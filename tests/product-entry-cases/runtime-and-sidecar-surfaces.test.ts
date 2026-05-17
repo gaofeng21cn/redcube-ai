@@ -233,6 +233,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'review_repair_transport',
         'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
+        'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
       ],
     );
     assert.equal(
@@ -277,6 +278,8 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'generic_cli_mcp_wrappers',
         'codex_executor_adapter',
         'observability_stability_read_model',
+        'visual_pack_compiler_handoff',
+        'visual_authority_functions',
       ],
     );
     assert.equal(sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.length, 0);
@@ -287,6 +290,17 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.current_safe_tombstone_candidate_count,
       0,
+    );
+    assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values, [
+      'opl_owned_replacement',
+      'opl_generated_surface',
+      'declarative_pack',
+      'minimal_authority_function',
+      'retire_tombstone',
+    ]);
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.visual_pack_compiler_handoff_ref,
+      '/visual_pack_compiler_handoff',
     );
     assert.match(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.no_safe_tombstone_candidate_reason,
@@ -348,6 +362,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_standard_domain_agent_generated_cli_mcp_wrappers',
     );
     assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'generic_cli_mcp_wrappers').migration_class,
+      'opl_generated_surface',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'visual_pack_compiler_handoff').migration_class,
+      'declarative_pack',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'visual_authority_functions').migration_class,
+      'minimal_authority_function',
+    );
+    assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').rca_owned_visual_domain_authority,
       false,
     );
@@ -356,7 +382,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_stability_read_model_and_observability_export',
     );
     for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.modules) {
-      assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
+      if (entry.module_id === 'visual_authority_functions') {
+        assert.equal(entry.opl_replacement_expectation.owner, 'redcube_ai', entry.module_id);
+      } else {
+        assert.equal(entry.opl_replacement_expectation.owner, 'opl', entry.module_id);
+      }
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
       assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
@@ -371,6 +401,49 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.source_manifest_refs.controlled_visual_stage_attempt_ref, '/controlled_visual_stage_attempt');
     assert.equal(sidecar.source_manifest_refs.controlled_memory_apply_proof_ref, '/controlled_memory_apply_proof');
     assert.equal(sidecar.runtime_residue_retirement.status, 'active_path_retired');
+    assert.equal(sidecar.mapped_surfaces.visual_pack_compiler_handoff.ref, '/visual_pack_compiler_handoff');
+    assert.equal(sidecar.mapped_surfaces.visual_pack_compiler_handoff.consumer, 'opl_pack_compiler');
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.declarative_visual_pack_input.compiler_owner,
+      'opl',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.declarative_visual_pack_input.repository_boundary.repo_tracks_generated_wrapper_outputs,
+      false,
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.generated_surface_targets,
+      [
+        'cli_wrapper',
+        'mcp_wrapper',
+        'product_entry_wrapper',
+        'product_sidecar_wrapper',
+        'status_projection_wrapper',
+        'session_wrapper',
+        'workbench_wrapper',
+        'functional_harness_wrapper',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.generated_surfaces_are_not_rca_long_term_owner,
+      true,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.authority_boundary.opl_can_authorize_review_export_verdict,
+      false,
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.minimal_authority_function_contract.allowed_functions,
+      [
+        'source_readiness_verdict',
+        'communication_visual_direction_decision',
+        'review_export_verdict',
+        'artifact_mutation_authorization',
+        'visual_memory_accept_reject',
+        'owner_receipt_signer',
+        'native_helper_implementation',
+      ],
+    );
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.gateway_first_public_entry, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.repo_local_manager_default, false);

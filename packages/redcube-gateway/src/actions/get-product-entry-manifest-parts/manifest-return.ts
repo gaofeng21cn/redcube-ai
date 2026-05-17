@@ -134,6 +134,7 @@ export function buildReturnedManifestProjection({
   nativePptOperatorUx,
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
+  visualPackCompilerHandoff,
   privatizedFunctionalModuleAudit,
   oplSubstrateAdapterExport,
   oplFamilyLifecycleAdapter,
@@ -236,6 +237,10 @@ export function buildReturnedManifestProjection({
     lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
     visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
     visual_transition_evaluator: visualTransitionEvaluator,
+    visual_pack_compiler_handoff: (
+      visualPackCompilerHandoff
+      || manifest.visual_pack_compiler_handoff
+    ),
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption || manifest.opl_generic_primitive_consumption,
     opl_stability_read_model_consumption: (

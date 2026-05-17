@@ -16,7 +16,9 @@
         "standard domain-agent skeleton mapping",
         "OPL generic primitive consumer projection",
         "OPL stability read-model consumer projection",
-        "OPL substrate adapter refs-only export"
+        "OPL substrate adapter refs-only export",
+        "declarative visual pack compiler input",
+        "OPL generated surface handoff"
       ],
       "opl_role": "discovery_queue_handoff_receipt_projection_consumer"
     },
@@ -1642,6 +1644,255 @@
         "rca_artifact_lifecycle_owner": false,
         "rca_review_repair_transport_owner": false,
         "rca_observability_export_owner": false
+      }
+    },
+    "visual_pack_compiler_handoff": {
+      "surface_kind": "visual_pack_compiler_handoff",
+      "projection_id": "rca.visual_pack_compiler_handoff.v1",
+      "ref": "/visual_pack_compiler_handoff",
+      "visual_pack_compiler_input_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+      "generated_surface_handoff_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+      "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+      "owner": "redcube_ai",
+      "consumer": "opl_pack_compiler",
+      "status": "machine_handoff_surface_landed",
+      "projection_mode": "declarative_visual_pack_input_with_generated_surface_handoff",
+      "read_only": true,
+      "refs_only": true,
+      "declares_production_soak_complete": false,
+      "declarative_visual_pack_input": {
+        "input_id": "rca.declarative_visual_pack_input.v1",
+        "owner": "redcube_ai",
+        "compiler_owner": "opl",
+        "input_mode": "domain_descriptor_refs_only",
+        "generated_surface_mode": "opl_generated_or_migration_bridge_only",
+        "source_refs": [
+          {
+            "source_id": "domain_descriptor",
+            "ref": "/standard_domain_agent_skeleton"
+          },
+          {
+            "source_id": "deliverable_family_graph",
+            "ref": "/family_stage_control_plane"
+          },
+          {
+            "source_id": "action_metadata",
+            "ref": "/family_action_catalog"
+          },
+          {
+            "source_id": "visual_transition_spec",
+            "ref": "/visual_transition_spec"
+          },
+          {
+            "source_id": "review_export_policies",
+            "refs": [
+              "/review_state",
+              "/publication_projection"
+            ]
+          },
+          {
+            "source_id": "artifact_locator_policy",
+            "ref": "/artifact_locator_contract"
+          },
+          {
+            "source_id": "memory_locator_policy",
+            "ref": "/domain_memory_descriptor_locator"
+          },
+          {
+            "source_id": "receipt_schema",
+            "ref": "/domain_owner_receipt_contract"
+          },
+          {
+            "source_id": "lifecycle_receipt_schema",
+            "ref": "/lifecycle_guarded_apply_proof"
+          },
+          {
+            "source_id": "native_helper_catalog",
+            "ref": "contracts/runtime-program/python-native-helper-catalog.json"
+          }
+        ],
+        "required_input_families": [
+          "domain_descriptor",
+          "deliverable_family_graph",
+          "stage_action_metadata",
+          "source_readiness_policy",
+          "visual_transition_spec",
+          "review_export_policy",
+          "artifact_locator_policy",
+          "memory_locator_policy",
+          "receipt_schema",
+          "authority_function_manifest",
+          "oracle_fixtures"
+        ],
+        "authority_function_manifest": {
+          "owner": "redcube_ai",
+          "retained_functions": [
+            "source_readiness_verdict",
+            "communication_visual_direction_decision",
+            "review_export_verdict",
+            "artifact_mutation_authorization",
+            "visual_memory_accept_reject",
+            "owner_receipt_signer",
+            "native_helper_implementation"
+          ],
+          "retained_function_count": 7,
+          "all_other_generic_shells_generated_by_opl": true
+        },
+        "repository_boundary": {
+          "repo_tracks_declarative_pack_input": true,
+          "repo_tracks_generated_wrapper_outputs": false,
+          "repo_tracks_workbench_shell": false,
+          "repo_tracks_visual_or_export_artifact_blobs": false,
+          "repo_tracks_visual_memory_body": false,
+          "repo_tracks_live_receipt_instances": false
+        }
+      },
+      "generated_surface_handoff": {
+        "handoff_id": "rca.opl_generated_surface_handoff.v1",
+        "owner": "opl",
+        "consumer": "redcube_ai",
+        "generation_owner": "opl_pack_compiler",
+        "rca_role": "declarative_visual_pack_provider_and_authority_function_owner",
+        "generated_surface_targets": [
+          "cli_wrapper",
+          "mcp_wrapper",
+          "product_entry_wrapper",
+          "product_sidecar_wrapper",
+          "status_projection_wrapper",
+          "session_wrapper",
+          "workbench_wrapper",
+          "functional_harness_wrapper"
+        ],
+        "rca_generated_surface_owner": false,
+        "current_rca_shell_status": "migration_bridge_until_opl_generated_surface_live",
+        "rca_may_keep_migration_bridge_until": [
+          "opl_generated_surface_live",
+          "active_callers_migrated",
+          "domain_authority_refs_preserved",
+          "no_regression_proof_recorded"
+        ],
+        "generated_surfaces_are_not_rca_long_term_owner": true,
+        "wrappers": {
+          "cli": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "mcp": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "product_entry": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "sidecar": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "status": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "session": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "workbench": {
+            "owner": "opl",
+            "current_rca_role": "generated_surface",
+            "long_term_rca_owner": false
+          },
+          "harness": {
+            "owner": "opl",
+            "current_rca_role": "generated_surface",
+            "long_term_rca_owner": false
+          }
+        },
+        "authority_boundary": {
+          "opl_can_generate_cli_wrapper": true,
+          "opl_can_generate_mcp_wrapper": true,
+          "opl_can_generate_product_entry_wrapper": true,
+          "opl_can_generate_sidecar_wrapper": true,
+          "opl_can_generate_status_projection": true,
+          "opl_can_generate_session_shell": true,
+          "opl_can_generate_workbench_shell": true,
+          "opl_can_generate_functional_harness": true,
+          "opl_can_write_rca_visual_truth": false,
+          "opl_can_authorize_source_readiness": false,
+          "opl_can_authorize_communication_visual_direction": false,
+          "opl_can_authorize_review_export_verdict": false,
+          "opl_can_authorize_artifact_mutation": false,
+          "opl_can_accept_or_reject_visual_memory": false,
+          "opl_can_issue_owner_receipt": false,
+          "opl_can_own_native_helper_implementation": false
+        }
+      },
+      "minimal_authority_function_contract": {
+        "contract_id": "rca.minimal_authority_functions.v1",
+        "owner": "redcube_ai",
+        "allowed_functions": [
+          "source_readiness_verdict",
+          "communication_visual_direction_decision",
+          "review_export_verdict",
+          "artifact_mutation_authorization",
+          "visual_memory_accept_reject",
+          "owner_receipt_signer",
+          "native_helper_implementation"
+        ],
+        "forbidden_rca_long_term_owner_surfaces": [
+          "cli_wrapper",
+          "mcp_wrapper",
+          "product_entry_wrapper",
+          "product_sidecar_wrapper",
+          "status_projection_wrapper",
+          "session_wrapper",
+          "workbench_wrapper",
+          "functional_harness_wrapper"
+        ],
+        "only_allowed_long_term_rca_authority": true,
+        "function_boundaries": {
+          "source_readiness_verdict": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "communication_visual_direction_decision": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "review_export_verdict": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "artifact_mutation_authorization": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "visual_memory_accept_reject": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "owner_receipt_signer": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "native_helper_implementation": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          }
+        }
       }
     }
   },
@@ -4349,6 +4600,255 @@
             "rca_review_repair_transport_owner": false,
             "rca_observability_export_owner": false
           }
+        },
+        "visual_pack_compiler_handoff": {
+          "surface_kind": "visual_pack_compiler_handoff",
+          "projection_id": "rca.visual_pack_compiler_handoff.v1",
+          "ref": "/visual_pack_compiler_handoff",
+          "visual_pack_compiler_input_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+          "generated_surface_handoff_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+          "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+          "owner": "redcube_ai",
+          "consumer": "opl_pack_compiler",
+          "status": "machine_handoff_surface_landed",
+          "projection_mode": "declarative_visual_pack_input_with_generated_surface_handoff",
+          "read_only": true,
+          "refs_only": true,
+          "declares_production_soak_complete": false,
+          "declarative_visual_pack_input": {
+            "input_id": "rca.declarative_visual_pack_input.v1",
+            "owner": "redcube_ai",
+            "compiler_owner": "opl",
+            "input_mode": "domain_descriptor_refs_only",
+            "generated_surface_mode": "opl_generated_or_migration_bridge_only",
+            "source_refs": [
+              {
+                "source_id": "domain_descriptor",
+                "ref": "/standard_domain_agent_skeleton"
+              },
+              {
+                "source_id": "deliverable_family_graph",
+                "ref": "/family_stage_control_plane"
+              },
+              {
+                "source_id": "action_metadata",
+                "ref": "/family_action_catalog"
+              },
+              {
+                "source_id": "visual_transition_spec",
+                "ref": "/visual_transition_spec"
+              },
+              {
+                "source_id": "review_export_policies",
+                "refs": [
+                  "/review_state",
+                  "/publication_projection"
+                ]
+              },
+              {
+                "source_id": "artifact_locator_policy",
+                "ref": "/artifact_locator_contract"
+              },
+              {
+                "source_id": "memory_locator_policy",
+                "ref": "/domain_memory_descriptor_locator"
+              },
+              {
+                "source_id": "receipt_schema",
+                "ref": "/domain_owner_receipt_contract"
+              },
+              {
+                "source_id": "lifecycle_receipt_schema",
+                "ref": "/lifecycle_guarded_apply_proof"
+              },
+              {
+                "source_id": "native_helper_catalog",
+                "ref": "contracts/runtime-program/python-native-helper-catalog.json"
+              }
+            ],
+            "required_input_families": [
+              "domain_descriptor",
+              "deliverable_family_graph",
+              "stage_action_metadata",
+              "source_readiness_policy",
+              "visual_transition_spec",
+              "review_export_policy",
+              "artifact_locator_policy",
+              "memory_locator_policy",
+              "receipt_schema",
+              "authority_function_manifest",
+              "oracle_fixtures"
+            ],
+            "authority_function_manifest": {
+              "owner": "redcube_ai",
+              "retained_functions": [
+                "source_readiness_verdict",
+                "communication_visual_direction_decision",
+                "review_export_verdict",
+                "artifact_mutation_authorization",
+                "visual_memory_accept_reject",
+                "owner_receipt_signer",
+                "native_helper_implementation"
+              ],
+              "retained_function_count": 7,
+              "all_other_generic_shells_generated_by_opl": true
+            },
+            "repository_boundary": {
+              "repo_tracks_declarative_pack_input": true,
+              "repo_tracks_generated_wrapper_outputs": false,
+              "repo_tracks_workbench_shell": false,
+              "repo_tracks_visual_or_export_artifact_blobs": false,
+              "repo_tracks_visual_memory_body": false,
+              "repo_tracks_live_receipt_instances": false
+            }
+          },
+          "generated_surface_handoff": {
+            "handoff_id": "rca.opl_generated_surface_handoff.v1",
+            "owner": "opl",
+            "consumer": "redcube_ai",
+            "generation_owner": "opl_pack_compiler",
+            "rca_role": "declarative_visual_pack_provider_and_authority_function_owner",
+            "generated_surface_targets": [
+              "cli_wrapper",
+              "mcp_wrapper",
+              "product_entry_wrapper",
+              "product_sidecar_wrapper",
+              "status_projection_wrapper",
+              "session_wrapper",
+              "workbench_wrapper",
+              "functional_harness_wrapper"
+            ],
+            "rca_generated_surface_owner": false,
+            "current_rca_shell_status": "migration_bridge_until_opl_generated_surface_live",
+            "rca_may_keep_migration_bridge_until": [
+              "opl_generated_surface_live",
+              "active_callers_migrated",
+              "domain_authority_refs_preserved",
+              "no_regression_proof_recorded"
+            ],
+            "generated_surfaces_are_not_rca_long_term_owner": true,
+            "wrappers": {
+              "cli": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "mcp": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "product_entry": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "sidecar": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "status": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "session": {
+                "owner": "opl",
+                "current_rca_role": "migration_bridge",
+                "long_term_rca_owner": false
+              },
+              "workbench": {
+                "owner": "opl",
+                "current_rca_role": "generated_surface",
+                "long_term_rca_owner": false
+              },
+              "harness": {
+                "owner": "opl",
+                "current_rca_role": "generated_surface",
+                "long_term_rca_owner": false
+              }
+            },
+            "authority_boundary": {
+              "opl_can_generate_cli_wrapper": true,
+              "opl_can_generate_mcp_wrapper": true,
+              "opl_can_generate_product_entry_wrapper": true,
+              "opl_can_generate_sidecar_wrapper": true,
+              "opl_can_generate_status_projection": true,
+              "opl_can_generate_session_shell": true,
+              "opl_can_generate_workbench_shell": true,
+              "opl_can_generate_functional_harness": true,
+              "opl_can_write_rca_visual_truth": false,
+              "opl_can_authorize_source_readiness": false,
+              "opl_can_authorize_communication_visual_direction": false,
+              "opl_can_authorize_review_export_verdict": false,
+              "opl_can_authorize_artifact_mutation": false,
+              "opl_can_accept_or_reject_visual_memory": false,
+              "opl_can_issue_owner_receipt": false,
+              "opl_can_own_native_helper_implementation": false
+            }
+          },
+          "minimal_authority_function_contract": {
+            "contract_id": "rca.minimal_authority_functions.v1",
+            "owner": "redcube_ai",
+            "allowed_functions": [
+              "source_readiness_verdict",
+              "communication_visual_direction_decision",
+              "review_export_verdict",
+              "artifact_mutation_authorization",
+              "visual_memory_accept_reject",
+              "owner_receipt_signer",
+              "native_helper_implementation"
+            ],
+            "forbidden_rca_long_term_owner_surfaces": [
+              "cli_wrapper",
+              "mcp_wrapper",
+              "product_entry_wrapper",
+              "product_sidecar_wrapper",
+              "status_projection_wrapper",
+              "session_wrapper",
+              "workbench_wrapper",
+              "functional_harness_wrapper"
+            ],
+            "only_allowed_long_term_rca_authority": true,
+            "function_boundaries": {
+              "source_readiness_verdict": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "communication_visual_direction_decision": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "review_export_verdict": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "artifact_mutation_authorization": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "visual_memory_accept_reject": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "owner_receipt_signer": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              },
+              "native_helper_implementation": {
+                "owner": "redcube_ai",
+                "output_refs_only_for_opl": true,
+                "opl_can_authorize": false
+              }
+            }
+          }
         }
       },
       "artifacts": {
@@ -5887,6 +6387,255 @@
         "rca_artifact_lifecycle_owner": false,
         "rca_review_repair_transport_owner": false,
         "rca_observability_export_owner": false
+      }
+    },
+    "visual_pack_compiler_handoff": {
+      "surface_kind": "visual_pack_compiler_handoff",
+      "projection_id": "rca.visual_pack_compiler_handoff.v1",
+      "ref": "/visual_pack_compiler_handoff",
+      "visual_pack_compiler_input_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+      "generated_surface_handoff_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+      "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+      "owner": "redcube_ai",
+      "consumer": "opl_pack_compiler",
+      "status": "machine_handoff_surface_landed",
+      "projection_mode": "declarative_visual_pack_input_with_generated_surface_handoff",
+      "read_only": true,
+      "refs_only": true,
+      "declares_production_soak_complete": false,
+      "declarative_visual_pack_input": {
+        "input_id": "rca.declarative_visual_pack_input.v1",
+        "owner": "redcube_ai",
+        "compiler_owner": "opl",
+        "input_mode": "domain_descriptor_refs_only",
+        "generated_surface_mode": "opl_generated_or_migration_bridge_only",
+        "source_refs": [
+          {
+            "source_id": "domain_descriptor",
+            "ref": "/standard_domain_agent_skeleton"
+          },
+          {
+            "source_id": "deliverable_family_graph",
+            "ref": "/family_stage_control_plane"
+          },
+          {
+            "source_id": "action_metadata",
+            "ref": "/family_action_catalog"
+          },
+          {
+            "source_id": "visual_transition_spec",
+            "ref": "/visual_transition_spec"
+          },
+          {
+            "source_id": "review_export_policies",
+            "refs": [
+              "/review_state",
+              "/publication_projection"
+            ]
+          },
+          {
+            "source_id": "artifact_locator_policy",
+            "ref": "/artifact_locator_contract"
+          },
+          {
+            "source_id": "memory_locator_policy",
+            "ref": "/domain_memory_descriptor_locator"
+          },
+          {
+            "source_id": "receipt_schema",
+            "ref": "/domain_owner_receipt_contract"
+          },
+          {
+            "source_id": "lifecycle_receipt_schema",
+            "ref": "/lifecycle_guarded_apply_proof"
+          },
+          {
+            "source_id": "native_helper_catalog",
+            "ref": "contracts/runtime-program/python-native-helper-catalog.json"
+          }
+        ],
+        "required_input_families": [
+          "domain_descriptor",
+          "deliverable_family_graph",
+          "stage_action_metadata",
+          "source_readiness_policy",
+          "visual_transition_spec",
+          "review_export_policy",
+          "artifact_locator_policy",
+          "memory_locator_policy",
+          "receipt_schema",
+          "authority_function_manifest",
+          "oracle_fixtures"
+        ],
+        "authority_function_manifest": {
+          "owner": "redcube_ai",
+          "retained_functions": [
+            "source_readiness_verdict",
+            "communication_visual_direction_decision",
+            "review_export_verdict",
+            "artifact_mutation_authorization",
+            "visual_memory_accept_reject",
+            "owner_receipt_signer",
+            "native_helper_implementation"
+          ],
+          "retained_function_count": 7,
+          "all_other_generic_shells_generated_by_opl": true
+        },
+        "repository_boundary": {
+          "repo_tracks_declarative_pack_input": true,
+          "repo_tracks_generated_wrapper_outputs": false,
+          "repo_tracks_workbench_shell": false,
+          "repo_tracks_visual_or_export_artifact_blobs": false,
+          "repo_tracks_visual_memory_body": false,
+          "repo_tracks_live_receipt_instances": false
+        }
+      },
+      "generated_surface_handoff": {
+        "handoff_id": "rca.opl_generated_surface_handoff.v1",
+        "owner": "opl",
+        "consumer": "redcube_ai",
+        "generation_owner": "opl_pack_compiler",
+        "rca_role": "declarative_visual_pack_provider_and_authority_function_owner",
+        "generated_surface_targets": [
+          "cli_wrapper",
+          "mcp_wrapper",
+          "product_entry_wrapper",
+          "product_sidecar_wrapper",
+          "status_projection_wrapper",
+          "session_wrapper",
+          "workbench_wrapper",
+          "functional_harness_wrapper"
+        ],
+        "rca_generated_surface_owner": false,
+        "current_rca_shell_status": "migration_bridge_until_opl_generated_surface_live",
+        "rca_may_keep_migration_bridge_until": [
+          "opl_generated_surface_live",
+          "active_callers_migrated",
+          "domain_authority_refs_preserved",
+          "no_regression_proof_recorded"
+        ],
+        "generated_surfaces_are_not_rca_long_term_owner": true,
+        "wrappers": {
+          "cli": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "mcp": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "product_entry": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "sidecar": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "status": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "session": {
+            "owner": "opl",
+            "current_rca_role": "migration_bridge",
+            "long_term_rca_owner": false
+          },
+          "workbench": {
+            "owner": "opl",
+            "current_rca_role": "generated_surface",
+            "long_term_rca_owner": false
+          },
+          "harness": {
+            "owner": "opl",
+            "current_rca_role": "generated_surface",
+            "long_term_rca_owner": false
+          }
+        },
+        "authority_boundary": {
+          "opl_can_generate_cli_wrapper": true,
+          "opl_can_generate_mcp_wrapper": true,
+          "opl_can_generate_product_entry_wrapper": true,
+          "opl_can_generate_sidecar_wrapper": true,
+          "opl_can_generate_status_projection": true,
+          "opl_can_generate_session_shell": true,
+          "opl_can_generate_workbench_shell": true,
+          "opl_can_generate_functional_harness": true,
+          "opl_can_write_rca_visual_truth": false,
+          "opl_can_authorize_source_readiness": false,
+          "opl_can_authorize_communication_visual_direction": false,
+          "opl_can_authorize_review_export_verdict": false,
+          "opl_can_authorize_artifact_mutation": false,
+          "opl_can_accept_or_reject_visual_memory": false,
+          "opl_can_issue_owner_receipt": false,
+          "opl_can_own_native_helper_implementation": false
+        }
+      },
+      "minimal_authority_function_contract": {
+        "contract_id": "rca.minimal_authority_functions.v1",
+        "owner": "redcube_ai",
+        "allowed_functions": [
+          "source_readiness_verdict",
+          "communication_visual_direction_decision",
+          "review_export_verdict",
+          "artifact_mutation_authorization",
+          "visual_memory_accept_reject",
+          "owner_receipt_signer",
+          "native_helper_implementation"
+        ],
+        "forbidden_rca_long_term_owner_surfaces": [
+          "cli_wrapper",
+          "mcp_wrapper",
+          "product_entry_wrapper",
+          "product_sidecar_wrapper",
+          "status_projection_wrapper",
+          "session_wrapper",
+          "workbench_wrapper",
+          "functional_harness_wrapper"
+        ],
+        "only_allowed_long_term_rca_authority": true,
+        "function_boundaries": {
+          "source_readiness_verdict": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "communication_visual_direction_decision": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "review_export_verdict": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "artifact_mutation_authorization": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "visual_memory_accept_reject": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "owner_receipt_signer": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          },
+          "native_helper_implementation": {
+            "owner": "redcube_ai",
+            "output_refs_only_for_opl": true,
+            "opl_can_authorize": false
+          }
+        }
       }
     }
   },

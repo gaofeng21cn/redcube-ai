@@ -56,6 +56,7 @@ import {
   buildOplStabilityReadModelConsumptionProjection,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildOplSubstrateAdapterExportProjection,
+  buildVisualPackCompilerHandoffProjection,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
 } from './product-sidecar-guarded-actions.js';
@@ -701,6 +702,7 @@ export async function getProductEntryManifest(request) {
   const familySchedulerReplacement = buildFamilySchedulerReplacementProjection();
   const oplGenericPrimitiveConsumption = buildOplGenericPrimitiveConsumptionProjection();
   const oplStabilityReadModelConsumption = buildOplStabilityReadModelConsumptionProjection();
+  const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
   const privatizedFunctionalModuleAudit = buildPrivatizedFunctionalModuleAuditProjection({
     familySchedulerReplacement,
     oplGenericPrimitiveConsumption,
@@ -767,6 +769,7 @@ export async function getProductEntryManifest(request) {
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
         privatized_functional_module_audit: privatizedFunctionalModuleAudit,
         opl_substrate_adapter_export: oplSubstrateAdapterExport,
+        visual_pack_compiler_handoff: visualPackCompilerHandoff,
         workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
         visual_transition_evaluator_ref: '/visual_transition_evaluator',
       },
@@ -910,6 +913,7 @@ export async function getProductEntryManifest(request) {
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
     opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
+    visual_pack_compiler_handoff: visualPackCompilerHandoff,
     privatized_functional_module_audit: privatizedFunctionalModuleAudit,
     opl_substrate_adapter_export: oplSubstrateAdapterExport,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
@@ -980,6 +984,7 @@ export async function getProductEntryManifest(request) {
     nativePptOperatorUx,
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
+    visualPackCompilerHandoff,
     privatizedFunctionalModuleAudit,
     oplSubstrateAdapterExport,
     oplFamilyLifecycleAdapter,

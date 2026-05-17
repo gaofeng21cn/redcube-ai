@@ -13,6 +13,7 @@ export function buildSidecarOwnerBoundary() {
     provider_owns_publication_gate: false,
     opl_owns_publication_gate: false,
     rca_owns_functional_harness: false,
+    rca_owns_generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper: false,
     rca_owns_generic_runtime: false,
     rca_owns_generic_scheduler: false,
     rca_owns_generic_daemon: false,

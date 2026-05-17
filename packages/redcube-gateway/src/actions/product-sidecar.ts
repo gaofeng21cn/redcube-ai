@@ -12,6 +12,7 @@ import {
   buildOplStabilityReadModelConsumptionProjection,
   buildPrivatizedFunctionalModuleAuditProjection,
   buildOplSubstrateAdapterExportProjection,
+  buildVisualPackCompilerHandoffProjection,
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
@@ -92,6 +93,10 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
     manifest.opl_substrate_adapter_export
     || buildOplSubstrateAdapterExportProjection()
   );
+  const visualPackCompilerHandoff = (
+    manifest.visual_pack_compiler_handoff
+    || buildVisualPackCompilerHandoffProjection()
+  );
   const visualTransitionEvaluator = (
     manifest.visual_transition_evaluator
     || buildVisualTransitionEvaluatorProjection({
@@ -127,6 +132,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
         privatized_functional_module_audit: privatizedFunctionalModuleAudit,
         opl_substrate_adapter_export: oplSubstrateAdapterExport,
+        visual_pack_compiler_handoff: visualPackCompilerHandoff,
         rca_is_functional_harness_owner: false,
         rca_is_generic_runtime_owner: false,
         rca_is_generic_scheduler_owner: false,
@@ -329,6 +335,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         writable_by_sidecar: false,
       },
       visual_transition_evaluator: visualTransitionEvaluator,
+      visual_pack_compiler_handoff: visualPackCompilerHandoff,
       family_scheduler_replacement: familySchedulerReplacement,
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
@@ -356,6 +363,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
       visual_transition_evaluator_ref: '/visual_transition_evaluator',
+      visual_pack_compiler_handoff_ref: '/visual_pack_compiler_handoff',
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
