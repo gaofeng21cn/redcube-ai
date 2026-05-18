@@ -499,7 +499,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     runtime_state_root: string;
     session_store_root: string;
   };
-  managed_runtime_contract: {
+  opl_provider_runtime_contract: {
     shared_contract_ref: string;
     runtime_owner: string;
     domain_owner: string;
@@ -565,7 +565,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
   current_truth: {
     product_entry_contract: string;
     opl_hosted_product_entry_contract: string;
-    managed_product_entry_contract: string;
+    session_continuity_provenance_contract: string;
   };
   session_continuity: {
     surface_kind: 'session_continuity';

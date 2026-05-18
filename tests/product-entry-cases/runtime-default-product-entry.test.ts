@@ -28,8 +28,8 @@ test('default product-entry path returns an OPL stage execution plan without req
     });
     assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime_inventory.executor_owner, 'configured_by_opl_runtime_provider');
-    assert.equal(manifest.managed_runtime_contract.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.managed_runtime_contract.executor_owner, 'configured_by_opl_runtime_provider');
+    assert.equal(manifest.opl_provider_runtime_contract.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.opl_provider_runtime_contract.executor_owner, 'configured_by_opl_runtime_provider');
     assert.equal(manifest.route_equivalence.downstream_runtime_truth.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.route_equivalence.downstream_runtime_truth.executor_owner, 'configured_by_opl_runtime_provider');
     assert.equal(manifest.runtime_inventory.substrate, 'opl_provider_backed_stage_attempt_runtime');
@@ -74,7 +74,7 @@ test('default product-entry path returns an OPL stage execution plan without req
     assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, '@redcube/codex-cli-client');
     assert.equal(invoked.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.equal(invoked.domain_entry_surface.result_surface.owner, 'one-person-lab');
-    assert.equal(invoked.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(invoked.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
     assert.equal(invoked.domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner, 'one-person-lab');
 
     const session = await getProductEntrySession({

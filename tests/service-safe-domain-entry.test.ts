@@ -123,7 +123,7 @@ test('invokeDomainEntry returns an OPL stage execution plan under the configured
     assert.equal(response.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.equal(response.result_surface.owner, 'one-person-lab');
     assert.equal(response.result_surface.provider_owner, 'opl_family_runtime_provider');
-    assert.equal(response.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(response.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
     assert.equal(response.result_surface.execution_model.rca_role, 'visual_domain_authority_functions_and_route_handler_refs');
     assert.equal(response.result_surface.control_policy.requested_stop_after_stage, 'storyline');
     assert.equal(response.result_surface.control_policy.approval_required, true);

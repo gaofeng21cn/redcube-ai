@@ -304,7 +304,7 @@ test('callDomainTool maps OPL stage-plan execution to the domain entry and retir
           surface_kind: 'opl_stage_execution_plan',
           plan_ref: 'opl-stage-execution-plan:ppt_deck:topic-a:deck-a:auto-to-terminal',
           execution_model: {
-            default_product_entry_executes_repo_local_managed_runner: false,
+            repo_local_stage_runner_active_caller: false,
           },
         },
       }),
@@ -313,7 +313,7 @@ test('callDomainTool maps OPL stage-plan execution to the domain entry and retir
 
   assert.equal(stagePlan.surface_kind, 'domain_entry');
   assert.equal(stagePlan.summary.actual_surface_kind, 'opl_stage_execution_plan');
-  assert.equal(stagePlan.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+  assert.equal(stagePlan.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
   await assert.rejects(
     () => callDomainTool(
       'redcube_deliverable',

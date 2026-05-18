@@ -147,7 +147,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_preflight.checks[3].status, 'pass');
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_hosted_handoff');
-    assert.equal(manifest.repo_mainline.active_baton_id, 'managed_product_entry_hardening');
+    assert.equal(manifest.repo_mainline.active_baton_provenance_id, 'managed_product_entry_hardening');
+    assert.equal(manifest.repo_mainline.active_baton_role, 'session_continuity_provenance');
     assert.equal(typeof manifest.product_entry_status.summary, 'string');
     assert.match(manifest.product_entry_status.summary, /product-entry overview\/intake surface/);
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
@@ -168,8 +169,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
-    assert.deepEqual(manifest.managed_runtime_contract, {
-      shared_contract_ref: 'contracts/opl-framework/managed-runtime-three-layer-contract.json',
+    assert.deepEqual(manifest.opl_provider_runtime_contract, {
+      shared_contract_ref: 'contracts/opl-framework/runtime-manager-contract.json',
       runtime_owner: 'configured_family_runtime_provider',
       domain_owner: 'redcube_ai',
       executor_owner: 'configured_by_opl_runtime_provider',
@@ -203,7 +204,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.runtime_inventory.workspace_binding.session_store_root, manifest.runtime.session_store_root);
     assert.equal(manifest.task_lifecycle.surface_kind, 'task_lifecycle');
     assert.equal(manifest.task_lifecycle.task_kind, 'visual_deliverable_loop');
-    assert.equal(manifest.task_lifecycle.task_id, 'managed_product_entry_hardening');
+    assert.equal(manifest.task_lifecycle.task_id, 'redcube_opl_stage_execution_plan_loop');
     assert.equal(manifest.task_lifecycle.status, 'resumable');
     assert.equal(
       manifest.task_lifecycle.progress_surface.command,

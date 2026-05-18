@@ -3,7 +3,7 @@ import { buildRuntimeLoopClosureManifestSurface } from '../product-entry-continu
 import {
   DEFAULT_RUNTIME_OWNER,
   OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-  MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+  SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
   PRODUCT_ENTRY_CONTRACT_REF,
 } from './policy.js';
 
@@ -24,8 +24,8 @@ export function buildManifestExtraPayload({
     current_truth: {
       product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
       opl_hosted_product_entry_contract: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-      managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
-      managed_contract_name_policy: 'legacy_provenance_name_for_session_continuity_not_rca_generic_runtime_owner',
+      session_continuity_provenance_contract: SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
+      provenance_contract_name_policy: 'legacy_file_name_for_session_continuity_not_rca_generic_runtime_owner',
     },
     session_continuity: {
       surface_kind: 'session_continuity',

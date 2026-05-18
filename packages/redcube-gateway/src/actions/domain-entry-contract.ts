@@ -39,7 +39,7 @@ export function buildRedCubeDomainEntryContract({
   serviceSafeDomainEntryContractRef,
   productEntryContractRef,
   oplHostedProductEntryContractRef,
-  managedProductEntryContractRef,
+  sessionContinuityProvenanceContractRef,
 }) {
   const commandCatalog = buildDomainEntryCommandCatalog([
     {
@@ -97,7 +97,7 @@ export function buildRedCubeDomainEntryContract({
       service_safe_contract_ref: serviceSafeDomainEntryContractRef,
       direct_product_entry_contract_ref: productEntryContractRef,
       opl_hosted_product_entry_contract_ref: oplHostedProductEntryContractRef,
-      managed_session_contract_ref: managedProductEntryContractRef,
+      session_continuity_provenance_contract_ref: sessionContinuityProvenanceContractRef,
       opl_hosted_handoff_ref: oplHostedProductEntryContractRef,
       domain_agent_entry_spec: RCA_DOMAIN_AGENT_ENTRY_SPEC_V1,
     },

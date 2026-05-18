@@ -87,7 +87,7 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     const [deckPlan, notePlan] = result.stage_execution_plans;
     assert.equal(deckPlan.surface_kind, 'opl_stage_execution_plan');
     assert.equal(deckPlan.owner, 'one-person-lab');
-    assert.equal(deckPlan.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(deckPlan.execution_model.repo_local_stage_runner_active_caller, false);
     assert.equal(deckPlan.execution_model.rca_role, 'visual_domain_authority_functions_and_route_handler_refs');
     assert.equal(deckPlan.delivery_identity.deliverable_family, 'ppt_deck');
     assert.equal(notePlan.delivery_identity.deliverable_family, 'xiaohongshu');

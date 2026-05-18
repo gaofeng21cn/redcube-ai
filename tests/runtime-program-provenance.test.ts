@@ -84,7 +84,7 @@ test('current runtime program keeps one active baton and machine-readable histor
   assert.equal(activeBaton.id, ACTIVE_BATON_ID);
   assert.equal(activeBaton.status, 'closeout_completed');
   assert.equal(activeBaton.review_status, 'verified');
-  assert.equal(activeBaton.artifacts.managed_product_entry_contract, ACTIVE_BATON_CONTRACT);
+  assert.equal(activeBaton.artifacts.session_continuity_provenance_contract, ACTIVE_BATON_CONTRACT);
   assert.equal(existsSync(path.resolve(ACTIVE_BATON_CONTRACT)), true);
 
   const activeContract = readJson(ACTIVE_BATON_CONTRACT);

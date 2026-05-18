@@ -26,7 +26,7 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 
 已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 仍属于证据门。
 
-2026-05-18 active surface scan 进一步确认：`supervise_managed_run`、`get_managed_run` 和 `product_entry_continuation` 只作为 retired-surface guard、deletion proof、negative test 或 provenance identifier 出现；active product-entry manifest、status 与 runtime inventory 不再用这些名字声明 RCA repo-local managed runtime owner。历史 `managed-product-entry-hardening` 文件名和 baton id 仅保留 session-continuity provenance，不作为当前 owner 语义。
+2026-05-18 active surface scan 进一步确认：`supervise_managed_run`、`get_managed_run` 和 `product_entry_continuation` 只作为 retired-surface guard、deletion proof、negative test 或 provenance identifier 出现；active product-entry manifest、status 与 runtime inventory 不再用这些名字声明 RCA repo-local managed runtime owner。Manifest、stage-control plane、OPL stage plan 和 runtime inventory 的 active machine fields 采用 `opl_provider_runtime_contract`、`repo_local_stage_runner_*`、`session_continuity_*` 口径。历史 `managed-product-entry-hardening` 文件名和 baton id 仅保留 session-continuity provenance，不作为当前 owner 语义。
 
 当前标准 OPL Agent 结构口径：
 

@@ -7,7 +7,7 @@ import {
 import { invokeProductEntry } from './invoke-product-entry.js';
 
 const OPL_HOSTED_PRODUCT_ENTRY_ID = 'opl_framework_hosted_product_entry';
-const MANAGED_RUNTIME_OWNER = 'configured_family_runtime_provider';
+const OPL_PROVIDER_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -44,12 +44,12 @@ function normalizeRuntimeSessionContract(request) {
     'runtime_session_contract.runtime_owner',
     contract?.runtime_owner || contract?.runtimeOwner,
   );
-  if (runtimeOwner !== MANAGED_RUNTIME_OWNER) {
-    throw new Error(`runtime_session_contract.runtime_owner 必须为 ${MANAGED_RUNTIME_OWNER}`);
+  if (runtimeOwner !== OPL_PROVIDER_RUNTIME_OWNER) {
+    throw new Error(`runtime_session_contract.runtime_owner 必须为 ${OPL_PROVIDER_RUNTIME_OWNER}`);
   }
   return buildRuntimeSessionContract({
     runtime_owner: runtimeOwner,
-    expected_runtime_owner: MANAGED_RUNTIME_OWNER,
+    expected_runtime_owner: OPL_PROVIDER_RUNTIME_OWNER,
   });
 }
 

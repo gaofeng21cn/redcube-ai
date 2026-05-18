@@ -11,8 +11,8 @@ import {
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
-export const OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT = Object.freeze({
-  contract_ref: 'contracts/opl-framework/managed-runtime-three-layer-contract.json',
+export const OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT = Object.freeze({
+  contract_ref: 'contracts/opl-framework/runtime-manager-contract.json',
   canonical_fail_closed_rules: [
     'domain_supervision_cannot_bypass_runtime',
     'executor_cannot_declare_global_gate_clear',

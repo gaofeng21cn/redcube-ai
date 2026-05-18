@@ -91,7 +91,7 @@ test('RCA exposes a thick OPL family lifecycle adapter while keeping SQLite defe
   assert.equal(adapter.sqlite_status, 'deferred_for_rca');
   assert.equal(adapter.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
   for (const surface of [
-    'managed-runs',
+    'session-continuity run envelopes',
     'product-entry sessions',
     'review state',
     'publication projection',
@@ -144,8 +144,8 @@ test('RCA stage control projection maps route stages without owning runtime cont
     rca_owns_artifact_authority: true,
     opl_role: 'read_only_stage_projection_consumer',
     default_ppt_route_changed: false,
-    managed_deliverable_runtime_changed: true,
-    repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
+    repo_local_stage_runner_retired: true,
+    repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
   });
 });
 
@@ -1026,8 +1026,8 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(stageProjection.status, 'repo_tracked_projection_contract');
   assert.equal(stageProjection.adapter_model, 'descriptor_and_stage_execution_plan_provider');
   assert.equal(stageProjection.default_ppt_route_changed, false);
-  assert.equal(stageProjection.managed_deliverable_runtime_changed, true);
-  assert.equal(stageProjection.repo_local_managed_deliverable_runtime_role, 'explicit_diagnostic_or_historical_regression_only');
+  assert.equal(stageProjection.repo_local_stage_runner_retired, true);
+  assert.equal(stageProjection.repo_local_stage_runner_role, 'tombstone_or_historical_regression_only');
   const attempt = payload.current_state.active_baton.scope.controlled_visual_stage_attempt;
 
   assert.equal(memory.status, DOMAIN_MEMORY_ADOPTION_STATE);

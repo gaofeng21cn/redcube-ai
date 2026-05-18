@@ -59,13 +59,13 @@ function deliveryProjectionIsOutputReady({ reviewState, publicationProjection, d
 }
 
 function buildRecommendedAction({
-  managedRun,
+  runtimeProjectionSurface,
   runtimeLoopClosure,
   reviewState,
   publicationProjection,
   deliverableId,
 }) {
-  const projection = managedRun?.progress_projection || null;
+  const projection = runtimeProjectionSurface?.progress_projection || null;
   if (projection?.needs_user_decision) {
     return 'decide_product_next_step';
   }
@@ -333,13 +333,13 @@ export async function getProductEntrySession(request) {
     ok: true,
     surface_kind: 'product_entry_session',
     recommended_action: buildRecommendedAction({
-      managedRun: null,
+      runtimeProjectionSurface: null,
       runtimeLoopClosure,
       reviewState,
       publicationProjection,
       deliverableId: session.deliverable_id,
     }),
-    product_entry_contract_id: 'managed_product_entry_hardening',
+    product_entry_contract_id: 'redcube_product_entry_session_continuity',
     entry_session: buildEntrySessionSurface({
       entry_session_id: entrySessionId,
       session_file: productEntrySessionPath(entrySessionId),

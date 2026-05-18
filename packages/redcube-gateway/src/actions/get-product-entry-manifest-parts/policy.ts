@@ -1,7 +1,7 @@
 // @ts-nocheck
 export const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
-export const MANAGED_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
+export const OPL_PROVIDER_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
 export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
 export const PRODUCT_STATUS_COMMAND = 'redcube product status';
 export const PRODUCT_START_COMMAND = 'redcube product start';
@@ -10,7 +10,7 @@ export const OPL_HOSTED_HANDOFF_REF = 'opl_framework:hosted_product_entry';
 export const PRODUCT_SESSION_COMMAND = 'redcube product session';
 export const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-entry-mvp.json';
 export const OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-framework-hosted-product-entry.json';
-export const MANAGED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
+export const SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF = 'contracts/runtime-program/managed-product-entry-hardening.json';
 export const SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF = 'contracts/runtime-program/service-safe-domain-entry-adapter.json';
 
 export const ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES = [

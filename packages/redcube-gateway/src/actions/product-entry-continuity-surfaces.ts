@@ -648,7 +648,7 @@ export function buildOplRuntimeManagerRegistration({
     consumable_projection_refs: ['/skill_catalog/skills/0/domain_projection/runtime_continuity', '/product_entry_shell/opl_hosted', '/session_continuity', '/artifact_inventory', '/runtime_inventory', '/review_state', '/publication_projection', '/opl_family_lifecycle_adapter', '/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
     state_index_inputs: {
       workspace_registry_index: '/workspace_locator',
-      managed_session_ledger_index: '/session_continuity',
+      session_continuity_ledger_index: '/session_continuity',
       artifact_projection_index: '/artifact_inventory',
       attention_queue_index: '/automation/automations/0',
       runtime_health_snapshot_index: '/runtime_inventory',

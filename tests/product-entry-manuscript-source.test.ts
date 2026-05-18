@@ -125,7 +125,7 @@ test('product-entry returns OPL plan while diagnostic route-level ppt deck prese
     assert.equal(response.ok, true);
     assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.equal(
-      response.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner,
+      response.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller,
       false,
     );
 

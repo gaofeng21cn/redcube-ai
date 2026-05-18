@@ -243,10 +243,10 @@ async function withMockCodexRuntimeCli(testFn) {
   }
 }
 
-test('CLI deliverable execute returns an OPL stage execution plan instead of starting repo-local managed runtime', async () => {
+test('CLI deliverable execute returns an OPL stage execution plan instead of starting repo-local stage runner', async () => {
   await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-stage-plan-'));
 
     await execCliAsync(
       cliPath,
@@ -319,7 +319,7 @@ test('CLI deliverable execute returns an OPL stage execution plan instead of sta
     assert.equal(executeParsed.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.equal(executeParsed.result_surface.owner, 'one-person-lab');
     assert.equal(
-      executeParsed.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner,
+      executeParsed.result_surface.execution_model.repo_local_stage_runner_active_caller,
       false,
     );
     assert.equal(executeParsed.result_surface.control_policy.requested_stop_after_stage, 'storyline');

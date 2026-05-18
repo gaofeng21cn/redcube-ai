@@ -118,7 +118,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       family_scheduler_replacement: familySchedulerReplacement,
       default_executor_policy: {
         selected_by: 'codex_or_domain_selected_executor',
-        domain_default_executor_owner: manifest.managed_runtime_contract?.executor_owner || 'codex_cli',
+        domain_default_executor_owner: manifest.opl_provider_runtime_contract?.executor_owner || 'codex_cli',
         executor_truth_owner: DOMAIN_ID,
       },
       rca_thin_surface_policy: {

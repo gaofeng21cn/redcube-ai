@@ -217,8 +217,8 @@ function stageDescriptor(stage, actionIds) {
       rca_owns_review_publication_projection: true,
       rca_owns_artifact_authority: true,
       default_ppt_route_changed: false,
-      managed_deliverable_runtime_changed: true,
-      repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
+      repo_local_stage_runner_retired: true,
+      repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
       independent_gate_receipt_required: Boolean(stage.independent_gate_receipt_required),
     },
   };
@@ -262,8 +262,8 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
       opl_can_write_review_truth: false,
       opl_can_write_publication_projection: false,
       default_ppt_route_changed: false,
-      managed_deliverable_runtime_changed: true,
-      repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
+      repo_local_stage_runner_retired: true,
+      repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
     },
     stages,
     notes: [

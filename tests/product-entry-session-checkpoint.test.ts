@@ -57,7 +57,7 @@ async function prepareProductEntryWorkspace() {
   return workspaceRoot;
 }
 
-test('getProductEntrySession projects the OPL stage execution plan checkpoint without a repo-local managed run', SERIAL_ENV_TEST, async () => {
+test('getProductEntrySession projects the OPL stage execution plan checkpoint without a repo-local stage runner', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 

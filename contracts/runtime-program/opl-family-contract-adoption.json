@@ -278,7 +278,7 @@
   "incident_projection": {
     "source_surfaces": [
       "runtimeWatch",
-      "managed deliverable report",
+      "OPL stage execution plan report",
       "review/export gate audit",
       "operator handoff"
     ],
@@ -306,7 +306,7 @@
     "surface_kind": "opl_family_lifecycle_adapter",
     "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
     "source_surfaces": [
-      "managed-runs",
+      "session-continuity run envelopes",
       "product-entry sessions",
       "review state",
       "publication projection",
@@ -338,7 +338,7 @@
     "maps_to_opl_contract": "opl_family_stage_control_plane.v1",
     "source_surfaces": [
       "hydrated overlay stage_sequence",
-      "managed-runs",
+      "session-continuity run envelopes",
       "runtimeWatch",
       "getReviewState",
       "getPublicationProjection",
@@ -464,12 +464,12 @@
       "rca_owns_artifact_authority": true,
       "opl_role": "read_only_stage_projection_consumer",
       "default_ppt_route_changed": false,
-      "managed_deliverable_runtime_changed": true,
-      "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+      "repo_local_stage_runner_retired": true,
+      "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
     },
     "opl_role": "stage_attempt_scheduler_and_projection_consumer",
-    "managed_deliverable_runtime_changed": true,
-    "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+    "repo_local_stage_runner_retired": true,
+    "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
   },
   "domain_memory_descriptor": {
     "surface_kind": "family_domain_memory_ref",

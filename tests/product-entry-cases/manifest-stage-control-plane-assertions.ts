@@ -79,10 +79,10 @@ export function assertManifestActionAndStageControlPlane({
   assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_review_truth, false);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_publication_projection, false);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.default_ppt_route_changed, false);
-  assert.equal(manifest.family_stage_control_plane.authority_boundary.managed_deliverable_runtime_changed, true);
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.repo_local_stage_runner_retired, true);
   assert.equal(
-    manifest.family_stage_control_plane.authority_boundary.repo_local_managed_deliverable_runtime_role,
-    'explicit_diagnostic_or_historical_regression_only',
+    manifest.family_stage_control_plane.authority_boundary.repo_local_stage_runner_role,
+    'tombstone_or_historical_regression_only',
   );
   assert.equal(manifest.family_stage_control_plane.freshness.status, 'current');
   assert.equal(manifest.family_stage_control_plane.freshness.checked_at, 'manifest_build');
@@ -167,14 +167,14 @@ export function assertManifestActionAndStageControlPlane({
     assert.equal(stage.authority_boundary.opl_can_write_review_truth, false);
     assert.equal(stage.authority_boundary.opl_can_write_publication_projection, false);
     assert.equal(stage.authority_boundary.default_ppt_route_changed, false);
-    assert.equal(stage.authority_boundary.managed_deliverable_runtime_changed, true);
-    assert.equal(stage.authority_boundary.repo_local_managed_deliverable_runtime_role, 'explicit_diagnostic_or_historical_regression_only');
+    assert.equal(stage.authority_boundary.repo_local_stage_runner_retired, true);
+    assert.equal(stage.authority_boundary.repo_local_stage_runner_role, 'tombstone_or_historical_regression_only');
   }
   const artifactStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'artifact_creation');
   assert.deepEqual(artifactStage.domain_stage_refs, ['author_image_pages', 'render_html', 'author_pptx_native']);
   assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
   assert.equal(artifactStage.authority_boundary.default_ppt_route_changed, false);
-  assert.equal(artifactStage.authority_boundary.managed_deliverable_runtime_changed, true);
+  assert.equal(artifactStage.authority_boundary.repo_local_stage_runner_retired, true);
   const reviewStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'review_and_revision');
   assert.deepEqual(reviewStage.visual_pattern_memory_refs, [
     '/domain_memory_descriptor_locator/writeback_proposal_generator',

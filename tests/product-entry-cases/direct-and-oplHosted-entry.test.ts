@@ -46,7 +46,7 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
     assert.equal(response.domain_entry_surface.result_surface.control_policy.mode, 'stop_after_stage');
     assert.equal(response.domain_entry_surface.result_surface.control_policy.requested_stop_after_stage, 'detailed_outline');
     assert.equal(response.domain_entry_surface.result_surface.owner, 'one-person-lab');
-    assert.equal(response.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(response.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
     assert.equal(response.runtime_loop_closure.control_policy.approval_required, true);
     assert.equal(response.summary.approval_required, true);
   });
@@ -209,7 +209,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
   });
 });
 
-test('invokeProductEntry rejects retired managed deliverable task intent without compatibility alias', SERIAL_ENV_TEST, async () => {
+test('invokeProductEntry rejects retired deliverable task intent without compatibility alias', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 

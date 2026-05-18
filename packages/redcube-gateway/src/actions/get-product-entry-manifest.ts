@@ -2,7 +2,9 @@
 import path from 'node:path';
 
 import { productEntrySessionDir } from '@redcube/runtime';
-import { buildManagedRuntimeContract } from 'opl-framework-shared/managed-runtime-contract';
+import {
+  buildManagedRuntimeContract as buildOplProviderRuntimeContract,
+} from 'opl-framework-shared/managed-runtime-contract';
 import {
   buildCheckpointSummary,
   buildRuntimeInventory,
@@ -62,7 +64,7 @@ import {
   listProductSidecarGuardedActionIds,
 } from './product-sidecar-guarded-actions.js';
 import {
-  OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
+  OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,
   buildDeliverableFacadeContract,
 } from './get-product-entry-manifest-parts/contracts.js';
@@ -73,7 +75,7 @@ import {
   DEFAULT_RUNTIME_OWNER,
   OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
   LONG_TASK_STAGE_POLICY,
-  MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+  SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
   PRODUCT_ENTRY_CONTRACT_REF,
   OPL_HOSTED_HANDOFF_REF,
   PRODUCT_STATUS_COMMAND,
@@ -113,7 +115,7 @@ export async function getProductEntryManifest(request) {
     serviceSafeDomainEntryContractRef: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
     productEntryContractRef: PRODUCT_ENTRY_CONTRACT_REF,
     oplHostedProductEntryContractRef: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-    managedProductEntryContractRef: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+    sessionContinuityProvenanceContractRef: SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
   });
   const userInteractionContract = buildRedCubeUserInteractionContract({
     productStatusCommand: PRODUCT_STATUS_COMMAND,
@@ -323,14 +325,14 @@ export async function getProductEntryManifest(request) {
     entryMode: 'manifest_projection',
     manifestProjection: true,
   });
-  const managedRuntimeContract = buildManagedRuntimeContract({
+  const oplProviderRuntimeContract = buildOplProviderRuntimeContract({
     runtime_owner: runtime.runtime_owner,
     domain_owner: 'redcube_ai',
     executor_owner: 'configured_by_opl_runtime_provider',
     supervision_status_surface: 'product_entry_session',
     attention_queue_surface: 'product_status',
     recovery_contract_surface: 'product_entry_session',
-    contract: OPL_FRAMEWORK_MANAGED_RUNTIME_CONTRACT,
+    contract: OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT,
   });
   const runtimeInventory = buildRuntimeInventory({
     summary: (
@@ -338,8 +340,8 @@ export async function getProductEntryManifest(request) {
       + 'and product-entry preflight/runtime surfaces; RCA remains a domain handler and authority surface.'
     ),
     runtime_owner: runtime.runtime_owner,
-    domain_owner: managedRuntimeContract.domain_owner,
-    executor_owner: managedRuntimeContract.executor_owner,
+    domain_owner: oplProviderRuntimeContract.domain_owner,
+    executor_owner: oplProviderRuntimeContract.executor_owner,
     substrate: 'opl_provider_backed_stage_attempt_runtime',
     availability: productEntryPreflight.ready_to_try_now ? 'ready' : 'attention_needed',
     health_status: productEntryPreflight.ready_to_try_now ? 'healthy' : 'degraded',
@@ -364,7 +366,7 @@ export async function getProductEntryManifest(request) {
       session_store_root: runtime.session_store_root,
     },
     domain_projection: {
-      managed_runtime_contract_ref: managedRuntimeContract.shared_contract_ref,
+      opl_provider_runtime_contract_ref: oplProviderRuntimeContract.shared_contract_ref,
       session_locator_field: familyOrchestration.resume_contract.session_locator_field,
       checkpoint_locator_field: familyOrchestration.resume_contract.checkpoint_locator_field,
     },
@@ -386,7 +388,7 @@ export async function getProductEntryManifest(request) {
   });
   const taskLifecycle = buildTaskLifecycle({
     task_kind: 'visual_deliverable_loop',
-    task_id: safeText(activeBaton.id, 'redcube_product_entry_loop'),
+    task_id: 'redcube_opl_stage_execution_plan_loop',
     status: 'resumable',
     summary: 'Continue the same RedCube deliverable loop via entry_session_id and persisted continuation snapshot.',
     progress_surface: {
@@ -538,8 +540,8 @@ export async function getProductEntryManifest(request) {
   const runtimeContinuityEnvelope = {
     surface_kind: 'skill_runtime_continuity',
     runtime_owner: runtime.runtime_owner,
-    domain_owner: managedRuntimeContract.domain_owner,
-    executor_owner: managedRuntimeContract.executor_owner,
+    domain_owner: oplProviderRuntimeContract.domain_owner,
+    executor_owner: oplProviderRuntimeContract.executor_owner,
     session_locator_field: familyOrchestration.resume_contract.session_locator_field,
     session_surface_ref: {
       ref_kind: 'json_pointer',
@@ -897,7 +899,8 @@ export async function getProductEntryManifest(request) {
       program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
       phase_id: safeText(currentState.phase_id, 'unknown_phase'),
       phase_label: safeText(currentState.phase_label, 'unknown phase'),
-      active_baton_id: safeText(activeBaton.id, 'unknown_baton'),
+      active_baton_provenance_id: safeText(activeBaton.id, 'unknown_baton'),
+      active_baton_role: 'session_continuity_provenance',
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
     product_entry_status: {
@@ -909,7 +912,7 @@ export async function getProductEntryManifest(request) {
       remaining_gaps_count: 2,
     },
     runtime,
-    managed_runtime_contract: managedRuntimeContract,
+    opl_provider_runtime_contract: oplProviderRuntimeContract,
     runtime_inventory: runtimeInventory,
     task_lifecycle: taskLifecycle,
     persistence_policy: persistencePolicy,
@@ -1010,6 +1013,7 @@ export async function getProductEntryManifest(request) {
     familyStageControlPlane,
     manifest,
     nativePptOperatorUx,
+    oplProviderRuntimeContract,
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
     visualPackCompilerHandoff,
@@ -1017,8 +1021,13 @@ export async function getProductEntryManifest(request) {
     oplSubstrateAdapterExport,
     oplFamilyLifecycleAdapter,
     operatorLoopActions,
+    runtimeInventory,
     productEntryShell,
     pptRoutePolicy,
+    taskLifecycle,
+    persistencePolicy,
+    lifecycleLedger,
+    ownerRoute,
     runtimeResidueRetirement,
     standardDomainAgentSkeleton,
     visualTransitionEvaluator,

@@ -97,8 +97,8 @@ export async function buildOplStageExecutionPlan({
     },
     execution_model: {
       model: 'opl_provider_backed_stage_attempt_runtime',
-      default_product_entry_executes_repo_local_managed_runner: false,
-      repo_local_managed_runner_role: 'explicit_diagnostic_or_historical_regression_only',
+      repo_local_stage_runner_active_caller: false,
+      repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
       stage_attempt_orchestrator_owner: OPL_STAGE_ATTEMPT_OWNER,
       attempt_ledger_owner: OPL_ATTEMPT_LEDGER_OWNER,
       retry_liveness_queue_owner: OPL_STAGE_EXECUTION_OWNER,

@@ -6384,8 +6384,8 @@
       "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
       "consumer_follow_through_scope": "default OPL stage execution plan / source-first fanout stage-plan handoff / generated surface ownership projection",
       "live_soak_claimed": false,
-      "default_product_entry_executes_repo_local_managed_runner": false,
-      "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
+      "repo_local_stage_runner_active_caller": false,
+      "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
     },
     "opl_family_scheduler_replacement": {
       "ref": "/family_scheduler_replacement",
@@ -6949,7 +6949,7 @@
         "current_host_stream_signal": "codex_exec_terminal_event_received",
         "current_host_closeout_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "current_host_latest_route_proof": [
-          "2026-04-13: local Codex CLI route and managed execution pass repo smoke with structured generation held inside runtime-family.",
+          "2026-04-13: local Codex CLI route and OPL stage execution pass repo smoke with structured generation held inside runtime-family.",
           "2026-04-13: ppt_deck / xiaohongshu / poster_onepager creative stages stay on AI-first Codex structured generation without pack/compiler fallback."
         ]
       },
@@ -7165,14 +7165,14 @@
           ],
           "core_generation_logic_changed": false,
           "default_truth_surface": "buildOplStageExecutionPlan",
-          "default_product_entry_executes_repo_local_managed_runner": false,
-          "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
+          "repo_local_stage_runner_active_caller": false,
+          "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
         },
         "opl_family_lifecycle_adapter": {
           "status": "repo_tracked_projection_contract",
           "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
           "source_surfaces": [
-            "managed-runs",
+            "session-continuity run envelopes",
             "product-entry sessions",
             "review/publication projections",
             "artifact inventory",
@@ -7209,8 +7209,8 @@
           "domain_truth_owner": "redcube_ai",
           "opl_role": "stage_attempt_scheduler_and_projection_consumer",
           "default_ppt_route_changed": false,
-          "managed_deliverable_runtime_changed": true,
-          "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+          "repo_local_stage_runner_retired": true,
+          "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
         },
         "domain_memory_descriptor_locator": {
           "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
@@ -11176,16 +11176,16 @@
             }
           }
         },
-        "default_product_entry_executes_repo_local_managed_runner": false,
-        "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_stage_runner_active_caller": false,
+        "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
       },
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
         "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
-        "managed_product_entry_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+        "session_continuity_provenance_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
         "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
-        "managed_product_entry_brief": "human_doc:program_managed_product_entry_hardening",
+        "session_continuity_provenance_brief": "human_doc:program_managed_product_entry_hardening",
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
         "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
