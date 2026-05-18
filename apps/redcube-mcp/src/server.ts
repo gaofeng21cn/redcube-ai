@@ -34,7 +34,6 @@ import {
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
-  runManagedDeliverable,
   runtimeWatch,
   buildRedCubeActionMetadata,
 } from '@redcube/gateway';
@@ -68,7 +67,7 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   executeSourceAugmentation,
   auditDeliverable,
   reviewRenderOutput,
-  runManagedDeliverable,
+  invokeManagedDeliverableStagePlan,
   getManagedRun,
   superviseManagedRun,
   runDeliverableRoute,
@@ -128,7 +127,7 @@ const TOOL_ROUTE_DEFINITIONS = {
     routes: {
       create_deliverable: 'createDeliverable',
       get_deliverable: 'getDeliverable',
-      run_managed_deliverable: 'runManagedDeliverable',
+      run_managed_deliverable: 'invokeManagedDeliverableStagePlan',
       get_managed_run: 'getManagedRun',
       supervise_managed_run: 'superviseManagedRun',
       run_deliverable_route: 'runDeliverableRoute',
@@ -312,6 +311,37 @@ export function getDomainActions(overrides = {}) {
     ...DEFAULT_DOMAIN_ACTIONS,
     ...overrides,
   };
+}
+
+export async function invokeManagedDeliverableStagePlan(args: Record<string, unknown>) {
+  return invokeDomainEntry({
+    target_domain_id: 'redcube_ai',
+    task_intent: 'run_managed_deliverable',
+    entry_mode: 'mcp_deliverable_action',
+    workspace_locator: {
+      workspace_root: String(args.workspaceRoot || args.workspace_root || ''),
+    },
+    runtime_session_contract: {
+      runtime_owner: 'configured_family_runtime_provider',
+      session_mode: 'ephemeral_run',
+    },
+    return_surface_contract: {
+      surface_kind: 'opl_stage_execution_plan',
+    },
+    domain_payload: {
+      deliverable_family: String(args.overlay || args.deliverable_family || ''),
+      topic_id: String(args.topicId || args.topic_id || ''),
+      deliverable_id: String(args.deliverableId || args.deliverable_id || ''),
+      route: typeof args.route === 'string' ? args.route : undefined,
+      adapter: typeof args.adapter === 'string' ? args.adapter : undefined,
+      user_intent: typeof args.userIntent === 'string' ? args.userIntent : String(args.user_intent || ''),
+      stop_after_stage: typeof args.stopAfterStage === 'string' ? args.stopAfterStage : String(args.stop_after_stage || ''),
+      mode: typeof args.mode === 'string' ? args.mode : 'draft_new',
+      baseline_deliverable_id: typeof args.baselineDeliverableId === 'string'
+        ? args.baselineDeliverableId
+        : String(args.baseline_deliverable_id || ''),
+    },
+  });
 }
 
 function findToolDefinition(name: string) {

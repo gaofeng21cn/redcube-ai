@@ -553,11 +553,13 @@ export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fan
   source_pack_manifest?: Record<string, unknown>;
   planner?: Record<string, unknown>;
   created_deliverables?: DeliverableCreateResponse[];
+  stage_execution_plans?: Record<string, unknown>[];
   managed_runs?: ManagedRunResponse[];
   summary: {
     topic_id: string;
     source_barrier_status: string;
     deliverable_count: number;
+    stage_execution_plan_count?: number;
     managed_run_count: number;
     parallel_family_ready?: boolean;
     max_parallel_width?: number;

@@ -22,6 +22,7 @@
             "updated_at"
         ],
         "latest_handle_fields": [
+            "latest_stage_execution_plan_ref",
             "latest_managed_run_id",
             "latest_run_id"
         ],
@@ -36,6 +37,7 @@
         ],
         "continuity_truth": {
             "restore_point_fields": [
+                "continuation_snapshot.latest_stage_execution_plan_ref",
                 "continuation_snapshot.latest_managed_run_id",
                 "continuation_snapshot.latest_run_id",
                 "session_continuity.restore_point.latest_handle"

@@ -38,12 +38,30 @@ function buildControlPolicy({ projection, manifestProjection = false }) {
 }
 
 function buildRestorePoint({ continuationSnapshot }) {
+  const latestStageExecutionPlanRef = continuationSnapshot?.latest_stage_execution_plan_ref || null;
   const latestManagedRunId = continuationSnapshot?.latest_managed_run_id || null;
   const latestRunId = continuationSnapshot?.latest_run_id || null;
   return {
-    latest_handle: latestManagedRunId || latestRunId || null,
+    latest_handle: latestStageExecutionPlanRef || latestManagedRunId || latestRunId || null,
+    latest_stage_execution_plan_ref: latestStageExecutionPlanRef,
     latest_managed_run_id: latestManagedRunId,
     latest_run_id: latestRunId,
+  };
+}
+
+function projectionFromStageExecutionPlan(stageExecutionPlan) {
+  if (!stageExecutionPlan) return null;
+  const summary = stageExecutionPlan.summary || {};
+  return {
+    projection_kind: 'opl_stage_execution_plan_projection',
+    content_status: 'planned_for_opl_stage_execution',
+    current_stage: summary.first_stage || null,
+    terminal_stage: summary.terminal_stage || null,
+    planned_stage_count: summary.planned_stage_count || 0,
+    needs_user_decision: Boolean(stageExecutionPlan.control_policy?.approval_required),
+    completed_stages: [],
+    remaining_stages: safeArray(stageExecutionPlan.stage_attempts).map((stage) => stage.stage_id).filter(Boolean),
+    final_artifact_refs: [],
   };
 }
 
@@ -75,7 +93,9 @@ export function buildSessionContinuitySurface({
 }
 
 export function buildProgressProjectionSurface({ continuationSnapshot }) {
-  const projection = continuationSnapshot?.managed_progress_projection || null;
+  const projection = continuationSnapshot?.managed_progress_projection
+    || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
+    || null;
   if (!projection) {
     return null;
   }
@@ -83,6 +103,7 @@ export function buildProgressProjectionSurface({ continuationSnapshot }) {
   const refs = continuationSnapshot?.runtime_supervision?.refs || null;
   return {
     surface_kind: 'progress_projection',
+    stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
     managed_run_id: continuationSnapshot?.latest_managed_run_id || null,
     projection,
     refs,
@@ -100,7 +121,9 @@ export function buildArtifactInventorySurface({
   continuationSnapshot,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
-  const projection = continuationSnapshot?.managed_progress_projection || null;
+  const projection = continuationSnapshot?.managed_progress_projection
+    || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
+    || null;
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
     ? projection.final_artifact_refs
     : [];
@@ -137,7 +160,9 @@ export function buildRuntimeLoopClosureSurface({
   entryMode,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
-  const projection = continuationSnapshot?.managed_progress_projection || null;
+  const projection = continuationSnapshot?.managed_progress_projection
+    || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
+    || null;
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
     ? projection.final_artifact_refs
     : [];
@@ -147,11 +172,14 @@ export function buildRuntimeLoopClosureSurface({
     resume_point: {
       entry_session_id: safeText(entrySessionId) || null,
       session_file: safeText(sessionFile) || null,
+      latest_stage_execution_plan_ref: restorePoint.latest_stage_execution_plan_ref,
       latest_managed_run_id: restorePoint.latest_managed_run_id,
       latest_run_id: restorePoint.latest_run_id,
       latest_handle: restorePoint.latest_handle,
       resume_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: restorePoint.latest_stage_execution_plan_ref
+        ? 'continuation_snapshot.latest_stage_execution_plan_ref'
+        : 'continuation_snapshot.latest_managed_run_id',
     },
     continuity_cursor: {
       surface_kind: 'session_continuity',
@@ -162,6 +190,7 @@ export function buildRuntimeLoopClosureSurface({
     progress_cursor: {
       surface_kind: 'progress_projection',
       surface_ref: '/progress_projection',
+      stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
       managed_run_id: continuationSnapshot?.latest_managed_run_id || null,
       current_stage: projection?.current_stage ?? null,
       content_status: projection?.content_status ?? null,
@@ -199,6 +228,7 @@ export function buildRuntimeLoopClosureManifestSurface({
     resume_point: {
       entry_session_id: null,
       session_file: null,
+      latest_stage_execution_plan_ref: null,
       latest_managed_run_id: null,
       latest_run_id: null,
       latest_handle: null,
@@ -214,6 +244,7 @@ export function buildRuntimeLoopClosureManifestSurface({
     progress_cursor: {
       surface_kind: 'progress_projection',
       surface_ref: '/progress_projection',
+      stage_execution_plan_ref: null,
       managed_run_id: null,
       current_stage: null,
       content_status: null,
@@ -248,12 +279,15 @@ export function buildRuntimeLoopClosureManifestSurface({
 function buildOplFamilyOwnerSplit({ runtimeOwner }) {
   void runtimeOwner;
   return {
-    family_persistence_owner: REDCUBE_LOOP_OWNER,
+    family_persistence_owner: 'one-person-lab',
+    session_shell_owner: 'one-person-lab',
+    stage_attempt_owner: 'one-person-lab',
+    attempt_ledger_owner: 'one-person-lab',
     lifecycle_projection_owner: REDCUBE_LOOP_OWNER,
     domain_truth_owner: REDCUBE_LOOP_OWNER,
     review_publication_owner: REDCUBE_LOOP_OWNER,
     runtime_manager_consumer: 'opl_runtime_manager',
-    executor_owner: 'codex_cli',
+    executor_owner: 'configured_by_opl_runtime_provider',
   };
 }
 
@@ -273,15 +307,15 @@ function buildOplFamilyRouteSurfaces() {
     },
     {
       surface_id: 'product_entry_session',
-      surface_kind: 'product_entry_session',
+      surface_kind: 'opl_generated_product_entry_session',
       ref: '/session_continuity',
-      owner: REDCUBE_LOOP_OWNER,
+      owner: 'one-person-lab',
     },
     {
-      surface_id: 'managed_run_store',
-      surface_kind: 'managed_run',
-      ref: '/continuation_snapshot/latest_managed_run_id',
-      owner: REDCUBE_LOOP_OWNER,
+      surface_id: 'opl_stage_execution_plan',
+      surface_kind: 'opl_stage_execution_plan',
+      ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
+      owner: 'one-person-lab',
     },
     {
       surface_id: 'review_state',
@@ -328,10 +362,16 @@ function buildOplFamilyPersistence({
       ],
     },
     session: {
-      surface_kind: 'product_entry_session',
+      surface_kind: 'opl_generated_product_entry_session',
       entry_session_id: safeText(entrySessionId) || null,
       session_file: safeText(sessionFile) || null,
       latest_handle: restorePoint.latest_handle,
+    },
+    stage_execution_plan: {
+      surface_kind: 'opl_stage_execution_plan',
+      plan_ref: restorePoint.latest_stage_execution_plan_ref,
+      provider_owner: 'opl_family_runtime_provider',
+      attempt_ledger_owner: 'one-person-lab',
     },
     managed_run: {
       surface_kind: 'managed_run',
@@ -382,7 +422,9 @@ function buildOplFamilyLifecycle({
   reviewState,
   publicationProjection,
 }) {
-  const projection = continuationSnapshot?.managed_progress_projection || null;
+  const projection = continuationSnapshot?.managed_progress_projection
+    || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
+    || null;
   const runtimeSupervision = continuationSnapshot?.runtime_supervision || null;
   return {
     lifecycle_contract_id: 'opl_family_runtime_attempt_contract.v1',
@@ -473,11 +515,12 @@ function buildOplFamilyAdoption({
       'deliverable_id',
     ],
     resume_surface: {
-      surface_kind: 'product_entry_session',
+      surface_kind: 'opl_generated_product_entry_session',
       command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
       entry_session_id: safeText(entrySessionId) || null,
       session_file: safeText(sessionFile) || null,
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: runtimeLoopClosure?.resume_point?.checkpoint_locator_field
+        || 'continuation_snapshot.latest_stage_execution_plan_ref',
     },
     next_surface_ref: runtimeLoopClosure?.control_policy?.continue_action?.surface_kind === 'product_entry_session'
       ? '/session_continuity'

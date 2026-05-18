@@ -1,5 +1,5 @@
 // @ts-nocheck
-export const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+export const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const MANAGED_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
 export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
@@ -25,7 +25,7 @@ export const ROUTE_EQUIVALENCE_SHARED_TRUTH_SURFACES = [
 
 export const DELIVERABLE_FACADE_TRUTH_SURFACES = [
   'createDeliverable',
-  'runManagedDeliverable',
+  'buildOplStageExecutionPlan',
   'runDeliverableRoute',
   'auditDeliverable',
   'runtimeWatch',

@@ -5,14 +5,14 @@ import {
 } from 'opl-framework-shared/product-entry-companions';
 
 import { runDeliverableRoute } from './run-deliverable-route.js';
-import { runManagedDeliverable } from './run-managed-deliverable.js';
+import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
-const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const TASK_INTENT_SURFACE_KIND = {
-  run_managed_deliverable: 'managed_run',
+  run_managed_deliverable: 'opl_stage_execution_plan',
   run_deliverable_route: 'route_run',
 };
 
@@ -120,16 +120,18 @@ export async function invokeDomainEntry(request) {
 
   let resultSurface;
   if (taskIntent === 'run_managed_deliverable') {
-    resultSurface = await runManagedDeliverable({
+    resultSurface = await buildOplStageExecutionPlan({
       workspaceRoot,
       overlay: domainPayload.overlay,
       topicId: domainPayload.topicId,
       deliverableId: domainPayload.deliverableId,
+      route: domainPayload.route || undefined,
       adapter: domainPayload.adapter || undefined,
       userIntent: domainPayload.userIntent || undefined,
       stopAfterStage: domainPayload.stopAfterStage || undefined,
       mode: domainPayload.mode || undefined,
       baselineDeliverableId: domainPayload.baselineDeliverableId || undefined,
+      entryMode,
     });
   } else if (taskIntent === 'run_deliverable_route') {
     resultSurface = await runDeliverableRoute({
@@ -179,6 +181,7 @@ export async function invokeDomainEntry(request) {
       task_intent: taskIntent,
       actual_surface_kind: resultSurface.surface_kind,
       target_handle: resultSurface.summary?.managed_run_id
+        || resultSurface.summary?.stage_execution_plan_ref
         || resultSurface.summary?.run_id
         || null,
     },

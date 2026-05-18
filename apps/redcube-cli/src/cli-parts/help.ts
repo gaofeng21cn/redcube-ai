@@ -254,11 +254,11 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
       },
       {
-        task: '托管执行整个交付链路并查看 managed 进度',
-        command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] && redcube managed get --workspace-root <dir> --managed-run-id <id>',
+        task: '生成 OPL stage execution plan 并交给 OPL provider 执行',
+        command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>]',
       },
       {
-        task: '触发一次 supervisor tick 刷新托管监管面',
+        task: '读取 managed run diagnostic projection',
         command: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       },
       {

@@ -162,7 +162,7 @@
     {
       "action_id": "get_product_entry_session",
       "title": "Read RedCube product-entry session",
-      "summary": "读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。",
+      "summary": "读取 OPL generated session shell 所需的 RCA entry-session domain snapshot refs；RCA 不持有 generic session/workbench owner。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {

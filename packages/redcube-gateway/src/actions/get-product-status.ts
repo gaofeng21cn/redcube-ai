@@ -7,7 +7,7 @@ import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continui
 
 import type { ProductEntryManifestResponse, ProductStatusResponse, RuntimeLoopClosureSurface } from '../types.js';
 
-const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
 type GatewayProductEntryManifest = ProductEntryManifestResponse & {
   deliverable_facade?: {

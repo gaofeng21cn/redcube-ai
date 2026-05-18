@@ -7,7 +7,6 @@ import type {
   DomainEntryRequest,
   DomainEntryResponse,
   ManagedRunRecordResponse,
-  ManagedRunResponse,
   ManagedSupervisionResponse,
   OverlayCatalogResponse,
   ProductEntryRequest,
@@ -18,7 +17,6 @@ import type {
   ReviewMutationResponse,
   ReviewStateResponse,
   RouteRunResponse,
-  RunManagedDeliverableRequest,
   RunRecordResponse,
   RuntimeWatchResponse,
   SourceAugmentationResponse,
@@ -91,7 +89,6 @@ export interface CliDomainActions {
     route: string;
     adapter?: string;
   }): Promise<RouteRunResponse>;
-  runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse>;
 }
 
 export interface CliDependencies {
@@ -113,7 +110,6 @@ export type CliRunSurface =
   | DeliverableRecordResponse
   | DomainEntryResponse
   | DeliverableAuditResponse
-  | ManagedRunResponse
   | ManagedRunRecordResponse
   | ManagedSupervisionResponse
   | RouteRunResponse

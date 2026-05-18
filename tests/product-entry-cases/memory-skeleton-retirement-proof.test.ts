@@ -39,7 +39,7 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
 
     assert.equal(manifest.runtime_residue_retirement.surface_kind, 'runtime_residue_retirement_audit');
     assert.equal(manifest.runtime_residue_retirement.status, 'active_path_retired');
-    assert.equal(manifest.runtime_residue_retirement.default_runtime_owner, 'codex_cli');
+    assert.equal(manifest.runtime_residue_retirement.default_runtime_owner, 'configured_family_runtime_provider');
     assert.deepEqual(manifest.runtime_residue_retirement.retired_default_surfaces, [
       'hermes_first_default_runtime',
       'gateway_first_public_entry',

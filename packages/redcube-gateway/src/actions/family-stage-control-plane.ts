@@ -148,9 +148,10 @@ function stageDescriptor(stage, actionIds) {
       { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'rca_publication_projection' },
     ],
     handoff: {
-      next_owner: 'redcube_ai',
+      next_owner: 'one-person-lab',
       resume_surface_ref: '/session_continuity',
       artifact_surface_ref: '/artifact_inventory',
+      stage_execution_plan_ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
     },
     authority_boundary: {
       domain_truth_owner: 'redcube_ai',
@@ -158,7 +159,9 @@ function stageDescriptor(stage, actionIds) {
       artifact_authority_owner: 'redcube_ai',
       review_publication_projection_owner: 'redcube_ai',
       opl_role: 'projection_consumer_only',
-      opl_can_schedule_stage: false,
+      opl_stage_attempt_owner: 'one-person-lab',
+      opl_can_schedule_stage: true,
+      opl_can_schedule_stage_attempt: true,
       opl_can_write_visual_truth: false,
       opl_can_write_review_truth: false,
       opl_can_write_publication_projection: false,
@@ -166,7 +169,8 @@ function stageDescriptor(stage, actionIds) {
       rca_owns_review_publication_projection: true,
       rca_owns_artifact_authority: true,
       default_ppt_route_changed: false,
-      managed_deliverable_runtime_changed: false,
+      managed_deliverable_runtime_changed: true,
+      repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
     },
   };
 }
@@ -202,17 +206,20 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
       rca_owns_visual_truth: true,
       rca_owns_review_publication_projection: true,
       rca_owns_artifact_authority: true,
-      opl_can_schedule_stage: false,
+      opl_stage_attempt_owner: 'one-person-lab',
+      opl_can_schedule_stage: true,
+      opl_can_schedule_stage_attempt: true,
       opl_can_write_visual_truth: false,
       opl_can_write_review_truth: false,
       opl_can_write_publication_projection: false,
       default_ppt_route_changed: false,
-      managed_deliverable_runtime_changed: false,
+      managed_deliverable_runtime_changed: true,
+      repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
     },
     stages,
     notes: [
       'Descriptor-only projection over existing RCA route stages.',
-      'OPL discovery must not schedule routes, change default PPT route, or own visual/artifact authority.',
+      'OPL provider may schedule stage attempts from this descriptor; it must not own RCA visual/artifact/review authority.',
     ],
   };
 }

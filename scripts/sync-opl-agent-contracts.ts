@@ -66,7 +66,7 @@ function buildSkeleton() {
   return buildStandardDomainAgentSkeleton({
     workspaceRoot: '<workspace_root>',
     runtime: {
-      runtime_owner: 'codex_cli',
+      runtime_owner: 'configured_family_runtime_provider',
       runtime_state_root: '<runtime_state_root>',
       session_store_root: '<session_store_root>',
     },

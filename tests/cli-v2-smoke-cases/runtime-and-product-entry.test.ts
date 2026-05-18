@@ -243,7 +243,7 @@ async function withMockCodexRuntimeCli(testFn) {
   }
 }
 
-test('CLI deliverable execute, managed get, and managed supervise proxy the managed execution control plane', async () => {
+test('CLI deliverable execute returns an OPL stage execution plan instead of starting repo-local managed runtime', async () => {
   await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-managed-'));
@@ -315,41 +315,15 @@ test('CLI deliverable execute, managed get, and managed supervise proxy the mana
       { cwd: path.resolve('.') },
     );
     assert.equal(executeParsed.ok, true);
-    assert.equal(executeParsed.surface_kind, 'managed_run');
-    assert.equal(executeParsed.summary.status, 'stopped_after_stage');
-
-    const managedParsed = await execCliAsync(
-      cliPath,
-      [
-        'managed',
-        'get',
-        '--workspace-root',
-        workspaceRoot,
-        '--managed-run-id',
-        executeParsed.summary.managed_run_id,
-      ],
-      { cwd: path.resolve('.') },
+    assert.equal(executeParsed.surface_kind, 'domain_entry');
+    assert.equal(executeParsed.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(executeParsed.result_surface.owner, 'one-person-lab');
+    assert.equal(
+      executeParsed.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner,
+      false,
     );
-    assert.equal(managedParsed.ok, true);
-    assert.equal(managedParsed.surface_kind, 'managed_run_record');
-    assert.equal(managedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
-    assert.equal(managedParsed.runtime_supervision.health_status, 'paused');
-
-    const supervisedParsed = await execCliAsync(
-      cliPath,
-      [
-        'managed',
-        'supervise',
-        '--workspace-root',
-        workspaceRoot,
-        '--managed-run-id',
-        executeParsed.summary.managed_run_id,
-      ],
-      { cwd: path.resolve('.') },
-    );
-    assert.equal(supervisedParsed.ok, true);
-    assert.equal(supervisedParsed.surface_kind, 'managed_supervision');
-    assert.equal(supervisedParsed.summary.managed_run_id, executeParsed.summary.managed_run_id);
+    assert.equal(executeParsed.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(executeParsed.summary.actual_surface_kind, 'opl_stage_execution_plan');
   });
 });
 

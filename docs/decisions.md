@@ -118,7 +118,7 @@
 - `RedCube AI` 的公开首页、docs 入口和核心五件套先表达独立 visual-deliverable domain agent 身份，再表达 OPL 托管路径。
 - 公开发布包装固定为 `RedCube AI Foundry Agent / OPL-compatible package built on OPL Framework`：single `redcube-ai` app skill、service-safe domain entry、product sidecar/projection、stage control projection 和 standard domain-agent skeleton mapping 是同一 package 的不同 surface。
 - `OPL` 在 RCA 文档中固定解释为 stage-led 的完整智能体运行框架，可作为外部依赖托管 RCA；它不成为 RCA 对外第一身份，也不接管 visual-domain truth、canonical artifacts、review/export gate 或 publication projection。
-- `Codex CLI` 是 RCA direct path 和未显式选择 hosted/proof backend 的 OPL-hosted path 的默认最小具体执行单元。
+- `Codex CLI` 是 OPL provider/executor adapter 可选的第一公民 concrete executor；RCA direct/default product-entry 的 runtime owner 是 `configured_family_runtime_provider`，默认返回 OPL stage execution plan。
 - 旧 `gateway`、`frontdoor`、`federation`、`harness-first`、`OPL-hosted handoff`、Hermes-first 口径只能出现在内部集成、provenance、合同引用、或 tombstone 语境中；仍被 runtime-program 合同引用的 reader-context brief 按生命周期迁入 `docs/active/` 或 `docs/history/`，通过 lifecycle note 降级，不再保留旧 `docs/program/` 活跃目录。
 
 ### 决策：RCA 对齐 OPL Temporal-backed production runtime，Temporal 为 OPL 生产必需 substrate
@@ -130,7 +130,7 @@
 
 ### 决策：RCA 消费 OPL 统一 Agent Executor Adapter receipt
 
-- RCA 的 concrete executor 默认仍是 `Codex CLI`；显式非默认 executor 通过 OPL generic Agent Executor Adapter 进入，RCA 只消费 OPL executor receipt / product sidecar receipt refs。
+- RCA 的 runtime owner 不再是 concrete executor；默认 runtime owner 是 OPL provider。`Codex CLI` 仍是第一公民 concrete executor 选项；显式非默认 executor 通过 OPL generic Agent Executor Adapter 进入，RCA 只消费 OPL executor receipt / product sidecar receipt refs。
 - `Hermes-Agent`、`Claude Code` 等只作为显式 opt-in backend。它们必须可接入、可回执、可审计、fail-closed，但不承诺输出质量、视觉审美、tool semantics、resume 或 artifact 结果与 Codex CLI 等价。
 - RCA 保留 visual route truth、review/export gate、canonical artifacts、publication projection truth 和 visual-domain quality authority；generic executor owner 不进入 RCA。
 - 当前状态：除真实 production-hosted controlled visual stage soak 外，本边界已落地到 status/runtime architecture/product sidecar/receipt proof 口径；旧 Hermes/Gateway/local-manager active path 已降为 explicit proof/provenance/history。
@@ -173,7 +173,7 @@
 ### 决策：默认公开能力面收口为稳定 capability surface
 
 - `RedCube AI` 对外默认合同优先冻结为 `CLI`、`MCP`、`invokeDomainEntry`、`invokeProductEntry`、本地脚本与 repo-tracked contracts 这一组稳定 callable surface。
-- `Codex CLI` 继续作为当前第一公民 concrete executor。
+- `configured_family_runtime_provider` 是默认 product-entry runtime owner；`Codex CLI` 继续作为当前第一公民 concrete executor 选项。
 - `Hermes-Agent` 相关路径只保留为显式 hosted/proof backend 或技术参考，不改写默认公开合同。
 
 ## 2026-04-11
@@ -246,7 +246,7 @@
 - 状态：此段保留为 2026-04-21 owner split 背景；当前 active owner split 以 2026-05-10 provider-backed OPL runtime target 为准。
 - `Hermes-Agent` 不再作为默认 managed runtime owner；OPL stage-led family runtime provider 承担托管路径，Temporal 是 production required provider，Hermes 只保留为可选 Agent executor adapter 或 proof lane。
 - `RedCube AI` 继续持有 visual-domain truth 与 domain durable surfaces。
-- `Codex CLI` 继续是 executor adapter 选中的第一公民 concrete executor，除非拿到显式 proof，不改默认 owner split。
+- `Codex CLI` 继续是 executor adapter 选中的第一公民 concrete executor 选项；runtime owner split 以 OPL provider 持有 stage attempt runtime / attempt ledger 为准。
 
 ### 决策：OPL 角色收口到 family-level runtime hosting
 

@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -57,7 +57,7 @@ async function prepareProductEntryWorkspace() {
   return workspaceRoot;
 }
 
-test('getProductEntrySession reconciles a stale session checkpoint with the workspace latest managed run', SERIAL_ENV_TEST, async () => {
+test('getProductEntrySession projects the OPL stage execution plan checkpoint without a repo-local managed run', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -93,39 +93,31 @@ test('getProductEntrySession reconciles a stale session checkpoint with the work
       },
     });
 
-    assert.notEqual(
-      continued.continuation_snapshot.latest_managed_run_id,
-      first.continuation_snapshot.latest_managed_run_id,
-    );
-
     const sessionFile = continued.entry_session.session_file;
-    const storedSession = readJson(sessionFile);
-    writeFileSync(
-      sessionFile,
-      JSON.stringify({
-        ...storedSession,
-        latest_managed_run_id: first.continuation_snapshot.latest_managed_run_id,
-        latest_surface_kind: 'managed_run',
-      }, null, 2),
-      'utf-8',
+    assert.notEqual(
+      continued.continuation_snapshot.latest_stage_execution_plan_ref,
+      first.continuation_snapshot.latest_stage_execution_plan_ref,
     );
+    assert.equal(continued.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal(readJson(sessionFile).latest_surface_kind, 'opl_stage_execution_plan');
 
     const session = await getProductEntrySession({
       entry_session_id: 'session-stale-checkpoint',
     });
 
     assert.equal(
-      session.continuation_snapshot.latest_managed_run_id,
-      continued.continuation_snapshot.latest_managed_run_id,
+      session.continuation_snapshot.latest_stage_execution_plan_ref,
+      continued.continuation_snapshot.latest_stage_execution_plan_ref,
     );
     assert.equal(
-      session.session_continuity.restore_point.latest_managed_run_id,
-      continued.continuation_snapshot.latest_managed_run_id,
+      session.session_continuity.restore_point.latest_stage_execution_plan_ref,
+      continued.continuation_snapshot.latest_stage_execution_plan_ref,
     );
     assert.equal(
-      readJson(sessionFile).latest_managed_run_id,
-      continued.continuation_snapshot.latest_managed_run_id,
+      readJson(sessionFile).latest_stage_execution_plan_ref,
+      continued.continuation_snapshot.latest_stage_execution_plan_ref,
     );
+    assert.equal(session.runtime_loop_closure.resume_point.checkpoint_locator_field, 'continuation_snapshot.latest_stage_execution_plan_ref');
   });
 });
 

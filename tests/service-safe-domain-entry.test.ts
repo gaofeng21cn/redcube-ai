@@ -63,7 +63,7 @@ async function prepareDomainEntryWorkspace() {
   return workspaceRoot;
 }
 
-test('invokeDomainEntry runs the service-safe managed deliverable adapter under the configured OPL provider contract', async () => {
+test('invokeDomainEntry returns an OPL stage execution plan under the configured provider contract', async () => {
   await withMockCodexRuntime(async () => {
     const sharedCompanions = await importGatewaySharedModule('opl-framework-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
@@ -81,7 +81,7 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
         session_mode: 'ephemeral_run',
       },
       return_surface_contract: {
-        surface_kind: 'managed_run',
+        surface_kind: 'opl_stage_execution_plan',
       },
       domain_payload: {
         deliverable_family: 'ppt_deck',
@@ -109,9 +109,9 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
     assert.deepEqual(
       response.return_surface_contract,
       sharedCompanions.buildReturnSurfaceContract({
-        requested_surface_kind: 'managed_run',
-        expected_surface_kind: 'managed_run',
-        actual_surface_kind: 'managed_run',
+        requested_surface_kind: 'opl_stage_execution_plan',
+        expected_surface_kind: 'opl_stage_execution_plan',
+        actual_surface_kind: 'opl_stage_execution_plan',
         durable_truth_surfaces: [
           'runtimeWatch',
           'getReviewState',
@@ -120,9 +120,15 @@ test('invokeDomainEntry runs the service-safe managed deliverable adapter under 
         ],
       }),
     );
-    assert.equal(response.result_surface.surface_kind, 'managed_run');
-    assert.equal(response.result_surface.managed_run.runtime_bridge?.owner, 'codex_cli');
-    assert.equal(response.result_surface.runtime_supervision.runtime_owner, 'codex_cli');
+    assert.equal(response.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(response.result_surface.owner, 'one-person-lab');
+    assert.equal(response.result_surface.provider_owner, 'opl_family_runtime_provider');
+    assert.equal(response.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(response.result_surface.execution_model.rca_role, 'visual_domain_authority_functions_and_route_handler_refs');
+    assert.equal(response.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(response.result_surface.control_policy.approval_required, true);
+    assert.equal(response.result_surface.stage_attempts[0].owner_split.route_handler_owner, 'redcube_ai');
+    assert.equal(response.result_surface.stage_attempts[0].owner_split.stage_attempt_owner, 'opl_family_runtime_provider');
   });
 });
 
@@ -133,7 +139,7 @@ test('invokeDomainEntry rejects unsupported target domains', async () => {
       task_intent: 'run_managed_deliverable',
       workspace_locator: { workspace_root: '/tmp/redcube' },
       runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
-      return_surface_contract: { surface_kind: 'managed_run' },
+      return_surface_contract: { surface_kind: 'opl_stage_execution_plan' },
       domain_payload: {
         deliverable_family: 'ppt_deck',
         topic_id: 'topic-a',
@@ -161,7 +167,7 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
           session_mode: 'ephemeral_run',
         },
         return_surface_contract: {
-          surface_kind: 'managed_run',
+          surface_kind: 'opl_stage_execution_plan',
         },
         domain_payload: {
           deliverable_family: 'ppt_deck',
@@ -200,7 +206,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
         deliverable_id: 'deck-a',
       },
     }),
-      /product entry companion requested_surface_kind 必须是 managed_run/,
+      /product entry companion requested_surface_kind 必须是 opl_stage_execution_plan/,
     );
   });
 });
@@ -210,7 +216,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
   const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
-  assert.equal(contract.runtime_session_contract.default_runtime_owner, 'codex_cli');
+  assert.equal(contract.runtime_session_contract.default_runtime_owner, 'configured_family_runtime_provider');
   assert.equal(contract.runtime_session_contract.hosted_runtime_owner_when_opl_hosted, 'configured_family_runtime_provider');
   assert.deepEqual(contract.opl_handoff_envelope.minimum_fields, [
     'target_domain_id',
@@ -226,7 +232,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
     'return_surface_contract.surface_kind',
   ]);
   assert.deepEqual(contract.validation.task_intent_surface_kind_map, {
-    run_managed_deliverable: 'managed_run',
+    run_managed_deliverable: 'opl_stage_execution_plan',
     run_deliverable_route: 'route_run',
   });
   assert.equal(contract.redcube_domain_payload.required_fields.includes('deliverable_family'), true);

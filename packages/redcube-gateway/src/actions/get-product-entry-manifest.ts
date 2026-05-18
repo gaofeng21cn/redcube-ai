@@ -186,7 +186,7 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryOverview = {
     ...buildProductEntryOverview({
-    summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    summary: 'Repo-verified product-entry overview/intake surface 已 landed；默认 invoke 生成 OPL stage execution plan 并交给 OPL provider 推进；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
     product_entry_command: PRODUCT_STATUS_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
@@ -202,7 +202,7 @@ export async function getProductEntryManifest(request) {
     recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-      '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
+      '继续把 OPL-hosted stage runtime handoff 作为默认 production consumption 路径验证到真实长跑证据。',
     ],
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,
@@ -267,7 +267,7 @@ export async function getProductEntryManifest(request) {
     fully_automatic: false,
     summary: (
       '当前可以作为 RedCube 的 agent-facing product-entry overview / CLI product-entry 主线使用，'
-      + 'OPL-hosted stage runtime handoff contract 也已冻结给外层壳读取，'
+      + '默认 product-entry 已返回 OPL stage execution plan / RCA authority refs，'
       + '但还不是成熟的最终用户前台或托管 Web 产品。'
     ),
     recommended_start_surface: 'product_status',
@@ -326,7 +326,7 @@ export async function getProductEntryManifest(request) {
   const managedRuntimeContract = buildManagedRuntimeContract({
     runtime_owner: runtime.runtime_owner,
     domain_owner: 'redcube_ai',
-    executor_owner: 'codex_cli',
+    executor_owner: 'configured_by_opl_runtime_provider',
     supervision_status_surface: 'product_entry_session',
     attention_queue_surface: 'product_status',
     recovery_contract_surface: 'product_entry_session',
@@ -340,7 +340,7 @@ export async function getProductEntryManifest(request) {
     runtime_owner: runtime.runtime_owner,
     domain_owner: managedRuntimeContract.domain_owner,
     executor_owner: managedRuntimeContract.executor_owner,
-    substrate: 'codex_cli_runtime',
+    substrate: 'opl_provider_backed_stage_attempt_runtime',
     availability: productEntryPreflight.ready_to_try_now ? 'ready' : 'attention_needed',
     health_status: productEntryPreflight.ready_to_try_now ? 'healthy' : 'degraded',
     status_surface: {

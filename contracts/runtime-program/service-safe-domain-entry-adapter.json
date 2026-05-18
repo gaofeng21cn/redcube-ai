@@ -5,7 +5,7 @@
   "owner_surface": "@redcube/gateway invokeDomainEntry",
   "entry_goal": {
     "label": "service-safe RedCube domain entry for OPL hosted integration handoff",
-    "summary": "Freeze one machine-readable RedCube domain adapter surface. Direct RedCube product-entry uses Codex CLI by default; the OPL-hosted path remains a thin product-managed adapter/projection layer over the configured family runtime provider, with domain truth on RedCube."
+    "summary": "Freeze one machine-readable RedCube domain adapter surface. Default RedCube product-entry returns an OPL stage execution plan and RCA authority refs for the configured family runtime provider; domain truth stays on RedCube."
   },
   "opl_handoff_envelope": {
     "minimum_fields": [
@@ -26,14 +26,14 @@
       "return_surface_contract.surface_kind"
     ],
     "task_intent_surface_kind_map": {
-      "run_managed_deliverable": "managed_run",
+      "run_managed_deliverable": "opl_stage_execution_plan",
       "run_deliverable_route": "route_run"
     }
   },
   "runtime_session_contract": {
-    "default_runtime_owner": "codex_cli",
+    "default_runtime_owner": "configured_family_runtime_provider",
     "hosted_runtime_owner_when_opl_hosted": "configured_family_runtime_provider",
-    "opl_runtime_manager_role": "product-managed adapter/projection layer over the configured family runtime provider",
+    "opl_runtime_manager_role": "provider-backed stage attempt runtime and attempt ledger owner",
     "adapter_surface": "@redcube/codex-cli-client",
     "session_mode": "ephemeral_run"
   },
@@ -58,7 +58,7 @@
   ],
   "return_surface_contract": {
     "supported_surface_kinds": [
-      "managed_run",
+      "opl_stage_execution_plan",
       "route_run"
     ],
     "durable_truth_surfaces": [

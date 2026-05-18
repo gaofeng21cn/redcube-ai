@@ -46,7 +46,7 @@ export function buildRuntimeResidueRetirementAudit({ runtime } = {}) {
     surface_kind: 'runtime_residue_retirement_audit',
     audit_id: 'rca.runtime_residue_retirement.active_path.v1',
     status: 'active_path_retired',
-    default_runtime_owner: runtime?.runtime_owner || 'codex_cli',
+    default_runtime_owner: runtime?.runtime_owner || 'configured_family_runtime_provider',
     retired_default_surfaces: [
       'hermes_first_default_runtime',
       'gateway_first_public_entry',

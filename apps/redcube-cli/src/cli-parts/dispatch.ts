@@ -29,7 +29,6 @@ import {
   listTopics as listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
-  runManagedDeliverable,
 } from '@redcube/gateway';
 
 import { buildCommandHelp, buildHelp } from './help.js';
@@ -80,7 +79,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
   listTopics: listTopicsGateway,
   runtimeWatch,
   runDeliverableRoute,
-  runManagedDeliverable,
 };
 
 export function getCliDomainActions(overrides: Record<string, unknown> = {}): typeof DEFAULT_DOMAIN_ACTIONS {
@@ -282,16 +280,30 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'execute') {
-      return gateway.runManagedDeliverable({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        overlay: options.overlay || '',
-        topicId: options.topicId || '',
-        deliverableId: options.deliverableId || '',
-        adapter: options.adapter || undefined,
-        userIntent: options.userIntent || '',
-        stopAfterStage: options.stopAfterStage || '',
-        mode: options.mode || 'draft_new',
-        baselineDeliverableId: options.baselineDeliverableId || '',
+      return gateway.invokeDomainEntry({
+        target_domain_id: 'redcube_ai',
+        task_intent: 'run_managed_deliverable',
+        entry_mode: 'service_call',
+        workspace_locator: {
+          workspace_root: resolveWorkspaceRoot(options, cwd),
+        },
+        runtime_session_contract: {
+          runtime_owner: 'configured_family_runtime_provider',
+          session_mode: 'ephemeral_run',
+        },
+        return_surface_contract: {
+          surface_kind: 'opl_stage_execution_plan',
+        },
+        domain_payload: {
+          deliverable_family: options.overlay || '',
+          topic_id: options.topicId || '',
+          deliverable_id: options.deliverableId || '',
+          adapter: options.adapter || undefined,
+          user_intent: options.userIntent || '',
+          stop_after_stage: options.stopAfterStage || '',
+          mode: options.mode || 'draft_new',
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+        },
       });
     }
 

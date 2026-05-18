@@ -33,7 +33,7 @@ const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
   review_gate_id: 'redcube_operator_review_gate',
   review_gate_title: 'RedCube operator review gate',
   resume_surface_kind: 'product_entry_session',
-  checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+  checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
 });
 
 const SESSION_CONTINUATION_REVIEW_SURFACE_REF = Object.freeze({
@@ -44,18 +44,21 @@ const SESSION_CONTINUATION_REVIEW_SURFACE_REF = Object.freeze({
 
 const SESSION_CONTINUATION_EVENT_ENVELOPE_SURFACE_REF = Object.freeze({
   ref_kind: 'json_pointer',
-  ref: '/continuation_snapshot/managed_progress_projection/latest_events',
-  label: 'managed run event companion',
+  ref: '/continuation_snapshot/stage_execution_plan/stage_attempts',
+  label: 'OPL stage execution plan companion',
 });
 
 const SESSION_CONTINUATION_CHECKPOINT_LINEAGE_SURFACE_REF = Object.freeze({
   ref_kind: 'json_pointer',
-  ref: '/continuation_snapshot/latest_managed_run_id',
-  label: 'latest managed-run continuation locator',
+  ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
+  label: 'latest OPL stage execution plan locator',
 });
 
 export function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
-  const needsUserDecision = Boolean(continuationSnapshot?.managed_progress_projection?.needs_user_decision);
+  const needsUserDecision = Boolean(
+    continuationSnapshot?.managed_progress_projection?.needs_user_decision
+    || continuationSnapshot?.stage_execution_plan?.control_policy?.approval_required,
+  );
   return needsUserDecision ? 'requested' : 'approved';
 }
 

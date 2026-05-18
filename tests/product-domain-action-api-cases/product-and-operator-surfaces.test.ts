@@ -10,7 +10,6 @@ import {
   os,
   path,
   runDeliverableRoute,
-  runManagedDeliverable,
   test,
   withAction,
   withMockCodexRuntime,
@@ -283,7 +282,7 @@ test('callDomainTool can return operator-facing deliverable and route-run surfac
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callDomainTool delegates managed deliverable execution and managed run lookup actions', async () => {
+test('callDomainTool maps managed deliverable execution to the OPL stage-plan domain entry and keeps managed lookup diagnostic', async () => {
   const managed = await callDomainTool(
     'redcube_deliverable',
     withAction('run_managed_deliverable', {
@@ -294,27 +293,19 @@ test('callDomainTool delegates managed deliverable execution and managed run loo
       userIntent: '给我一个最终 PPT',
     }),
     {
-      runManagedDeliverable: async () => ({
+      invokeManagedDeliverableStagePlan: async () => ({
         ok: true,
-        surface_kind: 'managed_run',
+        surface_kind: 'domain_entry',
         summary: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-          current_stage: 'export_pptx',
+          actual_surface_kind: 'opl_stage_execution_plan',
+          target_handle: 'opl-stage-execution-plan:ppt_deck:topic-a:deck-a:auto-to-terminal',
         },
-        managed_run: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-        },
-        progress_projection: {
-          current_stage: 'export_pptx',
-          latest_events: [],
-        },
-        runtime_supervision: {
-          health_status: 'completed',
-        },
-        escalation_record: {
-          escalation_status: 'none',
+        result_surface: {
+          surface_kind: 'opl_stage_execution_plan',
+          plan_ref: 'opl-stage-execution-plan:ppt_deck:topic-a:deck-a:auto-to-terminal',
+          execution_model: {
+            default_product_entry_executes_repo_local_managed_runner: false,
+          },
         },
       }),
       getManagedRun: async () => ({
@@ -432,8 +423,9 @@ test('callDomainTool delegates managed deliverable execution and managed run loo
     },
   );
 
-  assert.equal(managed.surface_kind, 'managed_run');
-  assert.equal(managed.summary.managed_run_id, 'managed-a');
+  assert.equal(managed.surface_kind, 'domain_entry');
+  assert.equal(managed.summary.actual_surface_kind, 'opl_stage_execution_plan');
+  assert.equal(managed.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
   assert.equal(stored.surface_kind, 'managed_run_record');
   assert.equal(stored.summary.managed_run_id, 'managed-a');
   assert.equal(supervised.surface_kind, 'managed_supervision');

@@ -1,11 +1,10 @@
 // @ts-nocheck
-import { readFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
-import { planManagedDeliverableDag } from '@redcube/runtime';
 
 import { createDeliverable } from './create-deliverable.js';
-import { runManagedDeliverable } from './run-managed-deliverable.js';
+import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';
 import { researchSource } from './source-research.js';
 
 function safeText(value, fallback = '') {
@@ -19,6 +18,10 @@ function safeArray(value) {
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function writeJson(file, value) {
+  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }
 
 function normalizeDeliverableSpec(spec, index) {
@@ -72,15 +75,57 @@ function planDeliverablesFromCreated(createdDeliverables) {
   }));
 }
 
-function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables }) {
-  const sourcePackId = sourcePackBarrierId({ topicId, fanout: sourcePackFanout });
-  const managedDag = planManagedDeliverableDag({
-    sourcePackId,
-    deliverables: planDeliverablesFromCreated(createdDeliverables),
-  });
+function consumerFamiliesFromDeliverables(deliverables) {
+  return deliverables.map((deliverable) => ({
+    family_id: deliverable.overlay,
+    deliverables: [
+      {
+        deliverable_id: deliverable.deliverableId,
+        profile_id: deliverable.profileId,
+        title: deliverable.title,
+        goal: deliverable.goal,
+      },
+    ],
+  }));
+}
+
+function hydrateSourcePackFanout({ sourcePackFanout, deliverables }) {
+  const consumerFamilies = consumerFamiliesFromDeliverables(deliverables);
   return {
-    planner_kind: 'source_first_cross_family_fanout',
-    schema_version: 1,
+    ...sourcePackFanout,
+    consumer_families: consumerFamilies,
+    parallel_family_ready: consumerFamilies.length >= 2,
+  };
+}
+
+function buildOplStagePlanDag({ sourcePackId, stageExecutionPlans }) {
+  return {
+    dag_kind: 'opl_stage_execution_plan_dag',
+    scheduler_owner: 'one-person-lab',
+    domain_role: 'visual_route_stage_refs_only',
+    layers: [
+      {
+        layer_id: 'shared_source_pack_barrier',
+        task_ids: [`source_pack:${sourcePackId}`],
+        owner: 'redcube_ai',
+      },
+      {
+        layer_id: 'opl_family_stage_plan_submission',
+        task_ids: stageExecutionPlans.map((plan) => plan.plan_ref),
+        owner: 'one-person-lab',
+      },
+    ],
+    max_parallel_width: stageExecutionPlans.length,
+    repo_local_managed_runtime_active_caller: false,
+  };
+}
+
+function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables, stageExecutionPlans }) {
+  const sourcePackId = sourcePackBarrierId({ topicId, fanout: sourcePackFanout });
+  const stagePlanDag = buildOplStagePlanDag({ sourcePackId, stageExecutionPlans });
+  return {
+    planner_kind: 'source_first_opl_stage_plan_fanout',
+    schema_version: 2,
     topic_id: topicId,
     barrier: {
       task_kind: 'shared_source_pack_barrier',
@@ -92,8 +137,11 @@ function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables }) 
       reuse_truth_source: 'source_pack_manifest.reuse',
     },
     family_execution: {
-      parallel_after_barrier: managedDag.optimization.cross_family_parallelism === true,
+      parallel_after_barrier: sourcePackFanout.parallel_family_ready === true,
       quality_gate_policy: 'preserve_each_family_review_and_export_gates',
+      stage_attempt_runtime_owner: 'configured_family_runtime_provider',
+      stage_scheduler_owner: 'one-person-lab',
+      rca_execution_role: 'visual_domain_authority_functions_and_route_handler_refs',
       gate_isolation: createdDeliverables.map((created) => ({
         overlay: created.deliverable.overlay,
         deliverable_id: created.deliverable.deliverable_id,
@@ -101,12 +149,25 @@ function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables }) 
         export_bundle: created.hydratedContract?.export_bundle || null,
       })),
     },
-    managed_dag: managedDag,
+    opl_stage_execution_plan_dag: stagePlanDag,
+    route_stage_refs: planDeliverablesFromCreated(createdDeliverables),
+    stage_execution_plan_refs: stageExecutionPlans.map((plan) => ({
+      plan_ref: plan.plan_ref,
+      overlay: plan.delivery_identity?.deliverable_family || null,
+      deliverable_id: plan.delivery_identity?.deliverable_id || null,
+      planned_stage_count: plan.summary?.planned_stage_count || 0,
+      terminal_stage: plan.summary?.terminal_stage || null,
+      recommended_action: plan.recommended_action || null,
+    })),
+    repo_local_managed_runtime: {
+      active_caller: false,
+      role: 'explicit_diagnostic_or_historical_regression_only',
+    },
   };
 }
 
-async function runManagedFamilyDeliverable({ workspaceRoot, topicId, deliverable }) {
-  return runManagedDeliverable({
+async function buildFamilyStageExecutionPlan({ workspaceRoot, topicId, deliverable }) {
+  return buildOplStageExecutionPlan({
     workspaceRoot,
     overlay: deliverable.overlay,
     topicId,
@@ -154,6 +215,7 @@ export async function runSourceFirstFanout({
         topic_id: topicId,
         source_barrier_status: 'blocked',
         deliverable_count: normalizedDeliverables.length,
+        stage_execution_plan_count: 0,
         managed_run_count: 0,
       },
     };
@@ -173,42 +235,48 @@ export async function runSourceFirstFanout({
   }
 
   const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
-  const sourcePackFanout = readJson(sourcePaths.sourcePackFanoutFile);
-  const sourcePackManifest = readJson(sourcePaths.sourcePackManifestFile);
-  const planner = buildFanoutPlanner({
-    topicId,
-    sourcePackFanout,
-    createdDeliverables,
+  const sourcePackFanout = hydrateSourcePackFanout({
+    sourcePackFanout: readJson(sourcePaths.sourcePackFanoutFile),
+    deliverables: normalizedDeliverables,
   });
-  planner.barrier.actual_reuse = sourcePackManifest?.reuse || null;
-
-  const managedRuns = await Promise.all(
-    normalizedDeliverables.map((deliverable) => runManagedFamilyDeliverable({
+  writeJson(sourcePaths.sourcePackFanoutFile, sourcePackFanout);
+  const sourcePackManifest = readJson(sourcePaths.sourcePackManifestFile);
+  const stageExecutionPlans = await Promise.all(
+    normalizedDeliverables.map((deliverable) => buildFamilyStageExecutionPlan({
       workspaceRoot,
       topicId,
       deliverable,
     })),
   );
+  const planner = buildFanoutPlanner({
+    topicId,
+    sourcePackFanout,
+    createdDeliverables,
+    stageExecutionPlans,
+  });
+  planner.barrier.actual_reuse = sourcePackManifest?.reuse || null;
 
   return {
-    ok: managedRuns.every((result) => result.ok === true),
+    ok: stageExecutionPlans.every((result) => result.ok === true),
     surface_kind: 'source_first_fanout',
-    recommended_action: managedRuns.every((result) => result.ok === true)
-      ? 'review_family_outputs'
-      : 'inspect_family_gate_failures',
+    recommended_action: stageExecutionPlans.every((result) => result.ok === true)
+      ? 'submit_fanout_to_opl_stage_attempt_runtime'
+      : 'inspect_opl_stage_plan_failures',
     source_barrier: sourceBarrier,
     source_pack_fanout: sourcePackFanout,
     source_pack_manifest: sourcePackManifest,
     planner,
     created_deliverables: createdDeliverables,
-    managed_runs: managedRuns,
+    stage_execution_plans: stageExecutionPlans,
+    managed_runs: [],
     summary: {
       topic_id: topicId,
       source_barrier_status: 'planning_ready',
       deliverable_count: normalizedDeliverables.length,
-      managed_run_count: managedRuns.length,
+      stage_execution_plan_count: stageExecutionPlans.length,
+      managed_run_count: 0,
       parallel_family_ready: sourcePackFanout.parallel_family_ready === true,
-      max_parallel_width: planner.managed_dag.max_parallel_width,
+      max_parallel_width: planner.opl_stage_execution_plan_dag.max_parallel_width,
     },
   };
 }

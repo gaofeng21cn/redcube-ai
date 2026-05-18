@@ -27,7 +27,7 @@ import {
 } from './product-entry-continuity-surfaces.js';
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 
-const DEFAULT_RUNTIME_OWNER = 'codex_cli';
+const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const SUPPORTED_RUNTIME_OWNERS = new Set([DEFAULT_RUNTIME_OWNER, HOSTED_RUNTIME_OWNER]);
 
@@ -289,7 +289,10 @@ function buildProductEntrySessionSummary({
   runtimeLoopClosure,
   familyOrchestration,
 }) {
-  const latestHandle = session.latest_managed_run_id || session.latest_run_id || null;
+  const latestHandle = session.latest_stage_execution_plan_ref
+    || session.latest_managed_run_id
+    || session.latest_run_id
+    || null;
   return {
     entry_session_id: entrySessionId,
     deliverable_id: session.deliverable_id,
@@ -342,6 +345,11 @@ export async function getProductEntrySession(request) {
     latest_run_id: session.latest_run_id || null,
     managed_progress_projection: managedRun?.progress_projection || null,
     runtime_supervision: managedRun?.runtime_supervision || null,
+    extra_payload: {
+      latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
+      stage_execution_plan: session.stage_execution_plan || null,
+      latest_surface_kind: session.latest_surface_kind || null,
+    },
   });
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,

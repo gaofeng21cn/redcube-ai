@@ -42,10 +42,11 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
     });
 
     assert.equal(response.ok, true);
-    assert.equal(response.domain_entry_surface.result_surface.managed_run.mode, 'stop_after_stage');
-    assert.equal(response.domain_entry_surface.result_surface.managed_run.stop_after_stage, 'detailed_outline');
-    assert.equal(response.domain_entry_surface.result_surface.managed_run.status, 'stopped_after_stage');
-    assert.equal(response.domain_entry_surface.result_surface.managed_run.current_stage, 'detailed_outline');
+    assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(response.domain_entry_surface.result_surface.control_policy.mode, 'stop_after_stage');
+    assert.equal(response.domain_entry_surface.result_surface.control_policy.requested_stop_after_stage, 'detailed_outline');
+    assert.equal(response.domain_entry_surface.result_surface.owner, 'one-person-lab');
+    assert.equal(response.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
     assert.equal(response.runtime_loop_closure.control_policy.approval_required, true);
     assert.equal(response.summary.approval_required, true);
   });
@@ -83,7 +84,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: path.join(runtimeStateRoot, 'product-entry-sessions', 'session-a.json'),
-        runtime_owner: 'codex_cli',
+        runtime_owner: 'configured_family_runtime_provider',
         resumed_from_session: false,
         created_deliverable: true,
       }),
@@ -99,14 +100,20 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     );
     assert.equal(response.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
     assert.equal(response.domain_entry_surface.entry_mode, 'redcube_product_entry');
-    assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'managed_run');
+    assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.deepEqual(
       response.continuation_snapshot,
       sharedCompanions.buildProductEntryContinuationSnapshot({
-        latest_managed_run_id: response.domain_entry_surface.summary.target_handle,
+        latest_managed_run_id: null,
         latest_run_id: null,
         managed_progress_projection: response.continuation_snapshot.managed_progress_projection,
         runtime_supervision: response.continuation_snapshot.runtime_supervision,
+        extra_payload: {
+          latest_stage_execution_plan_ref: response.domain_entry_surface.summary.target_handle,
+          stage_execution_plan: response.domain_entry_surface.result_surface,
+          domain_authority_refs: response.domain_entry_surface.result_surface.authority_refs,
+          latest_surface_kind: 'opl_stage_execution_plan',
+        },
       }),
     );
     assert.equal(response.session_continuity.surface_kind, 'session_continuity');
@@ -134,31 +141,20 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     );
     assert.equal(response.session_continuity.restore_point.latest_handle, response.summary.target_handle);
     assert.equal(
-      response.session_continuity.restore_point.latest_managed_run_id,
-      response.continuation_snapshot.latest_managed_run_id,
+      response.session_continuity.restore_point.latest_stage_execution_plan_ref,
+      response.continuation_snapshot.latest_stage_execution_plan_ref,
     );
-    if (response.continuation_snapshot.managed_progress_projection) {
-      assert.equal(response.progress_projection.surface_kind, 'progress_projection');
-      assert.deepEqual(
-        response.progress_projection.projection,
-        response.continuation_snapshot.managed_progress_projection,
-      );
-      assert.equal(response.artifact_inventory.surface_kind, 'artifact_inventory');
-      assert.equal(response.artifact_inventory.summary.latest_handle, response.summary.target_handle);
-      assert.deepEqual(
-        response.artifact_inventory.artifact_refs,
-        response.continuation_snapshot.managed_progress_projection.final_artifact_refs,
-      );
-    } else {
-      assert.equal(response.progress_projection, null);
-      assert.equal(response.artifact_inventory.surface_kind, 'artifact_inventory');
-      assert.deepEqual(response.artifact_inventory.artifact_refs, []);
-    }
+    assert.equal(response.progress_projection.surface_kind, 'progress_projection');
+    assert.equal(response.progress_projection.stage_execution_plan_ref, response.summary.target_handle);
+    assert.equal(response.progress_projection.projection.projection_kind, 'opl_stage_execution_plan_projection');
+    assert.equal(response.artifact_inventory.surface_kind, 'artifact_inventory');
+    assert.equal(response.artifact_inventory.summary.latest_handle, response.summary.target_handle);
+    assert.deepEqual(response.artifact_inventory.artifact_refs, []);
     assert.deepEqual(
       response.domain_entry_surface.runtime_session_contract,
       sharedCompanions.buildRuntimeSessionContract({
-        runtime_owner: 'codex_cli',
-        expected_runtime_owner: 'codex_cli',
+        runtime_owner: 'configured_family_runtime_provider',
+        expected_runtime_owner: 'configured_family_runtime_provider',
         adapter_surface: '@redcube/codex-cli-client',
         session_mode: 'entry_session',
       }),
@@ -166,9 +162,9 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.deepEqual(
       response.domain_entry_surface.return_surface_contract,
       sharedCompanions.buildReturnSurfaceContract({
-        requested_surface_kind: 'managed_run',
-        expected_surface_kind: 'managed_run',
-        actual_surface_kind: 'managed_run',
+        requested_surface_kind: 'opl_stage_execution_plan',
+        expected_surface_kind: 'opl_stage_execution_plan',
+        actual_surface_kind: 'opl_stage_execution_plan',
         durable_truth_surfaces: [
           'runtimeWatch',
           'getReviewState',
@@ -183,8 +179,8 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
     assert.equal(response.opl_family_lifecycle_adapter.persistence.session.entry_session_id, 'session-a');
     assert.equal(
-      response.opl_family_lifecycle_adapter.persistence.managed_run.managed_run_id,
-      response.continuation_snapshot.latest_managed_run_id,
+      response.opl_family_lifecycle_adapter.persistence.stage_execution_plan.plan_ref,
+      response.continuation_snapshot.latest_stage_execution_plan_ref,
     );
     assert.equal(response.opl_family_lifecycle_adapter.lifecycle.current_stage, response.progress_projection.projection.current_stage);
     assert.equal(response.opl_family_lifecycle_adapter.lifecycle.content_status, response.progress_projection.projection.content_status);
@@ -209,7 +205,8 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(storedSession.deliverable_family, 'ppt_deck');
     assert.equal(storedSession.topic_id, 'topic-a');
     assert.equal(storedSession.deliverable_id, 'deck-a');
-    assert.equal(storedSession.latest_managed_run_id, response.continuation_snapshot.latest_managed_run_id);
+    assert.equal(storedSession.latest_stage_execution_plan_ref, response.continuation_snapshot.latest_stage_execution_plan_ref);
+    assert.equal(storedSession.latest_managed_run_id, null);
   });
 });
 
@@ -258,7 +255,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: continued.entry_session.session_file,
-        runtime_owner: 'codex_cli',
+        runtime_owner: 'configured_family_runtime_provider',
         resumed_from_session: true,
         created_deliverable: false,
       }),
@@ -273,8 +270,11 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       }),
     );
     assert.equal(continued.domain_entry_surface.entry_mode, 'redcube_product_entry');
-    assert.equal(continued.domain_entry_surface.result_surface.surface_kind, 'managed_run');
-    assert.equal(continued.continuation_snapshot.latest_managed_run_id !== first.continuation_snapshot.latest_managed_run_id, true);
+    assert.equal(continued.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(
+      continued.continuation_snapshot.latest_stage_execution_plan_ref !== first.continuation_snapshot.latest_stage_execution_plan_ref,
+      true,
+    );
 
     const session = await getProductEntrySession({
       entry_session_id: 'session-a',
@@ -287,7 +287,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       sharedCompanions.buildEntrySessionSurface({
         entry_session_id: 'session-a',
         session_file: session.entry_session.session_file,
-        runtime_owner: 'codex_cli',
+        runtime_owner: 'configured_family_runtime_provider',
       }),
     );
     assert.deepEqual(
@@ -302,10 +302,15 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.deepEqual(
       session.continuation_snapshot,
       sharedCompanions.buildProductEntryContinuationSnapshot({
-        latest_managed_run_id: continued.continuation_snapshot.latest_managed_run_id,
+        latest_managed_run_id: null,
         latest_run_id: continued.continuation_snapshot.latest_run_id,
         managed_progress_projection: session.continuation_snapshot.managed_progress_projection,
         runtime_supervision: session.continuation_snapshot.runtime_supervision,
+        extra_payload: {
+          latest_stage_execution_plan_ref: continued.continuation_snapshot.latest_stage_execution_plan_ref,
+          stage_execution_plan: session.continuation_snapshot.stage_execution_plan,
+          latest_surface_kind: 'opl_stage_execution_plan',
+        },
       }),
     );
     assert.equal(session.session_continuity.surface_kind, 'session_continuity');
@@ -334,30 +339,19 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       session.family_orchestration.resume_contract.checkpoint_locator_field,
     );
     assert.equal(session.session_continuity.restore_point.latest_handle, continued.summary.target_handle);
-    assert.equal(session.session_continuity.restore_point.latest_managed_run_id, continued.summary.target_handle);
+    assert.equal(session.session_continuity.restore_point.latest_stage_execution_plan_ref, continued.summary.target_handle);
     assert.deepEqual(session.artifact_inventory.restore_point, session.session_continuity.restore_point);
-    if (session.continuation_snapshot.managed_progress_projection) {
-      assert.equal(session.progress_projection.surface_kind, 'progress_projection');
-      assert.deepEqual(
-        session.progress_projection.projection,
-        session.continuation_snapshot.managed_progress_projection,
-      );
-      assert.deepEqual(
-        session.artifact_inventory.artifact_refs,
-        session.continuation_snapshot.managed_progress_projection.final_artifact_refs,
-      );
-    } else {
-      assert.equal(session.progress_projection, null);
-      assert.deepEqual(session.artifact_inventory.artifact_refs, []);
-    }
+    assert.equal(session.progress_projection.surface_kind, 'progress_projection');
+    assert.equal(session.progress_projection.projection.projection_kind, 'opl_stage_execution_plan_projection');
+    assert.deepEqual(session.artifact_inventory.artifact_refs, []);
     assert.equal(session.review_state.surface_kind, 'review_state');
     assert.equal(session.publication_projection.surface_kind, 'publication_projection');
     assert.equal(session.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
     assert.equal(session.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
     assert.equal(session.opl_family_lifecycle_adapter.persistence.session.entry_session_id, 'session-a');
     assert.equal(
-      session.opl_family_lifecycle_adapter.persistence.managed_run.managed_run_id,
-      session.continuation_snapshot.latest_managed_run_id,
+      session.opl_family_lifecycle_adapter.persistence.stage_execution_plan.plan_ref,
+      session.continuation_snapshot.latest_stage_execution_plan_ref,
     );
     assert.equal(session.opl_family_lifecycle_adapter.lifecycle.content_status, session.progress_projection.projection.content_status);
     assert.equal(session.opl_family_lifecycle_adapter.owner_route_discovery.candidate_routes[0].route_id, 'product_entry_session');
@@ -463,7 +457,7 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
       response.summary.checkpoint_locator_field,
       response.family_orchestration.resume_contract.checkpoint_locator_field,
     );
-    assert.equal(response.product_entry_surface.continuation_snapshot.latest_managed_run_id, response.summary.target_handle);
+    assert.equal(response.product_entry_surface.continuation_snapshot.latest_stage_execution_plan_ref, response.summary.target_handle);
     assert.equal(response.session_continuity.entry_session_id, 'session-oplHosted');
     assert.deepEqual(response.session_continuity, response.product_entry_surface.session_continuity);
     assert.deepEqual(response.progress_projection, response.product_entry_surface.progress_projection);
@@ -523,13 +517,13 @@ test('session continuation family orchestration companion uses the shared contin
   });
   assert.deepEqual(requested.event_envelope_surface, {
     ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/managed_progress_projection/latest_events',
-    label: 'managed run event companion',
+    ref: '/continuation_snapshot/stage_execution_plan/stage_attempts',
+    label: 'OPL stage execution plan companion',
   });
   assert.deepEqual(requested.checkpoint_lineage_surface, {
     ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/latest_managed_run_id',
-    label: 'latest managed-run continuation locator',
+    ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
+    label: 'latest OPL stage execution plan locator',
   });
 
   const approved = buildSessionContinuationFamilyOrchestration({

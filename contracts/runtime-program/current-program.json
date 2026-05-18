@@ -502,28 +502,6 @@
         "unclassified_private_generic_residue_count": 0,
         "long_term_rca_generic_owner_claim_count": 0,
         "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
-        "remaining_evidence_gate_ids": [
-          "real_artifact_producing_domain_owner_receipt",
-          "opl_hosted_controlled_visual_stage_long_soak",
-          "real_memory_lifecycle_receipt_instances",
-          "cross_family_repeated_no_regression_evidence"
-        ],
-        "closure_basis_refs": [
-          "/family_scheduler_replacement",
-          "/opl_generic_primitive_consumption",
-          "/opl_stability_read_model_consumption",
-          "/opl_generated_interface_consumption",
-          "/visual_pack_compiler_handoff",
-          "/operator_evidence_readiness_projection",
-          "/opl_substrate_adapter_export"
-        ],
-        "allowed_remaining_module_classes": [
-          "opl_hosted_surface",
-          "opl_generated_surface",
-          "refs_only_adapter",
-          "declarative_pack",
-          "minimal_authority_function"
-        ],
         "remaining_functional_structure_gap_ids": [
           "opl_generated_surface_production_consumption",
           "repo_local_wrapper_active_caller_migration",
@@ -583,7 +561,30 @@
             "owner": "redcube_ai",
             "rca_role": "domain_handler_target_or_visual_authority_refs_only"
           }
-        ]
+        ],
+        "remaining_evidence_gate_ids": [
+          "real_artifact_producing_domain_owner_receipt",
+          "opl_hosted_controlled_visual_stage_long_soak",
+          "real_memory_lifecycle_receipt_instances",
+          "cross_family_repeated_no_regression_evidence"
+        ],
+        "closure_basis_refs": [
+          "/family_scheduler_replacement",
+          "/opl_generic_primitive_consumption",
+          "/opl_stability_read_model_consumption",
+          "/opl_generated_interface_consumption",
+          "/visual_pack_compiler_handoff",
+          "/operator_evidence_readiness_projection",
+          "/opl_substrate_adapter_export"
+        ],
+        "allowed_remaining_module_classes": [
+          "opl_hosted_surface",
+          "opl_generated_surface",
+          "refs_only_adapter",
+          "declarative_pack",
+          "minimal_authority_function"
+        ],
+        "functional_structure_gap_status": "classification_closed_followthrough_gaps_open"
       },
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 2,
@@ -723,7 +724,7 @@
             "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
           ],
           "activeCallers": [
-            "runManagedDeliverable",
+            "buildOplStageExecutionPlan",
             "superviseManagedRun",
             "evaluate_visual_transition sidecar action",
             "OPL hosted attempt receipt fixture"
@@ -1548,9 +1549,9 @@
             "domain entry contract",
             "runtime route executor tests"
           ],
-          "activeCallerStatus": "active_codex_cli_first_class_default",
+          "activeCallerStatus": "opl_executor_adapter_ref_with_codex_cli_concrete_option",
           "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
-          "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
+          "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as a first-class concrete executor option selected through the OPL provider / executor adapter.",
           "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
           "tombstone_required": false,
           "migration_class": "opl_hosted_surface",
@@ -1910,7 +1911,7 @@
         "visual_review_export_gate",
         "native_helper_implementation",
         "artifact_gallery_export_refs",
-        "codex_cli_default_route_policy"
+        "executor_adapter_route_policy"
       ],
       "authority_boundary": {
         "opl_can_index_audit_projection": true,
@@ -2209,15 +2210,15 @@
     }
   },
   "longrun_goal": {
-    "label": "RedCube AI Foundry Agent / OPL-compatible visual-deliverable package with a stable CLI/product-entry capability surface, TS/Python implementation target, and optional hosted runtime carriers managed through OPL stage-led hosted integration when oplHosted",
+    "label": "RedCube AI Foundry Agent / OPL-standard visual-deliverable package whose default product entry returns OPL stage execution plans, while RCA retains visual-domain authority functions and TypeScript/Python implementation surfaces",
     "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
     "final_target_route": {
-      "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces",
-      "opl_hosted_entry": "User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces"
+      "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> OPL stage execution plan -> OPL family runtime provider stage attempts -> RedCube visual-domain authority functions and truth surfaces",
+      "opl_hosted_entry": "User -> OPL Product Entry -> RedCube service-safe domain entry -> OPL stage execution plan -> OPL family runtime provider stage attempts -> RedCube visual-domain authority functions and truth surfaces"
     },
     "runtime_manager_boundary": {
-      "manager": "OPL stage-led hosted integration",
-      "layer_role": "product-managed adapter/projection layer over the configured family runtime provider",
+      "manager": "OPL stage-led family runtime provider",
+      "layer_role": "stage attempt runtime, queue/wakeup, attempt ledger, generated shell, workbench and provider receipt layer over RCA domain authority refs",
       "consumes_redcube_surfaces": [
         "redcube product-entry registration",
         "skill_catalog.domain_projection.opl_runtime_manager_registration",
@@ -2277,7 +2278,7 @@
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
-      "keep direct product-entry runtime_owner and executor_owner on codex_cli unless a caller explicitly enters the OPL oplHosted or Hermes proof lane",
+      "keep product-entry runtime_owner on configured_family_runtime_provider; Codex CLI remains a first-class concrete executor option selected through the OPL provider/executor adapter",
       "keep controller as an internal-only surface",
       "keep the current repository honestly Auto-only",
       "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
@@ -2410,10 +2411,10 @@
   },
   "current_state": {
     "product_mainline_mode": "auto_only",
-    "runtime_substrate_owner": "optional_hosted_runtime_carrier",
+    "runtime_substrate_owner": "configured_family_runtime_provider",
     "runtime_manager_status": {
-      "target_layer": "OPL stage-led hosted integration",
-      "status": "functional_consumer_follow_through_landed",
+      "target_layer": "OPL stage-led family runtime provider",
+      "status": "default_product_entry_stage_plan_landed_followthrough_open",
       "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
       "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
       "redcube_default_entry_unchanged": true,
@@ -2427,8 +2428,10 @@
       ],
       "generic_primitives_owner": "opl",
       "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
-      "consumer_follow_through_scope": "standard scaffold / manifest / sidecar / generic primitive projections",
-      "live_soak_claimed": false
+      "consumer_follow_through_scope": "default OPL stage execution plan / source-first fanout stage-plan handoff / generated surface ownership projection",
+      "live_soak_claimed": false,
+      "default_product_entry_executes_repo_local_managed_runner": false,
+      "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
     },
     "opl_family_scheduler_replacement": {
       "ref": "/family_scheduler_replacement",
@@ -3037,7 +3040,7 @@
         "status": "closeout_completed",
         "route_surface": "runDeliverableRoute",
         "managed_surfaces": [
-          "runManagedDeliverable",
+          "buildOplStageExecutionPlan",
           "getManagedRun",
           "superviseManagedRun"
         ],
@@ -3116,9 +3119,9 @@
       "scope": {
         "hardening_axis": "product_entry_service_surface_and_opl_hosted_handoff",
         "implementation_in_scope": true,
-        "runtime_substrate_owner": "optional_hosted_runtime_carrier",
-        "default_runtime_owner": "codex_cli",
-        "hosted_runtime_owner_policy": "provider_selected_by_opl_runtime_manager_or_explicit_proof_lane",
+        "runtime_substrate_owner": "configured_family_runtime_provider",
+        "default_runtime_owner": "configured_family_runtime_provider",
+        "hosted_runtime_owner_policy": "OPL provider owns stage attempt runtime and attempt ledger; RCA returns OPL stage execution plans and authority refs",
         "deployment_host": "codex_local_operator_host",
         "consumer_families": [
           "ppt_deck",
@@ -3138,7 +3141,7 @@
         ],
         "required_downstream_domain_surfaces": [
           "invokeDomainEntry",
-          "runManagedDeliverable",
+          "buildOplStageExecutionPlan",
           "runDeliverableRoute"
         ],
         "required_audit_surfaces": [
@@ -3186,7 +3189,10 @@
           "runtime_semantics_policy": {
             "second_runtime_semantics_allowed": false,
             "downstream_entry_surface_kind": "domain_entry"
-          }
+          },
+          "default_runtime_owner": "configured_family_runtime_provider",
+          "default_result_surface": "opl_stage_execution_plan",
+          "downstream_stage_attempt_owner": "one-person-lab"
         },
         "deliverable_facade": {
           "status": "repo_tracked_manifest_contract",
@@ -3196,14 +3202,17 @@
           ],
           "truth_surfaces": [
             "createDeliverable",
-            "runManagedDeliverable",
+            "buildOplStageExecutionPlan",
             "runDeliverableRoute",
             "auditDeliverable",
             "runtimeWatch",
             "getReviewState",
             "getPublicationProjection"
           ],
-          "core_generation_logic_changed": false
+          "core_generation_logic_changed": false,
+          "default_truth_surface": "buildOplStageExecutionPlan",
+          "default_product_entry_executes_repo_local_managed_runner": false,
+          "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
         },
         "opl_family_lifecycle_adapter": {
           "status": "repo_tracked_projection_contract",
@@ -3228,7 +3237,7 @@
         "opl_family_stage_control_projection": {
           "status": "repo_tracked_projection_contract",
           "projection_id": "rca.opl.family.stage-control.projection.v1",
-          "adapter_model": "descriptor_read_only",
+          "adapter_model": "descriptor_and_stage_execution_plan_provider",
           "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
           "covered_families": [
             "ppt_deck",
@@ -3244,9 +3253,10 @@
             "package_and_handoff"
           ],
           "domain_truth_owner": "redcube_ai",
-          "opl_role": "read_only_stage_projection_consumer",
+          "opl_role": "stage_attempt_scheduler_and_projection_consumer",
           "default_ppt_route_changed": false,
-          "managed_deliverable_runtime_changed": false
+          "managed_deliverable_runtime_changed": true,
+          "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
         },
         "domain_memory_descriptor_locator": {
           "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
@@ -3789,12 +3799,6 @@
             "functional_structure_gap_status": "classification_closed_followthrough_gaps_open",
             "functional_structure_gap_count": 8,
             "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
-            "remaining_evidence_gate_ids": [
-              "real_artifact_producing_domain_owner_receipt",
-              "opl_hosted_controlled_visual_stage_long_soak",
-              "real_memory_lifecycle_receipt_instances",
-              "cross_family_repeated_no_regression_evidence"
-            ],
             "remaining_functional_structure_gap_ids": [
               "opl_generated_surface_production_consumption",
               "repo_local_wrapper_active_caller_migration",
@@ -3804,6 +3808,12 @@
               "opl_app_operator_drilldown",
               "workspace_source_lifecycle_receipt_shell",
               "legacy_physical_cleanup"
+            ],
+            "remaining_evidence_gate_ids": [
+              "real_artifact_producing_domain_owner_receipt",
+              "opl_hosted_controlled_visual_stage_long_soak",
+              "real_memory_lifecycle_receipt_instances",
+              "cross_family_repeated_no_regression_evidence"
             ]
           },
           "aggregated_source_refs": [
@@ -3875,28 +3885,6 @@
             "unclassified_private_generic_residue_count": 0,
             "long_term_rca_generic_owner_claim_count": 0,
             "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
-            "remaining_evidence_gate_ids": [
-              "real_artifact_producing_domain_owner_receipt",
-              "opl_hosted_controlled_visual_stage_long_soak",
-              "real_memory_lifecycle_receipt_instances",
-              "cross_family_repeated_no_regression_evidence"
-            ],
-            "closure_basis_refs": [
-              "/family_scheduler_replacement",
-              "/opl_generic_primitive_consumption",
-              "/opl_stability_read_model_consumption",
-              "/opl_generated_interface_consumption",
-              "/visual_pack_compiler_handoff",
-              "/operator_evidence_readiness_projection",
-              "/opl_substrate_adapter_export"
-            ],
-            "allowed_remaining_module_classes": [
-              "opl_hosted_surface",
-              "opl_generated_surface",
-              "refs_only_adapter",
-              "declarative_pack",
-              "minimal_authority_function"
-            ],
             "remaining_functional_structure_gap_ids": [
               "opl_generated_surface_production_consumption",
               "repo_local_wrapper_active_caller_migration",
@@ -3956,7 +3944,30 @@
                 "owner": "redcube_ai",
                 "rca_role": "domain_handler_target_or_visual_authority_refs_only"
               }
-            ]
+            ],
+            "remaining_evidence_gate_ids": [
+              "real_artifact_producing_domain_owner_receipt",
+              "opl_hosted_controlled_visual_stage_long_soak",
+              "real_memory_lifecycle_receipt_instances",
+              "cross_family_repeated_no_regression_evidence"
+            ],
+            "closure_basis_refs": [
+              "/family_scheduler_replacement",
+              "/opl_generic_primitive_consumption",
+              "/opl_stability_read_model_consumption",
+              "/opl_generated_interface_consumption",
+              "/visual_pack_compiler_handoff",
+              "/operator_evidence_readiness_projection",
+              "/opl_substrate_adapter_export"
+            ],
+            "allowed_remaining_module_classes": [
+              "opl_hosted_surface",
+              "opl_generated_surface",
+              "refs_only_adapter",
+              "declarative_pack",
+              "minimal_authority_function"
+            ],
+            "functional_structure_gap_status": "classification_closed_followthrough_gaps_open"
           },
           "physical_deletion_guard": {
             "current_safe_tombstone_candidate_count": 2,
@@ -4096,7 +4107,7 @@
                 "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
               ],
               "activeCallers": [
-                "runManagedDeliverable",
+                "buildOplStageExecutionPlan",
                 "superviseManagedRun",
                 "evaluate_visual_transition sidecar action",
                 "OPL hosted attempt receipt fixture"
@@ -4921,9 +4932,9 @@
                 "domain entry contract",
                 "runtime route executor tests"
               ],
-              "activeCallerStatus": "active_codex_cli_first_class_default",
+              "activeCallerStatus": "opl_executor_adapter_ref_with_codex_cli_concrete_option",
               "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
-              "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
+              "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as a first-class concrete executor option selected through the OPL provider / executor adapter.",
               "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
               "tombstone_required": false,
               "migration_class": "opl_hosted_surface",
@@ -5283,7 +5294,7 @@
             "visual_review_export_gate",
             "native_helper_implementation",
             "artifact_gallery_export_refs",
-            "codex_cli_default_route_policy"
+            "executor_adapter_route_policy"
           ],
           "authority_boundary": {
             "opl_can_index_audit_projection": true,
@@ -5579,7 +5590,9 @@
               }
             }
           }
-        }
+        },
+        "default_product_entry_executes_repo_local_managed_runner": false,
+        "repo_local_managed_runner_role": "explicit_diagnostic_or_historical_regression_only"
       },
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
@@ -5975,28 +5988,6 @@
         "unclassified_private_generic_residue_count": 0,
         "long_term_rca_generic_owner_claim_count": 0,
         "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
-        "remaining_evidence_gate_ids": [
-          "real_artifact_producing_domain_owner_receipt",
-          "opl_hosted_controlled_visual_stage_long_soak",
-          "real_memory_lifecycle_receipt_instances",
-          "cross_family_repeated_no_regression_evidence"
-        ],
-        "closure_basis_refs": [
-          "/family_scheduler_replacement",
-          "/opl_generic_primitive_consumption",
-          "/opl_stability_read_model_consumption",
-          "/opl_generated_interface_consumption",
-          "/visual_pack_compiler_handoff",
-          "/operator_evidence_readiness_projection",
-          "/opl_substrate_adapter_export"
-        ],
-        "allowed_remaining_module_classes": [
-          "opl_hosted_surface",
-          "opl_generated_surface",
-          "refs_only_adapter",
-          "declarative_pack",
-          "minimal_authority_function"
-        ],
         "remaining_functional_structure_gap_ids": [
           "opl_generated_surface_production_consumption",
           "repo_local_wrapper_active_caller_migration",
@@ -6056,7 +6047,30 @@
             "owner": "redcube_ai",
             "rca_role": "domain_handler_target_or_visual_authority_refs_only"
           }
-        ]
+        ],
+        "remaining_evidence_gate_ids": [
+          "real_artifact_producing_domain_owner_receipt",
+          "opl_hosted_controlled_visual_stage_long_soak",
+          "real_memory_lifecycle_receipt_instances",
+          "cross_family_repeated_no_regression_evidence"
+        ],
+        "closure_basis_refs": [
+          "/family_scheduler_replacement",
+          "/opl_generic_primitive_consumption",
+          "/opl_stability_read_model_consumption",
+          "/opl_generated_interface_consumption",
+          "/visual_pack_compiler_handoff",
+          "/operator_evidence_readiness_projection",
+          "/opl_substrate_adapter_export"
+        ],
+        "allowed_remaining_module_classes": [
+          "opl_hosted_surface",
+          "opl_generated_surface",
+          "refs_only_adapter",
+          "declarative_pack",
+          "minimal_authority_function"
+        ],
+        "functional_structure_gap_status": "classification_closed_followthrough_gaps_open"
       },
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 2,
@@ -6196,7 +6210,7 @@
             "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
           ],
           "activeCallers": [
-            "runManagedDeliverable",
+            "buildOplStageExecutionPlan",
             "superviseManagedRun",
             "evaluate_visual_transition sidecar action",
             "OPL hosted attempt receipt fixture"
@@ -7021,9 +7035,9 @@
             "domain entry contract",
             "runtime route executor tests"
           ],
-          "activeCallerStatus": "active_codex_cli_first_class_default",
+          "activeCallerStatus": "opl_executor_adapter_ref_with_codex_cli_concrete_option",
           "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
-          "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
+          "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as a first-class concrete executor option selected through the OPL provider / executor adapter.",
           "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
           "tombstone_required": false,
           "migration_class": "opl_hosted_surface",
@@ -7383,7 +7397,7 @@
         "visual_review_export_gate",
         "native_helper_implementation",
         "artifact_gallery_export_refs",
-        "codex_cli_default_route_policy"
+        "executor_adapter_route_policy"
       ],
       "authority_boundary": {
         "opl_can_index_audit_projection": true,

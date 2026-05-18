@@ -38,8 +38,9 @@
       "delivery_request.baseline_deliverable_id"
     ],
     "default_task_intent": "run_managed_deliverable",
-    "default_runtime_owner": "codex_cli",
-    "default_executor_owner": "codex_cli",
+    "default_runtime_owner": "configured_family_runtime_provider",
+    "default_executor_owner": "configured_by_opl_runtime_provider",
+    "default_return_surface_kind": "opl_stage_execution_plan",
     "hosted_runtime_owner_when_opl_hosted": "configured_family_runtime_provider",
     "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
   },

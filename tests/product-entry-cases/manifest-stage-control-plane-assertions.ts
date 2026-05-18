@@ -53,25 +53,10 @@ export function assertManifestActionAndStageControlPlane({
   );
   const sidecarDispatchAction = manifest.family_action_catalog.actions
     .find((action) => action.action_id === 'dispatch_product_sidecar');
-  const sessionAction = manifest.family_action_catalog.actions
-    .find((action) => action.action_id === 'get_product_entry_session');
-  const sidecarExportAction = manifest.family_action_catalog.actions
-    .find((action) => action.action_id === 'export_product_sidecar');
-  assert.deepEqual(sessionAction.authority_boundary, {
-    generic_session_shell_owner: 'one-person-lab',
-    domain_snapshot_owner: 'redcube_ai',
-    rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
-    implements_generic_workbench: false,
-  });
-  assert.equal(sidecarExportAction.authority_boundary.generated_surface_owner, 'one-person-lab');
-  assert.equal(sidecarExportAction.authority_boundary.rca_role, 'domain_action_target_or_refs_only_adapter');
   assert.deepEqual(
     sidecarDispatchAction.authority_boundary.allowed_actions,
     sidecarGuardedActionMetadata.guardedActionIds,
   );
-  assert.equal(sidecarDispatchAction.authority_boundary.default_generic_dispatch_owner, 'one-person-lab');
-  assert.equal(sidecarDispatchAction.authority_boundary.default_managed_supervision_owner, 'one-person-lab');
-  assert.equal(sidecarDispatchAction.authority_boundary.rca_role, 'guarded_domain_action_target_only');
   assert.deepEqual(
     sidecarDispatchAction.authority_boundary.forbidden_writes,
     sidecarGuardedActionMetadata.forbiddenWrites,
@@ -87,12 +72,18 @@ export function assertManifestActionAndStageControlPlane({
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_visual_truth, true);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_review_publication_projection, true);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_artifact_authority, true);
-  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_schedule_stage, false);
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_schedule_stage, true);
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_schedule_stage_attempt, true);
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_stage_attempt_owner, 'one-person-lab');
   assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_visual_truth, false);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_review_truth, false);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_can_write_publication_projection, false);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.default_ppt_route_changed, false);
-  assert.equal(manifest.family_stage_control_plane.authority_boundary.managed_deliverable_runtime_changed, false);
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.managed_deliverable_runtime_changed, true);
+  assert.equal(
+    manifest.family_stage_control_plane.authority_boundary.repo_local_managed_deliverable_runtime_role,
+    'explicit_diagnostic_or_historical_regression_only',
+  );
   assert.equal(manifest.family_stage_control_plane.freshness.status, 'current');
   assert.equal(manifest.family_stage_control_plane.freshness.checked_at, 'manifest_build');
   assert.equal(manifest.family_stage_control_plane.stage_action_parity.status, 'aligned');
@@ -128,26 +119,30 @@ export function assertManifestActionAndStageControlPlane({
     for (const actionRef of stage.allowed_action_refs) {
       assert.equal(catalogActionIds.has(actionRef), true);
     }
-    assert.equal(stage.handoff.next_owner, 'redcube_ai');
+    assert.equal(stage.handoff.next_owner, 'one-person-lab');
     assert.equal(stage.handoff.resume_surface_ref, '/session_continuity');
     assert.equal(stage.handoff.artifact_surface_ref, '/artifact_inventory');
+    assert.equal(stage.handoff.stage_execution_plan_ref, '/continuation_snapshot/latest_stage_execution_plan_ref');
     assert.equal(stage.authority_boundary.domain_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.visual_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.artifact_authority_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.review_publication_projection_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.opl_role, 'projection_consumer_only');
-    assert.equal(stage.authority_boundary.opl_can_schedule_stage, false);
+    assert.equal(stage.authority_boundary.opl_can_schedule_stage, true);
+    assert.equal(stage.authority_boundary.opl_can_schedule_stage_attempt, true);
+    assert.equal(stage.authority_boundary.opl_stage_attempt_owner, 'one-person-lab');
     assert.equal(stage.authority_boundary.opl_can_write_visual_truth, false);
     assert.equal(stage.authority_boundary.opl_can_write_review_truth, false);
     assert.equal(stage.authority_boundary.opl_can_write_publication_projection, false);
     assert.equal(stage.authority_boundary.default_ppt_route_changed, false);
-    assert.equal(stage.authority_boundary.managed_deliverable_runtime_changed, false);
+    assert.equal(stage.authority_boundary.managed_deliverable_runtime_changed, true);
+    assert.equal(stage.authority_boundary.repo_local_managed_deliverable_runtime_role, 'explicit_diagnostic_or_historical_regression_only');
   }
   const artifactStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'artifact_creation');
   assert.deepEqual(artifactStage.domain_stage_refs, ['author_image_pages', 'render_html', 'author_pptx_native']);
   assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
   assert.equal(artifactStage.authority_boundary.default_ppt_route_changed, false);
-  assert.equal(artifactStage.authority_boundary.managed_deliverable_runtime_changed, false);
+  assert.equal(artifactStage.authority_boundary.managed_deliverable_runtime_changed, true);
   const reviewStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'review_and_revision');
   assert.deepEqual(reviewStage.visual_pattern_memory_refs, [
     '/domain_memory_descriptor_locator/writeback_proposal_generator',

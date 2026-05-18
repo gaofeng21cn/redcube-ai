@@ -3,46 +3,13 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { mkdtempSync, writeFileSync } from 'node:fs';
 
 import {
-  getReviewState,
   runSourceFirstFanout,
 } from './product-domain-action-test-api.ts';
-import {
-  startMockCodexCli,
-  withEnv,
-} from './mock-codex-cli.ts';
 
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
-  process.execPath,
-  '--experimental-strip-types',
-  path.join(MODULE_DIR, 'helpers/mock-redcube-python-with-playwright.ts'),
-]);
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-async function withMockRuntime(testFn) {
-  const upstream = await startMockCodexCli();
-  const restoreEnv = withEnv({
-    REDCUBE_CODEX_COMMAND: upstream.command,
-    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
-    REDCUBE_IMAGE_GENERATION_MOCK: '1',
-  });
-  try {
-    return await testFn();
-  } finally {
-    restoreEnv();
-    await upstream.close();
-  }
-}
-
-test('source-first fanout prepares one shared source pack then runs PPT and XHS family gates independently', async () => {
-  await withMockRuntime(async () => {
+test('source-first fanout prepares one shared source pack then returns OPL stage plans for PPT and XHS families', async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-first-fanout-'));
     const sourceFile = path.join(workspaceRoot, 'thyroid-source.md');
     writeFileSync(
@@ -79,12 +46,15 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
 
     assert.equal(result.ok, true);
     assert.equal(result.surface_kind, 'source_first_fanout');
+    assert.equal(result.recommended_action, 'submit_fanout_to_opl_stage_attempt_runtime');
     assert.equal(result.source_barrier.planningReady, true);
     assert.equal(result.source_barrier.intake.cache_status, 'miss');
     assert.equal(result.summary.source_barrier_status, 'planning_ready');
     assert.equal(result.summary.deliverable_count, 2);
-    assert.equal(result.summary.managed_run_count, 2);
+    assert.equal(result.summary.stage_execution_plan_count, 2);
+    assert.equal(result.summary.managed_run_count, 0);
     assert.equal(result.summary.parallel_family_ready, true);
+    assert.deepEqual(result.managed_runs, []);
 
     assert.equal(result.source_pack_fanout.artifact_kind, 'cross_family_source_pack_fanout');
     assert.deepEqual(
@@ -96,29 +66,33 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
       ['deck-fanout', 'note-fanout'],
     );
 
-    assert.equal(result.planner.planner_kind, 'source_first_cross_family_fanout');
+    assert.equal(result.planner.planner_kind, 'source_first_opl_stage_plan_fanout');
     assert.equal(result.planner.barrier.authoritative_surface, 'shared_source_truth');
     assert.equal(result.planner.barrier.planned_reuse, true);
     assert.equal(result.planner.barrier.actual_reuse.frozen_source_pack_reused, false);
     assert.equal(result.planner.barrier.reuse_truth_source, 'source_pack_manifest.reuse');
     assert.equal(result.planner.family_execution.parallel_after_barrier, true);
     assert.equal(result.planner.family_execution.quality_gate_policy, 'preserve_each_family_review_and_export_gates');
-    assert.deepEqual(result.planner.managed_dag.layers[0].task_ids, [
+    assert.equal(result.planner.family_execution.stage_attempt_runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(result.planner.family_execution.stage_scheduler_owner, 'one-person-lab');
+    assert.equal(result.planner.repo_local_managed_runtime.active_caller, false);
+    assert.deepEqual(result.planner.opl_stage_execution_plan_dag.layers[0].task_ids, [
       'source_pack:topic-fanout/source-pack/planning_ready',
     ]);
-    assert.deepEqual(result.planner.managed_dag.layers[1].task_ids, [
-      'ppt_deck:deck-fanout:storyline',
-      'xiaohongshu:note-fanout:research',
+    assert.deepEqual(result.planner.opl_stage_execution_plan_dag.layers[1].task_ids, [
+      'opl-stage-execution-plan:ppt_deck:topic-fanout:deck-fanout:auto-to-terminal',
+      'opl-stage-execution-plan:xiaohongshu:topic-fanout:note-fanout:auto-to-terminal',
     ]);
 
-    const [deckRun, noteRun] = result.managed_runs;
-    assert.equal(deckRun.managed_run.overlay, 'ppt_deck');
-    assert.equal(deckRun.managed_run.current_stage, 'export_pptx');
-    assert.equal(noteRun.managed_run.overlay, 'xiaohongshu');
-    assert.equal(noteRun.managed_run.current_stage, 'export_bundle');
-    assert.notEqual(deckRun.managed_run.managed_run_id, noteRun.managed_run.managed_run_id);
+    const [deckPlan, notePlan] = result.stage_execution_plans;
+    assert.equal(deckPlan.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(deckPlan.owner, 'one-person-lab');
+    assert.equal(deckPlan.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(deckPlan.execution_model.rca_role, 'visual_domain_authority_functions_and_route_handler_refs');
+    assert.equal(deckPlan.delivery_identity.deliverable_family, 'ppt_deck');
+    assert.equal(notePlan.delivery_identity.deliverable_family, 'xiaohongshu');
     assert.deepEqual(
-      deckRun.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+      deckPlan.stage_attempts.map((stageRun) => stageRun.stage_id),
       [
         'storyline',
         'detailed_outline',
@@ -127,11 +101,12 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
         'author_image_pages',
         'visual_director_review',
         'screenshot_review',
+        'repair_image_pages',
         'export_pptx',
       ],
     );
     assert.deepEqual(
-      noteRun.managed_run.route_runs.map((stageRun) => stageRun.stage_id),
+      notePlan.stage_attempts.map((stageRun) => stageRun.stage_id),
       [
         'research',
         'storyline',
@@ -140,36 +115,9 @@ test('source-first fanout prepares one shared source pack then runs PPT and XHS 
         'author_image_pages',
         'visual_director_review',
         'screenshot_review',
+        'repair_image_pages',
         'publish_copy',
         'export_bundle',
       ],
     );
-
-    const deckReview = await getReviewState({
-      workspaceRoot,
-      topicId: 'topic-fanout',
-      deliverableId: 'deck-fanout',
-    });
-    const noteReview = await getReviewState({
-      workspaceRoot,
-      topicId: 'topic-fanout',
-      deliverableId: 'note-fanout',
-    });
-    assert.equal(deckReview.state.deliverable_id, 'deck-fanout');
-    assert.equal(noteReview.state.deliverable_id, 'note-fanout');
-    assert.notDeepEqual(deckReview.state, noteReview.state);
-
-    const deckExport = readJson(path.join(
-      workspaceRoot,
-      'topics/topic-fanout/deliverables/deck-fanout/artifacts/publish_bundle.json',
-    ));
-    const noteExport = readJson(path.join(
-      workspaceRoot,
-      'topics/topic-fanout/deliverables/note-fanout/artifacts/publish_bundle.json',
-    ));
-    assert.equal(deckExport.overlay, 'ppt_deck');
-    assert.equal(deckExport.route, 'export_pptx');
-    assert.equal(noteExport.overlay, 'xiaohongshu');
-    assert.equal(noteExport.route, 'export_bundle');
-  });
 });

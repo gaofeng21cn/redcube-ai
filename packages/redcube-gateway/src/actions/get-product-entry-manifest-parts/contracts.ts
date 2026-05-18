@@ -64,7 +64,7 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
       entry_adapter: 'RedCubeDomainEntry',
       runtime_owner: runtime.runtime_owner,
       session_store_root: runtime.session_store_root,
-      executor_owner: 'codex_cli',
+      executor_owner: 'configured_by_opl_runtime_provider',
     },
     guardrails: [
       'do_not_create_second_public_skill',
@@ -98,7 +98,7 @@ export function buildDeliverableFacadeContract() {
     family_route_policy: {
       ppt_deck: {
         deliverable_family: 'ppt_deck',
-        route_surface: 'runManagedDeliverable',
+        route_surface: 'buildOplStageExecutionPlan',
         route_fallback_surface: 'runDeliverableRoute',
         protected_stage_sequence: pptDeckDescription.route_sequence || [],
         default_visual_route: pptDefaultVisualRoute,
@@ -131,7 +131,7 @@ export function buildDeliverableFacadeContract() {
       xiaohongshu: {
         deliverable_family: 'xiaohongshu',
         route_surface: 'runDeliverableRoute',
-        route_fallback_surface: 'runManagedDeliverable',
+        route_fallback_surface: 'buildOplStageExecutionPlan',
         protected_stage_sequence: xiaohongshuDescription.route_sequence || [],
         default_visual_route: xhsDefaultVisualRoute,
         default_visual_policy: xiaohongshuVisualPolicy.default_visual_policy || 'image_first',

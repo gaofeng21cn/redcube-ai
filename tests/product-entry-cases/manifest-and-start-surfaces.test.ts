@@ -92,7 +92,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       surface_kind: 'product_entry_session',
       command: 'redcube product session --entry-session-id <entry-session-id>',
       session_locator_field: 'entry_session_contract.entry_session_id',
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     });
     assert.equal(manifest.product_entry_overview.recommended_step_id, 'open_status');
     assert.deepEqual(manifest.product_entry_overview.human_gate_ids, ['redcube_operator_review_gate']);
@@ -116,7 +116,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       surface_kind: 'product_entry_session',
       command: 'redcube product session --entry-session-id <entry-session-id>',
       session_locator_field: 'entry_session_contract.entry_session_id',
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     });
     assert.deepEqual(manifest.product_entry_start.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.product_entry_preflight.surface_kind, 'product_entry_preflight');
@@ -166,13 +166,13 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       '成熟的最终用户前台壳仍未 landed。',
       'managed web productization 仍未 landed。',
     ]);
-    assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
+    assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
     assert.deepEqual(manifest.managed_runtime_contract, {
       shared_contract_ref: 'contracts/opl-framework/managed-runtime-three-layer-contract.json',
-      runtime_owner: 'codex_cli',
+      runtime_owner: 'configured_family_runtime_provider',
       domain_owner: 'redcube_ai',
-      executor_owner: 'codex_cli',
+      executor_owner: 'configured_by_opl_runtime_provider',
       supervision_status_surface: {
         surface_kind: 'product_entry_session',
         owner: 'redcube_ai',
@@ -192,9 +192,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       ],
     });
     assert.equal(manifest.runtime_inventory.surface_kind, 'runtime_inventory');
-    assert.equal(manifest.runtime_inventory.runtime_owner, 'codex_cli');
+    assert.equal(manifest.runtime_inventory.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime_inventory.domain_owner, 'redcube_ai');
-    assert.equal(manifest.runtime_inventory.executor_owner, 'codex_cli');
+    assert.equal(manifest.runtime_inventory.executor_owner, 'configured_by_opl_runtime_provider');
     assert.equal(manifest.runtime_inventory.status_surface.ref, '/product_entry_preflight');
     assert.equal(manifest.runtime_inventory.attention_surface.ref, '/status_surface');
     assert.equal(manifest.runtime_inventory.recovery_surface.ref, '/operator_loop_actions/continue_session');
@@ -459,9 +459,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.skill_catalog.skills[0].domain_projection.runtime_continuity,
       {
         surface_kind: 'skill_runtime_continuity',
-        runtime_owner: 'codex_cli',
+        runtime_owner: 'configured_family_runtime_provider',
         domain_owner: 'redcube_ai',
-        executor_owner: 'codex_cli',
+        executor_owner: 'configured_by_opl_runtime_provider',
         session_locator_field: 'entry_session_contract.entry_session_id',
         session_surface_ref: {
           ref_kind: 'json_pointer',
@@ -551,13 +551,13 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.route_equivalence.downstream_runtime_truth.runtime_owner,
-      'codex_cli',
+      'configured_family_runtime_provider',
     );
     assert.equal(manifest.deliverable_facade.surface_kind, 'deliverable_facade_contract');
     assert.deepEqual(manifest.deliverable_facade.covered_families, ['ppt_deck', 'xiaohongshu']);
     assert.deepEqual(manifest.deliverable_facade.facade_truth_surfaces, [
       'createDeliverable',
-      'runManagedDeliverable',
+      'buildOplStageExecutionPlan',
       'runDeliverableRoute',
       'auditDeliverable',
       'runtimeWatch',
@@ -715,7 +715,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	      '/continuation_snapshot/managed_progress_projection/final_artifact_refs',
 	    );
       assert.equal(manifest.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-      assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+      assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
       assert.equal(manifest.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
       assert.equal(manifest.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
       assert.equal(
@@ -749,12 +749,15 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.deepEqual(
         manifest.opl_family_lifecycle_adapter.discovery.owner_split,
         {
-          family_persistence_owner: 'redcube_ai',
+          family_persistence_owner: 'one-person-lab',
+          session_shell_owner: 'one-person-lab',
+          stage_attempt_owner: 'one-person-lab',
+          attempt_ledger_owner: 'one-person-lab',
           lifecycle_projection_owner: 'redcube_ai',
           domain_truth_owner: 'redcube_ai',
           review_publication_owner: 'redcube_ai',
           runtime_manager_consumer: 'opl_runtime_manager',
-          executor_owner: 'codex_cli',
+          executor_owner: 'configured_by_opl_runtime_provider',
         },
       );
       assert.deepEqual(
@@ -763,7 +766,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
           'product_entry_registration',
           'opl_hosted_stage_runtime',
           'product_entry_session',
-          'managed_run_store',
+          'opl_stage_execution_plan',
           'review_state',
           'publication_projection',
         ],

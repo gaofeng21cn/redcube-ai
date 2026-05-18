@@ -173,11 +173,11 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.resume_contract.session_locator_field, sessionLocatorField);
   assert.equal(
     surface.family_orchestration.resume_contract.checkpoint_locator_field,
-    'continuation_snapshot.latest_managed_run_id',
+    'continuation_snapshot.latest_stage_execution_plan_ref',
   );
 }
 
-function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwner = 'codex_cli' }) {
+function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwner = 'configured_family_runtime_provider' }) {
   assert.equal(surface.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
   assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, runtimeOwner);
   assert.equal(surface.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');

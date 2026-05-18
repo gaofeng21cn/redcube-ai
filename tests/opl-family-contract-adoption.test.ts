@@ -142,9 +142,10 @@ test('RCA stage control projection maps route stages without owning runtime cont
     rca_owns_visual_truth: true,
     rca_owns_review_publication_projection: true,
     rca_owns_artifact_authority: true,
-    opl_role: 'read_only_stage_projection_consumer',
+    opl_role: 'stage_attempt_scheduler_and_projection_consumer',
     default_ppt_route_changed: false,
-    managed_deliverable_runtime_changed: false,
+    managed_deliverable_runtime_changed: true,
+    repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
   });
 });
 
@@ -1082,9 +1083,10 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
     'adoption surface',
   ]);
   assert.equal(stageProjection.status, 'repo_tracked_projection_contract');
-  assert.equal(stageProjection.adapter_model, 'descriptor_read_only');
+  assert.equal(stageProjection.adapter_model, 'descriptor_and_stage_execution_plan_provider');
   assert.equal(stageProjection.default_ppt_route_changed, false);
-  assert.equal(stageProjection.managed_deliverable_runtime_changed, false);
+  assert.equal(stageProjection.managed_deliverable_runtime_changed, true);
+  assert.equal(stageProjection.repo_local_managed_deliverable_runtime_role, 'explicit_diagnostic_or_historical_regression_only');
   const attempt = payload.current_state.active_baton.scope.controlled_visual_stage_attempt;
 
   assert.equal(memory.status, DOMAIN_MEMORY_ADOPTION_STATE);

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   invokeProductEntry,
+  runManagedDeliverable,
 } from './product-domain-action-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
@@ -43,7 +44,7 @@ async function withMockCodexRuntimeState(testFn) {
   }
 }
 
-test('invokeProductEntry managed ppt deck preserves full manuscript evidence without enforcing source slide suggestions', SERIAL_ENV_TEST, async () => {
+test('product-entry returns OPL plan while diagnostic managed ppt deck preserves full manuscript evidence', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-manuscript-source-'));
     const sourceFile = path.join(workspaceRoot, 'nfpitnet-three-papers.md');
@@ -122,7 +123,21 @@ test('invokeProductEntry managed ppt deck preserves full manuscript evidence wit
     });
 
     assert.equal(response.ok, true);
-    const managedRun = response.domain_entry_surface.result_surface.managed_run;
+    assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(
+      response.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner,
+      false,
+    );
+
+    const diagnosticRun = await runManagedDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'nfpitnet-topic',
+      deliverableId: 'nfpitnet-deck',
+      userIntent: '诊断验证：显式运行 RCA route 到详细大纲，确认完整资料证据仍被消费。',
+      stopAfterStage: 'detailed_outline',
+    });
+    const managedRun = diagnosticRun.managed_run;
     assert.deepEqual(
       managedRun.route_runs.map((stageRun) => stageRun.stage_id),
       ['storyline', 'detailed_outline'],

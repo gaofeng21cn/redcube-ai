@@ -16,7 +16,7 @@ import {
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
 
-test('default product-entry path stays on codex_cli without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
+test('default product-entry path returns an OPL stage execution plan without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -26,28 +26,28 @@ test('default product-entry path stays on codex_cli without requiring Hermes API
     const manifest = await getProductEntryManifest({
       workspace_root: workspaceRoot,
     });
-    assert.equal(manifest.runtime.runtime_owner, 'codex_cli');
-    assert.equal(manifest.runtime_inventory.executor_owner, 'codex_cli');
-    assert.equal(manifest.managed_runtime_contract.runtime_owner, 'codex_cli');
-    assert.equal(manifest.managed_runtime_contract.executor_owner, 'codex_cli');
-    assert.equal(manifest.route_equivalence.downstream_runtime_truth.runtime_owner, 'codex_cli');
-    assert.equal(manifest.route_equivalence.downstream_runtime_truth.executor_owner, 'codex_cli');
-    assert.equal(manifest.runtime_inventory.substrate, 'codex_cli_runtime');
+    assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.runtime_inventory.executor_owner, 'configured_by_opl_runtime_provider');
+    assert.equal(manifest.managed_runtime_contract.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.managed_runtime_contract.executor_owner, 'configured_by_opl_runtime_provider');
+    assert.equal(manifest.route_equivalence.downstream_runtime_truth.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.route_equivalence.downstream_runtime_truth.executor_owner, 'configured_by_opl_runtime_provider');
+    assert.equal(manifest.runtime_inventory.substrate, 'opl_provider_backed_stage_attempt_runtime');
     assert.equal(
       manifest.skill_catalog.skills[0].domain_projection.runtime_continuity.runtime_owner,
-      'codex_cli',
+      'configured_family_runtime_provider',
     );
 
     const status = await getProductStatus({
       workspace_root: workspaceRoot,
     });
-    assert.equal(status.runtime.runtime_owner, 'codex_cli');
-    assert.equal(status.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+    assert.equal(status.runtime.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(status.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
 
     const start = await getProductStart({
       workspace_root: workspaceRoot,
     });
-    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
 
     const invoked = await invokeProductEntry({
       workspace_locator: {
@@ -61,26 +61,28 @@ test('default product-entry path stays on codex_cli without requiring Hermes API
         topic_id: 'topic-a',
         deliverable_id: 'deck-codex-default',
         profile_id: 'lecture_student',
-        title: 'Codex default product entry proof',
-        goal: '验证未配置 Hermes 时默认 product-entry 只走 Codex CLI',
+        title: 'OPL default product entry proof',
+        goal: '验证未配置 Hermes 时默认 product-entry 生成 OPL stage execution plan',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
       },
     });
-    assert.equal(invoked.entry_session.runtime_owner, 'codex_cli');
-    assert.equal(invoked.session_continuity.runtime_owner, 'codex_cli');
-    assert.equal(invoked.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
-    assert.equal(invoked.domain_entry_surface.runtime_session_contract.runtime_owner, 'codex_cli');
+    assert.equal(invoked.entry_session.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(invoked.session_continuity.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(invoked.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(invoked.domain_entry_surface.runtime_session_contract.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, '@redcube/codex-cli-client');
-    assert.equal(invoked.domain_entry_surface.result_surface.managed_run.adapter, 'codex_cli');
-    assert.equal(invoked.domain_entry_surface.result_surface.managed_run.runtime_bridge.owner, 'codex_cli');
+    assert.equal(invoked.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(invoked.domain_entry_surface.result_surface.owner, 'one-person-lab');
+    assert.equal(invoked.domain_entry_surface.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+    assert.equal(invoked.domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner, 'one-person-lab');
 
     const session = await getProductEntrySession({
       entry_session_id: 'session-codex-default',
     });
-    assert.equal(session.entry_session.runtime_owner, 'codex_cli');
-    assert.equal(session.session_continuity.runtime_owner, 'codex_cli');
-    assert.equal(session.runtime_loop_closure.loop_owner.runtime_owner, 'codex_cli');
+    assert.equal(session.entry_session.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(session.session_continuity.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(session.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
   });
 });
 
