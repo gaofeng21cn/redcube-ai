@@ -28,6 +28,34 @@ function jsonStable(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function assertNoLegacyAuthorityFunctionFields(value, label) {
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => assertNoLegacyAuthorityFunctionFields(entry, `${label}[${index}]`));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  if (value.contract_id === 'rca.minimal_authority_functions.v1') {
+    assert.equal('allowed_functions' in value, false, label);
+    assert.equal(Array.isArray(value.allowed_authority_surface_ids), true, label);
+    assert.equal('authority_surface_boundaries' in value, true, label);
+    assert.equal('function_boundaries' in value, false, label);
+  }
+  if (value.surface_kind === 'rca_minimal_authority_surface') {
+    assert.equal('function_id' in value, false, label);
+    assert.equal('legacy_function_id_compatibility' in value, false, label);
+    assert.equal(typeof value.authority_surface_id, 'string', label);
+  }
+  if (value.authority_surface_taxonomy) {
+    assert.equal('retained_functions' in value, false, label);
+    assert.equal('retained_function_count' in value, false, label);
+  }
+
+  for (const [key, entry] of Object.entries(value)) {
+    assertNoLegacyAuthorityFunctionFields(entry, `${label}.${key}`);
+  }
+}
+
 function buildCanonicalPack() {
   const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
   const stageControlPlane = buildRedCubeFamilyStageControlPlane({
@@ -74,7 +102,7 @@ function buildCanonicalPack() {
       domain_pack_owner: 'redcube_ai',
       generated_surface_owner: 'one-person-lab',
       declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
-      minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
+      minimal_authority_surface_ids: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_authority_surface_ids,
       minimal_authority_surface_taxonomy: (
         visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_taxonomy
       ),
@@ -213,7 +241,8 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   assert.equal(packCompilerInput.minimal_authority_surface_contracts.length, 7);
   for (const surface of packCompilerInput.minimal_authority_surface_contracts) {
     assert.equal(surface.surface_kind, 'rca_minimal_authority_surface', surface.authority_surface_id);
-    assert.equal(surface.function_id, surface.authority_surface_id, surface.authority_surface_id);
+    assert.equal('function_id' in surface, false, surface.authority_surface_id);
+    assert.equal('legacy_function_id_compatibility' in surface, false, surface.authority_surface_id);
     assert.equal(surface.mechanical_decision_forbidden, true, surface.authority_surface_id);
     assert.equal(surface.programmatic_verdict_generation_allowed, false, surface.authority_surface_id);
     assert.equal(
@@ -222,6 +251,17 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
       surface.authority_surface_id,
     );
   }
+
+  assertNoLegacyAuthorityFunctionFields(packCompilerInput, 'contracts/pack_compiler_input.json');
+  assertNoLegacyAuthorityFunctionFields(functionalAudit, 'contracts/functional_privatization_audit.json');
+  assertNoLegacyAuthorityFunctionFields(
+    readJson('contracts/runtime-program/current-program.json'),
+    'contracts/runtime-program/current-program.json',
+  );
+  assertNoLegacyAuthorityFunctionFields(
+    readJson('contracts/runtime-program/opl-family-contract-adoption.json'),
+    'contracts/runtime-program/opl-family-contract-adoption.json',
+  );
 });
 
 test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {

@@ -525,7 +525,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       false,
     );
     assert.deepEqual(
-      sidecar.mapped_surfaces.visual_pack_compiler_handoff.minimal_authority_function_contract.allowed_functions,
+      sidecar.mapped_surfaces.visual_pack_compiler_handoff.minimal_authority_function_contract.allowed_authority_surface_ids,
       [
         'source_readiness_verdict',
         'communication_visual_direction_decision',

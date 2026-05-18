@@ -119,7 +119,7 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     domain_pack_owner: DOMAIN_ID,
     generated_surface_owner: GENERATED_SURFACE_OWNER,
     declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
-    minimal_authority_functions: authorityContract.allowed_functions,
+    minimal_authority_surface_ids: authorityContract.allowed_authority_surface_ids,
     minimal_authority_surface_taxonomy: authorityContract.authority_surface_taxonomy,
     minimal_authority_surface_contracts: authorityContract.authority_surface_contracts,
     generated_surfaces_requested: GENERATED_SURFACES,

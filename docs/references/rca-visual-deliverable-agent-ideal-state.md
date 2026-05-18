@@ -208,7 +208,7 @@ RCA 的理想质量体系是 AI-first 的视觉交付体系。AI-authored stage 
 - provider completion 只说明执行器完成了尝试，不说明 artifact ready。
 - `ready`、`exportable`、`handoffable` 只能由 RCA-owned gate 给出。
 
-长期保留的 visual authority surfaces 必须逐项满足；旧 `function_id` 是兼容字段，不代表由私有函数直接裁决：
+长期保留的 visual authority surfaces 必须逐项满足；active machine contract 只使用 `authority_surface_id`，不再保留旧 `function_id` 兼容字段：
 
 | Authority surface | Work mode | Judgment owner | 程序角色 |
 | --- | --- | --- | --- |

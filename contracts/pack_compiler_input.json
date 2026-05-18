@@ -17,7 +17,7 @@
     "authority_function_manifest",
     "oracle_fixtures"
   ],
-  "minimal_authority_functions": [
+  "minimal_authority_surface_ids": [
     "source_readiness_verdict",
     "communication_visual_direction_decision",
     "review_export_verdict",
@@ -30,7 +30,6 @@
     "surface_kind": "rca_minimal_authority_surface_taxonomy",
     "taxonomy_id": "rca.minimal_authority_surface_taxonomy.v1",
     "owner": "redcube_ai",
-    "legacy_function_id_compatibility": true,
     "ai_first_judgment_surface_ids": [
       "source_readiness_verdict",
       "communication_visual_direction_decision",
@@ -59,8 +58,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "source_readiness_verdict",
-      "function_id": "source_readiness_verdict",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -113,8 +110,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "communication_visual_direction_decision",
-      "function_id": "communication_visual_direction_decision",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -167,8 +162,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "review_export_verdict",
-      "function_id": "review_export_verdict",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -221,8 +214,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "artifact_mutation_authorization",
-      "function_id": "artifact_mutation_authorization",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -275,8 +266,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "visual_memory_accept_reject",
-      "function_id": "visual_memory_accept_reject",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -329,8 +318,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "owner_receipt_signer",
-      "function_id": "owner_receipt_signer",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,
@@ -383,8 +370,6 @@
     {
       "surface_kind": "rca_minimal_authority_surface",
       "authority_surface_id": "native_helper_implementation",
-      "function_id": "native_helper_implementation",
-      "legacy_function_id_compatibility": true,
       "owner": "redcube_ai",
       "retention_class": "rca_minimal_authority_function",
       "generated_by_opl": false,

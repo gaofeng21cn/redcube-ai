@@ -80,7 +80,6 @@ export function buildRcaMinimalAuthoritySurfaceTaxonomy() {
     surface_kind: 'rca_minimal_authority_surface_taxonomy',
     taxonomy_id: 'rca.minimal_authority_surface_taxonomy.v1',
     owner: 'redcube_ai',
-    legacy_function_id_compatibility: true,
     ai_first_judgment_surface_ids: [...RCA_AI_FIRST_JUDGMENT_SURFACES],
     programmatic_authority_surface_ids: [...RCA_PROGRAMMATIC_AUTHORITY_SURFACES],
     all_surface_ids: [...RCA_MINIMAL_AUTHORITY_FUNCTIONS],
@@ -96,8 +95,6 @@ export function buildRcaMinimalAuthoritySurfaceContracts() {
     return {
       surface_kind: 'rca_minimal_authority_surface',
       authority_surface_id: surfaceId,
-      function_id: surfaceId,
-      legacy_function_id_compatibility: true,
       owner: 'redcube_ai',
       retention_class: 'rca_minimal_authority_function',
       generated_by_opl: false,
@@ -266,8 +263,8 @@ export function buildVisualPackCompilerHandoffProjection() {
       ],
       authority_function_manifest: {
         owner: 'redcube_ai',
-        retained_functions: [...RCA_MINIMAL_AUTHORITY_FUNCTIONS],
-        retained_function_count: RCA_MINIMAL_AUTHORITY_FUNCTIONS.length,
+        retained_authority_surface_ids: [...RCA_MINIMAL_AUTHORITY_FUNCTIONS],
+        retained_authority_surface_count: RCA_MINIMAL_AUTHORITY_FUNCTIONS.length,
         authority_surface_taxonomy: buildRcaMinimalAuthoritySurfaceTaxonomy(),
         retained_surface_contracts: buildRcaMinimalAuthoritySurfaceContracts(),
         all_other_generic_shells_generated_by_opl: true,
@@ -356,12 +353,12 @@ export function buildVisualPackCompilerHandoffProjection() {
     minimal_authority_function_contract: {
       contract_id: 'rca.minimal_authority_functions.v1',
       owner: 'redcube_ai',
-      allowed_functions: [...RCA_MINIMAL_AUTHORITY_FUNCTIONS],
+      allowed_authority_surface_ids: [...RCA_MINIMAL_AUTHORITY_FUNCTIONS],
       authority_surface_taxonomy: buildRcaMinimalAuthoritySurfaceTaxonomy(),
       authority_surface_contracts: buildRcaMinimalAuthoritySurfaceContracts(),
       forbidden_rca_long_term_owner_surfaces: [...OPL_GENERATED_SURFACE_TARGETS],
       only_allowed_long_term_rca_authority: true,
-      function_boundaries: {
+      authority_surface_boundaries: {
         source_readiness_verdict: {
           owner: 'redcube_ai',
           output_refs_only_for_opl: true,
