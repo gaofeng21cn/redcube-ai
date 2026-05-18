@@ -50,9 +50,9 @@ OPL 必须持有：
 
 旧 repo-local managed runtime 的物理清理已经闭合：active source/package/test surface 不再保留旧 deliverable runner、run store、DAG scheduler、managed event/prompt/run/liveness/surface/bridge helpers、gateway public managed action handlers 或 runtime-protocol managed run helper/types。需要追溯这些实现时只读 history/provenance 或旧 commit。
 
-当前必须保留：
+当前功能/结构差距已清零：
 
-`functional_structure_gap_count=1`
+`functional_structure_gap_count=0`
 
 已闭合为标准 OPL consumer 口径的 8 项：
 
@@ -65,10 +65,7 @@ OPL 必须持有：
 - `workspace_source_lifecycle_receipt_shell`
 - `legacy_physical_cleanup`
 
-这些闭合只表示 generic shell/runtime owner 归 OPL，RCA 以 refs-only/domain-handler/authority-function 方式消费；不能写成 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable。
-
-1. `production_live_soak_and_evidence`
-   OPL generated/hosted wrapper、session、workbench、artifact/review/source shell 已按合同消费，但还没有完成 Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence。
+这些闭合表示 generic shell/runtime owner 归 OPL，RCA 以 refs-only/domain-handler/authority-function 方式消费。Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence 不再计入功能/结构差距，保留为 production evidence tail。
 
 ## 当前 cleanliness tail
 
@@ -95,7 +92,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority functions：
 
 ## 当前测试/证据差距
 
-以下是目标结构正确后的证据门，不能替代上面的功能/结构 gap：
+以下是结构闭合后的证据门，不能写成 production visual-stage soak、visual ready、exportable 或 handoffable 已完成：
 
 - 真实 artifact-producing owner receipt。
 - visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。
@@ -105,11 +102,11 @@ RCA 长期只允许保留 visual domain 的 minimal authority functions：
 
 ## 完善顺序
 
-1. `production_live_soak_and_evidence`
+1. `production_evidence_tail`
    用低风险真实 workspace 继续跑 `ppt_deck` 或 `xiaohongshu`，从 OPL-hosted attempt 或 generated continuation shell 进入 RCA service-safe domain entry，累计 `domain_receipt`、`typed_blocker`、`no_regression_evidence`、artifact-producing owner receipt 和 memory/lifecycle receipt。
 
 2. `runtime_evidence_scaleout`
-   在结构差距关闭后，补真实 artifact-producing receipt、visual memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。
+   继续补真实 artifact-producing receipt、visual memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。
 
 3. `naming_contract_hygiene`
    将历史 `managed` 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增 compatibility alias。

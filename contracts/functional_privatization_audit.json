@@ -37,7 +37,7 @@
       "workspace_source_lifecycle_receipt_shell",
       "legacy_physical_cleanup"
     ],
-    "functional_structure_gap_count": 1,
+    "functional_structure_gap_count": 0,
     "long_term_rca_generic_owner_claim_count": 0,
     "remaining_evidence_gate_ids": [
       "real_artifact_producing_domain_owner_receipt",
@@ -45,20 +45,12 @@
       "real_memory_lifecycle_receipt_instances",
       "cross_family_repeated_no_regression_evidence"
     ],
-    "remaining_functional_structure_gap_ids": [
-      "production_live_soak_and_evidence"
-    ],
-    "remaining_functional_structure_gaps": [
-      {
-        "current_bucket": "production_evidence_blocker",
-        "gap_id": "production_live_soak_and_evidence",
-        "owner": "one-person-lab",
-        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
-      }
-    ],
-    "remaining_gap_class": "production_live_soak_evidence_only",
-    "status": "classification_closed_followthrough_gaps_open",
-    "unclassified_private_generic_residue_count": 0
+    "remaining_functional_structure_gap_ids": [],
+    "remaining_functional_structure_gaps": [],
+    "remaining_gap_class": "none",
+    "status": "functional_structure_gaps_closed_evidence_gates_open",
+    "unclassified_private_generic_residue_count": 0,
+    "evidence_gap_class": "production_live_soak_evidence_only"
   },
   "opl_generated_interface_consumption": {
     "bridge_exit_gate": {
@@ -79,9 +71,7 @@
       "rca_can_own_generated_surface": false,
       "rca_can_own_generic_session_shell": false,
       "rca_can_own_generic_workbench": false,
-      "remaining_blocker_ids": [
-        "production_live_soak_and_evidence"
-      ],
+      "remaining_blocker_ids": [],
       "repo_local_allowed_roles_before_exit": [
         "domain_handler_target",
         "direct_domain_entry",
@@ -98,6 +88,12 @@
       "required_before_retiring_repo_local_wrappers": [
         "domain_authority_refs_preserved",
         "no_regression_proof_recorded"
+      ],
+      "remaining_evidence_gate_ids": [
+        "real_artifact_producing_domain_owner_receipt",
+        "opl_hosted_controlled_visual_stage_long_soak",
+        "real_memory_lifecycle_receipt_instances",
+        "cross_family_repeated_no_regression_evidence"
       ]
     },
     "consumed_from_refs": [
@@ -218,9 +214,7 @@
       "gate_id": "rca.private_generic_residue_bridge_exit.v1",
       "owner": "redcube_ai",
       "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
-      "remaining_blocker_ids": [
-        "production_live_soak_and_evidence"
-      ],
+      "remaining_blocker_ids": [],
       "remaining_bridge_module_ids": [
         "product_entry_session_store",
         "workspace_source_intake",
@@ -238,7 +232,13 @@
         "domain_authority_refs_preserved",
         "no_regression_proof_recorded"
       ],
-      "status": "functional_bridge_exited_physical_cleanup_closed_evidence_open"
+      "status": "functional_bridge_exited_physical_cleanup_closed",
+      "remaining_evidence_gate_ids": [
+        "real_artifact_producing_domain_owner_receipt",
+        "opl_hosted_controlled_visual_stage_long_soak",
+        "real_memory_lifecycle_receipt_instances",
+        "cross_family_repeated_no_regression_evidence"
+      ]
     },
     "classification_values": [
       "opl_hosted_surface",
@@ -290,7 +290,7 @@
         "workspace_source_lifecycle_receipt_shell",
         "legacy_physical_cleanup"
       ],
-      "functional_structure_gap_count": 1,
+      "functional_structure_gap_count": 0,
       "long_term_rca_generic_owner_claim_count": 0,
       "remaining_evidence_gate_ids": [
         "real_artifact_producing_domain_owner_receipt",
@@ -298,20 +298,12 @@
         "real_memory_lifecycle_receipt_instances",
         "cross_family_repeated_no_regression_evidence"
       ],
-      "remaining_functional_structure_gap_ids": [
-        "production_live_soak_and_evidence"
-      ],
-      "remaining_functional_structure_gaps": [
-        {
-          "current_bucket": "production_evidence_blocker",
-          "gap_id": "production_live_soak_and_evidence",
-          "owner": "one-person-lab",
-          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
-        }
-      ],
-      "remaining_gap_class": "production_live_soak_evidence_only",
-      "status": "classification_closed_followthrough_gaps_open",
-      "unclassified_private_generic_residue_count": 0
+      "remaining_functional_structure_gap_ids": [],
+      "remaining_functional_structure_gaps": [],
+      "remaining_gap_class": "none",
+      "status": "functional_structure_gaps_closed_evidence_gates_open",
+      "unclassified_private_generic_residue_count": 0,
+      "evidence_gap_class": "production_live_soak_evidence_only"
     },
     "generated_interface_consumption": {
       "bridge_exit_gate": {
@@ -332,9 +324,7 @@
         "rca_can_own_generated_surface": false,
         "rca_can_own_generic_session_shell": false,
         "rca_can_own_generic_workbench": false,
-        "remaining_blocker_ids": [
-          "production_live_soak_and_evidence"
-        ],
+        "remaining_blocker_ids": [],
         "repo_local_allowed_roles_before_exit": [
           "domain_handler_target",
           "direct_domain_entry",
@@ -351,6 +341,12 @@
         "required_before_retiring_repo_local_wrappers": [
           "domain_authority_refs_preserved",
           "no_regression_proof_recorded"
+        ],
+        "remaining_evidence_gate_ids": [
+          "real_artifact_producing_domain_owner_receipt",
+          "opl_hosted_controlled_visual_stage_long_soak",
+          "real_memory_lifecycle_receipt_instances",
+          "cross_family_repeated_no_regression_evidence"
         ]
       },
       "consumed_from_refs": [
@@ -1720,9 +1716,7 @@
         "rca_can_own_generated_surface": false,
         "rca_can_own_generic_session_shell": false,
         "rca_can_own_generic_workbench": false,
-        "remaining_blocker_ids": [
-          "production_live_soak_and_evidence"
-        ],
+        "remaining_blocker_ids": [],
         "repo_local_allowed_roles_before_exit": [
           "domain_handler_target",
           "direct_domain_entry",
@@ -1739,6 +1733,12 @@
         "required_before_retiring_repo_local_wrappers": [
           "domain_authority_refs_preserved",
           "no_regression_proof_recorded"
+        ],
+        "remaining_evidence_gate_ids": [
+          "real_artifact_producing_domain_owner_receipt",
+          "opl_hosted_controlled_visual_stage_long_soak",
+          "real_memory_lifecycle_receipt_instances",
+          "cross_family_repeated_no_regression_evidence"
         ]
       },
       "consumed_from_refs": [

@@ -184,8 +184,12 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
   );
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
-  assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_blocker_ids, [
-    'production_live_soak_and_evidence',
+  assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_blocker_ids, []);
+  assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_evidence_gate_ids, [
+    'real_artifact_producing_domain_owner_receipt',
+    'opl_hosted_controlled_visual_stage_long_soak',
+    'real_memory_lifecycle_receipt_instances',
+    'cross_family_repeated_no_regression_evidence',
   ]);
 });
 
@@ -216,8 +220,12 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
       'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
     );
     assert.equal(surface.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
-    assert.deepEqual(surface.bridge_exit_gate.remaining_blocker_ids, [
-      'production_live_soak_and_evidence',
+    assert.deepEqual(surface.bridge_exit_gate.remaining_blocker_ids, []);
+    assert.deepEqual(surface.bridge_exit_gate.remaining_evidence_gate_ids, [
+      'real_artifact_producing_domain_owner_receipt',
+      'opl_hosted_controlled_visual_stage_long_soak',
+      'real_memory_lifecycle_receipt_instances',
+      'cross_family_repeated_no_regression_evidence',
     ]);
 
     for (const entry of surface.modules) {

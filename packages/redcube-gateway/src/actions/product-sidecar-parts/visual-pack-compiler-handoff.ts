@@ -77,8 +77,12 @@ export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
   declares_production_consumption_complete: true,
   production_consumption_scope: 'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
   declares_visual_stage_long_soak_complete: false,
-  remaining_blocker_ids: [
-    'production_live_soak_and_evidence',
+  remaining_blocker_ids: [],
+  remaining_evidence_gate_ids: [
+    'real_artifact_producing_domain_owner_receipt',
+    'opl_hosted_controlled_visual_stage_long_soak',
+    'real_memory_lifecycle_receipt_instances',
+    'cross_family_repeated_no_regression_evidence',
   ],
 });
 
@@ -164,7 +168,7 @@ export function buildVisualPackCompilerHandoffProjection() {
       repo_local_handler_targets: [...RCA_REPO_LOCAL_HANDLER_TARGETS],
       rca_generated_surface_owner: false,
       current_rca_shell_status: 'opl_generated_surface_consumed_domain_handlers_only',
-      remaining_cleanup_and_evidence_gates: [
+      post_closure_evidence_guard_ids: [
         'domain_authority_refs_preserved',
         'no_regression_proof_recorded',
       ],

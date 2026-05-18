@@ -20,7 +20,6 @@ export function buildOperatorEvidenceReadinessProjection({
     'legacy_physical_cleanup',
   ];
   const remainingFunctionalStructureGapIds = [
-    'production_live_soak_and_evidence',
   ];
   return {
     surface_kind: 'operator_evidence_readiness_projection',
@@ -93,12 +92,13 @@ export function buildOperatorEvidenceReadinessProjection({
     ready_for_operator_gap_projection: true,
     ready_for_opl_app_consumption: true,
     remaining_gap_classification: {
-      functional_structure_gap_status: 'classification_closed_followthrough_gaps_open',
+      functional_structure_gap_status: 'functional_structure_gaps_closed_evidence_gates_open',
       functional_structure_gap_count: remainingFunctionalStructureGapIds.length,
       completed_functional_structure_gap_count: completedFunctionalStructureGapIds.length,
       completed_functional_structure_gap_ids: completedFunctionalStructureGapIds,
-      remaining_gap_class: 'production_live_soak_evidence_only',
+      remaining_gap_class: 'none',
       remaining_functional_structure_gap_ids: remainingFunctionalStructureGapIds,
+      evidence_gap_class: 'production_live_soak_evidence_only',
       remaining_evidence_gate_ids: [
         'real_artifact_producing_domain_owner_receipt',
         'opl_hosted_controlled_visual_stage_long_soak',

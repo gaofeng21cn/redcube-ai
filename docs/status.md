@@ -18,13 +18,13 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 - `contracts/`、runtime-program contracts、product-entry manifest、CLI/MCP 行为、workspace/runtime receipt、artifact locator、review/export gate 与真实交付物证据是机器真相；`docs/**` 只做解释、导航、治理和 provenance。
 - 过程性 dated follow-through、closeout tranche 和 proof 命令摘要进入 `docs/history/`；当前目标态与 gap 只读 [RedCube AI 理想目标态](./references/rca-visual-deliverable-agent-ideal-state.md) 和 [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md)。
 
-## 当前功能/结构差距
+## 当前功能/结构闭合状态
 
 当前功能/结构差距按 active plan 维护：
 
-`functional_structure_gap_count=1`
+`functional_structure_gap_count=0`
 
-已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合只表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；不能替代 visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 证据。
+已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 仍属于证据门。
 
 当前标准 OPL Agent 结构口径：
 
@@ -32,12 +32,9 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 - OPL-owned/generated surface = CLI/MCP/Skill/product-entry/status/session/sidecar/workbench wrapper、generic supervision/session/workbench、provider-backed stage attempt runtime、attempt ledger、retry/dead-letter、artifact gallery/handoff shell、review/repair transport、operator/App shell。
 - active RCA source 中不再维护旧 repo-local deliverable runner、run store、DAG scheduler 或 public managed lookup/supervision action。
 
-1. `production_live_soak_and_evidence`
-   OPL generated/hosted wrapper、session、workbench、artifact/review/source shell 已按 contract 消费为 RCA refs-only/domain-handler target，但还没有完成 production visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipts 和 cross-family repeated no-regression evidence。
-
 ## 当前测试/证据差距
 
-以下证据门不能替代上面的功能/结构 gap：
+以下是结构闭合后的 production evidence tail，不再计入功能/结构差距：
 
 - 真实 artifact-producing owner receipt。
 - visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。

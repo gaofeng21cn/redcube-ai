@@ -231,7 +231,7 @@ export function buildFunctionalModulePhysicalDeletionGuard(entry) {
 export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
   return {
     gate_id: 'rca.private_generic_residue_bridge_exit.v1',
-    status: 'functional_bridge_exited_physical_cleanup_closed_evidence_open',
+    status: 'functional_bridge_exited_physical_cleanup_closed',
     owner: 'redcube_ai',
     replacement_owner: 'opl',
     required_before_retiring_remaining_repo_local_bridges: [...RCA_BRIDGE_EXIT_REQUIRED_GATES],
@@ -256,8 +256,12 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
     production_consumption_scope: 'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
     declares_visual_stage_long_soak_complete: false,
     declares_no_active_callers: true,
-    remaining_blocker_ids: [
-      'production_live_soak_and_evidence',
+    remaining_blocker_ids: [],
+    remaining_evidence_gate_ids: [
+      'real_artifact_producing_domain_owner_receipt',
+      'opl_hosted_controlled_visual_stage_long_soak',
+      'real_memory_lifecycle_receipt_instances',
+      'cross_family_repeated_no_regression_evidence',
     ],
   };
 }

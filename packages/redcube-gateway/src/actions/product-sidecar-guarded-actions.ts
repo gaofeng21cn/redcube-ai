@@ -137,7 +137,6 @@ export const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
 ]);
 
 export const RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS = Object.freeze([
-  'production_live_soak_and_evidence',
 ]);
 
 export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
@@ -621,7 +620,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     generated_interface_consumption_ref: OPL_GENERATED_INTERFACE_CONSUMPTION.ref,
     generated_interface_consumption: { ...OPL_GENERATED_INTERFACE_CONSUMPTION },
     functional_structure_gap_closure: {
-      status: 'classification_closed_followthrough_gaps_open',
+      status: 'functional_structure_gaps_closed_evidence_gates_open',
       closed_at: '2026-05-17',
       closure_scope: 'rca_functional_structure_gap_classification',
       functional_structure_gap_count: RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS.length,
@@ -629,14 +628,15 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       completed_functional_structure_gap_ids: [...RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS],
       unclassified_private_generic_residue_count: 0,
       long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'production_live_soak_evidence_only',
+      remaining_gap_class: 'none',
       remaining_functional_structure_gap_ids: [...RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS],
       remaining_functional_structure_gaps: RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS.map((gapId) => ({
         gap_id: gapId,
-        current_bucket: 'production_evidence_blocker',
+        current_bucket: 'functional_structure_gap',
         owner: 'one-person-lab',
         rca_role: 'domain_handler_target_or_visual_authority_refs_only',
       })),
+      evidence_gap_class: 'production_live_soak_evidence_only',
       remaining_evidence_gate_ids: [...RCA_REMAINING_EVIDENCE_GATES],
       closure_basis_refs: [
         '/family_scheduler_replacement',

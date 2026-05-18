@@ -337,10 +337,10 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       'retire_tombstone',
     ]);
     assert.deepEqual(surface.functional_structure_gap_closure, {
-      status: 'classification_closed_followthrough_gaps_open',
+      status: 'functional_structure_gaps_closed_evidence_gates_open',
       closed_at: '2026-05-17',
       closure_scope: 'rca_functional_structure_gap_classification',
-      functional_structure_gap_count: 1,
+      functional_structure_gap_count: 0,
       completed_functional_structure_gap_count: 8,
       completed_functional_structure_gap_ids: [
         'opl_generated_surface_production_consumption',
@@ -354,18 +354,10 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       ],
       unclassified_private_generic_residue_count: 0,
       long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'production_live_soak_evidence_only',
-      remaining_functional_structure_gap_ids: [
-        'production_live_soak_and_evidence',
-      ],
-      remaining_functional_structure_gaps: [
-        {
-          gap_id: 'production_live_soak_and_evidence',
-          current_bucket: 'production_evidence_blocker',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-      ],
+      remaining_gap_class: 'none',
+      remaining_functional_structure_gap_ids: [],
+      remaining_functional_structure_gaps: [],
+      evidence_gap_class: 'production_live_soak_evidence_only',
       remaining_evidence_gate_ids: [
         'real_artifact_producing_domain_owner_receipt',
         'opl_hosted_controlled_visual_stage_long_soak',

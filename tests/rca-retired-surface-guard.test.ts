@@ -360,9 +360,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     ]);
     assert.equal(
       surface.functional_structure_gap_closure.status,
-      'classification_closed_followthrough_gaps_open',
+      'functional_structure_gaps_closed_evidence_gates_open',
     );
-    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 1);
+    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 0);
     assert.equal(surface.functional_structure_gap_closure.completed_functional_structure_gap_count, 8);
     assert.deepEqual(surface.functional_structure_gap_closure.completed_functional_structure_gap_ids, [
       'opl_generated_surface_production_consumption',
@@ -376,11 +376,13 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     ]);
     assert.equal(
       surface.functional_structure_gap_closure.remaining_gap_class,
+      'none',
+    );
+    assert.deepEqual(surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids, []);
+    assert.equal(
+      surface.functional_structure_gap_closure.evidence_gap_class,
       'production_live_soak_evidence_only',
     );
-    assert.deepEqual(surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids, [
-      'production_live_soak_and_evidence',
-    ]);
     assert.ok(
       surface.functional_structure_gap_closure.remaining_evidence_gate_ids.includes(
         'real_artifact_producing_domain_owner_receipt',

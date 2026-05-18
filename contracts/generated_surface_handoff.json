@@ -17,9 +17,7 @@
     "rca_can_own_generated_surface": false,
     "rca_can_own_generic_session_shell": false,
     "rca_can_own_generic_workbench": false,
-    "remaining_blocker_ids": [
-      "production_live_soak_and_evidence"
-    ],
+    "remaining_blocker_ids": [],
     "repo_local_allowed_roles_before_exit": [
       "domain_handler_target",
       "direct_domain_entry",
@@ -36,6 +34,12 @@
     "required_before_retiring_repo_local_wrappers": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
+    ],
+    "remaining_evidence_gate_ids": [
+      "real_artifact_producing_domain_owner_receipt",
+      "opl_hosted_controlled_visual_stage_long_soak",
+      "real_memory_lifecycle_receipt_instances",
+      "cross_family_repeated_no_regression_evidence"
     ]
   },
   "domain_id": "redcube_ai",
