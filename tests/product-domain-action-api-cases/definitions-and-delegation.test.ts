@@ -56,6 +56,12 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(productEntry?.description.includes('status'), true);
   assert.equal(productEntry?.description.includes('preflight'), true);
   assert.equal(productEntry?.description.includes('product-entry'), true);
+  const listedDeliverable = listDomainTools().find((tool) => tool.name === 'redcube_deliverable');
+  assert.equal(listedDeliverable?.default_managed_supervision_owner, 'one-person-lab');
+  assert.equal(
+    listedDeliverable?.managed_supervision_route_role,
+    'diagnostic_domain_projection_not_default_generic_supervisor',
+  );
   assert.equal(Object.hasOwn(review?.inputSchema || {}, 'runId'), true);
   assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'entry_session_contract'), true);
   assert.equal(Object.hasOwn(productEntry?.inputSchema || {}, 'workspace_root'), true);

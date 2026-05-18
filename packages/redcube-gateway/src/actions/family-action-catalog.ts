@@ -205,6 +205,11 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
     repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+    product_sidecar_role: 'domain_action_target_or_refs_only_adapter',
+    generic_session_shell_owner: 'one-person-lab',
+    generic_workbench_owner: 'one-person-lab',
+    default_generic_dispatch_owner: 'one-person-lab',
+    default_managed_supervision_owner: 'one-person-lab',
     write_policy: 'no_domain_truth_writes',
   },
   actions: [
@@ -288,6 +293,12 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
         skill: { command_contract_id: 'get_product_entry_session', surface_kind: 'product_entry_session' },
         product_entry: { action_key: 'continue_session', surface_kind: 'product_entry_session' },
       },
+      authorityBoundary: {
+        generic_session_shell_owner: 'one-person-lab',
+        domain_snapshot_owner: 'redcube_ai',
+        rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+        implements_generic_workbench: false,
+      },
     }),
     action({
       actionId: 'get_product_entry_manifest',
@@ -302,6 +313,11 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
         cli: { surface_kind: 'product_entry_manifest' },
         mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_entry_manifest' },
         product_entry: { action_key: 'get_product_entry_manifest', surface_kind: 'product_entry_manifest' },
+      },
+      authorityBoundary: {
+        manifest_owner: 'redcube_ai',
+        generated_surface_owner: 'one-person-lab',
+        rca_role: 'declarative_visual_pack_and_domain_handler_refs',
       },
     }),
     action({
@@ -321,6 +337,8 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       authorityBoundary: {
         opl_role: 'typed_family_control_plane',
         provider_role: 'stage_attempt_queue_wakeup_transport',
+        generated_surface_owner: 'one-person-lab',
+        rca_role: 'domain_action_target_or_refs_only_adapter',
         write_policy: 'read_projection_only',
       },
     }),
@@ -341,6 +359,9 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       authorityBoundary: {
         allowed_actions: listProductSidecarGuardedActionIds(),
         forbidden_writes: listProductSidecarForbiddenWrites(),
+        default_generic_dispatch_owner: 'one-person-lab',
+        default_managed_supervision_owner: 'one-person-lab',
+        rca_role: 'guarded_domain_action_target_only',
       },
     }),
     action({

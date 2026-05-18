@@ -108,7 +108,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
     },
     'product session': {
-      summary: '读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。',
+      summary: '读取 OPL generated session shell 所需的 RCA entry-session domain snapshot refs；RCA 不持有 generic session/workbench owner。',
       usage: 'redcube product session --entry-session-id <id>',
       action_ref: 'getProductEntrySession',
       boundary_fields: ['entrySessionId'],
@@ -138,10 +138,17 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['workspaceRoot'],
     },
     'product sidecar': {
-      summary: '导出或调度 RCA product sidecar adapter；Hermes/OPL 只承担在线 substrate/control-plane，RCA 继续持有 visual truth、review 与 artifact authority。',
+      summary: '导出或调度 RCA product sidecar adapter；OPL 持有 generated sidecar/session/workbench shell，RCA 只作为 domain action target 或 refs-only adapter。',
       usage: 'redcube product sidecar export --workspace-root <dir> --format json | redcube product sidecar dispatch --task <task.json> --format json',
       action_ref: 'exportProductSidecar|dispatchProductSidecar',
       boundary_fields: ['workspaceRoot', 'task'],
+    },
+    'managed supervise': {
+      summary: '读取 managed run diagnostic projection；默认 generic supervision owner 是 OPL runner/session shell，RCA 只保留 visual run summary refs。',
+      usage: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
+      action_ref: 'superviseManagedRun',
+      boundary_fields: ['workspaceRoot', 'managedRunId'],
+      owner_model: 'diagnostic_domain_projection_not_default_generic_supervisor',
     },
     'native-ppt proof': {
       summary: '受控执行 ppt_deck native PPT proof route；只调用 repo-owned proof runner，并保持 product-entry review/export gates。',

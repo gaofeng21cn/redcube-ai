@@ -83,6 +83,10 @@ export const MCP_SURFACE_OWNER_BOUNDARY = Object.freeze({
   generated_interface_owner: 'one-person-lab',
   domain_handler_owner: 'redcube_ai',
   repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+  generic_session_shell_owner: 'one-person-lab',
+  generic_workbench_owner: 'one-person-lab',
+  default_managed_supervision_owner: 'one-person-lab',
+  managed_supervision_route_role: 'diagnostic_domain_projection_not_default_generic_supervisor',
   redcube_mcp_is_unified_metadata_owner: false,
 });
 
@@ -349,6 +353,12 @@ export function listDomainTools() {
   return TOOL_DEFINITIONS.map(({ name, description }) => ({
     name,
     description,
+    ...(name === 'redcube_deliverable'
+      ? {
+          managed_supervision_route_role: 'diagnostic_domain_projection_not_default_generic_supervisor',
+          default_managed_supervision_owner: 'one-person-lab',
+        }
+      : {}),
     generated_interface_owner: 'one-person-lab',
     domain_handler_owner: 'redcube_ai',
     repo_local_handler_target_only: true,

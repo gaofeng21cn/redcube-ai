@@ -151,6 +151,18 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     generatedSurfaceHandoff.repo_local_launcher_policy.default_generic_dispatch_owner,
     'one-person-lab',
   );
+  assert.equal(
+    generatedSurfaceHandoff.repo_local_launcher_policy.product_sidecar_role,
+    'domain_action_target_or_refs_only_adapter',
+  );
+  assert.equal(
+    generatedSurfaceHandoff.repo_local_launcher_policy.default_managed_supervision_owner,
+    'one-person-lab',
+  );
+  assert.equal(
+    generatedSurfaceHandoff.repo_local_launcher_policy.managed_supervision_diagnostic_owner,
+    'redcube_ai',
+  );
 });
 
 test('OPL generated interfaces are ready from RCA root contracts when OPL checkout is available', {

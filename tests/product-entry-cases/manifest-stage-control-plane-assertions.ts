@@ -16,6 +16,11 @@ export function assertManifestActionAndStageControlPlane({
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
     repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+    product_sidecar_role: 'domain_action_target_or_refs_only_adapter',
+    generic_session_shell_owner: 'one-person-lab',
+    generic_workbench_owner: 'one-person-lab',
+    default_generic_dispatch_owner: 'one-person-lab',
+    default_managed_supervision_owner: 'one-person-lab',
     write_policy: 'no_domain_truth_writes',
   });
   assert.deepEqual(
@@ -48,10 +53,25 @@ export function assertManifestActionAndStageControlPlane({
   );
   const sidecarDispatchAction = manifest.family_action_catalog.actions
     .find((action) => action.action_id === 'dispatch_product_sidecar');
+  const sessionAction = manifest.family_action_catalog.actions
+    .find((action) => action.action_id === 'get_product_entry_session');
+  const sidecarExportAction = manifest.family_action_catalog.actions
+    .find((action) => action.action_id === 'export_product_sidecar');
+  assert.deepEqual(sessionAction.authority_boundary, {
+    generic_session_shell_owner: 'one-person-lab',
+    domain_snapshot_owner: 'redcube_ai',
+    rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+    implements_generic_workbench: false,
+  });
+  assert.equal(sidecarExportAction.authority_boundary.generated_surface_owner, 'one-person-lab');
+  assert.equal(sidecarExportAction.authority_boundary.rca_role, 'domain_action_target_or_refs_only_adapter');
   assert.deepEqual(
     sidecarDispatchAction.authority_boundary.allowed_actions,
     sidecarGuardedActionMetadata.guardedActionIds,
   );
+  assert.equal(sidecarDispatchAction.authority_boundary.default_generic_dispatch_owner, 'one-person-lab');
+  assert.equal(sidecarDispatchAction.authority_boundary.default_managed_supervision_owner, 'one-person-lab');
+  assert.equal(sidecarDispatchAction.authority_boundary.rca_role, 'guarded_domain_action_target_only');
   assert.deepEqual(
     sidecarDispatchAction.authority_boundary.forbidden_writes,
     sidecarGuardedActionMetadata.forbiddenWrites,

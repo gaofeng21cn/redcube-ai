@@ -8,13 +8,11 @@ Date: `2026-05-17`
 
 ## 文档读法
 
-- `定位`：本文只写 RCA 的 north-star 目标态和长期 owner boundary；当前差距、执行顺序和 evidence 缺口回到 `rca-ideal-state-gap-plan.md`。
-- `当前实态校准`：本文只保留对目标态有影响的当前边界；dated follow-through 和过程证据归档到 `docs/history/plans/`。
-- `Owner 边界`：RCA 持有 source readiness verdict、communication strategy、visual direction、review/export verdict、canonical artifact、visual memory body/accept-reject、owner receipt、native helper implementation、typed blocker 和 safe action refs；OPL 持有 provider runtime、standard scaffold、functional harness、queue、stage attempt、attempt ledger、typed closeout、generic transition runner、restart/dead-letter/repair/human gate 状态链、generic runner/workbench、workspace/source intake shell、artifact gallery/handoff shell、memory transport、memory refs-only writeback chain、review/repair transport、native-helper generic envelope、observability/SLO、stability read-model 和 App/workbench shell。
-- `当前功能面`：RCA 已有 OPL consumer projection、stability read-model、visual transition evaluator、workspace receipt inventory、operator evidence readiness、private functional audit 和 default generic sidecar dispatch cleanup。这些 surface 只能说明 RCA 不应长期持有 generic owner claim，不能说明 OPL generated surface 已生产消费、active caller 已迁移、App/operator drilldown 已可用、workspace/source/lifecycle shell 已闭合或 legacy physical cleanup 已完成。
-- `目标态优先`：RCA 当前已有的 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 只能作为迁移输入，不是理想态约束。理想 RCA 是标准 OPL Agent：声明式 visual pack + OPL generated/hosted surfaces + 最小 visual authority functions。
-- `最短路径`：功能/结构差距继续按理想态判断。RCA 后续必须把 OPL generated surface production consumption、repo-local CLI/MCP/product-entry/session/sidecar/status/workbench wrapper active caller migration、focused hosted attempt 接通、artifact gallery/handoff shell、review/repair transport、OPL App/operator drilldown、workspace/source shell、lifecycle/receipt inventory 和 legacy physical cleanup 写回功能/结构差距；真实 memory/lifecycle receipt 实例、artifact-producing owner receipt、visual memory body reuse、Temporal long soak 和 cross-family repeated proof 才是测试/证据差距。
-- `禁写口径`：RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
+- 本文只写 RCA 的 north-star 目标态和长期 owner boundary。当前差距、执行顺序、functional_structure_gap_count 和 evidence 缺口回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。
+- dated follow-through、closeout tranche、proof 命令和过程证据归档到 `docs/history/`，不在本文承担 current truth。
+- 目标态优先于当前物理目录。RCA 当前已有的 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 都只能作为迁移输入，不是理想态约束。
+- OPL generated interface descriptor ready 只表示 OPL 能生成描述并路由到 RCA domain handler target；它不等于 production consumption、active caller migration、App/operator drilldown、workspace/source/lifecycle shell 或 legacy physical cleanup 已完成。
+- RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 
 ## 结论
 
@@ -29,8 +27,6 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 这条目标态高于当前 RCA 物理目录和实现方式。artifact-heavy 代码可以保留 visual authority 和 native helper implementation，但当前 managed-run/session、generic runner、workspace/source shell、artifact gallery/handoff、review/repair transport、operator projection、generic CLI/MCP/product shell 等不因为已经存在就成为长期 RCA 私有平台。必要时可以革命式重构 RCA，而不是在现状上做保守改革。能由 OPL primitive、pack compiler 或 App shell 承接的，必须列为上收或 generated surface 替换；不能承接的，必须收窄成明确的 visual authority function 或 refs-only adapter。
 
 RCA 可以为了清洁目标态重构 packages、runtime families、prompts、native helper callsite 和 product shell。保留项必须回答它是否直接作出 source readiness、visual direction、review/export verdict、artifact mutation、visual memory accept/reject 或 owner receipt signing；否则默认不能作为 RCA 长期私有功能。当前已知非知识功能面应归为 OPL hosted surface、OPL generated surface、refs-only adapter、declarative pack 或 minimal authority function；分类不是完成态。凡仍需 generated/hosted production consumption、active caller migration、wrapper retirement、operator drilldown、workspace/source/lifecycle shell 或 physical cleanup 的功能面，都继续构成功能/结构差距。
-
-当前功能/结构差距计数保持 `functional_structure_gap_count=8`：OPL generated surface production consumption、repo-local wrapper active caller migration、focused hosted attempt 接通、artifact gallery/handoff、review/repair transport、App/operator drilldown、workspace/source/lifecycle shell、legacy physical cleanup。测试/证据差距是 artifact-producing receipt、memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。过程性校准与 evidence 摘要见 [RCA standard agent 文档过程归档](../history/plans/rca-standard-agent-doc-process-history-2026-05.md)。
 
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
@@ -210,6 +206,18 @@ RCA 的理想质量体系是 AI-first 的视觉交付体系。AI-authored stage 
 - 后处理只允许作为 route 内显式 repair stage，不能成为隐藏 fallback chain。
 - provider completion 只说明执行器完成了尝试，不说明 artifact ready。
 - `ready`、`exportable`、`handoffable` 只能由 RCA-owned gate 给出。
+
+长期保留的 visual authority functions 必须逐项满足：
+
+| 函数 | 长期 owner | AI-first 边界 | 程序角色 |
+| --- | --- | --- | --- |
+| `source_readiness_verdict` | RCA source readiness owner | 判断 source 是否足够支撑视觉叙事和交付目标。 | validator / typed blocker |
+| `communication_visual_direction_decision` | RCA visual director stage | 传播策略、视觉方向和 route selection 必须由 AI-authored stage artifact 持有。 | artifact materializer / refs projection |
+| `review_export_verdict` | RCA review/export gate | review verdict、exportable 和 handoffable 只能由 visual review / export gate 给出。 | gate validator / receipt signer |
+| `artifact_mutation_authorization` | RCA artifact authority | artifact rewrite 必须有 blocked item、repair target 和 owner receipt。 | materializer / guard |
+| `visual_memory_accept_reject` | RCA visual memory owner | 视觉经验是否可沉淀由 visual route / review learning 判断。 | receipt writer / locator projection |
+| `owner_receipt_signer` | RCA owner surface | 只签 domain receipt、typed blocker、safe action refs 和 provenance currentness。 | receipt signer |
+| `native_helper_implementation` | RCA native helper owner | helper 只能实现 PPT/image/export mutation 或 proof，不给 visual ready verdict。 | helper implementation / guard |
 
 ## Direct Path 与 OPL-hosted Path 等价
 
