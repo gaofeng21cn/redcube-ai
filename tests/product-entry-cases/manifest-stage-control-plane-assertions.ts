@@ -12,7 +12,10 @@ export function assertManifestActionAndStageControlPlane({
   assert.equal(manifest.family_action_catalog.owner, 'redcube_ai');
   assert.deepEqual(manifest.family_action_catalog.authority_boundary, {
     domain_truth_owner: 'redcube_ai',
-    opl_role: 'projection_consumer_only',
+    opl_role: 'generated_interface_metadata_owner',
+    generated_interface_owner: 'one-person-lab',
+    repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
+    repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
     write_policy: 'no_domain_truth_writes',
   });
   assert.deepEqual(

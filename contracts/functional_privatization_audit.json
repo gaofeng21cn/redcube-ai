@@ -101,20 +101,78 @@
       }
     },
     "functional_structure_gap_closure": {
-      "status": "closed_for_rca_consumer_thinning",
+      "status": "classification_closed_followthrough_gaps_open",
       "closed_at": "2026-05-17",
       "closure_scope": "rca_functional_structure_gap_classification",
-      "functional_structure_gap_count": 0,
+      "functional_structure_gap_count": 8,
       "unclassified_private_generic_residue_count": 0,
       "long_term_rca_generic_owner_claim_count": 0,
-      "remaining_gap_class": "testing_evidence_gap_only",
+      "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
+      "remaining_functional_structure_gap_ids": [
+        "opl_generated_surface_production_consumption",
+        "repo_local_wrapper_active_caller_migration",
+        "focused_hosted_attempt_real_path_cutover",
+        "artifact_gallery_handoff_shell",
+        "review_repair_transport",
+        "opl_app_operator_drilldown",
+        "workspace_source_lifecycle_receipt_shell",
+        "legacy_physical_cleanup"
+      ],
+      "remaining_functional_structure_gaps": [
+        {
+          "gap_id": "opl_generated_surface_production_consumption",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "repo_local_wrapper_active_caller_migration",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "focused_hosted_attempt_real_path_cutover",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "artifact_gallery_handoff_shell",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "review_repair_transport",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "opl_app_operator_drilldown",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "workspace_source_lifecycle_receipt_shell",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "one-person-lab",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        },
+        {
+          "gap_id": "legacy_physical_cleanup",
+          "current_bucket": "functional_structure_followthrough_gap",
+          "owner": "redcube_ai",
+          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+        }
+      ],
       "remaining_evidence_gate_ids": [
         "real_artifact_producing_domain_owner_receipt",
         "opl_hosted_controlled_visual_stage_long_soak",
         "real_memory_lifecycle_receipt_instances",
-        "cross_family_repeated_no_regression_evidence",
-        "opl_generated_surface_production_consumption",
-        "opl_app_operator_drilldown"
+        "cross_family_repeated_no_regression_evidence"
       ],
       "closure_basis_refs": [
         "/family_scheduler_replacement",
@@ -1607,20 +1665,78 @@
     }
   },
   "functional_structure_gap_closure": {
-    "status": "closed_for_rca_consumer_thinning",
+    "status": "classification_closed_followthrough_gaps_open",
     "closed_at": "2026-05-17",
     "closure_scope": "rca_functional_structure_gap_classification",
-    "functional_structure_gap_count": 0,
+    "functional_structure_gap_count": 8,
     "unclassified_private_generic_residue_count": 0,
     "long_term_rca_generic_owner_claim_count": 0,
-    "remaining_gap_class": "testing_evidence_gap_only",
+    "remaining_gap_class": "functional_structure_followthrough_and_testing_evidence",
+    "remaining_functional_structure_gap_ids": [
+      "opl_generated_surface_production_consumption",
+      "repo_local_wrapper_active_caller_migration",
+      "focused_hosted_attempt_real_path_cutover",
+      "artifact_gallery_handoff_shell",
+      "review_repair_transport",
+      "opl_app_operator_drilldown",
+      "workspace_source_lifecycle_receipt_shell",
+      "legacy_physical_cleanup"
+    ],
+    "remaining_functional_structure_gaps": [
+      {
+        "gap_id": "opl_generated_surface_production_consumption",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "repo_local_wrapper_active_caller_migration",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "focused_hosted_attempt_real_path_cutover",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "artifact_gallery_handoff_shell",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "review_repair_transport",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "opl_app_operator_drilldown",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "workspace_source_lifecycle_receipt_shell",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "one-person-lab",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      },
+      {
+        "gap_id": "legacy_physical_cleanup",
+        "current_bucket": "functional_structure_followthrough_gap",
+        "owner": "redcube_ai",
+        "rca_role": "domain_handler_target_or_visual_authority_refs_only"
+      }
+    ],
     "remaining_evidence_gate_ids": [
       "real_artifact_producing_domain_owner_receipt",
       "opl_hosted_controlled_visual_stage_long_soak",
       "real_memory_lifecycle_receipt_instances",
-      "cross_family_repeated_no_regression_evidence",
-      "opl_generated_surface_production_consumption",
-      "opl_app_operator_drilldown"
+      "cross_family_repeated_no_regression_evidence"
     ],
     "closure_basis_refs": [
       "/family_scheduler_replacement",

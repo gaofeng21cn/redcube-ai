@@ -129,8 +129,17 @@ export const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
   'opl_hosted_controlled_visual_stage_long_soak',
   'real_memory_lifecycle_receipt_instances',
   'cross_family_repeated_no_regression_evidence',
+]);
+
+export const RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS = Object.freeze([
   'opl_generated_surface_production_consumption',
+  'repo_local_wrapper_active_caller_migration',
+  'focused_hosted_attempt_real_path_cutover',
+  'artifact_gallery_handoff_shell',
+  'review_repair_transport',
   'opl_app_operator_drilldown',
+  'workspace_source_lifecycle_receipt_shell',
+  'legacy_physical_cleanup',
 ]);
 
 export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
@@ -652,13 +661,20 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     generated_interface_consumption_ref: OPL_GENERATED_INTERFACE_CONSUMPTION.ref,
     generated_interface_consumption: { ...OPL_GENERATED_INTERFACE_CONSUMPTION },
     functional_structure_gap_closure: {
-      status: 'closed_for_rca_consumer_thinning',
+      status: 'classification_closed_followthrough_gaps_open',
       closed_at: '2026-05-17',
       closure_scope: 'rca_functional_structure_gap_classification',
-      functional_structure_gap_count: 0,
+      functional_structure_gap_count: RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS.length,
       unclassified_private_generic_residue_count: 0,
       long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'testing_evidence_gap_only',
+      remaining_gap_class: 'functional_structure_followthrough_and_testing_evidence',
+      remaining_functional_structure_gap_ids: [...RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS],
+      remaining_functional_structure_gaps: RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS.map((gapId) => ({
+        gap_id: gapId,
+        current_bucket: 'functional_structure_followthrough_gap',
+        owner: gapId.startsWith('legacy_physical') ? 'redcube_ai' : 'one-person-lab',
+        rca_role: 'domain_handler_target_or_visual_authority_refs_only',
+      })),
       remaining_evidence_gate_ids: [...RCA_REMAINING_EVIDENCE_GATES],
       closure_basis_refs: [
         '/family_scheduler_replacement',

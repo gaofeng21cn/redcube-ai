@@ -9,6 +9,16 @@ export function buildOperatorEvidenceReadinessProjection({
   workspaceReceiptInventoryProjection,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
+  const remainingFunctionalStructureGapIds = [
+    'opl_generated_surface_production_consumption',
+    'repo_local_wrapper_active_caller_migration',
+    'focused_hosted_attempt_real_path_cutover',
+    'artifact_gallery_handoff_shell',
+    'review_repair_transport',
+    'opl_app_operator_drilldown',
+    'workspace_source_lifecycle_receipt_shell',
+    'legacy_physical_cleanup',
+  ];
   return {
     surface_kind: 'operator_evidence_readiness_projection',
     projection_id: 'rca.operator_evidence_readiness.v1',
@@ -80,16 +90,15 @@ export function buildOperatorEvidenceReadinessProjection({
     ready_for_operator_gap_projection: true,
     ready_for_opl_app_consumption: true,
     remaining_gap_classification: {
-      functional_structure_gap_status: 'closed_for_rca_consumer_thinning',
-      functional_structure_gap_count: 0,
-      remaining_gap_class: 'testing_evidence_gap_only',
+      functional_structure_gap_status: 'classification_closed_followthrough_gaps_open',
+      functional_structure_gap_count: remainingFunctionalStructureGapIds.length,
+      remaining_gap_class: 'functional_structure_followthrough_and_testing_evidence',
+      remaining_functional_structure_gap_ids: remainingFunctionalStructureGapIds,
       remaining_evidence_gate_ids: [
         'real_artifact_producing_domain_owner_receipt',
         'opl_hosted_controlled_visual_stage_long_soak',
         'real_memory_lifecycle_receipt_instances',
         'cross_family_repeated_no_regression_evidence',
-        'opl_generated_surface_production_consumption',
-        'opl_app_operator_drilldown',
       ],
     },
     read_only: true,
