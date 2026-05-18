@@ -209,7 +209,6 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
     cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
     default_managed_supervision_owner: 'one-person-lab',
-    managed_supervision_diagnostic_owner: 'redcube_ai',
     managed_supervision_public_surface: 'retired',
     redcube_cli_is_unified_metadata_owner: false,
     redcube_mcp_is_unified_metadata_owner: false,
@@ -280,8 +279,8 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts',
     ],
     activeCallers: [
-      'diagnostic runManagedDeliverable explicit direct surface',
-      'diagnostic superviseManagedRun refs-only projection',
+      'internal historical runManagedDeliverable regression path',
+      'internal historical superviseManagedRun regression projection',
       'evaluate_visual_transition sidecar action',
       'OPL hosted attempt receipt fixture',
     ],
@@ -309,7 +308,7 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     ],
     activeCallers: [
       'redcube product session domain snapshot refs',
-      'diagnostic supervise managed run refs-only projection',
+      'internal historical managed supervision regression projection',
       'runtime watch/session locator projection',
     ],
     activeCallerStatus: 'opl_hosted_attempt_ledger_refs_with_rca_visual_summary',
@@ -746,7 +745,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         'product_sidecar_dispatch.product_entry_continuation',
       ],
       deletion_status: 'sidecar_default_generic_dispatch_removed',
-      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, diagnostic direct CLI surfaces, and declared visual pack inputs remain in RCA default package surfaces.',
+      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, internal historical diagnostic fixtures, and declared visual pack inputs remain in RCA package surfaces.',
       required_before_remaining_physical_delete: [
         'domain_authority_refs_preserved',
         'no_regression_proof_recorded',
@@ -839,7 +838,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         retired_at: '2026-05-17',
         replacement_owner: 'opl',
         replacement_surface: 'opl_generic_runner_and_supervisor_tick',
-        retained_rca_surface: 'direct deliverable managed supervision diagnostic surface',
+        retained_rca_surface: 'internal historical managed supervision regression fixture',
         active_default_caller: false,
       },
       {

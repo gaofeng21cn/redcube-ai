@@ -204,7 +204,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_deliverable',
     description: MCP_TOOL_METADATA.get('redcube_deliverable')?.description
-      || 'Grouped deliverable lifecycle execution surface for create/get/run and OPL stage-plan handoff across one deliverable boundary.',
+      || 'Grouped deliverable lifecycle execution surface for create/get/route run and OPL stage-plan handoff across one deliverable boundary.',
     action_catalog_projection: getMcpToolProjection('redcube_deliverable'),
     inputSchema: {
       action: ACTION_STRING,

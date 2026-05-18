@@ -78,7 +78,6 @@
     "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",
     "default_managed_supervision_owner": "one-person-lab",
-    "managed_supervision_diagnostic_owner": "redcube_ai",
     "managed_supervision_public_surface": "retired",
     "redcube_cli_is_unified_metadata_owner": false,
     "redcube_mcp_is_unified_metadata_owner": false,
@@ -99,7 +98,7 @@
       "direct_domain_entry",
       "direct_protocol_adapter",
       "refs_only_adapter",
-      "diagnostic_surface"
+      "historical_regression_fixture"
     ],
     "repo_local_forbidden_roles": [
       "unified_metadata_owner",
@@ -113,7 +112,7 @@
       "domain_handler_targets",
       "minimal_authority_functions",
       "refs_only_locator_projection",
-      "diagnostic_direct_surfaces"
+      "historical_regression_fixtures"
     ],
     "rca_can_own_generated_surface": false,
     "rca_can_own_generic_session_shell": false,

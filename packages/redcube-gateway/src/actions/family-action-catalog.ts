@@ -40,7 +40,7 @@ const MCP_TOOLS = [
   {
     name: 'redcube_deliverable',
     selector: 'action',
-    description: 'Grouped deliverable lifecycle execution surface for create/get/run and OPL stage-plan handoff across one deliverable boundary.',
+    description: 'Grouped deliverable lifecycle execution surface for create/get/route run and OPL stage-plan handoff across one deliverable boundary.',
   },
   {
     name: 'redcube_review',

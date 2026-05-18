@@ -45,6 +45,7 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
 
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable execute')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('redcube managed')), false);
   assert.equal(parsed.commonTasks.filter((item) => item.command.includes('deliverable execute')).length, 1);
   assert.deepEqual(parsed.commonFlows.ppt_deck, [
     '1. redcube workspace doctor --workspace-root <dir>',
@@ -78,6 +79,9 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while m
   assert.equal(parsed.operatorQuickstart.step1Gate, 'planning_ready');
   assert.equal(typeof parsed.usage.deliverableRun, 'string');
   assert.equal(typeof parsed.usage.deliverableExecute, 'string');
+  assert.equal(parsed.usage.managedGet, undefined);
+  assert.equal(parsed.usage.managedSupervise, undefined);
+  assert.equal(parsed.commandGroups.managed, undefined);
 });
 
 test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart action refs', async () => {
@@ -89,6 +93,7 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
 
   assert.equal(new Set(commands).size, commands.length);
   assert.equal(commands.filter((command) => command.includes('deliverable execute')).length, 1);
+  assert.equal(commands.some((command) => command.includes('redcube managed')), false);
 
   for (const [actionKey, toolName] of [
     ['doctorWorkspace', 'doctor'],
@@ -114,6 +119,13 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
       'redcube_sources',
       'redcube_workspace',
     ],
+  );
+});
+
+test('CLI managed command is retired from public operator surface', async () => {
+  await assert.rejects(
+    () => executeCli(['managed', 'supervise', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-a']),
+    /未知命令: managed/,
   );
 });
 

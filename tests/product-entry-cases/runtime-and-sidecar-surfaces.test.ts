@@ -1,21 +1,7 @@
 // @ts-nocheck
-import {
-  readFileSync,
-  writeFileSync,
-} from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 
-import {
-  SERIAL_ENV_TEST,
-  assert,
-  getProductEntryManifest,
-  getProductSidecarGuardedActionMetadata,
-  exportProductSidecar,
-  dispatchProductSidecar,
-  readJson,
-  test,
-  withMockCodexRuntimeState,
-  prepareProductEntryWorkspace,
-} from '../product-domain-action-case-shared.ts';
+import { SERIAL_ENV_TEST, assert, getProductEntryManifest, getProductSidecarGuardedActionMetadata, exportProductSidecar, dispatchProductSidecar, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
 
 test('product sidecar export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
@@ -313,22 +299,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         closure_scope: 'rca_functional_structure_gap_classification',
         functional_structure_gap_count: 2,
         completed_functional_structure_gap_count: 7,
-        completed_functional_structure_gap_ids: [
-          'opl_generated_surface_production_consumption',
-          'repo_local_wrapper_active_caller_migration',
-          'focused_hosted_attempt_real_path_cutover',
-          'artifact_gallery_handoff_shell',
-          'review_repair_transport',
-          'opl_app_operator_drilldown',
-          'workspace_source_lifecycle_receipt_shell',
-        ],
+        completed_functional_structure_gap_ids: ['opl_generated_surface_production_consumption', 'repo_local_wrapper_active_caller_migration', 'focused_hosted_attempt_real_path_cutover', 'artifact_gallery_handoff_shell', 'review_repair_transport', 'opl_app_operator_drilldown', 'workspace_source_lifecycle_receipt_shell'],
         unclassified_private_generic_residue_count: 0,
         long_term_rca_generic_owner_claim_count: 0,
         remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
-        remaining_functional_structure_gap_ids: [
-          'production_live_soak_and_evidence',
-          'legacy_physical_cleanup',
-        ],
+        remaining_functional_structure_gap_ids: ['production_live_soak_and_evidence', 'legacy_physical_cleanup'],
         remaining_functional_structure_gaps: [
           {
             gap_id: 'production_live_soak_and_evidence',
