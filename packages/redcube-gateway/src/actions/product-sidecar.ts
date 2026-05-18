@@ -123,7 +123,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       },
       rca_thin_surface_policy: {
         projection_scope: familySchedulerReplacement.projection_scope || 'consumer_projection_and_visual_domain_authority_refs_only',
-        managed_dag_scheduler_scope: familySchedulerReplacement.managed_dag_scheduler_scope,
+        visual_stage_descriptor_scope: familySchedulerReplacement.visual_stage_descriptor_scope,
         generic_surfaces_owner: 'opl',
         opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
         opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
@@ -378,7 +378,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       control_plane_owner: 'opl',
       generic_session_shell_owner: 'opl',
       generic_workbench_owner: 'opl',
-      default_managed_supervision_owner: 'opl',
+      default_supervision_owner: 'opl',
       domain_truth_owner: DOMAIN_ID,
       guarded_action_count: GUARDED_ACTIONS.size,
     },

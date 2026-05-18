@@ -79,7 +79,7 @@ const REPO_SOURCE_BOUNDARIES = [
       'packages/redcube-gateway/src/actions/product-sidecar.ts',
       'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
       'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts',
-      'packages/redcube-runtime/src/managed-deliverable.ts',
+      'packages/redcube-gateway/src/actions/opl-stage-execution-plan.ts',
     ],
   },
   {

@@ -20,7 +20,7 @@ export function assertManifestActionAndStageControlPlane({
     generic_session_shell_owner: 'one-person-lab',
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
-    default_managed_supervision_owner: 'one-person-lab',
+    default_supervision_owner: 'one-person-lab',
     write_policy: 'no_domain_truth_writes',
   });
   assert.deepEqual(

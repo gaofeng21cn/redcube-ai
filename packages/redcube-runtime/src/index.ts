@@ -27,7 +27,6 @@ import {
   appendHermesEvent as appendEventJs,
   readHermesEvents as readEventsJs,
 } from '@redcube/runtime-protocol';
-import { appendManagedEvent as appendManagedEventJs, readManagedEvents as readManagedEventsJs } from './managed-event-log.js';
 import {
   planCandidateRace as planCandidateRaceJs,
   runCandidateRaceRoute as runCandidateRaceRouteJs,
@@ -46,16 +45,6 @@ import {
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import {
-  buildManagedRepeatedReviewRerunDecision as buildManagedRepeatedReviewRerunDecisionJs,
-  getManagedRun as getManagedRunJs,
-  runManagedDeliverable as runManagedDeliverableJs,
-  superviseManagedRun as superviseManagedRunJs,
-} from './managed-deliverable.js';
-import {
-  executeManagedDagLayers as executeManagedDagLayersJs,
-  planManagedDeliverableDag as planManagedDeliverableDagJs,
-} from './managed-dag-scheduler.js';
-import {
   PRODUCT_ENTRY_SESSION_STORE_BOUNDARY as PRODUCT_ENTRY_SESSION_STORE_BOUNDARY_JS,
   loadProductEntrySession as loadProductEntrySessionJs,
   productEntrySessionDir as productEntrySessionDirJs,
@@ -69,16 +58,6 @@ import {
   loadHermesRun as loadRunJs,
   startHermesRun as startRunJs,
 } from '@redcube/runtime-protocol';
-import {
-  createManagedRun as createManagedRunJs,
-  loadManagedProgressProjection as loadManagedProgressProjectionJs,
-  loadManagedRun as loadManagedRunJs,
-  loadRuntimeSupervisionLatest as loadRuntimeSupervisionLatestJs,
-  managedPromptAuditFile as managedPromptAuditFileJs,
-  managedResultFile as managedResultFileJs,
-  saveManagedProgressProjection as saveManagedProgressProjectionJs,
-  saveManagedRun as saveManagedRunJs,
-} from './managed-run-store.js';
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { buildPerformanceReport as buildPerformanceReportJs } from './performance-report.js';
 import { resolveSourceAugmentationAdapter as resolveSourceAugmentationAdapterJs } from './source-augmentation-executor.js';
@@ -101,12 +80,6 @@ import type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
-  RuntimeManagedProgressProjection,
-  RuntimeManagedRunLookupRequest,
-  RuntimeManagedRunRecord,
-  RuntimeManagedRunRequest,
-  RuntimeManagedRunResponse,
-  RuntimeManagedSupervisionRequest,
   RuntimeProductEntrySessionRecord,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
@@ -166,14 +139,6 @@ export function readEvents(workspaceRoot: string, runId: string): unknown[] {
   return readEventsJs(workspaceRoot, runId) as unknown[];
 }
 
-export function appendManagedEvent(workspaceRoot: string, managedRunId: string, event: RuntimeEventRecord): void {
-  return appendManagedEventJs(workspaceRoot, managedRunId, event);
-}
-
-export function readManagedEvents(workspaceRoot: string, managedRunId: string): unknown[] {
-  return readManagedEventsJs(workspaceRoot, managedRunId) as unknown[];
-}
-
 export function planCandidateRace(request: Record<string, unknown>): Record<string, unknown> {
   return planCandidateRaceJs(request) as unknown as Record<string, unknown>;
 }
@@ -211,56 +176,6 @@ export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Prom
     request: RuntimeRunRouteRequest,
   ) => Promise<RuntimeRunRouteResponse>;
   return runRoute(request);
-}
-
-export async function runManagedDeliverable(
-  request: RuntimeManagedRunRequest,
-): Promise<RuntimeManagedRunResponse> {
-  const runManaged = runManagedDeliverableJs as unknown as (
-    request: RuntimeManagedRunRequest,
-  ) => Promise<RuntimeManagedRunResponse>;
-  return runManaged(request);
-}
-
-export async function getManagedRun(
-  request: RuntimeManagedRunLookupRequest,
-): Promise<RuntimeManagedRunResponse> {
-  return getManagedRunJs(request) as unknown as Promise<RuntimeManagedRunResponse>;
-}
-
-export function buildManagedRepeatedReviewRerunDecision(
-  request: {
-    managedRun: unknown;
-    stageId: unknown;
-    rerunFromStage: unknown;
-    targetSlideIds?: unknown[];
-    blockingReasons?: unknown[];
-  },
-): Record<string, unknown> {
-  const buildDecision = buildManagedRepeatedReviewRerunDecisionJs as unknown as (
-    decisionRequest: Record<string, unknown>,
-  ) => Record<string, unknown>;
-  return buildDecision(request as Record<string, unknown>);
-}
-
-export function loadRuntimeSupervisionLatest(request: {
-  workspaceRoot: string;
-}): Record<string, unknown> | null {
-  return loadRuntimeSupervisionLatestJs(request) as Record<string, unknown> | null;
-}
-
-export async function superviseManagedRun(
-  request: RuntimeManagedSupervisionRequest,
-): Promise<RuntimeManagedRunResponse> {
-  return superviseManagedRunJs(request) as Promise<RuntimeManagedRunResponse>;
-}
-
-export function planManagedDeliverableDag(request: Record<string, unknown>): Record<string, unknown> {
-  return planManagedDeliverableDagJs(request) as unknown as Record<string, unknown>;
-}
-
-export function executeManagedDagLayers(request: Record<string, unknown>): Promise<Record<string, unknown>> {
-  return executeManagedDagLayersJs(request) as Promise<Record<string, unknown>>;
 }
 
 export function productEntrySessionDir(): string {
@@ -320,62 +235,12 @@ export function failRun(request: RuntimeFailRunRequest): RuntimeRunRecord {
   return fail(request);
 }
 
-export function createManagedRun(request: RuntimeManagedRunRequest): RuntimeManagedRunRecord {
-  const create = createManagedRunJs as unknown as (
-    request: RuntimeManagedRunRequest,
-  ) => RuntimeManagedRunRecord;
-  return create(request);
-}
-
-export function loadManagedRun(request: RuntimeManagedRunLookupRequest): RuntimeManagedRunRecord {
-  return loadManagedRunJs(request) as RuntimeManagedRunRecord;
-}
-
-export function saveManagedRun(request: {
-  workspaceRoot: string;
-  managedRun: RuntimeManagedRunRecord;
-}): RuntimeManagedRunRecord {
-  return saveManagedRunJs(request) as RuntimeManagedRunRecord;
-}
-
-export function loadManagedProgressProjection(
-  request: RuntimeManagedRunLookupRequest,
-): RuntimeManagedProgressProjection | null {
-  return loadManagedProgressProjectionJs(request) as RuntimeManagedProgressProjection | null;
-}
-
 export function buildPerformanceReport(request: {
   workspaceRoot: string;
   topicId?: string | null;
   deliverableId?: string | null;
 }): Record<string, any> {
   return buildPerformanceReportJs(request);
-}
-
-export function saveManagedProgressProjection(request: {
-  workspaceRoot: string;
-  managedRunId: string;
-  projection: RuntimeManagedProgressProjection;
-}): string {
-  return saveManagedProgressProjectionJs(request) as string;
-}
-
-export function managedPromptAuditFile(request: {
-  workspaceRoot: string;
-  managedRunId: string;
-  stageId: string;
-  attempt: number;
-}): string {
-  return managedPromptAuditFileJs(request) as string;
-}
-
-export function managedResultFile(request: {
-  workspaceRoot: string;
-  managedRunId: string;
-  stageId: string;
-  attempt: number;
-}): string {
-  return managedResultFileJs(request) as string;
 }
 
 export async function intakeSource(request: RuntimeSourceIntakeRequest): Promise<RuntimeSourceIntakeResponse> {
@@ -430,12 +295,6 @@ export type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
-  RuntimeManagedProgressProjection,
-  RuntimeManagedRunLookupRequest,
-  RuntimeManagedRunRecord,
-  RuntimeManagedRunRequest,
-  RuntimeManagedRunResponse,
-  RuntimeManagedSupervisionRequest,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,

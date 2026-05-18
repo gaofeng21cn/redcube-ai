@@ -12,24 +12,6 @@ export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS = Object.freeze({
 });
 
 export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
-  managed_dag_scheduler: {
-    expectation_ref: '/family_scheduler_replacement',
-    opl_replacement_surface: 'opl_family_scheduler',
-    rca_projection_mode: 'visual_stage_dag_refs_only',
-    rca_exports_only: ['stage_dag_ref', 'route_policy_refs', 'visual_stage_order_refs'],
-  },
-  attempt_state_machine_runner: {
-    expectation_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner',
-    opl_replacement_surface: 'opl_generic_transition_runner',
-    rca_projection_mode: 'transition_spec_and_guard_result_refs_only',
-    rca_exports_only: ['visual_transition_spec_ref', 'guard_result_refs', 'owner_receipt_refs', 'typed_blocker_refs'],
-  },
-  managed_run_json_store: {
-    expectation_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout',
-    opl_replacement_surface: 'opl_attempt_ledger_provider_receipts',
-    rca_projection_mode: 'managed_run_locator_and_visual_summary_refs_only',
-    rca_exports_only: ['managed_run_locator_refs', 'visual_run_projection_refs', 'provider_receipt_correlation_refs'],
-  },
   product_entry_session_store: {
     expectation_ref: '/opl_generic_primitive_consumption',
     opl_replacement_surface: 'opl_app_session_shell_and_workbench',
@@ -105,7 +87,6 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
 export const RCA_BRIDGE_EXIT_REQUIRED_GATES = Object.freeze([
   'domain_authority_refs_preserved',
   'no_regression_proof_recorded',
-  'legacy_physical_cleanup_no_active_caller_proof',
 ]);
 
 export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
@@ -121,27 +102,6 @@ export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
 ]);
 
 const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
-  managed_dag_scheduler: {
-    bridge_role: 'declarative_visual_stage_dag_until_opl_family_scheduler_consumption',
-    replacement_owner: 'opl',
-    exit_gate_ref: '/family_scheduler_replacement',
-    retained_authority: ['visual_stage_order_refs', 'route_policy_refs'],
-    after_exit_rca_surface: 'visual_stage_dag_descriptor_only',
-  },
-  attempt_state_machine_runner: {
-    bridge_role: 'visual_transition_adapter_until_opl_generic_transition_runner_live',
-    replacement_owner: 'opl',
-    exit_gate_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner',
-    retained_authority: ['visual_transition_spec', 'visual_guard_evaluator', 'typed_blocker', 'owner_receipt_refs'],
-    after_exit_rca_surface: 'visual_transition_spec_and_guard_evaluator',
-  },
-  managed_run_json_store: {
-    bridge_role: 'managed_run_locator_projection_until_opl_attempt_ledger_live',
-    replacement_owner: 'opl',
-    exit_gate_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout',
-    retained_authority: ['managed_run_locator_refs', 'visual_run_projection_refs'],
-    after_exit_rca_surface: 'visual_run_summary_refs_only',
-  },
   product_entry_session_store: {
     bridge_role: 'entry_session_snapshot_adapter_until_opl_generated_session_shell_live',
     replacement_owner: 'opl',
@@ -260,11 +220,10 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
 export function buildFunctionalModulePhysicalDeletionGuard(entry) {
   return {
     safe_to_delete_now: false,
-    reason: `${entry.module_id} still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.`,
+    reason: `${entry.module_id} is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.`,
     required_before_delete: [
       'domain_authority_refs_preserved',
       'no_regression_proof_recorded',
-      'legacy_physical_cleanup_no_active_caller_proof',
     ],
   };
 }
@@ -272,7 +231,7 @@ export function buildFunctionalModulePhysicalDeletionGuard(entry) {
 export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
   return {
     gate_id: 'rca.private_generic_residue_bridge_exit.v1',
-    status: 'functional_bridge_exited_cleanup_and_evidence_open',
+    status: 'functional_bridge_exited_physical_cleanup_closed_evidence_open',
     owner: 'redcube_ai',
     replacement_owner: 'opl',
     required_before_retiring_remaining_repo_local_bridges: [...RCA_BRIDGE_EXIT_REQUIRED_GATES],
@@ -296,10 +255,9 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
     declares_production_consumption_complete: true,
     production_consumption_scope: 'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
     declares_visual_stage_long_soak_complete: false,
-    declares_no_active_callers: false,
+    declares_no_active_callers: true,
     remaining_blocker_ids: [
       'production_live_soak_and_evidence',
-      'legacy_physical_cleanup',
     ],
   };
 }

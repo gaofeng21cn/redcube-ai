@@ -307,9 +307,6 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     current.current_state.active_baton.scope.privatized_functional_module_audit,
   ];
   const expectedModules = [
-    'managed_dag_scheduler',
-    'attempt_state_machine_runner',
-    'managed_run_json_store',
     'product_entry_session_store',
     'workspace_source_intake',
     'memory_writeback_receipt_transport',
@@ -343,8 +340,8 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       status: 'classification_closed_followthrough_gaps_open',
       closed_at: '2026-05-17',
       closure_scope: 'rca_functional_structure_gap_classification',
-      functional_structure_gap_count: 2,
-      completed_functional_structure_gap_count: 7,
+      functional_structure_gap_count: 1,
+      completed_functional_structure_gap_count: 8,
       completed_functional_structure_gap_ids: [
         'opl_generated_surface_production_consumption',
         'repo_local_wrapper_active_caller_migration',
@@ -353,25 +350,19 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         'review_repair_transport',
         'opl_app_operator_drilldown',
         'workspace_source_lifecycle_receipt_shell',
+        'legacy_physical_cleanup',
       ],
       unclassified_private_generic_residue_count: 0,
       long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
+      remaining_gap_class: 'production_live_soak_evidence_only',
       remaining_functional_structure_gap_ids: [
         'production_live_soak_and_evidence',
-        'legacy_physical_cleanup',
       ],
       remaining_functional_structure_gaps: [
         {
           gap_id: 'production_live_soak_and_evidence',
           current_bucket: 'production_evidence_blocker',
           owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'legacy_physical_cleanup',
-          current_bucket: 'physical_cleanup_blocker',
-          owner: 'redcube_ai',
           rca_role: 'domain_handler_target_or_visual_authority_refs_only',
         },
       ],
@@ -398,12 +389,17 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         'minimal_authority_function',
       ],
     });
-    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 2);
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
       'product_sidecar_dispatch.supervise_managed_run',
       'product_sidecar_dispatch.product_entry_continuation',
+      'public_cli_mcp_gateway.get_managed_run',
+      'public_cli_mcp_gateway.supervise_managed_run',
+      'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+      'repo_local_visual_runtime.legacy_run_store_deleted',
+      'repo_local_visual_runtime.legacy_dag_runtime_deleted',
     ]);
-    assert.equal(surface.physical_deletion_guard.deletion_status, 'sidecar_default_generic_dispatch_removed');
+    assert.equal(surface.physical_deletion_guard.deletion_status, 'legacy_runtime_physical_cleanup_closed');
     assert.deepEqual(surface.rca_visual_authority_allowlist, [
       'source_readiness_verdict',
       'communication_visual_direction_decision',
@@ -478,11 +474,14 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       } else {
         assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
-        assert.match(entry.physical_deletion_guard.reason, /active callers|retained RCA visual authority refs/, entry.module_id);
+        assert.match(
+          entry.physical_deletion_guard.reason,
+          /retained RCA domain authority or refs-only projection/,
+          entry.module_id,
+        );
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
-          'legacy_physical_cleanup_no_active_caller_proof',
         ], entry.module_id);
       }
       for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
@@ -498,13 +497,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   }
 
   const byId = Object.fromEntries(surfaces[0].modules.map((entry) => [entry.module_id, entry]));
-  assert.equal(byId.managed_dag_scheduler.rca_scope, 'visual_deliverable_internal_dag_only');
-  assert.equal(byId.managed_dag_scheduler.migration_class, 'declarative_pack');
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
   assert.equal(byId.native_helper_envelope.migration_class, 'opl_hosted_surface');
   const closedFunctionalModuleIds = [
-    'attempt_state_machine_runner',
-    'managed_run_json_store',
     'product_entry_session_store',
     'artifact_export_lifecycle',
   ];
@@ -527,21 +522,6 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', moduleId);
     assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, moduleId);
   }
-  assert.equal(byId.attempt_state_machine_runner.status, 'opl_generic_transition_runner_consumed_refs_only');
-  assert.equal(byId.attempt_state_machine_runner.activeCallerStatus, 'refs_only_visual_transition_adapter_consuming_opl_runner');
-  assert.equal(byId.managed_run_json_store.status, 'opl_attempt_ledger_provider_receipts_consumed');
-  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'opl_hosted_attempt_ledger_refs_with_rca_visual_summary');
-  assert.equal(byId.managed_run_json_store.migration_class, 'opl_hosted_surface');
-  assert.equal(
-    byId.managed_run_json_store.opl_replacement_expectation.replacement_surface,
-    'opl_attempt_ledger_provider_receipts',
-  );
-  assert.equal(byId.managed_run_json_store.rca_projection_mode, 'managed_run_locator_and_visual_summary_refs_only');
-  assert.deepEqual(byId.managed_run_json_store.rca_exports_only, [
-    'managed_run_locator_refs',
-    'visual_run_projection_refs',
-    'provider_receipt_correlation_refs',
-  ]);
   assert.equal(byId.product_entry_session_store.status, 'opl_generated_workbench_session_surface_consumed');
   assert.equal(byId.product_entry_session_store.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');

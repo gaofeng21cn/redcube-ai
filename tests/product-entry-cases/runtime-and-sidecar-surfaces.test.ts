@@ -42,8 +42,8 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'workbench_shell',
     ]);
     assert.equal(
-      sidecar.runtime_framework.family_scheduler_replacement.managed_dag_scheduler_scope,
-      'visual_deliverable_internal_dag_only',
+      sidecar.runtime_framework.family_scheduler_replacement.visual_stage_descriptor_scope,
+      'opl_stage_execution_plan_route_handler_refs_only',
     );
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.generic_surfaces_owner, 'opl');
     assert.equal(sidecar.runtime_framework.rca_thin_surface_policy.rca_is_functional_harness_owner, false);
@@ -251,9 +251,6 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.map((entry) => entry.module_id),
       [
-        'managed_dag_scheduler',
-        'attempt_state_machine_runner',
-        'managed_run_json_store',
         'product_entry_session_store',
         'workspace_source_intake',
         'memory_writeback_receipt_transport',
@@ -281,7 +278,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.current_safe_tombstone_candidate_count,
-      2,
+      0,
     );
     assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values, [
       'opl_hosted_surface',
@@ -297,24 +294,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         status: 'classification_closed_followthrough_gaps_open',
         closed_at: '2026-05-17',
         closure_scope: 'rca_functional_structure_gap_classification',
-        functional_structure_gap_count: 2,
-        completed_functional_structure_gap_count: 7,
-        completed_functional_structure_gap_ids: ['opl_generated_surface_production_consumption', 'repo_local_wrapper_active_caller_migration', 'focused_hosted_attempt_real_path_cutover', 'artifact_gallery_handoff_shell', 'review_repair_transport', 'opl_app_operator_drilldown', 'workspace_source_lifecycle_receipt_shell'],
+        functional_structure_gap_count: 1,
+        completed_functional_structure_gap_count: 8,
+        completed_functional_structure_gap_ids: ['opl_generated_surface_production_consumption', 'repo_local_wrapper_active_caller_migration', 'focused_hosted_attempt_real_path_cutover', 'artifact_gallery_handoff_shell', 'review_repair_transport', 'opl_app_operator_drilldown', 'workspace_source_lifecycle_receipt_shell', 'legacy_physical_cleanup'],
         unclassified_private_generic_residue_count: 0,
         long_term_rca_generic_owner_claim_count: 0,
-        remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
-        remaining_functional_structure_gap_ids: ['production_live_soak_and_evidence', 'legacy_physical_cleanup'],
+        remaining_gap_class: 'production_live_soak_evidence_only',
+        remaining_functional_structure_gap_ids: ['production_live_soak_and_evidence'],
         remaining_functional_structure_gaps: [
           {
             gap_id: 'production_live_soak_and_evidence',
             current_bucket: 'production_evidence_blocker',
             owner: 'one-person-lab',
-            rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-          },
-          {
-            gap_id: 'legacy_physical_cleanup',
-            current_bucket: 'physical_cleanup_blocker',
-            owner: 'redcube_ai',
             rca_role: 'domain_handler_target_or_visual_authority_refs_only',
           },
         ],
@@ -351,6 +342,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       [
         'product_sidecar_dispatch.supervise_managed_run',
         'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.supervise_managed_run',
+        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+        'repo_local_visual_runtime.legacy_run_store_deleted',
+        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
       ],
     );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
@@ -359,14 +355,6 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('sidecar_status_action_metadata_projection'),
       false,
     );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').rca_scope,
-      'visual_deliverable_internal_dag_only',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_dag_scheduler').migration_class,
-      'declarative_pack',
-    );
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'codex_executor_adapter').codePaths,
       [
@@ -374,38 +362,6 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'packages/redcube-gateway/src/actions/run-deliverable-route.ts',
         'packages/redcube-gateway/src/actions/domain-entry-contract.ts',
         'tests/rca-executor-backend-contract.test.ts',
-      ],
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').opl_replacement_expectation.replacement_surface,
-      'opl_attempt_ledger_provider_receipts',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'attempt_state_machine_runner').status,
-      'opl_generic_transition_runner_consumed_refs_only',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'attempt_state_machine_runner').activeCallerStatus,
-      'refs_only_visual_transition_adapter_consuming_opl_runner',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').status,
-      'opl_attempt_ledger_provider_receipts_consumed',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').activeCallerStatus,
-      'opl_hosted_attempt_ledger_refs_with_rca_visual_summary',
-    );
-    assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').migration_class,
-      'opl_hosted_surface',
-    );
-    assert.deepEqual(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'managed_run_json_store').rca_exports_only,
-      [
-        'managed_run_locator_refs',
-        'visual_run_projection_refs',
-        'provider_receipt_correlation_refs',
       ],
     );
     assert.equal(
@@ -441,8 +397,6 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_artifact_lifecycle_gallery_handoff_shell',
     );
     const closedFunctionalModuleIds = [
-      'attempt_state_machine_runner',
-      'managed_run_json_store',
       'product_entry_session_store',
       'artifact_export_lifecycle',
     ];
@@ -1119,8 +1073,8 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       manifestWithReceipts.operator_evidence_readiness_projection.remaining_gap_classification,
       {
         functional_structure_gap_status: 'classification_closed_followthrough_gaps_open',
-        functional_structure_gap_count: 2,
-        completed_functional_structure_gap_count: 7,
+        functional_structure_gap_count: 1,
+        completed_functional_structure_gap_count: 8,
         completed_functional_structure_gap_ids: [
           'opl_generated_surface_production_consumption',
           'repo_local_wrapper_active_caller_migration',
@@ -1129,11 +1083,11 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
           'review_repair_transport',
           'opl_app_operator_drilldown',
           'workspace_source_lifecycle_receipt_shell',
+          'legacy_physical_cleanup',
         ],
-        remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
+        remaining_gap_class: 'production_live_soak_evidence_only',
         remaining_functional_structure_gap_ids: [
           'production_live_soak_and_evidence',
-          'legacy_physical_cleanup',
         ],
         remaining_evidence_gate_ids: [
           'real_artifact_producing_domain_owner_receipt',

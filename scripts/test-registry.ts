@@ -66,8 +66,6 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/product-domain-actions.test.ts',
     'tests/runtime-topology-regression.test.ts',
     'tests/codex-runtime-canonical-path.test.ts',
-    'tests/managed-deliverable-execution.test.ts',
-    'tests/managed-dag-scheduler.test.ts',
     'tests/product-domain-action-api.test.ts',
     'tests/poster-creative-ownership.test.ts',
     'tests/ppt-creative-ownership.test.ts',

@@ -27,7 +27,6 @@
       "generic_runner",
       "workbench_shell"
     ],
-    "managed_dag_scheduler_scope": "visual_deliverable_internal_dag_only",
     "rca_retained_authority": [
       "visual_truth",
       "review_export_verdict",
@@ -37,7 +36,8 @@
       "native_helper_implementation",
       "typed_blocker",
       "safe_action_refs"
-    ]
+    ],
+    "visual_stage_descriptor_scope": "opl_stage_execution_plan_route_handler_refs_only"
   },
   "opl_generic_primitive_consumption": {
     "ref": "/opl_generic_primitive_consumption",
@@ -1153,8 +1153,8 @@
     "refs_only": true,
     "remaining_gap_classification": {
       "functional_structure_gap_status": "classification_closed_followthrough_gaps_open",
-      "functional_structure_gap_count": 2,
-      "completed_functional_structure_gap_count": 7,
+      "functional_structure_gap_count": 1,
+      "completed_functional_structure_gap_count": 8,
       "completed_functional_structure_gap_ids": [
         "opl_generated_surface_production_consumption",
         "repo_local_wrapper_active_caller_migration",
@@ -1162,12 +1162,12 @@
         "artifact_gallery_handoff_shell",
         "review_repair_transport",
         "opl_app_operator_drilldown",
-        "workspace_source_lifecycle_receipt_shell"
-      ],
-      "remaining_gap_class": "live_soak_evidence_and_physical_cleanup",
-      "remaining_functional_structure_gap_ids": [
-        "production_live_soak_and_evidence",
+        "workspace_source_lifecycle_receipt_shell",
         "legacy_physical_cleanup"
+      ],
+      "remaining_gap_class": "production_live_soak_evidence_only",
+      "remaining_functional_structure_gap_ids": [
+        "production_live_soak_and_evidence"
       ],
       "remaining_evidence_gate_ids": [
         "real_artifact_producing_domain_owner_receipt",
@@ -1333,9 +1333,7 @@
     "read_only": true,
     "refs_only": true,
     "audit_scope": [
-      "managed-dag-scheduler",
-      "attempt/state-machine runner",
-      "managed-run JSON store",
+      "OPL stage execution plan route handler refs",
       "product-entry session store",
       "workspace/source intake",
       "memory/writeback receipt transport",
@@ -1393,11 +1391,11 @@
         "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
         "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
         "default_generic_dispatch_owner": "one-person-lab",
-        "default_managed_supervision_owner": "one-person-lab",
-        "managed_supervision_public_surface": "retired",
         "redcube_cli_is_unified_metadata_owner": false,
         "redcube_mcp_is_unified_metadata_owner": false,
-        "product_entry_session_store_is_generic_session_owner": false
+        "product_entry_session_store_is_generic_session_owner": false,
+        "default_supervision_owner": "one-person-lab",
+        "legacy_supervision_public_surface": "retired"
       },
       "bridge_exit_gate": {
         "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -1406,15 +1404,13 @@
         "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
         "required_before_retiring_repo_local_wrappers": [
           "domain_authority_refs_preserved",
-          "no_regression_proof_recorded",
-          "legacy_physical_cleanup_no_active_caller_proof"
+          "no_regression_proof_recorded"
         ],
         "repo_local_allowed_roles_before_exit": [
           "domain_handler_target",
           "direct_domain_entry",
           "direct_protocol_adapter",
-          "refs_only_adapter",
-          "historical_regression_fixture"
+          "refs_only_adapter"
         ],
         "repo_local_forbidden_roles": [
           "unified_metadata_owner",
@@ -1427,8 +1423,7 @@
           "declarative_visual_pack_input",
           "domain_handler_targets",
           "minimal_authority_functions",
-          "refs_only_locator_projection",
-          "historical_regression_fixtures"
+          "refs_only_locator_projection"
         ],
         "rca_can_own_generated_surface": false,
         "rca_can_own_generic_session_shell": false,
@@ -1436,8 +1431,7 @@
         "declares_production_consumption_complete": true,
         "declares_visual_stage_long_soak_complete": false,
         "remaining_blocker_ids": [
-          "production_live_soak_and_evidence",
-          "legacy_physical_cleanup"
+          "production_live_soak_and_evidence"
         ],
         "declares_generated_surface_consumption_complete": true,
         "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak"
@@ -1470,8 +1464,8 @@
       "status": "classification_closed_followthrough_gaps_open",
       "closed_at": "2026-05-17",
       "closure_scope": "rca_functional_structure_gap_classification",
-      "functional_structure_gap_count": 2,
-      "completed_functional_structure_gap_count": 7,
+      "functional_structure_gap_count": 1,
+      "completed_functional_structure_gap_count": 8,
       "completed_functional_structure_gap_ids": [
         "opl_generated_surface_production_consumption",
         "repo_local_wrapper_active_caller_migration",
@@ -1479,26 +1473,20 @@
         "artifact_gallery_handoff_shell",
         "review_repair_transport",
         "opl_app_operator_drilldown",
-        "workspace_source_lifecycle_receipt_shell"
+        "workspace_source_lifecycle_receipt_shell",
+        "legacy_physical_cleanup"
       ],
       "unclassified_private_generic_residue_count": 0,
       "long_term_rca_generic_owner_claim_count": 0,
-      "remaining_gap_class": "live_soak_evidence_and_physical_cleanup",
+      "remaining_gap_class": "production_live_soak_evidence_only",
       "remaining_functional_structure_gap_ids": [
-        "production_live_soak_and_evidence",
-        "legacy_physical_cleanup"
+        "production_live_soak_and_evidence"
       ],
       "remaining_functional_structure_gaps": [
         {
           "gap_id": "production_live_soak_and_evidence",
           "current_bucket": "production_evidence_blocker",
           "owner": "one-person-lab",
-          "rca_role": "domain_handler_target_or_visual_authority_refs_only"
-        },
-        {
-          "gap_id": "legacy_physical_cleanup",
-          "current_bucket": "physical_cleanup_blocker",
-          "owner": "redcube_ai",
           "rca_role": "domain_handler_target_or_visual_authority_refs_only"
         }
       ],
@@ -1526,33 +1514,30 @@
       ]
     },
     "physical_deletion_guard": {
-      "current_safe_tombstone_candidate_count": 2,
+      "current_safe_tombstone_candidate_count": 0,
       "deleted_or_thinned_default_surfaces": [
         "product_sidecar_dispatch.supervise_managed_run",
-        "product_sidecar_dispatch.product_entry_continuation"
+        "product_sidecar_dispatch.product_entry_continuation",
+        "public_cli_mcp_gateway.get_managed_run",
+        "public_cli_mcp_gateway.supervise_managed_run",
+        "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
+        "repo_local_visual_runtime.legacy_run_store_deleted",
+        "repo_local_visual_runtime.legacy_dag_runtime_deleted"
       ],
-      "deletion_status": "sidecar_default_generic_dispatch_removed",
-      "remaining_deletion_scope": "Only visual authority functions, refs-only projections, internal historical diagnostic fixtures, and declared visual pack inputs remain in RCA package surfaces.",
-      "required_before_remaining_physical_delete": [
-        "domain_authority_refs_preserved",
-        "no_regression_proof_recorded",
-        "legacy_physical_cleanup_no_active_caller_proof"
-      ]
+      "deletion_status": "legacy_runtime_physical_cleanup_closed",
+      "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
+      "required_before_remaining_physical_delete": []
     },
     "bridge_exit_gate": {
       "gate_id": "rca.private_generic_residue_bridge_exit.v1",
-      "status": "functional_bridge_exited_cleanup_and_evidence_open",
+      "status": "functional_bridge_exited_physical_cleanup_closed_evidence_open",
       "owner": "redcube_ai",
       "replacement_owner": "opl",
       "required_before_retiring_remaining_repo_local_bridges": [
         "domain_authority_refs_preserved",
-        "no_regression_proof_recorded",
-        "legacy_physical_cleanup_no_active_caller_proof"
+        "no_regression_proof_recorded"
       ],
       "remaining_bridge_module_ids": [
-        "managed_dag_scheduler",
-        "attempt_state_machine_runner",
-        "managed_run_json_store",
         "product_entry_session_store",
         "workspace_source_intake",
         "memory_writeback_receipt_transport",
@@ -1581,10 +1566,9 @@
       ],
       "declares_production_consumption_complete": true,
       "declares_visual_stage_long_soak_complete": false,
-      "declares_no_active_callers": false,
+      "declares_no_active_callers": true,
       "remaining_blocker_ids": [
-        "production_live_soak_and_evidence",
-        "legacy_physical_cleanup"
+        "production_live_soak_and_evidence"
       ],
       "declares_generated_surface_consumption_complete": true,
       "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak"
@@ -1610,333 +1594,6 @@
     ],
     "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
     "modules": [
-      {
-        "module_id": "managed_dag_scheduler",
-        "surface_ref": "/managed_runtime_contract/stage_dag",
-        "status": "rca_domain_thin_surface_retained",
-        "classification": "split_owner_boundary",
-        "opl_generic_primitive": "generic_scheduler",
-        "oplAbsorbCandidate": true,
-        "rcaRetains": [
-          "visual_deliverable_internal_dag",
-          "route_policy_refs",
-          "visual_stage_order"
-        ],
-        "rca_scope": "visual_deliverable_internal_dag_only",
-        "audit_readout": "retain",
-        "codePaths": [
-          "packages/redcube-runtime/src/managed-dag-scheduler.ts",
-          "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/family_scheduler_replacement"
-        ],
-        "activeCallers": [
-          "managed runtime contract",
-          "product-entry manifest",
-          "product sidecar export",
-          "managed DAG guard tests"
-        ],
-        "activeCallerStatus": "active_thin_domain_dag",
-        "migrationAction": "Move generic scheduling, queueing, daemon, retry and attempt lifecycle ownership to OPL family scheduler; keep only RCA visual stage DAG refs.",
-        "retentionReason": "RCA must define visual deliverable stage order and route-specific gate meaning for ppt_deck, xiaohongshu and poster families.",
-        "cannotAbsorbReason": "OPL can absorb scheduler mechanics but cannot own visual stage semantics, route policy or visual readiness authority.",
-        "tombstone_required": false,
-        "migration_class": "declarative_pack",
-        "opl_owned_generic_primitive_consumer": true,
-        "rca_owned_visual_domain_authority": true,
-        "opl_absorb_candidate": true,
-        "opl_replacement_expectation": {
-          "owner": "opl",
-          "expectation_ref": "/family_scheduler_replacement",
-          "replacement_surface": "opl_family_scheduler",
-          "expected_mode": "declarative_pack_consumed_by_opl_hosted_surface",
-          "rca_consumes_as": "consumer_projection_only",
-          "rca_owns_replacement_runtime": false
-        },
-        "bridge_exit_gate": {
-          "gate_id": "managed_dag_scheduler_bridge_exit_gate",
-          "bridge_role": "declarative_visual_stage_dag_until_opl_family_scheduler_consumption",
-          "bridge_owner": "redcube_ai_migration_bridge",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_family_scheduler",
-          "exit_gate_ref": "/family_scheduler_replacement",
-          "current_status": "bridge_until_exit_gates_pass",
-          "required_before_retire": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ],
-          "retained_rca_authority": [
-            "visual_stage_order_refs",
-            "route_policy_refs"
-          ],
-          "after_exit_rca_surface": "visual_stage_dag_descriptor_only",
-          "can_delete_without_no_active_caller_proof": false,
-          "declares_replacement_complete": false,
-          "rca_can_own_replacement_runtime": false,
-          "opl_can_write_visual_truth": false,
-          "opl_can_store_artifact_blob": false,
-          "opl_can_write_memory_body": false,
-          "opl_can_authorize_review_export_verdict": false,
-          "opl_can_issue_owner_receipt": false
-        },
-        "rca_projection_mode": "visual_stage_dag_refs_only",
-        "rca_exports_only": [
-          "stage_dag_ref",
-          "route_policy_refs",
-          "visual_stage_order_refs"
-        ],
-        "forbidden_generic_owner_flags": {
-          "rca_owns_generic_runtime": false,
-          "rca_owns_generic_attempt_ledger": false,
-          "rca_owns_generic_session_shell": false,
-          "rca_owns_generic_workbench": false,
-          "rca_owns_native_helper_generic_envelope": false,
-          "rca_owns_generic_cli_mcp_wrapper_generator": false,
-          "rca_owns_generic_executor_adapter": false,
-          "rca_owns_observability_exporter": false
-        },
-        "physical_deletion_guard": {
-          "safe_to_delete_now": false,
-          "reason": "managed_dag_scheduler still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-          "required_before_delete": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ]
-        },
-        "rca_retains": [
-          "visual_deliverable_internal_dag",
-          "route_policy_refs",
-          "visual_stage_order"
-        ],
-        "retire_tombstone": false,
-        "writes_visual_truth": false,
-        "writes_artifact_blob": false,
-        "writes_memory_body": false,
-        "declares_visual_ready": false,
-        "declares_exportable": false,
-        "declares_handoffable": false,
-        "declares_production_soak_complete": false
-      },
-      {
-        "module_id": "attempt_state_machine_runner",
-        "surface_ref": "/controlled_visual_stage_attempt",
-        "status": "opl_generic_transition_runner_consumed_refs_only",
-        "classification": "split_owner_boundary",
-        "opl_generic_primitive": "generic_transition_runner",
-        "oplAbsorbCandidate": true,
-        "rcaRetains": [
-          "visual_transition_spec",
-          "visual_guard_evaluator",
-          "typed_blocker",
-          "owner_receipt_refs"
-        ],
-        "rca_scope": "visual_transition_spec_and_guard_evaluator_only",
-        "audit_readout": "project_opl_runner_retain_visual_transition_authority",
-        "codePaths": [
-          "packages/redcube-runtime/src/managed-deliverable.ts",
-          "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts",
-          "packages/redcube-runtime/src/managed-deliverable-parts/execution-orchestration.ts",
-          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
-        ],
-        "activeCallers": [
-          "internal historical runManagedDeliverable regression path",
-          "internal historical superviseManagedRun regression projection",
-          "evaluate_visual_transition sidecar action",
-          "OPL hosted attempt receipt fixture"
-        ],
-        "activeCallerStatus": "refs_only_visual_transition_adapter_consuming_opl_runner",
-        "migrationAction": "Consume OPL generic transition runner for idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics; keep RCA visual transition guard refs only.",
-        "retentionReason": "RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.",
-        "cannotAbsorbReason": "A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.",
-        "tombstone_required": false,
-        "migration_class": "refs_only_adapter",
-        "opl_owned_generic_primitive_consumer": true,
-        "rca_owned_visual_domain_authority": true,
-        "opl_absorb_candidate": true,
-        "opl_replacement_expectation": {
-          "owner": "opl",
-          "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
-          "replacement_surface": "opl_generic_transition_runner",
-          "expected_mode": "refs_only_adapter_to_opl_surface",
-          "rca_consumes_as": "consumer_projection_only",
-          "rca_owns_replacement_runtime": false
-        },
-        "bridge_exit_gate": {
-          "gate_id": "attempt_state_machine_runner_bridge_exit_gate",
-          "bridge_role": "visual_transition_adapter_until_opl_generic_transition_runner_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_transition_runner",
-          "exit_gate_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/generic_transition_runner",
-          "current_status": "bridge_until_exit_gates_pass",
-          "required_before_retire": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ],
-          "retained_rca_authority": [
-            "visual_transition_spec",
-            "visual_guard_evaluator",
-            "typed_blocker",
-            "owner_receipt_refs"
-          ],
-          "after_exit_rca_surface": "visual_transition_spec_and_guard_evaluator",
-          "can_delete_without_no_active_caller_proof": false,
-          "declares_replacement_complete": false,
-          "rca_can_own_replacement_runtime": false,
-          "opl_can_write_visual_truth": false,
-          "opl_can_store_artifact_blob": false,
-          "opl_can_write_memory_body": false,
-          "opl_can_authorize_review_export_verdict": false,
-          "opl_can_issue_owner_receipt": false
-        },
-        "rca_projection_mode": "transition_spec_and_guard_result_refs_only",
-        "rca_exports_only": [
-          "visual_transition_spec_ref",
-          "guard_result_refs",
-          "owner_receipt_refs",
-          "typed_blocker_refs"
-        ],
-        "forbidden_generic_owner_flags": {
-          "rca_owns_generic_runtime": false,
-          "rca_owns_generic_attempt_ledger": false,
-          "rca_owns_generic_session_shell": false,
-          "rca_owns_generic_workbench": false,
-          "rca_owns_native_helper_generic_envelope": false,
-          "rca_owns_generic_cli_mcp_wrapper_generator": false,
-          "rca_owns_generic_executor_adapter": false,
-          "rca_owns_observability_exporter": false
-        },
-        "physical_deletion_guard": {
-          "safe_to_delete_now": false,
-          "reason": "attempt_state_machine_runner still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-          "required_before_delete": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ]
-        },
-        "rca_retains": [
-          "visual_transition_spec",
-          "visual_guard_evaluator",
-          "typed_blocker",
-          "owner_receipt_refs"
-        ],
-        "retire_tombstone": false,
-        "writes_visual_truth": false,
-        "writes_artifact_blob": false,
-        "writes_memory_body": false,
-        "declares_visual_ready": false,
-        "declares_exportable": false,
-        "declares_handoffable": false,
-        "declares_production_soak_complete": false
-      },
-      {
-        "module_id": "managed_run_json_store",
-        "surface_ref": "/runtime_inventory/managed_runs",
-        "status": "opl_attempt_ledger_provider_receipts_consumed",
-        "classification": "opl_owned_attempt_ledger_consumer",
-        "opl_generic_primitive": "attempt_ledger",
-        "oplAbsorbCandidate": true,
-        "rcaRetains": [
-          "managed_run_locator_refs",
-          "visual_run_projection_refs"
-        ],
-        "rca_scope": "opl_attempt_ledger_consumer_locator_refs",
-        "audit_readout": "migrate_store_to_opl_attempt_ledger_keep_locator_projection",
-        "codePaths": [
-          "packages/redcube-runtime/src/managed-run-store.ts",
-          "packages/redcube-runtime/src/managed-run-surfaces.ts",
-          "packages/redcube-gateway/src/actions/get-managed-run.ts",
-          "packages/redcube-gateway/src/actions/supervise-managed-run.ts"
-        ],
-        "activeCallers": [
-          "redcube product session domain snapshot refs",
-          "internal historical managed supervision regression projection",
-          "runtime watch/session locator projection"
-        ],
-        "activeCallerStatus": "opl_hosted_attempt_ledger_refs_with_rca_visual_summary",
-        "migrationAction": "Consume OPL attempt ledger/provider receipt storage while RCA exposes managed-run locator refs and visual-domain summaries.",
-        "retentionReason": "RCA keeps locator refs and visual run summaries needed to correlate provider receipts with domain-owned deliverable truth.",
-        "cannotAbsorbReason": "OPL owns the generic attempt ledger; it must not absorb canonical artifacts, review verdicts or visual run truth.",
-        "tombstone_required": false,
-        "migration_class": "opl_hosted_surface",
-        "opl_owned_generic_primitive_consumer": true,
-        "rca_owned_visual_domain_authority": false,
-        "opl_absorb_candidate": true,
-        "opl_replacement_expectation": {
-          "owner": "opl",
-          "expectation_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
-          "replacement_surface": "opl_attempt_ledger_provider_receipts",
-          "expected_mode": "opl_hosted_surface",
-          "rca_consumes_as": "consumer_projection_only",
-          "rca_owns_replacement_runtime": false
-        },
-        "bridge_exit_gate": {
-          "gate_id": "managed_run_json_store_bridge_exit_gate",
-          "bridge_role": "managed_run_locator_projection_until_opl_attempt_ledger_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_attempt_ledger_provider_receipts",
-          "exit_gate_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/queue_stage_attempt_typed_closeout",
-          "current_status": "bridge_until_exit_gates_pass",
-          "required_before_retire": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ],
-          "retained_rca_authority": [
-            "managed_run_locator_refs",
-            "visual_run_projection_refs"
-          ],
-          "after_exit_rca_surface": "visual_run_summary_refs_only",
-          "can_delete_without_no_active_caller_proof": false,
-          "declares_replacement_complete": false,
-          "rca_can_own_replacement_runtime": false,
-          "opl_can_write_visual_truth": false,
-          "opl_can_store_artifact_blob": false,
-          "opl_can_write_memory_body": false,
-          "opl_can_authorize_review_export_verdict": false,
-          "opl_can_issue_owner_receipt": false
-        },
-        "rca_projection_mode": "managed_run_locator_and_visual_summary_refs_only",
-        "rca_exports_only": [
-          "managed_run_locator_refs",
-          "visual_run_projection_refs",
-          "provider_receipt_correlation_refs"
-        ],
-        "forbidden_generic_owner_flags": {
-          "rca_owns_generic_runtime": false,
-          "rca_owns_generic_attempt_ledger": false,
-          "rca_owns_generic_session_shell": false,
-          "rca_owns_generic_workbench": false,
-          "rca_owns_native_helper_generic_envelope": false,
-          "rca_owns_generic_cli_mcp_wrapper_generator": false,
-          "rca_owns_generic_executor_adapter": false,
-          "rca_owns_observability_exporter": false
-        },
-        "physical_deletion_guard": {
-          "safe_to_delete_now": false,
-          "reason": "managed_run_json_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
-          "required_before_delete": [
-            "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
-          ]
-        },
-        "rca_retains": [
-          "managed_run_locator_refs",
-          "visual_run_projection_refs"
-        ],
-        "retire_tombstone": false,
-        "writes_visual_truth": false,
-        "writes_artifact_blob": false,
-        "writes_memory_body": false,
-        "declares_visual_ready": false,
-        "declares_exportable": false,
-        "declares_handoffable": false,
-        "declares_production_soak_complete": false
-      },
       {
         "module_id": "product_entry_session_store",
         "surface_ref": "/session_continuity",
@@ -1988,8 +1645,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "entry_session_domain_refs",
@@ -2025,11 +1681,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "product_entry_session_store still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2037,7 +1692,6 @@
           "deliverable_locator_refs",
           "latest_visual_run_ref"
         ],
-        "generated_session_shell_owner": "one-person-lab",
         "retire_tombstone": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
@@ -2045,7 +1699,8 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false
+        "declares_production_soak_complete": false,
+        "generated_session_shell_owner": "one-person-lab"
       },
       {
         "module_id": "workspace_source_intake",
@@ -2099,8 +1754,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "source_readiness_verdict",
@@ -2135,11 +1789,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "workspace_source_intake still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "workspace_source_intake is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2207,8 +1860,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "visual_memory_accept_reject",
@@ -2243,11 +1895,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "memory_writeback_receipt_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "memory_writeback_receipt_transport is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2316,8 +1967,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "artifact_mutation_authorization",
@@ -2352,11 +2002,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "artifact_export_lifecycle still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "artifact_export_lifecycle is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2390,7 +2039,7 @@
         "codePaths": [
           "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
           "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-          "packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts"
+          "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
         ],
         "activeCallers": [
           "visual director review",
@@ -2425,8 +2074,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "review_export_verdict",
@@ -2462,11 +2110,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "review_repair_transport still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "review_repair_transport is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2535,8 +2182,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "native_helper_implementation",
@@ -2570,11 +2216,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "native_helper_envelope still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "native_helper_envelope is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2643,8 +2288,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "evidence_gap_refs",
@@ -2679,11 +2323,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "operator_projection_shell still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "operator_projection_shell is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2754,8 +2397,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "domain_handler_refs",
@@ -2790,11 +2432,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "generic_cli_mcp_wrappers still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "generic_cli_mcp_wrappers is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2802,8 +2443,6 @@
           "domain_action_handlers",
           "safe_action_refs"
         ],
-        "repo_local_handler_target_only": true,
-        "generated_surface_metadata_owner": "one-person-lab",
         "retire_tombstone": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
@@ -2811,7 +2450,9 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false
+        "declares_production_soak_complete": false,
+        "generated_surface_metadata_owner": "one-person-lab",
+        "repo_local_handler_target_only": true
       },
       {
         "module_id": "codex_executor_adapter",
@@ -2865,8 +2506,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "route_policy_refs",
@@ -2901,11 +2541,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "codex_executor_adapter still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "codex_executor_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -2973,8 +2612,7 @@
           "current_status": "bridge_until_exit_gates_pass",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "retained_rca_authority": [
             "owner_receipt_refs",
@@ -3010,11 +2648,10 @@
         },
         "physical_deletion_guard": {
           "safe_to_delete_now": false,
-          "reason": "observability_stability_read_model still has active callers or retained RCA visual authority refs; physical deletion waits for OPL replacement adoption and no-active-caller proof.",
+          "reason": "observability_stability_read_model is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
           "required_before_delete": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ]
         },
         "rca_retains": [
@@ -3036,19 +2673,6 @@
         "surface_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
         "status": "declarative_pack_input_landed",
         "classification": "declarative_pack",
-        "migration_class": "declarative_pack",
-        "owner": "redcube_ai",
-        "opl_owned_generic_primitive_consumer": false,
-        "rca_owned_visual_domain_authority": false,
-        "opl_absorb_candidate": false,
-        "opl_replacement_expectation": {
-          "owner": "opl",
-          "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-          "replacement_surface": "opl_pack_compiler_generated_surface",
-          "expected_mode": "opl_generated_surface_from_declarative_pack",
-          "rca_consumes_as": "declarative_pack_provider",
-          "rca_owns_replacement_runtime": false
-        },
         "codePaths": [
           "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
         ],
@@ -3061,29 +2685,18 @@
         "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
         "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
         "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
-        "rca_projection_mode": "declarative_pack_refs_only",
-        "rca_exports_only": [
-          "stage_refs",
-          "action_metadata_refs",
-          "visual_transition_refs",
-          "receipt_schema_refs"
-        ],
-        "forbidden_generic_owner_flags": {
-          "rca_owns_generic_runtime": false,
-          "rca_owns_generic_attempt_ledger": false,
-          "rca_owns_generic_session_shell": false,
-          "rca_owns_generic_workbench": false,
-          "rca_owns_native_helper_generic_envelope": false,
-          "rca_owns_generic_cli_mcp_wrapper_generator": false,
-          "rca_owns_generic_executor_adapter": false,
-          "rca_owns_observability_exporter": false
-        },
-        "physical_deletion_guard": {
-          "safe_to_delete_now": false,
-          "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
-          "required_before_delete": [
-            "domain_package_replaced_by_new_rca_pack_contract"
-          ]
+        "tombstone_required": false,
+        "migration_class": "declarative_pack",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": false,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "opl",
+          "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+          "replacement_surface": "opl_pack_compiler_generated_surface",
+          "expected_mode": "opl_generated_surface_from_declarative_pack",
+          "rca_consumes_as": "declarative_pack_provider",
+          "rca_owns_replacement_runtime": false
         },
         "bridge_exit_gate": {
           "gate_id": "visual_pack_compiler_handoff_bridge_exit_gate",
@@ -3109,6 +2722,30 @@
           "opl_can_authorize_review_export_verdict": false,
           "opl_can_issue_owner_receipt": false
         },
+        "rca_projection_mode": "declarative_pack_refs_only",
+        "rca_exports_only": [
+          "stage_refs",
+          "action_metadata_refs",
+          "visual_transition_refs",
+          "receipt_schema_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
+          "required_before_delete": [
+            "domain_package_replaced_by_new_rca_pack_contract"
+          ]
+        },
         "rca_retains": [
           "visual_stage_pack",
           "action_metadata",
@@ -3116,33 +2753,20 @@
           "oracle_fixtures"
         ],
         "retire_tombstone": false,
-        "tombstone_required": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
         "writes_memory_body": false,
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false
+        "declares_production_soak_complete": false,
+        "owner": "redcube_ai"
       },
       {
         "module_id": "visual_authority_functions",
         "surface_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
         "status": "minimal_authority_function_manifest_landed",
         "classification": "minimal_authority_function",
-        "migration_class": "minimal_authority_function",
-        "owner": "redcube_ai",
-        "opl_owned_generic_primitive_consumer": false,
-        "rca_owned_visual_domain_authority": true,
-        "opl_absorb_candidate": false,
-        "opl_replacement_expectation": {
-          "owner": "redcube_ai",
-          "expectation_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
-          "replacement_surface": "not_absorbable_domain_authority_function",
-          "expected_mode": "domain_authority_function_called_by_generated_surface",
-          "rca_consumes_as": "authority_function_owner",
-          "rca_owns_replacement_runtime": false
-        },
         "codePaths": [
           "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
           "packages/redcube-gateway/src/actions/product-sidecar.ts",
@@ -3158,29 +2782,18 @@
         "migrationAction": "Retain only visual authority functions while OPL generates generic wrappers and runtime shells.",
         "retentionReason": "RCA must decide visual source readiness, visual direction, review/export verdicts, artifact mutation, visual memory acceptance and owner receipts.",
         "cannotAbsorbReason": "These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.",
-        "rca_projection_mode": "authority_receipt_refs_only",
-        "rca_exports_only": [
-          "verdict_refs",
-          "owner_receipt_refs",
-          "typed_blocker_refs",
-          "safe_action_refs"
-        ],
-        "forbidden_generic_owner_flags": {
-          "rca_owns_generic_runtime": false,
-          "rca_owns_generic_attempt_ledger": false,
-          "rca_owns_generic_session_shell": false,
-          "rca_owns_generic_workbench": false,
-          "rca_owns_native_helper_generic_envelope": false,
-          "rca_owns_generic_cli_mcp_wrapper_generator": false,
-          "rca_owns_generic_executor_adapter": false,
-          "rca_owns_observability_exporter": false
-        },
-        "physical_deletion_guard": {
-          "safe_to_delete_now": false,
-          "reason": "Minimal authority functions are the allowed RCA retention surface.",
-          "required_before_delete": [
-            "visual_domain_authority_moved_by_explicit_product_decision"
-          ]
+        "tombstone_required": false,
+        "migration_class": "minimal_authority_function",
+        "opl_owned_generic_primitive_consumer": false,
+        "rca_owned_visual_domain_authority": true,
+        "opl_absorb_candidate": false,
+        "opl_replacement_expectation": {
+          "owner": "redcube_ai",
+          "expectation_ref": "/visual_pack_compiler_handoff/minimal_authority_function_contract",
+          "replacement_surface": "not_absorbable_domain_authority_function",
+          "expected_mode": "domain_authority_function_called_by_generated_surface",
+          "rca_consumes_as": "authority_function_owner",
+          "rca_owns_replacement_runtime": false
         },
         "bridge_exit_gate": {
           "gate_id": "visual_authority_functions_bridge_exit_gate",
@@ -3212,6 +2825,30 @@
           "opl_can_authorize_review_export_verdict": false,
           "opl_can_issue_owner_receipt": false
         },
+        "rca_projection_mode": "authority_receipt_refs_only",
+        "rca_exports_only": [
+          "verdict_refs",
+          "owner_receipt_refs",
+          "typed_blocker_refs",
+          "safe_action_refs"
+        ],
+        "forbidden_generic_owner_flags": {
+          "rca_owns_generic_runtime": false,
+          "rca_owns_generic_attempt_ledger": false,
+          "rca_owns_generic_session_shell": false,
+          "rca_owns_generic_workbench": false,
+          "rca_owns_native_helper_generic_envelope": false,
+          "rca_owns_generic_cli_mcp_wrapper_generator": false,
+          "rca_owns_generic_executor_adapter": false,
+          "rca_owns_observability_exporter": false
+        },
+        "physical_deletion_guard": {
+          "safe_to_delete_now": false,
+          "reason": "Minimal authority functions are the allowed RCA retention surface.",
+          "required_before_delete": [
+            "visual_domain_authority_moved_by_explicit_product_decision"
+          ]
+        },
         "rca_retains": [
           "source_readiness_verdict",
           "communication_visual_direction_decision",
@@ -3222,14 +2859,14 @@
           "native_helper_implementation"
         ],
         "retire_tombstone": false,
-        "tombstone_required": false,
         "writes_visual_truth": false,
         "writes_artifact_blob": false,
         "writes_memory_body": false,
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false
+        "declares_production_soak_complete": false,
+        "owner": "redcube_ai"
       }
     ],
     "opl_owned_generic_primitives": [
@@ -3300,11 +2937,11 @@
         "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
         "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
         "default_generic_dispatch_owner": "one-person-lab",
-        "default_managed_supervision_owner": "one-person-lab",
-        "managed_supervision_public_surface": "retired",
         "redcube_cli_is_unified_metadata_owner": false,
         "redcube_mcp_is_unified_metadata_owner": false,
-        "product_entry_session_store_is_generic_session_owner": false
+        "product_entry_session_store_is_generic_session_owner": false,
+        "default_supervision_owner": "one-person-lab",
+        "legacy_supervision_public_surface": "retired"
       },
       "bridge_exit_gate": {
         "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -3313,15 +2950,13 @@
         "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
         "required_before_retiring_repo_local_wrappers": [
           "domain_authority_refs_preserved",
-          "no_regression_proof_recorded",
-          "legacy_physical_cleanup_no_active_caller_proof"
+          "no_regression_proof_recorded"
         ],
         "repo_local_allowed_roles_before_exit": [
           "domain_handler_target",
           "direct_domain_entry",
           "direct_protocol_adapter",
-          "refs_only_adapter",
-          "historical_regression_fixture"
+          "refs_only_adapter"
         ],
         "repo_local_forbidden_roles": [
           "unified_metadata_owner",
@@ -3334,8 +2969,7 @@
           "declarative_visual_pack_input",
           "domain_handler_targets",
           "minimal_authority_functions",
-          "refs_only_locator_projection",
-          "historical_regression_fixtures"
+          "refs_only_locator_projection"
         ],
         "rca_can_own_generated_surface": false,
         "rca_can_own_generic_session_shell": false,
@@ -3343,8 +2977,7 @@
         "declares_production_consumption_complete": true,
         "declares_visual_stage_long_soak_complete": false,
         "remaining_blocker_ids": [
-          "production_live_soak_and_evidence",
-          "legacy_physical_cleanup"
+          "production_live_soak_and_evidence"
         ],
         "declares_generated_surface_consumption_complete": true,
         "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak"
@@ -3399,7 +3032,7 @@
         "retired_at": "2026-05-17",
         "replacement_owner": "opl",
         "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-        "retained_rca_surface": "internal historical managed supervision regression fixture",
+        "retained_rca_surface": null,
         "active_default_caller": false
       },
       {
@@ -3412,7 +3045,7 @@
       }
     ],
     "must_not_retire": [
-      "managed_deliverable_internal_dag",
+      "visual_stage_descriptor",
       "visual_review_export_gate",
       "native_helper_implementation",
       "artifact_gallery_export_refs",
@@ -3621,15 +3254,13 @@
           "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
           "required_before_retiring_repo_local_wrappers": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded",
-            "legacy_physical_cleanup_no_active_caller_proof"
+            "no_regression_proof_recorded"
           ],
           "repo_local_allowed_roles_before_exit": [
             "domain_handler_target",
             "direct_domain_entry",
             "direct_protocol_adapter",
-            "refs_only_adapter",
-            "historical_regression_fixture"
+            "refs_only_adapter"
           ],
           "repo_local_forbidden_roles": [
             "unified_metadata_owner",
@@ -3642,8 +3273,7 @@
             "declarative_visual_pack_input",
             "domain_handler_targets",
             "minimal_authority_functions",
-            "refs_only_locator_projection",
-            "historical_regression_fixtures"
+            "refs_only_locator_projection"
           ],
           "rca_can_own_generated_surface": false,
           "rca_can_own_generic_session_shell": false,
@@ -3651,8 +3281,7 @@
           "declares_production_consumption_complete": true,
           "declares_visual_stage_long_soak_complete": false,
           "remaining_blocker_ids": [
-            "production_live_soak_and_evidence",
-            "legacy_physical_cleanup"
+            "production_live_soak_and_evidence"
           ],
           "declares_generated_surface_consumption_complete": true,
           "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak"
@@ -3706,8 +3335,7 @@
       "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
       "remaining_cleanup_and_evidence_gates": [
         "domain_authority_refs_preserved",
-        "no_regression_proof_recorded",
-        "legacy_physical_cleanup_no_active_caller_proof"
+        "no_regression_proof_recorded"
       ],
       "bridge_exit_gate": {
         "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -3716,15 +3344,13 @@
         "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
         "required_before_retiring_repo_local_wrappers": [
           "domain_authority_refs_preserved",
-          "no_regression_proof_recorded",
-          "legacy_physical_cleanup_no_active_caller_proof"
+          "no_regression_proof_recorded"
         ],
         "repo_local_allowed_roles_before_exit": [
           "domain_handler_target",
           "direct_domain_entry",
           "direct_protocol_adapter",
-          "refs_only_adapter",
-          "historical_regression_fixture"
+          "refs_only_adapter"
         ],
         "repo_local_forbidden_roles": [
           "unified_metadata_owner",
@@ -3737,8 +3363,7 @@
           "declarative_visual_pack_input",
           "domain_handler_targets",
           "minimal_authority_functions",
-          "refs_only_locator_projection",
-          "historical_regression_fixtures"
+          "refs_only_locator_projection"
         ],
         "rca_can_own_generated_surface": false,
         "rca_can_own_generic_session_shell": false,
@@ -3746,8 +3371,7 @@
         "declares_production_consumption_complete": true,
         "declares_visual_stage_long_soak_complete": false,
         "remaining_blocker_ids": [
-          "production_live_soak_and_evidence",
-          "legacy_physical_cleanup"
+          "production_live_soak_and_evidence"
         ],
         "declares_generated_surface_consumption_complete": true,
         "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak"
@@ -3762,11 +3386,11 @@
         "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
         "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
         "default_generic_dispatch_owner": "one-person-lab",
-        "default_managed_supervision_owner": "one-person-lab",
-        "managed_supervision_public_surface": "retired",
         "redcube_cli_is_unified_metadata_owner": false,
         "redcube_mcp_is_unified_metadata_owner": false,
-        "product_entry_session_store_is_generic_session_owner": false
+        "product_entry_session_store_is_generic_session_owner": false,
+        "default_supervision_owner": "one-person-lab",
+        "legacy_supervision_public_surface": "retired"
       },
       "wrappers": {
         "cli": {

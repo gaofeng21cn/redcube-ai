@@ -17,10 +17,10 @@ export function buildOperatorEvidenceReadinessProjection({
     'review_repair_transport',
     'opl_app_operator_drilldown',
     'workspace_source_lifecycle_receipt_shell',
+    'legacy_physical_cleanup',
   ];
   const remainingFunctionalStructureGapIds = [
     'production_live_soak_and_evidence',
-    'legacy_physical_cleanup',
   ];
   return {
     surface_kind: 'operator_evidence_readiness_projection',
@@ -97,7 +97,7 @@ export function buildOperatorEvidenceReadinessProjection({
       functional_structure_gap_count: remainingFunctionalStructureGapIds.length,
       completed_functional_structure_gap_count: completedFunctionalStructureGapIds.length,
       completed_functional_structure_gap_ids: completedFunctionalStructureGapIds,
-      remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
+      remaining_gap_class: 'production_live_soak_evidence_only',
       remaining_functional_structure_gap_ids: remainingFunctionalStructureGapIds,
       remaining_evidence_gate_ids: [
         'real_artifact_producing_domain_owner_receipt',

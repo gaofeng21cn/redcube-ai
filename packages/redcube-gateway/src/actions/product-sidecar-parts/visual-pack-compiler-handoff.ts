@@ -50,14 +50,12 @@ export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
   required_before_retiring_repo_local_wrappers: [
     'domain_authority_refs_preserved',
     'no_regression_proof_recorded',
-    'legacy_physical_cleanup_no_active_caller_proof',
   ],
   repo_local_allowed_roles_before_exit: [
     'domain_handler_target',
     'direct_domain_entry',
     'direct_protocol_adapter',
     'refs_only_adapter',
-    'historical_regression_fixture',
   ],
   repo_local_forbidden_roles: [
     'unified_metadata_owner',
@@ -71,7 +69,6 @@ export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
     'domain_handler_targets',
     'minimal_authority_functions',
     'refs_only_locator_projection',
-    'historical_regression_fixtures',
   ],
   rca_can_own_generated_surface: false,
   rca_can_own_generic_session_shell: false,
@@ -82,7 +79,6 @@ export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
   declares_visual_stage_long_soak_complete: false,
   remaining_blocker_ids: [
     'production_live_soak_and_evidence',
-    'legacy_physical_cleanup',
   ],
 });
 
@@ -171,7 +167,6 @@ export function buildVisualPackCompilerHandoffProjection() {
       remaining_cleanup_and_evidence_gates: [
         'domain_authority_refs_preserved',
         'no_regression_proof_recorded',
-        'legacy_physical_cleanup_no_active_caller_proof',
       ],
       bridge_exit_gate: { ...OPL_GENERATED_SURFACE_EXIT_GATE },
       generated_surfaces_are_not_rca_long_term_owner: true,
@@ -184,8 +179,8 @@ export function buildVisualPackCompilerHandoffProjection() {
         product_entry_session_store_role: 'entry_session_domain_snapshot_refs_only_adapter',
         cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
         default_generic_dispatch_owner: 'one-person-lab',
-        default_managed_supervision_owner: 'one-person-lab',
-        managed_supervision_public_surface: 'retired',
+        default_supervision_owner: 'one-person-lab',
+        legacy_supervision_public_surface: 'retired',
         redcube_cli_is_unified_metadata_owner: false,
         redcube_mcp_is_unified_metadata_owner: false,
         product_entry_session_store_is_generic_session_owner: false,

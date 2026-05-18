@@ -138,7 +138,6 @@ export const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
 
 export const RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS = Object.freeze([
   'production_live_soak_and_evidence',
-  'legacy_physical_cleanup',
 ]);
 
 export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
@@ -149,6 +148,7 @@ export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
   'review_repair_transport',
   'opl_app_operator_drilldown',
   'workspace_source_lifecycle_receipt_shell',
+  'legacy_physical_cleanup',
 ]);
 
 export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
@@ -208,8 +208,8 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
     product_entry_session_store_role: 'entry_session_domain_snapshot_refs_only_adapter',
     cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
-    default_managed_supervision_owner: 'one-person-lab',
-    managed_supervision_public_surface: 'retired',
+    default_supervision_owner: 'one-person-lab',
+    legacy_supervision_public_surface: 'retired',
     redcube_cli_is_unified_metadata_owner: false,
     redcube_mcp_is_unified_metadata_owner: false,
     product_entry_session_store_is_generic_session_owner: false,
@@ -241,82 +241,6 @@ export const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
 ]);
 
 export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
-  {
-    module_id: 'managed_dag_scheduler',
-    surface_ref: '/managed_runtime_contract/stage_dag',
-    status: 'rca_domain_thin_surface_retained',
-    classification: 'split_owner_boundary',
-    opl_generic_primitive: 'generic_scheduler',
-    oplAbsorbCandidate: true,
-    rcaRetains: ['visual_deliverable_internal_dag', 'route_policy_refs', 'visual_stage_order'],
-    rca_scope: 'visual_deliverable_internal_dag_only',
-    audit_readout: 'retain',
-    codePaths: [
-      'packages/redcube-runtime/src/managed-dag-scheduler.ts',
-      'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/family_scheduler_replacement',
-    ],
-    activeCallers: ['managed runtime contract', 'product-entry manifest', 'product sidecar export', 'managed DAG guard tests'],
-    activeCallerStatus: 'active_thin_domain_dag',
-    migrationAction: 'Move generic scheduling, queueing, daemon, retry and attempt lifecycle ownership to OPL family scheduler; keep only RCA visual stage DAG refs.',
-    retentionReason: 'RCA must define visual deliverable stage order and route-specific gate meaning for ppt_deck, xiaohongshu and poster families.',
-    cannotAbsorbReason: 'OPL can absorb scheduler mechanics but cannot own visual stage semantics, route policy or visual readiness authority.',
-    tombstone_required: false,
-  },
-  {
-    module_id: 'attempt_state_machine_runner',
-    surface_ref: '/controlled_visual_stage_attempt',
-    status: 'opl_generic_transition_runner_consumed_refs_only',
-    classification: 'split_owner_boundary',
-    opl_generic_primitive: 'generic_transition_runner',
-    oplAbsorbCandidate: true,
-    rcaRetains: ['visual_transition_spec', 'visual_guard_evaluator', 'typed_blocker', 'owner_receipt_refs'],
-    rca_scope: 'visual_transition_spec_and_guard_evaluator_only',
-    audit_readout: 'project_opl_runner_retain_visual_transition_authority',
-    codePaths: [
-      'packages/redcube-runtime/src/managed-deliverable.ts',
-      'packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts',
-      'packages/redcube-runtime/src/managed-deliverable-parts/execution-orchestration.ts',
-      'packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts',
-    ],
-    activeCallers: [
-      'internal historical runManagedDeliverable regression path',
-      'internal historical superviseManagedRun regression projection',
-      'evaluate_visual_transition sidecar action',
-      'OPL hosted attempt receipt fixture',
-    ],
-    activeCallerStatus: 'refs_only_visual_transition_adapter_consuming_opl_runner',
-    migrationAction: 'Consume OPL generic transition runner for idempotent tick, retry/dead-letter, provider attempt bridge and state-machine runner mechanics; keep RCA visual transition guard refs only.',
-    retentionReason: 'RCA keeps the visual transition table, guard refs, repair action meaning, typed blockers and owner receipt refs.',
-    cannotAbsorbReason: 'A generic runner cannot decide source readiness, visual review readiness, repair target meaning or export authority.',
-    tombstone_required: false,
-  },
-  {
-    module_id: 'managed_run_json_store',
-    surface_ref: '/runtime_inventory/managed_runs',
-    status: 'opl_attempt_ledger_provider_receipts_consumed',
-    classification: 'opl_owned_attempt_ledger_consumer',
-    opl_generic_primitive: 'attempt_ledger',
-    oplAbsorbCandidate: true,
-    rcaRetains: ['managed_run_locator_refs', 'visual_run_projection_refs'],
-    rca_scope: 'opl_attempt_ledger_consumer_locator_refs',
-    audit_readout: 'migrate_store_to_opl_attempt_ledger_keep_locator_projection',
-    codePaths: [
-      'packages/redcube-runtime/src/managed-run-store.ts',
-      'packages/redcube-runtime/src/managed-run-surfaces.ts',
-      'packages/redcube-gateway/src/actions/get-managed-run.ts',
-      'packages/redcube-gateway/src/actions/supervise-managed-run.ts',
-    ],
-    activeCallers: [
-      'redcube product session domain snapshot refs',
-      'internal historical managed supervision regression projection',
-      'runtime watch/session locator projection',
-    ],
-    activeCallerStatus: 'opl_hosted_attempt_ledger_refs_with_rca_visual_summary',
-    migrationAction: 'Consume OPL attempt ledger/provider receipt storage while RCA exposes managed-run locator refs and visual-domain summaries.',
-    retentionReason: 'RCA keeps locator refs and visual run summaries needed to correlate provider receipts with domain-owned deliverable truth.',
-    cannotAbsorbReason: 'OPL owns the generic attempt ledger; it must not absorb canonical artifacts, review verdicts or visual run truth.',
-    tombstone_required: false,
-  },
   {
     module_id: 'product_entry_session_store',
     surface_ref: '/session_continuity',
@@ -427,7 +351,7 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     codePaths: [
       'packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts',
       'packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection',
-      'packages/redcube-runtime/src/managed-deliverable-parts/stage-decision.ts',
+      'packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts',
     ],
     activeCallers: ['visual director review', 'screenshot review', 'repair_image_pages', 'product sidecar review projection'],
     activeCallerStatus: 'active_domain_review_gate',
@@ -562,9 +486,6 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
 ]);
 
 const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
-  managed_dag_scheduler: 'declarative_pack',
-  attempt_state_machine_runner: 'refs_only_adapter',
-  managed_run_json_store: 'opl_hosted_surface',
   product_entry_session_store: 'opl_generated_surface',
   workspace_source_intake: 'refs_only_adapter',
   memory_writeback_receipt_transport: 'refs_only_adapter',
@@ -653,7 +574,7 @@ export function buildFamilySchedulerReplacementProjection() {
       'generic_runner',
       'workbench_shell',
     ],
-    managed_dag_scheduler_scope: 'visual_deliverable_internal_dag_only',
+    visual_stage_descriptor_scope: 'opl_stage_execution_plan_route_handler_refs_only',
     rca_retained_authority: [...RCA_RETAINED_VISUAL_AUTHORITY],
   };
 }
@@ -675,9 +596,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     read_only: true,
     refs_only: true,
     audit_scope: [
-      'managed-dag-scheduler',
-      'attempt/state-machine runner',
-      'managed-run JSON store',
+      'OPL stage execution plan route handler refs',
       'product-entry session store',
       'workspace/source intake',
       'memory/writeback receipt transport',
@@ -710,14 +629,12 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       completed_functional_structure_gap_ids: [...RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS],
       unclassified_private_generic_residue_count: 0,
       long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
+      remaining_gap_class: 'production_live_soak_evidence_only',
       remaining_functional_structure_gap_ids: [...RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS],
       remaining_functional_structure_gaps: RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS.map((gapId) => ({
         gap_id: gapId,
-        current_bucket: gapId === 'legacy_physical_cleanup'
-          ? 'physical_cleanup_blocker'
-          : 'production_evidence_blocker',
-        owner: gapId.startsWith('legacy_physical') ? 'redcube_ai' : 'one-person-lab',
+        current_bucket: 'production_evidence_blocker',
+        owner: 'one-person-lab',
         rca_role: 'domain_handler_target_or_visual_authority_refs_only',
       })),
       remaining_evidence_gate_ids: [...RCA_REMAINING_EVIDENCE_GATES],
@@ -739,18 +656,19 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       ],
     },
     physical_deletion_guard: {
-      current_safe_tombstone_candidate_count: 2,
+      current_safe_tombstone_candidate_count: 0,
       deleted_or_thinned_default_surfaces: [
         'product_sidecar_dispatch.supervise_managed_run',
         'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.supervise_managed_run',
+        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+        'repo_local_visual_runtime.legacy_run_store_deleted',
+        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
       ],
-      deletion_status: 'sidecar_default_generic_dispatch_removed',
-      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, internal historical diagnostic fixtures, and declared visual pack inputs remain in RCA package surfaces.',
-      required_before_remaining_physical_delete: [
-        'domain_authority_refs_preserved',
-        'no_regression_proof_recorded',
-        'legacy_physical_cleanup_no_active_caller_proof',
-      ],
+      deletion_status: 'legacy_runtime_physical_cleanup_closed',
+      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
+      required_before_remaining_physical_delete: [],
     },
     bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
@@ -772,8 +690,6 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         migration_class: migrationClass,
         opl_owned_generic_primitive_consumer: true,
         rca_owned_visual_domain_authority: [
-          'managed_dag_scheduler',
-          'attempt_state_machine_runner',
           'workspace_source_intake',
           'memory_writeback_receipt_transport',
           'artifact_export_lifecycle',
@@ -838,7 +754,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         retired_at: '2026-05-17',
         replacement_owner: 'opl',
         replacement_surface: 'opl_generic_runner_and_supervisor_tick',
-        retained_rca_surface: 'internal historical managed supervision regression fixture',
+        retained_rca_surface: null,
         active_default_caller: false,
       },
       {
@@ -851,7 +767,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       },
     ],
     must_not_retire: [
-      'managed_deliverable_internal_dag',
+      'visual_stage_descriptor',
       'visual_review_export_gate',
       'native_helper_implementation',
       'artifact_gallery_export_refs',

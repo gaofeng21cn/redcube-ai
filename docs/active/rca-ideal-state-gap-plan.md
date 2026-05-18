@@ -46,13 +46,13 @@ OPL 必须持有：
 
 ## 当前功能/结构差距
 
-`classification_closed` 已推进到 standard OPL consumer 口径：RCA 不再声明 generated/hosted wrapper、session、workbench、artifact/review/source shell 或 generic runtime owner；这些面由 OPL generated/hosted surface 持有，RCA 只保留 domain handler target、refs-only adapter、minimal authority function、native helper implementation 和 legacy cleanup 前的内部历史回归面。
+`classification_closed` 已推进到 standard OPL consumer 口径：RCA 不再声明 generated/hosted wrapper、session、workbench、artifact/review/source shell 或 generic runtime owner；这些面由 OPL generated/hosted surface 持有，RCA 只保留 domain handler target、refs-only adapter、minimal authority function 和 native helper implementation。
 
 当前必须保留：
 
-`functional_structure_gap_count=2`
+`functional_structure_gap_count=1`
 
-已闭合为标准 OPL consumer 口径的 7 项：
+已闭合为标准 OPL consumer 口径的 8 项：
 
 - `opl_generated_surface_production_consumption`
 - `repo_local_wrapper_active_caller_migration`
@@ -61,14 +61,12 @@ OPL 必须持有：
 - `review_repair_transport`
 - `opl_app_operator_drilldown`
 - `workspace_source_lifecycle_receipt_shell`
+- `legacy_physical_cleanup`
 
 这些闭合只表示 generic shell/runtime owner 归 OPL，RCA 以 refs-only/domain-handler/authority-function 方式消费；不能写成 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable。
 
 1. `production_live_soak_and_evidence`
    OPL generated/hosted wrapper、session、workbench、artifact/review/source shell 已按合同消费，但还没有完成 Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence。
-
-2. `legacy_physical_cleanup`
-   旧 Hermes / Gateway / local-manager / bridge residue 仍需要 no-active-caller proof、domain authority refs preserved 和 no-regression proof 后删除或 tombstone。不保留 compatibility alias。
 
 ## Retained Private Authority Functions
 
@@ -101,10 +99,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority functions：
 1. `production_live_soak_and_evidence`
    用低风险真实 workspace 继续跑 `ppt_deck` 或 `xiaohongshu`，从 OPL-hosted attempt 或 generated continuation shell 进入 RCA service-safe domain entry，累计 `domain_receipt`、`typed_blocker`、`no_regression_evidence`、artifact-producing owner receipt 和 memory/lifecycle receipt。
 
-2. `legacy_physical_cleanup`
-   在 replacement proof、no-active-caller proof 和 domain authority refs preserved 成立后，删除或 tombstone 旧 Hermes / Gateway / local-manager / bridge residue。
-
-3. `runtime_evidence_scaleout`
+2. `runtime_evidence_scaleout`
    在结构差距关闭后，补真实 artifact-producing receipt、visual memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。
 
 ## 当前不能写成

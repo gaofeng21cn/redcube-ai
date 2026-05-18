@@ -156,11 +156,11 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     'domain_action_target_or_refs_only_adapter',
   );
   assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.default_managed_supervision_owner,
+    generatedSurfaceHandoff.repo_local_launcher_policy.default_supervision_owner,
     'one-person-lab',
   );
   assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.managed_supervision_public_surface,
+    generatedSurfaceHandoff.repo_local_launcher_policy.legacy_supervision_public_surface,
     'retired',
   );
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.gate_id, 'rca.generated_surface_bridge_exit.v1');
@@ -171,7 +171,6 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.required_before_retiring_repo_local_wrappers, [
     'domain_authority_refs_preserved',
     'no_regression_proof_recorded',
-    'legacy_physical_cleanup_no_active_caller_proof',
   ]);
   assert.equal(
     generatedSurfaceHandoff.bridge_exit_gate.repo_local_forbidden_roles.includes('generic_session_shell_owner'),
@@ -187,7 +186,6 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_blocker_ids, [
     'production_live_soak_and_evidence',
-    'legacy_physical_cleanup',
   ]);
 });
 
@@ -208,7 +206,6 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
     assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_remaining_repo_local_bridges, [
       'domain_authority_refs_preserved',
       'no_regression_proof_recorded',
-      'legacy_physical_cleanup_no_active_caller_proof',
     ]);
     assert.equal(surface.bridge_exit_gate.remaining_bridge_module_ids.includes('generic_cli_mcp_wrappers'), true);
     assert.equal(surface.bridge_exit_gate.forbidden_after_exit_rca_surface_classes.includes('generic_session_shell'), true);
@@ -221,7 +218,6 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
     assert.equal(surface.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
     assert.deepEqual(surface.bridge_exit_gate.remaining_blocker_ids, [
       'production_live_soak_and_evidence',
-      'legacy_physical_cleanup',
     ]);
 
     for (const entry of surface.modules) {
@@ -234,7 +230,6 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
         assert.deepEqual(entry.bridge_exit_gate.required_before_retire, [
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
-          'legacy_physical_cleanup_no_active_caller_proof',
         ], entry.module_id);
       }
     }

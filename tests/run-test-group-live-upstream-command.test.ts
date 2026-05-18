@@ -90,7 +90,6 @@ test('run-test-group partitions route-heavy files away from the default parallel
     partitionTestFilesForExecution({
       groupName: 'integration',
       files: [
-        'tests/managed-deliverable-execution.test.ts',
         'tests/runtime-deliverable-route-integration.test.ts',
         'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
@@ -102,7 +101,6 @@ test('run-test-group partitions route-heavy files away from the default parallel
         'tests/source-intake.test.ts',
       ],
       serialized_files: [
-        'tests/managed-deliverable-execution.test.ts',
         'tests/runtime-deliverable-route-integration.test.ts',
         'tests/runtime-deliverable-route.test.ts',
         'tests/review-platform.test.ts',
@@ -170,7 +168,7 @@ test('run-test-group exposes an integration remainder lane for local fast-then-i
   const fast = GROUPS.fast;
 
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(GROUPS['integration:remaining'].length, 37);
+  assert.equal(GROUPS['integration:remaining'].length, 35);
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {

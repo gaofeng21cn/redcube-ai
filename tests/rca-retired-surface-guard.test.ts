@@ -153,7 +153,7 @@ test('RCA consumes OPL family scheduler replacement without owning generic sched
       'generic_runner',
       'workbench_shell',
     ]);
-    assert.equal(surface.managed_dag_scheduler_scope, 'visual_deliverable_internal_dag_only');
+    assert.equal(surface.visual_stage_descriptor_scope, 'opl_stage_execution_plan_route_handler_refs_only');
     assert.deepEqual(surface.rca_retained_authority, [
       'visual_truth',
       'review_export_verdict',
@@ -321,7 +321,6 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     adoption.privatized_functional_module_audit,
   ];
   const expectedReplacementSurfaces = {
-    managed_run_json_store: 'opl_attempt_ledger_provider_receipts',
     product_entry_session_store: 'opl_app_session_shell_and_workbench',
     artifact_export_lifecycle: 'opl_artifact_lifecycle_gallery_handoff_shell',
     review_repair_transport: 'opl_review_repair_transport',
@@ -334,10 +333,15 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
 
   for (const surface of surfaces) {
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
-    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 2);
+    assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
       'product_sidecar_dispatch.supervise_managed_run',
       'product_sidecar_dispatch.product_entry_continuation',
+      'public_cli_mcp_gateway.get_managed_run',
+      'public_cli_mcp_gateway.supervise_managed_run',
+      'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+      'repo_local_visual_runtime.legacy_run_store_deleted',
+      'repo_local_visual_runtime.legacy_dag_runtime_deleted',
     ]);
     assert.deepEqual(
       surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
@@ -358,8 +362,8 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       surface.functional_structure_gap_closure.status,
       'classification_closed_followthrough_gaps_open',
     );
-    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 2);
-    assert.equal(surface.functional_structure_gap_closure.completed_functional_structure_gap_count, 7);
+    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 1);
+    assert.equal(surface.functional_structure_gap_closure.completed_functional_structure_gap_count, 8);
     assert.deepEqual(surface.functional_structure_gap_closure.completed_functional_structure_gap_ids, [
       'opl_generated_surface_production_consumption',
       'repo_local_wrapper_active_caller_migration',
@@ -368,14 +372,14 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       'review_repair_transport',
       'opl_app_operator_drilldown',
       'workspace_source_lifecycle_receipt_shell',
+      'legacy_physical_cleanup',
     ]);
     assert.equal(
       surface.functional_structure_gap_closure.remaining_gap_class,
-      'live_soak_evidence_and_physical_cleanup',
+      'production_live_soak_evidence_only',
     );
     assert.deepEqual(surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids, [
       'production_live_soak_and_evidence',
-      'legacy_physical_cleanup',
     ]);
     assert.ok(
       surface.functional_structure_gap_closure.remaining_evidence_gate_ids.includes(
@@ -408,7 +412,6 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
-          'legacy_physical_cleanup_no_active_caller_proof',
         ], entry.module_id);
       }
       assert.equal(entry.declares_production_soak_complete, false, entry.module_id);

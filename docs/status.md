@@ -22,15 +22,12 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 
 当前功能/结构差距按 active plan 维护：
 
-`functional_structure_gap_count=2`
+`functional_structure_gap_count=1`
 
-已闭合为标准 OPL consumer 口径的 7 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`。这些闭合只表示 RCA 不再声明对应 generic shell/runtime owner；不能替代 visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 证据。
+已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合只表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；不能替代 visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 证据。
 
 1. `production_live_soak_and_evidence`
    OPL generated/hosted wrapper、session、workbench、artifact/review/source shell 已按 contract 消费为 RCA refs-only/domain-handler target，但还没有完成 production visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipts 和 cross-family repeated no-regression evidence。
-
-2. `legacy_physical_cleanup`
-   旧 Hermes / Gateway / local-manager / bridge residue 仍需要 no-active-caller proof、domain authority refs preserved 和 no-regression proof 后删除或 tombstone。RCA 不能保留 compatibility alias。
 
 ## 当前测试/证据差距
 
@@ -53,7 +50,7 @@ RCA 长期只保留无法声明化的 visual authority functions：source readin
 - Public identity：`RedCube AI` Foundry Agent / OPL-compatible visual-deliverable package。
 - Direct route：`redcube-ai` app skill、CLI、MCP、`invokeProductEntry`、`getProductEntrySession`、`invokeDomainEntry`。
 - OPL-hosted route：OPL discovery 读取 RCA descriptor、family action catalog、stage control projection、memory descriptor 和 sidecar refs，再进入 RCA service-safe domain entry。
-- CLI/MCP/session/managed supervision/source/workbench：默认由 OPL generated/hosted caller 持有通用 wrapper、session shell、source shell、supervision 和 workbench；RCA 侧只暴露 domain handler target、refs-only adapter 或 minimal authority function，旧 managed supervision 只作为内部历史回归 fixture 保留。
+- CLI/MCP/session/source/workbench/supervision：默认由 OPL generated/hosted caller 持有通用 wrapper、session shell、source shell、supervision 和 workbench；RCA 侧只暴露 domain handler target、refs-only adapter 或 minimal authority function，旧 repo-local supervision/runtime 只保留在 history/provenance 语境。
 - Default visual routes：`ppt_deck` 和 `xiaohongshu` 默认 image-first；native editable PPTX 与 HTML lane 必须显式选择。
 - Runtime file boundary：真实 PPT/图片/PDF、receipt 实例、中间产物和导出包属于 workspace / runtime artifact root，不属于开发仓源码目录。
 

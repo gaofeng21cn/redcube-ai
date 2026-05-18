@@ -28,7 +28,7 @@ RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract
 
 当前 sidecar runtime apply surface 已包含 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 和 `emit_workspace_receipt_proof`。这些都属于 RCA-owned workspace/runtime surface：写入和返回的是 workspace runtime refs、domain receipt、typed blocker、no-regression evidence、memory receipt refs、lifecycle mutation receipt 或 proof pack；RCA 继续持有 visual truth、review/export verdict、memory body、canonical artifacts 和 artifact mutation authority。`workspace_receipt_inventory_projection` 只读这些 runtime receipt refs，供 OPL/App/operator 索引当前 workspace 的 receipt coverage；它不是 artifact gallery、workbench 或 production evidence producer。OPL-hosted path 只能消费 locator、projection、receipt refs、operator projection 和 repair hints，不能把 provider completion 或 stage metadata 升级成 RCA visual ready / exportable / handoffable verdict。真实 OPL Temporal controlled visual-stage long soak 当前仍未完成。
 
-RCA 现在消费 OPL `family_scheduler_replacement` projection：OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不在仓内实现 generic scheduler/runtime manager。仓内 `managed-dag-scheduler` 只描述 visual deliverable 内部 DAG 分层，继续受 RCA route truth、review/export verdict、artifact authority、visual memory body 和 owner receipt 约束。
+RCA 现在消费 OPL `family_scheduler_replacement` projection：OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不在仓内实现 generic scheduler/runtime manager。旧 repo-local managed DAG scheduler 已物理删除；当前视觉 stage 顺序只通过 hydrated deliverable contract、`family_stage_control_plane` 和 `opl_stage_execution_plan` 暴露为 route-handler refs。
 
 RCA 也消费 OPL stability read-model projection：`opl_stability_read_model_consumption` 只挂 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 的 refs。它让 OPL/App/operator 能看到 RCA stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和已观测资源压力信号；它不执行 domain action、不写 RCA domain truth、不授权 visual-ready / quality / export verdict、不写 artifact blob 或 memory body，也不把 generic fallback、字符串 retry、event bus 或 runtime adapter started 写成成功语义。
 
@@ -36,7 +36,7 @@ RCA 现在也暴露 `operator_evidence_readiness_projection`：这是 RCA-owned 
 
 RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL substrate adapter/export surface，只把 workspace/source/artifact/memory 的 locator、index、lifecycle 与 operator projection refs 投给 OPL。它是 opaque/index-only export，不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority；OPL 只能索引这些 refs 并路由回 RCA owner surface，不能把 refs 提升成 visual-ready、exportable、handoffable 或 memory accept/reject verdict。
 
-当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface；默认 truth surface 是 `buildOplStageExecutionPlan` / `opl_stage_execution_plan`，显式 stage rerun 继续使用 `runDeliverableRoute`，审计与投影继续使用 `createDeliverable`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。repo-local `runManagedDeliverable` 已从 public gateway / CLI / MCP surface 退役，仅作为内部历史回归 fixture 服务旧 managed-route parity 证据，不是默认 product-entry runtime。
+当前 deliverable facade 只覆盖已存在的 `ppt_deck` 与 `xiaohongshu` surface；默认 truth surface 是 `buildOplStageExecutionPlan` / `opl_stage_execution_plan`，显式 stage rerun 继续使用 `runDeliverableRoute`，审计与投影继续使用 `createDeliverable`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`。旧 repo-local deliverable runner、run store 和 DAG scheduler 已从 active runtime package 物理删除。
 
 当前仓内可执行的 runtime 基线按三层 owner 收口：
 

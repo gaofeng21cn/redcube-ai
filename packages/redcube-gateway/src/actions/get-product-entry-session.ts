@@ -4,9 +4,7 @@ import {
   getPublicationProjection,
   getReviewState,
   loadProductEntrySession,
-  loadRuntimeSupervisionLatest,
   productEntrySessionFile,
-  saveProductEntrySession,
 } from '@redcube/runtime';
 import {
   buildDeliveryIdentitySurface,
@@ -17,7 +15,6 @@ import {
 import {
   buildSessionContinuationFamilyOrchestration,
 } from './family-orchestration-companion.js';
-import { getManagedRun } from './get-managed-run.js';
 import {
   buildArtifactInventorySurface,
   buildOplFamilyLifecycleAdapterSurface,
@@ -38,34 +35,6 @@ function safeText(value, fallback = '') {
 
 function readJsonRecord(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function parseTimestampMs(value) {
-  const text = safeText(value);
-  if (!text) return null;
-  const ms = Date.parse(text);
-  return Number.isNaN(ms) ? null : ms;
-}
-
-function runtimeSupervisionIsNewerThanSession(runtimeSupervision, session) {
-  const runtimeMs = parseTimestampMs(
-    runtimeSupervision?.recorded_at
-      || runtimeSupervision?.checked_at
-      || runtimeSupervision?.updated_at,
-  );
-  if (runtimeMs == null) return false;
-
-  const sessionMs = parseTimestampMs(session?.updated_at);
-  if (sessionMs == null) return true;
-
-  return runtimeMs > sessionMs;
-}
-
-function shouldPreserveRouteCheckpoint(runtimeSupervision, session) {
-  if (safeText(session.latest_surface_kind) !== 'route_run' || !safeText(session.latest_run_id)) {
-    return false;
-  }
-  return !runtimeSupervisionIsNewerThanSession(runtimeSupervision, session);
 }
 
 function publicationProjectionForDeliverable(publicationProjection, deliverableId) {
@@ -231,40 +200,6 @@ function requireField(name, value) {
   return text;
 }
 
-function latestManagedRunMatchesSession(runtimeSupervision, session) {
-  if (!runtimeSupervision?.managed_run_id) return false;
-  return safeText(runtimeSupervision.topic_id) === safeText(session.topic_id)
-    && safeText(runtimeSupervision.deliverable_id) === safeText(session.deliverable_id);
-}
-
-function reconcileSessionCheckpointWithWorkspaceLatest(session) {
-  const runtimeSupervision = loadRuntimeSupervisionLatest({
-    workspaceRoot: session.workspace_root,
-  });
-  if (!latestManagedRunMatchesSession(runtimeSupervision, session)) {
-    return session;
-  }
-
-  const latestManagedRunId = safeText(runtimeSupervision.managed_run_id);
-  if (!latestManagedRunId || latestManagedRunId === safeText(session.latest_managed_run_id)) {
-    return session;
-  }
-  if (shouldPreserveRouteCheckpoint(runtimeSupervision, session)) {
-    return session;
-  }
-
-  return saveProductEntrySession({
-    session: {
-      ...session,
-      latest_managed_run_id: latestManagedRunId,
-      latest_run_id: null,
-      latest_surface_kind: 'managed_run',
-      checkpoint_reconciled_at: new Date().toISOString(),
-      checkpoint_reconciliation_source: 'workspace_latest_runtime_supervision',
-    },
-  }).session;
-}
-
 function buildSessionDeliveryIdentityPayload(session, { includeProfile = true } = {}) {
   const payload = {
     deliverable_family: session.deliverable_family,
@@ -318,12 +253,12 @@ export async function getProductEntrySession(request) {
   if (!storedSession) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
-  const session = reconcileSessionCheckpointWithWorkspaceLatest(storedSession);
+  const session = storedSession;
   if (!SUPPORTED_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
     throw new Error('product entry session runtime_owner 漂移');
   }
 
-  const [reviewState, publicationProjection, managedRun] = await Promise.all([
+  const [reviewState, publicationProjection] = await Promise.all([
     getReviewState({
       workspaceRoot: session.workspace_root,
       topicId: session.topic_id,
@@ -333,18 +268,12 @@ export async function getProductEntrySession(request) {
       workspaceRoot: session.workspace_root,
       topicId: session.topic_id,
     }),
-    session.latest_managed_run_id
-      ? getManagedRun({
-        workspaceRoot: session.workspace_root,
-        managedRunId: session.latest_managed_run_id,
-      })
-      : Promise.resolve(null),
   ]);
   const continuationSnapshot = buildProductEntryContinuationSnapshot({
-    latest_managed_run_id: session.latest_managed_run_id || null,
+    latest_managed_run_id: null,
     latest_run_id: session.latest_run_id || null,
-    managed_progress_projection: managedRun?.progress_projection || null,
-    runtime_supervision: managedRun?.runtime_supervision || null,
+    managed_progress_projection: null,
+    runtime_supervision: null,
     extra_payload: {
       latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
       stage_execution_plan: session.stage_execution_plan || null,
@@ -406,7 +335,7 @@ export async function getProductEntrySession(request) {
     ok: true,
     surface_kind: 'product_entry_session',
     recommended_action: buildRecommendedAction({
-      managedRun,
+      managedRun: null,
       runtimeLoopClosure,
       reviewState,
       publicationProjection,

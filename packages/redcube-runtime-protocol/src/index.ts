@@ -2,9 +2,6 @@ import {
   createRunRecord as createRunRecordJs,
 } from './runs.js';
 import {
-  createManagedRunRecord as createManagedRunRecordJs,
-} from './managed-runs.js';
-import {
   getDeliverablePaths as getDeliverablePathsJs,
   getNotePaths as getNotePathsJs,
   getTopicPaths as getTopicPathsJs,
@@ -45,20 +42,8 @@ import {
 import type {
   BuildSourceTruthConsumptionSummaryOptions,
   CodexRuntimeTopology,
-  CreateManagedRunRecordInput,
-  ManagedControllerDecisionRecord,
-  ManagedEscalationRecord,
   CreateRunRecordInput,
   DeliverablePaths,
-  ManagedProgressEvent,
-  ManagedProgressProjection,
-  ManagedRouteRunLink,
-  ManagedRuntimeLivenessAudit,
-  ManagedRuntimeSupervisionRecord,
-  ManagedRunMode,
-  ManagedRunRecord,
-  ManagedRunStatus,
-  ManagedStageResultRecord,
   NotePaths,
   RerunLinkage,
   RunRecord,
@@ -86,10 +71,6 @@ import type {
 
 export function createRunRecord(input: CreateRunRecordInput = {}): RunRecord {
   return createRunRecordJs(input) as RunRecord;
-}
-
-export function createManagedRunRecord(input: CreateManagedRunRecordInput = {}): ManagedRunRecord {
-  return createManagedRunRecordJs(input) as ManagedRunRecord;
 }
 
 export function resolveWorkspaceContract(input: { workspaceRoot: string }): WorkspaceContract {
@@ -268,20 +249,8 @@ export type {
 export type {
   BuildSourceTruthConsumptionSummaryOptions,
   CodexRuntimeTopology,
-  CreateManagedRunRecordInput,
-  ManagedControllerDecisionRecord,
-  ManagedEscalationRecord,
   CreateRunRecordInput,
   DeliverablePaths,
-  ManagedProgressEvent,
-  ManagedProgressProjection,
-  ManagedRouteRunLink,
-  ManagedRuntimeLivenessAudit,
-  ManagedRuntimeSupervisionRecord,
-  ManagedRunMode,
-  ManagedRunRecord,
-  ManagedRunStatus,
-  ManagedStageResultRecord,
   NotePaths,
   RerunLinkage,
   RunRecord,

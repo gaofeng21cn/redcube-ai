@@ -121,7 +121,7 @@ test('getProductEntrySession projects the OPL stage execution plan checkpoint wi
   });
 });
 
-test('getProductEntrySession preserves a newer route-run checkpoint over stale managed supervision', SERIAL_ENV_TEST, async () => {
+test('getProductEntrySession preserves a newer route-run checkpoint over stale legacy checkpoint projection', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -138,7 +138,7 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale m
         deliverable_id: 'deck-route-checkpoint',
         profile_id: 'lecture_student',
         title: 'Product entry route checkpoint proof',
-        goal: '验证 route-run checkpoint 不被旧 managed supervision 覆盖',
+        goal: '验证 route-run checkpoint 不被旧 checkpoint projection 覆盖',
         user_intent: '先做到故事主线',
         stop_after_stage: 'storyline',
       },
