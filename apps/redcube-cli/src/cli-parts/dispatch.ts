@@ -10,7 +10,6 @@ import {
   getPublicationProjection,
   getReviewState,
   getRun as getGatewayRun,
-  getManagedRun as getGatewayManagedRun,
   invokeDomainEntry,
   invokeProductEntry,
   getProductStatus,
@@ -19,7 +18,6 @@ import {
   getProductPreflight,
   getProductEntrySession,
   buildPerformanceReport,
-  superviseManagedRun as superviseGatewayManagedRun,
   intakeSource,
   researchSource,
   prepareSourceAugmentation,
@@ -48,7 +46,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
   getPublicationProjection,
   getReviewState,
   getRun: getGatewayRun,
-  getManagedRun: getGatewayManagedRun,
   invokeDomainEntry,
   invokeProductEntry,
   getProductStatus,
@@ -69,7 +66,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
     return (gateway as Record<string, any>).runNativePptProductEntryProof(request);
   },
   buildPerformanceReport,
-  superviseManagedRun: superviseGatewayManagedRun,
   intakeSource,
   researchSource,
   prepareSourceAugmentation,
@@ -308,24 +304,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     throw new Error('deliverable 命令仅支持 create|get|audit|execute|run');
-  }
-
-  if (command === 'managed') {
-    if (subcommand === 'get') {
-      return gateway.getManagedRun({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        managedRunId: options.managedRunId || '',
-      });
-    }
-
-    if (subcommand === 'supervise') {
-      return gateway.superviseManagedRun({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        managedRunId: options.managedRunId || '',
-      });
-    }
-
-    throw new Error('managed 命令仅支持 get|supervise');
   }
 
   if (command === 'product') {

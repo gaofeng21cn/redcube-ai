@@ -92,22 +92,6 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
       expectedSurfaceKind: 'product_entry',
     },
     {
-      name: 'managed get',
-      argv: ['managed', 'get', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-summary-1', '--json-summary'],
-      domainActions: {
-        getManagedRun: async () => minimalLongSurface('managed_run_record'),
-      },
-      expectedSurfaceKind: 'managed_run_record',
-    },
-    {
-      name: 'managed supervise',
-      argv: ['managed', 'supervise', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-summary-1', '--json-summary'],
-      domainActions: {
-        superviseManagedRun: async () => minimalLongSurface('managed_supervision'),
-      },
-      expectedSurfaceKind: 'managed_supervision',
-    },
-    {
       name: 'runs get',
       argv: ['runs', 'get', '--workspace-root', '/tmp/ws', '--run-id', 'run-summary-1', '--json-summary'],
       domainActions: {

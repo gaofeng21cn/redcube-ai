@@ -20,9 +20,6 @@ import type {
   OplHostedProductEntryRequest,
   OplHostedProductEntryResponse,
   DeliverableRequest,
-  ManagedRunRecordResponse,
-  ManagedRunResponse,
-  ManagedSupervisionResponse,
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
@@ -37,12 +34,10 @@ import type {
   ReviewRenderOutputRequest,
   ReviewRenderOutputResponse,
   RouteRunResponse,
-  RunManagedDeliverableRequest,
   RunSourceFirstFanoutRequest,
   SourceFirstFanoutResponse,
   RunDeliverableRouteRequest,
   RunRecordResponse,
-  SuperviseManagedRunRequest,
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceResearchResponse,
@@ -126,24 +121,9 @@ async function getRunJs(request: any) {
   return module.getRun(request);
 }
 
-async function getManagedRunJs(request: any) {
-  const module = await import('./actions/get-managed-run.js');
-  return module.getManagedRun(request);
-}
-
-async function superviseManagedRunJs(request: any) {
-  const module = await import('./actions/supervise-managed-run.js');
-  return module.superviseManagedRun(request);
-}
-
 async function runDeliverableRouteJs(request: any) {
   const module = await import('./actions/run-deliverable-route.js');
   return module.runDeliverableRoute(request);
-}
-
-async function runManagedDeliverableJs(request: any) {
-  const module = await import('./actions/run-managed-deliverable.js');
-  return module.runManagedDeliverable(request);
 }
 
 async function runSourceFirstFanoutJs(request: any) {
@@ -344,20 +324,8 @@ export function dispatchProductSidecar(request: Record<string, unknown>): Promis
   return dispatchProductSidecarJs(request) as Promise<Record<string, unknown>>;
 }
 
-export function getManagedRun(request: WorkspaceRootRequest & { managedRunId: string }): Promise<ManagedRunRecordResponse> {
-  return getManagedRunJs(request) as unknown as Promise<ManagedRunRecordResponse>;
-}
-
-export function superviseManagedRun(request: SuperviseManagedRunRequest): Promise<ManagedSupervisionResponse> {
-  return superviseManagedRunJs(request) as Promise<ManagedSupervisionResponse>;
-}
-
 export function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunResponse> {
   return runDeliverableRouteJs(request) as unknown as Promise<RouteRunResponse>;
-}
-
-export function runManagedDeliverable(request: RunManagedDeliverableRequest): Promise<ManagedRunResponse> {
-  return runManagedDeliverableJs(request) as unknown as Promise<ManagedRunResponse>;
 }
 
 export function runSourceFirstFanout(request: RunSourceFirstFanoutRequest): Promise<SourceFirstFanoutResponse> {
@@ -424,9 +392,6 @@ export type {
   OplHostedProductEntryRequest,
   OplHostedProductEntryResponse,
   DeliverableRequest,
-  ManagedRunRecordResponse,
-  ManagedRunResponse,
-  ManagedSupervisionResponse,
   ProductEntryRequest,
   ProductEntryResponse,
   ProductEntryManifestResponse,
@@ -442,12 +407,10 @@ export type {
   ReviewRenderOutputResponse,
   ReviewStateResponse,
   RouteRunResponse,
-  RunManagedDeliverableRequest,
   RunSourceFirstFanoutRequest,
   SourceFirstFanoutResponse,
   RunDeliverableRouteRequest,
   RunRecordResponse,
-  SuperviseManagedRunRequest,
   RuntimeWatchResponse,
   SourceIntakeResponse,
   SourceResearchResponse,

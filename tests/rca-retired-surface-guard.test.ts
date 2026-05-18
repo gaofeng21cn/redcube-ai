@@ -358,21 +358,25 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       surface.functional_structure_gap_closure.status,
       'classification_closed_followthrough_gaps_open',
     );
-    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 8);
+    assert.equal(surface.functional_structure_gap_closure.functional_structure_gap_count, 2);
+    assert.equal(surface.functional_structure_gap_closure.completed_functional_structure_gap_count, 7);
+    assert.deepEqual(surface.functional_structure_gap_closure.completed_functional_structure_gap_ids, [
+      'opl_generated_surface_production_consumption',
+      'repo_local_wrapper_active_caller_migration',
+      'focused_hosted_attempt_real_path_cutover',
+      'artifact_gallery_handoff_shell',
+      'review_repair_transport',
+      'opl_app_operator_drilldown',
+      'workspace_source_lifecycle_receipt_shell',
+    ]);
     assert.equal(
       surface.functional_structure_gap_closure.remaining_gap_class,
-      'functional_structure_followthrough_and_testing_evidence',
+      'live_soak_evidence_and_physical_cleanup',
     );
-    assert.ok(
-      surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids.includes(
-        'opl_generated_surface_production_consumption',
-      ),
-    );
-    assert.ok(
-      surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids.includes(
-        'opl_app_operator_drilldown',
-      ),
-    );
+    assert.deepEqual(surface.functional_structure_gap_closure.remaining_functional_structure_gap_ids, [
+      'production_live_soak_and_evidence',
+      'legacy_physical_cleanup',
+    ]);
     assert.ok(
       surface.functional_structure_gap_closure.remaining_evidence_gate_ids.includes(
         'real_artifact_producing_domain_owner_receipt',
@@ -402,10 +406,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
         ], entry.module_id);
       } else {
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-          'opl_replacement_surface_live',
-          'active_callers_migrated',
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
+          'legacy_physical_cleanup_no_active_caller_proof',
         ], entry.module_id);
       }
       assert.equal(entry.declares_production_soak_complete, false, entry.module_id);

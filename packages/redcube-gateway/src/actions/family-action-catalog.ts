@@ -40,7 +40,7 @@ const MCP_TOOLS = [
   {
     name: 'redcube_deliverable',
     selector: 'action',
-    description: 'Grouped deliverable lifecycle execution surface for create/get/run/managed route actions across one deliverable boundary.',
+    description: 'Grouped deliverable lifecycle execution surface for create/get/run and OPL stage-plan handoff across one deliverable boundary.',
   },
   {
     name: 'redcube_review',
@@ -280,7 +280,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_entry_session',
       title: 'Read RedCube product-entry session',
-      summary: '读取 product-entry session continuity surface，并回看 latest managed progress / review / projection。',
+      summary: '读取 OPL generated session shell 所需的 RCA entry-session domain snapshot refs；RCA 不持有 generic session/workbench owner。',
       effect: 'read_only',
       command: PRODUCT_SESSION_COMMAND,
       surfaceKind: 'product_entry_session',

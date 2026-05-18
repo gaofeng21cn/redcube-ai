@@ -9,7 +9,7 @@ export function buildOperatorEvidenceReadinessProjection({
   workspaceReceiptInventoryProjection,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
-  const remainingFunctionalStructureGapIds = [
+  const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
     'repo_local_wrapper_active_caller_migration',
     'focused_hosted_attempt_real_path_cutover',
@@ -17,6 +17,9 @@ export function buildOperatorEvidenceReadinessProjection({
     'review_repair_transport',
     'opl_app_operator_drilldown',
     'workspace_source_lifecycle_receipt_shell',
+  ];
+  const remainingFunctionalStructureGapIds = [
+    'production_live_soak_and_evidence',
     'legacy_physical_cleanup',
   ];
   return {
@@ -92,7 +95,9 @@ export function buildOperatorEvidenceReadinessProjection({
     remaining_gap_classification: {
       functional_structure_gap_status: 'classification_closed_followthrough_gaps_open',
       functional_structure_gap_count: remainingFunctionalStructureGapIds.length,
-      remaining_gap_class: 'functional_structure_followthrough_and_testing_evidence',
+      completed_functional_structure_gap_count: completedFunctionalStructureGapIds.length,
+      completed_functional_structure_gap_ids: completedFunctionalStructureGapIds,
+      remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
       remaining_functional_structure_gap_ids: remainingFunctionalStructureGapIds,
       remaining_evidence_gate_ids: [
         'real_artifact_producing_domain_owner_receipt',

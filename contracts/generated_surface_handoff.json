@@ -79,9 +79,53 @@
     "default_generic_dispatch_owner": "one-person-lab",
     "default_managed_supervision_owner": "one-person-lab",
     "managed_supervision_diagnostic_owner": "redcube_ai",
+    "managed_supervision_public_surface": "retired",
     "redcube_cli_is_unified_metadata_owner": false,
     "redcube_mcp_is_unified_metadata_owner": false,
     "product_entry_session_store_is_generic_session_owner": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "rca.generated_surface_bridge_exit.v1",
+    "owner": "one-person-lab",
+    "consumer": "redcube_ai",
+    "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
+    "required_before_retiring_repo_local_wrappers": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded",
+      "legacy_physical_cleanup_no_active_caller_proof"
+    ],
+    "repo_local_allowed_roles_before_exit": [
+      "domain_handler_target",
+      "direct_domain_entry",
+      "direct_protocol_adapter",
+      "refs_only_adapter",
+      "diagnostic_surface"
+    ],
+    "repo_local_forbidden_roles": [
+      "unified_metadata_owner",
+      "generic_dispatch_owner",
+      "generic_session_shell_owner",
+      "generic_workbench_owner",
+      "generated_surface_owner"
+    ],
+    "after_exit_rca_allowed_surfaces": [
+      "declarative_visual_pack_input",
+      "domain_handler_targets",
+      "minimal_authority_functions",
+      "refs_only_locator_projection",
+      "diagnostic_direct_surfaces"
+    ],
+    "rca_can_own_generated_surface": false,
+    "rca_can_own_generic_session_shell": false,
+    "rca_can_own_generic_workbench": false,
+    "declares_generated_surface_consumption_complete": true,
+    "declares_production_consumption_complete": true,
+    "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
+    "declares_visual_stage_long_soak_complete": false,
+    "remaining_blocker_ids": [
+      "production_live_soak_and_evidence",
+      "legacy_physical_cleanup"
+    ]
   },
   "required_domain_handoff": [
     "owner_receipt_schema",

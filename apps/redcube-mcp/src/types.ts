@@ -32,8 +32,6 @@ export interface DomainActionMap {
   createDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getPublicationProjection?: (args: Record<string, unknown>) => Promise<unknown>;
-  getManagedRun?: (args: Record<string, unknown>) => Promise<unknown>;
-  superviseManagedRun?: (args: Record<string, unknown>) => Promise<unknown>;
   intakeSource?: (args: Record<string, unknown>) => Promise<unknown>;
   auditDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   reviewRenderOutput?: (args: Record<string, unknown>) => Promise<unknown>;

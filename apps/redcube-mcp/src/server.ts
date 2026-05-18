@@ -19,8 +19,6 @@ import {
   getProductPreflight,
   exportProductSidecar,
   dispatchProductSidecar,
-  getManagedRun,
-  superviseManagedRun,
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
@@ -68,8 +66,6 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   auditDeliverable,
   reviewRenderOutput,
   invokeManagedDeliverableStagePlan,
-  getManagedRun,
-  superviseManagedRun,
   runDeliverableRoute,
   getRun,
   runtimeWatch,
@@ -85,7 +81,9 @@ export const MCP_SURFACE_OWNER_BOUNDARY = Object.freeze({
   generic_session_shell_owner: 'one-person-lab',
   generic_workbench_owner: 'one-person-lab',
   default_managed_supervision_owner: 'one-person-lab',
-  managed_supervision_route_role: 'diagnostic_domain_projection_not_default_generic_supervisor',
+  managed_supervision_route_role: 'retired_from_public_mcp_surface',
+  source_route_role: 'opl_generated_source_wrapper_invokes_rca_source_readiness_handler',
+  workbench_route_role: 'opl_generated_workbench_consumes_rca_operator_evidence_refs',
   redcube_mcp_is_unified_metadata_owner: false,
 });
 
@@ -128,8 +126,6 @@ const TOOL_ROUTE_DEFINITIONS = {
       create_deliverable: 'createDeliverable',
       get_deliverable: 'getDeliverable',
       run_managed_deliverable: 'invokeManagedDeliverableStagePlan',
-      get_managed_run: 'getManagedRun',
-      supervise_managed_run: 'superviseManagedRun',
       run_deliverable_route: 'runDeliverableRoute',
       get_run: 'getRun',
     },
@@ -208,7 +204,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_deliverable',
     description: MCP_TOOL_METADATA.get('redcube_deliverable')?.description
-      || 'Grouped deliverable lifecycle execution surface for create/get/run/managed route actions across one deliverable boundary.',
+      || 'Grouped deliverable lifecycle execution surface for create/get/run and OPL stage-plan handoff across one deliverable boundary.',
     action_catalog_projection: getMcpToolProjection('redcube_deliverable'),
     inputSchema: {
       action: ACTION_STRING,
@@ -383,12 +379,6 @@ export function listDomainTools() {
   return TOOL_DEFINITIONS.map(({ name, description }) => ({
     name,
     description,
-    ...(name === 'redcube_deliverable'
-      ? {
-          managed_supervision_route_role: 'diagnostic_domain_projection_not_default_generic_supervisor',
-          default_managed_supervision_owner: 'one-person-lab',
-        }
-      : {}),
     generated_interface_owner: 'one-person-lab',
     domain_handler_owner: 'redcube_ai',
     repo_local_handler_target_only: true,

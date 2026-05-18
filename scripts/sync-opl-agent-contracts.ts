@@ -156,6 +156,7 @@ function buildGeneratedSurfaceHandoff() {
     })),
     repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
     repo_local_launcher_policy: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_launcher_policy,
+    bridge_exit_gate: OPL_GENERATED_INTERFACE_CONSUMPTION.bridge_exit_gate,
     required_domain_handoff: [
       'owner_receipt_schema',
       'typed_blocker_schema',

@@ -282,7 +282,7 @@ test('callDomainTool can return operator-facing deliverable and route-run surfac
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callDomainTool maps managed deliverable execution to the OPL stage-plan domain entry and keeps managed lookup diagnostic', async () => {
+test('callDomainTool maps managed deliverable execution to the OPL stage-plan domain entry and retires public managed lookup actions', async () => {
   const managed = await callDomainTool(
     'redcube_deliverable',
     withAction('run_managed_deliverable', {
@@ -308,128 +308,32 @@ test('callDomainTool maps managed deliverable execution to the OPL stage-plan do
           },
         },
       }),
-      getManagedRun: async () => ({
-        ok: true,
-        surface_kind: 'managed_run_record',
-        summary: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-          current_stage: 'export_pptx',
-        },
-        managed_run: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-        },
-        progress_projection: {
-          current_stage: 'export_pptx',
-          latest_events: [],
-        },
-        runtime_supervision: {
-          health_status: 'completed',
-        },
-        escalation_record: {
-          escalation_status: 'none',
-        },
-      }),
-      superviseManagedRun: async () => ({
-        ok: true,
-        surface_kind: 'managed_supervision',
-        summary: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-          current_stage: 'export_pptx',
-        },
-        managed_run: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-        },
-        progress_projection: {
-          current_stage: 'export_pptx',
-          latest_events: [],
-        },
-        runtime_supervision: {
-          health_status: 'completed',
-        },
-        escalation_record: {
-          escalation_status: 'none',
-        },
-      }),
-    },
-  );
-
-  const stored = await callDomainTool(
-    'redcube_deliverable',
-    withAction('get_managed_run', {
-      workspaceRoot: '/tmp/redcube-workspace',
-      managedRunId: 'managed-a',
-    }),
-    {
-      getManagedRun: async () => ({
-        ok: true,
-        surface_kind: 'managed_run_record',
-        summary: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-          current_stage: 'export_pptx',
-        },
-        managed_run: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-        },
-        progress_projection: {
-          current_stage: 'export_pptx',
-          latest_events: [],
-        },
-        runtime_supervision: {
-          health_status: 'completed',
-        },
-        escalation_record: {
-          escalation_status: 'none',
-        },
-      }),
-    },
-  );
-
-  const supervised = await callDomainTool(
-    'redcube_deliverable',
-    withAction('supervise_managed_run', {
-      workspaceRoot: '/tmp/redcube-workspace',
-      managedRunId: 'managed-a',
-    }),
-    {
-      superviseManagedRun: async () => ({
-        ok: true,
-        surface_kind: 'managed_supervision',
-        summary: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-          current_stage: 'export_pptx',
-        },
-        managed_run: {
-          managed_run_id: 'managed-a',
-          status: 'completed',
-        },
-        progress_projection: {
-          current_stage: 'export_pptx',
-          latest_events: [],
-        },
-        runtime_supervision: {
-          health_status: 'completed',
-        },
-        escalation_record: {
-          escalation_status: 'none',
-        },
-      }),
     },
   );
 
   assert.equal(managed.surface_kind, 'domain_entry');
   assert.equal(managed.summary.actual_surface_kind, 'opl_stage_execution_plan');
   assert.equal(managed.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
-  assert.equal(stored.surface_kind, 'managed_run_record');
-  assert.equal(stored.summary.managed_run_id, 'managed-a');
-  assert.equal(supervised.surface_kind, 'managed_supervision');
-  assert.equal(supervised.runtime_supervision.health_status, 'completed');
+  await assert.rejects(
+    () => callDomainTool(
+      'redcube_deliverable',
+      withAction('get_managed_run', {
+        workspaceRoot: '/tmp/redcube-workspace',
+        managedRunId: 'managed-a',
+      }),
+    ),
+    /Unsupported redcube_deliverable action: get_managed_run/,
+  );
+  await assert.rejects(
+    () => callDomainTool(
+      'redcube_deliverable',
+      withAction('supervise_managed_run', {
+        workspaceRoot: '/tmp/redcube-workspace',
+        managedRunId: 'managed-a',
+      }),
+    ),
+    /Unsupported redcube_deliverable action: supervise_managed_run/,
+  );
 });
 
 

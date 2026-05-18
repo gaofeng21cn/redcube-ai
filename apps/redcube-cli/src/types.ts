@@ -6,8 +6,6 @@ import type {
   DeliverableRecordResponse,
   DomainEntryRequest,
   DomainEntryResponse,
-  ManagedRunRecordResponse,
-  ManagedSupervisionResponse,
   OverlayCatalogResponse,
   ProductEntryRequest,
   ProductEntryResponse,
@@ -24,7 +22,6 @@ import type {
   SourceIntakeResponse,
   TopicCatalogResponse,
   WorkspaceDoctorResponse,
-  SuperviseManagedRunRequest,
 } from '@redcube/gateway';
 
 export interface CliOptions extends Record<string, string | boolean> {}
@@ -76,8 +73,6 @@ export interface CliDomainActions {
   getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<PublicationProjectionResponse>;
   getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<ReviewStateResponse>;
   getRun(request: { workspaceRoot: string; runId: string }): Promise<RunRecordResponse>;
-  getManagedRun(request: { workspaceRoot: string; managedRunId: string }): Promise<ManagedRunRecordResponse>;
-  superviseManagedRun(request: SuperviseManagedRunRequest): Promise<ManagedSupervisionResponse>;
   auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse>;
   runtimeWatch(request: Record<string, unknown>): Promise<RuntimeWatchResponse>;
   applyReviewMutation(request: ReviewMutationRequest): Promise<ReviewMutationResponse>;
@@ -110,8 +105,6 @@ export type CliRunSurface =
   | DeliverableRecordResponse
   | DomainEntryResponse
   | DeliverableAuditResponse
-  | ManagedRunRecordResponse
-  | ManagedSupervisionResponse
   | RouteRunResponse
   | ProductEntryResponse
   | ProductEntrySessionResponse

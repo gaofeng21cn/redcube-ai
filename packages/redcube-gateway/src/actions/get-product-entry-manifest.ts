@@ -202,7 +202,7 @@ export async function getProductEntryManifest(request) {
     recommended_step_id: productEntryQuickstart.recommended_step_id,
     next_focus: [
       '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-      '继续把 OPL-hosted stage runtime handoff 作为默认 production consumption 路径验证到真实长跑证据。',
+      '继续用 OPL generated/hosted caller 消费 RCA domain handler，并把 production live-soak 证据验证到真实长跑。',
     ],
     remaining_gaps_count: 2,
     human_gate_ids: humanGateIds,

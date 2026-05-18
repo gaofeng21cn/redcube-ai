@@ -42,6 +42,50 @@ export const RCA_REPO_LOCAL_HANDLER_TARGETS = Object.freeze([
   'product_entry_session_store',
 ]);
 
+export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
+  gate_id: 'rca.generated_surface_bridge_exit.v1',
+  owner: 'one-person-lab',
+  consumer: 'redcube_ai',
+  current_rca_status: 'opl_generated_surface_consumed_domain_handlers_only',
+  required_before_retiring_repo_local_wrappers: [
+    'domain_authority_refs_preserved',
+    'no_regression_proof_recorded',
+    'legacy_physical_cleanup_no_active_caller_proof',
+  ],
+  repo_local_allowed_roles_before_exit: [
+    'domain_handler_target',
+    'direct_domain_entry',
+    'direct_protocol_adapter',
+    'refs_only_adapter',
+    'diagnostic_surface',
+  ],
+  repo_local_forbidden_roles: [
+    'unified_metadata_owner',
+    'generic_dispatch_owner',
+    'generic_session_shell_owner',
+    'generic_workbench_owner',
+    'generated_surface_owner',
+  ],
+  after_exit_rca_allowed_surfaces: [
+    'declarative_visual_pack_input',
+    'domain_handler_targets',
+    'minimal_authority_functions',
+    'refs_only_locator_projection',
+    'diagnostic_direct_surfaces',
+  ],
+  rca_can_own_generated_surface: false,
+  rca_can_own_generic_session_shell: false,
+  rca_can_own_generic_workbench: false,
+  declares_generated_surface_consumption_complete: true,
+  declares_production_consumption_complete: true,
+  production_consumption_scope: 'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
+  declares_visual_stage_long_soak_complete: false,
+  remaining_blocker_ids: [
+    'production_live_soak_and_evidence',
+    'legacy_physical_cleanup',
+  ],
+});
+
 export function buildVisualPackCompilerHandoffProjection() {
   return {
     surface_kind: 'visual_pack_compiler_handoff',
@@ -62,7 +106,7 @@ export function buildVisualPackCompilerHandoffProjection() {
       owner: 'redcube_ai',
       compiler_owner: 'opl',
       input_mode: 'domain_descriptor_refs_only',
-      generated_surface_mode: 'opl_generated_or_migration_bridge_only',
+      generated_surface_mode: 'opl_generated_surface_consumed_domain_handlers_only',
       source_refs: [
         { source_id: 'domain_descriptor', ref: '/standard_domain_agent_skeleton' },
         { source_id: 'deliverable_family_graph', ref: '/family_stage_control_plane' },
@@ -102,6 +146,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         repo_local_handlers_are_generated_surface_owners: false,
         redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
         redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+        bridge_exit_gate: { ...OPL_GENERATED_SURFACE_EXIT_GATE },
       },
       repository_boundary: {
         repo_tracks_declarative_pack_input: true,
@@ -122,13 +167,13 @@ export function buildVisualPackCompilerHandoffProjection() {
       generated_descriptor_scope: [...OPL_GENERATED_DESCRIPTOR_SCOPE],
       repo_local_handler_targets: [...RCA_REPO_LOCAL_HANDLER_TARGETS],
       rca_generated_surface_owner: false,
-      current_rca_shell_status: 'domain_handler_target_or_direct_entry_only',
-      rca_may_keep_migration_bridge_until: [
-        'opl_generated_surface_live',
-        'active_callers_migrated',
+      current_rca_shell_status: 'opl_generated_surface_consumed_domain_handlers_only',
+      remaining_cleanup_and_evidence_gates: [
         'domain_authority_refs_preserved',
         'no_regression_proof_recorded',
+        'legacy_physical_cleanup_no_active_caller_proof',
       ],
+      bridge_exit_gate: { ...OPL_GENERATED_SURFACE_EXIT_GATE },
       generated_surfaces_are_not_rca_long_term_owner: true,
       repo_local_launcher_policy: {
         generated_descriptor_owner: 'one-person-lab',
@@ -141,6 +186,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         default_generic_dispatch_owner: 'one-person-lab',
         default_managed_supervision_owner: 'one-person-lab',
         managed_supervision_diagnostic_owner: 'redcube_ai',
+        managed_supervision_public_surface: 'retired',
         redcube_cli_is_unified_metadata_owner: false,
         redcube_mcp_is_unified_metadata_owner: false,
         product_entry_session_store_is_generic_session_owner: false,

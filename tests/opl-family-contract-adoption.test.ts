@@ -111,7 +111,7 @@ test('RCA stage control projection maps route stages without owning runtime cont
 
   assert.equal(projection.surface_kind, 'opl_family_stage_control_projection');
   assert.equal(projection.projection_id, 'rca.opl.family.stage-control.projection.v1');
-  assert.equal(projection.adapter_model, 'descriptor_read_only');
+  assert.equal(projection.adapter_model, 'descriptor_and_stage_execution_plan_provider');
   assert.equal(projection.maps_to_opl_contract, 'opl_family_stage_control_plane.v1');
   assert.deepEqual(projection.covered_families, [
     'ppt_deck',
@@ -142,7 +142,7 @@ test('RCA stage control projection maps route stages without owning runtime cont
     rca_owns_visual_truth: true,
     rca_owns_review_publication_projection: true,
     rca_owns_artifact_authority: true,
-    opl_role: 'stage_attempt_scheduler_and_projection_consumer',
+    opl_role: 'read_only_stage_projection_consumer',
     default_ppt_route_changed: false,
     managed_deliverable_runtime_changed: true,
     repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
@@ -343,11 +343,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       status: 'classification_closed_followthrough_gaps_open',
       closed_at: '2026-05-17',
       closure_scope: 'rca_functional_structure_gap_classification',
-      functional_structure_gap_count: 8,
-      unclassified_private_generic_residue_count: 0,
-      long_term_rca_generic_owner_claim_count: 0,
-      remaining_gap_class: 'functional_structure_followthrough_and_testing_evidence',
-      remaining_functional_structure_gap_ids: [
+      functional_structure_gap_count: 2,
+      completed_functional_structure_gap_count: 7,
+      completed_functional_structure_gap_ids: [
         'opl_generated_surface_production_consumption',
         'repo_local_wrapper_active_caller_migration',
         'focused_hosted_attempt_real_path_cutover',
@@ -355,54 +353,24 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         'review_repair_transport',
         'opl_app_operator_drilldown',
         'workspace_source_lifecycle_receipt_shell',
+      ],
+      unclassified_private_generic_residue_count: 0,
+      long_term_rca_generic_owner_claim_count: 0,
+      remaining_gap_class: 'live_soak_evidence_and_physical_cleanup',
+      remaining_functional_structure_gap_ids: [
+        'production_live_soak_and_evidence',
         'legacy_physical_cleanup',
       ],
       remaining_functional_structure_gaps: [
         {
-          gap_id: 'opl_generated_surface_production_consumption',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'repo_local_wrapper_active_caller_migration',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'focused_hosted_attempt_real_path_cutover',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'artifact_gallery_handoff_shell',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'review_repair_transport',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'opl_app_operator_drilldown',
-          current_bucket: 'functional_structure_followthrough_gap',
-          owner: 'one-person-lab',
-          rca_role: 'domain_handler_target_or_visual_authority_refs_only',
-        },
-        {
-          gap_id: 'workspace_source_lifecycle_receipt_shell',
-          current_bucket: 'functional_structure_followthrough_gap',
+          gap_id: 'production_live_soak_and_evidence',
+          current_bucket: 'production_evidence_blocker',
           owner: 'one-person-lab',
           rca_role: 'domain_handler_target_or_visual_authority_refs_only',
         },
         {
           gap_id: 'legacy_physical_cleanup',
-          current_bucket: 'functional_structure_followthrough_gap',
+          current_bucket: 'physical_cleanup_blocker',
           owner: 'redcube_ai',
           rca_role: 'domain_handler_target_or_visual_authority_refs_only',
         },
@@ -512,10 +480,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
         assert.match(entry.physical_deletion_guard.reason, /active callers|retained RCA visual authority refs/, entry.module_id);
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-          'opl_replacement_surface_live',
-          'active_callers_migrated',
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
+          'legacy_physical_cleanup_no_active_caller_proof',
         ], entry.module_id);
       }
       for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
@@ -563,7 +530,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.attempt_state_machine_runner.status, 'opl_generic_transition_runner_consumed_refs_only');
   assert.equal(byId.attempt_state_machine_runner.activeCallerStatus, 'refs_only_visual_transition_adapter_consuming_opl_runner');
   assert.equal(byId.managed_run_json_store.status, 'opl_attempt_ledger_provider_receipts_consumed');
-  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'opl_provider_receipt_refs_with_rca_visual_summary');
+  assert.equal(byId.managed_run_json_store.activeCallerStatus, 'opl_hosted_attempt_ledger_refs_with_rca_visual_summary');
   assert.equal(byId.managed_run_json_store.migration_class, 'opl_hosted_surface');
   assert.equal(
     byId.managed_run_json_store.opl_replacement_expectation.replacement_surface,
@@ -580,6 +547,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
   assert.equal(byId.product_entry_session_store.migration_class, 'opl_generated_surface');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
+  assert.equal(byId.workspace_source_intake.activeCallerStatus, 'opl_workspace_source_shell_domain_handler_refs');
   assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');
   assert.equal(byId.workspace_source_intake.rca_exports_only.includes('source_readiness_verdict_ref'), true);
   assert.equal(byId.memory_writeback_receipt_transport.rca_scope, 'visual_memory_accept_reject_and_receipt_refs');
@@ -590,8 +558,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   );
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
-  assert.equal(byId.operator_projection_shell.activeCallerStatus, 'active_refs_only_projection_shell');
+  assert.equal(byId.operator_projection_shell.activeCallerStatus, 'opl_app_workbench_shell_domain_evidence_refs');
   assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'product_sidecar_status_action_metadata_projection');
+  assert.equal(byId.generic_cli_mcp_wrappers.activeCallerStatus, 'opl_generated_wrappers_domain_handler_targets');
   assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'opl_generated_surface');
   assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
   assert.equal(byId.codex_executor_adapter.migration_class, 'opl_hosted_surface');

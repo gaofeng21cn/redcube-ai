@@ -37,7 +37,6 @@ import {
   prepareSourceAugmentationResult,
   researchSource,
   runDeliverableRoute,
-  runManagedDeliverable,
   writeSourceAugmentationResult,
 } from '@redcube/gateway';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
@@ -305,7 +304,6 @@ export {
   reconcileHostedAttemptReceipt,
   researchSource,
   runDeliverableRoute,
-  runManagedDeliverable,
   test,
   unlinkSync,
   withAction,

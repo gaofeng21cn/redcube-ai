@@ -143,13 +143,6 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       action_ref: 'exportProductSidecar|dispatchProductSidecar',
       boundary_fields: ['workspaceRoot', 'task'],
     },
-    'managed supervise': {
-      summary: '读取 managed run diagnostic projection；默认 generic supervision owner 是 OPL runner/session shell，RCA 只保留 visual run summary refs。',
-      usage: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
-      action_ref: 'superviseManagedRun',
-      boundary_fields: ['workspaceRoot', 'managedRunId'],
-      owner_model: 'diagnostic_domain_projection_not_default_generic_supervisor',
-    },
     'native-ppt proof': {
       summary: '受控执行 ppt_deck native PPT proof route；只调用 repo-owned proof runner，并保持 product-entry review/export gates。',
       usage: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>] [--stop-after-stage <stage>]',
@@ -258,10 +251,6 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
         command: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>]',
       },
       {
-        task: '读取 managed run diagnostic projection',
-        command: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
-      },
-      {
         task: '读取交付物当前 review 状态',
         command: 'redcube review get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       },
@@ -301,7 +290,6 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       topics: ['list'],
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
-      managed: ['get', 'supervise'],
       product: ['status', 'start', 'preflight', 'invoke', 'session', 'manifest', 'sidecar'],
       'native-ppt': ['proof'],
       'image-ppt': ['proof'],
@@ -332,8 +320,6 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
       deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <codex_cli|hermes_agent>]',
       deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
-      managedGet: 'redcube managed get --workspace-root <dir> --managed-run-id <id>',
-      managedSupervise: 'redcube managed supervise --workspace-root <dir> --managed-run-id <id>',
       productStatus: 'redcube product status --workspace-root <dir>',
       productStart: 'redcube product start --workspace-root <dir>',
       productPreflight: 'redcube product preflight --workspace-root <dir>',
