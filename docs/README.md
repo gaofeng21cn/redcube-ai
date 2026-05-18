@@ -60,7 +60,7 @@ RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、v
 | Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
 | Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
 | Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
-| Active | 当前执行、当前计划、当前差距与 closeout evidence | [Active](./active/README.md) |
+| Active | 当前执行、当前计划、当前差距与当前完成门槛 | [Active](./active/README.md) |
 | Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) |
 | References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
 | History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.md) |
@@ -91,7 +91,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - `docs/delivery/`：deliverable family、route、proof、export 与示例材料
 - `docs/source/`：source readiness 与 augmentation 材料
 - `docs/policies/`：稳定治理与运行规则
-- `docs/active/`：当前计划、当前差距与 active closeout 记录
+- `docs/active/`：当前计划、当前差距与当前完成门槛
 - `docs/public/`：公开叙事薄索引；除非未来有真实公开材料，不承接旧 program/capability 正文
 - `docs/specs/`：当前技术规格薄索引；正文优先回到 contracts、runtime/delivery/source owner docs 或 machine surface
 - `docs/history/phase-2/`：已吸收 tranche brief 与 follow-on records

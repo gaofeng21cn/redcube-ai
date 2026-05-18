@@ -27,7 +27,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | 目录 | 长期职责 | 当前 RCA 承载 |
 | --- | --- | --- |
 | `docs/` root | docs 入口、核心五件套、docs governance | `README.md`、核心五件套、本文件。 |
-| `docs/active/` | 当前执行、当前计划、当前差距、active baton、closeout evidence | 当前只承接 `rca-ideal-state-gap-plan.md` 这类仍在推进的完成计划。 |
+| `docs/active/` | 当前执行、当前计划、当前差距、active baton、当前完成门槛 | 当前只承接 `rca-ideal-state-gap-plan.md` 这类仍在推进的完成计划。 |
 | `docs/public/` | public narrative index | 当前较薄；除非未来有真正公开材料，否则保持薄索引。 |
 | `docs/product/` | quickstart、profile、public publish、product/operator handoff | 真实承载。 |
 | `docs/runtime/` | runtime topology、executor/backend、service-safe entry、watch/projection | 真实承载但较薄，核心是 runtime architecture。 |
@@ -44,7 +44,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 
 `capabilities` 不作为 RCA docs active 目录复活。Capability truth 优先归 contracts、runtime manifest、CLI/MCP surface、delivery/source/runtime owner docs 或 domain action catalog。
 
-2026-05-16 docs 生命周期复核结论：
+当前 docs 生命周期复核结论：
 
 - `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
 - `docs/references/opl_managed_runtime_three_layer_contract.md` 已迁入 `docs/history/opl_managed_runtime_three_layer_contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
@@ -58,6 +58,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 
 1. 当前 visual truth、route truth、review/export verdict、artifact authority 合入核心五件套、runtime/delivery/source owner docs 或 machine surfaces。
 2. 当前 baton 和 active plan 留在 `docs/active/`；已完成且只解释合同面的 support brief 进入 `docs/references/`。
+2.1. dated follow-through、tranche closeout、命令证据流水和阶段性校准过程进入 `docs/history/plans/` 或其他 history/provenance 层；active/reference 主文档只保留当前定位、边界、差距、证据缺口和下一步顺序。
 3. Product/operator/profile/release 支撑进入 `docs/product/`。
 4. Runtime topology、service-safe entry、watch/projection 进入 `docs/runtime/`。
 5. Deliverable route/proof/export/manual validation 进入 `docs/delivery/`。
