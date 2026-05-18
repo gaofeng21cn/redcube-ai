@@ -11,7 +11,7 @@ Date: `2026-05-18`
 - 本文只维护 RCA 当前差距、owner 边界、功能/结构 gap、测试/证据 gap 和完善顺序。
 - RCA 的 north-star 目标态回到 [RedCube AI 理想目标态](../references/rca-visual-deliverable-agent-ideal-state.md)。
 - 过程性 dated follow-through、closeout tranche、proof 命令摘要和旧路线归入 `docs/history/`，不在本文承担 current truth。
-- 差距按目标态判断，不按当前 RCA 代码是否仍可运行判断。managed DAG、attempt/state-machine runner、managed-run/session store、workspace/source intake、memory/writeback transport、artifact export lifecycle、review/repair transport、native helper generic envelope、operator projection、generic CLI/MCP wrapper、executor adapter 和 status/product shell，只要承担通用 framework/runtime 职责，就必须进入 OPL 上收、generated surface 替换、refs-only 收薄或退役分类。
+- 差距按目标态判断，不按当前 RCA 代码是否仍可运行判断。旧 repo-local deliverable runner、run store 和 DAG runtime 已物理删除；product-entry session store、workspace/source intake、memory/writeback transport、artifact export lifecycle、review/repair transport、native helper generic envelope、operator projection、generic CLI/MCP wrapper、executor adapter 和 status/product shell，只要承担通用 framework/runtime 职责，就必须进入 OPL 上收、generated surface 替换、refs-only 收薄或退役分类。
 - Descriptor ready、transition fixture、no-regression evidence、provider completion 或 focused proof 都不能写成 visual ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak；`production consumption complete` 仅限 OPL generated/hosted surface consumption，不等于生产 soak 完成。
 
 ## 当前定位
@@ -48,6 +48,8 @@ OPL 必须持有：
 
 `classification_closed` 已推进到 standard OPL consumer 口径：RCA 不再声明 generated/hosted wrapper、session、workbench、artifact/review/source shell 或 generic runtime owner；这些面由 OPL generated/hosted surface 持有，RCA 只保留 domain handler target、refs-only adapter、minimal authority function 和 native helper implementation。
 
+旧 repo-local managed runtime 的物理清理已经闭合：active source/package/test surface 不再保留旧 deliverable runner、run store、DAG scheduler、managed event/prompt/run/liveness/surface/bridge helpers、gateway public managed action handlers 或 runtime-protocol managed run helper/types。需要追溯这些实现时只读 history/provenance 或旧 commit。
+
 当前必须保留：
 
 `functional_structure_gap_count=1`
@@ -67,6 +69,13 @@ OPL 必须持有：
 
 1. `production_live_soak_and_evidence`
    OPL generated/hosted wrapper、session、workbench、artifact/review/source shell 已按合同消费，但还没有完成 Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence。
+
+## 当前 cleanliness tail
+
+RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：
+
+- `production_evidence_tail`：真实 artifact-producing owner receipt、真实 visual memory body reuse、真实 workspace receipt scaleout、Temporal controlled visual-stage long soak 和 cross-family repeated no-regression evidence。
+- `naming_contract_hygiene_tail`：历史 runtime-program contract、human_doc 语义 ID、field name 或 task intent 中仍可能保留 `managed` 作为 session-continuity / provenance 命名。它们不代表 active 旧 runtime owner；后续清理必须通过 contract migration / tombstone policy / compatibility-free rename 做，不把旧 runtime surface 复活为 alias。
 
 ## Retained Private Authority Functions
 
@@ -101,6 +110,9 @@ RCA 长期只允许保留 visual domain 的 minimal authority functions：
 
 2. `runtime_evidence_scaleout`
    在结构差距关闭后，补真实 artifact-producing receipt、visual memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。
+
+3. `naming_contract_hygiene`
+   将历史 `managed` 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增 compatibility alias。
 
 ## 当前不能写成
 

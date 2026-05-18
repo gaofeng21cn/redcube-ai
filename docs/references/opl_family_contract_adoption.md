@@ -26,7 +26,7 @@ RCA 的质量门是 visual-deliverable-specific：内容适配、视觉审阅、
 
 ## Incident Projection
 
-RCA 通过 `runtimeWatch`、managed deliverable report、review/export gate audit 和 operator handoff 映射 `opl_family_incident_learning_loop.v1`。真实 incident 必须回流成 guard、test、contract、runbook、taxonomy update 或 operator projection；domain-specific failure 必须有 RCA-owned closure ref。
+RCA 通过 `runtimeWatch`、OPL stage-plan / route-run report、review/export gate audit 和 operator handoff 映射 `opl_family_incident_learning_loop.v1`。真实 incident 必须回流成 guard、test、contract、runbook、taxonomy update 或 operator projection；domain-specific failure 必须有 RCA-owned closure ref。
 
 ## Product Operator Projection
 
@@ -34,7 +34,7 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 ## Lifecycle Adapter Surface
 
-`opl_family_lifecycle_adapter` 是 RCA 侧的厚 adapter 投影。它把已有 managed-runs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射为 OPL family persistence / lifecycle / owner-route discovery / adoption surface。
+`opl_family_lifecycle_adapter` 是 RCA 侧的厚 adapter 投影。它把 OPL stage-plan / route-run refs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射为 OPL family persistence / lifecycle / owner-route discovery / adoption surface。
 
 manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。
 

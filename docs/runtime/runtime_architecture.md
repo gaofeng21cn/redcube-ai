@@ -11,7 +11,7 @@
 | state | current runtime explanation |
 | machine boundary | 可执行真相在 runtime-program contracts、CLI/MCP surfaces、product-entry / domain-entry / runtime-family source、workspace/runtime artifacts；本文只是读者上下文 |
 
-旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime、local runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner、generic framework/runtime owner 或 visual truth owner。
+旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime、local runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner、generic framework/runtime owner 或 visual truth owner。旧 repo-local deliverable runner、run store 和 DAG runtime 已从 active source/package/test surface 物理删除；当前 active runtime 只保留 OPL stage-plan refs、RCA route handlers、visual authority surfaces 和 native helper implementation。
 
 ## 当前拓扑
 
@@ -88,7 +88,7 @@ OPL 侧可通过 product sidecar 读取和派发受控动作：
 
 - `product sidecar export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
 - `product sidecar dispatch` 只允许 `runtime_watch`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`evaluate_visual_transition`、`emit_workspace_receipt_proof`、`notification_receipt` 这类 guarded actions。
-- `supervise_managed_run` 与 `product_entry_continuation` 已从 default generic sidecar dispatch 物理删除/收薄；`get_managed_run` / `supervise_managed_run` 已从 public CLI/MCP/gateway surface 退役。generic supervision / continuation 归 OPL runner/session shell。RCA 保留 direct product-entry/session API 和内部 visual authority surfaces；旧 managed supervision 只作为内部历史回归 fixture 保留。
+- `supervise_managed_run` 与 `product_entry_continuation` 已从 default generic sidecar dispatch 物理删除/收薄；`get_managed_run` / `supervise_managed_run` 已从 public CLI/MCP/gateway surface 退役。generic supervision / continuation 归 OPL runner/session shell。RCA 保留 direct product-entry/session API 和内部 visual authority surfaces；旧 repo-local supervision/runtime 不再作为 active fixture 保留，只在 history/provenance 语境追溯。
 - `emit_no_regression_evidence` 只生成 RCA-owned runtime evidence ref，落在 workspace `.redcube/runtime/evidence/no-regression/`；它证明 descriptor/runtime refs、physical skeleton anchor、legacy active-path retirement 和 no-forbidden-write 边界未回退，不写 visual artifact blob，也不声明 provider-hosted visual long soak 完成。
 
 Sidecar 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。

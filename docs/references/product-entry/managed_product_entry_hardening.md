@@ -18,8 +18,8 @@ direct / OPL-hosted 两条入口现在共享一个用户级 session store：
 
 因此同一个 `entry_session_id` 可以稳定回到同一个 deliverable，并读回：
 
-- latest managed progress
-- runtime supervision
+- latest OPL stage-plan / route-run checkpoint
+- runtime projection
 - review state
 - publication projection
 
