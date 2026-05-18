@@ -74,7 +74,7 @@ test('getProductEntrySession projects the OPL stage execution plan checkpoint wi
         deliverable_id: 'deck-stale-checkpoint',
         profile_id: 'lecture_student',
         title: 'Product entry stale checkpoint proof',
-        goal: '验证 product session 能吸收 workspace latest managed run',
+        goal: '验证 product session 能吸收最新 OPL stage execution plan checkpoint',
         user_intent: '先做到故事主线',
         stop_after_stage: 'storyline',
       },
@@ -98,7 +98,7 @@ test('getProductEntrySession projects the OPL stage execution plan checkpoint wi
       continued.continuation_snapshot.latest_stage_execution_plan_ref,
       first.continuation_snapshot.latest_stage_execution_plan_ref,
     );
-    assert.equal(continued.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal(continued.continuation_snapshot.latest_stage_execution_plan_ref.startsWith('opl-stage-execution-plan:'), true);
     assert.equal(readJson(sessionFile).latest_surface_kind, 'opl_stage_execution_plan');
 
     const session = await getProductEntrySession({
@@ -159,7 +159,7 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale l
 
     assert.equal(routeRun.domain_entry_surface.result_surface.surface_kind, 'route_run');
     assert.equal(Boolean(routeRun.continuation_snapshot.latest_run_id), true);
-    assert.equal(routeRun.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal('latest_stage_execution_plan_ref' in routeRun.continuation_snapshot, true);
     assert.equal(
       routeRun.domain_entry_surface.result_surface.artifact.contract.user_intent,
       '直接重跑故事主线',
@@ -180,7 +180,7 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale l
       session.continuation_snapshot.latest_run_id,
       routeRun.continuation_snapshot.latest_run_id,
     );
-    assert.equal(session.continuation_snapshot.latest_managed_run_id, null);
+    assert.equal('latest_stage_execution_plan_ref' in session.continuation_snapshot, true);
     assert.equal(
       session.session_continuity.restore_point.latest_handle,
       routeRun.continuation_snapshot.latest_run_id,

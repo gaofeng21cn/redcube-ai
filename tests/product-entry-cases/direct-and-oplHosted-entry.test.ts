@@ -104,13 +104,12 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.deepEqual(
       response.continuation_snapshot,
       sharedCompanions.buildProductEntryContinuationSnapshot({
-        latest_managed_run_id: null,
         latest_run_id: null,
-        managed_progress_projection: response.continuation_snapshot.managed_progress_projection,
-        runtime_supervision: response.continuation_snapshot.runtime_supervision,
         extra_payload: {
           latest_stage_execution_plan_ref: response.domain_entry_surface.summary.target_handle,
           stage_execution_plan: response.domain_entry_surface.result_surface,
+          runtime_progress_projection: response.continuation_snapshot.runtime_progress_projection,
+          runtime_projection: response.continuation_snapshot.runtime_projection,
           domain_authority_refs: response.domain_entry_surface.result_surface.authority_refs,
           latest_surface_kind: 'opl_stage_execution_plan',
         },
@@ -206,7 +205,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(storedSession.topic_id, 'topic-a');
     assert.equal(storedSession.deliverable_id, 'deck-a');
     assert.equal(storedSession.latest_stage_execution_plan_ref, response.continuation_snapshot.latest_stage_execution_plan_ref);
-    assert.equal(storedSession.latest_managed_run_id, null);
+    assert.equal('latest_stage_execution_plan_ref' in storedSession, true);
   });
 });
 
@@ -302,13 +301,12 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.deepEqual(
       session.continuation_snapshot,
       sharedCompanions.buildProductEntryContinuationSnapshot({
-        latest_managed_run_id: null,
         latest_run_id: continued.continuation_snapshot.latest_run_id,
-        managed_progress_projection: session.continuation_snapshot.managed_progress_projection,
-        runtime_supervision: session.continuation_snapshot.runtime_supervision,
         extra_payload: {
           latest_stage_execution_plan_ref: continued.continuation_snapshot.latest_stage_execution_plan_ref,
           stage_execution_plan: session.continuation_snapshot.stage_execution_plan,
+          runtime_progress_projection: session.continuation_snapshot.runtime_progress_projection,
+          runtime_projection: session.continuation_snapshot.runtime_projection,
           latest_surface_kind: 'opl_stage_execution_plan',
         },
       }),
@@ -504,7 +502,7 @@ test('session continuation family orchestration companion uses the shared contin
 
   const requested = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot: {
-      managed_progress_projection: {
+      runtime_progress_projection: {
         needs_user_decision: true,
       },
     },
@@ -528,7 +526,7 @@ test('session continuation family orchestration companion uses the shared contin
 
   const approved = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot: {
-      managed_progress_projection: {
+      runtime_progress_projection: {
         needs_user_decision: false,
       },
     },

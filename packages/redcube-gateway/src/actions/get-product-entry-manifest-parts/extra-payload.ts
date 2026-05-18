@@ -43,7 +43,7 @@ export function buildManifestExtraPayload({
         label: 'restore point surface',
       },
       restore_point_field_refs: [
-        { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_managed_run_id', label: 'latest managed run id' },
+        { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_stage_execution_plan_ref', label: 'latest OPL stage execution plan ref' },
         { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_run_id', label: 'latest route run id' },
         { ref_kind: 'json_pointer', ref: '/session_continuity/restore_point/latest_handle', label: 'latest handle' },
       ],
@@ -77,7 +77,7 @@ export function buildManifestExtraPayload({
       surface_kind: 'progress_projection',
       owner: 'redcube_ai',
       status: 'repo_tracked',
-      summary: 'Managed progress projection is surfaced alongside session continuity and can be dereferenced from the same-session restore point.',
+      summary: 'Runtime progress projection is surfaced alongside session continuity and can be dereferenced from the same-session restore point.',
       projection_field_ref: {
         ref_kind: 'json_pointer',
         ref: '/progress_projection/projection',
@@ -90,13 +90,13 @@ export function buildManifestExtraPayload({
       },
       fallback_projection_ref: {
         ref_kind: 'json_pointer',
-        ref: '/continuation_snapshot/managed_progress_projection',
-        label: 'managed progress projection snapshot',
+        ref: '/continuation_snapshot/runtime_progress_projection',
+        label: 'runtime progress projection snapshot',
       },
       fallback_runtime_refs_ref: {
         ref_kind: 'json_pointer',
-        ref: '/continuation_snapshot/runtime_supervision/refs',
-        label: 'runtime supervision refs snapshot',
+        ref: '/continuation_snapshot/runtime_projection/refs',
+        label: 'runtime projection refs snapshot',
       },
       truth_surfaces: [
         {
@@ -135,11 +135,11 @@ export function buildManifestExtraPayload({
       },
       artifact_refs_fallback_ref: {
         ref_kind: 'json_pointer',
-        ref: '/continuation_snapshot/managed_progress_projection/final_artifact_refs',
-        label: 'managed run final artifact refs',
+        ref: '/continuation_snapshot/runtime_progress_projection/final_artifact_refs',
+        label: 'runtime final artifact refs',
       },
       restore_point_field_refs: [
-        { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_managed_run_id', label: 'latest managed run id' },
+        { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_stage_execution_plan_ref', label: 'latest OPL stage execution plan ref' },
         { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_run_id', label: 'latest route run id' },
         { ref_kind: 'json_pointer', ref: '/artifact_inventory/restore_point/latest_handle', label: 'latest handle' },
       ],
@@ -172,7 +172,7 @@ export function buildManifestExtraPayload({
         session_command_template: productEntrySessionCommand,
         session_file_ref: { ref_kind: 'json_pointer', ref: '/entry_session/session_file' },
         restore_point_refs: [
-          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_managed_run_id' },
+          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_stage_execution_plan_ref' },
           { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_run_id' },
           { ref_kind: 'json_pointer', ref: '/session_continuity/restore_point/latest_handle' },
         ],
@@ -183,8 +183,8 @@ export function buildManifestExtraPayload({
           { surface_kind: 'product_entry', ref_kind: 'json_pointer', ref: '/progress_projection' },
           { surface_kind: 'product_entry_session', ref_kind: 'json_pointer', ref: '/progress_projection' },
         ],
-        projection_ref: { ref_kind: 'json_pointer', ref: '/continuation_snapshot/managed_progress_projection' },
-        runtime_refs_ref: { ref_kind: 'json_pointer', ref: '/continuation_snapshot/runtime_supervision/refs' },
+        projection_ref: { ref_kind: 'json_pointer', ref: '/continuation_snapshot/runtime_progress_projection' },
+        runtime_refs_ref: { ref_kind: 'json_pointer', ref: '/continuation_snapshot/runtime_projection/refs' },
       },
       artifact_inventory: {
         surface_kind: 'artifact_inventory',
@@ -194,12 +194,12 @@ export function buildManifestExtraPayload({
         ],
         session_command_template: productEntrySessionCommand,
         restore_point_refs: [
-          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_managed_run_id' },
+          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_stage_execution_plan_ref' },
           { ref_kind: 'json_pointer', ref: '/continuation_snapshot/latest_run_id' },
           { ref_kind: 'json_pointer', ref: '/artifact_inventory/restore_point/latest_handle' },
         ],
         artifact_ref_refs: [
-          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/managed_progress_projection/final_artifact_refs' },
+          { ref_kind: 'json_pointer', ref: '/continuation_snapshot/runtime_progress_projection/final_artifact_refs' },
           { ref_kind: 'json_pointer', ref: '/artifact_inventory/artifact_refs' },
         ],
       },

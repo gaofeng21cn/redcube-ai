@@ -12,12 +12,12 @@ import type {
 
 import type {
   DomainEntryContractSurface,
-  ManagedRunProjection,
-  ManagedRunResponse,
-  ManagedRuntimeSupervision,
   PublicationProjectionResponse,
   ReviewStateResponse,
   RouteRunResponse,
+  RuntimeProgressProjection,
+  RuntimeProjection,
+  StageExecutionResponse,
   SurfaceBase,
   SurfaceSummary,
 } from './foundation.js';
@@ -59,7 +59,7 @@ export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
   runtime_session_contract: Record<string, unknown>;
   return_surface_contract: Record<string, unknown>;
   domain_payload: Record<string, unknown>;
-  result_surface: ManagedRunResponse | RouteRunResponse;
+  result_surface: StageExecutionResponse | RouteRunResponse;
   summary: {
     task_intent: string;
     actual_surface_kind: string;
@@ -207,7 +207,7 @@ export interface ProductEntryPreflightCompanion {
 
 export interface ProductEntryRestorePoint {
   latest_handle: string | null;
-  latest_managed_run_id: string | null;
+  latest_stage_execution_plan_ref: string | null;
   latest_run_id: string | null;
 }
 
@@ -231,12 +231,12 @@ export interface SessionContinuitySurface {
 
 export interface ProgressProjectionSurface {
   surface_kind: 'progress_projection';
-  managed_run_id: string | null;
-  projection: ManagedRunProjection;
-  refs: ManagedRuntimeSupervision['refs'] | null;
+  stage_execution_plan_ref: string | null;
+  projection: RuntimeProgressProjection;
+  refs: RuntimeProjection['refs'] | null;
   summary: {
     current_stage: string | null;
-    content_status: ManagedRunProjection['content_status'] | null;
+    content_status: RuntimeProgressProjection['content_status'] | null;
     needs_user_decision: boolean;
   };
 }
@@ -247,7 +247,7 @@ export interface ArtifactInventorySurface {
   session_file: string;
   restore_point: ProductEntryRestorePoint;
   artifact_refs: string[];
-  refs: ManagedRuntimeSupervision['refs'] | null;
+  refs: RuntimeProjection['refs'] | null;
   summary: {
     latest_handle: string | null;
     artifact_ref_count: number;
@@ -264,7 +264,7 @@ export interface RuntimeLoopClosureSurface {
   resume_point: {
     entry_session_id: string | null;
     session_file: string | null;
-    latest_managed_run_id: string | null;
+    latest_stage_execution_plan_ref: string | null;
     latest_run_id: string | null;
     latest_handle: string | null;
     resume_command_template: string;
@@ -273,9 +273,9 @@ export interface RuntimeLoopClosureSurface {
   progress_cursor: {
     surface_kind: 'progress_projection';
     surface_ref: string;
-    managed_run_id: string | null;
+    stage_execution_plan_ref: string | null;
     current_stage: string | null;
-    content_status: ManagedRunProjection['content_status'] | null;
+    content_status: RuntimeProgressProjection['content_status'] | null;
     needs_user_decision: boolean;
   };
   artifact_pickup: {
@@ -356,10 +356,10 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   };
   domain_entry_surface: DomainEntryResponse;
   continuation_snapshot: {
-    latest_managed_run_id: string | null;
+    latest_stage_execution_plan_ref: string | null;
     latest_run_id: string | null;
-    managed_progress_projection: ManagedRunProjection | null;
-    runtime_supervision: ManagedRuntimeSupervision | null;
+    runtime_progress_projection: RuntimeProgressProjection | null;
+    runtime_projection: RuntimeProjection | null;
   };
   session_continuity: SessionContinuitySurface;
   progress_projection: ProgressProjectionSurface | null;
@@ -428,10 +428,10 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
     profile_id: string | null;
   };
   continuation_snapshot: {
-    latest_managed_run_id: string | null;
+    latest_stage_execution_plan_ref: string | null;
     latest_run_id: string | null;
-    managed_progress_projection: ManagedRunProjection | null;
-    runtime_supervision: ManagedRuntimeSupervision | null;
+    runtime_progress_projection: RuntimeProgressProjection | null;
+    runtime_projection: RuntimeProjection | null;
   };
   session_continuity: SessionContinuitySurface;
   progress_projection: ProgressProjectionSurface | null;

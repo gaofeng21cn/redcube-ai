@@ -56,7 +56,7 @@ const SESSION_CONTINUATION_CHECKPOINT_LINEAGE_SURFACE_REF = Object.freeze({
 
 export function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
   const needsUserDecision = Boolean(
-    continuationSnapshot?.managed_progress_projection?.needs_user_decision
+    continuationSnapshot?.runtime_progress_projection?.needs_user_decision
     || continuationSnapshot?.stage_execution_plan?.control_policy?.approval_required,
   );
   return needsUserDecision ? 'requested' : 'approved';

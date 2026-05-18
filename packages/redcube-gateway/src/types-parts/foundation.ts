@@ -253,8 +253,8 @@ export interface ApprovalThroughputSummary {
 }
 
 
-// Managed run surfaces
-export interface ManagedRunProjection {
+// Runtime projection surfaces
+export interface RuntimeProgressProjection {
   current_stage: string | null;
   latest_events: Array<{
     at: string;
@@ -282,10 +282,10 @@ export interface ManagedRunProjection {
   };
 }
 
-export interface ManagedRuntimeSupervision {
+export interface RuntimeProjection {
   schema_version: 1;
   recorded_at: string;
-  managed_run_id: string;
+  runtime_handle: string;
   overlay: string;
   topic_id: string;
   deliverable_id: string;
@@ -298,7 +298,7 @@ export interface ManagedRuntimeSupervision {
   worker_running: boolean;
   active_run_id: string | null;
   current_stage: string | null;
-  content_status: ManagedRunProjection['content_status'];
+  content_status: RuntimeProgressProjection['content_status'];
   current_blockers: string[];
   needs_human_intervention: boolean;
   summary: string;
@@ -307,64 +307,44 @@ export interface ManagedRuntimeSupervision {
   recovery_attempt_count: number;
   consecutive_failure_count: number;
   refs: {
-    managed_run_path: string;
+    stage_execution_plan_path: string;
     progress_projection_path: string;
-    runtime_supervision_path: string;
+    runtime_projection_path: string;
     escalation_record_path: string;
   };
 }
 
-export interface ManagedEscalationRecord {
+export interface RuntimeEscalationRecord {
   schema_version: 1;
   recorded_at: string;
-  managed_run_id: string;
+  runtime_handle: string;
   escalation_status: 'none' | 'escalated';
   reason_code: string | null;
-  severity: 'none' | 'managed_runtime';
+  severity: 'none' | 'runtime_projection';
   recommended_actions: string[];
   evidence_refs: string[];
   runtime_context_refs: Record<string, string>;
   requires_human_intervention: boolean;
 }
 
-export interface ManagedRunResponse extends SurfaceBase<'managed_run'> {
-  managed_run: Record<string, unknown>;
-  progress_projection: ManagedRunProjection;
-  runtime_supervision: ManagedRuntimeSupervision;
-  escalation_record: ManagedEscalationRecord;
+export interface StageExecutionResponse extends SurfaceBase<'opl_stage_execution_plan'> {
+  stage_execution_plan: Record<string, unknown>;
+  progress_projection: RuntimeProgressProjection;
+  runtime_projection: RuntimeProjection;
+  escalation_record: RuntimeEscalationRecord;
   summary: {
-    managed_run_id: string | null;
+    stage_execution_plan_ref: string | null;
     status: string | null;
     current_stage: string | null;
   };
 }
 
-export interface ManagedRunRecordResponse extends SurfaceBase<'managed_run_record'> {
-  managed_run: ManagedRunResponse['managed_run'];
-  progress_projection: ManagedRunProjection;
-  runtime_supervision: ManagedRuntimeSupervision;
-  escalation_record: ManagedEscalationRecord;
-  summary: ManagedRunResponse['summary'];
-}
-
-export interface ManagedSupervisionResponse extends SurfaceBase<'managed_supervision'> {
-  managed_run: ManagedRunResponse['managed_run'];
-  progress_projection: ManagedRunProjection;
-  runtime_supervision: ManagedRuntimeSupervision;
-  escalation_record: ManagedEscalationRecord;
-  summary: ManagedRunResponse['summary'];
-}
-
-export interface RunManagedDeliverableRequest extends DeliverableRequest, OverlayRequest {
+export interface RunStageDeliverableRequest extends DeliverableRequest, OverlayRequest {
   adapter?: string;
   userIntent?: string;
   stopAfterStage?: string;
   mode?: string;
   baselineDeliverableId?: string;
-}
-
-export interface SuperviseManagedRunRequest extends WorkspaceRootRequest {
-  managedRunId: string;
 }
 
 
@@ -554,13 +534,13 @@ export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fan
   planner?: Record<string, unknown>;
   created_deliverables?: DeliverableCreateResponse[];
   stage_execution_plans?: Record<string, unknown>[];
-  managed_runs?: ManagedRunResponse[];
+  stage_runtime_projections?: StageExecutionResponse[];
   summary: {
     topic_id: string;
     source_barrier_status: string;
     deliverable_count: number;
     stage_execution_plan_count?: number;
-    managed_run_count: number;
+    stage_runtime_projection_count: number;
     parallel_family_ready?: boolean;
     max_parallel_width?: number;
   };

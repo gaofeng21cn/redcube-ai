@@ -225,7 +225,6 @@ function buildProductEntrySessionSummary({
   familyOrchestration,
 }) {
   const latestHandle = session.latest_stage_execution_plan_ref
-    || session.latest_managed_run_id
     || session.latest_run_id
     || null;
   return {
@@ -270,13 +269,12 @@ export async function getProductEntrySession(request) {
     }),
   ]);
   const continuationSnapshot = buildProductEntryContinuationSnapshot({
-    latest_managed_run_id: null,
     latest_run_id: session.latest_run_id || null,
-    managed_progress_projection: null,
-    runtime_supervision: null,
     extra_payload: {
       latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
       stage_execution_plan: session.stage_execution_plan || null,
+      runtime_progress_projection: null,
+      runtime_projection: null,
       latest_surface_kind: session.latest_surface_kind || null,
     },
   });

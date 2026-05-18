@@ -52,9 +52,9 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     assert.equal(result.summary.source_barrier_status, 'planning_ready');
     assert.equal(result.summary.deliverable_count, 2);
     assert.equal(result.summary.stage_execution_plan_count, 2);
-    assert.equal(result.summary.managed_run_count, 0);
+    assert.equal(result.summary.stage_runtime_projection_count, 0);
     assert.equal(result.summary.parallel_family_ready, true);
-    assert.deepEqual(result.managed_runs, []);
+    assert.deepEqual(result.stage_runtime_projections, []);
 
     assert.equal(result.source_pack_fanout.artifact_kind, 'cross_family_source_pack_fanout');
     assert.deepEqual(
@@ -75,7 +75,7 @@ test('source-first fanout prepares one shared source pack then returns OPL stage
     assert.equal(result.planner.family_execution.quality_gate_policy, 'preserve_each_family_review_and_export_gates');
     assert.equal(result.planner.family_execution.stage_attempt_runtime_owner, 'configured_family_runtime_provider');
     assert.equal(result.planner.family_execution.stage_scheduler_owner, 'one-person-lab');
-    assert.equal(result.planner.repo_local_managed_runtime.active_caller, false);
+    assert.equal(result.planner.repo_local_stage_runtime.active_caller, false);
     assert.deepEqual(result.planner.opl_stage_execution_plan_dag.layers[0].task_ids, [
       'source_pack:topic-fanout/source-pack/planning_ready',
     ]);

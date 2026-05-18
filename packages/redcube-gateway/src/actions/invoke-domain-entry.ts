@@ -180,8 +180,7 @@ export async function invokeDomainEntry(request) {
     summary: {
       task_intent: taskIntent,
       actual_surface_kind: resultSurface.surface_kind,
-      target_handle: resultSurface.summary?.managed_run_id
-        || resultSurface.summary?.stage_execution_plan_ref
+      target_handle: resultSurface.summary?.stage_execution_plan_ref
         || resultSurface.summary?.run_id
         || null,
     },

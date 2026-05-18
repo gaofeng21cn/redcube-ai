@@ -39,12 +39,10 @@ function buildControlPolicy({ projection, manifestProjection = false }) {
 
 function buildRestorePoint({ continuationSnapshot }) {
   const latestStageExecutionPlanRef = continuationSnapshot?.latest_stage_execution_plan_ref || null;
-  const latestManagedRunId = continuationSnapshot?.latest_managed_run_id || null;
   const latestRunId = continuationSnapshot?.latest_run_id || null;
   return {
-    latest_handle: latestStageExecutionPlanRef || latestManagedRunId || latestRunId || null,
+    latest_handle: latestStageExecutionPlanRef || latestRunId || null,
     latest_stage_execution_plan_ref: latestStageExecutionPlanRef,
-    latest_managed_run_id: latestManagedRunId,
     latest_run_id: latestRunId,
   };
 }
@@ -93,18 +91,17 @@ export function buildSessionContinuitySurface({
 }
 
 export function buildProgressProjectionSurface({ continuationSnapshot }) {
-  const projection = continuationSnapshot?.managed_progress_projection
+  const projection = continuationSnapshot?.runtime_progress_projection
     || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
     || null;
   if (!projection) {
     return null;
   }
 
-  const refs = continuationSnapshot?.runtime_supervision?.refs || null;
+  const refs = continuationSnapshot?.runtime_projection?.refs || null;
   return {
     surface_kind: 'progress_projection',
     stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
-    managed_run_id: continuationSnapshot?.latest_managed_run_id || null,
     projection,
     refs,
     summary: {
@@ -121,7 +118,7 @@ export function buildArtifactInventorySurface({
   continuationSnapshot,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
-  const projection = continuationSnapshot?.managed_progress_projection
+  const projection = continuationSnapshot?.runtime_progress_projection
     || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
     || null;
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
@@ -134,7 +131,7 @@ export function buildArtifactInventorySurface({
     session_file: sessionFile,
     restore_point: restorePoint,
     artifact_refs: artifactRefs,
-    refs: continuationSnapshot?.runtime_supervision?.refs || null,
+    refs: continuationSnapshot?.runtime_projection?.refs || null,
     summary: {
       latest_handle: restorePoint.latest_handle,
       artifact_ref_count: artifactRefs.length,
@@ -160,7 +157,7 @@ export function buildRuntimeLoopClosureSurface({
   entryMode,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
-  const projection = continuationSnapshot?.managed_progress_projection
+  const projection = continuationSnapshot?.runtime_progress_projection
     || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
     || null;
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
@@ -173,13 +170,10 @@ export function buildRuntimeLoopClosureSurface({
       entry_session_id: safeText(entrySessionId) || null,
       session_file: safeText(sessionFile) || null,
       latest_stage_execution_plan_ref: restorePoint.latest_stage_execution_plan_ref,
-      latest_managed_run_id: restorePoint.latest_managed_run_id,
       latest_run_id: restorePoint.latest_run_id,
       latest_handle: restorePoint.latest_handle,
       resume_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-      checkpoint_locator_field: restorePoint.latest_stage_execution_plan_ref
-        ? 'continuation_snapshot.latest_stage_execution_plan_ref'
-        : 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     },
     continuity_cursor: {
       surface_kind: 'session_continuity',
@@ -191,7 +185,6 @@ export function buildRuntimeLoopClosureSurface({
       surface_kind: 'progress_projection',
       surface_ref: '/progress_projection',
       stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
-      managed_run_id: continuationSnapshot?.latest_managed_run_id || null,
       current_stage: projection?.current_stage ?? null,
       content_status: projection?.content_status ?? null,
       needs_user_decision: Boolean(projection?.needs_user_decision),
@@ -229,11 +222,10 @@ export function buildRuntimeLoopClosureManifestSurface({
       entry_session_id: null,
       session_file: null,
       latest_stage_execution_plan_ref: null,
-      latest_managed_run_id: null,
       latest_run_id: null,
       latest_handle: null,
       resume_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-      checkpoint_locator_field: 'continuation_snapshot.latest_managed_run_id',
+      checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     },
     continuity_cursor: {
       surface_kind: 'session_continuity',
@@ -245,7 +237,6 @@ export function buildRuntimeLoopClosureManifestSurface({
       surface_kind: 'progress_projection',
       surface_ref: '/progress_projection',
       stage_execution_plan_ref: null,
-      managed_run_id: null,
       current_stage: null,
       content_status: null,
       needs_user_decision: false,
@@ -340,7 +331,7 @@ function buildOplFamilyPersistence({
   artifactLocatorContract = null,
 }) {
   const restorePoint = buildRestorePoint({ continuationSnapshot });
-  const runtimeRefs = continuationSnapshot?.runtime_supervision?.refs || null;
+  const runtimeRefs = continuationSnapshot?.runtime_projection?.refs || null;
   return {
     authority_model: 'file_authority_plus_rebuildable_artifact_indexes',
     sqlite: {
@@ -373,13 +364,13 @@ function buildOplFamilyPersistence({
       provider_owner: 'opl_family_runtime_provider',
       attempt_ledger_owner: 'one-person-lab',
     },
-    managed_run: {
-      surface_kind: 'managed_run',
-      managed_run_id: restorePoint.latest_managed_run_id,
+    stage_runtime_projection: {
+      surface_kind: 'opl_stage_execution_plan',
+      stage_execution_plan_ref: restorePoint.latest_stage_execution_plan_ref,
       latest_run_id: restorePoint.latest_run_id,
-      managed_run_path: runtimeRefs?.managed_run_path || null,
+      stage_execution_plan_path: runtimeRefs?.stage_execution_plan_path || null,
       progress_projection_path: runtimeRefs?.progress_projection_path || null,
-      runtime_supervision_path: runtimeRefs?.runtime_supervision_path || null,
+      runtime_projection_path: runtimeRefs?.runtime_projection_path || null,
       escalation_record_path: runtimeRefs?.escalation_record_path || null,
     },
     artifact_index: {
@@ -422,10 +413,10 @@ function buildOplFamilyLifecycle({
   reviewState,
   publicationProjection,
 }) {
-  const projection = continuationSnapshot?.managed_progress_projection
+  const projection = continuationSnapshot?.runtime_progress_projection
     || projectionFromStageExecutionPlan(continuationSnapshot?.stage_execution_plan)
     || null;
-  const runtimeSupervision = continuationSnapshot?.runtime_supervision || null;
+  const runtimeProjection = continuationSnapshot?.runtime_projection || null;
   return {
     lifecycle_contract_id: 'opl_family_runtime_attempt_contract.v1',
     current_stage: projection?.current_stage ?? runtimeLoopClosure?.progress_cursor?.current_stage ?? null,
@@ -435,14 +426,14 @@ function buildOplFamilyLifecycle({
     completed_stages: safeArray(projection?.completed_stages),
     remaining_stages: safeArray(projection?.remaining_stages),
     latest_events: safeArray(projection?.latest_events).slice(-12),
-    runtime_supervision: runtimeSupervision
+    runtime_projection: runtimeProjection
       ? {
-        health_status: safeText(runtimeSupervision.health_status) || null,
-        worker_running: runtimeSupervision.worker_running === true,
-        active_run_id: runtimeSupervision.active_run_id || null,
-        runtime_liveness_audit: runtimeSupervision.runtime_liveness_audit || null,
-        needs_human_intervention: runtimeSupervision.needs_human_intervention === true,
-        next_action: safeText(runtimeSupervision.next_action) || null,
+        health_status: safeText(runtimeProjection.health_status) || null,
+        worker_running: runtimeProjection.worker_running === true,
+        active_run_id: runtimeProjection.active_run_id || null,
+        runtime_liveness_audit: runtimeProjection.runtime_liveness_audit || null,
+        needs_human_intervention: runtimeProjection.needs_human_intervention === true,
+        next_action: safeText(runtimeProjection.next_action) || null,
       }
       : null,
     review_publication: buildReviewPublicationRefs({
@@ -453,7 +444,7 @@ function buildOplFamilyLifecycle({
 }
 
 function recommendedOwnerRoute({ runtimeLoopClosure, continuationSnapshot }) {
-  const projection = continuationSnapshot?.managed_progress_projection || null;
+  const projection = continuationSnapshot?.runtime_progress_projection || null;
   if (runtimeLoopClosure?.control_policy?.approval_required === true || projection?.needs_user_decision === true) {
     return 'resolve_review_gate';
   }
@@ -549,7 +540,7 @@ function buildOplFamilyAuthorityBoundary() {
     allowed_authority: [
       'discover_product_entry_registration',
       'read_product_entry_session',
-      'read_managed_run_projection',
+      'read_runtime_progress_projection',
       'read_artifact_inventory',
       'read_review_publication_projection_refs',
       'adopt_session_resume_cursor',

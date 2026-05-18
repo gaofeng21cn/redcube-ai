@@ -116,7 +116,7 @@ function buildOplStagePlanDag({ sourcePackId, stageExecutionPlans }) {
       },
     ],
     max_parallel_width: stageExecutionPlans.length,
-    repo_local_managed_runtime_active_caller: false,
+    repo_local_stage_runtime_active_caller: false,
   };
 }
 
@@ -159,7 +159,7 @@ function buildFanoutPlanner({ topicId, sourcePackFanout, createdDeliverables, st
       terminal_stage: plan.summary?.terminal_stage || null,
       recommended_action: plan.recommended_action || null,
     })),
-    repo_local_managed_runtime: {
+    repo_local_stage_runtime: {
       active_caller: false,
       role: 'explicit_diagnostic_or_historical_regression_only',
     },
@@ -216,7 +216,7 @@ export async function runSourceFirstFanout({
         source_barrier_status: 'blocked',
         deliverable_count: normalizedDeliverables.length,
         stage_execution_plan_count: 0,
-        managed_run_count: 0,
+        stage_runtime_projection_count: 0,
       },
     };
   }
@@ -268,13 +268,13 @@ export async function runSourceFirstFanout({
     planner,
     created_deliverables: createdDeliverables,
     stage_execution_plans: stageExecutionPlans,
-    managed_runs: [],
+    stage_runtime_projections: [],
     summary: {
       topic_id: topicId,
       source_barrier_status: 'planning_ready',
       deliverable_count: normalizedDeliverables.length,
       stage_execution_plan_count: stageExecutionPlans.length,
-      managed_run_count: 0,
+      stage_runtime_projection_count: 0,
       parallel_family_ready: sourcePackFanout.parallel_family_ready === true,
       max_parallel_width: planner.opl_stage_execution_plan_dag.max_parallel_width,
     },

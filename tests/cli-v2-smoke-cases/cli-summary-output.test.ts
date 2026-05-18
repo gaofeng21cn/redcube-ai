@@ -13,7 +13,7 @@ function minimalLongSurface(kind, extra = {}) {
       status: 'completed',
       route: 'screenshot_review',
       run_id: 'run-summary-1',
-      managed_run_id: 'managed-summary-1',
+      stage_execution_plan_ref: 'opl-stage-summary-1',
     },
     run: {
       run_id: 'run-summary-1',
@@ -22,8 +22,8 @@ function minimalLongSurface(kind, extra = {}) {
         latency_ms: 1234,
       },
     },
-    managed_run: {
-      managed_run_id: 'managed-summary-1',
+    stage_execution_plan: {
+      plan_ref: 'opl-stage-summary-1',
       status: 'completed',
     },
     review_execution: {
@@ -85,7 +85,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
         invokeProductEntry: async () => minimalLongSurface('product_entry', {
           continuation_snapshot: {
             latest_run_id: 'run-summary-1',
-            latest_managed_run_id: 'managed-summary-1',
+            latest_stage_execution_plan_ref: 'opl-stage-summary-1',
           },
         }),
       },
@@ -125,7 +125,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     assert.equal(printed.status, 'completed', item.name);
     assert.equal(printed.route, 'screenshot_review', item.name);
     assert.equal(printed.run_id, 'run-summary-1', item.name);
-    assert.equal(printed.managed_run_id, 'managed-summary-1', item.name);
+    assert.equal(printed.stage_execution_plan_ref, 'opl-stage-summary-1', item.name);
     assert.equal(printed.latency_ms, 1234, item.name);
     assert.deepEqual(printed.target_slide_ids, ['S05'], item.name);
     assert.deepEqual(printed.reviewed_slide_ids, ['S05'], item.name);
@@ -137,7 +137,7 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
     assert.equal(printed.artifact_file, '/tmp/redcube/artifacts/screenshot_review.json', item.name);
     assert.equal(printed.full_payload_that_should_not_be_printed, undefined, item.name);
     assert.equal(printed.run, undefined, item.name);
-    assert.equal(printed.managed_run, undefined, item.name);
+    assert.equal(printed.stage_execution_plan, undefined, item.name);
   }
 });
 

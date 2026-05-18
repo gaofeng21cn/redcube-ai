@@ -138,9 +138,6 @@ function resolveDeliveryIdentity({ delivery, session }) {
 
 function buildContinuationSnapshot(domainEntrySurface) {
   const resultSurface = domainEntrySurface?.result_surface || {};
-  const latestManagedRunId = resultSurface?.summary?.managed_run_id
-    || resultSurface?.managed_run?.managed_run_id
-    || null;
   const latestStageExecutionPlanRef = resultSurface?.summary?.stage_execution_plan_ref
     || resultSurface?.plan_ref
     || resultSurface?.plan_id
@@ -150,13 +147,12 @@ function buildContinuationSnapshot(domainEntrySurface) {
     || null;
 
   return buildProductEntryContinuationSnapshot({
-    latest_managed_run_id: latestManagedRunId,
     latest_run_id: latestRunId,
-    managed_progress_projection: resultSurface?.progress_projection || null,
-    runtime_supervision: resultSurface?.runtime_supervision || null,
     extra_payload: {
       latest_stage_execution_plan_ref: latestStageExecutionPlanRef,
       stage_execution_plan: resultSurface?.surface_kind === 'opl_stage_execution_plan' ? resultSurface : null,
+      runtime_progress_projection: resultSurface?.progress_projection || null,
+      runtime_projection: resultSurface?.runtime_projection || null,
       domain_authority_refs: resultSurface?.authority_refs || null,
       latest_surface_kind: resultSurface?.surface_kind || null,
     },
@@ -212,13 +208,12 @@ function buildSessionRecord({
     runtime_owner: runtimeOwner,
     last_task_intent: taskIntent,
     last_entry_mode: entryMode,
-    latest_managed_run_id: continuationSnapshot.latest_managed_run_id,
     latest_run_id: continuationSnapshot.latest_run_id,
     latest_stage_execution_plan_ref: continuationSnapshot.latest_stage_execution_plan_ref || null,
     stage_execution_plan: continuationSnapshot.stage_execution_plan || null,
     latest_surface_kind: continuationSnapshot.latest_surface_kind
       || (continuationSnapshot.latest_stage_execution_plan_ref ? 'opl_stage_execution_plan' : null)
-      || (continuationSnapshot.latest_managed_run_id ? 'managed_run' : 'route_run'),
+      || 'route_run',
     updated_at: new Date().toISOString(),
   };
 }
@@ -259,7 +254,6 @@ function buildProductEntrySummary({
   familyOrchestration,
 }) {
   const latestHandle = continuationSnapshot.latest_stage_execution_plan_ref
-    || continuationSnapshot.latest_managed_run_id
     || continuationSnapshot.latest_run_id
     || null;
   return {

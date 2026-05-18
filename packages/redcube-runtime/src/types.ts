@@ -366,8 +366,9 @@ export interface RuntimeProductEntrySessionRecord {
   runtime_owner: string;
   last_task_intent: string;
   last_entry_mode: string;
-  latest_managed_run_id: string | null;
+  latest_stage_execution_plan_ref: string | null;
   latest_run_id: string | null;
+  stage_execution_plan?: Record<string, unknown> | null;
   latest_surface_kind: string | null;
   updated_at: string;
 }

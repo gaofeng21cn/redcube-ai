@@ -35,7 +35,7 @@ export function buildCliJsonSummary(result: JsonMap = {}): JsonMap {
   const summary = result?.summary || {};
   const run = result?.run || {};
   const runTelemetry = result?.run_telemetry || run?.telemetry || result?.telemetry || {};
-  const managedRun = result?.managed_run || {};
+  const stageRuntimeProjection = result?.stage_runtime_projection || result?.stage_execution_plan || {};
   const reviewExecution = result?.review_execution
     || result?.artifact?.review_execution
     || result?.artifact?.html_bundle?.render_execution
@@ -60,8 +60,8 @@ export function buildCliJsonSummary(result: JsonMap = {}): JsonMap {
       result?.status,
       summary?.status,
       run?.status,
-      managedRun?.status,
-      result?.runtime_supervision?.health_status,
+      stageRuntimeProjection?.status,
+      result?.runtime_projection?.health_status,
       reviewPatch?.current_status,
     ),
     surface_kind: firstText(result?.surface_kind),
@@ -73,12 +73,15 @@ export function buildCliJsonSummary(result: JsonMap = {}): JsonMap {
       runTelemetry?.run_id,
       continuation?.latest_run_id,
     ),
-    managed_run_id: firstText(
-      result?.managed_run_id,
-      summary?.managed_run_id,
-      managedRun?.managed_run_id,
-      result?.runtime_supervision?.managed_run_id,
-      continuation?.latest_managed_run_id,
+    stage_execution_plan_ref: firstText(
+      result?.stage_execution_plan_ref,
+      result?.plan_ref,
+      result?.plan_id,
+      summary?.stage_execution_plan_ref,
+      summary?.target_handle,
+      stageRuntimeProjection?.stage_execution_plan_ref,
+      stageRuntimeProjection?.plan_ref,
+      continuation?.latest_stage_execution_plan_ref,
     ),
     elapsed_ms: firstNumber(
       result?.elapsed_ms,
@@ -116,7 +119,7 @@ export function buildCliJsonSummary(result: JsonMap = {}): JsonMap {
       result?.blocking_reasons,
       summary?.blocking_reasons,
       reviewPatch?.blocking_reasons,
-      result?.runtime_supervision?.blocking_reasons,
+      result?.runtime_projection?.blocking_reasons,
     ),
     next_action: nextAction,
     recommended_action: recommendedAction,

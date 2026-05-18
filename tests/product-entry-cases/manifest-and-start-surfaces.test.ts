@@ -705,14 +705,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	    assert.equal(manifest.progress_projection.owner, 'redcube_ai');
 	    assert.equal(manifest.progress_projection.status, 'repo_tracked');
 	    assert.equal(manifest.progress_projection.projection_field_ref.ref, '/progress_projection/projection');
-	    assert.equal(manifest.progress_projection.fallback_projection_ref.ref, '/continuation_snapshot/managed_progress_projection');
+	    assert.equal(manifest.progress_projection.fallback_projection_ref.ref, '/continuation_snapshot/runtime_progress_projection');
 	    assert.equal(manifest.artifact_inventory.surface_kind, 'artifact_inventory');
 	    assert.equal(manifest.artifact_inventory.owner, 'redcube_ai');
 	    assert.equal(manifest.artifact_inventory.status, 'repo_tracked');
 	    assert.equal(manifest.artifact_inventory.artifact_refs_ref.ref, '/artifact_inventory/artifact_refs');
 	    assert.equal(
 	      manifest.artifact_inventory.artifact_refs_fallback_ref.ref,
-	      '/continuation_snapshot/managed_progress_projection/final_artifact_refs',
+	      '/continuation_snapshot/runtime_progress_projection/final_artifact_refs',
 	    );
       assert.equal(manifest.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
       assert.equal(manifest.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
