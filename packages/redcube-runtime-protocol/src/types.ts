@@ -264,7 +264,6 @@ export interface BuildSourceTruthConsumptionSummaryOptions {
 
 export interface CreateRunRecordInput {
   runId?: string;
-  managedRunId?: string | null;
   route?: string;
   scope?: string;
   target?: string;
@@ -313,7 +312,6 @@ export interface RerunLinkage {
 
 export interface RunRecord {
   run_id: string;
-  managed_run_id?: string | null;
   route: string;
   scope: string;
   target: string;

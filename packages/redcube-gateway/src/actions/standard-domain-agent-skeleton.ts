@@ -140,7 +140,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, 
       allowed_ref_kinds: [
         'workspace_runtime_artifact',
         'product_entry_session_ref',
-        'managed_run_artifact_ref',
+        'stage_run_artifact_ref',
       ],
     },
     repo_source_boundary: {

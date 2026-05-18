@@ -6,7 +6,6 @@ import type {
 
 export interface RuntimeRunRecord {
   run_id: string;
-  managed_run_id?: string | null;
   route: string;
   scope: string;
   target: string;
@@ -296,7 +295,6 @@ export interface RuntimeRunRouteRequest {
   deliverableId: string;
   route: string;
   runId?: string | null;
-  managedRunId?: string | null;
   adapter?: string;
   executorBackend?: 'codex_cli' | 'hermes_agent';
   executor_backend?: 'codex_cli' | 'hermes_agent';
@@ -330,7 +328,6 @@ export interface RuntimeStartRunRequest {
   target: string;
   topicId?: string | null;
   deliverableId?: string | null;
-  managedRunId?: string | null;
   baselineDeliverableId?: string;
   executor: Record<string, unknown>;
 }

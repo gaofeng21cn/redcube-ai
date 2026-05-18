@@ -118,6 +118,11 @@ export function assertManifestActionAndStageControlPlane({
     'package_and_handoff',
   ]);
   const catalogActionIds = new Set(manifest.family_action_catalog.actions.map((action) => action.action_id));
+  const expectedRuntimeEventRefs = new Map([
+    ['communication_strategy', ['runtime_event:rca.communication_strategy.accepted']],
+    ['visual_direction', ['runtime_event:rca.visual_direction.accepted']],
+    ['review_and_revision', ['runtime_event:rca.review_and_revision.gate_recorded']],
+  ]);
   for (const stage of manifest.family_stage_control_plane.stages) {
     assert.equal(stage.owner, 'redcube_ai');
     assert.equal(typeof stage.goal, 'string');
@@ -154,6 +159,7 @@ export function assertManifestActionAndStageControlPlane({
     if (['communication_strategy', 'visual_direction', 'review_and_revision'].includes(stage.stage_id)) {
       assert.equal(stage.trust_boundary.lane, 'ai_decision');
       assert.equal(stage.trust_boundary.effect_boundary, true);
+      assert.deepEqual(stage.stage_contract.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
     }
     assert.equal(stage.authority_boundary.domain_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.visual_truth_owner, 'redcube_ai');

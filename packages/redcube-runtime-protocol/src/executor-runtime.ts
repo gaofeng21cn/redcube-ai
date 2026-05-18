@@ -589,7 +589,6 @@ export function startHermesRun({
   target,
   topicId = null,
   deliverableId = null,
-  managedRunId = null,
   baselineDeliverableId = '',
   executor,
 }) {
@@ -604,7 +603,6 @@ export function startHermesRun({
   const run = {
     ...createRunRecord({
       runId: resolvedRunId,
-      managedRunId,
       route,
       scope,
       target,

@@ -28,6 +28,8 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 
 2026-05-18 active surface scan 进一步确认：`supervise_managed_run`、`get_managed_run` 和 `product_entry_continuation` 只作为 retired-surface guard、deletion proof、negative test 或 provenance identifier 出现；active product-entry manifest、status 与 runtime inventory 不再用这些名字声明 RCA repo-local managed runtime owner。Manifest、stage-control plane、OPL stage plan 和 runtime inventory 的 active machine fields 采用 `opl_provider_runtime_contract`、`repo_local_stage_runner_*`、`session_continuity_*` 口径。历史 `managed-product-entry-hardening` 文件名和 baton id 仅保留 session-continuity provenance，不作为当前 owner 语义。
 
+2026-05-18 fresh OPL stage admission read-model 曾阻断 RCA stage pack：`communication_strategy`、`visual_direction`、`review_and_revision` 是 AI / effect-boundary stage，但缺 machine-readable `runtime_event_refs`。当前已在 RCA-owned `family_stage_control_plane` 生成源与 `contracts/stage_control_plane.json` 中补齐 `stage_contract.runtime_event_refs`：`runtime_event:rca.communication_strategy.accepted`、`runtime_event:rca.visual_direction.accepted`、`runtime_event:rca.review_and_revision.gate_recorded`。这属于功能/结构 gap 修复；它不声明 production visual-stage long soak 或 artifact-producing owner receipt 完成。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。

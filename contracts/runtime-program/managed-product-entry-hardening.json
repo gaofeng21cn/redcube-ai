@@ -23,27 +23,26 @@
         ],
         "latest_handle_fields": [
             "latest_stage_execution_plan_ref",
-            "latest_managed_run_id",
             "latest_run_id"
         ],
         "continuation_surfaces": [
             "session_continuity",
             "progress_projection",
             "artifact_inventory",
-            "managed_progress_projection",
-            "runtime_supervision",
+            "stage_execution_plan_projection",
+            "runtime_loop_closure",
             "review_state",
             "publication_projection"
         ],
         "continuity_truth": {
             "restore_point_fields": [
                 "continuation_snapshot.latest_stage_execution_plan_ref",
-                "continuation_snapshot.latest_managed_run_id",
                 "continuation_snapshot.latest_run_id",
                 "session_continuity.restore_point.latest_handle"
             ],
             "artifact_ref_fields": [
-                "continuation_snapshot.managed_progress_projection.final_artifact_refs",
+                "continuation_snapshot.runtime_progress_projection.final_artifact_refs",
+                "continuation_snapshot.stage_execution_plan.stage_attempts",
                 "artifact_inventory.artifact_refs"
             ],
             "session_file_field": "entry_session.session_file"

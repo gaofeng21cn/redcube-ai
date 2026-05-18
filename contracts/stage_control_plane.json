@@ -263,6 +263,7 @@
         "ensures": [
           "source_truth_frozen"
         ],
+        "runtime_event_refs": [],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -325,6 +326,9 @@
       ],
       "trust_lane": "ai_decision",
       "independent_gate_receipt_required": true,
+      "runtime_event_refs": [
+        "runtime_event:rca.communication_strategy.accepted"
+      ],
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -494,6 +498,9 @@
         "ensures": [
           "communication_strategy_accepted"
         ],
+        "runtime_event_refs": [
+          "runtime_event:rca.communication_strategy.accepted"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -552,6 +559,9 @@
       ],
       "trust_lane": "ai_decision",
       "independent_gate_receipt_required": true,
+      "runtime_event_refs": [
+        "runtime_event:rca.visual_direction.accepted"
+      ],
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -707,6 +717,9 @@
         ],
         "ensures": [
           "visual_direction_accepted"
+        ],
+        "runtime_event_refs": [
+          "runtime_event:rca.visual_direction.accepted"
         ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
@@ -929,6 +942,7 @@
         "ensures": [
           "artifact_candidate_rendered"
         ],
+        "runtime_event_refs": [],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -991,6 +1005,9 @@
       ],
       "trust_lane": "ai_decision",
       "independent_gate_receipt_required": true,
+      "runtime_event_refs": [
+        "runtime_event:rca.review_and_revision.gate_recorded"
+      ],
       "visual_pattern_memory_refs": [
         "/domain_memory_descriptor_locator/writeback_proposal_generator",
         "/domain_memory_descriptor_locator/accept_reject_command"
@@ -1179,6 +1196,9 @@
         ],
         "ensures": [
           "visual_review_gate_receipt_recorded"
+        ],
+        "runtime_event_refs": [
+          "runtime_event:rca.review_and_revision.gate_recorded"
         ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
@@ -1426,6 +1446,7 @@
         "ensures": [
           "export_handoff_receipt_recorded"
         ],
+        "runtime_event_refs": [],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."

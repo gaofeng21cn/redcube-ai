@@ -166,7 +166,6 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
   oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
   opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
-  managedRunId?: string | null;
   stopAfterStage?: string;
 }
 

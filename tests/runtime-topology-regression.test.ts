@@ -103,7 +103,7 @@ async function startMockHermesAgentApiServer() {
   };
 }
 
-test('completed managed runs keep Codex runtime topology for Codex-native executor', () => {
+test('completed route runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
   const run = startHermesRun({
@@ -130,7 +130,7 @@ test('completed managed runs keep Codex runtime topology for Codex-native execut
   assert.equal(completed.runtime_topology.deployment_host_status, 'active_primary');
 });
 
-test('failed managed runs keep Codex runtime topology for Codex-native executor', () => {
+test('failed route runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
   const run = startHermesRun({

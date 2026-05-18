@@ -44,7 +44,6 @@ test('createRunRecord creates a stable minimal run envelope', () => {
 
   assert.deepEqual(run, {
     run_id: 'run-001',
-    managed_run_id: null,
     route: 'topic.storyline',
     scope: 'topic',
     target: 'topic-a',

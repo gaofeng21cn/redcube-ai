@@ -29,6 +29,7 @@ const STAGES = [
     next_stage_refs: ['visual_direction'],
     trust_lane: 'ai_decision',
     independent_gate_receipt_required: true,
+    runtime_event_refs: ['runtime_event:rca.communication_strategy.accepted'],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'strategy_checkpoint' },
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'stage_progress' },
@@ -46,6 +47,7 @@ const STAGES = [
     next_stage_refs: ['artifact_creation'],
     trust_lane: 'ai_decision',
     independent_gate_receipt_required: true,
+    runtime_event_refs: ['runtime_event:rca.visual_direction.accepted'],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'visual_direction_status' },
     ],
@@ -77,6 +79,7 @@ const STAGES = [
     next_stage_refs: ['package_and_handoff'],
     trust_lane: 'ai_decision',
     independent_gate_receipt_required: true,
+    runtime_event_refs: ['runtime_event:rca.review_and_revision.gate_recorded'],
     visual_pattern_memory_refs: [
       '/domain_memory_descriptor_locator/writeback_proposal_generator',
       '/domain_memory_descriptor_locator/accept_reject_command',
@@ -187,6 +190,7 @@ function stageDescriptor(stage, actionIds) {
     stage_contract: {
       requires: stage.requires || [],
       ensures: stage.ensures || [],
+      runtime_event_refs: stage.runtime_event_refs || [],
       boundary_assumptions: [
         'RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.',
         'OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable.',
