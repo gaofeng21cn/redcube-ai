@@ -119,9 +119,12 @@ export function assertManifestActionAndStageControlPlane({
   ]);
   const catalogActionIds = new Set(manifest.family_action_catalog.actions.map((action) => action.action_id));
   const expectedRuntimeEventRefs = new Map([
+    ['source_intake', ['runtime_event:rca.source_intake.source_truth_frozen']],
     ['communication_strategy', ['runtime_event:rca.communication_strategy.accepted']],
     ['visual_direction', ['runtime_event:rca.visual_direction.accepted']],
+    ['artifact_creation', ['runtime_event:rca.artifact_creation.candidate_rendered']],
     ['review_and_revision', ['runtime_event:rca.review_and_revision.gate_recorded']],
+    ['package_and_handoff', ['runtime_event:rca.package_and_handoff.export_handoff_recorded']],
   ]);
   for (const stage of manifest.family_stage_control_plane.stages) {
     assert.equal(stage.owner, 'redcube_ai');
@@ -152,6 +155,8 @@ export function assertManifestActionAndStageControlPlane({
     assert.equal(stage.stage_contract.ensures.length > 0, true);
     assert.equal(stage.trust_boundary.owner_receipt_required, true);
     assert.equal(stage.trust_boundary.runtime_guard_required, true);
+    assert.deepEqual(stage.stage_contract.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
+    assert.deepEqual(stage.trust_boundary.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
     assert.equal(
       stage.authority_boundary.independent_gate_receipt_required,
       independentGateStageIds.has(stage.stage_id),
@@ -159,7 +164,6 @@ export function assertManifestActionAndStageControlPlane({
     if (['communication_strategy', 'visual_direction', 'review_and_revision'].includes(stage.stage_id)) {
       assert.equal(stage.trust_boundary.lane, 'ai_decision');
       assert.equal(stage.trust_boundary.effect_boundary, true);
-      assert.deepEqual(stage.stage_contract.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
     }
     assert.equal(stage.authority_boundary.domain_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.visual_truth_owner, 'redcube_ai');

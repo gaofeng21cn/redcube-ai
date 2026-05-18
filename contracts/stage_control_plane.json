@@ -98,6 +98,9 @@
         "communication_strategy"
       ],
       "trust_lane": "domain_agent",
+      "runtime_event_refs": [
+        "runtime_event:rca.source_intake.source_truth_frozen"
+      ],
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -263,7 +266,9 @@
         "ensures": [
           "source_truth_frozen"
         ],
-        "runtime_event_refs": [],
+        "runtime_event_refs": [
+          "runtime_event:rca.source_intake.source_truth_frozen"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -274,6 +279,9 @@
         "static_check_eligible": false,
         "effect_boundary": false,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.source_intake.source_truth_frozen"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true
@@ -511,6 +519,9 @@
         "static_check_eligible": false,
         "effect_boundary": true,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.communication_strategy.accepted"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true
@@ -731,6 +742,9 @@
         "static_check_eligible": false,
         "effect_boundary": true,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.visual_direction.accepted"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true
@@ -781,6 +795,9 @@
         "review_and_revision"
       ],
       "trust_lane": "codex_executor",
+      "runtime_event_refs": [
+        "runtime_event:rca.artifact_creation.candidate_rendered"
+      ],
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -942,7 +959,9 @@
         "ensures": [
           "artifact_candidate_rendered"
         ],
-        "runtime_event_refs": [],
+        "runtime_event_refs": [
+          "runtime_event:rca.artifact_creation.candidate_rendered"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -953,6 +972,9 @@
         "static_check_eligible": false,
         "effect_boundary": false,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.artifact_creation.candidate_rendered"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true
@@ -1210,6 +1232,9 @@
         "static_check_eligible": false,
         "effect_boundary": true,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.review_and_revision.gate_recorded"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true
@@ -1260,6 +1285,9 @@
       "next_stage_refs": [],
       "trust_lane": "domain_agent",
       "independent_gate_receipt_required": true,
+      "runtime_event_refs": [
+        "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+      ],
       "visual_pattern_memory_refs": [
         "/domain_memory_descriptor_locator/writeback_receipt_locator",
         "/domain_memory_descriptor_locator/operator_receipt_projection"
@@ -1446,7 +1474,9 @@
         "ensures": [
           "export_handoff_receipt_recorded"
         ],
-        "runtime_event_refs": [],
+        "runtime_event_refs": [
+          "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1457,6 +1487,9 @@
         "static_check_eligible": false,
         "effect_boundary": false,
         "records_runtime_events": true,
+        "runtime_event_refs": [
+          "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+        ],
         "owner_receipt_required": true,
         "human_gate_required": false,
         "runtime_guard_required": true

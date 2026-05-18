@@ -43,7 +43,7 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 - `RedCube AI` 维护 visual-domain truth、本地 canonical artifacts、稳定 capability surface，以及 audit / review / projection surface
 - 第一公民 concrete executor 继续由 `Codex CLI` 通过统一 executor-adapter contract 被选择
 - OPL hosted integration 只作为 OPL 侧 product-managed adapter/projection layer 管理 family runtime provider、registration/status 索引、doctor/repair/resume 与 native helper catalog
-- `Hermes-Agent` 只在显式 hosted/proof backend、legacy provider 或技术参考层作为外部 runtime substrate 出现；Temporal 是 OPL production online runtime 的必需 provider
+- `Hermes-Agent` 只在显式 hosted/proof backend、非默认 executor adapter、proof lane 或技术参考层出现；Temporal 是 OPL production online runtime 的必需 provider
 
 ## 入口 taxonomy 与 OPL handoff
 
@@ -104,11 +104,13 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工
 
-`Hermes-Agent` 在 `RedCube AI` 当前主线里只作为显式 hosted/proof backend 或技术参考载体；启用时可承担：
+`Hermes-Agent` 在 `RedCube AI` 当前主线里只作为显式 hosted/proof backend、非默认 executor adapter 或技术参考载体。它不承担 RCA 默认 runtime owner，也不承担 OPL production online runtime substrate；OPL production online substrate 固定为 Temporal-backed family provider。
 
-- session / run / watch / memory / scheduling
-- gateway / messaging / interrupt / resume
-- family 级长期在线 runtime substrate
+启用 `hermes_agent` 时，它只能在显式 proof / agent-loop lane 内承担一次具体 executor session 的连接、生命周期、回执和审计：
+
+- session / run / watch events 的 executor-side proof
+- tool / message / interrupt / resume 能力的 opt-in proof
+- fail-closed receipt 与 no-regression evidence
 
 当前第一公民 concrete executor 是 `Codex CLI host-agent runtime`。在 OPL stage-led runtime framework 中，它也是未显式选择 hosted/proof backend 时的最小具体执行单元，负责：
 
@@ -118,10 +120,10 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 
 `RedCube AI` 自己继续持有：
 
-- `gateway -> family -> profile -> pack` 这条 domain 主链
+- route family、profile / pack descriptor、domain action catalog 与 service-safe domain entry 之间的 visual-domain 语义边界
 - visual deliverable 的对象边界、审计、review / publication projection
 - executor routing contract
-- `pack` 作为 domain boundary / pack-id 载体的语义真相
+- `pack` 作为 descriptor / pack-id carrier 的语义真相；它不得回退成旧 gateway、frontdoor、federation 或 repo-local managed runtime owner
 
 当前 executor-adapter contract 也已经冻结成统一口径：
 
@@ -148,7 +150,7 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 
 - `runtime family contract` 继续定义 route、artifact、review surface 与 visual-domain truth
 - `executor adapter` 只负责把这些 contract 下沉到具体执行器
-- 第一公民主线仍是 Codex CLI；Hermes-Agent loop 先作为 opt-in proof lane 保持可选，不提前替换默认
+- 第一公民主线仍是 Codex CLI；Hermes-Agent loop 只作为 opt-in proof lane 保持可选，不替换默认 executor，也不替代 OPL Temporal-backed provider
 
 `ppt_deck` runtime family 的 core 现在也按这个边界组织：`core.ts` 保留 route / lifecycle / visual-domain assembly，execution adapter、creative owner/source stamp、primary surface 和 structured artifact batch/executor helper 进入 `ppt-deck-runtime-family-parts/execution-adapters.ts`。这让 core 不再直接承载 executor/backend 分支，同时保持 public route、payload shape 和 runtime-family contract 不变。
 

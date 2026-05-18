@@ -34,7 +34,7 @@
 
 ## 四、系列一致性检查
 
-- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不承担公开第一身份。默认 direct route、OPL-hosted route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` 最小执行单元必须写成同一条 repo-verified 链路。OPL 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架；Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只可写成 legacy/optional provider 或显式 proof lane。
+- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不承担公开第一身份。默认 direct route、OPL-hosted route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` 最小执行单元必须写成同一条 repo-verified 链路。OPL 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架；Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只可写成显式非默认 executor/proof lane、hosted proof backend 或历史 provenance。
 - 系列项目名称与角色要与四仓当前真相同步：`One Person Lab` 是 stage-led、以 Agent executor 为最小执行单位 agent runtime framework 与 shared runtime/contracts owner，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`，`RedCube AI` 是视觉交付 domain agent。
 - 若提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内 runtime package、pilot、shim 或迁移材料都只能写成 repo-side adapter 或 service-safe consumption surface。
 - 根层公开入口、docs 中文 canonical 层、program brief、内部参考、稳定规则、typed boundary audit 与历史 provenance 必须继续分层，不把 reference/history 重新挤进公开默认入口。旧 gateway、frontdoor、federation、harness-first、OPL-hosted handoff 或 Hermes-first 计划只在 internal integration、provenance、contract reference 或 tombstone 语境保留。

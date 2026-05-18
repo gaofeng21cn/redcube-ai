@@ -54,7 +54,7 @@ OPL 必须持有：
 
 `functional_structure_gap_count=0`
 
-2026-05-18 fresh blocker 说明该计数必须以 OPL read model 为准：`communication_strategy`、`visual_direction`、`review_and_revision` 曾因 `effect_boundary_missing_runtime_event_refs` 被 `family_stage_admission` 阻断。当前修复把这些 AI / effect-boundary stage 的 machine-readable event refs 写回 RCA-owned `family_stage_control_plane` 生成源和 `contracts/stage_control_plane.json` 的 `stage_contract.runtime_event_refs`，让 OPL admission / proof bundle 能读取可审计事件边界。该项已闭合为结构修复，不进入 evidence tail。
+2026-05-18 fresh blocker 说明该计数必须以 OPL read model 为准：`communication_strategy`、`visual_direction`、`review_and_revision` 曾因 `effect_boundary_missing_runtime_event_refs` 被 `family_stage_admission` 阻断。随后 OPL admission 口径收紧为所有 `runtime_guard_required=true` stage 都必须声明 refs。当前修复把 6 个 stage 的 machine-readable event refs 写回 RCA-owned `family_stage_control_plane` 生成源和 `contracts/stage_control_plane.json` 的 `stage_contract.runtime_event_refs` / `trust_boundary.runtime_event_refs`，让 OPL admission / proof bundle 能读取可审计事件边界。该项已闭合为结构修复，不进入 evidence tail。
 
 已闭合为标准 OPL consumer 口径的 8 项：
 

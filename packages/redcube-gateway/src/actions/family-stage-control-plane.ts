@@ -12,6 +12,7 @@ const STAGES = [
     ensures: ['source_truth_frozen'],
     next_stage_refs: ['communication_strategy'],
     trust_lane: 'domain_agent',
+    runtime_event_refs: ['runtime_event:rca.source_intake.source_truth_frozen'],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/source_readiness', role: 'source_truth' },
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'progress_projection' },
@@ -63,6 +64,7 @@ const STAGES = [
     ensures: ['artifact_candidate_rendered'],
     next_stage_refs: ['review_and_revision'],
     trust_lane: 'codex_executor',
+    runtime_event_refs: ['runtime_event:rca.artifact_creation.candidate_rendered'],
     outputs: [
       { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_inventory' },
     ],
@@ -102,6 +104,7 @@ const STAGES = [
     next_stage_refs: [],
     trust_lane: 'domain_agent',
     independent_gate_receipt_required: true,
+    runtime_event_refs: ['runtime_event:rca.package_and_handoff.export_handoff_recorded'],
     visual_pattern_memory_refs: [
       '/domain_memory_descriptor_locator/writeback_receipt_locator',
       '/domain_memory_descriptor_locator/operator_receipt_projection',
@@ -201,6 +204,7 @@ function stageDescriptor(stage, actionIds) {
       static_check_eligible: false,
       effect_boundary: stage.trust_lane === 'ai_decision',
       records_runtime_events: true,
+      runtime_event_refs: stage.runtime_event_refs || [],
       owner_receipt_required: true,
       human_gate_required: false,
       runtime_guard_required: true,
