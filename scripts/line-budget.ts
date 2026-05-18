@@ -9,7 +9,6 @@ const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 
 export const DEFAULT_LIMIT = 1000;
 export const BASELINE_ENTRIES = {
-  'packages/redcube-gateway/src/actions/get-product-entry-manifest.ts': 1028,
   'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts': 1248,
   'tests/opl-family-contract-adoption.test.ts': 1214,
   'tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts': 1279,
