@@ -141,7 +141,7 @@
 ### 决策：RCA 对齐 OPL Temporal-backed production runtime，Temporal 为 OPL 生产必需 substrate
 
 - `RedCube AI` 的 OPL 长期托管口径更新为 `OPL Product Entry -> OPL stage-led family runtime provider -> RCA product sidecar export/dispatch -> RedCube service-safe domain entry`。
-- Temporal 是 OPL production online runtime 的必需 provider；Hermes-Agent 迁移后作为可选 Agent executor adapter、显式 hosted/proof backend 或 executor proof lane 保留，不再作为目标 24h session/wakeup substrate。
+- Temporal 是 OPL production online runtime 的必需 provider；`Hermes-Agent` / `hermes_agent` 只作为显式非默认 Agent executor adapter、显式 hosted/proof backend 或 executor proof lane 保留，不再作为目标 24h session/wakeup substrate。
 - `redcube product sidecar export|dispatch` 继续是 OPL provider 到 RCA owner surface 的受控桥接。OPL/Temporal/Hermes/local provider 只能 enqueue、dispatch、signal、query、投影 attempt/receipt，不得写 visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 - RedCube 继续持有 visual stage pack、prompt/skill、route truth、review/export gate、canonical artifacts 和 visual-domain quality authority。下方 Hermes-oriented thin-manager 决策保留为迁移背景，后续新投入按 Temporal-backed production runtime 解释。
 
