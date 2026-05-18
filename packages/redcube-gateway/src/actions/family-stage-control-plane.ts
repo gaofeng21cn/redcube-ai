@@ -126,6 +126,15 @@ const PLANE_SOURCE_REFS = [
   { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_authority_projection' },
 ];
 
+const CANONICAL_STAGE_PROMPT_REFS = {
+  source_intake: 'agent/prompts/source_intake.md',
+  communication_strategy: 'agent/prompts/communication_strategy.md',
+  visual_direction: 'agent/prompts/visual_direction.md',
+  artifact_creation: 'agent/prompts/artifact_creation.md',
+  review_and_revision: 'agent/prompts/review_and_revision.md',
+  package_and_handoff: 'agent/prompts/package_and_handoff.md',
+};
+
 function buildFreshness(sourceRefs) {
   return {
     status: 'current',
@@ -173,8 +182,15 @@ function stageDescriptor(stage, actionIds) {
       { ref_kind: 'skill_id', ref: 'presentations', role: 'presentation_output' },
     ],
     prompt_refs: [
-      { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_prompt_pack' },
-      { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_prompt_pack' },
+      {
+        ref_kind: 'repo_path',
+        ref: CANONICAL_STAGE_PROMPT_REFS[stage.stage_id],
+        role: 'canonical_stage_prompt_policy',
+      },
+    ],
+    legacy_prompt_asset_refs: [
+      { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_detailed_prompt_assets' },
+      { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_detailed_prompt_assets' },
     ],
     visual_pattern_memory_refs: stage.visual_pattern_memory_refs || [],
     evaluation: [

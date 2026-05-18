@@ -220,13 +220,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/source_intake.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "visual_pattern_memory_refs": [],
@@ -460,13 +467,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/communication_strategy.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "visual_pattern_memory_refs": [],
@@ -683,13 +697,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/visual_direction.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "visual_pattern_memory_refs": [],
@@ -913,13 +934,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/artifact_creation.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "visual_pattern_memory_refs": [],
@@ -1174,13 +1202,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/review_and_revision.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "evaluation": [
@@ -1431,13 +1466,20 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/package_and_handoff.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
         }
       ],
       "evaluation": [
