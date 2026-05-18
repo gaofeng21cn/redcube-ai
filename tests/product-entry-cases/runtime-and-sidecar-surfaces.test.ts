@@ -536,6 +536,38 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'native_helper_implementation',
       ],
     );
+    const authorityTaxonomy = sidecar.mapped_surfaces.visual_pack_compiler_handoff
+      .minimal_authority_function_contract
+      .authority_surface_taxonomy;
+    assert.deepEqual(authorityTaxonomy.ai_first_judgment_surface_ids, [
+      'source_readiness_verdict',
+      'communication_visual_direction_decision',
+      'review_export_verdict',
+      'visual_memory_accept_reject',
+    ]);
+    assert.deepEqual(authorityTaxonomy.programmatic_authority_surface_ids, [
+      'artifact_mutation_authorization',
+      'owner_receipt_signer',
+      'native_helper_implementation',
+    ]);
+    const authorityContracts = sidecar.mapped_surfaces.visual_pack_compiler_handoff
+      .minimal_authority_function_contract
+      .authority_surface_contracts;
+    const bySurfaceId = Object.fromEntries(
+      authorityContracts.map((surface) => [surface.authority_surface_id, surface]),
+    );
+    assert.equal(bySurfaceId.review_export_verdict.work_mode, 'ai_first_visual_judgment_surface');
+    assert.equal(bySurfaceId.review_export_verdict.ai_stage_artifact_required, true);
+    assert.equal(
+      bySurfaceId.artifact_mutation_authorization.work_mode,
+      'programmatic_authority_guard_surface',
+    );
+    assert.equal(bySurfaceId.artifact_mutation_authorization.ai_stage_artifact_required, false);
+    for (const surface of authorityContracts) {
+      assert.equal(surface.programmatic_verdict_generation_allowed, false, surface.authority_surface_id);
+      assert.equal(surface.mechanical_decision_forbidden, true, surface.authority_surface_id);
+      assert.equal(surface.decision_boundary.programmatic_role_may_compute_ready_verdict, false);
+    }
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.gateway_first_public_entry, false);
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.repo_local_manager_default, false);

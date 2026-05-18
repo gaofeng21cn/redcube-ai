@@ -13,7 +13,7 @@
   "allowed_private_surface_classes": [
     "minimal_authority_function",
     "visual_native_helper_implementation",
-    "review_or_export_verdict_authorizer"
+    "ai_first_review_export_ref_materializer"
   ],
   "forbidden_generic_owner_roles": [
     "generic_scheduler_owner",

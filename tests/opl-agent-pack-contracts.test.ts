@@ -75,6 +75,12 @@ function buildCanonicalPack() {
       generated_surface_owner: 'one-person-lab',
       declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
       minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
+      minimal_authority_surface_taxonomy: (
+        visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_taxonomy
+      ),
+      minimal_authority_surface_contracts: (
+        visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_contracts
+      ),
       generated_surfaces_requested: generatedSurfaceIds,
       generated_interface_consumption_ref: '/opl_generated_interface_consumption',
       repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
@@ -134,6 +140,7 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     .generated_descriptor_scope;
   const requestedSurfaces = packCompilerInput.generated_surfaces_requested;
   const handoffSurfaceIds = generatedSurfaceHandoff.generated_surfaces.map((surface) => surface.surface_id);
+  const authorityTaxonomy = packCompilerInput.minimal_authority_surface_taxonomy;
 
   for (const surfaceId of generatedScope) {
     assert.equal(requestedSurfaces.includes(surfaceId), true, surfaceId);
@@ -191,6 +198,30 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     'real_memory_lifecycle_receipt_instances',
     'cross_family_repeated_no_regression_evidence',
   ]);
+  assert.deepEqual(authorityTaxonomy.ai_first_judgment_surface_ids, [
+    'source_readiness_verdict',
+    'communication_visual_direction_decision',
+    'review_export_verdict',
+    'visual_memory_accept_reject',
+  ]);
+  assert.deepEqual(authorityTaxonomy.programmatic_authority_surface_ids, [
+    'artifact_mutation_authorization',
+    'owner_receipt_signer',
+    'native_helper_implementation',
+  ]);
+  assert.equal(authorityTaxonomy.programmatic_verdict_generation_allowed, false);
+  assert.equal(packCompilerInput.minimal_authority_surface_contracts.length, 7);
+  for (const surface of packCompilerInput.minimal_authority_surface_contracts) {
+    assert.equal(surface.surface_kind, 'rca_minimal_authority_surface', surface.authority_surface_id);
+    assert.equal(surface.function_id, surface.authority_surface_id, surface.authority_surface_id);
+    assert.equal(surface.mechanical_decision_forbidden, true, surface.authority_surface_id);
+    assert.equal(surface.programmatic_verdict_generation_allowed, false, surface.authority_surface_id);
+    assert.equal(
+      surface.decision_boundary.programmatic_role_may_compute_ready_verdict,
+      false,
+      surface.authority_surface_id,
+    );
+  }
 });
 
 test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {

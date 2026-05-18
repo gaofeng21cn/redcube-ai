@@ -207,17 +207,17 @@ RCA 的理想质量体系是 AI-first 的视觉交付体系。AI-authored stage 
 - provider completion 只说明执行器完成了尝试，不说明 artifact ready。
 - `ready`、`exportable`、`handoffable` 只能由 RCA-owned gate 给出。
 
-长期保留的 visual authority functions 必须逐项满足：
+长期保留的 visual authority surfaces 必须逐项满足；旧 `function_id` 是兼容字段，不代表由私有函数直接裁决：
 
-| 函数 | 长期 owner | AI-first 边界 | 程序角色 |
+| Authority surface | Work mode | Judgment owner | 程序角色 |
 | --- | --- | --- | --- |
-| `source_readiness_verdict` | RCA source readiness owner | 判断 source 是否足够支撑视觉叙事和交付目标。 | validator / typed blocker |
-| `communication_visual_direction_decision` | RCA visual director stage | 传播策略、视觉方向和 route selection 必须由 AI-authored stage artifact 持有。 | artifact materializer / refs projection |
-| `review_export_verdict` | RCA review/export gate | review verdict、exportable 和 handoffable 只能由 visual review / export gate 给出。 | gate validator / receipt signer |
-| `artifact_mutation_authorization` | RCA artifact authority | artifact rewrite 必须有 blocked item、repair target 和 owner receipt。 | materializer / guard |
-| `visual_memory_accept_reject` | RCA visual memory owner | 视觉经验是否可沉淀由 visual route / review learning 判断。 | receipt writer / locator projection |
-| `owner_receipt_signer` | RCA owner surface | 只签 domain receipt、typed blocker、safe action refs 和 provenance currentness。 | receipt signer |
-| `native_helper_implementation` | RCA native helper owner | helper 只能实现 PPT/image/export mutation 或 proof，不给 visual ready verdict。 | helper implementation / guard |
+| `source_readiness_verdict` | AI-first judgment | source readiness stage artifact 判断 source 是否足够支撑视觉叙事和交付目标。 | validator / typed blocker |
+| `communication_visual_direction_decision` | AI-first judgment | AI-authored communication strategy / visual direction stage artifact 持有传播策略、视觉方向和 route selection。 | artifact materializer / refs projection |
+| `review_export_verdict` | AI-first judgment | visual review / export gate artifact 给出 review verdict、exportable 和 handoffable。 | gate validator / receipt signer |
+| `visual_memory_accept_reject` | AI-first judgment | visual memory learning stage 判断经验是否可沉淀。 | receipt writer / locator projection |
+| `artifact_mutation_authorization` | Programmatic guard | blocked item、repair target 和 owner receipt。 | materializer / guard |
+| `owner_receipt_signer` | Programmatic guard | RCA receipt schema 与 domain provenance。 | receipt signer |
+| `native_helper_implementation` | Programmatic guard | native helper catalog、package module 与 owner receipt policy。 | helper implementation / guard |
 
 ## Direct Path 与 OPL-hosted Path 等价
 

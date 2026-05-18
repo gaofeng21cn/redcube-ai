@@ -2,6 +2,12 @@
 
 ## 2026-05-18
 
+### 决策：把 RCA retained functions 硬化为 AI-first visual authority surfaces
+
+- `visual_pack_compiler_handoff.minimal_authority_function_contract` 继续保留既有 `function_id` / `allowed_functions` 兼容字段，同时新增 authority surface taxonomy 与逐项 surface contract，明确 `source_readiness_verdict`、`communication_visual_direction_decision`、`review_export_verdict` 和 `visual_memory_accept_reject` 是 AI-first judgment surface。
+- `artifact_mutation_authorization`、`owner_receipt_signer` 和 `native_helper_implementation` 现在机器化标为 programmatic authority/helper surface，只能依 owner receipt、blocked item、repair target、helper catalog、typed blocker 和 refs 工作，不能生成 visual ready、exportable 或 handoffable verdict。
+- 该决策同步到 functional privatization audit、pack compiler input、root contracts、status 和 ideal-state docs；它不实现 OPL generic runtime、artifact gallery/handoff shell、review/repair transport、App/workbench shell 或 production visual-stage soak。
+
 ### 决策：旧 repo-local managed runtime 物理退役，RCA 收敛为标准 OPL consumer
 
 - 旧 repo-local deliverable runner、managed run store、managed DAG scheduler、managed event/prompt/run/liveness/surface/bridge helpers、gateway managed action handlers、runtime-protocol managed run helper/types 和 managed runtime 专属测试已经从 active source/test/package surface 删除。

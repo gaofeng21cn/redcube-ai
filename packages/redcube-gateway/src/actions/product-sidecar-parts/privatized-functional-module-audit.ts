@@ -1,5 +1,10 @@
 // @ts-nocheck
 
+import {
+  buildRcaMinimalAuthoritySurfaceContracts,
+  buildRcaMinimalAuthoritySurfaceTaxonomy,
+} from './visual-pack-compiler-handoff.js';
+
 export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS = Object.freeze({
   rca_owns_generic_runtime: false,
   rca_owns_generic_attempt_ledger: false,
@@ -362,6 +367,10 @@ export function buildVisualAuthorityFunctionsAuditModule() {
     cannotAbsorbReason: 'These functions are RCA domain authority and cannot be moved to OPL without moving visual truth.',
     rca_projection_mode: 'authority_receipt_refs_only',
     rca_exports_only: ['verdict_refs', 'owner_receipt_refs', 'typed_blocker_refs', 'safe_action_refs'],
+    authority_surface_taxonomy: buildRcaMinimalAuthoritySurfaceTaxonomy(),
+    authority_surface_contracts: buildRcaMinimalAuthoritySurfaceContracts(),
+    mechanical_decision_forbidden_for_all_authority_surfaces: true,
+    programmatic_verdict_generation_allowed: false,
     forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
     physical_deletion_guard: {
       safe_to_delete_now: false,

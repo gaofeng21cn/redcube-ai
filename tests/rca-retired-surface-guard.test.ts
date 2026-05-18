@@ -410,6 +410,19 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
           'visual_domain_authority_moved_by_explicit_product_decision',
         ], entry.module_id);
+        assert.deepEqual(entry.authority_surface_taxonomy.ai_first_judgment_surface_ids, [
+          'source_readiness_verdict',
+          'communication_visual_direction_decision',
+          'review_export_verdict',
+          'visual_memory_accept_reject',
+        ]);
+        assert.deepEqual(entry.authority_surface_taxonomy.programmatic_authority_surface_ids, [
+          'artifact_mutation_authorization',
+          'owner_receipt_signer',
+          'native_helper_implementation',
+        ]);
+        assert.equal(entry.programmatic_verdict_generation_allowed, false);
+        assert.equal(entry.mechanical_decision_forbidden_for_all_authority_surfaces, true);
       } else {
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
           'domain_authority_refs_preserved',

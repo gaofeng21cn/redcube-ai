@@ -111,6 +111,7 @@ function buildDomainDescriptor() {
 }
 
 function buildPackCompilerInput(visualPackCompilerHandoff) {
+  const authorityContract = visualPackCompilerHandoff.minimal_authority_function_contract;
   return {
     surface_kind: 'opl_domain_pack_compiler_input',
     schema_version: 1,
@@ -118,7 +119,9 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     domain_pack_owner: DOMAIN_ID,
     generated_surface_owner: GENERATED_SURFACE_OWNER,
     declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
-    minimal_authority_functions: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_functions,
+    minimal_authority_functions: authorityContract.allowed_functions,
+    minimal_authority_surface_taxonomy: authorityContract.authority_surface_taxonomy,
+    minimal_authority_surface_contracts: authorityContract.authority_surface_contracts,
     generated_surfaces_requested: GENERATED_SURFACES,
     generated_interface_consumption_ref: '/opl_generated_interface_consumption',
     repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
@@ -221,7 +224,7 @@ function buildPrivateFunctionalSurfacePolicy() {
     allowed_private_surface_classes: [
       'minimal_authority_function',
       'visual_native_helper_implementation',
-      'review_or_export_verdict_authorizer',
+      'ai_first_review_export_ref_materializer',
     ],
     forbidden_generic_owner_roles: FORBIDDEN_GENERIC_OWNER_ROLES,
   };
