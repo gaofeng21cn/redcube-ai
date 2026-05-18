@@ -103,6 +103,20 @@ export function assertManifestActionAndStageControlPlane({
       'package_and_handoff',
     ],
   );
+  const expectedNextStageRefs = new Map([
+    ['source_intake', ['communication_strategy']],
+    ['communication_strategy', ['visual_direction']],
+    ['visual_direction', ['artifact_creation']],
+    ['artifact_creation', ['review_and_revision']],
+    ['review_and_revision', ['package_and_handoff']],
+    ['package_and_handoff', []],
+  ]);
+  const independentGateStageIds = new Set([
+    'communication_strategy',
+    'visual_direction',
+    'review_and_revision',
+    'package_and_handoff',
+  ]);
   const catalogActionIds = new Set(manifest.family_action_catalog.actions.map((action) => action.action_id));
   for (const stage of manifest.family_stage_control_plane.stages) {
     assert.equal(stage.owner, 'redcube_ai');
@@ -119,10 +133,28 @@ export function assertManifestActionAndStageControlPlane({
     for (const actionRef of stage.allowed_action_refs) {
       assert.equal(catalogActionIds.has(actionRef), true);
     }
+    assert.equal(
+      stage.evaluation.some((evaluationRef) => evaluationRef.role === 'owner_receipt_gate'),
+      true,
+    );
     assert.equal(stage.handoff.next_owner, 'one-person-lab');
+    assert.deepEqual(stage.handoff.next_stage_refs, expectedNextStageRefs.get(stage.stage_id));
+    assert.deepEqual(stage.handoff.provides, stage.stage_contract.ensures);
     assert.equal(stage.handoff.resume_surface_ref, '/session_continuity');
     assert.equal(stage.handoff.artifact_surface_ref, '/artifact_inventory');
     assert.equal(stage.handoff.stage_execution_plan_ref, '/continuation_snapshot/latest_stage_execution_plan_ref');
+    assert.equal(stage.stage_contract.requires.length > 0, true);
+    assert.equal(stage.stage_contract.ensures.length > 0, true);
+    assert.equal(stage.trust_boundary.owner_receipt_required, true);
+    assert.equal(stage.trust_boundary.runtime_guard_required, true);
+    assert.equal(
+      stage.authority_boundary.independent_gate_receipt_required,
+      independentGateStageIds.has(stage.stage_id),
+    );
+    if (['communication_strategy', 'visual_direction', 'review_and_revision'].includes(stage.stage_id)) {
+      assert.equal(stage.trust_boundary.lane, 'ai_decision');
+      assert.equal(stage.trust_boundary.effect_boundary, true);
+    }
     assert.equal(stage.authority_boundary.domain_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.visual_truth_owner, 'redcube_ai');
     assert.equal(stage.authority_boundary.artifact_authority_owner, 'redcube_ai');

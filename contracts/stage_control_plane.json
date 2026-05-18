@@ -88,6 +88,16 @@
         "get_product_status",
         "get_product_entry_manifest"
       ],
+      "requires": [
+        "visual_delivery_request_received"
+      ],
+      "ensures": [
+        "source_truth_frozen"
+      ],
+      "next_stage_refs": [
+        "communication_strategy"
+      ],
+      "trust_lane": "domain_agent",
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -227,13 +237,45 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [
+          "communication_strategy"
+        ],
+        "provides": [
+          "source_truth_frozen"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "visual_delivery_request_received"
+        ],
+        "ensures": [
+          "source_truth_frozen"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "domain_agent",
+        "static_check_eligible": false,
+        "effect_boundary": false,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -252,7 +294,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": false
       }
     },
     {
@@ -271,6 +314,17 @@
         "invoke_product_entry",
         "get_product_entry_session"
       ],
+      "requires": [
+        "source_truth_frozen"
+      ],
+      "ensures": [
+        "communication_strategy_accepted"
+      ],
+      "next_stage_refs": [
+        "visual_direction"
+      ],
+      "trust_lane": "ai_decision",
+      "independent_gate_receipt_required": true,
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -414,13 +468,45 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [
+          "visual_direction"
+        ],
+        "provides": [
+          "communication_strategy_accepted"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "source_truth_frozen"
+        ],
+        "ensures": [
+          "communication_strategy_accepted"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "ai_decision",
+        "static_check_eligible": false,
+        "effect_boundary": true,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -439,7 +525,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": true
       }
     },
     {
@@ -454,6 +541,17 @@
         "invoke_product_entry",
         "get_product_entry_session"
       ],
+      "requires": [
+        "communication_strategy_accepted"
+      ],
+      "ensures": [
+        "visual_direction_accepted"
+      ],
+      "next_stage_refs": [
+        "artifact_creation"
+      ],
+      "trust_lane": "ai_decision",
+      "independent_gate_receipt_required": true,
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -584,13 +682,45 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [
+          "artifact_creation"
+        ],
+        "provides": [
+          "visual_direction_accepted"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "communication_strategy_accepted"
+        ],
+        "ensures": [
+          "visual_direction_accepted"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "ai_decision",
+        "static_check_eligible": false,
+        "effect_boundary": true,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -609,7 +739,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": true
       }
     },
     {
@@ -627,6 +758,16 @@
         "run_image_ppt_proof",
         "run_native_ppt_proof"
       ],
+      "requires": [
+        "visual_direction_accepted"
+      ],
+      "ensures": [
+        "artifact_candidate_rendered"
+      ],
+      "next_stage_refs": [
+        "review_and_revision"
+      ],
+      "trust_lane": "codex_executor",
       "outputs": [
         {
           "ref_kind": "json_pointer",
@@ -762,13 +903,45 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [
+          "review_and_revision"
+        ],
+        "provides": [
+          "artifact_candidate_rendered"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "visual_direction_accepted"
+        ],
+        "ensures": [
+          "artifact_candidate_rendered"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "codex_executor",
+        "static_check_eligible": false,
+        "effect_boundary": false,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -787,7 +960,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": false
       }
     },
     {
@@ -806,6 +980,17 @@
         "invoke_product_entry",
         "get_product_entry_session"
       ],
+      "requires": [
+        "artifact_candidate_rendered"
+      ],
+      "ensures": [
+        "visual_review_gate_receipt_recorded"
+      ],
+      "next_stage_refs": [
+        "package_and_handoff"
+      ],
+      "trust_lane": "ai_decision",
+      "independent_gate_receipt_required": true,
       "visual_pattern_memory_refs": [
         "/domain_memory_descriptor_locator/writeback_proposal_generator",
         "/domain_memory_descriptor_locator/accept_reject_command"
@@ -969,13 +1154,45 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [
+          "package_and_handoff"
+        ],
+        "provides": [
+          "visual_review_gate_receipt_recorded"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "artifact_candidate_rendered"
+        ],
+        "ensures": [
+          "visual_review_gate_receipt_recorded"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "ai_decision",
+        "static_check_eligible": false,
+        "effect_boundary": true,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -994,7 +1211,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": true
       }
     },
     {
@@ -1013,6 +1231,15 @@
         "get_product_entry_manifest",
         "export_product_sidecar"
       ],
+      "requires": [
+        "visual_review_gate_receipt_recorded"
+      ],
+      "ensures": [
+        "export_handoff_receipt_recorded"
+      ],
+      "next_stage_refs": [],
+      "trust_lane": "domain_agent",
+      "independent_gate_receipt_required": true,
       "visual_pattern_memory_refs": [
         "/domain_memory_descriptor_locator/writeback_receipt_locator",
         "/domain_memory_descriptor_locator/operator_receipt_projection"
@@ -1175,13 +1402,43 @@
           "ref_kind": "json_pointer",
           "ref": "/publication_projection",
           "role": "rca_publication_projection"
+        },
+        {
+          "ref_kind": "json_pointer",
+          "ref": "/domain_owner_receipt_contract",
+          "role": "owner_receipt_gate"
         }
       ],
       "handoff": {
         "next_owner": "one-person-lab",
+        "next_stage_refs": [],
+        "provides": [
+          "export_handoff_receipt_recorded"
+        ],
         "resume_surface_ref": "/session_continuity",
         "artifact_surface_ref": "/artifact_inventory",
         "stage_execution_plan_ref": "/continuation_snapshot/latest_stage_execution_plan_ref"
+      },
+      "stage_contract": {
+        "requires": [
+          "visual_review_gate_receipt_recorded"
+        ],
+        "ensures": [
+          "export_handoff_receipt_recorded"
+        ],
+        "boundary_assumptions": [
+          "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
+          "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
+        ]
+      },
+      "trust_boundary": {
+        "lane": "domain_agent",
+        "static_check_eligible": false,
+        "effect_boundary": false,
+        "records_runtime_events": true,
+        "owner_receipt_required": true,
+        "human_gate_required": false,
+        "runtime_guard_required": true
       },
       "authority_boundary": {
         "domain_truth_owner": "redcube_ai",
@@ -1200,7 +1457,8 @@
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
         "managed_deliverable_runtime_changed": true,
-        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only"
+        "repo_local_managed_deliverable_runtime_role": "explicit_diagnostic_or_historical_regression_only",
+        "independent_gate_receipt_required": true
       }
     }
   ],

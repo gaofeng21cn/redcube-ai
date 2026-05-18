@@ -8,6 +8,10 @@ const STAGES = [
     goal: 'Freeze source truth, audience, constraints, and missing-material risk before visual planning.',
     domain_stage_refs: ['source_readiness', 'research', 'storyline'],
     allowed_action_refs: ['get_product_status', 'get_product_entry_manifest'],
+    requires: ['visual_delivery_request_received'],
+    ensures: ['source_truth_frozen'],
+    next_stage_refs: ['communication_strategy'],
+    trust_lane: 'domain_agent',
     outputs: [
       { ref_kind: 'json_pointer', ref: '/source_readiness', role: 'source_truth' },
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'progress_projection' },
@@ -20,6 +24,11 @@ const STAGES = [
     goal: 'Shape storyline, outline, audience fit, information density, and key takeaways.',
     domain_stage_refs: ['storyline', 'detailed_outline', 'slide_blueprint', 'single_note_plan', 'poster_blueprint'],
     allowed_action_refs: ['invoke_product_entry', 'get_product_entry_session'],
+    requires: ['source_truth_frozen'],
+    ensures: ['communication_strategy_accepted'],
+    next_stage_refs: ['visual_direction'],
+    trust_lane: 'ai_decision',
+    independent_gate_receipt_required: true,
     outputs: [
       { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'strategy_checkpoint' },
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'stage_progress' },
@@ -32,6 +41,11 @@ const STAGES = [
     goal: 'Define layout density, image strategy, visual language, and feasibility before artifact creation.',
     domain_stage_refs: ['visual_direction'],
     allowed_action_refs: ['invoke_product_entry', 'get_product_entry_session'],
+    requires: ['communication_strategy_accepted'],
+    ensures: ['visual_direction_accepted'],
+    next_stage_refs: ['artifact_creation'],
+    trust_lane: 'ai_decision',
+    independent_gate_receipt_required: true,
     outputs: [
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'visual_direction_status' },
     ],
@@ -43,6 +57,10 @@ const STAGES = [
     goal: 'Create the visual deliverable through the selected RCA route while preserving source truth.',
     domain_stage_refs: ['author_image_pages', 'render_html', 'author_pptx_native'],
     allowed_action_refs: ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof'],
+    requires: ['visual_direction_accepted'],
+    ensures: ['artifact_candidate_rendered'],
+    next_stage_refs: ['review_and_revision'],
+    trust_lane: 'codex_executor',
     outputs: [
       { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_inventory' },
     ],
@@ -54,6 +72,11 @@ const STAGES = [
     goal: 'Run visual, screenshot, source-fidelity, and repair gates before export.',
     domain_stage_refs: ['visual_director_review', 'screenshot_review', 'repair_image_pages', 'fix_html', 'repair_pptx_native'],
     allowed_action_refs: ['invoke_product_entry', 'get_product_entry_session'],
+    requires: ['artifact_candidate_rendered'],
+    ensures: ['visual_review_gate_receipt_recorded'],
+    next_stage_refs: ['package_and_handoff'],
+    trust_lane: 'ai_decision',
+    independent_gate_receipt_required: true,
     visual_pattern_memory_refs: [
       '/domain_memory_descriptor_locator/writeback_proposal_generator',
       '/domain_memory_descriptor_locator/accept_reject_command',
@@ -71,6 +94,11 @@ const STAGES = [
     goal: 'Export final files, preview metadata, resume handles, and operator handoff refs.',
     domain_stage_refs: ['export_pptx', 'publish_copy', 'export_bundle', 'export_poster'],
     allowed_action_refs: ['get_product_entry_session', 'get_product_entry_manifest', 'export_product_sidecar'],
+    requires: ['visual_review_gate_receipt_recorded'],
+    ensures: ['export_handoff_receipt_recorded'],
+    next_stage_refs: [],
+    trust_lane: 'domain_agent',
+    independent_gate_receipt_required: true,
     visual_pattern_memory_refs: [
       '/domain_memory_descriptor_locator/writeback_receipt_locator',
       '/domain_memory_descriptor_locator/operator_receipt_projection',
@@ -146,12 +174,32 @@ function stageDescriptor(stage, actionIds) {
     evaluation: [
       { ref_kind: 'json_pointer', ref: '/review_state', role: 'rca_review_state' },
       { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'rca_publication_projection' },
+      { ref_kind: 'json_pointer', ref: '/domain_owner_receipt_contract', role: 'owner_receipt_gate' },
     ],
     handoff: {
       next_owner: 'one-person-lab',
+      next_stage_refs: stage.next_stage_refs || [],
+      provides: stage.ensures || [],
       resume_surface_ref: '/session_continuity',
       artifact_surface_ref: '/artifact_inventory',
       stage_execution_plan_ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
+    },
+    stage_contract: {
+      requires: stage.requires || [],
+      ensures: stage.ensures || [],
+      boundary_assumptions: [
+        'RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.',
+        'OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable.',
+      ],
+    },
+    trust_boundary: {
+      lane: stage.trust_lane || 'domain_agent',
+      static_check_eligible: false,
+      effect_boundary: stage.trust_lane === 'ai_decision',
+      records_runtime_events: true,
+      owner_receipt_required: true,
+      human_gate_required: false,
+      runtime_guard_required: true,
     },
     authority_boundary: {
       domain_truth_owner: 'redcube_ai',
@@ -171,6 +219,7 @@ function stageDescriptor(stage, actionIds) {
       default_ppt_route_changed: false,
       managed_deliverable_runtime_changed: true,
       repo_local_managed_deliverable_runtime_role: 'explicit_diagnostic_or_historical_regression_only',
+      independent_gate_receipt_required: Boolean(stage.independent_gate_receipt_required),
     },
   };
 }
