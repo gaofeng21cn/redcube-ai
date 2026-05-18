@@ -47,9 +47,9 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 当前 docs 生命周期复核结论：
 
 - `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
-- `docs/references/opl_managed_runtime_three_layer_contract.md` 已迁入 `docs/history/opl_managed_runtime_three_layer_contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
+- `docs/references/opl-managed-runtime-three-layer-contract.md` 已迁入 `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
 - `docs/references/product-entry/` 承接已落地的 `redcube_product_entry_mvp`、`managed_product_entry_hardening` 与 `opl_framework_hosted_product_entry` support brief；它们解释 contract surface，不承担 active plan。
-- `docs/references/lightweight_product_entry_and_opl_handoff.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/opl_family_contract_adoption.md`、`docs/references/rca_executor_routing_config.md` 仍是 support reference；它们解释 direct / hosted 边界、memory locator、family contract adoption 和 opt-in executor routing，不承担 active plan。
+- `docs/references/integration/lightweight-product-entry-and-opl-handoff.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/integration/opl-family-contract-adoption.md`、`docs/references/rca_executor_routing_config.md` 仍是 support reference；它们解释 direct / hosted 边界、memory locator、family contract adoption 和 opt-in executor routing，不承担 active plan。
 - `docs/references/positioning/domain-harness-os-positioning.md` 已迁入 `docs/history/positioning/domain-harness-os-positioning.md`；该语义 ID 只作为 historical positioning / internal boundary vocabulary 保留。
 - `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/` 和 `docs/history/tombstones/` 只保留 provenance / tombstone；其中的旧 Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。
 - 没有恢复 `docs/capabilities/`；新增 capability-like 内容应先进入 contracts、manifest、domain action catalog 或对应 owner doc。

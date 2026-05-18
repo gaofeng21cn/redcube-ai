@@ -77,7 +77,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 
 ## 维护者治理入口
 
-- 维护者验证与文档治理统一留在 `docs/references/series-doc-governance-checklist.md`。
+- 维护者验证与文档治理统一留在 `docs/references/governance/series-doc-governance-checklist.md`。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
 - 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前计划在 `docs/active/`，support brief 在 `docs/references/`，absorbed / proof / historical positioning 材料在 `docs/history/`。
 - RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
@@ -103,7 +103,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
 - [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md)：保留 future-facing 设计目标的参考文档，退出根层活跃表面
 - [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md)：source-plane 的 future target 继续留在同一 reference 层
-- [Historical OPL managed runtime three-layer contract](./history/opl_managed_runtime_three_layer_contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
+- [Historical OPL managed runtime three-layer contract](./history/runtime/opl-managed-runtime-three-layer-contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
 
 ## 文档规则
 
