@@ -65,7 +65,7 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   executeSourceAugmentation,
   auditDeliverable,
   reviewRenderOutput,
-  invokeManagedDeliverableStagePlan,
+  invokeOplStageExecutionPlan,
   runDeliverableRoute,
   getRun,
   runtimeWatch,
@@ -125,7 +125,7 @@ const TOOL_ROUTE_DEFINITIONS = {
     routes: {
       create_deliverable: 'createDeliverable',
       get_deliverable: 'getDeliverable',
-      run_managed_deliverable: 'invokeManagedDeliverableStagePlan',
+      run_opl_stage_execution_plan: 'invokeOplStageExecutionPlan',
       run_deliverable_route: 'runDeliverableRoute',
       get_run: 'getRun',
     },
@@ -221,7 +221,6 @@ export const TOOL_DEFINITIONS = [
       stopAfterStage: z.string().optional().describe('Optional explicit stage boundary to stop after.'),
       mode: z.string().optional().describe('Execution mode such as draft_new or optimize_existing.'),
       baselineDeliverableId: z.string().optional().describe('Optional approved baseline deliverable id.'),
-      managedRunId: z.string().optional().describe('Managed run identifier.'),
       runId: z.string().optional().describe('Run identifier.'),
     },
   },
@@ -252,7 +251,7 @@ export const TOOL_DEFINITIONS = [
     inputSchema: {
       action: ACTION_STRING,
       target_domain_id: z.string().optional().describe('Target domain id. Must be redcube_ai.'),
-      task_intent: z.string().optional().describe('Task intent such as run_managed_deliverable or run_deliverable_route.'),
+      task_intent: z.string().optional().describe('Task intent such as run_opl_stage_execution_plan or run_deliverable_route.'),
       entry_mode: z.string().optional().describe('Required entry mode such as opl_hosted or service_call.'),
       workspace_root: z.string().optional().describe('Absolute workspace root path.'),
       workspaceRoot: z.string().optional().describe('Absolute workspace root path.'),
@@ -309,10 +308,10 @@ export function getDomainActions(overrides = {}) {
   };
 }
 
-export async function invokeManagedDeliverableStagePlan(args: Record<string, unknown>) {
+export async function invokeOplStageExecutionPlan(args: Record<string, unknown>) {
   return invokeDomainEntry({
     target_domain_id: 'redcube_ai',
-    task_intent: 'run_managed_deliverable',
+    task_intent: 'run_opl_stage_execution_plan',
     entry_mode: 'mcp_deliverable_action',
     workspace_locator: {
       workspace_root: String(args.workspaceRoot || args.workspace_root || ''),

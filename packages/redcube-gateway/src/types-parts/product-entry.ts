@@ -24,7 +24,7 @@ import type {
 
 export interface DomainEntryRequest extends Record<string, unknown> {
   target_domain_id: string;
-  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  task_intent: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode: string;
   workspace_locator: {
     workspace_root: string;
@@ -74,7 +74,7 @@ export interface ProductEntryRequest extends Record<string, unknown> {
   entry_session_contract: {
     entry_session_id: string;
   };
-  task_intent?: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  task_intent?: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode?: string;
   delivery_request: {
     deliverable_family?: string;
@@ -379,7 +379,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
 
 export interface OplHostedProductEntryRequest extends Record<string, unknown> {
   target_domain_id: string;
-  task_intent: 'run_managed_deliverable' | 'run_deliverable_route' | string;
+  task_intent: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode: string;
   workspace_locator: {
     workspace_root: string;

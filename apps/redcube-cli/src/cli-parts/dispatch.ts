@@ -278,7 +278,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     if (subcommand === 'execute') {
       return gateway.invokeDomainEntry({
         target_domain_id: 'redcube_ai',
-        task_intent: 'run_managed_deliverable',
+        task_intent: 'run_opl_stage_execution_plan',
         entry_mode: 'service_call',
         workspace_locator: {
           workspace_root: resolveWorkspaceRoot(options, cwd),

@@ -54,7 +54,7 @@ export async function getProductStatus(request: Record<string, unknown>): Promis
   const notes = [
     'This product-entry overview surface is exposed through the `status` command key as a lightweight direct-entry shell over the landed product-entry contracts.',
     'The OPL-hosted stage runtime handoff contract stays available for shell integration while direct RedCube entry remains the default public surface.',
-    'It does not claim that a RedCube GUI shell or managed web productization is already landed.',
+    'It does not claim that a RedCube GUI shell, RCA-owned generic runtime, or production visual-stage soak is already landed.',
   ];
 
   return {

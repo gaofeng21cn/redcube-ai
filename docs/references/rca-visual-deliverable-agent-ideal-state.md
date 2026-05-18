@@ -229,6 +229,7 @@ Direct path 应提供：
 - `redcube product status / manifest / invoke / session`。
 - `invokeProductEntry`、`getProductEntrySession` 和 `invokeDomainEntry`。
 - 同一 entry session 下的 source intake、plan、deliverable、review、export 和 continuation。
+- 默认 service-safe task intent 使用 `run_opl_stage_execution_plan` 返回 OPL stage execution plan；旧 `run_managed_deliverable` 不作为 active public alias。
 
 OPL-hosted path 应提供：
 

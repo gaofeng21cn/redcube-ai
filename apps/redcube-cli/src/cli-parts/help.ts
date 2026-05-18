@@ -103,7 +103,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     },
     'product invoke': {
       summary: '以 direct RedCube product entry 方式创建或继续同一 deliverable，并下沉到同一个 service-safe domain entry。',
-      usage: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
+      usage: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_opl_stage_execution_plan|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
       action_ref: 'invokeProductEntry',
       boundary_fields: ['workspaceRoot', 'entrySessionId', 'topicId', 'deliverableId'],
     },
@@ -323,7 +323,7 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       productStatus: 'redcube product status --workspace-root <dir>',
       productStart: 'redcube product start --workspace-root <dir>',
       productPreflight: 'redcube product preflight --workspace-root <dir>',
-      productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_managed_deliverable|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
+      productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_opl_stage_execution_plan|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
       productSession: 'redcube product session --entry-session-id <id>',
       productManifest: 'redcube product manifest --workspace-root <dir>',
       productSidecarExport: 'redcube product sidecar export --workspace-root <dir> --format json',

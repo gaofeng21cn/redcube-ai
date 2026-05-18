@@ -70,7 +70,7 @@ test('invokeDomainEntry returns an OPL stage execution plan under the configured
 
     const response = await invokeDomainEntry({
       target_domain_id: 'redcube_ai',
-      task_intent: 'run_managed_deliverable',
+      task_intent: 'run_opl_stage_execution_plan',
       entry_mode: 'opl_hosted',
       workspace_locator: {
         workspace_root: workspaceRoot,
@@ -95,7 +95,7 @@ test('invokeDomainEntry returns an OPL stage execution plan under the configured
     assert.equal(response.ok, true);
     assert.equal(response.surface_kind, 'domain_entry');
     assert.equal(response.entry_contract_id, 'redcube_service_safe_domain_entry');
-    assert.equal(response.task_intent, 'run_managed_deliverable');
+    assert.equal(response.task_intent, 'run_opl_stage_execution_plan');
     assert.equal(response.entry_mode, 'opl_hosted');
     assert.deepEqual(
       response.runtime_session_contract,
@@ -136,7 +136,7 @@ test('invokeDomainEntry rejects unsupported target domains', async () => {
   await assert.rejects(
     () => invokeDomainEntry({
       target_domain_id: 'other_domain',
-      task_intent: 'run_managed_deliverable',
+      task_intent: 'run_opl_stage_execution_plan',
       workspace_locator: { workspace_root: '/tmp/redcube' },
       runtime_session_contract: { runtime_owner: 'configured_family_runtime_provider' },
       return_surface_contract: { surface_kind: 'opl_stage_execution_plan' },
@@ -157,7 +157,7 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
     await assert.rejects(
       () => invokeDomainEntry({
         target_domain_id: 'redcube_ai',
-        task_intent: 'run_managed_deliverable',
+        task_intent: 'run_opl_stage_execution_plan',
         workspace_locator: {
           workspace_root: workspaceRoot,
         },
@@ -187,7 +187,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
     await assert.rejects(
       () => invokeDomainEntry({
         target_domain_id: 'redcube_ai',
-        task_intent: 'run_managed_deliverable',
+        task_intent: 'run_opl_stage_execution_plan',
         entry_mode: 'opl_hosted',
         workspace_locator: {
           workspace_root: workspaceRoot,
@@ -232,7 +232,7 @@ test('service-safe domain entry contract is frozen in contracts and current prog
     'return_surface_contract.surface_kind',
   ]);
   assert.deepEqual(contract.validation.task_intent_surface_kind_map, {
-    run_managed_deliverable: 'opl_stage_execution_plan',
+    run_opl_stage_execution_plan: 'opl_stage_execution_plan',
     run_deliverable_route: 'route_run',
   });
   assert.equal(contract.redcube_domain_payload.required_fields.includes('deliverable_family'), true);

@@ -151,10 +151,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayPackagePath, 'node_modules', 'prompts'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime/scripts'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'redcube-runtime', 'scripts'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
     path.join(gatewayNodeModulesDir, 'overlay-registry'),
   );
@@ -352,7 +348,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   ]);
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
-  assert.equal(parsed.commandGroups.managed.includes('supervise'), true);
+  assert.equal(parsed.commandGroups.managed, undefined);
   assert.equal(parsed.commandGroups.product.includes('invoke'), true);
   assert.equal(parsed.commandGroups.product.includes('session'), true);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);

@@ -33,7 +33,7 @@ const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
-const SUPPORTED_TASK_INTENTS = new Set(['run_managed_deliverable', 'run_deliverable_route']);
+const SUPPORTED_TASK_INTENTS = new Set(['run_opl_stage_execution_plan', 'run_deliverable_route']);
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -88,7 +88,7 @@ function normalizeDeliveryRequest(request) {
 }
 
 function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession }) {
-  if (delivery.stopAfterStage || delivery.route || taskIntent !== 'run_managed_deliverable' || existingSession) {
+  if (delivery.stopAfterStage || delivery.route || taskIntent !== 'run_opl_stage_execution_plan' || existingSession) {
     return delivery.stopAfterStage;
   }
 
@@ -106,7 +106,7 @@ function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession 
 function resolveTaskIntent(request, delivery) {
   const taskIntent = safeText(
     request?.task_intent || request?.taskIntent || delivery.taskIntent,
-    delivery.route ? 'run_deliverable_route' : 'run_managed_deliverable',
+    delivery.route ? 'run_deliverable_route' : 'run_opl_stage_execution_plan',
   );
   if (!SUPPORTED_TASK_INTENTS.has(taskIntent)) {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);

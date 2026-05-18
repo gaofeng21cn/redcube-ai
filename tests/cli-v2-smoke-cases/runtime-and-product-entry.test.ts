@@ -384,7 +384,7 @@ test('CLI product status, product invoke, product sidecar, and product session p
     assert.equal(statusParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(statusParsed.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
     assert.equal(statusParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(statusParsed.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(statusParsed.product_entry_readiness.verdict, 'service_surface_ready_not_end_user_shell');
     assert.equal(statusParsed.product_entry_readiness.usable_now, true);
     assert.equal(statusParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
     assert.equal(statusParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');

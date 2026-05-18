@@ -12,7 +12,7 @@ const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const TASK_INTENT_SURFACE_KIND = {
-  run_managed_deliverable: 'opl_stage_execution_plan',
+  run_opl_stage_execution_plan: 'opl_stage_execution_plan',
   run_deliverable_route: 'route_run',
 };
 
@@ -119,7 +119,7 @@ export async function invokeDomainEntry(request) {
   const domainPayload = normalizeDomainPayload(request);
 
   let resultSurface;
-  if (taskIntent === 'run_managed_deliverable') {
+  if (taskIntent === 'run_opl_stage_execution_plan') {
     resultSurface = await buildOplStageExecutionPlan({
       workspaceRoot,
       overlay: domainPayload.overlay,

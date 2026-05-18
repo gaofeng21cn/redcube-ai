@@ -186,7 +186,7 @@ export async function getProductEntryManifest(request) {
   });
   const productEntryOverview = {
     ...buildProductEntryOverview({
-    summary: 'Repo-verified product-entry overview/intake surface 已 landed；默认 invoke 生成 OPL stage execution plan 并交给 OPL provider 推进；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+    summary: 'Repo-verified product-entry overview/intake surface 已 landed；默认 invoke 生成 OPL stage execution plan 并交给 OPL provider 推进；`status` 是当前 product overview 命令，成熟终端用户前台壳仍未 landed。',
     product_entry_command: PRODUCT_STATUS_COMMAND,
     recommended_command: PRODUCT_INVOKE_COMMAND,
     operator_loop_command: PRODUCT_INVOKE_COMMAND,
@@ -261,7 +261,7 @@ export async function getProductEntryManifest(request) {
     human_gate_ids: humanGateIds,
   });
   const productEntryReadiness = buildProductEntryReadiness({
-    verdict: 'service_surface_ready_not_managed_product',
+    verdict: 'service_surface_ready_not_end_user_shell',
     usable_now: true,
     good_to_use_now: false,
     fully_automatic: false,
@@ -276,7 +276,7 @@ export async function getProductEntryManifest(request) {
     recommended_loop_command: PRODUCT_INVOKE_COMMAND,
     blocking_gaps: [
       '成熟的最终用户前台壳仍未 landed。',
-      'managed web productization 仍未 landed。',
+      'production evidence tail 仍未闭合到真实 artifact-producing owner receipt 与 Temporal long soak。',
     ],
   });
   const runtime = {
@@ -334,8 +334,8 @@ export async function getProductEntryManifest(request) {
   });
   const runtimeInventory = buildRuntimeInventory({
     summary: (
-      'RedCube managed runtime inventory follows the same session store truth, managed runtime contract, '
-      + 'and product-entry preflight/runtime surfaces.'
+      'RedCube OPL provider runtime inventory follows the same session snapshot refs, OPL framework runtime contract, '
+      + 'and product-entry preflight/runtime surfaces; RCA remains a domain handler and authority surface.'
     ),
     runtime_owner: runtime.runtime_owner,
     domain_owner: managedRuntimeContract.domain_owner,
@@ -673,7 +673,7 @@ export async function getProductEntryManifest(request) {
         output_expectation: [
           'continue same entry session',
           'preserve publication and review truth',
-          'update latest managed continuation handle',
+          'update latest OPL stage continuation handle',
         ],
         target_command: productEntrySessionCommand,
         domain_projection: {
@@ -901,7 +901,7 @@ export async function getProductEntryManifest(request) {
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
     product_entry_status: {
-      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳与 managed web productization 仍未 landed。',
+      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳仍未 landed。',
       next_focus: [
         '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
         '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
@@ -991,7 +991,7 @@ export async function getProductEntryManifest(request) {
       'This manifest freezes the current repo-verified RedCube product-entry overview/intake service surface; `status` is the current product overview command.',
       'OPL generated descriptors own CLI/MCP/Skill/product/status/session/workbench metadata; repo-local redcube CLI/MCP are RCA domain handler targets and direct diagnostic entries.',
       'The OPL-hosted handoff stays available as an internal integration contract instead of a first-read user entry shell.',
-      'It does not claim that a mature end-user shell or managed web productization is already landed.',
+      'It does not claim that a mature end-user shell, RCA-owned generic runtime, or production visual-stage soak is already landed.',
     ],
     domain_entry_contract: domainEntryContract,
 	    user_interaction_contract: userInteractionContract,

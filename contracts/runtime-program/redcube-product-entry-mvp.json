@@ -25,7 +25,7 @@
       "delivery_request.goal"
     ],
     "supported_task_intents": [
-      "run_managed_deliverable",
+      "run_opl_stage_execution_plan",
       "run_deliverable_route"
     ],
     "optional_delivery_fields": [
@@ -37,7 +37,7 @@
       "delivery_request.mode",
       "delivery_request.baseline_deliverable_id"
     ],
-    "default_task_intent": "run_managed_deliverable",
+    "default_task_intent": "run_opl_stage_execution_plan",
     "default_runtime_owner": "configured_family_runtime_provider",
     "default_executor_owner": "configured_by_opl_runtime_provider",
     "default_return_surface_kind": "opl_stage_execution_plan",

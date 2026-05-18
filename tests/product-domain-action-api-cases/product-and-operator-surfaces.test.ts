@@ -282,10 +282,10 @@ test('callDomainTool can return operator-facing deliverable and route-run surfac
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callDomainTool maps managed deliverable execution to the OPL stage-plan domain entry and retires public managed lookup actions', async () => {
-  const managed = await callDomainTool(
+test('callDomainTool maps OPL stage-plan execution to the domain entry and retires public managed lookup actions', async () => {
+  const stagePlan = await callDomainTool(
     'redcube_deliverable',
-    withAction('run_managed_deliverable', {
+    withAction('run_opl_stage_execution_plan', {
       workspaceRoot: '/tmp/redcube-workspace',
       overlay: 'ppt_deck',
       topicId: 'topic-a',
@@ -293,7 +293,7 @@ test('callDomainTool maps managed deliverable execution to the OPL stage-plan do
       userIntent: '给我一个最终 PPT',
     }),
     {
-      invokeManagedDeliverableStagePlan: async () => ({
+      invokeOplStageExecutionPlan: async () => ({
         ok: true,
         surface_kind: 'domain_entry',
         summary: {
@@ -311,9 +311,9 @@ test('callDomainTool maps managed deliverable execution to the OPL stage-plan do
     },
   );
 
-  assert.equal(managed.surface_kind, 'domain_entry');
-  assert.equal(managed.summary.actual_surface_kind, 'opl_stage_execution_plan');
-  assert.equal(managed.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
+  assert.equal(stagePlan.surface_kind, 'domain_entry');
+  assert.equal(stagePlan.summary.actual_surface_kind, 'opl_stage_execution_plan');
+  assert.equal(stagePlan.result_surface.execution_model.default_product_entry_executes_repo_local_managed_runner, false);
   await assert.rejects(
     () => callDomainTool(
       'redcube_deliverable',

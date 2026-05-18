@@ -154,7 +154,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_status.next_focus.length, manifest.product_entry_status.remaining_gaps_count);
     assert.equal(manifest.product_entry_status.next_focus.every((gap) => typeof gap === 'string' && gap.length > 0), true);
     assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_end_user_shell');
     assert.equal(manifest.product_entry_readiness.usable_now, true);
     assert.equal(manifest.product_entry_readiness.good_to_use_now, false);
     assert.equal(manifest.product_entry_readiness.fully_automatic, false);
@@ -164,7 +164,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
     assert.deepEqual(manifest.product_entry_readiness.blocking_gaps, [
       '成熟的最终用户前台壳仍未 landed。',
-      'managed web productization 仍未 landed。',
+      'production evidence tail 仍未闭合到真实 artifact-producing owner receipt 与 Temporal long soak。',
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
@@ -825,7 +825,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'redcube product session --entry-session-id <entry-session-id>',
     );
     assert.equal(status.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(status.product_entry_readiness.verdict, 'service_surface_ready_not_managed_product');
+    assert.equal(status.product_entry_readiness.verdict, 'service_surface_ready_not_end_user_shell');
     assert.equal(status.product_entry_readiness.usable_now, true);
     assert.equal(status.product_entry_readiness.good_to_use_now, false);
     assert.equal(status.product_entry_readiness.recommended_start_command, 'redcube product status');

@@ -26,7 +26,7 @@
       "return_surface_contract.surface_kind"
     ],
     "task_intent_surface_kind_map": {
-      "run_managed_deliverable": "opl_stage_execution_plan",
+      "run_opl_stage_execution_plan": "opl_stage_execution_plan",
       "run_deliverable_route": "route_run"
     }
   },
@@ -53,7 +53,7 @@
     ]
   },
   "supported_task_intents": [
-    "run_managed_deliverable",
+    "run_opl_stage_execution_plan",
     "run_deliverable_route"
   ],
   "return_surface_contract": {

@@ -8,6 +8,7 @@
 - `legacy_physical_cleanup` 已从 remaining functional gap 移入 completed gap；production live-soak 相关项从 functional/structural gap 降为 production evidence tail，当前 `functional_structure_gap_count=0`。
 - 当前标准 OPL Agent 口径是：RCA 提供 declarative visual pack、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions 和 native helper implementation；OPL 持有 generated/hosted wrappers、generic supervision/session/workbench、provider-backed stage attempt runtime、attempt ledger、retry/dead-letter、artifact gallery/handoff shell、review/repair transport 和 operator/App shell。
 - 后续不得把旧 repo-local deliverable runner、run store、DAG scheduler、supervision diagnostic 或 public lookup action 恢复成 compatibility alias、internal fixture、standard sidecar template 或 active docs truth。需要追溯时只读 `docs/history/**`、旧 commit 或 tombstone/provenance。
+- 默认 service-safe task intent 改为 `run_opl_stage_execution_plan`；`run_managed_deliverable` 不保留 public compatibility alias。历史 `managed-product-entry-hardening` 文件名、runtime-program baton 和 run record nullable field 只作为 session-continuity provenance / historical run envelope，不作为 RCA generic runtime owner。
 - 本轮清理不声明 production visual-stage long soak、artifact-producing owner receipt、真实 visual memory lifecycle receipt 或 cross-family repeated no-regression 已完成；这些仍属于 production evidence tail。
 
 ## 2026-05-17

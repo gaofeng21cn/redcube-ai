@@ -209,6 +209,30 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
   });
 });
 
+test('invokeProductEntry rejects retired managed deliverable task intent without compatibility alias', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    await assert.rejects(
+      () => invokeProductEntry({
+        task_intent: 'run_managed_deliverable',
+        workspace_locator: {
+          workspace_root: workspaceRoot,
+        },
+        entry_session_contract: {
+          entry_session_id: 'session-retired-managed-intent',
+        },
+        delivery_request: {
+          deliverable_family: 'ppt_deck',
+          topic_id: 'topic-a',
+          deliverable_id: 'deck-retired-managed-intent',
+        },
+      }),
+      /Unsupported task_intent: run_managed_deliverable/,
+    );
+  });
+});
+
 test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
@@ -379,7 +403,7 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
 
     const response = await invokeOplHostedProductEntry({
       target_domain_id: 'redcube_ai',
-      task_intent: 'run_managed_deliverable',
+      task_intent: 'run_opl_stage_execution_plan',
       entry_mode: 'opl_hosted',
       workspace_locator: {
         workspace_root: workspaceRoot,

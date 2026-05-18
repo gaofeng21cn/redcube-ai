@@ -21,7 +21,12 @@ export function buildManifestExtraPayload({
     native_ppt_operator_ux: nativePptOperatorUx,
     review_state: { surface_kind: 'review_state', owner: 'redcube_ai', status: 'runtime_projection_ref', summary: 'Manifest-level read-only ref for RCA review state; runtime truth is produced by product-entry/session execution.', runtime_truth_surface: 'getReviewState', session_command_template: productEntrySessionCommand, route_rule: 'must_use_redcube_product_entry_and_review_export_gates' },
     publication_projection: { surface_kind: 'publication_projection', owner: 'redcube_ai', status: 'runtime_projection_ref', summary: 'Manifest-level read-only ref for RCA publication projection; runtime truth is produced by product-entry/session execution.', runtime_truth_surface: 'getPublicationProjection', session_command_template: productEntrySessionCommand, route_rule: 'must_use_redcube_product_entry_and_review_export_gates' },
-    current_truth: { product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF, opl_hosted_product_entry_contract: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF, managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF },
+    current_truth: {
+      product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
+      opl_hosted_product_entry_contract: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
+      managed_product_entry_contract: MANAGED_PRODUCT_ENTRY_CONTRACT_REF,
+      managed_contract_name_policy: 'legacy_provenance_name_for_session_continuity_not_rca_generic_runtime_owner',
+    },
     session_continuity: {
       surface_kind: 'session_continuity',
       owner: 'redcube_ai',

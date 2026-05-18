@@ -151,10 +151,6 @@ function createIsolatedCliInstall() {
     path.join(gatewayPackagePath, 'node_modules', 'prompts'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime/scripts'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'redcube-runtime', 'scripts'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
     path.join(gatewayNodeModulesDir, 'overlay-registry'),
   );
