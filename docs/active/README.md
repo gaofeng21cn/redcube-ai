@@ -21,6 +21,8 @@ Machine boundary: 人读索引。机器真相继续归 runtime-program contracts
 
 dated follow-through、tranche closeout、命令证据流水和阶段性校准过程不得堆回 active 主文档；需要保留来龙去脉时进入 `../history/plans/` 或对应 provenance 层，active 文档只保留当前结论、边界、差距和执行顺序。
 
+如果后续又出现 product-entry、managed/session、gateway/runtime 或 workbench 相关材料，默认先归入 `../references/product-entry/`、`../runtime/`、`../history/**` 或 tombstone。只有当它改变当前 RCA 理想态差距、证据门或完成顺序时，才更新 `rca-ideal-state-gap-plan.md`；不要新增第二个 active checklist。
+
 ## 当前入口
 
 - [文档索引](../README.md)
