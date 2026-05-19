@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-18`
+Date: `2026-05-19`
 
 ## 文档读法
 
@@ -69,6 +69,8 @@ OPL 必须持有：
 
 这些闭合表示 generic shell/runtime owner 归 OPL，RCA 以 refs-only/domain-handler/authority-function 方式消费。Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence 不再计入功能/结构差距，保留为 production evidence tail。
 
+2026-05-19 的 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` 与 `lifecycle_apply.status=dry_run_ready`。RCA `physical_skeleton_follow_through` 已向 OPL 暴露 provenance refs、history refs 和 tombstone refs，清除了此前 OPL gate 对 `missing_provenance_retention_evidence` 与 `missing_history_or_tombstone_evidence` 的 blocker。该状态只证明 OPL cleanup gate 能安全消费 RCA legacy cleanup proof，不表示 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable 已完成。
+
 ## 当前 cleanliness tail
 
 RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：
@@ -131,6 +133,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - 不能写成 OPL provider completion 等于 RCA visual ready、exportable 或 handoffable。
 - 不能把 OPL generated/hosted surface consumption 写成 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
 - 不能把 transition hosted-attempt fixture、no-regression evidence 或 focused receipt proof 写成 artifact-producing owner receipt。
+- 不能把 OPL legacy cleanup dry-run ready 写成 RCA production evidence tail 已完成；它只证明 provenance/history/tombstone proof 足够 OPL cleanup gate 消费。
 - 不能把 OPL control-loop summary、usage/resource pressure、observability export 或 external stability policy 写成 RCA visual quality/export verdict、自动降级、自动修复或 production success。
 - 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。

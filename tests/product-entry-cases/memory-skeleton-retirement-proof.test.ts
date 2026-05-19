@@ -189,6 +189,19 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
       'png_pptx_pdf_exports',
       'review_export_verdicts',
     ]);
+    assert.deepEqual(followThrough.provenance_refs, [
+      'docs/history/README.md',
+      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
+      'docs/history/hermes/README.md',
+      '/runtime_residue_retirement',
+    ]);
+    assert.deepEqual(followThrough.history_refs, [
+      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
+      'docs/history/runtime/opl-managed-runtime-three-layer-contract.md',
+    ]);
+    assert.deepEqual(followThrough.tombstone_refs, [
+      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
+    ]);
 
     const reviewHelper = manifest.review_helper_baseline_follow_through;
     assert.equal(reviewHelper.surface_kind, 'review_helper_baseline_follow_through');

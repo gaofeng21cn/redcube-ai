@@ -1,6 +1,6 @@
 # RedCube AI 当前状态
 
-更新时间：`2026-05-18`
+更新时间：`2026-05-19`
 
 ## 当前角色
 
@@ -31,6 +31,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 2026-05-18 active surface scan 进一步确认：`supervise_managed_run`、`get_managed_run` 和 `product_entry_continuation` 只作为 retired-surface guard、deletion proof、negative test 或 provenance identifier 出现；active product-entry manifest、status 与 runtime inventory 不再用这些名字声明 RCA repo-local managed runtime owner。Manifest、stage-control plane、OPL stage plan 和 runtime inventory 的 active machine fields 采用 `opl_provider_runtime_contract`、`repo_local_stage_runner_*`、`session_continuity_*` 口径。历史 `managed-product-entry-hardening` 文件名和 baton id 仅保留 session-continuity provenance，不作为当前 owner 语义。
 
 2026-05-18 fresh OPL stage admission read-model 曾阻断 RCA stage pack：AI / effect-boundary stage 缺 machine-readable `runtime_event_refs`。随后 OPL admission 口径收紧为所有 `runtime_guard_required=true` stage 都必须声明 refs。当前 RCA-owned `family_stage_control_plane` 生成源与 `contracts/stage_control_plane.json` 已为 6 个 stage 同步补齐 `stage_contract.runtime_event_refs` 与 `trust_boundary.runtime_event_refs`，包括 `runtime_event:rca.source_intake.source_truth_frozen`、`runtime_event:rca.communication_strategy.accepted`、`runtime_event:rca.visual_direction.accepted`、`runtime_event:rca.artifact_creation.candidate_rendered`、`runtime_event:rca.review_and_revision.gate_recorded`、`runtime_event:rca.package_and_handoff.export_handoff_recorded`。这属于功能/结构 gap 修复；它不声明 production visual-stage long soak 或 artifact-producing owner receipt 完成。
+
+2026-05-19 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` / `lifecycle_apply.status=dry_run_ready`。RCA `physical_skeleton_follow_through` 已补齐 provenance refs、history refs 和 tombstone refs，清除了 OPL cleanup gate 对 provenance / tombstone evidence 的 blocker。该状态只证明 RCA legacy cleanup proof 可被 OPL refs-only ledger 消费，不表示 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable 已完成。
 
 当前标准 OPL Agent 结构口径：
 
@@ -70,6 +72,7 @@ RCA 长期只保留无法声明化的 visual authority surfaces；active machine
 - 不能声明 RCA 已完成 production visual-stage long soak。
 - 不能把 OPL provider completion、transition hosted-attempt fixture、no-regression evidence 或 focused receipt proof 写成 RCA visual ready、exportable、handoffable 或 artifact-producing owner receipt。
 - 不能把 OPL generated/hosted surface consumption 写成 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
+- 不能把 OPL legacy cleanup dry-run ready 写成 production evidence tail 已完成；它只证明 cleanup proof refs 可被 OPL gate 消费。
 - 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
 - 不能恢复 gateway/frontdoor/federation/Hermes-first/local-manager/bridge residue 为 active public entry、runtime owner 或 compatibility alias。
