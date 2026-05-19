@@ -85,6 +85,16 @@ function assertNoLegacyAuthorityFunctionFields(value, label) {
   }
 }
 
+function assertCleanAgentRepoPathRef(refEntry, expectedPrefix, label) {
+  assert.equal(refEntry.ref_kind, 'repo_path', label);
+  assert.equal(refEntry.ref.startsWith(expectedPrefix), true, `${label}: ${refEntry.ref}`);
+  const fullPath = path.join(repoRoot, refEntry.ref);
+  assert.equal(fs.existsSync(fullPath), true, `${label}: ${refEntry.ref}`);
+  const content = fs.readFileSync(fullPath, 'utf8');
+  assert.notEqual(content.trim(), '', `${label}: ${refEntry.ref}`);
+  assert.equal(/\b(?:TODO|TBD)\b/i.test(content), false, `${label}: ${refEntry.ref}`);
+}
+
 function buildCanonicalPack() {
   const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
   const stageControlPlane = buildRedCubeFamilyStageControlPlane({
@@ -196,7 +206,7 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
 });
 
-test('RCA canonical semantic pack paths are concrete, clean, and stage prompt refs resolve under agent', () => {
+test('RCA canonical semantic pack paths are concrete, clean, and stage semantic refs resolve under agent', () => {
   const packCompilerInput = readJson('contracts/pack_compiler_input.json');
   const stageControlPlane = readJson('contracts/stage_control_plane.json');
 
@@ -239,8 +249,32 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage prompt re
         role: 'canonical_stage_prompt_policy',
       },
     ], stage.stage_id);
-    const promptPath = path.join(repoRoot, stage.prompt_refs[0].ref);
-    assert.equal(fs.existsSync(promptPath), true, stage.stage_id);
+    assertCleanAgentRepoPathRef(stage.prompt_refs[0], 'agent/prompts/', `${stage.stage_id}.prompt_refs`);
+    const stageSkillRefs = stage.skills.filter((skill) => skill.ref_kind === 'repo_path');
+    assert.equal(stageSkillRefs.length > 0, true, stage.stage_id);
+    assert.equal(
+      stage.skills.some((skill) => skill.ref_kind === 'skill_id' && skill.ref === 'redcube-ai'),
+      true,
+      stage.stage_id,
+    );
+    for (const [index, skillRef] of stageSkillRefs.entries()) {
+      assertCleanAgentRepoPathRef(skillRef, 'agent/skills/', `${stage.stage_id}.skills[${index}]`);
+    }
+    assert.equal(Array.isArray(stage.knowledge_refs), true, stage.stage_id);
+    assert.equal(stage.knowledge_refs.length > 0, true, stage.stage_id);
+    for (const [index, knowledgeRef] of stage.knowledge_refs.entries()) {
+      assertCleanAgentRepoPathRef(knowledgeRef, 'agent/knowledge/', `${stage.stage_id}.knowledge_refs[${index}]`);
+    }
+    assert.equal(Array.isArray(stage.evaluation), true, stage.stage_id);
+    assert.equal(stage.evaluation.length > 0, true, stage.stage_id);
+    assert.equal(
+      stage.evaluation.some((evaluationRef) => evaluationRef.role === 'owner_receipt_gate'),
+      true,
+      stage.stage_id,
+    );
+    for (const [index, evaluationRef] of stage.evaluation.entries()) {
+      assertCleanAgentRepoPathRef(evaluationRef, 'agent/quality_gates/', `${stage.stage_id}.evaluation[${index}]`);
+    }
     assert.equal(stage.legacy_prompt_asset_refs.length, 2, stage.stage_id);
     for (const legacyRef of stage.legacy_prompt_asset_refs) {
       assert.equal(legacyRef.ref.startsWith('prompts/'), true, stage.stage_id);
