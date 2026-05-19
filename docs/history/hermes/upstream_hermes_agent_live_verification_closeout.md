@@ -1,5 +1,10 @@
 # Upstream Hermes-Agent Live Verification Closeout
 
+Owner: `RedCube AI`
+Purpose: `historical_upstream_hermes_live_closeout_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 closeout brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文件是 F4 live verification closeout provenance。它证明过历史 Hermes-hosted proof lane 的 live run surface，不改变当前默认执行口径：RCA first public identity 是视觉交付领域智能体，OPL-hosted route 是内部集成路径，默认最小具体执行单元仍是 `Codex CLI`。

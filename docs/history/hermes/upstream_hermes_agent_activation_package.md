@@ -1,5 +1,10 @@
 # Upstream Hermes-Agent Activation Package
 
+Owner: `RedCube AI`
+Purpose: `historical_upstream_hermes_activation_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文件是已完成的 upstream Hermes proof provenance，仍因 program 合同引用而原位保留。它不表示 Hermes 是 RCA 当前默认 runtime owner；当前默认 concrete executor 是 `Codex CLI`，OPL 托管路径按 provider-backed / Temporal-target 口径读取。

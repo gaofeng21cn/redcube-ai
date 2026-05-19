@@ -1,5 +1,10 @@
 # Phase 2 Source Readiness Deep Research Trigger + Gate Convergence
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_source_readiness_trigger_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 source owner docs。
+
 日期锚点：`2026-04-09`
 
 生命周期说明：本文是已吸收的 source-plane hardening tranche brief，保留为 contract-linked provenance。当前 Deep Research 只作为 Source Readiness 的补料能力读取；它不等同于完整 MDS Scout + Idea，也不重新定义 RCA 的公开身份。

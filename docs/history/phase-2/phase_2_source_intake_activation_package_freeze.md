@@ -1,5 +1,10 @@
 # Phase 2 Activation Package Freeze
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_source_intake_activation_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 activation brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 source owner docs。
+
 日期锚点：`2026-04-07`
 
 生命周期说明：本文是已吸收的 activation freeze provenance，保留为 contract-linked Phase 2 记录。当前 source intake / shared source truth 可执行真相以 `docs/source/`、canonical workspace artifacts 和 runtime-program contracts 为准。

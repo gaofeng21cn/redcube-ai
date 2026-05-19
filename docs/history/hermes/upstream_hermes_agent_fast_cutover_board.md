@@ -1,5 +1,10 @@
 # Upstream Hermes-Agent Fast Cutover Board
 
+Owner: `RedCube AI`
+Purpose: `historical_upstream_hermes_cutover_board`
+State: `historical_provenance`
+Machine boundary: 人读历史 board。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文件是 contract-linked 的历史 cutover board / proof provenance。2026-05-10 之后的当前运行口径以 provider-backed OPL runtime target、Temporal production substrate target、默认 `Codex CLI` 最小执行单元、以及 RCA-owned visual-domain truth 为准；本文不再作为 RedCube 对外第一身份或 Hermes-first 默认 runtime owner 说明。

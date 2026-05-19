@@ -1,5 +1,10 @@
 # Upstream Hermes-Agent Final Target Shape
 
+Owner: `RedCube AI`
+Purpose: `historical_upstream_hermes_target_shape_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 target brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文件仍作为 contract-linked target/provenance brief 保留，但当前解释口径已被 2026-05-10 provider-backed OPL runtime target 更新。OPL 是可外部依赖的 stage-led、以 Agent executor 为最小执行单位 运行框架；Hermes 只保留 legacy/optional provider 或显式 proof lane；RedCube 的第一公开身份仍是视觉交付领域智能体。

@@ -1,5 +1,10 @@
 # OPL 托管运行时三层合同
 
+Owner: `RedCube AI`
+Purpose: `historical_opl_managed_runtime_owner_boundary`
+State: `historical_provenance`
+Machine boundary: 人读历史 owner-boundary brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 runtime owner docs。
+
 生命周期说明：本文是历史 owner-boundary 讨论，已从 `docs/references/` 迁入 `docs/history/`。它只保留三层 owner 语境的 provenance，不再承担 current support reference、runtime target、OPL production substrate 或 RCA active plan 职责。当前 RCA runtime truth 以 `docs/runtime/`、核心五件套、`docs/active/rca-ideal-state-gap-plan.md` 和 runtime-program contracts 为准。
 
 这份历史文档曾冻结 `OPL` 家族仓在托管运行时上的统一 owner 口径。当前系列口径已经更新为 provider-backed OPL runtime：OPL 是 stage-led、以 Agent executor 为最小执行单位的运行框架，Temporal 是 production online runtime 的必需 substrate，Hermes 只是 legacy/optional provider 或显式 proof lane；RCA 默认最小具体执行单元仍是 `Codex CLI`。

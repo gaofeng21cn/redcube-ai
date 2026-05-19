@@ -1,5 +1,10 @@
 # PPT Mainline Quality Closeout
 
+Owner: `RedCube AI`
+Purpose: `historical_ppt_html_quality_closeout_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 closeout brief。当前机器真相继续归 contracts、runtime-family source、workspace artifacts、artifact manifests、review/export receipts 和 canonical artifacts。
+
 状态锚点：`2026-05-01`
 
 ## 结论

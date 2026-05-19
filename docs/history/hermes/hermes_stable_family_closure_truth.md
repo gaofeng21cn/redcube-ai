@@ -1,5 +1,10 @@
 # Hermes Stable Family Closure Truth
 
+Owner: `RedCube AI`
+Purpose: `historical_hermes_stable_family_closure_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 > 历史说明：这份文档记录的是 repo-local stable-family migration closure 的 provenance，不代表当前仓库已经完成上游 `Hermes-Agent` 集成。
 
 ## 当前状态

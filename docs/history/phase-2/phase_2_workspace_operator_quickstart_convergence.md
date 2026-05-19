@@ -1,5 +1,10 @@
 # Phase 2 Workspace / Operator Quickstart Convergence
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_workspace_operator_quickstart_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 product/runtime owner docs。
+
 日期锚点：`2026-04-10`
 
 生命周期说明：本文是已吸收的 workspace/operator quickstart hardening brief，保留为 contract-linked provenance。当前 quickstart truth 以 `docs/product/human_quickstart.md`、CLI help、runtime-program contracts 与 workspace artifacts 为准。

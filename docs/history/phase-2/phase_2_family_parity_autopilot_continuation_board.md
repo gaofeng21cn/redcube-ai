@@ -1,5 +1,10 @@
 # Phase 2 Family Parity + Autopilot Continuation Board
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_family_parity_continuation_board`
+State: `historical_provenance`
+Machine boundary: 人读历史 continuation board。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 生命周期说明：本文是 contract-linked continuation board / absorbed tranche context，不是当前新的 public mainline。当前 RCA 第一身份仍是 visual-deliverable domain agent；OPL 只作为 stage-led、以 Agent executor 为最小执行单位 托管框架和 family-level runtime/projection 支撑出现。
 
 ## 文档目的

@@ -1,5 +1,10 @@
 # Phase 2 Architecture Boundary Governance
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_architecture_boundary_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 owner truth 以核心五件套、`docs/runtime/`、`docs/policies/` 与 machine-readable runtime-program contracts 为准；本文不重新打开 Phase 2 作为新的公开产品方向。
 
 ## 当前状态

@@ -1,5 +1,10 @@
 # Phase 2 PPT Native Authoring Production-Selectable Lane
 
+Owner: `RedCube AI`
+Purpose: `native_ppt_selectable_route_provenance`
+State: `historical_provenance_with_current_route_support`
+Machine boundary: 人读 historical proof lane brief。当前机器真相继续归 native helper catalog、proof runner scripts、runtime-family source、workspace artifacts、rendered proof artifacts 和 review/export receipts。
+
 生命周期说明：本文是已吸收的 selectable proof lane brief，仍服务当前 `ppt_deck` native editable PPTX 可选路线。当前默认 PPT 视觉路线是 image-first；native PPTX 只在用户显式要求可编辑或 DrawingML 路线时启用。
 
 ## 定位

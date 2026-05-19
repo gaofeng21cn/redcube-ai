@@ -1,5 +1,10 @@
 # Upstream Hermes-Agent Service-Safe Domain Entry
 
+Owner: `RedCube AI`
+Purpose: `historical_upstream_hermes_service_safe_entry_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 service-safe entry brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文件记录 service-safe domain entry 的历史 Hermes-hosted proof 语境，当前应按 OPL-hosted integration / provider-backed runtime 口径读取。它不改变 RCA 的 direct public identity，也不把 Hermes-first route 提升为默认对外入口。

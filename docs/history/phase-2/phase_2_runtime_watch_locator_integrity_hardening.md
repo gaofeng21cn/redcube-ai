@@ -1,5 +1,10 @@
 # Phase 2 Runtime Watch Locator Integrity Hardening
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_runtime_watch_locator_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 生命周期说明：本文是已吸收的 Phase 2 runtime-watch hardening brief，保留为 contract-linked provenance。当前 runtimeWatch / locator truth 以 machine-readable contracts、CLI/MCP surface 和 runtime artifacts 为准。
 
 ## 当前状态

@@ -8,6 +8,13 @@
   <a href="./README.md">English</a> | <a href="./README.zh-CN.md"><strong>中文</strong></a>
 </p>
 
+<!--
+Owner: `RedCube AI`
+Purpose: `public_repository_entry_zh_cn`
+State: `current_public_entry`
+Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+-->
+
 <p align="center"><strong>面向视觉交付的 Foundry Agent，以 built on OPL Framework 的 OPL-compatible package 形态发布</strong></p>
 <p align="center">幻灯片 · 小红书笔记 · 海报</p>
 
@@ -104,7 +111,7 @@
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
 - 如果外部智能体或 OPL 需要直接读取仓库跟踪的技能面，使用单一 `redcube-ai` 应用技能，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI 命令；`status` / `invoke` / `session` 继续作为这个技能下面的机器可读命令合同。`redcube product status` 是当前 product overview 命令，语义是产品入口概览 / 材料接收壳，不代表成熟的人用 GUI 或 WebUI；OPL 托管路径仍然只是内部集成面。
 - 测试 lane 真相放在 `scripts/test-registry.ts`，当前验证矩阵以 [当前状态](./docs/status.md) 为准。`smoke` 是最小本地入口，`fast` 是核心回归快线，hosted CI 等价于 `npm run test:ci`，`historical` 只在显式要求时运行。
-- `docs/active/` 用来读当前 baton，`docs/history/phase-2/` 用来读已经吸收进主线的阶段里程碑，`docs/references/` 用来读 bridge 和 provenance 材料；Agent 不需要先从零散实现文件里反推当前执行真相。
+- `docs/active/` 用来读当前 baton，`docs/references/` 用来读当前支撑参考，`docs/history/` 用来读已吸收里程碑、proof 记录、tombstone 和 provenance；Agent 不需要先从零散实现文件里反推当前执行真相。
 
 </details>
 

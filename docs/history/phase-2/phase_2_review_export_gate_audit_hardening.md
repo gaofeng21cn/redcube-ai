@@ -1,5 +1,10 @@
 # Phase 2 Review / Export / Gate / Audit Hardening
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_review_export_gate_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和 RCA-owned review/export gates。
+
 这份 absorbed tranche 对应的 hardening axis 口径固定为：`review / export / gate / audit hardening`。
 
 日期锚点：`2026-04-08`

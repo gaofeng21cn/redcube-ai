@@ -1,5 +1,10 @@
 # Historical Deep Research Source Readiness Pack Phase 1 Plan
 
+Owner: `RedCube AI`
+Purpose: `historical_source_readiness_plan_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 plan。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 source owner docs。
+
 > 历史规划工件，冻结于 `2026-04-08`。它保留当时的 source-readiness 第一阶段实现设想。当前 direct route、federated route 和活跃运行口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准。
 > 其中引用的 `tests/public-docs-surface.test.ts` 是已退役的历史文档 wording test，不再作为当前可运行验证入口；叙述性 README/docs 由人工/Agent review 对齐。
 

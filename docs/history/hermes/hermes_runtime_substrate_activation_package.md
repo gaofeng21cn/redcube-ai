@@ -1,5 +1,10 @@
 # Hermes Runtime Substrate Activation Package
 
+Owner: `RedCube AI`
+Purpose: `historical_hermes_runtime_activation_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 > 历史说明：这份文档保留的是 repo-local migration activation package 的 absorbed provenance，不代表当前仓库已经接入上游 `Hermes-Agent`。
 
 ## 当前状态

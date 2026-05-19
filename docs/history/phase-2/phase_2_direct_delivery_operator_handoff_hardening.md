@@ -1,5 +1,10 @@
 # Phase 2 Direct-Delivery Operator Handoff Hardening
 
+Owner: `RedCube AI`
+Purpose: `historical_phase_2_operator_handoff_provenance`
+State: `historical_provenance`
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 日期锚点：`2026-04-08`
 
 生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 operator handoff truth 以 RCA product/runtime surfaces、`docs/status.md`、`docs/delivery/` 与 runtime-program contracts 为准。

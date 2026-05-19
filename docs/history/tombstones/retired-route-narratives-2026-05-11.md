@@ -1,5 +1,10 @@
 # Retired Route Narratives Tombstone
 
+Owner: `RedCube AI`
+Purpose: `retired_route_narratives_tombstone`
+State: `history`
+Machine boundary: 人读 tombstone。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+
 日期锚点：`2026-05-11`
 
 本文保留旧路线词汇的可检索落点，避免读者把它们重新读成当前 RedCube 公开身份。
