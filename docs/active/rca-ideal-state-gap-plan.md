@@ -73,7 +73,11 @@ OPL 必须持有：
 
 2026-05-19 的 standard pack 合同校准把 `pack_compiler_input` 固定为 `canonical_semantic_pack_root="agent/"`，并从 `required_domain_pack_paths` 移除 `agent/README.md`。README 仍可作为人读入口或导航存在，但不能作为 OPL scaffold 的 required semantic pack 文件；每个 required path 必须指向真实 prompt / stage / skill / quality gate / knowledge 内容。
 
-2026-05-19 的 physical source morphology 调研把 RCA 的源码目标进一步固定：`agent/` 是 Declarative Visual Pack，`contracts/` 和 `contracts/runtime-program/current-program.index.json` / `current-program-parts/**` 是机器合同与 leaf-level program truth，`packages/` / `src` 只保留 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 的 artifact-heavy 代码是可保留的 visual authority / native helper 实现，不是未来新 Agent 的通用 scaffold；session continuity store、product sidecar/status、operator evidence、stability projection、native helper catalog、runtime-program leaf sync 都必须继续写成 OPL generated/hosted shell 的 domain target、refs-only read model或 visual authority implementation。
+2026-05-19 的 physical source morphology 调研把 RCA 的源码目标进一步固定：`agent/` 是 Declarative Visual Pack，`contracts/` 和 `contracts/runtime-program/current-program.index.json` / `current-program-parts/**` 是机器合同与 leaf-level program truth，`packages/` / `src` 只保留 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 的 artifact-heavy 代码是可保留的 visual authority / native helper 实现，不是未来新 Agent 的通用 scaffold；session continuity store、product sidecar/status、operator evidence、stability projection、native helper catalog、runtime-program leaf sync 都必须继续写成 OPL generated/hosted shell 的 domain target、refs-only read model 或 visual authority implementation。
+
+这条判断吸收的是成熟 agent/runtime 项目对职责分层的经验，不引入它们作为依赖。2026-05-19 live check 中，OpenAI Agents SDK 将 Agent 与 Runner / sessions / handoffs / guardrails 分层；LangGraph 将 state persistence、checkpoint、thread、store、replay 分层；AutoGen 将 agents、tools/workbench、teams 与 state/termination 分层；CrewAI 用声明式 agent role/goal/tools 与 crew/process 承载协作。RCA 对应落点是：visual pack、visual authority/native helpers、runtime orchestration、session continuity、artifact/workbench/evidence gate 分离；OPL 持有通用 shell，RCA 持有 visual judgment 与 artifact authority。
+
+当前 RCA 的物理源码仍有 naming / package hygiene tail：`apps/redcube-mcp/src/server.ts` 仍是 repo-local protocol adapter 并暴露 product-entry grouped surface；`packages/redcube-runtime/src/product-entry-session-store.ts` 仍是 product-entry session store refs adapter；`packages/redcube-runtime-protocol/src/workspace.ts` 与 `runs.ts` 仍持有 workspace/run envelope helpers；`packages/redcube-gateway/src/actions/runtime-watch.ts`、`product-sidecar-guarded-actions.ts` 和 product sidecar handoff parts 仍承担 runtimeWatch、sidecar guarded action、operator evidence 和 generated-surface mapping。它们当前是 domain handler target、refs-only adapter、native helper envelope 或 provenance，不是 RCA generic runtime owner。后续应通过 generated caller parity、contract-safe rename、tombstone 和 no-compatibility-alias 继续清理历史 runtime / gateway / session / sidecar / managed 命名。
 
 因此，历史 `managed`、`managed run`、session store、runtime family、product-entry continuation、sidecar supervision 等命名只允许作为 provenance、semantic-id、retired guard、refs-only adapter 或 domain handler 出现。若未来新增或恢复让 RCA 看起来持有 generic scheduler、runner、attempt ledger、workbench、artifact lifecycle shell、review/repair transport 或 generated wrapper owner 的源码，即使现有 `functional_structure_gap_count=0`，也必须重新打开 physical morphology gap。
 
@@ -118,6 +122,15 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 ## 当前测试/证据差距
 
+## 当前物理源码形态差距
+
+这部分是 naming / package hygiene tail。它不重开已闭合的旧 managed runtime 清理，但也不能被 `functional_structure_gap_count=0` 写成物理源码完全标准化。
+
+- MCP、CLI/product-entry、sidecar、status/session/workbench wrapper 的 repo-local adapter 仍可见；目标是 OPL generated/hosted wrapper 成为默认 shell，RCA 只保留 service-safe domain entry、domain handler target、owner receipt、typed blocker 和 authority refs。
+- `product-entry-session-store` 只能是 refs-only session snapshot adapter；目标是 OPL generic session shell 稳定后不再让 RCA 源码像 session runtime owner。
+- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只能输出 refs、receipt、typed blocker、no-regression evidence 或 visual authority action metadata；不得扩成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
+- `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词若继续存在，必须是 semantic-id、provenance、retired guard、domain adapter 或 refs-only read model；新增 active caller 不保留 compatibility alias。
+
 以下是结构闭合后的证据门，不能写成 production visual-stage soak、visual ready、exportable 或 handoffable 已完成：
 
 - 真实 artifact-producing owner receipt。
@@ -138,7 +151,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
    将历史 `managed` 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增 compatibility alias。
 
 4. `physical_source_morphology_hygiene`
-   继续确保 packages / runtime-program / product-entry / sidecar / native-helper / operator-evidence 源码只表达 visual authority、native helper implementation、domain handler target 或 refs-only adapter。新增 family、helper 或 projection 时，先落 `agent/` pack 与 `contracts/`，再只在 packages 中实现必要 visual authority；不把 artifact-heavy implementation 复制成 generic agent runtime。
+   继续确保 packages / runtime-program / MCP / product-entry / sidecar / native-helper / operator-evidence 源码只表达 visual authority、native helper implementation、domain handler target 或 refs-only adapter。优先治理 product-entry session store、runtimeWatch、workspace/run envelope helpers、sidecar guarded actions 和历史 `managed`/`runtime`/`gateway` 命名。新增 family、helper 或 projection 时，先落 `agent/` pack 与 `contracts/`，再只在 packages 中实现必要 visual authority；不把 artifact-heavy implementation 复制成 generic agent runtime。
 
 ## 当前不能写成
 
