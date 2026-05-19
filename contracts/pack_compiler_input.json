@@ -25,6 +25,7 @@
   ],
   "legacy_detail_asset_policy": "implementation_detail_prompt_assets_only_not_stage_control_prompt_refs",
   "required_domain_pack_paths": [
+    "agent/README.md",
     "agent/prompts/source_intake.md",
     "agent/prompts/communication_strategy.md",
     "agent/prompts/visual_direction.md",

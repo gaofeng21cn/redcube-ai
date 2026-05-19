@@ -21,6 +21,7 @@ const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 
 const requiredDomainPackPaths = [
+  'agent/README.md',
   'agent/prompts/source_intake.md',
   'agent/prompts/communication_strategy.md',
   'agent/prompts/visual_direction.md',
@@ -248,6 +249,17 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
         role: 'canonical_stage_prompt_policy',
       },
     ], stage.stage_id);
+    assert.equal(stage.stage_contract.source_scope_refs.length > 0, true, stage.stage_id);
+    assert.equal(stage.stage_contract.cohort_query_refs.length > 0, true, stage.stage_id);
+    assert.equal(stage.stage_contract.trigger_refs.length > 0, true, stage.stage_id);
+    assert.equal(stage.stage_contract.monitor_refs.length > 0, true, stage.stage_id);
+    assert.equal(stage.stage_contract.dashboard_metric_refs.length > 0, true, stage.stage_id);
+    assert.equal(
+      stage.stage_contract.trigger_refs.some((triggerRef) =>
+        triggerRef.role === 'opl_provider_stage_launch_trigger'),
+      true,
+      stage.stage_id,
+    );
     assertCleanAgentRepoPathRef(stage.prompt_refs[0], 'agent/prompts/', `${stage.stage_id}.prompt_refs`);
     const stageSkillRefs = stage.skills.filter((skill) => skill.ref_kind === 'repo_path');
     assert.equal(stageSkillRefs.length > 0, true, stage.stage_id);

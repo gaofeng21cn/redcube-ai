@@ -157,6 +157,16 @@ export function assertManifestActionAndStageControlPlane({
     assert.equal(stage.trust_boundary.runtime_guard_required, true);
     assert.deepEqual(stage.stage_contract.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
     assert.deepEqual(stage.trust_boundary.runtime_event_refs, expectedRuntimeEventRefs.get(stage.stage_id));
+    assert.equal(stage.stage_contract.source_scope_refs.length > 0, true);
+    assert.equal(stage.stage_contract.cohort_query_refs.length > 0, true);
+    assert.equal(stage.stage_contract.trigger_refs.length > 0, true);
+    assert.equal(stage.stage_contract.monitor_refs.length > 0, true);
+    assert.equal(stage.stage_contract.dashboard_metric_refs.length > 0, true);
+    assert.equal(
+      stage.stage_contract.trigger_refs.some((triggerRef) =>
+        triggerRef.role === 'opl_provider_stage_launch_trigger'),
+      true,
+    );
     assert.equal(
       stage.authority_boundary.independent_gate_receipt_required,
       independentGateStageIds.has(stage.stage_id),

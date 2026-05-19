@@ -288,6 +288,63 @@
         "runtime_event_refs": [
           "runtime_event:rca.source_intake.source_truth_frozen"
         ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "source_readiness",
+              "research",
+              "storyline"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/source_intake/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/source_intake",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "get_product_status",
+              "get_product_entry_manifest"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/source_intake/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -547,6 +604,65 @@
         "runtime_event_refs": [
           "runtime_event:rca.communication_strategy.accepted"
         ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "storyline",
+              "detailed_outline",
+              "slide_blueprint",
+              "single_note_plan",
+              "poster_blueprint"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/communication_strategy/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/communication_strategy",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "invoke_product_entry",
+              "get_product_entry_session"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/communication_strategy/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -788,6 +904,61 @@
         ],
         "runtime_event_refs": [
           "runtime_event:rca.visual_direction.accepted"
+        ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "visual_direction"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/visual_direction/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/visual_direction",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "invoke_product_entry",
+              "get_product_entry_session"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/visual_direction/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
         ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
@@ -1042,6 +1213,64 @@
         ],
         "runtime_event_refs": [
           "runtime_event:rca.artifact_creation.candidate_rendered"
+        ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "author_image_pages",
+              "render_html",
+              "author_pptx_native"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/artifact_creation/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/artifact_creation",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "invoke_product_entry",
+              "run_image_ppt_proof",
+              "run_native_ppt_proof"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/artifact_creation/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
         ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
@@ -1327,6 +1556,65 @@
         "runtime_event_refs": [
           "runtime_event:rca.review_and_revision.gate_recorded"
         ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "visual_director_review",
+              "screenshot_review",
+              "repair_image_pages",
+              "fix_html",
+              "repair_pptx_native"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/review_and_revision/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/review_and_revision",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "invoke_product_entry",
+              "get_product_entry_session"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/review_and_revision/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1610,6 +1898,65 @@
         ],
         "runtime_event_refs": [
           "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+        ],
+        "source_scope_refs": [
+          {
+            "ref_kind": "route_stage_refs",
+            "ref": [
+              "export_pptx",
+              "publish_copy",
+              "export_bundle",
+              "export_poster"
+            ],
+            "role": "rca_visual_stage_source_scope"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/package_and_handoff/source_refs",
+            "role": "stage_source_ref_projection"
+          }
+        ],
+        "cohort_query_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/source_readiness",
+            "role": "auditable_visual_source_query"
+          }
+        ],
+        "trigger_refs": [
+          {
+            "ref_kind": "queue_ref",
+            "ref": "opl://family-stage-queue/redcube_ai/package_and_handoff",
+            "role": "opl_provider_stage_launch_trigger"
+          },
+          {
+            "ref_kind": "action_ref",
+            "ref": [
+              "get_product_entry_session",
+              "get_product_entry_manifest",
+              "export_product_sidecar"
+            ],
+            "role": "rca_guarded_action_trigger_candidates"
+          }
+        ],
+        "monitor_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/progress_projection",
+            "role": "visual_stage_progress_monitor"
+          },
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/session_continuity",
+            "role": "session_continuity_monitor"
+          }
+        ],
+        "dashboard_metric_refs": [
+          {
+            "ref_kind": "json_pointer",
+            "ref": "/family_stage_control_plane/stages/package_and_handoff/freshness",
+            "role": "operator_stage_freshness_metric"
+          }
         ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",

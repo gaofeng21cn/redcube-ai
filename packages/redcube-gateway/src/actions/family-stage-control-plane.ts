@@ -235,6 +235,41 @@ function buildActionParity(stage, actionIds) {
   };
 }
 
+function buildCohortLoopRefs(stage) {
+  return {
+    source_scope_refs: [
+      { ref_kind: 'route_stage_refs', ref: stage.domain_stage_refs, role: 'rca_visual_stage_source_scope' },
+      {
+        ref_kind: 'json_pointer',
+        ref: `/family_stage_control_plane/stages/${stage.stage_id}/source_refs`,
+        role: 'stage_source_ref_projection',
+      },
+    ],
+    cohort_query_refs: [
+      { ref_kind: 'json_pointer', ref: '/source_readiness', role: 'auditable_visual_source_query' },
+    ],
+    trigger_refs: [
+      {
+        ref_kind: 'queue_ref',
+        ref: `opl://family-stage-queue/redcube_ai/${stage.stage_id}`,
+        role: 'opl_provider_stage_launch_trigger',
+      },
+      { ref_kind: 'action_ref', ref: stage.allowed_action_refs, role: 'rca_guarded_action_trigger_candidates' },
+    ],
+    monitor_refs: [
+      { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'visual_stage_progress_monitor' },
+      { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'session_continuity_monitor' },
+    ],
+    dashboard_metric_refs: [
+      {
+        ref_kind: 'json_pointer',
+        ref: `/family_stage_control_plane/stages/${stage.stage_id}/freshness`,
+        role: 'operator_stage_freshness_metric',
+      },
+    ],
+  };
+}
+
 function stageDescriptor(stage, actionIds) {
   const sourceRefs = [
     ...PLANE_SOURCE_REFS,
@@ -296,6 +331,7 @@ function stageDescriptor(stage, actionIds) {
       requires: stage.requires || [],
       ensures: stage.ensures || [],
       runtime_event_refs: stage.runtime_event_refs || [],
+      ...buildCohortLoopRefs(stage),
       boundary_assumptions: [
         'RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.',
         'OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable.',
