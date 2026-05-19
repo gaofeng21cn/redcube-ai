@@ -167,7 +167,7 @@ export function buildProductEntryManifestEntrySurfaces({
     recommended_loop_command: PRODUCT_INVOKE_COMMAND,
     blocking_gaps: [
       '成熟的最终用户前台壳仍未 landed。',
-      'production evidence tail 仍未闭合到真实 artifact-producing owner receipt 与 Temporal long soak。',
+      'production evidence tail 仍需 Temporal long soak、真实 memory/lifecycle receipt scaleout 与跨 family no-regression evidence。',
     ],
   });
   return {

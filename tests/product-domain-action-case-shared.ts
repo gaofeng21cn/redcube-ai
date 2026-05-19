@@ -28,7 +28,6 @@ import {
   createDeliverable,
   executeSourceAugmentation,
   getProductEntrySession,
-  getProductStatus,
   getProductPreflight,
   getProductStart,
   intakeSource,
@@ -69,6 +68,11 @@ async function importGatewaySharedModule(moduleSpecifier) {
 async function getProductEntryManifest(request) {
   const module = await import('../packages/redcube-gateway/dist/index.js');
   return module.getProductEntryManifest(request);
+}
+
+async function getProductStatus(request) {
+  const module = await import('../packages/redcube-gateway/dist/index.js');
+  return module.getProductStatus(request);
 }
 
 async function exportProductSidecar(request) {

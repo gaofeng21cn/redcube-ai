@@ -1126,13 +1126,23 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         remaining_functional_structure_gap_ids: [],
         evidence_gap_class: 'production_live_soak_evidence_only',
         remaining_evidence_gate_ids: [
-          'real_artifact_producing_domain_owner_receipt',
           'opl_hosted_controlled_visual_stage_long_soak',
           'real_memory_lifecycle_receipt_instances',
           'cross_family_repeated_no_regression_evidence',
         ],
       },
     );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_acceptance.status,
+      'closed_by_domain_owned_acceptance_receipt',
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.declares_artifact_producing_owner_receipt_scope,
+      'refs_only_receipt_chain_closed_not_visual_ready',
+    );
+    assert.equal(manifestWithReceipts.operator_evidence_readiness_projection.declares_visual_ready, false);
+    assert.equal(manifestWithReceipts.operator_evidence_readiness_projection.declares_exportable, false);
+    assert.equal(manifestWithReceipts.operator_evidence_readiness_projection.declares_domain_ready, false);
     assert.equal(memoryLifecycleGap.status, 'runtime_receipt_instances_visible_not_production_soak');
     assert.equal(memoryLifecycleGap.current_best_ref, '/workspace_receipt_inventory_projection');
     assert.deepEqual(memoryLifecycleGap.missing_receipt_kinds, []);

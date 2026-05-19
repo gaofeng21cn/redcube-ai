@@ -154,6 +154,36 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);
     assert.equal(manifest.product_entry_status.next_focus.length, manifest.product_entry_status.remaining_gaps_count);
     assert.equal(manifest.product_entry_status.next_focus.every((gap) => typeof gap === 'string' && gap.length > 0), true);
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_acceptance.status,
+      'closed_by_domain_owned_acceptance_receipt',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_acceptance.receipt_chain_scope,
+      'rca_owned_refs_only_artifact_producing_receipt_chain',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.declares_artifact_producing_owner_receipt,
+      true,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.declares_artifact_producing_owner_receipt_scope,
+      'refs_only_receipt_chain_closed_not_visual_ready',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.remaining_gap_classification.remaining_evidence_gate_ids.includes(
+        'real_artifact_producing_domain_owner_receipt',
+      ),
+      false,
+    );
+    assert.equal(manifest.operator_evidence_readiness_projection.declares_visual_ready, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.declares_exportable, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.declares_handoffable, false);
+    assert.equal(manifest.operator_evidence_readiness_projection.declares_domain_ready, false);
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_declare_domain_ready,
+      false,
+    );
     assert.equal(manifest.product_entry_readiness.surface_kind, 'product_entry_readiness');
     assert.equal(manifest.product_entry_readiness.verdict, 'service_surface_ready_not_end_user_shell');
     assert.equal(manifest.product_entry_readiness.usable_now, true);
@@ -165,7 +195,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
     assert.deepEqual(manifest.product_entry_readiness.blocking_gaps, [
       '成熟的最终用户前台壳仍未 landed。',
-      'production evidence tail 仍未闭合到真实 artifact-producing owner receipt 与 Temporal long soak。',
+      'production evidence tail 仍需 Temporal long soak、真实 memory/lifecycle receipt scaleout 与跨 family no-regression evidence。',
     ]);
     assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(manifest.runtime.runtime_state_root, runtimeStateRoot);
