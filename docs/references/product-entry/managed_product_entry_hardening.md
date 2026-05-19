@@ -1,5 +1,10 @@
 # Managed Product Entry Hardening
 
+Owner: `RedCube AI`
+Purpose: `product_entry_session_continuity_support`
+State: `contract_linked_support`
+Machine boundary: 人读 product-entry support。机器真相继续归 `contracts/runtime-program/managed-product-entry-hardening.json`、product-entry manifest、CLI/MCP/API behavior、source、runtime artifacts 和 owner receipts。
+
 状态锚点：`2026-04-12`
 
 生命周期说明：本文是 contract-linked support / absorbed hardening brief，唯一任务是解释 product-entry session continuity 与用户级 runtime-state 行为。它由旧 `docs/program/` active baton 层迁入 reference support；runtime-program 当前合同继续通过 `human_doc:program_managed_product_entry_hardening` 指向本文语义。它不定义新的公开 GUI、WebUI、generic managed runtime 或第二产品入口；后续生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)。

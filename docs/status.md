@@ -1,5 +1,10 @@
 # RedCube AI 当前状态
 
+Owner: `RedCube AI`
+Purpose: `current_status_and_gap_readout`
+State: `current_truth`
+Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
 更新时间：`2026-05-19`
 
 ## 当前角色

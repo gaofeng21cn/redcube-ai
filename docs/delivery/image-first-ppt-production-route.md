@@ -1,5 +1,10 @@
 # RedCube PPT Image-First Production Route
 
+Owner: `RedCube AI`
+Purpose: `image_first_ppt_route_support`
+State: `active_support`
+Machine boundary: 人读 route support。机器真相继续归 runtime-family source、contracts、proof runner config、workspace artifacts、artifact manifests、review/export receipts 和 canonical artifacts。
+
 ## Status
 
 `ppt_deck` 的默认视觉生产路线是 image-first：

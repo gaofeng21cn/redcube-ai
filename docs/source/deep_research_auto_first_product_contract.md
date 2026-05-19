@@ -1,5 +1,10 @@
 # RedCube Deep Research / 5 步 Auto-First 产品契约设计
 
+Owner: `RedCube AI`
+Purpose: `absorbed_source_readiness_product_semantics_support`
+State: `absorbed_support`
+Machine boundary: 人读 source product-semantics support。机器真相继续归 source contracts、workspace canonical artifacts、runtime-family source、runtime-program contracts 和 owner receipts。
+
 日期：2026-04-08
 
 状态：absorbed product-semantics support

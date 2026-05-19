@@ -1,5 +1,10 @@
 # RedCube AI 硬约束
 
+Owner: `RedCube AI`
+Purpose: `stable_invariants_and_forbidden_boundaries`
+State: `current_policy`
+Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
 ## Formal-entry
 
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。

@@ -1,5 +1,10 @@
 # RCA Adoption of OPL Family Contracts
 
+Owner: `RedCube AI`
+Purpose: `opl_family_contract_adoption_support`
+State: `active_support`
+Machine boundary: 人读 OPL family contract support。机器真相继续归 runtime-program contracts、product-entry manifest、CLI/MCP/API behavior、source、runtime artifacts 和 owner receipts。
+
 ## Purpose
 
 这份薄适配声明说明 `RedCube AI` 如何满足 `OPL` family runtime / quality / incident / operator projection 合同。它不把 `OPL` 变成 RedCube visual truth owner，也不把医学论文质量门或基金 fundability gate 引入 RCA。

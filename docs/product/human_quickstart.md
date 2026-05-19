@@ -1,5 +1,10 @@
 # 人类用户快速上手
 
+Owner: `RedCube AI`
+Purpose: `human_operator_quickstart`
+State: `active_support`
+Machine boundary: 人读 product / operator 指南。机器真相继续归 contracts、source、CLI/MCP/API 行为、workspace artifacts、owner receipts 和 product-entry manifest。
+
 这份文档写给专家、PIs 和专业内容团队。
 它属于仓库跟踪的操作文档层，不属于默认公开入口。
 如果未来要把它提升到默认公开面，先更新 `docs/public/` / `docs/product/` 的 owner 文档与核心五件套；不恢复 docs 层双语镜像。

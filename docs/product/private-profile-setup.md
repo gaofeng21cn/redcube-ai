@@ -1,5 +1,10 @@
 # 私有作者信息与 prompts 配置
 
+Owner: `RedCube AI`
+Purpose: `private_profile_setup_guide`
+State: `active_support`
+Machine boundary: 人读本地配置指南。机器真相继续归 ignored local config、workspace `.redcube/` files、CLI behavior、contracts 和 product-entry manifest。
+
 本文档说明如何在不污染公开仓库的前提下，继续使用你自己的作者信息、品牌、提示词和默认工作区。
 它属于私有 / 本地配置说明，不属于默认公开入口。
 

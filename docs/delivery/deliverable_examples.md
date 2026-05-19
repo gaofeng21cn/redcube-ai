@@ -1,5 +1,10 @@
 # 典型交付示例
 
+Owner: `RedCube AI`
+Purpose: `deliverable_examples`
+State: `active_support`
+Machine boundary: 人读交付示例。机器真相继续归 contracts、runtime-family source、workspace artifacts、artifact manifests、review/export receipts 和 canonical artifacts。
+
 这份文档展示 `RedCube AI` 当前两类最重要的交付面：`PPT` 与 `小红书图文`。
 
 ## 示例一：给学生讲课的 PPT

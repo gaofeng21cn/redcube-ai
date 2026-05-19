@@ -1,5 +1,10 @@
 # RCA executor routing config
 
+Owner: `RedCube AI`
+Purpose: `executor_routing_operator_reference`
+State: `active_support`
+Machine boundary: 人读 executor routing reference。机器真相继续归 runtime-program contracts、local ignored config、CLI/MCP behavior、executor adapter source、runtime artifacts 和 owner receipts。
+
 本文档说明 `RedCube AI` 如何管理 LLM executor 的三层配置。这里的配置示例只作为 opt-in 参考；仓库默认不会激活 Huawei MaaS、DeepSeek、GLM 或任何 route-specific Hermes profile。
 
 ## 三层边界

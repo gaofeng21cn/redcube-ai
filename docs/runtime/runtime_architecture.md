@@ -1,5 +1,10 @@
 # 运行架构说明
 
+Owner: `RedCube AI`
+Purpose: `runtime_topology_explanation`
+State: `current_runtime_support`
+Machine boundary: 人读 runtime topology support。机器真相继续归 runtime-program contracts、CLI/MCP surfaces、product-entry / domain-entry / runtime-family source、workspace/runtime artifacts 和 owner receipts。
+
 生命周期说明：本文是当前 runtime topology 的人读说明，服务 `human_doc:runtime_architecture` 语义引用。它不承载 active baton closeout、Phase 2 provenance、Hermes 迁移证明或 gateway / harness 历史叙事；这些材料分别归入 `docs/active/`、`docs/references/` 与 `docs/history/`。
 
 ## 文档边界

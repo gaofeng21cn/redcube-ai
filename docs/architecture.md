@@ -1,5 +1,10 @@
 # RedCube AI 架构
 
+Owner: `RedCube AI`
+Purpose: `current_architecture_and_owner_boundary`
+State: `current_truth`
+Machine boundary: 人读架构说明。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
 对外主语：`RedCube AI` 是独立 visual-deliverable Foundry Agent；公开发布形态是 built on `OPL Framework` 的 `OPL-compatible package`。`gateway / harness` 仅保留为内部架构边界语言。
 
 ## 主链路

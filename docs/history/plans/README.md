@@ -10,6 +10,7 @@ Machine boundary: 人读历史计划索引。机器真相继续归 contracts、s
 ## 当前文件
 
 - `2026-04-08-deep-research-source-readiness-pack-phase-1.md`：历史 Deep Research / Source Readiness Pack Phase 1 计划。它已被后续 source readiness、source augmentation、deep research trigger/gate 与 workspace quickstart hardening 吸收，不再作为当前 implementation checklist。
+- `creative-stage-ai-first-audit-2026-04-13.md`：历史 AI-first 创作阶段审计；其中 upstream Hermes owner wording 只保留为当时 proof/provenance，不再作为当前 executor owner、默认 route 或 active support reference。
 
 ## 维护规则
 

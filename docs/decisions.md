@@ -1,5 +1,10 @@
 # RedCube AI 关键决策
 
+Owner: `RedCube AI`
+Purpose: `active_decision_log`
+State: `current_policy_with_historical_context`
+Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
 ## 2026-05-18
 
 ### 决策：把 RCA retained functions 硬化为 AI-first visual authority surfaces

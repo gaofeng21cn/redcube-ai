@@ -1,5 +1,10 @@
 # Native PPT Proof Environment
 
+Owner: `RedCube AI`
+Purpose: `native_ppt_proof_environment_support`
+State: `active_support`
+Machine boundary: 人读 proof environment support。机器真相继续归 native helper catalog、proof runner scripts、CI config、runtime-family source、workspace artifacts、rendered proof artifacts 和 review/export receipts。
+
 ## Scope
 
 This environment is for renderer diagnostics and Linux native proof readiness checks. It does not replace RedCube product-entry, runtime-family routes, `visual_director_review`, `screenshot_review`, or `export_pptx`.

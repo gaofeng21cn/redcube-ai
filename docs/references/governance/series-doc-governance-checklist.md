@@ -1,5 +1,10 @@
 # 系列项目文档治理清单
 
+Owner: `RedCube AI`
+Purpose: `series_docs_governance_checklist`
+State: `active_support`
+Machine boundary: 人读治理清单。机器真相继续归各 repo 的 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 owner docs。
+
 ## 目标
 
 本清单用于把 `RedCube AI` 放进 `One Person Lab`、`Med Auto Science`、`Med Auto Grant`、`RedCube AI` 这组系列项目的统一文档管理口径里做巡检。

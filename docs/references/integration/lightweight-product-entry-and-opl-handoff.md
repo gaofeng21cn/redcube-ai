@@ -1,5 +1,10 @@
 # RedCube AI 轻量产品入口与 OPL 内部 Handoff
 
+Owner: `RedCube AI`
+Purpose: `direct_and_opl_hosted_handoff_support`
+State: `active_support`
+Machine boundary: 人读 integration support。机器真相继续归 runtime-program contracts、product-entry manifest、CLI/MCP/API behavior、source、runtime artifacts 和 owner receipts。
+
 生命周期说明：本文是 supporting reference，用来解释 direct RedCube entry 与 OPL 托管集成路径如何共用同一 downstream domain entry。它不把 OPL / bridge / handoff 写成 RedCube 的对外第一身份；公开入口仍以 `redcube-ai` 应用技能和视觉交付领域智能体身份为准。
 
 ## 1. 当前真相

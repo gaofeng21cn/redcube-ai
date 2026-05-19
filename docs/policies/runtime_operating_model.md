@@ -1,5 +1,10 @@
 # 运行模型 Policy
 
+Owner: `RedCube AI`
+Purpose: `runtime_operating_model_policy`
+State: `current_policy`
+Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts 和 RCA-owned review/export gates。
+
 这份文档定义 `RedCube AI` 当前稳定的顶层运行边界。
 
 ## 项目定位

@@ -1,5 +1,10 @@
 # 交付合同模型 Policy
 
+Owner: `RedCube AI`
+Purpose: `deliverable_contract_model_policy`
+State: `current_policy`
+Machine boundary: 人读交付合同 policy。机器真相继续归 contracts、runtime-family source、workspace artifacts、artifact manifests、review/export receipts 和 canonical artifacts。
+
 这份文档定义 `RedCube AI` 当前稳定的交付合同模型。
 
 ## 正式控制模型

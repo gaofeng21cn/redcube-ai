@@ -1,5 +1,10 @@
 # TypeScript Migration Policy
 
+Owner: `RedCube AI`
+Purpose: `typescript_migration_policy`
+State: `current_policy`
+Machine boundary: 人读实现语言 policy。机器真相继续归 source、package manifests、tsconfig、line-budget / JS residue contracts、tests 和 CI behavior。
+
 这份文档定义 `RedCube AI` 主仓当前稳定的 TypeScript 迁移边界。
 
 ## 稳定原则

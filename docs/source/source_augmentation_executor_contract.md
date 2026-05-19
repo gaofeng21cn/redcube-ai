@@ -1,5 +1,10 @@
 # Source Augmentation / Deep Research 执行器合同
 
+Owner: `RedCube AI`
+Purpose: `source_augmentation_executor_contract_support`
+State: `active_support`
+Machine boundary: 人读 source executor contract support。机器真相继续归 source contracts、workspace canonical artifacts、CLI/MCP behavior、runtime-family source、runtime-program contracts 和 owner receipts。
+
 这份文档写给技术协作同事和 Agent 执行者。
 它不属于默认公开入口，而是 repo 跟踪的稳定内部操作文档。
 

@@ -1,5 +1,10 @@
 # 公开发布到 GitHub
 
+Owner: `RedCube AI`
+Purpose: `public_repository_publish_guide`
+State: `active_support`
+Machine boundary: 人读发布协作指南。机器真相继续归 git state、GitHub remote state、repo source、contracts、ignored local config 和 runtime artifacts。
+
 本文档说明如何把当前 RedCube 仓库作为一个公开仓库发布，同时继续把个人作者信息、私有 prompts 和业务素材留在仓库外。
 
 ## 原则

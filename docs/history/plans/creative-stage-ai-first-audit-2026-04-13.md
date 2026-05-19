@@ -1,5 +1,12 @@
 # 创作阶段 AI-First 审计（2026-04-13）
 
+Owner: `RedCube AI`
+Purpose: `historical_ai_first_audit_provenance`
+State: `historical_provenance`
+Machine boundary: 本文是人读历史审计归档。当前机器真相继续归 contracts、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
+生命周期说明：本文从 `docs/references/` 迁入 `docs/history/plans/`。其中 `upstream Hermes` 创作 owner 表述只按 2026-04-13 proof/provenance 读取；当前默认 executor、image-first route、OPL-hosted boundary 和 AI-first authority truth 回到核心五件套、`docs/policies/ai_first_quality_boundary.md`、`docs/references/rca-visual-deliverable-agent-ideal-state.md` 与 `docs/active/rca-ideal-state-gap-plan.md`。
+
 ## 目的
 
 这份审计只回答一件事：

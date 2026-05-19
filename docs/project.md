@@ -1,5 +1,10 @@
 # RedCube AI 项目概览
 
+Owner: `RedCube AI`
+Purpose: `current_project_role_and_boundary`
+State: `current_truth`
+Machine boundary: 人读项目概览。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
+
 ## 项目是什么
 
 `RedCube AI` 是独立 visual-deliverable Foundry Agent；它的第一公开身份是视觉交付，而不是 OPL、gateway、harness 或旧 route。
