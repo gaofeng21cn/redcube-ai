@@ -8,6 +8,9 @@ import {
   buildTestGroups,
   TEST_REGISTRY,
 } from '../scripts/test-registry.ts';
+import {
+  checkCurrentProgramLeafIndex,
+} from '../scripts/sync-current-program-leaf-index.ts';
 
 const ACTIVE_MACHINE_READABLE_ROOTS = Object.freeze([
   'apps',
@@ -85,6 +88,7 @@ const HISTORICAL_CONTRACTS = Object.freeze([
 test('current runtime program is backed by indexed leaf refs instead of a monolithic truth owner', () => {
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
   const index = readJson('contracts/runtime-program/current-program.index.json');
+  const syncCheck = checkCurrentProgramLeafIndex();
 
   assert.equal(index.surface_kind, 'rca_current_program_leaf_index');
   assert.equal(index.schema_version, 2);
@@ -108,6 +112,8 @@ test('current runtime program is backed by indexed leaf refs instead of a monoli
   ]);
 
   assert.equal(index.leaf_refs.length > index.section_roots.length, true);
+  assert.deepEqual(syncCheck.mismatches, []);
+  assert.equal(syncCheck.leaf_ref_count, index.leaf_refs.length);
   for (const section of index.section_roots) {
     assert.equal(existsSync(path.resolve(section.ref_root)), true, section.ref_root);
   }
