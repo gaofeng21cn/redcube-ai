@@ -52,6 +52,35 @@ const GENERATED_SURFACES = [
   'functional_harness_cases',
 ];
 
+const REQUIRED_DOMAIN_PACK_PATHS = [
+  'agent/README.md',
+  'agent/prompts/source_intake.md',
+  'agent/prompts/communication_strategy.md',
+  'agent/prompts/visual_direction.md',
+  'agent/prompts/artifact_creation.md',
+  'agent/prompts/review_and_revision.md',
+  'agent/prompts/package_and_handoff.md',
+  'agent/stages/source_intake.md',
+  'agent/stages/communication_strategy.md',
+  'agent/stages/visual_direction.md',
+  'agent/stages/artifact_creation.md',
+  'agent/stages/review_and_revision.md',
+  'agent/stages/package_and_handoff.md',
+  'agent/skills/visual_deliverable_authoring.md',
+  'agent/skills/native_helper_policy.md',
+  'agent/skills/visual_memory_policy.md',
+  'agent/quality_gates/visual_authority_boundaries.md',
+  'agent/quality_gates/source_and_truth.md',
+  'agent/quality_gates/communication_and_direction.md',
+  'agent/quality_gates/artifact_authority.md',
+  'agent/quality_gates/review_export_memory.md',
+  'agent/knowledge/visual_truth_boundaries.md',
+  'agent/knowledge/communication_visual_direction.md',
+  'agent/knowledge/artifact_and_export_authority.md',
+  'agent/knowledge/review_export_memory.md',
+  'agent/knowledge/owner_receipt_policy.md',
+];
+
 function stable(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
@@ -119,6 +148,14 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     domain_pack_owner: DOMAIN_ID,
     generated_surface_owner: GENERATED_SURFACE_OWNER,
     declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
+    canonical_semantic_pack_root: 'agent/',
+    canonical_semantic_pack_role: 'repo_source_declarative_visual_pack',
+    legacy_detail_asset_roots: [
+      'prompts/ppt_deck/',
+      'prompts/xiaohongshu/',
+    ],
+    legacy_detail_asset_policy: 'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
+    required_domain_pack_paths: REQUIRED_DOMAIN_PACK_PATHS,
     minimal_authority_surface_ids: authorityContract.allowed_authority_surface_ids,
     minimal_authority_surface_taxonomy: authorityContract.authority_surface_taxonomy,
     minimal_authority_surface_contracts: authorityContract.authority_surface_contracts,
@@ -128,6 +165,7 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     repo_local_handlers_are_generated_surface_owners: false,
     domain_repo_can_own_generated_surface: false,
     source_refs: {
+      canonical_semantic_pack: 'agent/',
       action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
       stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
       memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
@@ -151,6 +189,21 @@ function buildGeneratedSurfaceHandoff() {
     domain_repo_can_own_generated_surface: false,
     source_contract_ref: 'contracts/pack_compiler_input.json',
     generated_interface_consumption_ref: '/opl_generated_interface_consumption',
+    semantic_pack_consumption_policy: {
+      source_pack_root: 'agent/',
+      stage_prompt_ref_policy: 'consume_agent_prompts_repo_paths_only',
+      legacy_prompt_assets_role: 'detail_assets_referenced_by_agent_prompt_policy',
+      opl_generated_surfaces_write_policy: 'refs_only_no_visual_truth_body_verdict_artifact_or_memory_writes',
+      forbidden_generated_surface_outputs: [
+        'visual_truth_body',
+        'review_export_verdict',
+        'artifact_body',
+        'artifact_mutation_authorization',
+        'visual_memory_body',
+        'visual_memory_accept_reject_verdict',
+        'owner_receipt',
+      ],
+    },
     generated_surfaces: GENERATED_SURFACES.map((surfaceId) => ({
       surface_id: surfaceId,
       owner: GENERATED_SURFACE_OWNER,

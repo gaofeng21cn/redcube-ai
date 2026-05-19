@@ -1,8 +1,10 @@
-# RedCube AI Agent Boundary
+# RedCube AI Agent Pack
 
 Owner: RedCube AI
-Purpose: repo-source anchor for the OPL standard domain-agent skeleton.
-State: descriptor/index surface only.
-Machine boundary: executable truth remains in `packages/`, `apps/`, `contracts/`, and product-entry manifests.
+Purpose: canonical repo-source semantic pack for the OPL standard domain-agent compiler.
+State: active declarative visual pack.
+Machine boundary: `agent/` owns stage semantics, prompt policy refs, skills, quality gates, and knowledge policy. Executable handlers, minimal authority functions, and native helpers remain in `packages/`, `apps/`, runtime contracts, and Python helper modules.
 
-This directory makes the standard `agent/`, `contracts/`, `runtime/`, `docs/` skeleton physically auditable. It does not store visual truth, review/export verdicts, canonical artifacts, memory bodies, or receipt instances.
+This directory is the canonical Declarative Visual Pack for RCA. OPL generated surfaces consume these refs to build CLI, MCP, Skill, product-entry, status, session, sidecar, and workbench descriptors. They do not write RedCube visual truth, artifact bodies, review/export verdicts, visual memory bodies, or owner receipts.
+
+Legacy detailed assets under `prompts/ppt_deck/` and `prompts/xiaohongshu/` remain implementation/detail prompt assets. Stage-level `prompt_refs` must point to `agent/prompts/*.md`, which then locates the detailed prompt assets by deliverable family and route.

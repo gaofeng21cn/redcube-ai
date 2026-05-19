@@ -126,6 +126,96 @@ const PLANE_SOURCE_REFS = [
   { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_authority_projection' },
 ];
 
+const CANONICAL_STAGE_PROMPT_REFS = {
+  source_intake: 'agent/prompts/source_intake.md',
+  communication_strategy: 'agent/prompts/communication_strategy.md',
+  visual_direction: 'agent/prompts/visual_direction.md',
+  artifact_creation: 'agent/prompts/artifact_creation.md',
+  review_and_revision: 'agent/prompts/review_and_revision.md',
+  package_and_handoff: 'agent/prompts/package_and_handoff.md',
+};
+
+const CANONICAL_STAGE_SKILL_REFS = {
+  source_intake: ['agent/skills/visual_deliverable_authoring.md'],
+  communication_strategy: ['agent/skills/visual_deliverable_authoring.md'],
+  visual_direction: ['agent/skills/visual_deliverable_authoring.md'],
+  artifact_creation: [
+    'agent/skills/visual_deliverable_authoring.md',
+    'agent/skills/native_helper_policy.md',
+  ],
+  review_and_revision: [
+    'agent/skills/visual_deliverable_authoring.md',
+    'agent/skills/visual_memory_policy.md',
+  ],
+  package_and_handoff: [
+    'agent/skills/native_helper_policy.md',
+    'agent/skills/visual_memory_policy.md',
+  ],
+};
+
+const CANONICAL_STAGE_KNOWLEDGE_REFS = {
+  source_intake: [
+    'agent/knowledge/visual_truth_boundaries.md',
+    'agent/knowledge/owner_receipt_policy.md',
+  ],
+  communication_strategy: [
+    'agent/knowledge/communication_visual_direction.md',
+    'agent/knowledge/visual_truth_boundaries.md',
+  ],
+  visual_direction: [
+    'agent/knowledge/communication_visual_direction.md',
+    'agent/knowledge/visual_truth_boundaries.md',
+  ],
+  artifact_creation: [
+    'agent/knowledge/artifact_and_export_authority.md',
+    'agent/knowledge/visual_truth_boundaries.md',
+  ],
+  review_and_revision: [
+    'agent/knowledge/review_export_memory.md',
+    'agent/knowledge/owner_receipt_policy.md',
+  ],
+  package_and_handoff: [
+    'agent/knowledge/artifact_and_export_authority.md',
+    'agent/knowledge/review_export_memory.md',
+    'agent/knowledge/owner_receipt_policy.md',
+  ],
+};
+
+const CANONICAL_STAGE_QUALITY_GATE_REFS = {
+  source_intake: [
+    { ref: 'agent/quality_gates/source_and_truth.md', role: 'source_truth_gate' },
+    { ref: 'agent/quality_gates/visual_authority_boundaries.md', role: 'owner_receipt_gate' },
+  ],
+  communication_strategy: [
+    { ref: 'agent/quality_gates/communication_and_direction.md', role: 'communication_strategy_gate' },
+    { ref: 'agent/quality_gates/visual_authority_boundaries.md', role: 'owner_receipt_gate' },
+  ],
+  visual_direction: [
+    { ref: 'agent/quality_gates/communication_and_direction.md', role: 'visual_direction_gate' },
+    { ref: 'agent/quality_gates/visual_authority_boundaries.md', role: 'owner_receipt_gate' },
+  ],
+  artifact_creation: [
+    { ref: 'agent/quality_gates/artifact_authority.md', role: 'artifact_authority_gate' },
+    { ref: 'agent/quality_gates/visual_authority_boundaries.md', role: 'owner_receipt_gate' },
+  ],
+  review_and_revision: [
+    { ref: 'agent/quality_gates/review_export_memory.md', role: 'review_export_memory_gate' },
+    { ref: 'agent/quality_gates/visual_authority_boundaries.md', role: 'owner_receipt_gate' },
+  ],
+  package_and_handoff: [
+    { ref: 'agent/quality_gates/artifact_authority.md', role: 'artifact_handoff_gate' },
+    { ref: 'agent/quality_gates/review_export_memory.md', role: 'owner_receipt_gate' },
+  ],
+};
+
+function repoPathRefs(refs, role) {
+  return refs.map((ref) => ({
+    ref_kind: 'repo_path',
+    ref,
+    role,
+  }));
+}
+
 function buildFreshness(sourceRefs) {
   return {
     status: 'current',
@@ -168,20 +258,32 @@ function stageDescriptor(stage, actionIds) {
       { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'resume_context' },
     ],
     skills: [
+      ...repoPathRefs(CANONICAL_STAGE_SKILL_REFS[stage.stage_id], 'canonical_stage_skill_policy'),
       { ref_kind: 'skill_id', ref: 'redcube-ai', role: 'domain_skill' },
       { ref_kind: 'skill_id', ref: 'imagegen', role: 'visual_generation' },
       { ref_kind: 'skill_id', ref: 'presentations', role: 'presentation_output' },
     ],
     prompt_refs: [
-      { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_prompt_pack' },
-      { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_prompt_pack' },
+      {
+        ref_kind: 'repo_path',
+        ref: CANONICAL_STAGE_PROMPT_REFS[stage.stage_id],
+        role: 'canonical_stage_prompt_policy',
+      },
     ],
+    legacy_prompt_asset_refs: [
+      { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_detailed_prompt_assets' },
+      { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_detailed_prompt_assets' },
+    ],
+    knowledge_refs: repoPathRefs(
+      CANONICAL_STAGE_KNOWLEDGE_REFS[stage.stage_id],
+      'canonical_stage_knowledge_policy',
+    ),
     visual_pattern_memory_refs: stage.visual_pattern_memory_refs || [],
-    evaluation: [
-      { ref_kind: 'json_pointer', ref: '/review_state', role: 'rca_review_state' },
-      { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'rca_publication_projection' },
-      { ref_kind: 'json_pointer', ref: '/domain_owner_receipt_contract', role: 'owner_receipt_gate' },
-    ],
+    evaluation: CANONICAL_STAGE_QUALITY_GATE_REFS[stage.stage_id].map((gate) => ({
+      ref_kind: 'repo_path',
+      ref: gate.ref,
+      role: gate.role,
+    })),
     handoff: {
       next_owner: 'one-person-lab',
       next_stage_refs: stage.next_stage_refs || [],

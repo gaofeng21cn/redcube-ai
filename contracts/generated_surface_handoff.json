@@ -6,6 +6,21 @@
   "domain_repo_can_own_generated_surface": false,
   "source_contract_ref": "contracts/pack_compiler_input.json",
   "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
+  "semantic_pack_consumption_policy": {
+    "source_pack_root": "agent/",
+    "stage_prompt_ref_policy": "consume_agent_prompts_repo_paths_only",
+    "legacy_prompt_assets_role": "detail_assets_referenced_by_agent_prompt_policy",
+    "opl_generated_surfaces_write_policy": "refs_only_no_visual_truth_body_verdict_artifact_or_memory_writes",
+    "forbidden_generated_surface_outputs": [
+      "visual_truth_body",
+      "review_export_verdict",
+      "artifact_body",
+      "artifact_mutation_authorization",
+      "visual_memory_body",
+      "visual_memory_accept_reject_verdict",
+      "owner_receipt"
+    ]
+  },
   "generated_surfaces": [
     {
       "surface_id": "cli",

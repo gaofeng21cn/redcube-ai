@@ -20,6 +20,7 @@
 `OPL` 是 stage-led 的完整智能体运行框架，可以把 RCA 作为外部依赖 / admitted domain agent 托管；RCA 不是 OPL 内部模块。OPL 可以读取 RCA stage/action/projection descriptor，负责 queue、wakeup、handoff、receipt、approval/retry 和 operator projection；RCA 继续持有 source intake、communication strategy、visual direction、artifact creation、review/revision、package/handoff 等 stage 语义，以及 visual-domain truth、review/export gate 和 canonical artifact authority。
 在这条 OPL 路线上，OPL stage-led family runtime provider 负责 provider profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是 production online runtime 的必需 substrate，Hermes 只在显式 hosted/proof backend、Agent executor adapter 或 proof lane 语境中出现。OPL 不持有 RedCube visual-domain truth、canonical artifacts、review-state truth、publication projection truth 或 concrete executor。
 当前 stage-led 对齐已经落到 RCA-owned descriptor/projection 层：`family_action_catalog`、`stage_control_projection`、`route_equivalence`、`product sidecar export/dispatch`、`opl_runtime_manager_registration` 与 `standard_domain_agent_skeleton`。这些 surface 让 OPL 能做 discovery、typed queue、wakeup、handoff、receipt 和 operator projection；OPL 只消费 descriptor / refs，不生成 visual route、review verdict、publication projection truth 或 canonical artifact。
+当前标准 OPL Agent 语义包的 canonical repo-source 已落到 `agent/`：六个 stage 的 prompt policy 在 `agent/prompts/*.md`，stage、skill、quality gate 与 knowledge 边界分别在 `agent/stages/`、`agent/skills/`、`agent/quality_gates/` 和 `agent/knowledge/`。旧 `prompts/ppt_deck/` 与 `prompts/xiaohongshu/` 仍是真实详细 prompt assets，但它们只是 implementation/detail assets，不再作为 stage control plane 的 canonical `prompt_refs`。
 
 ## 项目目标
 
@@ -31,6 +32,7 @@
 - 冻结一个可被 `OPL` 托管路径调用的 service-safe domain entry adapter，而不是先做聊天 UI。
 - 落地可 direct 调用、也可由 `OPL` 通过托管集成路径调用的 lightweight domain `product entry` service surface，并把 session continuity 收到用户级 runtime-state。
 - 保持 Codex App direct skill path 与 OPL 托管 path 的语义等价：两条路径都必须回到 RCA-owned route、review、artifact 和 export surface；Agent executor 是最小具体执行单位，`Codex CLI` 是当前第一公民 executor。
+- 保持 `agent/` 作为 Declarative Visual Pack 的单一 canonical repo-source；packages 继续只承载 domain handler、minimal authority function、refs-only adapter 和 native helper implementation。
 - 在不改写 domain 语义的前提下，继续维护 absorbed tranche、follow-on board 与 provenance。
 
 ## 非目标

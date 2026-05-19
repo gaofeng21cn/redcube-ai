@@ -20,6 +20,35 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 
+const requiredDomainPackPaths = [
+  'agent/README.md',
+  'agent/prompts/source_intake.md',
+  'agent/prompts/communication_strategy.md',
+  'agent/prompts/visual_direction.md',
+  'agent/prompts/artifact_creation.md',
+  'agent/prompts/review_and_revision.md',
+  'agent/prompts/package_and_handoff.md',
+  'agent/stages/source_intake.md',
+  'agent/stages/communication_strategy.md',
+  'agent/stages/visual_direction.md',
+  'agent/stages/artifact_creation.md',
+  'agent/stages/review_and_revision.md',
+  'agent/stages/package_and_handoff.md',
+  'agent/skills/visual_deliverable_authoring.md',
+  'agent/skills/native_helper_policy.md',
+  'agent/skills/visual_memory_policy.md',
+  'agent/quality_gates/visual_authority_boundaries.md',
+  'agent/quality_gates/source_and_truth.md',
+  'agent/quality_gates/communication_and_direction.md',
+  'agent/quality_gates/artifact_authority.md',
+  'agent/quality_gates/review_export_memory.md',
+  'agent/knowledge/visual_truth_boundaries.md',
+  'agent/knowledge/communication_visual_direction.md',
+  'agent/knowledge/artifact_and_export_authority.md',
+  'agent/knowledge/review_export_memory.md',
+  'agent/knowledge/owner_receipt_policy.md',
+];
+
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
@@ -54,6 +83,16 @@ function assertNoLegacyAuthorityFunctionFields(value, label) {
   for (const [key, entry] of Object.entries(value)) {
     assertNoLegacyAuthorityFunctionFields(entry, `${label}.${key}`);
   }
+}
+
+function assertCleanAgentRepoPathRef(refEntry, expectedPrefix, label) {
+  assert.equal(refEntry.ref_kind, 'repo_path', label);
+  assert.equal(refEntry.ref.startsWith(expectedPrefix), true, `${label}: ${refEntry.ref}`);
+  const fullPath = path.join(repoRoot, refEntry.ref);
+  assert.equal(fs.existsSync(fullPath), true, `${label}: ${refEntry.ref}`);
+  const content = fs.readFileSync(fullPath, 'utf8');
+  assert.notEqual(content.trim(), '', `${label}: ${refEntry.ref}`);
+  assert.equal(/\b(?:TODO|TBD)\b/i.test(content), false, `${label}: ${refEntry.ref}`);
 }
 
 function buildCanonicalPack() {
@@ -102,6 +141,14 @@ function buildCanonicalPack() {
       domain_pack_owner: 'redcube_ai',
       generated_surface_owner: 'one-person-lab',
       declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,
+      canonical_semantic_pack_root: 'agent/',
+      canonical_semantic_pack_role: 'repo_source_declarative_visual_pack',
+      legacy_detail_asset_roots: [
+        'prompts/ppt_deck/',
+        'prompts/xiaohongshu/',
+      ],
+      legacy_detail_asset_policy: 'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
+      required_domain_pack_paths: requiredDomainPackPaths,
       minimal_authority_surface_ids: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_authority_surface_ids,
       minimal_authority_surface_taxonomy: (
         visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_taxonomy
@@ -115,6 +162,7 @@ function buildCanonicalPack() {
       repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
       source_refs: {
+        canonical_semantic_pack: 'agent/',
         action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
         stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
         memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
@@ -156,6 +204,82 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.deepEqual(readJson('contracts/owner_receipt_contract.json'), canonical.ownerReceiptContract);
   assert.deepEqual(readJson('contracts/pack_compiler_input.json'), canonical.packCompilerInput);
   assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
+});
+
+test('RCA canonical semantic pack paths are concrete, clean, and stage semantic refs resolve under agent', () => {
+  const packCompilerInput = readJson('contracts/pack_compiler_input.json');
+  const stageControlPlane = readJson('contracts/stage_control_plane.json');
+
+  assert.equal(packCompilerInput.canonical_semantic_pack_root, 'agent/');
+  assert.equal(packCompilerInput.canonical_semantic_pack_role, 'repo_source_declarative_visual_pack');
+  assert.deepEqual(packCompilerInput.legacy_detail_asset_roots, [
+    'prompts/ppt_deck/',
+    'prompts/xiaohongshu/',
+  ]);
+  assert.equal(
+    packCompilerInput.legacy_detail_asset_policy,
+    'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
+  );
+  assert.deepEqual(packCompilerInput.required_domain_pack_paths, requiredDomainPackPaths);
+
+  for (const relativePath of packCompilerInput.required_domain_pack_paths) {
+    assert.equal(relativePath.startsWith('agent/'), true, relativePath);
+    const fullPath = path.join(repoRoot, relativePath);
+    assert.equal(fs.existsSync(fullPath), true, relativePath);
+    const content = fs.readFileSync(fullPath, 'utf8');
+    assert.notEqual(content.trim(), '', relativePath);
+    assert.equal(/\b(?:TODO|TBD)\b/i.test(content), false, relativePath);
+  }
+
+  const stageIds = stageControlPlane.stages.map((stage) => stage.stage_id);
+  assert.deepEqual(stageIds, [
+    'source_intake',
+    'communication_strategy',
+    'visual_direction',
+    'artifact_creation',
+    'review_and_revision',
+    'package_and_handoff',
+  ]);
+
+  for (const stage of stageControlPlane.stages) {
+    assert.deepEqual(stage.prompt_refs, [
+      {
+        ref_kind: 'repo_path',
+        ref: `agent/prompts/${stage.stage_id}.md`,
+        role: 'canonical_stage_prompt_policy',
+      },
+    ], stage.stage_id);
+    assertCleanAgentRepoPathRef(stage.prompt_refs[0], 'agent/prompts/', `${stage.stage_id}.prompt_refs`);
+    const stageSkillRefs = stage.skills.filter((skill) => skill.ref_kind === 'repo_path');
+    assert.equal(stageSkillRefs.length > 0, true, stage.stage_id);
+    assert.equal(
+      stage.skills.some((skill) => skill.ref_kind === 'skill_id' && skill.ref === 'redcube-ai'),
+      true,
+      stage.stage_id,
+    );
+    for (const [index, skillRef] of stageSkillRefs.entries()) {
+      assertCleanAgentRepoPathRef(skillRef, 'agent/skills/', `${stage.stage_id}.skills[${index}]`);
+    }
+    assert.equal(Array.isArray(stage.knowledge_refs), true, stage.stage_id);
+    assert.equal(stage.knowledge_refs.length > 0, true, stage.stage_id);
+    for (const [index, knowledgeRef] of stage.knowledge_refs.entries()) {
+      assertCleanAgentRepoPathRef(knowledgeRef, 'agent/knowledge/', `${stage.stage_id}.knowledge_refs[${index}]`);
+    }
+    assert.equal(Array.isArray(stage.evaluation), true, stage.stage_id);
+    assert.equal(stage.evaluation.length > 0, true, stage.stage_id);
+    assert.equal(
+      stage.evaluation.some((evaluationRef) => evaluationRef.role === 'owner_receipt_gate'),
+      true,
+      stage.stage_id,
+    );
+    for (const [index, evaluationRef] of stage.evaluation.entries()) {
+      assertCleanAgentRepoPathRef(evaluationRef, 'agent/quality_gates/', `${stage.stage_id}.evaluation[${index}]`);
+    }
+    assert.equal(stage.legacy_prompt_asset_refs.length, 2, stage.stage_id);
+    for (const legacyRef of stage.legacy_prompt_asset_refs) {
+      assert.equal(legacyRef.ref.startsWith('prompts/'), true, stage.stage_id);
+    }
+  }
 });
 
 test('RCA root generated surface handoff names OPL as owner for skill, product status, and session metadata', () => {

@@ -202,6 +202,11 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -220,30 +225,44 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/source_intake.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/visual_truth_boundaries.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/owner_receipt_policy.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "visual_pattern_memory_refs": [],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/source_and_truth.md",
+          "role": "source_truth_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/visual_authority_boundaries.md",
           "role": "owner_receipt_gate"
         }
       ],
@@ -442,6 +461,11 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -460,30 +484,44 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/communication_strategy.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/communication_visual_direction.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/visual_truth_boundaries.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "visual_pattern_memory_refs": [],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/communication_and_direction.md",
+          "role": "communication_strategy_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/visual_authority_boundaries.md",
           "role": "owner_receipt_gate"
         }
       ],
@@ -665,6 +703,11 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -683,30 +726,44 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/visual_direction.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/communication_visual_direction.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/visual_truth_boundaries.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "visual_pattern_memory_refs": [],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/communication_and_direction.md",
+          "role": "visual_direction_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/visual_authority_boundaries.md",
           "role": "owner_receipt_gate"
         }
       ],
@@ -895,6 +952,16 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/native_helper_policy.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -913,30 +980,44 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/artifact_creation.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/artifact_and_export_authority.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/visual_truth_boundaries.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "visual_pattern_memory_refs": [],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/artifact_authority.md",
+          "role": "artifact_authority_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/visual_authority_boundaries.md",
           "role": "owner_receipt_gate"
         }
       ],
@@ -1156,6 +1237,16 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_memory_policy.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -1174,29 +1265,43 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/review_and_revision.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/review_export_memory.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/owner_receipt_policy.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/review_export_memory.md",
+          "role": "review_export_memory_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/visual_authority_boundaries.md",
           "role": "owner_receipt_gate"
         }
       ],
@@ -1413,6 +1518,16 @@
       ],
       "skills": [
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/native_helper_policy.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_memory_policy.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -1431,29 +1546,48 @@
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
+          "ref": "agent/prompts/package_and_handoff.md",
+          "role": "canonical_stage_prompt_policy"
+        }
+      ],
+      "legacy_prompt_asset_refs": [
+        {
+          "ref_kind": "repo_path",
           "ref": "prompts/ppt_deck",
-          "role": "ppt_prompt_pack"
+          "role": "ppt_detailed_prompt_assets"
         },
         {
           "ref_kind": "repo_path",
           "ref": "prompts/xiaohongshu",
-          "role": "xiaohongshu_prompt_pack"
+          "role": "xiaohongshu_detailed_prompt_assets"
+        }
+      ],
+      "knowledge_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/artifact_and_export_authority.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/review_export_memory.md",
+          "role": "canonical_stage_knowledge_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/owner_receipt_policy.md",
+          "role": "canonical_stage_knowledge_policy"
         }
       ],
       "evaluation": [
         {
-          "ref_kind": "json_pointer",
-          "ref": "/review_state",
-          "role": "rca_review_state"
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/artifact_authority.md",
+          "role": "artifact_handoff_gate"
         },
         {
-          "ref_kind": "json_pointer",
-          "ref": "/publication_projection",
-          "role": "rca_publication_projection"
-        },
-        {
-          "ref_kind": "json_pointer",
-          "ref": "/domain_owner_receipt_contract",
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/review_export_memory.md",
           "role": "owner_receipt_gate"
         }
       ],
