@@ -1,0 +1,251 @@
+// @ts-nocheck
+
+export const RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES = Object.freeze([
+  'declarative_visual_pack',
+  'machine_contract',
+  'service_safe_domain_entry',
+  'domain_handler_target',
+  'refs_only_read_model',
+  'minimal_visual_authority_function',
+  'visual_native_helper_implementation',
+  'diagnostic_or_fixture',
+  'tombstone_or_provenance',
+]);
+
+export const RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES = Object.freeze([
+  'generic_scheduler_owner',
+  'generic_runner_owner',
+  'generic_attempt_ledger_owner',
+  'generic_workbench_owner',
+  'generic_review_repair_transport_owner',
+  'generic_session_runtime_owner',
+  'generic_artifact_lifecycle_owner',
+  'generic_generated_wrapper_owner',
+  'generic_gateway_runtime_owner',
+]);
+
+const FORBIDDEN_GENERIC_OWNER_FLAGS = Object.freeze({
+  rca_owns_generic_scheduler: false,
+  rca_owns_generic_runner: false,
+  rca_owns_generic_attempt_ledger: false,
+  rca_owns_generic_workbench: false,
+  rca_owns_generic_review_repair_transport: false,
+  rca_owns_generic_session_runtime: false,
+  rca_owns_generic_artifact_lifecycle: false,
+  rca_owns_generic_generated_wrapper: false,
+  rca_owns_generic_gateway_runtime: false,
+});
+
+const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
+  {
+    surface_id: 'agent_declarative_visual_pack',
+    source_refs: [
+      'agent/',
+    ],
+    classification: 'declarative_visual_pack',
+    current_rca_role: 'declarative_visual_pack',
+    allowed_outputs: [
+      'stage_prompt_policy_refs',
+      'stage_contract_refs',
+      'skill_refs',
+      'quality_gate_refs',
+      'knowledge_refs',
+    ],
+  },
+  {
+    surface_id: 'runtime_program_machine_contracts',
+    source_refs: [
+      'contracts/',
+      'contracts/runtime-program/current-program.index.json',
+      'contracts/runtime-program/current-program-parts/',
+    ],
+    classification: 'machine_contract',
+    current_rca_role: 'contract_truth_and_leaf_program_projection',
+    allowed_outputs: [
+      'contract_refs',
+      'semantic_id_refs',
+      'tombstone_refs',
+      'provenance_refs',
+    ],
+  },
+  {
+    surface_id: 'mcp_product_entry_domain_entry',
+    source_refs: [
+      'apps/redcube-mcp/src/server.ts',
+      'packages/redcube-gateway/src/actions/invoke-domain-entry.ts',
+      'packages/redcube-gateway/src/actions/invoke-product-entry.ts',
+    ],
+    classification: 'service_safe_domain_entry',
+    current_rca_role: 'direct_protocol_adapter_and_domain_handler_target',
+    allowed_outputs: [
+      'service_safe_domain_entry_response',
+      'domain_action_metadata_refs',
+      'typed_blocker',
+      'owner_receipt_refs',
+    ],
+  },
+  {
+    surface_id: 'product_entry_session_store',
+    source_refs: [
+      'packages/redcube-runtime/src/product-entry-session-store.ts',
+      'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
+      'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
+    ],
+    classification: 'refs_only_read_model',
+    current_rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+    allowed_outputs: [
+      'entry_session_domain_refs',
+      'deliverable_locator_refs',
+      'latest_visual_run_ref',
+      'operator_navigation_refs',
+    ],
+  },
+  {
+    surface_id: 'workspace_run_envelope_helpers',
+    source_refs: [
+      'packages/redcube-runtime-protocol/src/workspace.ts',
+      'packages/redcube-runtime-protocol/src/runs.ts',
+    ],
+    classification: 'refs_only_read_model',
+    current_rca_role: 'workspace_and_run_locator_envelope_refs_only_adapter',
+    allowed_outputs: [
+      'workspace_locator_refs',
+      'run_locator_refs',
+      'receipt_refs',
+      'typed_blocker',
+    ],
+  },
+  {
+    surface_id: 'runtime_watch_projection',
+    source_refs: [
+      'packages/redcube-gateway/src/actions/runtime-watch.ts',
+    ],
+    classification: 'refs_only_read_model',
+    current_rca_role: 'runtimeWatch_existing_run_locator_projection',
+    allowed_outputs: [
+      'run_status_refs',
+      'artifact_locator_refs',
+      'review_state_refs',
+      'typed_blocker',
+    ],
+  },
+  {
+    surface_id: 'product_sidecar_guarded_actions',
+    source_refs: [
+      'packages/redcube-gateway/src/actions/product-sidecar.ts',
+      'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts',
+      'packages/redcube-gateway/src/actions/product-sidecar-parts/',
+    ],
+    classification: 'domain_handler_target',
+    current_rca_role: 'guarded_domain_action_target_and_refs_only_sidecar_adapter',
+    allowed_outputs: [
+      'owner_receipt_refs',
+      'typed_blocker',
+      'visual_transition_decision_refs',
+      'safe_action_refs',
+      'no_regression_evidence_refs',
+    ],
+  },
+  {
+    surface_id: 'operator_evidence_stability_projection',
+    source_refs: [
+      'packages/redcube-gateway/src/actions/get-product-status.ts',
+      'packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts',
+      'packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts',
+    ],
+    classification: 'refs_only_read_model',
+    current_rca_role: 'operator_evidence_and_stability_refs_only_read_model',
+    allowed_outputs: [
+      'operator_evidence_refs',
+      'stability_read_model_refs',
+      'domain_blocker_meaning_refs',
+      'safe_repair_hint_refs',
+    ],
+  },
+  {
+    surface_id: 'visual_authority_functions',
+    source_refs: [
+      'packages/redcube-runtime/src/',
+      'python/redcube_ai/',
+      'contracts/runtime-program/python-native-helper-catalog.json',
+    ],
+    classification: 'minimal_visual_authority_function',
+    current_rca_role: 'visual_authority_and_native_helper_implementation',
+    allowed_outputs: [
+      'source_readiness_verdict',
+      'communication_visual_direction_decision_refs',
+      'review_export_verdict_refs',
+      'artifact_mutation_authorization_refs',
+      'visual_memory_accept_reject_receipt_refs',
+      'native_helper_receipt_refs',
+    ],
+  },
+  {
+    surface_id: 'legacy_managed_runtime_names',
+    source_refs: [
+      'contracts/runtime-program/managed-product-entry-hardening.json',
+      'contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retire_tombstone_candidates.json',
+      'docs/history/',
+    ],
+    classification: 'tombstone_or_provenance',
+    current_rca_role: 'contract_safe_semantic_id_or_tombstone_provenance_only',
+    allowed_outputs: [
+      'semantic_id_refs',
+      'retired_surface_guard_refs',
+      'deletion_proof_refs',
+      'history_refs',
+      'tombstone_refs',
+    ],
+  },
+]);
+
+export function buildPhysicalSourceMorphologyPolicy() {
+  return {
+    surface_kind: 'rca_physical_source_morphology_policy',
+    schema_version: 1,
+    domain_id: 'redcube_ai',
+    owner: 'redcube_ai',
+    consumer: 'opl',
+    status: 'active_source_classification_policy_landed',
+    policy_scope: 'active_source_and_machine_contract_surface_classification',
+    canonical_pack_root: 'agent/',
+    contract_truth_roots: [
+      'contracts/',
+      'contracts/runtime-program/current-program.index.json',
+      'contracts/runtime-program/current-program-parts/',
+    ],
+    allowed_surface_classes: [...RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES],
+    forbidden_generic_owner_classes: [...RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES],
+    active_surface_classifications: ACTIVE_SURFACE_CLASSIFICATIONS.map((entry) => ({
+      ...entry,
+      forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
+    })),
+    legacy_name_policy: {
+      managed_runtime_gateway_session_sidecar_terms_allowed_only_as: [
+        'tombstone_or_provenance',
+        'contract_safe_semantic_id',
+        'negative_test_guard',
+        'refs_only_read_model',
+        'domain_handler_target',
+      ],
+      compatibility_alias_allowed: false,
+      active_generic_runtime_owner_allowed: false,
+      active_generic_gateway_owner_allowed: false,
+      active_generic_session_runtime_owner_allowed: false,
+    },
+    new_surface_admission_gate: {
+      must_classify_before_active_caller: true,
+      allowed_new_rca_roles: [
+        'declarative_visual_pack',
+        'service_safe_domain_entry',
+        'domain_handler_target',
+        'refs_only_read_model',
+        'minimal_visual_authority_function',
+        'visual_native_helper_implementation',
+        'diagnostic_or_fixture',
+      ],
+      forbidden_new_rca_roles: [...RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES],
+      reopen_gap_if_forbidden_owner_role_appears: true,
+    },
+  };
+}

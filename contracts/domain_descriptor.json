@@ -15,7 +15,8 @@
     "stage_control_plane": "contracts/stage_control_plane.json",
     "pack_compiler_input": "contracts/pack_compiler_input.json",
     "generated_surface_handoff": "contracts/generated_surface_handoff.json",
-    "functional_privatization_audit": "contracts/functional_privatization_audit.json"
+    "functional_privatization_audit": "contracts/functional_privatization_audit.json",
+    "physical_source_morphology_policy": "contracts/physical_source_morphology_policy.json"
   },
   "authority_boundary": {
     "redcube_ai_owns_visual_truth": true,

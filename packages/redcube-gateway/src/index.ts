@@ -377,6 +377,10 @@ export {
   listProductSidecarGuardedActions,
 } from './actions/product-sidecar-guarded-actions.js';
 
+export {
+  buildPhysicalSourceMorphologyPolicy,
+} from './actions/product-sidecar-parts/physical-source-morphology-policy.js';
+
 export type {
   CreateDeliverableRequest,
   DeliverableAuditRequest,

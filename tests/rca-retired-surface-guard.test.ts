@@ -438,3 +438,66 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     }
   }
 });
+
+test('RCA physical morphology policy keeps active source tails classified and forbids generic owner return', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const byId = Object.fromEntries(policy.active_surface_classifications.map((entry) => [entry.surface_id, entry]));
+
+  assert.equal(policy.surface_kind, 'rca_physical_source_morphology_policy');
+  assert.equal(policy.owner, 'redcube_ai');
+  assert.equal(policy.consumer, 'opl');
+  assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
+  assert.deepEqual(policy.legacy_name_policy.managed_runtime_gateway_session_sidecar_terms_allowed_only_as, [
+    'tombstone_or_provenance',
+    'contract_safe_semantic_id',
+    'negative_test_guard',
+    'refs_only_read_model',
+    'domain_handler_target',
+  ]);
+  assert.equal(
+    policy.new_surface_admission_gate.forbidden_new_rca_roles.includes('generic_attempt_ledger_owner'),
+    true,
+  );
+
+  const requiredClassifications = {
+    mcp_product_entry_domain_entry: 'service_safe_domain_entry',
+    product_entry_session_store: 'refs_only_read_model',
+    workspace_run_envelope_helpers: 'refs_only_read_model',
+    runtime_watch_projection: 'refs_only_read_model',
+    product_sidecar_guarded_actions: 'domain_handler_target',
+    operator_evidence_stability_projection: 'refs_only_read_model',
+    visual_authority_functions: 'minimal_visual_authority_function',
+    legacy_managed_runtime_names: 'tombstone_or_provenance',
+  };
+
+  for (const [surfaceId, classification] of Object.entries(requiredClassifications)) {
+    assert.equal(byId[surfaceId].classification, classification, surfaceId);
+    for (const value of Object.values(byId[surfaceId].forbidden_generic_owner_flags)) {
+      assert.equal(value, false, surfaceId);
+    }
+  }
+
+  assert.equal(
+    byId.product_entry_session_store.current_rca_role,
+    'entry_session_domain_snapshot_refs_only_adapter',
+  );
+  assert.equal(
+    byId.runtime_watch_projection.current_rca_role,
+    'runtimeWatch_existing_run_locator_projection',
+  );
+  assert.equal(
+    byId.product_sidecar_guarded_actions.current_rca_role,
+    'guarded_domain_action_target_and_refs_only_sidecar_adapter',
+  );
+  assert.equal(
+    byId.operator_evidence_stability_projection.current_rca_role,
+    'operator_evidence_and_stability_refs_only_read_model',
+  );
+  assert.equal(
+    byId.legacy_managed_runtime_names.current_rca_role,
+    'contract_safe_semantic_id_or_tombstone_provenance_only',
+  );
+});

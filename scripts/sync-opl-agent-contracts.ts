@@ -7,6 +7,7 @@ import {
   buildFamilyDomainMemoryDescriptor,
   OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildPrivatizedFunctionalModuleAuditProjection,
+  buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
   buildStandardDomainAgentSkeleton,
@@ -122,6 +123,7 @@ function buildDomainDescriptor() {
       pack_compiler_input: 'contracts/pack_compiler_input.json',
       generated_surface_handoff: 'contracts/generated_surface_handoff.json',
       functional_privatization_audit: 'contracts/functional_privatization_audit.json',
+      physical_source_morphology_policy: 'contracts/physical_source_morphology_policy.json',
     },
     authority_boundary: {
       redcube_ai_owns_visual_truth: true,
@@ -303,6 +305,7 @@ function buildContracts() {
     owner_receipt_contract: skeleton.domain_owner_receipt_contract,
     functional_privatization_audit: buildFunctionalAudit(functionalAudit),
     private_functional_surface_policy: buildPrivateFunctionalSurfacePolicy(),
+    physical_source_morphology_policy: buildPhysicalSourceMorphologyPolicy(),
   };
 }
 

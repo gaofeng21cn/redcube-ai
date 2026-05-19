@@ -10,6 +10,7 @@ import {
   OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildFamilyDomainMemoryDescriptor,
   buildPrivatizedFunctionalModuleAuditProjection,
+  buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlane,
   buildStandardDomainAgentSkeleton,
@@ -191,6 +192,7 @@ function buildCanonicalPack() {
         domain_repo_can_own_generated_surface: false,
       },
     },
+    physicalSourceMorphologyPolicy: buildPhysicalSourceMorphologyPolicy(),
   });
 }
 
@@ -204,6 +206,60 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.deepEqual(readJson('contracts/owner_receipt_contract.json'), canonical.ownerReceiptContract);
   assert.deepEqual(readJson('contracts/pack_compiler_input.json'), canonical.packCompilerInput);
   assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
+  assert.deepEqual(
+    readJson('contracts/physical_source_morphology_policy.json'),
+    canonical.physicalSourceMorphologyPolicy,
+  );
+});
+
+test('RCA physical source morphology policy classifies active source tails without generic ownership', () => {
+  const policy = readJson('contracts/physical_source_morphology_policy.json');
+  const byId = Object.fromEntries(policy.active_surface_classifications.map((entry) => [entry.surface_id, entry]));
+
+  assert.equal(policy.surface_kind, 'rca_physical_source_morphology_policy');
+  assert.equal(policy.status, 'active_source_classification_policy_landed');
+  assert.equal(policy.canonical_pack_root, 'agent/');
+  assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
+  assert.equal(policy.legacy_name_policy.active_generic_runtime_owner_allowed, false);
+  assert.equal(policy.legacy_name_policy.active_generic_gateway_owner_allowed, false);
+  assert.equal(policy.legacy_name_policy.active_generic_session_runtime_owner_allowed, false);
+  assert.equal(policy.new_surface_admission_gate.must_classify_before_active_caller, true);
+  assert.equal(policy.new_surface_admission_gate.reopen_gap_if_forbidden_owner_role_appears, true);
+  assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
+  assert.equal(policy.allowed_surface_classes.includes('refs_only_read_model'), true);
+  assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
+
+  assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
+  assert.equal(byId.product_entry_session_store.classification, 'refs_only_read_model');
+  assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
+  assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
+  assert.equal(byId.product_sidecar_guarded_actions.classification, 'domain_handler_target');
+  assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
+  assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
+  assert.equal(byId.legacy_managed_runtime_names.classification, 'tombstone_or_provenance');
+
+  assert.deepEqual(byId.product_entry_session_store.source_refs, [
+    'packages/redcube-runtime/src/product-entry-session-store.ts',
+    'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
+    'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
+  ]);
+  assert.deepEqual(byId.runtime_watch_projection.source_refs, [
+    'packages/redcube-gateway/src/actions/runtime-watch.ts',
+  ]);
+  assert.equal(
+    byId.product_sidecar_guarded_actions.allowed_outputs.includes('visual_transition_decision_refs'),
+    true,
+  );
+  assert.equal(
+    byId.operator_evidence_stability_projection.allowed_outputs.includes('stability_read_model_refs'),
+    true,
+  );
+
+  for (const entry of policy.active_surface_classifications) {
+    for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
+      assert.equal(value, false, entry.surface_id);
+    }
+  }
 });
 
 test('RCA canonical semantic pack paths are concrete, clean, and stage semantic refs resolve under agent', () => {
