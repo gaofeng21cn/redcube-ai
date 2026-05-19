@@ -13,6 +13,7 @@ Date: `2026-05-19`
 - 过程性 dated follow-through、closeout tranche、proof 命令摘要和旧路线归入 `docs/history/`，不在本文承担 current truth。
 - 差距按目标态判断，不按当前 RCA 代码是否仍可运行判断。旧 repo-local deliverable runner、run store 和 DAG runtime 已物理删除；product-entry session store、workspace/source intake、memory/writeback transport、artifact export lifecycle、review/repair transport、native helper generic envelope、operator projection、generic CLI/MCP wrapper、executor adapter 和 status/product shell，只要承担通用 framework/runtime 职责，就必须进入 OPL 上收、generated surface 替换、refs-only 收薄或退役分类。
 - Descriptor ready、transition fixture、no-regression evidence、provider completion 或 focused proof 都不能写成 visual ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak；`production consumption complete` 仅限 OPL generated/hosted surface consumption，不等于生产 soak 完成。
+- 过时模块、接口、测试、fixture、CLI/MCP alias、product wrapper、gateway/runtime facade 和 docs 入口不保留兼容面。旧 managed run、session/runtime owner、gateway/frontdoor/federation、product-entry continuation、supervision/sidecar compatibility 等 active caller 迁出后直接删除、archive 或 tombstone；测试只保留 current contract、no-resurrection guard 和 provenance，不维护旧 public path。
 
 ## 当前定位
 

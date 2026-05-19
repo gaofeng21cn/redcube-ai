@@ -15,6 +15,7 @@ Date: `2026-05-19`
 - RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 - Pack compiler input 只能用 `canonical_semantic_pack_root="agent/"` 表达 canonical visual semantic pack；`required_domain_pack_paths` 只列真实 visual pack 语义文件，不把 `agent/README.md` 当作机器 required path。`current-program` 这类大合同也不能靠单个巨型 JSON 继续承担 canonical truth，必须拆成可审计 leaf refs 后再给旧 consumer 提供 read-through snapshot。
 - OPL standard conformance gate 必须保持通过。2026-05-19 fresh family defaults 已显示 RCA structural conformance `passed`；这只证明标准源码形态、generated owner、private generic-owner guard、active path scan 与 retired managed-runtime naming gate 被 OPL 接受，不替代 production visual-stage long soak、artifact-producing owner receipt 或 App/release consumption evidence。
+- 目标态不保留旧 managed/runtime/gateway/session/product shell 的兼容入口。旧模块、旧接口、旧测试和旧文档入口在 generated caller parity、owner receipt parity 与 no-active-caller proof 成立后直接清理；如需迁移历史数据，使用显式 tombstone / deprecation contract，不恢复 active alias。
 
 ## 结论
 
