@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-19`
+Date: `2026-05-20`
 
 ## 文档读法
 
@@ -28,6 +28,8 @@ Declarative Visual Pack
   + OPL generated/hosted surfaces
   + minimal visual authority functions
 ```
+
+当前 acceptance/readiness closeout 口径固定为 AI-first / executor-first：OPL 搭台，Codex/default executor 执行视觉 stage，RCA 保留 visual judgment、artifact authority、owner receipt 与 typed blocker。合同只固定边界、安全、receipt、replay 和恢复，不把执行器、provider、readiness projection 或 structural conformance 写成 visual ready / exportable / handoffable verdict。
 
 ## 当前边界
 
@@ -86,6 +88,8 @@ OPL 必须持有：
 
 2026-05-19 的 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` 与 `lifecycle_apply.status=dry_run_ready`，OPL refs-only lifecycle ledger 也已能 verify 读回 RCA 空计划 closure batch receipt。RCA `physical_skeleton_follow_through` 已向 OPL 暴露 provenance refs、history refs 和 tombstone refs，清除了此前 OPL gate 对 `missing_provenance_retention_evidence` 与 `missing_history_or_tombstone_evidence` 的 blocker。该状态只证明 OPL cleanup gate / refs-only ledger 能安全消费 RCA legacy cleanup proof，不表示 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable 已完成。
 
+本轮 production acceptance/readiness closeout 的 expected merged result 是 refs-only evidence 面闭合：RCA stage evidence refs 包含 runtime budget refs 与 replay evidence refs；RCA production acceptance/readiness 文档面保留 owner receipt / artifact receipt / review-export acceptance refs；OPL readiness consumption 能把这些 refs 读成 launch / replay / runtime evidence clean and observable。该结果关闭的是结构与可观察性验收，不关闭真实长时 visual-stage soak、跨 family repeated no-regression 或更多 workspace scaleout；这些继续作为 production scaleout evidence，不作为结构 blocker。
+
 ## 当前 cleanliness tail
 
 RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：
@@ -128,6 +132,8 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 故事、视觉方向、页面判断、review verdict 和 repair judgment 必须由 AI-authored stage artifact 承担。比例、空白、重复、裁切、字段泄漏、导出失败等机械检查只能表达 blocker 与 rerun target，不能替代 visual ready / exportable / handoffable verdict。
 
 ## 当前测试/证据差距
+
+结构 conformance 已通过不等于 visual ready；readiness clean / observable 也只表示 launch、replay、runtime evidence、typed blocker 和 receipt refs 可被 OPL/App/operator 观察。真实 visual-ready、exportable、handoffable 仍需要 RCA-owned AI-first review/export verdict 与 domain owner receipt 链路支撑。
 
 ## 当前物理源码形态差距
 

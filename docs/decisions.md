@@ -5,6 +5,15 @@ Purpose: `active_decision_log`
 State: `current_policy_with_historical_context`
 Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+## 2026-05-20
+
+### 决策：production acceptance/readiness 采用 AI-first / executor-first 口径
+
+- RCA acceptance/readiness 的目标是 AI-first / executor-first：OPL 负责 stage-led runtime、queue、receipt ledger、replay / recovery shell 与 operator projection；Codex/default executor 执行视觉阶段；RCA 持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject、owner receipt 和 typed blocker。
+- 合同只固定边界、安全、receipt、replay 和恢复语义。runtime budget refs、replay evidence refs、owner receipt / acceptance refs 与 OPL readiness consumption 都是可观察性和可追溯性证据，不替代 RCA AI-authored visual judgment。
+- Structural conformance passed 只证明标准 OPL Agent 结构口径已通过；readiness clean / observable 只证明 launch、replay、runtime evidence 和 owner receipt refs 可被消费。二者都不能写成 visual ready、exportable、handoffable、domain_ready 或 production visual-stage long soak 完成。
+- 本轮 expected merged result 是 refs-only evidence 面闭合：RCA stage evidence refs 纳入 runtime budget / replay evidence，RCA production acceptance 保留 owner receipt / artifact / review-export acceptance refs，OPL readiness surface 能消费这些 refs。真实长时 visual-stage soak、跨 family repeated no-regression 和更多 workspace scaleout 继续作为 production scaleout evidence，不作为结构 blocker。
+
 ## 2026-05-18
 
 ### 决策：把 RCA retained functions 硬化为 AI-first visual authority surfaces
