@@ -61,6 +61,9 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 - Temporal controlled visual-stage long soak 和 provider restart/re-query/retry/dead-letter proof。
 - Cross-family repeated no-regression proof。
 
+2026-05-19 RCA 新增 domain-owned production acceptance 机器面：
+`contracts/production_acceptance/rca-production-acceptance.json`。该 surface 明确记录 structural / physical conformance 已通过，且 production acceptance 只由 RCA-owned visual artifact-producing receipt chain 关闭；visual ready、exportable、handoffable 和 domain_ready 继续归 RCA visual / review / export authority。当前 evidence tail 状态为 `closed_by_domain_owned_acceptance_receipt`，证据以 refs-only 形式指向 RCA owner receipt、artifact locator / artifact receipt、review/export gate、memory/lifecycle receipt 和 next verification command refs。OPL conformance、OPL hosted/provider completion 和 cleanup proof 仍不能升级为 RCA visual/export/domain ready。
+
 此外仍有一类命名/合同卫生债：历史合同文件名、field name 或 task intent 中的 `managed` 可能仍作为已落地 session-continuity / product-entry provenance 语义存在，例如 `managed-product-entry-hardening`。这些不是旧 runtime active implementation；后续若要更干净，应通过语义 ID 迁移或 tombstone policy 逐步改名，避免破坏 runtime-program provenance。
 
 ## 当前物理源码形态差距

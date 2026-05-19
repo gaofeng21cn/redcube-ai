@@ -1,0 +1,139 @@
+{
+  "surface_kind": "rca_domain_owned_visual_production_acceptance_evidence",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "acceptance_id": "rca.production_acceptance.visual_delivery.v1",
+  "acceptance_scope": "domain_owned_visual_export_acceptance_evidence",
+  "updated_at": "2026-05-19",
+  "repository_boundary": {
+    "repo_tracks_acceptance_surface": true,
+    "repo_tracks_evidence_refs_only": true,
+    "repo_tracks_visual_artifact_blobs": false,
+    "repo_tracks_export_artifact_blobs": false,
+    "repo_tracks_visual_truth_body": false,
+    "repo_tracks_review_export_verdict_body": false,
+    "repo_tracks_live_receipt_instances": false
+  },
+  "structural_conformance": {
+    "opl_family_structural_conformance_status": "passed",
+    "physical_source_morphology_status": "passed",
+    "conformance_refs": [
+      "opl-agents-conformance:family-defaults:2026-05-19:rca:passed",
+      "contracts/physical_source_morphology_policy.json",
+      "contracts/generated_surface_handoff.json#/bridge_exit_gate",
+      "contracts/functional_privatization_audit.json#/functional_structure_gap_closure"
+    ],
+    "structural_conformance_claimed": true,
+    "physical_conformance_claimed": true,
+    "visual_or_export_ready_claimed_by_conformance": false,
+    "domain_ready_claimed_by_conformance": false
+  },
+  "authority_boundary": {
+    "visual_export_readiness_owner": "redcube_ai",
+    "domain_ready_owner": "redcube_ai",
+    "opl_role": "generated_hosted_shell_and_refs_only_projection_consumer",
+    "provider_role": "stage_attempt_executor_or_runtime_substrate",
+    "opl_can_authorize_visual_ready": false,
+    "opl_can_authorize_exportable": false,
+    "opl_can_authorize_handoffable": false,
+    "opl_can_authorize_domain_ready": false,
+    "provider_completion_is_visual_ready": false,
+    "provider_completion_is_exportable": false,
+    "provider_completion_is_domain_ready": false,
+    "conformance_pass_is_visual_ready": false,
+    "conformance_pass_is_exportable": false,
+    "conformance_pass_is_domain_ready": false
+  },
+  "visual_artifact_receipt_chain": {
+    "chain_status": "present_refs_only",
+    "chain_kind": "visual_artifact_producing_receipt_chain",
+    "required_ref_groups": [
+      "visual_owner_receipt_refs",
+      "artifact_receipt_refs",
+      "review_export_gate_refs"
+    ],
+    "visual_owner_receipt_refs": [
+      "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "contracts/owner_receipt_contract.json#/receipt_cases/0"
+    ],
+    "artifact_receipt_refs": [
+      "contracts/artifact_locator_contract.json",
+      "workspace-runtime-ref:artifact-locator:transition-hosted-domain-receipt"
+    ],
+    "review_export_gate_refs": [
+      "workspace-runtime-ref:review-export:transition-run",
+      "agent/quality_gates/review_export_memory.md",
+      "agent/quality_gates/artifact_authority.md"
+    ],
+    "memory_and_lifecycle_receipt_refs": [
+      "rca-memory-receipt:visual-pattern:transition-accepted",
+      "rca-lifecycle-receipt:retention:transition-retention"
+    ],
+    "provider_attempt_refs": [
+      "opl-provider-attempt:fixture-review-ready"
+    ],
+    "chain_is_artifact_producing": true,
+    "chain_contains_artifact_blob": false,
+    "chain_declares_visual_ready": false,
+    "chain_declares_exportable": false,
+    "chain_declares_handoffable": false
+  },
+  "evidence_tail": {
+    "production_live_soak_not_claimed_by_conformance": false,
+    "domain_ready_not_claimed_by_conformance": false,
+    "status": "closed_by_domain_owned_acceptance_receipt",
+    "allowed_status_values": [
+      "closed_by_domain_owned_acceptance_receipt",
+      "domain_owned_typed_blocker_with_next_verification_ref"
+    ],
+    "closure_receipt": {
+      "return_shape": "domain_receipt",
+      "owner": "redcube_ai",
+      "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "attempt_ref": "opl-provider-attempt:fixture-review-ready",
+      "artifact_locator_ref": "contracts/artifact_locator_contract.json",
+      "artifact_receipt_refs": [
+        "workspace-runtime-ref:artifact-locator:transition-hosted-domain-receipt"
+      ],
+      "review_export_ref": "workspace-runtime-ref:review-export:transition-run",
+      "memory_receipt_ref": "rca-memory-receipt:visual-pattern:transition-accepted",
+      "lifecycle_receipt_ref": "rca-lifecycle-receipt:retention:transition-retention",
+      "forbidden_write_proof_ref": "contracts/owner_receipt_contract.json#/receipt_cases/0/forbidden_write_proof_ref"
+    },
+    "typed_blocker": null,
+    "typed_blocker_policy": {
+      "required_when_status": "domain_owned_typed_blocker_with_next_verification_ref",
+      "required_fields": [
+        "blocker_ref",
+        "blocker_kind",
+        "owner",
+        "next_verification_command_refs"
+      ],
+      "allowed_owner": "redcube_ai"
+    }
+  },
+  "next_verification_command_refs": [
+    {
+      "ref": "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
+      "purpose": "focused_production_acceptance_contract_test"
+    },
+    {
+      "ref": "command:./scripts/verify.sh",
+      "purpose": "repo_minimum_verification"
+    },
+    {
+      "ref": "command:git diff --check",
+      "purpose": "whitespace_and_patch_integrity"
+    }
+  ],
+  "forbidden_claims": {
+    "opl_provider_completion_equals_visual_ready": false,
+    "opl_provider_completion_equals_exportable": false,
+    "opl_provider_completion_equals_domain_ready": false,
+    "structural_conformance_equals_visual_ready": false,
+    "structural_conformance_equals_domain_ready": false,
+    "physical_conformance_equals_visual_ready": false,
+    "physical_conformance_equals_domain_ready": false
+  }
+}

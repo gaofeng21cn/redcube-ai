@@ -313,6 +313,7 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 - Stage control plane 对每个 stage 暴露 source scope、cohort query、OPL queue trigger、monitor 和 dashboard metric refs，且 OPL `stages cohort-loop` 不再因闭环声明缺失阻断；该证明不能升级为 visual ready、exportable、handoffable 或 artifact-producing owner receipt。
 - OPL-hosted path 能真实运行 controlled visual stage attempt，并产出 RCA-owned domain receipt 或 no-regression evidence。
 - Transition hosted-attempt receipt proof 必须从 repo-local fixture 推进到真实 provider attempt 证据，同时保持 OPL 只存 refs，不裁决 visual ready / exportable / handoffable，不携带 artifact blob、memory body 或 review/export verdict。
+- Production acceptance 必须有 RCA-owned machine surface 记录，不由 conformance 或 provider completion 隐式推出。当前稳定路径是 `contracts/production_acceptance/rca-production-acceptance.json`；它只能表达 RCA owner receipt / typed blocker、artifact receipt refs、review/export gate refs、memory/lifecycle refs 和 next verification command refs。允许状态为 `closed_by_domain_owned_acceptance_receipt` 或 `domain_owned_typed_blocker_with_next_verification_ref`。
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的默认 route、显式可选 route、review gate 和 export gate 都有可重复 proof。
 - 每个 stage attempt 都有 source refs、artifact refs、review refs、owner receipt、blocked reason 或 human gate receipt。
 - Review/export gate 能 fail closed，并能从明确 blocked item 进入 repair stage。
