@@ -439,10 +439,10 @@
       "line_count": 1
     },
     {
-      "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/retire_tombstone_candidates",
-      "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retire_tombstone_candidates.json",
+      "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/retired_no_resurrection_guards",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 18
+      "line_count": 24
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/status",
@@ -931,10 +931,10 @@
       "line_count": 1
     },
     {
-      "json_pointer": "/current_state/privatized_functional_module_audit/retire_tombstone_candidates",
-      "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/retire_tombstone_candidates.json",
+      "json_pointer": "/current_state/privatized_functional_module_audit/retired_no_resurrection_guards",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 18
+      "line_count": 24
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/status",
@@ -1363,10 +1363,10 @@
       "line_count": 1
     },
     {
-      "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retire_tombstone_candidates",
-      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retire_tombstone_candidates.json",
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retired_no_resurrection_guards",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "current_program_leaf_source",
-      "line_count": 18
+      "line_count": 24
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/status",
@@ -1651,10 +1651,10 @@
       "line_count": 1
     },
     {
-      "json_pointer": "/product_release_metadata/privatized_functional_module_audit/retire_tombstone_candidates",
-      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/retire_tombstone_candidates.json",
+      "json_pointer": "/product_release_metadata/privatized_functional_module_audit/retired_no_resurrection_guards",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "current_program_leaf_source",
-      "line_count": 18
+      "line_count": 24
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/status",

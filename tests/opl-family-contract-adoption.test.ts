@@ -334,7 +334,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
-      'retire_tombstone',
+      'retired_no_resurrection_guard',
     ]);
     assert.deepEqual(surface.functional_structure_gap_closure, {
       status: 'functional_structure_gaps_closed_evidence_gates_open',
@@ -405,13 +405,20 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       assert.equal(value, false);
     }
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
+    assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.deepEqual(
-      surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );
+    for (const entry of surface.retired_no_resurrection_guards) {
+      assert.equal(entry.active_default_caller, false, entry.surface_id);
+      assert.equal(entry.active_caller, false, entry.surface_id);
+      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
+      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
+    }
     assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
     assert.equal(surface.authority_boundary.opl_can_write_rca_visual_truth, false);
     assert.equal(surface.authority_boundary.opl_can_claim_production_soak_complete, false);

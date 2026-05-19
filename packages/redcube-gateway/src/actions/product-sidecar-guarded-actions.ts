@@ -614,7 +614,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
-      'retire_tombstone',
+      'retired_no_resurrection_guard',
     ],
     replacement_expectation_mode: 'opl_replacement_expectation_or_refs_only_projection',
     generated_interface_consumption_ref: OPL_GENERATED_INTERFACE_CONSUMPTION.ref,
@@ -748,7 +748,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'owner_receipt',
       'native_helper_implementation',
     ],
-    retire_tombstone_candidates: [
+    retired_no_resurrection_guards: [
       {
         surface_id: 'product_sidecar_dispatch.retired_managed_supervision',
         retired_at: '2026-05-17',
@@ -756,6 +756,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         replacement_surface: 'opl_generic_runner_and_supervisor_tick',
         retained_rca_surface: null,
         active_default_caller: false,
+        active_caller: false,
+        compatibility_alias_allowed: false,
+        resurrection_policy: 'forbidden',
       },
       {
         surface_id: 'product_sidecar_dispatch.product_entry_continuation',
@@ -764,6 +767,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
         retained_rca_surface: 'direct product entry invoke/session surfaces',
         active_default_caller: false,
+        active_caller: false,
+        compatibility_alias_allowed: false,
+        resurrection_policy: 'forbidden',
       },
     ],
     must_not_retire: [

@@ -265,13 +265,23 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'visual_authority_functions',
       ],
     );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates,
+      undefined,
+    );
     assert.deepEqual(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );
+    for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
+      assert.equal(entry.active_default_caller, false, entry.surface_id);
+      assert.equal(entry.active_caller, false, entry.surface_id);
+      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
+      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
+    }
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.replacement_expectation_mode,
       'opl_replacement_expectation_or_refs_only_projection',
@@ -286,7 +296,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
-      'retire_tombstone',
+      'retired_no_resurrection_guard',
     ]);
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.functional_structure_gap_closure,

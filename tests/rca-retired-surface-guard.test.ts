@@ -343,20 +343,27 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       'repo_local_visual_runtime.legacy_run_store_deleted',
       'repo_local_visual_runtime.legacy_dag_runtime_deleted',
     ]);
+    assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.deepEqual(
-      surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
+      surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );
+    for (const entry of surface.retired_no_resurrection_guards) {
+      assert.equal(entry.active_default_caller, false, entry.surface_id);
+      assert.equal(entry.active_caller, false, entry.surface_id);
+      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
+      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
+    }
     assert.deepEqual(surface.classification_values, [
       'opl_hosted_surface',
       'opl_generated_surface',
       'refs_only_adapter',
       'declarative_pack',
       'minimal_authority_function',
-      'retire_tombstone',
+      'retired_no_resurrection_guard',
     ]);
     assert.equal(
       surface.functional_structure_gap_closure.status,
