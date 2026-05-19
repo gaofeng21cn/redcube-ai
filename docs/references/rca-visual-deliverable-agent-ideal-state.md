@@ -14,6 +14,7 @@ Date: `2026-05-19`
 - OPL generated interface descriptor ready 本身只表示 OPL 能生成描述并路由到 RCA domain handler target；当前 8 项已按 OPL consumer 口径闭合。未来若新发现同类 generated/hosted consumption、active caller migration、App/operator drilldown、workspace/source/lifecycle shell 或 physical cleanup 缺口，才重新计入功能/结构 gap。
 - RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
 - Pack compiler input 只能用 `canonical_semantic_pack_root="agent/"` 表达 canonical visual semantic pack；`required_domain_pack_paths` 只列真实 visual pack 语义文件，不把 `agent/README.md` 当作机器 required path。`current-program` 这类大合同也不能靠单个巨型 JSON 继续承担 canonical truth，必须拆成可审计 leaf refs 后再给旧 consumer 提供 read-through snapshot。
+- OPL standard conformance gate 必须保持通过。2026-05-19 fresh family defaults 已显示 RCA structural conformance `passed`；这只证明标准源码形态、generated owner、private generic-owner guard、active path scan 与 retired managed-runtime naming gate 被 OPL 接受，不替代 production visual-stage long soak、artifact-producing owner receipt 或 App/release consumption evidence。
 
 ## 结论
 
