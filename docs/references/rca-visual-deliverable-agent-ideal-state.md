@@ -31,6 +31,8 @@ RCA 可以为了清洁目标态重构 packages、runtime families、prompts、na
 
 机器合同的理想形态同样遵循“正确的东西在正确的位置”：`agent/` 持有 Declarative Visual Pack；`contracts/pack_compiler_input.json` 和 `contracts/generated_surface_handoff.json` 只描述 pack root、generated surface handoff 与 authority boundary；`contracts/runtime-program/current-program.index.json` 持有 current-program leaf index；`current-program.json` 只是既有 consumer 的 generated read-through snapshot。`scripts/sync-current-program-leaf-index.ts` 是 index/parts 的可重复生成与 `--check` 校验入口，任何新增大对象都应进入 leaf-level source，并通过脚本与 provenance 测试证明没有扩张单个巨型 truth 文件。
 
+RCA 的理想物理源码形态允许 artifact-heavy implementation，但只允许它服务 visual authority。`packages/redcube-runtime`、gateway/product-entry、sidecar、native helpers、review/export helpers、operator evidence 和 stability projections 可以存在，前提是它们被合同约束为 domain handler、native helper implementation、visual authority function、refs-only adapter、fixture 或 diagnostic。它们不能持有 generic scheduler、queue、attempt ledger、session shell、artifact gallery/handoff shell、review/repair transport、workspace/source shell、operator workbench 或 generated wrapper owner。历史 `managed` 命名只能保留在 provenance、semantic-id、tombstone、negative guard 或 migration record 中，不作为 active public alias 或 runtime owner 语义。
+
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 
 ## 产品分层
@@ -142,6 +144,7 @@ RCA 的标准 stage plane 应至少覆盖：
 - `outputs`：artifact refs、review verdict、blocked reason、repair target、owner receipt、handoff packet。
 - `handoff`：下一 stage、resume token、human gate、stop rule 和 next action。
 - `runtime_event_refs`：任何 `runtime_guard_required=true`、`ai_decision`、`human_gate`、`external_system` 或显式 `effect_boundary` stage 都必须声明 machine-readable runtime event refs，优先同步放在 `stage_contract.runtime_event_refs` 与 `trust_boundary.runtime_event_refs`，让 OPL admission / proof bundle 能审计事件边界，但不能据此裁决 visual ready。
+- `cohort_loop_refs`：source scope、visual source query、OPL queue trigger、progress/session monitor 和 operator freshness metric refs，让 OPL 能证明该 stage 具备可触发、可观察的声明式闭环，同时不拥有 RCA visual truth、artifact authority 或 review/export verdict。
 
 OPL 可负责 stage 的发现、排队、唤醒、恢复和投影。Stage 内的视觉判断、创作策略、review verdict 和 artifact authority 归 RCA。
 
@@ -305,6 +308,7 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 
 - Direct product entry、CLI/MCP、app skill 和 service-safe domain entry 长期稳定。
 - Stage control plane 对 runtime-guard / AI / effect-boundary stage 暴露 machine-readable `runtime_event_refs`，且 OPL stage admission / proof bundle 不再因缺少 runtime event refs 阻断。
+- Stage control plane 对每个 stage 暴露 source scope、cohort query、OPL queue trigger、monitor 和 dashboard metric refs，且 OPL `stages cohort-loop` 不再因闭环声明缺失阻断；该证明不能升级为 visual ready、exportable、handoffable 或 artifact-producing owner receipt。
 - OPL-hosted path 能真实运行 controlled visual stage attempt，并产出 RCA-owned domain receipt 或 no-regression evidence。
 - Transition hosted-attempt receipt proof 必须从 repo-local fixture 推进到真实 provider attempt 证据，同时保持 OPL 只存 refs，不裁决 visual ready / exportable / handoffable，不携带 artifact blob、memory body 或 review/export verdict。
 - `ppt_deck`、`xiaohongshu`、`poster_onepager` 的默认 route、显式可选 route、review gate 和 export gate 都有可重复 proof。

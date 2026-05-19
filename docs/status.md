@@ -32,6 +32,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-18 fresh OPL stage admission read-model 曾阻断 RCA stage pack：AI / effect-boundary stage 缺 machine-readable `runtime_event_refs`。随后 OPL admission 口径收紧为所有 `runtime_guard_required=true` stage 都必须声明 refs。当前 RCA-owned `family_stage_control_plane` 生成源与 `contracts/stage_control_plane.json` 已为 6 个 stage 同步补齐 `stage_contract.runtime_event_refs` 与 `trust_boundary.runtime_event_refs`，包括 `runtime_event:rca.source_intake.source_truth_frozen`、`runtime_event:rca.communication_strategy.accepted`、`runtime_event:rca.visual_direction.accepted`、`runtime_event:rca.artifact_creation.candidate_rendered`、`runtime_event:rca.review_and_revision.gate_recorded`、`runtime_event:rca.package_and_handoff.export_handoff_recorded`。这属于功能/结构 gap 修复；它不声明 production visual-stage long soak 或 artifact-producing owner receipt 完成。
 
+2026-05-19 stage cohort-loop refs 已补齐：六个 RCA stage 的 `stage_contract` 均声明 source scope、auditable visual source query、OPL queue trigger、visual progress / session continuity monitor 和 operator freshness metric refs。OPL `stages cohort-loop --domain rca` 读取当前 RCA main 后返回 6/6 `closed_loop_ready`、`blocker_count=0`。该状态只证明 RCA declarative launch/readiness loop 可被 OPL 消费，不表示 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable 已完成。
+
 2026-05-19 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` / `lifecycle_apply.status=dry_run_ready`，OPL refs-only lifecycle ledger 也已能 `verify` 读回 RCA 空计划 closure batch receipt。RCA `physical_skeleton_follow_through` 已补齐 provenance refs、history refs 和 tombstone refs，清除了 OPL cleanup gate 对 provenance / tombstone evidence 的 blocker。该状态只证明 RCA legacy cleanup proof 可被 OPL refs-only ledger 消费，不表示 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable 已完成。
 
 当前标准 OPL Agent 结构口径：
@@ -39,6 +41,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。
 - OPL-owned/generated surface = CLI/MCP/Skill/product-entry/status/session/sidecar/workbench wrapper、generic supervision/session/workbench、provider-backed stage attempt runtime、attempt ledger、retry/dead-letter、artifact gallery/handoff shell、review/repair transport、operator/App shell。
 - active RCA source 中不再维护旧 repo-local deliverable runner、run store、DAG scheduler 或 public managed lookup/supervision action。
+
+Physical source morphology 现在按同一标准治理：`agent/` 是 Declarative Visual Pack，`contracts/` 与 runtime-program leaf parts 是机器合同，`packages/` / native helper / product-entry / sidecar / operator evidence 源码只能承担 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 当前 artifact-heavy 目录不是可复制的新 Agent 通用 scaffold；历史 `managed` 命名只能作为 provenance、semantic-id、retired guard 或 tombstone，不恢复为 active runtime owner 或 compatibility alias。
 
 ## 当前测试/证据差距
 

@@ -56,6 +56,8 @@ OPL 必须持有：
 
 2026-05-18 fresh blocker 说明该计数必须以 OPL read model 为准：`communication_strategy`、`visual_direction`、`review_and_revision` 曾因 `effect_boundary_missing_runtime_event_refs` 被 `family_stage_admission` 阻断。随后 OPL admission 口径收紧为所有 `runtime_guard_required=true` stage 都必须声明 refs。当前修复把 6 个 stage 的 machine-readable event refs 写回 RCA-owned `family_stage_control_plane` 生成源和 `contracts/stage_control_plane.json` 的 `stage_contract.runtime_event_refs` / `trust_boundary.runtime_event_refs`，让 OPL admission / proof bundle 能读取可审计事件边界。该项已闭合为结构修复，不进入 evidence tail。
 
+2026-05-19 的 stage cohort-loop refs 已作为结构闭环落地。RCA 当前六个 stage 都声明 `source_scope_refs`、`cohort_query_refs`、OPL queue `trigger_refs`、`monitor_refs` 和 `dashboard_metric_refs`；OPL isolated verification 对当前 RCA main 返回 `stage_count=6`、`closed_loop_ready_count=6`、`blocker_count=0`。这关闭的是 declarative launch/readiness loop gap；真实 artifact-producing owner receipt、visual memory body reuse、workspace receipt scaleout、provider long soak 和 visual ready/exportable/handoffable verdict 仍归 evidence gate。
+
 已闭合为标准 OPL consumer 口径的 8 项：
 
 - `opl_generated_surface_production_consumption`
@@ -70,6 +72,10 @@ OPL 必须持有：
 这些闭合表示 generic shell/runtime owner 归 OPL，RCA 以 refs-only/domain-handler/authority-function 方式消费。Temporal controlled visual-stage long soak、真实 artifact-producing owner receipt、真实 memory lifecycle receipt、workspace receipt scaleout 和 cross-family repeated no-regression evidence 不再计入功能/结构差距，保留为 production evidence tail。
 
 2026-05-19 的 standard pack 合同校准把 `pack_compiler_input` 固定为 `canonical_semantic_pack_root="agent/"`，并从 `required_domain_pack_paths` 移除 `agent/README.md`。README 仍可作为人读入口或导航存在，但不能作为 OPL scaffold 的 required semantic pack 文件；每个 required path 必须指向真实 prompt / stage / skill / quality gate / knowledge 内容。
+
+2026-05-19 的 physical source morphology 调研把 RCA 的源码目标进一步固定：`agent/` 是 Declarative Visual Pack，`contracts/` 和 `contracts/runtime-program/current-program.index.json` / `current-program-parts/**` 是机器合同与 leaf-level program truth，`packages/` / `src` 只保留 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 的 artifact-heavy 代码是可保留的 visual authority / native helper 实现，不是未来新 Agent 的通用 scaffold；session continuity store、product sidecar/status、operator evidence、stability projection、native helper catalog、runtime-program leaf sync 都必须继续写成 OPL generated/hosted shell 的 domain target、refs-only read model或 visual authority implementation。
+
+因此，历史 `managed`、`managed run`、session store、runtime family、product-entry continuation、sidecar supervision 等命名只允许作为 provenance、semantic-id、retired guard、refs-only adapter 或 domain handler 出现。若未来新增或恢复让 RCA 看起来持有 generic scheduler、runner、attempt ledger、workbench、artifact lifecycle shell、review/repair transport 或 generated wrapper owner 的源码，即使现有 `functional_structure_gap_count=0`，也必须重新打开 physical morphology gap。
 
 2026-05-19 的 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` 与 `lifecycle_apply.status=dry_run_ready`，OPL refs-only lifecycle ledger 也已能 verify 读回 RCA 空计划 closure batch receipt。RCA `physical_skeleton_follow_through` 已向 OPL 暴露 provenance refs、history refs 和 tombstone refs，清除了此前 OPL gate 对 `missing_provenance_retention_evidence` 与 `missing_history_or_tombstone_evidence` 的 blocker。该状态只证明 OPL cleanup gate / refs-only ledger 能安全消费 RCA legacy cleanup proof，不表示 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable 已完成。
 
@@ -130,6 +136,9 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 3. `naming_contract_hygiene`
    将历史 `managed` 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增 compatibility alias。
+
+4. `physical_source_morphology_hygiene`
+   继续确保 packages / runtime-program / product-entry / sidecar / native-helper / operator-evidence 源码只表达 visual authority、native helper implementation、domain handler target 或 refs-only adapter。新增 family、helper 或 projection 时，先落 `agent/` pack 与 `contracts/`，再只在 packages 中实现必要 visual authority；不把 artifact-heavy implementation 复制成 generic agent runtime。
 
 ## 当前不能写成
 
