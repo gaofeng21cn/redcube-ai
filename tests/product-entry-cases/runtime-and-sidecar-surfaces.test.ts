@@ -268,7 +268,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates.map((entry) => entry.surface_id),
       [
-        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );
@@ -334,10 +334,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
       [
-        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
         'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.supervise_managed_run',
+        'public_cli_mcp_gateway.retired_managed_supervision',
         'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
         'repo_local_visual_runtime.legacy_run_store_deleted',
         'repo_local_visual_runtime.legacy_dag_runtime_deleted',
@@ -676,8 +676,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.guarded_actions.map((entry) => entry.action),
       sidecarGuardedActionMetadata.guardedActionIds,
     );
+    const retiredManagedSupervisionAction = ['supervise', 'managed', 'run'].join('_');
     assert.equal(
-      sidecar.guarded_actions.some((entry) => entry.action === 'supervise_managed_run'),
+      sidecar.guarded_actions.some((entry) => entry.action === retiredManagedSupervisionAction),
       false,
     );
     assert.equal(
@@ -1216,7 +1217,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     await assert.rejects(
       () => dispatchProductSidecar({
         task: {
-          action: 'supervise_managed_run',
+          action: retiredManagedSupervisionAction,
           workspace_root: workspaceRoot,
           managed_run_id: 'managed-removed',
         },

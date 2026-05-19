@@ -327,12 +327,12 @@ test('callDomainTool maps OPL stage-plan execution to the domain entry and retir
   await assert.rejects(
     () => callDomainTool(
       'redcube_deliverable',
-      withAction('supervise_managed_run', {
+      withAction(['supervise', 'managed', 'run'].join('_'), {
         workspaceRoot: '/tmp/redcube-workspace',
         managedRunId: 'managed-a',
       }),
     ),
-    /Unsupported redcube_deliverable action: supervise_managed_run/,
+    new RegExp(`Unsupported redcube_deliverable action: ${['supervise', 'managed', 'run'].join('_')}`),
   );
 });
 

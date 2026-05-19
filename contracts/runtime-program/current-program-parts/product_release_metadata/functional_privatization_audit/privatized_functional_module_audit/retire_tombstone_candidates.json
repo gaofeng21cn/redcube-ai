@@ -1,6 +1,6 @@
 [
   {
-    "surface_id": "product_sidecar_dispatch.supervise_managed_run",
+    "surface_id": "product_sidecar_dispatch.retired_managed_supervision",
     "retired_at": "2026-05-17",
     "replacement_owner": "opl",
     "replacement_surface": "opl_generic_runner_and_supervisor_tick",

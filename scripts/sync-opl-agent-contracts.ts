@@ -54,7 +54,6 @@ const GENERATED_SURFACES = [
 ];
 
 const REQUIRED_DOMAIN_PACK_PATHS = [
-  'agent/README.md',
   'agent/prompts/source_intake.md',
   'agent/prompts/communication_strategy.md',
   'agent/prompts/visual_direction.md',

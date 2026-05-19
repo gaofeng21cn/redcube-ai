@@ -364,7 +364,7 @@ export function buildPhysicalSkeletonFollowThrough() {
       {
         boundary_id: 'agent',
         status: 'present_with_repo_source_entrypoint',
-        entrypoint_refs: ['agent/README.md', 'plugins/rca/skills/rca/SKILL.md'],
+        entrypoint_refs: ['agent/prompts/source_intake.md', 'plugins/rca/skills/rca/SKILL.md'],
       },
       {
         boundary_id: 'contracts',

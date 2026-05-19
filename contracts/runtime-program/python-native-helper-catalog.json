@@ -29,8 +29,8 @@
       "-m",
       "<package_module>"
     ],
-    "compatibility_script_wrappers_allowed": false,
-    "compatibility_script_wrappers_are_preferred": false
+    "legacy_wrapper_scripts_allowed": false,
+    "legacy_wrapper_scripts_are_preferred": false
   },
   "bypass_policy": {
     "generic_bypass_allowed": false,

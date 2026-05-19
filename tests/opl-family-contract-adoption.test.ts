@@ -383,10 +383,10 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     });
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
-      'product_sidecar_dispatch.supervise_managed_run',
+      'product_sidecar_dispatch.retired_managed_supervision',
       'product_sidecar_dispatch.product_entry_continuation',
       'public_cli_mcp_gateway.get_managed_run',
-      'public_cli_mcp_gateway.supervise_managed_run',
+      'public_cli_mcp_gateway.retired_managed_supervision',
       'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
       'repo_local_visual_runtime.legacy_run_store_deleted',
       'repo_local_visual_runtime.legacy_dag_runtime_deleted',
@@ -408,7 +408,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.deepEqual(
       surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
       [
-        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );

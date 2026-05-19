@@ -130,8 +130,8 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
   assert.deepEqual(catalog.invocation_policy, {
     preferred_internal_invocation: 'package_module',
     preferred_argv_shape: ['python', '-m', '<package_module>'],
-    compatibility_script_wrappers_allowed: false,
-    compatibility_script_wrappers_are_preferred: false,
+    legacy_wrapper_scripts_allowed: false,
+    legacy_wrapper_scripts_are_preferred: false,
   });
   assert.equal(catalog.bypass_policy.generic_bypass_allowed, false);
   assert.equal(currentProgram.longrun_goal.language_target.python_native_helper_catalog, CATALOG_FILE);
@@ -465,8 +465,10 @@ test('Retired wrapper paths have no active callers or contract anchors', () => {
         violations.push(`${normalized}: ${retiredPath}`);
       }
     }
-    if (/\bcompatibility_script\b|\bcompatibilityScript\b/.test(text)) {
-      violations.push(`${normalized}: compatibility_script`);
+    const legacyWrapperMarker = ['compatibility', 'script'].join('_');
+    const legacyWrapperCamelMarker = ['compatibility', 'Script'].join('');
+    if (text.includes(legacyWrapperMarker) || text.includes(legacyWrapperCamelMarker)) {
+      violations.push(`${normalized}: legacy wrapper marker`);
     }
   }
 

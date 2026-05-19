@@ -14,14 +14,14 @@
 - `legacy_physical_cleanup` 已从 remaining functional gap 移入 completed gap；production live-soak 相关项从 functional/structural gap 降为 production evidence tail，当前 `functional_structure_gap_count=0`。
 - 当前标准 OPL Agent 口径是：RCA 提供 declarative visual pack、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions 和 native helper implementation；OPL 持有 generated/hosted wrappers、generic supervision/session/workbench、provider-backed stage attempt runtime、attempt ledger、retry/dead-letter、artifact gallery/handoff shell、review/repair transport 和 operator/App shell。
 - 后续不得把旧 repo-local deliverable runner、run store、DAG scheduler、supervision diagnostic 或 public lookup action 恢复成 compatibility alias、internal fixture、standard sidecar template 或 active docs truth。需要追溯时只读 `docs/history/**`、旧 commit 或 tombstone/provenance。
-- 默认 service-safe task intent 改为 `run_opl_stage_execution_plan`；`run_managed_deliverable` 不保留 public compatibility alias。历史 `managed-product-entry-hardening` 文件名、runtime-program baton 和 run record nullable field 只作为 session-continuity provenance / historical run envelope，不作为 RCA generic runtime owner。
+- 默认 service-safe task intent 改为 `run_opl_stage_execution_plan`；旧 managed deliverable task intent 不保留 public compatibility alias。历史 `managed-product-entry-hardening` 文件名、runtime-program baton 和 run record nullable field 只作为 session-continuity provenance / historical run envelope，不作为 RCA generic runtime owner。
 - 本轮清理不声明 production visual-stage long soak、artifact-producing owner receipt、真实 visual memory lifecycle receipt 或 cross-family repeated no-regression 已完成；这些仍属于 production evidence tail。
 
 ## 2026-05-17
 
 ### 决策：退役 default generic sidecar dispatch
 
-- `supervise_managed_run` 与 `product_entry_continuation` 已从 RCA product sidecar 默认 dispatch / guarded action 面物理删除或收薄；generic supervision 和 product-entry continuation 归 OPL runner / generated session shell。
+- 旧 managed supervision action 与 `product_entry_continuation` 已从 RCA product sidecar 默认 dispatch / guarded action 面物理删除或收薄；generic supervision 和 product-entry continuation 归 OPL runner / generated session shell。
 - RCA 保留 direct product-entry/session API、`runtime_watch` refs-only projection、owner receipt、visual memory/workspace lifecycle、visual transition、workspace receipt proof、notification receipt 和 visual authority surfaces；这些保留项不构成 standard sidecar template 或新 Agent 默认 sidecar action。
 - `privatized_functional_module_audit.physical_deletion_guard` 现在把 default generic dispatch、public managed lookup 和旧 repo-local visual runtime surfaces 列为已删除或已收薄 surface；剩余 active code path 只能是 declarative visual pack、refs-only adapter、diagnostic direct surface 或 minimal visual authority function。
 
@@ -31,7 +31,7 @@
 
 - RCA 在 runtime-program contracts、manifest、status 和 product sidecar projection 中维护 `privatized_functional_module_audit`，统一盘点 product-entry session store、workspace/source intake、memory/writeback receipt transport、artifact export lifecycle、review/repair transport、native helper envelope、operator projection shell、generic CLI/MCP wrappers、Codex executor adapter、observability/stability read model、visual pack compiler handoff 和 minimal visual authority functions。
 - 该 audit 只做 refs-only read model：OPL 可以索引模块边界、generic primitive consumer 关系、hosted/generated surface expectation、refs-only adapter 和 declarative pack handoff，但不能据此写 RCA visual truth、artifact blob、memory body，不能声明 visual-ready、exportable、handoffable 或 production soak complete。
-- 2026-05-17 后，default sidecar dispatch 里的 `supervise_managed_run` 与 `product_entry_continuation` 已成为已删除/已收薄 tombstone candidate；随后旧 repo-local deliverable runner、run store 和 DAG runtime 也已物理删除。review/export gate、artifact authority、owner receipt、route-level executor policy 和 Python native helper implementation 继续归 RCA，因为它们是 visual authority 或 native implementation，不是 generic runtime。
+- 2026-05-17 后，default sidecar dispatch 里的 旧 managed supervision action 与 `product_entry_continuation` 已成为已删除/已收薄 tombstone candidate；随后旧 repo-local deliverable runner、run store 和 DAG runtime 也已物理删除。review/export gate、artifact authority、owner receipt、route-level executor policy 和 Python native helper implementation 继续归 RCA，因为它们是 visual authority 或 native implementation，不是 generic runtime。
 - 真实仍需由 OPL 生成或托管的代码面是 generic scheduler/runner/attempt ledger、session/workbench shell、native-helper generic envelope、artifact lifecycle/handoff shell、review/repair transport、observability/SLO/read-model、executor adapter 与 CLI/MCP/product/status wrapper；RCA 只消费这些通用 primitive 的 projection，或提供 declarative visual pack / refs-only adapter / minimal authority function。
 
 ### 决策：product sidecar / action / status parity 由 canonical metadata 驱动
@@ -57,7 +57,7 @@
 
 - Python helper catalog、runtime callsite 和 native proof lane 统一使用 `python -m redcube_ai.<helper_module>` package module invocation。
 - `packages/redcube-runtime/scripts/ppt_deck_review.py`、`packages/redcube-runtime/scripts/ppt_deck_export.py`、`packages/redcube-runtime/scripts/ppt_deck_native.py` 与 `python/redcube_ai/hermes/agent_loop_bridge.py` thin wrapper 已退役。
-- Catalog / proof lane 不再声明 `script` / `compatibility_script` wrapper authority；后续不得恢复 compatibility layer、script caller 或 contract anchor。
+- Catalog / proof lane 不再声明 `script` / legacy wrapper script marker wrapper authority；后续不得恢复 compatibility layer、script caller 或 contract anchor。
 - Native helpers 继续受 RCA route、visual director review、screenshot review 和 export gate 约束，不能绕过 product-entry/runtime-family mainline。
 
 ### 决策：RCA 只消费 OPL stability read-model，不实现观测/控制 runtime

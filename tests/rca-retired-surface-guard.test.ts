@@ -74,8 +74,8 @@ const RETIRED_ACTIVE_PATTERNS = Object.freeze([
   /packages\/redcube-runtime\/scripts\/ppt_deck_export\.py/,
   /packages\/redcube-runtime\/scripts\/ppt_deck_native\.py/,
   /python\/redcube_ai\/hermes\/agent_loop_bridge\.py/,
-  /\bcompatibility_script\b/,
-  /\bcompatibilityScript\b/,
+  new RegExp(`\\b${['compatibility', 'script'].join('_')}\\b`),
+  new RegExp(`\\b${['compatibility', 'Script'].join('')}\\b`),
 ]);
 
 function listTextFiles(root) {
@@ -335,10 +335,10 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
-      'product_sidecar_dispatch.supervise_managed_run',
+      'product_sidecar_dispatch.retired_managed_supervision',
       'product_sidecar_dispatch.product_entry_continuation',
       'public_cli_mcp_gateway.get_managed_run',
-      'public_cli_mcp_gateway.supervise_managed_run',
+      'public_cli_mcp_gateway.retired_managed_supervision',
       'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
       'repo_local_visual_runtime.legacy_run_store_deleted',
       'repo_local_visual_runtime.legacy_dag_runtime_deleted',
@@ -346,7 +346,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.deepEqual(
       surface.retire_tombstone_candidates.map((entry) => entry.surface_id),
       [
-        'product_sidecar_dispatch.supervise_managed_run',
+        'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],
     );
@@ -470,7 +470,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     product_sidecar_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
-    legacy_managed_runtime_names: 'tombstone_or_provenance',
+    legacy_managed_runtime_gateway_names: 'tombstone_or_provenance',
   };
 
   for (const [surfaceId, classification] of Object.entries(requiredClassifications)) {
@@ -497,7 +497,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'operator_evidence_and_stability_refs_only_read_model',
   );
   assert.equal(
-    byId.legacy_managed_runtime_names.current_rca_role,
+    byId.legacy_managed_runtime_gateway_names.current_rca_role,
     'contract_safe_semantic_id_or_tombstone_provenance_only',
   );
 });

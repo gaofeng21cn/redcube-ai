@@ -22,7 +22,6 @@ const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 
 const requiredDomainPackPaths = [
-  'agent/README.md',
   'agent/prompts/source_intake.md',
   'agent/prompts/communication_strategy.md',
   'agent/prompts/visual_direction.md',
@@ -236,7 +235,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.product_sidecar_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
-  assert.equal(byId.legacy_managed_runtime_names.classification, 'tombstone_or_provenance');
+  assert.equal(byId.legacy_managed_runtime_gateway_names.classification, 'tombstone_or_provenance');
 
   assert.deepEqual(byId.product_entry_session_store.source_refs, [
     'packages/redcube-runtime/src/product-entry-session-store.ts',

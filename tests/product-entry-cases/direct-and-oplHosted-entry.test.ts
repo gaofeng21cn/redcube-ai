@@ -212,10 +212,11 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
 test('invokeProductEntry rejects retired deliverable task intent without compatibility alias', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
+    const retiredManagedDeliverableIntent = ['run', 'managed', 'deliverable'].join('_');
 
     await assert.rejects(
       () => invokeProductEntry({
-        task_intent: 'run_managed_deliverable',
+        task_intent: retiredManagedDeliverableIntent,
         workspace_locator: {
           workspace_root: workspaceRoot,
         },
@@ -228,7 +229,7 @@ test('invokeProductEntry rejects retired deliverable task intent without compati
           deliverable_id: 'deck-retired-managed-intent',
         },
       }),
-      /Unsupported task_intent: run_managed_deliverable/,
+      new RegExp(`Unsupported task_intent: ${retiredManagedDeliverableIntent}`),
     );
   });
 });

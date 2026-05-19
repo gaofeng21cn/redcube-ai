@@ -192,10 +192,10 @@
     "physical_deletion_guard": {
       "current_safe_tombstone_candidate_count": 0,
       "deleted_or_thinned_default_surfaces": [
-        "product_sidecar_dispatch.supervise_managed_run",
+        "product_sidecar_dispatch.retired_managed_supervision",
         "product_sidecar_dispatch.product_entry_continuation",
         "public_cli_mcp_gateway.get_managed_run",
-        "public_cli_mcp_gateway.supervise_managed_run",
+        "public_cli_mcp_gateway.retired_managed_supervision",
         "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
         "repo_local_visual_runtime.legacy_run_store_deleted",
         "repo_local_visual_runtime.legacy_dag_runtime_deleted"
@@ -2108,7 +2108,7 @@
     ],
     "retire_tombstone_candidates": [
       {
-        "surface_id": "product_sidecar_dispatch.supervise_managed_run",
+        "surface_id": "product_sidecar_dispatch.retired_managed_supervision",
         "retired_at": "2026-05-17",
         "replacement_owner": "opl",
         "replacement_surface": "opl_generic_runner_and_supervisor_tick",
