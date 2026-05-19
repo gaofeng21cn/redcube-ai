@@ -1,0 +1,36 @@
+{
+  "status": "refs_only_consumer_projection_landed",
+  "source_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
+  "source_sidecar_surface": "redcube product sidecar export#/mapped_surfaces/opl_stability_read_model_consumption",
+  "contract_ref": "opl.family_operator_stability_read_model.v1",
+  "owner": "opl",
+  "consumer": "redcube_ai",
+  "projection_mode": "consumer_projection_only",
+  "observability_only": true,
+  "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
+  "completion_scope": "stability_read_model_refs_projected_not_live_soak",
+  "live_soak_claimed": false,
+  "rca_does_not_own": [
+    "family_conflict_envelope_schema",
+    "control_loop_summary_builder",
+    "usage_projection_aggregator",
+    "resource_pressure_projection",
+    "runtime_observability_exporter",
+    "external_stability_policy_runtime",
+    "generic_fallback_completion",
+    "string_rule_retry_execution",
+    "generic_event_bus_truth_source",
+    "generic_runtime_adapter_success_semantics"
+  ],
+  "rca_retained_authority": [
+    "visual_truth",
+    "review_export_verdict",
+    "artifact_authority",
+    "visual_memory_body",
+    "owner_receipt",
+    "native_helper_implementation",
+    "typed_blocker",
+    "safe_action_refs"
+  ],
+  "source_contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/opl_stability_read_model_consumption"
+}

@@ -1,0 +1,91 @@
+{
+  "stable_deliverable_manual_test_driven_hardening": {
+    "status": "closeout_completed",
+    "commit": "96dc6c1"
+  },
+  "phase_2_source_intake_shared_source_truth_baseline": {
+    "status": "closeout_completed",
+    "commit": "a4424d2"
+  },
+  "phase_2_family_source_truth_consumption_convergence": {
+    "status": "closeout_completed",
+    "commit": "e894641"
+  },
+  "phase_2_runtime_watch_locator_integrity_hardening": {
+    "status": "closeout_completed"
+  },
+  "phase_2_family_parity_governance_surface_convergence": {
+    "status": "closeout_completed"
+  },
+  "upstream_hermes_agent_activation_package": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",
+    "brief": "human_doc:program_upstream_hermes_agent_activation_package"
+  },
+  "upstream_hermes_runtime_owner_cutover": {
+    "status": "closeout_completed",
+    "route_surface": "runDeliverableRoute",
+    "managed_surfaces": [
+      "buildOplStageExecutionPlan",
+      "getManagedRun",
+      "superviseManagedRun"
+    ],
+    "adapter_surface": "@redcube/codex-cli-client"
+  },
+  "service_safe_domain_entry_adapter": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
+    "brief": "human_doc:program_upstream_hermes_agent_service_safe_domain_entry",
+    "action_surface": "invokeDomainEntry",
+    "validation_mode": "fail_closed_on_missing_or_mismatched_opl_handoff_envelope"
+  },
+  "redcube_product_entry_mvp": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
+    "brief": "human_doc:program_redcube_product_entry_mvp",
+    "action_surface": "invokeProductEntry"
+  },
+  "opl_framework_hosted_product_entry": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
+    "brief": "human_doc:program_opl_framework_hosted_product_entry",
+    "action_surface": "invokeOplHostedProductEntry"
+  },
+  "managed_product_entry_hardening": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+    "brief": "human_doc:program_managed_product_entry_hardening",
+    "action_surface": "getProductEntrySession"
+  },
+  "upstream_hermes_agent_live_verification_blocker": {
+    "status": "historical_blocker_resolved",
+    "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-blocker.json",
+    "brief": "human_doc:program_upstream_hermes_agent_live_verification_blocker",
+    "resolved_by": "upstream_hermes_agent_live_verification_closeout"
+  },
+  "upstream_hermes_agent_live_verification_closeout": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/upstream-hermes-agent-live-verification-closeout.json",
+    "brief": "human_doc:program_upstream_hermes_agent_live_verification_closeout"
+  },
+  "upstream_hermes_agent_final_target_shape": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
+    "brief": "human_doc:program_upstream_hermes_agent_final_target_shape"
+  },
+  "hermes_runtime_substrate_activation_package": {
+    "status": "historical_local_migration_artifact"
+  },
+  "hermes_runtime_capability_extraction_map": {
+    "status": "historical_local_migration_artifact"
+  },
+  "hermes_runtime_substrate_canonical_closure": {
+    "status": "historical_local_migration_artifact"
+  },
+  "hermes_stable_family_closure_truth": {
+    "status": "historical_local_migration_artifact"
+  },
+  "hermes_managed_family_closure_truth": {
+    "status": "historical_local_migration_artifact"
+  }
+}

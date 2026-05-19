@@ -1,0 +1,19 @@
+{
+  "rca_owns": [
+    "visual truth",
+    "review/export verdict",
+    "route owner",
+    "artifact authority",
+    "visual memory body",
+    "owner receipt",
+    "native helper implementation"
+  ],
+  "opl_does_not_own": [
+    "visual truth",
+    "review/export verdict",
+    "canonical artifacts",
+    "domain memory content",
+    "native helper implementation"
+  ],
+  "status_command_semantics": "entry shell only; not GUI/WebUI"
+}

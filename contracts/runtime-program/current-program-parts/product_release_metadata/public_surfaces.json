@@ -1,0 +1,16 @@
+{
+  "app_skill_id": "redcube-ai",
+  "service_safe_domain_entry": "invokeDomainEntry",
+  "product_entry_surfaces": [
+    "invokeProductEntry",
+    "getProductEntrySession",
+    "redcube product status",
+    "redcube product invoke",
+    "redcube product session"
+  ],
+  "sidecar_surfaces": [
+    "redcube product sidecar export",
+    "redcube product sidecar dispatch"
+  ],
+  "stage_control_projection": "redcube product manifest#/stage_control_projection"
+}

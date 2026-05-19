@@ -1,0 +1,53 @@
+{
+  "program_id": {
+    "role": "active mainline control-plane pointer",
+    "durable_surfaces": [
+      "contracts/runtime-program/current-program.json",
+      "$CODEX_HOME/projects/redcube-ai/runtime-state/reports/<program_id>/"
+    ],
+    "must_not_replace": [
+      "topic_id",
+      "deliverable_id",
+      "run_id"
+    ]
+  },
+  "topic_id": {
+    "role": "topic aggregate-root identity",
+    "durable_surfaces": [
+      "topics/<topic>/canonical/source-audit.json",
+      "topics/<topic>/publication-state.json"
+    ],
+    "must_not_replace": [
+      "program_id",
+      "deliverable_id",
+      "run_id"
+    ]
+  },
+  "deliverable_id": {
+    "role": "durable deliverable identity inside a topic",
+    "durable_surfaces": [
+      "topics/<topic>/deliverables/<deliverable>/deliverable.json",
+      "topics/<topic>/deliverables/<deliverable>/contracts/delivery-contract.json",
+      "topics/<topic>/deliverables/<deliverable>/reports/review-state.json"
+    ],
+    "must_not_replace": [
+      "program_id",
+      "topic_id",
+      "run_id"
+    ]
+  },
+  "run_id": {
+    "role": "single routed execution handle",
+    "durable_surfaces": [
+      "runtime/runs/<run>.json",
+      "runtime/events/<run>.jsonl",
+      "runtimeWatch",
+      "ops_eval_summary"
+    ],
+    "must_not_replace": [
+      "program_id",
+      "topic_id",
+      "deliverable_id"
+    ]
+  }
+}

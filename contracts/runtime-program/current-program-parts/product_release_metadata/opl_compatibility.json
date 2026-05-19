@@ -1,0 +1,17 @@
+{
+  "framework": "OPL Framework",
+  "compatibility_model": "admitted_domain_agent_package",
+  "package_surfaces": [
+    "single redcube-ai app skill",
+    "service-safe domain entry",
+    "product sidecar projection",
+    "stage control projection",
+    "standard domain-agent skeleton mapping",
+    "OPL generic primitive consumer projection",
+    "OPL stability read-model consumer projection",
+    "OPL substrate adapter refs-only export",
+    "declarative visual pack compiler input",
+    "OPL generated surface handoff"
+  ],
+  "opl_role": "discovery_queue_handoff_receipt_projection_consumer"
+}

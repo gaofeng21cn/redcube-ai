@@ -1,0 +1,107 @@
+{
+  "module_id": "codex_executor_adapter",
+  "surface_ref": "/domain_entry_contract/executor",
+  "status": "split_owner_boundary_landed",
+  "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
+  "opl_generic_primitive": "agent_executor_adapter",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "default_codex_executor_policy",
+    "route_executor_requirements",
+    "executor_receipt_refs"
+  ],
+  "rca_scope": "route_level_executor_policy_and_receipt_refs",
+  "audit_readout": "project_opl_executor_adapter_retain_rca_route_policy",
+  "codePaths": [
+    "packages/redcube-runtime/src/executors.ts",
+    "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+    "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+    "tests/rca-executor-backend-contract.test.ts"
+  ],
+  "activeCallers": [
+    "deliverable route runner",
+    "domain entry contract",
+    "runtime route executor tests"
+  ],
+  "activeCallerStatus": "active_codex_cli_first_class_default",
+  "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+  "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
+  "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
+  "tombstone_required": false,
+  "migration_class": "opl_hosted_surface",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": true,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/domain_entry_contract/executor",
+    "replacement_surface": "opl_agent_executor_adapter",
+    "expected_mode": "opl_hosted_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "codex_executor_adapter_bridge_exit_gate",
+    "bridge_role": "route_executor_policy_adapter_until_opl_executor_adapter_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_agent_executor_adapter",
+    "exit_gate_ref": "/domain_entry_contract/executor",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "route_policy_refs",
+      "executor_requirement_refs",
+      "executor_receipt_refs"
+    ],
+    "after_exit_rca_surface": "route_level_executor_policy_refs",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "route_level_executor_policy_refs_only",
+  "rca_exports_only": [
+    "executor_requirement_refs",
+    "executor_receipt_refs",
+    "route_policy_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "codex_executor_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "default_codex_executor_policy",
+    "route_executor_requirements",
+    "executor_receipt_refs"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

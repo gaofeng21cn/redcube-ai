@@ -1,0 +1,106 @@
+{
+  "module_id": "native_helper_envelope",
+  "surface_ref": "/native_ppt_operator_ux",
+  "status": "split_owner_boundary_landed",
+  "classification": "split_owner_boundary",
+  "opl_generic_primitive": "native_helper_generic_envelope",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "python_native_helper_implementation",
+    "ppt_image_export_mutation_logic",
+    "helper_specific_proof"
+  ],
+  "rca_scope": "python_native_helper_implementation",
+  "audit_readout": "retain_rca_implementation_project_opl_envelope",
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+    "contracts/runtime-program/python-native-helper-catalog.json",
+    "python/redcube_ai"
+  ],
+  "activeCallers": [
+    "native PPT proof lane",
+    "author_pptx_native route",
+    "repair_pptx_native route",
+    "python native helper catalog tests"
+  ],
+  "activeCallerStatus": "active_rca_native_implementation_package_module_only",
+  "migrationAction": "Move helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope to OPL.",
+  "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
+  "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
+  "tombstone_required": false,
+  "migration_class": "opl_hosted_surface",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": true,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+    "replacement_surface": "opl_native_helper_execution_envelope",
+    "expected_mode": "opl_hosted_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "native_helper_envelope_bridge_exit_gate",
+    "bridge_role": "native_helper_execution_adapter_until_opl_generic_envelope_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_native_helper_execution_envelope",
+    "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "native_helper_implementation",
+      "helper_proof_refs"
+    ],
+    "after_exit_rca_surface": "native_helper_package_module_implementation",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
+  "rca_exports_only": [
+    "helper_catalog_refs",
+    "package_module_refs",
+    "helper_proof_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "native_helper_envelope is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "python_native_helper_implementation",
+    "ppt_image_export_mutation_logic",
+    "helper_specific_proof"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

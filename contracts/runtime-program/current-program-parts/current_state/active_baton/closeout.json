@@ -1,0 +1,12 @@
+{
+  "executed_at": "2026-04-12",
+  "verification_commands": [
+    "git diff --check",
+    "npm run typecheck",
+    "node --experimental-strip-types --test tests/product-entry.test.ts tests/cli-v2-smoke.test.ts tests/product-domain-action-api.test.ts tests/runtime-program-provenance.test.ts",
+    "npm run test:fast"
+  ],
+  "suite_result": "pass",
+  "findings_recorded": 0,
+  "absorbed_to_main": true
+}

@@ -1,0 +1,107 @@
+{
+  "module_id": "observability_stability_read_model",
+  "surface_ref": "/opl_stability_read_model_consumption",
+  "status": "refs_only_consumer_projection_landed",
+  "classification": "opl_owned_observability_stability_read_model_consumed_by_rca",
+  "opl_generic_primitive": "runtime_observability_exporter",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "domain_blocker_meaning",
+    "safe_repair_hint_refs",
+    "no_regression_evidence_refs"
+  ],
+  "rca_scope": "visual_domain_status_projection_refs_only",
+  "audit_readout": "project_only",
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
+    "packages/redcube-gateway/src/actions/get-product-status.ts",
+    "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+  ],
+  "activeCallers": [
+    "product status",
+    "product sidecar runtime framework",
+    "operator evidence readiness projection"
+  ],
+  "activeCallerStatus": "active_refs_only_consumer_projection",
+  "migrationAction": "Keep observability exporter, SLO, control-loop summary, usage and resource-pressure aggregation in OPL.",
+  "retentionReason": "RCA contributes domain blocker meaning, visual-safe repair hints and no-regression evidence refs.",
+  "cannotAbsorbReason": "OPL observability cannot authorize RCA quality, exportability or visual remediation decisions.",
+  "tombstone_required": false,
+  "migration_class": "refs_only_adapter",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": false,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/opl_stability_read_model_consumption",
+    "replacement_surface": "opl_stability_read_model_and_observability_export",
+    "expected_mode": "refs_only_adapter_to_opl_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "observability_stability_read_model_bridge_exit_gate",
+    "bridge_role": "stability_refs_consumer_until_opl_observability_read_model_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_stability_read_model_and_observability_export",
+    "exit_gate_ref": "/opl_stability_read_model_consumption",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "owner_receipt_refs",
+      "typed_blocker_refs",
+      "no_regression_evidence_refs"
+    ],
+    "after_exit_rca_surface": "visual_domain_status_refs_only",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "observability_refs_only",
+  "rca_exports_only": [
+    "owner_receipt_refs",
+    "typed_blocker_refs",
+    "no_regression_evidence_refs",
+    "resource_pressure_signal_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "observability_stability_read_model is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "domain_blocker_meaning",
+    "safe_repair_hint_refs",
+    "no_regression_evidence_refs"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

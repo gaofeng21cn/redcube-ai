@@ -1,0 +1,94 @@
+{
+  "module_id": "visual_pack_compiler_handoff",
+  "surface_ref": "/visual_pack_compiler_handoff/declarative_visual_pack_input",
+  "status": "declarative_pack_input_landed",
+  "classification": "declarative_pack",
+  "migration_class": "declarative_pack",
+  "owner": "redcube_ai",
+  "opl_owned_generic_primitive_consumer": false,
+  "rca_owned_visual_domain_authority": false,
+  "opl_absorb_candidate": false,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+    "replacement_surface": "opl_pack_compiler_generated_surface",
+    "expected_mode": "opl_generated_surface_from_declarative_pack",
+    "rca_consumes_as": "declarative_pack_provider",
+    "rca_owns_replacement_runtime": false
+  },
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+  ],
+  "activeCallers": [
+    "product-entry manifest",
+    "product sidecar export",
+    "product status"
+  ],
+  "activeCallerStatus": "declarative_pack_input_active",
+  "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+  "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
+  "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
+  "rca_projection_mode": "declarative_pack_refs_only",
+  "rca_exports_only": [
+    "stage_refs",
+    "action_metadata_refs",
+    "visual_transition_refs",
+    "receipt_schema_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
+    "required_before_delete": [
+      "domain_package_replaced_by_new_rca_pack_contract"
+    ]
+  },
+  "bridge_exit_gate": {
+    "gate_id": "visual_pack_compiler_handoff_bridge_exit_gate",
+    "bridge_role": "declarative_visual_pack_input_required_by_opl_pack_compiler",
+    "bridge_owner": "redcube_ai",
+    "replacement_owner": "redcube_ai",
+    "replacement_surface": "opl_pack_compiler_generated_surface",
+    "exit_gate_ref": "/visual_pack_compiler_handoff",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [],
+    "retained_rca_authority": [
+      "visual_stage_pack",
+      "action_metadata",
+      "receipt_schema_refs"
+    ],
+    "after_exit_rca_surface": "declarative_visual_pack_input",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_retains": [
+    "visual_stage_pack",
+    "action_metadata",
+    "authority_policy",
+    "oracle_fixtures"
+  ],
+  "retire_tombstone": false,
+  "tombstone_required": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

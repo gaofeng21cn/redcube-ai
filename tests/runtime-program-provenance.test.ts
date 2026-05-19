@@ -36,6 +36,15 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
+function valueAtJsonPointer(document, pointer) {
+  if (pointer === '') return document;
+  return pointer
+    .slice(1)
+    .split('/')
+    .map((part) => part.replace(/~1/g, '/').replace(/~0/g, '~'))
+    .reduce((value, part) => value[part], document);
+}
+
 function listTextFiles(root) {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(root, entry.name);
@@ -72,6 +81,42 @@ const HISTORICAL_CONTRACTS = Object.freeze([
     status: 'closeout_completed',
   },
 ]);
+
+test('current runtime program is backed by indexed leaf refs instead of a monolithic truth owner', () => {
+  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const index = readJson('contracts/runtime-program/current-program.index.json');
+
+  assert.equal(index.surface_kind, 'rca_current_program_leaf_index');
+  assert.equal(index.schema_version, 2);
+  assert.equal(index.aggregate_snapshot_ref, 'contracts/runtime-program/current-program.json');
+  assert.equal(index.aggregate_snapshot_role, 'generated_read_through_snapshot_for_existing_consumers');
+  assert.equal(index.canonical_truth_model, 'leaf_refs_are_canonical_current_program_sources');
+  assert.equal(index.no_second_truth_rule.includes('must mirror every indexed leaf ref'), true);
+  assert.equal(index.split_policy.aggregate_snapshot_is_not_canonical_edit_surface, true);
+
+  const indexedSectionIds = index.section_roots.map((section) => section.section_id);
+  assert.deepEqual(indexedSectionIds, [
+    'program_id',
+    'date_anchor',
+    'product_release_metadata',
+    'longrun_goal',
+    'formal_entry',
+    'execution_handle_contract',
+    'durable_surface_contract',
+    'current_state',
+    'historical_snapshots',
+  ]);
+
+  assert.equal(index.leaf_refs.length > index.section_roots.length, true);
+  for (const section of index.section_roots) {
+    assert.equal(existsSync(path.resolve(section.ref_root)), true, section.ref_root);
+  }
+  for (const leaf of index.leaf_refs) {
+    assert.equal(existsSync(path.resolve(leaf.ref)), true, leaf.ref);
+    assert.equal(leaf.line_count <= index.split_policy.max_leaf_json_line_count, true, leaf.ref);
+    assert.deepEqual(readJson(leaf.ref), valueAtJsonPointer(currentProgram, leaf.json_pointer), leaf.ref);
+  }
+});
 
 test('current runtime program keeps one active baton and machine-readable historical provenance', () => {
   const currentProgram = readJson('contracts/runtime-program/current-program.json');

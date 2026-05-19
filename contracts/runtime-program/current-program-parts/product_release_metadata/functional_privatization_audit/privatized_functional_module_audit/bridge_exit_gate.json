@@ -1,0 +1,49 @@
+{
+  "gate_id": "rca.private_generic_residue_bridge_exit.v1",
+  "status": "functional_bridge_exited_physical_cleanup_closed",
+  "owner": "redcube_ai",
+  "replacement_owner": "opl",
+  "required_before_retiring_remaining_repo_local_bridges": [
+    "domain_authority_refs_preserved",
+    "no_regression_proof_recorded"
+  ],
+  "remaining_bridge_module_ids": [
+    "product_entry_session_store",
+    "workspace_source_intake",
+    "memory_writeback_receipt_transport",
+    "artifact_export_lifecycle",
+    "review_repair_transport",
+    "native_helper_envelope",
+    "operator_projection_shell",
+    "generic_cli_mcp_wrappers",
+    "codex_executor_adapter",
+    "observability_stability_read_model"
+  ],
+  "allowed_after_exit_rca_surface_classes": [
+    "declarative_pack",
+    "minimal_authority_function",
+    "refs_only_locator_projection",
+    "diagnostic_direct_surface"
+  ],
+  "forbidden_after_exit_rca_surface_classes": [
+    "generic_scheduler",
+    "generic_attempt_ledger",
+    "generic_session_shell",
+    "generic_cli_mcp_product_wrapper",
+    "generic_workbench_shell",
+    "generic_review_repair_transport",
+    "generic_native_helper_envelope"
+  ],
+  "declares_generated_surface_consumption_complete": true,
+  "declares_production_consumption_complete": true,
+  "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
+  "declares_visual_stage_long_soak_complete": false,
+  "declares_no_active_callers": true,
+  "remaining_blocker_ids": [],
+  "remaining_evidence_gate_ids": [
+    "real_artifact_producing_domain_owner_receipt",
+    "opl_hosted_controlled_visual_stage_long_soak",
+    "real_memory_lifecycle_receipt_instances",
+    "cross_family_repeated_no_regression_evidence"
+  ]
+}

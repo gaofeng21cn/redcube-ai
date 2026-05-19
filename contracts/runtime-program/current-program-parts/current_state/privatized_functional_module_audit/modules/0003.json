@@ -1,0 +1,107 @@
+{
+  "module_id": "artifact_export_lifecycle",
+  "surface_ref": "/artifact_locator_contract",
+  "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
+  "classification": "split_owner_boundary",
+  "opl_generic_primitive": "artifact_lifecycle",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "canonical_artifact_authority",
+    "export_verdict",
+    "artifact_mutation_permission"
+  ],
+  "rca_scope": "visual_artifact_export_authority_and_locator_refs",
+  "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
+    "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
+    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+  ],
+  "activeCallers": [
+    "artifact locator contract",
+    "export_pptx route",
+    "workspace lifecycle guarded apply",
+    "product sidecar export"
+  ],
+  "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
+  "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
+  "retentionReason": "RCA owns canonical visual artifacts, exportability verdict and artifact mutation permission.",
+  "cannotAbsorbReason": "OPL may index artifact refs but cannot publish, mutate or declare RCA visual artifacts exportable.",
+  "tombstone_required": false,
+  "migration_class": "refs_only_adapter",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": true,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+    "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+    "expected_mode": "refs_only_adapter_to_opl_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "artifact_export_lifecycle_bridge_exit_gate",
+    "bridge_role": "artifact_locator_authority_adapter_until_opl_gallery_handoff_shell_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
+    "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "artifact_mutation_authorization",
+      "review_export_verdict",
+      "artifact_locator_refs"
+    ],
+    "after_exit_rca_surface": "artifact_authority_and_export_verdict_refs",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
+  "rca_exports_only": [
+    "artifact_locator_refs",
+    "export_verdict_refs",
+    "lifecycle_receipt_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "artifact_export_lifecycle is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "canonical_artifact_authority",
+    "export_verdict",
+    "artifact_mutation_permission"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

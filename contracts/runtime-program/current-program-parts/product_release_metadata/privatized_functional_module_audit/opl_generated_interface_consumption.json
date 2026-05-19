@@ -1,0 +1,108 @@
+{
+  "surface_kind": "opl_generated_interface_consumption",
+  "ref": "/opl_generated_interface_consumption",
+  "owner": "one-person-lab",
+  "consumer": "redcube_ai",
+  "status": "opl_generated_surface_consumed_domain_handlers_only",
+  "projection_mode": "generated_descriptor_owner_with_domain_handler_targets",
+  "unified_metadata_owner": "one-person-lab",
+  "generated_interface_owner": "one-person-lab",
+  "domain_handler_owner": "redcube_ai",
+  "generated_descriptor_scope": [
+    "cli",
+    "mcp",
+    "skill",
+    "product_entry",
+    "product_status",
+    "product_session",
+    "sidecar",
+    "workbench"
+  ],
+  "repo_local_handler_targets": [
+    "redcube_cli",
+    "redcube_mcp",
+    "invokeProductEntry",
+    "invokeDomainEntry",
+    "product_sidecar",
+    "product_entry_session_store"
+  ],
+  "repo_local_launcher_policy": {
+    "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
+    "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
+    "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
+    "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+    "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
+    "default_generic_dispatch_owner": "one-person-lab",
+    "default_supervision_owner": "one-person-lab",
+    "legacy_supervision_public_surface": "retired",
+    "redcube_cli_is_unified_metadata_owner": false,
+    "redcube_mcp_is_unified_metadata_owner": false,
+    "product_entry_session_store_is_generic_session_owner": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "rca.generated_surface_bridge_exit.v1",
+    "owner": "one-person-lab",
+    "consumer": "redcube_ai",
+    "current_rca_status": "opl_generated_surface_consumed_domain_handlers_only",
+    "required_before_retiring_repo_local_wrappers": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "repo_local_allowed_roles_before_exit": [
+      "domain_handler_target",
+      "direct_domain_entry",
+      "direct_protocol_adapter",
+      "refs_only_adapter"
+    ],
+    "repo_local_forbidden_roles": [
+      "unified_metadata_owner",
+      "generic_dispatch_owner",
+      "generic_session_shell_owner",
+      "generic_workbench_owner",
+      "generated_surface_owner"
+    ],
+    "after_exit_rca_allowed_surfaces": [
+      "declarative_visual_pack_input",
+      "domain_handler_targets",
+      "minimal_authority_functions",
+      "refs_only_locator_projection"
+    ],
+    "rca_can_own_generated_surface": false,
+    "rca_can_own_generic_session_shell": false,
+    "rca_can_own_generic_workbench": false,
+    "declares_generated_surface_consumption_complete": true,
+    "declares_production_consumption_complete": true,
+    "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
+    "declares_visual_stage_long_soak_complete": false,
+    "remaining_blocker_ids": [],
+    "remaining_evidence_gate_ids": [
+      "real_artifact_producing_domain_owner_receipt",
+      "opl_hosted_controlled_visual_stage_long_soak",
+      "real_memory_lifecycle_receipt_instances",
+      "cross_family_repeated_no_regression_evidence"
+    ]
+  },
+  "consumed_from_refs": [
+    "/domain_descriptor",
+    "/family_action_catalog",
+    "/family_stage_control_plane",
+    "/visual_pack_compiler_handoff/generated_surface_handoff",
+    "/privatized_functional_module_audit"
+  ],
+  "rca_retained_authority": [
+    "visual_truth",
+    "review_export_verdict",
+    "artifact_authority",
+    "visual_memory_body",
+    "owner_receipt",
+    "native_helper_implementation",
+    "typed_blocker",
+    "safe_action_refs"
+  ],
+  "forbidden_rca_claims": {
+    "rca_owns_generated_cli_mcp_skill_product_status_workbench_metadata": false,
+    "rca_owns_default_generic_dispatch": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false
+  }
+}

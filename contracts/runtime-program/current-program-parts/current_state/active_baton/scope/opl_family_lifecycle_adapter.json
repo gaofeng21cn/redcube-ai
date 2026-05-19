@@ -1,0 +1,20 @@
+{
+  "status": "repo_tracked_projection_contract",
+  "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
+  "source_surfaces": [
+    "session-continuity run envelopes",
+    "product-entry sessions",
+    "review/publication projections",
+    "artifact inventory",
+    "runtime loop closure"
+  ],
+  "exposes": [
+    "family persistence",
+    "lifecycle projection",
+    "owner-route discovery",
+    "adoption surface"
+  ],
+  "sqlite_status": "deferred_for_rca",
+  "domain_truth_owner": "redcube_ai",
+  "opl_role": "projection_consumer_only"
+}

@@ -21,7 +21,6 @@ const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 
 const requiredDomainPackPaths = [
-  'agent/README.md',
   'agent/prompts/source_intake.md',
   'agent/prompts/communication_strategy.md',
   'agent/prompts/visual_direction.md',

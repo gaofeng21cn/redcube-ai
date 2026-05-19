@@ -1,0 +1,212 @@
+{
+  "ref": "/opl_generic_primitive_consumption",
+  "contract_ref": "opl.standard_domain_agent_scaffold_and_generic_primitives.v1",
+  "owner": "opl",
+  "consumer": "redcube_ai",
+  "status": "functional_consumer_follow_through_landed",
+  "projection_mode": "consumer_projection_only",
+  "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
+  "completion_scope": "functional_consumer_follow_through_complete_not_live_soak",
+  "live_soak_claimed": false,
+  "rca_does_not_own": [
+    "standard_domain_agent_scaffold",
+    "functional_harness",
+    "generic_runtime",
+    "generic_scheduler",
+    "daemon",
+    "typed_queue",
+    "stage_attempt_orchestrator",
+    "attempt_ledger",
+    "typed_closeout_transport",
+    "generic_runner",
+    "generic_transition_runner",
+    "workbench_shell",
+    "memory_transport",
+    "memory_refs_only_writeback_chain",
+    "artifact_lifecycle",
+    "review_repair_transport",
+    "restart_dead_letter_repair_human_gate_state_chain",
+    "native_helper_generic_envelope",
+    "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+  ],
+  "opl_owned_generic_primitives": [
+    "standard_domain_agent_scaffold",
+    "functional_harness",
+    "generic_runtime",
+    "generic_scheduler",
+    "daemon",
+    "typed_queue",
+    "stage_attempt_orchestrator",
+    "attempt_ledger",
+    "typed_closeout_transport",
+    "generic_runner",
+    "generic_transition_runner",
+    "workbench_shell",
+    "memory_transport",
+    "memory_refs_only_writeback_chain",
+    "artifact_lifecycle",
+    "review_repair_transport",
+    "restart_dead_letter_repair_human_gate_state_chain",
+    "native_helper_generic_envelope",
+    "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+  ],
+  "rca_retained_authority": [
+    "visual_truth",
+    "review_export_verdict",
+    "artifact_authority",
+    "visual_memory_body",
+    "owner_receipt",
+    "native_helper_implementation",
+    "typed_blocker",
+    "safe_action_refs"
+  ],
+  "functional_harness_consumer_coverage": {
+    "harness_role": "functional_harness_consumer",
+    "coverage_status": "domain_authority_pack_landed",
+    "pass_claim_scope": "consumer_contract_coverage_only",
+    "opl_harness_pass_is_visual_ready": false,
+    "opl_harness_pass_is_exportable": false,
+    "opl_harness_pass_is_handoffable": false,
+    "opl_harness_pass_is_artifact_producing_owner_receipt": false,
+    "rca_generic_runtime_owner": false,
+    "covered_chains": [
+      "memory_refs_only_writeback_chain",
+      "queue_stage_attempt_typed_closeout",
+      "generic_transition_runner",
+      "restart_dead_letter_repair_human_gate_state_chain"
+    ],
+    "chain_authority": {
+      "memory_refs_only_writeback_chain": {
+        "owner": "opl",
+        "rca_retains": [
+          "visual_memory_body",
+          "owner_receipt",
+          "typed_blocker"
+        ],
+        "rca_exports_only": [
+          "memory_locator_refs",
+          "writeback_receipt_refs",
+          "safe_action_refs"
+        ],
+        "memory_body_written_by_opl": false
+      },
+      "queue_stage_attempt_typed_closeout": {
+        "owner": "opl",
+        "rca_retains": [
+          "visual_truth",
+          "review_export_verdict",
+          "artifact_authority",
+          "owner_receipt"
+        ],
+        "rca_exports_only": [
+          "stage_descriptor_refs",
+          "attempt_source_refs",
+          "typed_closeout_receipt_refs"
+        ],
+        "artifact_produced_by_harness_pass": false
+      },
+      "generic_transition_runner": {
+        "owner": "opl",
+        "rca_retains": [
+          "visual_transition_spec",
+          "typed_blocker",
+          "safe_action_refs"
+        ],
+        "rca_exports_only": [
+          "transition_spec_ref",
+          "transition_result_refs",
+          "owner_receipt_refs"
+        ],
+        "visual_ready_declared_by_runner": false
+      },
+      "restart_dead_letter_repair_human_gate_state_chain": {
+        "owner": "opl",
+        "rca_retains": [
+          "typed_blocker",
+          "safe_action_refs",
+          "review_export_verdict"
+        ],
+        "rca_exports_only": [
+          "repair_hint_refs",
+          "human_gate_reason_refs",
+          "dead_letter_receipt_refs"
+        ],
+        "handoffable_declared_by_state_chain": false
+      }
+    }
+  },
+  "rca_thin_program_surfaces": [
+    "single redcube-ai app skill",
+    "service-safe domain entry",
+    "product sidecar projection",
+    "stage control projection",
+    "visual transition spec",
+    "artifact locator refs",
+    "review/export gate refs",
+    "owner receipt refs",
+    "native helper implementation refs"
+  ],
+  "consumed_projection_surfaces": [
+    {
+      "primitive": "standard_domain_agent_scaffold",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
+      "manifest_ref": "/standard_domain_agent_skeleton",
+      "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
+    },
+    {
+      "primitive": "generic_scheduler",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
+      "manifest_ref": "/family_scheduler_replacement",
+      "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
+    },
+    {
+      "primitive": "memory_transport",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+      "manifest_ref": "/domain_memory_descriptor_locator",
+      "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+    },
+    {
+      "primitive": "artifact_lifecycle",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
+      "manifest_ref": "/lifecycle_guarded_apply_proof",
+      "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+    },
+    {
+      "primitive": "review_repair_transport",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
+      "manifest_ref": "/review_state",
+      "sidecar_ref": "/mapped_surfaces/review_projection"
+    },
+    {
+      "primitive": "native_helper_generic_envelope",
+      "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
+      "manifest_ref": "/native_ppt_operator_ux",
+      "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+    },
+    {
+      "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+      "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+      "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+      "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+    }
+  ],
+  "forbidden_rca_generic_owner_flags": {
+    "rca_generic_scheduler_owner": false,
+    "rca_generic_runtime_owner": false,
+    "rca_generic_daemon_owner": false,
+    "rca_generic_queue_owner": false,
+    "rca_stage_attempt_orchestrator_owner": false,
+    "rca_generic_attempt_ledger_owner": false,
+    "rca_typed_closeout_transport_owner": false,
+    "rca_generic_runner_owner": false,
+    "rca_generic_transition_runner_owner": false,
+    "rca_generic_workbench_owner": false,
+    "rca_memory_transport_owner": false,
+    "rca_memory_refs_only_writeback_chain_owner": false,
+    "rca_artifact_lifecycle_owner": false,
+    "rca_review_repair_transport_owner": false,
+    "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
+    "rca_native_helper_generic_envelope_owner": false,
+    "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
+  }
+}

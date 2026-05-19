@@ -1,0 +1,59 @@
+{
+  "credible": true,
+  "clean_clone_required": true,
+  "blocked_by": [],
+  "local_codex_execution": {
+    "codex_command_env": "REDCUBE_CODEX_COMMAND",
+    "codex_model_env": "REDCUBE_CODEX_MODEL",
+    "codex_reasoning_env": "REDCUBE_CODEX_REASONING_EFFORT",
+    "codex_default_command_strategy": "prefer $HOME/bin/codex-canonical when executable, otherwise use PATH codex",
+    "codex_managed_canonical_command": [
+      "$HOME/bin/codex-canonical"
+    ],
+    "codex_default_command": [
+      "codex"
+    ],
+    "python_command_env": "REDCUBE_PYTHON_COMMAND",
+    "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
+    "python_command_requirement": "screenshot review and export helpers must execute on a Python executable with playwright installed",
+    "node_test_file_concurrency": {
+      "light_files": "runner_default",
+      "route_heavy_files": 1,
+      "route_heavy_groups": [
+        "smoke",
+        "fast",
+        "integration",
+        "integration:remaining",
+        "e2e",
+        "full",
+        "full:remaining",
+        "full:with-historical"
+      ]
+    },
+    "preflight_requires": [
+      "codex exec",
+      "structured generation prompt",
+      "runtime family route execution"
+    ],
+    "current_host_status": "fresh_codex_smoke_passed",
+    "current_host_blocking_reason": null,
+    "current_host_stream_signal": "codex_exec_terminal_event_received",
+    "current_host_closeout_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+    "current_host_latest_route_proof": [
+      "2026-04-13: local Codex CLI route and OPL stage execution pass repo smoke with structured generation held inside runtime-family.",
+      "2026-04-13: ppt_deck / xiaohongshu / poster_onepager creative stages stay on AI-first Codex structured generation without pack/compiler fallback."
+    ]
+  },
+  "ci_quality_lane_requires": [
+    "python-3.12",
+    "ci-python-requirements"
+  ],
+  "ci_quality_lane_reason": "test:smoke is the minimal local entry, test:fast is the hosted core regression lane, test:family keeps the family shared pin contract clean-clone safe, meta:ci runs only the meta remainder not already covered by fast, integration:remaining keeps local fast-then-integration verification from rerunning fast-covered integration files, full:remaining keeps local fast-family-meta-integration verification from rerunning already covered active files, historical stays explicit through test:historical or full:with-historical, route-heavy Codex/browser verification files stay serialized, and proof-only browser/renderer setup stays in the explicit native-ppt-proof and image-ppt-proof jobs instead of the default quality lane",
+  "required_verification": [
+    "git status --short",
+    "git diff --check",
+    "git diff --stat",
+    "npm run test:full",
+    "npm run typecheck"
+  ]
+}

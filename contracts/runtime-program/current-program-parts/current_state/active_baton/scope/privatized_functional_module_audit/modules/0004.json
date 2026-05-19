@@ -1,0 +1,108 @@
+{
+  "module_id": "review_repair_transport",
+  "surface_ref": "/review_state",
+  "status": "split_owner_boundary_landed",
+  "classification": "split_owner_boundary",
+  "opl_generic_primitive": "review_repair_transport",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "visual_review_verdict",
+    "repair_decision",
+    "blocked_item_semantics"
+  ],
+  "rca_scope": "visual_review_export_verdict_and_repair_decision",
+  "audit_readout": "retain_domain_gate_project_transport_refs",
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
+    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
+    "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+  ],
+  "activeCallers": [
+    "visual director review",
+    "screenshot review",
+    "repair_image_pages",
+    "product sidecar review projection"
+  ],
+  "activeCallerStatus": "active_domain_review_gate",
+  "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
+  "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
+  "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
+  "tombstone_required": false,
+  "migration_class": "refs_only_adapter",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": true,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+    "replacement_surface": "opl_review_repair_transport",
+    "expected_mode": "refs_only_adapter_to_opl_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "review_repair_transport_bridge_exit_gate",
+    "bridge_role": "review_repair_refs_adapter_until_opl_review_repair_transport_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_review_repair_transport",
+    "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "review_export_verdict",
+      "repair_decision_refs",
+      "typed_blocker"
+    ],
+    "after_exit_rca_surface": "review_export_verdict_and_repair_refs",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
+  "rca_exports_only": [
+    "review_state_refs",
+    "blocked_item_refs",
+    "repair_hint_refs",
+    "export_verdict_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "review_repair_transport is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "visual_review_verdict",
+    "repair_decision",
+    "blocked_item_semantics"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

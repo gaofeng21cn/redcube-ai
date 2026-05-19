@@ -1,0 +1,113 @@
+{
+  "label": "RedCube AI Foundry Agent / OPL-standard visual-deliverable package whose default product entry returns OPL stage execution plans, while RCA retains visual-domain authority functions and TypeScript/Python implementation surfaces",
+  "final_target_shape_contract": "contracts/runtime-program/upstream-hermes-agent-final-target-shape.json",
+  "final_target_route": {
+    "redcube_direct_entry": "User -> RedCube Product Entry -> RedCube service-safe domain entry -> OPL stage execution plan -> OPL family runtime provider stage attempts -> RedCube visual-domain authority functions and truth surfaces",
+    "opl_hosted_entry": "User -> OPL Product Entry -> RedCube service-safe domain entry -> OPL stage execution plan -> OPL family runtime provider stage attempts -> RedCube visual-domain authority functions and truth surfaces"
+  },
+  "runtime_manager_boundary": {
+    "manager": "OPL stage-led family runtime provider",
+    "layer_role": "stage attempt runtime, queue/wakeup, attempt ledger, generated shell, workbench and provider receipt layer over RCA domain authority refs",
+    "consumes_redcube_surfaces": [
+      "redcube product-entry registration",
+      "skill_catalog.domain_projection.opl_runtime_manager_registration",
+      "invokeOplHostedProductEntry",
+      "getProductEntrySession",
+      "runtimeWatch",
+      "artifact inventory",
+      "review and publication projection",
+      "opl_family_lifecycle_adapter",
+      "opl_family_stage_control_projection",
+      "domain_memory_descriptor_locator"
+    ],
+    "does_not_own": [
+      "visual-domain truth",
+      "canonical artifacts",
+      "review-state truth",
+      "publication projection truth",
+      "domain memory content or verdicts",
+      "concrete executor",
+      "private Hermes-Agent fork"
+    ],
+    "future_sidecar_promotion_gate": "only if external Hermes-Agent cannot express the task/wakeup/approval/audit/product isolation contracts required by OPL"
+  },
+  "language_target": {
+    "typescript_owner": "product entry, CLI/MCP surfaces, contracts, gateway, runtime-family shell, and typed service boundaries",
+    "typescript_package_build_contract": "contracts/runtime-program/typescript-package-build-contract.json",
+    "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
+    "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
+    "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
+    "ppt_deck_direction": "use image-first full-slide PNG authoring through Responses image_generation as the default visual route; keep HTML and native editable PPTX as explicit selectable optional routes",
+    "xiaohongshu_direction": "use GPT-Image-2 full-page 3:4 PNG authoring through author_image_pages as the default visual route; keep HTML render_html/fix_html only as explicit selectable maintenance routes"
+  },
+  "persistence_policy": {
+    "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
+    "sqlite_status": "deferred_for_rca",
+    "sqlite_adoption_gate": [
+      "measured artifact or session file-count growth",
+      "cross-deliverable query pressure",
+      "operator need for global artifact inventory",
+      "JSON retention ledger maintenance cost"
+    ],
+    "if_adopted_scope": [
+      "session index",
+      "deliverable index",
+      "route run index",
+      "artifact path and hash index",
+      "review and export bundle projection",
+      "retention ledger projection"
+    ],
+    "must_not_own": [
+      "visual-domain truth",
+      "canonical artifact truth",
+      "review/export judgment",
+      "PNG/PPTX/PDF blob storage"
+    ],
+    "source_reference": "MAS/MDS runtime lifecycle SQLite sidecar pattern"
+  },
+  "north_star": [
+    "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
+    "keep product-entry runtime_owner on configured_family_runtime_provider; Codex CLI remains a first-class concrete executor option selected through the OPL provider/executor adapter",
+    "keep controller as an internal-only surface",
+    "keep the current repository honestly Auto-only",
+    "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
+    "keep OPL hosted integration as a thin oplHosted adapter/projection layer over configured family runtime providers rather than a RedCube truth owner",
+    "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
+    "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
+    "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
+  ],
+  "ad_hoc_bypass_policy": {
+    "policy_id": "forbid_generic_visual_deliverable_bypass",
+    "scope": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "rule": "When a task is in a RedCube visual-deliverable family, callers must use RedCube product-entry, hydrated overlay stage_sequence, and review/export gates; generic presentation/document/image tooling may only be used when the user explicitly requests an alternative technical exploration outside the RedCube runtime.",
+    "ppt_deck_default_sequence": [
+      "storyline",
+      "detailed_outline",
+      "slide_blueprint",
+      "visual_direction",
+      "author_image_pages",
+      "visual_director_review",
+      "screenshot_review",
+      "repair_image_pages",
+      "export_pptx"
+    ],
+    "ppt_deck_default_visual_route": "author_image_pages",
+    "xiaohongshu_default_sequence": [
+      "research",
+      "storyline",
+      "single_note_plan",
+      "visual_direction",
+      "author_image_pages",
+      "visual_director_review",
+      "screenshot_review",
+      "repair_image_pages",
+      "publish_copy",
+      "export_bundle"
+    ],
+    "xiaohongshu_default_visual_route": "author_image_pages"
+  }
+}

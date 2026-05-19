@@ -1,0 +1,107 @@
+{
+  "module_id": "operator_projection_shell",
+  "surface_ref": "/operator_evidence_readiness_projection",
+  "status": "opl_app_workbench_shell_bridge_with_exit_gate",
+  "classification": "opl_owned_workbench_consumer_projection",
+  "opl_generic_primitive": "workbench_shell",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "operator_evidence_refs",
+    "domain_gap_semantics",
+    "safe_repair_hints"
+  ],
+  "rca_scope": "rca_operator_projection_refs_only",
+  "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
+  "codePaths": [
+    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+    "packages/redcube-gateway/src/actions/get-product-status.ts",
+    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+  ],
+  "activeCallers": [
+    "OPL generated product status/workbench consumes RCA operator evidence refs",
+    "product-entry manifest domain projection refs",
+    "product sidecar export refs-only projection",
+    "operator evidence readiness tests"
+  ],
+  "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
+  "migrationAction": "Move generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell to OPL App.",
+  "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
+  "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
+  "tombstone_required": false,
+  "migration_class": "opl_generated_surface",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": false,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/operator_evidence_readiness_projection",
+    "replacement_surface": "opl_app_operator_workbench_shell",
+    "expected_mode": "opl_generated_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "operator_projection_shell_bridge_exit_gate",
+    "bridge_role": "operator_evidence_refs_adapter_until_opl_app_workbench_shell_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_app_operator_workbench_shell",
+    "exit_gate_ref": "/operator_evidence_readiness_projection",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "evidence_gap_refs",
+      "typed_blocker_refs",
+      "safe_repair_hint_refs"
+    ],
+    "after_exit_rca_surface": "operator_evidence_refs_only",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "operator_evidence_readiness_refs_only",
+  "rca_exports_only": [
+    "evidence_gap_refs",
+    "typed_blocker_refs",
+    "safe_repair_hint_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "operator_projection_shell is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "operator_evidence_refs",
+    "domain_gap_semantics",
+    "safe_repair_hints"
+  ],
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

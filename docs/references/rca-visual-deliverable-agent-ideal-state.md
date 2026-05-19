@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `north_star_reference`
 State: `active_support`
 Machine boundary: 本文是人读目标态参考。机器可读真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-18`
+Date: `2026-05-19`
 
 ## 文档读法
 
@@ -13,6 +13,7 @@ Date: `2026-05-18`
 - 目标态优先于当前物理目录。旧 repo-local managed DAG、attempt/state-machine runner 和 managed-run store 已从 active source/package/test surface 删除；仍存在的 session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 只能作为 OPL generated/hosted surface consumer、refs-only adapter、declarative pack input 或 minimal authority function 读取，不是 RCA 长期私有 runtime 约束。
 - OPL generated interface descriptor ready 本身只表示 OPL 能生成描述并路由到 RCA domain handler target；当前 8 项已按 OPL consumer 口径闭合。未来若新发现同类 generated/hosted consumption、active caller migration、App/operator drilldown、workspace/source/lifecycle shell 或 physical cleanup 缺口，才重新计入功能/结构 gap。
 - RCA 当前 artifact-heavy 目录不是通用新 Agent scaffold；transition hosted-attempt receipt proof、provider completion 或 no-regression evidence 都不能写成 visual-ready、exportable、handoffable 或 production visual-stage soak 完成。
+- Pack compiler input 只能用 `canonical_semantic_pack_root="agent/"` 表达 canonical visual semantic pack；`required_domain_pack_paths` 只列真实 visual pack 语义文件，不把 `agent/README.md` 当作机器 required path。`current-program` 这类大合同也不能靠单个巨型 JSON 继续承担 canonical truth，必须拆成可审计 leaf refs 后再给旧 consumer 提供 read-through snapshot。
 
 ## 结论
 
@@ -27,6 +28,8 @@ OPL 在理想状态中承担通用运行外围：stage attempt、provider-backed
 这条目标态高于当前 RCA 物理目录和实现方式。artifact-heavy 代码可以保留 visual authority 和 native helper implementation，但 session continuity、generic runner、workspace/source shell、artifact gallery/handoff、review/repair transport、operator projection、generic CLI/MCP/product shell 等不因为已经存在就成为长期 RCA 私有平台。旧 repo-local runner/store/DAG 已经物理退役；后续新增实现也必须服务 `Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`，不能绕回私有 runtime。能由 OPL primitive、pack compiler 或 App shell 承接的，必须列为上收或 generated surface 替换；不能承接的，必须收窄成明确的 visual authority function 或 refs-only adapter。
 
 RCA 可以为了清洁目标态重构 packages、runtime families、prompts、native helper callsite 和 product shell。保留项必须回答它是否直接作出 source readiness、visual direction、review/export verdict、artifact mutation、visual memory accept/reject 或 owner receipt signing；否则默认不能作为 RCA 长期私有功能。当前已知非知识功能面已归为 OPL hosted surface、OPL generated surface、refs-only adapter、declarative pack 或 minimal authority function；未来新发现仍需 generated/hosted production consumption、active caller migration、wrapper retirement、operator drilldown、workspace/source/lifecycle shell 或 physical cleanup 的功能面，才重新构成功能/结构差距。production soak 与真实 receipt 规模化验证另属 evidence tail。
+
+机器合同的理想形态同样遵循“正确的东西在正确的位置”：`agent/` 持有 Declarative Visual Pack；`contracts/pack_compiler_input.json` 和 `contracts/generated_surface_handoff.json` 只描述 pack root、generated surface handoff 与 authority boundary；`contracts/runtime-program/current-program.index.json` 持有 current-program leaf index；`current-program.json` 只是既有 consumer 的 generated read-through snapshot。任何新增大对象都应进入 leaf-level source，而不是继续扩张单个巨型 truth 文件。
 
 本文描述目标态，不替代当前状态判断。当前真实落地程度以 [Status](../status.md)、[Project](../project.md)、[Architecture](../architecture.md)、[Invariants](../invariants.md)、[Decisions](../decisions.md)、[RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 `contracts/runtime-program/current-program.json` 为准。
 

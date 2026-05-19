@@ -1,0 +1,16 @@
+{
+  "status": "guarded_apply_proof_landed_domain_artifact_mutation_requires_receipt",
+  "proof_id": "rca.lifecycle_guarded_apply_proof.v1",
+  "source_manifest_surface": "redcube product manifest#/lifecycle_guarded_apply_proof",
+  "operations": [
+    "cleanup",
+    "restore",
+    "retention"
+  ],
+  "domain_artifact_mutation_requires_domain_receipt": true,
+  "runtime_receipt_action": "apply_visual_workspace_lifecycle",
+  "workspace_receipt_path_model": "<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json",
+  "opl_can_apply_domain_artifact_mutation": false,
+  "repo_tracks_lifecycle_receipt_instances": false,
+  "repo_tracks_visual_or_export_artifacts": false
+}

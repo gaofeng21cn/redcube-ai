@@ -1,0 +1,18 @@
+[
+  {
+    "surface_id": "product_sidecar_dispatch.supervise_managed_run",
+    "retired_at": "2026-05-17",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_generic_runner_and_supervisor_tick",
+    "retained_rca_surface": null,
+    "active_default_caller": false
+  },
+  {
+    "surface_id": "product_sidecar_dispatch.product_entry_continuation",
+    "retired_at": "2026-05-17",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
+    "retained_rca_surface": "direct product entry invoke/session surfaces",
+    "active_default_caller": false
+  }
+]

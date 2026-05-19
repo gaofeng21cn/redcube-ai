@@ -1,0 +1,8 @@
+{
+  "id": "managed_product_entry_hardening",
+  "status": "closeout_completed",
+  "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+  "brief": "human_doc:program_managed_product_entry_hardening",
+  "adapter_surface": "@redcube/codex-cli-client",
+  "probe_script": "redcube product invoke"
+}

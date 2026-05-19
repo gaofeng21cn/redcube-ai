@@ -1,0 +1,108 @@
+{
+  "module_id": "product_entry_session_store",
+  "surface_ref": "/session_continuity",
+  "status": "opl_generated_workbench_session_surface_consumed",
+  "classification": "split_owner_boundary",
+  "opl_generic_primitive": "workbench_shell",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "entry_session_domain_refs",
+    "deliverable_locator_refs",
+    "latest_visual_run_ref"
+  ],
+  "rca_scope": "product_entry_session_domain_snapshot_refs",
+  "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
+  "codePaths": [
+    "packages/redcube-runtime/src/product-entry-session-store.ts",
+    "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+    "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+  ],
+  "activeCallers": [
+    "redcube product session domain snapshot refs",
+    "OPL generated session shell continuation target",
+    "operator loop domain locator refs"
+  ],
+  "activeCallerStatus": "opl_generated_session_shell_domain_refs",
+  "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
+  "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
+  "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
+  "tombstone_required": false,
+  "migration_class": "opl_generated_surface",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": false,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/opl_generic_primitive_consumption",
+    "replacement_surface": "opl_app_session_shell_and_workbench",
+    "expected_mode": "opl_generated_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "product_entry_session_store_bridge_exit_gate",
+    "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_app_session_shell_and_workbench",
+    "exit_gate_ref": "/opl_generated_interface_consumption",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "entry_session_domain_refs",
+      "deliverable_locator_refs",
+      "latest_visual_run_ref"
+    ],
+    "after_exit_rca_surface": "domain_session_snapshot_refs_only",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
+  "rca_exports_only": [
+    "entry_session_id",
+    "topic_deliverable_run_locator_refs",
+    "latest_visual_run_ref",
+    "domain_snapshot_ref"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "entry_session_domain_refs",
+    "deliverable_locator_refs",
+    "latest_visual_run_ref"
+  ],
+  "generated_session_shell_owner": "one-person-lab",
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

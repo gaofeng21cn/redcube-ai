@@ -1,0 +1,111 @@
+{
+  "module_id": "generic_cli_mcp_wrappers",
+  "surface_ref": "/family_action_catalog_parity",
+  "status": "canonical_metadata_parity_landed",
+  "classification": "opl_discoverable_projection_rca_owned_action_metadata",
+  "opl_generic_primitive": "standard_domain_agent_scaffold",
+  "oplAbsorbCandidate": true,
+  "rcaRetains": [
+    "rca_action_metadata",
+    "domain_action_handlers",
+    "safe_action_refs"
+  ],
+  "rca_scope": "product_sidecar_status_action_metadata_projection",
+  "audit_readout": "retain_thin_projection_project_generated_wrappers",
+  "codePaths": [
+    "apps/redcube-cli/src/cli.ts",
+    "apps/redcube-mcp/src/server.ts",
+    "packages/redcube-gateway/src/actions/family-action-catalog.ts",
+    "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+  ],
+  "activeCallers": [
+    "OPL generated CLI/MCP wrapper domain handler targets",
+    "redcube CLI direct diagnostic entry",
+    "redcube MCP direct protocol adapter",
+    "family action catalog refs",
+    "product sidecar guarded action list refs"
+  ],
+  "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
+  "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
+  "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
+  "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+  "tombstone_required": false,
+  "migration_class": "opl_generated_surface",
+  "opl_owned_generic_primitive_consumer": true,
+  "rca_owned_visual_domain_authority": true,
+  "opl_absorb_candidate": true,
+  "opl_replacement_expectation": {
+    "owner": "opl",
+    "expectation_ref": "/family_action_catalog",
+    "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+    "expected_mode": "opl_generated_surface",
+    "rca_consumes_as": "consumer_projection_only",
+    "rca_owns_replacement_runtime": false
+  },
+  "bridge_exit_gate": {
+    "gate_id": "generic_cli_mcp_wrappers_bridge_exit_gate",
+    "bridge_role": "domain_handler_target_until_opl_generated_wrappers_are_default_callers",
+    "bridge_owner": "redcube_ai_migration_bridge",
+    "replacement_owner": "one-person-lab",
+    "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
+    "exit_gate_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
+    "current_status": "bridge_until_exit_gates_pass",
+    "required_before_retire": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ],
+    "retained_rca_authority": [
+      "domain_handler_refs",
+      "safe_action_refs"
+    ],
+    "after_exit_rca_surface": "domain_handler_target_only",
+    "can_delete_without_no_active_caller_proof": false,
+    "declares_replacement_complete": false,
+    "rca_can_own_replacement_runtime": false,
+    "opl_can_write_visual_truth": false,
+    "opl_can_store_artifact_blob": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_authorize_review_export_verdict": false,
+    "opl_can_issue_owner_receipt": false
+  },
+  "rca_projection_mode": "canonical_action_metadata_refs_only",
+  "rca_exports_only": [
+    "family_action_catalog_refs",
+    "guarded_action_refs",
+    "domain_handler_refs",
+    "direct_domain_entry_refs"
+  ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_runtime": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_native_helper_generic_envelope": false,
+    "rca_owns_generic_cli_mcp_wrapper_generator": false,
+    "rca_owns_generic_executor_adapter": false,
+    "rca_owns_observability_exporter": false
+  },
+  "physical_deletion_guard": {
+    "safe_to_delete_now": false,
+    "reason": "generic_cli_mcp_wrappers is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "required_before_delete": [
+      "domain_authority_refs_preserved",
+      "no_regression_proof_recorded"
+    ]
+  },
+  "rca_retains": [
+    "rca_action_metadata",
+    "domain_action_handlers",
+    "safe_action_refs"
+  ],
+  "repo_local_handler_target_only": true,
+  "generated_surface_metadata_owner": "one-person-lab",
+  "retire_tombstone": false,
+  "writes_visual_truth": false,
+  "writes_artifact_blob": false,
+  "writes_memory_body": false,
+  "declares_visual_ready": false,
+  "declares_exportable": false,
+  "declares_handoffable": false,
+  "declares_production_soak_complete": false
+}

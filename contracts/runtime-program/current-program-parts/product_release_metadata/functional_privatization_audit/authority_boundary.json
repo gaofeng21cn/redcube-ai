@@ -1,0 +1,7 @@
+{
+  "opl_can_write_domain_truth": false,
+  "opl_can_write_memory_body": false,
+  "opl_can_authorize_quality_or_export": false,
+  "domain_can_claim_generic_runtime_owner": false,
+  "domain_repo_can_own_generated_surface": false
+}

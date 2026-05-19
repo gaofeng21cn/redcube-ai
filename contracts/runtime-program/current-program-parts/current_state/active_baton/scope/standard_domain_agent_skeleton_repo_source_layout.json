@@ -1,0 +1,19 @@
+{
+  "status": "audit_surface_landed",
+  "mapping_model": "physical_skeleton_repo_source_layout_with_manifest_projection",
+  "audit_surface": "redcube product manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+  "expected_roots": [
+    "agent",
+    "contracts",
+    "runtime",
+    "docs"
+  ],
+  "missing_roots": [],
+  "forbidden_repo_writes": [
+    "visual_truth",
+    "review_export_verdict",
+    "canonical_artifact_blob",
+    "memory_content_body",
+    "receipt_instance"
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
+  "sqlite_sidecar_enabled_now": false,
+  "sqlite_decision": "deferred_until_measured_rca_runtime_file_growth_or_query_pressure",
+  "canonical_truth_surfaces_remain_files": [
+    "product-entry/session truth",
+    "deliverable contracts",
+    "review state",
+    "export bundles",
+    "artifact gallery manifests",
+    "final delivery manifests",
+    "opl_family_lifecycle_adapter projection",
+    "opl_family_stage_control_projection projection",
+    "domain_memory_descriptor_locator projection"
+  ],
+  "future_sidecar_constraints": [
+    "must be rebuildable",
+    "must not store PNG/PPTX/PDF blobs",
+    "must not replace visual-domain truth or review/export judgment",
+    "must not be Git-tracked"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "status": "repo_tracked_projection_contract",
+  "projection_id": "rca.opl.family.stage-control.projection.v1",
+  "adapter_model": "descriptor_and_stage_execution_plan_provider",
+  "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
+  "covered_families": [
+    "ppt_deck",
+    "xiaohongshu",
+    "poster_onepager"
+  ],
+  "family_stage_kinds": [
+    "source_intake",
+    "communication_strategy",
+    "visual_direction",
+    "artifact_creation",
+    "review_and_revision",
+    "package_and_handoff"
+  ],
+  "domain_truth_owner": "redcube_ai",
+  "opl_role": "stage_attempt_scheduler_and_projection_consumer",
+  "default_ppt_route_changed": false,
+  "repo_local_stage_runner_retired": true,
+  "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
+}

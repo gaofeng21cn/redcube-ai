@@ -1,0 +1,92 @@
+{
+  "ref": "/opl_stability_read_model_consumption",
+  "contract_ref": "opl.family_operator_stability_read_model.v1",
+  "owner": "opl",
+  "consumer": "redcube_ai",
+  "status": "refs_only_consumer_projection_landed",
+  "projection_mode": "consumer_projection_only",
+  "observability_only": true,
+  "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
+  "completion_scope": "stability_read_model_refs_projected_not_live_soak",
+  "live_soak_claimed": false,
+  "consumed_read_model_surfaces": [
+    {
+      "surface": "family_conflict_envelope",
+      "contract_ref": "contracts/family-orchestration/family-conflict-envelope.schema.json",
+      "rca_consumes": "typed_blocker_or_conflict_refs_only"
+    },
+    {
+      "surface": "control_loop_summary",
+      "contract_ref": "contracts/opl-framework/family-product-operator-projection.json#/required_projection_fields/control_loop_summary",
+      "rca_consumes": "trigger_decision_route_receipt_blocker_refs_only"
+    },
+    {
+      "surface": "usage_projection",
+      "contract_ref": "contracts/opl-framework/family-runtime-attempt-contract.json#/stability_projection_fields/usage_projection",
+      "rca_consumes": "observed_usage_refs_only"
+    },
+    {
+      "surface": "resource_pressure",
+      "contract_ref": "contracts/opl-framework/family-product-operator-projection.json#/required_projection_fields/resource_pressure",
+      "rca_consumes": "observed_retry_budget_pressure_refs_only"
+    },
+    {
+      "surface": "observability_export",
+      "contract_ref": "opl runtime observability-export [--format json|openmetrics]",
+      "rca_consumes": "read_only_counter_export_refs_only"
+    },
+    {
+      "surface": "external_stability_policy",
+      "contract_ref": "contracts/opl-framework/family-product-operator-projection.json#/external_stability_learning_policy",
+      "rca_consumes": "policy_boundary_refs_only"
+    }
+  ],
+  "rca_does_not_own": [
+    "family_conflict_envelope_schema",
+    "control_loop_summary_builder",
+    "usage_projection_aggregator",
+    "resource_pressure_projection",
+    "runtime_observability_exporter",
+    "external_stability_policy_runtime",
+    "generic_fallback_completion",
+    "string_rule_retry_execution",
+    "generic_event_bus_truth_source",
+    "generic_runtime_adapter_success_semantics"
+  ],
+  "rca_retained_authority": [
+    "visual_truth",
+    "review_export_verdict",
+    "artifact_authority",
+    "visual_memory_body",
+    "owner_receipt",
+    "native_helper_implementation",
+    "typed_blocker",
+    "safe_action_refs"
+  ],
+  "authority_boundary": {
+    "opl_can_execute_rca_domain_action": false,
+    "opl_can_write_rca_domain_truth": false,
+    "opl_can_authorize_visual_ready": false,
+    "opl_can_authorize_quality_verdict": false,
+    "opl_can_authorize_exportable": false,
+    "opl_can_write_artifact_blob": false,
+    "opl_can_write_visual_memory_body": false,
+    "provider_completion_is_visual_ready": false,
+    "generic_fallback_can_mark_success": false,
+    "string_retry_can_drive_execution": false,
+    "event_bus_can_be_truth_source": false,
+    "runtime_adapter_started_is_behavior_equivalent": false
+  },
+  "forbidden_rca_stability_owner_flags": {
+    "rca_family_conflict_envelope_owner": false,
+    "rca_control_loop_summary_owner": false,
+    "rca_usage_projection_owner": false,
+    "rca_resource_pressure_owner": false,
+    "rca_observability_export_owner": false,
+    "rca_external_stability_policy_owner": false,
+    "rca_generic_fallback_completion_owner": false,
+    "rca_string_rule_retry_execution_owner": false,
+    "rca_generic_event_bus_truth_owner": false,
+    "rca_runtime_adapter_success_semantics_owner": false
+  }
+}
