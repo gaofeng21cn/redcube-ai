@@ -578,7 +578,7 @@ test('Codex-backed verification Python command contract is frozen in current pro
   );
   assert.equal(
     currentProgram.current_state.green_baseline.local_codex_execution.current_host_closeout_contract,
-    'contracts/runtime-program/managed-product-entry-hardening.json',
+    'contracts/runtime-program/product-entry-session-continuity.json',
   );
   assert.equal(
     currentProgram.current_state.green_baseline.local_codex_execution.current_host_latest_route_proof.some((item) => item.includes('local Codex CLI route and OPL stage execution pass repo smoke')),

@@ -147,8 +147,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_preflight.checks[3].status, 'pass');
     assert.equal(manifest.repo_mainline.program_id, 'redcube-runtime-program');
     assert.equal(manifest.repo_mainline.phase_id, 'repo_verified_product_entry_and_opl_hosted_handoff');
-    assert.equal(manifest.repo_mainline.active_baton_provenance_id, 'managed_product_entry_hardening');
+    assert.equal(manifest.repo_mainline.active_baton_provenance_id, 'product_entry_session_continuity');
     assert.equal(manifest.repo_mainline.active_baton_role, 'session_continuity_provenance');
+    assert.equal(
+      manifest.current_truth.session_continuity_provenance_contract,
+      'contracts/runtime-program/product-entry-session-continuity.json',
+    );
+    assert.equal(
+      manifest.current_truth.provenance_contract_name_policy,
+      'neutral_session_continuity_contract_with_legacy_managed_tombstone',
+    );
     assert.equal(typeof manifest.product_entry_status.summary, 'string');
     assert.match(manifest.product_entry_status.summary, /product-entry overview\/intake surface/);
     assert.equal(manifest.product_entry_status.remaining_gaps_count, 2);

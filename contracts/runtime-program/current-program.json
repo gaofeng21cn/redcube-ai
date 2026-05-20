@@ -6926,7 +6926,7 @@
         "current_host_status": "fresh_codex_smoke_passed",
         "current_host_blocking_reason": null,
         "current_host_stream_signal": "codex_exec_terminal_event_received",
-        "current_host_closeout_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+        "current_host_closeout_contract": "contracts/runtime-program/product-entry-session-continuity.json",
         "current_host_latest_route_proof": [
           "2026-04-13: local Codex CLI route and OPL stage execution pass repo smoke with structured generation held inside runtime-family.",
           "2026-04-13: ppt_deck / xiaohongshu / poster_onepager creative stages stay on AI-first Codex structured generation without pack/compiler fallback."
@@ -6999,10 +6999,13 @@
         "action_surface": "invokeOplHostedProductEntry"
       },
       "managed_product_entry_hardening": {
-        "status": "closeout_completed",
+        "status": "tombstone_only",
         "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
         "brief": "human_doc:program_managed_product_entry_hardening",
-        "action_surface": "getProductEntrySession"
+        "replacement_contract": "contracts/runtime-program/product-entry-session-continuity.json",
+        "replacement_brief": "human_doc:program_product_entry_session_continuity",
+        "active_caller_retained": false,
+        "compatibility_alias_allowed": false
       },
       "upstream_hermes_agent_live_verification_blocker": {
         "status": "historical_blocker_resolved",
@@ -7034,18 +7037,24 @@
       },
       "hermes_managed_family_closure_truth": {
         "status": "historical_local_migration_artifact"
+      },
+      "product_entry_session_continuity": {
+        "status": "closeout_completed",
+        "contract": "contracts/runtime-program/product-entry-session-continuity.json",
+        "brief": "human_doc:program_product_entry_session_continuity",
+        "action_surface": "getProductEntrySession"
       }
     },
     "next_activation_package": {
-      "id": "managed_product_entry_hardening",
+      "id": "product_entry_session_continuity",
       "status": "closeout_completed",
-      "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
-      "brief": "human_doc:program_managed_product_entry_hardening",
+      "contract": "contracts/runtime-program/product-entry-session-continuity.json",
+      "brief": "human_doc:program_product_entry_session_continuity",
       "adapter_surface": "@redcube/codex-cli-client",
       "probe_script": "redcube product invoke"
     },
     "active_baton": {
-      "id": "managed_product_entry_hardening",
+      "id": "product_entry_session_continuity",
       "status": "closeout_completed",
       "review_status": "verified",
       "program_mode": "repo_verified_product_entry_service_surface",
@@ -11222,10 +11231,10 @@
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
         "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
-        "session_continuity_provenance_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+        "session_continuity_provenance_contract": "contracts/runtime-program/product-entry-session-continuity.json",
         "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
         "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
-        "session_continuity_provenance_brief": "human_doc:program_managed_product_entry_hardening",
+        "session_continuity_provenance_brief": "human_doc:program_product_entry_session_continuity",
         "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
         "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
         "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",

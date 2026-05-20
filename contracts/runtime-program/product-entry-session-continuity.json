@@ -1,0 +1,79 @@
+{
+  "product_entry_session_continuity_id": "product_entry_session_continuity",
+  "date_anchor": "2026-04-12",
+  "status": "closeout_completed",
+  "goal": "Persist product-entry session continuity under user-level runtime-state and expose a repo-verified continuation surface.",
+  "callable_surface": {
+    "action_ref": "get_product_entry_session",
+    "api_surface": "getProductEntrySession",
+    "cli_entry": "redcube product session",
+    "mcp_tool": "get_product_entry_session"
+  },
+  "session_store_contract": {
+    "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "required_fields": [
+      "entry_session_id",
+      "workspace_root",
+      "deliverable_family",
+      "topic_id",
+      "deliverable_id",
+      "runtime_owner",
+      "last_task_intent",
+      "updated_at"
+    ],
+    "latest_handle_fields": [
+      "latest_stage_execution_plan_ref",
+      "latest_run_id"
+    ],
+    "continuation_surfaces": [
+      "session_continuity",
+      "progress_projection",
+      "artifact_inventory",
+      "stage_execution_plan_projection",
+      "runtime_loop_closure",
+      "review_state",
+      "publication_projection"
+    ],
+    "continuity_truth": {
+      "restore_point_fields": [
+        "continuation_snapshot.latest_stage_execution_plan_ref",
+        "continuation_snapshot.latest_run_id",
+        "session_continuity.restore_point.latest_handle"
+      ],
+      "artifact_ref_fields": [
+        "continuation_snapshot.runtime_progress_projection.final_artifact_refs",
+        "continuation_snapshot.stage_execution_plan.stage_attempts",
+        "artifact_inventory.artifact_refs"
+      ],
+      "session_file_field": "entry_session.session_file"
+    }
+  },
+  "behavior_contract": {
+    "session_identity_scope": "one durable deliverable per entry_session_id",
+    "direct_and_opl_hosted_entry_share_same_store": true,
+    "fail_closed_on": [
+      "missing_entry_session_id",
+      "session_not_found",
+      "session_runtime_owner_drift"
+    ]
+  },
+  "response_contract": {
+    "surface_kind": "product_entry_session",
+    "must_include": [
+      "entry_session",
+      "continuation_snapshot",
+      "session_continuity",
+      "progress_projection",
+      "artifact_inventory",
+      "review_state",
+      "publication_projection"
+    ]
+  },
+  "legacy_tombstone_refs": [
+    "contracts/runtime-program/managed-product-entry-hardening.json",
+    "human_doc:program_managed_product_entry_hardening",
+    "docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md"
+  ],
+  "compatibility_alias_allowed": false,
+  "active_generic_runtime_owner_allowed": false
+}

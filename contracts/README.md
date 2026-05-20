@@ -16,7 +16,8 @@
 - `runtime-program/upstream-hermes-agent-final-target-shape.json`：独立 RCA domain-agent 在显式 hosted runtime carrier 语境下的目标形态冻结件（direct route 与 OPL-hosted handoff 共用同一下游 domain entry）
 - `runtime-program/redcube-product-entry-mvp.json`：当前 direct product-entry service surface 冻结件
 - `runtime-program/opl-framework-hosted-product-entry.json`：当前 OPL-hosted stage runtime handoff / integration 冻结件
-- `runtime-program/managed-product-entry-hardening.json`：当前 product-entry session continuity 冻结件
+- `runtime-program/product-entry-session-continuity.json`：当前 product-entry session continuity 冻结件
+- `runtime-program/managed-product-entry-hardening.json`：旧 `managed` contract tombstone；只保留 provenance / semantic-id，不提供 callable alias 或 compatibility wrapper
 - `product_status` 等 product-entry command keys 只作为单一 `redcube-ai` app skill 下的 machine-readable overview / intake / entry-shell contract 保留；它们不表示成熟 GUI、WebUI 或最终用户前台壳已经落地。
 - `runtime-program/rca-executor-routing-config.schema.json`：RCA executor routing 的 opt-in 配置 schema；只表达 `codex_cli` / `hermes_agent` 与 `structured_call` / `agent_loop`，不保存 provider secret
 - `runtime-program/rca-one-shot-production-hardening-closeout.json`：2026-05-20 一步到位落地计划的 closeout 机器面，显式记录 `planned`、`done`、`deferred`、`skipped`、`verification` 与 `commit_push_state`。它只声明 A/B/C/D 的结构、executor policy、evidence refs 与 wrapper classification 已落地；production visual-stage long soak、真实 memory lifecycle scaleout 与 cross-family repeated no-regression 仍保留为 RCA-owned typed blocker/backlog，不升级为 visual ready、exportable 或 handoffable。

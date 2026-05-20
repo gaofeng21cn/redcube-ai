@@ -25,7 +25,7 @@ export function buildManifestExtraPayload({
       product_entry_contract: PRODUCT_ENTRY_CONTRACT_REF,
       opl_hosted_product_entry_contract: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
       session_continuity_provenance_contract: SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
-      provenance_contract_name_policy: 'legacy_file_name_for_session_continuity_not_rca_generic_runtime_owner',
+      provenance_contract_name_policy: 'neutral_session_continuity_contract_with_legacy_managed_tombstone',
     },
     session_continuity: {
       surface_kind: 'session_continuity',

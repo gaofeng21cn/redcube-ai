@@ -26,3 +26,4 @@ Machine boundary: 人读 tombstone 索引。机器真相继续归 contracts、sc
 当前 tombstone：
 
 - `retired-route-narratives-2026-05-11.md`: gateway-first, frontdoor-first, federation-first, harness-first, OPL-first, OPL bridge, Hermes-first, and open-ended Phase 2 public-direction wording.
+- `retired-managed-product-entry-contract-2026-05-20.md`: legacy managed product-entry contract naming; active contract is product-entry session continuity.

@@ -509,4 +509,29 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     byId.legacy_managed_runtime_gateway_names.current_rca_role,
     'contract_safe_semantic_id_or_tombstone_provenance_only',
   );
+  assert.equal(
+    byId.legacy_managed_runtime_gateway_names.source_refs.includes(
+      'docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md',
+    ),
+    true,
+  );
+});
+
+test('retired managed product-entry contract is tombstoned without compatibility caller', () => {
+  const retired = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/managed-product-entry-hardening.json'),
+    'utf-8',
+  ));
+  const replacement = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/product-entry-session-continuity.json'),
+    'utf-8',
+  ));
+
+  assert.equal(retired.surface_kind, 'retired_runtime_program_contract_tombstone');
+  assert.equal(retired.replacement_contract, 'contracts/runtime-program/product-entry-session-continuity.json');
+  assert.equal(retired.compatibility_alias_allowed, false);
+  assert.equal(retired.callable_surface_retained, false);
+  assert.equal(retired.active_caller_retained, false);
+  assert.equal(replacement.product_entry_session_continuity_id, 'product_entry_session_continuity');
+  assert.equal(replacement.callable_surface.api_surface, 'getProductEntrySession');
 });

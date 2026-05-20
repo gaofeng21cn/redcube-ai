@@ -52,10 +52,13 @@
     "action_surface": "invokeOplHostedProductEntry"
   },
   "managed_product_entry_hardening": {
-    "status": "closeout_completed",
+    "status": "tombstone_only",
     "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
     "brief": "human_doc:program_managed_product_entry_hardening",
-    "action_surface": "getProductEntrySession"
+    "replacement_contract": "contracts/runtime-program/product-entry-session-continuity.json",
+    "replacement_brief": "human_doc:program_product_entry_session_continuity",
+    "active_caller_retained": false,
+    "compatibility_alias_allowed": false
   },
   "upstream_hermes_agent_live_verification_blocker": {
     "status": "historical_blocker_resolved",
@@ -87,5 +90,11 @@
   },
   "hermes_managed_family_closure_truth": {
     "status": "historical_local_migration_artifact"
+  },
+  "product_entry_session_continuity": {
+    "status": "closeout_completed",
+    "contract": "contracts/runtime-program/product-entry-session-continuity.json",
+    "brief": "human_doc:program_product_entry_session_continuity",
+    "action_surface": "getProductEntrySession"
   }
 }

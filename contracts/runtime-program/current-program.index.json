@@ -682,7 +682,7 @@
       "json_pointer": "/current_state/foundation_milestones",
       "ref": "contracts/runtime-program/current-program-parts/current_state/foundation_milestones.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 91
+      "line_count": 100
     },
     {
       "json_pointer": "/current_state/green_baseline",

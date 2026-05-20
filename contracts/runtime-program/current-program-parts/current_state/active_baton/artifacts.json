@@ -1,10 +1,10 @@
 {
   "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
   "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
-  "session_continuity_provenance_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+  "session_continuity_provenance_contract": "contracts/runtime-program/product-entry-session-continuity.json",
   "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
   "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
-  "session_continuity_provenance_brief": "human_doc:program_managed_product_entry_hardening",
+  "session_continuity_provenance_brief": "human_doc:program_product_entry_session_continuity",
   "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
   "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
   "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",

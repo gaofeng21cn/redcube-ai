@@ -38,7 +38,7 @@
     "current_host_status": "fresh_codex_smoke_passed",
     "current_host_blocking_reason": null,
     "current_host_stream_signal": "codex_exec_terminal_event_received",
-    "current_host_closeout_contract": "contracts/runtime-program/managed-product-entry-hardening.json",
+    "current_host_closeout_contract": "contracts/runtime-program/product-entry-session-continuity.json",
     "current_host_latest_route_proof": [
       "2026-04-13: local Codex CLI route and OPL stage execution pass repo smoke with structured generation held inside runtime-family.",
       "2026-04-13: ppt_deck / xiaohongshu / poster_onepager creative stages stay on AI-first Codex structured generation without pack/compiler fallback."

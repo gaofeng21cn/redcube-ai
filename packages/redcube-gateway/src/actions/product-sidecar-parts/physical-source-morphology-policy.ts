@@ -184,7 +184,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     surface_id: 'legacy_managed_runtime_gateway_names',
     source_refs: [
       'contracts/runtime-program/managed-product-entry-hardening.json',
-      'contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retired_surface_tombstones.json',
+      'docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md',
       'docs/history/',
     ],
     classification: 'tombstone_or_provenance',
