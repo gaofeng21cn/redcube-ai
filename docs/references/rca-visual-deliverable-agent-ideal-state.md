@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `north_star_reference`
 State: `active_support`
 Machine boundary: 本文是人读目标态参考。机器可读真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-19`
+Date: `2026-05-21`
 
 ## 文档读法
 
