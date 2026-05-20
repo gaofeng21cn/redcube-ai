@@ -72,7 +72,7 @@
   "legacy_tombstone_refs": [
     "contracts/runtime-program/managed-product-entry-hardening.json",
     "human_doc:program_managed_product_entry_hardening",
-    "docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md"
+    "human_doc:retired_managed_product_entry_contract_tombstone"
   ],
   "compatibility_alias_allowed": false,
   "active_generic_runtime_owner_allowed": false

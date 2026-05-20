@@ -54,6 +54,8 @@ User / Agent
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
+`temporal_autonomy_readiness` 是当前判断 RCA 是否能被 OPL/Temporal 长时间托管的机器读面。它声明 RCA 侧已提供 stage descriptor、queue/wakeup handoff、progress re-query、runtimeWatch、owner receipt、workspace receipt proof 与 no-regression refs，因此 `can_be_opl_temporal_hosted=true`；同时它也把 provider production residency、worker restart/resume/re-query、retry/dead-letter 和真实 visual-stage long soak 留给 OPL/Temporal 证明，并保持 `long_time_autonomy_claimed=false`、`production_visual_stage_long_soak_complete=false`。
+
 因此本文的 `runtime` 只指 RCA domain-agent runtime boundary，不表示 RCA 仓维护 generic scheduler、generic queue、generic attempt ledger、generic state-machine runner、generic memory locator、generic observability 或通用 App/workbench runtime。
 
 RCA 长线实现语言面保持 `TypeScript + Python`：
