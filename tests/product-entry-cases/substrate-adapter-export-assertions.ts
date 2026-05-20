@@ -63,6 +63,40 @@ export function assertManifestSubstrateAdapterExport(manifest) {
     manifest.product_entry_shell.sidecar.opl_substrate_adapter_export.ref,
     '/opl_substrate_adapter_export',
   );
+  assert.equal(manifest.source_provenance.surface_kind, 'source_provenance');
+  assert.equal(manifest.source_provenance.capability_classification, 'source_provenance_only');
+  assert.equal(manifest.source_provenance.source_provenance_ref.ref, 'docs/source/source_augmentation_executor_contract.md');
+  assert.equal(manifest.source_provenance.parity_oracle_ref.ref, '/visual_pack_compiler_handoff');
+  assert.equal(
+    manifest.source_provenance.authority_boundary.includes('source_refs_do_not_contain_source_body'),
+    true,
+  );
+  assert.equal(
+    manifest.source_provenance.authority_boundary.includes('artifact_authority_owner_is_redcube_ai'),
+    true,
+  );
+  assert.equal(manifest.artifact_inventory.surface_kind, 'artifact_inventory');
+  assert.equal(
+    manifest.artifact_inventory.supporting_files.some(
+      (entry) => entry.file_id === 'artifact_locator_contract' && entry.ref.ref === '/artifact_locator_contract',
+    ),
+    true,
+  );
+  assert.equal(
+    manifest.artifact_inventory.supporting_files.some(
+      (entry) => entry.file_id === 'operator_evidence_readiness_projection'
+        && entry.ref.ref === '/operator_evidence_readiness_projection',
+    ),
+    true,
+  );
+  assert.equal(
+    manifest.artifact_inventory.supporting_files.every((entry) => entry.kind === 'supporting'),
+    true,
+  );
+  assert.equal(
+    JSON.stringify(manifest.artifact_inventory.supporting_files).includes('artifact_blob'),
+    false,
+  );
 }
 
 export function assertSidecarSubstrateAdapterExport(sidecar) {

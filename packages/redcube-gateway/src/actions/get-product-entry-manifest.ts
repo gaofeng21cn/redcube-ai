@@ -336,6 +336,40 @@ export async function getProductEntryManifest(request) {
     ],
     source_provenance: [],
   };
+  const sourceProvenance = {
+    surface_kind: 'source_provenance',
+    summary: (
+      'RCA exposes visual-deliverable source provenance as OPL-indexable body-free refs only; '
+      + 'source truth, visual route judgment, artifact authority, review/export verdicts, and memory bodies remain RCA-owned.'
+    ),
+    source_provenance_ref: {
+      surface_kind: 'rca_visual_source_provenance',
+      ref: 'docs/source/source_augmentation_executor_contract.md',
+    },
+    historical_fixture_ref: {
+      surface_kind: 'rca_visual_source_fixture_ref',
+      ref: 'tests/fixtures/ppt-image-first-benchmark/manifest.json',
+    },
+    explicit_archive_import_ref: {
+      surface_kind: 'rca_explicit_source_intake_ref',
+      command: `${PRODUCT_STATUS_COMMAND} --workspace-root <workspace-root>`,
+    },
+    parity_oracle_ref: {
+      surface_kind: 'rca_visual_pack_parity_oracle_ref',
+      ref: '/visual_pack_compiler_handoff',
+    },
+    authority_boundary: [
+      'source_refs_do_not_contain_source_body',
+      'opl_projection_reads_refs_only',
+      'workspace_source_intake_shell_owner_is_one_person_lab',
+      'visual_source_truth_owner_is_redcube_ai',
+      'review_export_verdict_owner_is_redcube_ai',
+      'artifact_authority_owner_is_redcube_ai',
+      'no_runtime_workbench_ledger_or_scheduler_authority_transferred',
+    ],
+    capability_classification: 'source_provenance_only',
+    recommended_audit_command: PRODUCT_MANIFEST_COMMAND,
+  };
   const lifecycleLedger = {
     surface_kind: 'family_lifecycle_ledger',
     version: 'family-lifecycle-ledger.v1',
@@ -873,6 +907,7 @@ export async function getProductEntryManifest(request) {
       deliverableFacade,
       nativePptOperatorUx,
       productEntrySessionCommand,
+      sourceProvenance,
     }),
 	  });
   return buildReturnedManifestProjection({
