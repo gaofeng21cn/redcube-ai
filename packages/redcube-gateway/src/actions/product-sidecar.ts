@@ -225,6 +225,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         receipt_root_model: manifest.workspace_receipt_inventory_projection?.receipt_root_model || '<workspace-root>/.redcube/runtime/receipts/',
         receipt_counts: manifest.workspace_receipt_inventory_projection?.receipt_counts || {},
         gap_projection: manifest.workspace_receipt_inventory_projection?.gap_projection || {},
+        scaleout_projection: manifest.workspace_receipt_inventory_projection?.scaleout_projection || {},
         writable_by_sidecar: false,
         read_only: true,
         refs_only: true,
@@ -311,6 +312,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         opl_consumption_policy: manifest.no_regression_owner_receipt_opl_consumption_proof?.opl_consumption_policy || {},
         writable_by_sidecar: true,
       },
+      production_evidence_scaleout_refs: manifest.operator_evidence_readiness_projection?.production_evidence_scaleout_refs || {},
       lifecycle_guarded_apply: {
         ref: '/lifecycle_guarded_apply_proof',
         owner: DOMAIN_ID,
@@ -368,6 +370,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
+      production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
       opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',
     },

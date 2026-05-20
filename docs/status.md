@@ -45,6 +45,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-20 production acceptance/readiness closeout 的当前文档口径是：结构 conformance 通过不是 visual ready；readiness clean / observable 只表示 launch、replay、runtime evidence、owner receipt refs 和 typed blocker 可被观察与追溯。最终合并后的 expected result 是 RCA stage evidence 中出现 runtime budget refs 与 replay evidence refs、RCA production acceptance 中保留 owner receipt / artifact / review-export acceptance refs、OPL readiness surface 能消费这些 refs 并报告 clean/observable；这些结果仍不声明 production visual-stage long soak、跨 family repeated no-regression 或更多 workspace scaleout 已完成。
 
+2026-05-20 evidence scaleout refs 已补到 RCA production acceptance、operator evidence readiness projection、workspace receipt inventory projection 和 product sidecar projection。当前新增 refs 覆盖 artifact-producing owner receipt、workspace receipt scaleout ref model、visual memory body reuse ref、repeated no-regression evidence refs 和 naming tombstone follow-through；这些都是 RCA-owned refs-only evidence，不把 visual truth、review/export verdict、artifact blob、memory body 或 production soak success 交给 OPL。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。
@@ -67,6 +69,8 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 
 RCA 的 domain-owned production acceptance 机器面是：
 `contracts/production_acceptance/rca-production-acceptance.json`。该 surface 明确记录 structural / physical conformance 已通过，且 production acceptance 只由 RCA-owned visual artifact-producing receipt chain 或 RCA-owned typed blocker 关闭；visual ready、exportable、handoffable 和 domain_ready 继续归 RCA visual / review / export authority。当前 evidence tail 以 refs-only 形式指向 RCA owner receipt、artifact locator / artifact receipt、review/export gate、memory/lifecycle receipt 和 next verification command refs。OPL conformance、readiness clean/observable、OPL hosted/provider completion、replay evidence 与 cleanup proof 都不能升级为 RCA visual/export/domain ready。
+
+当前 scaleout refs 已经把 production evidence tail 变成可追踪读模型：workspace receipt inventory 可以暴露 receipt-kind coverage 和 scaleout ref model，operator evidence readiness 可以聚合 production evidence scaleout refs，sidecar export 可以给 OPL/App 读取这些 refs。真实跨 workspace scaleout、Temporal controlled visual-stage long soak 和最终 visual-ready/exportable/handoffable verdict 仍需后续真实运行证据关闭。
 
 此外仍有一类命名/合同卫生债：历史合同文件名、field name 或 task intent 中的 `managed` 可能仍作为已落地 session-continuity / product-entry provenance 语义存在，例如 `managed-product-entry-hardening`。这些不是旧 runtime active implementation；后续若要更干净，应通过语义 ID 迁移或 tombstone policy 逐步改名，避免破坏 runtime-program provenance。
 

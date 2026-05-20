@@ -90,6 +90,8 @@ OPL 必须持有：
 
 本轮 production acceptance/readiness closeout 的 expected merged result 是 refs-only evidence 面闭合：RCA stage evidence refs 包含 runtime budget refs 与 replay evidence refs；RCA production acceptance/readiness 文档面保留 owner receipt / artifact receipt / review-export acceptance refs；OPL readiness consumption 能把这些 refs 读成 launch / replay / runtime evidence clean and observable。该结果关闭的是结构与可观察性验收，不关闭真实长时 visual-stage soak、跨 family repeated no-regression 或更多 workspace scaleout；这些继续作为 production scaleout evidence，不作为结构 blocker。
 
+2026-05-20 evidence scaleout lane 已把 production tail 的五类 ref 明确接入 RCA machine surfaces：artifact-producing owner receipt ref、workspace receipt scaleout ref model、visual memory body reuse ref、repeated no-regression evidence refs、naming tombstone follow-through refs。该变更只提升 operator/readiness 可观察性，仍不声明 production visual-stage long soak、跨 workspace scaleout 完成、visual ready、exportable 或 handoffable。
+
 ## 当前 cleanliness tail
 
 RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：

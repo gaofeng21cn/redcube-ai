@@ -1,5 +1,93 @@
 // @ts-nocheck
 
+function buildProductionEvidenceScaleoutRefs({
+  standardDomainAgentSkeleton,
+  workspaceReceiptInventoryProjection,
+}) {
+  const receiptContract = standardDomainAgentSkeleton.domain_owner_receipt_contract || {};
+  const memoryApplyProof = standardDomainAgentSkeleton.controlled_memory_apply_proof || {};
+  const noRegressionProof = standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof || {};
+  const physicalSkeleton = standardDomainAgentSkeleton.physical_skeleton_follow_through || {};
+  return {
+    surface_kind: 'rca_visual_production_evidence_scaleout_refs',
+    owner: 'redcube_ai',
+    status: 'refs_landed_scaleout_runtime_evidence_pending',
+    evidence_model: 'refs_only_no_visual_truth_artifact_blob_or_memory_body',
+    evidence_receipt_fixture_ref: 'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
+    owner_receipt_refs: {
+      status: 'artifact_producing_owner_receipt_ref_closed',
+      contract_ref: '/domain_owner_receipt_contract',
+      receipt_ref: 'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+      allowed_return_shapes: receiptContract.allowed_return_shapes || [],
+      opl_can_store_receipt_refs: receiptContract.opl_consumption_policy?.opl_can_store_receipt_refs === true,
+      visual_readiness_claimed: false,
+      export_readiness_claimed: false,
+    },
+    workspace_receipt_scaleout_refs: {
+      status: workspaceReceiptInventoryProjection?.scaleout_projection?.status || 'workspace_receipt_scaleout_ref_model_pending',
+      workspace_receipt_inventory_ref: '/workspace_receipt_inventory_projection',
+      workspace_receipt_proof_action: 'emit_workspace_receipt_proof',
+      workspace_receipt_proof_ref_model: 'rca-workspace-receipt-proof:visual-stage:<proof-id>',
+      runtime_locator_ref_model: 'workspace-runtime-ref:receipt-proof:<proof-id>',
+      required_workspace_count_for_scaleout: 2,
+      observed_workspace_count: workspaceReceiptInventoryProjection?.scaleout_projection?.observed_workspace_count || 0,
+      observed_receipt_count: workspaceReceiptInventoryProjection?.scaleout_projection?.observed_receipt_count || 0,
+      receipt_kind_coverage_ready: workspaceReceiptInventoryProjection?.scaleout_projection?.receipt_kind_coverage_ready === true,
+      workspace_receipt_scaleout_claimed: false,
+    },
+    visual_memory_body_reuse_refs: {
+      status: 'body_external_reuse_ref_landed',
+      memory_locator_ref: '/domain_memory_descriptor_locator/memory_locator',
+      controlled_apply_proof_ref: '/controlled_memory_apply_proof',
+      consumed_memory_ref: memoryApplyProof.consumed_visual_pattern_memory_refs?.[0]?.memory_ref || 'rca-memory:visual-pattern:<memory-id>',
+      memory_content_body_ref: memoryApplyProof.consumed_visual_pattern_memory_refs?.[0]?.content_ref || 'rca-memory-content-ref:visual-pattern:<memory-id>',
+      runtime_receipt_instances_ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
+      body_owner: 'redcube_ai',
+      projected_body_to_opl: false,
+      contains_memory_body: false,
+    },
+    repeated_no_regression_evidence_refs: {
+      status: 'repeated_refs_available_not_production_soak',
+      generator_action: 'emit_no_regression_evidence',
+      proof_contract_ref: '/no_regression_owner_receipt_opl_consumption_proof',
+      proof_status: noRegressionProof.status || 'unknown',
+      evidence_refs: [
+        'rca-no-regression:visual-stage:transition-hosted-no-regression',
+        'rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression',
+      ],
+      deliverable_family_refs: [
+        'ppt_deck',
+        'xiaohongshu',
+      ],
+      required_minimum_evidence_ref_count: 2,
+      repeated_no_regression_claimed_as_soak: false,
+    },
+    naming_tombstone_follow_through_refs: {
+      status: 'tombstone_follow_through_refs_landed_no_compatibility_alias',
+      active_caller_compatibility_alias_restored: false,
+      tombstone_refs: physicalSkeleton.tombstone_refs || [],
+      retained_provenance_refs: [
+        'contracts/runtime-program/managed-product-entry-hardening.json',
+        'human_doc:managed_product_entry_hardening',
+      ],
+      forbidden_active_occurrence_classes: [
+        'compatibility_alias',
+        'default_runtime_owner',
+        'public_action_key',
+        'sidecar_template',
+      ],
+    },
+    authority_boundary: {
+      opl_can_store_projection_refs: true,
+      opl_can_write_rca_visual_truth: false,
+      opl_can_store_artifact_blob: false,
+      opl_can_store_memory_body: false,
+      opl_can_authorize_review_export_verdict: false,
+      opl_can_claim_production_soak_complete: false,
+    },
+  };
+}
+
 export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
   oplGeneratedInterfaceConsumption,
@@ -9,6 +97,10 @@ export function buildOperatorEvidenceReadinessProjection({
   workspaceReceiptInventoryProjection,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
+  const productionEvidenceScaleoutRefs = buildProductionEvidenceScaleoutRefs({
+    standardDomainAgentSkeleton,
+    workspaceReceiptInventoryProjection,
+  });
   const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
     'repo_local_wrapper_active_caller_migration',
@@ -38,6 +130,12 @@ export function buildOperatorEvidenceReadinessProjection({
         source_id: 'domain_owner_receipt_contract',
         ref: '/domain_owner_receipt_contract',
         allowed_return_shapes: standardDomainAgentSkeleton.domain_owner_receipt_contract?.allowed_return_shapes || [],
+      },
+      {
+        source_id: 'production_evidence_scaleout_refs',
+        ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
+        status: productionEvidenceScaleoutRefs.status,
+        evidence_receipt_fixture_ref: productionEvidenceScaleoutRefs.evidence_receipt_fixture_ref,
       },
       {
         source_id: 'controlled_memory_apply_runtime_receipt_refs',
@@ -109,6 +207,7 @@ export function buildOperatorEvidenceReadinessProjection({
       surface_kind: 'rca_domain_owned_visual_production_acceptance_evidence',
       status: 'closed_by_domain_owned_acceptance_receipt',
       contract_ref: 'contracts/production_acceptance/rca-production-acceptance.json',
+      evidence_receipt_fixture_ref: 'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
       receipt_ref: 'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
       receipt_chain_scope: 'rca_owned_refs_only_artifact_producing_receipt_chain',
       visual_ready_claimed: false,
@@ -116,6 +215,7 @@ export function buildOperatorEvidenceReadinessProjection({
       handoffable_claimed: false,
       domain_ready_claimed: false,
     },
+    production_evidence_scaleout_refs: productionEvidenceScaleoutRefs,
     read_only: true,
     refs_only: true,
     writes_visual_truth: false,

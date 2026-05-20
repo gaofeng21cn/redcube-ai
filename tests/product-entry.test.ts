@@ -1,5 +1,6 @@
 // @ts-nocheck
 await import('./product-entry-cases/manifest-and-start-surfaces.test.ts');
+await import('./product-entry-cases/evidence-scaleout-surfaces.test.ts');
 await import('./product-entry-cases/domain-memory-ref-adapter.test.ts');
 await import('./product-entry-cases/manifest-memory-and-attempt-surfaces.test.ts');
 await import('./product-entry-cases/memory-skeleton-retirement-proof.test.ts');
