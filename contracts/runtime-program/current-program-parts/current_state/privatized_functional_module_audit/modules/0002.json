@@ -28,6 +28,7 @@
   "cannotAbsorbReason": "OPL must not store visual memory body or decide whether a visual pattern is reusable for RCA deliverables.",
   "tombstone_required": false,
   "migration_class": "refs_only_adapter",
+  "active_reader_facing_classification": "refs_only_adapter",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": true,
   "opl_absorb_candidate": true,

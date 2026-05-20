@@ -28,7 +28,8 @@
   "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
   "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
   "tombstone_required": false,
-  "migration_class": "opl_hosted_surface",
+  "migration_class": "refs_only_adapter",
+  "active_reader_facing_classification": "refs_only_adapter",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": true,
   "opl_absorb_candidate": true,
@@ -36,7 +37,7 @@
     "owner": "opl",
     "expectation_ref": "/domain_entry_contract/executor",
     "replacement_surface": "opl_agent_executor_adapter",
-    "expected_mode": "opl_hosted_surface",
+    "expected_mode": "refs_only_adapter_to_opl_surface",
     "rca_consumes_as": "consumer_projection_only",
     "rca_owns_replacement_runtime": false
   },

@@ -76,7 +76,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-gateway/src/actions/invoke-product-entry.ts',
     ],
     classification: 'service_safe_domain_entry',
-    current_rca_role: 'direct_protocol_adapter_and_domain_handler_target',
+    current_rca_role: 'direct_protocol_adapter_domain_handler_target_not_generated_wrapper_owner',
     allowed_outputs: [
       'service_safe_domain_entry_response',
       'domain_action_metadata_refs',
@@ -92,7 +92,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
     ],
     classification: 'refs_only_read_model',
-    current_rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+    current_rca_role: 'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
     allowed_outputs: [
       'entry_session_domain_refs',
       'deliverable_locator_refs',
@@ -107,7 +107,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-runtime-protocol/src/runs.ts',
     ],
     classification: 'refs_only_read_model',
-    current_rca_role: 'workspace_and_run_locator_envelope_refs_only_adapter',
+    current_rca_role: 'workspace_and_run_locator_envelope_refs_only_adapter_not_attempt_ledger',
     allowed_outputs: [
       'workspace_locator_refs',
       'run_locator_refs',
@@ -121,7 +121,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-gateway/src/actions/runtime-watch.ts',
     ],
     classification: 'refs_only_read_model',
-    current_rca_role: 'runtimeWatch_existing_run_locator_projection',
+    current_rca_role: 'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
     allowed_outputs: [
       'run_status_refs',
       'artifact_locator_refs',
@@ -137,7 +137,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-gateway/src/actions/product-sidecar-parts/',
     ],
     classification: 'domain_handler_target',
-    current_rca_role: 'guarded_domain_action_target_and_refs_only_sidecar_adapter',
+    current_rca_role: 'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',
     allowed_outputs: [
       'owner_receipt_refs',
       'typed_blocker',
@@ -154,7 +154,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts',
     ],
     classification: 'refs_only_read_model',
-    current_rca_role: 'operator_evidence_and_stability_refs_only_read_model',
+    current_rca_role: 'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
     allowed_outputs: [
       'operator_evidence_refs',
       'stability_read_model_refs',

@@ -27,7 +27,8 @@
   "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
   "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
   "tombstone_required": false,
-  "migration_class": "opl_generated_surface",
+  "migration_class": "refs_only_adapter",
+  "active_reader_facing_classification": "refs_only_adapter",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": false,
   "opl_absorb_candidate": true,
@@ -35,7 +36,7 @@
     "owner": "opl",
     "expectation_ref": "/opl_generic_primitive_consumption",
     "replacement_surface": "opl_app_session_shell_and_workbench",
-    "expected_mode": "opl_generated_surface",
+    "expected_mode": "refs_only_adapter_to_opl_surface",
     "rca_consumes_as": "consumer_projection_only",
     "rca_owns_replacement_runtime": false
   },

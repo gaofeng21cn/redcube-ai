@@ -485,24 +485,25 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
 ]);
 
 const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
-  product_entry_session_store: 'opl_generated_surface',
+  product_entry_session_store: 'refs_only_adapter',
   workspace_source_intake: 'refs_only_adapter',
   memory_writeback_receipt_transport: 'refs_only_adapter',
   artifact_export_lifecycle: 'refs_only_adapter',
   review_repair_transport: 'refs_only_adapter',
-  native_helper_envelope: 'opl_hosted_surface',
-  operator_projection_shell: 'opl_generated_surface',
-  generic_cli_mcp_wrappers: 'opl_generated_surface',
-  codex_executor_adapter: 'opl_hosted_surface',
+  native_helper_envelope: 'native_helper_implementation',
+  operator_projection_shell: 'refs_only_adapter',
+  generic_cli_mcp_wrappers: 'domain_handler_target',
+  codex_executor_adapter: 'refs_only_adapter',
   observability_stability_read_model: 'refs_only_adapter',
 });
 
 const FUNCTIONAL_MODULE_EXPECTED_MODES = Object.freeze({
   declarative_pack: 'declarative_pack_consumed_by_opl_hosted_surface',
+  domain_handler_target: 'domain_handler_target_called_by_opl_generated_surface',
   refs_only_adapter: 'refs_only_adapter_to_opl_surface',
-  opl_hosted_surface: 'opl_hosted_surface',
-  opl_generated_surface: 'opl_generated_surface',
   minimal_authority_function: 'domain_authority_function_called_by_generated_surface',
+  native_helper_implementation: 'native_helper_implementation_called_by_opl_envelope',
+  provenance: 'provenance_or_retired_guard',
 });
 
 export const OPL_FUNCTIONAL_HARNESS_COVERAGE = Object.freeze({
@@ -609,12 +610,14 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'observability/stability read model',
     ],
     classification_values: [
-      'opl_hosted_surface',
-      'opl_generated_surface',
+      'domain_handler_target',
       'refs_only_adapter',
-      'declarative_pack',
       'minimal_authority_function',
-      'retired_no_resurrection_guard',
+      'native_helper_implementation',
+      'provenance',
+    ],
+    non_adapter_classification_values: [
+      'declarative_pack',
     ],
     replacement_expectation_mode: 'opl_replacement_expectation_or_refs_only_projection',
     generated_interface_consumption_ref: OPL_GENERATED_INTERFACE_CONSUMPTION.ref,
@@ -648,11 +651,12 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         '/opl_substrate_adapter_export',
       ],
       allowed_remaining_module_classes: [
-        'opl_hosted_surface',
-        'opl_generated_surface',
+        'domain_handler_target',
         'refs_only_adapter',
         'declarative_pack',
         'minimal_authority_function',
+        'native_helper_implementation',
+        'provenance',
       ],
     },
     physical_deletion_guard: {
@@ -688,6 +692,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       return {
         ...entry,
         migration_class: migrationClass,
+        active_reader_facing_classification: migrationClass,
         opl_owned_generic_primitive_consumer: true,
         rca_owned_visual_domain_authority: [
           'workspace_source_intake',

@@ -29,6 +29,7 @@
   "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
   "tombstone_required": false,
   "migration_class": "refs_only_adapter",
+  "active_reader_facing_classification": "refs_only_adapter",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": true,
   "opl_absorb_candidate": true,

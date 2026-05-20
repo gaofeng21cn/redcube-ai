@@ -1,8 +1,7 @@
 [
-  "opl_hosted_surface",
-  "opl_generated_surface",
+  "domain_handler_target",
   "refs_only_adapter",
-  "declarative_pack",
   "minimal_authority_function",
-  "retired_no_resurrection_guard"
+  "native_helper_implementation",
+  "provenance"
 ]

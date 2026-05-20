@@ -246,6 +246,22 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-gateway/src/actions/runtime-watch.ts',
   ]);
   assert.equal(
+    byId.product_entry_session_store.current_rca_role,
+    'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
+  );
+  assert.equal(
+    byId.runtime_watch_projection.current_rca_role,
+    'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
+  );
+  assert.equal(
+    byId.product_sidecar_guarded_actions.current_rca_role,
+    'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',
+  );
+  assert.equal(
+    byId.operator_evidence_stability_projection.current_rca_role,
+    'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
+  );
+  assert.equal(
     byId.product_sidecar_guarded_actions.allowed_outputs.includes('visual_transition_decision_refs'),
     true,
   );

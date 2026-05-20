@@ -358,12 +358,14 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
     }
     assert.deepEqual(surface.classification_values, [
-      'opl_hosted_surface',
-      'opl_generated_surface',
+      'domain_handler_target',
       'refs_only_adapter',
-      'declarative_pack',
       'minimal_authority_function',
-      'retired_no_resurrection_guard',
+      'native_helper_implementation',
+      'provenance',
+    ]);
+    assert.deepEqual(surface.non_adapter_classification_values, [
+      'declarative_pack',
     ]);
     assert.equal(
       surface.functional_structure_gap_closure.status,
@@ -489,19 +491,19 @@ test('RCA physical morphology policy keeps active source tails classified and fo
 
   assert.equal(
     byId.product_entry_session_store.current_rca_role,
-    'entry_session_domain_snapshot_refs_only_adapter',
+    'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
   assert.equal(
     byId.runtime_watch_projection.current_rca_role,
-    'runtimeWatch_existing_run_locator_projection',
+    'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
   );
   assert.equal(
     byId.product_sidecar_guarded_actions.current_rca_role,
-    'guarded_domain_action_target_and_refs_only_sidecar_adapter',
+    'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',
   );
   assert.equal(
     byId.operator_evidence_stability_projection.current_rca_role,
-    'operator_evidence_and_stability_refs_only_read_model',
+    'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
   );
   assert.equal(
     byId.legacy_managed_runtime_gateway_names.current_rca_role,

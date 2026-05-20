@@ -36,10 +36,11 @@
     "/opl_substrate_adapter_export"
   ],
   "allowed_remaining_module_classes": [
-    "opl_hosted_surface",
-    "opl_generated_surface",
+    "domain_handler_target",
     "refs_only_adapter",
     "declarative_pack",
-    "minimal_authority_function"
+    "minimal_authority_function",
+    "native_helper_implementation",
+    "provenance"
   ]
 }

@@ -30,7 +30,8 @@
   "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
   "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
   "tombstone_required": false,
-  "migration_class": "opl_generated_surface",
+  "migration_class": "domain_handler_target",
+  "active_reader_facing_classification": "domain_handler_target",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": true,
   "opl_absorb_candidate": true,
@@ -38,7 +39,7 @@
     "owner": "opl",
     "expectation_ref": "/family_action_catalog",
     "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
-    "expected_mode": "opl_generated_surface",
+    "expected_mode": "domain_handler_target_called_by_opl_generated_surface",
     "rca_consumes_as": "consumer_projection_only",
     "rca_owns_replacement_runtime": false
   },

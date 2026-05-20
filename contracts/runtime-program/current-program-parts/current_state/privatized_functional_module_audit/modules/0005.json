@@ -28,7 +28,8 @@
   "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
   "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
   "tombstone_required": false,
-  "migration_class": "opl_hosted_surface",
+  "migration_class": "native_helper_implementation",
+  "active_reader_facing_classification": "native_helper_implementation",
   "opl_owned_generic_primitive_consumer": true,
   "rca_owned_visual_domain_authority": true,
   "opl_absorb_candidate": true,
@@ -36,7 +37,7 @@
     "owner": "opl",
     "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
     "replacement_surface": "opl_native_helper_execution_envelope",
-    "expected_mode": "opl_hosted_surface",
+    "expected_mode": "native_helper_implementation_called_by_opl_envelope",
     "rca_consumes_as": "consumer_projection_only",
     "rca_owns_replacement_runtime": false
   },

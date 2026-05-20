@@ -291,13 +291,13 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       0,
     );
     assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values, [
-      'opl_hosted_surface',
-      'opl_generated_surface',
+      'domain_handler_target',
       'refs_only_adapter',
-      'declarative_pack',
       'minimal_authority_function',
-      'retired_no_resurrection_guard',
+      'native_helper_implementation',
+      'provenance',
     ]);
+    assert.deepEqual(sidecar.mapped_surfaces.privatized_functional_module_audit.non_adapter_classification_values, ['declarative_pack']);
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.functional_structure_gap_closure,
       {
@@ -329,11 +329,9 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
           '/opl_substrate_adapter_export',
         ],
         allowed_remaining_module_classes: [
-          'opl_hosted_surface',
-          'opl_generated_surface',
-          'refs_only_adapter',
+          ...sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values.slice(0, 2),
           'declarative_pack',
-          'minimal_authority_function',
+          ...sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values.slice(2),
         ],
       },
     );
@@ -382,7 +380,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').migration_class,
-      'opl_generated_surface',
+      'refs_only_adapter',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'artifact_export_lifecycle').cannotAbsorbReason,
@@ -443,7 +441,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'generic_cli_mcp_wrappers').migration_class,
-      'opl_generated_surface',
+      'domain_handler_target',
     );
     assert.equal(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'visual_pack_compiler_handoff').migration_class,
@@ -461,7 +459,16 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'observability_stability_read_model').opl_replacement_expectation.replacement_surface,
       'opl_stability_read_model_and_observability_export',
     );
+    const allowedActiveReaderFacingClassifications = new Set([
+      ...sidecar.mapped_surfaces.privatized_functional_module_audit.classification_values,
+      ...sidecar.mapped_surfaces.privatized_functional_module_audit.non_adapter_classification_values,
+    ]);
     for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.modules) {
+      assert.equal(
+        allowedActiveReaderFacingClassifications.has(entry.active_reader_facing_classification || entry.migration_class),
+        true,
+        entry.module_id,
+      );
       if (entry.module_id === 'visual_authority_functions') {
         assert.equal(entry.opl_replacement_expectation.owner, 'redcube_ai', entry.module_id);
       } else {

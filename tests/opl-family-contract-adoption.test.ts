@@ -329,12 +329,14 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.equal(surface.refs_only, true);
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.deepEqual(surface.classification_values, [
-      'opl_hosted_surface',
-      'opl_generated_surface',
+      'domain_handler_target',
       'refs_only_adapter',
-      'declarative_pack',
       'minimal_authority_function',
-      'retired_no_resurrection_guard',
+      'native_helper_implementation',
+      'provenance',
+    ]);
+    assert.deepEqual(surface.non_adapter_classification_values, [
+      'declarative_pack',
     ]);
     assert.deepEqual(surface.functional_structure_gap_closure, {
       status: 'functional_structure_gaps_closed_evidence_gates_open',
@@ -374,11 +376,12 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         '/opl_substrate_adapter_export',
       ],
       allowed_remaining_module_classes: [
-        'opl_hosted_surface',
-        'opl_generated_surface',
+        'domain_handler_target',
         'refs_only_adapter',
         'declarative_pack',
         'minimal_authority_function',
+        'native_helper_implementation',
+        'provenance',
       ],
     });
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
@@ -443,9 +446,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
         'declarative_pack_consumed_by_opl_hosted_surface',
         'opl_generated_surface_from_declarative_pack',
         'domain_authority_function_called_by_generated_surface',
+        'domain_handler_target_called_by_opl_generated_surface',
         'refs_only_adapter_to_opl_surface',
-        'opl_hosted_surface',
-        'opl_generated_surface',
+        'native_helper_implementation_called_by_opl_envelope',
       ].includes(entry.opl_replacement_expectation.expected_mode), entry.module_id);
       assert.ok([
         'consumer_projection_only',
@@ -497,7 +500,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
 
   const byId = Object.fromEntries(surfaces[0].modules.map((entry) => [entry.module_id, entry]));
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
-  assert.equal(byId.native_helper_envelope.migration_class, 'opl_hosted_surface');
+  assert.equal(byId.native_helper_envelope.migration_class, 'native_helper_implementation');
   const closedFunctionalModuleIds = [
     'product_entry_session_store',
     'artifact_export_lifecycle',
@@ -524,7 +527,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.product_entry_session_store.status, 'opl_generated_workbench_session_surface_consumed');
   assert.equal(byId.product_entry_session_store.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
   assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
-  assert.equal(byId.product_entry_session_store.migration_class, 'opl_generated_surface');
+  assert.equal(byId.product_entry_session_store.migration_class, 'refs_only_adapter');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
   assert.equal(byId.workspace_source_intake.activeCallerStatus, 'opl_workspace_source_shell_domain_handler_refs');
   assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');
@@ -540,14 +543,29 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.operator_projection_shell.activeCallerStatus, 'opl_app_workbench_shell_domain_evidence_refs');
   assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'product_sidecar_status_action_metadata_projection');
   assert.equal(byId.generic_cli_mcp_wrappers.activeCallerStatus, 'opl_generated_wrappers_domain_handler_targets');
-  assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'opl_generated_surface');
+  assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'domain_handler_target');
   assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
-  assert.equal(byId.codex_executor_adapter.migration_class, 'opl_hosted_surface');
+  assert.equal(byId.codex_executor_adapter.migration_class, 'refs_only_adapter');
   assert.equal(byId.observability_stability_read_model.rca_owned_visual_domain_authority, false);
   assert.equal(
     byId.observability_stability_read_model.opl_replacement_expectation.replacement_surface,
     'opl_stability_read_model_and_observability_export',
   );
+  const allowedActiveReaderFacingClassifications = new Set([
+    'domain_handler_target',
+    'refs_only_adapter',
+    'minimal_authority_function',
+    'native_helper_implementation',
+    'provenance',
+    'declarative_pack',
+  ]);
+  for (const entry of Object.values(byId)) {
+    assert.equal(
+      allowedActiveReaderFacingClassifications.has(entry.active_reader_facing_classification || entry.migration_class),
+      true,
+      entry.module_id,
+    );
+  }
   const expectedGeneratedTargets = [
     'cli_wrapper',
     'mcp_wrapper',
