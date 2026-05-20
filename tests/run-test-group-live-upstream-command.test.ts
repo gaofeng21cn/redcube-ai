@@ -76,13 +76,34 @@ test('run-test-group routes Python cache outside the checkout', () => {
   const runner = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const pyproject = readFileSync('pyproject.toml', 'utf-8');
 
-  assert.match(runner, /mkdtempSync\(path\.join\(os\.tmpdir\(\), 'redcube-python-test-cache-'\)\)/);
+  assert.match(runner, /OPL_REPO_TEMP_ROOT/);
+  assert.match(runner, /redcube-repo-temp-/);
   assert.match(runner, /PYTHONDONTWRITEBYTECODE/);
   assert.match(runner, /PYTHONPYCACHEPREFIX/);
+  assert.match(runner, /UV_PROJECT_ENVIRONMENT/);
+  assert.match(runner, /NPM_CONFIG_CACHE/);
+  assert.match(runner, /NODE_COMPILE_CACHE/);
+  assert.match(runner, /XDG_CACHE_HOME/);
+  assert.match(runner, /pathIsInsideRepo/);
   assert.match(runner, /-p no:cacheprovider/);
   assert.match(runner, /cache_dir=\$\{path\.join\(pythonCacheRoot, 'pytest-cache'\)\}/);
   assert.match(pyproject, /\[tool\.pytest\.ini_options\]/);
   assert.match(pyproject, /cache_dir = "\/tmp\/redcube-ai-pytest-cache"/);
+});
+
+test('verification scripts expose repo temp hygiene entrypoints', () => {
+  const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
+  const hygieneScript = readFileSync('scripts/repo-hygiene.sh', 'utf-8');
+  const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
+
+  assert.match(verifyScript, /run-with-repo-temp-env\.sh/);
+  assert.match(verifyScript, /OPL_REPO_TEMP_ENV_ACTIVE/);
+  assert.match(verifyScript, /scripts\/repo-hygiene\.sh --fix/);
+  assert.match(hygieneScript, /scripts\/repo-hygiene\.sh \[--fix\]/);
+  assert.match(hygieneScript, /git ls-files --others --exclude-standard/);
+  assert.match(hygieneScript, /Route the producer to OPL_REPO_TEMP_ROOT/);
+  assert.equal(packageJson.scripts['repo:hygiene'], 'scripts/repo-hygiene.sh');
+  assert.equal(packageJson.scripts['repo:hygiene:fix'], 'scripts/repo-hygiene.sh --fix');
 });
 
 test('run-test-group partitions route-heavy files away from the default parallel batch', () => {

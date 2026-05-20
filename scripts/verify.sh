@@ -1,9 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+if [ "${OPL_REPO_TEMP_ENV_ACTIVE:-}" != "1" ]; then
+  exec "$(dirname "$0")/run-with-repo-temp-env.sh" "$0" "$@"
+fi
+
 lane="${1:-smoke}"
 
 node --experimental-strip-types scripts/line-budget.ts
+scripts/repo-hygiene.sh --fix
 scripts/repo-hygiene.sh
 
 case "$lane" in
