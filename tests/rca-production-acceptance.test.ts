@@ -257,6 +257,23 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(acceptance.evidence_tail.closure_receipt.evidence_receipt_fixture_ref, evidenceFixturePath);
   assert.equal(acceptance.controlled_visual_soak.evidence_receipt_fixture_ref, evidenceFixturePath);
   assert.equal(acceptance.controlled_visual_soak.production_soak_complete, false);
+  assert.equal(acceptance.remaining_evidence_gate_blockers.status, 'domain_owned_typed_blockers_reported');
+  assert.equal(acceptance.remaining_evidence_gate_blockers.production_evidence_success_claimed, false);
+  assert.equal(acceptance.remaining_evidence_gate_blockers.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.deepEqual(
+    acceptance.remaining_evidence_gate_blockers.blockers.map((blocker) => blocker.remaining_gap_id),
+    [
+      'opl_hosted_controlled_visual_stage_long_soak',
+      'real_memory_lifecycle_receipt_instances',
+      'cross_family_repeated_no_regression_evidence',
+    ],
+  );
+  for (const blocker of acceptance.remaining_evidence_gate_blockers.blockers) {
+    assertRefString(blocker.typed_blocker_ref, `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.typed_blocker_ref`);
+    assertRefString(blocker.typed_blocker_kind, `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.typed_blocker_kind`);
+    assert.equal(typeof blocker.reason, 'string', `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.reason`);
+    assert.notEqual(blocker.reason.trim(), '', `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.reason`);
+  }
 
   assert.equal(fixture.surface_kind, 'rca_evidence_receipt_fixture');
   assert.equal(fixture.owner, 'redcube_ai');
@@ -340,6 +357,26 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     soak.typed_blocker.next_verification_command_refs,
     'controlled_visual_soak_closeout.typed_blocker.next_verification_command_refs',
   );
+
+  const gateBlockers = fixture.remaining_evidence_gate_blockers;
+  assert.equal(gateBlockers.state, 'domain_owned_typed_blockers_with_next_verification_refs');
+  assert.equal(gateBlockers.production_evidence_success_claimed, false);
+  assert.deepEqual(
+    gateBlockers.blockers.map((blocker) => blocker.remaining_gap_id),
+    [
+      'opl_hosted_controlled_visual_stage_long_soak',
+      'real_memory_lifecycle_receipt_instances',
+      'cross_family_repeated_no_regression_evidence',
+    ],
+  );
+  for (const blocker of gateBlockers.blockers) {
+    assertRefString(blocker.typed_blocker_ref, `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.typed_blocker_ref`);
+    assertRefString(blocker.typed_blocker_kind, `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.typed_blocker_kind`);
+    assertRefArray(
+      blocker.next_verification_command_refs,
+      `remaining_evidence_gate_blockers.${blocker.remaining_gap_id}.next_verification_command_refs`,
+    );
+  }
 
   assert.equal(fixture.legacy_managed_naming_policy.active_caller_compatibility_alias_restored, false);
   assert.deepEqual(fixture.legacy_managed_naming_policy.allowed_managed_occurrence_classes, [

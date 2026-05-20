@@ -209,6 +209,31 @@
     "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
     "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak"
   },
+  "remaining_evidence_gate_blockers": {
+    "status": "domain_owned_typed_blockers_reported",
+    "production_evidence_success_claimed": false,
+    "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+    "blockers": [
+      {
+        "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak",
+        "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+        "typed_blocker_kind": "controlled_visual_soak_runtime_evidence_pending",
+        "reason": "OPL hosted visual-stage long soak has not produced live provider restart, re-query, retry, dead-letter, owner receipt, or no-regression evidence."
+      },
+      {
+        "remaining_gap_id": "real_memory_lifecycle_receipt_instances",
+        "typed_blocker_ref": "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+        "typed_blocker_kind": "real_memory_lifecycle_receipt_instances_pending",
+        "reason": "RCA exposes locator, workspace receipt inventory, and memory/lifecycle ref models, but this repo does not track live receipt instance bodies or claim scaleout receipt instances are complete."
+      },
+      {
+        "remaining_gap_id": "cross_family_repeated_no_regression_evidence",
+        "typed_blocker_ref": "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending",
+        "typed_blocker_kind": "cross_family_repeated_no_regression_evidence_pending",
+        "reason": "RCA exposes repeated no-regression refs for ppt_deck and xiaohongshu, but those refs are not production soak completion evidence across repeated family runs."
+      }
+    ]
+  },
   "next_verification_command_refs": [
     {
       "ref": "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
