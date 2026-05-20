@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const acceptancePath = 'contracts/production_acceptance/rca-production-acceptance.json';
+const evidenceFixturePath = 'contracts/production_acceptance/rca-evidence-receipt-fixture.json';
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
@@ -108,6 +109,8 @@ test('RCA acceptance chain is refs-only and requires owner, artifact, and review
     'review_export_gate_refs',
   ]);
   assertRefArray(chain.visual_owner_receipt_refs, 'visual_owner_receipt_refs');
+  assertRefString(chain.evidence_receipt_fixture_ref, 'evidence_receipt_fixture_ref');
+  assert.equal(fs.existsSync(path.join(repoRoot, chain.evidence_receipt_fixture_ref)), true);
   assertRefArray(chain.artifact_receipt_refs, 'artifact_receipt_refs');
   assertRefArray(chain.review_export_gate_refs, 'review_export_gate_refs');
   assertRefArray(chain.memory_and_lifecycle_receipt_refs, 'memory_and_lifecycle_receipt_refs');
@@ -154,6 +157,7 @@ test('RCA evidence tail is closed only by domain receipt or by typed blocker wit
       'memory_receipt_ref',
       'lifecycle_receipt_ref',
       'forbidden_write_proof_ref',
+      'evidence_receipt_fixture_ref',
     ]) {
       assertRefString(tail.closure_receipt[key], `closure_receipt.${key}`);
     }
@@ -168,6 +172,92 @@ test('RCA evidence tail is closed only by domain receipt or by typed blocker wit
     assert.ok(key in tail.typed_blocker, key);
   }
   assertRefArray(tail.typed_blocker.next_verification_command_refs, 'typed_blocker.next_verification_command_refs');
+});
+
+test('RCA evidence receipt fixture records artifact receipt refs, memory workspace refs, and a controlled soak blocker', () => {
+  const acceptance = readJson(acceptancePath);
+  const fixture = readJson(evidenceFixturePath);
+
+  assert.equal(acceptance.visual_artifact_receipt_chain.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.equal(acceptance.evidence_tail.closure_receipt.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.equal(acceptance.controlled_visual_soak.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.equal(acceptance.controlled_visual_soak.production_soak_complete, false);
+
+  assert.equal(fixture.surface_kind, 'rca_evidence_receipt_fixture');
+  assert.equal(fixture.owner, 'redcube_ai');
+  assert.equal(
+    fixture.fixture_scope,
+    'artifact_producing_owner_receipt_memory_workspace_refs_and_controlled_soak_blocker',
+  );
+  assert.equal(fixture.repository_boundary.repo_tracks_receipt_fixture, true);
+  assert.equal(fixture.repository_boundary.repo_tracks_live_receipt_instances, false);
+  assert.equal(fixture.repository_boundary.repo_tracks_artifact_body, false);
+  assert.equal(fixture.repository_boundary.repo_tracks_memory_body, false);
+
+  const receipt = fixture.artifact_producing_owner_receipt;
+  assert.equal(receipt.return_shape, 'domain_receipt');
+  assert.equal(receipt.owner, 'redcube_ai');
+  assert.equal(receipt.artifact_producing_receipt, true);
+  assert.equal(receipt.contains_artifact_blob, false);
+  assert.equal(receipt.declares_visual_ready, false);
+  assert.equal(receipt.declares_exportable, false);
+  assert.equal(receipt.declares_handoffable, false);
+  assert.equal(receipt.declares_domain_ready, false);
+  for (const key of [
+    'receipt_ref',
+    'attempt_ref',
+    'artifact_locator_ref',
+    'review_export_ref',
+    'forbidden_write_proof_ref',
+  ]) {
+    assertRefString(receipt[key], `artifact_producing_owner_receipt.${key}`);
+  }
+  assertRefArray(receipt.artifact_receipt_refs, 'artifact_producing_owner_receipt.artifact_receipt_refs');
+  assertRefArray(receipt.artifact_stage_refs, 'artifact_producing_owner_receipt.artifact_stage_refs');
+
+  const memoryWorkspace = fixture.visual_memory_workspace_evidence;
+  assert.equal(memoryWorkspace.evidence_model, 'runtime_receipt_refs_only');
+  assertRefArray(memoryWorkspace.memory_receipt_refs, 'visual_memory_workspace_evidence.memory_receipt_refs');
+  assert.equal(memoryWorkspace.memory_receipt_refs.some((ref) => ref.includes('transition-accepted')), true);
+  assert.equal(memoryWorkspace.memory_receipt_refs.some((ref) => ref.includes('transition-rejected')), true);
+  assertRefString(memoryWorkspace.workspace_receipt_inventory_ref, 'workspace_receipt_inventory_ref');
+  assertRefString(memoryWorkspace.runtime_receipt_instances_ref, 'runtime_receipt_instances_ref');
+  assert.deepEqual(memoryWorkspace.required_workspace_receipt_kinds, [
+    'domain_owner',
+    'accepted_memory',
+    'rejected_memory',
+    'lifecycle_cleanup',
+    'lifecycle_restore',
+    'lifecycle_retention',
+  ]);
+  assert.equal(memoryWorkspace.workspace_receipt_scaleout_claimed, false);
+  assert.equal(memoryWorkspace.contains_memory_body, false);
+  assert.equal(memoryWorkspace.contains_receipt_instance_body, false);
+  assert.equal(memoryWorkspace.contains_artifact_blob, false);
+
+  const soak = fixture.controlled_visual_soak_closeout;
+  assert.equal(soak.state, 'domain_owned_typed_blocker_with_next_verification_ref');
+  assert.equal(soak.production_soak_complete, false);
+  assert.equal(soak.provider_restart_requery_retry_dead_letter_proven, false);
+  assert.equal(soak.typed_blocker.owner, 'redcube_ai');
+  assert.equal(soak.typed_blocker.blocker_kind, 'controlled_visual_soak_runtime_evidence_pending');
+  assertRefString(soak.typed_blocker.blocker_ref, 'controlled_visual_soak_closeout.typed_blocker.blocker_ref');
+  assertRefArray(
+    soak.typed_blocker.next_verification_command_refs,
+    'controlled_visual_soak_closeout.typed_blocker.next_verification_command_refs',
+  );
+
+  assert.equal(fixture.legacy_managed_naming_policy.active_caller_compatibility_alias_restored, false);
+  assert.deepEqual(fixture.legacy_managed_naming_policy.allowed_managed_occurrence_classes, [
+    'provenance',
+    'semantic_id',
+    'tombstone',
+  ]);
+  assert.equal(
+    fixture.legacy_managed_naming_policy.forbidden_active_occurrence_classes.includes('compatibility_alias'),
+    true,
+  );
+  assert.equal(fixture.forbidden_payload_fields.includes('managed_runtime_compatibility_alias'), true);
 });
 
 test('RCA production acceptance surface does not introduce ready-claim keys or blob fields', () => {

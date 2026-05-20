@@ -1151,6 +1151,21 @@
     "projection_mode": "derived_from_existing_manifest_source_refs_only",
     "read_only": true,
     "refs_only": true,
+    "declares_production_soak_complete": false,
+    "declares_artifact_producing_owner_receipt": true,
+    "declares_artifact_producing_owner_receipt_scope": "refs_only_receipt_chain_closed_not_visual_ready",
+    "production_acceptance": {
+      "surface_kind": "rca_domain_owned_visual_production_acceptance_evidence",
+      "status": "closed_by_domain_owned_acceptance_receipt",
+      "contract_ref": "contracts/production_acceptance/rca-production-acceptance.json",
+      "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+      "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "receipt_chain_scope": "rca_owned_refs_only_artifact_producing_receipt_chain",
+      "visual_ready_claimed": false,
+      "exportable_claimed": false,
+      "handoffable_claimed": false,
+      "domain_ready_claimed": false
+    },
     "remaining_gap_classification": {
       "functional_structure_gap_status": "functional_structure_gaps_closed_evidence_gates_open",
       "functional_structure_gap_count": 0,
@@ -1168,7 +1183,6 @@
       "remaining_gap_class": "none",
       "remaining_functional_structure_gap_ids": [],
       "remaining_evidence_gate_ids": [
-        "real_artifact_producing_domain_owner_receipt",
         "opl_hosted_controlled_visual_stage_long_soak",
         "real_memory_lifecycle_receipt_instances",
         "cross_family_repeated_no_regression_evidence"
@@ -1184,16 +1198,12 @@
       "redcube product manifest#/lifecycle_guarded_apply_proof",
       "redcube product manifest#/controlled_soak_no_regression_attempt",
       "redcube product manifest#/workspace_receipt_inventory_projection",
+      "contracts/production_acceptance/rca-production-acceptance.json",
       "redcube product manifest#/visual_transition_evaluator",
       "redcube product manifest#/opl_generic_primitive_consumption/functional_harness_consumer_coverage",
       "redcube product manifest#/opl_stability_read_model_consumption"
     ],
     "next_evidence_gaps": [
-      {
-        "gap_id": "real_artifact_producing_domain_owner_receipt",
-        "owner": "redcube_ai",
-        "status": "pending_runtime_evidence"
-      },
       {
         "gap_id": "opl_hosted_controlled_visual_stage_long_soak",
         "owner": "opl_provider_then_redcube_ai_receipt",
