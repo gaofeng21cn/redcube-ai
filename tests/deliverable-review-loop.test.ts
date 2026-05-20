@@ -462,6 +462,31 @@ test('runtimeWatch reports pending review loop state', async () => {
   assert.equal(report.cost_summary.executor_identity, null);
   assert.equal(report.quality_drift_summary.relative_quality_verdict, null);
   assert.equal(report.approval_throughput_summary.pending_review_count, 1);
+  assert.equal(report.owner_boundary.surface_kind, 'runtime_watch_boundary');
+  assert.equal(report.owner_boundary.classification, 'refs_only_read_model');
+  assert.equal(report.owner_boundary.role, 'existing_run_locator_refs_only_projection');
+  assert.equal(report.owner_boundary.refs_only, true);
+  assert.equal(report.owner_boundary.read_only, true);
+  assert.equal(report.owner_boundary.generic_supervisor_owner, 'opl');
+  assert.equal(report.owner_boundary.owns_generic_supervisor, false);
+  assert.equal(report.owner_boundary.owns_generic_runner, false);
+  assert.equal(report.owner_boundary.owns_generic_attempt_ledger, false);
+  assert.equal(report.owner_boundary.owns_generic_session_runtime, false);
+  assert.equal(report.owner_boundary.owns_generic_workbench, false);
+  assert.equal(report.owner_boundary.compatibility_alias_allowed, false);
+  assert.equal(report.owner_boundary.declares_visual_ready, false);
+  assert.equal(report.owner_boundary.declares_exportable, false);
+  assert.equal(report.owner_boundary.declares_handoffable, false);
+  assert.equal(report.owner_boundary.declares_production_soak_complete, false);
+  assert.equal(report.owner_boundary.no_resurrection_gate.generic_supervisor_owner_allowed, false);
+  assert.deepEqual(report.owner_boundary.exports_only, [
+    'run_status_refs',
+    'artifact_locator_refs',
+    'review_state_refs',
+    'typed_blocker_refs',
+    'operator_evidence_refs',
+    'telemetry_summary_refs',
+  ]);
 });
 
 

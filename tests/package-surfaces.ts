@@ -73,11 +73,13 @@ export {
   completeHermesRun,
   failHermesRun,
   generateStructuredArtifactViaHermesAgentStructuredCall,
+  RUN_LOCATOR_ENVELOPE_BOUNDARY,
   normalizeExecutorBackend,
   probeHermesAgentLoop,
   runAgentLoopViaHermesAgentApi,
   startHermesRun,
   structuredCallViaHermesAgentApi,
+  WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from '@redcube/runtime-protocol';
 export {
   persistReviewStatePatch,

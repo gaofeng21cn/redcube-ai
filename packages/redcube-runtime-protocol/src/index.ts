@@ -1,5 +1,6 @@
 import {
   createRunRecord as createRunRecordJs,
+  RUN_LOCATOR_ENVELOPE_BOUNDARY as RUN_LOCATOR_ENVELOPE_BOUNDARY_JS,
 } from './runs.js';
 import {
   getDeliverablePaths as getDeliverablePathsJs,
@@ -8,6 +9,7 @@ import {
   ensureWorkspaceGitBoundary as ensureWorkspaceGitBoundaryJs,
   renderWorkspaceGitignore as renderWorkspaceGitignoreJs,
   resolveWorkspaceContract as resolveWorkspaceContractJs,
+  WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY as WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY_JS,
 } from './workspace.js';
 import {
   buildSourcePackFanoutArtifact as buildSourcePackFanoutArtifactJs,
@@ -73,9 +75,13 @@ export function createRunRecord(input: CreateRunRecordInput = {}): RunRecord {
   return createRunRecordJs(input) as RunRecord;
 }
 
+export const RUN_LOCATOR_ENVELOPE_BOUNDARY = RUN_LOCATOR_ENVELOPE_BOUNDARY_JS;
+
 export function resolveWorkspaceContract(input: { workspaceRoot: string }): WorkspaceContract {
   return resolveWorkspaceContractJs(input) as WorkspaceContract;
 }
+
+export const WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY = WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY_JS;
 
 export function renderWorkspaceGitignore(): string {
   return renderWorkspaceGitignoreJs() as string;

@@ -363,6 +363,7 @@ export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
 }
 
 export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
+  owner_boundary: Record<string, unknown>;
   run_id: string;
   current_stage: string | null;
   status: string;

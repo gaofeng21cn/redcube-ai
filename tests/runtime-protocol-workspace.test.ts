@@ -7,7 +7,9 @@ import {
   createRunRecord,
   getNotePaths,
   getTopicPaths,
+  RUN_LOCATOR_ENVELOPE_BOUNDARY,
   resolveWorkspaceContract,
+  WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from './package-surfaces.ts';
 
 test('resolveWorkspaceContract returns canonical workspace metadata paths', () => {
@@ -82,6 +84,47 @@ test('createRunRecord creates a stable minimal run envelope', () => {
     },
     error: null,
   });
+});
+
+test('workspace and run envelope helpers expose refs-only boundary contracts', () => {
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.surface_kind, 'workspace_locator_envelope_boundary');
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.classification, 'refs_only_read_model');
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.refs_only, true);
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_workspace_shell, false);
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_attempt_ledger, false);
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_session_runtime, false);
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_artifact_lifecycle, false);
+  assert.equal(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.compatibility_alias_allowed, false);
+  assert.equal(
+    WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.no_resurrection_gate.generic_workspace_shell_owner_allowed,
+    false,
+  );
+  assert.deepEqual(WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY.exports_only, [
+    'workspace_locator_refs',
+    'topic_locator_refs',
+    'deliverable_locator_refs',
+    'note_locator_refs',
+  ]);
+
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.surface_kind, 'run_locator_envelope_boundary');
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.classification, 'refs_only_read_model');
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.refs_only, true);
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_runner, false);
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_attempt_ledger, false);
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_scheduler, false);
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.owns_generic_session_runtime, false);
+  assert.equal(RUN_LOCATOR_ENVELOPE_BOUNDARY.compatibility_alias_allowed, false);
+  assert.equal(
+    RUN_LOCATOR_ENVELOPE_BOUNDARY.no_resurrection_gate.generic_attempt_ledger_owner_allowed,
+    false,
+  );
+  assert.deepEqual(RUN_LOCATOR_ENVELOPE_BOUNDARY.exports_only, [
+    'run_id',
+    'route_ref',
+    'topic_deliverable_locator_refs',
+    'artifact_locator_refs',
+    'telemetry_summary_refs',
+  ]);
 });
 
 test('getTopicPaths rejects unsafe topic ids', () => {

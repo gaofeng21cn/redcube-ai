@@ -253,6 +253,25 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.runtime_watch_projection.current_rca_role,
     'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
   );
+  assert.deepEqual(byId.workspace_run_envelope_helpers.machine_boundary_refs, [
+    'packages/redcube-runtime-protocol/src/workspace.ts#WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY',
+    'packages/redcube-runtime-protocol/src/runs.ts#RUN_LOCATOR_ENVELOPE_BOUNDARY',
+  ]);
+  assert.equal(
+    byId.workspace_run_envelope_helpers.no_resurrection_gate.generic_attempt_ledger_owner_allowed,
+    false,
+  );
+  assert.deepEqual(byId.runtime_watch_projection.machine_boundary_refs, [
+    'packages/redcube-gateway/src/actions/runtime-watch.ts#RUNTIME_WATCH_BOUNDARY',
+  ]);
+  assert.equal(
+    byId.runtime_watch_projection.no_resurrection_gate.generic_supervisor_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.runtime_watch_projection.no_resurrection_gate.default_supervision_route_allowed,
+    false,
+  );
   assert.equal(
     byId.product_sidecar_guarded_actions.current_rca_role,
     'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',

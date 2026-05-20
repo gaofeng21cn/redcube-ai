@@ -145,6 +145,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.lifecycle_transport_owner, 'opl');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.ref, '/product_sidecar_receipt_refs');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.forbidden_receipt_fields.includes('export_verdict'), true);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.surface_kind, 'runtime_watch_boundary');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.classification, 'refs_only_read_model');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.refs_only, true);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.refs_only, true);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.generic_supervisor_owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.generic_session_shell_owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.compatibility_alias_allowed, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.no_resurrection_gate.generic_supervisor_owner_allowed, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.declares_visual_ready, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.declares_exportable, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.declares_handoffable, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.declares_production_soak_complete, false);
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.descriptor_ref, '/domain_memory_descriptor_locator');
     assert.equal(sidecar.mapped_surfaces.visual_pattern_memory_writeback.transport_owner, 'opl');
     assert.equal(

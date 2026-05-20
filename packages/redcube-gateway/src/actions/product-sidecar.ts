@@ -23,6 +23,7 @@ import {
   evaluateVisualTransition,
 } from './product-sidecar-parts/visual-transition-evaluator.js';
 import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-parts/temporal-autonomy-readiness.js';
+import { RUNTIME_WATCH_BOUNDARY } from './runtime-watch.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,
@@ -182,8 +183,17 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         owner: DOMAIN_ID,
         read_only: true,
         projection_mode: 'runtime_watch_refs_only',
+        owner_boundary: RUNTIME_WATCH_BOUNDARY,
+        refs_only: true,
         dispatch_owner: 'redcube_ai',
         generic_supervisor_owner: 'opl',
+        generic_session_shell_owner: 'opl',
+        compatibility_alias_allowed: false,
+        no_resurrection_gate: RUNTIME_WATCH_BOUNDARY.no_resurrection_gate,
+        declares_visual_ready: false,
+        declares_exportable: false,
+        declares_handoffable: false,
+        declares_production_soak_complete: false,
       },
       review_projection: {
         review_state_ref: '/review_state',

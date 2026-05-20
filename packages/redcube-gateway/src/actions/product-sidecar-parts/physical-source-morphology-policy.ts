@@ -114,6 +114,17 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'receipt_refs',
       'typed_blocker',
     ],
+    machine_boundary_refs: [
+      'packages/redcube-runtime-protocol/src/workspace.ts#WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY',
+      'packages/redcube-runtime-protocol/src/runs.ts#RUN_LOCATOR_ENVELOPE_BOUNDARY',
+    ],
+    no_resurrection_gate: {
+      generic_workspace_shell_owner_allowed: false,
+      generic_runtime_owner_allowed: false,
+      generic_runner_owner_allowed: false,
+      generic_attempt_ledger_owner_allowed: false,
+      compatibility_alias_allowed: false,
+    },
   },
   {
     surface_id: 'runtime_watch_projection',
@@ -128,6 +139,16 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'review_state_refs',
       'typed_blocker',
     ],
+    machine_boundary_refs: [
+      'packages/redcube-gateway/src/actions/runtime-watch.ts#RUNTIME_WATCH_BOUNDARY',
+    ],
+    no_resurrection_gate: {
+      generic_supervisor_owner_allowed: false,
+      generic_runtime_owner_allowed: false,
+      generic_session_runtime_owner_allowed: false,
+      default_supervision_route_allowed: false,
+      compatibility_alias_allowed: false,
+    },
   },
   {
     surface_id: 'product_sidecar_guarded_actions',

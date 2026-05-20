@@ -22,6 +22,36 @@ const WORKSPACE_GITIGNORE_ENTRIES = [
   '*.sock',
 ];
 
+export const WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY = Object.freeze({
+  surface_kind: 'workspace_locator_envelope_boundary',
+  boundary_contract_id: 'rca.workspace_locator_envelope_refs_only.v1',
+  owner: 'redcube_ai',
+  consumer: 'opl',
+  role: 'workspace_locator_envelope_refs_only_adapter',
+  classification: 'refs_only_read_model',
+  refs_only: true,
+  active_caller_status: 'domain_handler_and_opl_generated_source_shell_locator_refs',
+  owns_generic_workspace_shell: false,
+  owns_generic_attempt_ledger: false,
+  owns_generic_session_runtime: false,
+  owns_generic_artifact_lifecycle: false,
+  writes_visual_truth: false,
+  writes_artifact_blob: false,
+  writes_memory_body: false,
+  compatibility_alias_allowed: false,
+  no_resurrection_gate: {
+    generic_workspace_shell_owner_allowed: false,
+    generic_runtime_owner_allowed: false,
+    generic_gateway_owner_allowed: false,
+  },
+  exports_only: [
+    'workspace_locator_refs',
+    'topic_locator_refs',
+    'deliverable_locator_refs',
+    'note_locator_refs',
+  ],
+});
+
 interface SegmentOptions {
   disallowParent?: boolean;
   disallowSeparator?: boolean;

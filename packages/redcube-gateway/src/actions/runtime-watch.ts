@@ -11,6 +11,47 @@ import {
 
 type AnyRecord = Record<string, any>;
 
+export const RUNTIME_WATCH_BOUNDARY = Object.freeze({
+  surface_kind: 'runtime_watch_boundary',
+  boundary_contract_id: 'rca.runtime_watch_refs_only_projection.v1',
+  owner: 'redcube_ai',
+  consumer: 'opl',
+  role: 'existing_run_locator_refs_only_projection',
+  classification: 'refs_only_read_model',
+  refs_only: true,
+  read_only: true,
+  active_caller_status: 'direct_review_watch_and_opl_operator_projection_target',
+  generic_supervisor_owner: 'opl',
+  generic_session_shell_owner: 'opl',
+  owns_generic_supervisor: false,
+  owns_generic_runner: false,
+  owns_generic_attempt_ledger: false,
+  owns_generic_session_runtime: false,
+  owns_generic_workbench: false,
+  writes_visual_truth: false,
+  writes_artifact_blob: false,
+  writes_memory_body: false,
+  declares_visual_ready: false,
+  declares_exportable: false,
+  declares_handoffable: false,
+  declares_production_soak_complete: false,
+  compatibility_alias_allowed: false,
+  no_resurrection_gate: {
+    generic_supervisor_owner_allowed: false,
+    generic_runtime_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    default_supervision_route_allowed: false,
+  },
+  exports_only: [
+    'run_status_refs',
+    'artifact_locator_refs',
+    'review_state_refs',
+    'typed_blocker_refs',
+    'operator_evidence_refs',
+    'telemetry_summary_refs',
+  ],
+});
+
 function resolveRun(request: AnyRecord): AnyRecord {
   const providedRun = request?.run && typeof request.run === 'object' ? request.run : null;
   const providedRunId = String(request?.runId || '').trim();
@@ -78,6 +119,7 @@ export async function runtimeWatch(request: AnyRecord) {
   };
   return {
     ...response,
+    owner_boundary: RUNTIME_WATCH_BOUNDARY,
     source_readiness_summary: response?.source_readiness_summary || null,
     gate_summary: response?.gate_summary || null,
     lifecycle_stage_summary: response?.lifecycle_stage_summary || null,
