@@ -64,13 +64,34 @@
     "surface_kind": "rca_visual_production_evidence_scaleout_fixture_refs",
     "owner": "redcube_ai",
     "evidence_model": "refs_only_no_payload_body",
+    "selected_artifact_producing_visual_route": {
+      "deliverable_family": "ppt_deck",
+      "route_id": "ppt_deck.image_first.artifact_producing.v1",
+      "route_ref": "redcube product manifest#/ppt_deck_visual_route_truth",
+      "route_kind": "image_first_ppt_artifact_route",
+      "stage_sequence_refs": [
+        "author_image_pages",
+        "visual_director_review",
+        "screenshot_review",
+        "export_pptx"
+      ],
+      "produces_artifact_refs": true,
+      "selected_for_evidence_scaleout": true,
+      "html_or_native_route_selected": false,
+      "visual_verdict_owner": "redcube_ai",
+      "artifact_authority_owner": "redcube_ai"
+    },
     "artifact_producing_owner_receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
     "workspace_receipt_scaleout_refs": {
       "workspace_receipt_inventory_ref": "redcube product manifest#/workspace_receipt_inventory_projection",
       "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
       "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
       "required_workspace_count_for_scaleout": 2,
-      "scaleout_claimed": false
+      "scaleout_claimed": false,
+      "emits_owner_receipt_ref": true,
+      "emits_memory_receipt_refs": true,
+      "emits_no_regression_evidence_ref": true,
+      "declares_production_soak_complete": false
     },
     "visual_memory_body_reuse_refs": {
       "memory_locator_ref": "redcube product manifest#/domain_memory_descriptor_locator/memory_locator",
@@ -79,7 +100,8 @@
       "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
       "body_owner": "redcube_ai",
       "projected_body_to_opl": false,
-      "contains_memory_body": false
+      "contains_memory_body": false,
+      "reuse_ref_scope": "visual_pattern_memory_locator_and_content_ref_only"
     },
     "repeated_no_regression_evidence_refs": {
       "generator_action": "emit_no_regression_evidence",
@@ -92,6 +114,7 @@
         "ppt_deck",
         "xiaohongshu"
       ],
+      "evidence_cadence": "repeated_family_refs_only",
       "minimum_ref_count": 2,
       "declares_production_soak_complete": false
     },

@@ -144,6 +144,21 @@ export async function emitWorkspaceReceiptProof({
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
+      selected_artifact_producing_visual_route_ref: '/ppt_deck_visual_route_truth',
+    },
+    selected_artifact_producing_visual_route: {
+      deliverable_family: 'ppt_deck',
+      route_id: 'ppt_deck.image_first.artifact_producing.v1',
+      stage_sequence_refs: [
+        'author_image_pages',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+      produces_artifact_refs: true,
+      visual_verdict_owner: DOMAIN_ID,
+      artifact_authority_owner: DOMAIN_ID,
+      contains_artifact_blob: false,
     },
     receipt_refs: {
       accepted_memory_receipt_ref: acceptedMemory.receipt_ref,

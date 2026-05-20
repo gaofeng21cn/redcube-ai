@@ -92,13 +92,13 @@ OPL 必须持有：
 
 本轮 production acceptance/readiness closeout 的 expected merged result 是 refs-only evidence 面闭合：RCA stage evidence refs 包含 runtime budget refs 与 replay evidence refs；RCA production acceptance/readiness 文档面保留 owner receipt / artifact receipt / review-export acceptance refs；OPL readiness consumption 能把这些 refs 读成 launch / replay / runtime evidence clean and observable。该结果关闭的是结构与可观察性验收，不关闭真实长时 visual-stage soak、跨 family repeated no-regression 或更多 workspace scaleout；这些继续作为 production scaleout evidence，不作为结构 blocker。
 
-2026-05-20 evidence scaleout lane 已把 production tail 的五类 ref 明确接入 RCA machine surfaces：artifact-producing owner receipt ref、workspace receipt scaleout ref model、visual memory body reuse ref、repeated no-regression evidence refs、naming tombstone follow-through refs。该变更只提升 operator/readiness 可观察性，仍不声明 production visual-stage long soak、跨 workspace scaleout 完成、visual ready、exportable 或 handoffable。
+2026-05-20 evidence scaleout lane 已把 production tail 的五类 ref 明确接入 RCA machine surfaces：artifact-producing owner receipt ref、workspace receipt scaleout ref model、visual memory body reuse ref、repeated no-regression evidence refs、naming tombstone follow-through refs。Lane 4B 进一步固定真实 artifact-producing visual route 为 `ppt_deck.image_first.artifact_producing.v1`，即 `author_image_pages -> visual_director_review -> screenshot_review -> export_pptx`。production acceptance fixture、manifest operator projection 与 workspace receipt proof 现在都能读到该 route ref；workspace proof 会产出 owner receipt ref、memory receipt refs 和 no-regression evidence ref；visual memory reuse 只暴露 locator/content refs；repeated no-regression 以 `ppt_deck` / `xiaohongshu` family refs-only cadence 记录；naming tombstone follow-through 继续禁止 compatibility alias。该变更只提升 operator/readiness 可观察性与 scaleout 证据可追踪性，仍不声明 production visual-stage long soak、跨 workspace scaleout 完成、visual ready、exportable 或 handoffable。
 
 ## 当前 cleanliness tail
 
 RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：
 
-- `production_evidence_tail`：真实 artifact-producing owner receipt、真实 visual memory body reuse、真实 workspace receipt scaleout、Temporal controlled visual-stage long soak 和 cross-family repeated no-regression evidence。
+- `production_evidence_tail`：artifact-producing route/owner receipt/workspace receipt/memory reuse/no-regression/tombstone refs 已可追踪；仍需真实跨 workspace scaleout、Temporal controlled visual-stage long soak、最终 RCA-owned review/export verdict 与 cross-family repeated no-regression production evidence。
 - `naming_contract_hygiene_tail`：历史 runtime-program contract、human_doc 语义 ID、field name 或 task intent 中仍可能保留 `managed` 作为 session-continuity / provenance 命名。它们不代表 active 旧 runtime owner；后续清理必须通过 contract migration / tombstone policy / compatibility-free rename 做，不把旧 runtime surface 复活为 alias。
 
 2026-05-19 后，`contracts/runtime-program/current-program.index.json` 与 `contracts/runtime-program/current-program-parts/**` 是 current-program 的 leaf-level canonical source；`current-program.json` 只保留为既有 consumer 的 generated read-through snapshot。`scripts/sync-current-program-leaf-index.ts` 负责按 `split_policy.max_leaf_json_line_count` 从聚合快照递归生成/校验 index 与 leaf parts，`npm run contracts:current-program:check` 和 `runtime-program-provenance` 测试共同锁定每个 leaf ref 与聚合快照的 JSON pointer value 一致性。后续不再把巨型 `current-program.json`、巨型 section 文件或手工拆分当成唯一编辑入口。
@@ -152,9 +152,9 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 以下是结构闭合后的证据门，不能写成 production visual-stage soak、visual ready、exportable 或 handoffable 已完成：
 
-- 真实 artifact-producing owner receipt。
-- visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。
-- 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证。
+- artifact-producing owner receipt route 已固定为 image-first PPT route，后续还需真实 workspace 运行持续积累 receipt instances。
+- visual memory body reuse 已有 locator/content ref，后续还需真实 visual pattern memory accepted/rejected receipt scaleout。
+- workspace receipt proof 已能产出 owner/memory/no-regression refs，后续还需跨 workspace retention ledger / inventory 规模化验证。
 - Temporal controlled visual-stage long soak、provider restart/re-query/retry/dead-letter proof 和 repair cadence。
 - Expected receipt instance 与 monitor freshness evidence，需要 RCA owner receipt、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 回填；OPL stage evidence receipt 只能证明 refs-only route 可用。
 - Cross-family repeated no-regression proof。

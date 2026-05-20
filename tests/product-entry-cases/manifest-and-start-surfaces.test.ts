@@ -188,17 +188,46 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.surface_kind,
       'rca_visual_production_evidence_scaleout_refs',
     );
+    assert.deepEqual(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.stage_sequence_refs,
+      [
+        'author_image_pages',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.visual_verdict_owner,
+      'redcube_ai',
+    );
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
       false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.emits_owner_receipt_ref,
+      true,
     );
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.projected_body_to_opl,
       false,
     );
     assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.reuse_ref_scope,
+      'visual_pattern_memory_locator_and_content_ref_only',
+    );
+    assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs.length >= 2,
       true,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
+      'repeated_family_refs_only',
     );
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,

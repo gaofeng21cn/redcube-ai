@@ -145,6 +145,23 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.equal(scaleout.status, 'refs_landed_scaleout_runtime_evidence_pending');
   assert.equal(scaleout.evidence_model, 'refs_only_no_visual_truth_artifact_blob_or_memory_body');
   assert.equal(scaleout.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.deepEqual(scaleout.selected_artifact_producing_visual_route, {
+    deliverable_family: 'ppt_deck',
+    route_id: 'ppt_deck.image_first.artifact_producing.v1',
+    route_ref: 'redcube product manifest#/ppt_deck_visual_route_truth',
+    route_kind: 'image_first_ppt_artifact_route',
+    stage_sequence_refs: [
+      'author_image_pages',
+      'visual_director_review',
+      'screenshot_review',
+      'export_pptx',
+    ],
+    produces_artifact_refs: true,
+    selected_for_evidence_scaleout: true,
+    html_or_native_route_selected: false,
+    visual_verdict_owner: 'redcube_ai',
+    artifact_authority_owner: 'redcube_ai',
+  });
   assert.deepEqual(scaleout.required_evidence_ref_groups, [
     'artifact_producing_owner_receipt',
     'workspace_receipt_scaleout',
@@ -170,6 +187,10 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.equal(scaleout.workspace_receipt_scaleout_refs.workspace_receipt_proof_action, 'emit_workspace_receipt_proof');
   assert.equal(scaleout.workspace_receipt_scaleout_refs.required_workspace_count_for_scaleout, 2);
   assert.equal(scaleout.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed, false);
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.emits_owner_receipt_ref, true);
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.emits_memory_receipt_refs, true);
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.emits_no_regression_evidence_ref, true);
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.declares_production_soak_complete, false);
 
   assert.equal(scaleout.visual_memory_body_reuse_refs.status, 'body_external_reuse_ref_landed');
   assertRefString(scaleout.visual_memory_body_reuse_refs.memory_locator_ref, 'visual_memory_body_reuse_refs.memory_locator_ref');
@@ -177,6 +198,10 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assertRefString(scaleout.visual_memory_body_reuse_refs.memory_content_body_ref, 'visual_memory_body_reuse_refs.memory_content_body_ref');
   assert.equal(scaleout.visual_memory_body_reuse_refs.memory_body_projected_to_opl, false);
   assert.equal(scaleout.visual_memory_body_reuse_refs.contains_memory_body, false);
+  assert.equal(
+    scaleout.visual_memory_body_reuse_refs.reuse_ref_scope,
+    'visual_pattern_memory_locator_and_content_ref_only',
+  );
 
   assert.equal(scaleout.repeated_no_regression_evidence_refs.status, 'repeated_refs_available_not_production_soak');
   assert.equal(scaleout.repeated_no_regression_evidence_refs.generator_action, 'emit_no_regression_evidence');
@@ -186,6 +211,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     'ppt_deck',
     'xiaohongshu',
   ]);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_cadence, 'repeated_family_refs_only');
   assert.equal(scaleout.repeated_no_regression_evidence_refs.repeated_no_regression_claimed_as_soak, false);
 
   assert.equal(
@@ -332,17 +358,36 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(scaleoutFixture.surface_kind, 'rca_visual_production_evidence_scaleout_fixture_refs');
   assert.equal(scaleoutFixture.owner, 'redcube_ai');
   assert.equal(scaleoutFixture.evidence_model, 'refs_only_no_payload_body');
+  assert.deepEqual(scaleoutFixture.selected_artifact_producing_visual_route.stage_sequence_refs, [
+    'author_image_pages',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+  ]);
+  assert.equal(scaleoutFixture.selected_artifact_producing_visual_route.produces_artifact_refs, true);
+  assert.equal(scaleoutFixture.selected_artifact_producing_visual_route.html_or_native_route_selected, false);
+  assert.equal(scaleoutFixture.selected_artifact_producing_visual_route.visual_verdict_owner, 'redcube_ai');
+  assert.equal(scaleoutFixture.selected_artifact_producing_visual_route.artifact_authority_owner, 'redcube_ai');
   assertRefString(scaleoutFixture.artifact_producing_owner_receipt_ref, 'artifact_producing_owner_receipt_ref');
   assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.scaleout_claimed, false);
   assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.required_workspace_count_for_scaleout, 2);
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.emits_owner_receipt_ref, true);
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.emits_memory_receipt_refs, true);
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.emits_no_regression_evidence_ref, true);
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.declares_production_soak_complete, false);
   assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.body_owner, 'redcube_ai');
   assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.projected_body_to_opl, false);
   assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.contains_memory_body, false);
+  assert.equal(
+    scaleoutFixture.visual_memory_body_reuse_refs.reuse_ref_scope,
+    'visual_pattern_memory_locator_and_content_ref_only',
+  );
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 2);
   assertRefArray(
     scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs,
     'production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs',
   );
+  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.evidence_cadence, 'repeated_family_refs_only');
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.declares_production_soak_complete, false);
   assert.equal(scaleoutFixture.naming_tombstone_follow_through.active_caller_compatibility_alias_restored, false);
 

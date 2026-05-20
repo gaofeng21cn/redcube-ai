@@ -19,6 +19,23 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       sidecar.mapped_surfaces.production_evidence_scaleout_refs.surface_kind,
       'rca_visual_production_evidence_scaleout_refs',
     );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.stage_sequence_refs,
+      [
+        'author_image_pages',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.html_or_native_route_selected,
+      false,
+    );
     assert.equal(
       sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
       false,
@@ -111,6 +128,18 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       true,
     );
     assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.emits_owner_receipt_ref,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.emits_memory_receipt_refs,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.emits_no_regression_evidence_ref,
+      true,
+    );
+    assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
       false,
     );
@@ -119,8 +148,16 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       false,
     );
     assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.reuse_ref_scope,
+      'visual_pattern_memory_locator_and_content_ref_only',
+    );
+    assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.required_minimum_evidence_ref_count,
       2,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
+      'repeated_family_refs_only',
     );
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.deliverable_family_refs,
@@ -134,5 +171,28 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.authority_boundary.opl_can_write_rca_visual_truth,
       false,
     );
+
+    const repeatProof = await dispatchProductSidecar({
+      task: {
+        action: 'emit_workspace_receipt_proof',
+        workspace_root: workspaceRoot,
+        proof_id: 'scaleout-surface-artifact-route',
+        attempt_ref: 'workspace-runtime-ref:attempt:artifact-route',
+        artifact_locator_ref: '/artifact_locator_contract',
+        review_export_ref: 'workspace-runtime-ref:review-export:artifact-route',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: ['workspace-runtime-ref:artifact:artifact-route-slide'],
+      },
+    });
+    assert.deepEqual(repeatProof.result_surface.selected_artifact_producing_visual_route.stage_sequence_refs, [
+      'author_image_pages',
+      'visual_director_review',
+      'screenshot_review',
+      'export_pptx',
+    ]);
+    assert.equal(repeatProof.result_surface.selected_artifact_producing_visual_route.produces_artifact_refs, true);
+    assert.equal(repeatProof.result_surface.selected_artifact_producing_visual_route.contains_artifact_blob, false);
+    assert.equal(repeatProof.result_surface.receipt_refs.domain_owner_receipt_ref.startsWith('rca-owner-receipt:'), true);
+    assert.equal(repeatProof.result_surface.receipt_refs.no_regression_evidence_ref.startsWith('rca-no-regression:'), true);
   });
 });
