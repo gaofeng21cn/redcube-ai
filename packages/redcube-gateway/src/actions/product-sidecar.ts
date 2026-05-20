@@ -319,6 +319,9 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         writable_by_sidecar: true,
       },
       production_evidence_scaleout_refs: manifest.operator_evidence_readiness_projection?.production_evidence_scaleout_refs || {},
+      opl_expected_receipt_monitor_freshness_handoff: (
+        manifest.operator_evidence_readiness_projection?.opl_expected_receipt_monitor_freshness_handoff || {}
+      ),
       lifecycle_guarded_apply: {
         ref: '/lifecycle_guarded_apply_proof',
         owner: DOMAIN_ID,
@@ -377,6 +380,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
       production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
+      opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
       opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',
     },

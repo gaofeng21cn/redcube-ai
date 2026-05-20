@@ -63,6 +63,8 @@ OPL 必须持有：
 
 2026-05-20 OPL 已把 stage production expected receipt / monitor freshness 的 unobserved 缺口变成 `stage_production_evidence_receipt_record|verify` safe action route，并在 App/operator route 中提供空 `payload_template`、`payload_ref_hints`、机器可审计 `payload_workorder` 与 record 前 preflight。该能力属于 OPL App/operator evidence transport 和 refs-only ledger，不属于 RCA 私有功能面；RCA 的关闭责任是提供真实 artifact-producing owner receipt instance、typed blocker、no-regression evidence、visual memory/lifecycle receipt、direct/hosted parity 或 Temporal controlled visual-stage long-soak refs，并把这些真实 refs 填入 OPL workorder。空 template、声明型占位 ref、OPL ledger receipt ref、artifact/visual memory/domain truth body 都不能作为 RCA 成功证据提交。OPL 验证 stage evidence receipt 只能证明 refs-only roundtrip 可用，不能声明 visual ready、exportable、handoffable、artifact mutation authorization、App/workbench consumption 或 production visual-stage soak 成功。
 
+2026-05-20 Lane B-RCA 已把可回填的 RCA owner evidence 收口成 `opl_expected_receipt_monitor_freshness_handoff`。该 surface 由 RCA production acceptance / operator evidence readiness / sidecar projection 暴露，只包含 body-free owner receipt ref、workspace receipt proof ref、visual memory reuse locator/content ref、repeated no-regression ref、monitor freshness ref 和 typed blocker ref；它是 OPL expected receipt / monitor freshness workorder 的输入，不是 RCA 私有 ledger，也不携带 visual truth、review/export verdict body、artifact blob 或 memory body。
+
 已闭合为标准 OPL consumer 口径的 8 项：
 
 - `opl_generated_surface_production_consumption`
@@ -162,7 +164,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - visual memory body reuse 已有 locator/content ref，后续还需真实 visual pattern memory accepted/rejected receipt scaleout。
 - workspace receipt proof 已能产出 owner/memory/no-regression refs，后续还需跨 workspace retention ledger / inventory 规模化验证。
 - Temporal controlled visual-stage long soak、provider restart/re-query/retry/dead-letter proof 和 repair cadence。
-- Expected receipt instance 与 monitor freshness evidence，需要 RCA owner receipt instance、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 回填；OPL stage evidence receipt 只能证明 refs-only route、payload workorder 和 preflight 可用。
+- Expected receipt instance 与 monitor freshness evidence 已有 RCA body-free handoff refs，可供 OPL workorder 回填；后续仍需真实 workspace owner receipt instance、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 持续刷新，OPL stage evidence receipt 只能证明 refs-only route、payload workorder 和 preflight 可用。
 - Cross-family repeated no-regression proof。
 
 ## 完善顺序

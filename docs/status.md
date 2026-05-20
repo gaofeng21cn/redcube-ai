@@ -55,6 +55,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-20 一步到位落地计划的 closeout 机器面已落到 `contracts/runtime-program/rca-one-shot-production-hardening-closeout.json`，并由 `contracts/runtime-program/current-program.json#/current_state/active_baton/closeout` 指向。该 surface 明确记录四条 lane 的 `planned`、`done`、`deferred`、`skipped`、`verification` 与 `commit_push_state`：B/C/A 已吸收入主线，D 负责文档与 contract closeout；`Codex CLI` 仍是 production 默认 executor，`fallback_with_proof` 只属于 explicit experimental proof lane；剩余 production visual-stage long soak、real memory lifecycle receipt scaleout 和 cross-family repeated no-regression 仍是 RCA-owned typed blocker/backlog。`docs/**` 继续只做人读治理，测试断言只指向 machine-readable contracts、schema、manifest、receipt refs 和行为面。
 
+2026-05-20 Lane B-RCA 把 `opl_expected_receipt_monitor_freshness_handoff` 补到 production acceptance、evidence fixture、operator evidence readiness projection、runtime-program snapshot 和 product sidecar projection。该 handoff 只给 OPL `stage_production_evidence_receipt_record|verify` workorder 回填 body-free owner receipt refs、workspace receipt proof refs、visual memory reuse refs、repeated no-regression refs、monitor freshness refs 和 RCA typed blocker refs；OPL 可记录 expected receipt / monitor freshness refs，但不能接收 visual truth、review/export verdict body、artifact blob、memory body，也不能据此声明 visual ready、exportable、handoffable 或 production visual-stage soak complete。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。

@@ -255,6 +255,85 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.equal(scaleout.authority_boundary.opl_can_claim_production_soak_complete, false);
 });
 
+test('RCA production acceptance exposes body-free OPL expected receipt and monitor freshness refs', () => {
+  const acceptance = readJson(acceptancePath);
+  const handoff = acceptance.opl_expected_receipt_monitor_freshness_handoff;
+
+  assert.equal(handoff.surface_kind, 'rca_opl_expected_receipt_monitor_freshness_handoff');
+  assert.equal(handoff.owner, 'redcube_ai');
+  assert.equal(handoff.consumer, 'one_person_lab');
+  assert.equal(handoff.status, 'body_free_refs_ready_for_opl_workorder');
+  assert.equal(handoff.handoff_scope, 'opl_expected_receipt_and_monitor_freshness_backfill');
+  assert.equal(handoff.evidence_model, 'refs_only_no_visual_truth_artifact_blob_memory_body_or_review_verdict_body');
+  assert.equal(handoff.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assertRefString(
+    handoff.source_projection_refs.operator_evidence_readiness_projection_ref,
+    'handoff.source_projection_refs.operator_evidence_readiness_projection_ref',
+  );
+  assertRefString(
+    handoff.source_projection_refs.production_evidence_scaleout_refs_ref,
+    'handoff.source_projection_refs.production_evidence_scaleout_refs_ref',
+  );
+
+  assert.equal(handoff.body_free_owner_receipt_ref.expected_receipt_slot, 'artifact_producing_owner_receipt');
+  assert.equal(handoff.body_free_owner_receipt_ref.receipt_ref, acceptance.production_evidence_scaleout_refs.owner_receipt_refs.receipt_ref);
+  assert.equal(handoff.body_free_owner_receipt_ref.payload_body_included, false);
+  assert.equal(handoff.body_free_owner_receipt_ref.visual_readiness_claimed, false);
+  assert.equal(handoff.body_free_owner_receipt_ref.export_readiness_claimed, false);
+
+  assert.equal(handoff.body_free_workspace_receipt_ref.expected_receipt_slot, 'workspace_receipt');
+  assert.equal(handoff.body_free_workspace_receipt_ref.workspace_receipt_proof_action, 'emit_workspace_receipt_proof');
+  assert.equal(handoff.body_free_workspace_receipt_ref.workspace_receipt_scaleout_claimed, false);
+  assertRefString(
+    handoff.body_free_workspace_receipt_ref.workspace_receipt_proof_ref_model,
+    'body_free_workspace_receipt_ref.workspace_receipt_proof_ref_model',
+  );
+
+  assert.equal(handoff.body_free_visual_memory_reuse_ref.expected_receipt_slot, 'visual_memory_reuse_ref');
+  assertRefString(handoff.body_free_visual_memory_reuse_ref.memory_locator_ref, 'body_free_visual_memory_reuse_ref.memory_locator_ref');
+  assertRefString(handoff.body_free_visual_memory_reuse_ref.consumed_memory_ref, 'body_free_visual_memory_reuse_ref.consumed_memory_ref');
+  assertRefString(handoff.body_free_visual_memory_reuse_ref.memory_content_body_ref, 'body_free_visual_memory_reuse_ref.memory_content_body_ref');
+  assert.equal(handoff.body_free_visual_memory_reuse_ref.memory_body_projected_to_opl, false);
+  assert.equal(handoff.body_free_visual_memory_reuse_ref.payload_body_included, false);
+
+  assert.equal(handoff.body_free_repeated_no_regression_refs.expected_receipt_slot, 'repeated_no_regression_evidence');
+  assertRefArray(handoff.body_free_repeated_no_regression_refs.evidence_refs, 'body_free_repeated_no_regression_refs.evidence_refs');
+  assert.deepEqual(handoff.body_free_repeated_no_regression_refs.deliverable_family_refs, ['ppt_deck', 'xiaohongshu']);
+  assert.equal(handoff.body_free_repeated_no_regression_refs.repeated_no_regression_claimed_as_soak, false);
+
+  assert.equal(handoff.monitor_freshness_backfill_refs.monitor_surface_ref, 'redcube product manifest#/workspace_receipt_inventory_projection');
+  assert.equal(handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required, false);
+  assert.equal(handoff.monitor_freshness_backfill_refs.production_soak_claimed, false);
+
+  assert.deepEqual(handoff.typed_blocker_backfill_refs.blocker_refs, [
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+    'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+    'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+  ]);
+  assert.equal(handoff.typed_blocker_backfill_refs.blocker_owner, 'redcube_ai');
+  assert.equal(handoff.typed_blocker_backfill_refs.payload_body_included, false);
+
+  assert.equal(handoff.opl_payload_policy.payload_kind, 'stage_production_evidence_receipt_record_body_free_refs');
+  assert.equal(handoff.opl_payload_policy.payload_body_required, false);
+  assert.equal(handoff.opl_payload_policy.payload_body_allowed, false);
+  assert.deepEqual(handoff.opl_payload_policy.allowed_payload_ref_groups, [
+    'body_free_owner_receipt_ref',
+    'body_free_workspace_receipt_ref',
+    'body_free_visual_memory_reuse_ref',
+    'body_free_repeated_no_regression_refs',
+    'typed_blocker_backfill_refs',
+  ]);
+
+  assert.equal(handoff.authority_boundary.opl_can_store_handoff_refs, true);
+  assert.equal(handoff.authority_boundary.opl_can_record_expected_receipt_refs, true);
+  assert.equal(handoff.authority_boundary.opl_can_record_monitor_freshness_refs, true);
+  assert.equal(handoff.authority_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(handoff.authority_boundary.opl_can_store_artifact_payload, false);
+  assert.equal(handoff.authority_boundary.opl_can_store_memory_body, false);
+  assert.equal(handoff.authority_boundary.opl_can_authorize_review_export_verdict, false);
+  assert.equal(handoff.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
+});
+
 test('RCA evidence tail is closed only by domain receipt or by typed blocker with next verification refs', () => {
   const acceptance = readJson(acceptancePath);
   const tail = acceptance.evidence_tail;
@@ -427,6 +506,27 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.declares_production_soak_complete, false);
   assert.equal(scaleoutFixture.review_export_verdict_refs.verdict_body_projected_to_opl, false);
   assert.equal(scaleoutFixture.naming_tombstone_follow_through.active_caller_compatibility_alias_restored, false);
+
+  const oplHandoff = fixture.opl_expected_receipt_monitor_freshness_handoff;
+  assert.equal(oplHandoff.surface_kind, 'rca_opl_expected_receipt_monitor_freshness_handoff_fixture_refs');
+  assert.equal(oplHandoff.status, 'body_free_refs_ready_for_opl_workorder');
+  assert.equal(oplHandoff.evidence_model, 'refs_only_no_payload_body');
+  assert.equal(oplHandoff.body_free_owner_receipt_ref.payload_body_included, false);
+  assert.equal(oplHandoff.body_free_workspace_receipt_ref.workspace_receipt_scaleout_claimed, false);
+  assert.equal(oplHandoff.body_free_visual_memory_reuse_ref.payload_body_included, false);
+  assert.equal(oplHandoff.body_free_repeated_no_regression_refs.repeated_no_regression_claimed_as_soak, false);
+  assert.equal(oplHandoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required, false);
+  assert.equal(oplHandoff.monitor_freshness_backfill_refs.production_soak_claimed, false);
+  assert.equal(oplHandoff.typed_blocker_backfill_refs.blocker_owner, 'redcube_ai');
+  assert.equal(oplHandoff.typed_blocker_backfill_refs.payload_body_included, false);
+  assert.equal(oplHandoff.opl_payload_policy.payload_body_allowed, false);
+  assert.equal(oplHandoff.authority_boundary.opl_can_record_expected_receipt_refs, true);
+  assert.equal(oplHandoff.authority_boundary.opl_can_record_monitor_freshness_refs, true);
+  assert.equal(oplHandoff.authority_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(oplHandoff.authority_boundary.opl_can_store_artifact_payload, false);
+  assert.equal(oplHandoff.authority_boundary.opl_can_store_memory_body, false);
+  assert.equal(oplHandoff.authority_boundary.opl_can_authorize_review_export_verdict, false);
+  assert.equal(oplHandoff.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
 
   const soak = fixture.controlled_visual_soak_closeout;
   assert.equal(soak.state, 'domain_owned_typed_blocker_with_next_verification_ref');

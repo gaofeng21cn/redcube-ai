@@ -60,6 +60,42 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       sidecar.source_manifest_refs.production_evidence_scaleout_refs_ref,
       '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
     );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.surface_kind,
+      'rca_opl_expected_receipt_monitor_freshness_handoff',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.status,
+      'body_free_refs_ready_for_opl_workorder',
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_owner_receipt_ref.payload_body_included,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_visual_memory_reuse_ref.payload_body_included,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
+      true,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_monitor_freshness_refs,
+      true,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_write_rca_visual_truth,
+      false,
+    );
+    assert.equal(
+      sidecar.source_manifest_refs.opl_expected_receipt_monitor_freshness_handoff_ref,
+      '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+    );
 
     await dispatchProductSidecar({
       task: {
@@ -197,6 +233,41 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.authority_boundary.opl_can_write_rca_visual_truth,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.source_refs.some(
+        (source) => source.source_id === 'opl_expected_receipt_monitor_freshness_handoff'
+          && source.status === 'body_free_refs_ready_for_opl_workorder',
+      ),
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.body_free_workspace_receipt_ref.observed_workspace_count,
+      1,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.body_free_workspace_receipt_ref.receipt_kind_coverage_ready,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.body_free_owner_receipt_ref.receipt_ref,
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.owner_receipt_refs.receipt_ref,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.typed_blocker_backfill_refs.blocker_refs,
+      [
+        'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+        'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+        'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+      ],
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.opl_payload_policy.payload_body_allowed,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_claim_visual_stage_soak_complete,
       false,
     );
 
