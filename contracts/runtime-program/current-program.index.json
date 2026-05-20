@@ -88,7 +88,7 @@
       "json_pointer": "/current_state/active_baton/closeout",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/closeout.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 12
+      "line_count": 14
     },
     {
       "json_pointer": "/current_state/active_baton/id",

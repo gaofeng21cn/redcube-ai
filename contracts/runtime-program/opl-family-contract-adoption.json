@@ -1292,7 +1292,7 @@
         "status": "tombstone_follow_through_refs_landed_no_compatibility_alias",
         "active_caller_compatibility_alias_restored": false,
         "tombstone_refs": [
-          "docs/history/tombstones/retired-route-narratives-2026-05-11.md"
+          "human_doc:retired_route_narratives_tombstone"
         ],
         "retained_provenance_refs": [
           "contracts/runtime-program/managed-product-entry-hardening.json",

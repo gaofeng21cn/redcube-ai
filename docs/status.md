@@ -53,6 +53,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-20 Lane 4B 进一步把 evidence scaleout 从泛化 refs 收敛到真实 artifact-producing visual route：`ppt_deck.image_first.artifact_producing.v1`，stage 顺序固定为 `author_image_pages -> visual_director_review -> screenshot_review -> export_pptx`。production acceptance fixture、manifest operator projection 与 workspace receipt proof 都暴露同一 route ref；workspace proof 明确会产出 owner receipt ref、memory receipt refs 和 no-regression evidence ref；visual memory reuse 只暴露 locator/content refs，memory body 继续留在 RCA；repeated no-regression 记录为 `ppt_deck` / `xiaohongshu` family refs-only cadence；naming tombstone follow-through 继续禁止 compatibility alias。该轮关闭的是 evidence scaleout 可追踪性，不声明 production visual-stage long soak、跨 workspace scaleout 完成、visual ready、exportable 或 handoffable。
 
+2026-05-20 一步到位落地计划的 closeout 机器面已落到 `contracts/runtime-program/rca-one-shot-production-hardening-closeout.json`，并由 `contracts/runtime-program/current-program.json#/current_state/active_baton/closeout` 指向。该 surface 明确记录四条 lane 的 `planned`、`done`、`deferred`、`skipped`、`verification` 与 `commit_push_state`：B/C/A 已吸收入主线，D 负责文档与 contract closeout；`Codex CLI` 仍是 production 默认 executor，`fallback_with_proof` 只属于 explicit experimental proof lane；剩余 production visual-stage long soak、real memory lifecycle receipt scaleout 和 cross-family repeated no-regression 仍是 RCA-owned typed blocker/backlog。`docs/**` 继续只做人读治理，测试断言只指向 machine-readable contracts、schema、manifest、receipt refs 和行为面。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。

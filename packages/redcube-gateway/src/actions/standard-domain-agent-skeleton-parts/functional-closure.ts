@@ -400,17 +400,17 @@ export function buildPhysicalSkeletonFollowThrough() {
       '/product_sidecar_receipt_refs',
     ],
     provenance_refs: [
-      'docs/history/README.md',
-      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
-      'docs/history/hermes/README.md',
+      'human_doc:rca_history_index',
+      'human_doc:retired_route_narratives_tombstone',
+      'human_doc:upstream_hermes_history_index',
       '/runtime_residue_retirement',
     ],
     history_refs: [
-      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
-      'docs/history/runtime/opl-managed-runtime-three-layer-contract.md',
+      'human_doc:retired_route_narratives_tombstone',
+      'human_doc:opl_managed_runtime_three_layer_contract_history',
     ],
     tombstone_refs: [
-      'docs/history/tombstones/retired-route-narratives-2026-05-11.md',
+      'human_doc:retired_route_narratives_tombstone',
     ],
   };
 }

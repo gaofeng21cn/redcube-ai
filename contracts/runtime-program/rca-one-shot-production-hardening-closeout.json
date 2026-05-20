@@ -1,0 +1,292 @@
+{
+  "closeout_id": "rca_one_shot_production_hardening_closeout",
+  "surface_kind": "rca_program_closeout_contract",
+  "schema_version": 1,
+  "date_anchor": "2026-05-20",
+  "owner": "redcube_ai",
+  "status": "closed_with_typed_production_evidence_blockers",
+  "scope": {
+    "objective": "advance RCA to an AI-first and Codex-first visual-deliverable agent while preserving OPL-owned generic runtime boundaries",
+    "default_executor_policy": "codex_cli_first_class_default",
+    "executor_first_claim": "OPL provides stage runtime, queue, receipts, recovery and projection; Codex/default executor performs protected visual stages; RCA owns visual truth, review/export verdict, artifact authority, visual memory accept/reject, owner receipt and native helpers",
+    "domain_boundary": {
+      "rca_retains": [
+        "visual_truth",
+        "review_export_verdict",
+        "artifact_authority",
+        "visual_memory_accept_reject",
+        "owner_receipt",
+        "native_helper_implementation"
+      ],
+      "opl_owns": [
+        "runtime",
+        "queue",
+        "attempt_ledger",
+        "session_workbench_shell",
+        "artifact_review_transport",
+        "operator_projection",
+        "generated_wrappers"
+      ]
+    }
+  },
+  "planned": [
+    {
+      "lane_id": "A",
+      "branch": "codex/rca-production-evidence-tail",
+      "scope": "production evidence tail",
+      "worktree": ".worktrees/codex/rca-production-evidence-tail",
+      "planned_result": "record artifact-producing image-first route refs, owner/workspace/memory/no-regression receipt refs, and typed blockers for remaining production evidence gaps"
+    },
+    {
+      "lane_id": "B",
+      "branch": "codex/rca-executor-policy-hardening",
+      "scope": "executor policy hardening",
+      "worktree": ".worktrees/codex/rca-executor-policy-hardening",
+      "planned_result": "keep codex_cli as default, make production route failures fail closed, and limit fallback_with_proof to explicit experimental proof lanes"
+    },
+    {
+      "lane_id": "C",
+      "branch": "codex/rca-wrapper-morphology-hygiene",
+      "scope": "wrapper morphology hygiene",
+      "worktree": ".worktrees/codex/rca-wrapper-morphology-hygiene",
+      "planned_result": "classify remaining repo-local wrappers as domain handler targets, refs-only adapters, minimal authority functions, native helper implementations or provenance"
+    },
+    {
+      "lane_id": "D",
+      "branch": "codex/rca-doc-contract-closeout",
+      "scope": "docs and contract closeout",
+      "worktree": ".worktrees/codex/rca-doc-contract-closeout",
+      "planned_result": "make the landed state machine-readable, update human governance docs, preserve deferred blockers, and avoid docs prose test assertions"
+    }
+  ],
+  "done": [
+    {
+      "lane_id": "A",
+      "status": "absorbed_to_main_before_closeout_lane",
+      "evidence_refs": [
+        "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
+        "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+        "redcube product manifest#/operator_evidence_readiness_projection",
+        "redcube product manifest#/workspace_receipt_inventory_projection",
+        "redcube product sidecar#/emit_workspace_receipt_proof"
+      ],
+      "landed_truth": [
+        "selected artifact-producing visual route is ppt_deck.image_first.artifact_producing.v1",
+        "stage sequence is author_image_pages -> visual_director_review -> screenshot_review -> export_pptx",
+        "workspace proof exposes owner receipt, memory receipt and no-regression evidence refs",
+        "visual memory reuse remains locator/content ref only",
+        "remaining production evidence gaps are represented as RCA-owned typed blockers"
+      ]
+    },
+    {
+      "lane_id": "B",
+      "status": "absorbed_to_main_before_closeout_lane",
+      "evidence_refs": [
+        "contracts/runtime-program/rca-executor-routing-config.schema.json",
+        "config/examples/executor-routing.example.json",
+        "human_doc:rca_executor_routing_config_reference",
+        "packages/redcube-config/src/index.ts",
+        "tests/runtime-config.test.ts",
+        "tests/rca-executor-backend-contract.test.ts"
+      ],
+      "landed_truth": [
+        "codex_cli remains the production default executor",
+        "production structured-call route failure policy defaults to fail_closed",
+        "fallback_with_proof is valid only when lane is experimental_proof and fallback is inherit_effective_default_executor",
+        "hermes_agent remains explicit proof backend without behavior or quality equivalence claims"
+      ]
+    },
+    {
+      "lane_id": "C",
+      "status": "absorbed_to_main_before_closeout_lane",
+      "evidence_refs": [
+        "contracts/functional_privatization_audit.json",
+        "contracts/physical_source_morphology_policy.json",
+        "contracts/runtime-program/current-program.json#/current_state/active_baton/scope/privatized_functional_module_audit",
+        "contracts/runtime-program/current-program.json#/product_release_metadata/functional_privatization_audit",
+        "tests/rca-retired-surface-guard.test.ts",
+        "tests/opl-agent-pack-contracts.test.ts"
+      ],
+      "landed_truth": [
+        "active reader-facing classifications are domain_handler_target, refs_only_adapter, minimal_authority_function, native_helper_implementation and provenance",
+        "repo-local wrapper surfaces no longer claim generic runtime, session, workbench, review transport or wrapper ownership",
+        "retained adapters expose refs, receipts, typed blockers, authority action metadata or native helper targets"
+      ]
+    },
+    {
+      "lane_id": "D",
+      "status": "implemented_in_closeout_lane",
+      "evidence_refs": [
+        "contracts/runtime-program/rca-one-shot-production-hardening-closeout.json",
+        "contracts/runtime-program/current-program.json#/current_state/active_baton/closeout",
+        "human_doc:rca_current_status",
+        "human_doc:rca_ideal_state_gap_plan",
+        "human_doc:rca_architecture",
+        "human_doc:rca_invariants",
+        "tests/rca-one-shot-closeout.test.ts"
+      ],
+      "landed_truth": [
+        "planned/done/deferred/skipped/verification/commit-push state is machine-readable",
+        "human docs reference machine contracts instead of becoming test assertion targets",
+        "deferred production evidence remains typed blocker or backlog, not ready-state prose"
+      ]
+    }
+  ],
+  "deferred": [
+    {
+      "gap_id": "opl_hosted_controlled_visual_stage_long_soak",
+      "status": "deferred_typed_blocker",
+      "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+      "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/0",
+      "reason": "Temporal controlled visual-stage long soak still lacks live provider restart, re-query, retry and dead-letter evidence",
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts"
+      ],
+      "must_not_claim": [
+        "production_visual_stage_long_soak_complete",
+        "visual_ready",
+        "exportable",
+        "handoffable"
+      ]
+    },
+    {
+      "gap_id": "real_memory_lifecycle_receipt_instances",
+      "status": "deferred_typed_blocker",
+      "typed_blocker_ref": "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+      "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/1",
+      "reason": "RCA exposes locator and receipt ref models, but more real visual memory accepted/rejected lifecycle receipt instances are still pending",
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+      ],
+      "must_not_claim": [
+        "memory_lifecycle_scaleout_complete",
+        "visual_memory_body_projected_to_opl"
+      ]
+    },
+    {
+      "gap_id": "cross_family_repeated_no_regression_evidence",
+      "status": "deferred_typed_blocker",
+      "typed_blocker_ref": "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending",
+      "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/2",
+      "reason": "Repeated no-regression refs exist for ppt_deck and xiaohongshu, but cross-family production cadence evidence is not complete",
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/rca-production-acceptance.test.ts"
+      ],
+      "must_not_claim": [
+        "cross_family_repeated_no_regression_complete",
+        "domain_ready"
+      ]
+    },
+    {
+      "gap_id": "naming_contract_hygiene_tail",
+      "status": "deferred_backlog",
+      "backlog_ref": "human_doc:rca_ideal_state_gap_plan#current_cleanliness_tail",
+      "reason": "Some historical managed/runtime/session semantic ids remain as provenance or tombstone-compatible contract ids and require compatibility-free migration before deletion",
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-retired-surface-guard.test.ts tests/runtime-program-provenance.test.ts"
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "item": "opl_repo_changes",
+      "reason": "RCA verification found no blocker requiring edits in the OPL repo during this closeout"
+    },
+    {
+      "item": "compatibility_alias_restoration",
+      "reason": "the plan explicitly forbids restoring old managed runtime, gateway/frontdoor/federation, Hermes-first, local-manager or bridge aliases"
+    },
+    {
+      "item": "docs_prose_assertions",
+      "reason": "docs remain human governance surfaces; tests assert machine contracts, schema, CLI/API behavior, manifest, receipt refs and production acceptance surfaces"
+    },
+    {
+      "item": "claiming_visual_ready_or_handoffable",
+      "reason": "production evidence blockers remain open and must not be upgraded by structural conformance, provider completion or refs-only receipts"
+    }
+  ],
+  "verification": {
+    "lane_verification": {
+      "A": {
+        "reported_commands": [
+          "git diff --check",
+          "git diff --cached --check",
+          "npm run contracts:current-program:check",
+          "npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-cases/manifest-and-start-surfaces.test.ts"
+        ],
+        "reported_result": "pass"
+      },
+      "B": {
+        "reported_commands": [
+          "git diff --check",
+          "npm run --silent build",
+          "node --experimental-strip-types scripts/run-test-group.ts meta --files tests/runtime-config.test.ts",
+          "node --experimental-strip-types scripts/run-test-group.ts integration --files tests/rca-executor-backend-contract.test.ts"
+        ],
+        "reported_result": "pass"
+      },
+      "C": {
+        "reported_commands": [
+          "git diff --check",
+          "npm run --silent contracts:current-program:check",
+          "npm run --silent line-budget",
+          "npm run --silent build && node --test tests/rca-retired-surface-guard.test.ts tests/opl-agent-pack-contracts.test.ts tests/opl-family-contract-adoption.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-session-checkpoint.test.ts"
+        ],
+        "reported_result": "pass"
+      },
+      "D": {
+        "required_fresh_commands_before_absorb": [
+          "git diff --check",
+          "npm run contracts:current-program:check",
+          "npm run --silent build && node --experimental-strip-types --test tests/rca-one-shot-closeout.test.ts tests/rca-production-acceptance.test.ts tests/runtime-config.test.ts tests/opl-agent-pack-contracts.test.ts",
+          "npm run test:meta"
+        ],
+        "fresh_verification_result": "pass_before_lane_commit",
+        "fresh_verification_observed": {
+          "focused_tests": "27/27 pass",
+          "current_program_check": "288 leaf refs in sync",
+          "meta_lane": "261/261 pass",
+          "diff_check": "pass"
+        }
+      }
+    },
+    "final_main_verification_required": [
+      "scripts/verify.sh",
+      "npm run test:fast",
+      "npm run test:meta",
+      "git diff --check",
+      "git worktree list",
+      "git status --short --branch"
+    ],
+    "docs_assertion_policy": {
+      "docs_are_human_governance_surfaces": true,
+      "tests_must_not_assert_markdown_prose": true,
+      "tests_may_assert_machine_contracts": true
+    }
+  },
+  "commit_push_state": {
+    "lane_absorb_order": [
+      "B",
+      "C",
+      "A",
+      "D"
+    ],
+    "B": "absorbed_to_main_before_closeout_lane",
+    "C": "absorbed_to_main_before_closeout_lane",
+    "A": "absorbed_to_main_before_closeout_lane",
+    "D": "pending_absorb_until_fresh_verification_and_commit",
+    "main_push_state": "pending_final_main_verification",
+    "cleanup_required": [
+      ".worktrees/codex/rca-production-evidence-tail",
+      ".worktrees/codex/rca-executor-policy-hardening",
+      ".worktrees/codex/rca-wrapper-morphology-hygiene",
+      ".worktrees/codex/rca-doc-contract-closeout"
+    ],
+    "branches_to_remove_after_absorb": [
+      "codex/rca-production-evidence-tail",
+      "codex/rca-executor-policy-hardening",
+      "codex/rca-wrapper-morphology-hygiene",
+      "codex/rca-doc-contract-closeout"
+    ]
+  }
+}

@@ -24,6 +24,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 ## RCA Domain Authority 与标准 Agent 目标
 
 - 当前 OPL stage-led 对齐 surface 只供 OPL discovery、queue、wakeup、handoff、receipt、retry/dead-letter 和 operator projection 使用；不得授权 OPL 生成 visual route、review verdict、publication projection truth 或 canonical artifact。
+- RCA 的 executor-first policy 固定为 `codex_cli` production 默认与 `fail_closed` production route。`fallback_with_proof` 只允许 explicit `experimental_proof` lane，且必须写入 proof；不得让非默认 executor 静默回 Codex、静默替换 Codex，或被写成与 Codex 质量/行为等价。
 - RCA 的目标态高于当前实现分布。旧 repo-local managed DAG、attempt/state-machine runner 和 managed-run store 已物理删除；当前 session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 或 executor adapter 只能作为 OPL generated/hosted consumer、refs-only adapter、declarative pack input、minimal authority function 或迁移输入。
 - RCA 作为标准 OPL Agent 的长期形态是 `Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。通用 transport、ledger、index、lifecycle、runner、session、workbench、observability、artifact/review shell、native-helper envelope、executor adapter 和 generated wrapper 必须上收到 OPL primitive / pack compiler / App shell，或收薄成 refs-only adapter / diagnostic cleanup path。
 - `TypeScript + Python` 是实现目标，不是绕过 runtime-family 的许可。Python native PPT/Office helper 必须挂在 RedCube product-entry、route/proof lane、review/export gate 与 repo-tracked contract 下。
@@ -48,6 +49,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 - `README*` 与 `docs/README*` 必须先写 RCA 的视觉交付身份，再写 OPL 托管 / 内部集成路径。
 - 含有旧 gateway、bridge、harness、Hermes-first 或 OPL-first 口径的文档，若仍被 `human_doc:*` 或 runtime-program 合同引用，留在原生命周期层并补充 lifecycle/provenance 说明；无合同引用且不服务当前 baton 的旧计划进入 `docs/history/` 或 tombstone 语境。
 - 开发计划 closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；`deferred` 必须可追溯到合同引用、真实 blocker 或明确 history/tombstone 落点。
+- 一步到位或并行 lane closeout 必须优先落 machine-readable closeout contract，再由 `docs/**` 做人读解释；测试可以断言合同字段与行为面，不得断言 Markdown 文案。
 - 理想态差距和开发计划必须按目标态拆分 `功能/结构差距` 与 `测试/证据差距`；现有通用功能面应由 OPL 承担时，即使可运行，也写成功能/结构差距。
 - `当前实际` 只能作为迁移起点、风险和证据来源；不得反向约束理想态，不得把现有私有实现包装成长期设计。
 

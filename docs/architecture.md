@@ -157,11 +157,13 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
   - `simple_llm` 与 `openai_compatible_gateway` 不作为 RedCube 一等 backend
 - 默认正式 backend 是 `codex_cli`
   - 它对应本机 Codex CLI autonomous runtime
+  - production route 失败策略默认 `fail_closed`，不会静默回 Codex 或静默替换 Codex
 - 备选 proof backend 是 `hermes_agent`
   - 只有 caller 显式传 Hermes proof adapter，或 `fix_html` escalation policy 触发时才会启用
   - 当前已经对齐到 `ppt_deck`、`xiaohongshu`、`poster_onepager` 三个 family
   - 底层不是单轮 chat relay，而是 external Hermes-Agent loop bridge
   - 默认 model / reasoning 继承本机 Hermes 默认配置，不在 repo 内 pin 死
+  - `fallback_with_proof` 只允许 `lane=experimental_proof`，且必须显式声明回到 effective default executor；它不表示 Hermes 与 Codex 在质量或行为上等价
 
 这意味着 RedCube 现在的 family runtime 并不是“写死 Codex-only”，而是：
 
