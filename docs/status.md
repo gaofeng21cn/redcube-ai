@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-更新时间：`2026-05-19`
+更新时间：`2026-05-20`
 
 ## 当前角色
 
@@ -16,6 +16,8 @@ OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue
 RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.md` 是 stage-level canonical prompt policy；`agent/stages/`、`agent/skills/`、`agent/quality_gates/` 与 `agent/knowledge/` 持有 Declarative Visual Pack 的 repo-source 语义。`prompts/ppt_deck/` 与 `prompts/xiaohongshu/` 继续作为 detailed implementation prompt assets，由 `agent/prompts/*.md` 定位；`contracts/stage_control_plane.json` 的 `prompt_refs` 只指向 `agent/prompts/*.md`。
 
 `Codex CLI` 是当前第一公民 executor。`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现，不承诺行为或输出质量与 Codex CLI 等价。
+
+当前 acceptance / readiness 口径是 AI-first / executor-first：OPL 搭建 stage-led runtime、queue、receipt ledger、replay / recovery shell 与 operator projection；Codex/default executor 执行视觉阶段；RCA 持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt。合同只固定边界、安全、receipt、replay 和恢复语义，不能把机械 conformance 或 provider completion 升级成视觉判断。
 
 ## 当前运行与文档事实
 
@@ -41,6 +43,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-19 OPL legacy cleanup dry-run 读取当前 RCA manifest 后返回 `plan_status=ready` / `lifecycle_apply.status=dry_run_ready`，OPL refs-only lifecycle ledger 也已能 `verify` 读回 RCA 空计划 closure batch receipt。RCA `physical_skeleton_follow_through` 已补齐 provenance refs、history refs 和 tombstone refs，清除了 OPL cleanup gate 对 provenance / tombstone evidence 的 blocker。该状态只证明 RCA legacy cleanup proof 可被 OPL refs-only ledger 消费，不表示 production visual-stage long soak、artifact-producing owner receipt、visual ready、exportable 或 handoffable 已完成。
 
+2026-05-20 production acceptance/readiness closeout 的当前文档口径是：结构 conformance 通过不是 visual ready；readiness clean / observable 只表示 launch、replay、runtime evidence、owner receipt refs 和 typed blocker 可被观察与追溯。最终合并后的 expected result 是 RCA stage evidence 中出现 runtime budget refs 与 replay evidence refs、RCA production acceptance 中保留 owner receipt / artifact / review-export acceptance refs、OPL readiness surface 能消费这些 refs 并报告 clean/observable；这些结果仍不声明 production visual-stage long soak、跨 family repeated no-regression 或更多 workspace scaleout 已完成。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。
@@ -61,8 +65,8 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 - Temporal controlled visual-stage long soak 和 provider restart/re-query/retry/dead-letter proof。
 - Cross-family repeated no-regression proof。
 
-2026-05-19 RCA 新增 domain-owned production acceptance 机器面：
-`contracts/production_acceptance/rca-production-acceptance.json`。该 surface 明确记录 structural / physical conformance 已通过，且 production acceptance 只由 RCA-owned visual artifact-producing receipt chain 关闭；visual ready、exportable、handoffable 和 domain_ready 继续归 RCA visual / review / export authority。当前 evidence tail 状态为 `closed_by_domain_owned_acceptance_receipt`，证据以 refs-only 形式指向 RCA owner receipt、artifact locator / artifact receipt、review/export gate、memory/lifecycle receipt 和 next verification command refs。OPL conformance、OPL hosted/provider completion 和 cleanup proof 仍不能升级为 RCA visual/export/domain ready。
+RCA 的 domain-owned production acceptance 机器面是：
+`contracts/production_acceptance/rca-production-acceptance.json`。该 surface 明确记录 structural / physical conformance 已通过，且 production acceptance 只由 RCA-owned visual artifact-producing receipt chain 或 RCA-owned typed blocker 关闭；visual ready、exportable、handoffable 和 domain_ready 继续归 RCA visual / review / export authority。当前 evidence tail 以 refs-only 形式指向 RCA owner receipt、artifact locator / artifact receipt、review/export gate、memory/lifecycle receipt 和 next verification command refs。OPL conformance、readiness clean/observable、OPL hosted/provider completion、replay evidence 与 cleanup proof 都不能升级为 RCA visual/export/domain ready。
 
 此外仍有一类命名/合同卫生债：历史合同文件名、field name 或 task intent 中的 `managed` 可能仍作为已落地 session-continuity / product-entry provenance 语义存在，例如 `managed-product-entry-hardening`。这些不是旧 runtime active implementation；后续若要更干净，应通过语义 ID 迁移或 tombstone policy 逐步改名，避免破坏 runtime-program provenance。
 
