@@ -345,6 +345,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/source_intake/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/source_intake/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/source_intake/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/source_intake/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/source_intake",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/source_intake",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.source_intake.source_truth_frozen"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/source_intake",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:source_intake",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/source_intake"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/source_intake"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.source_intake.source_truth_frozen"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/source_intake",
+          "owner_receipt:source_intake"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:source_intake"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -378,6 +445,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": false
@@ -663,6 +733,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/communication_strategy/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/communication_strategy/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/communication_strategy/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/communication_strategy/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/communication_strategy",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/communication_strategy",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.communication_strategy.accepted"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/communication_strategy",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:communication_strategy",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/communication_strategy"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/communication_strategy"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.communication_strategy.accepted"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/communication_strategy",
+          "owner_receipt:communication_strategy"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:communication_strategy"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -696,6 +833,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
@@ -960,6 +1100,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/visual_direction/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/visual_direction/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/visual_direction/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/visual_direction/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/visual_direction",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/visual_direction",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.visual_direction.accepted"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/visual_direction",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:visual_direction",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/visual_direction"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/visual_direction"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.visual_direction.accepted"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/visual_direction",
+          "owner_receipt:visual_direction"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:visual_direction"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -993,6 +1200,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
@@ -1272,6 +1482,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/artifact_creation/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/artifact_creation/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/artifact_creation/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/artifact_creation/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/artifact_creation",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/artifact_creation",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.artifact_creation.candidate_rendered"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/artifact_creation",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:artifact_creation",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/artifact_creation"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/artifact_creation"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.artifact_creation.candidate_rendered"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/artifact_creation",
+          "owner_receipt:artifact_creation"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:artifact_creation"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1305,6 +1582,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": false
@@ -1615,6 +1895,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/review_and_revision/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/review_and_revision/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/review_and_revision/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/review_and_revision/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/review_and_revision",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/review_and_revision",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.review_and_revision.gate_recorded"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/review_and_revision",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:review_and_revision",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/review_and_revision"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/review_and_revision"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.review_and_revision.gate_recorded"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/review_and_revision",
+          "owner_receipt:review_and_revision"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:review_and_revision"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1648,6 +1995,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
@@ -1958,6 +2308,73 @@
             "role": "operator_stage_freshness_metric"
           }
         ],
+        "metric_refs": [
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/package_and_handoff/expected-success",
+            "role": "expected_success_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/package_and_handoff/boundary-success-rate",
+            "role": "boundary_success_rate_ref"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/package_and_handoff/runtime-event-coverage",
+            "role": "runtime_event_coverage"
+          },
+          {
+            "ref_kind": "metric_ref",
+            "ref": "metric:rca/package_and_handoff/owner-receipt-coverage",
+            "role": "owner_receipt_coverage"
+          }
+        ],
+        "replay_evidence_refs": [
+          {
+            "ref_kind": "event_log_ref",
+            "ref": "event-log:rca/stages/package_and_handoff",
+            "role": "append_only_event_log_ref"
+          },
+          {
+            "ref_kind": "attempt_ledger_ref",
+            "ref": "attempt-ledger:opl/redcube_ai/package_and_handoff",
+            "role": "opl_stage_attempt_ledger_ref"
+          },
+          {
+            "ref_kind": "runtime_event_ref",
+            "ref": [
+              "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+            ],
+            "role": "recorded_runtime_event_refs"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "closeout_receipt:rca/package_and_handoff",
+            "role": "stage_closeout_receipt_ref"
+          },
+          {
+            "ref_kind": "receipt_ref",
+            "ref": "owner_receipt:package_and_handoff",
+            "role": "domain_owner_receipt_ref"
+          }
+        ],
+        "append_only_event_log_refs": [
+          "event-log:rca/stages/package_and_handoff"
+        ],
+        "attempt_ledger_refs": [
+          "attempt-ledger:opl/redcube_ai/package_and_handoff"
+        ],
+        "recorded_runtime_event_refs": [
+          "runtime_event:rca.package_and_handoff.export_handoff_recorded"
+        ],
+        "closeout_receipt_refs": [
+          "closeout_receipt:rca/package_and_handoff",
+          "owner_receipt:package_and_handoff"
+        ],
+        "owner_receipt_refs": [
+          "owner_receipt:package_and_handoff"
+        ],
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1991,6 +2408,9 @@
         "rca_owns_review_publication_projection": true,
         "rca_owns_artifact_authority": true,
         "default_ppt_route_changed": false,
+        "provider_completion_is_visual_ready": false,
+        "provider_completion_is_exportable": false,
+        "provider_completion_is_domain_ready": false,
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true

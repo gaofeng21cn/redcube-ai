@@ -267,6 +267,49 @@ function buildCohortLoopRefs(stage) {
         role: 'operator_stage_freshness_metric',
       },
     ],
+    metric_refs: [
+      {
+        ref_kind: 'metric_ref',
+        ref: `metric:rca/${stage.stage_id}/expected-success`,
+        role: 'expected_success_ref',
+      },
+      {
+        ref_kind: 'metric_ref',
+        ref: `metric:rca/${stage.stage_id}/boundary-success-rate`,
+        role: 'boundary_success_rate_ref',
+      },
+      {
+        ref_kind: 'metric_ref',
+        ref: `metric:rca/${stage.stage_id}/runtime-event-coverage`,
+        role: 'runtime_event_coverage',
+      },
+      {
+        ref_kind: 'metric_ref',
+        ref: `metric:rca/${stage.stage_id}/owner-receipt-coverage`,
+        role: 'owner_receipt_coverage',
+      },
+    ],
+  };
+}
+
+function buildReplayEvidenceRefs(stage) {
+  const appendOnlyEventLogRef = `event-log:rca/stages/${stage.stage_id}`;
+  const attemptLedgerRef = `attempt-ledger:opl/redcube_ai/${stage.stage_id}`;
+  const closeoutReceiptRef = `closeout_receipt:rca/${stage.stage_id}`;
+  const ownerReceiptRef = `owner_receipt:${stage.stage_id}`;
+  return {
+    replay_evidence_refs: [
+      { ref_kind: 'event_log_ref', ref: appendOnlyEventLogRef, role: 'append_only_event_log_ref' },
+      { ref_kind: 'attempt_ledger_ref', ref: attemptLedgerRef, role: 'opl_stage_attempt_ledger_ref' },
+      { ref_kind: 'runtime_event_ref', ref: stage.runtime_event_refs || [], role: 'recorded_runtime_event_refs' },
+      { ref_kind: 'receipt_ref', ref: closeoutReceiptRef, role: 'stage_closeout_receipt_ref' },
+      { ref_kind: 'receipt_ref', ref: ownerReceiptRef, role: 'domain_owner_receipt_ref' },
+    ],
+    append_only_event_log_refs: [appendOnlyEventLogRef],
+    attempt_ledger_refs: [attemptLedgerRef],
+    recorded_runtime_event_refs: stage.runtime_event_refs || [],
+    closeout_receipt_refs: [closeoutReceiptRef, ownerReceiptRef],
+    owner_receipt_refs: [ownerReceiptRef],
   };
 }
 
@@ -332,6 +375,7 @@ function stageDescriptor(stage, actionIds) {
       ensures: stage.ensures || [],
       runtime_event_refs: stage.runtime_event_refs || [],
       ...buildCohortLoopRefs(stage),
+      ...buildReplayEvidenceRefs(stage),
       boundary_assumptions: [
         'RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.',
         'OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable.',
@@ -363,6 +407,9 @@ function stageDescriptor(stage, actionIds) {
       rca_owns_review_publication_projection: true,
       rca_owns_artifact_authority: true,
       default_ppt_route_changed: false,
+      provider_completion_is_visual_ready: false,
+      provider_completion_is_exportable: false,
+      provider_completion_is_domain_ready: false,
       repo_local_stage_runner_retired: true,
       repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
       independent_gate_receipt_required: Boolean(stage.independent_gate_receipt_required),

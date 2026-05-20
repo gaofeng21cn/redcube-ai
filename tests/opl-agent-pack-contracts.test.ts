@@ -309,6 +309,40 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
     assert.equal(stage.stage_contract.trigger_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.monitor_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.dashboard_metric_refs.length > 0, true, stage.stage_id);
+    assert.equal(stage.stage_contract.metric_refs.length >= 4, true, stage.stage_id);
+    assert.equal(
+      stage.stage_contract.metric_refs.some((metricRef) => metricRef.role === 'expected_success_ref'),
+      true,
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.metric_refs.some((metricRef) => metricRef.role === 'boundary_success_rate_ref'),
+      true,
+      stage.stage_id,
+    );
+    assert.deepEqual(stage.stage_contract.recorded_runtime_event_refs, stage.stage_contract.runtime_event_refs);
+    assert.deepEqual(stage.stage_contract.owner_receipt_refs, [`owner_receipt:${stage.stage_id}`]);
+    assert.equal(stage.stage_contract.append_only_event_log_refs.length, 1, stage.stage_id);
+    assert.equal(stage.stage_contract.attempt_ledger_refs.length, 1, stage.stage_id);
+    assert.equal(
+      stage.stage_contract.closeout_receipt_refs.includes(`owner_receipt:${stage.stage_id}`),
+      true,
+      stage.stage_id,
+    );
+    assert.deepEqual(
+      stage.stage_contract.replay_evidence_refs.map((replayRef) => replayRef.role),
+      [
+        'append_only_event_log_ref',
+        'opl_stage_attempt_ledger_ref',
+        'recorded_runtime_event_refs',
+        'stage_closeout_receipt_ref',
+        'domain_owner_receipt_ref',
+      ],
+      stage.stage_id,
+    );
+    assert.equal(stage.authority_boundary.provider_completion_is_visual_ready, false, stage.stage_id);
+    assert.equal(stage.authority_boundary.provider_completion_is_exportable, false, stage.stage_id);
+    assert.equal(stage.authority_boundary.provider_completion_is_domain_ready, false, stage.stage_id);
     assert.equal(
       stage.stage_contract.trigger_refs.some((triggerRef) =>
         triggerRef.role === 'opl_provider_stage_launch_trigger'),
