@@ -163,6 +163,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'rca_owned_refs_only_artifact_producing_receipt_chain',
     );
     assert.equal(
+      manifest.operator_evidence_readiness_projection.production_acceptance.evidence_receipt_fixture_ref,
+      'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
+    );
+    assert.equal(
       manifest.operator_evidence_readiness_projection.declares_artifact_producing_owner_receipt,
       true,
     );
@@ -180,6 +184,30 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.operator_evidence_readiness_projection.declares_exportable, false);
     assert.equal(manifest.operator_evidence_readiness_projection.declares_handoffable, false);
     assert.equal(manifest.operator_evidence_readiness_projection.declares_domain_ready, false);
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.surface_kind,
+      'rca_visual_production_evidence_scaleout_refs',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.projected_body_to_opl,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs.length >= 2,
+      true,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.authority_boundary.opl_can_store_memory_body,
+      false,
+    );
     assert.equal(
       manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_declare_domain_ready,
       false,

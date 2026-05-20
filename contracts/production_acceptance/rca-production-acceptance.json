@@ -52,7 +52,11 @@
     "required_ref_groups": [
       "visual_owner_receipt_refs",
       "artifact_receipt_refs",
-      "review_export_gate_refs"
+      "review_export_gate_refs",
+      "workspace_receipt_scaleout_refs",
+      "visual_memory_body_reuse_refs",
+      "repeated_no_regression_evidence_refs",
+      "naming_tombstone_follow_through_refs"
     ],
     "visual_owner_receipt_refs": [
       "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
@@ -81,6 +85,87 @@
     "chain_declares_visual_ready": false,
     "chain_declares_exportable": false,
     "chain_declares_handoffable": false
+  },
+  "production_evidence_scaleout_refs": {
+    "surface_kind": "rca_visual_production_evidence_scaleout_refs",
+    "owner": "redcube_ai",
+    "status": "refs_landed_scaleout_runtime_evidence_pending",
+    "evidence_model": "refs_only_no_visual_truth_artifact_blob_or_memory_body",
+    "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+    "required_evidence_ref_groups": [
+      "artifact_producing_owner_receipt",
+      "workspace_receipt_scaleout",
+      "visual_memory_body_reuse",
+      "repeated_no_regression_evidence",
+      "naming_tombstone_follow_through"
+    ],
+    "owner_receipt_refs": {
+      "status": "artifact_producing_owner_receipt_ref_closed",
+      "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "contract_ref": "contracts/owner_receipt_contract.json#/receipt_cases/0",
+      "artifact_locator_ref": "contracts/artifact_locator_contract.json",
+      "review_export_gate_ref": "workspace-runtime-ref:review-export:transition-run",
+      "visual_readiness_claimed": false,
+      "export_readiness_claimed": false
+    },
+    "workspace_receipt_scaleout_refs": {
+      "status": "scaleout_ref_model_landed_more_workspaces_pending",
+      "workspace_receipt_inventory_ref": "redcube product manifest#/workspace_receipt_inventory_projection",
+      "workspace_receipt_proof_action": "emit_workspace_receipt_proof",
+      "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
+      "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
+      "required_workspace_count_for_scaleout": 2,
+      "workspace_receipt_scaleout_claimed": false
+    },
+    "visual_memory_body_reuse_refs": {
+      "status": "body_external_reuse_ref_landed",
+      "memory_locator_ref": "redcube product manifest#/domain_memory_descriptor_locator/memory_locator",
+      "controlled_apply_proof_ref": "redcube product manifest#/controlled_memory_apply_proof",
+      "consumed_memory_ref": "rca-memory:visual-pattern:<memory-id>",
+      "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
+      "memory_body_projected_to_opl": false,
+      "contains_memory_body": false
+    },
+    "repeated_no_regression_evidence_refs": {
+      "status": "repeated_refs_available_not_production_soak",
+      "generator_action": "emit_no_regression_evidence",
+      "proof_contract_ref": "redcube product manifest#/no_regression_owner_receipt_opl_consumption_proof",
+      "evidence_refs": [
+        "rca-no-regression:visual-stage:transition-hosted-no-regression",
+        "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+      ],
+      "deliverable_family_refs": [
+        "ppt_deck",
+        "xiaohongshu"
+      ],
+      "required_minimum_evidence_ref_count": 2,
+      "repeated_no_regression_claimed_as_soak": false
+    },
+    "naming_tombstone_follow_through_refs": {
+      "status": "tombstone_follow_through_refs_landed_no_compatibility_alias",
+      "active_caller_compatibility_alias_restored": false,
+      "tombstone_refs": [
+        "docs/history/tombstones/retired-route-narratives-2026-05-11.md"
+      ],
+      "retained_provenance_refs": [
+        "contracts/runtime-program/managed-product-entry-hardening.json",
+        "human_doc:managed_product_entry_hardening"
+      ],
+      "forbidden_active_occurrence_classes": [
+        "compatibility_alias",
+        "default_runtime_owner",
+        "public_action_key",
+        "sidecar_template"
+      ]
+    },
+    "authority_boundary": {
+      "opl_can_store_projection_refs": true,
+      "opl_can_write_rca_visual_truth": false,
+      "opl_can_store_artifact_blob": false,
+      "opl_can_store_memory_body": false,
+      "opl_can_authorize_review_export_verdict": false,
+      "opl_can_claim_production_soak_complete": false
+    }
   },
   "evidence_tail": {
     "production_live_soak_not_claimed_by_conformance": false,

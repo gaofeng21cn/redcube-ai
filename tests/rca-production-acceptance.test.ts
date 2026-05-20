@@ -107,6 +107,10 @@ test('RCA acceptance chain is refs-only and requires owner, artifact, and review
     'visual_owner_receipt_refs',
     'artifact_receipt_refs',
     'review_export_gate_refs',
+    'workspace_receipt_scaleout_refs',
+    'visual_memory_body_reuse_refs',
+    'repeated_no_regression_evidence_refs',
+    'naming_tombstone_follow_through_refs',
   ]);
   assertRefArray(chain.visual_owner_receipt_refs, 'visual_owner_receipt_refs');
   assertRefString(chain.evidence_receipt_fixture_ref, 'evidence_receipt_fixture_ref');
@@ -130,6 +134,77 @@ test('RCA acceptance chain is refs-only and requires owner, artifact, and review
   ]) {
     assert.equal(serialized.includes(forbiddenToken), false, forbiddenToken);
   }
+});
+
+test('RCA production acceptance records visual evidence scaleout refs without moving verdict authority to OPL', () => {
+  const acceptance = readJson(acceptancePath);
+  const scaleout = acceptance.production_evidence_scaleout_refs;
+
+  assert.equal(scaleout.surface_kind, 'rca_visual_production_evidence_scaleout_refs');
+  assert.equal(scaleout.owner, 'redcube_ai');
+  assert.equal(scaleout.status, 'refs_landed_scaleout_runtime_evidence_pending');
+  assert.equal(scaleout.evidence_model, 'refs_only_no_visual_truth_artifact_blob_or_memory_body');
+  assert.equal(scaleout.evidence_receipt_fixture_ref, evidenceFixturePath);
+  assert.deepEqual(scaleout.required_evidence_ref_groups, [
+    'artifact_producing_owner_receipt',
+    'workspace_receipt_scaleout',
+    'visual_memory_body_reuse',
+    'repeated_no_regression_evidence',
+    'naming_tombstone_follow_through',
+  ]);
+
+  assert.equal(scaleout.owner_receipt_refs.status, 'artifact_producing_owner_receipt_ref_closed');
+  assertRefString(scaleout.owner_receipt_refs.receipt_ref, 'production_evidence_scaleout_refs.owner_receipt_refs.receipt_ref');
+  assertRefString(scaleout.owner_receipt_refs.contract_ref, 'production_evidence_scaleout_refs.owner_receipt_refs.contract_ref');
+  assert.equal(scaleout.owner_receipt_refs.visual_readiness_claimed, false);
+  assert.equal(scaleout.owner_receipt_refs.export_readiness_claimed, false);
+
+  assert.equal(
+    scaleout.workspace_receipt_scaleout_refs.status,
+    'scaleout_ref_model_landed_more_workspaces_pending',
+  );
+  assertRefString(
+    scaleout.workspace_receipt_scaleout_refs.workspace_receipt_inventory_ref,
+    'workspace_receipt_scaleout_refs.workspace_receipt_inventory_ref',
+  );
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.workspace_receipt_proof_action, 'emit_workspace_receipt_proof');
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.required_workspace_count_for_scaleout, 2);
+  assert.equal(scaleout.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed, false);
+
+  assert.equal(scaleout.visual_memory_body_reuse_refs.status, 'body_external_reuse_ref_landed');
+  assertRefString(scaleout.visual_memory_body_reuse_refs.memory_locator_ref, 'visual_memory_body_reuse_refs.memory_locator_ref');
+  assertRefString(scaleout.visual_memory_body_reuse_refs.consumed_memory_ref, 'visual_memory_body_reuse_refs.consumed_memory_ref');
+  assertRefString(scaleout.visual_memory_body_reuse_refs.memory_content_body_ref, 'visual_memory_body_reuse_refs.memory_content_body_ref');
+  assert.equal(scaleout.visual_memory_body_reuse_refs.memory_body_projected_to_opl, false);
+  assert.equal(scaleout.visual_memory_body_reuse_refs.contains_memory_body, false);
+
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.status, 'repeated_refs_available_not_production_soak');
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.generator_action, 'emit_no_regression_evidence');
+  assertRefArray(scaleout.repeated_no_regression_evidence_refs.evidence_refs, 'repeated_no_regression_evidence_refs.evidence_refs');
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.length >= 2, true);
+  assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.deliverable_family_refs, [
+    'ppt_deck',
+    'xiaohongshu',
+  ]);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.repeated_no_regression_claimed_as_soak, false);
+
+  assert.equal(
+    scaleout.naming_tombstone_follow_through_refs.status,
+    'tombstone_follow_through_refs_landed_no_compatibility_alias',
+  );
+  assert.equal(scaleout.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored, false);
+  assertRefArray(scaleout.naming_tombstone_follow_through_refs.tombstone_refs, 'naming_tombstone_follow_through_refs.tombstone_refs');
+  assert.equal(
+    scaleout.naming_tombstone_follow_through_refs.forbidden_active_occurrence_classes.includes('compatibility_alias'),
+    true,
+  );
+
+  assert.equal(scaleout.authority_boundary.opl_can_store_projection_refs, true);
+  assert.equal(scaleout.authority_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(scaleout.authority_boundary.opl_can_store_artifact_blob, false);
+  assert.equal(scaleout.authority_boundary.opl_can_store_memory_body, false);
+  assert.equal(scaleout.authority_boundary.opl_can_authorize_review_export_verdict, false);
+  assert.equal(scaleout.authority_boundary.opl_can_claim_production_soak_complete, false);
 });
 
 test('RCA evidence tail is closed only by domain receipt or by typed blocker with next verification refs', () => {
@@ -193,6 +268,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(fixture.repository_boundary.repo_tracks_live_receipt_instances, false);
   assert.equal(fixture.repository_boundary.repo_tracks_artifact_body, false);
   assert.equal(fixture.repository_boundary.repo_tracks_memory_body, false);
+  assert.equal(fixture.repository_boundary.repo_tracks_scaleout_receipt_refs, true);
 
   const receipt = fixture.artifact_producing_owner_receipt;
   assert.equal(receipt.return_shape, 'domain_receipt');
@@ -234,6 +310,24 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(memoryWorkspace.contains_memory_body, false);
   assert.equal(memoryWorkspace.contains_receipt_instance_body, false);
   assert.equal(memoryWorkspace.contains_artifact_blob, false);
+
+  const scaleoutFixture = fixture.production_evidence_scaleout_refs;
+  assert.equal(scaleoutFixture.surface_kind, 'rca_visual_production_evidence_scaleout_fixture_refs');
+  assert.equal(scaleoutFixture.owner, 'redcube_ai');
+  assert.equal(scaleoutFixture.evidence_model, 'refs_only_no_payload_body');
+  assertRefString(scaleoutFixture.artifact_producing_owner_receipt_ref, 'artifact_producing_owner_receipt_ref');
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.scaleout_claimed, false);
+  assert.equal(scaleoutFixture.workspace_receipt_scaleout_refs.required_workspace_count_for_scaleout, 2);
+  assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.body_owner, 'redcube_ai');
+  assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.projected_body_to_opl, false);
+  assert.equal(scaleoutFixture.visual_memory_body_reuse_refs.contains_memory_body, false);
+  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 2);
+  assertRefArray(
+    scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs,
+    'production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs',
+  );
+  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.declares_production_soak_complete, false);
+  assert.equal(scaleoutFixture.naming_tombstone_follow_through.active_caller_compatibility_alias_restored, false);
 
   const soak = fixture.controlled_visual_soak_closeout;
   assert.equal(soak.state, 'domain_owned_typed_blocker_with_next_verification_ref');

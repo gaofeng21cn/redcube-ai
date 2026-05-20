@@ -171,6 +171,13 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
       : hasInvalidReceiptPayloads
         ? 'blocked_invalid_receipt_payloads'
         : 'awaiting_runtime_receipt_instances';
+  const receiptKindScaleoutRefCoverageReady = (
+    hasRefsOnlyRequiredMemoryLifecycleReceipts
+    && counts.domain_owner >= 2
+    && counts.memory_visual_pattern >= 2
+    && counts.lifecycle_retention >= 2
+  );
+  const observedWorkspaceCount = existsSync(receiptRoot) ? 1 : 0;
 
   return {
     surface_kind: 'workspace_receipt_inventory_projection',
@@ -205,6 +212,26 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
     receipt_counts: counts,
     receipt_refs: exportedReceiptRefs,
     receipt_refs_truncated: receiptRefs.length > exportedReceiptRefs.length,
+    scaleout_projection: {
+      surface_kind: 'workspace_receipt_scaleout_projection',
+      status: receiptKindScaleoutRefCoverageReady
+        ? 'workspace_receipt_scaleout_ref_model_ready_more_workspaces_pending'
+        : status === 'workspace_receipt_instances_visible_refs_only'
+          ? 'workspace_receipt_scaleout_receipt_kind_coverage_pending'
+          : 'workspace_receipt_scaleout_blocked_by_inventory_gap',
+      evidence_model: 'receipt_refs_only_multi_receipt_kind_coverage',
+      required_workspace_count_for_scaleout: 2,
+      observed_workspace_count: observedWorkspaceCount,
+      observed_receipt_count: counts.total,
+      workspace_receipt_proof_ref_model: 'rca-workspace-receipt-proof:visual-stage:<proof-id>',
+      runtime_locator_ref_model: 'workspace-runtime-ref:receipt-proof:<proof-id>',
+      receipt_kind_coverage_ready: receiptKindScaleoutRefCoverageReady,
+      workspace_receipt_scaleout_claimed: false,
+      declares_production_soak_complete: false,
+      writes_visual_truth: false,
+      writes_artifact_blob: false,
+      writes_memory_body: false,
+    },
     invalid_receipt_refs: invalidReceiptRefs,
     coverage: {
       accepted_memory_receipt_visible: !missingRequiredReceiptKinds.includes('accepted_memory'),
