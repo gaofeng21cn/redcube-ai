@@ -5,7 +5,7 @@
   "owner": "redcube_ai",
   "acceptance_id": "rca.production_acceptance.visual_delivery.v1",
   "acceptance_scope": "domain_owned_visual_export_acceptance_evidence",
-  "updated_at": "2026-05-19",
+  "updated_at": "2026-05-20",
   "repository_boundary": {
     "repo_tracks_acceptance_surface": true,
     "repo_tracks_evidence_refs_only": true,
@@ -13,7 +13,8 @@
     "repo_tracks_export_artifact_blobs": false,
     "repo_tracks_visual_truth_body": false,
     "repo_tracks_review_export_verdict_body": false,
-    "repo_tracks_live_receipt_instances": false
+    "repo_tracks_live_receipt_instances": false,
+    "repo_tracks_evidence_receipt_fixture": true
   },
   "structural_conformance": {
     "opl_family_structural_conformance_status": "passed",
@@ -57,6 +58,7 @@
       "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
       "contracts/owner_receipt_contract.json#/receipt_cases/0"
     ],
+    "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
     "artifact_receipt_refs": [
       "contracts/artifact_locator_contract.json",
       "workspace-runtime-ref:artifact-locator:transition-hosted-domain-receipt"
@@ -68,6 +70,7 @@
     ],
     "memory_and_lifecycle_receipt_refs": [
       "rca-memory-receipt:visual-pattern:transition-accepted",
+      "rca-memory-receipt:visual-pattern:transition-rejected",
       "rca-lifecycle-receipt:retention:transition-retention"
     ],
     "provider_attempt_refs": [
@@ -99,7 +102,8 @@
       "review_export_ref": "workspace-runtime-ref:review-export:transition-run",
       "memory_receipt_ref": "rca-memory-receipt:visual-pattern:transition-accepted",
       "lifecycle_receipt_ref": "rca-lifecycle-receipt:retention:transition-retention",
-      "forbidden_write_proof_ref": "contracts/owner_receipt_contract.json#/receipt_cases/0/forbidden_write_proof_ref"
+      "forbidden_write_proof_ref": "contracts/owner_receipt_contract.json#/receipt_cases/0/forbidden_write_proof_ref",
+      "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json"
     },
     "typed_blocker": null,
     "typed_blocker_policy": {
@@ -112,6 +116,13 @@
       ],
       "allowed_owner": "redcube_ai"
     }
+  },
+  "controlled_visual_soak": {
+    "status": "domain_owned_typed_blocker_with_next_verification_ref",
+    "production_soak_complete": false,
+    "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+    "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+    "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak"
   },
   "next_verification_command_refs": [
     {

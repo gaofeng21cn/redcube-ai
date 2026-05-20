@@ -9,7 +9,20 @@
   "read_only": true,
   "refs_only": true,
   "declares_production_soak_complete": false,
-  "declares_artifact_producing_owner_receipt": false,
+  "declares_artifact_producing_owner_receipt": true,
+  "declares_artifact_producing_owner_receipt_scope": "refs_only_receipt_chain_closed_not_visual_ready",
+  "production_acceptance": {
+    "surface_kind": "rca_domain_owned_visual_production_acceptance_evidence",
+    "status": "closed_by_domain_owned_acceptance_receipt",
+    "contract_ref": "contracts/production_acceptance/rca-production-acceptance.json",
+    "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+    "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+    "receipt_chain_scope": "rca_owned_refs_only_artifact_producing_receipt_chain",
+    "visual_ready_claimed": false,
+    "exportable_claimed": false,
+    "handoffable_claimed": false,
+    "domain_ready_claimed": false
+  },
   "implements_opl_generic_runtime": false,
   "implements_opl_workbench": false,
   "implements_opl_observability": false,
@@ -30,7 +43,6 @@
     "remaining_gap_class": "none",
     "remaining_functional_structure_gap_ids": [],
     "remaining_evidence_gate_ids": [
-      "real_artifact_producing_domain_owner_receipt",
       "opl_hosted_controlled_visual_stage_long_soak",
       "real_memory_lifecycle_receipt_instances",
       "cross_family_repeated_no_regression_evidence"
@@ -44,12 +56,12 @@
     "lifecycle_guarded_apply_proof",
     "controlled_soak_no_regression_attempt",
     "workspace_receipt_inventory_projection",
+    "production_acceptance",
     "visual_transition_evaluator",
     "opl_generic_primitive_consumption/functional_harness_consumer_coverage",
     "opl_stability_read_model_consumption"
   ],
   "next_evidence_gaps": [
-    "real_artifact_producing_domain_owner_receipt",
     "opl_hosted_controlled_visual_stage_long_soak",
     "real_memory_lifecycle_receipt_instances",
     "cross_family_repeated_no_regression_evidence"
