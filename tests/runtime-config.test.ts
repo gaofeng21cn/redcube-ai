@@ -244,8 +244,14 @@ test('loadExecutorRoutingConfig resolves opt-in structured_call route model prof
           executor_backend: 'hermes_agent',
           execution_shape: 'structured_call',
           hermes_profile: 'huawei-deepseek-v4-flash',
-          fallback: 'inherit_effective_default_executor',
-          failure_policy: 'fallback_with_proof',
+          opl_hosted_executor_requirement: {
+            source: 'opl_hosted_executor_requirement',
+            required_receipt_source: 'opl_executor_adapter_receipt',
+            hosted_adapter_reference: 'opl_hosted:hermes_agent_loop',
+          },
+          lane: 'production',
+          fallback: 'fail_closed',
+          failure_policy: 'fail_closed',
         },
       },
     },
@@ -274,6 +280,9 @@ test('loadExecutorRoutingConfig resolves opt-in structured_call route model prof
     assert.equal(matched.selected_executor.executor_backend, 'hermes_agent');
     assert.equal(matched.selected_executor.execution_shape, 'structured_call');
     assert.equal(matched.selected_executor.hermes_profile, 'huawei-deepseek-v4-flash');
+    assert.equal(matched.structured_call_routing.lane, 'production');
+    assert.equal(matched.structured_call_routing.fallback, 'fail_closed');
+    assert.equal(matched.structured_call_routing.failure_policy, 'fail_closed');
 
     const missing = resolveExecutorRouting({
       cwd: repoRoot,
@@ -285,6 +294,121 @@ test('loadExecutorRoutingConfig resolves opt-in structured_call route model prof
     });
     assert.equal(missing.matched_route_key, null);
     assert.equal(missing.selected_executor.executor_backend, 'codex_cli');
+    assert.equal(missing.structured_call_routing.fallback, 'fail_closed');
+    assert.equal(missing.structured_call_routing.failure_policy, 'fail_closed');
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('resolveExecutorRouting only permits fallback_with_proof on experimental proof routes', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+  const routingFile = path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json');
+
+  writeJson(routingFile, {
+    schema_version: 1,
+    structured_call_routing: {
+      enabled: true,
+      default_on_missing: 'inherit_effective_default_executor',
+      routes: {
+        'ppt_deck/lecture_peer/fix_html': {
+          executor_backend: 'hermes_agent',
+          execution_shape: 'structured_call',
+          lane: 'experimental_proof',
+          hermes_profile: 'huawei-glm-5.1',
+          opl_hosted_executor_requirement: {
+            source: 'opl_hosted_executor_requirement',
+            required_receipt_source: 'opl_executor_adapter_receipt',
+            hosted_adapter_reference: 'opl_hosted:hermes_agent_loop',
+          },
+          fallback: 'inherit_effective_default_executor',
+          failure_policy: 'fallback_with_proof',
+        },
+      },
+    },
+  });
+
+  try {
+    const matched = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'fix_html',
+    });
+    assert.equal(matched.matched_route_key, 'ppt_deck/lecture_peer/fix_html');
+    assert.equal(matched.selected_executor.executor_backend, 'hermes_agent');
+    assert.equal(matched.structured_call_routing.lane, 'experimental_proof');
+    assert.equal(matched.structured_call_routing.fallback, 'inherit_effective_default_executor');
+    assert.equal(matched.structured_call_routing.failure_policy, 'fallback_with_proof');
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('loadExecutorRoutingConfig rejects production fallback_with_proof routes', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+  const routingFile = path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json');
+
+  writeJson(routingFile, {
+    schema_version: 1,
+    structured_call_routing: {
+      enabled: true,
+      routes: {
+        render_html: {
+          executor_backend: 'hermes_agent',
+          execution_shape: 'structured_call',
+          opl_hosted_executor_requirement: {
+            source: 'opl_hosted_executor_requirement',
+            required_receipt_source: 'opl_executor_adapter_receipt',
+            hosted_adapter_reference: 'opl_hosted:hermes_agent_loop',
+          },
+          lane: 'production',
+          fallback: 'inherit_effective_default_executor',
+          failure_policy: 'fallback_with_proof',
+        },
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadExecutorRoutingConfig({ cwd: repoRoot, homeDir, env: {} }),
+      /fallback_with_proof requires lane=experimental_proof/,
+    );
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test('loadExecutorRoutingConfig rejects hermes_agent routes without hosted proof boundary', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+  const routingFile = path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json');
+
+  writeJson(routingFile, {
+    schema_version: 1,
+    structured_call_routing: {
+      enabled: true,
+      routes: {
+        render_html: {
+          executor_backend: 'hermes_agent',
+          execution_shape: 'structured_call',
+          lane: 'production',
+          failure_policy: 'fail_closed',
+        },
+      },
+    },
+  });
+
+  try {
+    assert.throws(
+      () => loadExecutorRoutingConfig({ cwd: repoRoot, homeDir, env: {} }),
+      /requires OPL receipt or hosted executor requirement/,
+    );
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }

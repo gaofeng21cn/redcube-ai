@@ -73,7 +73,10 @@ export interface RedcubeExecutorSelection {
 export interface RedcubeStructuredCallRoutePolicy {
   executor_backend: RedcubeExecutorBackend;
   execution_shape: 'structured_call';
+  lane?: 'production' | 'experimental_proof';
   hermes_profile?: string;
+  opl_executor_adapter_receipt?: Record<string, unknown>;
+  opl_hosted_executor_requirement?: Record<string, unknown>;
   fallback?: 'inherit_effective_default_executor' | 'fail_closed';
   failure_policy?: 'fallback_with_proof' | 'fail_closed';
 }
@@ -128,6 +131,7 @@ export interface RedcubeExecutorRoutingResolution {
     enabled: boolean;
     default_on_missing: 'inherit_effective_default_executor';
     route_matched: boolean;
+    lane: 'production' | 'experimental_proof';
     fallback: 'inherit_effective_default_executor' | 'fail_closed';
     failure_policy: 'fallback_with_proof' | 'fail_closed';
   };

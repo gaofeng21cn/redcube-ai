@@ -15,7 +15,7 @@ Machine boundary: 人读 executor routing reference。机器真相继续归 runt
    - OPL hosted handoff default executor
    - RCA domain local user config
    - RCA built-in default `codex_cli`
-3. route-level `structured_call` routing：RCA 只对单轮任务保存 route policy，例如 `render_html`、`fix_html` 可显式指向某个 Hermes profile。未命中时继承 effective default executor。
+3. route-level `structured_call` routing：RCA 只对单轮任务保存 route policy，例如 `render_html`、`fix_html` 可显式指向某个 Hermes profile。未命中时继承 effective default executor；命中的 production route 默认 `fail_closed`，不会静默回 Codex 或静默替换 Codex。
 
 ## 后端与 shape
 
@@ -53,13 +53,25 @@ RCA 只保存非 secret 的 `hermes_profile` id，例如 `huawei-deepseek-v4-fla
         "executor_backend": "hermes_agent",
         "execution_shape": "structured_call",
         "hermes_profile": "huawei-deepseek-v4-flash",
-        "fallback": "inherit_effective_default_executor",
-        "failure_policy": "fallback_with_proof"
+        "opl_hosted_executor_requirement": {
+          "source": "opl_hosted_executor_requirement",
+          "required_receipt_source": "opl_executor_adapter_receipt",
+          "hosted_adapter_reference": "opl_hosted:hermes_agent_loop"
+        },
+        "lane": "production",
+        "fallback": "fail_closed",
+        "failure_policy": "fail_closed"
       },
       "ppt_deck/lecture_peer/fix_html": {
         "executor_backend": "hermes_agent",
         "execution_shape": "structured_call",
         "hermes_profile": "huawei-glm-5.1",
+        "opl_hosted_executor_requirement": {
+          "source": "opl_hosted_executor_requirement",
+          "required_receipt_source": "opl_executor_adapter_receipt",
+          "hosted_adapter_reference": "opl_hosted:hermes_agent_loop"
+        },
+        "lane": "experimental_proof",
         "fallback": "inherit_effective_default_executor",
         "failure_policy": "fallback_with_proof"
       }
@@ -78,6 +90,8 @@ route key 从精确到宽松匹配：
 
 ## fallback
 
-`failure_policy: "fallback_with_proof"` 只对 route policy 选中的 `hermes_agent + structured_call` 生效。若 Hermes structured call 失败，RCA 会回到 effective default executor，并把 fallback 原因写入 generation runtime / execution proof。显式要求 `fail_closed` 时不会 fallback。
+production route 的默认 failure policy 是 `fail_closed`。route policy 即使显式选择 `hermes_agent + structured_call`，失败时也必须停止并暴露错误；不能静默回 Codex，也不能把非默认 executor 静默替换成 Codex。
+
+`failure_policy: "fallback_with_proof"` 只允许用于 `lane: "experimental_proof"`，并且必须同时显式声明 `fallback: "inherit_effective_default_executor"`。若 Hermes structured call 失败，RCA 才会回到 effective default executor，并把 fallback 原因写入 generation runtime / execution proof。该模式只服务 experimental / explicit proof lane，不表示 `hermes_agent` 与 `codex_cli` 在质量或行为上等价。
 
 `fix_html` 仍保留 agentic escalation：结构化回修后如果同一调用内复审仍要求 `fix_html`，最多自动升级一次到 `hermes_agent + agent_loop`，并记录两次尝试。

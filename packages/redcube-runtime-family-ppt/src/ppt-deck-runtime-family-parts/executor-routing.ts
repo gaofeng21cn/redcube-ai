@@ -74,11 +74,13 @@ export function createStructuredArtifactExecutor({
     } catch (error) {
       const failurePolicy = safeText(executorRouting?.structured_call_routing?.failure_policy, 'fail_closed');
       const fallbackPolicy = safeText(executorRouting?.structured_call_routing?.fallback, 'fail_closed');
+      const routeLane = safeText(executorRouting?.structured_call_routing?.lane, 'production');
       const selected = executorRouting?.selected_executor || {};
       const effectiveDefault = executorRouting?.effective_default_executor || {};
       const selectedBackend = safeText(selected.executor_backend);
       const selectedShape = safeText(selected.execution_shape);
       const canFallback = failurePolicy === 'fallback_with_proof'
+        && routeLane === 'experimental_proof'
         && fallbackPolicy === 'inherit_effective_default_executor'
         && selectedBackend === HERMES_AGENT_EXECUTOR_BACKEND
         && selectedShape === 'structured_call';

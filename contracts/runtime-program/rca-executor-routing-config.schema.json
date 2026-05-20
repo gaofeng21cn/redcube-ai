@@ -114,6 +114,10 @@
               "execution_shape": {
                 "const": "structured_call"
               },
+              "lane": {
+                "enum": ["production", "experimental_proof"],
+                "default": "production"
+              },
               "hermes_profile": {
                 "type": "string",
                 "minLength": 1
@@ -150,6 +154,27 @@
                       "required": ["opl_hosted_executor_requirement"]
                     }
                   ]
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "failure_policy": {
+                      "const": "fallback_with_proof"
+                    }
+                  },
+                  "required": ["failure_policy"]
+                },
+                "then": {
+                  "required": ["lane", "fallback"],
+                  "properties": {
+                    "lane": {
+                      "const": "experimental_proof"
+                    },
+                    "fallback": {
+                      "const": "inherit_effective_default_executor"
+                    }
+                  }
                 }
               }
             ]

@@ -9,6 +9,12 @@ import {
   buildHermesAgentLoopExecutorDescriptor,
   normalizeExecutorBackend,
 } from './package-surfaces.ts';
+import { createStructuredArtifactExecutor } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/executor-routing.ts';
+
+function safeText(value: unknown, fallback = ''): string {
+  const text = String(value ?? '').trim();
+  return text || fallback;
+}
 
 test('RCA executor contract exposes only canonical public backends and execution shapes', () => {
   assert.equal(normalizeExecutorBackend('codex_cli'), 'codex_cli');
@@ -60,6 +66,7 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
   const requirement = schema.$defs?.opl_hosted_executor_requirement;
   const routePolicy = schema.properties?.structured_call_routing?.properties?.routes?.additionalProperties;
   const hermesGuard = routePolicy?.allOf?.[0]?.then?.anyOf;
+  const fallbackGuard = routePolicy?.allOf?.[1]?.then;
 
   assert.deepEqual(receipt.required, [
     'source',
@@ -88,6 +95,11 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
     { required: ['opl_executor_adapter_receipt'] },
     { required: ['opl_hosted_executor_requirement'] },
   ]);
+  assert.deepEqual(routePolicy.properties.lane.enum, ['production', 'experimental_proof']);
+  assert.equal(routePolicy.properties.lane.default, 'production');
+  assert.deepEqual(fallbackGuard.required, ['lane', 'fallback']);
+  assert.equal(fallbackGuard.properties.lane.const, 'experimental_proof');
+  assert.equal(fallbackGuard.properties.fallback.const, 'inherit_effective_default_executor');
 });
 
 test('RCA route execution policy keeps render_html structured and fix_html agent escalation explicit', () => {
@@ -112,4 +124,77 @@ test('RCA route execution policy keeps render_html structured and fix_html agent
       route: 'fix_html',
     },
   });
+});
+
+test('RCA runtime fallback gate requires experimental proof lane even for direct executorRouting input', async () => {
+  let codexCalls = 0;
+  const executor = createStructuredArtifactExecutor({
+    CODEX_DEFAULT_ADAPTER: 'codex_cli',
+    HERMES_AGENT_EXECUTOR_BACKEND: 'hermes_agent',
+    HERMES_AGENT_ADAPTER: 'hermes_agent_loop',
+    generateStructuredArtifactViaCodexCli: async () => {
+      codexCalls += 1;
+      return {
+        data: { ok: true },
+        generationRuntime: { owner: 'codex_cli' },
+      };
+    },
+    generateStructuredArtifactViaHermesAgentStructuredCall: async () => {
+      throw new Error('hermes structured call failed');
+    },
+    generateStructuredArtifactViaHermesAgentApi: async () => {
+      throw new Error('unexpected hermes api call');
+    },
+    generateStructuredArtifactViaHermesAgentLoop: async () => {
+      throw new Error('unexpected hermes loop call');
+    },
+    isHermesAgentAdapter: (adapter: string) => adapter === 'hermes_agent',
+    safeText,
+  }) as (input: Record<string, unknown>) => Promise<any>;
+  const baseRouting = {
+    selected_executor: {
+      executor_backend: 'hermes_agent',
+      execution_shape: 'structured_call',
+      adapter: 'hermes_agent',
+    },
+    effective_default_executor: {
+      executor_backend: 'codex_cli',
+      execution_shape: 'structured_call',
+      adapter: 'codex_cli',
+    },
+  };
+
+  await assert.rejects(
+    () => executor({
+      adapter: 'hermes_agent',
+      executionShape: 'structured_call',
+      executorRouting: {
+        ...baseRouting,
+        structured_call_routing: {
+          lane: 'production',
+          fallback: 'inherit_effective_default_executor',
+          failure_policy: 'fallback_with_proof',
+        },
+      },
+    }),
+    /hermes structured call failed/,
+  );
+  assert.equal(codexCalls, 0);
+
+  const result = await executor({
+    adapter: 'hermes_agent',
+    executionShape: 'structured_call',
+    executorRouting: {
+      ...baseRouting,
+      structured_call_routing: {
+        lane: 'experimental_proof',
+        fallback: 'inherit_effective_default_executor',
+        failure_policy: 'fallback_with_proof',
+      },
+    },
+  });
+  assert.equal(codexCalls, 1);
+  assert.equal(result.generationRuntime.executor_routing.fallback.status, 'used');
+  assert.equal(result.generationRuntime.executor_routing.fallback.failed_executor_backend, 'hermes_agent');
+  assert.equal(result.generationRuntime.executor_routing.fallback.fallback_executor_backend, 'codex_cli');
 });

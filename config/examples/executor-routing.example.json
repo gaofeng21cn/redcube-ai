@@ -8,13 +8,25 @@
         "executor_backend": "hermes_agent",
         "execution_shape": "structured_call",
         "hermes_profile": "huawei-deepseek-v4-flash",
-        "fallback": "inherit_effective_default_executor",
-        "failure_policy": "fallback_with_proof"
+        "opl_hosted_executor_requirement": {
+          "source": "opl_hosted_executor_requirement",
+          "required_receipt_source": "opl_executor_adapter_receipt",
+          "hosted_adapter_reference": "opl_hosted:hermes_agent_loop"
+        },
+        "lane": "production",
+        "fallback": "fail_closed",
+        "failure_policy": "fail_closed"
       },
       "ppt_deck/lecture_peer/fix_html": {
         "executor_backend": "hermes_agent",
         "execution_shape": "structured_call",
         "hermes_profile": "huawei-glm-5.1",
+        "opl_hosted_executor_requirement": {
+          "source": "opl_hosted_executor_requirement",
+          "required_receipt_source": "opl_executor_adapter_receipt",
+          "hosted_adapter_reference": "opl_hosted:hermes_agent_loop"
+        },
+        "lane": "experimental_proof",
         "fallback": "inherit_effective_default_executor",
         "failure_policy": "fallback_with_proof"
       }
