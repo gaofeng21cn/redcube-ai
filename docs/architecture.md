@@ -35,6 +35,20 @@ RCA functional closure 的新增生产边界是：`domain_owner_receipt_contract
 
 当前 sidecar runtime apply surface 已包含 `emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle` 和 `emit_workspace_receipt_proof`。这些都属于 RCA-owned workspace/runtime surface：写入和返回的是 workspace runtime refs、domain receipt、typed blocker、no-regression evidence、memory receipt refs、lifecycle mutation receipt 或 proof pack；RCA 继续持有 visual truth、review/export verdict、memory body、canonical artifacts 和 artifact mutation authority。`workspace_receipt_inventory_projection` 只读这些 runtime receipt refs，供 OPL/App/operator 索引当前 workspace 的 receipt coverage；它不是 artifact gallery、workbench 或 production evidence producer。OPL-hosted path 只能消费 locator、projection、receipt refs、operator projection 和 repair hints，不能把 provider completion 或 stage metadata 升级成 RCA visual ready / exportable / handoffable verdict。真实 OPL Temporal controlled visual-stage long soak 当前仍未完成。
 
+## Workspace / file lifecycle 结构
+
+RCA repo-source 目录按标准 domain agent 职责分层：
+
+- `agent/`：visual declarative pack，包含 stage prompts、stage policies、skill/knowledge refs 与 quality gate refs。
+- `contracts/`：机器合同、schema、descriptor、locator/index contract、receipt ref contract 与 restore/retention policy。
+- `runtime/authority_functions/`：最小 visual authority function 的 runtime-facing anchor；只暴露 action metadata、owner receipt refs、typed blocker refs、no-regression refs 或 guarded apply refs，不承载 runtime artifact root。
+- `packages/`：RCA domain handler、AI-first authority adapter、receipt signer、typed blocker materializer 与 Python/native helper implementation；不能扩展成 generic runner、queue、session store 或 workbench。
+- `docs/`：人读治理、当前状态、边界说明和 provenance，不作为机器接口。
+
+真实 workspace/file lifecycle 由 OPL generic lifecycle primitive 与 RCA owner authority 分层完成。OPL 持有通用 locator/index、scheduler/runner/session/workbench shell、retention/restore orchestration、artifact gallery/handoff shell 与 projection；RCA repo source 只持有 refs、policy、schema 和 proof。真实 source workspace、PNG/PPTX/PDF/export bundle、runtime artifact、receipt instance、cache、venv、pycache、pytest cache 和 install sync 副产物必须落在 workspace/runtime artifact root 或 `$CODEX_HOME/projects/redcube-ai/runtime-state/`，不能写回开发 checkout。
+
+RCA 的 authority 边界不因 refs-only lifecycle 上收而外移：visual truth、review/export verdict、artifact mutation authority、visual memory body accept/reject 和 owner receipt 继续由 RCA owner surface 决定；OPL 只能消费 locator、receipt ref、typed blocker 或 no-regression evidence。
+
 RCA 现在消费 OPL `family_scheduler_replacement` projection：OPL 持有 family scheduler、daemon 和 generic lifecycle owner；RCA 不在仓内实现 generic scheduler/runtime manager。旧 repo-local managed DAG scheduler 已物理删除；当前视觉 stage 顺序只通过 hydrated deliverable contract、`family_stage_control_plane` 和 `opl_stage_execution_plan` 暴露为 route-handler refs。
 
 RCA 也消费 OPL stability read-model projection：`opl_stability_read_model_consumption` 只挂 OPL `family-conflict-envelope`、`control_loop_summary`、`usage_projection`、`resource_pressure`、`runtime observability-export` 和 external stability policy 的 refs。它让 OPL/App/operator 能看到 RCA stage refs、owner receipt refs、typed blocker/no-regression evidence refs 和已观测资源压力信号；它不执行 domain action、不写 RCA domain truth、不授权 visual-ready / quality / export verdict、不写 artifact blob 或 memory body，也不把 generic fallback、字符串 retry、event bus 或 runtime adapter started 写成成功语义。

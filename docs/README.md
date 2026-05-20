@@ -25,6 +25,12 @@ OPL 系列项目的全局主参考是 OPL 仓的 `docs/active/opl-family-develop
 
 RCA 本仓只维护 visual-deliverable domain agent 的目标、当前差距、visual truth、review/export verdict、artifact authority、direct product-entry path、OPL-hosted sidecar/projection/receipt 边界，以及哪些通用 source/workspace intake、artifact gallery、route/decision graph、review/repair transport、native-helper envelope、memory locator 和 observability primitive 应上收到 OPL。RCA 理想目标态读 [RedCube AI 理想目标态](./references/rca-visual-deliverable-agent-ideal-state.md)，当前差距和完善计划读 [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md)。MAS、MAG、MDS 或 OPL-owned App/workbench 的并行 backlog 不写入 RCA 文档。
 
+## Workspace / file lifecycle 边界
+
+RCA 的 repo-source layout 按标准 domain agent 职责读取：`agent/` 持有 visual declarative pack，`contracts/` 持有机器合同和 schema/index，`runtime/authority_functions/` 只作为最小 visual authority function 的 runtime-facing descriptor/receipt-ref 边界，`packages/` 持有 domain handler、authority adapter 与 native helper，`docs/` 持有人读治理说明。真实 source workspace state、runtime artifact、receipt instance、PNG/PPTX/PDF/export bundle、临时 build/cache/venv/pycache/pytest cache/install sync 副产物不进入开发 checkout；它们必须落到 workspace/runtime artifact root 或 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+
+RCA repo source 只保存 locator、index、schema、receipt ref、restore/retention policy 和 no-forbidden-write 证据。visual truth、review/export verdict、artifact authority、visual memory body accept/reject 与 owner receipt 仍归 RCA owner chain；OPL 只上收通用 workspace/file lifecycle primitive、scheduler/runner/session/workbench shell 和 projection。
+
 ## 当前基线
 
 - `RedCube AI` 持有视觉领域真相、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` 应用技能、`CLI`、`MCP`、本地脚本与仓库跟踪合同组成的稳定可调用面。

@@ -28,6 +28,9 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 - RCA 作为标准 OPL Agent 的长期形态是 `Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。通用 transport、ledger、index、lifecycle、runner、session、workbench、observability、artifact/review shell、native-helper envelope、executor adapter 和 generated wrapper 必须上收到 OPL primitive / pack compiler / App shell，或收薄成 refs-only adapter / diagnostic cleanup path。
 - `TypeScript + Python` 是实现目标，不是绕过 runtime-family 的许可。Python native PPT/Office helper 必须挂在 RedCube product-entry、route/proof lane、review/export gate 与 repo-tracked contract 下。
 - 保留在 RCA 的私有程序面必须是无法声明化的 visual authority function：source readiness verdict、communication / visual direction decision、review/export verdict、artifact mutation authorization、visual memory accept/reject、owner receipt signer 或 native helper implementation。缺少接口、active caller、不能上收原因、receipt/blocker/ref 输出边界和 no-forbidden-write 证据时，必须作为功能/结构差距处理。
+- 开发 checkout 只保存 repo source、docs、schema/contract、locator/index、receipt ref、restore/retention policy 与 authority-function descriptor。真实 workspace state、runtime artifact、receipt instance、PNG/PPTX/PDF/export bundle、临时 build/cache/venv/pycache/pytest cache/install sync 副产物必须写入 workspace/runtime artifact root 或 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
+- `runtime/authority_functions/` 的语义只限最小 RCA authority function anchor；它不得变成 runtime artifact root、generic lifecycle engine、session store、scheduler、runner、queue、workbench、artifact gallery 或 memory body store。
+- OPL 上收通用 workspace/file lifecycle primitive 后，RCA 私有 scheduler/runner/session/workbench 残留只能作为迁移输入、refs-only adapter、diagnostic 或 tombstone；不得继续定义长期结构。
 - 文档和计划必须先设理想态，再找差距；差距不是妥协清单。处理清楚 active caller、替代 surface、provenance 和必要证据后，旧模块、旧接口、旧测试、旧目录、旧文案和兼容面默认删除、archive 或 tombstone。
 
 ## Legacy 退役与 forbidden surface
