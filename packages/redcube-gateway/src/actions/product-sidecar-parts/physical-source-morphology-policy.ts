@@ -87,7 +87,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
   {
     surface_id: 'product_entry_session_store',
     source_refs: [
-      'packages/redcube-runtime/src/product-entry-session-store.ts',
+      'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',
       'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
       'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
     ],

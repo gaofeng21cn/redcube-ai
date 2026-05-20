@@ -4,13 +4,15 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolveRuntimeStatePath } from './runtime-state.js';
 import type { RuntimeProductEntrySessionRecord } from './types.js';
 
-export const PRODUCT_ENTRY_SESSION_STORE_BOUNDARY = Object.freeze({
-  surface_kind: 'product_entry_session_store_boundary',
+export const PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY = Object.freeze({
+  surface_kind: 'product_entry_session_snapshot_ref_adapter_boundary',
   owner: 'redcube_ai',
   generated_session_shell_owner: 'one-person-lab',
   role: 'entry_session_domain_snapshot_refs_only_adapter',
+  retained_semantic_contract_id: 'product_entry_session_store',
   refs_only: true,
   owns_generic_session_shell: false,
+  owns_generic_session_store: false,
   owns_generic_workbench: false,
   writes_visual_truth: false,
   writes_artifact_blob: false,
@@ -44,7 +46,9 @@ export function productEntrySessionFile(entrySessionId: string): string {
   return path.join(productEntrySessionDir(), `${safeText(entrySessionId)}.json`);
 }
 
-export function loadProductEntrySession({ entrySessionId }: { entrySessionId: string }): RuntimeProductEntrySessionRecord | null {
+export function loadProductEntrySessionSnapshotRef({ entrySessionId }: {
+  entrySessionId: string;
+}): RuntimeProductEntrySessionRecord | null {
   const file = productEntrySessionFile(entrySessionId);
   if (!existsSync(file)) {
     return null;
@@ -52,7 +56,7 @@ export function loadProductEntrySession({ entrySessionId }: { entrySessionId: st
   return readJson(file);
 }
 
-export function saveProductEntrySession({ session }: { session: RuntimeProductEntrySessionRecord }): {
+export function saveProductEntrySessionSnapshotRef({ session }: { session: RuntimeProductEntrySessionRecord }): {
   session: RuntimeProductEntrySessionRecord;
   file: string;
 } {

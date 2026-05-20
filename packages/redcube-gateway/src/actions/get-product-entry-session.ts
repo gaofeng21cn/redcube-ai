@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import {
   getPublicationProjection,
   getReviewState,
-  loadProductEntrySession,
+  loadProductEntrySessionSnapshotRef,
   productEntrySessionFile,
 } from '@redcube/runtime';
 import {
@@ -248,7 +248,7 @@ export async function getProductEntrySession(request) {
     'entry_session_id',
     request?.entry_session_id || request?.entrySessionId,
   );
-  const storedSession = loadProductEntrySession({ entrySessionId });
+  const storedSession = loadProductEntrySessionSnapshotRef({ entrySessionId });
   if (!storedSession) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }

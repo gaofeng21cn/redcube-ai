@@ -238,7 +238,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.legacy_managed_runtime_gateway_names.classification, 'tombstone_or_provenance');
 
   assert.deepEqual(byId.product_entry_session_store.source_refs, [
-    'packages/redcube-runtime/src/product-entry-session-store.ts',
+    'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',
     'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
     'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
   ]);

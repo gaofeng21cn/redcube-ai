@@ -91,7 +91,7 @@ RCA 的 domain-owned production acceptance 机器面是：
 ## 当前物理源码形态差距
 
 - MCP / CLI / product-entry / sidecar / status / session wrapper 仍有 repo-local adapter；目标是 OPL generated/hosted shell default 化，RCA 只保留 service-safe domain entry、domain handler target、receipt、typed blocker 与 visual authority refs。
-- `product-entry-session-store` 只允许是 refs-only snapshot adapter；目标是 OPL generic session shell 稳定后消除 RCA 持有 session runtime 的误读。
+- `product-entry-session-snapshot-ref-adapter` 只允许是 refs-only snapshot/ref adapter；`product_entry_session_store` 仅保留为当前机器合同 semantic id，目标是 OPL generic session shell 稳定后消除 RCA 持有 session runtime 的误读。
 - workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只允许输出 refs、receipt、typed blocker、no-regression evidence 或 visual action metadata；`WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 是审计这些路径的当前 contract anchors，不得扩展成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
 - `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词继续出现时，必须有 provenance、retired guard、domain adapter 或 refs-only read-model 解释；新增 active caller 不增加 compatibility alias。
 

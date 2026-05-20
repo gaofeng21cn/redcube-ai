@@ -45,12 +45,12 @@ import {
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import {
-  PRODUCT_ENTRY_SESSION_STORE_BOUNDARY as PRODUCT_ENTRY_SESSION_STORE_BOUNDARY_JS,
-  loadProductEntrySession as loadProductEntrySessionJs,
+  PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY as PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY_JS,
+  loadProductEntrySessionSnapshotRef as loadProductEntrySessionSnapshotRefJs,
   productEntrySessionDir as productEntrySessionDirJs,
   productEntrySessionFile as productEntrySessionFileJs,
-  saveProductEntrySession as saveProductEntrySessionJs,
-} from './product-entry-session-store.js';
+  saveProductEntrySessionSnapshotRef as saveProductEntrySessionSnapshotRefJs,
+} from './product-entry-session-snapshot-ref-adapter.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import {
   completeHermesRun as completeRunJs,
@@ -186,21 +186,21 @@ export function productEntrySessionFile(entrySessionId: string): string {
   return productEntrySessionFileJs(entrySessionId) as string;
 }
 
-export const PRODUCT_ENTRY_SESSION_STORE_BOUNDARY = PRODUCT_ENTRY_SESSION_STORE_BOUNDARY_JS;
+export const PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY = PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY_JS;
 
-export function loadProductEntrySession(request: {
+export function loadProductEntrySessionSnapshotRef(request: {
   entrySessionId: string;
 }): RuntimeProductEntrySessionRecord | null {
-  return loadProductEntrySessionJs(request) as RuntimeProductEntrySessionRecord | null;
+  return loadProductEntrySessionSnapshotRefJs(request) as RuntimeProductEntrySessionRecord | null;
 }
 
-export function saveProductEntrySession(request: {
+export function saveProductEntrySessionSnapshotRef(request: {
   session: RuntimeProductEntrySessionRecord;
 }): {
   session: RuntimeProductEntrySessionRecord;
   file: string;
 } {
-  return saveProductEntrySessionJs(request) as {
+  return saveProductEntrySessionSnapshotRefJs(request) as {
     session: RuntimeProductEntrySessionRecord;
     file: string;
   };

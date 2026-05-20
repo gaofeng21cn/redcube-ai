@@ -9,9 +9,9 @@ import {
 import {
   getPublicationProjection,
   getReviewState,
-  loadProductEntrySession,
+  loadProductEntrySessionSnapshotRef,
   productEntrySessionFile,
-  saveProductEntrySession,
+  saveProductEntrySessionSnapshotRef,
 } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -423,7 +423,7 @@ function buildProductEntryResponse({
 export async function invokeProductEntry(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const entrySession = normalizeEntrySessionContract(request);
-  const existingSession = loadProductEntrySession({ entrySessionId: entrySession.entrySessionId });
+  const existingSession = loadProductEntrySessionSnapshotRef({ entrySessionId: entrySession.entrySessionId });
   const delivery = normalizeDeliveryRequest(request);
   const taskIntent = resolveTaskIntent(request, delivery);
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
@@ -461,7 +461,7 @@ export async function invokeProductEntry(request) {
   }));
 
   const continuationSnapshot = buildContinuationSnapshot(domainEntrySurface);
-  const persisted = saveProductEntrySession({
+  const persisted = saveProductEntrySessionSnapshotRef({
     session: buildSessionRecord({
       entrySessionId: entrySession.entrySessionId,
       workspaceRoot,

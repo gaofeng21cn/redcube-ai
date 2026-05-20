@@ -68,7 +68,7 @@ const RETIRED_SOURCE_JS_FILES = {
   'packages/redcube-runtime/src/creative-ownership.ts': 1,
   'packages/redcube-runtime/src/executors.ts': 1,
   'packages/redcube-runtime/src/index.ts': 1,
-  'packages/redcube-runtime/src/product-entry-session-store.ts': 1,
+  'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts': 1,
   'packages/redcube-runtime/src/runtime-state.ts': 1,
   'packages/redcube-runtime/src/shared-source-truth.ts': 1,
   'packages/redcube-runtime/src/source-augmentation-executor.ts': 1,
