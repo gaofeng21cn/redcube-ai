@@ -376,6 +376,36 @@ test('RCA evidence tail is closed only by domain receipt or by typed blocker wit
   assertRefArray(tail.typed_blocker.next_verification_command_refs, 'typed_blocker.next_verification_command_refs');
 });
 
+test('RCA production acceptance exposes Temporal autonomy readiness without claiming long soak', () => {
+  const acceptance = readJson(acceptancePath);
+  const readiness = acceptance.temporal_autonomy_readiness;
+
+  assert.equal(readiness.surface_kind, 'temporal_autonomy_readiness');
+  assert.equal(readiness.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
+  assert.equal(readiness.status, 'standard_opl_temporal_contract_ready_live_rca_soak_pending');
+  assert.equal(readiness.provider_owner, 'one-person-lab');
+  assert.equal(readiness.provider_kind_required_for_production, 'temporal');
+  assert.equal(readiness.can_be_opl_temporal_hosted, true);
+  assert.equal(readiness.long_time_autonomy_claimed, false);
+  assert.equal(readiness.production_visual_stage_long_soak_complete, false);
+  assert.deepEqual(readiness.required_success_evidence, [
+    'temporal_provider_production_residency',
+    'provider_hosted_visual_stage_attempt',
+    'worker_restart_requery_resume',
+    'retry_dead_letter_repair_projection',
+    'artifact_producing_owner_receipt',
+    'cross_family_no_regression',
+  ]);
+  assert.equal(
+    readiness.remaining_typed_blocker_ref,
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+  );
+  assert.equal(
+    readiness.focused_test_ref,
+    'tests/product-entry-cases/temporal-autonomy-readiness.test.ts',
+  );
+});
+
 test('RCA evidence receipt fixture records artifact receipt refs, memory workspace refs, and a controlled soak blocker', () => {
   const acceptance = readJson(acceptancePath);
   const fixture = readJson(evidenceFixturePath);
@@ -527,6 +557,41 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(oplHandoff.authority_boundary.opl_can_store_memory_body, false);
   assert.equal(oplHandoff.authority_boundary.opl_can_authorize_review_export_verdict, false);
   assert.equal(oplHandoff.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
+
+  const temporalReadinessFixture = fixture.temporal_autonomy_readiness;
+  assert.equal(temporalReadinessFixture.surface_kind, 'temporal_autonomy_readiness_fixture_refs');
+  assert.equal(temporalReadinessFixture.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
+  assert.equal(temporalReadinessFixture.status, 'standard_opl_temporal_contract_ready_live_rca_soak_pending');
+  assert.equal(temporalReadinessFixture.provider_owner, 'one-person-lab');
+  assert.equal(temporalReadinessFixture.provider_kind_required_for_production, 'temporal');
+  assert.equal(temporalReadinessFixture.can_be_opl_temporal_hosted, true);
+  assert.equal(temporalReadinessFixture.long_time_autonomy_claimed, false);
+  assert.equal(temporalReadinessFixture.production_visual_stage_long_soak_complete, false);
+  assert.deepEqual(temporalReadinessFixture.capability_gate_refs, [
+    'provider_online_management',
+    'stage_descriptor_handoff',
+    'queue_wakeup_handoff',
+    'progress_requery',
+    'restart_resume_recovery',
+    'retry_dead_letter_repair',
+    'domain_closeout_receipts',
+  ]);
+  assert.equal(
+    temporalReadinessFixture.remaining_typed_blocker_ref,
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+  );
+  assert.equal(
+    temporalReadinessFixture.authority_boundary.opl_can_write_rca_visual_truth,
+    false,
+  );
+  assert.equal(
+    temporalReadinessFixture.authority_boundary.opl_can_authorize_review_export_verdict,
+    false,
+  );
+  assert.equal(
+    temporalReadinessFixture.authority_boundary.provider_completion_is_production_soak_complete,
+    false,
+  );
 
   const soak = fixture.controlled_visual_soak_closeout;
   assert.equal(soak.state, 'domain_owned_typed_blocker_with_next_verification_ref');

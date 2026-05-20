@@ -362,6 +362,26 @@
     "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
     "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak"
   },
+  "temporal_autonomy_readiness": {
+    "surface_kind": "temporal_autonomy_readiness",
+    "readiness_ref": "redcube product manifest#/temporal_autonomy_readiness",
+    "status": "standard_opl_temporal_contract_ready_live_rca_soak_pending",
+    "provider_owner": "one-person-lab",
+    "provider_kind_required_for_production": "temporal",
+    "can_be_opl_temporal_hosted": true,
+    "long_time_autonomy_claimed": false,
+    "production_visual_stage_long_soak_complete": false,
+    "required_success_evidence": [
+      "temporal_provider_production_residency",
+      "provider_hosted_visual_stage_attempt",
+      "worker_restart_requery_resume",
+      "retry_dead_letter_repair_projection",
+      "artifact_producing_owner_receipt",
+      "cross_family_no_regression"
+    ],
+    "remaining_typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+    "focused_test_ref": "tests/product-entry-cases/temporal-autonomy-readiness.test.ts"
+  },
   "remaining_evidence_gate_blockers": {
     "status": "domain_owned_typed_blockers_reported",
     "production_evidence_success_claimed": false,

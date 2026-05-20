@@ -458,6 +458,7 @@ export function buildReturnedManifestProjection({
   visualTransitionEvaluator,
   visualPatternMemoryWriteback,
   workspaceReceiptInventoryProjection,
+  temporalAutonomyReadiness,
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
     oplGenericPrimitiveConsumption,
@@ -553,6 +554,7 @@ export function buildReturnedManifestProjection({
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    temporal_autonomy_readiness: temporalAutonomyReadiness || manifest.temporal_autonomy_readiness,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,

@@ -242,6 +242,33 @@
       ]
     }
   },
+  "temporal_autonomy_readiness": {
+    "surface_kind": "temporal_autonomy_readiness_fixture_refs",
+    "readiness_ref": "redcube product manifest#/temporal_autonomy_readiness",
+    "status": "standard_opl_temporal_contract_ready_live_rca_soak_pending",
+    "provider_owner": "one-person-lab",
+    "provider_kind_required_for_production": "temporal",
+    "can_be_opl_temporal_hosted": true,
+    "long_time_autonomy_claimed": false,
+    "production_visual_stage_long_soak_complete": false,
+    "capability_gate_refs": [
+      "provider_online_management",
+      "stage_descriptor_handoff",
+      "queue_wakeup_handoff",
+      "progress_requery",
+      "restart_resume_recovery",
+      "retry_dead_letter_repair",
+      "domain_closeout_receipts"
+    ],
+    "remaining_typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+    "authority_boundary": {
+      "opl_can_schedule_wakeup_retry_dead_letter": true,
+      "opl_can_write_rca_visual_truth": false,
+      "opl_can_authorize_review_export_verdict": false,
+      "provider_completion_is_visual_ready": false,
+      "provider_completion_is_production_soak_complete": false
+    }
+  },
   "remaining_evidence_gate_blockers": {
     "state": "domain_owned_typed_blockers_with_next_verification_refs",
     "production_evidence_success_claimed": false,

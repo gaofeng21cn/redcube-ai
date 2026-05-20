@@ -6,4 +6,6 @@ await import('./product-entry-cases/manifest-memory-and-attempt-surfaces.test.ts
 await import('./product-entry-cases/memory-skeleton-retirement-proof.test.ts');
 await import('./product-entry-cases/runtime-and-sidecar-surfaces.test.ts');
 await import('./product-entry-cases/runtime-default-product-entry.test.ts');
+await import('./product-entry-cases/sidecar-receipt-and-workspace-proof.test.ts');
 await import('./product-entry-cases/substrate-adapter-export.test.ts');
+await import('./product-entry-cases/temporal-autonomy-readiness.test.ts');

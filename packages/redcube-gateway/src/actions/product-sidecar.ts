@@ -22,6 +22,7 @@ import {
   buildVisualTransitionEvaluatorProjection,
   evaluateVisualTransition,
 } from './product-sidecar-parts/visual-transition-evaluator.js';
+import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-parts/temporal-autonomy-readiness.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,
@@ -98,6 +99,18 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
     manifest.visual_transition_evaluator
     || buildVisualTransitionEvaluatorProjection({
       visualTransitionSpec: manifest.visual_transition_spec,
+    })
+  );
+  const temporalAutonomyReadiness = (
+    manifest.temporal_autonomy_readiness
+    || buildTemporalAutonomyReadinessProjection({
+      familySchedulerReplacement,
+      oplGenericPrimitiveConsumption,
+      oplStabilityReadModelConsumption,
+      standardDomainAgentSkeleton: manifest.standard_domain_agent_skeleton,
+      runtimeInventory: manifest.runtime_inventory,
+      taskLifecycle: manifest.task_lifecycle,
+      productSidecarGuardedActionIds: listProductSidecarGuardedActions().map((entry) => entry.action),
     })
   );
   return {
@@ -301,6 +314,21 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         evidence_surface_kind: 'no_regression_evidence',
         writable_by_sidecar: false,
       },
+      temporal_autonomy_readiness: {
+        ref: '/temporal_autonomy_readiness',
+        owner: DOMAIN_ID,
+        provider_owner: temporalAutonomyReadiness.provider_owner,
+        provider_kind_required_for_production: temporalAutonomyReadiness.provider_kind_required_for_production,
+        status: temporalAutonomyReadiness.status,
+        can_be_opl_temporal_hosted: temporalAutonomyReadiness.can_be_opl_temporal_hosted,
+        long_time_autonomy_claimed: temporalAutonomyReadiness.long_time_autonomy_claimed,
+        production_visual_stage_long_soak_complete: temporalAutonomyReadiness.production_visual_stage_long_soak_complete,
+        capability_gates: temporalAutonomyReadiness.capability_gates,
+        typed_blockers: temporalAutonomyReadiness.typed_blockers,
+        authority_boundary: temporalAutonomyReadiness.authority_boundary,
+        writable_by_sidecar: false,
+        refs_only: true,
+      },
       owner_receipt_contract: {
         ref: '/domain_owner_receipt_contract',
         owner: DOMAIN_ID,
@@ -381,6 +409,7 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
       production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
       opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+      temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
       opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',
     },

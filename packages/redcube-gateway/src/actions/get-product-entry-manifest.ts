@@ -84,6 +84,7 @@ import { normalizeWorkspaceRoot, readCurrentProgramContract, safeText } from './
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './product-sidecar-parts/visual-transition-evaluator.js';
 import { buildProductEntryManifestEntrySurfaces } from './get-product-entry-manifest-parts/entry-surfaces.js';
+import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-parts/temporal-autonomy-readiness.js';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -271,6 +272,15 @@ export async function getProductEntryManifest(request) {
       continuation_shell_key: 'session',
       continuation_surface_kind: 'product_entry_session',
     },
+  });
+  const temporalAutonomyReadiness = buildTemporalAutonomyReadinessProjection({
+    familySchedulerReplacement: buildFamilySchedulerReplacementProjection(),
+    oplGenericPrimitiveConsumption: buildOplGenericPrimitiveConsumptionProjection(),
+    oplStabilityReadModelConsumption: buildOplStabilityReadModelConsumptionProjection(),
+    standardDomainAgentSkeleton,
+    runtimeInventory,
+    taskLifecycle,
+    productSidecarGuardedActionIds: listProductSidecarGuardedActionIds(),
   });
   const persistencePolicy = {
     surface_kind: 'family_persistence_policy',
@@ -788,6 +798,7 @@ export async function getProductEntryManifest(request) {
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    temporal_autonomy_readiness: temporalAutonomyReadiness,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
@@ -892,5 +903,6 @@ export async function getProductEntryManifest(request) {
     visualTransitionEvaluator,
     visualPatternMemoryWriteback,
     workspaceReceiptInventoryProjection,
+    temporalAutonomyReadiness,
   });
 		}
