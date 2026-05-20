@@ -159,7 +159,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 - MCP、CLI/product-entry、sidecar、status/session/workbench wrapper 的 repo-local adapter 仍可见；目标是 OPL generated/hosted wrapper 成为默认 shell，RCA 只保留 service-safe domain entry、domain handler target、owner receipt、typed blocker 和 authority refs。
 - `product-entry-session-store` 只能是 refs-only session snapshot adapter；目标是 OPL generic session shell 稳定后不再让 RCA 源码像 session runtime owner。
-- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只能输出 refs、receipt、typed blocker、no-regression evidence 或 visual authority action metadata；不得扩成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
+- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只能输出 refs、receipt、typed blocker、no-regression evidence 或 visual authority action metadata；当前 `WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 已把 workspace/run/runtimeWatch 路径锁成 refs-only read model，并声明不拥有 generic workspace shell、runner、attempt ledger、scheduler、session runtime、supervisor、workbench 或 artifact lifecycle。后续 cleanup 仍需 OPL generated/default caller parity、owner receipt roundtrip、no-regression proof 和 no-compatibility-alias migration。
 - `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词若继续存在，必须是 semantic-id、provenance、retired guard、domain adapter 或 refs-only read model；新增 active caller 不保留 compatibility alias。
 
 以下是结构闭合后的证据门，不能写成 production visual-stage soak、visual ready、exportable 或 handoffable 已完成：

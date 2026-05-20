@@ -69,7 +69,7 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 Physical source morphology 现在按同一标准治理：`agent/` 是 Declarative Visual Pack，`contracts/` 与 runtime-program leaf parts 是机器合同，`packages/` / native helper / product-entry / sidecar / operator evidence 源码只能承担 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 当前 artifact-heavy 目录不是可复制的新 Agent 通用 scaffold；历史 `managed` 命名只能作为 provenance、semantic-id、retired guard 或 tombstone，不恢复为 active runtime owner 或 compatibility alias。
 
-当前物理源码仍有命名与包边界 tail：MCP server、product-entry session store、workspace/run envelope helpers、runtimeWatch、sidecar guarded actions、operator evidence/stability projections 和 generated-surface handoff mapping 仍是 active source。它们不能被写成 RCA-owned generic runtime，也不能被写成已经完全像新 Agent 模板；它们的当前角色是 protocol/domain handler target、refs-only adapter、native helper envelope、operator read model 或 provenance。后续 cleanup 需要 OPL generated wrapper / session shell / App workbench evidence、direct/hosted parity、owner receipt roundtrip、no-regression proof 和 no-compatibility-alias migration。
+当前物理源码仍有命名与包边界 tail：MCP server、product-entry session store、workspace/run envelope helpers、runtimeWatch、sidecar guarded actions、operator evidence/stability projections 和 generated-surface handoff mapping 仍是 active source。它们不能被写成 RCA-owned generic runtime，也不能被写成已经完全像新 Agent 模板；它们的当前角色是 protocol/domain handler target、refs-only adapter、native helper envelope、operator read model 或 provenance。`WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY` 和 `RUNTIME_WATCH_BOUNDARY` 是当前 machine-readable refs-only 边界：它们显式声明不拥有 generic workspace shell、runner、attempt ledger、scheduler、session runtime、supervisor、workbench、artifact lifecycle 或 visual ready/export verdict。后续 cleanup 需要 OPL generated wrapper / session shell / App workbench evidence、direct/hosted parity、owner receipt roundtrip、no-regression proof 和 no-compatibility-alias migration。
 
 ## 当前测试/证据差距
 
@@ -92,7 +92,7 @@ RCA 的 domain-owned production acceptance 机器面是：
 
 - MCP / CLI / product-entry / sidecar / status / session wrapper 仍有 repo-local adapter；目标是 OPL generated/hosted shell default 化，RCA 只保留 service-safe domain entry、domain handler target、receipt、typed blocker 与 visual authority refs。
 - `product-entry-session-store` 只允许是 refs-only snapshot adapter；目标是 OPL generic session shell 稳定后消除 RCA 持有 session runtime 的误读。
-- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只允许输出 refs、receipt、typed blocker、no-regression evidence 或 visual action metadata；不得扩展成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
+- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只允许输出 refs、receipt、typed blocker、no-regression evidence 或 visual action metadata；`WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 是审计这些路径的当前 contract anchors，不得扩展成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
 - `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词继续出现时，必须有 provenance、retired guard、domain adapter 或 refs-only read-model 解释；新增 active caller 不增加 compatibility alias。
 
 ## 当前保留的 visual authority surfaces
