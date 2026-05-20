@@ -129,10 +129,10 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
   {
     surface_id: 'runtime_watch_projection',
     source_refs: [
-      'packages/redcube-gateway/src/actions/runtime-watch.ts',
+      'packages/redcube-gateway/src/actions/run-review-ref-projection.ts',
     ],
     classification: 'refs_only_read_model',
-    current_rca_role: 'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
+    current_rca_role: 'run_review_existing_run_locator_refs_only_projection_not_supervisor',
     allowed_outputs: [
       'run_status_refs',
       'artifact_locator_refs',
@@ -140,7 +140,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'typed_blocker',
     ],
     machine_boundary_refs: [
-      'packages/redcube-gateway/src/actions/runtime-watch.ts#RUNTIME_WATCH_BOUNDARY',
+      'packages/redcube-gateway/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
     ],
     no_resurrection_gate: {
       generic_supervisor_owner_allowed: false,

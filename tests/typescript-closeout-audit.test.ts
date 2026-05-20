@@ -54,7 +54,7 @@ const RETIRED_SOURCE_JS_FILES = {
   'packages/redcube-gateway/src/actions/ops-eval-summary.ts': 1,
   'packages/redcube-gateway/src/actions/prepare-source-augmentation-result.ts': 1,
   'packages/redcube-gateway/src/actions/prepare-source-augmentation.ts': 1,
-  'packages/redcube-gateway/src/actions/runtime-watch.ts': 1,
+  'packages/redcube-gateway/src/actions/run-review-ref-projection.ts': 1,
   'packages/redcube-gateway/src/actions/run-deliverable-route.ts': 1,
   'packages/redcube-gateway/src/actions/source-research.ts': 1,
   'packages/redcube-gateway/src/actions/write-source-augmentation-result.ts': 1,

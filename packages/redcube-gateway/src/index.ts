@@ -197,7 +197,7 @@ async function reviewRenderOutputJs(request: any) {
 }
 
 async function runtimeWatchJs(request: any) {
-  const module = await import('./actions/runtime-watch.js');
+  const module = await import('./actions/run-review-ref-projection.js');
   return module.runtimeWatch(request);
 }
 

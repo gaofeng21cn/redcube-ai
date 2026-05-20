@@ -15,7 +15,7 @@ import {
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
 } from './product-sidecar-guarded-actions.js';
-import { runtimeWatch } from './runtime-watch.js';
+import { runtimeWatch } from './run-review-ref-projection.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
 import { buildSidecarOwnerBoundary } from './product-sidecar-parts/owner-boundary.js';
 import {
@@ -23,7 +23,7 @@ import {
   evaluateVisualTransition,
 } from './product-sidecar-parts/visual-transition-evaluator.js';
 import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-parts/temporal-autonomy-readiness.js';
-import { RUNTIME_WATCH_BOUNDARY } from './runtime-watch.js';
+import { RUNTIME_WATCH_BOUNDARY } from './run-review-ref-projection.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,

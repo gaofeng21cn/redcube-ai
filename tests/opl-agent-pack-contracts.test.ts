@@ -243,7 +243,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
   ]);
   assert.deepEqual(byId.runtime_watch_projection.source_refs, [
-    'packages/redcube-gateway/src/actions/runtime-watch.ts',
+    'packages/redcube-gateway/src/actions/run-review-ref-projection.ts',
   ]);
   assert.equal(
     byId.product_entry_session_store.current_rca_role,
@@ -251,7 +251,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   );
   assert.equal(
     byId.runtime_watch_projection.current_rca_role,
-    'runtimeWatch_existing_run_locator_refs_only_projection_not_supervisor',
+    'run_review_existing_run_locator_refs_only_projection_not_supervisor',
   );
   assert.deepEqual(byId.workspace_run_envelope_helpers.machine_boundary_refs, [
     'packages/redcube-runtime-protocol/src/workspace.ts#WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY',
@@ -262,7 +262,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
   assert.deepEqual(byId.runtime_watch_projection.machine_boundary_refs, [
-    'packages/redcube-gateway/src/actions/runtime-watch.ts#RUNTIME_WATCH_BOUNDARY',
+    'packages/redcube-gateway/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
   ]);
   assert.equal(
     byId.runtime_watch_projection.no_resurrection_gate.generic_supervisor_owner_allowed,
