@@ -61,6 +61,8 @@ OPL 必须持有：
 
 2026-05-19 的 stage cohort-loop refs 已作为结构闭环落地。RCA 当前六个 stage 都声明 `source_scope_refs`、`cohort_query_refs`、OPL queue `trigger_refs`、`monitor_refs` 和 `dashboard_metric_refs`；OPL isolated verification 对当前 RCA main 返回 `stage_count=6`、`closed_loop_ready_count=6`、`blocker_count=0`。这关闭的是 declarative launch/readiness loop gap；真实 artifact-producing owner receipt、visual memory body reuse、workspace receipt scaleout、provider long soak 和 visual ready/exportable/handoffable verdict 仍归 evidence gate。
 
+2026-05-20 OPL 已把 stage production expected receipt / monitor freshness 的 unobserved 缺口变成 `stage_production_evidence_receipt_record|verify` safe action route。该能力属于 OPL App/operator evidence transport 和 refs-only ledger，不属于 RCA 私有功能面；RCA 的关闭责任是提供真实 artifact-producing owner receipt、typed blocker、no-regression evidence、visual memory/lifecycle receipt、direct/hosted parity 或 Temporal controlled visual-stage long-soak refs。OPL 验证 stage evidence receipt 只能证明 refs-only roundtrip 可用，不能声明 visual ready、exportable、handoffable、artifact mutation authorization、App/workbench consumption 或 production visual-stage soak 成功。
+
 已闭合为标准 OPL consumer 口径的 8 项：
 
 - `opl_generated_surface_production_consumption`
@@ -154,6 +156,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。
 - 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证。
 - Temporal controlled visual-stage long soak、provider restart/re-query/retry/dead-letter proof 和 repair cadence。
+- Expected receipt instance 与 monitor freshness evidence，需要 RCA owner receipt、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 回填；OPL stage evidence receipt 只能证明 refs-only route 可用。
 - Cross-family repeated no-regression proof。
 
 ## 完善顺序
