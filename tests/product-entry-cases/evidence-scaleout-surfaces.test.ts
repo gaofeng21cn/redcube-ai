@@ -113,6 +113,22 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       false,
     );
     assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.refs_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.artifact_producing_owner_receipt_refs.length,
+      2,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.memory_lifecycle_receipt_refs.length >= 10,
+      true,
+    );
+    assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.source_refs.some(
         (source) => source.source_id === 'production_evidence_scaleout_refs'
           && source.evidence_receipt_fixture_ref === 'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
@@ -144,6 +160,14 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       false,
     );
     assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.owner_receipt_refs.actual_workspace_receipt_refs_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.actual_workspace_receipt_refs.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.projected_body_to_opl,
       false,
     );
@@ -158,6 +182,10 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
       'repeated_family_refs_only',
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.review_export_verdict_refs.verdict_body_projected_to_opl,
+      false,
     );
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.deliverable_family_refs,
@@ -194,5 +222,18 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(repeatProof.result_surface.selected_artifact_producing_visual_route.contains_artifact_blob, false);
     assert.equal(repeatProof.result_surface.receipt_refs.domain_owner_receipt_ref.startsWith('rca-owner-receipt:'), true);
     assert.equal(repeatProof.result_surface.receipt_refs.no_regression_evidence_ref.startsWith('rca-no-regression:'), true);
+    assert.equal(
+      repeatProof.result_surface.actual_workspace_receipt_refs.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      repeatProof.result_surface.actual_workspace_receipt_refs.artifact_producing_owner_receipt_ref,
+      repeatProof.result_surface.receipt_refs.domain_owner_receipt_ref,
+    );
+    assert.equal(
+      repeatProof.result_surface.actual_workspace_receipt_refs.review_export_verdict_ref,
+      'workspace-runtime-ref:review-export:artifact-route',
+    );
+    assert.equal(repeatProof.result_surface.actual_workspace_receipt_refs.declares_exportable, false);
   });
 });

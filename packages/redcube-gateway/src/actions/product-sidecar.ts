@@ -226,6 +226,12 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
         receipt_counts: manifest.workspace_receipt_inventory_projection?.receipt_counts || {},
         gap_projection: manifest.workspace_receipt_inventory_projection?.gap_projection || {},
         scaleout_projection: manifest.workspace_receipt_inventory_projection?.scaleout_projection || {},
+        selected_artifact_producing_visual_route: (
+          manifest.workspace_receipt_inventory_projection?.selected_artifact_producing_visual_route || {}
+        ),
+        actual_workspace_receipt_refs: (
+          manifest.workspace_receipt_inventory_projection?.actual_workspace_receipt_refs || {}
+        ),
         writable_by_sidecar: false,
         read_only: true,
         refs_only: true,

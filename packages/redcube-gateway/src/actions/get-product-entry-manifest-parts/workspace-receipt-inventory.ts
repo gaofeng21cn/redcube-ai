@@ -6,6 +6,13 @@ const DOMAIN_ID = 'redcube_ai';
 const PROJECTION_ID = 'rca.workspace_receipt_inventory.v1';
 const RECEIPT_ROOT_MODEL = '<workspace-root>/.redcube/runtime/receipts/';
 const MAX_EXPORTED_RECEIPTS = 25;
+const ARTIFACT_PRODUCING_ROUTE_ID = 'ppt_deck.image_first.artifact_producing.v1';
+const ARTIFACT_PRODUCING_STAGE_REFS = Object.freeze([
+  'author_image_pages',
+  'visual_director_review',
+  'screenshot_review',
+  'export_pptx',
+]);
 const FORBIDDEN_PAYLOAD_FIELDS = Object.freeze([
   'visual_truth',
   'visual_verdict',
@@ -177,6 +184,20 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
     && counts.memory_visual_pattern >= 2
     && counts.lifecycle_retention >= 2
   );
+  const artifactProducingOwnerReceiptRefs = receiptRefs
+    .filter((item) => item.receipt_kind === 'domain_owner' && item.receipt_ref)
+    .map((item) => item.receipt_ref);
+  const memoryLifecycleReceiptRefs = receiptRefs
+    .filter((item) => (
+      item.receipt_ref
+      && (
+        item.receipt_kind === 'memory_visual_pattern'
+        || item.receipt_kind === 'lifecycle_cleanup'
+        || item.receipt_kind === 'lifecycle_restore'
+        || item.receipt_kind === 'lifecycle_retention'
+      )
+    ))
+    .map((item) => item.receipt_ref);
   const observedWorkspaceCount = existsSync(receiptRoot) ? 1 : 0;
 
   return {
@@ -209,6 +230,17 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
       'emit_domain_owner_receipt',
       'emit_workspace_receipt_proof',
     ],
+    selected_artifact_producing_visual_route: {
+      deliverable_family: 'ppt_deck',
+      route_id: ARTIFACT_PRODUCING_ROUTE_ID,
+      stage_sequence_refs: [...ARTIFACT_PRODUCING_STAGE_REFS],
+      produces_artifact_refs: true,
+      visual_verdict_owner: DOMAIN_ID,
+      artifact_authority_owner: DOMAIN_ID,
+      declares_visual_ready: false,
+      declares_exportable: false,
+      declares_handoffable: false,
+    },
     receipt_counts: counts,
     receipt_refs: exportedReceiptRefs,
     receipt_refs_truncated: receiptRefs.length > exportedReceiptRefs.length,
@@ -231,6 +263,21 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
       writes_visual_truth: false,
       writes_artifact_blob: false,
       writes_memory_body: false,
+    },
+    actual_workspace_receipt_refs: {
+      route_id: ARTIFACT_PRODUCING_ROUTE_ID,
+      stage_sequence_refs: [...ARTIFACT_PRODUCING_STAGE_REFS],
+      artifact_producing_owner_receipt_refs: artifactProducingOwnerReceiptRefs,
+      memory_lifecycle_receipt_refs: memoryLifecycleReceiptRefs,
+      required_owner_receipt_visible: artifactProducingOwnerReceiptRefs.length > 0,
+      required_memory_lifecycle_receipt_refs_visible: hasRefsOnlyRequiredMemoryLifecycleReceipts,
+      no_regression_evidence_ref_model: 'workspace-runtime-ref:no-regression-evidence:<evidence-id>',
+      workspace_receipt_proof_ref_model: 'rca-workspace-receipt-proof:visual-stage:<proof-id>',
+      refs_visible: artifactProducingOwnerReceiptRefs.length > 0 && hasRefsOnlyRequiredMemoryLifecycleReceipts,
+      declares_visual_ready: false,
+      declares_exportable: false,
+      declares_handoffable: false,
+      declares_production_soak_complete: false,
     },
     invalid_receipt_refs: invalidReceiptRefs,
     coverage: {

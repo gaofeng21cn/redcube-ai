@@ -1073,6 +1073,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       manifestWithReceipts.workspace_receipt_inventory_projection.coverage.no_forbidden_payload_fields_detected,
       true,
     );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.refs_visible,
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.required_owner_receipt_visible,
+      true,
+    );
     assert.deepEqual(
       manifestWithReceipts.workspace_receipt_inventory_projection.gap_projection,
       {
@@ -1164,6 +1176,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(
       sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.status,
       'workspace_receipt_instances_visible_refs_only',
+    );
+    assert.equal(
+      sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(
+      sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.refs_visible,
+      true,
     );
     assert.equal(
       sidecarWithReceipts.mapped_surfaces.workspace_receipt_inventory_projection.opl_can_write_receipt_instance,

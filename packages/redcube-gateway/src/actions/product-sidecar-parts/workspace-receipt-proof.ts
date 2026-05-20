@@ -4,6 +4,16 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 const DOMAIN_ID = 'redcube_ai';
+const ARTIFACT_PRODUCING_ROUTE = Object.freeze({
+  deliverable_family: 'ppt_deck',
+  route_id: 'ppt_deck.image_first.artifact_producing.v1',
+  stage_sequence_refs: [
+    'author_image_pages',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+  ],
+});
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -147,14 +157,7 @@ export async function emitWorkspaceReceiptProof({
       selected_artifact_producing_visual_route_ref: '/ppt_deck_visual_route_truth',
     },
     selected_artifact_producing_visual_route: {
-      deliverable_family: 'ppt_deck',
-      route_id: 'ppt_deck.image_first.artifact_producing.v1',
-      stage_sequence_refs: [
-        'author_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'export_pptx',
-      ],
+      ...ARTIFACT_PRODUCING_ROUTE,
       produces_artifact_refs: true,
       visual_verdict_owner: DOMAIN_ID,
       artifact_authority_owner: DOMAIN_ID,
@@ -168,6 +171,30 @@ export async function emitWorkspaceReceiptProof({
       retention_lifecycle_receipt_ref: lifecycleReceipts.retention.receipt_ref,
       no_regression_evidence_ref: noRegressionEvidence.evidence_ref,
       domain_owner_receipt_ref: domainReceipt.receipt_ref,
+    },
+    actual_workspace_receipt_refs: {
+      route_id: ARTIFACT_PRODUCING_ROUTE.route_id,
+      stage_sequence_refs: [...ARTIFACT_PRODUCING_ROUTE.stage_sequence_refs],
+      artifact_producing_owner_receipt_ref: domainReceipt.receipt_ref,
+      review_export_verdict_ref: task.review_export_ref || task.reviewExportRef,
+      artifact_receipt_refs: [
+        ...(task.artifact_refs || task.artifactRefs || []),
+        domainReceipt.runtime_locator_ref,
+      ],
+      memory_lifecycle_receipt_refs: [
+        acceptedMemory.receipt_ref,
+        rejectedMemory.receipt_ref,
+        lifecycleReceipts.cleanup.receipt_ref,
+        lifecycleReceipts.restore.receipt_ref,
+        lifecycleReceipts.retention.receipt_ref,
+      ],
+      no_regression_evidence_ref: noRegressionEvidence.evidence_ref,
+      workspace_receipt_proof_ref: `rca-workspace-receipt-proof:visual-stage:${id}`,
+      runtime_locator_ref: `workspace-runtime-ref:receipt-proof:${id}`,
+      declares_visual_ready: false,
+      declares_exportable: false,
+      declares_handoffable: false,
+      declares_production_soak_complete: false,
     },
     runtime_files: {
       accepted_memory_receipt_file: acceptedMemory.receipt_file,

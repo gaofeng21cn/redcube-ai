@@ -19,6 +19,7 @@
     "return_shape": "domain_receipt",
     "owner": "redcube_ai",
     "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+    "actual_workspace_receipt_ref": "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner",
     "attempt_ref": "opl-provider-attempt:fixture-review-ready",
     "artifact_locator_ref": "contracts/artifact_locator_contract.json",
     "artifact_receipt_refs": [
@@ -31,6 +32,7 @@
       "export_pptx"
     ],
     "review_export_ref": "workspace-runtime-ref:review-export:transition-run",
+    "actual_workspace_review_export_ref": "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first",
     "forbidden_write_proof_ref": "contracts/owner_receipt_contract.json#/receipt_cases/0/forbidden_write_proof_ref",
     "artifact_producing_receipt": true,
     "contains_artifact_blob": false,
@@ -86,12 +88,38 @@
       "workspace_receipt_inventory_ref": "redcube product manifest#/workspace_receipt_inventory_projection",
       "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
       "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
+      "actual_workspace_receipt_refs": {
+        "route_id": "ppt_deck.image_first.artifact_producing.v1",
+        "artifact_producing_owner_receipt_ref": "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner",
+        "review_export_verdict_ref": "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first",
+        "workspace_receipt_proof_ref": "rca-workspace-receipt-proof:visual-stage:production-evidence-tail-ppt-image-first",
+        "runtime_locator_ref": "workspace-runtime-ref:receipt-proof:production-evidence-tail-ppt-image-first",
+        "artifact_receipt_refs": [
+          "workspace-runtime-ref:artifact:ppt-image-first-page-bundle:production-evidence-tail"
+        ],
+        "memory_lifecycle_receipt_refs": [
+          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+          "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+          "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+          "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+        ],
+        "no_regression_evidence_ref": "rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression",
+        "declares_production_soak_complete": false
+      },
       "required_workspace_count_for_scaleout": 2,
       "scaleout_claimed": false,
       "emits_owner_receipt_ref": true,
       "emits_memory_receipt_refs": true,
       "emits_no_regression_evidence_ref": true,
       "declares_production_soak_complete": false
+    },
+    "review_export_verdict_refs": {
+      "status": "review_export_refs_routed_through_artifact_producing_route",
+      "route_id": "ppt_deck.image_first.artifact_producing.v1",
+      "review_export_gate_ref": "workspace-runtime-ref:review-export:transition-run",
+      "actual_workspace_review_export_ref": "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first",
+      "verdict_body_projected_to_opl": false
     },
     "visual_memory_body_reuse_refs": {
       "memory_locator_ref": "redcube product manifest#/domain_memory_descriptor_locator/memory_locator",

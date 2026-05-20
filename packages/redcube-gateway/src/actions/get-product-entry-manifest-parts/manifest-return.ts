@@ -35,6 +35,10 @@ function buildProductionEvidenceScaleoutRefs({
       status: 'artifact_producing_owner_receipt_ref_closed',
       contract_ref: '/domain_owner_receipt_contract',
       receipt_ref: 'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+      actual_workspace_receipt_refs: workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs?.artifact_producing_owner_receipt_refs || [],
+      actual_workspace_receipt_refs_visible: (
+        workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs?.required_owner_receipt_visible === true
+      ),
       allowed_return_shapes: receiptContract.allowed_return_shapes || [],
       opl_can_store_receipt_refs: receiptContract.opl_consumption_policy?.opl_can_store_receipt_refs === true,
       visual_readiness_claimed: false,
@@ -50,6 +54,7 @@ function buildProductionEvidenceScaleoutRefs({
       observed_workspace_count: workspaceReceiptInventoryProjection?.scaleout_projection?.observed_workspace_count || 0,
       observed_receipt_count: workspaceReceiptInventoryProjection?.scaleout_projection?.observed_receipt_count || 0,
       receipt_kind_coverage_ready: workspaceReceiptInventoryProjection?.scaleout_projection?.receipt_kind_coverage_ready === true,
+      actual_workspace_receipt_refs: workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs || null,
       workspace_receipt_scaleout_claimed: false,
       emits_owner_receipt_ref: true,
       emits_memory_receipt_refs: true,
@@ -84,6 +89,16 @@ function buildProductionEvidenceScaleoutRefs({
       evidence_cadence: 'repeated_family_refs_only',
       required_minimum_evidence_ref_count: 2,
       repeated_no_regression_claimed_as_soak: false,
+    },
+    review_export_verdict_refs: {
+      status: 'review_export_refs_routed_through_artifact_producing_route',
+      route_id: 'ppt_deck.image_first.artifact_producing.v1',
+      review_export_gate_ref: 'workspace-runtime-ref:review-export:transition-run',
+      actual_workspace_review_export_ref_model: 'workspace-runtime-ref:review-export:<run-id>',
+      verdict_body_projected_to_opl: false,
+      declares_visual_ready: false,
+      declares_exportable: false,
+      declares_handoffable: false,
     },
     naming_tombstone_follow_through_refs: {
       status: 'tombstone_follow_through_refs_landed_no_compatibility_alias',
