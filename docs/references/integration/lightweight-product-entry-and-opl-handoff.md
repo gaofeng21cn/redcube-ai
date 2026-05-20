@@ -89,10 +89,8 @@ Machine boundary: 人读 integration support。机器真相继续归 runtime-pro
 - 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行
 - 所以这份文档现在冻结的是目标边界、调用合同与 repo-verified service surface，不是过度宣称“前台产品已经做完”
 
-## 6. 下一步落地方向
+## 6. 支撑边界
 
-1. 保持 `CLI / MCP / controller` 的 formal-entry 语义稳定，不让产品入口叙事反向污染当前可验证入口。
-2. 让 direct entry 与 OPL internal handoff 继续共用同一 downstream service-safe domain entry。
-3. 把 runtime session continuity、managed progress、review state、publication projection 收到用户级 runtime-state。
+本文只解释 direct entry 与 OPL internal handoff 如何共用同一 downstream service-safe domain entry。后续 gap、证据门和完善顺序统一回到 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)；本文不新增 active checklist。
 
-这里也要继续诚实：repo-verified product-entry service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地。
+当前必须继续保持的读法是：repo-verified product-entry service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地。

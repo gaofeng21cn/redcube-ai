@@ -181,7 +181,7 @@ Workspace 应保存：
 
 RCA repo 应保存：
 
-- TypeScript orchestration、CLI/MCP、gateway、contracts、schemas、runtime family shell、projection builders、tests 和 docs。
+- TypeScript orchestration、CLI/MCP、service-safe domain entry、contracts、schemas、refs-only product-entry adapter、projection builders、tests 和 docs。历史 `gateway` / `runtime family shell` 命名只可作为内部 semantic-id、provenance 或 retired guard 读取，不能成为 RCA 长期 generic runtime owner。
 - Python native helpers、Office/PPT repair helpers、screenshot/export helpers 和 fixture/proof tools。
 - Prompts、skills、stage definitions、quality gate code、small fixtures 和 machine-readable descriptors。
 

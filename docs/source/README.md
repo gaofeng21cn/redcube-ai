@@ -16,6 +16,12 @@ Source docs 解释当前 source readiness、augmentation、deep research trigger
 当前材料：
 
 - [Source augmentation executor contract](./source_augmentation_executor_contract.md)
-- [Deep Research / auto-first product contract](./deep_research_auto_first_product_contract.md)
+
+历史 source 产品语义与 longrun target freeze 已归入 `../history/plans/`：
+
+- [Deep Research / auto-first product contract](../history/plans/2026-04-08-deep-research-auto-first-product-contract.md)
+- [Source readiness deep research longrun target state](../history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md)
+
+这些历史文档只保留 provenance，不再作为当前 source contract 或 active checklist。当前 source 执行合同以本目录的 `source_augmentation_executor_contract.md` 和 machine-readable contracts 为准。
 
 机器可读 surface 应使用 canonical artifact/contract paths 或 `human_doc:*` semantic IDs，不应把本文 prose path 当稳定接口。

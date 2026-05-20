@@ -22,7 +22,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 - 正式主线优先复用宿主 Agent runtime，不在 RCA 内重建 generic runtime platform
 - 显式 proof lane 可以使用 `hermes_agent`，但它不是默认 runtime owner
 - 默认 concrete executor 是本地 `Codex CLI host-agent runtime`
-- `Hermes-Agent` 只作为显式 hosted/proof backend 或技术参考层保留
+- `Hermes-Agent` 只作为显式 hosted/proof backend、非默认 executor adapter 或技术参考层保留
 - `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance，不是兼容桥、当前 owner 或可继续扩展的 active path
 - 未来人用 workbench / product shell 应读取 projection 和 receipt refs；它不持有 visual truth、review/export verdict 或 artifact rewrite authority
@@ -125,7 +125,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 - `workspace / operator quickstart convergence` 已在当前主线上吸收：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，同时保持 `workspace doctor` 只做诊断、真正 bootstrap 由 `source intake` / `source research` 落盘
 - `operator surface consistency hardening` 已在当前主线上吸收：`workspace doctor` 对 brand-new workspace 只暴露 `source intake` / `source research` bootstrap guidance；command-scoped CLI help 现在必须 machine-readable 且 `--help` 不执行真正命令；`CLI review watch` 与 `MCP runtime_watch` 围绕同一 `workspace/topic/deliverable/run` locator 收口到 `runtimeWatch`
 - `runtime watch locator integrity hardening` 已在当前主线上吸收：deliverable-scope run record 现在必须持久化 `topic_id` / `deliverable_id`；`runtimeWatch` 在 persisted / preloaded run 两条入口上都必须验证 quartet locator；`CLI review watch` 与 `MCP runtime_watch` 在 mismatch 时共享同一 fail-closed 行为
-- 历史 `Hermes stable family closure truth` 冻结件只保留为本地迁移 provenance；当前 repo-verified 基线是 stable family runtime output 暴露同一份 Codex-native runtime bridge truth，并由 `Codex` 本地 operator host 承担当前部署宿主角色
+- 历史 `Hermes stable family closure truth` 冻结件只保留为本地迁移 provenance；当前 repo-verified 基线是 RCA 通过 direct product entry、service-safe domain entry、runtime-family route、review/export gate 与 OPL stage-plan refs 形成同一份 Codex-default execution truth，并由 `Codex CLI` 承担默认 concrete executor 角色
 - `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
 - authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary
 - `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance

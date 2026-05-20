@@ -10,6 +10,9 @@ Machine boundary: 人读历史计划索引。机器真相继续归 contracts、s
 ## 当前文件
 
 - `2026-04-08-deep-research-source-readiness-pack-phase-1.md`：历史 Deep Research / Source Readiness Pack Phase 1 计划。它已被后续 source readiness、source augmentation、deep research trigger/gate 与 workspace quickstart hardening 吸收，不再作为当前 implementation checklist。
+- `2026-04-08-deep-research-auto-first-product-contract.md`：历史 Deep Research / 5 步 auto-first 产品语义 freeze。当前 source 执行合同回到 `docs/source/source_augmentation_executor_contract.md`。
+- `2026-04-09-direct-delivery-longrun-target-state.md`：历史 direct-delivery longrun target freeze。当前 delivery truth 回到 `docs/delivery/`、核心五件套和 contracts。
+- `2026-04-09-source-readiness-deep-research-longrun-target-state.md`：历史 source-plane longrun target freeze。当前 source truth 回到 `docs/source/`、核心五件套和 contracts。
 - `creative-stage-ai-first-audit-2026-04-13.md`：历史 AI-first 创作阶段审计；其中 upstream Hermes owner wording 只保留为当时 proof/provenance，不再作为当前 executor owner、默认 route 或 active support reference。
 - `rca-production-acceptance-readiness-closeout-2026-05-20.md`：production acceptance/readiness closeout provenance，记录 AI-first / executor-first 验收读法、expected merged refs-only evidence result 和 production scaleout remainder。
 

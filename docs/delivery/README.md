@@ -11,7 +11,7 @@ Machine boundary: 人读 delivery 索引。机器真相继续归 runtime-family 
 
 ## 当前角色
 
-Delivery docs 解释当前 deliverable families、default routes、proof environments 和 examples。描述旧 rendering paths 的 route notes 必须标明 optional、fallback 或 historical support，避免被读成当前默认 route。
+Delivery docs 解释当前 deliverable families、default routes、proof environments 和 examples。描述旧 rendering paths 的 route notes 必须标明 explicit optional route、route-level repair/recovery 或 historical support，避免被读成当前默认 route 或 hidden fallback chain。
 
 当前 delivery 材料：
 

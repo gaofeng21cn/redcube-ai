@@ -1,15 +1,15 @@
 # RedCube Deep Research / 5 步 Auto-First 产品契约设计
 
 Owner: `RedCube AI`
-Purpose: `absorbed_source_readiness_product_semantics_support`
-State: `absorbed_support`
-Machine boundary: 人读 source product-semantics support。机器真相继续归 source contracts、workspace canonical artifacts、runtime-family source、runtime-program contracts 和 owner receipts。
+Purpose: `archived_source_readiness_product_semantics_support`
+State: `history_provenance`
+Machine boundary: 人读历史 source product-semantics support。机器真相继续归 source contracts、workspace canonical artifacts、runtime-family source、runtime-program contracts 和 owner receipts。
 
 日期：2026-04-08
 
 状态：absorbed product-semantics support
 
-生命周期说明：本文冻结的是 `Source Readiness -> Storyline -> Plan -> Visual -> Delivery` 的产品语义与 deep research 边界。当前可执行真相以 `docs/source/source_augmentation_executor_contract.md`、workspace canonical artifacts、runtime-family contracts 与 runtime-program contracts 为准；本文作为 absorbed product-semantics support 读取。
+生命周期说明：本文已从 `docs/source/` 归入 `docs/history/plans/`。它冻结的是 2026-04-08 `Source Readiness -> Storyline -> Plan -> Visual -> Delivery` 产品语义与 deep research 边界的 absorbed provenance，不再承担当前 source owner doc 或 active checklist。当前可执行真相以 `docs/source/source_augmentation_executor_contract.md`、workspace canonical artifacts、runtime-family contracts 与 runtime-program contracts 为准；当前 RCA 目标与差距回到 `docs/references/rca-visual-deliverable-agent-ideal-state.md` 和 `docs/active/rca-ideal-state-gap-plan.md`。
 
 ## 1. 设计结论
 

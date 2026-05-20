@@ -107,8 +107,8 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - 本地 AI / Superpowers 过程草稿继续在被忽略的 `docs/superpowers/` 下维护，不进入 repo-tracked history。
 - [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。
 - [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
-- [Direct-delivery longrun target state](./references/direct_delivery_longrun_target_state.md)：保留 future-facing 设计目标的参考文档，退出根层活跃表面
-- [Source readiness deep research longrun target state](./references/source_readiness_deep_research_longrun_target_state.md)：source-plane 的 future target 继续留在同一 reference 层
+- [Direct-delivery longrun target state](./history/plans/2026-04-09-direct-delivery-longrun-target-state.md)：历史 future-facing 设计目标 freeze，已退出 active/reference 支撑面
+- [Source readiness deep research longrun target state](./history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md)：历史 source-plane future target freeze，当前 source truth 回到 source owner docs 和 contracts
 - [Historical OPL managed runtime three-layer contract](./history/runtime/opl-managed-runtime-three-layer-contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
 
 ## 文档规则

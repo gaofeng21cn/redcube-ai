@@ -1,11 +1,13 @@
 # Source Readiness Deep Research Longrun Target State
 
 Owner: `RedCube AI`
-Purpose: `source_readiness_future_target_reference`
-State: `future_facing_reference`
-Machine boundary: 人读 source-plane future target reference。机器真相继续归 current source contracts、workspace canonical artifacts、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 source owner docs。
+Purpose: `archived_source_readiness_future_target_reference`
+State: `history_provenance`
+Machine boundary: 人读历史 source-plane target-state freeze。机器真相继续归 current source contracts、workspace canonical artifacts、CLI/MCP/API 行为、runtime artifacts、owner receipts 和 source owner docs。
 
 日期锚点：`2026-04-09`
+
+生命周期说明：本文已从 active reference 层归入 `docs/history/plans/`。它只保留 2026-04-09 source-plane longrun target freeze 的 provenance，不再承担当前 source contract、active plan 或 implementation checklist。当前 source 可执行口径读 `docs/source/source_augmentation_executor_contract.md`、workspace canonical artifacts、runtime-family contracts 与 runtime-program contracts；当前 RCA 差距与顺序读 `docs/active/rca-ideal-state-gap-plan.md`。
 
 > **future-facing 目标态文档**
 >

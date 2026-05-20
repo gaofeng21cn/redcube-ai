@@ -1,11 +1,13 @@
 # Direct-Delivery Longrun Target State
 
 Owner: `RedCube AI`
-Purpose: `direct_delivery_future_target_reference`
-State: `future_facing_reference`
-Machine boundary: 人读 future target reference。机器真相继续归 current contracts、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、delivery owner docs 和 RCA-owned review/export gates。
+Purpose: `archived_direct_delivery_future_target_reference`
+State: `history_provenance`
+Machine boundary: 人读历史 target-state freeze。机器真相继续归 current contracts、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、delivery owner docs 和 RCA-owned review/export gates。
 
 日期锚点：`2026-04-09`
+
+生命周期说明：本文已从 active reference 层归入 `docs/history/plans/`。它只保留 2026-04-09 direct-delivery longrun target freeze 的 provenance，不再承担当前 delivery target、active plan 或 implementation checklist。当前 RCA 目标态读 `docs/references/rca-visual-deliverable-agent-ideal-state.md`，当前差距与顺序读 `docs/active/rca-ideal-state-gap-plan.md`，当前 delivery route 读 `docs/delivery/` 与 runtime-program contracts。
 
 这份参考文档定义的是 **future-facing** 的 direct-delivery longrun target。
 
