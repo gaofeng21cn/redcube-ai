@@ -63,6 +63,7 @@ const ACTIVE_BATON_ID = 'product_entry_session_continuity';
 const ACTIVE_BATON_CONTRACT = 'contracts/runtime-program/product-entry-session-continuity.json';
 const RETIRED_MANAGED_BATON_ID = 'managed_product_entry_hardening';
 const RETIRED_MANAGED_BATON_CONTRACT = 'contracts/runtime-program/managed-product-entry-hardening.json';
+const RETIRED_MANAGED_BATON_HUMAN_DOC = 'human_doc:retired_managed_product_entry_contract_tombstone';
 
 const HISTORICAL_CONTRACTS = Object.freeze([
   {
@@ -150,8 +151,13 @@ test('current runtime program keeps one active baton and machine-readable histor
   assert.equal(retiredManagedContract.surface_kind, 'retired_runtime_program_contract_tombstone');
   assert.equal(retiredManagedContract.retired_contract_id, RETIRED_MANAGED_BATON_ID);
   assert.equal(retiredManagedContract.replacement_contract, ACTIVE_BATON_CONTRACT);
+  assert.equal(retiredManagedContract.retained_human_doc, RETIRED_MANAGED_BATON_HUMAN_DOC);
   assert.equal(retiredManagedContract.callable_surface_retained, false);
   assert.equal(retiredManagedContract.compatibility_alias_allowed, false);
+  assert.deepEqual(activeContract.legacy_tombstone_refs, [
+    RETIRED_MANAGED_BATON_CONTRACT,
+    RETIRED_MANAGED_BATON_HUMAN_DOC,
+  ]);
 
   for (const historicalContract of HISTORICAL_CONTRACTS) {
     const milestone = currentProgram.current_state.foundation_milestones[historicalContract.milestone];

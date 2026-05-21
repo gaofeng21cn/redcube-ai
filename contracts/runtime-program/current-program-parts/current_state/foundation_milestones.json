@@ -54,7 +54,7 @@
   "managed_product_entry_hardening": {
     "status": "tombstone_only",
     "contract": "contracts/runtime-program/managed-product-entry-hardening.json",
-    "brief": "human_doc:program_managed_product_entry_hardening",
+    "brief": "human_doc:retired_managed_product_entry_contract_tombstone",
     "replacement_contract": "contracts/runtime-program/product-entry-session-continuity.json",
     "replacement_brief": "human_doc:program_product_entry_session_continuity",
     "active_caller_retained": false,

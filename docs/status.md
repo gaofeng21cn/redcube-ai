@@ -88,6 +88,8 @@ RCA 的 domain-owned production acceptance 机器面是：
 
 此外仍有一类命名/合同卫生债：历史合同文件名、field name 或 task intent 中的 `managed` 可能仍作为已落地 session-continuity / product-entry provenance 语义存在，例如 `managed-product-entry-hardening`。这些不是旧 runtime active implementation；后续若要更干净，应通过语义 ID 迁移或 tombstone policy 逐步改名，避免破坏 runtime-program provenance。
 
+2026-05-21 legacy active-reference cleanup 已把 `docs/references/product-entry/managed_product_entry_hardening.md` 从 active reference 层物理删除，并把 active machine / read-model provenance refs 统一到 `human_doc:retired_managed_product_entry_contract_tombstone`。产品 API 行为测试不再携带旧 `get_managed_run` / managed supervision compatibility-only negative branch；旧 surface 的防复活证据继续只留在 retired-surface guard、physical deletion proof 和 tombstone/provenance contract。当前仍不能删除的 remainder 是：`contracts/runtime-program/managed-product-entry-hardening.json` 作为 tombstone/semantic-id 被 current-program、session-continuity 和 provenance tests 消费；`product_entry_continuation`、`get_managed_run`、retired managed supervision 字符串作为 no-resurrection guard / deletion proof 存在；Hermes-Agent loop bridge 作为显式 opt-in proof backend 和 Python helper catalog active target 存在；product-entry session store、runtimeWatch、sidecar guarded actions、operator evidence projection 仍是 refs-only adapter / domain action target，有 active caller 与合同边界，不能按无 caller 删除。
+
 ## 当前物理源码形态差距
 
 - MCP / CLI / product-entry / sidecar / status / session wrapper 仍有 repo-local adapter；目标是 OPL generated/hosted shell default 化，RCA 只保留 service-safe domain entry、domain handler target、receipt、typed blocker 与 visual authority refs。

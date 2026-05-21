@@ -11,7 +11,8 @@ Machine boundary: 人读 support 索引。机器真相继续归 runtime-program 
 
 - [RedCube Product Entry MVP](./redcube_product_entry_mvp.md)：解释 direct `invokeProductEntry` service surface。
 - [Product Entry Session Continuity](./product_entry_session_continuity.md)：解释同一 entry session 下的 continuity 与用户级 runtime-state。
-- [Managed Product Entry Hardening](./managed_product_entry_hardening.md)：旧 `managed` 命名的 provenance support；active contract 已迁到 session continuity。
 - [OPL Framework Hosted Product Entry](./opl_framework_hosted_product_entry.md)：解释 OPL-hosted route 如何进入同一 RCA service-safe domain entry。
+
+旧 `managed_product_entry_hardening` 支撑文档已退出 active reference 层；provenance 只读 [retired managed product-entry tombstone](../../history/tombstones/retired-managed-product-entry-contract-2026-05-20.md)。
 
 后续完善顺序、OPL 上收边界和生产证据缺口统一维护在 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)。

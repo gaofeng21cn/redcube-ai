@@ -106,7 +106,7 @@ function buildProductionEvidenceScaleoutRefs({
       tombstone_refs: physicalSkeleton.tombstone_refs || [],
       retained_provenance_refs: [
         'contracts/runtime-program/managed-product-entry-hardening.json',
-        'human_doc:managed_product_entry_hardening',
+        'human_doc:retired_managed_product_entry_contract_tombstone',
       ],
       forbidden_active_occurrence_classes: [
         'compatibility_alias',

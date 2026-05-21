@@ -10,12 +10,14 @@ Machine boundary: 人读 tombstone。机器真相继续归 `contracts/runtime-pr
 - `managed_product_entry_hardening`
 - `managed-product-entry-hardening.json`
 - `human_doc:program_managed_product_entry_hardening`
+- `human_doc:managed_product_entry_hardening`
 
 当前 owner surface：
 
 - active contract：`contracts/runtime-program/product-entry-session-continuity.json`
 - active support doc：`docs/references/product-entry/product_entry_session_continuity.md`
 - callable surface：`getProductEntrySession` / `redcube product session` / `get_product_entry_session`
+- provenance human doc id：`human_doc:retired_managed_product_entry_contract_tombstone`
 
 退役读法：
 
