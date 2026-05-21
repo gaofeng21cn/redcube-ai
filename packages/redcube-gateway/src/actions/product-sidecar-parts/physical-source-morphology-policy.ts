@@ -202,9 +202,9 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     ],
   },
   {
-    surface_id: 'legacy_managed_runtime_gateway_names',
+    surface_id: 'retired_product_entry_contract_tombstone_refs',
     source_refs: [
-      'contracts/runtime-program/managed-product-entry-hardening.json',
+      'contracts/runtime-program/product-entry-session-continuity.json',
       'docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md',
       'docs/history/',
     ],
@@ -217,6 +217,15 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'history_refs',
       'tombstone_refs',
     ],
+    retired_legacy_refs: [
+      'contracts/runtime-program/managed-product-entry-hardening.json',
+    ],
+    no_resurrection_gate: {
+      legacy_managed_runtime_gateway_surface_id_allowed: false,
+      compatibility_alias_allowed: false,
+      callable_alias_allowed: false,
+      active_caller_allowed: false,
+    },
   },
 ]);
 
@@ -242,12 +251,15 @@ export function buildPhysicalSourceMorphologyPolicy() {
       forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
     })),
     legacy_name_policy: {
-      managed_runtime_gateway_session_sidecar_terms_allowed_only_as: [
+      retired_runtime_gateway_session_sidecar_terms_allowed_only_as: [
         'tombstone_or_provenance',
         'contract_safe_semantic_id',
         'negative_test_guard',
         'refs_only_read_model',
         'domain_handler_target',
+      ],
+      forbidden_active_surface_ids: [
+        'legacy_managed_runtime_gateway_names',
       ],
       compatibility_alias_allowed: false,
       active_generic_runtime_owner_allowed: false,

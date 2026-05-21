@@ -459,12 +459,15 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.owner, 'redcube_ai');
   assert.equal(policy.consumer, 'opl');
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
-  assert.deepEqual(policy.legacy_name_policy.managed_runtime_gateway_session_sidecar_terms_allowed_only_as, [
+  assert.deepEqual(policy.legacy_name_policy.retired_runtime_gateway_session_sidecar_terms_allowed_only_as, [
     'tombstone_or_provenance',
     'contract_safe_semantic_id',
     'negative_test_guard',
     'refs_only_read_model',
     'domain_handler_target',
+  ]);
+  assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
+    'legacy_managed_runtime_gateway_names',
   ]);
   assert.equal(
     policy.new_surface_admission_gate.forbidden_new_rca_roles.includes('generic_attempt_ledger_owner'),
@@ -479,7 +482,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     product_sidecar_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
-    legacy_managed_runtime_gateway_names: 'tombstone_or_provenance',
+    retired_product_entry_contract_tombstone_refs: 'tombstone_or_provenance',
   };
 
   for (const [surfaceId, classification] of Object.entries(requiredClassifications)) {
@@ -524,16 +527,23 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     byId.operator_evidence_stability_projection.current_rca_role,
     'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
   );
+  assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
   assert.equal(
-    byId.legacy_managed_runtime_gateway_names.current_rca_role,
+    byId.retired_product_entry_contract_tombstone_refs.current_rca_role,
     'contract_safe_semantic_id_or_tombstone_provenance_only',
   );
   assert.equal(
-    byId.legacy_managed_runtime_gateway_names.source_refs.includes(
+    byId.retired_product_entry_contract_tombstone_refs.source_refs.includes(
       'docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md',
     ),
     true,
   );
+  assert.deepEqual(byId.retired_product_entry_contract_tombstone_refs.no_resurrection_gate, {
+    legacy_managed_runtime_gateway_surface_id_allowed: false,
+    compatibility_alias_allowed: false,
+    callable_alias_allowed: false,
+    active_caller_allowed: false,
+  });
 });
 
 test('retired managed product-entry contract is tombstoned without compatibility caller', () => {

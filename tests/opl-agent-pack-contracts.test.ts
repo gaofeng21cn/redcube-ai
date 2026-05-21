@@ -222,6 +222,9 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.legacy_name_policy.active_generic_runtime_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_gateway_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_session_runtime_owner_allowed, false);
+  assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
+    'legacy_managed_runtime_gateway_names',
+  ]);
   assert.equal(policy.new_surface_admission_gate.must_classify_before_active_caller, true);
   assert.equal(policy.new_surface_admission_gate.reopen_gap_if_forbidden_owner_role_appears, true);
   assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
@@ -235,7 +238,11 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.product_sidecar_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
-  assert.equal(byId.legacy_managed_runtime_gateway_names.classification, 'tombstone_or_provenance');
+  assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
+  assert.equal(byId.retired_product_entry_contract_tombstone_refs.classification, 'tombstone_or_provenance');
+  assert.deepEqual(byId.retired_product_entry_contract_tombstone_refs.retired_legacy_refs, [
+    'contracts/runtime-program/managed-product-entry-hardening.json',
+  ]);
 
   assert.deepEqual(byId.product_entry_session_store.source_refs, [
     'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',

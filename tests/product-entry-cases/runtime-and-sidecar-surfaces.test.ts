@@ -282,8 +282,8 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
-        'product_sidecar_dispatch.retired_managed_supervision',
-        'product_sidecar_dispatch.product_entry_continuation',
+        'retired_product_sidecar.supervision_action_tombstone',
+        'retired_product_sidecar.continuation_action_tombstone',
       ],
     );
     for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
@@ -352,13 +352,13 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
       [
-        'product_sidecar_dispatch.retired_managed_supervision',
-        'product_sidecar_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-        'repo_local_visual_runtime.legacy_run_store_deleted',
-        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
+        'retired_product_sidecar.supervision_action_tombstone',
+        'retired_product_sidecar.continuation_action_tombstone',
+        'retired_public_entry.run_lookup_tombstone',
+        'retired_public_entry.supervision_lookup_tombstone',
+        'retired_repo_local_visual_loop.deliverable_runner_deleted',
+        'retired_repo_local_visual_loop.run_store_deleted',
+        'retired_repo_local_visual_loop.dag_runner_deleted',
       ],
     );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));

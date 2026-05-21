@@ -506,13 +506,13 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     physical_deletion_guard: {
       current_safe_tombstone_candidate_count: 0,
       deleted_or_thinned_default_surfaces: [
-        'product_sidecar_dispatch.retired_managed_supervision',
-        'product_sidecar_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-        'repo_local_visual_runtime.legacy_run_store_deleted',
-        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
+        'retired_product_sidecar.supervision_action_tombstone',
+        'retired_product_sidecar.continuation_action_tombstone',
+        'retired_public_entry.run_lookup_tombstone',
+        'retired_public_entry.supervision_lookup_tombstone',
+        'retired_repo_local_visual_loop.deliverable_runner_deleted',
+        'retired_repo_local_visual_loop.run_store_deleted',
+        'retired_repo_local_visual_loop.dag_runner_deleted',
       ],
       deletion_status: 'legacy_runtime_physical_cleanup_closed',
       remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
@@ -599,7 +599,8 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     ],
     retired_no_resurrection_guards: [
       {
-        surface_id: 'product_sidecar_dispatch.retired_managed_supervision',
+        surface_id: 'retired_product_sidecar.supervision_action_tombstone',
+        retired_legacy_surface_id: 'product_sidecar_dispatch.retired_managed_supervision',
         retired_at: '2026-05-17',
         replacement_owner: 'opl',
         replacement_surface: 'opl_generic_runner_and_supervisor_tick',
@@ -610,7 +611,8 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         resurrection_policy: 'forbidden',
       },
       {
-        surface_id: 'product_sidecar_dispatch.product_entry_continuation',
+        surface_id: 'retired_product_sidecar.continuation_action_tombstone',
+        retired_legacy_surface_id: 'product_sidecar_dispatch.product_entry_continuation',
         retired_at: '2026-05-17',
         replacement_owner: 'opl',
         replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
