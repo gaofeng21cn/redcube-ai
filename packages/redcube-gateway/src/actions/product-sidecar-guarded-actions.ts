@@ -31,6 +31,91 @@ import {
   buildOplStabilityReadModelConsumptionProjection,
 } from './product-sidecar-parts/opl-generic-boundaries.js';
 
+const RETIRED_DEFAULT_SURFACE_TOMBSTONES = Object.freeze([
+  {
+    surface_id: 'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+    retired_legacy_surface_id: 'product_sidecar_dispatch.runtime_watch',
+    retired_at: '2026-05-21',
+    replacement_owner: 'opl',
+    replacement_surface: 'opl_status_workbench_runtime_read_model',
+    retained_rca_surface: 'runtimeWatch direct review/progress read model',
+    active_default_caller: false,
+    active_caller: false,
+    compatibility_alias_allowed: false,
+    resurrection_policy: 'forbidden',
+  },
+  {
+    surface_id: 'retired_product_sidecar.supervision_action_tombstone',
+    retired_legacy_surface_id: 'product_sidecar_dispatch.retired_managed_supervision',
+    retired_at: '2026-05-17',
+    replacement_owner: 'opl',
+    replacement_surface: 'opl_generic_runner_and_supervisor_tick',
+    retained_rca_surface: null,
+    active_default_caller: false,
+    active_caller: false,
+    compatibility_alias_allowed: false,
+    resurrection_policy: 'forbidden',
+  },
+  {
+    surface_id: 'retired_product_sidecar.continuation_action_tombstone',
+    retired_legacy_surface_id: 'product_sidecar_dispatch.product_entry_continuation',
+    retired_at: '2026-05-17',
+    replacement_owner: 'opl',
+    replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
+    retained_rca_surface: 'direct product entry invoke/session surfaces',
+    active_default_caller: false,
+    active_caller: false,
+    compatibility_alias_allowed: false,
+    resurrection_policy: 'forbidden',
+  },
+  {
+    surface_id: 'retired_public_cli_mcp.managed_run_lookup_tombstone',
+    retired_legacy_surface_id: 'public_cli_mcp_gateway.get_managed_run',
+    retired_at: '2026-05-18',
+    replacement_owner: 'opl',
+    replacement_surface: 'opl_generated_status_session_workbench_read_model',
+    retained_rca_surface: null,
+    active_default_caller: false,
+    active_caller: false,
+    compatibility_alias_allowed: false,
+    resurrection_policy: 'forbidden',
+  },
+  {
+    surface_id: 'retired_public_cli_mcp.managed_supervision_tombstone',
+    retired_legacy_surface_id: 'public_cli_mcp_gateway.retired_managed_supervision',
+    retired_at: '2026-05-18',
+    replacement_owner: 'opl',
+    replacement_surface: 'opl_generic_runner_and_supervisor_tick',
+    retained_rca_surface: null,
+    active_default_caller: false,
+    active_caller: false,
+    compatibility_alias_allowed: false,
+    resurrection_policy: 'forbidden',
+  },
+]);
+
+const RETIRED_REPO_LOCAL_RUNTIME_TOMBSTONES = Object.freeze([
+  'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
+  'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
+  'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
+]);
+
+const LEGACY_REPO_LOCAL_RUNTIME_SURFACE_REFS = Object.freeze([
+  'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+  'repo_local_visual_runtime.legacy_run_store_deleted',
+  'repo_local_visual_runtime.legacy_dag_runtime_deleted',
+]);
+
+const RETIRED_DEFAULT_SURFACE_TOMBSTONE_IDS = Object.freeze([
+  ...RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => entry.surface_id),
+  ...RETIRED_REPO_LOCAL_RUNTIME_TOMBSTONES,
+]);
+
+const RETIRED_DEFAULT_LEGACY_SURFACE_IDS = Object.freeze([
+  ...RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => entry.retired_legacy_surface_id),
+  ...LEGACY_REPO_LOCAL_RUNTIME_SURFACE_REFS,
+]);
+
 export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'emit_no_regression_evidence',
@@ -498,16 +583,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     },
     physical_deletion_guard: {
       current_safe_tombstone_candidate_count: 0,
-      deleted_or_thinned_default_surfaces: [
-        'product_sidecar_dispatch.runtime_watch',
-        'product_sidecar_dispatch.retired_managed_supervision',
-        'product_sidecar_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-        'repo_local_visual_runtime.legacy_run_store_deleted',
-        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
-      ],
+      deleted_or_thinned_default_surfaces: [...RETIRED_DEFAULT_SURFACE_TOMBSTONE_IDS],
+      retired_legacy_surface_ids: [...RETIRED_DEFAULT_LEGACY_SURFACE_IDS],
+      surface_id_policy: 'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
       deletion_status: 'legacy_runtime_physical_cleanup_closed',
       remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
       required_before_remaining_physical_delete: [],
@@ -591,44 +669,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'owner_receipt',
       'native_helper_implementation',
     ],
-    retired_no_resurrection_guards: [
-      {
-        surface_id: 'retired_product_sidecar.runtime_watch_dispatch_tombstone',
-        retired_legacy_surface_id: 'product_sidecar_dispatch.runtime_watch',
-        retired_at: '2026-05-21',
-        replacement_owner: 'opl',
-        replacement_surface: 'opl_status_workbench_runtime_read_model',
-        retained_rca_surface: 'runtimeWatch direct review/progress read model',
-        active_default_caller: false,
-        active_caller: false,
-        compatibility_alias_allowed: false,
-        resurrection_policy: 'forbidden',
-      },
-      {
-        surface_id: 'retired_product_sidecar.supervision_action_tombstone',
-        retired_legacy_surface_id: 'product_sidecar_dispatch.retired_managed_supervision',
-        retired_at: '2026-05-17',
-        replacement_owner: 'opl',
-        replacement_surface: 'opl_generic_runner_and_supervisor_tick',
-        retained_rca_surface: null,
-        active_default_caller: false,
-        active_caller: false,
-        compatibility_alias_allowed: false,
-        resurrection_policy: 'forbidden',
-      },
-      {
-        surface_id: 'retired_product_sidecar.continuation_action_tombstone',
-        retired_legacy_surface_id: 'product_sidecar_dispatch.product_entry_continuation',
-        retired_at: '2026-05-17',
-        replacement_owner: 'opl',
-        replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
-        retained_rca_surface: 'direct product entry invoke/session surfaces',
-        active_default_caller: false,
-        active_caller: false,
-        compatibility_alias_allowed: false,
-        resurrection_policy: 'forbidden',
-      },
-    ],
+    retired_no_resurrection_guards: RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => ({ ...entry })),
     must_not_retire: [
       'visual_stage_descriptor',
       'visual_review_export_gate',

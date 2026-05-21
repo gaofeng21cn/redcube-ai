@@ -394,7 +394,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 16
+      "line_count": 27
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/projection_mode",
@@ -448,7 +448,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/retired_no_resurrection_guards",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 35
+      "line_count": 62
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/status",
@@ -892,7 +892,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 16
+      "line_count": 27
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/projection_mode",
@@ -946,7 +946,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/retired_no_resurrection_guards",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 35
+      "line_count": 62
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/status",
@@ -1330,7 +1330,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "current_program_leaf_source",
-      "line_count": 16
+      "line_count": 27
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/projection_mode",
@@ -1384,7 +1384,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retired_no_resurrection_guards",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "current_program_leaf_source",
-      "line_count": 35
+      "line_count": 62
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/status",
@@ -1624,7 +1624,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "current_program_leaf_source",
-      "line_count": 16
+      "line_count": 27
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/projection_mode",
@@ -1678,7 +1678,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/retired_no_resurrection_guards",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/retired_no_resurrection_guards.json",
       "role": "current_program_leaf_source",
-      "line_count": 35
+      "line_count": 62
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/status",

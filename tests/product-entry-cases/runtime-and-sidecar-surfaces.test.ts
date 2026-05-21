@@ -295,6 +295,18 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'retired_product_sidecar.runtime_watch_dispatch_tombstone',
         'retired_product_sidecar.supervision_action_tombstone',
         'retired_product_sidecar.continuation_action_tombstone',
+        'retired_public_cli_mcp.managed_run_lookup_tombstone',
+        'retired_public_cli_mcp.managed_supervision_tombstone',
+      ],
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.retired_legacy_surface_id),
+      [
+        'product_sidecar_dispatch.runtime_watch',
+        'product_sidecar_dispatch.retired_managed_supervision',
+        'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.retired_managed_supervision',
       ],
     );
     for (const entry of sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
@@ -363,6 +375,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
       [
+        'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+        'retired_product_sidecar.supervision_action_tombstone',
+        'retired_product_sidecar.continuation_action_tombstone',
+        'retired_public_cli_mcp.managed_run_lookup_tombstone',
+        'retired_public_cli_mcp.managed_supervision_tombstone',
+        'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
+        'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
+        'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
+      ],
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids,
+      [
         'product_sidecar_dispatch.runtime_watch',
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
@@ -372,6 +397,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         'repo_local_visual_runtime.legacy_run_store_deleted',
         'repo_local_visual_runtime.legacy_dag_runtime_deleted',
       ],
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.surface_id_policy,
+      'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
     );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('native_helper_implementation'));

@@ -335,6 +335,16 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
+      'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+      'retired_product_sidecar.supervision_action_tombstone',
+      'retired_product_sidecar.continuation_action_tombstone',
+      'retired_public_cli_mcp.managed_run_lookup_tombstone',
+      'retired_public_cli_mcp.managed_supervision_tombstone',
+      'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
+      'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
+      'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
+    ]);
+    assert.deepEqual(surface.physical_deletion_guard.retired_legacy_surface_ids, [
       'product_sidecar_dispatch.runtime_watch',
       'product_sidecar_dispatch.retired_managed_supervision',
       'product_sidecar_dispatch.product_entry_continuation',
@@ -344,13 +354,29 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       'repo_local_visual_runtime.legacy_run_store_deleted',
       'repo_local_visual_runtime.legacy_dag_runtime_deleted',
     ]);
+    assert.equal(
+      surface.physical_deletion_guard.surface_id_policy,
+      'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
+    );
     assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.deepEqual(
       surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
+        'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+        'retired_product_sidecar.supervision_action_tombstone',
+        'retired_product_sidecar.continuation_action_tombstone',
+        'retired_public_cli_mcp.managed_run_lookup_tombstone',
+        'retired_public_cli_mcp.managed_supervision_tombstone',
+      ],
+    );
+    assert.deepEqual(
+      surface.retired_no_resurrection_guards.map((entry) => entry.retired_legacy_surface_id),
+      [
         'product_sidecar_dispatch.runtime_watch',
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.retired_managed_supervision',
       ],
     );
     for (const entry of surface.retired_no_resurrection_guards) {

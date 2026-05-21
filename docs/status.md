@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-更新时间：`2026-05-20`
+更新时间：`2026-05-22`
 
 ## 当前角色
 
@@ -93,6 +93,8 @@ RCA 的 domain-owned production acceptance 机器面是：
 此外仍有一类命名/合同卫生债：历史合同文件名、field name 或 task intent 中的 `managed` 可能仍作为已落地 session-continuity / product-entry provenance 语义存在，例如 `managed-product-entry-hardening`。这些不是旧 runtime active implementation；后续若要更干净，应通过语义 ID 迁移或 tombstone policy 逐步改名，避免破坏 runtime-program provenance。
 
 2026-05-21 legacy active-reference cleanup 已把 `docs/references/product-entry/managed_product_entry_hardening.md` 从 active reference 层物理删除，并把 active machine / read-model provenance refs 统一到 `human_doc:retired_managed_product_entry_contract_tombstone`。产品 API 行为测试不再携带旧 `get_managed_run` / managed supervision compatibility-only negative branch；旧 surface 的防复活证据继续只留在 retired-surface guard、physical deletion proof 和 tombstone/provenance contract。当前仍不能删除的 remainder 是：`contracts/runtime-program/managed-product-entry-hardening.json` 作为 tombstone/semantic-id 被 current-program、session-continuity 和 provenance tests 消费；`product_entry_continuation`、`get_managed_run`、retired managed supervision 与 `product_sidecar_dispatch.runtime_watch` 字符串作为 no-resurrection guard / deletion proof 存在；Hermes-Agent loop bridge 作为显式 opt-in proof backend 和 Python helper catalog active target 存在；product-entry session snapshot refs adapter、direct runtimeWatch read model、sidecar guarded authority actions、operator evidence projection 仍是 refs-only adapter / domain action target，有 active caller 与合同边界，不能按无 caller 删除。
+
+2026-05-22 naming hygiene tranche 已把 RCA `privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces` 从旧 active surface id 改为 tombstone-first id，并新增 `retired_legacy_surface_ids` 与 `surface_id_policy`。`retired_no_resurrection_guards` 现在覆盖 product sidecar `runtime_watch`、managed supervision、`product_entry_continuation` 以及 public CLI/MCP `get_managed_run` / managed supervision 旧面；旧字符串只保留在 `retired_legacy_surface_id`、tombstone/provenance 合同或运行时拒绝旧 action 的 negative input 中，不作为 callable alias、active reader-facing id 或 RCA generic runtime owner。该轮关闭的是一段 naming/contract hygiene tail；仍不声明 production visual-stage long soak、真实 owner receipt scaleout、visual ready、exportable 或 handoffable。
 
 ## 当前物理源码形态差距
 
