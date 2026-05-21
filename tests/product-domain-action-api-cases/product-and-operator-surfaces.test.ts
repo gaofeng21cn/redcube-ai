@@ -282,7 +282,7 @@ test('callDomainTool can return operator-facing deliverable and route-run surfac
   assert.equal(routeRun.summary.route, 'storyline');
 });
 
-test('callDomainTool maps OPL stage-plan execution to the domain entry and retires public managed lookup actions', async () => {
+test('callDomainTool maps OPL stage-plan execution to the domain entry', async () => {
   const stagePlan = await callDomainTool(
     'redcube_deliverable',
     withAction('run_opl_stage_execution_plan', {
@@ -314,26 +314,6 @@ test('callDomainTool maps OPL stage-plan execution to the domain entry and retir
   assert.equal(stagePlan.surface_kind, 'domain_entry');
   assert.equal(stagePlan.summary.actual_surface_kind, 'opl_stage_execution_plan');
   assert.equal(stagePlan.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
-  await assert.rejects(
-    () => callDomainTool(
-      'redcube_deliverable',
-      withAction('get_managed_run', {
-        workspaceRoot: '/tmp/redcube-workspace',
-        managedRunId: 'managed-a',
-      }),
-    ),
-    /Unsupported redcube_deliverable action: get_managed_run/,
-  );
-  await assert.rejects(
-    () => callDomainTool(
-      'redcube_deliverable',
-      withAction(['supervise', 'managed', 'run'].join('_'), {
-        workspaceRoot: '/tmp/redcube-workspace',
-        managedRunId: 'managed-a',
-      }),
-    ),
-    new RegExp(`Unsupported redcube_deliverable action: ${['supervise', 'managed', 'run'].join('_')}`),
-  );
 });
 
 

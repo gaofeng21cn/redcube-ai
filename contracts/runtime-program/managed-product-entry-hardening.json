@@ -7,7 +7,7 @@
   "replacement_contract": "contracts/runtime-program/product-entry-session-continuity.json",
   "replacement_contract_id": "product_entry_session_continuity",
   "replacement_human_doc": "human_doc:program_product_entry_session_continuity",
-  "retained_human_doc": "human_doc:program_managed_product_entry_hardening",
+  "retained_human_doc": "human_doc:retired_managed_product_entry_contract_tombstone",
   "allowed_occurrence_classes": [
     "provenance",
     "semantic_id",

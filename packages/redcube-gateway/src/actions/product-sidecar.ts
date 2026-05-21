@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
@@ -23,6 +23,20 @@ import {
   evaluateVisualTransition,
 } from './product-sidecar-parts/visual-transition-evaluator.js';
 import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-parts/temporal-autonomy-readiness.js';
+import {
+  missingFields,
+  noRegressionEvidenceId,
+  normalizeAction,
+  normalizeWorkspaceRoot,
+  optionalArray,
+  readTaskPayload,
+  receiptId,
+  requireField,
+  safeText,
+  slugId,
+  taskValue,
+  workspaceRootFromTask,
+} from './product-sidecar-parts/task-utils.js';
 import { RUNTIME_WATCH_BOUNDARY } from './run-review-ref-projection.js';
 export {
   assertReceiptOnlyHostedAttemptProjection,
@@ -36,38 +50,6 @@ const DOMAIN_ID = 'redcube_ai';
 const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
 const GUARDED_ACTIONS = productSidecarGuardedActionSet();
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
-
-function normalizeWorkspaceRoot(request) {
-  return requireField(
-    'workspace_root',
-    request?.workspace_root || request?.workspaceRoot,
-  );
-}
-
-function readTaskPayload(request) {
-  const payload = request?.task && typeof request.task === 'object'
-    ? request.task
-    : null;
-  if (payload) {
-    return payload;
-  }
-
-  const taskFile = requireField('task', request?.task_file || request?.taskFile);
-  return JSON.parse(readFileSync(taskFile, 'utf-8'));
-}
 
 function buildSidecarProjection({ workspaceRoot, manifest }) {
   const sessionSurface = manifest.product_entry_shell?.session || {};
@@ -443,20 +425,6 @@ export async function exportProductSidecar(request) {
   return buildSidecarProjection({ workspaceRoot, manifest });
 }
 
-function normalizeAction(task) {
-  return safeText(task?.action || task?.action_id || task?.task_intent || task?.kind);
-}
-
-function workspaceRootFromTask(task) {
-  return requireField(
-    'workspace_root',
-    task?.workspace_root
-      || task?.workspaceRoot
-      || task?.workspace_locator?.workspace_root
-      || task?.workspaceLocator?.workspaceRoot,
-  );
-}
-
 function buildDispatchEnvelope({ task, result, action }) {
   return {
     ok: true,
@@ -483,59 +451,6 @@ function buildDispatchEnvelope({ task, result, action }) {
       rca_role: 'domain_truth_owner',
     },
   };
-}
-
-function slugId(value, fallback) {
-  return safeText(value, fallback).replace(/[^A-Za-z0-9_.:-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
-}
-
-function noRegressionEvidenceId(task) {
-  const provided = task.evidence_id || task.evidenceId || task.no_regression_evidence_id || task.noRegressionEvidenceId;
-  if (safeText(provided)) {
-    return slugId(provided, 'evidence');
-  }
-  const seed = [
-    task.task_id || task.id || '',
-    task.entry_session_id || task.entrySessionId || '',
-    task.topic_id || task.topicId || '',
-    task.deliverable_id || task.deliverableId || '',
-  ].join(':');
-  const digest = createHash('sha256').update(seed || new Date(0).toISOString()).digest('hex').slice(0, 12);
-  return `evidence-${digest}`;
-}
-
-function receiptId(task, fieldName, fallbackPrefix) {
-  const provided = task[fieldName]
-    || task[`${fieldName}_id`]
-    || task.receipt_id
-    || task.receiptId
-    || task.id;
-  if (safeText(provided)) {
-    return slugId(provided, fallbackPrefix);
-  }
-  const seed = [
-    task.task_id || task.taskId || '',
-    task.entry_session_id || task.entrySessionId || '',
-    task.topic_id || task.topicId || '',
-    task.deliverable_id || task.deliverableId || '',
-    task.run_id || task.runId || '',
-    fallbackPrefix,
-  ].join(':');
-  const digest = createHash('sha256').update(seed).digest('hex').slice(0, 12);
-  return `${fallbackPrefix}-${digest}`;
-}
-
-function taskValue(task, snake, camel = null) {
-  return task?.[snake] ?? (camel ? task?.[camel] : undefined);
-}
-
-function optionalArray(value) {
-  if (!value) return [];
-  return Array.isArray(value) ? value : [value];
-}
-
-function missingFields(task, fields) {
-  return fields.filter((field) => !safeText(taskValue(task, field, field.replace(/_([a-z])/g, (_, char) => char.toUpperCase()))));
 }
 
 function buildTypedBlocker({
