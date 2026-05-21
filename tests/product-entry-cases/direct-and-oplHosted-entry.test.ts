@@ -187,7 +187,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assert.equal(response.opl_family_lifecycle_adapter.lifecycle.review_publication.publication_projection_ref.surface_kind, 'publication_projection');
     assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.recommended_owner_route, 'resolve_review_gate');
     assert.equal(response.opl_family_lifecycle_adapter.adoption.resume_surface.command, 'redcube product session --entry-session-id <entry-session-id>');
-    assert.equal(response.opl_family_lifecycle_adapter.authority_boundary.owns_visual_truth, false);
+    assert.equal(response.opl_family_lifecycle_adapter.authority_boundary.owns_domain_truth, false);
     assert.equal(response.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
     assertRuntimeLoopClosureShape(response, {
       source: 'direct',
@@ -379,7 +379,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     assert.equal(session.opl_family_lifecycle_adapter.lifecycle.content_status, session.progress_projection.projection.content_status);
     assert.equal(session.opl_family_lifecycle_adapter.owner_route_discovery.candidate_routes[0].route_id, 'product_entry_session');
     assert.equal(session.opl_family_lifecycle_adapter.adoption.adoption_command, 'redcube product session --entry-session-id <entry-session-id>');
-    assert.equal(session.opl_family_lifecycle_adapter.persistence.sqlite.status, 'deferred_for_rca');
+    assert.equal(session.opl_family_lifecycle_adapter.persistence.sqlite.status, 'not_domain_owned_generic_persistence');
     assertRuntimeLoopClosureShape(continued, {
       source: 'direct',
       entryMode: 'redcube_product_entry',
