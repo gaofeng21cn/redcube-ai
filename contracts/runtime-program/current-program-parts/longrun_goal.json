@@ -72,7 +72,7 @@
     "keep the current repository honestly Auto-only",
     "keep RedCube as an independent domain agent callable through both direct and OPL-hosted entry routes",
     "keep OPL hosted integration as a thin oplHosted adapter/projection layer over configured family runtime providers rather than a RedCube truth owner",
-    "keep hosted runtime carriers explicit and optional without redefining the default capability surface",
+    "keep OPL/Temporal hosted scheduling as the default runtime posture after task start while keeping non-default executor and proof adapters explicit",
     "move implementation toward TypeScript for product/runtime contracts and Python for native PPT/Office/document helpers that share the MAS/MAG automation ecosystem",
     "preserve durable identity, audit/watch/review/projection truth while leaving managed web runtime as a future shape on the same substrate"
   ],

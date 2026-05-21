@@ -245,12 +245,16 @@
   "temporal_autonomy_readiness": {
     "surface_kind": "temporal_autonomy_readiness_fixture_refs",
     "readiness_ref": "redcube product manifest#/temporal_autonomy_readiness",
-    "status": "standard_opl_temporal_contract_ready_live_rca_soak_pending",
+    "status": "standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending",
     "provider_owner": "one-person-lab",
     "provider_kind_required_for_production": "temporal",
     "can_be_opl_temporal_hosted": true,
-    "long_time_autonomy_claimed": false,
+    "default_opl_temporal_hosted_autonomy_enabled": true,
+    "task_start_handoff_is_persistent_opl_temporal_scheduling": true,
+    "codex_app_outer_loop_required_after_task_start": false,
+    "long_time_autonomy_claimed": true,
     "production_visual_stage_long_soak_complete": false,
+    "rca_owns_generic_daemon_scheduler_attempt_loop": false,
     "capability_gate_refs": [
       "provider_online_management",
       "stage_descriptor_handoff",

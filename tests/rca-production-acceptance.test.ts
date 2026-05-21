@@ -376,18 +376,22 @@ test('RCA evidence tail is closed only by domain receipt or by typed blocker wit
   assertRefArray(tail.typed_blocker.next_verification_command_refs, 'typed_blocker.next_verification_command_refs');
 });
 
-test('RCA production acceptance exposes Temporal autonomy readiness without claiming long soak', () => {
+test('RCA production acceptance exposes default Temporal-hosted autonomy without claiming long soak', () => {
   const acceptance = readJson(acceptancePath);
   const readiness = acceptance.temporal_autonomy_readiness;
 
   assert.equal(readiness.surface_kind, 'temporal_autonomy_readiness');
   assert.equal(readiness.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
-  assert.equal(readiness.status, 'standard_opl_temporal_contract_ready_live_rca_soak_pending');
+  assert.equal(readiness.status, 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending');
   assert.equal(readiness.provider_owner, 'one-person-lab');
   assert.equal(readiness.provider_kind_required_for_production, 'temporal');
   assert.equal(readiness.can_be_opl_temporal_hosted, true);
-  assert.equal(readiness.long_time_autonomy_claimed, false);
+  assert.equal(readiness.default_opl_temporal_hosted_autonomy_enabled, true);
+  assert.equal(readiness.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
+  assert.equal(readiness.codex_app_outer_loop_required_after_task_start, false);
+  assert.equal(readiness.long_time_autonomy_claimed, true);
   assert.equal(readiness.production_visual_stage_long_soak_complete, false);
+  assert.equal(readiness.rca_owns_generic_daemon_scheduler_attempt_loop, false);
   assert.deepEqual(readiness.required_success_evidence, [
     'temporal_provider_production_residency',
     'provider_hosted_visual_stage_attempt',
@@ -561,12 +565,16 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   const temporalReadinessFixture = fixture.temporal_autonomy_readiness;
   assert.equal(temporalReadinessFixture.surface_kind, 'temporal_autonomy_readiness_fixture_refs');
   assert.equal(temporalReadinessFixture.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
-  assert.equal(temporalReadinessFixture.status, 'standard_opl_temporal_contract_ready_live_rca_soak_pending');
+  assert.equal(temporalReadinessFixture.status, 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending');
   assert.equal(temporalReadinessFixture.provider_owner, 'one-person-lab');
   assert.equal(temporalReadinessFixture.provider_kind_required_for_production, 'temporal');
   assert.equal(temporalReadinessFixture.can_be_opl_temporal_hosted, true);
-  assert.equal(temporalReadinessFixture.long_time_autonomy_claimed, false);
+  assert.equal(temporalReadinessFixture.default_opl_temporal_hosted_autonomy_enabled, true);
+  assert.equal(temporalReadinessFixture.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
+  assert.equal(temporalReadinessFixture.codex_app_outer_loop_required_after_task_start, false);
+  assert.equal(temporalReadinessFixture.long_time_autonomy_claimed, true);
   assert.equal(temporalReadinessFixture.production_visual_stage_long_soak_complete, false);
+  assert.equal(temporalReadinessFixture.rca_owns_generic_daemon_scheduler_attempt_loop, false);
   assert.deepEqual(temporalReadinessFixture.capability_gate_refs, [
     'provider_online_management',
     'stage_descriptor_handoff',
