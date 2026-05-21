@@ -105,7 +105,7 @@ function buildCanonicalPack() {
     runtime: {
       runtime_owner: 'codex_cli',
       runtime_state_root: '<runtime_state_root>',
-      session_store_root: '<session_store_root>',
+      session_continuity_root: '<session_continuity_root>',
     },
     productEntrySessionCommand: 'redcube product session --entry-session-id <entry-session-id>',
   });

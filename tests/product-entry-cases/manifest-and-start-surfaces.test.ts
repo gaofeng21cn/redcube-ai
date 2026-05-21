@@ -296,7 +296,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.runtime_inventory.recovery_surface.ref, '/operator_loop_actions/continue_session');
     assert.equal(manifest.runtime_inventory.workspace_binding.workspace_root, workspaceRoot);
     assert.equal(manifest.runtime_inventory.workspace_binding.runtime_state_root, runtimeStateRoot);
-    assert.equal(manifest.runtime_inventory.workspace_binding.session_store_root, manifest.runtime.session_store_root);
+    assert.equal(manifest.runtime_inventory.workspace_binding.session_continuity_root, manifest.runtime.session_continuity_root);
     assert.equal(manifest.task_lifecycle.surface_kind, 'task_lifecycle');
     assert.equal(manifest.task_lifecycle.task_kind, 'visual_deliverable_loop');
     assert.equal(manifest.task_lifecycle.task_id, 'redcube_opl_stage_execution_plan_loop');
@@ -352,7 +352,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.workspace_root, workspaceRoot);
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.runtime_state_root, runtimeStateRoot);
-    assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_store_root, manifest.runtime.session_store_root);
+    assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_continuity_root, manifest.runtime.session_continuity_root);
     assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
     assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
     assert.equal(manifest.opl_generic_primitive_consumption.ref, '/opl_generic_primitive_consumption');

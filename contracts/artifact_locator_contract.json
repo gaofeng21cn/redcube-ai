@@ -9,7 +9,7 @@
     "root_id": "workspace_runtime_artifact_root",
     "workspace_root": "<workspace_root>",
     "runtime_state_root": "<runtime_state_root>",
-    "session_store_root": "<session_store_root>",
+    "session_continuity_root": "<session_continuity_root>",
     "path_template": "<workspace-root>/.redcube/runtime/artifacts/<topic_id>/<deliverable_id>/<run_id>"
   },
   "artifact_ref_schema": {

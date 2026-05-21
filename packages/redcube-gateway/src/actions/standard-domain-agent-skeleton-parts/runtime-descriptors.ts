@@ -11,7 +11,7 @@ import {
   DOMAIN_OWNER,
 } from './skeleton-constants.js';
 
-export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, sessionStoreRoot }) {
+export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, sessionContinuityRoot }) {
   return {
     surface_kind: 'artifact_locator_contract',
     contract_id: 'rca.workspace_runtime_artifact_locator.v1',
@@ -23,7 +23,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, 
       root_id: 'workspace_runtime_artifact_root',
       workspace_root: workspaceRoot || null,
       runtime_state_root: runtimeStateRoot || null,
-      session_store_root: sessionStoreRoot || null,
+      session_continuity_root: sessionContinuityRoot || null,
       path_template: '<workspace-root>/.redcube/runtime/artifacts/<topic_id>/<deliverable_id>/<run_id>',
     },
     artifact_ref_schema: {

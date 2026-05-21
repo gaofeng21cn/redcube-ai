@@ -9,7 +9,7 @@
     "cli_entry": "redcube product session",
     "mcp_tool": "get_product_entry_session"
   },
-  "session_store_contract": {
+  "session_continuity_contract": {
     "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
     "required_fields": [
       "entry_session_id",
@@ -50,7 +50,7 @@
   },
   "behavior_contract": {
     "session_identity_scope": "one durable deliverable per entry_session_id",
-    "direct_and_opl_hosted_entry_share_same_store": true,
+    "direct_and_opl_hosted_entry_share_same_continuity_root": true,
     "fail_closed_on": [
       "missing_entry_session_id",
       "session_not_found",

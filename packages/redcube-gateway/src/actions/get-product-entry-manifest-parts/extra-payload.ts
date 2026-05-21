@@ -33,7 +33,7 @@ export function buildManifestExtraPayload({
       surface_kind: 'session_continuity',
       owner: 'redcube_ai',
       status: 'repo_tracked',
-      summary: 'RCA product-entry session continuity is persisted in the shared session store and restored via entry_session_id.',
+      summary: 'RCA product-entry session continuity is persisted in the shared session-continuity root and restored via entry_session_id.',
       progress_surface_ref: {
         ref_kind: 'json_pointer',
         ref: '/progress_projection',

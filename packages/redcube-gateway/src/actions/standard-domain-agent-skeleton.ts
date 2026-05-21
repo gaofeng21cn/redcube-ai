@@ -57,7 +57,7 @@ export function buildStandardDomainAgentSkeleton({
   const artifactLocatorContract = buildArtifactLocatorContract({
     workspaceRoot,
     runtimeStateRoot: runtime?.runtime_state_root,
-    sessionStoreRoot: runtime?.session_store_root,
+    sessionContinuityRoot: runtime?.session_continuity_root,
   });
   const receiptRefs = buildProductSidecarReceiptRefs();
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();

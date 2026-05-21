@@ -63,7 +63,7 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
       entry_surface_kind: 'domain_entry',
       entry_adapter: 'RedCubeDomainEntry',
       runtime_owner: runtime.runtime_owner,
-      session_store_root: runtime.session_store_root,
+      session_continuity_root: runtime.session_continuity_root,
       executor_owner: 'configured_by_opl_runtime_provider',
     },
     guardrails: [

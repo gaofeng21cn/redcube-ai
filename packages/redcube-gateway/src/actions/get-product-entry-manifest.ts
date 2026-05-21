@@ -81,7 +81,7 @@ import { buildTemporalAutonomyReadinessProjection } from './product-sidecar-part
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
-  const sessionStoreRoot = productEntrySessionDir();
+  const sessionContinuityRoot = productEntrySessionDir();
   const productEntrySessionCommand = `${PRODUCT_SESSION_COMMAND} --entry-session-id <entry-session-id>`;
   const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
@@ -136,8 +136,8 @@ export async function getProductEntryManifest(request) {
   });
   const runtime = {
     runtime_owner: DEFAULT_RUNTIME_OWNER,
-    runtime_state_root: path.dirname(sessionStoreRoot),
-    session_store_root: sessionStoreRoot,
+    runtime_state_root: path.dirname(sessionContinuityRoot),
+    session_continuity_root: sessionContinuityRoot,
   };
   const standardDomainAgentSkeleton = buildStandardDomainAgentSkeleton({
     workspaceRoot,
@@ -216,7 +216,7 @@ export async function getProductEntryManifest(request) {
     workspace_binding: {
       workspace_root: workspaceRoot,
       runtime_state_root: runtime.runtime_state_root,
-      session_store_root: runtime.session_store_root,
+      session_continuity_root: runtime.session_continuity_root,
     },
     domain_projection: {
       opl_provider_runtime_contract_ref: oplProviderRuntimeContract.shared_contract_ref,

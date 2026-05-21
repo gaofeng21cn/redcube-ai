@@ -497,7 +497,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
   runtime: {
     runtime_owner: string;
     runtime_state_root: string;
-    session_store_root: string;
+    session_continuity_root: string;
   };
   opl_provider_runtime_contract: {
     shared_contract_ref: string;

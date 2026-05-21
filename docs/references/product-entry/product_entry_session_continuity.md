@@ -15,7 +15,7 @@ Machine boundary: 人读 product-entry support。机器真相继续归 `contract
 
 ## 这一步解决什么
 
-direct / OPL-hosted 两条入口共享一个用户级 session store：
+direct / OPL-hosted 两条入口共享一个用户级 session-continuity root：
 
 `$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`
 
@@ -36,7 +36,7 @@ direct / OPL-hosted 两条入口共享一个用户级 session store：
 
 ## 最小行为
 
-1. `invokeProductEntry` 与 `invokeOplHostedProductEntry` 都写入同一个 session store
+1. `invokeProductEntry` 与 `invokeOplHostedProductEntry` 都写入同一个 session-continuity root
 2. `entry_session_id` 绑定同一 deliverable identity
 3. continuation surface 必须显式返回 latest handles
 4. 用户级 runtime-state 继续只落在 `$CODEX_HOME/projects/redcube-ai/runtime-state/`
@@ -44,7 +44,7 @@ direct / OPL-hosted 两条入口共享一个用户级 session store：
 ## 明确不做
 
 - 不伪造跨 deliverable 的 session continuity
-- 不把 session store 写回 repo-tracked 目录
+- 不把 session continuity state 写回 repo-tracked 目录
 - 不用 fallback 掩盖 session drift
 - 不把 session continuity 写成旧 workbench、repo-local Hermes runtime 或 managed web runtime 已落地
 - 不为退役 session / gateway / frontdoor alias 保留兼容入口

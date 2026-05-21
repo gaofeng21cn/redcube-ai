@@ -46,7 +46,7 @@
   },
   "behavior_contract": {
     "create_or_continue_same_deliverable": true,
-    "session_store_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "session_continuity_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
     "fail_closed_on": [
       "missing_workspace_root",
       "missing_entry_session_id",

@@ -7199,7 +7199,7 @@
           "deliverable_id",
           "run_id"
         ],
-        "required_session_store_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+        "required_session_continuity_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
         "excluded_scope": [
           "managed web runtime control plane",
           "controller expansion",
