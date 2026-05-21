@@ -33,13 +33,6 @@ import {
 
 export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   {
-    action: 'runtime_watch',
-    effect: 'read_only',
-    summary: 'Read RCA runtimeWatch for an existing run locator as a refs-only projection; this does not run a generic supervisor or continuation loop.',
-    required_fields: ['workspace_root', 'topic_id', 'deliverable_id', 'run_id'],
-    api_surface: 'runtimeWatch',
-  },
-  {
     action: 'emit_no_regression_evidence',
     effect: 'guarded_runtime_evidence_write',
     summary: 'Emit RCA-owned no-regression evidence refs for descriptor/runtime surfaces without writing visual artifacts or claiming long soak.',
@@ -506,13 +499,14 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     physical_deletion_guard: {
       current_safe_tombstone_candidate_count: 0,
       deleted_or_thinned_default_surfaces: [
-        'retired_product_sidecar.supervision_action_tombstone',
-        'retired_product_sidecar.continuation_action_tombstone',
-        'retired_public_entry.run_lookup_tombstone',
-        'retired_public_entry.supervision_lookup_tombstone',
-        'retired_repo_local_visual_loop.deliverable_runner_deleted',
-        'retired_repo_local_visual_loop.run_store_deleted',
-        'retired_repo_local_visual_loop.dag_runner_deleted',
+        'product_sidecar_dispatch.runtime_watch',
+        'product_sidecar_dispatch.retired_managed_supervision',
+        'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.retired_managed_supervision',
+        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+        'repo_local_visual_runtime.legacy_run_store_deleted',
+        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
       ],
       deletion_status: 'legacy_runtime_physical_cleanup_closed',
       remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
@@ -598,6 +592,18 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'native_helper_implementation',
     ],
     retired_no_resurrection_guards: [
+      {
+        surface_id: 'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+        retired_legacy_surface_id: 'product_sidecar_dispatch.runtime_watch',
+        retired_at: '2026-05-21',
+        replacement_owner: 'opl',
+        replacement_surface: 'opl_status_workbench_runtime_read_model',
+        retained_rca_surface: 'runtimeWatch direct review/progress read model',
+        active_default_caller: false,
+        active_caller: false,
+        compatibility_alias_allowed: false,
+        resurrection_policy: 'forbidden',
+      },
       {
         surface_id: 'retired_product_sidecar.supervision_action_tombstone',
         retired_legacy_surface_id: 'product_sidecar_dispatch.retired_managed_supervision',

@@ -1,6 +1,7 @@
 {
   "current_safe_tombstone_candidate_count": 0,
   "deleted_or_thinned_default_surfaces": [
+    "product_sidecar_dispatch.runtime_watch",
     "product_sidecar_dispatch.retired_managed_supervision",
     "product_sidecar_dispatch.product_entry_continuation",
     "public_cli_mcp_gateway.get_managed_run",

@@ -94,7 +94,7 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 OPL 侧可通过 product sidecar 读取和派发受控动作：
 
 - `product sidecar export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
-- `product sidecar dispatch` 只允许 `runtime_watch`、`emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`evaluate_visual_transition`、`emit_workspace_receipt_proof`、`notification_receipt` 这类 guarded actions。
+- `product sidecar dispatch` 只允许 `emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`evaluate_visual_transition`、`emit_workspace_receipt_proof`、`notification_receipt` 这类 RCA-owned guarded actions。`runtime_watch` 已从 sidecar dispatch 退役；`runtimeWatch` 继续作为 direct review/progress read model，sidecar 查询归 OPL status/workbench runtime read-model target。
 - 旧 managed supervision action 与 `product_entry_continuation` 已从 default generic sidecar dispatch 物理删除/收薄；旧 managed run lookup action / 旧 managed supervision action 已从 public CLI/MCP/gateway surface 退役。generic supervision / continuation 归 OPL runner/session shell。RCA 保留 direct product-entry/session API 和内部 visual authority surfaces；旧 repo-local supervision/runtime 不再作为 active fixture 保留，只在 history/provenance 语境追溯。
 - `emit_no_regression_evidence` 只生成 RCA-owned runtime evidence ref，落在 workspace `.redcube/runtime/evidence/no-regression/`；它证明 descriptor/runtime refs、physical skeleton anchor、legacy active-path retirement 和 no-forbidden-write 边界未回退，不写 visual artifact blob，也不声明 provider-hosted visual long soak 完成。
 

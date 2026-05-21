@@ -15,7 +15,6 @@ import {
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
 } from './product-sidecar-guarded-actions.js';
-import { runtimeWatch } from './run-review-ref-projection.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './product-sidecar-parts/workspace-receipt-proof.js';
 import { buildSidecarOwnerBoundary } from './product-sidecar-parts/owner-boundary.js';
 import {
@@ -162,13 +161,19 @@ function buildSidecarProjection({ workspaceRoot, manifest }) {
       runtime_watch: {
         command: 'redcube review watch',
         api_surface: 'runtimeWatch',
-        owner: DOMAIN_ID,
+        owner: 'one-person-lab',
+        rca_direct_read_model_owner: DOMAIN_ID,
         read_only: true,
         projection_mode: 'runtime_watch_refs_only',
         owner_boundary: RUNTIME_WATCH_BOUNDARY,
         refs_only: true,
-        dispatch_owner: 'redcube_ai',
+        sidecar_dispatch_allowed: false,
+        dispatch_owner: 'one-person-lab',
+        dispatch_surface: 'opl_status_workbench_runtime_read_model',
+        retired_sidecar_dispatch_ref: 'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+        retained_rca_surface: 'runtimeWatch direct review/progress read model',
         generic_supervisor_owner: 'opl',
+        generic_status_workbench_owner: 'opl',
         generic_session_shell_owner: 'opl',
         compatibility_alias_allowed: false,
         no_resurrection_gate: RUNTIME_WATCH_BOUNDARY.no_resurrection_gate,
@@ -850,18 +855,11 @@ async function applyVisualWorkspaceLifecycle(task) {
 export async function dispatchProductSidecar(request) {
   const task = readTaskPayload(request);
   const action = normalizeAction(task);
+  if (action === 'runtime_watch') {
+    throw new Error('product sidecar action 不允许: runtime_watch; use OPL status/workbench/read-model target or direct runtimeWatch review surface');
+  }
   if (!GUARDED_ACTIONS.has(action)) {
     throw new Error(`product sidecar action 不允许: ${action || '<empty>'}`);
-  }
-
-  if (action === 'runtime_watch') {
-    const result = await runtimeWatch({
-      workspaceRoot: workspaceRootFromTask(task),
-      topicId: requireField('topic_id', task.topic_id || task.topicId),
-      deliverableId: requireField('deliverable_id', task.deliverable_id || task.deliverableId),
-      runId: requireField('run_id', task.run_id || task.runId),
-    });
-    return buildDispatchEnvelope({ task, result, action });
   }
 
   if (action === 'emit_no_regression_evidence') {

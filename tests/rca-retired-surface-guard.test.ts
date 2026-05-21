@@ -335,6 +335,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
+      'product_sidecar_dispatch.runtime_watch',
       'product_sidecar_dispatch.retired_managed_supervision',
       'product_sidecar_dispatch.product_entry_continuation',
       'public_cli_mcp_gateway.get_managed_run',
@@ -347,6 +348,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.deepEqual(
       surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
+        'product_sidecar_dispatch.runtime_watch',
         'product_sidecar_dispatch.retired_managed_supervision',
         'product_sidecar_dispatch.product_entry_continuation',
       ],

@@ -110,7 +110,6 @@ export function buildTemporalAutonomyReadinessProjection({
         status: 'ready',
         rca_surface_ref: '/product_entry_shell/sidecar',
         required_sidecar_actions: [
-          'runtime_watch',
           'emit_no_regression_evidence',
           'emit_domain_owner_receipt',
           'emit_workspace_receipt_proof',
@@ -119,9 +118,12 @@ export function buildTemporalAutonomyReadinessProjection({
       },
       {
         gate_id: 'progress_requery',
-        owner: DOMAIN_ID,
+        owner: OPL_OWNER,
         status: 'ready',
         rca_surface_ref: '/runtime_inventory',
+        projection_target: 'opl_status_workbench_runtime_read_model',
+        retained_rca_read_model_ref: 'runtimeWatch direct review/progress read model',
+        sidecar_dispatch_action_required: false,
         progress_surface_ref: ref(runtimeInventory?.status_surface?.ref, '/product_entry_preflight'),
         resume_surface_ref: ref(taskLifecycle?.resume_surface?.surface_kind, 'product_entry_session'),
       },

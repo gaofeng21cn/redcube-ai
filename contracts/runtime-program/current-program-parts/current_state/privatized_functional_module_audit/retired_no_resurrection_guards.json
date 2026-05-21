@@ -1,5 +1,16 @@
 [
   {
+    "surface_id": "product_sidecar_dispatch.runtime_watch",
+    "retired_at": "2026-05-21",
+    "replacement_owner": "opl",
+    "replacement_surface": "opl_status_workbench_runtime_read_model",
+    "retained_rca_surface": "runtimeWatch direct review/progress read model",
+    "active_default_caller": false,
+    "active_caller": false,
+    "compatibility_alias_allowed": false,
+    "resurrection_policy": "forbidden"
+  },
+  {
     "surface_id": "product_sidecar_dispatch.retired_managed_supervision",
     "retired_at": "2026-05-17",
     "replacement_owner": "opl",

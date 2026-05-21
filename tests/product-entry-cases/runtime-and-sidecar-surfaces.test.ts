@@ -145,11 +145,21 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(sidecar.mapped_surfaces.artifact_locator_contract.lifecycle_transport_owner, 'opl');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.ref, '/product_sidecar_receipt_refs');
     assert.equal(sidecar.mapped_surfaces.receipt_refs.forbidden_receipt_fields.includes('export_verdict'), true);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.owner, 'one-person-lab');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.rca_direct_read_model_owner, 'redcube_ai');
     assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.surface_kind, 'runtime_watch_boundary');
     assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.classification, 'refs_only_read_model');
     assert.equal(sidecar.mapped_surfaces.runtime_watch.owner_boundary.refs_only, true);
     assert.equal(sidecar.mapped_surfaces.runtime_watch.refs_only, true);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.sidecar_dispatch_allowed, false);
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.dispatch_owner, 'one-person-lab');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.dispatch_surface, 'opl_status_workbench_runtime_read_model');
+    assert.equal(
+      sidecar.mapped_surfaces.runtime_watch.retired_sidecar_dispatch_ref,
+      'retired_product_sidecar.runtime_watch_dispatch_tombstone',
+    );
     assert.equal(sidecar.mapped_surfaces.runtime_watch.generic_supervisor_owner, 'opl');
+    assert.equal(sidecar.mapped_surfaces.runtime_watch.generic_status_workbench_owner, 'opl');
     assert.equal(sidecar.mapped_surfaces.runtime_watch.generic_session_shell_owner, 'opl');
     assert.equal(sidecar.mapped_surfaces.runtime_watch.compatibility_alias_allowed, false);
     assert.equal(sidecar.mapped_surfaces.runtime_watch.no_resurrection_gate.generic_supervisor_owner_allowed, false);
@@ -282,6 +292,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
+        'retired_product_sidecar.runtime_watch_dispatch_tombstone',
         'retired_product_sidecar.supervision_action_tombstone',
         'retired_product_sidecar.continuation_action_tombstone',
       ],
@@ -352,13 +363,14 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
       [
-        'retired_product_sidecar.supervision_action_tombstone',
-        'retired_product_sidecar.continuation_action_tombstone',
-        'retired_public_entry.run_lookup_tombstone',
-        'retired_public_entry.supervision_lookup_tombstone',
-        'retired_repo_local_visual_loop.deliverable_runner_deleted',
-        'retired_repo_local_visual_loop.run_store_deleted',
-        'retired_repo_local_visual_loop.dag_runner_deleted',
+        'product_sidecar_dispatch.runtime_watch',
+        'product_sidecar_dispatch.retired_managed_supervision',
+        'product_sidecar_dispatch.product_entry_continuation',
+        'public_cli_mcp_gateway.get_managed_run',
+        'public_cli_mcp_gateway.retired_managed_supervision',
+        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
+        'repo_local_visual_runtime.legacy_run_store_deleted',
+        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
       ],
     );
     assert.ok(sidecar.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
@@ -709,6 +721,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       false,
     );
     assert.equal(
+      sidecar.guarded_actions.some((entry) => entry.action === 'runtime_watch'),
+      false,
+    );
+    assert.equal(
       sidecar.guarded_actions.some((entry) => entry.action === 'product_entry_continuation'),
       false,
     );
@@ -788,6 +804,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
         },
       }),
       /product sidecar action 不允许/,
+    );
+
+    await assert.rejects(
+      () => dispatchProductSidecar({
+        task: {
+          action: 'runtime_watch',
+          workspace_root: workspaceRoot,
+          topic_id: 'topic-removed',
+          deliverable_id: 'deck-removed',
+          run_id: 'run-removed',
+        },
+      }),
+      /use OPL status\/workbench\/read-model target or direct runtimeWatch review surface/,
     );
 
     await assert.rejects(

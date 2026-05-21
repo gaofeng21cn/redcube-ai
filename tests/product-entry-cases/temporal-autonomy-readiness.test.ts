@@ -45,12 +45,14 @@ test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract w
     assert.equal(gatesById.stage_descriptor_handoff.rca_surface_ref, '/family_stage_control_plane');
     assert.equal(gatesById.queue_wakeup_handoff.status, 'ready');
     assert.deepEqual(gatesById.queue_wakeup_handoff.required_sidecar_actions, [
-      'runtime_watch',
       'emit_no_regression_evidence',
       'emit_domain_owner_receipt',
       'emit_workspace_receipt_proof',
     ]);
     assert.equal(gatesById.progress_requery.status, 'ready');
+    assert.equal(gatesById.progress_requery.owner, 'one-person-lab');
+    assert.equal(gatesById.progress_requery.projection_target, 'opl_status_workbench_runtime_read_model');
+    assert.equal(gatesById.progress_requery.sidecar_dispatch_action_required, false);
     assert.equal(gatesById.restart_resume_recovery.status, 'contract_ready_live_evidence_pending');
     assert.equal(gatesById.retry_dead_letter_repair.status, 'contract_ready_live_evidence_pending');
     assert.equal(gatesById.domain_closeout_receipts.status, 'ready');
