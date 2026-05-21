@@ -3,6 +3,8 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+import { findForbiddenPayloadFieldPaths } from './task-utils.js';
+
 const DOMAIN_ID = 'redcube_ai';
 const ARTIFACT_PRODUCING_ROUTE = Object.freeze({
   deliverable_family: 'ppt_deck',
@@ -75,6 +77,7 @@ export async function emitWorkspaceReceiptProof({
 }) {
   const missing = missingRequiredRefs(task);
   const id = proofId(task);
+  const forbiddenPayloadFields = [...findForbiddenPayloadFieldPaths(task)].sort();
   if (missing.length > 0) {
     return buildTypedBlocker({
       blockerKind: 'workspace_receipt_proof_missing_required_refs',
@@ -83,6 +86,19 @@ export async function emitWorkspaceReceiptProof({
       sourceContract: 'rca.workspace_receipt_proof.v1',
       nextRequiredOwnerAction: 'provide_attempt_artifact_review_and_forbidden_write_refs_before_receipt_proof',
       workspaceRoot,
+    });
+  }
+  if (forbiddenPayloadFields.length > 0) {
+    return buildTypedBlocker({
+      blockerKind: 'workspace_receipt_proof_forbidden_payload_fields',
+      blockerId: id,
+      sourceContract: 'rca.workspace_receipt_proof.v1',
+      nextRequiredOwnerAction: 'replace_body_payloads_with_rca_owned_locator_or_receipt_refs',
+      workspaceRoot,
+      details: {
+        forbidden_payload_fields: forbiddenPayloadFields,
+        payload_body_allowed: false,
+      },
     });
   }
 

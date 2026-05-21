@@ -306,7 +306,10 @@
         "visual truth body",
         "review or export verdict body",
         "artifact blob",
-        "memory body"
+        "artifact body",
+        "memory body",
+        "generic runtime state",
+        "managed runtime compatibility alias"
       ]
     },
     "authority_boundary": {

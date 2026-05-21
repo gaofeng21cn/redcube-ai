@@ -63,6 +63,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-21 Lane C 新增 RCA-owned `rca_efficiency_handoff_projection`，并接入 production acceptance contract、product-entry manifest 和 product sidecar projection。该 surface 汇总既有 `cache_status`、`elapsed_ms`、`render_execution`、`reused_slide_ids`、`cost_summary`、`screenshot_review` gate 和 export result refs，输出 refs-only Agent Lab compatible suite input；suite kind 继续使用 OPL Agent Lab `standard`，不要求新增 RCA-specific kind。该投影只提升效率可观察性和编排评估，不降低 `screenshot_review`、review/export gate、artifact authority、visual memory authority 或 owner receipt 门槛，不声明 visual ready、exportable、handoffable 或 production soak complete。
 
+2026-05-21 owner-payload hardening tranche 把 `emit_domain_owner_receipt` 与 `emit_workspace_receipt_proof` 的完整 refs 路径收紧为 body-free fail-closed：若 task payload 夹带 `visual_truth_body`、`review_export_verdict_body`、`canonical_artifact_blob`、`artifact_blob`、`artifact_body`、`memory_content_body`、`generic_runtime_state` 或 `managed_runtime_compatibility_alias` 等 forbidden 字段，product sidecar 在写入 workspace receipt/proof 前返回 RCA-owned typed blocker，并保留 `visual_ready_claimed=false`、`exportable_claimed=false`、`handoffable_claimed=false`。`product_sidecar_receipt_refs`、production acceptance fixture 与 focused sidecar test 已同步该字段口径。该轮只关闭 owner/workspace receipt body-free guard 缺口，不声明 production visual-stage long soak、跨 workspace scaleout、visual ready、exportable 或 handoffable 完成。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。

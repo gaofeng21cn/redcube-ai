@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { SERIAL_ENV_TEST, assert, getProductEntryManifest, exportProductSidecar, dispatchProductSidecar, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
@@ -50,6 +50,49 @@ test('product sidecar receipt actions emit refs-only workspace proof without pro
     assert.equal(missingReceiptRefs.result_surface.blocker_kind, 'domain_owner_receipt_missing_required_refs');
     assert.equal(missingReceiptRefs.result_surface.owner, 'redcube_ai');
     assert.equal(missingReceiptRefs.result_surface.visual_ready_claimed, false);
+    assert.equal(
+      existsSync(`${workspaceRoot}/.redcube/runtime/receipts/domain-owner/missing-domain-refs.json`),
+      false,
+    );
+
+    const forbiddenDomainReceiptPayload = await dispatchProductSidecar({
+      task: {
+        action: 'emit_domain_owner_receipt',
+        workspace_root: workspaceRoot,
+        receipt_id: 'forbidden-domain-payload',
+        attempt_ref: 'workspace-runtime-ref:attempt:run-forbidden',
+        artifact_locator_ref: '/artifact_locator_contract',
+        memory_receipt_ref: 'rca-memory-receipt:visual-pattern:accepted-forbidden',
+        lifecycle_receipt_ref: 'rca-lifecycle-receipt:retention:forbidden-lifecycle',
+        review_export_ref: 'workspace-runtime-ref:review-export:run-forbidden',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: [
+          {
+            artifact_kind: 'png_page',
+            ref_kind: 'workspace_runtime_artifact',
+            artifact_ref: 'workspace-runtime-ref:artifact:forbidden-slide',
+            artifact_body: 'forbidden body payload must not enter owner receipt',
+          },
+        ],
+        memory_content_body: 'forbidden memory body must not enter owner receipt',
+      },
+    });
+    assert.equal(forbiddenDomainReceiptPayload.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(
+      forbiddenDomainReceiptPayload.result_surface.blocker_kind,
+      'domain_owner_receipt_forbidden_payload_fields',
+    );
+    assert.deepEqual(
+      forbiddenDomainReceiptPayload.result_surface.forbidden_payload_fields,
+      ['artifact_refs[0].artifact_body', 'memory_content_body'],
+    );
+    assert.equal(forbiddenDomainReceiptPayload.result_surface.visual_ready_claimed, false);
+    assert.equal(forbiddenDomainReceiptPayload.result_surface.exportable_claimed, false);
+    assert.equal(forbiddenDomainReceiptPayload.result_surface.handoffable_claimed, false);
+    assert.equal(
+      existsSync(`${workspaceRoot}/.redcube/runtime/receipts/domain-owner/forbidden-domain-payload.json`),
+      false,
+    );
 
     const domainReceipt = await dispatchProductSidecar({
       task: {
@@ -534,5 +577,40 @@ test('product sidecar receipt actions emit refs-only workspace proof without pro
       'workspace_receipt_proof_missing_required_refs',
     );
     assert.equal(blockedWorkspaceReceiptProof.result_surface.visual_ready_claimed, false);
+    assert.equal(
+      existsSync(`${workspaceRoot}/.redcube/runtime/proofs/workspace-receipts/blocked-workspace-receipts.json`),
+      false,
+    );
+
+    const forbiddenWorkspaceReceiptProofPayload = await dispatchProductSidecar({
+      task: {
+        action: 'emit_workspace_receipt_proof',
+        workspace_root: workspaceRoot,
+        proof_id: 'forbidden-workspace-receipts',
+        attempt_ref: 'workspace-runtime-ref:attempt:run-proof-forbidden',
+        artifact_locator_ref: '/artifact_locator_contract',
+        review_export_ref: 'workspace-runtime-ref:review-export:run-proof-forbidden',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: ['workspace-runtime-ref:artifact:slide-proof-forbidden'],
+        review_export_verdict_body: { verdict: 'forbidden body payload' },
+        generic_runtime_state: { hidden_state: true },
+      },
+    });
+    assert.equal(forbiddenWorkspaceReceiptProofPayload.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(
+      forbiddenWorkspaceReceiptProofPayload.result_surface.blocker_kind,
+      'workspace_receipt_proof_forbidden_payload_fields',
+    );
+    assert.deepEqual(
+      forbiddenWorkspaceReceiptProofPayload.result_surface.forbidden_payload_fields,
+      ['generic_runtime_state', 'review_export_verdict_body'],
+    );
+    assert.equal(forbiddenWorkspaceReceiptProofPayload.result_surface.visual_ready_claimed, false);
+    assert.equal(forbiddenWorkspaceReceiptProofPayload.result_surface.exportable_claimed, false);
+    assert.equal(forbiddenWorkspaceReceiptProofPayload.result_surface.handoffable_claimed, false);
+    assert.equal(
+      existsSync(`${workspaceRoot}/.redcube/runtime/proofs/workspace-receipts/forbidden-workspace-receipts.json`),
+      false,
+    );
   });
 });

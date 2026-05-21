@@ -14,6 +14,7 @@ import {
 } from './sidecar-export-projection.js';
 import {
   missingFields,
+  findForbiddenPayloadFieldPaths,
   noRegressionEvidenceId,
   normalizeAction,
   optionalArray,
@@ -127,6 +128,7 @@ async function emitDomainOwnerReceipt(task) {
   ];
   const missing = missingFields(task, required);
   const id = receiptId(task, 'domain_owner_receipt', 'domain-receipt');
+  const forbiddenPayloadFields = [...findForbiddenPayloadFieldPaths(task)].sort();
   if (missing.length > 0) {
     return buildTypedBlocker({
       blockerKind: 'domain_owner_receipt_missing_required_refs',
@@ -135,6 +137,19 @@ async function emitDomainOwnerReceipt(task) {
       sourceContract: 'rca.domain_owner_receipt.v1',
       nextRequiredOwnerAction: 'provide_rca_owned_attempt_artifact_memory_lifecycle_review_and_forbidden_write_refs',
       workspaceRoot,
+    });
+  }
+  if (forbiddenPayloadFields.length > 0) {
+    return buildTypedBlocker({
+      blockerKind: 'domain_owner_receipt_forbidden_payload_fields',
+      blockerId: id,
+      sourceContract: 'rca.domain_owner_receipt.v1',
+      nextRequiredOwnerAction: 'replace_body_payloads_with_rca_owned_locator_or_receipt_refs',
+      workspaceRoot,
+      details: {
+        forbidden_payload_fields: forbiddenPayloadFields,
+        payload_body_allowed: false,
+      },
     });
   }
 

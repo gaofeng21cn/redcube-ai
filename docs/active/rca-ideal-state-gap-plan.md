@@ -140,6 +140,8 @@ Fresh OPL stage evidence closeout 进一步读取 RCA `opl_expected_receipt_moni
 
 2026-05-21 的 `temporal_autonomy_readiness` 已把“RCA 是否按标准 OPL/Temporal 默认自治运行”的判断从 prose 收到机器面：manifest 与 sidecar 均可读到 `can_be_opl_temporal_hosted=true`、`default_opl_temporal_hosted_autonomy_enabled=true`、`long_time_autonomy_claimed=true`，同时继续保持 `production_visual_stage_long_soak_complete=false`。这意味着任务启动后应由 OPL/Temporal 持久在线调度、唤醒、retry/dead-letter、resume 和 attempt 投影，而不是由 Codex App 外围持续驱动；RCA 不拥有 generic daemon、scheduler、attempt loop 或 attempt ledger。剩余缺口集中在真实 provider-hosted visual-stage long soak：Temporal provider production residency、worker restart/resume/re-query、retry/dead-letter repair projection、artifact-producing owner receipt 和 cross-family no-regression 必须以真实 refs 关闭。
 
+2026-05-21 owner-payload hardening tranche 将完整 refs 路径上的 body payload 漏洞收紧到 sidecar action 层：`emit_domain_owner_receipt` 和 `emit_workspace_receipt_proof` 现在会在写 workspace runtime receipt/proof 前扫描 task payload，发现 visual truth、review/export verdict body、artifact blob/body、memory body、generic runtime state 或 managed runtime compatibility alias 时返回 typed blocker。该 guard 允许 `*_ref` locator/receipt 字段继续流转，禁止 payload body 进入 OPL-facing receipt chain。它关闭的是 owner/workspace receipt 的 body-free fail-closed 缺口；真实 provider-hosted visual-stage long soak、跨 workspace receipt scaleout、cross-family no-regression、visual/export/handoff verdict 仍是测试/证据尾项。
+
 因此，production acceptance 不再作为功能/结构差距，也不由 OPL/provider completion 关闭。若未来真实运行证据缺失，该 surface 必须降级为 RCA-owned typed blocker 并给出下一条验证命令 ref；不能把 OPL structural pass、provider completion、transition fixture 或 cleanup proof 写成 visual ready、exportable、handoffable 或 domain_ready。
 
 ## Retained Private Authority Surfaces

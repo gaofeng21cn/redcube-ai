@@ -328,8 +328,10 @@
     "visual_truth_body",
     "review_export_verdict_body",
     "canonical_artifact_blob",
+    "artifact_blob",
     "artifact_body",
     "memory_content_body",
+    "generic_runtime_state",
     "managed_runtime_compatibility_alias"
   ]
 }

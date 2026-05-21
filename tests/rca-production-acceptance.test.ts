@@ -643,6 +643,8 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     fixture.legacy_managed_naming_policy.forbidden_active_occurrence_classes.includes('compatibility_alias'),
     true,
   );
+  assert.equal(fixture.forbidden_payload_fields.includes('artifact_blob'), true);
+  assert.equal(fixture.forbidden_payload_fields.includes('generic_runtime_state'), true);
   assert.equal(fixture.forbidden_payload_fields.includes('managed_runtime_compatibility_alias'), true);
 });
 

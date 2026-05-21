@@ -380,10 +380,17 @@ export function buildProductSidecarReceiptRefs() {
     ],
     forbidden_receipt_fields: [
       'visual_verdict',
+      'visual_truth_body',
       'export_verdict',
       'review_verdict',
+      'review_export_verdict_body',
       'publication_gate_verdict',
+      'canonical_artifact_blob',
       'artifact_blob',
+      'artifact_body',
+      'memory_content_body',
+      'generic_runtime_state',
+      'managed_runtime_compatibility_alias',
     ],
     authority_boundary: {
       receipt_owner: DOMAIN_OWNER,

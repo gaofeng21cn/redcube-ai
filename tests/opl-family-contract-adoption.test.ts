@@ -731,7 +731,20 @@ test('RCA artifact locator and sidecar receipts expose refs without OPL visual v
     assert.ok(skeleton.artifact_locator_contract.opl_forbidden.includes(forbidden));
   }
   assert.equal(skeleton.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
-  for (const field of ['visual_verdict', 'export_verdict', 'review_verdict', 'publication_gate_verdict', 'artifact_blob']) {
+  for (const field of [
+    'visual_verdict',
+    'visual_truth_body',
+    'export_verdict',
+    'review_verdict',
+    'review_export_verdict_body',
+    'publication_gate_verdict',
+    'canonical_artifact_blob',
+    'artifact_blob',
+    'artifact_body',
+    'memory_content_body',
+    'generic_runtime_state',
+    'managed_runtime_compatibility_alias',
+  ]) {
     assert.ok(skeleton.product_sidecar_receipt_refs.forbidden_receipt_fields.includes(field));
   }
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');

@@ -2,6 +2,23 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
+export const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
+  'visual_truth',
+  'visual_truth_body',
+  'visual_verdict',
+  'review_verdict',
+  'export_verdict',
+  'review_export_verdict',
+  'review_export_verdict_body',
+  'publication_gate',
+  'canonical_artifact_blob',
+  'artifact_blob',
+  'artifact_body',
+  'memory_content_body',
+  'generic_runtime_state',
+  'managed_runtime_compatibility_alias',
+]);
+
 export function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -99,4 +116,24 @@ export function optionalArray(value) {
 
 export function missingFields(task, fields) {
   return fields.filter((field) => !safeText(taskValue(task, field, field.replace(/_([a-z])/g, (_, char) => char.toUpperCase()))));
+}
+
+export function findForbiddenPayloadFieldPaths(value, path = '', found = new Set()) {
+  if (!value || typeof value !== 'object') {
+    return found;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((item, index) => {
+      findForbiddenPayloadFieldPaths(item, `${path}[${index}]`, found);
+    });
+    return found;
+  }
+  for (const [key, nested] of Object.entries(value)) {
+    const currentPath = path ? `${path}.${key}` : key;
+    if (FORBIDDEN_RECEIPT_PAYLOAD_FIELDS.includes(key)) {
+      found.add(currentPath);
+    }
+    findForbiddenPayloadFieldPaths(nested, currentPath, found);
+  }
+  return found;
 }
