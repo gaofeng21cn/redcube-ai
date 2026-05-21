@@ -12,7 +12,7 @@ import {
 import type { RunRecordResponse, WorkspaceRootRequest } from '../types.js';
 import type { RuntimeRunRecord } from '@redcube/runtime';
 
-type GatewayRunRecord = RuntimeRunRecord & {
+type RuntimeRecordSurface = RuntimeRunRecord & {
   pending_reviews?: unknown;
 };
 
@@ -32,7 +32,7 @@ export async function getRun({
   workspaceRoot,
   runId,
 }: WorkspaceRootRequest & { runId: string }): Promise<RunRecordResponse> {
-  const run = loadRun({ workspaceRoot, runId }) as GatewayRunRecord;
+  const run = loadRun({ workspaceRoot, runId }) as RuntimeRecordSurface;
   const staleStatus = run.status === 'expired' || run.status === 'orphaned';
   const recommendedAction = staleStatus
     ? 'inspect_stale_run'

@@ -79,7 +79,7 @@ export function createStructuredArtifactExecutor({
       const effectiveDefault = executorRouting?.effective_default_executor || {};
       const selectedBackend = safeText(selected.executor_backend);
       const selectedShape = safeText(selected.execution_shape);
-      const canFallback = failurePolicy === 'fallback_with_proof'
+      const proofGatedExperimentalFallback = failurePolicy === 'fallback_with_proof'
         && routeLane === 'experimental_proof'
         && fallbackPolicy === 'inherit_effective_default_executor'
         && selectedBackend === HERMES_AGENT_EXECUTOR_BACKEND
@@ -90,7 +90,7 @@ export function createStructuredArtifactExecutor({
       const sameExecutor = fallbackAdapter === adapter
         && fallbackShape === safeText(executionShape)
         && safeText(fallbackProfile) === safeText(hermesProfile);
-      if (!canFallback || sameExecutor) {
+      if (!proofGatedExperimentalFallback || sameExecutor) {
         throw error;
       }
       const fallbackResult = await generateWithSelectedExecutor({

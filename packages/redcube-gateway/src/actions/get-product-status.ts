@@ -9,7 +9,7 @@ import type { ProductEntryManifestResponse, ProductStatusResponse, RuntimeLoopCl
 
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
-type GatewayProductEntryManifest = ProductEntryManifestResponse & {
+type ProductEntryManifestSurface = ProductEntryManifestResponse & {
   deliverable_facade?: {
     family_route_policy?: Record<string, unknown>;
   } & Record<string, unknown>;
@@ -39,7 +39,7 @@ type ProductStatusSurface = ProductStatusResponse & {
 };
 
 export async function getProductStatus(request: Record<string, unknown>): Promise<ProductStatusSurface> {
-  const manifest = await getProductEntryManifest(request) as unknown as GatewayProductEntryManifest;
+  const manifest = await getProductEntryManifest(request) as unknown as ProductEntryManifestSurface;
   const entrySurfaces = buildFamilyProductEntrySurfaces({
     product_entry_shell: manifest.product_entry_shell,
     shell_aliases: {

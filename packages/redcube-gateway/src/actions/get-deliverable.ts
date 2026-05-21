@@ -7,7 +7,7 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import type { DeliverableRecordResponse, DeliverableRequest } from '../types.js';
 import type { JsonObject } from '@redcube/overlay-core';
 
-type DeliverableRecordGatewayResponse = Omit<DeliverableRecordResponse, 'summary'> & {
+type DeliverableRecordSurfaceResponse = Omit<DeliverableRecordResponse, 'summary'> & {
   hydrated_contract: Record<string, unknown>;
   summary: {
     deliverable_id: string;
@@ -31,7 +31,7 @@ export async function getDeliverable({
   workspaceRoot,
   topicId,
   deliverableId,
-}: DeliverableRequest): Promise<DeliverableRecordGatewayResponse> {
+}: DeliverableRequest): Promise<DeliverableRecordSurfaceResponse> {
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const deliverable = readJsonRecord(deliverablePaths.deliverableFile) as DeliverableRecordPayload;
   const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();

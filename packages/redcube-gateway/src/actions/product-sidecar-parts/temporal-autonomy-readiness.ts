@@ -58,7 +58,7 @@ export function buildTemporalAutonomyReadinessProjection({
         evidence_id: 'provider_hosted_visual_stage_attempt',
         owner: OPL_OWNER,
         required_surface: 'provider_hosted_stage_attempt',
-        current_rca_status: 'descriptor_and_sidecar_ready',
+        current_rca_status: 'descriptor_and_sidecar_contract_ready_live_soak_pending',
       },
       {
         evidence_id: 'worker_restart_requery_resume',
