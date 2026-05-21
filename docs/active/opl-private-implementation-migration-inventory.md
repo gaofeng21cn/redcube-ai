@@ -27,7 +27,8 @@ OPL Framework 持有 generated/hosted wrappers、generic supervision/session/wor
 
 | surface | lines | class | current active caller | 当前实际职责 | 为什么属于该分类 | RCA 必须保留的 authority | 可迁往 OPL 的 generic 子域 | 迁移/退役门槛 | 推荐验证入口 |
 | --- | ---: | --- | --- | --- | --- | --- | --- | --- | --- |
-| `packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts` | 1121 | `needs_split_before_migration` | product sidecar guarded action tests、manifest/sidecar dispatch | owner receipt、visual memory/lifecycle apply、visual transition evaluator、operator evidence/stability projection | 同时承载 RCA authority actions 与 generic sidecar/operator evidence envelope；迁移前需拆清 | artifact mutation authorization、visual memory accept/reject、owner receipt signer、typed blocker、visual transition decision refs | generated sidecar dispatch shell、generic lifecycle/memory transport、operator evidence shell | split authority handlers from generic sidecar assembly；OPL wrapper parity；owner receipt roundtrip；no compat alias | `tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts`、`tests/product-domain-action-api-cases/definitions-and-delegation.test.ts` |
+| `packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts` | 671 | `already_thin_adapter` | product sidecar guarded action tests、manifest/sidecar dispatch | guarded action metadata 与 privatized functional module audit projection | 2026-05-21 已把 OPL generated wrapper / generic primitive / stability read-model / substrate export projection 拆到 `product-sidecar-parts/opl-generic-boundaries.ts`；本文件不再承载通用平台 projection body | artifact mutation authorization、visual memory accept/reject、owner receipt signer、typed blocker、visual transition decision refs | generated sidecar dispatch shell、generic lifecycle/memory transport、operator evidence shell 仍归 OPL；RCA 只消费 refs/projection | OPL wrapper parity；owner receipt roundtrip；no compat alias；后续再把 authority action handlers 与 dispatch envelope 拆开 | `tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts`、`tests/product-domain-action-api-cases/definitions-and-delegation.test.ts` |
+| `packages/redcube-gateway/src/actions/product-sidecar-parts/opl-generic-boundaries.ts` | 473 | `opl_framework_migration_candidate` | manifest/sidecar/audit projection builders | OPL generated interface consumption、generic primitive consumption、stability read-model consumption 和 substrate adapter export 的 refs-only projection | 这是从 guarded actions 中拆出的平台边界模块；当前仍在 RCA repo 内作为 migration input / consumer projection，不能写成 RCA 已拥有或 OPL 已完全默认接管 | RCA retained authority list only；不含 visual truth body、artifact body、review/export verdict body 或 memory body | generated CLI/MCP/product-entry/sidecar/status/session/workbench wrapper、generic scheduler/runtime/workbench、observability/stability read model、substrate adapter shell | OPL generated/hosted shell 成为默认 caller；RCA manifest/sidecar 只保留 domain handler refs；production long-soak evidence 关闭 | `tests/opl-family-contract-adoption.test.ts`、`tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts` |
 | `packages/redcube-gateway/src/actions/product-sidecar.ts` | 1008 | `opl_framework_migration_candidate` | product sidecar export/dispatch、OPL provider bridge | refs-only sidecar export, dispatch envelope, runtime framework projection | sidecar wrapper/typed queue transport 长期归 OPL；RCA 只保留 domain target/actions | domain action metadata、owner receipt refs、typed blockers | generated sidecar wrapper、typed queue dispatch shell | OPL sidecar default caller；RCA receipt parity；no forbidden writes | product-entry sidecar tests, `npm run test:fast` |
 | `packages/redcube-gateway/src/actions/get-product-entry-manifest.ts` | 943 | `opl_framework_migration_candidate` | product-entry manifest/status/session projection | product-entry / stage / action / runtime-program manifest aggregation | manifest/status/workbench shell 应由 OPL generated surface default 化 | visual route truth refs、authority surface refs、artifact locator refs | generated product/status/workbench manifest shell | OPL generated shell production/default caller；direct route parity | `tests/product-entry-cases/manifest-and-start-surfaces.test.ts` |
 | `packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts` | 940 | `already_thin_adapter` | OPL pack/skeleton conformance tests | standard agent skeleton mapping and descriptor projection | 当前是 contract mapping / conformance support，不是 runtime owner | RCA semantic pack refs | OPL scaffold/generator owner | keep until OPL source fully owns skeleton mapping; no runtime behavior | `tests/opl-agent-pack-contracts.test.ts` |
@@ -44,7 +45,7 @@ OPL Framework 持有 generated/hosted wrappers、generic supervision/session/wor
 
 ## Bad-smell flags
 
-- Hand-written sidecar/action aggregation: `product-sidecar-guarded-actions.ts`, `product-sidecar.ts`.
+- Hand-written sidecar/action aggregation: `product-sidecar.ts` 仍是主要风险；`product-sidecar-guarded-actions.ts` 已移出 OPL generic projection body，但仍是 guarded action metadata / audit 聚合面。
 - Session/workbench wrapper risk: product-entry continuity/session snapshot refs must remain refs-only.
 - Projection/workbench authority risk: operator evidence/stability projections must not generate visual ready/exportable/handoffable verdict.
 - Compatibility alias risk: `managed`, `gateway`, `runtime`, `session` terms only allowed as semantic id, provenance, retired guard, domain adapter or refs-only read model.
@@ -53,10 +54,9 @@ OPL Framework 持有 generated/hosted wrappers、generic supervision/session/wor
 
 ## Immediate thinning items
 
-1. Split `product-sidecar-guarded-actions.ts` into visual authority action handlers vs generic sidecar/operator evidence assembly.
-2. Keep `product-sidecar.ts` as domain sidecar target until OPL generated wrapper is default; avoid adding generic sidecar actions.
-3. Continue reducing `session` / `managed` naming through tombstone/semantic-id migration without compatibility alias.
-4. Keep Python native helpers as domain implementation; only the invocation envelope can migrate to OPL.
+1. Continue thinning `product-sidecar.ts` sidecar export/dispatch envelope once OPL generated wrapper is the default caller; keep it as a domain sidecar target until then and do not add generic sidecar actions.
+2. Continue reducing `session` / `managed` naming through tombstone/semantic-id migration without compatibility alias.
+3. Keep Python native helpers as domain implementation; only the invocation envelope can migrate to OPL.
 
 ## OPL primitive dependencies
 
