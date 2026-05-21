@@ -553,6 +553,187 @@ test('ppt incremental screenshot_review summarizes only changed slides and recor
   );
 });
 
+function makePptScreenshotBatchingFixture() {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-screenshot-batching-'));
+  const reportsDir = path.join(workspaceRoot, 'reports');
+  const screenshotsDir = path.join(reportsDir, 'screenshots', 'capture-a');
+  mkdirSync(screenshotsDir, { recursive: true });
+  const htmlFile = path.join(workspaceRoot, 'deck.html');
+  const slides = ['S01', 'S02', 'S03'].map((slideId, index) => ({
+    slide_id: slideId,
+    title: `第${index + 1}页`,
+    content: `<section data-slide-root="true" data-slide-id="${slideId}" data-qa-block="root" data-primary-point="true" data-title="第${index + 1}页" data-layout-family="body" data-speaker-seconds="30" data-recipe-id="body_metric" data-template-id="none" data-peak-page="false" data-director-role="body"><div data-qa-block="body">page ${index + 1}</div></section>`,
+    screenshot_file: path.join(screenshotsDir, `slide-${String(index + 1).padStart(2, '0')}.png`),
+  }));
+  for (const slide of slides) writeFileSync(slide.screenshot_file, 'png');
+  writeFileSync(htmlFile, `<html><body>${slides.map((slide) => slide.content).join('')}</body></html>`);
+  const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
+  const mechanicalSlideReviews = slides.map((slide) => ({
+    slide_id: slide.slide_id,
+    title: slide.title,
+    layout_family: 'body',
+    screenshot_file: slide.screenshot_file,
+    checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true, page_number_consistency_ok: true },
+    issues: [],
+    metrics: { occupied_ratio: 0.5, title_font_size: 34 },
+  }));
+  writeFileSync(reviewScript, `console.log(JSON.stringify({ slide_reviews: ${JSON.stringify(mechanicalSlideReviews)}, checks: { overflow_free: true }, metrics: { page_count: 3 }, baseline: {} }));\n`);
+  const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
+  const contexts = [];
+  const stageParts = createPptDeckStageParts({
+    CANVAS: { width: 1152, height: 648 },
+    CODEX_DEFAULT_ADAPTER: 'test-adapter',
+    CREATIVE_MATERIALIZED_FROM: 'test',
+    PAGE_FIX_ROUTE: 'fix_html',
+    PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
+    PYTHON_EXPORT: '/tmp/export.py',
+    PYTHON_REVIEW: reviewScript,
+    RENDER_HTML_BATCH_SIZE: 2,
+    RENDER_REFERENCE_SLIDE_WINDOW: 2,
+    SCREENSHOT_REVIEW_BATCH_SIZE: 2,
+    TARGETED_RENDER_HTML_BATCH_SIZE: 1,
+    aiFirstMechanicalCheckValue: (items, check) => items.every((slide) => slide.checks?.[check] !== false),
+    attachCommon: (stage) => ({ stage }),
+    buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, ai_review: aiReview }),
+    buildAuthoringContext: () => ({}),
+    buildDeckHtml: () => '<html></html>',
+    chunkArray: (items, size) => {
+      const chunks = [];
+      for (let index = 0; index < items.length; index += size) chunks.push(items.slice(index, index + size));
+      return chunks;
+    },
+    collectSlidesNeedingTargetedRevision: () => [],
+    compareFailuresAndDensity: () => ({ verdict: 'not_degraded' }),
+    createReviewCapturePaths: () => ({ captureId: 'capture-a', screenshotsDir, reviewMarkdownFile: path.join(screenshotsDir, 'review.md') }),
+    creativeExecution: (_route, generationRuntime) => ({ generation_runtime: generationRuntime }),
+    creativeSourceStamp: () => ({}),
+    currentHtmlStageId: () => 'render_html',
+    deriveProfileChecks: () => ({}),
+    deriveScreenshotReviewRerunStage: () => 'render_html',
+    directorReviewOutputContract: () => ({}),
+    ensureDir: (dir) => {
+      mkdirSync(dir, { recursive: true });
+      return dir;
+    },
+    extraChecks: () => ({}),
+    generateStructuredArtifact: async ({ context }) => {
+      contexts.push(context);
+      if (context?.review_scope === 'slide_batch') {
+        return {
+          data: {
+            slide_reviews: safeArray(context?.screenshot_mechanics?.slides).map((slide) => ({
+              slide_id: slide.slide_id,
+              judgement: 'pass',
+              visual_findings: [],
+              recommended_fix: '',
+            })),
+          },
+          generationRuntime: { estimated_prompt_tokens: 7, prompt_bytes: 70, context_bytes: 30 },
+        };
+      }
+      if (context?.review_scope === 'summary') {
+        return {
+          data: { director_intent_landed: true, anti_template_ok: true, weak_pages: [], review_summary: 'ai ok' },
+          generationRuntime: { estimated_prompt_tokens: 3, prompt_bytes: 30, context_bytes: 10 },
+        };
+      }
+      return { data: {}, generationRuntime: {} };
+    },
+    getDeliverablePaths: () => deliverablePaths,
+    getDeliverableViewSurfacePaths: () => ({ stableHtmlFile: htmlFile }),
+    getReviewState: () => ({}),
+    hasAiVisualBlock: (review) => review?.judgement === 'block',
+    hydrateRenderedSlideRootMetadata: (slide) => slide,
+    isBaselineApprovedState: () => true,
+    loadOperatorRevisionBrief: () => null,
+    normalizeInlineText: (value) => String(value || ''),
+    normalizePptScreenshotAiSlideReviews: (value) => value,
+    normalizeStringList: (value) => safeArray(value),
+    normalizeTypographyPlan: (value) => value,
+    primarySurface: () => 'test-surface',
+    readCurrentHtmlArtifact: () => ({
+      route: 'render_html',
+      html_bundle: {
+        html_file: htmlFile,
+        page_count: slides.length,
+        slides: slides.map((slide) => ({
+          slide_id: slide.slide_id,
+          title: slide.title,
+          content: slide.content,
+          content_html: slide.content,
+          evidence_and_sources: [{ public_label: 'source' }],
+        })),
+      },
+    }),
+    readJson: () => ({}),
+    readPromptPackText: () => '',
+    readStageArtifact: (_contract, _paths, stage) => {
+      if (stage === 'visual_director_review') return { visual_director_review: { director_intent_landed: true, anti_template_ok: true } };
+      if (stage === 'slide_blueprint') return { slide_blueprint: { slides: slides.map((slide) => ({ slide_id: slide.slide_id, title: slide.title })) } };
+      if (stage === 'storyline') return {};
+      return null;
+    },
+    renderHtmlOutputContract: () => ({}),
+    renderHtmlSummaryOutputContract: () => ({}),
+    requireText: (value) => String(value || ''),
+    resolvePromptPackAsset: () => '',
+    resolveRedCubePythonCommand: () => ({ command: 'node' }),
+    safeArray,
+    safeFileMtimeMs: () => 1,
+    safeText,
+    screenshotReviewSlideBatchOutputContract: () => ({}),
+    screenshotReviewSummaryOutputContract: () => ({}),
+    seedDeliverableStableViews: () => [],
+    stageArtifactPath: () => path.join(workspaceRoot, 'screenshot-review.json'),
+    summarizeBlueprintSlides: (artifact) => safeArray(artifact?.slide_blueprint?.slides),
+    summarizeRelativeQuality: () => 'baseline ok',
+    validateRenderedReviewAnchors: () => [],
+    validateRenderedSlideContent: () => [],
+    writeJson: (file, value) => writeFileSync(file, JSON.stringify(value)),
+    writeText: (file, text) => {
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, text);
+    },
+  });
+  return { stageParts, workspaceRoot, contract: { title: 'PPT batch review', layout_rules: { max_primary_points_per_slide: 5 } }, contexts };
+}
+
+test('ppt screenshot_review batches page-local AI calls while preserving child-call telemetry', async () => {
+  const fixture = makePptScreenshotBatchingFixture();
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  let artifact;
+  try {
+    artifact = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract: fixture.contract,
+      mode: 'create_new',
+      adapter: 'test-adapter',
+    });
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
+
+  const slideBatchContexts = fixture.contexts.filter((context) => context.review_scope === 'slide_batch');
+  assert.deepEqual(
+    slideBatchContexts.map((context) => context.screenshot_mechanics.slides.map((slide) => slide.slide_id)),
+    [['S01', 'S02'], ['S03']],
+  );
+  assert.equal(artifact.status, 'pass');
+  assert.deepEqual(artifact.review_execution.reviewed_slide_ids, ['S01', 'S02', 'S03']);
+  assert.equal(artifact.review_execution.generation_runtime.estimated_prompt_tokens, 17);
+  assert.deepEqual(
+    artifact.review_execution.generation_runtime.child_calls.map((call) => call.target_slide_ids),
+    [['S01', 'S02'], ['S03'], []],
+  );
+});
+
 function makeXhsReviewParts() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-screenshot-cache-'));
   const reportsDir = path.join(workspaceRoot, 'reports');

@@ -17,11 +17,13 @@ export function createPptDeckScreenshotReviewParts(deps) {
     PAGE_FIX_ROUTE,
     PROMPT_PACK,
     PYTHON_REVIEW,
+    SCREENSHOT_REVIEW_BATCH_SIZE,
     SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID = 'ppt_deck_screenshot_mechanics:v3:parent-surface-target-audit',
     aiFirstMechanicalCheckValue,
     attachCommon,
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
+    chunkArray,
     collectSlidesNeedingTargetedRevision,
     compareFailuresAndDensity,
     createReviewCapturePaths,
@@ -200,8 +202,13 @@ export function createPptDeckScreenshotReviewParts(deps) {
         })),
       },
     };
-    const batchResults = await Promise.all(safeArray(slideReviews).map(async (slide) => {
-      const slideBatch = [slide];
+    const reviewBatchSize = Math.max(1, Number(SCREENSHOT_REVIEW_BATCH_SIZE || 1));
+    const slideReviewBatches = safeArray(chunkArray
+      ? chunkArray(slideReviews, reviewBatchSize)
+      : safeArray(slideReviews).map((slide) => [slide]))
+      .map((batch) => safeArray(batch).filter(Boolean))
+      .filter((batch) => batch.length > 0);
+    const batchResults = await Promise.all(slideReviewBatches.map(async (slideBatch) => {
       const batchSlideIds = slideBatch.map((item) => safeText(item?.slide_id)).filter(Boolean);
       const { data: batchData, generationRuntime: batchRuntime } = await generateStructuredArtifact({
         adapter,
