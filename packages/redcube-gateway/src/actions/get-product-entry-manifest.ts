@@ -560,7 +560,10 @@ export async function getProductEntryManifest(request) {
     formal_entry: {
       default: 'CLI',
       supported_protocols: ['MCP'],
-      internal_surface: 'gateway',
+      internal_surface: 'domain_entry_protocol_boundary',
+      internal_surface_role: 'service_safe_domain_entry_and_protocol_adapter',
+      retired_internal_surface_ids: ['gateway'],
+      compatibility_alias_allowed: false,
     },
     workspace_locator: {
       workspace_surface_kind: 'redcube_workspace',

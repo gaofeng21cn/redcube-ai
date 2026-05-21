@@ -456,6 +456,9 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     default: 'CLI' | string;
     supported_protocols: string[];
     internal_surface: string;
+    internal_surface_role?: string;
+    retired_internal_surface_ids?: string[];
+    compatibility_alias_allowed?: boolean;
   };
   workspace_locator: {
     workspace_surface_kind: string;

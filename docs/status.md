@@ -98,6 +98,8 @@ RCA 的 domain-owned production acceptance 机器面是：
 
 2026-05-22 session-continuity naming hygiene tranche 进一步把 active manifest、artifact locator、product-entry behavior contract、current-program active baton、contract sync seed 和 product-entry focused tests 中的 `session_store_root` / `required_session_store_root` 硬迁移为 `session_continuity_root` / `required_session_continuity_root`，并把 active `session_store_contract` 字段改为 `session_continuity_contract`。旧 `session store` 词只保留在 forbidden generic-owner role、retired semantic id、tombstone/provenance 或人读解释语境；本轮不保留 compatibility alias，也不改变真实用户级 runtime-state 目录。该项只压缩 active reader-facing naming tail，不声明 OPL generated session shell、App workbench、Temporal visual-stage long soak、真实 memory/lifecycle receipt scaleout、visual ready、exportable 或 handoffable 完成。
 
+2026-05-22 domain-entry naming hygiene tranche 把 product-entry manifest 的 active `formal_entry.internal_surface` 从旧 `gateway` 迁移为 `domain_entry_protocol_boundary`，并显式声明 `internal_surface_role=service_safe_domain_entry_and_protocol_adapter`、`retired_internal_surface_ids=["gateway"]` 与 `compatibility_alias_allowed=false`。Current-program 的 active TypeScript owner 也改为 `domain-entry protocol boundary` 口径。`@redcube/gateway` 包名、历史 contract refs 和 retired legacy ids 继续只作为 package/provenance/tombstone 语境保留；本轮不新增 gateway compatibility alias，也不声明 OPL generated wrapper、Temporal visual-stage long soak、真实 owner receipt scaleout、visual ready、exportable 或 handoffable 完成。
+
 ## 当前物理源码形态差距
 
 - MCP / CLI / product-entry / sidecar / status / session wrapper 仍有 repo-local adapter；目标是 OPL generated/hosted shell default 化，RCA 只保留 service-safe domain entry、domain handler target、receipt、typed blocker 与 visual authority refs。
