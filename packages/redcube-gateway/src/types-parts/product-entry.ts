@@ -329,7 +329,7 @@ export interface OplFamilyLifecycleAdapterSurface {
   owner_route_discovery: Record<string, unknown>;
   adoption: Record<string, unknown>;
   authority_boundary: {
-    owns_visual_truth: boolean;
+    owns_domain_truth: boolean;
     owns_canonical_artifacts: boolean;
     owns_review_truth: boolean;
     owns_publication_projection: boolean;

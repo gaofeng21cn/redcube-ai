@@ -1,7 +1,7 @@
 // @ts-nocheck
 import {
-  buildOplFamilyLifecycleAdapterSurface as buildOplFamilyLifecycleAdapterSurfaceImpl,
-} from './product-entry-continuity-surfaces-parts/opl-family-lifecycle-adapter.js';
+  buildOplProductEntryLifecycleAdapterSurface,
+} from 'opl-framework-shared/product-entry-companions';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -285,22 +285,47 @@ export function buildOplFamilyLifecycleAdapterSurface({
   entryMode = 'manifest_projection',
   manifestProjection = false,
 }) {
-  return buildOplFamilyLifecycleAdapterSurfaceImpl({
-    domainOwner: REDCUBE_LOOP_OWNER,
-    runtimeOwner,
-    entrySessionId,
-    sessionFile,
-    deliveryIdentity,
-    continuationSnapshot,
-    runtimeLoopClosure,
-    reviewState,
-    publicationProjection,
-    artifactLocatorContract,
+  return buildOplProductEntryLifecycleAdapterSurface({
+    domain_id: REDCUBE_LOOP_OWNER,
+    domain_owner: REDCUBE_LOOP_OWNER,
+    runtime_owner: runtimeOwner,
+    entry_session_id: entrySessionId,
+    session_file: sessionFile,
+    delivery_identity: deliveryIdentity,
+    continuation_snapshot: continuationSnapshot,
+    runtime_loop_closure: runtimeLoopClosure,
+    review_projection: reviewState,
+    publication_projection: publicationProjection,
+    artifact_locator_contract: artifactLocatorContract,
     source,
-    entryMode,
-    manifestProjection,
-    productEntrySessionCommandTemplate: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
-    oplHostedHandoffRef: OPL_HOSTED_HANDOFF_REF,
+    entry_mode: entryMode,
+    manifest_projection: manifestProjection,
+    product_entry_session_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
+    direct_product_entry_command: 'redcube product invoke',
+    opl_hosted_handoff_ref: OPL_HOSTED_HANDOFF_REF,
+    adapter_id: 'rca.opl.family.lifecycle.adapter.v1',
+    version: 'v1',
+    owner_overrides: {
+      lifecycle_projection_owner: REDCUBE_LOOP_OWNER,
+      domain_truth_owner: REDCUBE_LOOP_OWNER,
+      review_publication_owner: REDCUBE_LOOP_OWNER,
+    },
+    route_equivalence_ref: '/route_equivalence',
+    non_goals: [
+      'not_a_visual_domain_truth_owner',
+      'not_a_canonical_artifact_owner',
+      'not_a_review_or_publication_projection_owner',
+      'not_a_concrete_executor',
+      'not_a_private_sqlite_authority',
+    ],
+    allowed_authority: [
+      'discover_product_entry_registration',
+      'read_product_entry_session',
+      'read_runtime_progress_projection',
+      'read_artifact_inventory',
+      'read_review_publication_projection_refs',
+      'adopt_session_resume_cursor',
+    ],
   });
 }
 

@@ -840,7 +840,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
       assert.equal(manifest.opl_family_lifecycle_adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
       assert.equal(manifest.opl_family_lifecycle_adapter.discovery.adoption_state, 'discoverable_manifest_projection');
-      assert.equal(manifest.opl_family_lifecycle_adapter.persistence.sqlite.status, 'deferred_for_rca');
+      assert.equal(manifest.opl_family_lifecycle_adapter.persistence.sqlite.status, 'not_domain_owned_generic_persistence');
       assert.equal(manifest.opl_family_lifecycle_adapter.persistence.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
       assert.deepEqual(
         manifest.opl_family_lifecycle_adapter.discovery.owner_split,
@@ -871,7 +871,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         manifest.opl_family_lifecycle_adapter.adoption.required_input_fields.includes('entry_session_id'),
         true,
       );
-      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_visual_truth, false);
+      assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_domain_truth, false);
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_canonical_artifacts, false);
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_review_truth, false);
       assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
