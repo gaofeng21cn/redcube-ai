@@ -9,7 +9,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 - 对外主语固定为独立 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不成为公开第一身份。
 - 当前 formal-entry matrix 固定为 `CLI`（默认正式入口）/ `MCP`（支持协议层）/ `controller`（内部控制面）。不得把 `controller` 写成公开产品入口。
-- 当前默认公开 capability contract 固定为 `CLI / MCP / product-entry/service-safe-domain-entry surface + Codex-default execution`；在 OPL 托管路径中，除非调用方显式选择 hosted/proof backend，`Codex CLI` 仍是 RCA 的最小具体执行单元。
+- 当前默认公开 capability contract 固定为 `CLI / MCP / product-entry/service-safe-domain-entry surface + OPL/Temporal hosted scheduling + Codex-default stage execution`；任务启动后的持久在线调度、唤醒、resume、retry/dead-letter 与 attempt ledger 归 OPL/Temporal，`Codex CLI` 仍是 RCA 的最小具体 stage executor。
 - `contracts/runtime-program/current-program.json` 是当前 active mainline pointer；`contracts/runtime-program/*.json` 是 tranche / board / provenance 的机器可读真相面。`docs/active/*.md` 与 `docs/history/phase-2/*.md` 是对应人读 brief，必须与 contracts 和 tests 同步。
 - repo-verified direct route 与 OPL-hosted route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
 

@@ -9,7 +9,7 @@ import {
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
 
-test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract with RCA receipt gates', SERIAL_ENV_TEST, async () => {
+test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract with RCA evidence gates', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
@@ -19,11 +19,16 @@ test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract w
     assert.equal(readiness.target_domain_id, 'redcube_ai');
     assert.equal(readiness.provider_owner, 'one-person-lab');
     assert.equal(readiness.provider_kind_required_for_production, 'temporal');
-    assert.equal(readiness.status, 'standard_opl_temporal_contract_ready_live_rca_soak_pending');
+    assert.equal(readiness.status, 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending');
     assert.equal(readiness.can_be_opl_temporal_hosted, true);
-    assert.equal(readiness.long_time_autonomy_claimed, false);
+    assert.equal(readiness.default_opl_temporal_hosted_autonomy_enabled, true);
+    assert.equal(readiness.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
+    assert.equal(readiness.codex_app_outer_loop_required_after_task_start, false);
+    assert.equal(readiness.long_time_autonomy_claimed, true);
     assert.equal(readiness.production_visual_stage_long_soak_complete, false);
     assert.equal(readiness.rca_owns_generic_scheduler_or_daemon, false);
+    assert.equal(readiness.rca_owns_generic_attempt_loop, false);
+    assert.equal(readiness.rca_owns_generic_attempt_ledger, false);
     assert.equal(readiness.default_executor, 'codex_cli');
 
     assert.deepEqual(
@@ -40,7 +45,7 @@ test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract w
 
     const gatesById = Object.fromEntries(readiness.capability_gates.map((gate) => [gate.gate_id, gate]));
     assert.equal(gatesById.provider_online_management.owner, 'one-person-lab');
-    assert.equal(gatesById.provider_online_management.status, 'opl_provider_capability_required');
+    assert.equal(gatesById.provider_online_management.status, 'default_enabled');
     assert.equal(gatesById.stage_descriptor_handoff.status, 'ready');
     assert.equal(gatesById.stage_descriptor_handoff.rca_surface_ref, '/family_stage_control_plane');
     assert.equal(gatesById.queue_wakeup_handoff.status, 'ready');
@@ -67,6 +72,7 @@ test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract w
     ]);
     assert.equal(readiness.authority_boundary.opl_can_write_rca_visual_truth, false);
     assert.equal(readiness.authority_boundary.opl_can_authorize_review_export_verdict, false);
+    assert.equal(readiness.authority_boundary.rca_owns_generic_daemon_scheduler_attempt_loop, false);
     assert.equal(readiness.authority_boundary.provider_completion_is_visual_ready, false);
     assert.equal(readiness.authority_boundary.provider_completion_is_production_soak_complete, false);
 
@@ -77,11 +83,15 @@ test('RCA exposes Temporal autonomy readiness as an OPL-owned runtime contract w
     );
     assert.equal(
       sidecar.mapped_surfaces.temporal_autonomy_readiness.status,
-      'standard_opl_temporal_contract_ready_live_rca_soak_pending',
+      'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending',
     );
     assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.provider_owner, 'one-person-lab');
     assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.can_be_opl_temporal_hosted, true);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.long_time_autonomy_claimed, false);
+    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.default_opl_temporal_hosted_autonomy_enabled, true);
+    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
+    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.codex_app_outer_loop_required_after_task_start, false);
+    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.long_time_autonomy_claimed, true);
+    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.production_visual_stage_long_soak_complete, false);
     assert.equal(
       sidecar.source_manifest_refs.temporal_autonomy_readiness_ref,
       '/temporal_autonomy_readiness',
