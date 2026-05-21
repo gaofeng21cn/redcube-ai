@@ -237,6 +237,134 @@ function buildOplExpectedReceiptMonitorFreshnessHandoff({
   };
 }
 
+export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleoutRefs } = {}) {
+  const reviewExportRefs = productionEvidenceScaleoutRefs?.review_export_verdict_refs || {};
+  const ownerReceiptRefs = productionEvidenceScaleoutRefs?.owner_receipt_refs || {};
+  const memoryReuseRefs = productionEvidenceScaleoutRefs?.visual_memory_body_reuse_refs || {};
+  return {
+    surface_kind: 'rca_efficiency_handoff_projection',
+    projection_id: 'rca.efficiency_handoff_projection.v1',
+    owner: 'redcube_ai',
+    consumer: 'opl_agent_lab',
+    status: 'refs_only_standard_suite_input_ready',
+    projection_model: 'derived_from_existing_runtime_review_export_refs_only',
+    refs_only: true,
+    read_only: true,
+    agent_lab_suite_input: {
+      suite_kind: 'standard',
+      suite_id: 'redcube-ai.efficiency-observability.standard.v1',
+      domain_id: 'redcube-ai',
+      domain_specific_suite_kind_required: false,
+      compatible_agent_lab_contract_ref: 'opl agent-lab suite-input#/standard',
+      input_mode: 'refs_only_handoff',
+      claims_visual_ready: false,
+      claims_exportable: false,
+      claims_handoffable: false,
+      claims_production_soak_complete: false,
+    },
+    efficiency_signal_refs: {
+      duration_refs: [
+        'workspace-runtime-ref:route-summary:<run-id>#/elapsed_ms',
+        'redcube product session#/runtime_loop_closure/elapsed_ms',
+      ],
+      cost_refs: [
+        'workspace-runtime-ref:route-summary:<run-id>#/cost_summary',
+        'redcube product session#/runtime_loop_closure/cost_summary',
+      ],
+      cache_refs: [
+        'workspace-runtime-ref:route-summary:<run-id>#/cache_status',
+        'redcube product manifest#/ppt_deck_visual_route_truth/cache_status',
+      ],
+      reuse_refs: [
+        'workspace-runtime-ref:route-artifact:<run-id>#/render_execution/reused_slide_ids',
+        'workspace-runtime-ref:route-artifact:<run-id>#/review_execution/reused_slide_ids',
+      ],
+      render_execution_refs: [
+        'workspace-runtime-ref:route-artifact:<run-id>#/render_execution',
+        'workspace-runtime-ref:route-artifact:<run-id>#/render_execution/codex_batch_runtime',
+      ],
+      export_result_refs: [
+        reviewExportRefs.actual_workspace_review_export_ref_model || 'workspace-runtime-ref:review-export:<run-id>',
+        'workspace-runtime-ref:export-result:<run-id>',
+      ],
+    },
+    efficiency_fields: {
+      cache_status: {
+        source_ref: 'workspace-runtime-ref:route-summary:<run-id>#/cache_status',
+        body_included: false,
+      },
+      elapsed_ms: {
+        source_ref: 'workspace-runtime-ref:route-summary:<run-id>#/elapsed_ms',
+        body_included: false,
+      },
+      render_execution: {
+        source_ref: 'workspace-runtime-ref:route-artifact:<run-id>#/render_execution',
+        body_included: false,
+      },
+      reused_slide_ids: {
+        source_ref: 'workspace-runtime-ref:route-artifact:<run-id>#/render_execution/reused_slide_ids',
+        body_included: false,
+      },
+      cost_summary: {
+        source_ref: 'workspace-runtime-ref:route-summary:<run-id>#/cost_summary',
+        body_included: false,
+      },
+      screenshot_review_gate: {
+        source_ref: 'workspace-runtime-ref:screenshot_review:<run-id>',
+        body_included: false,
+      },
+      export_result: {
+        source_ref: 'workspace-runtime-ref:export-result:<run-id>',
+        body_included: false,
+      },
+    },
+    quality_floor_refs: {
+      review_export_gate_refs: [
+        reviewExportRefs.review_export_gate_ref || 'workspace-runtime-ref:review-export:transition-run',
+        reviewExportRefs.actual_workspace_review_export_ref_model || 'workspace-runtime-ref:review-export:<run-id>',
+        'agent/quality_gates/review_export_memory.md',
+      ],
+      screenshot_review_gate_refs: [
+        'agent/quality_gates/screenshot_review.md',
+        'workspace-runtime-ref:screenshot_review:<run-id>',
+      ],
+      visual_memory_authority_refs: [
+        'redcube product manifest#/domain_memory_descriptor_locator/memory_locator',
+        'redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
+      ],
+      owner_receipt_refs: [
+        ownerReceiptRefs.receipt_ref || 'rca-owner-receipt:visual-stage:<receipt-id>',
+        'contracts/owner_receipt_contract.json#/receipt_cases/0',
+      ],
+      export_authority_refs: [
+        'agent/quality_gates/artifact_authority.md',
+        'contracts/artifact_locator_contract.json',
+      ],
+    },
+    optimization_policy: {
+      efficiency_improves_observability_only: true,
+      orchestration_only: true,
+      quality_gates_may_be_lowered: false,
+      screenshot_review_required: true,
+      export_gate_required: true,
+      visual_ready_claim_allowed: false,
+    },
+    authority_boundary: {
+      no_forbidden_write: true,
+      opl_agent_lab_can_store_suite_input_refs: true,
+      opl_agent_lab_can_compare_efficiency_refs: true,
+      opl_agent_lab_can_write_rca_visual_truth: false,
+      opl_agent_lab_can_write_artifact_blob: false,
+      opl_agent_lab_can_write_memory_body: false,
+      opl_agent_lab_can_authorize_quality_verdict: false,
+      opl_agent_lab_can_authorize_exportable: false,
+      opl_agent_lab_can_claim_visual_ready: false,
+      rca_quality_floor_owner: 'redcube_ai',
+      rca_export_authority_owner: 'redcube_ai',
+    },
+  };
+}
+
 export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
   oplGeneratedInterfaceConsumption,
@@ -253,6 +381,9 @@ export function buildOperatorEvidenceReadinessProjection({
   const oplExpectedReceiptMonitorFreshnessHandoff = buildOplExpectedReceiptMonitorFreshnessHandoff({
     productionEvidenceScaleoutRefs,
     workspaceReceiptInventoryProjection,
+  });
+  const rcaEfficiencyHandoffProjection = buildRcaEfficiencyHandoffProjection({
+    productionEvidenceScaleoutRefs,
   });
   const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
@@ -376,6 +507,7 @@ export function buildOperatorEvidenceReadinessProjection({
     },
     production_evidence_scaleout_refs: productionEvidenceScaleoutRefs,
     opl_expected_receipt_monitor_freshness_handoff: oplExpectedReceiptMonitorFreshnessHandoff,
+    rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
     read_only: true,
     refs_only: true,
     writes_visual_truth: false,
@@ -585,6 +717,7 @@ export function buildReturnedManifestProjection({
       || manifest.opl_substrate_adapter_export
     ),
     operator_evidence_readiness_projection: operatorEvidenceReadinessProjection,
+    rca_efficiency_handoff_projection: operatorEvidenceReadinessProjection.rca_efficiency_handoff_projection,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,

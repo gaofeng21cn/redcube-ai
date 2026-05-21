@@ -37,6 +37,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/python-native-helper-catalog.test.ts',
     'tests/publish-governance-single-owner.test.ts',
     'tests/rca-production-acceptance.test.ts',
+    'tests/rca-efficiency-handoff-projection.test.ts',
     'tests/rca-one-shot-closeout.test.ts',
     'tests/rca-retired-surface-guard.test.ts',
     'tests/reference-quality-os.test.ts',

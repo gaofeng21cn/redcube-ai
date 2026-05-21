@@ -61,6 +61,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 2026-05-21 RCA 新增 `temporal_autonomy_readiness` 机器面，并接入 product-entry manifest、product sidecar projection 和 production acceptance fixture。当前结论是：RCA 已具备标准 OPL/Temporal 托管所需的 descriptor、queue/wakeup handoff、progress re-query、runtimeWatch direct read model、owner receipt、workspace receipt proof 和 no-regression refs；provider 在线管理、restart/resume/re-query、retry/dead-letter 仍归 OPL/Temporal。该 surface 状态为 `standard_opl_temporal_contract_ready_live_rca_soak_pending`，明确 `can_be_opl_temporal_hosted=true`，但 `long_time_autonomy_claimed=false`、`production_visual_stage_long_soak_complete=false`。剩余 blocker 仍是 `rca-typed-blocker:controlled-soak:temporal-long-soak-pending`，需要真实 OPL-hosted visual-stage long soak 关闭。
 
+2026-05-21 Lane C 新增 RCA-owned `rca_efficiency_handoff_projection`，并接入 production acceptance contract、product-entry manifest 和 product sidecar projection。该 surface 汇总既有 `cache_status`、`elapsed_ms`、`render_execution`、`reused_slide_ids`、`cost_summary`、`screenshot_review` gate 和 export result refs，输出 refs-only Agent Lab compatible suite input；suite kind 继续使用 OPL Agent Lab `standard`，不要求新增 RCA-specific kind。该投影只提升效率可观察性和编排评估，不降低 `screenshot_review`、review/export gate、artifact authority、visual memory authority 或 owner receipt 门槛，不声明 visual ready、exportable、handoffable 或 production soak complete。
+
 当前标准 OPL Agent 结构口径：
 
 - RCA package surface = `agent/` canonical declarative visual pack、family action catalog、stage control projection、service-safe domain entry、domain handler targets、refs-only projections、visual authority functions、Python native helper implementation。
