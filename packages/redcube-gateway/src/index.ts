@@ -371,11 +371,14 @@ export {
   buildPrivatizedFunctionalModuleAuditProjection,
   OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildVisualPackCompilerHandoffProjection,
+} from './actions/product-sidecar-guarded-actions.js';
+
+export {
   listProductSidecarBlockedActions,
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
   listProductSidecarGuardedActions,
-} from './actions/product-sidecar-guarded-actions.js';
+} from './actions/product-sidecar-parts/guarded-action-catalog.js';
 
 export {
   buildPhysicalSourceMorphologyPolicy,

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
-import { productSidecarGuardedActionSet } from './product-sidecar-guarded-actions.js';
+import { productSidecarGuardedActionSet } from './product-sidecar-parts/guarded-action-catalog.js';
 import { dispatchProductSidecar as dispatchProductSidecarImpl } from './product-sidecar-parts/dispatch-orchestration.js';
 import { buildSidecarProjection, DOMAIN_ID, SIDECAR_ID } from './product-sidecar-parts/sidecar-export-projection.js';
 import { normalizeWorkspaceRoot } from './product-sidecar-parts/task-utils.js';

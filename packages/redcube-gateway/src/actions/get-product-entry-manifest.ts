@@ -49,9 +49,11 @@ import {
   buildPrivatizedFunctionalModuleAuditProjection,
   buildOplSubstrateAdapterExportProjection,
   buildVisualPackCompilerHandoffProjection,
+} from './product-sidecar-guarded-actions.js';
+import {
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
-} from './product-sidecar-guarded-actions.js';
+} from './product-sidecar-parts/guarded-action-catalog.js';
 import {
   OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT,
   buildRouteEquivalenceContract,

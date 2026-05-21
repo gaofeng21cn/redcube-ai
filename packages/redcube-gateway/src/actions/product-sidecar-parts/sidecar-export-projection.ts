@@ -7,10 +7,12 @@ import {
   buildPrivatizedFunctionalModuleAuditProjection,
   buildOplSubstrateAdapterExportProjection,
   buildVisualPackCompilerHandoffProjection,
+} from '../product-sidecar-guarded-actions.js';
+import {
   listProductSidecarBlockedActions,
   listProductSidecarGuardedActions,
   productSidecarGuardedActionSet,
-} from '../product-sidecar-guarded-actions.js';
+} from './guarded-action-catalog.js';
 import { RUNTIME_WATCH_BOUNDARY } from '../run-review-ref-projection.js';
 import { buildSidecarOwnerBoundary } from './owner-boundary.js';
 import { buildTemporalAutonomyReadinessProjection } from './temporal-autonomy-readiness.js';

@@ -4,7 +4,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { getProductEntryManifest } from '../get-product-entry-manifest.js';
-import { productSidecarGuardedActionSet } from '../product-sidecar-guarded-actions.js';
+import { productSidecarGuardedActionSet } from './guarded-action-catalog.js';
 import { buildSidecarOwnerBoundary } from './owner-boundary.js';
 import { evaluateVisualTransition } from './visual-transition-evaluator.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './workspace-receipt-proof.js';

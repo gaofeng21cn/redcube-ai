@@ -15,7 +15,7 @@ import {
 import {
   listProductSidecarForbiddenWrites,
   listProductSidecarGuardedActionIds,
-} from './product-sidecar-guarded-actions.js';
+} from './product-sidecar-parts/guarded-action-catalog.js';
 
 type JsonMap = Record<string, any>;
 
