@@ -17,7 +17,7 @@ export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS = Object.freeze({
 });
 
 export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
-  product_entry_session_store: {
+  product_entry_session_snapshot_refs_adapter: {
     expectation_ref: '/opl_generic_primitive_consumption',
     opl_replacement_surface: 'opl_app_session_shell_and_workbench',
     rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
@@ -107,7 +107,7 @@ export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
 ]);
 
 const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
-  product_entry_session_store: {
+  product_entry_session_snapshot_refs_adapter: {
     bridge_role: 'entry_session_snapshot_adapter_until_opl_generated_session_shell_live',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generated_interface_consumption',

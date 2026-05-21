@@ -232,7 +232,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
 
   assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
-  assert.equal(byId.product_entry_session_store.classification, 'refs_only_read_model');
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.classification, 'refs_only_read_model');
   assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
   assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
   assert.equal(byId.product_sidecar_guarded_actions.classification, 'domain_handler_target');
@@ -244,7 +244,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'contracts/runtime-program/managed-product-entry-hardening.json',
   ]);
 
-  assert.deepEqual(byId.product_entry_session_store.source_refs, [
+  assert.deepEqual(byId.product_entry_session_snapshot_refs_adapter.source_refs, [
     'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',
     'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
     'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
@@ -253,7 +253,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-gateway/src/actions/run-review-ref-projection.ts',
   ]);
   assert.equal(
-    byId.product_entry_session_store.current_rca_role,
+    byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
   assert.equal(

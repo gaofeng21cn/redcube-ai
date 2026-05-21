@@ -307,7 +307,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     current.current_state.active_baton.scope.privatized_functional_module_audit,
   ];
   const expectedModules = [
-    'product_entry_session_store',
+    'product_entry_session_snapshot_refs_adapter',
     'workspace_source_intake',
     'memory_writeback_receipt_transport',
     'artifact_export_lifecycle',
@@ -504,7 +504,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.native_helper_envelope.rca_scope, 'python_native_helper_implementation');
   assert.equal(byId.native_helper_envelope.migration_class, 'native_helper_implementation');
   const closedFunctionalModuleIds = [
-    'product_entry_session_store',
+    'product_entry_session_snapshot_refs_adapter',
     'artifact_export_lifecycle',
   ];
   for (const moduleId of closedFunctionalModuleIds) {
@@ -526,10 +526,10 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', moduleId);
     assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, moduleId);
   }
-  assert.equal(byId.product_entry_session_store.status, 'opl_generated_workbench_session_surface_consumed');
-  assert.equal(byId.product_entry_session_store.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
-  assert.equal(byId.product_entry_session_store.opl_generic_primitive, 'workbench_shell');
-  assert.equal(byId.product_entry_session_store.migration_class, 'refs_only_adapter');
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.status, 'opl_generated_workbench_session_surface_consumed');
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.opl_generic_primitive, 'workbench_shell');
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.migration_class, 'refs_only_adapter');
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
   assert.equal(byId.workspace_source_intake.activeCallerStatus, 'opl_workspace_source_shell_domain_handler_refs');
   assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');
@@ -598,7 +598,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.deepEqual(handoff.generated_surface_targets, expectedGeneratedTargets);
     assert.deepEqual(handoff.generated_descriptor_scope, expectedDescriptorScope);
     assert.equal(handoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner, 'one-person-lab');
-    assert.equal(handoff.repo_local_launcher_policy.product_entry_session_store_is_generic_session_owner, false);
+    assert.equal(handoff.repo_local_launcher_policy.product_entry_session_snapshot_refs_adapter_is_generic_session_owner, false);
     assert.equal(handoff.wrappers.skill.owner, 'opl');
     assert.equal(handoff.wrappers.skill.long_term_rca_owner, false);
   }

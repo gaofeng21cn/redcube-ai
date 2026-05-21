@@ -489,7 +489,7 @@
       "invokeProductEntry",
       "invokeDomainEntry",
       "product_sidecar",
-      "product_entry_session_store"
+      "product_entry_session_snapshot_refs_adapter"
     ],
     "repo_local_handlers_are_generated_surface_owners": false,
     "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",

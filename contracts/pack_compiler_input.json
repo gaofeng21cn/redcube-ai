@@ -472,7 +472,7 @@
     "invokeProductEntry",
     "invokeDomainEntry",
     "product_sidecar",
-    "product_entry_session_store"
+    "product_entry_session_snapshot_refs_adapter"
   ],
   "repo_local_handlers_are_generated_surface_owners": false,
   "domain_repo_can_own_generated_surface": false,

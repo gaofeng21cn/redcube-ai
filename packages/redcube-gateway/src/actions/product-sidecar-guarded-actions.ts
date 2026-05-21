@@ -151,7 +151,7 @@ export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
 
 export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
-    module_id: 'product_entry_session_store',
+    module_id: 'product_entry_session_snapshot_refs_adapter',
     surface_ref: '/session_continuity',
     status: 'opl_generated_workbench_session_surface_consumed',
     classification: 'split_owner_boundary',
@@ -395,7 +395,7 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
 ]);
 
 const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
-  product_entry_session_store: 'refs_only_adapter',
+  product_entry_session_snapshot_refs_adapter: 'refs_only_adapter',
   workspace_source_intake: 'refs_only_adapter',
   memory_writeback_receipt_transport: 'refs_only_adapter',
   artifact_export_lifecycle: 'refs_only_adapter',
@@ -434,7 +434,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     refs_only: true,
     audit_scope: [
       'OPL stage execution plan route handler refs',
-      'product-entry session store',
+      'product-entry session snapshot refs adapter',
       'workspace/source intake',
       'memory/writeback receipt transport',
       'artifact export lifecycle',
@@ -558,7 +558,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         rca_retains: entry.rcaRetains || [],
         repo_local_handler_target_only: entry.module_id === 'generic_cli_mcp_wrappers' ? true : undefined,
         generated_surface_metadata_owner: entry.module_id === 'generic_cli_mcp_wrappers' ? 'one-person-lab' : undefined,
-        generated_session_shell_owner: entry.module_id === 'product_entry_session_store' ? 'one-person-lab' : undefined,
+        generated_session_shell_owner: entry.module_id === 'product_entry_session_snapshot_refs_adapter' ? 'one-person-lab' : undefined,
         retire_tombstone: false,
         writes_visual_truth: false,
         writes_artifact_blob: false,

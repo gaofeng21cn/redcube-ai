@@ -8,7 +8,7 @@
     "no_regression_proof_recorded"
   ],
   "remaining_bridge_module_ids": [
-    "product_entry_session_store",
+    "product_entry_session_snapshot_refs_adapter",
     "workspace_source_intake",
     "memory_writeback_receipt_transport",
     "artifact_export_lifecycle",

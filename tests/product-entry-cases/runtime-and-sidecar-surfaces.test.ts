@@ -271,7 +271,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.map((entry) => entry.module_id),
       [
-        'product_entry_session_store',
+        'product_entry_session_snapshot_refs_adapter',
         'workspace_source_intake',
         'memory_writeback_receipt_transport',
         'artifact_export_lifecycle',
@@ -389,19 +389,19 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       ],
     );
     assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').opl_replacement_expectation.replacement_surface,
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_snapshot_refs_adapter').opl_replacement_expectation.replacement_surface,
       'opl_app_session_shell_and_workbench',
     );
     assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').status,
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_snapshot_refs_adapter').status,
       'opl_generated_workbench_session_surface_consumed',
     );
     assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').activeCallerStatus,
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_snapshot_refs_adapter').activeCallerStatus,
       'opl_generated_session_shell_domain_refs',
     );
     assert.equal(
-      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_store').migration_class,
+      sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'product_entry_session_snapshot_refs_adapter').migration_class,
       'refs_only_adapter',
     );
     assert.equal(
@@ -421,7 +421,7 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       'opl_artifact_lifecycle_gallery_handoff_shell',
     );
     const closedFunctionalModuleIds = [
-      'product_entry_session_store',
+      'product_entry_session_snapshot_refs_adapter',
       'artifact_export_lifecycle',
     ];
     for (const moduleId of closedFunctionalModuleIds) {

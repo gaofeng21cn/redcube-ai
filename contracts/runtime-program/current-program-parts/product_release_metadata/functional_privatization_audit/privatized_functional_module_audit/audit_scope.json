@@ -1,6 +1,6 @@
 [
   "OPL stage execution plan route handler refs",
-  "product-entry session store",
+  "product-entry session snapshot refs adapter",
   "workspace/source intake",
   "memory/writeback receipt transport",
   "artifact export lifecycle",

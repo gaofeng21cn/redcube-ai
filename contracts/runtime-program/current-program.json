@@ -471,7 +471,7 @@
       "refs_only": true,
       "audit_scope": [
         "OPL stage execution plan route handler refs",
-        "product-entry session store",
+        "product-entry session snapshot refs adapter",
         "workspace/source intake",
         "memory/writeback receipt transport",
         "artifact export lifecycle",
@@ -521,20 +521,20 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -675,7 +675,7 @@
           "no_regression_proof_recorded"
         ],
         "remaining_bridge_module_ids": [
-          "product_entry_session_store",
+          "product_entry_session_snapshot_refs_adapter",
           "workspace_source_intake",
           "memory_writeback_receipt_transport",
           "artifact_export_lifecycle",
@@ -736,7 +736,7 @@
       "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
       "modules": [
         {
-          "module_id": "product_entry_session_store",
+          "module_id": "product_entry_session_snapshot_refs_adapter",
           "surface_ref": "/session_continuity",
           "status": "opl_generated_workbench_session_surface_consumed",
           "classification": "split_owner_boundary",
@@ -778,7 +778,7 @@
             "rca_owns_replacement_runtime": false
           },
           "bridge_exit_gate": {
-            "gate_id": "product_entry_session_store_bridge_exit_gate",
+            "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
             "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
             "bridge_owner": "redcube_ai_migration_bridge",
             "replacement_owner": "opl",
@@ -823,7 +823,7 @@
           },
           "physical_deletion_guard": {
             "safe_to_delete_now": false,
-            "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+            "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
             "required_before_delete": [
               "domain_authority_refs_preserved",
               "no_regression_proof_recorded"
@@ -2475,20 +2475,20 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -3141,7 +3141,7 @@
             "invokeProductEntry",
             "invokeDomainEntry",
             "product_sidecar",
-            "product_entry_session_store"
+            "product_entry_session_snapshot_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -3232,7 +3232,7 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
         "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -3290,14 +3290,14 @@
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "wrappers": {
           "cli": {
@@ -3838,7 +3838,7 @@
         "refs_only": true,
         "audit_scope": [
           "OPL stage execution plan route handler refs",
-          "product-entry session store",
+          "product-entry session snapshot refs adapter",
           "workspace/source intake",
           "memory/writeback receipt transport",
           "artifact export lifecycle",
@@ -3888,20 +3888,20 @@
             "invokeProductEntry",
             "invokeDomainEntry",
             "product_sidecar",
-            "product_entry_session_store"
+            "product_entry_session_snapshot_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
             "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-            "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+            "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
             "default_supervision_owner": "one-person-lab",
             "legacy_supervision_public_surface": "retired",
             "redcube_cli_is_unified_metadata_owner": false,
             "redcube_mcp_is_unified_metadata_owner": false,
-            "product_entry_session_store_is_generic_session_owner": false
+            "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
           },
           "bridge_exit_gate": {
             "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -4042,7 +4042,7 @@
             "no_regression_proof_recorded"
           ],
           "remaining_bridge_module_ids": [
-            "product_entry_session_store",
+            "product_entry_session_snapshot_refs_adapter",
             "workspace_source_intake",
             "memory_writeback_receipt_transport",
             "artifact_export_lifecycle",
@@ -4103,7 +4103,7 @@
         "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
         "modules": [
           {
-            "module_id": "product_entry_session_store",
+            "module_id": "product_entry_session_snapshot_refs_adapter",
             "surface_ref": "/session_continuity",
             "status": "opl_generated_workbench_session_surface_consumed",
             "classification": "split_owner_boundary",
@@ -4145,7 +4145,7 @@
               "rca_owns_replacement_runtime": false
             },
             "bridge_exit_gate": {
-              "gate_id": "product_entry_session_store_bridge_exit_gate",
+              "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
               "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
               "bridge_owner": "redcube_ai_migration_bridge",
               "replacement_owner": "opl",
@@ -4190,7 +4190,7 @@
             },
             "physical_deletion_guard": {
               "safe_to_delete_now": false,
-              "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+              "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
               "required_before_delete": [
                 "domain_authority_refs_preserved",
                 "no_regression_proof_recorded"
@@ -5842,20 +5842,20 @@
             "invokeProductEntry",
             "invokeDomainEntry",
             "product_sidecar",
-            "product_entry_session_store"
+            "product_entry_session_snapshot_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
             "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-            "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+            "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
             "default_supervision_owner": "one-person-lab",
             "legacy_supervision_public_surface": "retired",
             "redcube_cli_is_unified_metadata_owner": false,
             "redcube_mcp_is_unified_metadata_owner": false,
-            "product_entry_session_store_is_generic_session_owner": false
+            "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
           },
           "bridge_exit_gate": {
             "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -6029,20 +6029,20 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -7910,7 +7910,7 @@
           "refs_only": true,
           "audit_scope": [
             "OPL stage execution plan route handler refs",
-            "product-entry session store",
+            "product-entry session snapshot refs adapter",
             "workspace/source intake",
             "memory/writeback receipt transport",
             "artifact export lifecycle",
@@ -7960,20 +7960,20 @@
               "invokeProductEntry",
               "invokeDomainEntry",
               "product_sidecar",
-              "product_entry_session_store"
+              "product_entry_session_snapshot_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
               "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_store_is_generic_session_owner": false
+              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
             },
             "bridge_exit_gate": {
               "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -8114,7 +8114,7 @@
               "no_regression_proof_recorded"
             ],
             "remaining_bridge_module_ids": [
-              "product_entry_session_store",
+              "product_entry_session_snapshot_refs_adapter",
               "workspace_source_intake",
               "memory_writeback_receipt_transport",
               "artifact_export_lifecycle",
@@ -8175,7 +8175,7 @@
           "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
           "modules": [
             {
-              "module_id": "product_entry_session_store",
+              "module_id": "product_entry_session_snapshot_refs_adapter",
               "surface_ref": "/session_continuity",
               "status": "opl_generated_workbench_session_surface_consumed",
               "classification": "split_owner_boundary",
@@ -8217,7 +8217,7 @@
                 "rca_owns_replacement_runtime": false
               },
               "bridge_exit_gate": {
-                "gate_id": "product_entry_session_store_bridge_exit_gate",
+                "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
                 "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
                 "bridge_owner": "redcube_ai_migration_bridge",
                 "replacement_owner": "opl",
@@ -8262,7 +8262,7 @@
               },
               "physical_deletion_guard": {
                 "safe_to_delete_now": false,
-                "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+                "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
                 "required_before_delete": [
                   "domain_authority_refs_preserved",
                   "no_regression_proof_recorded"
@@ -9914,20 +9914,20 @@
               "invokeProductEntry",
               "invokeDomainEntry",
               "product_sidecar",
-              "product_entry_session_store"
+              "product_entry_session_snapshot_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
               "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_store_is_generic_session_owner": false
+              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
             },
             "bridge_exit_gate": {
               "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -10580,7 +10580,7 @@
                 "invokeProductEntry",
                 "invokeDomainEntry",
                 "product_sidecar",
-                "product_entry_session_store"
+                "product_entry_session_snapshot_refs_adapter"
               ],
               "repo_local_handlers_are_generated_surface_owners": false,
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -10671,7 +10671,7 @@
               "invokeProductEntry",
               "invokeDomainEntry",
               "product_sidecar",
-              "product_entry_session_store"
+              "product_entry_session_snapshot_refs_adapter"
             ],
             "rca_generated_surface_owner": false,
             "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -10729,14 +10729,14 @@
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
               "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_store_is_generic_session_owner": false
+              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
             },
             "wrappers": {
               "cli": {
@@ -11629,7 +11629,7 @@
       "refs_only": true,
       "audit_scope": [
         "OPL stage execution plan route handler refs",
-        "product-entry session store",
+        "product-entry session snapshot refs adapter",
         "workspace/source intake",
         "memory/writeback receipt transport",
         "artifact export lifecycle",
@@ -11679,20 +11679,20 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -11833,7 +11833,7 @@
           "no_regression_proof_recorded"
         ],
         "remaining_bridge_module_ids": [
-          "product_entry_session_store",
+          "product_entry_session_snapshot_refs_adapter",
           "workspace_source_intake",
           "memory_writeback_receipt_transport",
           "artifact_export_lifecycle",
@@ -11894,7 +11894,7 @@
       "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
       "modules": [
         {
-          "module_id": "product_entry_session_store",
+          "module_id": "product_entry_session_snapshot_refs_adapter",
           "surface_ref": "/session_continuity",
           "status": "opl_generated_workbench_session_surface_consumed",
           "classification": "split_owner_boundary",
@@ -11936,7 +11936,7 @@
             "rca_owns_replacement_runtime": false
           },
           "bridge_exit_gate": {
-            "gate_id": "product_entry_session_store_bridge_exit_gate",
+            "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
             "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
             "bridge_owner": "redcube_ai_migration_bridge",
             "replacement_owner": "opl",
@@ -11981,7 +11981,7 @@
           },
           "physical_deletion_guard": {
             "safe_to_delete_now": false,
-            "reason": "product_entry_session_store is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+            "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
             "required_before_delete": [
               "domain_authority_refs_preserved",
               "no_regression_proof_recorded"
@@ -13633,20 +13633,20 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -14299,7 +14299,7 @@
             "invokeProductEntry",
             "invokeDomainEntry",
             "product_sidecar",
-            "product_entry_session_store"
+            "product_entry_session_snapshot_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -14390,7 +14390,7 @@
           "invokeProductEntry",
           "invokeDomainEntry",
           "product_sidecar",
-          "product_entry_session_store"
+          "product_entry_session_snapshot_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
         "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -14448,14 +14448,14 @@
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
           "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_store_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_store_is_generic_session_owner": false
+          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
         },
         "wrappers": {
           "cli": {

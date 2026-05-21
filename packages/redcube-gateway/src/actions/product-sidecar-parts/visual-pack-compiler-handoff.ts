@@ -168,7 +168,7 @@ export const RCA_REPO_LOCAL_HANDLER_TARGETS = Object.freeze([
   'invokeProductEntry',
   'invokeDomainEntry',
   'product_sidecar',
-  'product_entry_session_store',
+  'product_entry_session_snapshot_refs_adapter',
 ]);
 
 export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
@@ -311,14 +311,14 @@ export function buildVisualPackCompilerHandoffProjection() {
         redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
         redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
         product_sidecar_role: 'domain_action_target_or_refs_only_adapter',
-        product_entry_session_store_role: 'entry_session_domain_snapshot_refs_only_adapter',
+        product_entry_session_snapshot_refs_adapter_role: 'entry_session_domain_snapshot_refs_only_adapter',
         cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
         default_generic_dispatch_owner: 'one-person-lab',
         default_supervision_owner: 'one-person-lab',
         legacy_supervision_public_surface: 'retired',
         redcube_cli_is_unified_metadata_owner: false,
         redcube_mcp_is_unified_metadata_owner: false,
-        product_entry_session_store_is_generic_session_owner: false,
+        product_entry_session_snapshot_refs_adapter_is_generic_session_owner: false,
       },
       wrappers: {
         cli: { owner: 'opl', current_rca_role: 'domain_handler_target', long_term_rca_owner: false },

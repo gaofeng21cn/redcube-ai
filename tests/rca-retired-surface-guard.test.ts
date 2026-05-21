@@ -321,7 +321,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     adoption.privatized_functional_module_audit,
   ];
   const expectedReplacementSurfaces = {
-    product_entry_session_store: 'opl_app_session_shell_and_workbench',
+    product_entry_session_snapshot_refs_adapter: 'opl_app_session_shell_and_workbench',
     artifact_export_lifecycle: 'opl_artifact_lifecycle_gallery_handoff_shell',
     review_repair_transport: 'opl_review_repair_transport',
     native_helper_envelope: 'opl_native_helper_execution_envelope',
@@ -478,7 +478,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
 
   const requiredClassifications = {
     mcp_product_entry_domain_entry: 'service_safe_domain_entry',
-    product_entry_session_store: 'refs_only_read_model',
+    product_entry_session_snapshot_refs_adapter: 'refs_only_read_model',
     workspace_run_envelope_helpers: 'refs_only_read_model',
     runtime_watch_projection: 'refs_only_read_model',
     product_sidecar_guarded_actions: 'domain_handler_target',
@@ -495,7 +495,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   }
 
   assert.equal(
-    byId.product_entry_session_store.current_rca_role,
+    byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
   assert.equal(
