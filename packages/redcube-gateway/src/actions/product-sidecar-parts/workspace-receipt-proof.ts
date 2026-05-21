@@ -172,6 +172,30 @@ export async function emitWorkspaceReceiptProof({
       no_regression_evidence_ref: noRegressionEvidence.evidence_ref,
       domain_owner_receipt_ref: domainReceipt.receipt_ref,
     },
+    live_visual_route_owner_chain_refs: {
+      surface_kind: 'rca_live_visual_route_owner_chain_refs',
+      selected_artifact_producing_visual_route: {
+        ...ARTIFACT_PRODUCING_ROUTE,
+      },
+      owner: DOMAIN_ID,
+      payload_body_included: false,
+      owner_receipt_ref: domainReceipt.receipt_ref,
+      workspace_receipt_ref: `rca-workspace-receipt-proof:visual-stage:${id}`,
+      visual_memory_reuse_refs: [
+        acceptedMemory.receipt_ref,
+        rejectedMemory.receipt_ref,
+      ],
+      repeated_no_regression_evidence_refs: [
+        noRegressionEvidence.evidence_ref,
+      ],
+      typed_blocker_refs: [],
+      readiness_claims: {
+        claims_visual_ready: false,
+        claims_exportable: false,
+        claims_handoffable: false,
+        claims_production_visual_soak_complete: false,
+      },
+    },
     actual_workspace_receipt_refs: {
       route_id: ARTIFACT_PRODUCING_ROUTE.route_id,
       stage_sequence_refs: [...ARTIFACT_PRODUCING_ROUTE.stage_sequence_refs],

@@ -231,9 +231,44 @@ test('product sidecar receipt actions emit refs-only workspace proof without pro
     assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_store_receipt_refs, true);
     assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_store_visual_truth, false);
     assert.equal(workspaceReceiptProof.result_surface.authority_boundary.opl_can_write_visual_memory_body, false);
+    assert.equal(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.surface_kind,
+      'rca_live_visual_route_owner_chain_refs',
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.selected_artifact_producing_visual_route.route_id,
+      'ppt_deck.image_first.artifact_producing.v1',
+    );
+    assert.equal(workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.payload_body_included, false);
+    assert.equal(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.owner_receipt_ref,
+      workspaceReceiptProof.result_surface.receipt_refs.domain_owner_receipt_ref,
+    );
+    assert.equal(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.workspace_receipt_ref,
+      workspaceReceiptProof.result_surface.proof_ref,
+    );
+    assert.deepEqual(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.visual_memory_reuse_refs,
+      [
+        workspaceReceiptProof.result_surface.receipt_refs.accepted_memory_receipt_ref,
+        workspaceReceiptProof.result_surface.receipt_refs.rejected_memory_receipt_ref,
+      ],
+    );
+    assert.deepEqual(
+      workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.repeated_no_regression_evidence_refs,
+      [workspaceReceiptProof.result_surface.receipt_refs.no_regression_evidence_ref],
+    );
+    assert.deepEqual(workspaceReceiptProof.result_surface.live_visual_route_owner_chain_refs.readiness_claims, {
+      claims_visual_ready: false,
+      claims_exportable: false,
+      claims_handoffable: false,
+      claims_production_visual_soak_complete: false,
+    });
     const workspaceReceiptProofFile = readJson(workspaceReceiptProof.result_surface.proof_file);
     assert.equal(workspaceReceiptProofFile.surface_kind, 'workspace_receipt_proof');
     assert.equal(workspaceReceiptProofFile.coverage.production_soak_claimed, false);
+    assert.equal(workspaceReceiptProofFile.live_visual_route_owner_chain_refs.payload_body_included, false);
     assert.equal(
       readJson(workspaceReceiptProof.result_surface.runtime_files.accepted_memory_receipt_file).writeback_status,
       'accepted',
