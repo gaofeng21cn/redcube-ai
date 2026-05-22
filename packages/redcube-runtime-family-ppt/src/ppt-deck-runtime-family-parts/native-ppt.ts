@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
+import { buildNativePptQualityNonregressionReadModel } from './native-ppt-quality-nonregression.js';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
@@ -783,6 +784,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       non_blocking_slide_reuse_ok: repairEvidence.non_blocking_slide_reuse_ok,
     };
     writeJson(paths.repairLogFile, enrichedRepairLog);
+    const qualityNonregressionReadModel = buildNativePptQualityNonregressionReadModel({
+      route,
+      editableShapePlanFile: paths.editableShapePlanFile,
+      shapeManifestFile: paths.shapeManifestFile,
+      renderProof,
+      repairEvidence,
+    });
     return {
       ...attachCommon(route, contract, null, adapter),
       status: 'completed',
@@ -806,6 +814,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         shape_manifest_schema_version: Number(payload.shape_manifest_schema_version || 0),
         editable_artifact: true,
         editable_shape_plan_file: paths.editableShapePlanFile,
+        quality_nonregression_read_model_ref: 'native_quality_nonregression_read_model',
         pptx_file: safeText(payload.pptx_file, paths.pptxFile),
         pdf_file: safeText(payload.pdf_file, paths.pdfFile),
         shape_manifest_file: safeText(payload.shape_manifest_file, paths.shapeManifestFile),
@@ -850,6 +859,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         feedback_count: Number(enrichedRepairLog.feedback_count || repairFeedback.length || 0),
         repair_log_file: safeText(enrichedRepairLog.repair_log_file, paths.repairLogFile),
       },
+      native_quality_nonregression_read_model: qualityNonregressionReadModel,
       artifact_refs: [
         paths.inputFile,
         paths.editableShapePlanFile,

@@ -35,6 +35,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/ppt-image-route-selection.test.ts',
     'tests/ppt-html-route-quality-nonregression.test.ts',
     'tests/ppt-overlay.test.ts',
+    'tests/ppt-native-pptx-quality-nonregression.test.ts',
     'tests/profile-contract-hydration.test.ts',
     'tests/python-native-helper-catalog.test.ts',
     'tests/publish-governance-single-owner.test.ts',

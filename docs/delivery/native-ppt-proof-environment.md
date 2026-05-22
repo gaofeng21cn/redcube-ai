@@ -11,6 +11,19 @@ This environment is for renderer diagnostics and Linux native proof readiness ch
 
 Native PPT production proof uses LibreOffice headless -> PDF -> Poppler PNG. Microsoft PowerPoint, AppleScript, and synthetic previews are not accepted proof surfaces.
 
+## Quality Non-Regression Surface
+
+Native editable PPTX exposes a refs-only quality non-regression surface for OPL Agent Lab at `contracts/runtime-program/ppt-native-pptx-quality-nonregression.json`.
+
+The surface contains shape manifest metric refs, editable shape plan refs, true render proof refs, blocked-page-only `repair_pptx_native` evidence refs, export proof summary refs, and standard Agent Lab suite input refs. Agent Lab may compare and score those refs for optimization, but that score is not an RCA visual verdict and cannot authorize visual ready, exportable, handoffable, artifact writes, memory body writes, or quality/export verdicts.
+
+The route boundary remains unchanged:
+
+- `author_pptx_native` and `repair_pptx_native` are explicit optional native PPTX routes.
+- The default `ppt_deck` visual route remains image-first page authoring.
+- `visual_director_review`, `screenshot_review`, and `export_pptx` remain required RCA-owned gates.
+- The Python helper can execute, validate, render/export, and emit shape/render/repair refs; it cannot replace the AI creative owner or write visual truth.
+
 ## Dependencies
 
 Required Linux packages:

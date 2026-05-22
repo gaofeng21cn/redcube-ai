@@ -1,0 +1,177 @@
+{
+  "surface_kind": "ppt_native_pptx_quality_nonregression",
+  "contract_id": "ppt-native-pptx-quality-nonregression",
+  "projection_id": "redcube-ai.ppt-native-pptx-quality-nonregression.v1",
+  "date_anchor": "2026-05-22",
+  "owner": "redcube_ai",
+  "consumer": "opl_agent_lab",
+  "status": "refs_only_standard_suite_input_ready",
+  "deliverable_family": "ppt_deck",
+  "projection_model": "derived_from_native_pptx_route_shape_manifest_render_proof_repair_and_export_refs_only",
+  "refs_only": true,
+  "read_only": true,
+  "body_included": false,
+  "route_policy": {
+    "explicit_optional_route": true,
+    "default_visual_route": "author_image_pages",
+    "default_visual_policy": "image_first",
+    "default_visual_route_changed": false,
+    "default_executor_changed": false,
+    "runnable_native_routes": [
+      "author_pptx_native",
+      "repair_pptx_native"
+    ],
+    "explicit_selection_required_for": [
+      "author_pptx_native",
+      "repair_pptx_native"
+    ],
+    "preserved_review_export_gates": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ],
+    "not_a_fallback_chain": true
+  },
+  "agent_lab_suite_input": {
+    "suite_kind": "standard",
+    "suite_id": "redcube-ai.ppt-native-pptx-quality-nonregression.standard.v1",
+    "domain_id": "redcube-ai",
+    "deliverable_family": "ppt_deck",
+    "compatible_agent_lab_contract_ref": "opl agent-lab suite-input#/standard",
+    "input_mode": "refs_only_handoff",
+    "refs_only": true,
+    "read_only": true,
+    "agent_lab_score_is_rca_visual_verdict": false,
+    "claims_visual_ready": false,
+    "claims_exportable": false,
+    "claims_handoffable": false,
+    "claims_production_soak_complete": false
+  },
+  "shape_manifest_contract": {
+    "quality_model": "shape_manifest_layout_metrics_v1",
+    "source_surface_kind": "native_pptx",
+    "shape_manifest_ref": "workspace-runtime-ref:native_pptx:<run-id>#/shape_manifest_file",
+    "required_per_slide_metrics": [
+      "bounds",
+      "text_char_count",
+      "primary_points",
+      "occupied_ratio",
+      "edge_clearance",
+      "overlap_pairs",
+      "decorative_shape_count",
+      "shape_kind_count",
+      "role_count",
+      "layout_richness_score",
+      "chart_bounds",
+      "table_bounds",
+      "metric_grid_bounds",
+      "chart_metrics",
+      "table_metrics",
+      "metric_grid_metrics",
+      "axis_label_count",
+      "legend_label_count",
+      "table_cell_fit_ok",
+      "table_cell_fit_failures",
+      "numeric_label_overflow_count",
+      "numeric_label_overflows",
+      "coordinate_determinism_hash",
+      "preview_screenshot_sha256",
+      "preview_screenshot_dimensions"
+    ],
+    "required_metric_refs": [
+      "shape_manifest#/slides/*/metrics/bounds",
+      "shape_manifest#/slides/*/metrics/text_char_count",
+      "shape_manifest#/slides/*/metrics/primary_points",
+      "shape_manifest#/slides/*/metrics/occupied_ratio",
+      "shape_manifest#/slides/*/metrics/edge_clearance",
+      "shape_manifest#/slides/*/metrics/overlap_pairs",
+      "shape_manifest#/slides/*/metrics/shape_kind_count",
+      "shape_manifest#/slides/*/metrics/role_count",
+      "shape_manifest#/slides/*/metrics/layout_richness_score",
+      "shape_manifest#/slides/*/metrics/chart_metrics",
+      "shape_manifest#/slides/*/metrics/table_metrics",
+      "shape_manifest#/slides/*/metrics/metric_grid_metrics",
+      "shape_manifest#/slides/*/metrics/coordinate_determinism_hash",
+      "shape_manifest#/slides/*/preview_screenshot_sha256",
+      "shape_manifest#/slides/*/preview_screenshot_dimensions"
+    ],
+    "fail_closed_when_missing": true,
+    "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks"
+  },
+  "editable_shape_plan_contract": {
+    "required": true,
+    "editable_shape_plan_ref": "workspace-runtime-ref:native_pptx:<run-id>#/editable_shape_plan_file",
+    "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
+    "creative_owner": "llm_agent",
+    "python_helper_role": "execute_validate_export_only",
+    "template_substitution_allowed": false,
+    "helper_can_replace_ai_creative_owner": false,
+    "fail_closed_when_missing": true
+  },
+  "true_render_proof": {
+    "required": true,
+    "source_surface_kind": "native_pptx",
+    "renderer_kind": "libreoffice_headless",
+    "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+    "runtime": "libreoffice_headless",
+    "cross_platform_render_required": true,
+    "synthetic_preview_allowed": false,
+    "fail_closed_when_missing": true,
+    "render_proof_ref": "workspace-runtime-ref:native_pptx:<run-id>#/render_proof",
+    "preview_screenshot_refs": [
+      "workspace-runtime-ref:native_pptx:<run-id>#/preview_screenshots"
+    ]
+  },
+  "repair_policy": {
+    "repair_route": "repair_pptx_native",
+    "blocked_page_only": true,
+    "scope": "page",
+    "target_source": "screenshot_review.blocked_slide_ids",
+    "repair_evidence_surface": "native_ppt_repair_evidence_v1",
+    "repair_evidence_ref": "workspace-runtime-ref:native_pptx:<run-id>#/native_ppt_repair_log/repair_evidence",
+    "passed_slides_reused": true,
+    "preserved_slide_policy": "do_not_reauthor_passed_slides",
+    "non_blocking_slide_reuse_required": true
+  },
+  "export_proof_summary": {
+    "required": true,
+    "summary_surface": "native_export_bundle_operator_proof_summary_v1",
+    "summary_ref": "workspace-runtime-ref:export_pptx:<run-id>#/operator_proof_summary",
+    "artifact_gallery_ref": "workspace-runtime-ref:export_pptx:<run-id>#/artifact_gallery",
+    "renderer_proof_ref": "workspace-runtime-ref:export_pptx:<run-id>#/renderer_proof",
+    "shape_manifest_summary_ref": "workspace-runtime-ref:export_pptx:<run-id>#/shape_manifest_summary"
+  },
+  "quality_gate_refs": [
+    "agent/quality_gates/screenshot_review.md",
+    "agent/quality_gates/review_export_memory.md",
+    "workspace-runtime-ref:screenshot_review:<run-id>",
+    "workspace-runtime-ref:export_pptx:<run-id>#/operator_proof_summary"
+  ],
+  "agent_lab_input_refs": {
+    "shape_manifest_metrics_ref": "workspace-runtime-ref:native_pptx:<run-id>#/shape_manifest_file",
+    "editable_shape_plan_ref": "workspace-runtime-ref:native_pptx:<run-id>#/editable_shape_plan_file",
+    "true_render_proof_ref": "workspace-runtime-ref:native_pptx:<run-id>#/render_proof",
+    "repair_evidence_ref": "workspace-runtime-ref:native_pptx:<run-id>#/native_ppt_repair_log/repair_evidence",
+    "export_proof_summary_ref": "workspace-runtime-ref:export_pptx:<run-id>#/operator_proof_summary"
+  },
+  "authority_boundary": {
+    "no_forbidden_write": true,
+    "opl_agent_lab_can_store_suite_input_refs": true,
+    "opl_agent_lab_can_compare_quality_refs": true,
+    "opl_agent_lab_can_score_nonregression_refs": true,
+    "opl_agent_lab_score_is_rca_visual_verdict": false,
+    "opl_agent_lab_can_write_rca_visual_truth": false,
+    "opl_agent_lab_can_write_artifact_blob": false,
+    "opl_agent_lab_can_write_memory_body": false,
+    "opl_agent_lab_can_authorize_quality_verdict": false,
+    "opl_agent_lab_can_authorize_exportable": false,
+    "opl_agent_lab_can_claim_visual_ready": false,
+    "python_helper_can_replace_ai_creative_owner": false,
+    "python_helper_can_write_visual_truth": false,
+    "python_helper_can_authorize_quality_verdict": false,
+    "python_helper_can_authorize_exportable": false,
+    "default_executor_changed": false,
+    "rca_quality_floor_owner": "redcube_ai",
+    "rca_export_authority_owner": "redcube_ai"
+  }
+}
