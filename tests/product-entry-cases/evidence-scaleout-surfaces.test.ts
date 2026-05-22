@@ -9,6 +9,8 @@ import {
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
@@ -306,5 +308,122 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       'workspace-runtime-ref:review-export:artifact-route',
     );
     assert.equal(repeatProof.result_surface.actual_workspace_receipt_refs.declares_exportable, false);
+  });
+});
+
+test('workspace receipt inventory aggregates refs across two workspaces without claiming production soak', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const firstWorkspaceRoot = await prepareProductEntryWorkspace();
+    const secondWorkspaceRoot = await prepareProductEntryWorkspace();
+
+    for (const [workspaceRoot, proofId] of [
+      [firstWorkspaceRoot, 'scaleout-workspace-a'],
+      [firstWorkspaceRoot, 'scaleout-workspace-a-repeat'],
+      [secondWorkspaceRoot, 'scaleout-workspace-b'],
+      [secondWorkspaceRoot, 'scaleout-workspace-b-repeat'],
+    ]) {
+      await dispatchProductSidecar({
+        task: {
+          action: 'emit_workspace_receipt_proof',
+          workspace_root: workspaceRoot,
+          proof_id: proofId,
+          attempt_ref: `workspace-runtime-ref:attempt:${proofId}`,
+          artifact_locator_ref: '/artifact_locator_contract',
+          review_export_ref: `workspace-runtime-ref:review-export:${proofId}`,
+          forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+          artifact_refs: [`workspace-runtime-ref:artifact:${proofId}`],
+        },
+      });
+    }
+
+    const manifest = await getProductEntryManifest({
+      workspace_root: firstWorkspaceRoot,
+      workspace_receipt_scaleout_roots: [
+        secondWorkspaceRoot,
+        path.join(secondWorkspaceRoot, '.'),
+      ],
+    });
+    const scaleout = manifest.workspace_receipt_inventory_projection.scaleout_projection;
+
+    assert.equal(scaleout.required_workspace_count_for_scaleout, 2);
+    assert.equal(scaleout.observed_workspace_count, 2);
+    assert.equal(scaleout.receipt_kind_coverage_ready, true);
+    assert.equal(scaleout.workspace_receipt_scaleout_claimed, false);
+    assert.equal(scaleout.declares_production_soak_complete, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.declares_visual_ready, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.declares_exportable, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.declares_handoffable, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.declares_production_soak_complete, false);
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs.length,
+      2,
+    );
+    assert.deepEqual(
+      manifest.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs.map(
+        (source) => source.valid_receipt_count > 0,
+      ),
+      [true, true],
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.observed_workspace_count,
+      2,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.declares_production_soak_complete,
+      false,
+    );
+  });
+});
+
+test('workspace receipt inventory excludes invalid-only roots from observed scaleout evidence', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const validWorkspaceRoot = await prepareProductEntryWorkspace();
+    const invalidOnlyWorkspaceRoot = await prepareProductEntryWorkspace();
+
+    for (const proofId of [
+      'scaleout-valid-workspace',
+      'scaleout-valid-workspace-repeat',
+    ]) {
+      await dispatchProductSidecar({
+        task: {
+          action: 'emit_workspace_receipt_proof',
+          workspace_root: validWorkspaceRoot,
+          proof_id: proofId,
+          attempt_ref: `workspace-runtime-ref:attempt:${proofId}`,
+          artifact_locator_ref: '/artifact_locator_contract',
+          review_export_ref: `workspace-runtime-ref:review-export:${proofId}`,
+          forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+          artifact_refs: [`workspace-runtime-ref:artifact:${proofId}`],
+        },
+      });
+    }
+
+    const invalidReceiptRoot = path.join(invalidOnlyWorkspaceRoot, '.redcube', 'runtime', 'receipts');
+    mkdirSync(invalidReceiptRoot, { recursive: true });
+    writeFileSync(path.join(invalidReceiptRoot, 'invalid.json'), '{', 'utf-8');
+
+    const manifest = await getProductEntryManifest({
+      workspace_root: validWorkspaceRoot,
+      workspace_receipt_scaleout_roots: [invalidOnlyWorkspaceRoot],
+    });
+    const scaleout = manifest.workspace_receipt_inventory_projection.scaleout_projection;
+
+    assert.equal(scaleout.observed_workspace_count, 1);
+    assert.equal(scaleout.receipt_kind_coverage_ready, false);
+    assert.equal(scaleout.workspace_receipt_scaleout_claimed, false);
+    assert.equal(scaleout.declares_production_soak_complete, false);
+    assert.equal(manifest.workspace_receipt_inventory_projection.receipt_counts.invalid, 1);
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs[1].valid_receipt_count,
+      0,
+    );
+    assert.equal(
+      manifest.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs[1].invalid_receipt_count,
+      1,
+    );
   });
 });

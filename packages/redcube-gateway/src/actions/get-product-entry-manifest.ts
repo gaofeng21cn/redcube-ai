@@ -130,7 +130,10 @@ export async function getProductEntryManifest(request) {
   });
   const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: standardDomainAgentSkeleton.domain_memory_descriptor_locator });
   const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton });
-  const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({ workspaceRoot });
+  const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({
+    workspaceRoot,
+    workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
+  });
   const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,

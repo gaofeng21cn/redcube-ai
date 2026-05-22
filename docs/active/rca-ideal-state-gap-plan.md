@@ -153,7 +153,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 - artifact-producing owner receipt route 已固定为 image-first PPT route，后续还需真实 workspace 运行持续积累 receipt instances。
 - visual memory body reuse 已有 locator/content ref，后续还需真实 visual pattern memory accepted/rejected receipt scaleout。
-- workspace receipt proof 已能产出 owner/memory/no-regression refs，后续还需跨 workspace retention ledger / inventory 规模化验证。
+- workspace receipt proof 已能产出 owner/memory/no-regression refs，product-entry manifest 的 workspace receipt inventory 已支持显式多 workspace refs 聚合；后续还需真实长期 workspace retention ledger、production operator cadence 与跨 family no-regression evidence scaleout，不能把 `observed_workspace_count=2` 写成 visual ready、exportable、handoffable 或 Temporal production soak complete。
 - Temporal controlled visual-stage long soak、provider restart/re-query/retry/dead-letter proof 和 repair cadence。
 - Expected receipt instance 与 monitor freshness evidence 已有 RCA body-free handoff refs，可供 OPL workorder 回填；后续仍需真实 workspace owner receipt instance、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 持续刷新，OPL stage evidence receipt 只能证明 refs-only route、payload workorder 和 preflight 可用。
 - Cross-family repeated no-regression proof。

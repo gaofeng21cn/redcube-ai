@@ -92,11 +92,12 @@ function increment(counts, key) {
   counts[key] = (counts[key] || 0) + 1;
 }
 
-function exportedReceiptRef({ file, root, payload }) {
+function exportedReceiptRef({ file, root, payload, workspaceIndex }) {
   const relativePath = path.relative(root, file);
   const kind = receiptKind(relativePath, payload);
   const stat = statSync(file);
   return {
+    workspace_source_ref: `workspace_receipt_source:${workspaceIndex}`,
     receipt_kind: kind,
     receipt_id: safeText(payload.receipt_id || payload.id),
     receipt_ref: safeText(payload.receipt_ref),
@@ -112,8 +113,16 @@ function exportedReceiptRef({ file, root, payload }) {
   };
 }
 
-export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
-  const receiptRoot = path.join(workspaceRoot, '.redcube', 'runtime', 'receipts');
+function normalizeScaleoutRoots({ workspaceRoot, workspaceReceiptScaleoutRoots }) {
+  const roots = [workspaceRoot, ...(Array.isArray(workspaceReceiptScaleoutRoots) ? workspaceReceiptScaleoutRoots : [])]
+    .map((root) => safeText(root))
+    .filter(Boolean)
+    .map((root) => path.resolve(root));
+  return [...new Set(roots)];
+}
+
+export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot, workspaceReceiptScaleoutRoots = [] }) {
+  const workspaceRoots = normalizeScaleoutRoots({ workspaceRoot, workspaceReceiptScaleoutRoots });
   const counts = {
     total: 0,
     domain_owner: 0,
@@ -127,30 +136,54 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
   const receiptRefs = [];
   const invalidReceiptRefs = [];
   const forbiddenPayloadFields = new Set();
+  const workspaceReceiptSourceRefs = [];
 
-  for (const file of listJsonFiles(receiptRoot)) {
-    const relativePath = path.relative(receiptRoot, file).split(path.sep).join('/');
-    let payload;
-    try {
-      payload = JSON.parse(readFileSync(file, 'utf-8'));
-    } catch {
-      counts.invalid += 1;
-      invalidReceiptRefs.push({
-        relative_path: relativePath,
-        receipt_file_ref: `${RECEIPT_ROOT_MODEL}${relativePath}`,
-        error_kind: 'invalid_json',
+  workspaceRoots.forEach((root, index) => {
+    const receiptRoot = path.join(root, '.redcube', 'runtime', 'receipts');
+    const sourceRef = {
+      workspace_source_ref: `workspace_receipt_source:${index}`,
+      workspace_root: root,
+      receipt_root_exists: existsSync(receiptRoot),
+      receipt_count: 0,
+      valid_receipt_count: 0,
+      invalid_receipt_count: 0,
+    };
+    workspaceReceiptSourceRefs.push(sourceRef);
+
+    for (const file of listJsonFiles(receiptRoot)) {
+      const relativePath = path.relative(receiptRoot, file).split(path.sep).join('/');
+      let payload;
+      try {
+        payload = JSON.parse(readFileSync(file, 'utf-8'));
+      } catch {
+        counts.invalid += 1;
+        sourceRef.receipt_count += 1;
+        sourceRef.invalid_receipt_count += 1;
+        invalidReceiptRefs.push({
+          workspace_source_ref: sourceRef.workspace_source_ref,
+          relative_path: relativePath,
+          receipt_file_ref: `${RECEIPT_ROOT_MODEL}${relativePath}`,
+          error_kind: 'invalid_json',
+        });
+        continue;
+      }
+      const forbidden = [...findForbiddenPayloadFields(payload)];
+      for (const field of forbidden) {
+        forbiddenPayloadFields.add(field);
+      }
+      const item = exportedReceiptRef({
+        file,
+        root: receiptRoot,
+        payload,
+        workspaceIndex: index,
       });
-      continue;
+      increment(counts, item.receipt_kind in counts ? item.receipt_kind : 'other');
+      counts.total += 1;
+      sourceRef.receipt_count += 1;
+      sourceRef.valid_receipt_count += 1;
+      receiptRefs.push(item);
     }
-    const forbidden = [...findForbiddenPayloadFields(payload)];
-    for (const field of forbidden) {
-      forbiddenPayloadFields.add(field);
-    }
-    const item = exportedReceiptRef({ file, root: receiptRoot, payload });
-    increment(counts, item.receipt_kind in counts ? item.receipt_kind : 'other');
-    counts.total += 1;
-    receiptRefs.push(item);
-  }
+  });
 
   receiptRefs.sort((left, right) => right.mtime_ms - left.mtime_ms || left.relative_path.localeCompare(right.relative_path));
   const exportedReceiptRefs = receiptRefs.slice(0, MAX_EXPORTED_RECEIPTS).map(({ mtime_ms, ...item }) => item);
@@ -198,7 +231,9 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
       )
     ))
     .map((item) => item.receipt_ref);
-  const observedWorkspaceCount = existsSync(receiptRoot) ? 1 : 0;
+  const observedWorkspaceCount = workspaceReceiptSourceRefs
+    .filter((source) => source.receipt_root_exists && source.valid_receipt_count > 0)
+    .length;
 
   return {
     surface_kind: 'workspace_receipt_inventory_projection',
@@ -209,9 +244,11 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
     projection_model: 'workspace_runtime_receipt_refs_only_read_model',
     workspace_locator: {
       workspace_root: workspaceRoot,
+      workspace_receipt_scaleout_roots: workspaceRoots.slice(1),
+      workspace_receipt_source_refs: workspaceReceiptSourceRefs,
     },
     receipt_root_model: RECEIPT_ROOT_MODEL,
-    receipt_root_exists: existsSync(receiptRoot),
+    receipt_root_exists: workspaceReceiptSourceRefs.some((source) => source.receipt_root_exists),
     read_only: true,
     refs_only: true,
     writes_visual_truth: false,
@@ -269,6 +306,7 @@ export function buildWorkspaceReceiptInventoryProjection({ workspaceRoot }) {
       stage_sequence_refs: [...ARTIFACT_PRODUCING_STAGE_REFS],
       artifact_producing_owner_receipt_refs: artifactProducingOwnerReceiptRefs,
       memory_lifecycle_receipt_refs: memoryLifecycleReceiptRefs,
+      workspace_receipt_source_refs: workspaceReceiptSourceRefs,
       required_owner_receipt_visible: artifactProducingOwnerReceiptRefs.length > 0,
       required_memory_lifecycle_receipt_refs_visible: hasRefsOnlyRequiredMemoryLifecycleReceipts,
       no_regression_evidence_ref_model: 'workspace-runtime-ref:no-regression-evidence:<evidence-id>',
