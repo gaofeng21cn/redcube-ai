@@ -444,6 +444,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       [
         'packages/redcube-runtime/src/executors.ts',
         'packages/redcube-gateway/src/actions/run-deliverable-route.ts',
+        'packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts',
+        'packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts',
+        'packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts',
+        'packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts',
         'packages/redcube-gateway/src/actions/domain-entry-contract.ts',
         'tests/rca-executor-backend-contract.test.ts',
       ],

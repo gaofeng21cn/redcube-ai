@@ -16,7 +16,7 @@
     "apps/redcube-cli/src/cli.ts",
     "apps/redcube-mcp/src/server.ts",
     "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+    "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
   ],
   "activeCallers": [
     "OPL generated CLI/MCP wrapper domain handler targets",
