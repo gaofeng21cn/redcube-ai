@@ -1,0 +1,181 @@
+{
+  "contract_id": "ppt_html_route_quality_nonregression_v1",
+  "status": "landed",
+  "deliverable_family": "ppt_deck",
+  "current_default_visual_route": "author_image_pages",
+  "html_route_policy": {
+    "status": "production_selectable_optional",
+    "explicit_selection_required": true,
+    "default_enabled": false,
+    "default_executor_changed": false,
+    "routes": [
+      "render_html",
+      "fix_html"
+    ],
+    "executor_policy": {
+      "default_backend": "codex_cli",
+      "render_html_execution_shape": "structured_call",
+      "fix_html_default_execution_shape": "structured_call",
+      "hermes_agent_allowed_only_when_explicit_or_fix_escalation_policy_requires": true,
+      "silent_executor_fallback_allowed": false
+    }
+  },
+  "prompt_static_policy": {
+    "canonical_stage_prompt_policy_refs": [
+      "agent/prompts/artifact_creation.md",
+      "agent/prompts/review_and_revision.md"
+    ],
+    "detailed_prompt_asset_refs": [
+      "prompts/ppt_deck/render_html.md",
+      "prompts/ppt_deck/fix_html.md",
+      "prompts/ppt_deck/render_shell.html"
+    ],
+    "static_context_refs": [
+      "prompt_pack.render_contract.ui_ux_quality_companion",
+      "prompt_pack.render_contract.html_authoring_lane",
+      "stage_sequence.alternate_stages"
+    ],
+    "policy": [
+      "prompt/static optimization may reuse refs and stable context hashes only",
+      "prompt/static optimization must not remove audience visibility guardrails",
+      "prompt/static optimization must not replace AI-authored HTML with a fixed template compiler",
+      "prompt/static optimization must not bypass RCA-owned review/export gates"
+    ]
+  },
+  "layout_constraints": {
+    "canvas": {
+      "ratio": "16:9",
+      "source": "runtime CANVAS contract"
+    },
+    "required_html_anchors": [
+      "data-slide-root=true",
+      "matching data-slide-id",
+      "at least two data-qa-block anchors",
+      "at least one data-primary-point=true"
+    ],
+    "blocked_regression_classes": [
+      "audience-visible authoring metadata",
+      "speaker notes or transition text leak",
+      "source_id or material_id leak",
+      "title safe-zone obstruction",
+      "text overflow",
+      "visual occlusion",
+      "edge crop risk",
+      "low information density",
+      "page number inconsistency",
+      "template registry leakage",
+      "script or style block leakage"
+    ],
+    "hard_quality_floor_checks": [
+      "overflow_free",
+      "occlusion_free",
+      "visual_density_ok",
+      "edge_clearance_ok",
+      "block_content_fit_ok",
+      "title_typography_ok",
+      "external_audience_language_ok"
+    ]
+  },
+  "fix_html_policy": {
+    "route": "fix_html",
+    "requires_prior_current_html_artifact": true,
+    "target_scope": "blocked_slide_ids_only",
+    "passed_pages_must_be_reused": true,
+    "full_regeneration_allowed_without_stale_upstream_or_missing_prior_html": false,
+    "consumes_review_refs": [
+      "visual_director_review",
+      "screenshot_review",
+      "operator_revision_brief"
+    ],
+    "target_slide_id_sources": [
+      "screenshot_review.blocked_slide_ids",
+      "screenshot_review.slide_feedback",
+      "operator_revision_brief.target_slide_ids",
+      "visual_director_review.weak_pages"
+    ],
+    "repair_output_refs": [
+      "render_execution.targeted_slide_ids",
+      "render_execution.freshly_rendered_slide_ids",
+      "render_execution.reused_slide_ids",
+      "targeted_rerun.target_slide_ids",
+      "targeted_rerun.reused_slide_ids"
+    ],
+    "forbidden_repair_patterns": [
+      "padding_only",
+      "line_height_only",
+      "micro_font_scale_only",
+      "global redraw when blocked slide refs are available"
+    ]
+  },
+  "gate_non_regression": {
+    "required_gates": [
+      "visual_director_review",
+      "screenshot_review",
+      "export_pptx"
+    ],
+    "visual_director_review_may_be_lowered": false,
+    "screenshot_review_may_be_lowered": false,
+    "export_pptx_may_be_lowered": false,
+    "html_route_must_not_bypass_review_export": true,
+    "review_export_refs": [
+      "workspace-runtime-ref:visual_director_review:<run-id>",
+      "workspace-runtime-ref:screenshot_review:<run-id>",
+      "workspace-runtime-ref:export_pptx:<run-id>"
+    ],
+    "rca_owned_quality_floor_refs": [
+      "agent/quality_gates/screenshot_review.md",
+      "agent/quality_gates/artifact_authority.md",
+      "contracts/artifact_locator_contract.json",
+      "contracts/owner_receipt_contract.json"
+    ]
+  },
+  "agent_lab_suite_input_refs": {
+    "consumer": "opl_agent_lab",
+    "suite_kind": "standard",
+    "suite_id": "redcube-ai.ppt-html-route-quality-nonregression.standard.v1",
+    "domain_id": "redcube-ai",
+    "refs_only": true,
+    "read_only": true,
+    "domain_specific_suite_kind_required": false,
+    "score_authority": {
+      "agent_lab_score_can_compare_quality_nonregression_refs": true,
+      "agent_lab_score_is_rca_visual_verdict": false,
+      "rca_quality_floor_owner": "redcube_ai"
+    },
+    "input_refs": {
+      "route_policy_ref": "contracts/runtime-program/ppt-html-route-quality-nonregression.json#/html_route_policy",
+      "prompt_static_policy_ref": "contracts/runtime-program/ppt-html-route-quality-nonregression.json#/prompt_static_policy",
+      "layout_constraints_ref": "contracts/runtime-program/ppt-html-route-quality-nonregression.json#/layout_constraints",
+      "fix_html_policy_ref": "contracts/runtime-program/ppt-html-route-quality-nonregression.json#/fix_html_policy",
+      "gate_non_regression_ref": "contracts/runtime-program/ppt-html-route-quality-nonregression.json#/gate_non_regression",
+      "runtime_companion_ref": "workspace-runtime-ref:route-artifact:<run-id>#/html_route_quality_companion",
+      "render_execution_ref": "workspace-runtime-ref:route-artifact:<run-id>#/render_execution",
+      "screenshot_review_ref": "workspace-runtime-ref:screenshot_review:<run-id>",
+      "export_result_ref": "workspace-runtime-ref:export_pptx:<run-id>"
+    },
+    "claims_visual_ready": false,
+    "claims_exportable": false,
+    "claims_handoffable": false,
+    "claims_production_soak_complete": false
+  },
+  "authority_boundary": {
+    "no_forbidden_authority_flags": true,
+    "opl_agent_lab_can_store_suite_input_refs": true,
+    "opl_agent_lab_can_compare_nonregression_refs": true,
+    "opl_agent_lab_can_write_rca_visual_truth": false,
+    "opl_agent_lab_can_write_artifact_blob": false,
+    "opl_agent_lab_can_write_memory_body": false,
+    "opl_agent_lab_can_authorize_quality_verdict": false,
+    "opl_agent_lab_can_authorize_exportable": false,
+    "opl_agent_lab_can_claim_visual_ready": false,
+    "agent_lab_score_is_rca_visual_verdict": false,
+    "rca_quality_floor_owner": "redcube_ai",
+    "rca_export_authority_owner": "redcube_ai"
+  },
+  "target_verification_refs": [
+    "target-verification:redcube-ai/build",
+    "target-verification:redcube-ai/ppt-html-route-quality-nonregression",
+    "target-verification:redcube-ai/render-html-guardrails",
+    "target-verification:redcube-ai/targeted-rerender-operator-context"
+  ]
+}

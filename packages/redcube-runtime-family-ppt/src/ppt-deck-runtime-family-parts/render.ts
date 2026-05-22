@@ -87,6 +87,7 @@ export function createPptDeckRenderStageParts(deps) {
     computeRenderRevisionFreshness,
     filterRenderRevisionContextForSlides,
     htmlDesignCompanion,
+    htmlRouteQualityCompanion,
     loadPriorRenderedSlideHtmlMap,
     planRenderHtmlExecution,
     renderContract,
@@ -140,6 +141,7 @@ export function createPptDeckRenderStageParts(deps) {
       ...(visualArtifact?.visual_direction || {}),
       typography_plan: typographyPlan,
     };
+    const htmlQualityCompanion = htmlRouteQualityCompanion(contract);
     const sharedContext = {
       ...buildAuthoringContext(contract),
       deck_style_reference: {
@@ -192,7 +194,9 @@ export function createPptDeckRenderStageParts(deps) {
         '若 revision_context 点名了 blocked slides 或遮挡问题，必须优先重建这些页面，先消除裁切/遮挡，再保留导演结构意图。',
         '不要使用 renderSlide/layoutByType/cardsGrid/pageType，不要输出 <script>/<style> block，也不要把模板注册表或内部文档写入 HTML。',
         'HTML 必须由 AI 直接创作，不得退化成固定 slot/template compiler 产物。',
-      ], ui_ux_quality_companion: htmlDesignCompanion(contract),
+      ],
+      ui_ux_quality_companion: htmlDesignCompanion(contract),
+      html_route_quality_companion: htmlQualityCompanion,
     };
     const slideBatches = renderPlan.mode === 'targeted_revision_only'
       ? chunkArray(renderPlan.slides_to_render, renderBatchSize)
@@ -487,7 +491,9 @@ export function createPptDeckRenderStageParts(deps) {
       peak_pages: safeArray(visualArtifact?.visual_direction?.peak_pages),
       page_family_ceiling: visualArtifact?.visual_direction?.page_family_ceiling || {},
       rerender_mode: safeText(renderExecution?.mode, 'full_regeneration'),
-      render_execution: renderExecution || null, html_design_companion: htmlDesignCompanion(contract),
+      render_execution: renderExecution || null,
+      html_design_companion: htmlDesignCompanion(contract),
+      html_route_quality_companion: htmlRouteQualityCompanion(contract),
       slides: slidesMarkup.map((slide) => ({
         slide_id: slide.slide_id,
         title: slide.title,
@@ -539,6 +545,7 @@ export function createPptDeckRenderStageParts(deps) {
         adapter,
       ),
       render_execution: renderExecution || null,
+      html_route_quality_companion: renderPlan.html_route_quality_companion,
       revision_context: revisionContext || null,
       ...(targetedRerun ? { targeted_rerun: targetedRerun } : {}),
       lifecycle_stage: contract.lifecycle_model?.route_to_stage?.[route] || contract.lifecycle_model?.route_to_stage?.render_html || 'visual_authorship',
@@ -549,7 +556,9 @@ export function createPptDeckRenderStageParts(deps) {
         render_strategy: renderPlan.render_strategy,
         generator_instructions: renderPlan.generator_instructions,
         render_summary: normalizeStringList(data?.render_summary, `${route}.render_summary`, { min: 1, max: 4 }),
-        render_execution: renderExecution || null, html_design_companion: renderPlan.html_design_companion,
+        render_execution: renderExecution || null,
+        html_design_companion: renderPlan.html_design_companion,
+        html_route_quality_companion: renderPlan.html_route_quality_companion,
         shell_contract: {
           ratio: CANVAS.ratio,
           width: CANVAS.width,

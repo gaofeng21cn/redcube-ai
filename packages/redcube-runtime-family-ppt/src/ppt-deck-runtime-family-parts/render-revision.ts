@@ -22,6 +22,41 @@ export function createPptDeckRenderRevisionParts(deps) {
     return contract?.prompt_pack?.render_contract || {};
   }
   function htmlDesignCompanion(contract) { const companion = renderContract(contract)?.ui_ux_quality_companion; return companion && typeof companion === 'object' ? companion : null; }
+
+  function htmlRouteQualityCompanion(_contract) {
+    return {
+      companion_id: 'ppt_html_route_quality_nonregression_companion_v1',
+      contract_ref: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json',
+      refs_only: true,
+      read_only: true,
+      current_default_visual_route: 'author_image_pages',
+      html_route_explicit_selection_required: true,
+      routes: ['render_html', 'fix_html'],
+      quality_gate_refs: [
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
+      prompt_static_policy_ref: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json#/prompt_static_policy',
+      layout_constraints_ref: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json#/layout_constraints',
+      fix_html_policy_ref: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json#/fix_html_policy',
+      agent_lab_suite_input_ref: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json#/agent_lab_suite_input_refs',
+      authority_boundary: {
+        no_forbidden_authority_flags: true,
+        opl_agent_lab_can_store_suite_input_refs: true,
+        opl_agent_lab_can_compare_nonregression_refs: true,
+        opl_agent_lab_can_write_rca_visual_truth: false,
+        opl_agent_lab_can_write_artifact_blob: false,
+        opl_agent_lab_can_write_memory_body: false,
+        opl_agent_lab_can_authorize_quality_verdict: false,
+        opl_agent_lab_can_authorize_exportable: false,
+        opl_agent_lab_can_claim_visual_ready: false,
+        agent_lab_score_is_rca_visual_verdict: false,
+        rca_quality_floor_owner: 'redcube_ai',
+        rca_export_authority_owner: 'redcube_ai',
+      },
+    };
+  }
   const {
     buildRenderRevisionLocalFileInspection,
     summarizeRenderRevisionSlideFeedback,
@@ -539,6 +574,7 @@ export function createPptDeckRenderRevisionParts(deps) {
     computeRenderRevisionFreshness,
     filterRenderRevisionContextForSlides,
     htmlDesignCompanion,
+    htmlRouteQualityCompanion,
     loadPriorRenderedSlideHtmlMap,
     planRenderHtmlExecution,
     renderContract,
