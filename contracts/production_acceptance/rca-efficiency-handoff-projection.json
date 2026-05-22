@@ -30,19 +30,34 @@
     ],
     "cache_refs": [
       "workspace-runtime-ref:route-summary:<run-id>#/cache_status",
-      "redcube product manifest#/ppt_deck_visual_route_truth/cache_status"
+      "redcube product manifest#/ppt_deck_visual_route_truth/cache_status",
+      "workspace-runtime-ref:source-pack-reuse:<run-id>#/cache_status",
+      "workspace-runtime-ref:prompt-static-prefix-cache:<run-id>#/cache_status",
+      "workspace-runtime-ref:export-preview-cache:<run-id>#/cache_status"
     ],
     "reuse_refs": [
       "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/reused_slide_ids",
-      "workspace-runtime-ref:route-artifact:<run-id>#/review_execution/reused_slide_ids"
+      "workspace-runtime-ref:route-artifact:<run-id>#/review_execution/reused_slide_ids",
+      "workspace-runtime-ref:source-pack-reuse:<run-id>#/reused_source_pack_ref",
+      "workspace-runtime-ref:prompt-static-prefix-cache:<run-id>#/prefix_hash",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/preserved_slide_hashes",
+      "workspace-runtime-ref:export-preview-cache:<run-id>#/preview_artifact_hash"
     ],
     "render_execution_refs": [
       "workspace-runtime-ref:route-artifact:<run-id>#/render_execution",
-      "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/codex_batch_runtime"
+      "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/codex_batch_runtime",
+      "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/page_local_batch_runtime",
+      "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/parallel_batch_sizing"
     ],
     "export_result_refs": [
       "workspace-runtime-ref:review-export:<run-id>",
-      "workspace-runtime-ref:export-result:<run-id>"
+      "workspace-runtime-ref:export-result:<run-id>",
+      "workspace-runtime-ref:export-preview-cache:<run-id>"
+    ],
+    "repair_scope_refs": [
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/blocked_slide_ids",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/freshly_rendered_slide_ids",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/reused_slide_ids"
     ]
   },
   "efficiency_fields": {
@@ -73,8 +88,35 @@
     "export_result": {
       "source_ref": "workspace-runtime-ref:export-result:<run-id>",
       "body_included": false
+    },
+    "source_pack_reuse": {
+      "source_ref": "workspace-runtime-ref:source-pack-reuse:<run-id>",
+      "body_included": false
+    },
+    "prompt_static_prefix_cache": {
+      "source_ref": "workspace-runtime-ref:prompt-static-prefix-cache:<run-id>",
+      "body_included": false
+    },
+    "page_local_batch_runtime": {
+      "source_ref": "workspace-runtime-ref:route-artifact:<run-id>#/render_execution/page_local_batch_runtime",
+      "body_included": false
+    },
+    "blocked_page_only_repair": {
+      "source_ref": "workspace-runtime-ref:repair-image-pages:<run-id>",
+      "body_included": false
+    },
+    "export_preview_cache": {
+      "source_ref": "workspace-runtime-ref:export-preview-cache:<run-id>",
+      "body_included": false
     }
   },
+  "target_verification_refs": [
+    "target-verification:redcube-ai/typecheck",
+    "target-verification:redcube-ai/test-fast",
+    "target-verification:redcube-ai/rca-efficiency-handoff-projection",
+    "target-verification:redcube-ai/ppt-creative-ownership-targeted-rerender",
+    "target-verification:redcube-ai/export-preview-cache"
+  ],
   "quality_floor_refs": {
     "review_export_gate_refs": [
       "workspace-runtime-ref:review-export:transition-run",
@@ -96,6 +138,15 @@
     "export_authority_refs": [
       "agent/quality_gates/artifact_authority.md",
       "contracts/artifact_locator_contract.json"
+    ],
+    "blocked_page_only_repair_refs": [
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/blocked_slide_ids",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/preserved_slide_hashes",
+      "agent/prompts/repair_image_pages.md"
+    ],
+    "export_preview_cache_gate_refs": [
+      "workspace-runtime-ref:export-preview-cache:<run-id>",
+      "workspace-runtime-ref:export-result:<run-id>"
     ]
   },
   "optimization_policy": {
@@ -104,6 +155,11 @@
     "quality_gates_may_be_lowered": false,
     "screenshot_review_required": true,
     "export_gate_required": true,
+    "source_pack_reuse_allowed": true,
+    "prompt_static_prefix_cache_allowed": true,
+    "page_local_parallel_or_batch_sizing_telemetry_allowed": true,
+    "blocked_page_only_repair_required_for_repair_route": true,
+    "export_preview_cache_allowed": true,
     "visual_ready_claim_allowed": false
   },
   "authority_boundary": {

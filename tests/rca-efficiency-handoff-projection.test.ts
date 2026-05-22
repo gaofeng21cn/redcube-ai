@@ -52,6 +52,27 @@ function assertEfficiencySuiteShape(suite) {
   assertRefArray(suite.efficiency_signal_refs.reuse_refs, 'reuse_refs');
   assertRefArray(suite.efficiency_signal_refs.render_execution_refs, 'render_execution_refs');
   assertRefArray(suite.efficiency_signal_refs.export_result_refs, 'export_result_refs');
+  assertRefArray(suite.efficiency_signal_refs.repair_scope_refs, 'repair_scope_refs');
+  assert.equal(
+    suite.efficiency_signal_refs.cache_refs.some((ref) => ref.includes('source-pack-reuse')),
+    true,
+  );
+  assert.equal(
+    suite.efficiency_signal_refs.cache_refs.some((ref) => ref.includes('prompt-static-prefix-cache')),
+    true,
+  );
+  assert.equal(
+    suite.efficiency_signal_refs.cache_refs.some((ref) => ref.includes('export-preview-cache')),
+    true,
+  );
+  assert.equal(
+    suite.efficiency_signal_refs.render_execution_refs.some((ref) => ref.includes('page_local_batch_runtime')),
+    true,
+  );
+  assert.equal(
+    suite.efficiency_signal_refs.repair_scope_refs.some((ref) => ref.includes('blocked_slide_ids')),
+    true,
+  );
 
   assert.equal(suite.efficiency_fields.cache_status.source_ref.includes('cache_status'), true);
   assert.equal(suite.efficiency_fields.elapsed_ms.source_ref.includes('elapsed_ms'), true);
@@ -59,11 +80,19 @@ function assertEfficiencySuiteShape(suite) {
   assert.equal(suite.efficiency_fields.reused_slide_ids.source_ref.includes('reused_slide_ids'), true);
   assert.equal(suite.efficiency_fields.cost_summary.source_ref.includes('cost_summary'), true);
   assert.equal(suite.efficiency_fields.export_result.source_ref.includes('export'), true);
+  assert.equal(suite.efficiency_fields.source_pack_reuse.body_included, false);
+  assert.equal(suite.efficiency_fields.prompt_static_prefix_cache.body_included, false);
+  assert.equal(suite.efficiency_fields.page_local_batch_runtime.body_included, false);
+  assert.equal(suite.efficiency_fields.blocked_page_only_repair.body_included, false);
+  assert.equal(suite.efficiency_fields.export_preview_cache.body_included, false);
+  assertRefArray(suite.target_verification_refs, 'target_verification_refs');
 
   assertRefArray(suite.quality_floor_refs.review_export_gate_refs, 'review_export_gate_refs');
   assertRefArray(suite.quality_floor_refs.screenshot_review_gate_refs, 'screenshot_review_gate_refs');
   assertRefArray(suite.quality_floor_refs.visual_memory_authority_refs, 'visual_memory_authority_refs');
   assertRefArray(suite.quality_floor_refs.owner_receipt_refs, 'owner_receipt_refs');
+  assertRefArray(suite.quality_floor_refs.blocked_page_only_repair_refs, 'blocked_page_only_repair_refs');
+  assertRefArray(suite.quality_floor_refs.export_preview_cache_gate_refs, 'export_preview_cache_gate_refs');
 
   assert.equal(suite.authority_boundary.no_forbidden_write, true);
   assert.equal(suite.authority_boundary.opl_agent_lab_can_write_rca_visual_truth, false);
@@ -72,6 +101,11 @@ function assertEfficiencySuiteShape(suite) {
   assert.equal(suite.authority_boundary.rca_quality_floor_owner, 'redcube_ai');
   assert.equal(suite.optimization_policy.efficiency_improves_observability_only, true);
   assert.equal(suite.optimization_policy.quality_gates_may_be_lowered, false);
+  assert.equal(suite.optimization_policy.source_pack_reuse_allowed, true);
+  assert.equal(suite.optimization_policy.prompt_static_prefix_cache_allowed, true);
+  assert.equal(suite.optimization_policy.page_local_parallel_or_batch_sizing_telemetry_allowed, true);
+  assert.equal(suite.optimization_policy.blocked_page_only_repair_required_for_repair_route, true);
+  assert.equal(suite.optimization_policy.export_preview_cache_allowed, true);
 }
 
 test('RCA efficiency handoff contract exposes a refs-only standard Agent Lab suite input', () => {
