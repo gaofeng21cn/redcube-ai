@@ -9,3 +9,4 @@ Gate rules:
 - Visual memory writeback proposals must link to rendered artifact evidence and review refs.
 - Visual memory accept/reject requires RCA owner judgment and receipt refs.
 - OPL may transport review, repair, memory proposal, and receipt refs only.
+- Agent Lab efficiency refs, including source pack reuse, prompt/static-prefix cache, blocked-page-only repair, page-local batch telemetry, and export preview cache, remain refs-only observability and cannot replace screenshot review, review/export verdicts, or RCA owner receipts.

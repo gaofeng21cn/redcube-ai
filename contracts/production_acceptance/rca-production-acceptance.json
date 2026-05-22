@@ -323,6 +323,49 @@
       "opl_can_claim_visual_stage_soak_complete": false
     }
   },
+  "efficiency_handoff_projection_refs": {
+    "surface_kind": "rca_production_acceptance_efficiency_handoff_projection_refs",
+    "work_order_ref": "oma_developer_patch_work_order_5a1b68cacbd4",
+    "owner": "redcube_ai",
+    "consumer": "opl_agent_lab",
+    "projection_ref": "redcube product manifest#/rca_efficiency_handoff_projection",
+    "sidecar_projection_ref": "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
+    "contract_ref": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
+    "runtime_consumption_refs": [
+      "redcube product manifest#/rca_efficiency_handoff_projection",
+      "redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection",
+      "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
+      "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref"
+    ],
+    "quality_floor_refs": [
+      "workspace-runtime-ref:review-export:<run-id>",
+      "workspace-runtime-ref:export-result:<run-id>",
+      "agent/quality_gates/review_export_memory.md",
+      "agent/quality_gates/artifact_authority.md",
+      "contracts/artifact_locator_contract.json"
+    ],
+    "target_verification_refs": [
+      "target_runtime_consumption_verification_receipt",
+      "target_workspace_environment_consumption_receipt",
+      "workspace-runtime-ref:review-export:<run-id>",
+      "workspace-runtime-ref:export-result:<run-id>",
+      "target-verification:redcube-ai/product-manifest-read",
+      "target-verification:redcube-ai/product-sidecar-export-read",
+      "target-verification:redcube-ai/typecheck",
+      "target-verification:redcube-ai/test-fast",
+      "target-verification:redcube-ai/targeted-efficiency-tests"
+    ],
+    "refs_only": true,
+    "read_only": true,
+    "visual_readiness_claimed": false,
+    "export_readiness_claimed": false,
+    "handoff_readiness_claimed": false,
+    "production_soak_complete_claimed": false,
+    "writes_visual_truth": false,
+    "writes_artifact_body": false,
+    "writes_memory_body": false,
+    "authorizes_quality_or_export": false
+  },
   "evidence_tail": {
     "production_live_soak_not_claimed_by_conformance": false,
     "domain_ready_not_claimed_by_conformance": false,

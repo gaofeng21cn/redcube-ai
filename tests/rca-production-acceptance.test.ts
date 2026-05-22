@@ -334,6 +334,45 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.equal(handoff.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
 });
 
+test('RCA production acceptance exposes Agent Lab efficiency handoff refs without moving authority', () => {
+  const acceptance = readJson(acceptancePath);
+  const handoff = acceptance.efficiency_handoff_projection_refs;
+
+  assert.equal(handoff.surface_kind, 'rca_production_acceptance_efficiency_handoff_projection_refs');
+  assert.equal(handoff.work_order_ref, 'oma_developer_patch_work_order_5a1b68cacbd4');
+  assert.equal(handoff.owner, 'redcube_ai');
+  assert.equal(handoff.consumer, 'opl_agent_lab');
+  assert.equal(handoff.projection_ref, 'redcube product manifest#/rca_efficiency_handoff_projection');
+  assert.equal(
+    handoff.sidecar_projection_ref,
+    'redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection',
+  );
+  assert.equal(handoff.contract_ref, 'contracts/production_acceptance/rca-efficiency-handoff-projection.json');
+  assertRefArray(handoff.runtime_consumption_refs, 'efficiency_handoff_projection_refs.runtime_consumption_refs');
+  assertRefArray(handoff.quality_floor_refs, 'efficiency_handoff_projection_refs.quality_floor_refs');
+  assert.deepEqual(handoff.target_verification_refs, [
+    'target_runtime_consumption_verification_receipt',
+    'target_workspace_environment_consumption_receipt',
+    'workspace-runtime-ref:review-export:<run-id>',
+    'workspace-runtime-ref:export-result:<run-id>',
+    'target-verification:redcube-ai/product-manifest-read',
+    'target-verification:redcube-ai/product-sidecar-export-read',
+    'target-verification:redcube-ai/typecheck',
+    'target-verification:redcube-ai/test-fast',
+    'target-verification:redcube-ai/targeted-efficiency-tests',
+  ]);
+  assert.equal(handoff.refs_only, true);
+  assert.equal(handoff.read_only, true);
+  assert.equal(handoff.visual_readiness_claimed, false);
+  assert.equal(handoff.export_readiness_claimed, false);
+  assert.equal(handoff.handoff_readiness_claimed, false);
+  assert.equal(handoff.production_soak_complete_claimed, false);
+  assert.equal(handoff.writes_visual_truth, false);
+  assert.equal(handoff.writes_artifact_body, false);
+  assert.equal(handoff.writes_memory_body, false);
+  assert.equal(handoff.authorizes_quality_or_export, false);
+});
+
 test('RCA evidence tail is closed only by domain receipt or by typed blocker with next verification refs', () => {
   const acceptance = readJson(acceptancePath);
   const tail = acceptance.evidence_tail;

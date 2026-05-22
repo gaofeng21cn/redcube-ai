@@ -371,6 +371,16 @@ export function buildProductEntryManifestShellProjections({
         ref: '/task_lifecycle',
         label: 'task lifecycle',
       },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/rca_efficiency_handoff_projection',
+        label: 'Agent Lab refs-only efficiency handoff projection',
+      },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+        label: 'operator evidence readiness efficiency handoff',
+      },
     ],
   };
   return {

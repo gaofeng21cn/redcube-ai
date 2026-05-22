@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, utimesSync } from 'node:fs';
-import { createServer } from 'node:http';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -44,79 +43,8 @@ async function withMockCodexRuntime(testFn) {
   }
 }
 
-async function startMockHermesAgentApiServer() {
-  let runCounter = 0;
-  const server = createServer(async (request, response) => {
-    const chunks = [];
-    for await (const chunk of request) chunks.push(chunk);
-    const bodyText = Buffer.concat(chunks).toString('utf-8');
-    const body = bodyText ? JSON.parse(bodyText) : {};
-    response.setHeader('content-type', 'application/json');
-
-    if (request.method === 'POST' && request.url === '/v1/runs') {
-      runCounter += 1;
-      const input = body.input || {};
-      response.end(JSON.stringify({
-        provider: 'mock-hermes-provider',
-        model: 'server-selected-agent-loop-model',
-        session_id: 'mock-hermes-session',
-        run_id: `mock-hermes-run-${runCounter}`,
-        output: {
-          payload: buildMockCreativeOutput({
-            family: input.family,
-            route: input.route,
-            context: input.context,
-          }),
-        },
-      }));
-      return;
-    }
-
-    if (request.method === 'GET' && /^\/v1\/runs\/[^/]+\/events$/.test(String(request.url || ''))) {
-      response.end(JSON.stringify({
-        events: [
-          { type: 'run.started' },
-          { type: 'tool.used', tool: 'read_file' },
-          { type: 'run.completed' },
-        ],
-      }));
-      return;
-    }
-
-    response.statusCode = 404;
-    response.end(JSON.stringify({ error: 'not_found' }));
-  });
-
-  await new Promise((resolve) => {
-    server.listen(0, '127.0.0.1', resolve);
-  });
-  const address = server.address();
-  assert.equal(typeof address, 'object');
-  assert.notEqual(address, null);
-  return {
-    baseUrl: `http://127.0.0.1:${address.port}`,
-    close: () => new Promise((resolve, reject) => {
-      server.close((error) => (error ? reject(error) : resolve()));
-    }),
-  };
-}
-
-async function withMockHermesAgentApi(testFn) {
-  const server = await startMockHermesAgentApiServer();
-  const restoreEnv = withEnv({
-    REDCUBE_HERMES_AGENT_API_BASE_URL: server.baseUrl,
-    REDCUBE_HERMES_AGENT_API_COMPAT_MODEL: 'caller-compat-model',
-  });
-  try {
-    return await testFn();
-  } finally {
-    restoreEnv();
-    await server.close();
-  }
-}
-
 test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix_html', async () => {
-  await withMockCodexRuntime(async () => withMockHermesAgentApi(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-recovery-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -209,7 +137,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
     } finally {
       restoreVariants();
     }
-  }));
+  });
 });
 
 test('runDeliverableRoute continues from ppt fix_html to requested stop-after review gate', async () => {
@@ -300,7 +228,7 @@ test('runDeliverableRoute continues from ppt fix_html to requested stop-after re
 });
 
 test('runDeliverableRoute escalates repeated ppt fix_html review blocks through Hermes agent loop once', async () => {
-  await withMockCodexRuntime(async () => withMockHermesAgentApi(async () => {
+  await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-escalation-'));
     await completeSourceReadiness({
       workspaceRoot,
@@ -381,5 +309,5 @@ test('runDeliverableRoute escalates repeated ppt fix_html review blocks through 
     } finally {
       restoreVariants();
     }
-  }));
+  });
 });

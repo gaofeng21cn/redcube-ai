@@ -1,5 +1,93 @@
 // @ts-nocheck
 
+const RCA_EFFICIENCY_WORK_ORDER_ID = 'oma_developer_patch_work_order_5a1b68cacbd4';
+
+const RCA_EFFICIENCY_TARGET_VERIFICATION_REFS = Object.freeze([
+  'target_runtime_consumption_verification_receipt',
+  'target_workspace_environment_consumption_receipt',
+  'workspace-runtime-ref:review-export:<run-id>',
+  'workspace-runtime-ref:export-result:<run-id>',
+  'target-verification:redcube-ai/product-manifest-read',
+  'target-verification:redcube-ai/product-sidecar-export-read',
+  'target-verification:redcube-ai/typecheck',
+  'target-verification:redcube-ai/test-fast',
+  'target-verification:redcube-ai/targeted-efficiency-tests',
+]);
+
+const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
+  Object.freeze({
+    proposed_change_ref: 'target_agent_owner_receipt_contract_ref:target_agent/live-acceptance',
+    target_surface: 'target_agent_owner_receipt_contract_ref',
+    target_repo_refs: [
+      'contracts/owner_receipt_contract.json',
+      'redcube product manifest#/domain_owner_receipt_contract',
+    ],
+    verifies_ref: 'target-owner-receipt-or-typed-blocker:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4',
+    refs_only: true,
+    writes_target_domain_truth: false,
+    writes_memory_body: false,
+    writes_artifact_body: false,
+    authorizes_quality_or_export: false,
+  }),
+  Object.freeze({
+    proposed_change_ref: 'target_agent_owner_route_ref:target_agent/owner-receipt-projection',
+    target_surface: 'target_agent_owner_route_ref',
+    target_repo_refs: [
+      'redcube product manifest#/owner_route',
+      'redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
+    ],
+    verifies_ref: 'target-runtime-read-model-consumption:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4/source-patch',
+    refs_only: true,
+    writes_target_domain_truth: false,
+    writes_memory_body: false,
+    writes_artifact_body: false,
+    authorizes_quality_or_export: false,
+  }),
+  Object.freeze({
+    proposed_change_ref: 'target_agent_production_acceptance_contract_ref:target_agent/production_acceptance',
+    target_surface: 'target_agent_production_acceptance_contract_ref',
+    target_repo_refs: [
+      'contracts/production_acceptance/rca-production-acceptance.json',
+      'contracts/production_acceptance/rca-efficiency-handoff-projection.json',
+    ],
+    verifies_ref: 'workspace-runtime-ref:review-export:<run-id>',
+    refs_only: true,
+    writes_target_domain_truth: false,
+    writes_memory_body: false,
+    writes_artifact_body: false,
+    authorizes_quality_or_export: false,
+  }),
+  Object.freeze({
+    proposed_change_ref: 'target_agent_quality_gate_ref:target_agent/export-owner',
+    target_surface: 'target_agent_quality_gate_ref',
+    target_repo_refs: [
+      'agent/quality_gates/review_export_memory.md',
+      'agent/quality_gates/artifact_authority.md',
+      'prompts/ppt_deck/repair_image_pages.md',
+    ],
+    verifies_ref: 'workspace-runtime-ref:export-result:<run-id>',
+    refs_only: true,
+    writes_target_domain_truth: false,
+    writes_memory_body: false,
+    writes_artifact_body: false,
+    authorizes_quality_or_export: false,
+  }),
+  Object.freeze({
+    proposed_change_ref: 'target_agent_regression_suite_ref:target_agent/owner-boundary',
+    target_surface: 'target_agent_regression_suite_ref',
+    target_repo_refs: [
+      'tests/rca-efficiency-handoff-projection.test.ts',
+      'tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+    ],
+    verifies_ref: 'target-verification:redcube-ai/targeted-efficiency-tests',
+    refs_only: true,
+    writes_target_domain_truth: false,
+    writes_memory_body: false,
+    writes_artifact_body: false,
+    authorizes_quality_or_export: false,
+  }),
+]);
+
 export function buildProductionEvidenceScaleoutRefs({
   standardDomainAgentSkeleton,
   workspaceReceiptInventoryProjection,
@@ -250,6 +338,7 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
     projection_model: 'derived_from_existing_runtime_review_export_refs_only',
     refs_only: true,
     read_only: true,
+    source_work_order_ref: RCA_EFFICIENCY_WORK_ORDER_ID,
     agent_lab_suite_input: {
       suite_kind: 'standard',
       suite_id: 'redcube-ai.efficiency-observability.standard.v1',
@@ -262,6 +351,27 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       claims_handoffable: false,
       claims_production_soak_complete: false,
     },
+    target_agent_owner_surface_refs: {
+      owner_route_ref: 'redcube product manifest#/owner_route',
+      owner_receipt_contract_ref: 'redcube product manifest#/domain_owner_receipt_contract',
+      production_acceptance_contract_ref: 'contracts/production_acceptance/rca-production-acceptance.json',
+      quality_gate_refs: [
+        'agent/quality_gates/review_export_memory.md',
+        'agent/quality_gates/artifact_authority.md',
+      ],
+      regression_suite_refs: [
+        'tests/rca-efficiency-handoff-projection.test.ts',
+        'tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+      ],
+      owner: 'redcube_ai',
+      refs_only: true,
+    },
+    target_runtime_consumption_refs: [
+      'redcube product manifest#/rca_efficiency_handoff_projection',
+      'redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+      'redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection',
+      'redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
+    ],
     efficiency_signal_refs: {
       duration_refs: [
         'workspace-runtime-ref:route-summary:<run-id>#/elapsed_ms',
@@ -353,13 +463,8 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
         body_included: false,
       },
     },
-    target_verification_refs: [
-      'target-verification:redcube-ai/typecheck',
-      'target-verification:redcube-ai/test-fast',
-      'target-verification:redcube-ai/rca-efficiency-handoff-projection',
-      'target-verification:redcube-ai/ppt-creative-ownership-targeted-rerender',
-      'target-verification:redcube-ai/export-preview-cache',
-    ],
+    patch_traceability_matrix: RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX.map((entry) => ({ ...entry })),
+    target_verification_refs: [...RCA_EFFICIENCY_TARGET_VERIFICATION_REFS],
     quality_floor_refs: {
       review_export_gate_refs: [
         reviewExportRefs.review_export_gate_ref || 'workspace-runtime-ref:review-export:transition-run',
@@ -385,7 +490,7 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       blocked_page_only_repair_refs: [
         'workspace-runtime-ref:repair-image-pages:<run-id>#/blocked_slide_ids',
         'workspace-runtime-ref:repair-image-pages:<run-id>#/preserved_slide_hashes',
-        'agent/prompts/repair_image_pages.md',
+        'prompts/ppt_deck/repair_image_pages.md',
       ],
       export_preview_cache_gate_refs: [
         'workspace-runtime-ref:export-preview-cache:<run-id>',

@@ -253,6 +253,18 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       false,
     );
     assert.equal(
+      manifest.operator_evidence_readiness_projection.rca_efficiency_handoff_projection.source_work_order_ref,
+      'oma_developer_patch_work_order_5a1b68cacbd4',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.rca_efficiency_handoff_projection.target_agent_owner_surface_refs.refs_only,
+      true,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.rca_efficiency_handoff_projection.patch_traceability_matrix.length,
+      5,
+    );
+    assert.equal(
       manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_declare_domain_ready,
       false,
     );
@@ -326,6 +338,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.lifecycle_ledger.actions[0].action_id, 'verify_redcube_product_entry_manifest');
     assert.equal(manifest.owner_route.surface_kind, 'family_owner_route');
     assert.equal(manifest.owner_route.next_owner, 'redcube_ai');
+    assert.equal(
+      manifest.owner_route.projection_refs.some((entry) => entry.ref === '/rca_efficiency_handoff_projection'),
+      true,
+    );
+    assert.equal(
+      manifest.owner_route.projection_refs.some(
+        (entry) => entry.ref === '/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+      ),
+      true,
+    );
     assertManifestActionAndStageControlPlane({
       manifest,
       sidecarGuardedActionMetadata,

@@ -16,6 +16,18 @@
     "review_export_ref",
     "forbidden_write_proof_ref"
   ],
+  "efficiency_handoff_owner_projection": {
+    "work_order_ref": "oma_developer_patch_work_order_5a1b68cacbd4",
+    "projection_ref": "redcube product manifest#/rca_efficiency_handoff_projection/target_agent_owner_surface_refs/owner_receipt_contract_ref",
+    "target_owner_return_ref": "target-owner-receipt-or-typed-blocker:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4",
+    "allowed_return_shapes_ref": "redcube product manifest#/domain_owner_receipt_contract/allowed_return_shapes",
+    "refs_only": true,
+    "projects_receipt_body": false,
+    "writes_visual_truth": false,
+    "writes_artifact_body": false,
+    "writes_memory_body": false,
+    "authorizes_quality_or_export": false
+  },
   "receipt_cases": [
     {
       "return_shape": "domain_receipt",

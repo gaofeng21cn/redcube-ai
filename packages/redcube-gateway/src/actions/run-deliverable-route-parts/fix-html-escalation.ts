@@ -42,7 +42,10 @@ function executorBackendForAdapter(adapter: string): 'codex_cli' | 'hermes_agent
 }
 
 function hermesAgentLoopAvailable(): boolean {
-  return Boolean(safeText(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL));
+  return Boolean(
+    safeText(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL)
+    || safeText(process.env.REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND),
+  );
 }
 
 function executionShapeForBackend(

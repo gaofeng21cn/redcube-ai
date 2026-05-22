@@ -8,3 +8,4 @@ Gate rules:
 - Artifact mutation requires RCA route policy, helper catalog refs, repair target refs, or owner receipt refs.
 - Native helpers may materialize artifacts, manifests, screenshots, PPTX/PDF, PNG sequences, and package directories.
 - Generated OPL surfaces may consume artifact refs; they cannot store artifact bodies or authorize artifact mutation.
+- Export preview cache refs and preserved slide hashes are evidence refs only; final export artifacts still require RCA export gate refs and artifact locator refs.
