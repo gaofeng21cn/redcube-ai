@@ -352,7 +352,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0008.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108
+      "line_count": 112
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/9",
@@ -850,7 +850,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0008.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108
+      "line_count": 112
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/9",
@@ -1288,7 +1288,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0008.json",
       "role": "current_program_leaf_source",
-      "line_count": 108
+      "line_count": 112
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/9",
@@ -1582,7 +1582,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0008.json",
       "role": "current_program_leaf_source",
-      "line_count": 108
+      "line_count": 112
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/9",

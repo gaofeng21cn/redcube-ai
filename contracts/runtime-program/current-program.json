@@ -1520,7 +1520,7 @@
             "apps/redcube-cli/src/cli.ts",
             "apps/redcube-mcp/src/server.ts",
             "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+            "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
           ],
           "activeCallers": [
             "OPL generated CLI/MCP wrapper domain handler targets",
@@ -1617,7 +1617,7 @@
         {
           "module_id": "codex_executor_adapter",
           "surface_ref": "/domain_entry_contract/executor",
-          "status": "split_owner_boundary_landed",
+          "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
           "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
           "opl_generic_primitive": "agent_executor_adapter",
           "oplAbsorbCandidate": true,
@@ -1631,6 +1631,10 @@
           "codePaths": [
             "packages/redcube-runtime/src/executors.ts",
             "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
             "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
             "tests/rca-executor-backend-contract.test.ts"
           ],
@@ -1640,7 +1644,7 @@
             "runtime route executor tests"
           ],
           "activeCallerStatus": "active_codex_cli_first_class_default",
-          "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+          "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
           "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
           "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
           "tombstone_required": false,
@@ -4925,7 +4929,7 @@
               "apps/redcube-cli/src/cli.ts",
               "apps/redcube-mcp/src/server.ts",
               "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+              "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
             ],
             "activeCallers": [
               "OPL generated CLI/MCP wrapper domain handler targets",
@@ -5022,7 +5026,7 @@
           {
             "module_id": "codex_executor_adapter",
             "surface_ref": "/domain_entry_contract/executor",
-            "status": "split_owner_boundary_landed",
+            "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
             "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
             "opl_generic_primitive": "agent_executor_adapter",
             "oplAbsorbCandidate": true,
@@ -5036,6 +5040,10 @@
             "codePaths": [
               "packages/redcube-runtime/src/executors.ts",
               "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
+              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
+              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
               "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
               "tests/rca-executor-backend-contract.test.ts"
             ],
@@ -5045,7 +5053,7 @@
               "runtime route executor tests"
             ],
             "activeCallerStatus": "active_codex_cli_first_class_default",
-            "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+            "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
             "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
             "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
             "tombstone_required": false,
@@ -9035,7 +9043,7 @@
                 "apps/redcube-cli/src/cli.ts",
                 "apps/redcube-mcp/src/server.ts",
                 "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+                "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
               ],
               "activeCallers": [
                 "OPL generated CLI/MCP wrapper domain handler targets",
@@ -9132,7 +9140,7 @@
             {
               "module_id": "codex_executor_adapter",
               "surface_ref": "/domain_entry_contract/executor",
-              "status": "split_owner_boundary_landed",
+              "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
               "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
               "opl_generic_primitive": "agent_executor_adapter",
               "oplAbsorbCandidate": true,
@@ -9146,6 +9154,10 @@
               "codePaths": [
                 "packages/redcube-runtime/src/executors.ts",
                 "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
+                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
+                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
                 "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
                 "tests/rca-executor-backend-contract.test.ts"
               ],
@@ -9155,7 +9167,7 @@
                 "runtime route executor tests"
               ],
               "activeCallerStatus": "active_codex_cli_first_class_default",
-              "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+              "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
               "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
               "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
               "tombstone_required": false,
@@ -12792,7 +12804,7 @@
             "apps/redcube-cli/src/cli.ts",
             "apps/redcube-mcp/src/server.ts",
             "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts"
+            "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
           ],
           "activeCallers": [
             "OPL generated CLI/MCP wrapper domain handler targets",
@@ -12889,7 +12901,7 @@
         {
           "module_id": "codex_executor_adapter",
           "surface_ref": "/domain_entry_contract/executor",
-          "status": "split_owner_boundary_landed",
+          "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
           "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
           "opl_generic_primitive": "agent_executor_adapter",
           "oplAbsorbCandidate": true,
@@ -12903,6 +12915,10 @@
           "codePaths": [
             "packages/redcube-runtime/src/executors.ts",
             "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
+            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
             "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
             "tests/rca-executor-backend-contract.test.ts"
           ],
@@ -12912,7 +12928,7 @@
             "runtime route executor tests"
           ],
           "activeCallerStatus": "active_codex_cli_first_class_default",
-          "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter to OPL generic Agent Executor Adapter.",
+          "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
           "retentionReason": "RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.",
           "cannotAbsorbReason": "OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.",
           "tombstone_required": false,
