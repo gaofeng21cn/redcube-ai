@@ -55,6 +55,8 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 
 当前 active source 中仍可见的 `product-entry-session-snapshot-ref-adapter`、direct `runtimeWatch` read model、product sidecar guarded actions、operator evidence/stability projection、native helper envelope、MCP/CLI/product-entry wrapper 和 `@redcube/gateway` package boundary 都不是旧接口兼容承诺。它们只允许作为 refs-only adapter、domain handler target、native helper implementation、fixture、diagnostic 或 package/protocol boundary；generated/default caller parity、domain authority refs preserved、no-regression proof 与 provenance consumer migration 成立后，继续 rename/delete/tombstone，不新增 compatibility alias、facade 或旧 public path。
 
+Product-entry manifest 入口已做一次源码边界收薄：OPL runtime inventory、task lifecycle、automation catalog、skill/operator shell 与 workbench/sidecar projection 组装已进入 `get-product-entry-manifest-parts/shell-projections.ts`，`get-product-entry-manifest.ts` 保持 RCA domain refs 与 manifest assembly。剩余状态仍是 OPL 需继续接管 generic session shell、workbench shell 和 generated sidecar primitive 的默认 caller；这不改变 RCA 持有 visual truth、review/export verdict、artifact mutation authority、owner receipt 和 native helper implementation。
+
 ## 当前测试/证据差距
 
 以下是结构闭合后的 production evidence tail，不再计入功能/结构差距：
