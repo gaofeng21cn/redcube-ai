@@ -65,7 +65,19 @@
     "opl_can_store_artifact_blob": false,
     "opl_can_write_memory_body": false,
     "opl_can_authorize_review_export_verdict": false,
-    "opl_can_issue_owner_receipt": false
+    "opl_can_issue_owner_receipt": false,
+    "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
+    "typed_blocker_refs": [
+      "typed-blocker:rca/default-caller-deletion/observability_stability_read_model/physical-delete-requires-explicit-owner-receipt"
+    ],
+    "no_forbidden_write_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/observability_stability_read_model/refs-only-boundary"
+    ],
+    "no_forbidden_write_evidence_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/observability_stability_read_model/refs-only-boundary"
+    ],
+    "domain_repo_physical_delete_authorized": false,
+    "physical_delete_authorized_by_refs": false
   },
   "rca_projection_mode": "observability_refs_only",
   "rca_exports_only": [
@@ -104,5 +116,8 @@
   "declares_visual_ready": false,
   "declares_exportable": false,
   "declares_handoffable": false,
-  "declares_production_soak_complete": false
+  "declares_production_soak_complete": false,
+  "current_surface_refs": [
+    "/opl_stability_read_model_consumption"
+  ]
 }

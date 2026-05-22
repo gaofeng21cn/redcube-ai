@@ -402,6 +402,23 @@ const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
   observability_stability_read_model: 'refs_only_adapter',
 });
 
+const FUNCTIONAL_MODULE_CURRENT_SURFACE_REFS = Object.freeze({
+  generic_cli_mcp_wrappers: [
+    'cli',
+    'mcp',
+    'skill',
+    'family_action_catalog',
+    'guarded_action_catalog',
+  ],
+  operator_projection_shell: [
+    'product_status',
+    'status_read_model',
+    'workbench',
+    'workbench_drilldown',
+    'operator_evidence_readiness_projection',
+  ],
+});
+
 const FUNCTIONAL_MODULE_EXPECTED_MODES = Object.freeze({
   declarative_pack: 'declarative_pack_consumed_by_opl_hosted_surface',
   domain_handler_target: 'domain_handler_target_called_by_opl_generated_surface',
@@ -539,6 +556,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
           rca_owns_replacement_runtime: false,
         },
         bridge_exit_gate: buildBridgeExitGate(entry, replacementGuard),
+        current_surface_refs: FUNCTIONAL_MODULE_CURRENT_SURFACE_REFS[entry.module_id] || [entry.surface_ref],
         rca_projection_mode: replacementGuard.rca_projection_mode || 'refs_only_projection',
         rca_exports_only: replacementGuard.rca_exports_only || [],
         forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },

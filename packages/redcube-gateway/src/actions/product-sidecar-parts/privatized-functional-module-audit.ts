@@ -198,6 +198,7 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
   const replacementSurface = replacementGuard.opl_replacement_surface || entry.opl_generic_primitive || 'domain_authority_function';
   const isAuthorityFunction = entry.module_id === 'visual_authority_functions';
   const isDeclarativePack = entry.module_id === 'visual_pack_compiler_handoff';
+  const emitsDefaultCallerDeletionEvidence = !isAuthorityFunction && !isDeclarativePack;
   return {
     gate_id: `${entry.module_id}_bridge_exit_gate`,
     bridge_role: profile.bridge_role || 'refs_only_adapter_until_opl_replacement_live',
@@ -219,6 +220,21 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
     opl_can_write_memory_body: false,
     opl_can_authorize_review_export_verdict: false,
     opl_can_issue_owner_receipt: false,
+    ...(emitsDefaultCallerDeletionEvidence ? {
+      default_caller_deletion_evidence_scope:
+        'domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization',
+      typed_blocker_refs: [
+        `typed-blocker:rca/default-caller-deletion/${entry.module_id}/physical-delete-requires-explicit-owner-receipt`,
+      ],
+      no_forbidden_write_refs: [
+        `no-forbidden-write:rca/default-caller-deletion/${entry.module_id}/refs-only-boundary`,
+      ],
+      no_forbidden_write_evidence_refs: [
+        `no-forbidden-write:rca/default-caller-deletion/${entry.module_id}/refs-only-boundary`,
+      ],
+      domain_repo_physical_delete_authorized: false,
+      physical_delete_authorized_by_refs: false,
+    } : {}),
   };
 }
 

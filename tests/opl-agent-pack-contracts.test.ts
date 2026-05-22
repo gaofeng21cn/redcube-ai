@@ -180,6 +180,7 @@ function buildCanonicalPack() {
       schema_version: 1,
       domain_id: 'redcube_ai',
       target_domain_id: 'redcube_ai',
+      ...functionalAudit,
       privatized_functional_module_audit: functionalAudit,
       opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
       functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
@@ -658,4 +659,44 @@ test('OPL generated interfaces are ready from RCA root contracts when OPL checko
   assert.equal(bundle.skill.status, 'ready');
   assert.equal(bundle.product_entry.status, 'ready');
   assert.equal(bundle.stage_routes.length, 6);
+});
+
+test('OPL default callers see RCA deletion evidence refs without delete authority', {
+  skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
+}, () => {
+  const result = spawnSync(oplBin, [
+    'agents',
+    'default-callers',
+    '--agent',
+    `redcube-ai=${repoRoot}`,
+    '--json',
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  const payload = JSON.parse(result.stdout);
+  const readiness = payload.agent_default_caller_readiness;
+  assert.equal(readiness.status, 'ready_domain_evidence_required');
+  assert.equal(readiness.summary.generated_default_caller_surface_count, 8);
+  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 0);
+  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 0);
+  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 0);
+  assert.equal(readiness.migration_gate_policy.physical_delete_authorized_by_this_report, false);
+  assert.equal(readiness.authority_boundary.report_can_authorize_domain_repo_physical_delete, false);
+
+  const report = readiness.reports[0];
+  assert.equal(report.deletion_gate.physical_delete_authorized, false);
+  const bySurface = Object.fromEntries(report.surface_gates.map((gate) => [gate.surface_id, gate]));
+  assert.equal(bySurface.cli.active_caller_module_id, 'generic_cli_mcp_wrappers');
+  assert.equal(bySurface.skill.active_caller_module_id, 'generic_cli_mcp_wrappers');
+  assert.equal(bySurface.product_status.active_caller_module_id, 'operator_projection_shell');
+  for (const gate of report.surface_gates) {
+    const worklist = gate.deletion_evidence_worklist;
+    assert.equal(worklist.domain_owner_receipt_or_typed_blocker.status, 'observed', gate.surface_id);
+    assert.equal(worklist.no_forbidden_write_proof.status, 'observed', gate.surface_id);
+    assert.equal(worklist.tombstone_or_provenance_ref.status, 'observed', gate.surface_id);
+    assert.equal(worklist.physical_delete_authorized, false, gate.surface_id);
+  }
 });

@@ -249,6 +249,7 @@ function buildFunctionalAudit(functionalAudit) {
     schema_version: 1,
     domain_id: DOMAIN_ID,
     target_domain_id: DOMAIN_ID,
+    ...functionalAudit,
     privatized_functional_module_audit: functionalAudit,
     opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
     functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
