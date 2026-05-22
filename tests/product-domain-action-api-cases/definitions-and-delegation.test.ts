@@ -385,6 +385,7 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
   await client.connect(transport);
 
   try {
+    assert.equal(client.getServerVersion()?.name, 'redcube-ai');
     const tools = await client.listTools();
     assert.ok(
       tools.tools.some((tool) => tool.name === 'redcube_review'),

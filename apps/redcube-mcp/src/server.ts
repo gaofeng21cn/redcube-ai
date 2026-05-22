@@ -425,7 +425,7 @@ export async function callDomainTool(name: string, args: ToolArgs, deps: Partial
 
 export function createMcpServer(deps: Partial<DomainActionMap> = {}) {
   const server = new McpServer({
-    name: 'redcube-gateway',
+    name: 'redcube-ai',
     version: '0.1.0',
   });
 

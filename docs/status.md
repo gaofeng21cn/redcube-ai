@@ -77,6 +77,7 @@ RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness
 - `product_entry_continuation`、`get_managed_run`、retired managed supervision 与 `product_sidecar_dispatch.runtime_watch` 字符串只作为 retired legacy surface id、tombstone/provenance ref 或 negative dispatch input 存在。
 - `session_store_root` / `required_session_store_root` 的 active reader-facing 字段已迁到 `session_continuity_root` / `required_session_continuity_root`；旧 `session store` 词只可留在 forbidden generic-owner role、retired semantic id、tombstone/provenance 或人读解释语境。
 - active `formal_entry.internal_surface` 口径已迁为 `domain_entry_protocol_boundary`；`@redcube/gateway` 包名只作为 package/protocol boundary 或 provenance 语境读取，不代表 gateway public identity 或 generic gateway runtime owner。
+- active MCP server initialization identity 已收口为 `redcube-ai`；这只清理 reader-facing `gateway` 命名泄漏，不改变 `@redcube/gateway` package/protocol boundary，也不声明 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
 
 ## 当前物理源码形态差距
 
