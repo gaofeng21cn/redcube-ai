@@ -53,6 +53,8 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 Physical source morphology 现在按同一标准治理：`agent/` 是 Declarative Visual Pack，`contracts/` 与 runtime-program leaf parts 是机器合同，`packages/` / native helper / product-entry / sidecar / operator evidence 源码只能承担 visual domain handler、minimal authority function、native helper implementation、refs-only adapter、fixture 或 diagnostic。RCA 当前 artifact-heavy 目录不是可复制的新 Agent 通用 scaffold；历史 `managed` 命名只能作为 provenance、semantic-id、retired guard 或 tombstone，不恢复为 active runtime owner 或 compatibility alias。
 
+当前 active source 中仍可见的 `product-entry-session-snapshot-ref-adapter`、direct `runtimeWatch` read model、product sidecar guarded actions、operator evidence/stability projection、native helper envelope、MCP/CLI/product-entry wrapper 和 `@redcube/gateway` package boundary 都不是旧接口兼容承诺。它们只允许作为 refs-only adapter、domain handler target、native helper implementation、fixture、diagnostic 或 package/protocol boundary；generated/default caller parity、domain authority refs preserved、no-regression proof 与 provenance consumer migration 成立后，继续 rename/delete/tombstone，不新增 compatibility alias、facade 或旧 public path。
+
 ## 当前测试/证据差距
 
 以下是结构闭合后的 production evidence tail，不再计入功能/结构差距：
@@ -78,6 +80,7 @@ RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness
 - `product-entry-session-snapshot-ref-adapter` 只允许是 refs-only snapshot/ref adapter；active manifest / artifact locator / behavior contract 已使用 `session_continuity_root` 命名承认它是 continuity root，不是 generic session store owner；`product_entry_session_snapshot_refs_adapter` 仅保留为当前机器合同 semantic id，目标是 OPL generic session shell 稳定后消除 RCA 持有 session runtime 的误读。
 - workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只允许输出 refs、receipt、typed blocker、no-regression evidence 或 visual action metadata；OPL generic boundary projection 当前集中在 `product-sidecar-parts/opl-generic-boundaries.ts`，sidecar export projection 当前集中在 `product-sidecar-parts/sidecar-export-projection.ts`。两者都是 refs-only consumer projection / migration input，不是 RCA-owned platform runtime。`WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 是审计这些路径的当前 contract anchors，不得扩展成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
 - `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词继续出现时，必须有 provenance、retired guard、domain adapter 或 refs-only read-model 解释；新增 active caller 不增加 compatibility alias。
+- 只保护旧 managed/gateway/runtime/session path 的测试应删除或改写为 current contract、no-resurrection、fail-closed negative input、owner receipt、typed blocker 或 tombstone semantics；不维护旧 public path 兼容。
 
 ## 当前保留的 visual authority surfaces
 
