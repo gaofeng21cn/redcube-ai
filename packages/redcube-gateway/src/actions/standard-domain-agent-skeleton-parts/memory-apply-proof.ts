@@ -49,7 +49,7 @@ export function buildRuntimeResidueRetirementAudit({ runtime } = {}) {
     default_runtime_owner: runtime?.runtime_owner || 'configured_family_runtime_provider',
     retired_default_surfaces: [
       'hermes_first_default_runtime',
-      'gateway_first_public_entry',
+      'retired_gateway_protocol_boundary_public_entry',
       'repo_local_manager_default',
     ],
     allowed_remaining_roles: [
@@ -59,7 +59,7 @@ export function buildRuntimeResidueRetirementAudit({ runtime } = {}) {
     ],
     active_path_policy: {
       hermes_agent_default_runtime: false,
-      gateway_first_public_entry: false,
+      retired_gateway_protocol_boundary_public_entry: false,
       repo_local_manager_default: false,
       opl_hosted_provider_path_allowed: true,
       explicit_proof_backend_allowed: true,

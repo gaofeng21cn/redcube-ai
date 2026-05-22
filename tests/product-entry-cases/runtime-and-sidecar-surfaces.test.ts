@@ -668,7 +668,10 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       assert.equal(surface.decision_boundary.programmatic_role_may_compute_ready_verdict, false);
     }
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime, false);
-    assert.equal(sidecar.runtime_residue_retirement.active_path_policy.gateway_first_public_entry, false);
+    assert.equal(
+      sidecar.runtime_residue_retirement.active_path_policy.retired_gateway_protocol_boundary_public_entry,
+      false,
+    );
     assert.equal(sidecar.runtime_residue_retirement.active_path_policy.repo_local_manager_default, false);
     assert.equal(
       sidecar.mapped_surfaces.controlled_soak_no_regression_attempt.ref,

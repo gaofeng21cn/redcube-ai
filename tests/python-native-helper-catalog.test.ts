@@ -109,6 +109,11 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
 
   assert.equal(catalog.contract_id, 'python-native-helper-catalog');
   assert.equal(catalog.language, 'python');
+  assert.equal(
+    catalog.typescript_boundary,
+    'TypeScript owns product entry, CLI/MCP, domain-entry protocol contracts, runtime-family route orchestration, and review/export gate wiring.',
+  );
+  assert.doesNotMatch(catalog.typescript_boundary, /\bgateway contracts\b/);
   assert.deepEqual(catalog.package, {
     name: 'redcube-ai',
     source_root: 'python',

@@ -21,7 +21,7 @@
     }
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
-  "typescript_boundary": "TypeScript owns product entry, CLI/MCP, gateway contracts, runtime-family route orchestration, and review/export gate wiring.",
+  "typescript_boundary": "TypeScript owns product entry, CLI/MCP, domain-entry protocol contracts, runtime-family route orchestration, and review/export gate wiring.",
   "invocation_policy": {
     "preferred_internal_invocation": "package_module",
     "preferred_argv_shape": [

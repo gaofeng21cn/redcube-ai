@@ -42,7 +42,7 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
     assert.equal(manifest.runtime_residue_retirement.default_runtime_owner, 'configured_family_runtime_provider');
     assert.deepEqual(manifest.runtime_residue_retirement.retired_default_surfaces, [
       'hermes_first_default_runtime',
-      'gateway_first_public_entry',
+      'retired_gateway_protocol_boundary_public_entry',
       'repo_local_manager_default',
     ]);
     assert.deepEqual(manifest.runtime_residue_retirement.allowed_remaining_roles, [
@@ -52,7 +52,7 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
     ]);
     assert.deepEqual(manifest.runtime_residue_retirement.active_path_policy, {
       hermes_agent_default_runtime: false,
-      gateway_first_public_entry: false,
+      retired_gateway_protocol_boundary_public_entry: false,
       repo_local_manager_default: false,
       opl_hosted_provider_path_allowed: true,
       explicit_proof_backend_allowed: true,

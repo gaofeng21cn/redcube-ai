@@ -1199,7 +1199,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(residueRetirement.status, 'active_path_retired');
   assert.deepEqual(residueRetirement.retired_default_surfaces, [
     'hermes_first_default_runtime',
-    'gateway_first_public_entry',
+    'retired_gateway_protocol_boundary_public_entry',
     'repo_local_manager_default',
   ]);
   assert.deepEqual(residueRetirement.allowed_remaining_roles, [
