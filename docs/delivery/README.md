@@ -17,6 +17,7 @@ Delivery docs 解释当前 deliverable families、default routes、proof environ
 
 - [Deliverable examples](./deliverable_examples.md)
 - [Image-first PPT production route](./image-first-ppt-production-route.md)
+- [RCA real route evolution probe](./real-route-evolution-probe.md)
 - [HTML PPT route quality](./html-ppt-route-quality.md)
 - [Native PPT proof environment](./native-ppt-proof-environment.md)
 历史 stable deliverable 手工测试简报已进入 [history/phase-2](../history/phase-2/stable_deliverable_manual_test_brief.md)，不再作为当前 delivery 材料读取。

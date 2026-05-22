@@ -405,6 +405,12 @@ function materializeRouteResult({ raced, executor }) {
     ...(routeResult.artifact || {}),
     candidate_race: raced.race,
   };
+  if (routeResult.cache_status === 'hit') {
+    routeResult.artifact_refs = Array.from(new Set([
+      ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
+    ]));
+    return routeResult;
+  }
   writeFileSync(routeResult.artifact_file, JSON.stringify(routeResult.artifact, null, 2), 'utf-8');
   routeResult.artifact_refs = Array.from(new Set([
     ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),

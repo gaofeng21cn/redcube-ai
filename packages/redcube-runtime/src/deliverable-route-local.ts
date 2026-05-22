@@ -175,15 +175,21 @@ function pptDraftViewFiles(deliverablePaths, deliverableId) {
   ];
 }
 
+function pptOperatorRevisionFile(deliverablePaths) {
+  return path.join(deliverablePaths.viewsDir, 'operator', '幻灯片', '当前返修要求.md');
+}
+
 function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract, deliverableId }) {
   const files = routeRequiresArtifacts(contract, route)
     .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
   if (overlay === 'ppt_deck') {
-    if (['render_html', 'fix_html', 'author_image_pages', 'repair_image_pages'].includes(route)) {
+    if (['render_html', 'fix_html'].includes(route)) {
+      files.push(pptOperatorRevisionFile(deliverablePaths));
+    }
+    if (route === 'fix_html') {
       files.push(
         stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
         stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),
-        path.join(deliverablePaths.viewsDir, 'operator', '幻灯片', '当前返修要求.md'),
       );
     }
     if (['visual_director_review', 'screenshot_review', 'export_pptx'].includes(route)) {
@@ -206,7 +212,7 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
       stageArtifactFile(deliverablePaths, contract, 'fix_html'),
     );
   }
-  if (overlay === 'xiaohongshu' && ['author_image_pages', 'repair_image_pages', 'render_html', 'fix_html'].includes(route)) {
+  if (overlay === 'xiaohongshu' && ['repair_image_pages', 'fix_html'].includes(route)) {
     files.push(
       stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
       stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),
@@ -549,7 +555,6 @@ export async function executeDeliverableRouteLocally({
     requiredArtifactFiles,
   });
   if (cachedArtifact) {
-    writeFileSync(artifactFile, JSON.stringify(cachedArtifact, null, 2), 'utf-8');
     return {
       ok: true,
       route: safeRoute,

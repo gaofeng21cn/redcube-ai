@@ -43,6 +43,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/rca-efficiency-handoff-projection.test.ts',
     'tests/rca-one-shot-closeout.test.ts',
     'tests/rca-retired-surface-guard.test.ts',
+    'tests/real-route-evolution-probe.test.ts',
     'tests/reference-quality-os.test.ts',
     'tests/render-ceiling-deepening.test.ts',
     'tests/runtime-config.test.ts',
@@ -160,6 +161,7 @@ const FAST_FILES = Object.freeze([
   'tests/python-native-helper-catalog.test.ts',
   'tests/product-entry-runtime-manager-registration.test.ts',
   'tests/product-entry-session-checkpoint.test.ts',
+  'tests/real-route-evolution-probe.test.ts',
   'tests/product-entry.test.ts',
   'tests/source-augmentation-provider.test.ts',
 ]);

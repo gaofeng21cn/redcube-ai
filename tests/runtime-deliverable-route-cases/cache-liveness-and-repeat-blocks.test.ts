@@ -64,6 +64,144 @@ test('runDeliverableRoute reuses a fresh gated stage artifact when the route cac
   });
 });
 
+test('route cache hits do not rewrite upstream artifacts or invalidate dependent stage cache', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-cache-hit-stable-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: '稳定 cache hit deck',
+      goal: '验证上游 cache hit 不会污染下游输入指纹',
+    });
+
+    const firstStoryline = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+    assert.equal(firstStoryline.ok, true);
+    assert.equal(firstStoryline.summary.cache_status, 'miss');
+
+    const firstOutline = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'detailed_outline',
+    });
+    assert.equal(firstOutline.ok, true);
+    assert.equal(firstOutline.summary.cache_status, 'miss');
+
+    const persistedStorylineBefore = readFileSync(firstStoryline.artifactFile, 'utf-8');
+    await new Promise((resolve) => setTimeout(resolve, 25));
+
+    const cachedStoryline = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'storyline',
+    });
+    assert.equal(cachedStoryline.ok, true);
+    assert.equal(cachedStoryline.summary.cache_status, 'hit');
+    assert.equal(cachedStoryline.artifact?.route_cache?.cache_status, 'hit');
+    assert.equal(readFileSync(firstStoryline.artifactFile, 'utf-8'), persistedStorylineBefore);
+
+    const cachedOutline = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'detailed_outline',
+    });
+    assert.equal(cachedOutline.ok, true);
+    assert.equal(cachedOutline.summary.cache_status, 'hit');
+    assert.equal(cachedOutline.run.stage_results[0].status, 'cached');
+  });
+});
+
+test('image authoring cache survives downstream review and export artifacts', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-image-author-cache-'));
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'image route cache deck',
+      goal: '验证下游审阅与导出不会让上游 image authoring cache 失效',
+    });
+
+    for (const route of [
+      'storyline',
+      'detailed_outline',
+      'slide_blueprint',
+      'visual_direction',
+      'author_image_pages',
+      'visual_director_review',
+      'screenshot_review',
+      'export_pptx',
+    ]) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+      assert.equal(result.summary.cache_status, 'miss', route);
+    }
+
+    const cachedAuthor = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'author_image_pages',
+    });
+    assert.equal(cachedAuthor.ok, true);
+    assert.equal(cachedAuthor.summary.cache_status, 'hit');
+    assert.equal(cachedAuthor.run.stage_results[0].status, 'cached');
+
+    const cachedDirectorReview = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'visual_director_review',
+    });
+    assert.equal(cachedDirectorReview.ok, true);
+    assert.equal(cachedDirectorReview.summary.cache_status, 'hit');
+
+    const cachedScreenshotReview = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'screenshot_review',
+    });
+    assert.equal(cachedScreenshotReview.ok, true);
+    assert.equal(cachedScreenshotReview.summary.cache_status, 'hit');
+
+    const cachedExport = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+    });
+    assert.equal(cachedExport.ok, true);
+    assert.equal(cachedExport.summary.cache_status, 'hit');
+  });
+});
+
 test('getRun and runtimeWatch expire stale persisted running route runs with an audit trail', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-stale-run-'));
 
