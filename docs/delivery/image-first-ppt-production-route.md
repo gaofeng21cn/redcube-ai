@@ -60,11 +60,12 @@ tools/image-ppt-proof/run.sh --live-image-generation --output-dir artifacts/imag
 
 live 模式需要 `REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD` 或 `OPENAI_API_KEY`。CI `image-ppt-proof` job 只在 `workflow_dispatch`、nightly schedule 或 PR label `image-ppt-proof` 触发；默认质量 lane 不跑真实 image generation。
 
-## Closeout Ledger
+## Lifecycle Note
 
-- planned: lightweight real-style proof、PNG/OCR/crop/density/field-leak visual QA、artifact cache、局部 repair fidelity、operator UX、contracts/docs closeout。
-- done: `author_image_pages / repair_image_pages` runtime route、Responses image adapter、prompt/style/image manifest、PNG screenshot review hard-blocks、image artifact cache、blocked-slide-only repair、image-first export bundle、artifact gallery、product-entry/operator UX、`redcube image-ppt proof` helper、default route selection tests、proof runner/CI contract。
-- deferred: 完整“肠癌AI”长 PPT 常规回归、animation、narration、template import、online image search、SVG editor。
-- skipped: 第二公开 skill、PowerPoint/AppleScript proof、synthetic preview fallback、把 image-first PPTX 伪装成 editable shapes。
-- verification: see current rollout final verification and `tools/image-ppt-proof/ci-contract.json`.
-- commit-push state: tracked by the final implementation commit for the image-first hardening route.
+本文只承担当前 image-first PPT route support，不维护 closeout ledger 或 rollout receipt。旧 planned/done/deferred/skipped/verification 过程以 `contracts/runtime-program/ppt-image-first-production-route.json`、`tools/image-ppt-proof/ci-contract.json`、相关测试和 history/provenance 为准。
+
+当前仍有效的读法：
+
+- `ppt_deck` 默认 image-first full-slide authoring。
+- HTML / native editable PPTX 是显式可选 route，不是 fallback chain。
+- 真实 production visual-stage long soak、artifact-producing owner receipt 和 final visual ready/exportable/handoffable verdict 仍回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md) 与 RCA-owned review/export gates。
