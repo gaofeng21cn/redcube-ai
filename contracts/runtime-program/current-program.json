@@ -763,6 +763,8 @@
           "codePaths": [
             "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
             "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
             "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
@@ -4172,6 +4174,8 @@
             "codePaths": [
               "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
               "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+              "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+              "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
               "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
             ],
             "activeCallers": [
@@ -8286,6 +8290,8 @@
               "codePaths": [
                 "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
                 "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+                "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+                "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
                 "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
               ],
               "activeCallers": [
@@ -12047,6 +12053,8 @@
           "codePaths": [
             "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
             "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
+            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
             "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
