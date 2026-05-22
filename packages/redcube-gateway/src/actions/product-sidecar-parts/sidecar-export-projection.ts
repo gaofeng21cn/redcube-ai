@@ -23,6 +23,77 @@ export const DOMAIN_ID = 'redcube_ai';
 export const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
 
+function buildRouteStageHandoffBoundary(manifest) {
+  return {
+    surface_kind: 'rca_route_stage_handoff_boundary',
+    version: 'rca-route-stage-handoff-boundary.v1',
+    domain_id: DOMAIN_ID,
+    route_is_stage: false,
+    route_semantics_owner: DOMAIN_ID,
+    domain_truth_owner: DOMAIN_ID,
+    stage_graph_owner: 'one-person-lab',
+    stage_lifecycle_owner: 'one-person-lab',
+    runtime_transition_owner: 'one-person-lab',
+    queue_attempt_owner: 'one-person-lab',
+    opl_hydrates_route_refs_to_queue_and_stage_attempts: true,
+    rca_owns_inter_route_scheduler: false,
+    stage_graph_ref: '/family_stage_control_plane',
+    route_stage_projection_ref: '/stage_control_projection/route_stage_projection',
+    visual_transition_spec_ref: '/visual_transition_spec',
+    visual_stage_descriptor_scope: (
+      manifest.family_scheduler_replacement?.visual_stage_descriptor_scope
+      || 'opl_stage_execution_plan_route_handler_refs_only'
+    ),
+    route_semantics: (
+      'RCA routes express visual-deliverable next-step and route-back semantics; '
+      + 'OPL transports them as refs into stage attempts.'
+    ),
+    allowed_handoff_refs: [
+      'deliverable_id',
+      'route_id',
+      'family_id',
+      'stage_id',
+      'route_stage_refs',
+      'visual_transition_spec_ref',
+      'review_export_receipt_ref',
+      'artifact_authority_receipt_ref',
+      'typed_blocker_refs',
+      'human_gate_schema_ref',
+      'no_forbidden_write_ref',
+    ],
+    forbidden_payload_classes: [
+      'visual_truth_body',
+      'artifact_body',
+      'visual_memory_body',
+      'review_verdict_body',
+      'export_verdict_body',
+      'generic_runtime_state',
+      'generic_attempt_ledger_record',
+      'generic_runner_decision',
+      'runtime_queue_state',
+    ],
+    authority_boundary: {
+      rca_owner_receipt_required: true,
+      opl_can_write_visual_truth: false,
+      opl_can_store_artifact_blob: false,
+      opl_can_write_visual_memory_body: false,
+      opl_can_declare_visual_ready: false,
+      opl_can_declare_exportable: false,
+      opl_can_declare_handoffable: false,
+      rca_implements_generic_route_scheduler: false,
+      rca_implements_generic_stage_attempt_graph: false,
+    },
+    forbidden_claims: [
+      'route_is_stage',
+      'rca_owned_generic_route_scheduler',
+      'rca_owned_generic_stage_attempt_graph',
+      'opl_provider_completion_is_visual_ready',
+      'opl_stage_attempt_completion_is_exportable',
+      'opl_stage_attempt_completion_is_handoffable',
+    ],
+  };
+}
+
 export function buildSidecarProjection({ workspaceRoot, manifest }) {
   const sessionSurface = manifest.product_entry_shell?.session || {};
   const familySchedulerReplacement = manifest.family_scheduler_replacement || buildFamilySchedulerReplacementProjection();
@@ -55,6 +126,9 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
     || buildVisualTransitionEvaluatorProjection({
       visualTransitionSpec: manifest.visual_transition_spec,
     })
+  );
+  const routeStageHandoffBoundary = (
+    manifest.route_stage_handoff_boundary || buildRouteStageHandoffBoundary(manifest)
   );
   const rcaEfficiencyHandoffProjection = (
     manifest.rca_efficiency_handoff_projection
@@ -103,6 +177,7 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
         privatized_functional_module_audit: privatizedFunctionalModuleAudit,
         opl_substrate_adapter_export: oplSubstrateAdapterExport,
         visual_pack_compiler_handoff: visualPackCompilerHandoff,
+        route_stage_handoff_boundary: routeStageHandoffBoundary,
         rca_is_functional_harness_owner: false,
         rca_is_generic_runtime_owner: false,
         rca_is_generic_scheduler_owner: false,
@@ -355,6 +430,7 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
       },
       visual_transition_evaluator: visualTransitionEvaluator,
       visual_pack_compiler_handoff: visualPackCompilerHandoff,
+      route_stage_handoff_boundary: routeStageHandoffBoundary,
       family_scheduler_replacement: familySchedulerReplacement,
       opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
       opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
@@ -383,6 +459,7 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
       visual_transition_spec_ref: '/visual_transition_spec',
       visual_transition_evaluator_ref: '/visual_transition_evaluator',
       visual_pack_compiler_handoff_ref: '/visual_pack_compiler_handoff',
+      route_stage_handoff_boundary_ref: '/route_stage_handoff_boundary',
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
