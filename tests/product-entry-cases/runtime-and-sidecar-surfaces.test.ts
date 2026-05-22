@@ -109,6 +109,37 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
       sidecar.runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt,
       false,
     );
+    const routeStageBoundary = sidecar.runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary;
+    assert.equal(routeStageBoundary.surface_kind, 'rca_route_stage_handoff_boundary');
+    assert.equal(routeStageBoundary.route_is_stage, false);
+    assert.equal(routeStageBoundary.route_semantics_owner, 'redcube_ai');
+    assert.equal(routeStageBoundary.domain_truth_owner, 'redcube_ai');
+    assert.equal(routeStageBoundary.stage_graph_owner, 'one-person-lab');
+    assert.equal(routeStageBoundary.stage_lifecycle_owner, 'one-person-lab');
+    assert.equal(routeStageBoundary.runtime_transition_owner, 'one-person-lab');
+    assert.equal(routeStageBoundary.queue_attempt_owner, 'one-person-lab');
+    assert.equal(routeStageBoundary.opl_hydrates_route_refs_to_queue_and_stage_attempts, true);
+    assert.equal(routeStageBoundary.rca_owns_inter_route_scheduler, false);
+    assert.equal(routeStageBoundary.stage_graph_ref, '/family_stage_control_plane');
+    assert.equal(routeStageBoundary.route_stage_projection_ref, '/stage_control_projection/route_stage_projection');
+    assert.equal(routeStageBoundary.visual_transition_spec_ref, '/visual_transition_spec');
+    assert.equal(routeStageBoundary.visual_stage_descriptor_scope, 'opl_stage_execution_plan_route_handler_refs_only');
+    assert.equal(routeStageBoundary.allowed_handoff_refs.includes('route_stage_refs'), true);
+    assert.equal(routeStageBoundary.allowed_handoff_refs.includes('review_export_receipt_ref'), true);
+    assert.equal(routeStageBoundary.forbidden_payload_classes.includes('artifact_body'), true);
+    assert.equal(routeStageBoundary.forbidden_payload_classes.includes('generic_runtime_state'), true);
+    assert.equal(routeStageBoundary.authority_boundary.opl_can_write_visual_truth, false);
+    assert.equal(routeStageBoundary.authority_boundary.opl_can_store_artifact_blob, false);
+    assert.equal(routeStageBoundary.authority_boundary.opl_can_declare_visual_ready, false);
+    assert.equal(routeStageBoundary.authority_boundary.opl_can_declare_exportable, false);
+    assert.equal(routeStageBoundary.authority_boundary.rca_implements_generic_route_scheduler, false);
+    assert.equal(routeStageBoundary.authority_boundary.rca_implements_generic_stage_attempt_graph, false);
+    assert.equal(routeStageBoundary.forbidden_claims.includes('route_is_stage'), true);
+    assert.deepEqual(sidecar.mapped_surfaces.route_stage_handoff_boundary, routeStageBoundary);
+    assert.equal(
+      sidecar.source_manifest_refs.route_stage_handoff_boundary_ref,
+      '/route_stage_handoff_boundary',
+    );
     assert.equal(sidecar.owner_boundary.provider_owns_visual_truth, false);
     assert.equal(sidecar.owner_boundary.opl_owns_review_verdict, false);
     assert.equal(sidecar.owner_boundary.opl_owns_publication_gate, false);
