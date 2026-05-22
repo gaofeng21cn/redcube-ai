@@ -37,7 +37,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.formal_entry.internal_surface_role,
       'service_safe_domain_entry_and_protocol_adapter',
     );
-    assert.deepEqual(manifest.formal_entry.retired_internal_surface_ids, ['gateway']);
+    assert.deepEqual(manifest.formal_entry.retired_internal_surface_ids, [
+      'retired_gateway_protocol_boundary_public_entry',
+    ]);
+    assert.equal(manifest.formal_entry.retired_internal_surface_ids.includes('gateway'), false);
     assert.equal(manifest.formal_entry.compatibility_alias_allowed, false);
     assert.equal(manifest.workspace_locator.workspace_surface_kind, 'redcube_workspace');
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);

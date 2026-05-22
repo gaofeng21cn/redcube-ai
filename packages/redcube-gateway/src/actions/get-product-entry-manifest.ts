@@ -244,7 +244,7 @@ export async function getProductEntryManifest(request) {
       supported_protocols: ['MCP'],
       internal_surface: 'domain_entry_protocol_boundary',
       internal_surface_role: 'service_safe_domain_entry_and_protocol_adapter',
-      retired_internal_surface_ids: ['gateway'],
+      retired_internal_surface_ids: ['retired_gateway_protocol_boundary_public_entry'],
       compatibility_alias_allowed: false,
     },
     workspace_locator: {
