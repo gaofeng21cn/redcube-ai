@@ -83,6 +83,7 @@ function listTextFiles(root) {
     const file = path.join(root, entry.name);
     const normalized = file.split(path.sep).join('/');
     if (entry.isDirectory()) {
+      if (normalized.includes('__closeout-audit-test__')) return [];
       if (entry.name === 'dist' || entry.name === 'build' || entry.name === 'node_modules') return [];
       return listTextFiles(file);
     }

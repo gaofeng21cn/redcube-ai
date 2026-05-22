@@ -57,6 +57,8 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 
 Product-entry manifest 入口已继续做源码边界收薄：OPL runtime inventory、task lifecycle、automation catalog、skill/operator shell 与 workbench/sidecar projection 组装已进入 `get-product-entry-manifest-parts/shell-projections.ts`；operator evidence 的 production evidence refs、expected receipt / monitor freshness handoff 与 efficiency handoff 已拆入独立 parts；`manifest-return.ts` 保持 RCA domain refs 的最终 manifest assembly。剩余状态仍是 OPL 需继续接管 generic session shell、workbench shell 和 generated sidecar primitive 的默认 caller；这不改变 RCA 持有 visual truth、review/export verdict、artifact mutation authority、owner receipt 和 native helper implementation。
 
+Executor runtime protocol 入口也已收薄：`executor-runtime.ts` 现在保留 executor topology/policy descriptor 与 public exports，route-run record persistence、event log helper、telemetry 和 stale-running-run audit 已进入 `executor-runtime-parts/route-run-records.ts`。这是 RCA 当前 active route-run record adapter 和 OPL attempt-ledger 迁移输入，不是新的长期 generic run store；OPL 仍需把 Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 默认化后才能继续退役该 adapter。
+
 ## 当前测试/证据差距
 
 以下是结构闭合后的 production evidence tail，不再计入功能/结构差距：
