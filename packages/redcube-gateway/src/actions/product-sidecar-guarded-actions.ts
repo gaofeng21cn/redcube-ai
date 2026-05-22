@@ -150,6 +150,8 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     codePaths: [
       'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',
       'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
+      'packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts',
+      'packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts',
       'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
     ],
     activeCallers: [
@@ -345,6 +347,8 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     rca_scope: 'route_level_executor_policy_and_receipt_refs',
     audit_readout: 'project_opl_executor_adapter_retain_rca_route_policy',
     codePaths: [
+      'packages/redcube-runtime-protocol/src/executor-runtime.ts',
+      'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
       'packages/redcube-runtime/src/executors.ts',
       'packages/redcube-gateway/src/actions/run-deliverable-route.ts',
       'packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts',
@@ -355,10 +359,10 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'tests/rca-executor-backend-contract.test.ts',
     ],
     activeCallers: ['deliverable route runner', 'domain entry contract', 'runtime route executor tests'],
-    activeCallerStatus: 'active_codex_cli_first_class_default',
-    migrationAction: 'Move concrete executor lifecycle/provisioning/receipt adapter and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.',
-    retentionReason: 'RCA keeps route-level executor requirements and Codex CLI as current first-class default for visual deliverables.',
-    cannotAbsorbReason: 'OPL can provide executor adapter mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes.',
+    activeCallerStatus: 'route_run_record_adapter_split_landed_opl_attempt_shell_pending',
+    migrationAction: 'Move concrete executor lifecycle/provisioning/receipt adapter, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.',
+    retentionReason: 'RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.',
+    cannotAbsorbReason: 'OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.',
     tombstone_required: false,
   },
   {

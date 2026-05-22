@@ -109,7 +109,10 @@ test('harness audit: product/domain surface is stable across success and failure
   const cli = readCliSource();
   const mcp = read('apps/redcube-mcp/src/server.ts');
   const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.ts');
-  const runRoute = readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.ts');
+  const runRoute = [
+    readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.ts'),
+    readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts'),
+  ].join('\n');
   const doctor = readImplementation('packages/redcube-gateway/src/actions/doctor-workspace.ts');
   const listTopics = readImplementation('packages/redcube-gateway/src/actions/list-topics.ts');
   const gatewayIndex = readImplementation('packages/redcube-gateway/src/index.ts');

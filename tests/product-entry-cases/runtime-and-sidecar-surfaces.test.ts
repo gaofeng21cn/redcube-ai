@@ -442,6 +442,8 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.deepEqual(
       sidecar.mapped_surfaces.privatized_functional_module_audit.modules.find((entry) => entry.module_id === 'codex_executor_adapter').codePaths,
       [
+        'packages/redcube-runtime-protocol/src/executor-runtime.ts',
+        'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
         'packages/redcube-runtime/src/executors.ts',
         'packages/redcube-gateway/src/actions/run-deliverable-route.ts',
         'packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts',
