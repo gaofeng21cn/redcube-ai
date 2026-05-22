@@ -1,0 +1,178 @@
+{
+  "contract_id": "ppt_image_first_quality_nonregression_v1",
+  "status": "landed",
+  "owner": "redcube_ai",
+  "consumer": "opl_agent_lab",
+  "deliverable_family": "ppt_deck",
+  "surface_kind": "ppt_image_first_quality_nonregression",
+  "projection_model": "refs_only_quality_route_suite_input",
+  "refs_only": true,
+  "read_only": true,
+  "extends_efficiency_projection": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
+  "source_route_contract": "contracts/runtime-program/ppt-image-first-production-route.json",
+  "default_route_policy": {
+    "default_visual_route": "author_image_pages",
+    "default_visual_policy": "image_first",
+    "default_executor_changed": false,
+    "route_chain": [
+      "storyline",
+      "detailed_outline",
+      "slide_blueprint",
+      "visual_direction",
+      "author_image_pages",
+      "visual_director_review",
+      "screenshot_review",
+      "repair_image_pages",
+      "export_pptx"
+    ],
+    "alternate_routes_remain_explicit": {
+      "html": [
+        "render_html",
+        "fix_html"
+      ],
+      "native_editable_pptx": [
+        "author_pptx_native",
+        "repair_pptx_native"
+      ]
+    }
+  },
+  "agent_lab_suite_input": {
+    "suite_kind": "standard",
+    "suite_id": "redcube-ai.ppt-image-first-quality-nonregression.standard.v1",
+    "domain_id": "redcube-ai",
+    "input_mode": "refs_only_handoff",
+    "domain_specific_suite_kind_required": false,
+    "compatible_agent_lab_contract_ref": "opl agent-lab suite-input#/standard",
+    "score_scope": "quality_nonregression_optimizer_signal_only",
+    "score_is_rca_visual_verdict": false,
+    "claims_visual_ready": false,
+    "claims_exportable": false,
+    "claims_handoffable": false,
+    "claims_production_soak_complete": false
+  },
+  "quality_route_refs": {
+    "route_contract_ref": "contracts/runtime-program/ppt-image-first-production-route.json",
+    "runtime_read_model_ref": "workspace-runtime-ref:author-image-pages:<run-id>#/quality_non_regression_read_model",
+    "repair_read_model_ref": "workspace-runtime-ref:repair-image-pages:<run-id>#/quality_non_regression_read_model",
+    "prompt_manifest_refs": [
+      "workspace-runtime-ref:author-image-pages:<run-id>#/image_pages_bundle/prompt_manifest_file",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/image_pages_bundle/prompt_manifest_file"
+    ],
+    "style_manifest_refs": [
+      "workspace-runtime-ref:author-image-pages:<run-id>#/image_pages_bundle/style_manifest_file",
+      "workspace-runtime-ref:repair-image-pages:<run-id>#/image_pages_bundle/style_manifest_file"
+    ],
+    "visual_director_review_refs": [
+      "agent/quality_gates/review_export_memory.md",
+      "workspace-runtime-ref:visual_director_review:<run-id>"
+    ],
+    "screenshot_review_refs": [
+      "agent/quality_gates/screenshot_review.md",
+      "workspace-runtime-ref:screenshot_review:<run-id>"
+    ],
+    "export_pptx_refs": [
+      "agent/quality_gates/artifact_authority.md",
+      "workspace-runtime-ref:export-result:<run-id>",
+      "workspace-runtime-ref:review-export:<run-id>"
+    ],
+    "agent_lab_suite_input_refs": [
+      "contracts/runtime-program/ppt-image-first-quality-nonregression.json#/agent_lab_suite_input",
+      "workspace-runtime-ref:author-image-pages:<run-id>#/quality_non_regression_read_model/agent_lab_suite_input"
+    ]
+  },
+  "fact_governance_policy": {
+    "fact_whitelist_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/fact_governance/fact_whitelist_surface",
+    "verification_ledger_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/fact_governance/verification_ledger_surface",
+    "visible_claims_must_trace_to_source_truth": true,
+    "unresolved_claim_policy": "block_or_rephrase_as_general_without_unverified_specifics",
+    "forbidden_generated_artifacts_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/fact_governance/forbidden_generated_artifacts"
+  },
+  "verified_asset_policy": {
+    "asset_overlay_manifest_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/verified_asset_overlay_policy/asset_overlay_surface",
+    "deterministic_overlay_only": true,
+    "overlay_manifest_required": true,
+    "machine_verification_required_when_applicable": true,
+    "model_generation_for_verified_assets_forbidden": true,
+    "composition_repair_allowed": false
+  },
+  "audience_language_policy": {
+    "visible_operator_language_allowed": false,
+    "forbidden_visible_fragments_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/audience_language_policy/forbidden_visible_fragments",
+    "rewrite_target": "project-facing audience language",
+    "internal_route_names_visible_in_final_slide_allowed": false
+  },
+  "layout_legibility_policy": {
+    "title_safe_zone_clear_required": true,
+    "table_min_body_font_pt": 11,
+    "max_blank_ratio_in_card": 0.38,
+    "layout_density_required": true,
+    "policy_ref": "contracts/runtime-program/ppt-image-first-production-route.json#/layout_legibility_policy"
+  },
+  "blocked_page_only_repair_policy": {
+    "repair_route": "repair_image_pages",
+    "source_review_stage": "screenshot_review",
+    "blocked_slide_ids_ref": "workspace-runtime-ref:repair-image-pages:<run-id>#/repair_image_pages/blocked_slide_ids",
+    "preserved_slide_hashes_ref": "workspace-runtime-ref:repair-image-pages:<run-id>#/repair_image_pages/preserved_slide_hashes",
+    "freshly_rendered_slide_ids_ref": "workspace-runtime-ref:repair-image-pages:<run-id>#/quality_non_regression_read_model/repair_scope/freshly_rendered_slide_ids",
+    "scope": "blocked_slide_ids_only",
+    "unblocked_slide_policy": "reuse_prior_png_and_record_preserved_hashes",
+    "fail_closed_when_prior_png_missing": true,
+    "repair_may_touch_unblocked_pages": false
+  },
+  "export_pptx_policy": {
+    "required_route": "export_pptx",
+    "source_visual_route_allowed": [
+      "author_image_pages",
+      "repair_image_pages"
+    ],
+    "full_slide_image_pages_required": true,
+    "editable_shapes_claim_allowed": false,
+    "non_editable_full_slide_image_policy": true,
+    "export_gate_may_be_replaced_by_agent_lab_score": false
+  },
+  "nonregression_policy": {
+    "visual_director_review_required": true,
+    "screenshot_review_required": true,
+    "export_pptx_required": true,
+    "quality_gates_may_be_lowered": false,
+    "hard_block_checks_may_be_removed": false,
+    "fact_governance_may_be_bypassed": false,
+    "verified_asset_policy_may_be_bypassed": false,
+    "audience_language_policy_may_be_bypassed": false,
+    "layout_legibility_policy_may_be_bypassed": false,
+    "blocked_page_only_repair_required_for_repair_route": true,
+    "agent_lab_score_can_replace_rca_visual_verdict": false
+  },
+  "allowed_optimization_inputs": {
+    "source_pack_reuse_refs_allowed": true,
+    "prompt_static_prefix_cache_refs_allowed": true,
+    "page_local_parallel_or_batch_sizing_telemetry_allowed": true,
+    "blocked_page_only_repair_refs_allowed": true,
+    "export_preview_cache_refs_allowed": true,
+    "quality_nonregression_score_refs_allowed": true
+  },
+  "forbidden_authority_flags": {
+    "no_forbidden_write": true,
+    "opl_agent_lab_can_store_suite_input_refs": true,
+    "opl_agent_lab_can_compare_quality_nonregression_refs": true,
+    "opl_agent_lab_can_propose_optimizer_candidate_refs": true,
+    "opl_agent_lab_can_write_rca_visual_truth": false,
+    "opl_agent_lab_can_write_artifact_blob": false,
+    "opl_agent_lab_can_write_memory_body": false,
+    "opl_agent_lab_can_write_owner_receipt": false,
+    "opl_agent_lab_can_authorize_quality_verdict": false,
+    "opl_agent_lab_can_authorize_exportable": false,
+    "opl_agent_lab_can_claim_visual_ready": false,
+    "opl_agent_lab_can_switch_default_executor": false,
+    "opl_agent_lab_can_lower_visual_director_review": false,
+    "opl_agent_lab_can_lower_screenshot_review": false,
+    "opl_agent_lab_can_lower_export_pptx": false
+  },
+  "quality_floor_owner": {
+    "visual_truth_owner": "redcube_ai",
+    "review_export_verdict_owner": "redcube_ai",
+    "artifact_authority_owner": "redcube_ai",
+    "visual_memory_authority_owner": "redcube_ai",
+    "owner_receipt_owner": "redcube_ai"
+  }
+}

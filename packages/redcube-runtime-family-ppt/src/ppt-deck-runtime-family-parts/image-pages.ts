@@ -34,6 +34,7 @@ const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 const DEFAULT_IMAGE_SIZE = '1536x864';
 const DEFAULT_STYLE_PROFILE_ASSET = 'prompts/ppt_deck/image-first-default-style-profile.json';
 const DEFAULT_PROMPT_TEMPLATE_ASSET = 'prompts/ppt_deck/image_first_prompt_template.md';
+const QUALITY_NON_REGRESSION_CONTRACT = 'contracts/runtime-program/ppt-image-first-quality-nonregression.json';
 const REFERENCE_IMAGE_EXTENSIONS = new Set(['.png', '.jpg', '.jpeg', '.webp']);
 
 export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
@@ -665,6 +666,10 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         preserved_slide_hash: safeText(slide?.preserved_slide_hash || slide?.hash),
         image_file: safeText(slide?.image_file || slide?.png_file),
       }));
+    const freshlyRenderedSlideIds = manifestSlides
+      .filter((slide) => !slide.preserved)
+      .map((slide) => safeText(slide?.slide_id))
+      .filter(Boolean);
     const bundlePages = manifestSlides.map((slide) => ({
       ...slide,
       png_file: safeText(slide?.png_file || slide?.image_file),
@@ -717,6 +722,67 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     writeJson(paths.styleManifestFile, deckStyleManifest);
     writeJson(paths.metadataFile, { kind: 'ppt_image_generation_metadata', route, calls: generationMetadata });
     writeJson(paths.manifestFile, manifest);
+    const qualityNonRegressionReadModel = {
+      surface_kind: 'ppt_image_first_quality_nonregression_read_model',
+      contract_ref: QUALITY_NON_REGRESSION_CONTRACT,
+      route,
+      refs_only: true,
+      read_only: true,
+      agent_lab_suite_input: {
+        suite_kind: 'standard',
+        suite_id: 'redcube-ai.ppt-image-first-quality-nonregression.standard.v1',
+        input_mode: 'refs_only_handoff',
+        score_is_rca_visual_verdict: false,
+        claims_visual_ready: false,
+        claims_exportable: false,
+        claims_handoffable: false,
+      },
+      quality_gate_refs: {
+        visual_director_review: 'workspace-runtime-ref:visual_director_review:<run-id>',
+        screenshot_review: 'workspace-runtime-ref:screenshot_review:<run-id>',
+        export_pptx: 'workspace-runtime-ref:export-result:<run-id>',
+        fact_governance: `${QUALITY_NON_REGRESSION_CONTRACT}#/fact_governance_policy`,
+        verified_asset_policy: `${QUALITY_NON_REGRESSION_CONTRACT}#/verified_asset_policy`,
+        audience_language_policy: `${QUALITY_NON_REGRESSION_CONTRACT}#/audience_language_policy`,
+        layout_legibility_policy: `${QUALITY_NON_REGRESSION_CONTRACT}#/layout_legibility_policy`,
+      },
+      repair_scope: route === 'repair_image_pages'
+        ? {
+            policy: 'blocked_slide_ids_only',
+            source_review_stage: 'screenshot_review',
+            blocked_slide_ids: targetSlideIds,
+            freshly_rendered_slide_ids: freshlyRenderedSlideIds,
+            preserved_slide_hashes: preservedSlideHashes,
+            repair_may_touch_unblocked_pages: false,
+          }
+        : {
+            policy: 'full_initial_authoring',
+            source_review_stage: null,
+            blocked_slide_ids: [],
+            freshly_rendered_slide_ids: freshlyRenderedSlideIds,
+            preserved_slide_hashes: [],
+            repair_may_touch_unblocked_pages: false,
+          },
+      export_pptx_policy: {
+        full_slide_image_pages_required: true,
+        editable_shapes_claim_allowed: false,
+        non_editable_full_slide_image_policy: true,
+      },
+      forbidden_authority_flags: {
+        no_forbidden_write: true,
+        opl_agent_lab_can_write_rca_visual_truth: false,
+        opl_agent_lab_can_write_artifact_blob: false,
+        opl_agent_lab_can_write_memory_body: false,
+        opl_agent_lab_can_write_owner_receipt: false,
+        opl_agent_lab_can_authorize_quality_verdict: false,
+        opl_agent_lab_can_authorize_exportable: false,
+        opl_agent_lab_can_claim_visual_ready: false,
+        opl_agent_lab_can_switch_default_executor: false,
+        opl_agent_lab_can_lower_visual_director_review: false,
+        opl_agent_lab_can_lower_screenshot_review: false,
+        opl_agent_lab_can_lower_export_pptx: false,
+      },
+    };
     return {
       ...attachCommon(route, contract, null, adapter),
       status: 'completed',
@@ -735,6 +801,7 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       image_pages_bundle: imagePagesBundle,
       image_page_manifest: manifest,
       image_generation_calls: generationMetadata,
+      quality_non_regression_read_model: qualityNonRegressionReadModel,
       repair_image_pages: route === 'repair_image_pages'
         ? {
             source_review_stage: 'screenshot_review',
