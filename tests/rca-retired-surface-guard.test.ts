@@ -488,23 +488,72 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.owner, 'redcube_ai');
   assert.equal(policy.consumer, 'opl');
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
+  assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
+  assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
+    'managed',
+    'runtime',
+    'gateway',
+    'session',
+    'sidecar',
+  ]);
+  assert.deepEqual(policy.legacy_name_policy.allowed_legacy_name_roles, [
+    'machine_contract_ref',
+    'package_protocol_boundary',
+    'service_safe_domain_entry',
+    'contract_safe_semantic_id',
+    'tombstone_or_provenance',
+    'negative_test_guard',
+    'refs_only_read_model',
+    'domain_handler_target',
+    'minimal_visual_authority_function',
+    'visual_native_helper_path',
+    'locator_protocol_boundary',
+  ]);
   assert.deepEqual(policy.legacy_name_policy.retired_runtime_gateway_session_sidecar_terms_allowed_only_as, [
     'tombstone_or_provenance',
     'contract_safe_semantic_id',
     'negative_test_guard',
     'refs_only_read_model',
     'domain_handler_target',
+    'service_safe_domain_entry',
+    'machine_contract_ref',
+    'package_protocol_boundary',
+    'minimal_visual_authority_function',
+    'visual_native_helper_path',
+    'locator_protocol_boundary',
   ]);
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
     'legacy_managed_runtime_gateway_names',
   ]);
+  assert.deepEqual(policy.legacy_name_policy.allowance_guard_required_fields, [
+    'compatibility_alias_allowed',
+    'callable_alias_allowed',
+    'public_identity_allowed',
+    'active_generic_runtime_owner_allowed',
+    'active_generic_gateway_owner_allowed',
+    'active_generic_session_runtime_owner_allowed',
+    'active_generic_sidecar_owner_allowed',
+    'active_generic_workbench_owner_allowed',
+    'active_generic_attempt_ledger_owner_allowed',
+  ]);
+  assert.deepEqual(policy.legacy_name_policy.package_protocol_boundary_policy, {
+    package_name: '@redcube/gateway',
+    allowed_as: 'package_protocol_boundary',
+    public_identity: 'redcube-ai',
+    public_gateway_identity_allowed: false,
+    generic_gateway_runtime_owner_allowed: false,
+    compatibility_alias_allowed: false,
+  });
   assert.equal(
     policy.new_surface_admission_gate.forbidden_new_rca_roles.includes('generic_attempt_ledger_owner'),
     true,
   );
+  assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
 
   const requiredClassifications = {
+    runtime_program_machine_contracts: 'machine_contract',
     mcp_product_entry_domain_entry: 'service_safe_domain_entry',
+    redcube_gateway_package_protocol_boundary: 'package_protocol_boundary',
     product_entry_session_snapshot_refs_adapter: 'refs_only_read_model',
     workspace_run_envelope_helpers: 'refs_only_read_model',
     runtime_watch_projection: 'refs_only_read_model',
@@ -521,10 +570,70 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     }
   }
 
+  const legacyAllowanceExpectations = {
+    runtime_program_machine_contracts: {
+      terms: ['runtime'],
+      allowedAs: ['machine_contract_ref', 'contract_safe_semantic_id'],
+    },
+    mcp_product_entry_domain_entry: {
+      terms: ['gateway'],
+      allowedAs: ['service_safe_domain_entry', 'package_protocol_boundary'],
+    },
+    redcube_gateway_package_protocol_boundary: {
+      terms: ['gateway'],
+      allowedAs: ['package_protocol_boundary'],
+    },
+    product_entry_session_snapshot_refs_adapter: {
+      terms: ['session'],
+      allowedAs: ['refs_only_read_model', 'contract_safe_semantic_id'],
+    },
+    workspace_run_envelope_helpers: {
+      terms: ['runtime'],
+      allowedAs: ['refs_only_read_model', 'locator_protocol_boundary'],
+    },
+    runtime_watch_projection: {
+      terms: ['runtime'],
+      allowedAs: ['refs_only_read_model', 'negative_test_guard'],
+    },
+    product_sidecar_guarded_actions: {
+      terms: ['sidecar', 'gateway'],
+      allowedAs: ['domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
+    },
+    operator_evidence_stability_projection: {
+      terms: ['gateway'],
+      allowedAs: ['refs_only_read_model', 'package_protocol_boundary'],
+    },
+    visual_authority_functions: {
+      terms: ['runtime'],
+      allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path'],
+    },
+    retired_product_entry_contract_tombstone_refs: {
+      terms: ['managed', 'runtime', 'gateway', 'session'],
+      allowedAs: ['tombstone_or_provenance', 'contract_safe_semantic_id', 'negative_test_guard'],
+    },
+  };
+
+  for (const [surfaceId, expectation] of Object.entries(legacyAllowanceExpectations)) {
+    const allowance = byId[surfaceId].legacy_name_allowance;
+    assert.deepEqual(allowance.legacy_terms, expectation.terms, surfaceId);
+    assert.deepEqual(allowance.allowed_as, expectation.allowedAs, surfaceId);
+    for (const field of policy.legacy_name_policy.allowance_guard_required_fields) {
+      assert.equal(allowance[field], false, `${surfaceId}.${field}`);
+    }
+  }
+
   assert.equal(
     byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
+  assert.equal(
+    byId.redcube_gateway_package_protocol_boundary.current_rca_role,
+    'package_protocol_boundary_for_domain_action_protocol_not_public_gateway_identity',
+  );
+  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.source_refs, [
+    'packages/redcube-gateway/package.json',
+    'packages/redcube-gateway/src/index.ts',
+  ]);
   assert.equal(
     byId.runtime_watch_projection.current_rca_role,
     'run_review_existing_run_locator_refs_only_projection_not_supervisor',

@@ -219,19 +219,45 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.status, 'active_source_classification_policy_landed');
   assert.equal(policy.canonical_pack_root, 'agent/');
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
+  assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
   assert.equal(policy.legacy_name_policy.active_generic_runtime_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_gateway_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_session_runtime_owner_allowed, false);
+  assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
+    'managed',
+    'runtime',
+    'gateway',
+    'session',
+    'sidecar',
+  ]);
+  assert.deepEqual(policy.legacy_name_policy.allowed_legacy_name_roles, [
+    'machine_contract_ref',
+    'package_protocol_boundary',
+    'service_safe_domain_entry',
+    'contract_safe_semantic_id',
+    'tombstone_or_provenance',
+    'negative_test_guard',
+    'refs_only_read_model',
+    'domain_handler_target',
+    'minimal_visual_authority_function',
+    'visual_native_helper_path',
+    'locator_protocol_boundary',
+  ]);
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
     'legacy_managed_runtime_gateway_names',
   ]);
+  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.package_name, '@redcube/gateway');
+  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_identity, 'redcube-ai');
+  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_gateway_identity_allowed, false);
   assert.equal(policy.new_surface_admission_gate.must_classify_before_active_caller, true);
   assert.equal(policy.new_surface_admission_gate.reopen_gap_if_forbidden_owner_role_appears, true);
+  assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
   assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
   assert.equal(policy.allowed_surface_classes.includes('refs_only_read_model'), true);
   assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
 
   assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
+  assert.equal(byId.redcube_gateway_package_protocol_boundary.classification, 'package_protocol_boundary');
   assert.equal(byId.product_entry_session_snapshot_refs_adapter.classification, 'refs_only_read_model');
   assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
   assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
@@ -254,10 +280,32 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(byId.runtime_watch_projection.source_refs, [
     'packages/redcube-gateway/src/actions/run-review-ref-projection.ts',
   ]);
+  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.source_refs, [
+    'packages/redcube-gateway/package.json',
+    'packages/redcube-gateway/src/index.ts',
+  ]);
+  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.allowed_as, [
+    'package_protocol_boundary',
+  ]);
+  assert.equal(byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.public_identity_allowed, false);
+  assert.equal(
+    byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.active_generic_gateway_owner_allowed,
+    false,
+  );
   assert.equal(
     byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
+  assert.deepEqual(byId.product_entry_session_snapshot_refs_adapter.legacy_name_allowance.allowed_as, [
+    'refs_only_read_model',
+    'contract_safe_semantic_id',
+  ]);
+  assert.equal(byId.product_entry_session_snapshot_refs_adapter.legacy_name_allowance.compatibility_alias_allowed, false);
+  assert.deepEqual(byId.runtime_watch_projection.legacy_name_allowance.allowed_as, [
+    'refs_only_read_model',
+    'negative_test_guard',
+  ]);
+  assert.equal(byId.runtime_watch_projection.legacy_name_allowance.active_generic_runtime_owner_allowed, false);
   assert.equal(
     byId.runtime_watch_projection.current_rca_role,
     'run_review_existing_run_locator_refs_only_projection_not_supervisor',

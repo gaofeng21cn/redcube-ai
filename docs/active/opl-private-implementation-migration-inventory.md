@@ -65,7 +65,7 @@ Executor runtime protocol 入口已做同样收薄：`packages/redcube-runtime-p
 - Session/workbench wrapper risk: product-entry continuity and session snapshot refs must remain refs-only.
 - Retired private lifecycle adapter risk: do not restore RCA-local lifecycle adapter bodies as compatibility wrappers after OPL shared primitives are pinned.
 - Projection/workbench authority risk: operator evidence, stability and efficiency projections must not generate visual ready/exportable/handoffable verdict.
-- Compatibility alias risk: `managed`, `gateway`, `runtime`, `session` terms are allowed only as semantic id, provenance, retired guard, domain adapter, package name or refs-only read model.
+- Compatibility alias risk: `managed`, `gateway`, `runtime`, `session` and `sidecar` terms are allowed only when `contracts/physical_source_morphology_policy.json` records a `legacy_name_allowance` as machine contract ref, package/protocol boundary, service-safe domain entry, semantic id, provenance/tombstone, negative guard, refs-only read model, domain handler target, visual authority/native helper path or locator protocol boundary, with compatibility alias, callable alias, public identity and generic owner flags all false.
 - Descriptor/generated surface ready must not be written as production visual-stage long soak, artifact-producing owner receipt, visual ready, exportable or handoffable.
 - Tests must not treat file existence, suite pass, transition fixture, OPL provider completion or OPL refs-only ledger receipt as RCA visual quality verdict.
 
@@ -77,7 +77,7 @@ Executor runtime protocol 入口已做同样收薄：`packages/redcube-runtime-p
 4. Move route-run record persistence, event append/read and stale-running-run audit from RCA protocol adapter into OPL attempt ledger/runtime record primitive after OPL default caller parity is proven; keep RCA route executor policy and receipt refs.
 5. Continue thinning product-entry continuity/session refs only after generated/hosted product-entry session becomes the default caller; do not restore retired private lifecycle adapter bodies.
 6. Keep standard-domain-agent runtime descriptors as migration input until OPL owns skeleton mapping and owner receipt / typed blocker roundtrip is proven.
-7. Continue reducing `session` / `managed` / `gateway` naming through tombstone/semantic-id migration without compatibility alias.
+7. Continue reducing `session` / `managed` / `gateway` / `runtime` / `sidecar` naming through tombstone/semantic-id migration without compatibility alias; any active-source retention must remain covered by `legacy_name_allowance`.
 8. Keep Python native helpers as RCA domain implementation; only the invocation envelope can migrate to OPL.
 
 ## OPL Primitive Dependencies
