@@ -399,6 +399,22 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     ]);
     assert.equal(surface.physical_deletion_guard.surface_id_policy, 'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id');
     assert.equal(surface.physical_deletion_guard.deletion_status, 'legacy_runtime_physical_cleanup_closed');
+    assert.equal(surface.fresh_large_private_surface_scan.surface_kind, 'rca_large_private_platform_surface_scan');
+    assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.no_obvious_safe_large_generic_control_plane_split_found, true);
+    assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.functional_structure_gap_reopened, false);
+    assert.ok(surface.fresh_large_private_surface_scan.generic_surfaces_for_opl_or_shared_runtime.includes('attempt ledger and route-run event persistence'));
+    assert.ok(surface.fresh_large_private_surface_scan.high_risk_surfaces_not_migrated.includes('native PPT/Office helper implementation'));
+    assert.deepEqual(
+      surface.fresh_large_private_surface_scan.large_surface_readout.map((entry) => entry.classification),
+      [
+        'visual_domain_profile_authority',
+        'native_helper_implementation',
+        'native_helper_implementation',
+        'visual_artifact_creation_route',
+        'review_export_helper_authority',
+        'native_helper_implementation',
+      ],
+    );
     assert.deepEqual(surface.rca_visual_authority_allowlist, [
       'source_readiness_verdict',
       'communication_visual_direction_decision',

@@ -3634,6 +3634,118 @@
       "rca_artifact_lifecycle_owner": false,
       "rca_review_repair_transport_owner": false,
       "rca_observability_export_owner": false
+    },
+    "fresh_large_private_surface_scan": {
+      "surface_kind": "rca_large_private_platform_surface_scan",
+      "scan_date": "2026-05-22",
+      "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
+      "line_count_thresholds": {
+        "primary_attention_lines": 800,
+        "preferred_source_limit_lines": 1000,
+        "hard_split_signal_lines": 1500
+      },
+      "scan_command_refs": [
+        "git ls-files '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' '*.py' | xargs wc -l | sort -nr | head -80",
+        "node --experimental-strip-types scripts/line-budget.ts --list"
+      ],
+      "current_clean_truth": {
+        "no_tracked_code_file_exceeds_1500_lines": true,
+        "line_budget_baseline_only_tracks": [
+          "tests/opl-family-contract-adoption.test.ts"
+        ],
+        "no_obvious_safe_large_generic_control_plane_split_found": true,
+        "functional_structure_gap_reopened": false
+      },
+      "large_surface_readout": [
+        {
+          "path": "packages/redcube-overlay-ppt/src/profiles.ts",
+          "observed_lines": 910,
+          "classification": "visual_domain_profile_authority",
+          "retained_authority": [
+            "deliverable_family_profile_policy",
+            "visual_route_profile_truth"
+          ],
+          "migration_action": "retain_in_rca_until_profile_contract_can_be_declarative_without_losing_visual_truth"
+        },
+        {
+          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
+          "observed_lines": 902,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "native_ppt_authoring_helper",
+            "export_helper_behavior"
+          ],
+          "migration_action": "retain_as_rca_native_helper_implementation; OPL may own helper envelope only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
+          "observed_lines": 881,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "ppt_layout_materialization_helper"
+          ],
+          "migration_action": "retain_as_domain_native_helper; do not move Office/PPT layout body to OPL"
+        },
+        {
+          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/image-pages.ts",
+          "observed_lines": 850,
+          "classification": "visual_artifact_creation_route",
+          "retained_authority": [
+            "image_first_visual_route_materialization",
+            "artifact_creation_refs"
+          ],
+          "migration_action": "retain route implementation; OPL owns attempt runtime and queue only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
+          "observed_lines": 826,
+          "classification": "review_export_helper_authority",
+          "retained_authority": [
+            "screenshot_layout_review_helper",
+            "blocked_item_materialization"
+          ],
+          "migration_action": "retain review helper body; OPL may transport review/repair refs only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+          "observed_lines": 804,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "native_ppt_operation_helper"
+          ],
+          "migration_action": "retain helper body; keep no-forbidden-write and receipt boundaries"
+        }
+      ],
+      "high_risk_surfaces_not_migrated": [
+        "visual route truth and family profile policy",
+        "image-first artifact creation body",
+        "native PPT/Office helper implementation",
+        "screenshot/layout review helper behavior",
+        "review/export verdict and blocked-item materialization"
+      ],
+      "generic_surfaces_for_opl_or_shared_runtime": [
+        "provider-backed stage attempt runtime",
+        "attempt ledger and route-run event persistence",
+        "generic session/workbench shell",
+        "workspace/source locator shell",
+        "artifact gallery/handoff shell",
+        "review/repair transport shell",
+        "native helper execution envelope",
+        "operator projection/workbench shell",
+        "generated CLI/MCP/product-entry/sidecar/status wrappers"
+      ],
+      "migration_gates_before_code_retirement": [
+        "generated/default caller parity proven for the replacement OPL surface",
+        "domain authority refs preserved",
+        "owner receipt roundtrip or no-regression proof recorded",
+        "no compatibility alias or retired public path restored",
+        "no visual truth, artifact blob, memory body, review/export verdict, or owner receipt authority moved to OPL"
+      ],
+      "verification_entry": [
+        "scripts/verify.sh line-budget",
+        "npm run contracts:current-program:check",
+        "npm run test:meta"
+      ]
     }
   },
   "opl_substrate_adapter_export": {
