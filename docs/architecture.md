@@ -238,51 +238,17 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 
 退役的 thin wrapper 包括 `packages/redcube-runtime/scripts/ppt_deck_review.py`、`packages/redcube-runtime/scripts/ppt_deck_export.py`、`packages/redcube-runtime/scripts/ppt_deck_native.py` 与 `python/redcube_ai/hermes/agent_loop_bridge.py`。这些路径不得作为 active caller、contract anchor 或 compatibility layer 恢复；no-active-caller proof 与 retired-surface guard 由 native helper catalog tests 和 retired surface guard 维护。
 
-## 结构角色
+## 文档结构角色
 
-### 1. Public docs
+RCA 文档结构按 `docs/docs_portfolio_consolidation.md` 维护。架构读者只需要记住当前六层：
 
-- `README*`
-- `docs/README*`
+| 层 | 当前职责 |
+| --- | --- |
+| `README*` / `docs/README.md` | 入口与导航，先说明 RCA visual-deliverable 身份，再说明 OPL-hosted 集成路径。 |
+| 核心五件套 | `project`、`status`、`architecture`、`invariants`、`decisions` 持有当前项目角色、架构边界、约束、决策和状态读法。 |
+| Machine truth | `contracts/`、schema、source、CLI/MCP/API 行为、workspace/runtime artifacts、owner receipts 与 review/export gates。 |
+| Lifecycle owner docs | `docs/product/`、`docs/runtime/`、`docs/delivery/`、`docs/source/`、`docs/policies/` 解释当前工作面和稳定规则。 |
+| Active plan | `docs/active/` 只保留当前差距、完成门槛和迁移台账；当前唯一 completion plan 是 `rca-ideal-state-gap-plan.md`。 |
+| References / History | `docs/references/` 保留仍支撑当前合同或目标态的参考；`docs/history/` 保存 absorbed tranche、旧路线、tombstone 和 provenance。 |
 
-这层负责对外说明项目是什么、当前主线在哪里、如何理解 formal-entry 与 product role。
-
-### 2. Core maintainer docs
-
-- `docs/project.md`
-- `docs/status.md`
-- `docs/architecture.md`
-- `docs/invariants.md`
-- `docs/decisions.md`
-
-这层负责 AI / 维护者快速建立上下文。
-
-### 3. Machine-readable runtime program
-
-- `contracts/runtime-program/current-program.json`
-- `contracts/runtime-program/*.json`
-
-这层负责活跃主线指针、absorbed tranche、follow-on board 与 provenance contract。
-
-### 4. Program briefs
-
-- `docs/active/*.md`
-- `docs/history/phase-2/*.md`
-
-这层负责与 contracts 对应的人类可读 tranche brief，不是默认公开首页叙事。
-
-### 5. Stable rules and references
-
-- `docs/policies/*`
-- `docs/references/*`
-
-这层分别承载稳定规则和非活跃参考材料。
-
-### 6. Lifecycle reading layers
-
-- `docs/product/*`
-- `docs/runtime/*`
-- `docs/delivery/*`
-- `docs/source/*`
-
-这层按 product、runtime、delivery 与 source 生命周期职责承载人类可读说明。机器可读合同继续使用 contract/schema/source/artifact 路径或 `human_doc:*` 语义 ID，不把这些 Markdown 路径当成稳定 API。
+历史 tranche brief、旧 follow-on board、proof 命令流水和旧 program 材料不再作为当前架构层。机器可读合同继续使用 contract/schema/source/artifact 路径或 `human_doc:*` 语义 ID，不把 Markdown 路径当成稳定 API。
