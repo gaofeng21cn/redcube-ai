@@ -131,6 +131,36 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     }),
   },
   {
+    surface_id: 'redcube_cli_domain_entry_adapter',
+    source_refs: [
+      'apps/redcube-cli/package.json',
+      'apps/redcube-cli/src/cli-parts/dispatch.ts',
+      'apps/redcube-cli/src/cli-parts/help.ts',
+      'apps/redcube-cli/src/types.ts',
+    ],
+    classification: 'service_safe_domain_entry',
+    current_rca_role: 'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',
+    allowed_outputs: [
+      'cli_domain_action_response',
+      'domain_action_metadata_refs',
+      'typed_blocker',
+      'owner_receipt_refs',
+      'operator_help_projection',
+    ],
+    legacy_name_allowance: legacyNameAllowance({
+      legacy_terms: ['runtime', 'gateway', 'session', 'sidecar'],
+      allowed_as: ['service_safe_domain_entry', 'domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
+      rationale: 'redcube CLI source paths are direct domain-entry adapter and operator help surfaces; OPL owns generated CLI/workbench/session wrappers.',
+    }),
+    no_resurrection_gate: {
+      generic_cli_wrapper_owner_allowed: false,
+      generic_workbench_owner_allowed: false,
+      generic_session_runtime_owner_allowed: false,
+      generic_gateway_runtime_owner_allowed: false,
+      compatibility_alias_allowed: false,
+    },
+  },
+  {
     surface_id: 'redcube_gateway_package_protocol_boundary',
     source_refs: [
       'packages/redcube-gateway/package.json',

@@ -277,6 +277,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
 
   assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
+  assert.equal(byId.redcube_cli_domain_entry_adapter.classification, 'service_safe_domain_entry');
   assert.equal(byId.redcube_gateway_package_protocol_boundary.classification, 'package_protocol_boundary');
   assert.equal(byId.product_entry_session_snapshot_refs_adapter.classification, 'refs_only_read_model');
   assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
@@ -304,6 +305,30 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-gateway/package.json',
     'packages/redcube-gateway/src/index.ts',
   ]);
+  assert.deepEqual(byId.redcube_cli_domain_entry_adapter.source_refs, [
+    'apps/redcube-cli/package.json',
+    'apps/redcube-cli/src/cli-parts/dispatch.ts',
+    'apps/redcube-cli/src/cli-parts/help.ts',
+    'apps/redcube-cli/src/types.ts',
+  ]);
+  assert.equal(
+    byId.redcube_cli_domain_entry_adapter.current_rca_role,
+    'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',
+  );
+  assert.deepEqual(byId.redcube_cli_domain_entry_adapter.legacy_name_allowance.allowed_as, [
+    'service_safe_domain_entry',
+    'domain_handler_target',
+    'refs_only_read_model',
+    'package_protocol_boundary',
+  ]);
+  assert.equal(
+    byId.redcube_cli_domain_entry_adapter.no_resurrection_gate.generic_cli_wrapper_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.redcube_cli_domain_entry_adapter.no_resurrection_gate.generic_workbench_owner_allowed,
+    false,
+  );
   assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.allowed_as, [
     'package_protocol_boundary',
   ]);

@@ -91,6 +91,22 @@ function listTextFiles(root) {
   });
 }
 
+function normalizePath(value) {
+  return value.split(path.sep).join('/');
+}
+
+function sourceRefPath(sourceRef) {
+  return String(sourceRef).split('#')[0];
+}
+
+function sourceRefCoversFile(sourceRef, file) {
+  const sourcePath = sourceRefPath(sourceRef);
+  if (sourcePath.endsWith('/')) {
+    return file.startsWith(sourcePath);
+  }
+  return file === sourcePath || file.startsWith(`${sourcePath}/`);
+}
+
 test('RCA active source surfaces do not reintroduce retired runtime terms', () => {
   for (const contractFile of RETIRED_CONTRACTS) {
     assert.equal(existsSync(path.resolve(contractFile)), false, contractFile);
@@ -561,6 +577,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
     retired_product_entry_contract_tombstone_refs: 'tombstone_or_provenance',
+    redcube_cli_domain_entry_adapter: 'service_safe_domain_entry',
   };
 
   for (const [surfaceId, classification] of Object.entries(requiredClassifications)) {
@@ -578,6 +595,10 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     mcp_product_entry_domain_entry: {
       terms: ['gateway'],
       allowedAs: ['service_safe_domain_entry', 'package_protocol_boundary'],
+    },
+    redcube_cli_domain_entry_adapter: {
+      terms: ['runtime', 'gateway', 'session', 'sidecar'],
+      allowedAs: ['service_safe_domain_entry', 'domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
     },
     redcube_gateway_package_protocol_boundary: {
       terms: ['gateway'],
@@ -634,6 +655,23 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'packages/redcube-gateway/package.json',
     'packages/redcube-gateway/src/index.ts',
   ]);
+  assert.deepEqual(byId.redcube_cli_domain_entry_adapter.source_refs, [
+    'apps/redcube-cli/package.json',
+    'apps/redcube-cli/src/cli-parts/dispatch.ts',
+    'apps/redcube-cli/src/cli-parts/help.ts',
+    'apps/redcube-cli/src/types.ts',
+  ]);
+  assert.equal(
+    byId.redcube_cli_domain_entry_adapter.current_rca_role,
+    'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',
+  );
+  assert.deepEqual(byId.redcube_cli_domain_entry_adapter.no_resurrection_gate, {
+    generic_cli_wrapper_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    generic_gateway_runtime_owner_allowed: false,
+    compatibility_alias_allowed: false,
+  });
   assert.equal(
     byId.runtime_watch_projection.current_rca_role,
     'run_review_existing_run_locator_refs_only_projection_not_supervisor',
@@ -682,6 +720,54 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     callable_alias_allowed: false,
     active_caller_allowed: false,
   });
+});
+
+test('RCA active CLI source legacy names are covered by explicit morphology allowance', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const trackedTerms = policy.legacy_name_policy.tracked_legacy_terms;
+  const classifiedEntries = policy.active_surface_classifications.filter(
+    (entry) => entry.legacy_name_allowance,
+  );
+  const activeCliFiles = [
+    'apps/redcube-cli/package.json',
+    'apps/redcube-cli/src/cli-parts/dispatch.ts',
+    'apps/redcube-cli/src/cli-parts/help.ts',
+    'apps/redcube-cli/src/types.ts',
+  ];
+
+  for (const file of activeCliFiles) {
+    const text = readFileSync(path.resolve(file), 'utf-8');
+    const legacyHits = trackedTerms.filter((term) => new RegExp(`\\b${term}\\b`, 'i').test(text));
+    assert.equal(legacyHits.length > 0, true, file);
+
+    const coveringEntries = classifiedEntries.filter((entry) => (
+      entry.source_refs || []
+    ).some((sourceRef) => sourceRefCoversFile(sourceRef, normalizePath(file))));
+    assert.deepEqual(
+      coveringEntries.map((entry) => entry.surface_id),
+      ['redcube_cli_domain_entry_adapter'],
+      file,
+    );
+
+    const allowedTerms = new Set(coveringEntries.flatMap(
+      (entry) => entry.legacy_name_allowance.legacy_terms,
+    ));
+    assert.deepEqual(
+      legacyHits.filter((term) => !allowedTerms.has(term)),
+      [],
+      file,
+    );
+    for (const entry of coveringEntries) {
+      assert.equal(entry.legacy_name_allowance.compatibility_alias_allowed, false, entry.surface_id);
+      assert.equal(entry.legacy_name_allowance.public_identity_allowed, false, entry.surface_id);
+      assert.equal(entry.legacy_name_allowance.active_generic_runtime_owner_allowed, false, entry.surface_id);
+      assert.equal(entry.legacy_name_allowance.active_generic_session_runtime_owner_allowed, false, entry.surface_id);
+      assert.equal(entry.legacy_name_allowance.active_generic_sidecar_owner_allowed, false, entry.surface_id);
+    }
+  }
 });
 
 test('retired managed product-entry contract is tombstoned without compatibility caller', () => {
