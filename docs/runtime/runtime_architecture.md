@@ -16,7 +16,7 @@ Machine boundary: 人读 runtime topology support。机器真相继续归 runtim
 | state | current runtime explanation |
 | machine boundary | 可执行真相在 runtime-program contracts、CLI/MCP surfaces、product-entry / domain-entry / runtime-family source、workspace/runtime artifacts；本文只是读者上下文 |
 
-旧 `Gateway`、`Domain Harness OS`、Hermes-first、managed web runtime、local runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner、generic framework/runtime owner 或 visual truth owner。旧 repo-local deliverable runner、run store 和 DAG runtime 已从 active source/package/test surface 物理删除；当前 active runtime 只保留 OPL stage-plan refs、RCA route handlers、visual authority surfaces 和 native helper implementation。
+旧 `Gateway`、`Domain Harness OS`、Hermes 优先、managed web runtime、local runtime 或 repo-local managed pilot 词汇只按内部边界、proof lane、迁移 provenance 或 tombstone 读取，不能读成当前公开身份、默认 runtime owner、generic framework/runtime owner 或 visual truth owner。旧 repo-local deliverable runner、run store 和 DAG runtime 已从 active source/package/test surface 物理删除；当前 active runtime 只保留 OPL stage-plan refs、RCA route handlers、visual authority surfaces 和 native helper implementation。
 
 ## 当前拓扑
 
@@ -49,7 +49,7 @@ User / Agent
 
 当前默认 concrete stage executor 是 `Codex CLI host-agent runtime`，对应 runtime-program surface 里的 `codex_cli`。任务启动后默认由 OPL/Temporal 承担持久在线调度、唤醒、retry/dead-letter、resume 和 attempt 投影；`Codex CLI` 是 stage 内的第一公民执行单元，不是 RCA 自带 daemon / scheduler / attempt loop。
 
-`hermes_agent` 只表示显式 hosted/proof backend、可选 executor adapter 或历史 proof lane。它不能作为默认 runtime owner、OPL provider、production online substrate 或 legacy fallback 读取，也不能把旧 Hermes-first board 重新提升为当前公开主线。
+`hermes_agent` 只表示显式 hosted/proof backend、可选 executor adapter 或历史 proof lane。它不能作为默认 runtime owner、OPL provider、production online substrate 或 legacy fallback 读取，也不能把旧 Hermes 优先 board 重新提升为当前公开主线。
 `claude_code` 等未来 executor 也按 OPL generic Agent Executor Adapter / receipt 边界显式接入；RCA 只消费 receipt/projection refs，不实现 generic executor owner，也不承诺非默认 executor 的视觉质量、工具语义或 resume 行为与 `Codex CLI` 等价。2026-05-12 当前状态是 adapter/receipt/fail-closed 边界已落地，剩余验收是 provider-hosted controlled visual stage soak、真实 receipt instance、workspace/runtime memory writeback 和 no-forbidden-write proof。
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 product sidecar projection / guarded dispatch 和 service-safe domain entry；provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
@@ -153,7 +153,7 @@ Codex App direct skill 调用与 OPL-hosted 调用必须在 `invokeDomainEntry` 
 - Phase 2 hardening closeout：`docs/history/phase-2/`
 - upstream Hermes proof / blocker / closeout：`docs/history/hermes/upstream_hermes_agent_*.md`
 - repo-local Hermes migration history：`docs/history/hermes/`
-- gateway / harness / bridge / Hermes-first 退役读法：`docs/history/tombstones/retired-route-narratives-2026-05-11.md`
+- gateway / harness / bridge / 旧 Hermes 优先口径的退役读法：`docs/history/tombstones/retired-route-narratives-2026-05-11.md`
 - OPL handoff 与 family contract 支撑材料：`docs/references/`
 
 长期稳定规则继续看：

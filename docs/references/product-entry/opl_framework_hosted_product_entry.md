@@ -51,5 +51,5 @@ RCA 在这里暴露的是 domain package 薄程序面：descriptor、sidecar、p
 - 不让 hosted handoff 反向改写 visual-domain truth
 - 不因为 handoff landed 就过度宣称 end-user product shell 已成熟
 - 不把 repo-local Hermes wrapper 或旧 Gateway 命名写成 external `Hermes-Agent` substrate proof
-- 不恢复 `OPL Gateway`、frontdoor、federation、source-pack-federation 或 product frontdesk 作为 active API / source surface
+- 不恢复 `OPL Gateway`、retired public entry、federation、source-pack-federation 或 product frontdesk 作为 active API / source surface
 - 不为退役 handoff alias 保留兼容面；旧命名只允许保存在 provenance、tombstone 或合同引用上下文

@@ -324,7 +324,7 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 - OPL legacy cleanup ledger 可以消费 RCA provenance/history/tombstone refs，并记录 refs-only cleanup receipt；该 receipt 不能升级成 RCA visual ready、artifact-producing owner receipt、export verdict 或 production long-soak。
 - RCA repo 内仍保留的非知识代码均能归类为 visual authority function、domain-native helper 或迁移桥；每项都有 active caller、cannot-absorb reason、receipt/schema 边界和 OPL generated/replacement expectation。能由 OPL pack compiler 生成的 CLI/MCP/product-entry/sidecar/status/projection/harness 不再作为 RCA 长期私有实现扩展。
 - 用户工作台能清楚展示进度、阻塞、下一步、产物和证据来源。
-- 旧 gateway-first、Hermes-first、repo-local runtime pilot、hidden fallback 和 prompt-only route 不回到 active public identity。
+- 旧 gateway 优先口径、Hermes 优先、repo-local runtime pilot、hidden fallback 和 prompt-only route 不回到 active public identity。
 
 ## 当前差距与完善计划
 

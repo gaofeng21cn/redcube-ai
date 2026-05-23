@@ -146,7 +146,7 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 - route family、profile / pack descriptor、domain action catalog 与 service-safe domain entry 之间的 visual-domain 语义边界
 - visual deliverable 的对象边界、审计、review / publication projection
 - executor routing contract
-- `pack` 作为 descriptor / pack-id carrier 的语义真相；它不得回退成旧 gateway、frontdoor、federation 或 repo-local managed runtime owner
+- `pack` 作为 descriptor / pack-id carrier 的语义真相；它不得回退成旧 gateway、retired public entry、federation 或 repo-local managed runtime owner
 
 当前 executor-adapter contract 也已经冻结成统一口径：
 

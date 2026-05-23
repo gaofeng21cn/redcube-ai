@@ -31,7 +31,7 @@ Machine boundary: 人读 integration support。机器真相继续归 runtime-pro
 
 `User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
-这也是当前“最终目标形态”冻结件要表达的主线；较早的 Hermes-first program 文档只保留 provenance，当前按 provider-backed / Temporal-target 口径读取。
+这也是当前“最终目标形态”冻结件要表达的主线；较早的 Hermes 优先 program 文档只保留 provenance，当前按 provider-backed / Temporal-target 口径读取。
 
 这意味着：
 

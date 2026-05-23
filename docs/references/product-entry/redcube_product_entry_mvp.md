@@ -13,7 +13,7 @@ Machine boundary: 人读 product-entry support。机器真相继续归 `contract
 
 `RedCube AI` 当前保留的是 repo-verified 的 direct `product entry` service surface：`invokeProductEntry`。
 
-这不是聊天 UI、旧 workbench、frontdoor、federation、repo-local Hermes proof 或新的 generic runtime。本文不再承接新的 active plan；新增 action 必须进入 `family_action_catalog`、CLI/MCP/product manifest 同源命名体系，并继续回到 RCA-owned domain entry。
+这不是聊天 UI、旧 workbench、retired public entry、federation、repo-local Hermes proof 或新的 generic runtime。本文不再承接新的 active plan；新增 action 必须进入 `family_action_catalog`、CLI/MCP/product manifest 同源命名体系，并继续回到 RCA-owned domain entry。
 
 ## 这一步解决什么
 
@@ -48,5 +48,5 @@ Machine boundary: 人读 product-entry support。机器真相继续归 `contract
 - 不把这一步写成成熟 end-user UI 已落地
 - 不把 repo-local `Hermes` 包装成 runtime owner
 - 不新开 family，不扩 academic poster，不先做聊天壳
-- 不恢复 `frontdoor`、`federation`、`product frontdesk`、`GatewayActionMap` 或 gateway-tool 兼容别名
+- 不恢复 retired public entry、`federation`、`product frontdesk`、`GatewayActionMap` 或 gateway-tool 兼容别名
 - 不把退役接口改写成 compatibility layer；无 active caller 后直接删除或归入 history / tombstone

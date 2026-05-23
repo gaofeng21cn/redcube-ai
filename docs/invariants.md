@@ -37,8 +37,8 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 ## Legacy 退役与 forbidden surface
 
 - 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境；active surface 必须以 direct route / service-safe domain entry / product sidecar / stage descriptor / OPL-hosted handoff parity 为准。
-- 已物理删除的旧 repo-local deliverable runner、run store、DAG scheduler、managed helper/types 和 public managed action handler 不得以 compatibility alias、diagnostic fixture 或 standard sidecar template 名义恢复。
-- 已退役的 active 接口不保留兼容别名：`REDCUBE_WORKBENCH_ROOT`、standalone upstream Hermes probe script、`GatewayActionMap` / `getCliGatewayActions`、`callGatewayTool` / `listGatewayTools` / `GatewayTool*`、`source_workbench*`、frontdoor/federation/product frontdesk/source-pack-federation 等旧入口不得重新进入源码、测试、contracts 或 package surface。
+- 已物理删除的旧 repo-local deliverable runner、run store、DAG scheduler、managed helper/types 和 public managed action handler 不得以兼容别名、diagnostic fixture 或 standard sidecar template 名义恢复。
+- 已退役的 active 接口不保留兼容别名：`REDCUBE_WORKBENCH_ROOT`、standalone upstream Hermes probe script、`GatewayActionMap` / `getCliGatewayActions`、`callGatewayTool` / `listGatewayTools` / `GatewayTool*`、`source_workbench*`、retired public entry / federation / product frontdesk / source-pack-federation 等旧入口不得重新进入源码、测试、contracts 或 package surface。
 - 若历史合同名仍带 `managed`，只能按 provenance / semantic-id 迁移处理，不能解释成 active runtime owner。仍被合同引用的旧文档只能作为 provenance 原位保留。
 - Python / native helper 验证必须把 bytecode、pytest cache、`uv sync` project venv 和安装/同步副产物导向仓库外部；开发 checkout 不应产生 `.venv`、`__pycache__`、`.pytest_cache` 或 `*.egg-info` 副产物。
 
@@ -47,7 +47,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 - `AGENTS.md` 只管工作方式，不堆项目事实；核心项目知识优先收敛到 `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md`。
 - `docs/**` 是中文内部开发与维护参考；稳定路径优先使用无语言后缀 `.md` 承载中文 canonical 内容。根层 `README*` 是否保留公开双语入口，由产品分发和 public 需求单独决定。
 - `README*` 与 `docs/README*` 必须先写 RCA 的视觉交付身份，再写 OPL 托管 / 内部集成路径。
-- 含有旧 gateway、bridge、harness、Hermes-first 或 OPL-first 口径的文档，若仍被 `human_doc:*` 或 runtime-program 合同引用，留在原生命周期层并补充 lifecycle/provenance 说明；无合同引用且不服务当前 baton 的旧计划进入 `docs/history/` 或 tombstone 语境。
+- 含有旧 gateway、bridge、harness、旧 Hermes 优先口径或 OPL-first 口径的文档，若仍被 `human_doc:*` 或 runtime-program 合同引用，留在原生命周期层并补充 lifecycle/provenance 说明；无合同引用且不服务当前 baton 的旧计划进入 `docs/history/` 或 tombstone 语境。
 - 开发计划 closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；`deferred` 必须可追溯到合同引用、真实 blocker 或明确 history/tombstone 落点。
 - 一步到位或并行 lane closeout 必须优先落 machine-readable closeout contract，再由 `docs/**` 做人读解释；测试可以断言合同字段与行为面，不得断言 Markdown 文案。
 - 理想态差距和开发计划必须按目标态拆分 `功能/结构差距` 与 `测试/证据差距`；现有通用功能面应由 OPL 承担时，即使可运行，也写成功能/结构差距。

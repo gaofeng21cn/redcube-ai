@@ -13,8 +13,8 @@ Date: `2026-05-23`
 - 过程性 dated follow-through、closeout tranche、proof 命令摘要和旧路线归入 `docs/history/`，不在本文承担 current truth。
 - 差距按目标态判断，不按当前 RCA 代码是否仍可运行判断。旧 repo-local deliverable runner、run store 和 DAG runtime 已物理删除；product-entry session snapshot refs adapter、workspace/source intake、memory/writeback transport、artifact export lifecycle、review/repair transport、native helper generic envelope、operator projection、generic CLI/MCP wrapper、executor adapter 和 status/product shell，只要承担通用 framework/runtime 职责，就必须进入 OPL 上收、generated surface 替换、refs-only 收薄或退役分类。
 - Descriptor ready、transition fixture、no-regression evidence、provider completion 或 focused proof 都不能写成 visual ready、exportable、handoffable、artifact-producing owner receipt 或 production visual-stage soak；`production consumption complete` 仅限 OPL generated/hosted surface consumption，不等于生产 soak 完成。
-- 过时模块、接口、测试、fixture、CLI/MCP alias、product wrapper、gateway/runtime facade 和 docs 入口不保留兼容面。旧 managed run、session/runtime owner、gateway/frontdoor/federation、product-entry continuation、supervision/sidecar compatibility 等 active caller 迁出后直接删除、archive 或 tombstone；测试只保留 current contract、no-resurrection guard 和 provenance，不维护旧 public path。
-- 当前 source scan 结论是：旧 managed runtime implementation 已不在 active source 中；`product-entry-session-snapshot-ref-adapter`、direct `runtimeWatch` read model、product sidecar guarded actions、operator evidence/stability projection、native helper envelope、MCP/CLI/product-entry wrapper 和 `@redcube/gateway` package boundary 仍是 active source，但只能作为 refs-only adapter、domain handler target、native helper implementation、fixture、diagnostic、service-safe domain entry 或 package/protocol boundary 读取，不构成 compatibility promise。CLI direct adapter 已在 `physical_source_morphology_policy` 中单独分类为 `redcube_cli_domain_entry_adapter`，禁止 generated wrapper owner、generic workbench owner、generic session runtime owner 和 generic gateway runtime owner 回流。generated/default caller parity、domain authority refs preserved、no-regression proof 与 provenance consumer migration 成立后，直接 rename/delete/tombstone，不新增 compatibility alias。
+- 过时模块、接口、测试、fixture、CLI/MCP alias、product wrapper、gateway/runtime facade 和 docs 入口不保留兼容面。旧 managed run、session/runtime owner、gateway / retired public entry / federation、product-entry continuation、supervision/sidecar compatibility 等 active caller 迁出后直接删除、archive 或 tombstone；测试只保留 current contract、no-resurrection guard 和 provenance，不维护旧 public path。
+- 当前 source scan 结论是：旧 managed runtime implementation 已不在 active source 中；`product-entry-session-snapshot-ref-adapter`、direct `runtimeWatch` read model、product sidecar guarded actions、operator evidence/stability projection、native helper envelope、MCP/CLI/product-entry wrapper 和 `@redcube/gateway` package boundary 仍是 active source，但只能作为 refs-only adapter、domain handler target、native helper implementation、fixture、diagnostic、service-safe domain entry 或 package/protocol boundary 读取，不构成 compatibility promise。CLI direct adapter 已在 `physical_source_morphology_policy` 中单独分类为 `redcube_cli_domain_entry_adapter`，禁止 generated wrapper owner、generic workbench owner、generic session runtime owner 和 generic gateway runtime owner 回流。generated/default caller parity、domain authority refs preserved、no-regression proof 与 provenance consumer migration 成立后，直接 rename/delete/tombstone，不新增兼容别名。
 - Large private surface scan 结论以 `privatized_functional_module_audit.fresh_large_private_surface_scan` 为准：当前没有 tracked source file 超过 `1500` 行，也没有低风险的大型 generic private control plane 可安全代码拆分。active plan 只保存该结论；候选文件、行数和扫描过程归 machine-readable inventory、history/provenance 或提交历史。
 
 ## 当前定位
@@ -87,12 +87,22 @@ Executor runtime protocol 源码也进入同一迁移输入口径：`executor-ru
 
 如果未来新增或恢复让 RCA 看起来持有 generic runtime/session/workbench/sidecar owner 的源码、合同或文档，即使 `functional_structure_gap_count=0`，也必须重新打开 physical morphology gap。过程性 OPL workorder accounting、legacy cleanup proof、stage evidence receipt、domain dispatch receipt、bridge-module drilldown、external framework comparison和 closeout tranche 只读相应 machine surface 或 `docs/history/**`；本文不再双写。
 
+## 当前完成进度
+
+| Area | Current status | Live evidence | Notes |
+| --- | --- | --- | --- |
+| Standard OPL Agent structure | done | `agent/`、`contracts/stage_control_plane.json`、`contracts/pack_compiler_input.json`、`contracts/runtime-program/current-program.index.json` | Declarative Visual Pack、stage descriptor、generated-surface handoff 和 current-program leaf source 已成为当前结构锚点。 |
+| Generic private runtime cleanup | done | `docs/status.md`、`docs/decisions.md`、`privatized_functional_module_audit` machine surface | 旧 repo-local deliverable runner、run store、DAG scheduler 和 public managed action handler 已退出 active source/package/test surface。 |
+| RCA retained authority surfaces | done | `authority_surface_id` contracts、production acceptance surface、product-entry manifest | 保留 surface 限定为 visual authority、owner receipt、typed blocker、native helper implementation 和 refs-only adapter。 |
+| Production visual evidence | evidence_gap | `contracts/production_acceptance/rca-production-acceptance.json`、operator evidence readiness projection | 证据面可观测，但真实 artifact-producing receipt、long soak、memory/lifecycle scaleout 和 cross-family repeated proof 仍需继续积累。 |
+| Naming / contract hygiene | partial | `contracts/physical_source_morphology_policy.json`、retired-surface guards、doctor output | 当前 reader-facing `gateway`/managed/session 语义已降级，但 active docs 和 support docs 仍需持续保持 retired/tombstone 读法。 |
+
 ## 当前 cleanliness tail
 
 RCA 已符合标准 OPL Agent 的结构口径，但仍有两类完善尾巴需要继续推进：
 
 - `production_evidence_tail`：artifact-producing route/owner receipt/workspace receipt/memory reuse/no-regression/tombstone refs 已可追踪；仍需真实跨 workspace scaleout、Temporal controlled visual-stage long soak、最终 RCA-owned review/export verdict 与 cross-family repeated no-regression production evidence。
-- `naming_contract_hygiene_tail`：active MCP server initialization identity 已收口为 `redcube-ai`，不再把 reader-facing MCP 握手名暴露为 `redcube-gateway`；active product-entry manifest 的 `formal_entry.retired_internal_surface_ids` 也已从裸 `gateway` 降为 `retired_gateway_protocol_boundary_public_entry` tombstone semantic id。历史 runtime-program contract、human_doc 语义 ID、field name 或 task intent 中仍可能保留 `managed` 作为 session-continuity / provenance 命名，`@redcube/gateway` 已在 `physical_source_morphology_policy` 中独立分类为 `package_protocol_boundary`。Active `session_store_root` / `required_session_store_root` 已迁为 `session_continuity_root` / `required_session_continuity_root`，active `session_store_contract` 已迁为 `session_continuity_contract`；旧 `session store` 词只允许继续作为 forbidden generic-owner role、retired semantic id、tombstone/provenance 或人读解释存在。`managed`、`runtime`、`gateway`、`session`、`sidecar` active source 残留现在必须带 `legacy_name_allowance`，并显式禁用 compatibility alias、callable alias、public identity、generic runtime/gateway/session/sidecar/workbench/attempt-ledger owner。它们不代表 active 旧 runtime owner；后续清理必须通过 contract migration / tombstone policy / compatibility-free rename 做，不把旧 runtime surface 复活为 alias。
+- `naming_contract_hygiene_tail`：active MCP server initialization identity 已收口为 `redcube-ai`，不再把 reader-facing MCP 握手名暴露为 `redcube-gateway`；active product-entry manifest 的 `formal_entry.retired_internal_surface_ids` 也已从裸 `gateway` 降为 `retired_gateway_protocol_boundary_public_entry` tombstone semantic id。历史 runtime-program contract、human_doc 语义 ID、field name 或 task intent 中仍可能保留 `managed` 作为 session-continuity / provenance 命名，`@redcube/gateway` 已在 `physical_source_morphology_policy` 中独立分类为 `package_protocol_boundary`。Active `session_store_root` / `required_session_store_root` 已迁为 `session_continuity_root` / `required_session_continuity_root`，active `session_store_contract` 已迁为 `session_continuity_contract`；旧 `session store` 词只允许继续作为 forbidden generic-owner role、retired semantic id、tombstone/provenance 或人读解释存在。`managed`、`runtime`、`gateway`、`session`、`sidecar` active source 残留现在必须带 `legacy_name_allowance`，并显式禁用兼容别名、callable alias、public identity、generic runtime/gateway/session/sidecar/workbench/attempt-ledger owner。它们不代表 active 旧 runtime owner；后续清理必须通过 contract migration / tombstone policy / compatibility-free rename 做，不把旧 runtime surface 复活为 alias。
 - `physical_source_morphology_hygiene`：repo-local product-entry/session/sidecar/status/MCP/CLI/read-model adapter 仍需随 OPL generated/default caller、owner receipt roundtrip、no-regression proof 和 no-compatibility-alias migration 继续收薄；CLI direct adapter 已有 explicit morphology allowance 与 no-resurrection gate，这不重开功能/结构 gap，也不能写成 OPL generated shell 已完全接管。
 
 当前直接退役优先级：
@@ -153,7 +163,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - Executor runtime protocol 的私有 run/event persistence 已拆成 `route-run-records.ts` 迁移输入。剩余 gap 是 OPL Agent Executor Adapter / attempt ledger / runtime record primitive 继续接管 start/complete/fail/load/event caller，而不是扩大 RCA-local route-run record adapter。
 - `product-entry-session-snapshot-ref-adapter` 只能是 refs-only session snapshot/ref adapter；目标是 OPL generic session shell 稳定后不再让 RCA 源码像 session runtime owner。
 - workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 sidecar guarded actions 只能输出 refs、receipt、typed blocker、no-regression evidence 或 visual authority action metadata；当前 `WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 已把 workspace/run/runtimeWatch 路径锁成 refs-only read model，并声明不拥有 generic workspace shell、runner、attempt ledger、scheduler、session runtime、supervisor、workbench 或 artifact lifecycle。Operator evidence 的 refs-only accounting 已从 final manifest assembly 中拆出，后续 cleanup 仍需 OPL generated/default caller parity、owner receipt roundtrip、no-regression proof 和 no-compatibility-alias migration。
-- `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词若继续存在，必须是 semantic-id、provenance、retired guard、domain adapter 或 refs-only read model；新增 active caller 不保留 compatibility alias。
+- `runtime`、`gateway`、`sidecar`、`managed`、`session` 等历史词若继续存在，必须是 semantic-id、provenance、retired guard、domain adapter 或 refs-only read model；新增 active caller 不保留兼容别名。
 
 以下是结构闭合后的证据门，不能写成 production visual-stage soak、visual ready、exportable 或 handoffable 已完成：
 
@@ -173,7 +183,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
    继续补真实 artifact-producing receipt、visual memory body reuse、workspace receipt scaleout、Temporal long soak 和 cross-family repeated proof。
 
 3. `naming_contract_hygiene`
-   将历史 `managed`、generic session store 和旧 runtime 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增 compatibility alias。
+   将历史 `managed`、generic session store 和旧 runtime 命名从 active reader-facing 口径继续降到 provenance / semantic-id 语境。任何改名都必须先确认 active caller、runtime-program pointer 和 test contract，直接迁移到 OPL stage/session/continuation 词汇，不新增兼容别名。
 
 4. `physical_source_morphology_hygiene`
    继续确保 packages / runtime-program / MCP / product-entry / sidecar / native-helper / operator-evidence 源码只表达 visual authority、native helper implementation、domain handler target 或 refs-only adapter。优先治理 product-entry session snapshot refs adapter、runtimeWatch、workspace/run envelope helpers、sidecar guarded actions 和历史 `managed`/`runtime`/`gateway` 命名。新增 family、helper 或 projection 时，先落 `agent/` pack 与 `contracts/`，再只在 packages 中实现必要 visual authority；不把 artifact-heavy implementation 复制成 generic agent runtime。
@@ -190,7 +200,52 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - 不能把 OPL control-loop summary、usage/resource pressure、observability export 或 external stability policy 写成 RCA visual quality/export verdict、自动降级、自动修复或 production success。
 - 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
-- 不能恢复 gateway/frontdoor/federation/Hermes-first/local-manager/bridge residue 为 active public entry、runtime owner 或 compatibility alias。
+- 不能恢复 gateway、retired public entry、federation、旧 Hermes 优先口径、local-manager 或 bridge residue 为 active public entry、runtime owner 或兼容别名。
+
+## 下一轮 Agent Prompt
+
+Objective:
+
+使用 OPL Doc Governance 继续治理 `/Users/gaofeng/workspace/redcube-ai` 的 RCA Active Truth 与 production evidence tail。先读取 `AGENTS.md`、`TASTE.md`、`README*`、`docs/README.md`、核心五件套、`docs/references/rca-visual-deliverable-agent-ideal-state.md`、本文、`contracts/production_acceptance/rca-production-acceptance.json`、product-entry manifest、`contracts/physical_source_morphology_policy.json` 和 live doctor 输出；然后只在 RCA repo 内推进剩余 production evidence / naming hygiene / physical morphology hygiene，不改 OPL、MAS、MAG 或其他仓库。
+
+Write scope:
+
+- 可改：RCA `docs/active/rca-ideal-state-gap-plan.md`、必要的 RCA canonical docs、RCA support/history/tombstone docs、RCA contracts/tests/source 中与 evidence 或 retired-surface hygiene 直接相关的最小文件。
+- 不改：其他仓库、真实 workspace artifact body、visual memory body、用户级 runtime-state、无关 package/source refactor。
+
+Non-goals:
+
+- 不把 docs completion 写成 production visual ready。
+- 不恢复旧 public entry、generic runtime owner、session/workbench shell、sidecar wrapper 或兼容别名。
+- 不用 OPL provider completion、structural conformance、transition fixture 或 no-regression ref 代替 RCA-owned visual review/export verdict。
+
+Required actions:
+
+1. 用 live doctor 和 `rg` 重新检查 active docs、support docs 与 machine contracts 中的 retired wording；只保留 provenance/tombstone/semantic-id 读法。
+2. 若发现新的 generic runtime/session/workbench/sidecar owner 迹象，重新打开 functional / structural gap；否则保持 `functional_structure_gap_count=0`，只维护 evidence tail。
+3. 从 production acceptance、operator evidence readiness、workspace receipt inventory 和 real workspace refs 中刷新真实 evidence 状态；缺证据时返回 RCA-owned typed blocker 或下一条验证命令 ref。
+4. 把已关闭的过程材料折回 canonical docs 或 `docs/history/**`，active plan 只保留当前进度、当前 gap 和下一轮 prompt。
+
+Verification commands:
+
+```bash
+python3 /Users/gaofeng/workspace/opl-doc-governance/scripts/opl_doc_doctor.py doctor . --format json
+./scripts/verify.sh
+git diff --check
+```
+
+Completion / foldback gate:
+
+- Doctor 不再报告 active path 的 retired public entry / old Hermes-priority / compatibility wording warning，或每个 warning 都已在 history/tombstone support 中明确降级。
+- `functional_structure_gap_count` 与 live contracts/source truth 一致。
+- 当前 production evidence gap 只列真实缺失证据，不混入已闭合结构项。
+- 下一轮 prompt 只命名剩余工作；完成过程不堆回 active plan。
+
+## History / Tombstone Foldback
+
+- Process material：dated closeout、proof 命令流水、absorbed tranche 和 historical comparison 进入 `docs/history/**` 或已存在 provenance docs。
+- Retired surfaces：旧 managed runtime、retired gateway public-entry semantic id、旧 handoff/federation/product-shell wording、旧 Hermes 优先路线和 compatibility-only aliases 只作为 tombstone/provenance 读取。
+- No-resurrection guard：测试和 docs 只保护 current contract、fail-closed negative input、owner receipt、typed blocker、semantic-id tombstone 与 no-forbidden-write proof；不保护旧 public path 可调用性。
 
 ## 验证口径
 
