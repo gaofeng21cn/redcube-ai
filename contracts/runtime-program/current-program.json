@@ -1871,6 +1871,18 @@
           "declares_production_soak_complete": false,
           "current_surface_refs": [
             "/domain_entry_contract/executor"
+          ],
+          "semantic_equivalence_status": "cleared_by_boundary",
+          "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+          "semantic_equivalence_evidence_refs": [
+            "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+            "/domain_entry_contract/executor"
+          ],
+          "semantic_equivalence_typed_blocker_refs": [
+            "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+          ],
+          "semantic_equivalence_no_regression_refs": [
+            "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
           ]
         },
         {
@@ -5411,7 +5423,19 @@
             "declares_visual_ready": false,
             "declares_exportable": false,
             "declares_handoffable": false,
-            "declares_production_soak_complete": false
+            "declares_production_soak_complete": false,
+            "semantic_equivalence_status": "cleared_by_boundary",
+            "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+            "semantic_equivalence_evidence_refs": [
+              "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+              "/domain_entry_contract/executor"
+            ],
+            "semantic_equivalence_typed_blocker_refs": [
+              "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+            ],
+            "semantic_equivalence_no_regression_refs": [
+              "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
+            ]
           },
           {
             "module_id": "observability_stability_read_model",
@@ -9672,6 +9696,18 @@
               "declares_production_soak_complete": false,
               "current_surface_refs": [
                 "/domain_entry_contract/executor"
+              ],
+              "semantic_equivalence_status": "cleared_by_boundary",
+              "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+              "semantic_equivalence_evidence_refs": [
+                "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+                "/domain_entry_contract/executor"
+              ],
+              "semantic_equivalence_typed_blocker_refs": [
+                "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+              ],
+              "semantic_equivalence_no_regression_refs": [
+                "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
               ]
             },
             {
@@ -13707,6 +13743,18 @@
           "declares_production_soak_complete": false,
           "current_surface_refs": [
             "/domain_entry_contract/executor"
+          ],
+          "semantic_equivalence_status": "cleared_by_boundary",
+          "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+          "semantic_equivalence_evidence_refs": [
+            "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+            "/domain_entry_contract/executor"
+          ],
+          "semantic_equivalence_typed_blocker_refs": [
+            "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+          ],
+          "semantic_equivalence_no_regression_refs": [
+            "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
           ]
         },
         {

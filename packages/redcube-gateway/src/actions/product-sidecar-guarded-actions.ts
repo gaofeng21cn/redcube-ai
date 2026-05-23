@@ -363,6 +363,19 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     migrationAction: 'Move concrete executor lifecycle/provisioning/receipt adapter, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.',
     retentionReason: 'RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.',
     cannotAbsorbReason: 'OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.',
+    semantic_equivalence_status: 'cleared_by_boundary',
+    semantic_equivalence_reason:
+      'RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.',
+    semantic_equivalence_evidence_refs: [
+      'semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary',
+      '/domain_entry_contract/executor',
+    ],
+    semantic_equivalence_typed_blocker_refs: [
+      'typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt',
+    ],
+    semantic_equivalence_no_regression_refs: [
+      'no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary',
+    ],
     tombstone_required: false,
   },
   {

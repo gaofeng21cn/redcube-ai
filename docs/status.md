@@ -57,7 +57,7 @@ Physical source morphology 现在按同一标准治理：`agent/` 是 Declarativ
 
 Product-entry manifest、operator evidence 和 shell catalog 当前只作为 refs-only migration input 与 domain refs assembly 读取。剩余状态仍是 OPL 需继续接管 generic session shell、workbench shell 和 generated sidecar primitive 的默认 caller；这不改变 RCA 持有 visual truth、review/export verdict、artifact mutation authority、owner receipt 和 native helper implementation。
 
-Executor runtime protocol 当前是 RCA route-level executor policy、receipt refs 与 refs-only route-run record materialization 的迁移输入，不是新的长期 generic run store。OPL 仍需把 Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 默认化后才能继续退役该 adapter。
+Executor runtime protocol 当前是 RCA route-level executor policy、receipt refs 与 refs-only route-run record materialization 的迁移输入，不是新的长期 generic run store。`codex_executor_adapter` 已在 functional privatization audit 中显式声明 `semantic_equivalence_status=cleared_by_boundary`，并给出 route-policy boundary proof、typed blocker ref 与 no-forbidden-write/no-regression ref；这只关闭 OPL drilldown 对 RCA executor adapter 的语义等价 review 歧义。OPL attempt shell parity、Agent Executor Adapter default caller、runtime record/event log、stale attempt audit read model 和 physical delete 仍是 bridge-exit / physical morphology 尾项，不是 production visual evidence。OPL 仍需把 Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 默认化后才能继续退役该 adapter。
 
 ## 当前测试/证据差距
 
