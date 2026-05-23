@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `opl_private_implementation_migration_inventory`
 State: `active_inventory`
 Machine boundary: 本文是人读迁移治理台账。机器真相继续归 contracts、runtime-program leaf contracts、CLI/MCP/API 行为、product-entry manifest、product sidecar projection、workspace/runtime receipt、artifact locator、review/export gate 和 RCA owner receipt。
-Date: `2026-05-22`
+Date: `2026-05-23`
 
 ## 当前 clean truth
 
@@ -12,11 +12,11 @@ RCA 是 OPL-compatible visual-deliverable domain agent。旧 repo-local managed 
 
 OPL Framework 持有 generated/hosted wrappers、generic supervision/session/workbench、provider-backed stage attempt runtime、attempt ledger、retry/dead-letter、artifact gallery/handoff shell、review/repair transport、operator/App shell、generic native-helper envelope 与 observability/SLO/read model。RCA 持有 visual truth、source readiness、communication/visual direction、review/export verdict、artifact authority、visual memory accept/reject、owner receipt、typed blocker 和 native helper implementation。
 
-Product-entry manifest 入口已继续收薄：OPL runtime inventory、task lifecycle、automation catalog、skill/operator shell 与 workbench/sidecar projection 组装已拆入 `packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/shell-projections.ts`；operator evidence 的 production evidence refs、expected receipt / monitor freshness handoff 与 efficiency handoff 已拆入 `operator-evidence-refs.ts`，`operator-evidence-readiness.ts` 只负责 refs-only readiness projection，`manifest-return.ts` 只做最终 manifest assembly。`get-product-entry-manifest.ts` 仍保留 RCA domain refs、manifest 组装、visual route truth refs 和 authority refs；这些只是源码边界收薄，不表示 OPL 已完全接管 generic session/workbench/sidecar primitive。
+Product-entry manifest 当前只按 RCA domain refs、manifest assembly、visual route truth refs、authority refs、OPL shell projection 和 refs-only operator evidence 子投影读取。相关 source split 是迁移治理事实，不表示 OPL 已完全接管 generic session/workbench/sidecar primitive；过程细节不在本文继续追加。
 
 Deliverable route runner 入口也已做源码责任拆分：`run-deliverable-route.ts` 收薄为 `runDeliverableRoute` 调度入口，route dependency recovery、`stop_after_stage` continuation、`fix_html` agent-loop escalation proof、stage artifact / hydrated contract access 和 gateway response assembly 分别进入 `run-deliverable-route-parts/`。这只是把混合控制面拆成可迁移子域；active caller 仍在 RCA，OPL generic route attempt shell / retry-dead-letter / attempt ledger 还未成为 default caller。
 
-Executor runtime protocol 入口已做同样收薄：`packages/redcube-runtime-protocol/src/executor-runtime.ts` 保留 executor policy、topology descriptor 和 public exports，route-run record persistence、event append/read、telemetry 与 stale-running-run audit 已拆入 `executor-runtime-parts/route-run-records.ts`。该子模块是迁移输入和当前 active adapter，不是 RCA 新建长期 generic run store；OPL attempt ledger / runtime record primitive 成为 default caller 前，RCA 只保留 route-level executor policy、receipt refs 与 refs-only route-run record materialization。
+Executor runtime protocol 当前只保留 route-level executor policy、topology descriptor、receipt refs 与 refs-only route-run record materialization。route-run record / event persistence 是迁移输入和当前 active adapter，不是 RCA 新建长期 generic run store；OPL attempt ledger / runtime record primitive 成为 default caller 后继续退役。
 
 本文里的“仍需 OPL primitive / replacement / default caller”表示退役手段尚未完全默认化或尚未以 active caller 证明，不表示 RCA 私有平台化目标暂停，也不表示 OPL 已经完全接管。已提供并被 RCA 消费的能力会写成 `consumed`、`default caller live` 或 `generated/hosted surface active`；尚未默认化的能力继续作为迁移/退役门槛，而不是保留私有平台的理由。
 
