@@ -403,6 +403,10 @@ const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
 });
 
 const FUNCTIONAL_MODULE_CURRENT_SURFACE_REFS = Object.freeze({
+  product_entry_session_snapshot_refs_adapter: [
+    'product_session',
+    '/session_continuity',
+  ],
   generic_cli_mcp_wrappers: [
     'cli',
     'mcp',

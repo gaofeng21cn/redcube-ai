@@ -372,6 +372,7 @@
         "physical_delete_authorized_by_refs": false
       },
       "current_surface_refs": [
+        "product_session",
         "/session_continuity"
       ],
       "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
@@ -2742,6 +2743,7 @@
           "physical_delete_authorized_by_refs": false
         },
         "current_surface_refs": [
+          "product_session",
           "/session_continuity"
         ],
         "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
