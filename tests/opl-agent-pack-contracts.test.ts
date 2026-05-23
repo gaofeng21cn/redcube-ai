@@ -49,6 +49,25 @@ const requiredDomainPackPaths = [
   'agent/knowledge/owner_receipt_policy.md',
 ];
 
+const oplCanonicalGeneratedSurfaceIds = [
+  'cli',
+  'mcp',
+  'skill',
+  'product_entry_manifest',
+  'sidecar_export_dispatch',
+  'status_read_model',
+  'workbench_drilldown',
+  'functional_harness_cases',
+];
+
+const wrapperDescriptorScopeIds = [
+  'product_entry',
+  'product_status',
+  'product_session',
+  'sidecar',
+  'workbench',
+];
+
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
@@ -112,8 +131,8 @@ function buildCanonicalPack() {
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
   const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
   const generatedSurfaceIds = [
-    ...OPL_GENERATED_INTERFACE_CONSUMPTION.generated_descriptor_scope,
-    'functional_harness_cases',
+    ...oplCanonicalGeneratedSurfaceIds,
+    ...wrapperDescriptorScopeIds,
   ];
 
   return jsonStable({
@@ -488,6 +507,10 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   const authorityTaxonomy = packCompilerInput.minimal_authority_surface_taxonomy;
 
   for (const surfaceId of generatedScope) {
+    assert.equal(requestedSurfaces.includes(surfaceId), true, surfaceId);
+    assert.equal(handoffSurfaceIds.includes(surfaceId), true, surfaceId);
+  }
+  for (const surfaceId of oplCanonicalGeneratedSurfaceIds) {
     assert.equal(requestedSurfaces.includes(surfaceId), true, surfaceId);
     assert.equal(handoffSurfaceIds.includes(surfaceId), true, surfaceId);
   }

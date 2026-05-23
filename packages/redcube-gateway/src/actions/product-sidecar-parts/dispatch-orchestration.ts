@@ -467,9 +467,6 @@ async function applyVisualWorkspaceLifecycle(task) {
 export async function dispatchProductSidecar(request) {
   const task = readTaskPayload(request);
   const action = normalizeAction(task);
-  if (action === 'runtime_watch') {
-    throw new Error('product sidecar action 不允许: runtime_watch; use OPL status/workbench/read-model target or direct runtimeWatch review surface');
-  }
   if (!GUARDED_ACTIONS.has(action)) {
     throw new Error(`product sidecar action 不允许: ${action || '<empty>'}`);
   }

@@ -41,6 +41,36 @@
       "status": "descriptor_source_available"
     },
     {
+      "surface_id": "product_entry_manifest",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "sidecar_export_dispatch",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "status_read_model",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "workbench_drilldown",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
+      "surface_id": "functional_harness_cases",
+      "owner": "one-person-lab",
+      "domain_repo_can_own_generated_surface": false,
+      "status": "descriptor_source_available"
+    },
+    {
       "surface_id": "product_entry",
       "owner": "one-person-lab",
       "domain_repo_can_own_generated_surface": false,
@@ -66,12 +96,6 @@
     },
     {
       "surface_id": "workbench",
-      "owner": "one-person-lab",
-      "domain_repo_can_own_generated_surface": false,
-      "status": "descriptor_source_available"
-    },
-    {
-      "surface_id": "functional_harness_cases",
       "owner": "one-person-lab",
       "domain_repo_can_own_generated_surface": false,
       "status": "descriptor_source_available"

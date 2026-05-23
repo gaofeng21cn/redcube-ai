@@ -458,12 +458,16 @@
     "cli",
     "mcp",
     "skill",
+    "product_entry_manifest",
+    "sidecar_export_dispatch",
+    "status_read_model",
+    "workbench_drilldown",
+    "functional_harness_cases",
     "product_entry",
     "product_status",
     "product_session",
     "sidecar",
-    "workbench",
-    "functional_harness_cases"
+    "workbench"
   ],
   "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
   "repo_local_handler_targets": [
