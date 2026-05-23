@@ -15,7 +15,13 @@ const GUARDED_ACTIONS = productSidecarGuardedActionSet();
 
 export async function exportProductSidecar(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
-  const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
+  const manifestRequest = {
+    workspace_root: workspaceRoot,
+  };
+  if (Array.isArray(request?.workspace_receipt_scaleout_roots)) {
+    manifestRequest.workspace_receipt_scaleout_roots = request.workspace_receipt_scaleout_roots;
+  }
+  const manifest = await getProductEntryManifest(manifestRequest);
   return buildSidecarProjection({ workspaceRoot, manifest });
 }
 

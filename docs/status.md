@@ -65,7 +65,7 @@ Executor runtime protocol 当前是 RCA route-level executor policy、receipt re
 
 - 真实 artifact-producing owner receipt。
 - visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。
-- 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证；当前 product-entry manifest 的 workspace receipt inventory 已可用显式 `workspace_receipt_scaleout_roots` 聚合多个 workspace 的 body-free receipt refs，并把 `observed_workspace_count` 投给 OPL/App/operator，但仍保持 `workspace_receipt_scaleout_claimed=false` 与 `declares_production_soak_complete=false`。
+- 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证；当前 product-entry manifest/status、product sidecar export、product session surface 与 CLI read surfaces 已可用显式 `workspace_receipt_scaleout_roots` / `--workspace-receipt-scaleout-root` 聚合多个 workspace 的 body-free receipt refs，并把 `observed_workspace_count` 投给 OPL/App/operator，但仍保持 `workspace_receipt_scaleout_claimed=false` 与 `declares_production_soak_complete=false`。
 - Temporal controlled visual-stage long soak 和 provider restart/re-query/retry/dead-letter proof。
 - Cross-family repeated no-regression proof。
 

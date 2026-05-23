@@ -292,6 +292,7 @@ export function invokeOplHostedProductEntry(
 export function getProductEntrySession(request: {
   entry_session_id?: string;
   entrySessionId?: string;
+  workspace_receipt_scaleout_roots?: string[];
 }): Promise<ProductEntrySessionResponse> {
   return getProductEntrySessionJs(request) as unknown as Promise<ProductEntrySessionResponse>;
 }

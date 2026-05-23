@@ -63,7 +63,11 @@ export interface CliDomainActions {
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
   invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
   invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
-  getProductEntrySession(request: { entry_session_id?: string; entrySessionId?: string }): Promise<ProductEntrySessionResponse>;
+  getProductEntrySession(request: {
+    entry_session_id?: string;
+    entrySessionId?: string;
+    workspace_receipt_scaleout_roots?: string[];
+  }): Promise<ProductEntrySessionResponse>;
   runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;

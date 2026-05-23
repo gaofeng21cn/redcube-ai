@@ -4,7 +4,9 @@ import {
   assert,
   dispatchProductSidecar,
   exportProductSidecar,
+  getProductEntrySession,
   getProductEntryManifest,
+  invokeProductEntry,
   prepareProductEntryWorkspace,
   test,
   withMockCodexRuntimeState,
@@ -375,6 +377,98 @@ test('workspace receipt inventory aggregates refs across two workspaces without 
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.declares_production_soak_complete,
       false,
+    );
+
+    const sidecar = await exportProductSidecar({
+      workspace_root: firstWorkspaceRoot,
+      workspace_receipt_scaleout_roots: [secondWorkspaceRoot],
+    });
+    assert.equal(
+      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.observed_workspace_count,
+      2,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.observed_workspace_count,
+      2,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
+      false,
+    );
+    assert.equal(
+      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.declares_production_soak_complete,
+      false,
+    );
+    assert.deepEqual(
+      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs.map(
+        (source) => source.workspace_root,
+      ),
+      [path.resolve(firstWorkspaceRoot), path.resolve(secondWorkspaceRoot)],
+    );
+  });
+});
+
+test('product-entry session reads explicit workspace receipt scaleout roots without becoming the generic session owner', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const firstWorkspaceRoot = await prepareProductEntryWorkspace();
+    const secondWorkspaceRoot = await prepareProductEntryWorkspace();
+
+    await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: firstWorkspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-scaleout-entry',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-a',
+        profile_id: 'lecture_student',
+        title: 'Receipt scaleout session',
+        goal: 'Keep session inventory refs aligned with manifest scaleout roots.',
+        stop_after_stage: 'storyline',
+      },
+    });
+
+    for (const [workspaceRoot, proofId] of [
+      [firstWorkspaceRoot, 'session-scaleout-workspace-a'],
+      [firstWorkspaceRoot, 'session-scaleout-workspace-a-repeat'],
+      [secondWorkspaceRoot, 'session-scaleout-workspace-b'],
+      [secondWorkspaceRoot, 'session-scaleout-workspace-b-repeat'],
+    ]) {
+      await dispatchProductSidecar({
+        task: {
+          action: 'emit_workspace_receipt_proof',
+          workspace_root: workspaceRoot,
+          proof_id: proofId,
+          attempt_ref: `workspace-runtime-ref:attempt:${proofId}`,
+          artifact_locator_ref: '/artifact_locator_contract',
+          review_export_ref: `workspace-runtime-ref:review-export:${proofId}`,
+          forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+          artifact_refs: [`workspace-runtime-ref:artifact:${proofId}`],
+        },
+      });
+    }
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-scaleout-entry',
+      workspace_receipt_scaleout_roots: [secondWorkspaceRoot],
+    });
+    const scaleout = session.workspace_receipt_inventory_projection.scaleout_projection;
+
+    assert.equal(session.surface_kind, 'product_entry_session');
+    assert.equal(session.entry_session.entry_session_id, 'session-scaleout-entry');
+    assert.equal(scaleout.observed_workspace_count, 2);
+    assert.equal(scaleout.receipt_kind_coverage_ready, true);
+    assert.equal(scaleout.workspace_receipt_scaleout_claimed, false);
+    assert.equal(scaleout.declares_production_soak_complete, false);
+    assert.equal(session.workspace_receipt_inventory_projection.implements_opl_workbench, false);
+    assert.equal(session.workspace_receipt_inventory_projection.declares_visual_ready, false);
+    assert.equal(session.workspace_receipt_inventory_projection.declares_exportable, false);
+    assert.deepEqual(
+      session.workspace_receipt_inventory_projection.workspace_locator.workspace_receipt_scaleout_roots,
+      [path.resolve(secondWorkspaceRoot)],
     );
   });
 });

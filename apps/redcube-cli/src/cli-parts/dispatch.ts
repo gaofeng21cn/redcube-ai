@@ -93,6 +93,28 @@ function repoRootFromCwd(cwd: () => string): string {
   return path.resolve(cwd());
 }
 
+function workspaceReceiptScaleoutRoots(options: JsonMap): string[] {
+  const raw = options.workspaceReceiptScaleoutRoot || options.workspaceReceiptScaleoutRoots;
+  if (!raw || raw === true) {
+    return [];
+  }
+  return String(raw)
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function productReadRequest(options: JsonMap, cwd: () => string): JsonMap {
+  const scaleoutRoots = workspaceReceiptScaleoutRoots(options);
+  const request: JsonMap = {
+    workspace_root: resolveWorkspaceRoot(options, cwd),
+  };
+  if (scaleoutRoots.length > 0) {
+    request.workspace_receipt_scaleout_roots = scaleoutRoots;
+  }
+  return request;
+}
+
 function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap {
   const repoRoot = repoRootFromCwd(cwd);
   const outputDir = String(options.outputDir || 'artifacts/image-ppt-proof');
@@ -308,9 +330,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'product') {
     if (subcommand === 'status') {
-      return gateway.getProductStatus({
-        workspace_root: resolveWorkspaceRoot(options, cwd),
-      });
+      return gateway.getProductStatus(productReadRequest(options, cwd));
     }
 
     if (subcommand === 'start') {
@@ -353,22 +373,25 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'session') {
-      return gateway.getProductEntrySession({
+      const request: JsonMap = {
         entry_session_id: options.entrySessionId || '',
-      });
+      };
+      const scaleoutRoots = workspaceReceiptScaleoutRoots(options);
+      if (scaleoutRoots.length > 0) {
+        request.workspace_receipt_scaleout_roots = scaleoutRoots;
+      }
+      return gateway.getProductEntrySession(request);
     }
 
     if (subcommand === 'manifest') {
-      return gateway.getProductEntryManifest({
-        workspace_root: resolveWorkspaceRoot(options, cwd),
-      });
+      return gateway.getProductEntryManifest(productReadRequest(options, cwd));
     }
 
     if (subcommand === 'sidecar') {
       const sidecarAction = rest[1];
       if (sidecarAction === 'export') {
         return gateway.exportProductSidecar({
-          workspace_root: resolveWorkspaceRoot(options, cwd),
+          ...productReadRequest(options, cwd),
           format: options.format || 'json',
         });
       }

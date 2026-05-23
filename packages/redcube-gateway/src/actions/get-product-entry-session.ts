@@ -117,6 +117,7 @@ export async function getProductEntrySession(request) {
   });
   const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({
     workspaceRoot: session.workspace_root,
+    workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
   });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,

@@ -25,6 +25,7 @@ import {
 
 const execFileAsync = promisify(execFile);
 const gatewayResolve = createRequire(path.resolve('packages/redcube-gateway/package.json'));
+const CLI_STDIO_MAX_BUFFER = 8 * 1024 * 1024;
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
   cpSync(sourceDir, targetDir, {
@@ -210,6 +211,7 @@ function execCliExpectFailure(cliPath, args, options) {
 async function execCliAsync(cliPath, args, options = {}) {
   const result = await execFileAsync('node', [cliPath, ...args], {
     encoding: 'utf-8',
+    maxBuffer: CLI_STDIO_MAX_BUFFER,
     ...options,
   });
   return JSON.parse(result.stdout);
@@ -768,6 +770,90 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
   assert.equal(evidenceDispatched.request.task_file, evidenceTaskFile);
   assert.equal(evidenceDispatched.result_surface.surface_kind, 'no_regression_evidence');
   assert.equal(evidenceDispatched.result_surface.evidence_ref, 'rca-no-regression:visual-stage:cli-no-regression');
+});
+
+test('CLI product read surfaces pass workspace receipt scaleout roots as refs-only read input', async () => {
+  const domainActions = {
+    getProductStatus: async (request) => ({
+      ok: true,
+      surface_kind: 'product_status',
+      request,
+    }),
+    getProductEntryManifest: async (request) => ({
+      ok: true,
+      surface_kind: 'product_entry_manifest',
+      request,
+    }),
+    getProductEntrySession: async (request) => ({
+      ok: true,
+      surface_kind: 'product_entry_session',
+      request,
+    }),
+    exportProductSidecar: async (request) => ({
+      ok: true,
+      surface_kind: 'product_sidecar_export',
+      request,
+    }),
+  };
+
+  for (const [argv, expectedSurface] of [
+    [
+      [
+        'product',
+        'status',
+        '--workspace-root',
+        '/tmp/redcube-scaleout-a',
+        '--workspace-receipt-scaleout-root',
+        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
+      ],
+      'product_status',
+    ],
+    [
+      [
+        'product',
+        'manifest',
+        '--workspace-root',
+        '/tmp/redcube-scaleout-a',
+        '--workspace-receipt-scaleout-root',
+        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
+      ],
+      'product_entry_manifest',
+    ],
+    [
+      [
+        'product',
+        'sidecar',
+        'export',
+        '--workspace-root',
+        '/tmp/redcube-scaleout-a',
+        '--workspace-receipt-scaleout-root',
+        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
+      ],
+      'product_sidecar_export',
+    ],
+    [
+      [
+        'product',
+        'session',
+        '--entry-session-id',
+        'session-scaleout-cli',
+        '--workspace-receipt-scaleout-root',
+        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
+      ],
+      'product_entry_session',
+    ],
+  ]) {
+    const result = await executeCli(argv, { domainActions });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.surface_kind, expectedSurface);
+    assert.deepEqual(result.request.workspace_receipt_scaleout_roots, [
+      '/tmp/redcube-scaleout-b',
+      '/tmp/redcube-scaleout-c',
+    ]);
+    assert.equal(result.request.workspace_receipt_scaleout_claimed, undefined);
+    assert.equal(result.request.declares_production_soak_complete, undefined);
+  }
 });
 
 test('CLI image-ppt proof runs repo-owned lightweight mock runner by default', async () => {
