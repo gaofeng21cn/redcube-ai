@@ -81,7 +81,6 @@ export const MCP_SURFACE_OWNER_BOUNDARY = Object.freeze({
   generic_session_shell_owner: 'one-person-lab',
   generic_workbench_owner: 'one-person-lab',
   default_supervision_owner: 'one-person-lab',
-  legacy_supervision_route_role: 'retired_from_public_mcp_surface',
   source_route_role: 'opl_generated_source_wrapper_invokes_rca_source_readiness_handler',
   workbench_route_role: 'opl_generated_workbench_consumes_rca_operator_evidence_refs',
   redcube_mcp_is_unified_metadata_owner: false,
