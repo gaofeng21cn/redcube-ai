@@ -10,7 +10,6 @@ const MARKETPLACE_NAME = 'rca-local';
 const MARKETPLACE_DISPLAY_NAME = 'RedCube AI Local';
 const LEGACY_MARKETPLACE_DISPLAY_NAMES = ['RCA Local'];
 const PLUGIN_CATEGORY = 'Creative';
-const LEGACY_PLUGIN_NAMES = ['redcube-ai'];
 const LANGUAGE_SURFACE = { implementationTarget: 'TypeScript orchestration + Python native helpers', newCodeDefault: 'TypeScript or Python under RedCube routes and gates', javascriptPolicy: 'Repo-tracked JavaScript is retired; closeout audit blocks new product, test, and script JavaScript' };
 function resolveDefaultRepoRoot() {
   return path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -118,9 +117,6 @@ function upsertMarketplace(marketplacePath) {
 
   let replaced = false;
   const plugins = existingPlugins.map((item) => {
-    if (LEGACY_PLUGIN_NAMES.includes(item.name)) {
-      return null;
-    }
     if (item.name === PLUGIN_NAME) {
       replaced = true;
       return pluginEntry;
@@ -161,11 +157,6 @@ function installCodexPlugin({ repoRoot, home }) {
   const userPluginRoot = path.join(resolvedHome, 'plugins', PLUGIN_NAME);
   const userSkillRoot = path.join(resolvedHome, '.agents', 'skills', PLUGIN_NAME);
   const marketplacePath = repoMarketplacePath(resolvedRepoRoot);
-
-  for (const legacyName of LEGACY_PLUGIN_NAMES) {
-    removeLegacySymlink(path.join(resolvedHome, 'plugins', legacyName));
-    removeLegacySymlink(path.join(resolvedHome, '.agents', 'skills', legacyName));
-  }
 
   removeLegacySymlink(userPluginRoot);
   removeLegacySymlink(userSkillRoot);

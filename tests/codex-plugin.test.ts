@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, symlinkSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
@@ -48,14 +48,6 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
 
 test('codex plugin installer keeps plugin and skill paths repo-local with machine-readable output', () => {
   const homeDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));
-  const legacyTarget = path.join(homeDir, 'legacy-target');
-  const legacyPluginRoot = path.join(homeDir, 'plugins', 'redcube-ai');
-  const legacySkillRoot = path.join(homeDir, '.agents', 'skills', 'redcube-ai');
-  mkdirSync(legacyTarget, { recursive: true });
-  mkdirSync(path.dirname(legacyPluginRoot), { recursive: true });
-  mkdirSync(path.dirname(legacySkillRoot), { recursive: true });
-  symlinkSync(legacyTarget, legacyPluginRoot);
-  symlinkSync(legacyTarget, legacySkillRoot);
   const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 
   const output = execFileSync(
@@ -75,9 +67,6 @@ test('codex plugin installer keeps plugin and skill paths repo-local with machin
   assert.equal(result.home, homeDir);
   assert.equal(existsSync(installedPluginRoot), false);
   assert.equal(existsSync(installedSkillRoot), false);
-  assert.equal(existsSync(legacyPluginRoot), false);
-  assert.equal(existsSync(legacySkillRoot), false);
-  assert.equal(marketplace.plugins.some((item) => item.name === 'redcube-ai'), false);
   assert.equal(result.plugin_root, pluginRoot);
   assert.equal(result.skill_root, path.dirname(pluginSkillPath));
   assert.equal(existsSync(path.join(homeDir, '.codex', 'skills', 'rca')), false);
