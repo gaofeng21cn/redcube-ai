@@ -313,6 +313,7 @@
           "apply_visual_workspace_lifecycle",
           "evaluate_visual_transition",
           "emit_workspace_receipt_proof",
+          "emit_external_work_order_owner_closeout",
           "notification_receipt"
         ],
         "forbidden_writes": [

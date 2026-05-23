@@ -390,6 +390,25 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
         guarded_action: 'emit_domain_owner_receipt',
         receipt_root_model: '<workspace-root>/.redcube/runtime/receipts/domain-owner/<receipt-id>.json',
       },
+      external_work_order_owner_closeout: {
+        ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
+        owner: DOMAIN_ID,
+        action: 'emit_external_work_order_owner_closeout',
+        allowed_return_shapes: (
+          manifest.domain_owner_receipt_contract
+            ?.external_work_order_owner_closeout
+            ?.allowed_return_shapes || ['no_regression_evidence', 'typed_blocker']
+        ),
+        refs_only: true,
+        writable_by_sidecar: true,
+        guarded_action: 'emit_external_work_order_owner_closeout',
+        runtime_locator_model: 'workspace-runtime-ref:external-work-order-owner-closeout:<work-order-id>',
+        writes_visual_truth: false,
+        writes_artifact_body: false,
+        writes_memory_body: false,
+        writes_review_export_verdict: false,
+        authorizes_quality_or_export: false,
+      },
       no_regression_owner_receipt_opl_consumption_proof: {
         ref: '/no_regression_owner_receipt_opl_consumption_proof',
         owner: DOMAIN_ID,
@@ -454,6 +473,7 @@ export function buildSidecarProjection({ workspaceRoot, manifest }) {
       controlled_memory_apply_proof_ref: '/controlled_memory_apply_proof',
       controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+      external_work_order_owner_closeout_ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',

@@ -28,6 +28,51 @@
     "writes_memory_body": false,
     "authorizes_quality_or_export": false
   },
+  "external_work_order_owner_closeout": {
+    "surface_kind": "external_work_order_owner_closeout_contract",
+    "action": "emit_external_work_order_owner_closeout",
+    "owner": "redcube_ai",
+    "contract_ref": "/domain_owner_receipt_contract",
+    "refs_only": true,
+    "input_ref_model": {
+      "execution_receipt_ref": "agent-lab-work-order-execution-receipt:<work-order-id>",
+      "absorbed_head_ref": "git:commit:<sha>",
+      "target_verification_refs": [
+        "target-verification:redcube-ai/typecheck"
+      ],
+      "no_forbidden_write_refs": [
+        "no_target_domain_truth_write_proof"
+      ],
+      "patch_absorption_ref": "patch-absorption:redcube_ai/<work-order-id>/source-patch",
+      "worktree_cleanup_ref": "worktree-cleanup:redcube_ai/<work-order-id>/source-patch"
+    },
+    "allowed_return_shapes": [
+      "no_regression_evidence",
+      "typed_blocker"
+    ],
+    "output_ref_model": {
+      "no_regression_evidence_ref": "rca-no-regression:external-work-order:<work-order-id>",
+      "runtime_locator_ref": "workspace-runtime-ref:external-work-order-owner-closeout:<work-order-id>",
+      "typed_blocker_ref": "rca-typed-blocker:external-work-order-owner-closeout:<blocker-id>"
+    },
+    "authority_boundary": {
+      "rca_owns_closeout_evidence": true,
+      "opl_can_store_closeout_ref": true,
+      "opl_can_store_typed_blocker": true,
+      "opl_can_write_rca_visual_truth": false,
+      "opl_can_store_artifact_body": false,
+      "opl_can_store_memory_body": false,
+      "opl_can_authorize_quality_or_export": false
+    },
+    "repository_boundary": {
+      "repo_tracks_contract_refs": true,
+      "repo_tracks_live_closeout_instance": false,
+      "repo_tracks_visual_truth": false,
+      "repo_tracks_artifact_body": false,
+      "repo_tracks_memory_body": false,
+      "repo_tracks_quality_or_export_verdict": false
+    }
+  },
   "receipt_cases": [
     {
       "return_shape": "domain_receipt",

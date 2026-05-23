@@ -331,11 +331,15 @@
     "projection_ref": "redcube product manifest#/rca_efficiency_handoff_projection",
     "sidecar_projection_ref": "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
     "contract_ref": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
+    "external_work_order_owner_closeout_ref": "redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout",
+    "external_work_order_owner_closeout_action": "emit_external_work_order_owner_closeout",
     "runtime_consumption_refs": [
       "redcube product manifest#/rca_efficiency_handoff_projection",
       "redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection",
       "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
-      "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref"
+      "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
+      "redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout",
+      "redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref"
     ],
     "quality_floor_refs": [
       "workspace-runtime-ref:review-export:<run-id>",

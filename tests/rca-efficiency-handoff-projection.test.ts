@@ -56,6 +56,14 @@ function assertEfficiencySuiteShape(suite) {
     'redcube product manifest#/domain_owner_receipt_contract',
   );
   assert.equal(
+    suite.target_agent_owner_surface_refs.external_work_order_owner_closeout_ref,
+    'redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+  );
+  assert.equal(
+    suite.target_agent_owner_surface_refs.external_work_order_owner_closeout_action,
+    'emit_external_work_order_owner_closeout',
+  );
+  assert.equal(
     suite.target_agent_owner_surface_refs.production_acceptance_contract_ref,
     'contracts/production_acceptance/rca-production-acceptance.json',
   );
@@ -68,6 +76,14 @@ function assertEfficiencySuiteShape(suite) {
   );
   assert.equal(
     suite.target_runtime_consumption_refs.includes('redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection'),
+    true,
+  );
+  assert.equal(
+    suite.target_runtime_consumption_refs.includes('redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout'),
+    true,
+  );
+  assert.equal(
+    suite.target_runtime_consumption_refs.includes('redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref'),
     true,
   );
 

@@ -348,7 +348,16 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
     'redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection',
   );
   assert.equal(handoff.contract_ref, 'contracts/production_acceptance/rca-efficiency-handoff-projection.json');
+  assert.equal(
+    handoff.external_work_order_owner_closeout_ref,
+    'redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+  );
+  assert.equal(handoff.external_work_order_owner_closeout_action, 'emit_external_work_order_owner_closeout');
   assertRefArray(handoff.runtime_consumption_refs, 'efficiency_handoff_projection_refs.runtime_consumption_refs');
+  assert.equal(
+    handoff.runtime_consumption_refs.includes('redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout'),
+    true,
+  );
   assertRefArray(handoff.quality_floor_refs, 'efficiency_handoff_projection_refs.quality_floor_refs');
   assert.deepEqual(handoff.target_verification_refs, [
     'target_runtime_consumption_verification_receipt',

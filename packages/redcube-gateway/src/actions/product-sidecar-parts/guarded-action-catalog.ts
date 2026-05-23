@@ -73,6 +73,20 @@ export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
     api_surface: 'productSidecarEmitWorkspaceReceiptProof',
   },
   {
+    action: 'emit_external_work_order_owner_closeout',
+    effect: 'guarded_owner_closeout_no_regression_or_typed_blocker',
+    summary: 'Return RCA-owned refs-only no-regression evidence or a typed blocker for an absorbed external work order; never write visual truth, artifact bodies, memory bodies, or quality/export verdicts.',
+    required_fields: [
+      'workspace_root',
+      'work_order_id',
+      'execution_receipt_ref',
+      'absorbed_head_ref',
+      'target_verification_refs',
+      'no_forbidden_write_refs',
+    ],
+    api_surface: 'productSidecarEmitExternalWorkOrderOwnerCloseout',
+  },
+  {
     action: 'notification_receipt',
     effect: 'control_plane_ack_only',
     summary: 'Acknowledge an OPL/Hermes notification without writing RCA visual truth, review verdict, or publication gate.',

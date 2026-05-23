@@ -286,6 +286,144 @@ async function emitNoRegressionEvidence(task) {
   };
 }
 
+async function emitExternalWorkOrderOwnerCloseout(task) {
+  const workspaceRoot = workspaceRootFromTask(task);
+  const workOrderId = slugId(task.work_order_id || task.workOrderId, 'external-work-order');
+  const required = [
+    'work_order_id',
+    'execution_receipt_ref',
+    'absorbed_head_ref',
+    'target_verification_refs',
+    'no_forbidden_write_refs',
+  ];
+  const missing = missingFields(task, required);
+  const forbiddenPayloadFields = [...findForbiddenPayloadFieldPaths(task)].sort();
+  if (missing.length > 0) {
+    return buildTypedBlocker({
+      blockerKind: 'external_work_order_owner_closeout_missing_required_refs',
+      blockerId: workOrderId,
+      missing,
+      sourceContract: 'rca.external_work_order_owner_closeout.v1',
+      nextRequiredOwnerAction: 'provide_opl_execution_receipt_absorbed_head_target_verification_and_no_forbidden_write_refs',
+      workspaceRoot,
+    });
+  }
+  if (forbiddenPayloadFields.length > 0) {
+    return buildTypedBlocker({
+      blockerKind: 'external_work_order_owner_closeout_forbidden_payload_fields',
+      blockerId: workOrderId,
+      sourceContract: 'rca.external_work_order_owner_closeout.v1',
+      nextRequiredOwnerAction: 'replace_body_payloads_with_owner_closeout_refs_only',
+      workspaceRoot,
+      details: {
+        forbidden_payload_fields: forbiddenPayloadFields,
+        payload_body_allowed: false,
+      },
+    });
+  }
+
+  const targetVerificationRefs = optionalArray(
+    task.target_verification_refs || task.targetVerificationRefs,
+  ).map((ref) => safeText(ref)).filter(Boolean);
+  const noForbiddenWriteRefs = optionalArray(
+    task.no_forbidden_write_refs || task.noForbiddenWriteRefs,
+  ).map((ref) => safeText(ref)).filter(Boolean);
+  if (targetVerificationRefs.length === 0 || noForbiddenWriteRefs.length === 0) {
+    return buildTypedBlocker({
+      blockerKind: 'external_work_order_owner_closeout_missing_required_refs',
+      blockerId: workOrderId,
+      missing: [
+        ...(targetVerificationRefs.length === 0 ? ['target_verification_refs'] : []),
+        ...(noForbiddenWriteRefs.length === 0 ? ['no_forbidden_write_refs'] : []),
+      ],
+      sourceContract: 'rca.external_work_order_owner_closeout.v1',
+      nextRequiredOwnerAction: 'provide_non_empty_target_verification_and_no_forbidden_write_ref_arrays',
+      workspaceRoot,
+    });
+  }
+
+  const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
+  const closeout = {
+    ok: true,
+    surface_kind: 'external_work_order_owner_closeout',
+    return_shape: 'no_regression_evidence',
+    evidence_id: workOrderId,
+    evidence_ref: `rca-no-regression:external-work-order:${workOrderId}`,
+    runtime_locator_ref: `workspace-runtime-ref:external-work-order-owner-closeout:${workOrderId}`,
+    owner: DOMAIN_ID,
+    generated_by_action: 'emit_external_work_order_owner_closeout',
+    contract_ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
+    workspace_locator: { workspace_root: workspaceRoot },
+    closeout_refs: {
+      work_order_id: workOrderId,
+      execution_receipt_ref: safeText(task.execution_receipt_ref || task.executionReceiptRef),
+      absorbed_head_ref: safeText(task.absorbed_head_ref || task.absorbedHeadRef),
+      patch_absorption_ref: safeText(task.patch_absorption_ref || task.patchAbsorptionRef),
+      worktree_cleanup_ref: safeText(task.worktree_cleanup_ref || task.worktreeCleanupRef),
+      agent_lab_reevaluation_ref: safeText(task.agent_lab_reevaluation_ref || task.agentLabReevaluationRef),
+      target_verification_refs: targetVerificationRefs,
+      no_forbidden_write_refs: noForbiddenWriteRefs,
+      changed_file_refs: optionalArray(task.changed_file_refs || task.changedFileRefs).map((ref) => safeText(ref)).filter(Boolean),
+    },
+    source_manifest_refs: {
+      domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+      external_work_order_owner_closeout_contract_ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
+      rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
+      operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
+      product_sidecar_ref: '/product_entry_shell/sidecar',
+      no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
+    },
+    coverage: {
+      required_refs_present: true,
+      absorbed_patch_verified: true,
+      target_verification_refs_present: targetVerificationRefs.length > 0,
+      no_forbidden_write_refs_present: noForbiddenWriteRefs.length > 0,
+      agent_lab_reevaluation_ref_present: Boolean(safeText(task.agent_lab_reevaluation_ref || task.agentLabReevaluationRef)),
+      visual_ready_claimed: false,
+      exportable_claimed: false,
+      handoffable_claimed: false,
+      production_soak_claimed: false,
+      quality_verdict_authorized: false,
+      visual_truth_written: false,
+      artifact_body_written: false,
+      memory_body_written: false,
+      review_export_verdict_written: false,
+    },
+    authority_boundary: {
+      rca_owns_closeout_evidence: true,
+      opl_can_store_closeout_ref: true,
+      opl_can_store_typed_blocker: true,
+      opl_can_write_rca_visual_truth: false,
+      opl_can_store_artifact_body: false,
+      opl_can_store_memory_body: false,
+      opl_can_authorize_quality_or_export: false,
+      opl_can_claim_visual_ready: false,
+      opl_can_claim_exportable: false,
+    },
+    repository_boundary: {
+      repo_tracks_contract_refs: true,
+      repo_tracks_live_closeout_instance: false,
+      repo_tracks_visual_truth: false,
+      repo_tracks_artifact_body: false,
+      repo_tracks_memory_body: false,
+      repo_tracks_quality_or_export_verdict: false,
+      receipt_instance_path_model: '<workspace-root>/.redcube/runtime/owner-closeout/external-work-orders/<work-order-id>.json',
+    },
+    contract_allowed_return_shapes: (
+      manifest.domain_owner_receipt_contract
+        ?.external_work_order_owner_closeout
+        ?.allowed_return_shapes || []
+    ),
+  };
+  const written = writeRuntimeJson({
+    workspaceRoot,
+    parts: ['owner-closeout', 'external-work-orders'],
+    fileName: `${workOrderId}.json`,
+    payload: closeout,
+  });
+  return { ...written.payload, closeout_file: written.file };
+}
+
 function normalizeMemoryDecision(task) {
   return safeText(task.decision || task.writeback_status || task.writebackStatus).toLowerCase();
 }
@@ -477,6 +615,8 @@ export async function dispatchProductSidecar(request) {
   let result;
   if (action === 'emit_no_regression_evidence') {
     result = await emitNoRegressionEvidence(task);
+  } else if (action === 'emit_external_work_order_owner_closeout') {
+    result = await emitExternalWorkOrderOwnerCloseout(task);
   } else if (action === 'emit_domain_owner_receipt') {
     result = await emitDomainOwnerReceipt(task);
   } else if (action === 'apply_visual_memory_writeback') {

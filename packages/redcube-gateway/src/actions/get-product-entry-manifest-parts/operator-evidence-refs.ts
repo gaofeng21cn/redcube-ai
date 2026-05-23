@@ -354,6 +354,8 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
     target_agent_owner_surface_refs: {
       owner_route_ref: 'redcube product manifest#/owner_route',
       owner_receipt_contract_ref: 'redcube product manifest#/domain_owner_receipt_contract',
+      external_work_order_owner_closeout_ref: 'redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+      external_work_order_owner_closeout_action: 'emit_external_work_order_owner_closeout',
       production_acceptance_contract_ref: 'contracts/production_acceptance/rca-production-acceptance.json',
       quality_gate_refs: [
         'agent/quality_gates/review_export_memory.md',
@@ -371,6 +373,8 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       'redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
       'redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection',
       'redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
+      'redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout',
+      'redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref',
     ],
     efficiency_signal_refs: {
       duration_refs: [
