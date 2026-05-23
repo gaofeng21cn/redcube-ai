@@ -79,6 +79,7 @@ RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness
 - active `formal_entry.internal_surface` 口径已迁为 `domain_entry_protocol_boundary`；`@redcube/gateway` 包名只作为 machine-guarded package/protocol boundary 或 provenance 语境读取，不代表 gateway public identity 或 generic gateway runtime owner。
 - active product-entry manifest 的 `formal_entry.retired_internal_surface_ids` 已从裸 `gateway` 降为 `retired_gateway_protocol_boundary_public_entry`；这是 tombstone semantic id，不是 public entry、callable alias 或 compatibility surface。
 - active MCP server initialization identity 已收口为 `redcube-ai`；这只清理 reader-facing `gateway` 命名泄漏，不改变 `@redcube/gateway` package/protocol boundary，也不声明 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
+- active product-entry status / manifest / CLI help 的 operator-facing OPL-hosted handoff 口径已收敛为 `framework-side handoff contract`；`bridge contract` 只允许继续作为 contracts/provenance/history 中的 bridge-exit 语境，不作为当前入口说明。
 
 ## 当前物理源码形态差距
 

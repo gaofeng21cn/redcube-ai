@@ -114,7 +114,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['entrySessionId', 'workspaceReceiptScaleoutRoot'],
     },
     'product status': {
-      summary: '读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。',
+      summary: '读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted framework-side handoff 合同。',
       usage: 'redcube product status --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]]',
       action_ref: 'getProductStatus',
       boundary_fields: ['workspaceRoot', 'workspaceReceiptScaleoutRoot'],

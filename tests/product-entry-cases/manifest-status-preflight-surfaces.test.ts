@@ -12,6 +12,13 @@ import {
   prepareProductEntryWorkspace,
 } from '../product-domain-action-case-shared.ts';
 
+function assertNoActiveBridgeContractWording(surface) {
+  assert.equal(surface === undefined || surface === null, false);
+  const text = JSON.stringify(surface);
+  assert.equal(text.includes('bridge contract'), false);
+  assert.equal(text.includes('单独的 bridge'), false);
+}
+
 test('product status, preflight, and CLI manifest stay aligned with the product-entry manifest projection', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
     const workspaceRoot = await prepareProductEntryWorkspace();
@@ -24,6 +31,14 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
     });
     assert.equal(status.ok, true);
     assert.equal(status.surface_kind, 'product_status');
+    assertNoActiveBridgeContractWording(status.entry_status_surface);
+    assertNoActiveBridgeContractWording(status.status_surface);
+    assert.match(
+      status.entry_status_surface.summary,
+      /framework-side handoff contract/,
+    );
+    assertNoActiveBridgeContractWording(manifest.entry_status_surface);
+    assertNoActiveBridgeContractWording(manifest.product_entry_shell.status);
     assert.equal(status.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(status.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
     assert.equal(status.product_entry_start.surface_kind, 'product_entry_start');
@@ -110,6 +125,9 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
       },
     ));
     assert.equal(cliManifest.ok, true);
+    assertNoActiveBridgeContractWording(cliManifest.entry_status_surface);
+    assertNoActiveBridgeContractWording(cliManifest.status_surface);
+    assertNoActiveBridgeContractWording(cliManifest.product_entry_shell.status);
     assert.equal(cliManifest.family_stage_control_plane.surface_kind, 'family_stage_control_plane');
     assert.deepEqual(
       cliManifest.family_stage_control_plane.stages.map((stage) => stage.stage_id),

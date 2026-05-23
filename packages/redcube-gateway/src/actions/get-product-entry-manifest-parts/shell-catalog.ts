@@ -127,7 +127,7 @@ export function buildProductEntryManifestShellCatalog({
       surface_kind: 'product_status',
       purpose: (
         '当前 agent-facing product-entry overview/intake shell；`status` 是当前 product overview 命令，'
-        + '用于暴露 direct / session 入口，并把 OPL-hosted stage runtime handoff 保持在单独的 bridge contract。'
+        + '用于暴露 direct / session 入口，并把 OPL-hosted stage runtime handoff 保持在 framework-side handoff contract。'
       ),
       extra_payload: {
         generated_interface_owner: 'one-person-lab',
