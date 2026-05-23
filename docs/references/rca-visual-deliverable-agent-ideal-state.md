@@ -326,7 +326,7 @@ RCA 达到理想生产级状态时，应满足以下门槛：
 - 用户工作台能清楚展示进度、阻塞、下一步、产物和证据来源。
 - 旧 gateway 优先口径、Hermes 优先、repo-local runtime pilot、hidden fallback 和 prompt-only route 不回到 active public identity。
 
-## 当前差距与完善计划
+## Active Plan 边界
 
 RCA 当前差距、通用模块上收 OPL 清单、总体差距矩阵和长期完善顺序已经拆到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。本文只保留 north-star 目标态和长期 owner 边界，避免目标态与 active plan 在同一文件里继续双写。
 

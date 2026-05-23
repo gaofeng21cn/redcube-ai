@@ -169,7 +169,7 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 
 - artifact-producing owner receipt route 已固定为 image-first PPT route，后续还需真实 workspace 运行持续积累 receipt instances。
 - visual memory body reuse 已有 locator/content ref，后续还需真实 visual pattern memory accepted/rejected receipt scaleout。
-- workspace receipt proof 已能产出 owner/memory/no-regression refs，product-entry manifest 的 workspace receipt inventory 已支持显式多 workspace refs 聚合；后续还需真实长期 workspace retention ledger、production operator cadence 与跨 family no-regression evidence scaleout，不能把 `observed_workspace_count=2` 写成 visual ready、exportable、handoffable 或 Temporal production soak complete。
+- workspace receipt proof 已能产出 owner/memory/no-regression refs，product-entry manifest 的 workspace receipt inventory 已支持显式多 workspace refs 聚合；live runtime-state 快照仍显示当前观测 inventory 缺口，`observed_workspace_count=0`、`observed_receipt_count=0`、`workspace_receipt_scaleout_claimed=false`、`declares_production_soak_complete=false`。后续还需真实长期 workspace retention ledger、production operator cadence 与跨 family no-regression evidence scaleout，不能把 refs-only projection 写成 visual ready、exportable、handoffable 或 Temporal production soak complete。
 - Temporal controlled visual-stage long soak、provider restart/re-query/retry/dead-letter proof 和 repair cadence。
 - Expected receipt instance 与 monitor freshness evidence 已有 RCA body-free handoff refs，可供 OPL workorder 回填；后续仍需真实 workspace owner receipt instance、typed blocker、visual memory/lifecycle receipt 或 long-soak refs 持续刷新，OPL stage evidence receipt 只能证明 refs-only route、payload workorder 和 preflight 可用。
 - Cross-family repeated no-regression proof。
@@ -202,44 +202,24 @@ RCA 长期只允许保留 visual domain 的 minimal authority surfaces；active 
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
 - 不能恢复 gateway、retired public entry、federation、旧 Hermes 优先口径、local-manager 或 bridge residue 为 active public entry、runtime owner 或兼容别名。
 
-## 下一轮 Agent Prompt
+## 剩余工作边界
 
-Objective:
+本轮 live doctor 预检没有发现 docs taxonomy 或核心文档缺口；这只证明文档骨架可读，不替代 semantic audit。当前 live contracts/source truth 继续支持 `functional_structure_gap_count=0`，没有发现新的 RCA-owned generic runtime/session/workbench/sidecar owner 迹象。
 
-使用 OPL Doc Governance 继续治理 `/Users/gaofeng/workspace/redcube-ai` 的 RCA Active Truth 与 production evidence tail。先读取 `AGENTS.md`、`TASTE.md`、`README*`、`docs/README.md`、核心五件套、`docs/references/rca-visual-deliverable-agent-ideal-state.md`、本文、`contracts/production_acceptance/rca-production-acceptance.json`、product-entry manifest、`contracts/physical_source_morphology_policy.json` 和 live doctor 输出；然后只在 RCA repo 内推进剩余 production evidence / naming hygiene / physical morphology hygiene，不改 OPL、MAS、MAG 或其他仓库。
+后续工作只剩三类：
 
-Write scope:
+1. `production_evidence_tail`：从真实 workspace 继续积累 artifact-producing owner receipt、workspace receipt inventory、visual memory accepted/rejected receipt、lifecycle receipt、Temporal controlled visual-stage long-soak 和 cross-family repeated no-regression evidence。
+2. `naming_contract_hygiene`：仅在确认 active caller、runtime-program pointer 和测试合同后，继续把历史 `managed`、`runtime`、`gateway`、`session`、`sidecar` reader-facing 语义迁到 provenance / semantic-id / tombstone；不新增兼容别名。
+3. `physical_source_morphology_hygiene`：随 OPL generated/default caller 成为 live 后，继续收薄 product-entry session refs adapter、direct `runtimeWatch`、sidecar guarded actions、operator evidence/stability projection 和 executor route-run record adapter；RCA 只保留 domain handler、refs-only adapter、visual authority function 与 native helper implementation。
 
-- 可改：RCA `docs/active/rca-ideal-state-gap-plan.md`、必要的 RCA canonical docs、RCA support/history/tombstone docs、RCA contracts/tests/source 中与 evidence 或 retired-surface hygiene 直接相关的最小文件。
-- 不改：其他仓库、真实 workspace artifact body、visual memory body、用户级 runtime-state、无关 package/source refactor。
+后续审计必须继续从 live evidence 判定：doctor 只作预检；production acceptance、operator evidence readiness、workspace receipt inventory、product status/manifest/sidecar export、contracts、tests、CLI/MCP 行为和 runtime-state refs 才能证明或否定文档 claim。
 
-Non-goals:
+## 完成门槛
 
-- 不把 docs completion 写成 production visual ready。
-- 不恢复旧 public entry、generic runtime owner、session/workbench shell、sidecar wrapper 或兼容别名。
-- 不用 OPL provider completion、structural conformance、transition fixture 或 no-regression ref 代替 RCA-owned visual review/export verdict。
-
-Required actions:
-
-1. 用 live doctor 和 `rg` 重新检查 active docs、support docs 与 machine contracts 中的 retired wording；只保留 provenance/tombstone/semantic-id 读法。
-2. 若发现新的 generic runtime/session/workbench/sidecar owner 迹象，重新打开 functional / structural gap；否则保持 `functional_structure_gap_count=0`，只维护 evidence tail。
-3. 从 production acceptance、operator evidence readiness、workspace receipt inventory 和 real workspace refs 中刷新真实 evidence 状态；缺证据时返回 RCA-owned typed blocker 或下一条验证命令 ref。
-4. 把已关闭的过程材料折回 canonical docs 或 `docs/history/**`，active plan 只保留当前进度、当前 gap 和下一轮 prompt。
-
-Verification commands:
-
-```bash
-python3 /Users/gaofeng/workspace/opl-doc-governance/scripts/opl_doc_doctor.py doctor . --format json
-./scripts/verify.sh
-git diff --check
-```
-
-Completion / foldback gate:
-
-- Doctor 不再报告 active path 的 retired public entry / old Hermes-priority / compatibility wording warning，或每个 warning 都已在 history/tombstone support 中明确降级。
-- `functional_structure_gap_count` 与 live contracts/source truth 一致。
-- 当前 production evidence gap 只列真实缺失证据，不混入已闭合结构项。
-- 下一轮 prompt 只命名剩余工作；完成过程不堆回 active plan。
+- Doctor 没有 active-path retired public entry、old Hermes-priority 或 compatibility wording finding；若 future doctor 出现 warning，必须逐条降级到 history/tombstone/provenance 或修正 active wording。
+- `functional_structure_gap_count` 与 `contracts/functional_privatization_audit.json`、`contracts/physical_source_morphology_policy.json`、source surface 和 tests 保持一致。
+- Production evidence gap 只列真实缺失证据，不混入已闭合结构项。
+- Active plan 只保留当前结论、边界、差距和执行顺序；过程命令、dated closeout、absorbed tranche、historical comparison 和 agent prompt 模板进入 history/provenance 或外部执行记录。
 
 ## History / Tombstone Foldback
 
