@@ -864,40 +864,33 @@ test('product sidecar export and dispatch preserve RCA authority while allowing 
     assert.equal(blockedTransition.result_surface.visual_ready_claimed, false);
     assert.equal(blockedTransition.result_surface.exportable_claimed, false);
 
-    await assert.rejects(
-      () => dispatchProductSidecar({
-        task: {
-          action: retiredManagedSupervisionAction,
-          workspace_root: workspaceRoot,
-          managed_run_id: 'managed-removed',
-        },
-      }),
-      /product sidecar action 不允许/,
-    );
-
-    await assert.rejects(
-      () => dispatchProductSidecar({
-        task: {
-          action: 'runtime_watch',
-          workspace_root: workspaceRoot,
-          topic_id: 'topic-removed',
-          deliverable_id: 'deck-removed',
-          run_id: 'run-removed',
-        },
-      }),
-      /use OPL status\/workbench\/read-model target or direct runtimeWatch review surface/,
-    );
-
-    await assert.rejects(
-      () => dispatchProductSidecar({
-        task: {
-          action: 'product_entry_continuation',
-          workspace_root: workspaceRoot,
-          entry_session_id: 'session-removed',
-        },
-      }),
-      /product sidecar action 不允许/,
-    );
+    const retiredSidecarActions = [
+      {
+        action: retiredManagedSupervisionAction,
+        managed_run_id: 'managed-removed',
+      },
+      {
+        action: 'runtime_watch',
+        topic_id: 'topic-removed',
+        deliverable_id: 'deck-removed',
+        run_id: 'run-removed',
+      },
+      {
+        action: 'product_entry_continuation',
+        entry_session_id: 'session-removed',
+      },
+    ];
+    for (const retiredAction of retiredSidecarActions) {
+      await assert.rejects(
+        () => dispatchProductSidecar({
+          task: {
+            workspace_root: workspaceRoot,
+            ...retiredAction,
+          },
+        }),
+        new RegExp(`product sidecar action 不允许: ${retiredAction.action}`),
+      );
+    }
 
     await assert.rejects(
       () => dispatchProductSidecar({

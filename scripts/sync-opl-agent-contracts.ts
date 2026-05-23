@@ -41,16 +41,30 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generated_surface_owner_in_domain_repo',
 ];
 
-const GENERATED_SURFACES = [
+const OPL_CANONICAL_GENERATED_SURFACES = [
   'cli',
   'mcp',
   'skill',
+  'product_entry_manifest',
+  'sidecar_export_dispatch',
+  'status_read_model',
+  'workbench_drilldown',
+  'functional_harness_cases',
+];
+
+const GENERATED_WRAPPER_DESCRIPTOR_SCOPE = [
   'product_entry',
   'product_status',
   'product_session',
   'sidecar',
   'workbench',
-  'functional_harness_cases',
+];
+
+const OPL_REQUESTED_GENERATED_SURFACES = [
+  ...new Set([
+    ...OPL_CANONICAL_GENERATED_SURFACES,
+    ...GENERATED_WRAPPER_DESCRIPTOR_SCOPE,
+  ]),
 ];
 
 const REQUIRED_DOMAIN_PACK_PATHS = [
@@ -160,7 +174,7 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     minimal_authority_surface_ids: authorityContract.allowed_authority_surface_ids,
     minimal_authority_surface_taxonomy: authorityContract.authority_surface_taxonomy,
     minimal_authority_surface_contracts: authorityContract.authority_surface_contracts,
-    generated_surfaces_requested: GENERATED_SURFACES,
+    generated_surfaces_requested: OPL_REQUESTED_GENERATED_SURFACES,
     generated_interface_consumption_ref: '/opl_generated_interface_consumption',
     repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
     repo_local_handlers_are_generated_surface_owners: false,
@@ -205,7 +219,7 @@ function buildGeneratedSurfaceHandoff() {
         'owner_receipt',
       ],
     },
-    generated_surfaces: GENERATED_SURFACES.map((surfaceId) => ({
+    generated_surfaces: OPL_REQUESTED_GENERATED_SURFACES.map((surfaceId) => ({
       surface_id: surfaceId,
       owner: GENERATED_SURFACE_OWNER,
       domain_repo_can_own_generated_surface: false,
