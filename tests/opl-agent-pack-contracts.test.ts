@@ -242,6 +242,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
   assert.equal(policy.legacy_name_policy.active_generic_runtime_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_domain_entry_owner_allowed, false);
+  assert.equal(policy.legacy_name_policy.active_generic_gateway_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_session_runtime_owner_allowed, false);
   assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
     'managed',

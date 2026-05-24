@@ -57,6 +57,7 @@ const LEGACY_NAME_GUARD_DEFAULTS = Object.freeze({
   public_identity_allowed: false,
   active_generic_runtime_owner_allowed: false,
   active_generic_domain_entry_owner_allowed: false,
+  active_generic_gateway_owner_allowed: false,
   active_generic_session_runtime_owner_allowed: false,
   active_generic_domain_action_adapter_owner_allowed: false,
   active_generic_workbench_owner_allowed: false,
@@ -385,6 +386,7 @@ export function buildPhysicalSourceMorphologyPolicy() {
         'public_identity_allowed',
         'active_generic_runtime_owner_allowed',
         'active_generic_domain_entry_owner_allowed',
+        'active_generic_gateway_owner_allowed',
         'active_generic_session_runtime_owner_allowed',
         'active_generic_domain_action_adapter_owner_allowed',
         'active_generic_workbench_owner_allowed',
@@ -401,6 +403,7 @@ export function buildPhysicalSourceMorphologyPolicy() {
       compatibility_alias_allowed: false,
       active_generic_runtime_owner_allowed: false,
       active_generic_domain_entry_owner_allowed: false,
+      active_generic_gateway_owner_allowed: false,
       active_generic_session_runtime_owner_allowed: false,
     },
     new_surface_admission_gate: {

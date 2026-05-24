@@ -547,6 +547,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'public_identity_allowed',
     'active_generic_runtime_owner_allowed',
     'active_generic_domain_entry_owner_allowed',
+    'active_generic_gateway_owner_allowed',
     'active_generic_session_runtime_owner_allowed',
     'active_generic_domain_action_adapter_owner_allowed',
     'active_generic_workbench_owner_allowed',

@@ -27,6 +27,7 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_state_machine_runner_owner',
   'generic_cli_mcp_product_wrapper_owner',
   'generic_domain_action_adapter_owner',
+  'generic_sidecar_owner',
   'generic_session_store_owner',
   'generic_status_workbench_owner',
   'generic_workspace_source_intake_owner',
