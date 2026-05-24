@@ -23,8 +23,8 @@ Machine boundary: 本文是人读过程归档。机器真相继续归 `contracts
 - RCA 增加 OPL substrate adapter export，只导出 opaque/index-only workspace/source/artifact/memory refs 与 lifecycle/operator projection refs；不导出 visual truth、layout/review/export verdict、deliverable artifact body、visual memory body 或 owner receipt authority。
 - RCA 增加 OPL Agent Lab longline migration guard，用于确认 framework-level longline orchestration、hosted-attempt reconciliation projection 和 no-forbidden-write cross-domain regression 由 OPL Agent Lab 承接；RCA 保留 visual quality scorer、render/export owner receipt fixture 和 artifact authority checks。
 
-## 归档后的当前口径
+## 归档时点口径
 
-当前功能/结构差距计数保持 `functional_structure_gap_count=8`：OPL generated surface production consumption、repo-local wrapper active caller migration、focused hosted attempt 接通、artifact gallery/handoff、review/repair transport、App/operator drilldown、workspace/source/lifecycle shell、legacy physical cleanup。
+归档时点功能/结构差距计数为 `functional_structure_gap_count=8`：OPL generated surface production consumption、repo-local wrapper active caller migration、focused hosted attempt 接通、artifact gallery/handoff、review/repair transport、App/operator drilldown、workspace/source/lifecycle shell、legacy physical cleanup。当前计数与后续完成状态以 `docs/active/rca-ideal-state-gap-plan.md` 和 `docs/status.md` 为准。
 
 当前测试/证据差距是：真实 artifact-producing receipt、memory body reuse、workspace receipt scaleout、Temporal long soak、cross-family repeated proof。
