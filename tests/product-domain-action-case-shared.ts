@@ -36,7 +36,7 @@ import {
   researchSource,
   runDeliverableRoute,
   writeSourceAugmentationResult,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,
@@ -53,64 +53,64 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
-const GATEWAY_PACKAGE_JSON = fileURLToPath(
-  new URL('../packages/redcube-gateway/package.json', import.meta.url),
+const DOMAIN_ENTRY_PACKAGE_JSON = fileURLToPath(
+  new URL('../packages/redcube-domain-entry/package.json', import.meta.url),
 );
-const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
+const domainEntryRequire = createRequire(DOMAIN_ENTRY_PACKAGE_JSON);
 const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-companions';
 const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-program-companions';
 
-async function importGatewaySharedModule(moduleSpecifier) {
-  return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
+async function importDomainEntrySharedModule(moduleSpecifier) {
+  return import(pathToFileURL(domainEntryRequire.resolve(moduleSpecifier)).href);
 }
 
 async function getProductEntryManifest(request) {
-  const module = await import('../packages/redcube-gateway/dist/index.js');
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return module.getProductEntryManifest(request);
 }
 
 async function getProductEntrySessionSurface(request) {
-  const module = await import('../packages/redcube-gateway/dist/index.js');
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return module.getProductEntrySession(request);
 }
 
 async function getProductStatus(request) {
-  const module = await import('../packages/redcube-gateway/dist/index.js');
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return module.getProductStatus(request);
 }
 
-async function exportProductSidecar(request) {
-  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
-  return module.exportProductSidecar(request);
+async function exportDomainActionAdapter(request) {
+  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
+  return module.exportDomainActionAdapter(request);
 }
 
-async function dispatchProductSidecar(request) {
-  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
-  return module.dispatchProductSidecar(request);
+async function dispatchDomainActionAdapter(request) {
+  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
+  return module.dispatchDomainActionAdapter(request);
 }
 
-async function getProductSidecarGuardedActionMetadata() {
-  const module = await import('../packages/redcube-gateway/dist/index.js');
+async function getDomainActionAdapterGuardedActionMetadata() {
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return {
-    guardedActions: module.listProductSidecarGuardedActions(),
-    guardedActionIds: module.listProductSidecarGuardedActionIds(),
-    forbiddenWrites: module.listProductSidecarForbiddenWrites(),
-    blockedActions: module.listProductSidecarBlockedActions(),
+    guardedActions: module.listDomainActionAdapterGuardedActions(),
+    guardedActionIds: module.listDomainActionAdapterGuardedActionIds(),
+    forbiddenWrites: module.listDomainActionAdapterForbiddenWrites(),
+    blockedActions: module.listDomainActionAdapterBlockedActions(),
   };
 }
 
 async function buildHostedAttemptBridgeFixture(request) {
-  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
   return module.buildHostedAttemptBridgeFixture(request);
 }
 
 async function reconcileHostedAttemptReceipt(request) {
-  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
   return module.reconcileHostedAttemptReceipt(request);
 }
 
 async function assertReceiptOnlyHostedAttemptProjection(projection) {
-  const module = await import('../packages/redcube-gateway/dist/actions/product-sidecar.js');
+  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
   return module.assertReceiptOnlyHostedAttemptProjection(projection);
 }
 
@@ -267,7 +267,7 @@ const SERIAL_ENV_TEST = { concurrency: false };
 
 export {
   Client,
-  GATEWAY_PACKAGE_JSON,
+  DOMAIN_ENTRY_PACKAGE_JSON,
   PRODUCT_ENTRY_COMPANIONS_SPECIFIER,
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
@@ -284,8 +284,8 @@ export {
   completeSourceReadiness,
   createDeliverable,
   execFileSync,
-  exportProductSidecar,
-  dispatchProductSidecar,
+  exportDomainActionAdapter,
+  dispatchDomainActionAdapter,
   executeSourceAugmentation,
   existsSync,
   fileURLToPath,
@@ -294,9 +294,9 @@ export {
   getProductStatus,
   getProductPreflight,
   getProductStart,
-  getProductSidecarGuardedActionMetadata,
+  getDomainActionAdapterGuardedActionMetadata,
   getToolDefinitions,
-  importGatewaySharedModule,
+  importDomainEntrySharedModule,
   intakeSource,
   invokeOplHostedProductEntry,
   invokeProductEntry,

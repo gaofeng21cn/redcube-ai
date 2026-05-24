@@ -13,13 +13,13 @@
   "rca_scope": "visual_domain_status_projection_refs_only",
   "audit_readout": "project_only",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-    "packages/redcube-gateway/src/actions/get-product-status.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+    "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
+    "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
   ],
   "activeCallers": [
     "product status",
-    "product sidecar runtime framework",
+    "product domain_action_adapter runtime framework",
     "operator evidence readiness projection"
   ],
   "activeCallerStatus": "active_refs_only_consumer_projection",

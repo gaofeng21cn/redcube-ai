@@ -21,7 +21,7 @@ import {
 } from '../helpers/mock-codex-cli.ts';
 
 const execFileAsync = promisify(execFile);
-const gatewayResolve = createRequire(path.resolve('packages/redcube-gateway/package.json'));
+const domainEntryResolve = createRequire(path.resolve('packages/redcube-domain-entry/package.json'));
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
   cpSync(sourceDir, targetDir, {
@@ -34,15 +34,15 @@ function createIsolatedCliInstall() {
   const installRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-isolated-'));
   const cliDir = path.join(installRoot, 'dist');
   const consumerNodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
-  const gatewayPackagePath = path.join(consumerNodeModulesDir, 'gateway');
-  const gatewayNodeModulesDir = path.join(gatewayPackagePath, 'node_modules', '@redcube');
-  const runtimeProtocolPackagePath = path.join(gatewayNodeModulesDir, 'runtime-protocol');
+  const domainEntryPackagePath = path.join(consumerNodeModulesDir, 'domain-entry');
+  const domainEntryNodeModulesDir = path.join(domainEntryPackagePath, 'node_modules', '@redcube');
+  const runtimeProtocolPackagePath = path.join(domainEntryNodeModulesDir, 'runtime-protocol');
 
   mkdirSync(cliDir, { recursive: true });
   mkdirSync(consumerNodeModulesDir, { recursive: true });
 
-  const gatewaySourcePackageJson = JSON.parse(
-    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  const domainEntrySourcePackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-domain-entry/package.json'), 'utf-8'),
   );
 
   copyFileSync(
@@ -68,15 +68,15 @@ function createIsolatedCliInstall() {
       private: true,
       type: 'module',
       dependencies: {
-        '@redcube/gateway': gatewaySourcePackageJson.version,
+        '@redcube/domain-entry': domainEntrySourcePackageJson.version,
       },
     }, null, 2),
     'utf-8',
   );
 
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-gateway'),
-    gatewayPackagePath,
+    path.resolve('packages/redcube-domain-entry'),
+    domainEntryPackagePath,
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-protocol'),
@@ -84,87 +84,87 @@ function createIsolatedCliInstall() {
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime'),
-    path.join(gatewayNodeModulesDir, 'runtime'),
+    path.join(domainEntryNodeModulesDir, 'runtime'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-config'),
-    path.join(gatewayNodeModulesDir, 'redcube-config'),
+    path.join(domainEntryNodeModulesDir, 'redcube-config'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-governance'),
-    path.join(gatewayNodeModulesDir, 'governance'),
+    path.join(domainEntryNodeModulesDir, 'governance'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-reference-os'),
-    path.join(gatewayNodeModulesDir, 'reference-os'),
+    path.join(domainEntryNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-ppt'),
-    path.join(gatewayNodeModulesDir, 'pack-ppt'),
+    path.join(domainEntryNodeModulesDir, 'pack-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'pack-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'pack-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'pack-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'pack-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'runtime-family-ppt'),
+    path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-poster-onepager'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
+    path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-registry'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-registry'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-core'),
-    path.join(gatewayNodeModulesDir, 'overlay-core'),
+    path.join(domainEntryNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
-    path.join(gatewayNodeModulesDir, 'codex-cli-client'),
+    path.join(domainEntryNodeModulesDir, 'codex-cli-client'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
-    path.join(gatewayNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
+    path.join(domainEntryNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
   );
   copyPackageIntoInstall(
     path.resolve('prompts'),
-    path.join(gatewayPackagePath, 'node_modules', 'prompts'),
+    path.join(domainEntryPackagePath, 'node_modules', 'prompts'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
-    path.join(gatewayNodeModulesDir, 'overlay-registry'),
+    path.join(domainEntryNodeModulesDir, 'overlay-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-ppt'),
-    path.join(gatewayNodeModulesDir, 'overlay-ppt'),
+    path.join(domainEntryNodeModulesDir, 'overlay-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'overlay-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'overlay-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'overlay-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'overlay-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('contracts'),
@@ -172,18 +172,18 @@ function createIsolatedCliInstall() {
   );
   copyPackageIntoInstall(
     path.resolve('contracts'),
-    path.join(gatewayPackagePath, 'node_modules', 'contracts'),
+    path.join(domainEntryPackagePath, 'node_modules', 'contracts'),
   );
-  const oplGatewaySharedDist = gatewayResolve.resolve('opl-framework-shared/family-orchestration');
-  const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
+  const oplFrameworkSharedDist = domainEntryResolve.resolve('opl-framework-shared/family-orchestration');
+  const oplFrameworkSharedPackageRoot = path.resolve(path.dirname(oplFrameworkSharedDist), '..');
   copyPackageIntoInstall(
-    oplGatewaySharedPackageRoot,
-    path.join(gatewayPackagePath, 'node_modules', 'opl-framework-shared'),
+    oplFrameworkSharedPackageRoot,
+    path.join(domainEntryPackagePath, 'node_modules', 'opl-framework-shared'),
   );
 
   return {
     cliPath: path.join(cliDir, 'cli.js'),
-    gatewayPackagePath,
+    domainEntryPackagePath,
     runtimeProtocolPackagePath,
     installRoot,
   };
@@ -528,16 +528,16 @@ test('CLI workspace doctor falls back to process.cwd() when root flags are absen
   assert.equal(parsed.workspaceRoot, expectedCwd);
 });
 
-test('@redcube/cli declares @redcube/gateway dependency explicitly', () => {
+test('@redcube/cli declares @redcube/domain-entry dependency explicitly', () => {
   const packageJson = JSON.parse(
     readFileSync(path.resolve('apps/redcube-cli/package.json'), 'utf-8'),
   );
-  const gatewayPackageJson = JSON.parse(
-    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  const domainEntryPackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-domain-entry/package.json'), 'utf-8'),
   );
 
   assert.equal(
-    packageJson.dependencies?.['@redcube/gateway'],
-    gatewayPackageJson.version,
+    packageJson.dependencies?.['@redcube/domain-entry'],
+    domainEntryPackageJson.version,
   );
 });

@@ -57,7 +57,7 @@ export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 export const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
   '@redcube/runtime',
   '@redcube/runtime-protocol',
-  '@redcube/gateway',
+  '@redcube/domain-entry',
 ]);
 export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   {
@@ -66,15 +66,15 @@ export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   },
   {
     specifier: 'opl-framework-shared/product-entry-companions',
-    resolve_from: 'packages/redcube-gateway/package.json',
+    resolve_from: 'packages/redcube-domain-entry/package.json',
   },
   {
     specifier: 'opl-framework-shared/product-entry-program-companions',
-    resolve_from: 'packages/redcube-gateway/package.json',
+    resolve_from: 'packages/redcube-domain-entry/package.json',
   },
   {
     specifier: 'opl-framework-shared/family-shared-release',
-    resolve_from: 'packages/redcube-gateway/package.json',
+    resolve_from: 'packages/redcube-domain-entry/package.json',
   },
 ]);
 const REPO_LOCAL_SHARED_PIN_FALLBACKS = Object.freeze({
@@ -88,7 +88,7 @@ const REPO_LOCAL_SHARED_PIN_FALLBACKS = Object.freeze({
       verify_command: 'scripts/verify.sh family',
       targets: Object.freeze([
         Object.freeze({
-          file: 'packages/redcube-gateway/package.json',
+          file: 'packages/redcube-domain-entry/package.json',
           kind: 'js_dependency',
         }),
         Object.freeze({

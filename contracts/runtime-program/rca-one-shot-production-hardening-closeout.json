@@ -68,7 +68,7 @@
         "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
         "redcube product manifest#/operator_evidence_readiness_projection",
         "redcube product manifest#/workspace_receipt_inventory_projection",
-        "redcube product sidecar#/emit_workspace_receipt_proof"
+        "redcube product domain_action_adapter#/emit_workspace_receipt_proof"
       ],
       "landed_truth": [
         "selected artifact-producing visual route is ppt_deck.image_first.artifact_producing.v1",
@@ -140,7 +140,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/0",
       "reason": "Temporal controlled visual-stage long soak still lacks live provider restart, re-query, retry and dead-letter evidence",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts"
+        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts"
       ],
       "must_not_claim": [
         "production_visual_stage_long_soak_complete",
@@ -156,7 +156,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/1",
       "reason": "RCA exposes locator and receipt ref models, but more real visual memory accepted/rejected lifecycle receipt instances are still pending",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
       ],
       "must_not_claim": [
         "memory_lifecycle_scaleout_complete",
@@ -212,7 +212,7 @@
           "git diff --check",
           "git diff --cached --check",
           "npm run contracts:current-program:check",
-          "npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-cases/manifest-and-start-surfaces.test.ts"
+          "npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/manifest-and-start-surfaces.test.ts"
         ],
         "reported_result": "pass"
       },
@@ -230,7 +230,7 @@
           "git diff --check",
           "npm run --silent contracts:current-program:check",
           "npm run --silent line-budget",
-          "npm run --silent build && node --test tests/rca-retired-surface-guard.test.ts tests/opl-agent-pack-contracts.test.ts tests/opl-family-contract-adoption.test.ts tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts tests/product-entry-session-checkpoint.test.ts"
+          "npm run --silent build && node --test tests/rca-retired-surface-guard.test.ts tests/opl-agent-pack-contracts.test.ts tests/opl-family-contract-adoption.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-session-checkpoint.test.ts"
         ],
         "reported_result": "pass"
       },

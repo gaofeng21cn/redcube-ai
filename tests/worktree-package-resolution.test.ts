@@ -51,11 +51,11 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
       },
       {
         specifier: 'opl-framework-shared/product-entry-companions',
-        resolve_from: 'packages/redcube-gateway/package.json',
+        resolve_from: 'packages/redcube-domain-entry/package.json',
       },
       {
         specifier: 'opl-framework-shared/family-shared-release',
-        resolve_from: 'packages/redcube-gateway/package.json',
+        resolve_from: 'packages/redcube-domain-entry/package.json',
       },
     ],
     resolve(specifier) {
@@ -78,11 +78,11 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
       },
       {
         specifier: 'opl-framework-shared/product-entry-program-companions',
-        resolve_from: 'packages/redcube-gateway/package.json',
+        resolve_from: 'packages/redcube-domain-entry/package.json',
       },
       {
         specifier: 'opl-framework-shared/family-shared-release',
-        resolve_from: 'packages/redcube-gateway/package.json',
+        resolve_from: 'packages/redcube-domain-entry/package.json',
       },
     ],
     resolve(specifier) {
@@ -132,14 +132,14 @@ function withTempRedcubeRepo(buildFiles, run) {
 test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when the owner repo contract is unavailable', () => {
   const ownerCommit = '0123456789abcdef0123456789abcdef01234567';
   const result = withTempRedcubeRepo(({ writeJson }) => {
-    writeJson('packages/redcube-gateway/package.json', {
+    writeJson('packages/redcube-domain-entry/package.json', {
       dependencies: {
         'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
       },
     });
     writeJson('package-lock.json', {
       packages: {
-        'packages/redcube-gateway': {
+        'packages/redcube-domain-entry': {
           dependencies: {
             'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
           },
@@ -155,7 +155,7 @@ test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when t
   assert.equal(result.owner_commit, ownerCommit);
   assert.deepEqual(
     result.findings.map((entry) => entry.file),
-    ['packages/redcube-gateway/package.json', 'package-lock.json'],
+    ['packages/redcube-domain-entry/package.json', 'package-lock.json'],
   );
   assert.deepEqual(
     result.findings.map((entry) => entry.status),
@@ -167,14 +167,14 @@ test('inspectCurrentRepoSharedPinAlignment fallback still reports stale package-
   const ownerCommit = '89abcdef0123456789abcdef0123456789abcdef';
   const staleCommit = 'fedcba9876543210fedcba9876543210fedcba98';
   const result = withTempRedcubeRepo(({ writeJson }) => {
-    writeJson('packages/redcube-gateway/package.json', {
+    writeJson('packages/redcube-domain-entry/package.json', {
       dependencies: {
         'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
       },
     });
     writeJson('package-lock.json', {
       packages: {
-        'packages/redcube-gateway': {
+        'packages/redcube-domain-entry': {
           dependencies: {
             'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${staleCommit}`,
           },

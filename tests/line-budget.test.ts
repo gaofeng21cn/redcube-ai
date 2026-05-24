@@ -87,8 +87,8 @@ test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy
   assert.match(healthcheck, /tests\/product-entry-session-checkpoint\.test\.ts/);
   assert.match(healthcheck, /tests\/product-entry-cases\/domain-memory-ref-adapter\.test\.ts/);
   assert.match(healthcheck, /tests\/product-entry-cases\/manifest-and-start-surfaces\.test\.ts/);
-  assert.match(healthcheck, /tests\/product-entry-cases\/runtime-and-sidecar-surfaces\.test\.ts/);
-  assert.match(healthcheck, /tests\/product-entry-cases\/sidecar-receipt-and-workspace-proof\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-cases\/runtime-and-domain_action_adapter-surfaces\.test\.ts/);
+  assert.match(healthcheck, /tests\/product-entry-cases\/domain_action_adapter-receipt-and-workspace-proof\.test\.ts/);
   assert.doesNotMatch(healthcheck, /test:fast|scripts\/verify\.sh fast|run-test-group\.ts fast/);
 });
 

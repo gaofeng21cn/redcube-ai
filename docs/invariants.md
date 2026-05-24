@@ -25,7 +25,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 - 当前 OPL stage-led 对齐 surface 只供 OPL discovery、queue、wakeup、handoff、receipt、retry/dead-letter 和 operator projection 使用；不得授权 OPL 生成 visual route、review verdict、publication projection truth 或 canonical artifact。
 - RCA 的 executor-first policy 固定为 `codex_cli` production 默认与 `fail_closed` production route。`fallback_with_proof` 只允许 explicit `experimental_proof` lane，且必须写入 proof；不得让非默认 executor 静默回 Codex、静默替换 Codex，或被写成与 Codex 质量/行为等价。
-- RCA 的目标态高于当前实现分布。旧 repo-local managed DAG、attempt/state-machine runner 和 managed-run store 已物理删除；当前 session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/sidecar/status wrapper 或 executor adapter 只能作为 OPL generated/hosted consumer、refs-only adapter、declarative pack input、minimal authority function 或迁移输入。
+- RCA 的目标态高于当前实现分布。旧 repo-local managed DAG、attempt/state-machine runner 和 managed-run store 已物理删除；当前 session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/domain_action_adapter/status wrapper 或 executor adapter 只能作为 OPL generated/hosted consumer、refs-only adapter、declarative pack input、minimal authority function 或迁移输入。
 - RCA 作为标准 OPL Agent 的长期形态是 `Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。通用 transport、ledger、index、lifecycle、runner、session、workbench、observability、artifact/review shell、native-helper envelope、executor adapter 和 generated wrapper 必须上收到 OPL primitive / pack compiler / App shell，或收薄成 refs-only adapter / diagnostic cleanup path。
 - `TypeScript + Python` 是实现目标，不是绕过 runtime-family 的许可。Python native PPT/Office helper 必须挂在 RedCube product-entry、route/proof lane、review/export gate 与 repo-tracked contract 下。
 - 保留在 RCA 的私有程序面必须是无法声明化的 visual authority function：source readiness verdict、communication / visual direction decision、review/export verdict、artifact mutation authorization、visual memory accept/reject、owner receipt signer 或 native helper implementation。缺少接口、active caller、不能上收原因、receipt/blocker/ref 输出边界和 no-forbidden-write 证据时，必须作为功能/结构差距处理。
@@ -36,8 +36,8 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 ## Legacy 退役与 forbidden surface
 
-- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境；active surface 必须以 direct route / service-safe domain entry / product sidecar / stage descriptor / OPL-hosted handoff parity 为准。
-- 已物理删除的旧 repo-local deliverable runner、run store、DAG scheduler、managed helper/types 和 public managed action handler 不得以兼容别名、diagnostic fixture 或 standard sidecar template 名义恢复。
+- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境；active surface 必须以 direct route / service-safe domain entry / product domain_action_adapter / stage descriptor / OPL-hosted handoff parity 为准。
+- 已物理删除的旧 repo-local deliverable runner、run store、DAG scheduler、managed helper/types 和 public managed action handler 不得以兼容别名、diagnostic fixture 或 standard domain_action_adapter template 名义恢复。
 - 已退役的 active 接口不保留兼容别名：`REDCUBE_WORKBENCH_ROOT`、standalone upstream Hermes probe script、`GatewayActionMap` / `getCliGatewayActions`、`callGatewayTool` / `listGatewayTools` / `GatewayTool*`、`source_workbench*`、retired public entry / federation / product frontdesk / source-pack-federation 等旧入口不得重新进入源码、测试、contracts 或 package surface。
 - 若历史合同名仍带 `managed`，只能按 provenance / semantic-id 迁移处理，不能解释成 active runtime owner。仍被合同引用的旧文档只能作为 provenance 原位保留。
 - Python / native helper 验证必须把 bytecode、pytest cache、`uv sync` project venv 和安装/同步副产物导向仓库外部；开发 checkout 不应产生 `.venv`、`__pycache__`、`.pytest_cache` 或 `*.egg-info` 副产物。

@@ -53,13 +53,13 @@ Machine boundary: 本文是人读历史定位参考。机器真相继续归 cont
 
 本节是 legacy positioning support，不是 current runtime owner 文档。当前 runtime truth 与后续差距分别读 [运行架构说明](../../runtime/runtime_architecture.md) 和 [RCA 理想目标态差距与完善计划](../../active/rca-ideal-state-gap-plan.md)。下面只保留“这些历史词现在应如何读取”的口径：
 
-- OPL stage-led hosted integration（OPL Framework 侧通用 runtime / queue / wakeup / projection 路径，消费 RCA descriptor、sidecar、receipt refs 和 operator projection）
+- OPL stage-led hosted integration（OPL Framework 侧通用 runtime / queue / wakeup / projection 路径，消费 RCA descriptor、domain_action_adapter、receipt refs 和 operator projection）
 - configured family runtime provider（Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只作为 legacy/optional provider 或显式 hosted/proof lane）
 - 本地 Codex CLI host-agent runtime（当前默认 concrete executor）
 - `Codex` 本地 operator host（当前本地开发与操作宿主）
 - repo-local managed runtime pilot（历史本地迁移工件，不是兼容桥或当前 owner）
 
-RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、product sidecar、service-safe domain entry、projection builder、review/export gate、artifact locator、receipt schema 和 domain transition spec/table。generic scheduler、generic queue、generic attempt ledger、generic workspace/source intake shell、generic artifact gallery、generic memory locator、generic observability 与通用 App/workbench runtime 都归 OPL 或未来产品壳，不在 RCA 内重建。
+RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、product domain_action_adapter、service-safe domain entry、projection builder、review/export gate、artifact locator、receipt schema 和 domain transition spec/table。generic scheduler、generic queue、generic attempt ledger、generic workspace/source intake shell、generic artifact gallery、generic memory locator、generic observability 与通用 App/workbench runtime 都归 OPL 或未来产品壳，不在 RCA 内重建。
 
 当前 formal-entry matrix：
 
@@ -99,7 +99,7 @@ RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、prod
 
 - 保持同一 RCA-owned domain entry、route truth、review/export gate 和 artifact authority
 - 只读取 projection、artifact refs、review state、attention item 和 receipt refs
-- framework-level 动作回到 OPL provider；domain-level 动作回到 RCA product entry / sidecar / direct skill
+- framework-level 动作回到 OPL provider；domain-level 动作回到 RCA product entry / domain_action_adapter / direct skill
 
 迁移后不改变的内容：
 

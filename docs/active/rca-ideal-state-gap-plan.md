@@ -16,8 +16,8 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | --- | --- | --- |
 | 功能/结构差距 | `functional_structure_gap_count=0` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
 | 生产证据 | `evidence_gap` | 仍需真实 artifact-producing owner receipt、memory/lifecycle receipt scaleout、Temporal controlled visual-stage long soak 与 cross-family repeated no-regression。 |
-| 命名/合同卫生 | `active_hygiene_tail` | `managed`、`gateway`、`runtime`、`session`、`sidecar` 等历史词只能按 semantic-id、tombstone、refs-only adapter、domain handler target 或 package/protocol boundary 读取。 |
-| 物理源码形态 | `active_hygiene_tail` | repo-local session / sidecar / watch / operator projection / executor record adapter 仍可见，但只能作为 refs-only adapter、domain handler target、native helper implementation 或迁移输入。 |
+| 命名/合同卫生 | `active_hygiene_tail` | `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter` 等历史词只能按 semantic-id、tombstone、refs-only adapter、domain handler target 或 package/protocol boundary 读取。 |
+| 物理源码形态 | `active_hygiene_tail` | repo-local session / domain_action_adapter / watch / operator projection / executor record adapter 仍可见，但只能作为 refs-only adapter、domain handler target、native helper implementation 或迁移输入。 |
 
 这些状态不能互相升级：结构闭合不等于 visual ready、exportable、handoffable，也不等于 production visual-stage long soak 完成。
 
@@ -44,7 +44,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Standard OPL Agent structure | done | `agent/`、`contracts/stage_control_plane.json`、`contracts/pack_compiler_input.json`、`contracts/runtime-program/current-program.index.json` |
 | Generic private runtime cleanup | done | `docs/status.md`、`docs/decisions.md`、`privatized_functional_module_audit` machine surface |
 | RCA retained authority surfaces | done | `authority_surface_id` contracts、production acceptance surface、product-entry manifest |
-| Direct / hosted boundary | done structurally | product-entry manifest、family action catalog、product sidecar export/dispatch、stage control projection |
+| Direct / hosted boundary | done structurally | product-entry manifest、family action catalog、product domain_action_adapter export/dispatch、stage control projection |
 | Current-program source shape | done | `contracts/runtime-program/current-program.index.json` 与 `contracts/runtime-program/current-program-parts/**` |
 
 已闭合为标准 OPL consumer 口径的 8 项：
@@ -70,7 +70,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 
 - 新增或恢复 RCA-owned generic scheduler、runner、attempt ledger、session/workbench shell、artifact gallery/handoff shell、review/repair transport、workspace/source shell、observability/SLO、generic native-helper envelope 或 generated wrapper owner。
 - retained authority surface 缺少接口、active caller、不能上收原因、receipt/blocker/ref 输出边界或 no-forbidden-write 证据。
-- 旧 `managed`、`gateway`、`runtime`、`session`、`sidecar`、retired public entry、federation、bridge 或 Hermes-first 口径重新成为 active public entry、callable alias、compatibility facade 或 generic owner。
+- 旧 `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter`、retired public entry、federation、bridge 或 Hermes-first 口径重新成为 active public entry、callable alias、compatibility facade 或 generic owner。
 - 测试重新保护旧 public path 可调用性，而不是 current contract、no-resurrection guard、fail-closed negative input、owner receipt、typed blocker 或 tombstone semantics。
 
 ## 测试/证据差距
@@ -96,8 +96,8 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 | Surface | 当前角色 | 退役门 |
 | --- | --- | --- |
 | `getProductEntrySession` / session continuity refs | entry-session domain snapshot refs adapter | OPL generated session shell 成为 default caller，RCA 仅返回 visual/domain snapshot refs。 |
-| direct `runtimeWatch` | direct review/progress refs-only read model | OPL App/workbench live route parity 后收薄为 domain ref provider；不恢复 sidecar default dispatch。 |
-| product sidecar export/dispatch | domain sidecar target、guarded visual authority action adapter | OPL generated sidecar wrapper default 化后，只保留 guarded domain action handlers。 |
+| direct `runtimeWatch` | direct review/progress refs-only read model | OPL App/workbench live route parity 后收薄为 domain ref provider；不恢复 domain_action_adapter default dispatch。 |
+| product domain_action_adapter export/dispatch | domain domain_action_adapter target、guarded visual authority action adapter | OPL generated domain_action_adapter wrapper default 化后，只保留 guarded domain action handlers。 |
 | operator evidence / stability / efficiency projections | refs-only read model 和 migration input | OPL App/workbench/observability shell 稳定后，RCA 只输出 owner receipt、typed blocker、artifact/memory evidence refs。 |
 | executor route-run record adapter | route-level executor policy、receipt refs 与 route-run record materialization | OPL Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 成为 default caller。 |
 | legacy historical strings | semantic-id、tombstone/provenance、negative input、refs-only read model、domain handler target 或 package/protocol boundary | provenance consumer 迁出后 rename/delete/tombstone；不新增 public entry、alias、facade 或 compatibility command。 |
@@ -105,7 +105,7 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 不能直接删除的 explicit remainder：
 
 - `contracts/runtime-program/managed-product-entry-hardening.json` 是 tombstone-only / semantic-id provenance surface，仍被 runtime-program provenance、session continuity legacy refs 和 morphology policy 消费。
-- `product_sidecar_dispatch.product_entry_continuation`、`public_cli_mcp_gateway.get_managed_run`、`product_sidecar_dispatch.runtime_watch` 与 retired managed supervision 字符串只作为 retired legacy surface id、tombstone/provenance ref 或 negative dispatch input 存在。
+- `domain_action_adapter_dispatch.product_entry_continuation`、`public_cli_mcp_gateway.get_managed_run`、`domain_action_adapter_dispatch.runtime_watch` 与 retired managed supervision 字符串只作为 retired legacy surface id、tombstone/provenance ref 或 negative dispatch input 存在。
 - Hermes-Agent loop bridge / API client 仍是显式 opt-in proof backend、executor routing schema、runtime-protocol client 与 Python helper catalog target；它不是默认 runtime owner。
 
 详细 active caller、分类和退役门读 [RCA 私有实现与 OPL 迁移台账](./opl-private-implementation-migration-inventory.md)；本文只保留当前状态和顺序。
@@ -119,13 +119,13 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
    扩大真实 visual memory accepted/rejected receipts、workspace receipt inventory、lifecycle receipt、Temporal long soak 和 cross-family repeated no-regression evidence。refs-only projection 只做 accounting，不升级为完成声明。
 
 3. `generated_default_caller_thinning`
-   随 OPL generated/default session、sidecar、product-entry、workbench、Agent Executor Adapter、attempt ledger 和 native-helper envelope 成为 live caller，继续收薄 RCA repo-local adapter，只保留 domain handler target、visual authority function、native helper implementation 和 refs-only return shape。
+   随 OPL generated/default session、domain_action_adapter、product-entry、workbench、Agent Executor Adapter、attempt ledger 和 native-helper envelope 成为 live caller，继续收薄 RCA repo-local adapter，只保留 domain handler target、visual authority function、native helper implementation 和 refs-only return shape。
 
 4. `naming_contract_hygiene`
-   将历史 `managed`、generic session store、gateway/runtime/sidecar 读者可见语义继续降到 provenance / semantic-id / tombstone。任何改名必须先确认 active caller、runtime-program pointer、test contract 和 no-compatibility-alias policy。
+   将历史 `managed`、generic session store、gateway/runtime/domain_action_adapter 读者可见语义继续降到 provenance / semantic-id / tombstone。任何改名必须先确认 active caller、runtime-program pointer、test contract 和 no-compatibility-alias policy。
 
 5. `compatibility_free_retirement`
-   active caller 迁出后直接删除旧 CLI/MCP alias、product wrapper、gateway/runtime facade、sidecar compatibility path 和只保护旧 public path 的测试；保留的测试只断言 current contract、fail-closed negative input、owner receipt、typed blocker、semantic-id tombstone 或 no-forbidden-write proof。
+   active caller 迁出后直接删除旧 CLI/MCP alias、product wrapper、gateway/runtime facade、domain_action_adapter compatibility path 和只保护旧 public path 的测试；保留的测试只断言 current contract、fail-closed negative input、owner receipt、typed blocker、semantic-id tombstone 或 no-forbidden-write proof。
 
 ## 完成门槛
 

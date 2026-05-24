@@ -10,25 +10,25 @@
     "domain_action_handlers",
     "safe_action_refs"
   ],
-  "rca_scope": "product_sidecar_status_action_metadata_projection",
+  "rca_scope": "domain_action_adapter_status_action_metadata_projection",
   "audit_readout": "retain_thin_projection_project_generated_wrappers",
   "codePaths": [
     "apps/redcube-cli/src/cli.ts",
     "apps/redcube-mcp/src/server.ts",
-    "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
+    "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
   ],
   "activeCallers": [
     "OPL generated CLI/MCP wrapper domain handler targets",
     "redcube CLI direct diagnostic entry",
     "redcube MCP direct protocol adapter",
     "family action catalog refs",
-    "product sidecar guarded action list refs"
+    "product domain_action_adapter guarded action list refs"
   ],
   "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
   "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
   "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-  "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+  "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
   "tombstone_required": false,
   "migration_class": "domain_handler_target",
   "active_reader_facing_classification": "domain_handler_target",

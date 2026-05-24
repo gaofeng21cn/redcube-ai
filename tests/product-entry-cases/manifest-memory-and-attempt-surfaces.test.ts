@@ -127,16 +127,16 @@ test('product entry manifest keeps memory and controlled attempt surfaces refs-o
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_accept_or_reject_memory_writeback, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_issue_review_or_export_verdict, false);
     assert.equal(manifest.domain_memory_descriptor_locator.authority_boundary.opl_can_mutate_canonical_artifacts, false);
-    assert.equal(manifest.product_sidecar_receipt_refs.receipt_contract_id, 'rca.product_sidecar.receipt_refs.v1');
-    assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
-    assert.equal(manifest.product_sidecar_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
+    assert.equal(manifest.domain_action_adapter_receipt_refs.receipt_contract_id, 'rca.domain_action_adapter.receipt_refs.v1');
+    assert.equal(manifest.domain_action_adapter_receipt_refs.forbidden_receipt_fields.includes('visual_verdict'), true);
+    assert.equal(manifest.domain_action_adapter_receipt_refs.forbidden_receipt_fields.includes('artifact_blob'), true);
     assert.equal(manifest.controlled_visual_stage_attempt.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
     assert.equal(manifest.controlled_visual_stage_attempt.status, 'descriptor_proof_contract_landed_runtime_writeback_pending');
     assert.equal(manifest.controlled_visual_stage_attempt.proof_contract_state, 'landed');
     assert.equal(manifest.controlled_visual_stage_attempt.runtime_writeback_state, 'pending');
     assert.equal(
       manifest.controlled_visual_stage_attempt.proof_model,
-      'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+      'consumed_memory_writeback_receipt_descriptor_domain_action_adapter_quality_ref_equivalence_only',
     );
     assert.equal(
       manifest.controlled_visual_stage_attempt.provider_controlled_proof_id,
@@ -154,8 +154,8 @@ test('product entry manifest keeps memory and controlled attempt surfaces refs-o
       manifest.controlled_visual_stage_attempt.opl_hosted_attempt.descriptor_refs,
     );
     assert.deepEqual(
-      manifest.controlled_visual_stage_attempt.direct_skill_attempt.sidecar_refs,
-      manifest.controlled_visual_stage_attempt.opl_hosted_attempt.sidecar_refs,
+      manifest.controlled_visual_stage_attempt.direct_skill_attempt.domain_action_adapter_refs,
+      manifest.controlled_visual_stage_attempt.opl_hosted_attempt.domain_action_adapter_refs,
     );
     assert.deepEqual(
       manifest.controlled_visual_stage_attempt.direct_skill_attempt.quality_refs,
@@ -167,7 +167,7 @@ test('product entry manifest keeps memory and controlled attempt surfaces refs-o
     );
     assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_descriptor_refs, true);
     assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_consumed_memory_refs, true);
-    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_sidecar_refs, true);
+    assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_domain_action_adapter_refs, true);
     assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.direct_and_opl_share_quality_refs, true);
     assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.opl_writes_visual_truth, false);
     assert.equal(manifest.controlled_visual_stage_attempt.equivalence_proof.opl_writes_review_export_verdict, false);

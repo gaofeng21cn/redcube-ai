@@ -2,7 +2,7 @@
 import {
   SERIAL_ENV_TEST,
   assert,
-  exportProductSidecar,
+  exportDomainActionAdapter,
   getProductEntryManifest,
   prepareProductEntryWorkspace,
   test,
@@ -49,7 +49,7 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     assert.equal(gatesById.stage_descriptor_handoff.status, 'ready');
     assert.equal(gatesById.stage_descriptor_handoff.rca_surface_ref, '/family_stage_control_plane');
     assert.equal(gatesById.queue_wakeup_handoff.status, 'ready');
-    assert.deepEqual(gatesById.queue_wakeup_handoff.required_sidecar_actions, [
+    assert.deepEqual(gatesById.queue_wakeup_handoff.required_domain_action_adapter_actions, [
       'emit_no_regression_evidence',
       'emit_domain_owner_receipt',
       'emit_workspace_receipt_proof',
@@ -57,7 +57,7 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     assert.equal(gatesById.progress_requery.status, 'ready');
     assert.equal(gatesById.progress_requery.owner, 'one-person-lab');
     assert.equal(gatesById.progress_requery.projection_target, 'opl_status_workbench_runtime_read_model');
-    assert.equal(gatesById.progress_requery.sidecar_dispatch_action_required, false);
+    assert.equal(gatesById.progress_requery.domain_action_adapter_dispatch_action_required, false);
     assert.equal(gatesById.restart_resume_recovery.status, 'contract_ready_live_evidence_pending');
     assert.equal(gatesById.retry_dead_letter_repair.status, 'contract_ready_live_evidence_pending');
     assert.equal(gatesById.domain_closeout_receipts.status, 'ready');
@@ -76,24 +76,24 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     assert.equal(readiness.authority_boundary.provider_completion_is_visual_ready, false);
     assert.equal(readiness.authority_boundary.provider_completion_is_production_soak_complete, false);
 
-    const sidecar = await exportProductSidecar({ workspace_root: workspaceRoot });
+    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
     assert.equal(
-      sidecar.mapped_surfaces.temporal_autonomy_readiness.ref,
+      domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.ref,
       '/temporal_autonomy_readiness',
     );
     assert.equal(
-      sidecar.mapped_surfaces.temporal_autonomy_readiness.status,
+      domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.status,
       'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending',
     );
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.provider_owner, 'one-person-lab');
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.can_be_opl_temporal_hosted, true);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.default_opl_temporal_hosted_autonomy_enabled, true);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.codex_app_outer_loop_required_after_task_start, false);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.long_time_autonomy_claimed, true);
-    assert.equal(sidecar.mapped_surfaces.temporal_autonomy_readiness.production_visual_stage_long_soak_complete, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.provider_owner, 'one-person-lab');
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.can_be_opl_temporal_hosted, true);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.default_opl_temporal_hosted_autonomy_enabled, true);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.task_start_handoff_is_persistent_opl_temporal_scheduling, true);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.codex_app_outer_loop_required_after_task_start, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.long_time_autonomy_claimed, true);
+    assert.equal(domain_action_adapter.mapped_surfaces.temporal_autonomy_readiness.production_visual_stage_long_soak_complete, false);
     assert.equal(
-      sidecar.source_manifest_refs.temporal_autonomy_readiness_ref,
+      domain_action_adapter.source_manifest_refs.temporal_autonomy_readiness_ref,
       '/temporal_autonomy_readiness',
     );
   });

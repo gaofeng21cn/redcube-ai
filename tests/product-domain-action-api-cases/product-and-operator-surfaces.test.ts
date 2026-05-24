@@ -53,9 +53,9 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
       }),
     },
   );
-  const sidecarReceipt = await callDomainTool(
+  const domain_action_adapterReceipt = await callDomainTool(
     'redcube_product_entry',
-    withAction('dispatch_product_sidecar', {
+    withAction('dispatch_domain_action_adapter', {
       task: {
         action: 'notification_receipt',
         workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
@@ -63,11 +63,11 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
       },
     }),
     {
-      dispatchProductSidecar: async (request) => ({
+      dispatchDomainActionAdapter: async (request) => ({
         ok: true,
-        surface_kind: 'product_sidecar_dispatch',
+        surface_kind: 'domain_action_adapter_dispatch',
         action: request.task.action,
-        sidecar_policy: {
+        domain_action_adapter_policy: {
           writes_visual_truth: false,
         },
         result_surface: {
@@ -159,11 +159,11 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
   assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-  assert.equal(sidecarReceipt.surface_kind, 'product_sidecar_dispatch');
-  assert.equal(sidecarReceipt.action, 'notification_receipt');
-  assert.equal(sidecarReceipt.sidecar_policy.writes_visual_truth, false);
-  assert.equal(sidecarReceipt.result_surface.surface_kind, 'notification_receipt');
-  assert.equal(sidecarReceipt.result_surface.notification_id, 'notice-a');
+  assert.equal(domain_action_adapterReceipt.surface_kind, 'domain_action_adapter_dispatch');
+  assert.equal(domain_action_adapterReceipt.action, 'notification_receipt');
+  assert.equal(domain_action_adapterReceipt.domain_action_adapter_policy.writes_visual_truth, false);
+  assert.equal(domain_action_adapterReceipt.result_surface.surface_kind, 'notification_receipt');
+  assert.equal(domain_action_adapterReceipt.result_surface.notification_id, 'notice-a');
   assert.equal(session.surface_kind, 'product_entry_session');
   assert.equal(session.entry_session.entry_session_id, 'session-a');
   assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');

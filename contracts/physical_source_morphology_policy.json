@@ -33,7 +33,7 @@
     "generic_session_runtime_owner",
     "generic_artifact_lifecycle_owner",
     "generic_generated_wrapper_owner",
-    "generic_gateway_runtime_owner"
+    "generic_domain_entry_runtime_owner"
   ],
   "active_surface_classifications": [
     {
@@ -59,7 +59,7 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
@@ -90,9 +90,9 @@
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
@@ -105,15 +105,15 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
       "surface_id": "mcp_product_entry_domain_entry",
       "source_refs": [
         "apps/redcube-mcp/src/server.ts",
-        "packages/redcube-gateway/src/actions/invoke-domain-entry.ts",
-        "packages/redcube-gateway/src/actions/invoke-product-entry.ts"
+        "packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts",
+        "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts"
       ],
       "classification": "service_safe_domain_entry",
       "current_rca_role": "direct_protocol_adapter_domain_handler_target_not_generated_wrapper_owner",
@@ -123,25 +123,6 @@
         "typed_blocker",
         "owner_receipt_refs"
       ],
-      "legacy_name_allowance": {
-        "legacy_terms": [
-          "gateway"
-        ],
-        "allowed_as": [
-          "service_safe_domain_entry",
-          "package_protocol_boundary"
-        ],
-        "rationale": "redcube-gateway source paths are implementation package/protocol boundaries over the RCA domain entry, not public gateway identity.",
-        "compatibility_alias_allowed": false,
-        "callable_alias_allowed": false,
-        "public_identity_allowed": false,
-        "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
-        "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
-        "active_generic_workbench_owner_allowed": false,
-        "active_generic_attempt_ledger_owner_allowed": false
-      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,
@@ -151,7 +132,7 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
@@ -171,12 +152,18 @@
         "owner_receipt_refs",
         "operator_help_projection"
       ],
+      "no_resurrection_gate": {
+        "generic_cli_wrapper_owner_allowed": false,
+        "generic_workbench_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_domain_entry_runtime_owner_allowed": false,
+        "compatibility_alias_allowed": false
+      },
       "legacy_name_allowance": {
         "legacy_terms": [
           "runtime",
-          "gateway",
           "session",
-          "sidecar"
+          "domain_action_adapter"
         ],
         "allowed_as": [
           "service_safe_domain_entry",
@@ -184,23 +171,16 @@
           "refs_only_read_model",
           "package_protocol_boundary"
         ],
-        "rationale": "redcube CLI source paths are direct domain-entry adapter and operator help surfaces; OPL owns generated CLI/workbench/session wrappers.",
+        "rationale": "CLI help and dispatch expose current OPL runtime/session/domain action adapter refs; RCA remains a direct domain entry adapter and cannot own generated wrappers or generic runtime/session shells.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
-      },
-      "no_resurrection_gate": {
-        "generic_cli_wrapper_owner_allowed": false,
-        "generic_workbench_owner_allowed": false,
-        "generic_session_runtime_owner_allowed": false,
-        "generic_gateway_runtime_owner_allowed": false,
-        "compatibility_alias_allowed": false
       },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
@@ -211,41 +191,23 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
-      "surface_id": "redcube_gateway_package_protocol_boundary",
+      "surface_id": "redcube_domain_entry_package_protocol_boundary",
       "source_refs": [
-        "packages/redcube-gateway/package.json",
-        "packages/redcube-gateway/src/index.ts"
+        "packages/redcube-domain-entry/package.json",
+        "packages/redcube-domain-entry/src/index.ts"
       ],
       "classification": "package_protocol_boundary",
-      "current_rca_role": "package_protocol_boundary_for_domain_action_protocol_not_public_gateway_identity",
+      "current_rca_role": "package_protocol_boundary_for_domain_action_protocol_not_public_framework_identity",
       "allowed_outputs": [
         "typed_domain_action_exports",
         "product_entry_protocol_exports",
-        "sidecar_protocol_exports",
+        "domain_action_adapter_protocol_exports",
         "pack_contract_builder_exports"
       ],
-      "legacy_name_allowance": {
-        "legacy_terms": [
-          "gateway"
-        ],
-        "allowed_as": [
-          "package_protocol_boundary"
-        ],
-        "rationale": "@redcube/gateway remains a private package/protocol boundary; public identity and MCP initialization stay redcube-ai.",
-        "compatibility_alias_allowed": false,
-        "callable_alias_allowed": false,
-        "public_identity_allowed": false,
-        "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
-        "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
-        "active_generic_workbench_owner_allowed": false,
-        "active_generic_attempt_ledger_owner_allowed": false
-      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,
@@ -255,17 +217,17 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
-      "surface_id": "product_entry_session_snapshot_refs_adapter",
+      "surface_id": "product_entry_continuity_refs_adapter",
       "source_refs": [
-        "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-        "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+        "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
       ],
       "classification": "refs_only_read_model",
       "current_rca_role": "entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell",
@@ -288,9 +250,9 @@
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
@@ -303,7 +265,7 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
@@ -333,9 +295,9 @@
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
@@ -359,13 +321,13 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
       "surface_id": "runtime_watch_projection",
       "source_refs": [
-        "packages/redcube-gateway/src/actions/run-review-ref-projection.ts"
+        "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts"
       ],
       "classification": "refs_only_read_model",
       "current_rca_role": "run_review_existing_run_locator_refs_only_projection_not_supervisor",
@@ -383,19 +345,19 @@
           "refs_only_read_model",
           "negative_test_guard"
         ],
-        "rationale": "runtimeWatch is a direct review/progress refs read model and remains retired from sidecar default dispatch.",
+        "rationale": "runtimeWatch is a direct review/progress refs read model and remains retired from domain_action_adapter default dispatch.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
       "machine_boundary_refs": [
-        "packages/redcube-gateway/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY"
+        "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY"
       ],
       "no_resurrection_gate": {
         "generic_supervisor_owner_allowed": false,
@@ -413,18 +375,18 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
-      "surface_id": "product_sidecar_guarded_actions",
+      "surface_id": "domain_action_adapter_guarded_actions",
       "source_refs": [
-        "packages/redcube-gateway/src/actions/product-sidecar.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts",
-        "packages/redcube-gateway/src/actions/product-sidecar-parts/"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+        "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/"
       ],
       "classification": "domain_handler_target",
-      "current_rca_role": "guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner",
+      "current_rca_role": "guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner",
       "allowed_outputs": [
         "owner_receipt_refs",
         "typed_blocker",
@@ -432,27 +394,6 @@
         "safe_action_refs",
         "no_regression_evidence_refs"
       ],
-      "legacy_name_allowance": {
-        "legacy_terms": [
-          "sidecar",
-          "gateway"
-        ],
-        "allowed_as": [
-          "domain_handler_target",
-          "refs_only_read_model",
-          "package_protocol_boundary"
-        ],
-        "rationale": "product sidecar code is a guarded RCA domain target consumed by OPL wrappers, not a generic sidecar owner or gateway runtime.",
-        "compatibility_alias_allowed": false,
-        "callable_alias_allowed": false,
-        "public_identity_allowed": false,
-        "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
-        "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
-        "active_generic_workbench_owner_allowed": false,
-        "active_generic_attempt_ledger_owner_allowed": false
-      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,
@@ -462,15 +403,15 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
       "surface_id": "operator_evidence_stability_projection",
       "source_refs": [
-        "packages/redcube-gateway/src/actions/get-product-status.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
-        "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+        "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
       ],
       "classification": "refs_only_read_model",
       "current_rca_role": "operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench",
@@ -480,25 +421,6 @@
         "domain_blocker_meaning_refs",
         "safe_repair_hint_refs"
       ],
-      "legacy_name_allowance": {
-        "legacy_terms": [
-          "gateway"
-        ],
-        "allowed_as": [
-          "refs_only_read_model",
-          "package_protocol_boundary"
-        ],
-        "rationale": "gateway source paths here only host operator evidence refs emitted for OPL/App projection.",
-        "compatibility_alias_allowed": false,
-        "callable_alias_allowed": false,
-        "public_identity_allowed": false,
-        "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
-        "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
-        "active_generic_workbench_owner_allowed": false,
-        "active_generic_attempt_ledger_owner_allowed": false
-      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,
@@ -508,7 +430,7 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
@@ -541,9 +463,9 @@
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
@@ -556,7 +478,7 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     },
     {
@@ -583,26 +505,27 @@
           "managed",
           "runtime",
           "gateway",
-          "session"
+          "session",
+          "domain_action_adapter"
         ],
         "allowed_as": [
           "tombstone_or_provenance",
           "contract_safe_semantic_id",
           "negative_test_guard"
         ],
-        "rationale": "managed/runtime/gateway/session strings are retained only for tombstone read-through, semantic ids, or no-resurrection guards.",
+        "rationale": "legacy control-plane terms are retained only for tombstone read-through, semantic ids, or no-resurrection guards.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
         "active_generic_runtime_owner_allowed": false,
-        "active_generic_gateway_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
         "active_generic_session_runtime_owner_allowed": false,
-        "active_generic_sidecar_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
       "no_resurrection_gate": {
-        "legacy_managed_runtime_gateway_surface_id_allowed": false,
+        "legacy_managed_runtime_domain_entry_surface_id_allowed": false,
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "active_caller_allowed": false
@@ -616,20 +539,20 @@
         "rca_owns_generic_session_runtime": false,
         "rca_owns_generic_artifact_lifecycle": false,
         "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_gateway_runtime": false
+        "rca_owns_generic_domain_entry_runtime": false
       }
     }
   ],
   "legacy_name_policy": {
-    "retired_runtime_gateway_session_sidecar_terms_allowed_only_as": [
-      "tombstone_or_provenance",
+    "retired_control_plane_terms_allowed_only_as": [
+      "machine_contract_ref",
+      "package_protocol_boundary",
+      "service_safe_domain_entry",
       "contract_safe_semantic_id",
+      "tombstone_or_provenance",
       "negative_test_guard",
       "refs_only_read_model",
       "domain_handler_target",
-      "service_safe_domain_entry",
-      "machine_contract_ref",
-      "package_protocol_boundary",
       "minimal_visual_authority_function",
       "visual_native_helper_path",
       "locator_protocol_boundary"
@@ -639,7 +562,7 @@
       "runtime",
       "gateway",
       "session",
-      "sidecar"
+      "domain_action_adapter"
     ],
     "allowed_legacy_name_roles": [
       "machine_contract_ref",
@@ -663,23 +586,23 @@
       "callable_alias_allowed",
       "public_identity_allowed",
       "active_generic_runtime_owner_allowed",
-      "active_generic_gateway_owner_allowed",
+      "active_generic_domain_entry_owner_allowed",
       "active_generic_session_runtime_owner_allowed",
-      "active_generic_sidecar_owner_allowed",
+      "active_generic_domain_action_adapter_owner_allowed",
       "active_generic_workbench_owner_allowed",
       "active_generic_attempt_ledger_owner_allowed"
     ],
     "package_protocol_boundary_policy": {
-      "package_name": "@redcube/gateway",
+      "package_name": "@redcube/domain-entry",
       "allowed_as": "package_protocol_boundary",
       "public_identity": "redcube-ai",
-      "public_gateway_identity_allowed": false,
-      "generic_gateway_runtime_owner_allowed": false,
+      "public_framework_identity_allowed": false,
+      "generic_domain_entry_runtime_owner_allowed": false,
       "compatibility_alias_allowed": false
     },
     "compatibility_alias_allowed": false,
     "active_generic_runtime_owner_allowed": false,
-    "active_generic_gateway_owner_allowed": false,
+    "active_generic_domain_entry_owner_allowed": false,
     "active_generic_session_runtime_owner_allowed": false
   },
   "new_surface_admission_gate": {
@@ -702,7 +625,7 @@
       "generic_session_runtime_owner",
       "generic_artifact_lifecycle_owner",
       "generic_generated_wrapper_owner",
-      "generic_gateway_runtime_owner"
+      "generic_domain_entry_runtime_owner"
     ],
     "reopen_gap_if_forbidden_owner_role_appears": true
   }

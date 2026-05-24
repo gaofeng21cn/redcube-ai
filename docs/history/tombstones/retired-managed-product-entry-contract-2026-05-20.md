@@ -21,4 +21,4 @@ Machine boundary: 人读 tombstone。机器真相继续归 `contracts/runtime-pr
 
 退役读法：
 
-旧 `managed` 命名只允许作为 provenance、semantic-id 或 tombstone 出现。它不得恢复为 active caller、public action key、default runtime owner、sidecar template、compatibility alias、facade 或 wrapper。RCA 继续持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject authority 和 owner receipt；OPL 持有 generic stage runtime / attempt ledger / queue / wakeup shell。
+旧 `managed` 命名只允许作为 provenance、semantic-id 或 tombstone 出现。它不得恢复为 active caller、public action key、default runtime owner、domain_action_adapter template、compatibility alias、facade 或 wrapper。RCA 继续持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject authority 和 owner receipt；OPL 持有 generic stage runtime / attempt ledger / queue / wakeup shell。

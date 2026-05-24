@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 import {
   researchSource,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

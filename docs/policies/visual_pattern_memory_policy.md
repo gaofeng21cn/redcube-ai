@@ -90,7 +90,7 @@ Now:
 - keep this policy as the RCA memory owner reference;
 - preserve image-first / HTML / native route contracts as structured route truth;
 - keep `rca.visual_pattern_memory.migration_plan.v1`, `rca.visual_pattern_memory.seed_fixture_locator.v1`, `rca.visual_pattern_memory.writeback_proposal_generator.v1`, `rca.visual_pattern_memory.accept_reject.v1`, `rca.visual_pattern_memory.writeback_receipt_locator.v1`, and `rca.visual_pattern_memory.operator_receipt_projection.v1` as repo-source contract surfaces for migration, RCA decision, and operator-visible receipt projection;
-- use `rca.controlled_visual_stage_attempt.fixture.v1` as a descriptor/sidecar/quality-ref proof that direct RedCube skill calls and OPL-hosted stage attempts converge on the same RCA-owned review/revision/export refs;
+- use `rca.controlled_visual_stage_attempt.fixture.v1` as a descriptor/domain_action_adapter/quality-ref proof that direct RedCube skill calls and OPL-hosted stage attempts converge on the same RCA-owned review/revision/export refs;
 - expose the standard top-level `domain_memory_descriptor` / `family-domain-memory-ref.v1` projection from the same RCA-owned descriptor locator, so OPL can index RCA visual pattern memory refs without owning memory content;
 - record reusable visual lessons as prose in future review/export closeouts, runtime/domain-memory roots, or reference docs.
 

@@ -62,9 +62,9 @@ test('listTopics returns topic metadata from canonical workspace tree', async ()
   assert.equal(result.topics[0].status, 'draft');
 });
 
-test('@redcube/gateway manifest declares runtime-protocol without sibling file dependency', () => {
+test('@redcube/domain-entry manifest declares runtime-protocol without sibling file dependency', () => {
   const packageJson = JSON.parse(
-    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+    readFileSync(path.resolve('packages/redcube-domain-entry/package.json'), 'utf-8'),
   );
   const runtimeProtocolPackageJson = JSON.parse(
     readFileSync(path.resolve('packages/redcube-runtime-protocol/package.json'), 'utf-8'),

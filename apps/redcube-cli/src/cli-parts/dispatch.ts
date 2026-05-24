@@ -9,7 +9,7 @@ import {
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
-  getRun as getGatewayRun,
+  getRun as getDomainEntryRun,
   invokeDomainEntry,
   invokeProductEntry,
   getProductStatus,
@@ -24,10 +24,10 @@ import {
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
   executeSourceAugmentation,
-  listTopics as listTopicsGateway,
+  listTopics as listTopicsDomainEntry,
   runtimeWatch,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 
 import { buildCommandHelp, buildHelp } from './help.js';
 import { buildCliJsonSummary } from './json-summary.js';
@@ -45,7 +45,7 @@ const DEFAULT_DOMAIN_ACTIONS = {
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
-  getRun: getGatewayRun,
+  getRun: getDomainEntryRun,
   invokeDomainEntry,
   invokeProductEntry,
   getProductStatus,
@@ -53,17 +53,17 @@ const DEFAULT_DOMAIN_ACTIONS = {
   getProductStart,
   getProductPreflight,
   getProductEntrySession,
-  exportProductSidecar: async (request: Record<string, unknown>) => {
-    const gateway = await import('@redcube/gateway');
-    return (gateway as Record<string, any>).exportProductSidecar(request);
+  exportDomainActionAdapter: async (request: Record<string, unknown>) => {
+    const domainEntry = await import('@redcube/domain-entry');
+    return (domainEntry as Record<string, any>).exportDomainActionAdapter(request);
   },
-  dispatchProductSidecar: async (request: Record<string, unknown>) => {
-    const gateway = await import('@redcube/gateway');
-    return (gateway as Record<string, any>).dispatchProductSidecar(request);
+  dispatchDomainActionAdapter: async (request: Record<string, unknown>) => {
+    const domainEntry = await import('@redcube/domain-entry');
+    return (domainEntry as Record<string, any>).dispatchDomainActionAdapter(request);
   },
   runNativePptProductEntryProof: async (request: Record<string, unknown>) => {
-    const gateway = await import('@redcube/gateway');
-    return (gateway as Record<string, any>).runNativePptProductEntryProof(request);
+    const domainEntry = await import('@redcube/domain-entry');
+    return (domainEntry as Record<string, any>).runNativePptProductEntryProof(request);
   },
   buildPerformanceReport,
   intakeSource,
@@ -72,7 +72,7 @@ const DEFAULT_DOMAIN_ACTIONS = {
   prepareSourceAugmentationResult,
   writeSourceAugmentationResult,
   executeSourceAugmentation,
-  listTopics: listTopicsGateway,
+  listTopics: listTopicsDomainEntry,
   runtimeWatch,
   runDeliverableRoute,
 };
@@ -155,17 +155,17 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   const [command, ...rest] = argv;
   const subcommand = rest[0];
   const options = parseArgs(rest);
-  const gateway = getCliDomainActions(deps.domainActions || {});
+  const domainEntry = getCliDomainActions(deps.domainActions || {});
   const cwd = deps.cwd || process.cwd;
   const loadPrivateProfile = deps.loadPrivateProfileModule || loadPrivateProfileModule;
 
   if (!command || command === 'help' || command === '--help') {
-    return buildHelp(gateway);
+    return buildHelp(domainEntry);
   }
 
   if (options.help === true) {
     const commandHelp = buildCommandHelp(
-      command === 'product' && subcommand === 'sidecar'
+      command === 'product' && subcommand === 'domain_action_adapter'
         ? [command, subcommand, rest[1]].filter(Boolean).join(' ')
         : [command, subcommand].filter(Boolean).join(' '),
     );
@@ -179,7 +179,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       throw new Error('workspace 命令仅支持 doctor');
     }
 
-    return gateway.doctorWorkspace({
+    return domainEntry.doctorWorkspace({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
     });
   }
@@ -189,14 +189,14 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       throw new Error('topics 命令仅支持 list');
     }
 
-    return gateway.listTopics({
+    return domainEntry.listTopics({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
     });
   }
 
   if (command === 'source') {
     if (subcommand === 'intake') {
-      return gateway.intakeSource({
+      return domainEntry.intakeSource({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         title: options.title || '',
@@ -208,7 +208,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'research') {
-      return gateway.researchSource({
+      return domainEntry.researchSource({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         title: options.title || '',
@@ -221,7 +221,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'augment') {
-      return gateway.prepareSourceAugmentation({
+      return domainEntry.prepareSourceAugmentation({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         title: options.title || '',
@@ -229,14 +229,14 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'prepare-augmentation-result') {
-      return gateway.prepareSourceAugmentationResult({
+      return domainEntry.prepareSourceAugmentationResult({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
       });
     }
 
     if (subcommand === 'write-augmentation-result') {
-      return gateway.writeSourceAugmentationResult({
+      return domainEntry.writeSourceAugmentationResult({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         inputFile: options.inputFile || '',
@@ -245,7 +245,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'execute-augmentation') {
-      return gateway.executeSourceAugmentation({
+      return domainEntry.executeSourceAugmentation({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
       });
@@ -256,7 +256,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'deliverable') {
     if (subcommand === 'create') {
-      return gateway.createDeliverable({
+      return domainEntry.createDeliverable({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         profileId: options.profileId || '',
@@ -268,7 +268,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'get') {
-      return gateway.getDeliverable({
+      return domainEntry.getDeliverable({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
@@ -276,7 +276,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'audit') {
-      return gateway.auditDeliverable({
+      return domainEntry.auditDeliverable({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         topicId: options.topicId || '',
@@ -287,7 +287,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'run') {
-      return gateway.runDeliverableRoute({
+      return domainEntry.runDeliverableRoute({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         overlay: options.overlay || '',
         topicId: options.topicId || '',
@@ -298,7 +298,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'execute') {
-      return gateway.invokeDomainEntry({
+      return domainEntry.invokeDomainEntry({
         target_domain_id: 'redcube_ai',
         task_intent: 'run_opl_stage_execution_plan',
         entry_mode: 'service_call',
@@ -330,23 +330,23 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'product') {
     if (subcommand === 'status') {
-      return gateway.getProductStatus(productReadRequest(options, cwd));
+      return domainEntry.getProductStatus(productReadRequest(options, cwd));
     }
 
     if (subcommand === 'start') {
-      return gateway.getProductStart({
+      return domainEntry.getProductStart({
         workspace_root: resolveWorkspaceRoot(options, cwd),
       });
     }
 
     if (subcommand === 'preflight') {
-      return gateway.getProductPreflight({
+      return domainEntry.getProductPreflight({
         workspace_root: resolveWorkspaceRoot(options, cwd),
       });
     }
 
     if (subcommand === 'invoke') {
-      return gateway.invokeProductEntry({
+      return domainEntry.invokeProductEntry({
         workspace_locator: {
           workspace_root: resolveWorkspaceRoot(options, cwd),
         },
@@ -380,38 +380,38 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       if (scaleoutRoots.length > 0) {
         request.workspace_receipt_scaleout_roots = scaleoutRoots;
       }
-      return gateway.getProductEntrySession(request);
+      return domainEntry.getProductEntrySession(request);
     }
 
     if (subcommand === 'manifest') {
-      return gateway.getProductEntryManifest(productReadRequest(options, cwd));
+      return domainEntry.getProductEntryManifest(productReadRequest(options, cwd));
     }
 
-    if (subcommand === 'sidecar') {
-      const sidecarAction = rest[1];
-      if (sidecarAction === 'export') {
-        return gateway.exportProductSidecar({
+    if (subcommand === 'domain_action_adapter') {
+      const domain_action_adapterAction = rest[1];
+      if (domain_action_adapterAction === 'export') {
+        return domainEntry.exportDomainActionAdapter({
           ...productReadRequest(options, cwd),
           format: options.format || 'json',
         });
       }
 
-      if (sidecarAction === 'dispatch') {
-        return gateway.dispatchProductSidecar({
+      if (domain_action_adapterAction === 'dispatch') {
+        return domainEntry.dispatchDomainActionAdapter({
           task_file: options.task || options.taskFile || '',
           format: options.format || 'json',
         });
       }
 
-      throw new Error('product sidecar 命令仅支持 export|dispatch');
+      throw new Error('product domain_action_adapter 命令仅支持 export|dispatch');
     }
 
-    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|sidecar；OPL-hosted stage runtime handoff 由 product sidecar 或 framework caller 调用');
+    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|domain_action_adapter；OPL-hosted stage runtime handoff 由 product domain_action_adapter 或 framework caller 调用');
   }
 
   if (command === 'native-ppt') {
     if (subcommand === 'proof') {
-      return gateway.runNativePptProductEntryProof({
+      return domainEntry.runNativePptProductEntryProof({
         workspace_root: resolveWorkspaceRoot(options, cwd),
         entry_session_id: options.entrySessionId || '',
         topic_id: options.topicId || '',
@@ -436,7 +436,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'review') {
     if (subcommand === 'get') {
-      return gateway.getReviewState({
+      return domainEntry.getReviewState({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
@@ -444,14 +444,14 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'projection') {
-      return gateway.getPublicationProjection({
+      return domainEntry.getPublicationProjection({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
       });
     }
 
     if (subcommand === 'watch') {
-      return gateway.runtimeWatch({
+      return domainEntry.runtimeWatch({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
@@ -461,7 +461,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
-      return gateway.applyReviewMutation({
+      return domainEntry.applyReviewMutation({
         workspaceRoot: resolveWorkspaceRoot(options, cwd),
         topicId: options.topicId || '',
         deliverableId: options.deliverableId || '',
@@ -485,7 +485,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       throw new Error('runs 命令仅支持 get');
     }
 
-    return gateway.getRun({
+    return domainEntry.getRun({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
       runId: options.runId || '',
     });
@@ -496,7 +496,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       throw new Error('report 命令仅支持 performance');
     }
 
-    return gateway.buildPerformanceReport({
+    return domainEntry.buildPerformanceReport({
       workspaceRoot: resolveWorkspaceRoot(options, cwd),
       topicId: options.topicId || null,
       deliverableId: options.deliverableId || null,
@@ -505,7 +505,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'profile') {
     if (options.action === 'list') {
-      return gateway.getOverlayCatalog();
+      return domainEntry.getOverlayCatalog();
     }
 
     if (options.action === 'bootstrap') {

@@ -1,1 +1,1 @@
-export * from '@redcube/gateway';
+export * from '@redcube/domain-entry';

@@ -17,8 +17,8 @@ import {
   getProductStatus,
   getProductStart,
   getProductPreflight,
-  exportProductSidecar,
-  dispatchProductSidecar,
+  exportDomainActionAdapter,
+  dispatchDomainActionAdapter,
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
@@ -34,7 +34,7 @@ import {
   runDeliverableRoute,
   runtimeWatch,
   buildRedCubeActionMetadata,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 import * as z from 'zod/v4';
 
 type DomainActionMap = Record<string, ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>)>;
@@ -52,8 +52,8 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   getProductStatus,
   getProductStart,
   getProductPreflight,
-  exportProductSidecar,
-  dispatchProductSidecar,
+  exportDomainActionAdapter,
+  dispatchDomainActionAdapter,
   createDeliverable,
   getDeliverable,
   getPublicationProjection,
@@ -245,7 +245,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_product_entry',
     description: MCP_TOOL_METADATA.get('redcube_product_entry')?.description
-      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, sidecar, and domain-entry actions.',
+      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, domain_action_adapter, and domain-entry actions.',
     action_catalog_projection: getMcpToolProjection('redcube_product_entry'),
     inputSchema: {
       action: ACTION_STRING,

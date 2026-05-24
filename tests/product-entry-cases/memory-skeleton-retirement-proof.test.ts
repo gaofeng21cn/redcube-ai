@@ -162,7 +162,7 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     assert.equal(transitionSpec.runner_boundary.opl_can_declare_visual_ready, false);
     assert.equal(transitionSpec.runner_boundary.opl_can_mutate_artifacts, false);
     assert.equal(transitionSpec.evaluator_descriptor.descriptor_id, 'rca.visual_transition_evaluator.v1');
-    assert.equal(transitionSpec.evaluator_descriptor.sidecar_action, 'evaluate_visual_transition');
+    assert.equal(transitionSpec.evaluator_descriptor.domain_action_adapter_action, 'evaluate_visual_transition');
     assert.equal(transitionSpec.family_transition_spec_descriptor.rca_implements_opl_generic_runner, false);
     assert.equal(transitionSpec.runner_boundary.rca_can_evaluate_guard_refs, true);
     assert.equal(transitionSpec.runner_boundary.rca_implements_generic_transition_runner, false);

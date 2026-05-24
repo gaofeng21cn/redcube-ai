@@ -2017,7 +2017,7 @@
       "allowed_action_refs": [
         "get_product_entry_session",
         "get_product_entry_manifest",
-        "export_product_sidecar"
+        "export_domain_action_adapter"
       ],
       "requires": [
         "visual_review_gate_receipt_recorded"
@@ -2133,7 +2133,7 @@
         "allowed_action_refs": [
           "get_product_entry_session",
           "get_product_entry_manifest",
-          "export_product_sidecar"
+          "export_domain_action_adapter"
         ],
         "missing_action_refs": []
       },
@@ -2284,7 +2284,7 @@
             "ref": [
               "get_product_entry_session",
               "get_product_entry_manifest",
-              "export_product_sidecar"
+              "export_domain_action_adapter"
             ],
             "role": "rca_guarded_action_trigger_candidates"
           }

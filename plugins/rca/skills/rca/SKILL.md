@@ -10,7 +10,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 ## 这个 plugin 是什么
 
 - `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
-- 消费 OPL generated descriptors；CLI/MCP/Skill/product/status/session/sidecar/workbench metadata 的统一 owner 是 `one-person-lab`
+- 消费 OPL generated descriptors；CLI/MCP/Skill/product/status/session/domain_action_adapter/workbench metadata 的统一 owner 是 `one-person-lab`
 - repo-local `redcube` CLI / `redcube-mcp` / product-entry API 只是 RCA domain handler target 或 direct domain entry，不是 generated surface owner、generic runner、generic session shell 或通用 workbench owner
 
 ## Agent 语言面
@@ -33,7 +33,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 `redcube product status` 是当前 product overview 命令；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
 
-默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；OPL-hosted handoff 通过 `invokeOplHostedProductEntry` / product sidecar 进入同一 downstream RedCube product-entry contract，不作为第二个公开 skill。
+默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；OPL-hosted handoff 通过 `invokeOplHostedProductEntry` / product domain_action_adapter 进入同一 downstream RedCube product-entry contract，不作为第二个公开 skill。
 
 默认交付运行方式：
 
@@ -56,7 +56,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - `author_image_pages` 是默认视觉实现路线，通过 Responses `image_generation` 生成完整 16:9 PPT 页面 PNG；HTML routes 与 native editable PPTX routes 只能作为显式选择路线，不能替代默认 `author_image_pages -> screenshot_review -> export_pptx`。
 - `author_image_pages` 可复用同 key 的 image artifact cache；真实 image generation 只在 cache miss、显式重绘或 blocked-slide repair target 时发生，artifact 不记录 token。
-- `screenshot_review` 必须消费 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR sidecar 检查；缺关键 artifact 或 hard-block 视觉 QA 时 fail-closed。
+- `screenshot_review` 必须消费 PNG 与 prompt/style/image manifest，并执行 16:9、非空、重复、低信息密度、裁切、碎片化、字段泄漏与可选 OCR domain_action_adapter 检查；缺关键 artifact 或 hard-block 视觉 QA 时 fail-closed。
 - 截图质控未通过时，必须从明确 stage rerun 或 `repair_image_pages` 回修；`repair_image_pages` 只重绘 blocked slide ids，未阻断页复用并记录 preserved hashes，不能跳过 review gate 直接交付。
 - 用户明确要求 HTML / CSS / 网页时走 `render_html / fix_html`；用户明确要求可编辑 / 原生 PPTX / DrawingML 时走 `author_pptx_native / repair_pptx_native`。
 - `redcube image-ppt proof` 是 repo-owned lightweight proof helper，默认 mock、不调用真实图片 API、不注册第二公开 skill；live image generation 必须显式开启，常规回归不得使用完整“肠癌AI”长 PPT。

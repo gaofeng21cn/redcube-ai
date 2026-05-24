@@ -14,7 +14,7 @@ const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies'
 const LAYER_BY_PACKAGE = new Map([
   ['@redcube/cli', 'app'],
   ['@redcube/mcp', 'app'],
-  ['@redcube/gateway', 'gateway'],
+  ['@redcube/domain-entry', 'domain-entry'],
   ['@redcube/runtime', 'runtime'],
   ['@redcube/runtime-family-registry', 'runtime-family-registry'],
   ['@redcube/runtime-family-ppt', 'runtime-family'],
@@ -36,8 +36,8 @@ const LAYER_BY_PACKAGE = new Map([
 ]);
 
 const ALLOWED_DEPENDENCY_LAYERS = new Map([
-  ['app', new Set(['gateway', 'config'])],
-  ['gateway', new Set(['overlay', 'runtime', 'protocol'])],
+  ['app', new Set(['domain-entry', 'config'])],
+  ['domain-entry', new Set(['overlay', 'runtime', 'protocol'])],
   ['runtime', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'runtime-family-registry', 'protocol', 'substrate'])],
   ['runtime-family-registry', new Set(['runtime-family'])],
   ['runtime-family', new Set(['client', 'config', 'governance', 'overlay', 'pack', 'reference', 'protocol', 'substrate'])],

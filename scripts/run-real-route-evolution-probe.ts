@@ -12,7 +12,7 @@ import {
   createDeliverable,
   invokeProductEntry,
   researchSource,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
 

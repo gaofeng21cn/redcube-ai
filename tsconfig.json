@@ -56,7 +56,7 @@
       "path": "./packages/redcube-runtime"
     },
     {
-      "path": "./packages/redcube-gateway"
+      "path": "./packages/redcube-domain-entry"
     },
     {
       "path": "./apps/redcube-cli"

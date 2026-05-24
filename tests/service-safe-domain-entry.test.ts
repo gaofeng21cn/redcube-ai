@@ -17,13 +17,13 @@ import {
 import { createRequire } from 'node:module';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-const GATEWAY_PACKAGE_JSON = fileURLToPath(
-  new URL('../packages/redcube-gateway/package.json', import.meta.url),
+const DOMAIN_ENTRY_PACKAGE_JSON = fileURLToPath(
+  new URL('../packages/redcube-domain-entry/package.json', import.meta.url),
 );
-const gatewayRequire = createRequire(GATEWAY_PACKAGE_JSON);
+const domainEntryRequire = createRequire(DOMAIN_ENTRY_PACKAGE_JSON);
 
-async function importGatewaySharedModule(moduleSpecifier) {
-  return import(pathToFileURL(gatewayRequire.resolve(moduleSpecifier)).href);
+async function importDomainEntrySharedModule(moduleSpecifier) {
+  return import(pathToFileURL(domainEntryRequire.resolve(moduleSpecifier)).href);
 }
 
 async function withMockCodexRuntime(testFn) {
@@ -65,7 +65,7 @@ async function prepareDomainEntryWorkspace() {
 
 test('invokeDomainEntry returns an OPL stage execution plan under the configured provider contract', async () => {
   await withMockCodexRuntime(async () => {
-    const sharedCompanions = await importGatewaySharedModule('opl-framework-shared/product-entry-companions');
+    const sharedCompanions = await importDomainEntrySharedModule('opl-framework-shared/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     const response = await invokeDomainEntry({

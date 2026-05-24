@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 
 export function assertManifestActionAndStageControlPlane({
   manifest,
-  sidecarGuardedActionMetadata,
+  domain_action_adapterGuardedActionMetadata,
 }) {
   assert.equal(manifest.family_action_catalog.surface_kind, 'family_action_catalog');
   assert.equal(manifest.family_action_catalog.version, 'family-action-catalog.v1');
@@ -16,7 +16,7 @@ export function assertManifestActionAndStageControlPlane({
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
     repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-    product_sidecar_role: 'domain_action_target_or_refs_only_adapter',
+    domain_action_adapter_role: 'domain_action_target_or_refs_only_adapter',
     generic_session_shell_owner: 'one-person-lab',
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
@@ -32,8 +32,8 @@ export function assertManifestActionAndStageControlPlane({
       'invoke_product_entry',
       'get_product_entry_session',
       'get_product_entry_manifest',
-      'export_product_sidecar',
-      'dispatch_product_sidecar',
+      'export_domain_action_adapter',
+      'dispatch_domain_action_adapter',
       'run_image_ppt_proof',
       'run_native_ppt_proof',
       'invoke_domain_entry',
@@ -51,15 +51,15 @@ export function assertManifestActionAndStageControlPlane({
       'redcube native-ppt proof',
     ],
   );
-  const sidecarDispatchAction = manifest.family_action_catalog.actions
-    .find((action) => action.action_id === 'dispatch_product_sidecar');
+  const domain_action_adapterDispatchAction = manifest.family_action_catalog.actions
+    .find((action) => action.action_id === 'dispatch_domain_action_adapter');
   assert.deepEqual(
-    sidecarDispatchAction.authority_boundary.allowed_actions,
-    sidecarGuardedActionMetadata.guardedActionIds,
+    domain_action_adapterDispatchAction.authority_boundary.allowed_actions,
+    domain_action_adapterGuardedActionMetadata.guardedActionIds,
   );
   assert.deepEqual(
-    sidecarDispatchAction.authority_boundary.forbidden_writes,
-    sidecarGuardedActionMetadata.forbiddenWrites,
+    domain_action_adapterDispatchAction.authority_boundary.forbidden_writes,
+    domain_action_adapterGuardedActionMetadata.forbiddenWrites,
   );
   assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');
   assert.equal(manifest.family_action_catalog_parity.status, 'aligned');

@@ -95,7 +95,7 @@
     "review/repair transport shell",
     "native helper execution envelope",
     "operator projection/workbench shell",
-    "generated CLI/MCP/product-entry/sidecar/status wrappers"
+    "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
   ],
   "migration_gates_before_code_retirement": [
     "generated/default caller parity proven for the replacement OPL surface",

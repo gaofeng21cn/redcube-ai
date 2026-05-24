@@ -1,5 +1,5 @@
 {
-  "module_id": "product_entry_session_snapshot_refs_adapter",
+  "module_id": "product_entry_continuity_refs_adapter",
   "surface_ref": "/session_continuity",
   "status": "opl_generated_workbench_session_surface_consumed",
   "classification": "split_owner_boundary",
@@ -13,11 +13,11 @@
   "rca_scope": "product_entry_session_domain_snapshot_refs",
   "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
   "codePaths": [
-    "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-    "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-    "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-    "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-    "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+    "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+    "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+    "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+    "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+    "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
   ],
   "activeCallers": [
     "redcube product session domain snapshot refs",
@@ -43,7 +43,7 @@
     "rca_owns_replacement_runtime": false
   },
   "bridge_exit_gate": {
-    "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
+    "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
     "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
     "bridge_owner": "redcube_ai_migration_bridge",
     "replacement_owner": "opl",
@@ -70,13 +70,13 @@
     "opl_can_issue_owner_receipt": false,
     "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
     "typed_blocker_refs": [
-      "typed-blocker:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/physical-delete-requires-explicit-owner-receipt"
+      "typed-blocker:rca/default-caller-deletion/product_entry_continuity_refs_adapter/physical-delete-requires-explicit-owner-receipt"
     ],
     "no_forbidden_write_refs": [
-      "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+      "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
     ],
     "no_forbidden_write_evidence_refs": [
-      "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+      "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
     ],
     "domain_repo_physical_delete_authorized": false,
     "physical_delete_authorized_by_refs": false
@@ -100,7 +100,7 @@
   },
   "physical_deletion_guard": {
     "safe_to_delete_now": false,
-    "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+    "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
     "required_before_delete": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"

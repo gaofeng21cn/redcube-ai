@@ -11,5 +11,5 @@ NODE_NO_WARNINGS=1 node --experimental-strip-types --test \
   tests/product-entry-cases/domain-memory-ref-adapter.test.ts \
   tests/product-entry-cases/manifest-and-start-surfaces.test.ts \
   tests/product-entry-cases/manifest-status-preflight-surfaces.test.ts \
-  tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts \
-  tests/product-entry-cases/sidecar-receipt-and-workspace-proof.test.ts
+  tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts \
+  tests/product-entry-cases/domain_action_adapter-receipt-and-workspace-proof.test.ts

@@ -1,7 +1,7 @@
 # RedCube AI Runtime Boundary
 
 Owner: RedCube AI
-Purpose: repo-source anchor for runtime descriptors, sidecar projections, and lifecycle adapter contracts.
+Purpose: repo-source anchor for runtime descriptors, domain_action_adapter projections, and lifecycle adapter contracts.
 State: descriptor/index surface only.
 Machine boundary: runtime instances live under `$CODEX_HOME/projects/redcube-ai/runtime-state/` or workspace artifact roots, not in this repository.
 

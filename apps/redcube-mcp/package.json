@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "1.29.0",
-    "@redcube/gateway": "0.1.0",
+    "@redcube/domain-entry": "0.1.0",
     "zod": "4.3.6"
   },
   "license": "Apache-2.0"

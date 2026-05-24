@@ -12,7 +12,7 @@ Machine boundary: 人读历史 plan。当前机器真相继续归 contracts、so
 
 **Historical architecture:** 保留现有 canonical quartet 作为底层真相面，在同一 `topics/<topic>/canonical/` 下新增一个衍生但正式的 `source-readiness-pack.json`。`xiaohongshu research` 从“混入 storyline 判断”的薄 brief，收紧成“基于 shared source truth 的事实库 / readiness artifact”；`storyline` 再从 source truth / readiness pack 中生成受众、why-now、tension、memory hook。这样不需要先让 `ppt_deck` 长出显式 `research` route，也不会破坏现有 shared runtime 主线。
 
-**Historical tech stack:** Node.js ESM、repo 内置 `node:test`、`@redcube/runtime-protocol`、`@redcube/runtime`、`@redcube/gateway`、`xiaohongshu` family runtime/prompts、CLI/文档 surface。
+**Historical tech stack:** Node.js ESM、repo 内置 `node:test`、`@redcube/runtime-protocol`、`@redcube/runtime`、`@redcube/domain-entry`、`xiaohongshu` family runtime/prompts、CLI/文档 surface。
 
 ---
 

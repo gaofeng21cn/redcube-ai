@@ -62,7 +62,7 @@ Forbidden seed fields include memory content bodies, generated slide/page conten
 
 ## Controlled Stage Attempt Proof
 
-`rca.controlled_visual_stage_attempt.fixture.v1` proves the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RedCube skill path and OPL-hosted path share the same descriptor refs, product sidecar refs, and quality refs. OPL consumes those refs for queue/projection/receipt behavior; RCA keeps the visual truth, review/export verdicts, and artifact authority.
+`rca.controlled_visual_stage_attempt.fixture.v1` proves the review/revision/export portion of a visual stage attempt through descriptor refs only. The direct RedCube skill path and OPL-hosted path share the same descriptor refs, product domain_action_adapter refs, and quality refs. OPL consumes those refs for queue/projection/receipt behavior; RCA keeps the visual truth, review/export verdicts, and artifact authority.
 
 `rca.visual_pattern_memory.controlled_apply_proof.v1` is the landed controlled apply proof. It exposes consumed visual pattern memory refs, a locator-only writeback proposal projection, accepted/rejected receipt projection cases, accepted/rejected runtime receipt refs, and a no-forbidden-write audit. It intentionally excludes memory content bodies, slide/page content, review/export verdicts, visual truth, canonical artifact blobs, and receipt instances from repo source.
 

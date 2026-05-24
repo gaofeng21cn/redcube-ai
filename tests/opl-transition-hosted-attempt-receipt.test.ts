@@ -4,8 +4,8 @@ import {
   assert,
   assertReceiptOnlyHostedAttemptProjection,
   buildHostedAttemptBridgeFixture,
-  dispatchProductSidecar,
-  exportProductSidecar,
+  dispatchDomainActionAdapter,
+  exportDomainActionAdapter,
   getProductEntryManifest,
   prepareProductEntryWorkspace,
   reconcileHostedAttemptReceipt,
@@ -17,7 +17,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    const sidecar = await exportProductSidecar({ workspace_root: workspaceRoot });
+    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
     const transitionResult = {
       surface_kind: 'family_transition_result',
       status: 'transition_applied',
@@ -72,7 +72,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     };
     const bridgeFixture = await buildHostedAttemptBridgeFixture({
       visualTransitionSpec: manifest.visual_transition_spec,
-      sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+      domain_action_adapterVisualTransitionSpec: domain_action_adapter.mapped_surfaces.visual_transition_spec,
       transitionResult,
     });
     assert.equal(bridgeFixture.transition_result_ref, 'family_transition_matrix_result:rca.visual_transition_spec.v1:review_ready_to_package');
@@ -81,7 +81,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     assert.equal(bridgeFixture.owner_route_ref, 'rca-visual-transition:review_ready_to_package');
     assert.equal(bridgeFixture.owner_action, 'export_or_return_typed_blocker');
 
-    const domainReceipt = await dispatchProductSidecar({
+    const domainReceipt = await dispatchDomainActionAdapter({
       task: {
         action: 'emit_domain_owner_receipt',
         workspace_root: workspaceRoot,
@@ -96,7 +96,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     const domainProjection = await reconcileHostedAttemptReceipt({
       bridgeFixture,
-      sidecarResult: domainReceipt,
+      domain_action_adapterResult: domainReceipt,
     });
     assert.deepEqual(domainProjection, {
       bridge_kind: 'repo_local_opl_provider_attempt_bridge_fixture',
@@ -110,7 +110,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
       from_stage: 'review_and_revision',
       to_stage: 'package_and_handoff',
       owner_action: 'export_or_return_typed_blocker',
-      sidecar_return_shape: 'domain_receipt',
+      domain_action_adapter_return_shape: 'domain_receipt',
       domain_owner_receipt_ref: 'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
       typed_blocker: null,
       no_regression_evidence_ref: null,
@@ -121,7 +121,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     await assertReceiptOnlyHostedAttemptProjection(domainProjection);
 
-    const blockedReceipt = await dispatchProductSidecar({
+    const blockedReceipt = await dispatchDomainActionAdapter({
       task: {
         action: 'emit_domain_owner_receipt',
         workspace_root: workspaceRoot,
@@ -131,7 +131,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     const blockerProjection = await reconcileHostedAttemptReceipt({
       bridgeFixture,
-      sidecarResult: blockedReceipt,
+      domain_action_adapterResult: blockedReceipt,
     });
     assert.deepEqual(blockerProjection.typed_blocker, {
       blocker_ref: 'rca-typed-blocker:domain_owner_receipt_missing_required_refs:transition-hosted-blocker',
@@ -143,10 +143,10 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     assert.equal(blockerProjection.exportable, false);
     assert.equal(blockerProjection.handoffable, false);
     assert.equal(blockerProjection.production_soak_complete, false);
-    assert.equal(blockerProjection.sidecar_return_shape, 'typed_blocker');
+    assert.equal(blockerProjection.domain_action_adapter_return_shape, 'typed_blocker');
     await assertReceiptOnlyHostedAttemptProjection(blockerProjection);
 
-    const noRegression = await dispatchProductSidecar({
+    const noRegression = await dispatchDomainActionAdapter({
       task: {
         action: 'emit_no_regression_evidence',
         workspace_root: workspaceRoot,
@@ -155,7 +155,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     const noRegressionProjection = await reconcileHostedAttemptReceipt({
       bridgeFixture,
-      sidecarResult: noRegression,
+      domain_action_adapterResult: noRegression,
     });
     assert.deepEqual(noRegressionProjection, {
       bridge_kind: 'repo_local_opl_provider_attempt_bridge_fixture',
@@ -169,7 +169,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
       from_stage: 'review_and_revision',
       to_stage: 'package_and_handoff',
       owner_action: 'export_or_return_typed_blocker',
-      sidecar_return_shape: 'no_regression_evidence',
+      domain_action_adapter_return_shape: 'no_regression_evidence',
       domain_owner_receipt_ref: null,
       typed_blocker: null,
       no_regression_evidence_ref: 'rca-no-regression:visual-stage:transition-hosted-no-regression',
@@ -183,7 +183,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     await assert.rejects(
       () => buildHostedAttemptBridgeFixture({
         visualTransitionSpec: manifest.visual_transition_spec,
-        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        domain_action_adapterVisualTransitionSpec: domain_action_adapter.mapped_surfaces.visual_transition_spec,
         transitionResult: {
           ...transitionResult,
           next_state: 'visual_ready',
@@ -195,7 +195,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     await assert.rejects(
       () => reconcileHostedAttemptReceipt({
         bridgeFixture,
-        sidecarResult: {
+        domain_action_adapterResult: {
           result_surface: {
             return_shape: 'domain_receipt',
             receipt_ref: 'rca-owner-receipt:visual-stage:bad-ready-claim',
@@ -205,13 +205,13 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
           },
         },
       }),
-      /RCA sidecar result 不得声明 coverage\.visual_ready_claimed/,
+      /RCA domain_action_adapter result 不得声明 coverage\.visual_ready_claimed/,
     );
 
     await assert.rejects(
       () => buildHostedAttemptBridgeFixture({
         visualTransitionSpec: manifest.visual_transition_spec,
-        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        domain_action_adapterVisualTransitionSpec: domain_action_adapter.mapped_surfaces.visual_transition_spec,
         transitionResult: {
           ...transitionResult,
           receipt: {
@@ -227,7 +227,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     await assert.rejects(
       () => buildHostedAttemptBridgeFixture({
         visualTransitionSpec: manifest.visual_transition_spec,
-        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        domain_action_adapterVisualTransitionSpec: domain_action_adapter.mapped_surfaces.visual_transition_spec,
         transitionResult: {
           ...transitionResult,
           projection: {
@@ -246,7 +246,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     await assert.rejects(
       () => buildHostedAttemptBridgeFixture({
         visualTransitionSpec: manifest.visual_transition_spec,
-        sidecarVisualTransitionSpec: sidecar.mapped_surfaces.visual_transition_spec,
+        domain_action_adapterVisualTransitionSpec: domain_action_adapter.mapped_surfaces.visual_transition_spec,
         transitionResult: {
           ...transitionResult,
           projection: {

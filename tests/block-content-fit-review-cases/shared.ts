@@ -593,7 +593,7 @@ export function runReviewWithOverflowingChildGroup() {
           </article>
           <article data-qa-block="mainline-card" style="position:absolute;left:24px;top:134px;width:308px;height:92px;padding:16px 18px;border-radius:24px;background:rgba(37,99,235,0.12);border:1px solid rgba(37,99,235,0.18);box-shadow:0 12px 24px rgba(37,99,235,0.08);">
             <div style="font-size:18px;line-height:1.2;font-weight:800;color:#1E3A8A;">Med Auto Science</div>
-            <div style="margin-top:8px;font-size:14px;line-height:1.44;color:#334155;">把 gateway、controller、overlay、adapter 串成正式控制链。</div>
+            <div style="margin-top:8px;font-size:14px;line-height:1.44;color:#334155;">把 domain entry、controller、overlay、adapter 串成正式控制链。</div>
           </article>
           <article data-qa-block="execution-card" style="position:absolute;left:36px;top:248px;width:296px;height:96px;padding:14px 18px;border-radius:22px;background:#FFFFFF;border:1px solid rgba(18,34,56,0.1);box-shadow:0 10px 22px rgba(15,23,42,0.06);">
             <div style="font-size:18px;line-height:1.2;font-weight:800;color:#132238;">执行面</div>

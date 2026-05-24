@@ -874,16 +874,16 @@ test('runtimeWatch exposes poster-specific metric extension surface separately f
   assert.equal(report.metric_extensions[0].metrics.every((item) => item.status === 'not_evaluated'), true);
 });
 
-test('@redcube/gateway manifest declares runtime dependency for review loop actions', () => {
-  const gatewayPackageJson = JSON.parse(
-    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+test('@redcube/domain-entry manifest declares runtime dependency for review loop actions', () => {
+  const domainEntryPackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-domain-entry/package.json'), 'utf-8'),
   );
   const runtimePackageJson = JSON.parse(
     readFileSync(path.resolve('packages/redcube-runtime/package.json'), 'utf-8'),
   );
 
   assert.equal(
-    gatewayPackageJson.dependencies?.['@redcube/runtime'],
+    domainEntryPackageJson.dependencies?.['@redcube/runtime'],
     runtimePackageJson.version,
   );
 });

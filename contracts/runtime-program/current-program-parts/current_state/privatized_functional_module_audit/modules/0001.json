@@ -13,7 +13,7 @@
   "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
   "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/intake-source.ts",
+    "packages/redcube-domain-entry/src/actions/intake-source.ts",
     "packages/redcube-runtime/src/source-intake.ts",
     "packages/redcube-runtime/src/source-readiness-pack.ts",
     "packages/redcube-runtime/src/shared-source-truth.ts"

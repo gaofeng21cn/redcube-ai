@@ -159,7 +159,7 @@ test('product-entry manifest exposes controlled consumed-memory and writeback re
 
     assert.equal(
       attempt.proof_model,
-      'consumed_memory_writeback_receipt_descriptor_sidecar_quality_ref_equivalence_only',
+      'consumed_memory_writeback_receipt_descriptor_domain_action_adapter_quality_ref_equivalence_only',
     );
     assert.equal(attempt.status, DOMAIN_MEMORY_ADOPTION_STATE);
     assert.equal(attempt.proof_contract_state, 'landed');

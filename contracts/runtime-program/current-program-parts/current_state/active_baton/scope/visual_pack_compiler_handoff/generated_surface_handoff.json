@@ -9,7 +9,7 @@
     "mcp_wrapper",
     "skill_wrapper",
     "product_entry_wrapper",
-    "product_sidecar_wrapper",
+    "domain_action_adapter_wrapper",
     "status_projection_wrapper",
     "session_wrapper",
     "workbench_wrapper",
@@ -22,7 +22,7 @@
     "product_entry",
     "product_status",
     "product_session",
-    "sidecar",
+    "domain_action_adapter",
     "workbench"
   ],
   "repo_local_handler_targets": [
@@ -30,8 +30,8 @@
     "redcube_mcp",
     "invokeProductEntry",
     "invokeDomainEntry",
-    "product_sidecar",
-    "product_entry_session_snapshot_refs_adapter"
+    "domain_action_adapter",
+    "product_entry_continuity_refs_adapter"
   ],
   "rca_generated_surface_owner": false,
   "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -88,15 +88,15 @@
     "domain_handler_owner": "redcube_ai",
     "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
     "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-    "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-    "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+    "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+    "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
     "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",
     "default_supervision_owner": "one-person-lab",
     "legacy_supervision_public_surface": "retired",
     "redcube_cli_is_unified_metadata_owner": false,
     "redcube_mcp_is_unified_metadata_owner": false,
-    "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+    "product_entry_continuity_refs_adapter_is_generic_session_owner": false
   },
   "wrappers": {
     "cli": {
@@ -119,9 +119,9 @@
       "current_rca_role": "direct_domain_entry_target",
       "long_term_rca_owner": false
     },
-    "sidecar": {
+    "domain_action_adapter": {
       "owner": "opl",
-      "current_rca_role": "domain_sidecar_target",
+      "current_rca_role": "domain_domain_action_adapter_target",
       "long_term_rca_owner": false
     },
     "status": {
@@ -149,7 +149,7 @@
     "opl_can_generate_cli_wrapper": true,
     "opl_can_generate_mcp_wrapper": true,
     "opl_can_generate_product_entry_wrapper": true,
-    "opl_can_generate_sidecar_wrapper": true,
+    "opl_can_generate_domain_action_adapter_wrapper": true,
     "opl_can_generate_status_projection": true,
     "opl_can_generate_session_shell": true,
     "opl_can_generate_workbench_shell": true,

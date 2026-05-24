@@ -11,9 +11,9 @@ Machine boundary: 人读 product-entry support。机器真相继续归 `contract
 
 ## 一句话结论
 
-OPL stage-led hosted integration 作为 OPL Framework 侧的通用 runtime / queue / wakeup / projection 路径，可以通过 RCA thin sidecar / product-entry surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
+OPL stage-led hosted integration 作为 OPL Framework 侧的通用 runtime / queue / wakeup / projection 路径，可以通过 RCA thin domain_action_adapter / product-entry surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
 
-RCA 在这里暴露的是 domain package 薄程序面：descriptor、sidecar、projection、receipt refs、typed blocker 和 domain entry。它不维护第二套 generic scheduler、generic queue、generic runtime manager 或 workbench runtime。
+RCA 在这里暴露的是 domain package 薄程序面：descriptor、domain_action_adapter、projection、receipt refs、typed blocker 和 domain entry。它不维护第二套 generic scheduler、generic queue、generic runtime manager 或 workbench runtime。
 
 ## 这一步解决什么
 
@@ -33,7 +33,7 @@ RCA 在这里暴露的是 domain package 薄程序面：descriptor、sidecar、p
 - contract：`contracts/runtime-program/opl-framework-hosted-product-entry.json`
 - action ref：`opl_framework:hosted_product_entry`
 - API surface：`invokeOplHostedProductEntry`
-- sidecar dispatch：`redcube product sidecar dispatch`
+- domain_action_adapter dispatch：`redcube product domain_action_adapter dispatch`
 
 ## 最小 handoff envelope
 

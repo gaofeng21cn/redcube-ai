@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-import { buildPerformanceReport as buildGatewayPerformanceReport } from './product-domain-action-test-api.ts';
+import { buildPerformanceReport as buildDomainEntryPerformanceReport } from './product-domain-action-test-api.ts';
 import { buildPerformanceReport } from './package-surfaces.ts';
 import { executeCli } from '../apps/redcube-cli/dist/cli.js';
 
@@ -109,7 +109,7 @@ test('buildPerformanceReport aggregates route telemetry, child calls, review sco
   assert.equal(report.review_history.blocked_checks.block_content_fit_ok, 1);
 });
 
-test('performance report is exposed through gateway and CLI surfaces', async () => {
+test('performance report is exposed through domain entry and CLI surfaces', async () => {
   const workspaceRoot = mkdtempWorkspace();
   writeJson(path.join(workspaceRoot, 'runtime', 'runs', 'run-1.json'), {
     run_id: 'run-1',
@@ -126,8 +126,8 @@ test('performance report is exposed through gateway and CLI surfaces', async () 
     },
   });
 
-  const gatewayReport = await buildGatewayPerformanceReport({ workspaceRoot });
-  assert.equal(gatewayReport.routes.render_html.status_counts.completed, 1);
+  const domainEntryReport = await buildDomainEntryPerformanceReport({ workspaceRoot });
+  assert.equal(domainEntryReport.routes.render_html.status_counts.completed, 1);
 
   const cliReport = await executeCli([
     'report',

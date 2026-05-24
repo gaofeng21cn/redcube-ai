@@ -13,7 +13,7 @@
   "writeback_receipt_proof_contract_id": "rca.visual_pattern_memory.writeback_receipt_proof.v1",
   "direct_and_opl_share_descriptor_refs": true,
   "direct_and_opl_share_consumed_memory_refs": true,
-  "direct_and_opl_share_sidecar_refs": true,
+  "direct_and_opl_share_domain_action_adapter_refs": true,
   "direct_and_opl_share_quality_refs": true,
   "downstream_truth_owner": "redcube_ai",
   "opl_writes_visual_truth": false,

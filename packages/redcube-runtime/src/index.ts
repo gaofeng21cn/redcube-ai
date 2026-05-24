@@ -45,12 +45,12 @@ import {
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
 import {
-  PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY as PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY_JS,
-  loadProductEntrySessionSnapshotRef as loadProductEntrySessionSnapshotRefJs,
+  PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY as PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY_JS,
+  loadProductEntryContinuityRef as loadProductEntryContinuityRefJs,
   productEntrySessionDir as productEntrySessionDirJs,
   productEntrySessionFile as productEntrySessionFileJs,
-  saveProductEntrySessionSnapshotRef as saveProductEntrySessionSnapshotRefJs,
-} from './product-entry-session-snapshot-ref-adapter.js';
+  saveProductEntryContinuityRef as saveProductEntryContinuityRefJs,
+} from './product-entry-continuity-ref-adapter.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import {
   completeHermesRun as completeRunJs,
@@ -186,21 +186,21 @@ export function productEntrySessionFile(entrySessionId: string): string {
   return productEntrySessionFileJs(entrySessionId) as string;
 }
 
-export const PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY = PRODUCT_ENTRY_SESSION_SNAPSHOT_REF_ADAPTER_BOUNDARY_JS;
+export const PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY = PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY_JS;
 
-export function loadProductEntrySessionSnapshotRef(request: {
+export function loadProductEntryContinuityRef(request: {
   entrySessionId: string;
 }): RuntimeProductEntrySessionRecord | null {
-  return loadProductEntrySessionSnapshotRefJs(request) as RuntimeProductEntrySessionRecord | null;
+  return loadProductEntryContinuityRefJs(request) as RuntimeProductEntrySessionRecord | null;
 }
 
-export function saveProductEntrySessionSnapshotRef(request: {
+export function saveProductEntryContinuityRef(request: {
   session: RuntimeProductEntrySessionRecord;
 }): {
   session: RuntimeProductEntrySessionRecord;
   file: string;
 } {
-  return saveProductEntrySessionSnapshotRefJs(request) as {
+  return saveProductEntryContinuityRefJs(request) as {
     session: RuntimeProductEntrySessionRecord;
     file: string;
   };

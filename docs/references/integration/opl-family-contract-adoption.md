@@ -43,7 +43,7 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。
 
-该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite sidecar 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
+该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite domain_action_adapter 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
 
 ## Stage Control Projection
 
@@ -70,8 +70,8 @@ RCA 继续持有 visual truth、review/publication projection 与 artifact autho
 
 ## Domain Memory Index Status
 
-RCA 当前已经通过 product-entry manifest 顶层 `domain_memory_descriptor` 暴露标准 `family-domain-memory-ref.v1` projection，并继续保留 RCA-owned `domain_memory_descriptor_locator`、migration plan、seed fixture locator、writeback proposal generator、accept/reject command、writeback receipt locator、operator receipt projection、`controlled_visual_stage_attempt` proof descriptor，以及 `controlled_memory_apply_proof`。它们证明 direct RedCube skill 与 OPL-hosted path 可以回到同一 RCA-owned descriptor、sidecar、quality refs，并且 memory apply 只携带 consumed refs、proposal projection、accepted/rejected receipt projection 和 no-forbidden-write audit。
+RCA 当前已经通过 product-entry manifest 顶层 `domain_memory_descriptor` 暴露标准 `family-domain-memory-ref.v1` projection，并继续保留 RCA-owned `domain_memory_descriptor_locator`、migration plan、seed fixture locator、writeback proposal generator、accept/reject command、writeback receipt locator、operator receipt projection、`controlled_visual_stage_attempt` proof descriptor，以及 `controlled_memory_apply_proof`。它们证明 direct RedCube skill 与 OPL-hosted path 可以回到同一 RCA-owned descriptor、domain_action_adapter、quality refs，并且 memory apply 只携带 consumed refs、proposal projection、accepted/rejected receipt projection 和 no-forbidden-write audit。
 
-当前机器面应能把 RCA 解析为 resolved domain-memory descriptor；具体 resolved/readiness 结果以 OPL 和 RCA 的 live commands 为准。真实 visual memory body、真实 receipt instance 和 artifact output 仍属于 workspace/runtime roots；provider-hosted production controlled visual stage soak 仍是 production evidence tail。延后期间不得退化 descriptor、sidecar、quality refs、direct route parity 或 no-forbidden-write proof。
+当前机器面应能把 RCA 解析为 resolved domain-memory descriptor；具体 resolved/readiness 结果以 OPL 和 RCA 的 live commands 为准。真实 visual memory body、真实 receipt instance 和 artifact output 仍属于 workspace/runtime roots；provider-hosted production controlled visual stage soak 仍是 production evidence tail。延后期间不得退化 descriptor、domain_action_adapter、quality refs、direct route parity 或 no-forbidden-write proof。
 
 该 adapter 只解决 OPL family-level resolved-memory projection。OPL 可以索引、携带和投影 RCA memory refs；memory body、accept/reject、visual route、review/export verdict 与 canonical artifacts 继续由 RCA 持有。

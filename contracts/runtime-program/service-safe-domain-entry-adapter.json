@@ -2,7 +2,7 @@
   "entry_contract_id": "redcube_service_safe_domain_entry",
   "date_anchor": "2026-04-12",
   "status": "closeout_completed",
-  "owner_surface": "@redcube/gateway invokeDomainEntry",
+  "owner_surface": "@redcube/domain-entry invokeDomainEntry",
   "entry_goal": {
     "label": "service-safe RedCube domain entry for OPL hosted integration handoff",
     "summary": "Freeze one machine-readable RedCube domain adapter surface. Default RedCube product-entry returns an OPL stage execution plan and RCA authority refs for the configured family runtime provider; domain truth stays on RedCube."

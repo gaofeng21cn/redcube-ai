@@ -39,7 +39,7 @@ Machine boundary: Human-readable public entry. Machine truth remains in contract
   <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI overview" width="100%" />
 </p>
 
-> `RedCube AI` is the RedCube Foundry Agent: it keeps source material, generation, review, reruns, progress reporting, and exported files on the same delivery line for formal visual work. Its release shape is one `redcube-ai` app skill plus service-safe domain entry, sidecar/projection, and stage-control projection surfaces.
+> `RedCube AI` is the RedCube Foundry Agent: it keeps source material, generation, review, reruns, progress reporting, and exported files on the same delivery line for formal visual work. Its release shape is one `redcube-ai` app skill plus service-safe domain entry, domain_action_adapter/projection, and stage-control projection surfaces.
 
 ## One-Sentence Quick Start
 
@@ -72,7 +72,7 @@ You can start with prompts like:
 ## Current Boundary
 
 - `RedCube AI` is an independent visual-deliverable Foundry Agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.
-- Public release form: `RedCube AI Foundry Agent`, an OPL-compatible package built on the OPL Framework. The package shape is the single `redcube-ai` app skill, the service-safe domain entry (`invokeDomainEntry`), product sidecar/projection surfaces, and the read-only stage control projection.
+- Public release form: `RedCube AI Foundry Agent`, an OPL-compatible package built on the OPL Framework. The package shape is the single `redcube-ai` app skill, the service-safe domain entry (`invokeDomainEntry`), product domain_action_adapter/projection surfaces, and the read-only stage control projection.
 - The first public surface is the single `redcube-ai` app skill; `status` / `invoke` / `session` stay as machine-readable command contracts underneath that skill. In that contract, `status` means the agent-facing product-entry overview / intake / entry shell, not a landed GUI, WebUI, or end-user front office.
 - The repo-root OPL standard pack is the generated-interface source for OPL. OPL compiles that pack into generated CLI / MCP / Skill / product-entry / tool descriptors; the local CLI, MCP/product-entry commands, `invokeDomainEntry`, local scripts, and repo-tracked contracts remain RCA-owned action targets and visual authority functions behind those descriptors.
 - RedCube's public executor backend contract is `codex_cli` or `hermes_agent`; `execution_shape` is declared separately as `structured_call` or `agent_loop`.
@@ -105,7 +105,7 @@ You can start with prompts like:
 
 - Read the [Docs Guide](./docs/README.md) first. It explains the direct RedCube route, the OPL-hosted integration path, the stable capability surface, and the current technical baseline.
 - Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
-- Treat the public package as `RedCube AI Foundry Agent`: an OPL-compatible package built on the OPL Framework that publishes one app skill, one service-safe domain entry, product sidecar/projection refs, and stage-control projection metadata while keeping domain truth inside RCA.
+- Treat the public package as `RedCube AI Foundry Agent`: an OPL-compatible package built on the OPL Framework that publishes one app skill, one service-safe domain entry, product domain_action_adapter/projection refs, and stage-control projection metadata while keeping domain truth inside RCA.
 - The current repo-verified public entry surfaces are the single `redcube-ai` app skill, `CLI`, and `MCP`; `controller` remains the internal control plane. Together with `invokeDomainEntry`, `invokeProductEntry`, local scripts, and repo-tracked contracts, they form the stable callable surface. OPL/Temporal hosted scheduling is the default runtime posture after task start, `Codex CLI` remains the default concrete stage executor, and non-default executor / proof adapters remain explicit opt-in lanes.
 - RedCube can be invoked directly through its Codex app skill or through OPL as an external domain agent. Both routes must converge on the same RedCube-owned route, review, artifact, and export surfaces.
 - Treat the implementation surface as TypeScript orchestration plus Python native helpers. Repo-tracked JavaScript is retired; new product, test, or script JavaScript is blocked by the closeout audit.

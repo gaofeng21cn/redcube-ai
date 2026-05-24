@@ -13,14 +13,14 @@
   "rca_scope": "rca_operator_projection_refs_only",
   "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-    "packages/redcube-gateway/src/actions/get-product-status.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+    "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+    "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
   ],
   "activeCallers": [
     "OPL generated product status/workbench consumes RCA operator evidence refs",
     "product-entry manifest domain projection refs",
-    "product sidecar export refs-only projection",
+    "product domain_action_adapter export refs-only projection",
     "operator evidence readiness tests"
   ],
   "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",

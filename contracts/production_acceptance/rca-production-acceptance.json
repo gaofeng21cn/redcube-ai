@@ -205,7 +205,7 @@
         "compatibility_alias",
         "default_runtime_owner",
         "public_action_key",
-        "sidecar_template"
+        "domain_action_adapter_template"
       ]
     },
     "authority_boundary": {
@@ -229,7 +229,7 @@
       "operator_evidence_readiness_projection_ref": "redcube product manifest#/operator_evidence_readiness_projection",
       "production_evidence_scaleout_refs_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
       "workspace_receipt_inventory_projection_ref": "redcube product manifest#/workspace_receipt_inventory_projection",
-      "product_sidecar_export_ref": "redcube product manifest#/product_entry_shell/sidecar"
+      "domain_action_adapter_export_ref": "redcube product manifest#/product_entry_shell/domain_action_adapter"
     },
     "body_free_owner_receipt_ref": {
       "expected_receipt_slot": "artifact_producing_owner_receipt",
@@ -329,17 +329,17 @@
     "owner": "redcube_ai",
     "consumer": "opl_agent_lab",
     "projection_ref": "redcube product manifest#/rca_efficiency_handoff_projection",
-    "sidecar_projection_ref": "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
+    "domain_action_adapter_projection_ref": "redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection",
     "contract_ref": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
     "external_work_order_owner_closeout_ref": "redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout",
     "external_work_order_owner_closeout_action": "emit_external_work_order_owner_closeout",
     "runtime_consumption_refs": [
       "redcube product manifest#/rca_efficiency_handoff_projection",
       "redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection",
-      "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
-      "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
-      "redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout",
-      "redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref"
+      "redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection",
+      "redcube product domain_action_adapter#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
+      "redcube product domain_action_adapter#/mapped_surfaces/external_work_order_owner_closeout",
+      "redcube product domain_action_adapter#/source_manifest_refs/external_work_order_owner_closeout_ref"
     ],
     "quality_floor_refs": [
       "workspace-runtime-ref:review-export:<run-id>",
@@ -354,7 +354,7 @@
       "workspace-runtime-ref:review-export:<run-id>",
       "workspace-runtime-ref:export-result:<run-id>",
       "target-verification:redcube-ai/product-manifest-read",
-      "target-verification:redcube-ai/product-sidecar-export-read",
+      "target-verification:redcube-ai/domain-action-adapter-export-read",
       "target-verification:redcube-ai/typecheck",
       "target-verification:redcube-ai/test-fast",
       "target-verification:redcube-ai/targeted-efficiency-tests"
@@ -456,7 +456,7 @@
         "typed_blocker_kind": "real_memory_lifecycle_receipt_instances_pending",
         "reason": "RCA exposes locator, workspace receipt inventory, and memory/lifecycle ref models, but this repo does not track live receipt instance bodies or claim scaleout receipt instances are complete.",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-sidecar-surfaces.test.ts"
+          "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts"
         ]
       },
       {

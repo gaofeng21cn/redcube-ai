@@ -480,7 +480,7 @@
       "product_entry",
       "product_status",
       "product_session",
-      "sidecar",
+      "domain_action_adapter",
       "workbench"
     ],
     "repo_local_handler_targets": [
@@ -488,8 +488,8 @@
       "redcube_mcp",
       "invokeProductEntry",
       "invokeDomainEntry",
-      "product_sidecar",
-      "product_entry_session_snapshot_refs_adapter"
+      "domain_action_adapter",
+      "product_entry_continuity_refs_adapter"
     ],
     "repo_local_handlers_are_generated_surface_owners": false,
     "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",

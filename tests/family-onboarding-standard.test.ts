@@ -22,8 +22,8 @@ function readCliSource() {
 }
 
 test('domain actions no longer hardcode overlay family packages directly', () => {
-  const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.ts');
-  const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.ts');
+  const createDeliverable = read('packages/redcube-domain-entry/src/actions/create-deliverable.ts');
+  const auditDeliverable = read('packages/redcube-domain-entry/src/actions/audit-deliverable.ts');
 
   assert.equal(createDeliverable.includes("@redcube/overlay-ppt"), false);
   assert.equal(createDeliverable.includes("@redcube/overlay-xiaohongshu"), false);
@@ -36,7 +36,7 @@ test('domain actions no longer hardcode overlay family packages directly', () =>
 test('overlay registry package exports default registry entrypoint', () => {
   const registryIndex = read('packages/redcube-overlay-registry/src/index.ts');
   const registryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
-  const gatewayPackage = JSON.parse(read('packages/redcube-gateway/package.json'));
+  const domainEntryPackage = JSON.parse(read('packages/redcube-domain-entry/package.json'));
 
   assert.equal(registryIndex.includes('getDefaultOverlayRegistry'), true);
   assert.equal(registryIndex.includes('getDefaultOverlayCatalog'), true);
@@ -63,8 +63,8 @@ test('overlay registry package exports default registry entrypoint', () => {
       },
     ],
   );
-  assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-ppt']), false);
-  assert.equal(Boolean(gatewayPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
+  assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-ppt']), false);
+  assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
 });
 
 test('CLI onboarding usage no longer hardcodes current overlay ids in deliverable create help', () => {

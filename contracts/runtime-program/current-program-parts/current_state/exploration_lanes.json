@@ -180,7 +180,7 @@
         "title safe zone obstruction",
         "table font below 11pt",
         "sparse oversized card",
-        "optional OCR manifest sidecar"
+        "optional OCR manifest domain_action_adapter"
       ],
       "hard_block_checks": [
         "external_audience_language_ok",

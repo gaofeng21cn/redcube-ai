@@ -19,7 +19,7 @@
   "review_repair_transport",
   "restart_dead_letter_repair_human_gate_state_chain",
   "native_helper_generic_envelope",
-  "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+  "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
   "family_conflict_envelope_schema",
   "control_loop_summary_builder",
   "usage_projection_aggregator",

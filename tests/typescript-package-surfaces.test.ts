@@ -41,7 +41,7 @@ const PACKAGE_SURFACES = Object.freeze([
     entryMatches: [/export type/, /WorkspaceContract/, /RunRecord/],
   },
   {
-    directory: 'packages/redcube-gateway',
+    directory: 'packages/redcube-domain-entry',
     expectedTypesEntry: './dist/index.d.ts',
     requiredFiles: ['src/index.ts', 'src/types.ts', 'src/types-parts/foundation.ts', 'src/types-parts/product-entry.ts'],
     entryMatches: [/export function createDeliverable/, /export function getDeliverable/, /export function runDeliverableRoute/],

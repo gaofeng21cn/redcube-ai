@@ -1,7 +1,7 @@
 [
   {
-    "surface_id": "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-    "retired_legacy_surface_id": "product_sidecar_dispatch.runtime_watch",
+    "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+    "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
     "retired_at": "2026-05-21",
     "replacement_owner": "opl",
     "replacement_surface": "opl_status_workbench_runtime_read_model",
@@ -12,8 +12,8 @@
     "resurrection_policy": "forbidden"
   },
   {
-    "surface_id": "retired_product_sidecar.supervision_action_tombstone",
-    "retired_legacy_surface_id": "product_sidecar_dispatch.retired_managed_supervision",
+    "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
+    "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
     "retired_at": "2026-05-17",
     "replacement_owner": "opl",
     "replacement_surface": "opl_generic_runner_and_supervisor_tick",
@@ -24,8 +24,8 @@
     "resurrection_policy": "forbidden"
   },
   {
-    "surface_id": "retired_product_sidecar.continuation_action_tombstone",
-    "retired_legacy_surface_id": "product_sidecar_dispatch.product_entry_continuation",
+    "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
+    "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
     "retired_at": "2026-05-17",
     "replacement_owner": "opl",
     "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",

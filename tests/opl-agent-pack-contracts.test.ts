@@ -15,7 +15,7 @@ import {
   buildRedCubeFamilyStageControlPlane,
   buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
-} from '../packages/redcube-gateway/dist/index.js';
+} from '../packages/redcube-domain-entry/dist/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -54,7 +54,7 @@ const oplCanonicalGeneratedSurfaceIds = [
   'mcp',
   'skill',
   'product_entry_manifest',
-  'sidecar_export_dispatch',
+  'domain_action_adapter_export_dispatch',
   'status_read_model',
   'workbench_drilldown',
   'functional_harness_cases',
@@ -64,7 +64,7 @@ const wrapperDescriptorScopeIds = [
   'product_entry',
   'product_status',
   'product_session',
-  'sidecar',
+  'domain_action_adapter',
   'workbench',
 ];
 
@@ -182,10 +182,10 @@ function buildCanonicalPack() {
       domain_repo_can_own_generated_surface: false,
       source_refs: {
         canonical_semantic_pack: 'agent/',
-        action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
-        stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
-        memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
-        functional_audit: 'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
+        action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
+        stage_control_plane: 'packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
+        memory_descriptor: 'packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
+        functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
       },
       authority_boundary: {
         opl_can_write_domain_truth: false,
@@ -241,14 +241,14 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
   assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
   assert.equal(policy.legacy_name_policy.active_generic_runtime_owner_allowed, false);
-  assert.equal(policy.legacy_name_policy.active_generic_gateway_owner_allowed, false);
+  assert.equal(policy.legacy_name_policy.active_generic_domain_entry_owner_allowed, false);
   assert.equal(policy.legacy_name_policy.active_generic_session_runtime_owner_allowed, false);
   assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
     'managed',
     'runtime',
     'gateway',
     'session',
-    'sidecar',
+    'domain_action_adapter',
   ]);
   assert.deepEqual(policy.legacy_name_policy.allowed_legacy_name_roles, [
     'machine_contract_ref',
@@ -266,9 +266,9 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
     'legacy_managed_runtime_gateway_names',
   ]);
-  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.package_name, '@redcube/gateway');
+  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.package_name, '@redcube/domain-entry');
   assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_identity, 'redcube-ai');
-  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_gateway_identity_allowed, false);
+  assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_framework_identity_allowed, false);
   assert.equal(policy.new_surface_admission_gate.must_classify_before_active_caller, true);
   assert.equal(policy.new_surface_admission_gate.reopen_gap_if_forbidden_owner_role_appears, true);
   assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
@@ -278,11 +278,11 @@ test('RCA physical source morphology policy classifies active source tails witho
 
   assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
   assert.equal(byId.redcube_cli_domain_entry_adapter.classification, 'service_safe_domain_entry');
-  assert.equal(byId.redcube_gateway_package_protocol_boundary.classification, 'package_protocol_boundary');
-  assert.equal(byId.product_entry_session_snapshot_refs_adapter.classification, 'refs_only_read_model');
+  assert.equal(byId.redcube_domain_entry_package_protocol_boundary.classification, 'package_protocol_boundary');
+  assert.equal(byId.product_entry_continuity_refs_adapter.classification, 'refs_only_read_model');
   assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
   assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
-  assert.equal(byId.product_sidecar_guarded_actions.classification, 'domain_handler_target');
+  assert.equal(byId.domain_action_adapter_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
   assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
@@ -291,19 +291,19 @@ test('RCA physical source morphology policy classifies active source tails witho
     'contracts/runtime-program/managed-product-entry-hardening.json',
   ]);
 
-  assert.deepEqual(byId.product_entry_session_snapshot_refs_adapter.source_refs, [
-    'packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts',
-    'packages/redcube-gateway/src/actions/get-product-entry-session.ts',
-    'packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts',
-    'packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts',
-    'packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts',
+  assert.deepEqual(byId.product_entry_continuity_refs_adapter.source_refs, [
+    'packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-session.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts',
+    'packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts',
   ]);
   assert.deepEqual(byId.runtime_watch_projection.source_refs, [
-    'packages/redcube-gateway/src/actions/run-review-ref-projection.ts',
+    'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts',
   ]);
-  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.source_refs, [
-    'packages/redcube-gateway/package.json',
-    'packages/redcube-gateway/src/index.ts',
+  assert.deepEqual(byId.redcube_domain_entry_package_protocol_boundary.source_refs, [
+    'packages/redcube-domain-entry/package.json',
+    'packages/redcube-domain-entry/src/index.ts',
   ]);
   assert.deepEqual(byId.redcube_cli_domain_entry_adapter.source_refs, [
     'apps/redcube-cli/package.json',
@@ -329,23 +329,16 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.redcube_cli_domain_entry_adapter.no_resurrection_gate.generic_workbench_owner_allowed,
     false,
   );
-  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.allowed_as, [
-    'package_protocol_boundary',
-  ]);
-  assert.equal(byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.public_identity_allowed, false);
+  assert.equal(byId.redcube_domain_entry_package_protocol_boundary.legacy_name_allowance, undefined);
   assert.equal(
-    byId.redcube_gateway_package_protocol_boundary.legacy_name_allowance.active_generic_gateway_owner_allowed,
-    false,
-  );
-  assert.equal(
-    byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
+    byId.product_entry_continuity_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
-  assert.deepEqual(byId.product_entry_session_snapshot_refs_adapter.legacy_name_allowance.allowed_as, [
+  assert.deepEqual(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.allowed_as, [
     'refs_only_read_model',
     'contract_safe_semantic_id',
   ]);
-  assert.equal(byId.product_entry_session_snapshot_refs_adapter.legacy_name_allowance.compatibility_alias_allowed, false);
+  assert.equal(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.compatibility_alias_allowed, false);
   assert.deepEqual(byId.runtime_watch_projection.legacy_name_allowance.allowed_as, [
     'refs_only_read_model',
     'negative_test_guard',
@@ -364,7 +357,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
   assert.deepEqual(byId.runtime_watch_projection.machine_boundary_refs, [
-    'packages/redcube-gateway/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
+    'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
   ]);
   assert.equal(
     byId.runtime_watch_projection.no_resurrection_gate.generic_supervisor_owner_allowed,
@@ -375,15 +368,15 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
   assert.equal(
-    byId.product_sidecar_guarded_actions.current_rca_role,
-    'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',
+    byId.domain_action_adapter_guarded_actions.current_rca_role,
+    'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner',
   );
   assert.equal(
     byId.operator_evidence_stability_projection.current_rca_role,
     'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
   );
   assert.equal(
-    byId.product_sidecar_guarded_actions.allowed_outputs.includes('visual_transition_decision_refs'),
+    byId.domain_action_adapter_guarded_actions.allowed_outputs.includes('visual_transition_decision_refs'),
     true,
   );
   assert.equal(
@@ -552,7 +545,7 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     'one-person-lab',
   );
   assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.product_sidecar_role,
+    generatedSurfaceHandoff.repo_local_launcher_policy.domain_action_adapter_role,
     'domain_action_target_or_refs_only_adapter',
   );
   assert.equal(

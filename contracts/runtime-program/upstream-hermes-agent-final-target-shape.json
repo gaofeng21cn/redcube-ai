@@ -63,7 +63,7 @@
     "service_safe_domain_entry": {
       "entry_contract_id": "redcube_service_safe_domain_entry",
       "contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json",
-      "callable_surface": "@redcube/gateway invokeDomainEntry"
+      "callable_surface": "@redcube/domain-entry invokeDomainEntry"
     },
     "product_entry_service_surface": {
       "status": "repo_verified_service_surface_landed",

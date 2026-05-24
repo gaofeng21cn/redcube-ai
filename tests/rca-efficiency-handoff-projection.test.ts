@@ -6,7 +6,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
-  exportProductSidecar,
+  exportDomainActionAdapter,
   prepareProductEntryWorkspace,
   SERIAL_ENV_TEST,
   withMockCodexRuntimeState,
@@ -75,15 +75,15 @@ function assertEfficiencySuiteShape(suite) {
     true,
   );
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection'),
+    suite.target_runtime_consumption_refs.includes('redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection'),
     true,
   );
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout'),
+    suite.target_runtime_consumption_refs.includes('redcube product domain_action_adapter#/mapped_surfaces/external_work_order_owner_closeout'),
     true,
   );
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref'),
+    suite.target_runtime_consumption_refs.includes('redcube product domain_action_adapter#/source_manifest_refs/external_work_order_owner_closeout_ref'),
     true,
   );
 
@@ -133,7 +133,7 @@ function assertEfficiencySuiteShape(suite) {
     'workspace-runtime-ref:review-export:<run-id>',
     'workspace-runtime-ref:export-result:<run-id>',
     'target-verification:redcube-ai/product-manifest-read',
-    'target-verification:redcube-ai/product-sidecar-export-read',
+    'target-verification:redcube-ai/domain-action-adapter-export-read',
     'target-verification:redcube-ai/typecheck',
     'target-verification:redcube-ai/test-fast',
     'target-verification:redcube-ai/targeted-efficiency-tests',
@@ -193,10 +193,10 @@ test('RCA efficiency handoff contract exposes a refs-only standard Agent Lab sui
   assertEfficiencySuiteShape(suite);
 });
 
-test('product sidecar projection includes RCA efficiency handoff without claiming visual readiness', SERIAL_ENV_TEST, async () => {
+test('product domain_action_adapter projection includes RCA efficiency handoff without claiming visual readiness', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const projection = await exportProductSidecar({
+    const projection = await exportDomainActionAdapter({
       workspace_root: workspaceRoot,
     });
 
@@ -207,7 +207,7 @@ test('product sidecar projection includes RCA efficiency handoff without claimin
     );
     assert.equal(
       projection.mapped_surfaces.rca_efficiency_handoff_projection.target_runtime_consumption_refs.includes(
-        'redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection',
+        'redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection',
       ),
       true,
     );
@@ -217,7 +217,7 @@ test('product sidecar projection includes RCA efficiency handoff without claimin
 test('product manifest exposes RCA efficiency handoff and owner route consumption refs', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const manifestModule = await import('../packages/redcube-gateway/dist/index.js');
+    const manifestModule = await import('../packages/redcube-domain-entry/dist/index.js');
     const manifest = await manifestModule.getProductEntryManifest({
       workspace_root: workspaceRoot,
     });

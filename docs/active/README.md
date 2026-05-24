@@ -14,7 +14,7 @@ Machine boundary: 人读索引。机器真相继续归 runtime-program contracts
 | 文档 | 当前任务 | 生命周期状态 |
 | --- | --- | --- |
 | `rca-ideal-state-gap-plan.md` | 维护 RCA visual-deliverable 目标差距、OPL 上收边界与后续证据缺口 | active completion plan |
-| `opl-private-implementation-migration-inventory.md` | 维护 RCA product-entry、sidecar、session、MCP、runtimeWatch、native-helper envelope 等私有平台化候选的 active caller、分类、保留 authority、可上收 generic 子域、迁移门槛与验证入口 | active inventory |
+| `opl-private-implementation-migration-inventory.md` | 维护 RCA product-entry、domain_action_adapter、session、MCP、runtimeWatch、native-helper envelope 等私有平台化候选的 active caller、分类、保留 authority、可上收 generic 子域、迁移门槛与验证入口 | active inventory |
 
 旧 `gateway`、`frontdoor`、`federation`、repo-local Hermes、workbench 和 product frontdesk 词汇不得在本目录中重新获得 active truth。它们只能作为 provenance、tombstone 或合同引用上下文出现；已退役模块、接口、测试入口和文档入口默认 direct retirement，不保留兼容别名或 compatibility-only 聚合测试。
 

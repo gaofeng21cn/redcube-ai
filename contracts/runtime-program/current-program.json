@@ -11,7 +11,7 @@
       "package_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product sidecar projection",
+        "product domain_action_adapter projection",
         "stage control projection",
         "standard domain-agent skeleton mapping",
         "OPL generic primitive consumer projection",
@@ -95,9 +95,9 @@
         "redcube product invoke",
         "redcube product session"
       ],
-      "sidecar_surfaces": [
-        "redcube product sidecar export",
-        "redcube product sidecar dispatch"
+      "domain_action_adapter_surfaces": [
+        "redcube product domain_action_adapter export",
+        "redcube product domain_action_adapter dispatch"
       ],
       "stage_control_projection": "redcube product manifest#/stage_control_projection"
     },
@@ -185,7 +185,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
       ],
       "opl_owned_generic_primitives": [
         "standard_domain_agent_scaffold",
@@ -206,7 +206,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
       ],
       "rca_retained_authority": [
         "visual_truth",
@@ -296,7 +296,7 @@
       "rca_thin_program_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product sidecar projection",
+        "product domain_action_adapter projection",
         "stage control projection",
         "visual transition spec",
         "artifact locator refs",
@@ -309,43 +309,43 @@
           "primitive": "standard_domain_agent_scaffold",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
           "manifest_ref": "/standard_domain_agent_skeleton",
-          "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
+          "domain_action_adapter_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
         },
         {
           "primitive": "generic_scheduler",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
           "manifest_ref": "/family_scheduler_replacement",
-          "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
+          "domain_action_adapter_ref": "/runtime_framework/family_scheduler_replacement"
         },
         {
           "primitive": "memory_transport",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
           "manifest_ref": "/domain_memory_descriptor_locator",
-          "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+          "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
         },
         {
           "primitive": "artifact_lifecycle",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
           "manifest_ref": "/lifecycle_guarded_apply_proof",
-          "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+          "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
         },
         {
           "primitive": "review_repair_transport",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
           "manifest_ref": "/review_state",
-          "sidecar_ref": "/mapped_surfaces/review_projection"
+          "domain_action_adapter_ref": "/mapped_surfaces/review_projection"
         },
         {
           "primitive": "native_helper_generic_envelope",
           "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
           "manifest_ref": "/native_ppt_operator_ux",
-          "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+          "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
         },
         {
-          "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+          "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
           "contract_ref": "rca.visual_pack_compiler_handoff.v1",
           "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-          "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+          "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
         }
       ],
       "forbidden_rca_generic_owner_flags": {
@@ -365,7 +365,7 @@
         "rca_review_repair_transport_owner": false,
         "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
         "rca_native_helper_generic_envelope_owner": false,
-        "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
+        "rca_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper_owner": false
       }
     },
     "opl_stability_read_model_consumption": {
@@ -479,7 +479,7 @@
         "native helper envelope",
         "operator projection shell",
         "generic CLI/MCP wrappers",
-        "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
+        "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
         "Codex executor adapter",
         "observability/stability read model"
       ],
@@ -512,7 +512,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -520,21 +520,21 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -652,9 +652,9 @@
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 0,
         "deleted_or_thinned_default_surfaces": [
-          "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-          "retired_product_sidecar.supervision_action_tombstone",
-          "retired_product_sidecar.continuation_action_tombstone",
+          "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+          "retired_domain_action_adapter.supervision_action_tombstone",
+          "retired_domain_action_adapter.continuation_action_tombstone",
           "retired_public_cli_mcp.managed_run_lookup_tombstone",
           "retired_public_cli_mcp.managed_supervision_tombstone",
           "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
@@ -662,9 +662,9 @@
           "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
         ],
         "retired_legacy_surface_ids": [
-          "product_sidecar_dispatch.runtime_watch",
-          "product_sidecar_dispatch.retired_managed_supervision",
-          "product_sidecar_dispatch.product_entry_continuation",
+          "domain_action_adapter_dispatch.runtime_watch",
+          "domain_action_adapter_dispatch.retired_managed_supervision",
+          "domain_action_adapter_dispatch.product_entry_continuation",
           "public_cli_mcp_gateway.get_managed_run",
           "public_cli_mcp_gateway.retired_managed_supervision",
           "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
@@ -686,7 +686,7 @@
           "no_regression_proof_recorded"
         ],
         "remaining_bridge_module_ids": [
-          "product_entry_session_snapshot_refs_adapter",
+          "product_entry_continuity_refs_adapter",
           "workspace_source_intake",
           "memory_writeback_receipt_transport",
           "artifact_export_lifecycle",
@@ -747,7 +747,7 @@
       "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
       "modules": [
         {
-          "module_id": "product_entry_session_snapshot_refs_adapter",
+          "module_id": "product_entry_continuity_refs_adapter",
           "surface_ref": "/session_continuity",
           "status": "opl_generated_workbench_session_surface_consumed",
           "classification": "split_owner_boundary",
@@ -761,11 +761,11 @@
           "rca_scope": "product_entry_session_domain_snapshot_refs",
           "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
           "codePaths": [
-            "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-            "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+            "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+            "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
             "redcube product session domain snapshot refs",
@@ -791,7 +791,7 @@
             "rca_owns_replacement_runtime": false
           },
           "bridge_exit_gate": {
-            "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
+            "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
             "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
             "bridge_owner": "redcube_ai_migration_bridge",
             "replacement_owner": "opl",
@@ -818,13 +818,13 @@
             "opl_can_issue_owner_receipt": false,
             "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
             "typed_blocker_refs": [
-              "typed-blocker:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/physical-delete-requires-explicit-owner-receipt"
+              "typed-blocker:rca/default-caller-deletion/product_entry_continuity_refs_adapter/physical-delete-requires-explicit-owner-receipt"
             ],
             "no_forbidden_write_refs": [
-              "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+              "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
             ],
             "no_forbidden_write_evidence_refs": [
-              "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+              "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
             ],
             "domain_repo_physical_delete_authorized": false,
             "physical_delete_authorized_by_refs": false
@@ -848,7 +848,7 @@
           },
           "physical_deletion_guard": {
             "safe_to_delete_now": false,
-            "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+            "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
             "required_before_delete": [
               "domain_authority_refs_preserved",
               "no_regression_proof_recorded"
@@ -887,7 +887,7 @@
           "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
           "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/intake-source.ts",
+            "packages/redcube-domain-entry/src/actions/intake-source.ts",
             "packages/redcube-runtime/src/source-intake.ts",
             "packages/redcube-runtime/src/source-readiness-pack.ts",
             "packages/redcube-runtime/src/shared-source-truth.ts"
@@ -1010,12 +1010,12 @@
           "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
           "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+            "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
           ],
           "activeCallers": [
-            "apply_visual_memory_writeback sidecar action",
+            "apply_visual_memory_writeback domain_action_adapter action",
             "workspace receipt inventory",
             "operator evidence readiness projection"
           ],
@@ -1132,15 +1132,15 @@
           "rca_scope": "visual_artifact_export_authority_and_locator_refs",
           "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
           ],
           "activeCallers": [
             "artifact locator contract",
             "export_pptx route",
             "workspace lifecycle guarded apply",
-            "product sidecar export"
+            "product domain_action_adapter export"
           ],
           "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
           "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -1255,15 +1255,15 @@
           "rca_scope": "visual_review_export_verdict_and_repair_decision",
           "audit_readout": "retain_domain_gate_project_transport_refs",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
           ],
           "activeCallers": [
             "visual director review",
             "screenshot review",
             "repair_image_pages",
-            "product sidecar review projection"
+            "product domain_action_adapter review projection"
           ],
           "activeCallerStatus": "active_domain_review_gate",
           "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
@@ -1379,7 +1379,7 @@
           "rca_scope": "python_native_helper_implementation",
           "audit_readout": "retain_rca_implementation_project_opl_envelope",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
             "contracts/runtime-program/python-native-helper-catalog.json",
             "python/redcube_ai"
           ],
@@ -1501,14 +1501,14 @@
           "rca_scope": "rca_operator_projection_refs_only",
           "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-            "packages/redcube-gateway/src/actions/get-product-status.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+            "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
           ],
           "activeCallers": [
             "OPL generated product status/workbench consumes RCA operator evidence refs",
             "product-entry manifest domain projection refs",
-            "product sidecar export refs-only projection",
+            "product domain_action_adapter export refs-only projection",
             "operator evidence readiness tests"
           ],
           "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -1625,25 +1625,25 @@
             "domain_action_handlers",
             "safe_action_refs"
           ],
-          "rca_scope": "product_sidecar_status_action_metadata_projection",
+          "rca_scope": "domain_action_adapter_status_action_metadata_projection",
           "audit_readout": "retain_thin_projection_project_generated_wrappers",
           "codePaths": [
             "apps/redcube-cli/src/cli.ts",
             "apps/redcube-mcp/src/server.ts",
-            "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
+            "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
           ],
           "activeCallers": [
             "OPL generated CLI/MCP wrapper domain handler targets",
             "redcube CLI direct diagnostic entry",
             "redcube MCP direct protocol adapter",
             "family action catalog refs",
-            "product sidecar guarded action list refs"
+            "product domain_action_adapter guarded action list refs"
           ],
           "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
           "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
           "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
           "tombstone_required": false,
           "migration_class": "domain_handler_target",
           "active_reader_facing_classification": "domain_handler_target",
@@ -1762,12 +1762,12 @@
             "packages/redcube-runtime-protocol/src/executor-runtime.ts",
             "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
             "packages/redcube-runtime/src/executors.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
-            "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+            "packages/redcube-domain-entry/src/actions/domain-entry-contract.ts",
             "tests/rca-executor-backend-contract.test.ts"
           ],
           "activeCallers": [
@@ -1900,13 +1900,13 @@
           "rca_scope": "visual_domain_status_projection_refs_only",
           "audit_readout": "project_only",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-            "packages/redcube-gateway/src/actions/get-product-status.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+            "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
+            "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
           ],
           "activeCallers": [
             "product status",
-            "product sidecar runtime framework",
+            "product domain_action_adapter runtime framework",
             "operator evidence readiness projection"
           ],
           "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -2027,15 +2027,15 @@
             "rca_owns_replacement_runtime": false
           },
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts"
           ],
           "activeCallers": [
             "product-entry manifest",
-            "product sidecar export",
+            "product domain_action_adapter export",
             "product status"
           ],
           "activeCallerStatus": "declarative_pack_input_active",
-          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
           "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
           "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
           "rca_projection_mode": "declarative_pack_refs_only",
@@ -2121,8 +2121,8 @@
             "rca_owns_replacement_runtime": false
           },
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
             "packages/redcube-runtime/src"
           ],
           "activeCallers": [
@@ -2626,7 +2626,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
         "family_conflict_envelope_schema",
         "control_loop_summary_builder",
         "usage_projection_aggregator",
@@ -2655,7 +2655,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -2663,21 +2663,21 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -2768,8 +2768,8 @@
       ],
       "retired_no_resurrection_guards": [
         {
-          "surface_id": "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.runtime_watch",
+          "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
           "retired_at": "2026-05-21",
           "replacement_owner": "opl",
           "replacement_surface": "opl_status_workbench_runtime_read_model",
@@ -2780,8 +2780,8 @@
           "resurrection_policy": "forbidden"
         },
         {
-          "surface_id": "retired_product_sidecar.supervision_action_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.retired_managed_supervision",
+          "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
           "retired_at": "2026-05-17",
           "replacement_owner": "opl",
           "replacement_surface": "opl_generic_runner_and_supervisor_tick",
@@ -2792,8 +2792,8 @@
           "resurrection_policy": "forbidden"
         },
         {
-          "surface_id": "retired_product_sidecar.continuation_action_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.product_entry_continuation",
+          "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
           "retired_at": "2026-05-17",
           "replacement_owner": "opl",
           "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
@@ -2948,7 +2948,7 @@
           "review/repair transport shell",
           "native helper execution envelope",
           "operator projection/workbench shell",
-          "generated CLI/MCP/product-entry/sidecar/status wrappers"
+          "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
         ],
         "migration_gates_before_code_retirement": [
           "generated/default caller parity proven for the replacement OPL surface",
@@ -3460,7 +3460,7 @@
             "product_entry",
             "product_status",
             "product_session",
-            "sidecar",
+            "domain_action_adapter",
             "workbench"
           ],
           "repo_local_handler_targets": [
@@ -3468,8 +3468,8 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "product_sidecar",
-            "product_entry_session_snapshot_refs_adapter"
+            "domain_action_adapter",
+            "product_entry_continuity_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -3538,7 +3538,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "product_sidecar_wrapper",
+          "domain_action_adapter_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -3551,7 +3551,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -3559,8 +3559,8 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
         "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -3617,15 +3617,15 @@
           "domain_handler_owner": "redcube_ai",
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "wrappers": {
           "cli": {
@@ -3648,9 +3648,9 @@
             "current_rca_role": "direct_domain_entry_target",
             "long_term_rca_owner": false
           },
-          "sidecar": {
+          "domain_action_adapter": {
             "owner": "opl",
-            "current_rca_role": "domain_sidecar_target",
+            "current_rca_role": "domain_domain_action_adapter_target",
             "long_term_rca_owner": false
           },
           "status": {
@@ -3678,7 +3678,7 @@
           "opl_can_generate_cli_wrapper": true,
           "opl_can_generate_mcp_wrapper": true,
           "opl_can_generate_product_entry_wrapper": true,
-          "opl_can_generate_sidecar_wrapper": true,
+          "opl_can_generate_domain_action_adapter_wrapper": true,
           "opl_can_generate_status_projection": true,
           "opl_can_generate_session_shell": true,
           "opl_can_generate_workbench_shell": true,
@@ -4104,7 +4104,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "product_sidecar_wrapper",
+          "domain_action_adapter_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -4174,7 +4174,7 @@
           "native helper envelope",
           "operator projection shell",
           "generic CLI/MCP wrappers",
-          "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
+          "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
           "Codex executor adapter",
           "observability/stability read model"
         ],
@@ -4207,7 +4207,7 @@
             "product_entry",
             "product_status",
             "product_session",
-            "sidecar",
+            "domain_action_adapter",
             "workbench"
           ],
           "repo_local_handler_targets": [
@@ -4215,21 +4215,21 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "product_sidecar",
-            "product_entry_session_snapshot_refs_adapter"
+            "domain_action_adapter",
+            "product_entry_continuity_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-            "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-            "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+            "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+            "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
             "default_supervision_owner": "one-person-lab",
             "legacy_supervision_public_surface": "retired",
             "redcube_cli_is_unified_metadata_owner": false,
             "redcube_mcp_is_unified_metadata_owner": false,
-            "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+            "product_entry_continuity_refs_adapter_is_generic_session_owner": false
           },
           "bridge_exit_gate": {
             "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -4347,9 +4347,9 @@
         "physical_deletion_guard": {
           "current_safe_tombstone_candidate_count": 0,
           "deleted_or_thinned_default_surfaces": [
-            "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-            "retired_product_sidecar.supervision_action_tombstone",
-            "retired_product_sidecar.continuation_action_tombstone",
+            "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+            "retired_domain_action_adapter.supervision_action_tombstone",
+            "retired_domain_action_adapter.continuation_action_tombstone",
             "retired_public_cli_mcp.managed_run_lookup_tombstone",
             "retired_public_cli_mcp.managed_supervision_tombstone",
             "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
@@ -4357,9 +4357,9 @@
             "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
           ],
           "retired_legacy_surface_ids": [
-            "product_sidecar_dispatch.runtime_watch",
-            "product_sidecar_dispatch.retired_managed_supervision",
-            "product_sidecar_dispatch.product_entry_continuation",
+            "domain_action_adapter_dispatch.runtime_watch",
+            "domain_action_adapter_dispatch.retired_managed_supervision",
+            "domain_action_adapter_dispatch.product_entry_continuation",
             "public_cli_mcp_gateway.get_managed_run",
             "public_cli_mcp_gateway.retired_managed_supervision",
             "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
@@ -4381,7 +4381,7 @@
             "no_regression_proof_recorded"
           ],
           "remaining_bridge_module_ids": [
-            "product_entry_session_snapshot_refs_adapter",
+            "product_entry_continuity_refs_adapter",
             "workspace_source_intake",
             "memory_writeback_receipt_transport",
             "artifact_export_lifecycle",
@@ -4442,7 +4442,7 @@
         "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
         "modules": [
           {
-            "module_id": "product_entry_session_snapshot_refs_adapter",
+            "module_id": "product_entry_continuity_refs_adapter",
             "surface_ref": "/session_continuity",
             "status": "opl_generated_workbench_session_surface_consumed",
             "classification": "split_owner_boundary",
@@ -4456,11 +4456,11 @@
             "rca_scope": "product_entry_session_domain_snapshot_refs",
             "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
             "codePaths": [
-              "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-              "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-              "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-              "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-              "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+              "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+              "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
             ],
             "activeCallers": [
               "redcube product session domain snapshot refs",
@@ -4486,7 +4486,7 @@
               "rca_owns_replacement_runtime": false
             },
             "bridge_exit_gate": {
-              "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
+              "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
               "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
               "bridge_owner": "redcube_ai_migration_bridge",
               "replacement_owner": "opl",
@@ -4531,7 +4531,7 @@
             },
             "physical_deletion_guard": {
               "safe_to_delete_now": false,
-              "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+              "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
               "required_before_delete": [
                 "domain_authority_refs_preserved",
                 "no_regression_proof_recorded"
@@ -4567,7 +4567,7 @@
             "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
             "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/intake-source.ts",
+              "packages/redcube-domain-entry/src/actions/intake-source.ts",
               "packages/redcube-runtime/src/source-intake.ts",
               "packages/redcube-runtime/src/source-readiness-pack.ts",
               "packages/redcube-runtime/src/shared-source-truth.ts"
@@ -4675,12 +4675,12 @@
             "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
             "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
-              "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+              "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
             ],
             "activeCallers": [
-              "apply_visual_memory_writeback sidecar action",
+              "apply_visual_memory_writeback domain_action_adapter action",
               "workspace receipt inventory",
               "operator evidence readiness projection"
             ],
@@ -4782,15 +4782,15 @@
             "rca_scope": "visual_artifact_export_authority_and_locator_refs",
             "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-              "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
             ],
             "activeCallers": [
               "artifact locator contract",
               "export_pptx route",
               "workspace lifecycle guarded apply",
-              "product sidecar export"
+              "product domain_action_adapter export"
             ],
             "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
             "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -4890,15 +4890,15 @@
             "rca_scope": "visual_review_export_verdict_and_repair_decision",
             "audit_readout": "retain_domain_gate_project_transport_refs",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-              "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
             ],
             "activeCallers": [
               "visual director review",
               "screenshot review",
               "repair_image_pages",
-              "product sidecar review projection"
+              "product domain_action_adapter review projection"
             ],
             "activeCallerStatus": "active_domain_review_gate",
             "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
@@ -4999,7 +4999,7 @@
             "rca_scope": "python_native_helper_implementation",
             "audit_readout": "retain_rca_implementation_project_opl_envelope",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+              "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
               "contracts/runtime-program/python-native-helper-catalog.json",
               "python/redcube_ai"
             ],
@@ -5106,14 +5106,14 @@
             "rca_scope": "rca_operator_projection_refs_only",
             "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-              "packages/redcube-gateway/src/actions/get-product-status.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+              "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+              "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
             ],
             "activeCallers": [
               "OPL generated product status/workbench consumes RCA operator evidence refs",
               "product-entry manifest domain projection refs",
-              "product sidecar export refs-only projection",
+              "product domain_action_adapter export refs-only projection",
               "operator evidence readiness tests"
             ],
             "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -5211,25 +5211,25 @@
               "domain_action_handlers",
               "safe_action_refs"
             ],
-            "rca_scope": "product_sidecar_status_action_metadata_projection",
+            "rca_scope": "domain_action_adapter_status_action_metadata_projection",
             "audit_readout": "retain_thin_projection_project_generated_wrappers",
             "codePaths": [
               "apps/redcube-cli/src/cli.ts",
               "apps/redcube-mcp/src/server.ts",
-              "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
+              "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
             ],
             "activeCallers": [
               "OPL generated CLI/MCP wrapper domain handler targets",
               "redcube CLI direct diagnostic entry",
               "redcube MCP direct protocol adapter",
               "family action catalog refs",
-              "product sidecar guarded action list refs"
+              "product domain_action_adapter guarded action list refs"
             ],
             "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
             "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
             "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-            "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+            "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
             "tombstone_required": false,
             "migration_class": "domain_handler_target",
             "active_reader_facing_classification": "domain_handler_target",
@@ -5329,12 +5329,12 @@
               "packages/redcube-runtime-protocol/src/executor-runtime.ts",
               "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
               "packages/redcube-runtime/src/executors.ts",
-              "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
-              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
-              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
-              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
-              "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
-              "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+              "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
+              "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
+              "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+              "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts",
+              "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+              "packages/redcube-domain-entry/src/actions/domain-entry-contract.ts",
               "tests/rca-executor-backend-contract.test.ts"
             ],
             "activeCallers": [
@@ -5452,13 +5452,13 @@
             "rca_scope": "visual_domain_status_projection_refs_only",
             "audit_readout": "project_only",
             "codePaths": [
-              "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-              "packages/redcube-gateway/src/actions/get-product-status.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+              "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
+              "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
             ],
             "activeCallers": [
               "product status",
-              "product sidecar runtime framework",
+              "product domain_action_adapter runtime framework",
               "operator evidence readiness projection"
             ],
             "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -5564,15 +5564,15 @@
               "rca_owns_replacement_runtime": false
             },
             "codePaths": [
-              "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts"
             ],
             "activeCallers": [
               "product-entry manifest",
-              "product sidecar export",
+              "product domain_action_adapter export",
               "product status"
             ],
             "activeCallerStatus": "declarative_pack_input_active",
-            "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+            "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
             "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
             "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
             "rca_projection_mode": "declarative_pack_refs_only",
@@ -5658,8 +5658,8 @@
               "rca_owns_replacement_runtime": false
             },
             "codePaths": [
-              "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-              "packages/redcube-gateway/src/actions/product-sidecar.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
+              "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
               "packages/redcube-runtime/src"
             ],
             "activeCallers": [
@@ -6163,7 +6163,7 @@
           "review_repair_transport",
           "restart_dead_letter_repair_human_gate_state_chain",
           "native_helper_generic_envelope",
-          "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+          "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
           "family_conflict_envelope_schema",
           "control_loop_summary_builder",
           "usage_projection_aggregator",
@@ -6192,7 +6192,7 @@
             "product_entry",
             "product_status",
             "product_session",
-            "sidecar",
+            "domain_action_adapter",
             "workbench"
           ],
           "repo_local_handler_targets": [
@@ -6200,21 +6200,21 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "product_sidecar",
-            "product_entry_session_snapshot_refs_adapter"
+            "domain_action_adapter",
+            "product_entry_continuity_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-            "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-            "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+            "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+            "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
             "default_supervision_owner": "one-person-lab",
             "legacy_supervision_public_surface": "retired",
             "redcube_cli_is_unified_metadata_owner": false,
             "redcube_mcp_is_unified_metadata_owner": false,
-            "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+            "product_entry_continuity_refs_adapter_is_generic_session_owner": false
           },
           "bridge_exit_gate": {
             "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -6305,8 +6305,8 @@
         ],
         "retired_no_resurrection_guards": [
           {
-            "surface_id": "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-            "retired_legacy_surface_id": "product_sidecar_dispatch.runtime_watch",
+            "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+            "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
             "retired_at": "2026-05-21",
             "replacement_owner": "opl",
             "replacement_surface": "opl_status_workbench_runtime_read_model",
@@ -6317,8 +6317,8 @@
             "resurrection_policy": "forbidden"
           },
           {
-            "surface_id": "retired_product_sidecar.supervision_action_tombstone",
-            "retired_legacy_surface_id": "product_sidecar_dispatch.retired_managed_supervision",
+            "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
+            "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
             "retired_at": "2026-05-17",
             "replacement_owner": "opl",
             "replacement_surface": "opl_generic_runner_and_supervisor_tick",
@@ -6329,8 +6329,8 @@
             "resurrection_policy": "forbidden"
           },
           {
-            "surface_id": "retired_product_sidecar.continuation_action_tombstone",
-            "retired_legacy_surface_id": "product_sidecar_dispatch.product_entry_continuation",
+            "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
+            "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
             "retired_at": "2026-05-17",
             "replacement_owner": "opl",
             "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
@@ -6406,7 +6406,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -6414,21 +6414,21 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -6583,7 +6583,7 @@
         "concrete executor",
         "private Hermes-Agent fork"
       ],
-      "future_sidecar_promotion_gate": "only if external Hermes-Agent cannot express the task/wakeup/approval/audit/product isolation contracts required by OPL"
+      "future_domain_action_adapter_promotion_gate": "only if external Hermes-Agent cannot express the task/wakeup/approval/audit/product isolation contracts required by OPL"
     },
     "language_target": {
       "typescript_owner": "product entry, CLI/MCP surfaces, contracts, domain-entry protocol boundary, runtime-family shell, and typed service boundaries",
@@ -6617,7 +6617,7 @@
         "review/export judgment",
         "PNG/PPTX/PDF blob storage"
       ],
-      "source_reference": "MAS/MDS runtime lifecycle SQLite sidecar pattern"
+      "source_reference": "MAS/MDS runtime lifecycle SQLite domain_action_adapter pattern"
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
@@ -6761,7 +6761,7 @@
       "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
       "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
       "redcube_default_entry_unchanged": true,
-      "full_sidecar_enabled_now": false,
+      "full_domain_action_adapter_enabled_now": false,
       "native_helper_scope": [
         "RCA-owned native helper implementation",
         "OPL-owned native helper generic envelope",
@@ -6840,7 +6840,7 @@
     },
     "runtime_persistence_strategy": {
       "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
-      "sqlite_sidecar_enabled_now": false,
+      "sqlite_domain_action_adapter_enabled_now": false,
       "sqlite_decision": "deferred_until_measured_rca_runtime_file_growth_or_query_pressure",
       "canonical_truth_surfaces_remain_files": [
         "product-entry/session truth",
@@ -6853,7 +6853,7 @@
         "opl_family_stage_control_projection projection",
         "domain_memory_descriptor_locator projection"
       ],
-      "future_sidecar_constraints": [
+      "future_domain_action_adapter_constraints": [
         "must be rebuildable",
         "must not store PNG/PPTX/PDF blobs",
         "must not replace visual-domain truth or review/export judgment",
@@ -7042,7 +7042,7 @@
             "title safe zone obstruction",
             "table font below 11pt",
             "sparse oversized card",
-            "optional OCR manifest sidecar"
+            "optional OCR manifest domain_action_adapter"
           ],
           "hard_block_checks": [
             "external_audience_language_ok",
@@ -7485,10 +7485,10 @@
           "invokeOplHostedProductEntry",
           "getProductEntrySession",
           "redcube product invoke",
-          "redcube product sidecar",
+          "redcube product domain_action_adapter",
           "redcube product session",
           "invoke_product_entry",
-          "product_sidecar_dispatch",
+          "domain_action_adapter_dispatch",
           "get_product_entry_session"
         ],
         "required_downstream_domain_surfaces": [
@@ -7658,7 +7658,7 @@
           "writeback_receipt_proof_contract_id": "rca.visual_pattern_memory.writeback_receipt_proof.v1",
           "direct_and_opl_share_descriptor_refs": true,
           "direct_and_opl_share_consumed_memory_refs": true,
-          "direct_and_opl_share_sidecar_refs": true,
+          "direct_and_opl_share_domain_action_adapter_refs": true,
           "direct_and_opl_share_quality_refs": true,
           "downstream_truth_owner": "redcube_ai",
           "opl_writes_visual_truth": false,
@@ -7757,7 +7757,7 @@
           "owner": "redcube_ai",
           "no_regression_evidence": {
             "action": "emit_no_regression_evidence",
-            "dispatch_surface": "redcube product sidecar dispatch",
+            "dispatch_surface": "redcube product domain_action_adapter dispatch",
             "surface_kind": "no_regression_evidence",
             "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
             "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
@@ -7913,7 +7913,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
           ],
           "opl_owned_generic_primitives": [
             "standard_domain_agent_scaffold",
@@ -7934,7 +7934,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
           ],
           "rca_retained_authority": [
             "visual_truth",
@@ -8024,7 +8024,7 @@
           "rca_thin_program_surfaces": [
             "single redcube-ai app skill",
             "service-safe domain entry",
-            "product sidecar projection",
+            "product domain_action_adapter projection",
             "stage control projection",
             "visual transition spec",
             "artifact locator refs",
@@ -8037,43 +8037,43 @@
               "primitive": "standard_domain_agent_scaffold",
               "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
               "manifest_ref": "/standard_domain_agent_skeleton",
-              "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
+              "domain_action_adapter_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
             },
             {
               "primitive": "generic_scheduler",
               "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
               "manifest_ref": "/family_scheduler_replacement",
-              "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
+              "domain_action_adapter_ref": "/runtime_framework/family_scheduler_replacement"
             },
             {
               "primitive": "memory_transport",
               "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
               "manifest_ref": "/domain_memory_descriptor_locator",
-              "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+              "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
             },
             {
               "primitive": "artifact_lifecycle",
               "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
               "manifest_ref": "/lifecycle_guarded_apply_proof",
-              "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+              "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
             },
             {
               "primitive": "review_repair_transport",
               "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
               "manifest_ref": "/review_state",
-              "sidecar_ref": "/mapped_surfaces/review_projection"
+              "domain_action_adapter_ref": "/mapped_surfaces/review_projection"
             },
             {
               "primitive": "native_helper_generic_envelope",
               "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
               "manifest_ref": "/native_ppt_operator_ux",
-              "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+              "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
             },
             {
-              "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+              "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
               "contract_ref": "rca.visual_pack_compiler_handoff.v1",
               "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-              "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+              "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
             }
           ],
           "forbidden_rca_generic_owner_flags": {
@@ -8093,13 +8093,13 @@
             "rca_review_repair_transport_owner": false,
             "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
             "rca_native_helper_generic_envelope_owner": false,
-            "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
+            "rca_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper_owner": false
           }
         },
         "opl_stability_read_model_consumption": {
           "status": "refs_only_consumer_projection_landed",
           "source_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
-          "source_sidecar_surface": "redcube product sidecar export#/mapped_surfaces/opl_stability_read_model_consumption",
+          "source_domain_action_adapter_surface": "redcube product domain_action_adapter export#/mapped_surfaces/opl_stability_read_model_consumption",
           "contract_ref": "opl.family_operator_stability_read_model.v1",
           "owner": "opl",
           "consumer": "redcube_ai",
@@ -8272,7 +8272,7 @@
                 "compatibility_alias",
                 "default_runtime_owner",
                 "public_action_key",
-                "sidecar_template"
+                "domain_action_adapter_template"
               ]
             },
             "authority_boundary": {
@@ -8304,7 +8304,7 @@
             "native helper envelope",
             "operator projection shell",
             "generic CLI/MCP wrappers",
-            "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
+            "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
             "Codex executor adapter",
             "observability/stability read model"
           ],
@@ -8337,7 +8337,7 @@
               "product_entry",
               "product_status",
               "product_session",
-              "sidecar",
+              "domain_action_adapter",
               "workbench"
             ],
             "repo_local_handler_targets": [
@@ -8345,21 +8345,21 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "product_sidecar",
-              "product_entry_session_snapshot_refs_adapter"
+              "domain_action_adapter",
+              "product_entry_continuity_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+              "product_entry_continuity_refs_adapter_is_generic_session_owner": false
             },
             "bridge_exit_gate": {
               "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -8477,9 +8477,9 @@
           "physical_deletion_guard": {
             "current_safe_tombstone_candidate_count": 0,
             "deleted_or_thinned_default_surfaces": [
-              "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-              "retired_product_sidecar.supervision_action_tombstone",
-              "retired_product_sidecar.continuation_action_tombstone",
+              "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+              "retired_domain_action_adapter.supervision_action_tombstone",
+              "retired_domain_action_adapter.continuation_action_tombstone",
               "retired_public_cli_mcp.managed_run_lookup_tombstone",
               "retired_public_cli_mcp.managed_supervision_tombstone",
               "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
@@ -8487,9 +8487,9 @@
               "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
             ],
             "retired_legacy_surface_ids": [
-              "product_sidecar_dispatch.runtime_watch",
-              "product_sidecar_dispatch.retired_managed_supervision",
-              "product_sidecar_dispatch.product_entry_continuation",
+              "domain_action_adapter_dispatch.runtime_watch",
+              "domain_action_adapter_dispatch.retired_managed_supervision",
+              "domain_action_adapter_dispatch.product_entry_continuation",
               "public_cli_mcp_gateway.get_managed_run",
               "public_cli_mcp_gateway.retired_managed_supervision",
               "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
@@ -8511,7 +8511,7 @@
               "no_regression_proof_recorded"
             ],
             "remaining_bridge_module_ids": [
-              "product_entry_session_snapshot_refs_adapter",
+              "product_entry_continuity_refs_adapter",
               "workspace_source_intake",
               "memory_writeback_receipt_transport",
               "artifact_export_lifecycle",
@@ -8572,7 +8572,7 @@
           "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
           "modules": [
             {
-              "module_id": "product_entry_session_snapshot_refs_adapter",
+              "module_id": "product_entry_continuity_refs_adapter",
               "surface_ref": "/session_continuity",
               "status": "opl_generated_workbench_session_surface_consumed",
               "classification": "split_owner_boundary",
@@ -8586,11 +8586,11 @@
               "rca_scope": "product_entry_session_domain_snapshot_refs",
               "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
               "codePaths": [
-                "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-                "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-                "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-                "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-                "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+                "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+                "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
               ],
               "activeCallers": [
                 "redcube product session domain snapshot refs",
@@ -8616,7 +8616,7 @@
                 "rca_owns_replacement_runtime": false
               },
               "bridge_exit_gate": {
-                "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
+                "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
                 "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
                 "bridge_owner": "redcube_ai_migration_bridge",
                 "replacement_owner": "opl",
@@ -8643,13 +8643,13 @@
                 "opl_can_issue_owner_receipt": false,
                 "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
                 "typed_blocker_refs": [
-                  "typed-blocker:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/physical-delete-requires-explicit-owner-receipt"
+                  "typed-blocker:rca/default-caller-deletion/product_entry_continuity_refs_adapter/physical-delete-requires-explicit-owner-receipt"
                 ],
                 "no_forbidden_write_refs": [
-                  "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+                  "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
                 ],
                 "no_forbidden_write_evidence_refs": [
-                  "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+                  "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
                 ],
                 "domain_repo_physical_delete_authorized": false,
                 "physical_delete_authorized_by_refs": false
@@ -8673,7 +8673,7 @@
               },
               "physical_deletion_guard": {
                 "safe_to_delete_now": false,
-                "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+                "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
                 "required_before_delete": [
                   "domain_authority_refs_preserved",
                   "no_regression_proof_recorded"
@@ -8712,7 +8712,7 @@
               "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
               "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/intake-source.ts",
+                "packages/redcube-domain-entry/src/actions/intake-source.ts",
                 "packages/redcube-runtime/src/source-intake.ts",
                 "packages/redcube-runtime/src/source-readiness-pack.ts",
                 "packages/redcube-runtime/src/shared-source-truth.ts"
@@ -8835,12 +8835,12 @@
               "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
               "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
-                "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+                "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
               ],
               "activeCallers": [
-                "apply_visual_memory_writeback sidecar action",
+                "apply_visual_memory_writeback domain_action_adapter action",
                 "workspace receipt inventory",
                 "operator evidence readiness projection"
               ],
@@ -8957,15 +8957,15 @@
               "rca_scope": "visual_artifact_export_authority_and_locator_refs",
               "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-                "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
               ],
               "activeCallers": [
                 "artifact locator contract",
                 "export_pptx route",
                 "workspace lifecycle guarded apply",
-                "product sidecar export"
+                "product domain_action_adapter export"
               ],
               "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
               "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -9080,15 +9080,15 @@
               "rca_scope": "visual_review_export_verdict_and_repair_decision",
               "audit_readout": "retain_domain_gate_project_transport_refs",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-                "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
               ],
               "activeCallers": [
                 "visual director review",
                 "screenshot review",
                 "repair_image_pages",
-                "product sidecar review projection"
+                "product domain_action_adapter review projection"
               ],
               "activeCallerStatus": "active_domain_review_gate",
               "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
@@ -9204,7 +9204,7 @@
               "rca_scope": "python_native_helper_implementation",
               "audit_readout": "retain_rca_implementation_project_opl_envelope",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+                "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
                 "contracts/runtime-program/python-native-helper-catalog.json",
                 "python/redcube_ai"
               ],
@@ -9326,14 +9326,14 @@
               "rca_scope": "rca_operator_projection_refs_only",
               "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-                "packages/redcube-gateway/src/actions/get-product-status.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+                "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+                "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
               ],
               "activeCallers": [
                 "OPL generated product status/workbench consumes RCA operator evidence refs",
                 "product-entry manifest domain projection refs",
-                "product sidecar export refs-only projection",
+                "product domain_action_adapter export refs-only projection",
                 "operator evidence readiness tests"
               ],
               "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -9450,25 +9450,25 @@
                 "domain_action_handlers",
                 "safe_action_refs"
               ],
-              "rca_scope": "product_sidecar_status_action_metadata_projection",
+              "rca_scope": "domain_action_adapter_status_action_metadata_projection",
               "audit_readout": "retain_thin_projection_project_generated_wrappers",
               "codePaths": [
                 "apps/redcube-cli/src/cli.ts",
                 "apps/redcube-mcp/src/server.ts",
-                "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
+                "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
               ],
               "activeCallers": [
                 "OPL generated CLI/MCP wrapper domain handler targets",
                 "redcube CLI direct diagnostic entry",
                 "redcube MCP direct protocol adapter",
                 "family action catalog refs",
-                "product sidecar guarded action list refs"
+                "product domain_action_adapter guarded action list refs"
               ],
               "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
               "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
               "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-              "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+              "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
               "tombstone_required": false,
               "migration_class": "domain_handler_target",
               "active_reader_facing_classification": "domain_handler_target",
@@ -9587,12 +9587,12 @@
                 "packages/redcube-runtime-protocol/src/executor-runtime.ts",
                 "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
                 "packages/redcube-runtime/src/executors.ts",
-                "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
-                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
-                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
-                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
-                "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
-                "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+                "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
+                "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
+                "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+                "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts",
+                "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+                "packages/redcube-domain-entry/src/actions/domain-entry-contract.ts",
                 "tests/rca-executor-backend-contract.test.ts"
               ],
               "activeCallers": [
@@ -9725,13 +9725,13 @@
               "rca_scope": "visual_domain_status_projection_refs_only",
               "audit_readout": "project_only",
               "codePaths": [
-                "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-                "packages/redcube-gateway/src/actions/get-product-status.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+                "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
+                "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
               ],
               "activeCallers": [
                 "product status",
-                "product sidecar runtime framework",
+                "product domain_action_adapter runtime framework",
                 "operator evidence readiness projection"
               ],
               "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -9852,15 +9852,15 @@
                 "rca_owns_replacement_runtime": false
               },
               "codePaths": [
-                "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts"
               ],
               "activeCallers": [
                 "product-entry manifest",
-                "product sidecar export",
+                "product domain_action_adapter export",
                 "product status"
               ],
               "activeCallerStatus": "declarative_pack_input_active",
-              "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+              "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
               "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
               "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
               "rca_projection_mode": "declarative_pack_refs_only",
@@ -9946,8 +9946,8 @@
                 "rca_owns_replacement_runtime": false
               },
               "codePaths": [
-                "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-                "packages/redcube-gateway/src/actions/product-sidecar.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
+                "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
                 "packages/redcube-runtime/src"
               ],
               "activeCallers": [
@@ -10451,7 +10451,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
             "family_conflict_envelope_schema",
             "control_loop_summary_builder",
             "usage_projection_aggregator",
@@ -10480,7 +10480,7 @@
               "product_entry",
               "product_status",
               "product_session",
-              "sidecar",
+              "domain_action_adapter",
               "workbench"
             ],
             "repo_local_handler_targets": [
@@ -10488,21 +10488,21 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "product_sidecar",
-              "product_entry_session_snapshot_refs_adapter"
+              "domain_action_adapter",
+              "product_entry_continuity_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+              "product_entry_continuity_refs_adapter_is_generic_session_owner": false
             },
             "bridge_exit_gate": {
               "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -10593,8 +10593,8 @@
           ],
           "retired_no_resurrection_guards": [
             {
-              "surface_id": "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-              "retired_legacy_surface_id": "product_sidecar_dispatch.runtime_watch",
+              "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+              "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
               "retired_at": "2026-05-21",
               "replacement_owner": "opl",
               "replacement_surface": "opl_status_workbench_runtime_read_model",
@@ -10605,8 +10605,8 @@
               "resurrection_policy": "forbidden"
             },
             {
-              "surface_id": "retired_product_sidecar.supervision_action_tombstone",
-              "retired_legacy_surface_id": "product_sidecar_dispatch.retired_managed_supervision",
+              "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
+              "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
               "retired_at": "2026-05-17",
               "replacement_owner": "opl",
               "replacement_surface": "opl_generic_runner_and_supervisor_tick",
@@ -10617,8 +10617,8 @@
               "resurrection_policy": "forbidden"
             },
             {
-              "surface_id": "retired_product_sidecar.continuation_action_tombstone",
-              "retired_legacy_surface_id": "product_sidecar_dispatch.product_entry_continuation",
+              "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
+              "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
               "retired_at": "2026-05-17",
               "replacement_owner": "opl",
               "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
@@ -10773,7 +10773,7 @@
               "review/repair transport shell",
               "native helper execution envelope",
               "operator projection/workbench shell",
-              "generated CLI/MCP/product-entry/sidecar/status wrappers"
+              "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
             ],
             "migration_gates_before_code_retirement": [
               "generated/default caller parity proven for the replacement OPL surface",
@@ -11285,7 +11285,7 @@
                 "product_entry",
                 "product_status",
                 "product_session",
-                "sidecar",
+                "domain_action_adapter",
                 "workbench"
               ],
               "repo_local_handler_targets": [
@@ -11293,8 +11293,8 @@
                 "redcube_mcp",
                 "invokeProductEntry",
                 "invokeDomainEntry",
-                "product_sidecar",
-                "product_entry_session_snapshot_refs_adapter"
+                "domain_action_adapter",
+                "product_entry_continuity_refs_adapter"
               ],
               "repo_local_handlers_are_generated_surface_owners": false,
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -11363,7 +11363,7 @@
               "mcp_wrapper",
               "skill_wrapper",
               "product_entry_wrapper",
-              "product_sidecar_wrapper",
+              "domain_action_adapter_wrapper",
               "status_projection_wrapper",
               "session_wrapper",
               "workbench_wrapper",
@@ -11376,7 +11376,7 @@
               "product_entry",
               "product_status",
               "product_session",
-              "sidecar",
+              "domain_action_adapter",
               "workbench"
             ],
             "repo_local_handler_targets": [
@@ -11384,8 +11384,8 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "product_sidecar",
-              "product_entry_session_snapshot_refs_adapter"
+              "domain_action_adapter",
+              "product_entry_continuity_refs_adapter"
             ],
             "rca_generated_surface_owner": false,
             "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -11442,15 +11442,15 @@
               "domain_handler_owner": "redcube_ai",
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-              "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
               "default_supervision_owner": "one-person-lab",
               "legacy_supervision_public_surface": "retired",
               "redcube_cli_is_unified_metadata_owner": false,
               "redcube_mcp_is_unified_metadata_owner": false,
-              "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+              "product_entry_continuity_refs_adapter_is_generic_session_owner": false
             },
             "wrappers": {
               "cli": {
@@ -11473,9 +11473,9 @@
                 "current_rca_role": "direct_domain_entry_target",
                 "long_term_rca_owner": false
               },
-              "sidecar": {
+              "domain_action_adapter": {
                 "owner": "opl",
-                "current_rca_role": "domain_sidecar_target",
+                "current_rca_role": "domain_domain_action_adapter_target",
                 "long_term_rca_owner": false
               },
               "status": {
@@ -11503,7 +11503,7 @@
               "opl_can_generate_cli_wrapper": true,
               "opl_can_generate_mcp_wrapper": true,
               "opl_can_generate_product_entry_wrapper": true,
-              "opl_can_generate_sidecar_wrapper": true,
+              "opl_can_generate_domain_action_adapter_wrapper": true,
               "opl_can_generate_status_projection": true,
               "opl_can_generate_session_shell": true,
               "opl_can_generate_workbench_shell": true,
@@ -11929,7 +11929,7 @@
               "mcp_wrapper",
               "skill_wrapper",
               "product_entry_wrapper",
-              "product_sidecar_wrapper",
+              "domain_action_adapter_wrapper",
               "status_projection_wrapper",
               "session_wrapper",
               "workbench_wrapper",
@@ -12057,7 +12057,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
       ],
       "opl_owned_generic_primitives": [
         "standard_domain_agent_scaffold",
@@ -12078,7 +12078,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
       ],
       "rca_retained_authority": [
         "visual_truth",
@@ -12168,7 +12168,7 @@
       "rca_thin_program_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product sidecar projection",
+        "product domain_action_adapter projection",
         "stage control projection",
         "visual transition spec",
         "artifact locator refs",
@@ -12181,43 +12181,43 @@
           "primitive": "standard_domain_agent_scaffold",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
           "manifest_ref": "/standard_domain_agent_skeleton",
-          "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
+          "domain_action_adapter_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
         },
         {
           "primitive": "generic_scheduler",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
           "manifest_ref": "/family_scheduler_replacement",
-          "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
+          "domain_action_adapter_ref": "/runtime_framework/family_scheduler_replacement"
         },
         {
           "primitive": "memory_transport",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
           "manifest_ref": "/domain_memory_descriptor_locator",
-          "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+          "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
         },
         {
           "primitive": "artifact_lifecycle",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
           "manifest_ref": "/lifecycle_guarded_apply_proof",
-          "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+          "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
         },
         {
           "primitive": "review_repair_transport",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
           "manifest_ref": "/review_state",
-          "sidecar_ref": "/mapped_surfaces/review_projection"
+          "domain_action_adapter_ref": "/mapped_surfaces/review_projection"
         },
         {
           "primitive": "native_helper_generic_envelope",
           "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
           "manifest_ref": "/native_ppt_operator_ux",
-          "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+          "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
         },
         {
-          "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+          "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
           "contract_ref": "rca.visual_pack_compiler_handoff.v1",
           "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-          "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+          "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
         }
       ],
       "forbidden_rca_generic_owner_flags": {
@@ -12237,7 +12237,7 @@
         "rca_review_repair_transport_owner": false,
         "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
         "rca_native_helper_generic_envelope_owner": false,
-        "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
+        "rca_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper_owner": false
       }
     },
     "opl_stability_read_model_consumption": {
@@ -12351,7 +12351,7 @@
         "native helper envelope",
         "operator projection shell",
         "generic CLI/MCP wrappers",
-        "generated CLI/MCP/product-entry/sidecar/status/session/workbench wrappers",
+        "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
         "Codex executor adapter",
         "observability/stability read model"
       ],
@@ -12384,7 +12384,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -12392,21 +12392,21 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -12524,9 +12524,9 @@
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 0,
         "deleted_or_thinned_default_surfaces": [
-          "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-          "retired_product_sidecar.supervision_action_tombstone",
-          "retired_product_sidecar.continuation_action_tombstone",
+          "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+          "retired_domain_action_adapter.supervision_action_tombstone",
+          "retired_domain_action_adapter.continuation_action_tombstone",
           "retired_public_cli_mcp.managed_run_lookup_tombstone",
           "retired_public_cli_mcp.managed_supervision_tombstone",
           "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
@@ -12534,9 +12534,9 @@
           "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
         ],
         "retired_legacy_surface_ids": [
-          "product_sidecar_dispatch.runtime_watch",
-          "product_sidecar_dispatch.retired_managed_supervision",
-          "product_sidecar_dispatch.product_entry_continuation",
+          "domain_action_adapter_dispatch.runtime_watch",
+          "domain_action_adapter_dispatch.retired_managed_supervision",
+          "domain_action_adapter_dispatch.product_entry_continuation",
           "public_cli_mcp_gateway.get_managed_run",
           "public_cli_mcp_gateway.retired_managed_supervision",
           "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
@@ -12558,7 +12558,7 @@
           "no_regression_proof_recorded"
         ],
         "remaining_bridge_module_ids": [
-          "product_entry_session_snapshot_refs_adapter",
+          "product_entry_continuity_refs_adapter",
           "workspace_source_intake",
           "memory_writeback_receipt_transport",
           "artifact_export_lifecycle",
@@ -12619,7 +12619,7 @@
       "visual_pack_compiler_handoff_ref": "/visual_pack_compiler_handoff",
       "modules": [
         {
-          "module_id": "product_entry_session_snapshot_refs_adapter",
+          "module_id": "product_entry_continuity_refs_adapter",
           "surface_ref": "/session_continuity",
           "status": "opl_generated_workbench_session_surface_consumed",
           "classification": "split_owner_boundary",
@@ -12633,11 +12633,11 @@
           "rca_scope": "product_entry_session_domain_snapshot_refs",
           "audit_readout": "project_opl_session_shell_retain_domain_snapshot_refs",
           "codePaths": [
-            "packages/redcube-runtime/src/product-entry-session-snapshot-ref-adapter.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-artifacts.ts",
-            "packages/redcube-gateway/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-            "packages/redcube-gateway/src/actions/product-entry-continuity-surfaces.ts"
+            "packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+            "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
             "redcube product session domain snapshot refs",
@@ -12663,7 +12663,7 @@
             "rca_owns_replacement_runtime": false
           },
           "bridge_exit_gate": {
-            "gate_id": "product_entry_session_snapshot_refs_adapter_bridge_exit_gate",
+            "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
             "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
             "bridge_owner": "redcube_ai_migration_bridge",
             "replacement_owner": "opl",
@@ -12690,13 +12690,13 @@
             "opl_can_issue_owner_receipt": false,
             "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
             "typed_blocker_refs": [
-              "typed-blocker:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/physical-delete-requires-explicit-owner-receipt"
+              "typed-blocker:rca/default-caller-deletion/product_entry_continuity_refs_adapter/physical-delete-requires-explicit-owner-receipt"
             ],
             "no_forbidden_write_refs": [
-              "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+              "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
             ],
             "no_forbidden_write_evidence_refs": [
-              "no-forbidden-write:rca/default-caller-deletion/product_entry_session_snapshot_refs_adapter/refs-only-boundary"
+              "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
             ],
             "domain_repo_physical_delete_authorized": false,
             "physical_delete_authorized_by_refs": false
@@ -12720,7 +12720,7 @@
           },
           "physical_deletion_guard": {
             "safe_to_delete_now": false,
-            "reason": "product_entry_session_snapshot_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
+            "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
             "required_before_delete": [
               "domain_authority_refs_preserved",
               "no_regression_proof_recorded"
@@ -12759,7 +12759,7 @@
           "rca_scope": "visual_source_readiness_and_domain_source_pack_refs",
           "audit_readout": "project_opl_workspace_source_shell_retain_rca_source_verdict",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/intake-source.ts",
+            "packages/redcube-domain-entry/src/actions/intake-source.ts",
             "packages/redcube-runtime/src/source-intake.ts",
             "packages/redcube-runtime/src/source-readiness-pack.ts",
             "packages/redcube-runtime/src/shared-source-truth.ts"
@@ -12882,12 +12882,12 @@
           "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
           "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_memory_writeback",
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
+            "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
           ],
           "activeCallers": [
-            "apply_visual_memory_writeback sidecar action",
+            "apply_visual_memory_writeback domain_action_adapter action",
             "workspace receipt inventory",
             "operator evidence readiness projection"
           ],
@@ -13004,15 +13004,15 @@
           "rca_scope": "visual_artifact_export_authority_and_locator_refs",
           "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
           ],
           "activeCallers": [
             "artifact locator contract",
             "export_pptx route",
             "workspace lifecycle guarded apply",
-            "product sidecar export"
+            "product domain_action_adapter export"
           ],
           "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
           "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -13127,15 +13127,15 @@
           "rca_scope": "visual_review_export_verdict_and_repair_decision",
           "audit_readout": "retain_domain_gate_project_transport_refs",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
           ],
           "activeCallers": [
             "visual director review",
             "screenshot review",
             "repair_image_pages",
-            "product sidecar review projection"
+            "product domain_action_adapter review projection"
           ],
           "activeCallerStatus": "active_domain_review_gate",
           "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
@@ -13251,7 +13251,7 @@
           "rca_scope": "python_native_helper_implementation",
           "audit_readout": "retain_rca_implementation_project_opl_envelope",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
             "contracts/runtime-program/python-native-helper-catalog.json",
             "python/redcube_ai"
           ],
@@ -13373,14 +13373,14 @@
           "rca_scope": "rca_operator_projection_refs_only",
           "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-            "packages/redcube-gateway/src/actions/get-product-status.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/operator_evidence_readiness_projection"
+            "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
+            "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection"
           ],
           "activeCallers": [
             "OPL generated product status/workbench consumes RCA operator evidence refs",
             "product-entry manifest domain projection refs",
-            "product sidecar export refs-only projection",
+            "product domain_action_adapter export refs-only projection",
             "operator evidence readiness tests"
           ],
           "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -13497,25 +13497,25 @@
             "domain_action_handlers",
             "safe_action_refs"
           ],
-          "rca_scope": "product_sidecar_status_action_metadata_projection",
+          "rca_scope": "domain_action_adapter_status_action_metadata_projection",
           "audit_readout": "retain_thin_projection_project_generated_wrappers",
           "codePaths": [
             "apps/redcube-cli/src/cli.ts",
             "apps/redcube-mcp/src/server.ts",
-            "packages/redcube-gateway/src/actions/family-action-catalog.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/guarded-action-catalog.ts"
+            "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
           ],
           "activeCallers": [
             "OPL generated CLI/MCP wrapper domain handler targets",
             "redcube CLI direct diagnostic entry",
             "redcube MCP direct protocol adapter",
             "family action catalog refs",
-            "product sidecar guarded action list refs"
+            "product domain_action_adapter guarded action list refs"
           ],
           "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
           "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
           "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded sidecar handler authority.",
+          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
           "tombstone_required": false,
           "migration_class": "domain_handler_target",
           "active_reader_facing_classification": "domain_handler_target",
@@ -13634,12 +13634,12 @@
             "packages/redcube-runtime-protocol/src/executor-runtime.ts",
             "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
             "packages/redcube-runtime/src/executors.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/recovery.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts",
-            "packages/redcube-gateway/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
-            "packages/redcube-gateway/src/actions/domain-entry-contract.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts",
+            "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+            "packages/redcube-domain-entry/src/actions/domain-entry-contract.ts",
             "tests/rca-executor-backend-contract.test.ts"
           ],
           "activeCallers": [
@@ -13772,13 +13772,13 @@
           "rca_scope": "visual_domain_status_projection_refs_only",
           "audit_readout": "project_only",
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts#/opl_stability_read_model_consumption",
-            "packages/redcube-gateway/src/actions/get-product-status.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts#/runtime_framework"
+            "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
+            "packages/redcube-domain-entry/src/actions/get-product-status.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
           ],
           "activeCallers": [
             "product status",
-            "product sidecar runtime framework",
+            "product domain_action_adapter runtime framework",
             "operator evidence readiness projection"
           ],
           "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -13899,15 +13899,15 @@
             "rca_owns_replacement_runtime": false
           },
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts"
           ],
           "activeCallers": [
             "product-entry manifest",
-            "product sidecar export",
+            "product domain_action_adapter export",
             "product status"
           ],
           "activeCallerStatus": "declarative_pack_input_active",
-          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
           "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
           "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
           "rca_projection_mode": "declarative_pack_refs_only",
@@ -13993,8 +13993,8 @@
             "rca_owns_replacement_runtime": false
           },
           "codePaths": [
-            "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-            "packages/redcube-gateway/src/actions/product-sidecar.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
+            "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
             "packages/redcube-runtime/src"
           ],
           "activeCallers": [
@@ -14498,7 +14498,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
         "family_conflict_envelope_schema",
         "control_loop_summary_builder",
         "usage_projection_aggregator",
@@ -14527,7 +14527,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -14535,21 +14535,21 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "bridge_exit_gate": {
           "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -14640,8 +14640,8 @@
       ],
       "retired_no_resurrection_guards": [
         {
-          "surface_id": "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.runtime_watch",
+          "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
           "retired_at": "2026-05-21",
           "replacement_owner": "opl",
           "replacement_surface": "opl_status_workbench_runtime_read_model",
@@ -14652,8 +14652,8 @@
           "resurrection_policy": "forbidden"
         },
         {
-          "surface_id": "retired_product_sidecar.supervision_action_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.retired_managed_supervision",
+          "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
           "retired_at": "2026-05-17",
           "replacement_owner": "opl",
           "replacement_surface": "opl_generic_runner_and_supervisor_tick",
@@ -14664,8 +14664,8 @@
           "resurrection_policy": "forbidden"
         },
         {
-          "surface_id": "retired_product_sidecar.continuation_action_tombstone",
-          "retired_legacy_surface_id": "product_sidecar_dispatch.product_entry_continuation",
+          "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
+          "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
           "retired_at": "2026-05-17",
           "replacement_owner": "opl",
           "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
@@ -14820,7 +14820,7 @@
           "review/repair transport shell",
           "native helper execution envelope",
           "operator projection/workbench shell",
-          "generated CLI/MCP/product-entry/sidecar/status wrappers"
+          "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
         ],
         "migration_gates_before_code_retirement": [
           "generated/default caller parity proven for the replacement OPL surface",
@@ -15332,7 +15332,7 @@
             "product_entry",
             "product_status",
             "product_session",
-            "sidecar",
+            "domain_action_adapter",
             "workbench"
           ],
           "repo_local_handler_targets": [
@@ -15340,8 +15340,8 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "product_sidecar",
-            "product_entry_session_snapshot_refs_adapter"
+            "domain_action_adapter",
+            "product_entry_continuity_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
@@ -15410,7 +15410,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "product_sidecar_wrapper",
+          "domain_action_adapter_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -15423,7 +15423,7 @@
           "product_entry",
           "product_status",
           "product_session",
-          "sidecar",
+          "domain_action_adapter",
           "workbench"
         ],
         "repo_local_handler_targets": [
@@ -15431,8 +15431,8 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "product_sidecar",
-          "product_entry_session_snapshot_refs_adapter"
+          "domain_action_adapter",
+          "product_entry_continuity_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
         "current_rca_shell_status": "opl_generated_surface_consumed_domain_handlers_only",
@@ -15489,15 +15489,15 @@
           "domain_handler_owner": "redcube_ai",
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-          "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
           "default_supervision_owner": "one-person-lab",
           "legacy_supervision_public_surface": "retired",
           "redcube_cli_is_unified_metadata_owner": false,
           "redcube_mcp_is_unified_metadata_owner": false,
-          "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+          "product_entry_continuity_refs_adapter_is_generic_session_owner": false
         },
         "wrappers": {
           "cli": {
@@ -15520,9 +15520,9 @@
             "current_rca_role": "direct_domain_entry_target",
             "long_term_rca_owner": false
           },
-          "sidecar": {
+          "domain_action_adapter": {
             "owner": "opl",
-            "current_rca_role": "domain_sidecar_target",
+            "current_rca_role": "domain_domain_action_adapter_target",
             "long_term_rca_owner": false
           },
           "status": {
@@ -15550,7 +15550,7 @@
           "opl_can_generate_cli_wrapper": true,
           "opl_can_generate_mcp_wrapper": true,
           "opl_can_generate_product_entry_wrapper": true,
-          "opl_can_generate_sidecar_wrapper": true,
+          "opl_can_generate_domain_action_adapter_wrapper": true,
           "opl_can_generate_status_projection": true,
           "opl_can_generate_session_shell": true,
           "opl_can_generate_workbench_shell": true,
@@ -15976,7 +15976,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "product_sidecar_wrapper",
+          "domain_action_adapter_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",

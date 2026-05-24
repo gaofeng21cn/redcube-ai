@@ -13,7 +13,7 @@ Machine boundary: 人读 runtime 索引。机器真相继续归 contracts、sche
 
 Runtime docs 解释当前 executor/backend split、service-safe entry、watch/projection 语义和 hosted integration 边界。每份材料都应先说明它是 current runtime guidance、target-state reference 还是 historical provider/proof context。
 
-RCA runtime docs 只描述 domain-agent runtime boundary：service-safe domain entry、sidecar projection、guarded dispatch、review/export refs、artifact locators、owner receipts 和 executor adapter expectations。Generic stage runtime、queue、wakeup、retry/dead-letter、operator projection、memory locator shell 和 App/workbench runtime 归 OPL Framework 或 product shell，不在 RCA docs 中成为第二平台。
+RCA runtime docs 只描述 domain-agent runtime boundary：service-safe domain entry、domain_action_adapter projection、guarded dispatch、review/export refs、artifact locators、owner receipts 和 executor adapter expectations。Generic stage runtime、queue、wakeup、retry/dead-letter、operator projection、memory locator shell 和 App/workbench runtime 归 OPL Framework 或 product shell，不在 RCA docs 中成为第二平台。
 
 当前材料：
 

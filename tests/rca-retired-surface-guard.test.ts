@@ -213,7 +213,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     'review_repair_transport',
     'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
-    'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
+    'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
   ];
   const expectedRetainedAuthority = [
     'visual_truth',
@@ -258,7 +258,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
       'artifact_lifecycle',
       'review_repair_transport',
       'native_helper_generic_envelope',
-      'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
+      'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
     ],
   );
   for (const value of Object.values(adoption.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
@@ -321,7 +321,7 @@ test('RCA consumes OPL stability read-model surfaces without implementing observ
   );
 });
 
-test('RCA functional audit exposes OPL replacement expectations and retired generic sidecar dispatch', () => {
+test('RCA functional audit exposes OPL replacement expectations and retired generic domain_action_adapter dispatch', () => {
   const currentProgram = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/current-program.json'),
     'utf-8',
@@ -338,7 +338,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     adoption.privatized_functional_module_audit,
   ];
   const expectedReplacementSurfaces = {
-    product_entry_session_snapshot_refs_adapter: 'opl_app_session_shell_and_workbench',
+    product_entry_continuity_refs_adapter: 'opl_app_session_shell_and_workbench',
     artifact_export_lifecycle: 'opl_artifact_lifecycle_gallery_handoff_shell',
     review_repair_transport: 'opl_review_repair_transport',
     native_helper_envelope: 'opl_native_helper_execution_envelope',
@@ -352,9 +352,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
-      'retired_product_sidecar.runtime_watch_dispatch_tombstone',
-      'retired_product_sidecar.supervision_action_tombstone',
-      'retired_product_sidecar.continuation_action_tombstone',
+      'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
+      'retired_domain_action_adapter.supervision_action_tombstone',
+      'retired_domain_action_adapter.continuation_action_tombstone',
       'retired_public_cli_mcp.managed_run_lookup_tombstone',
       'retired_public_cli_mcp.managed_supervision_tombstone',
       'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
@@ -362,9 +362,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
     ]);
     assert.deepEqual(surface.physical_deletion_guard.retired_legacy_surface_ids, [
-      'product_sidecar_dispatch.runtime_watch',
-      'product_sidecar_dispatch.retired_managed_supervision',
-      'product_sidecar_dispatch.product_entry_continuation',
+      'domain_action_adapter_dispatch.runtime_watch',
+      'domain_action_adapter_dispatch.retired_managed_supervision',
+      'domain_action_adapter_dispatch.product_entry_continuation',
       'public_cli_mcp_gateway.get_managed_run',
       'public_cli_mcp_gateway.retired_managed_supervision',
       'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
@@ -379,9 +379,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.deepEqual(
       surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
       [
-        'retired_product_sidecar.runtime_watch_dispatch_tombstone',
-        'retired_product_sidecar.supervision_action_tombstone',
-        'retired_product_sidecar.continuation_action_tombstone',
+        'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
+        'retired_domain_action_adapter.supervision_action_tombstone',
+        'retired_domain_action_adapter.continuation_action_tombstone',
         'retired_public_cli_mcp.managed_run_lookup_tombstone',
         'retired_public_cli_mcp.managed_supervision_tombstone',
       ],
@@ -389,9 +389,9 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.deepEqual(
       surface.retired_no_resurrection_guards.map((entry) => entry.retired_legacy_surface_id),
       [
-        'product_sidecar_dispatch.runtime_watch',
-        'product_sidecar_dispatch.retired_managed_supervision',
-        'product_sidecar_dispatch.product_entry_continuation',
+        'domain_action_adapter_dispatch.runtime_watch',
+        'domain_action_adapter_dispatch.retired_managed_supervision',
+        'domain_action_adapter_dispatch.product_entry_continuation',
         'public_cli_mcp_gateway.get_managed_run',
         'public_cli_mcp_gateway.retired_managed_supervision',
       ],
@@ -510,7 +510,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'runtime',
     'gateway',
     'session',
-    'sidecar',
+    'domain_action_adapter',
   ]);
   assert.deepEqual(policy.legacy_name_policy.allowed_legacy_name_roles, [
     'machine_contract_ref',
@@ -525,15 +525,15 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'visual_native_helper_path',
     'locator_protocol_boundary',
   ]);
-  assert.deepEqual(policy.legacy_name_policy.retired_runtime_gateway_session_sidecar_terms_allowed_only_as, [
-    'tombstone_or_provenance',
+  assert.deepEqual(policy.legacy_name_policy.retired_control_plane_terms_allowed_only_as, [
+    'machine_contract_ref',
+    'package_protocol_boundary',
+    'service_safe_domain_entry',
     'contract_safe_semantic_id',
+    'tombstone_or_provenance',
     'negative_test_guard',
     'refs_only_read_model',
     'domain_handler_target',
-    'service_safe_domain_entry',
-    'machine_contract_ref',
-    'package_protocol_boundary',
     'minimal_visual_authority_function',
     'visual_native_helper_path',
     'locator_protocol_boundary',
@@ -546,18 +546,18 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'callable_alias_allowed',
     'public_identity_allowed',
     'active_generic_runtime_owner_allowed',
-    'active_generic_gateway_owner_allowed',
+    'active_generic_domain_entry_owner_allowed',
     'active_generic_session_runtime_owner_allowed',
-    'active_generic_sidecar_owner_allowed',
+    'active_generic_domain_action_adapter_owner_allowed',
     'active_generic_workbench_owner_allowed',
     'active_generic_attempt_ledger_owner_allowed',
   ]);
   assert.deepEqual(policy.legacy_name_policy.package_protocol_boundary_policy, {
-    package_name: '@redcube/gateway',
+    package_name: '@redcube/domain-entry',
     allowed_as: 'package_protocol_boundary',
     public_identity: 'redcube-ai',
-    public_gateway_identity_allowed: false,
-    generic_gateway_runtime_owner_allowed: false,
+    public_framework_identity_allowed: false,
+    generic_domain_entry_runtime_owner_allowed: false,
     compatibility_alias_allowed: false,
   });
   assert.equal(
@@ -569,11 +569,11 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   const requiredClassifications = {
     runtime_program_machine_contracts: 'machine_contract',
     mcp_product_entry_domain_entry: 'service_safe_domain_entry',
-    redcube_gateway_package_protocol_boundary: 'package_protocol_boundary',
-    product_entry_session_snapshot_refs_adapter: 'refs_only_read_model',
+    redcube_domain_entry_package_protocol_boundary: 'package_protocol_boundary',
+    product_entry_continuity_refs_adapter: 'refs_only_read_model',
     workspace_run_envelope_helpers: 'refs_only_read_model',
     runtime_watch_projection: 'refs_only_read_model',
-    product_sidecar_guarded_actions: 'domain_handler_target',
+    domain_action_adapter_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
     retired_product_entry_contract_tombstone_refs: 'tombstone_or_provenance',
@@ -592,19 +592,11 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       terms: ['runtime'],
       allowedAs: ['machine_contract_ref', 'contract_safe_semantic_id'],
     },
-    mcp_product_entry_domain_entry: {
-      terms: ['gateway'],
-      allowedAs: ['service_safe_domain_entry', 'package_protocol_boundary'],
-    },
     redcube_cli_domain_entry_adapter: {
-      terms: ['runtime', 'gateway', 'session', 'sidecar'],
+      terms: ['runtime', 'session', 'domain_action_adapter'],
       allowedAs: ['service_safe_domain_entry', 'domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
     },
-    redcube_gateway_package_protocol_boundary: {
-      terms: ['gateway'],
-      allowedAs: ['package_protocol_boundary'],
-    },
-    product_entry_session_snapshot_refs_adapter: {
+    product_entry_continuity_refs_adapter: {
       terms: ['session'],
       allowedAs: ['refs_only_read_model', 'contract_safe_semantic_id'],
     },
@@ -616,20 +608,12 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       terms: ['runtime'],
       allowedAs: ['refs_only_read_model', 'negative_test_guard'],
     },
-    product_sidecar_guarded_actions: {
-      terms: ['sidecar', 'gateway'],
-      allowedAs: ['domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
-    },
-    operator_evidence_stability_projection: {
-      terms: ['gateway'],
-      allowedAs: ['refs_only_read_model', 'package_protocol_boundary'],
-    },
     visual_authority_functions: {
       terms: ['runtime'],
       allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path'],
     },
     retired_product_entry_contract_tombstone_refs: {
-      terms: ['managed', 'runtime', 'gateway', 'session'],
+      terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
       allowedAs: ['tombstone_or_provenance', 'contract_safe_semantic_id', 'negative_test_guard'],
     },
   };
@@ -644,16 +628,16 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   }
 
   assert.equal(
-    byId.product_entry_session_snapshot_refs_adapter.current_rca_role,
+    byId.product_entry_continuity_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
   assert.equal(
-    byId.redcube_gateway_package_protocol_boundary.current_rca_role,
-    'package_protocol_boundary_for_domain_action_protocol_not_public_gateway_identity',
+    byId.redcube_domain_entry_package_protocol_boundary.current_rca_role,
+    'package_protocol_boundary_for_domain_action_protocol_not_public_framework_identity',
   );
-  assert.deepEqual(byId.redcube_gateway_package_protocol_boundary.source_refs, [
-    'packages/redcube-gateway/package.json',
-    'packages/redcube-gateway/src/index.ts',
+  assert.deepEqual(byId.redcube_domain_entry_package_protocol_boundary.source_refs, [
+    'packages/redcube-domain-entry/package.json',
+    'packages/redcube-domain-entry/src/index.ts',
   ]);
   assert.deepEqual(byId.redcube_cli_domain_entry_adapter.source_refs, [
     'apps/redcube-cli/package.json',
@@ -669,7 +653,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     generic_cli_wrapper_owner_allowed: false,
     generic_workbench_owner_allowed: false,
     generic_session_runtime_owner_allowed: false,
-    generic_gateway_runtime_owner_allowed: false,
+    generic_domain_entry_runtime_owner_allowed: false,
     compatibility_alias_allowed: false,
   });
   assert.equal(
@@ -685,7 +669,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     false,
   );
   assert.deepEqual(byId.runtime_watch_projection.machine_boundary_refs, [
-    'packages/redcube-gateway/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
+    'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
   ]);
   assert.equal(
     byId.runtime_watch_projection.no_resurrection_gate.generic_session_runtime_owner_allowed,
@@ -696,8 +680,8 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     false,
   );
   assert.equal(
-    byId.product_sidecar_guarded_actions.current_rca_role,
-    'guarded_domain_action_target_and_refs_only_sidecar_adapter_not_sidecar_owner',
+    byId.domain_action_adapter_guarded_actions.current_rca_role,
+    'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner',
   );
   assert.equal(
     byId.operator_evidence_stability_projection.current_rca_role,
@@ -715,7 +699,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     true,
   );
   assert.deepEqual(byId.retired_product_entry_contract_tombstone_refs.no_resurrection_gate, {
-    legacy_managed_runtime_gateway_surface_id_allowed: false,
+    legacy_managed_runtime_domain_entry_surface_id_allowed: false,
     compatibility_alias_allowed: false,
     callable_alias_allowed: false,
     active_caller_allowed: false,
@@ -741,7 +725,6 @@ test('RCA active CLI source legacy names are covered by explicit morphology allo
   for (const file of activeCliFiles) {
     const text = readFileSync(path.resolve(file), 'utf-8');
     const legacyHits = trackedTerms.filter((term) => new RegExp(`\\b${term}\\b`, 'i').test(text));
-    assert.equal(legacyHits.length > 0, true, file);
 
     const coveringEntries = classifiedEntries.filter((entry) => (
       entry.source_refs || []
@@ -751,7 +734,6 @@ test('RCA active CLI source legacy names are covered by explicit morphology allo
       ['redcube_cli_domain_entry_adapter'],
       file,
     );
-
     const allowedTerms = new Set(coveringEntries.flatMap(
       (entry) => entry.legacy_name_allowance.legacy_terms,
     ));
@@ -765,7 +747,7 @@ test('RCA active CLI source legacy names are covered by explicit morphology allo
       assert.equal(entry.legacy_name_allowance.public_identity_allowed, false, entry.surface_id);
       assert.equal(entry.legacy_name_allowance.active_generic_runtime_owner_allowed, false, entry.surface_id);
       assert.equal(entry.legacy_name_allowance.active_generic_session_runtime_owner_allowed, false, entry.surface_id);
-      assert.equal(entry.legacy_name_allowance.active_generic_sidecar_owner_allowed, false, entry.surface_id);
+      assert.equal(entry.legacy_name_allowance.active_generic_domain_action_adapter_owner_allowed, false, entry.surface_id);
     }
   }
 });

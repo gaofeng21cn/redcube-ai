@@ -13,15 +13,15 @@
   "rca_scope": "visual_review_export_verdict_and_repair_decision",
   "audit_readout": "retain_domain_gate_project_transport_refs",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/product-sidecar-parts/owner-boundary.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/review_projection",
-    "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-transition-evaluator.ts"
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts"
   ],
   "activeCallers": [
     "visual director review",
     "screenshot review",
     "repair_image_pages",
-    "product sidecar review projection"
+    "product domain_action_adapter review projection"
   ],
   "activeCallerStatus": "active_domain_review_gate",
   "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",

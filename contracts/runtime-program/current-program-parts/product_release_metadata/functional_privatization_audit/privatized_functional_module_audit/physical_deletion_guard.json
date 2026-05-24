@@ -1,9 +1,9 @@
 {
   "current_safe_tombstone_candidate_count": 0,
   "deleted_or_thinned_default_surfaces": [
-    "retired_product_sidecar.runtime_watch_dispatch_tombstone",
-    "retired_product_sidecar.supervision_action_tombstone",
-    "retired_product_sidecar.continuation_action_tombstone",
+    "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
+    "retired_domain_action_adapter.supervision_action_tombstone",
+    "retired_domain_action_adapter.continuation_action_tombstone",
     "retired_public_cli_mcp.managed_run_lookup_tombstone",
     "retired_public_cli_mcp.managed_supervision_tombstone",
     "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
@@ -11,9 +11,9 @@
     "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
   ],
   "retired_legacy_surface_ids": [
-    "product_sidecar_dispatch.runtime_watch",
-    "product_sidecar_dispatch.retired_managed_supervision",
-    "product_sidecar_dispatch.product_entry_continuation",
+    "domain_action_adapter_dispatch.runtime_watch",
+    "domain_action_adapter_dispatch.retired_managed_supervision",
+    "domain_action_adapter_dispatch.product_entry_continuation",
     "public_cli_mcp_gateway.get_managed_run",
     "public_cli_mcp_gateway.retired_managed_supervision",
     "repo_local_visual_runtime.legacy_deliverable_runner_deleted",

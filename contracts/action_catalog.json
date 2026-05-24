@@ -10,7 +10,7 @@
     "generated_interface_owner": "one-person-lab",
     "repo_local_redcube_cli_role": "domain_handler_target_or_direct_entry_only",
     "repo_local_redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-    "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
+    "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
     "generic_session_shell_owner": "one-person-lab",
     "generic_workbench_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",
@@ -238,31 +238,31 @@
       }
     },
     {
-      "action_id": "export_product_sidecar",
-      "title": "Export RedCube product sidecar adapter",
-      "summary": "导出 RCA product sidecar adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
+      "action_id": "export_domain_action_adapter",
+      "title": "Export RedCube product domain_action_adapter adapter",
+      "summary": "导出 RCA product domain_action_adapter adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product sidecar export",
-        "surface_kind": "product_sidecar_export"
+        "command": "redcube product domain_action_adapter export",
+        "surface_kind": "domain_action_adapter_export"
       },
-      "input_schema_ref": "schema:redcube.product_sidecar.export.request.v1",
-      "output_schema_ref": "schema:redcube.product_sidecar.export.response.v1",
+      "input_schema_ref": "schema:redcube.domain_action_adapter.export.request.v1",
+      "output_schema_ref": "schema:redcube.domain_action_adapter.export.response.v1",
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
         "cli": {
-          "surface_kind": "product_sidecar_export"
+          "surface_kind": "domain_action_adapter_export"
         },
         "mcp": {
           "tool_name": "redcube_product_entry",
-          "action_key": "export_product_sidecar"
+          "action_key": "export_domain_action_adapter"
         },
         "skill": null,
         "product_entry": {
-          "surface_kind": "product_sidecar_export",
-          "action_key": "export_product_sidecar"
+          "surface_kind": "domain_action_adapter_export",
+          "action_key": "export_domain_action_adapter"
         },
         "openai": null,
         "ai_sdk": null
@@ -276,31 +276,31 @@
       }
     },
     {
-      "action_id": "dispatch_product_sidecar",
-      "title": "Dispatch RedCube product sidecar guarded action",
-      "summary": "调度 RCA-owned guarded actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA sidecar 默认派发面暴露。",
+      "action_id": "dispatch_domain_action_adapter",
+      "title": "Dispatch RedCube product domain_action_adapter guarded action",
+      "summary": "调度 RCA-owned guarded actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA domain_action_adapter 默认派发面暴露。",
       "owner": "redcube_ai",
       "effect": "mutating",
       "source_command": {
-        "command": "redcube product sidecar dispatch",
-        "surface_kind": "product_sidecar_dispatch"
+        "command": "redcube product domain_action_adapter dispatch",
+        "surface_kind": "domain_action_adapter_dispatch"
       },
-      "input_schema_ref": "schema:redcube.product_sidecar.dispatch.request.v1",
-      "output_schema_ref": "schema:redcube.product_sidecar.dispatch.response.v1",
+      "input_schema_ref": "schema:redcube.domain_action_adapter.dispatch.request.v1",
+      "output_schema_ref": "schema:redcube.domain_action_adapter.dispatch.response.v1",
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
         "cli": {
-          "surface_kind": "product_sidecar_dispatch"
+          "surface_kind": "domain_action_adapter_dispatch"
         },
         "mcp": {
           "tool_name": "redcube_product_entry",
-          "action_key": "dispatch_product_sidecar"
+          "action_key": "dispatch_domain_action_adapter"
         },
         "skill": null,
         "product_entry": {
-          "surface_kind": "product_sidecar_dispatch",
-          "action_key": "dispatch_product_sidecar"
+          "surface_kind": "domain_action_adapter_dispatch",
+          "action_key": "dispatch_domain_action_adapter"
         },
         "openai": null,
         "ai_sdk": null
@@ -446,7 +446,7 @@
     "generic_attempt_ledger_owner",
     "generic_state_machine_runner_owner",
     "generic_cli_mcp_product_wrapper_owner",
-    "generic_sidecar_owner",
+    "generic_domain_action_adapter_owner",
     "generic_session_store_owner",
     "generic_status_workbench_owner",
     "generic_workspace_source_intake_owner",

@@ -1,5 +1,5 @@
 import type { DomainActionMap, JsonMap } from './types.js';
-import { buildRedCubeActionMetadata } from '@redcube/gateway';
+import { buildRedCubeActionMetadata } from '@redcube/domain-entry';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
   return Object.fromEntries(
@@ -137,10 +137,10 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       action_ref: 'getProductEntryManifest',
       boundary_fields: ['workspaceRoot', 'workspaceReceiptScaleoutRoot'],
     },
-    'product sidecar': {
-      summary: '导出或调度 RCA product sidecar adapter；OPL 持有 generated sidecar/session/workbench shell，RCA 只作为 domain action target 或 refs-only adapter。',
-      usage: 'redcube product sidecar export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json | redcube product sidecar dispatch --task <task.json> --format json',
-      action_ref: 'exportProductSidecar|dispatchProductSidecar',
+    'product domain_action_adapter': {
+      summary: '导出或调度 RCA product domain_action_adapter adapter；OPL 持有 generated domain_action_adapter/session/workbench shell，RCA 只作为 domain action target 或 refs-only adapter。',
+      usage: 'redcube product domain_action_adapter export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json | redcube product domain_action_adapter dispatch --task <task.json> --format json',
+      action_ref: 'exportDomainActionAdapter|dispatchDomainActionAdapter',
       boundary_fields: ['workspaceRoot', 'workspaceReceiptScaleoutRoot', 'task'],
     },
     'native-ppt proof': {
@@ -290,7 +290,7 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       topics: ['list'],
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],
       deliverable: ['create', 'get', 'audit', 'execute', 'run'],
-      product: ['status', 'start', 'preflight', 'invoke', 'session', 'manifest', 'sidecar'],
+      product: ['status', 'start', 'preflight', 'invoke', 'session', 'manifest', 'domain_action_adapter'],
       'native-ppt': ['proof'],
       'image-ppt': ['proof'],
       runs: ['get'],
@@ -326,8 +326,8 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_opl_stage_execution_plan|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>]',
       productSession: 'redcube product session --entry-session-id <id> [--workspace-receipt-scaleout-root <dir>[,<dir>...]]',
       productManifest: 'redcube product manifest --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]]',
-      productSidecarExport: 'redcube product sidecar export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json',
-      productSidecarDispatch: 'redcube product sidecar dispatch --task <task.json> --format json',
+      domainActionAdapterExport: 'redcube product domain_action_adapter export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json',
+      domainActionAdapterDispatch: 'redcube product domain_action_adapter dispatch --task <task.json> --format json',
       nativePptProof: 'redcube native-ppt proof --workspace-root <dir> --entry-session-id <id> --topic-id <id> --deliverable-id <id> [--route <author_pptx_native|repair_pptx_native>]',
       imagePptProof: 'redcube image-ppt proof --output-dir <dir> [--mock-image-generation|--live-image-generation] [--skip-system-deps] [--style-reference-dir <dir>]',
       runsGet: 'redcube runs get --workspace-root <dir> --run-id <id>',

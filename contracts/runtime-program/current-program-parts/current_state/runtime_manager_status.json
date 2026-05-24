@@ -4,7 +4,7 @@
   "registration_surface": "skill_catalog.domain_projection.opl_runtime_manager_registration",
   "native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
   "redcube_default_entry_unchanged": true,
-  "full_sidecar_enabled_now": false,
+  "full_domain_action_adapter_enabled_now": false,
   "native_helper_scope": [
     "RCA-owned native helper implementation",
     "OPL-owned native helper generic envelope",

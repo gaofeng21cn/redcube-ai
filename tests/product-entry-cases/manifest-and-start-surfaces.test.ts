@@ -6,8 +6,8 @@ import {
   assertFamilyOrchestrationCompanion,
   assertRuntimeLoopClosureShape,
   getProductEntryManifest,
-  getProductSidecarGuardedActionMetadata,
-  importGatewaySharedModule,
+  getDomainActionAdapterGuardedActionMetadata,
+  importDomainEntrySharedModule,
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
@@ -17,13 +17,13 @@ import { assertManifestActionAndStageControlPlane } from './manifest-stage-contr
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
-    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
+    const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const manifest = await getProductEntryManifest({
       workspace_root: workspaceRoot,
     });
-    const sidecarGuardedActionMetadata = await getProductSidecarGuardedActionMetadata();
+    const domain_action_adapterGuardedActionMetadata = await getDomainActionAdapterGuardedActionMetadata();
 
     assert.equal(manifest.ok, true);
     assert.equal(manifest.surface_kind, 'product_entry_manifest');
@@ -350,7 +350,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assertManifestActionAndStageControlPlane({
       manifest,
-      sidecarGuardedActionMetadata,
+      domain_action_adapterGuardedActionMetadata,
     });
     assert.equal(manifest.standard_domain_agent_skeleton.surface_kind, 'standard_domain_agent_skeleton');
     assert.equal(manifest.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
@@ -362,7 +362,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(manifest.standard_domain_agent_skeleton.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
     assert.deepEqual(manifest.standard_domain_agent_skeleton.runtime_declarations.declares_only, [
-      'product_sidecar_adapter',
+      'domain_action_adapter_adapter',
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',
@@ -371,7 +371,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'domain_owner_receipt_contract',
       'lifecycle_guarded_apply_proof',
     ]);
-    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.sidecar_adapter_ref, '/product_entry_shell/sidecar');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_action_adapter_adapter_ref, '/product_entry_shell/domain_action_adapter');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
@@ -414,7 +414,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'review_repair_transport',
         'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
-        'generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper',
+        'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
       ],
     );
     assert.deepEqual(
@@ -497,8 +497,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         ['start_deliverable', 'redcube product invoke', 'product_entry'],
         ['continue_session', 'redcube product session', 'product_entry_session'],
         ['get_product_entry_manifest', 'redcube product manifest', 'product_entry_manifest'],
-        ['export_product_sidecar', 'redcube product sidecar export', 'product_sidecar_export'],
-        ['dispatch_product_sidecar', 'redcube product sidecar dispatch', 'product_sidecar_dispatch'],
+        ['export_domain_action_adapter', 'redcube product domain_action_adapter export', 'domain_action_adapter_export'],
+        ['dispatch_domain_action_adapter', 'redcube product domain_action_adapter dispatch', 'domain_action_adapter_dispatch'],
         ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
         ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
         ['invoke_domain_entry', 'redcube service-safe domain entry', 'domain_entry'],
@@ -627,21 +627,21 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.opl_hosted.command, 'opl_framework:hosted_product_entry');
     assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
-    assert.equal(manifest.product_entry_shell.sidecar.command, 'redcube product sidecar');
-    assert.equal(manifest.product_entry_shell.sidecar.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.product_entry_shell.sidecar.provider_transport_owner, 'opl_family_runtime_provider');
-    assert.equal(manifest.product_entry_shell.sidecar.control_plane_owner, 'opl');
+    assert.equal(manifest.product_entry_shell.domain_action_adapter.command, 'redcube product domain_action_adapter');
+    assert.equal(manifest.product_entry_shell.domain_action_adapter.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.product_entry_shell.domain_action_adapter.provider_transport_owner, 'opl_family_runtime_provider');
+    assert.equal(manifest.product_entry_shell.domain_action_adapter.control_plane_owner, 'opl');
     assert.equal(
-      manifest.product_entry_shell.sidecar.opl_generic_primitive_consumption.status,
+      manifest.product_entry_shell.domain_action_adapter.opl_generic_primitive_consumption.status,
       'functional_consumer_follow_through_landed',
     );
     assert.deepEqual(
-      manifest.product_entry_shell.sidecar.allowed_actions,
-      sidecarGuardedActionMetadata.guardedActionIds,
+      manifest.product_entry_shell.domain_action_adapter.allowed_actions,
+      domain_action_adapterGuardedActionMetadata.guardedActionIds,
     );
     assert.deepEqual(
-      manifest.product_entry_shell.sidecar.forbidden_writes,
-      sidecarGuardedActionMetadata.forbiddenWrites,
+      manifest.product_entry_shell.domain_action_adapter.forbidden_writes,
+      domain_action_adapterGuardedActionMetadata.forbiddenWrites,
     );
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
     assert.equal(

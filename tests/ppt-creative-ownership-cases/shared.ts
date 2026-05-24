@@ -19,7 +19,7 @@ import {
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 import {
   getPublicationProjection,
 } from '@redcube/governance';

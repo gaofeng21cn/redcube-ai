@@ -47,7 +47,7 @@
       "status": "descriptor_source_available"
     },
     {
-      "surface_id": "sidecar_export_dispatch",
+      "surface_id": "domain_action_adapter_export_dispatch",
       "owner": "one-person-lab",
       "domain_repo_can_own_generated_surface": false,
       "status": "descriptor_source_available"
@@ -89,7 +89,7 @@
       "status": "descriptor_source_available"
     },
     {
-      "surface_id": "sidecar",
+      "surface_id": "domain_action_adapter",
       "owner": "one-person-lab",
       "domain_repo_can_own_generated_surface": false,
       "status": "descriptor_source_available"
@@ -106,21 +106,21 @@
     "redcube_mcp",
     "invokeProductEntry",
     "invokeDomainEntry",
-    "product_sidecar",
-    "product_entry_session_snapshot_refs_adapter"
+    "domain_action_adapter",
+    "product_entry_continuity_refs_adapter"
   ],
   "repo_local_launcher_policy": {
     "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
     "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-    "product_sidecar_role": "domain_action_target_or_refs_only_adapter",
-    "product_entry_session_snapshot_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
+    "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+    "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
     "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",
     "default_supervision_owner": "one-person-lab",
     "legacy_supervision_public_surface": "retired",
     "redcube_cli_is_unified_metadata_owner": false,
     "redcube_mcp_is_unified_metadata_owner": false,
-    "product_entry_session_snapshot_refs_adapter_is_generic_session_owner": false
+    "product_entry_continuity_refs_adapter_is_generic_session_owner": false
   },
   "bridge_exit_gate": {
     "gate_id": "rca.generated_surface_bridge_exit.v1",

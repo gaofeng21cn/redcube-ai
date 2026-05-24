@@ -12,7 +12,7 @@ import {
   buildRedCubeFamilyStageControlPlane,
   buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
-} from '../packages/redcube-gateway/dist/index.js';
+} from '../packages/redcube-domain-entry/dist/index.js';
 
 const CONTRACTS_DIR = path.resolve('contracts');
 const DOMAIN_ID = 'redcube_ai';
@@ -26,7 +26,7 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_attempt_ledger_owner',
   'generic_state_machine_runner_owner',
   'generic_cli_mcp_product_wrapper_owner',
-  'generic_sidecar_owner',
+  'generic_domain_action_adapter_owner',
   'generic_session_store_owner',
   'generic_status_workbench_owner',
   'generic_workspace_source_intake_owner',
@@ -46,7 +46,7 @@ const OPL_CANONICAL_GENERATED_SURFACES = [
   'mcp',
   'skill',
   'product_entry_manifest',
-  'sidecar_export_dispatch',
+  'domain_action_adapter_export_dispatch',
   'status_read_model',
   'workbench_drilldown',
   'functional_harness_cases',
@@ -56,7 +56,7 @@ const GENERATED_WRAPPER_DESCRIPTOR_SCOPE = [
   'product_entry',
   'product_status',
   'product_session',
-  'sidecar',
+  'domain_action_adapter',
   'workbench',
 ];
 
@@ -181,10 +181,10 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     domain_repo_can_own_generated_surface: false,
     source_refs: {
       canonical_semantic_pack: 'agent/',
-      action_catalog: 'packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
-      stage_control_plane: 'packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
-      memory_descriptor: 'packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
-      functional_audit: 'packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
+      action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
+      stage_control_plane: 'packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
+      memory_descriptor: 'packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
+      functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
     },
     authority_boundary: {
       opl_can_write_domain_truth: false,

@@ -12,7 +12,7 @@ RCA-owned bodies and verdicts:
 - owner receipt
 
 OPL-owned shells:
-- generated CLI/MCP/Skill/product-entry/status/session/sidecar/workbench descriptors
+- generated CLI/MCP/Skill/product-entry/status/session/domain_action_adapter/workbench descriptors
 - generic provider-backed attempt runtime
 - typed queue, retry, dead-letter, and operator projection
 - generic artifact gallery or handoff shell over RCA refs

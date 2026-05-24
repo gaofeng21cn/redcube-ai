@@ -17,15 +17,15 @@
     "rca_owns_replacement_runtime": false
   },
   "codePaths": [
-    "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts"
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts"
   ],
   "activeCallers": [
     "product-entry manifest",
-    "product sidecar export",
+    "product domain_action_adapter export",
     "product status"
   ],
   "activeCallerStatus": "declarative_pack_input_active",
-  "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/sidecar/status/session/workbench/harness surfaces.",
+  "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
   "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
   "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
   "rca_projection_mode": "declarative_pack_refs_only",

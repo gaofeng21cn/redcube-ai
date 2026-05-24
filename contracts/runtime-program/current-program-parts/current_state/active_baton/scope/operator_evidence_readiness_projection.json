@@ -138,7 +138,7 @@
         "compatibility_alias",
         "default_runtime_owner",
         "public_action_key",
-        "sidecar_template"
+        "domain_action_adapter_template"
       ]
     },
     "authority_boundary": {

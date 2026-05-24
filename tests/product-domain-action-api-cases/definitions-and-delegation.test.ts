@@ -22,7 +22,7 @@ import {
 import {
   buildRedCubeActionMetadata,
   getRedCubeFamilyActionCatalog,
-} from '../../packages/redcube-gateway/dist/index.js';
+} from '../../packages/redcube-domain-entry/dist/index.js';
 
 test('listDomainTools exposes deliverable-centric product/domain action API tools in stable order', () => {
   const tools = listDomainTools();
@@ -109,8 +109,8 @@ test('MCP catalog definitions are projected from the RedCube family action catal
     productEntryTool?.action_catalog_projection?.action_ids,
   );
   assert.equal(productEntryActionIds.every((actionId) => catalogActionIds.has(actionId)), true);
-  assert.equal(productEntryActions.includes('export_product_sidecar'), true);
-  assert.equal(productEntryActions.includes('dispatch_product_sidecar'), true);
+  assert.equal(productEntryActions.includes('export_domain_action_adapter'), true);
+  assert.equal(productEntryActions.includes('dispatch_domain_action_adapter'), true);
   assert.equal(productEntryActions.includes('invoke_domain_entry'), true);
   assert.equal(productEntryActions.includes('invoke_opl_hosted_product_entry'), false);
   assert.equal(productEntryTool?.description, metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.description);

@@ -29,7 +29,7 @@
       "concrete executor",
       "private Hermes-Agent fork"
     ],
-    "future_sidecar_promotion_gate": "only if external Hermes-Agent cannot express the task/wakeup/approval/audit/product isolation contracts required by OPL"
+    "future_domain_action_adapter_promotion_gate": "only if external Hermes-Agent cannot express the task/wakeup/approval/audit/product isolation contracts required by OPL"
   },
   "language_target": {
     "typescript_owner": "product entry, CLI/MCP surfaces, contracts, domain-entry protocol boundary, runtime-family shell, and typed service boundaries",
@@ -63,7 +63,7 @@
       "review/export judgment",
       "PNG/PPTX/PDF blob storage"
     ],
-    "source_reference": "MAS/MDS runtime lifecycle SQLite sidecar pattern"
+    "source_reference": "MAS/MDS runtime lifecycle SQLite domain_action_adapter pattern"
   },
   "north_star": [
     "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",

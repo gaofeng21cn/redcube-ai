@@ -39,7 +39,7 @@ OPL family 的上位原则是 `AI-first / executor-first / Codex-first`：系统
 
 6. **单一来源派生多入口**
 
-   关键 action、stage、descriptor、contract 和 routing metadata 由 canonical source 统一表达。CLI、MCP、Skill、product-entry、sidecar、status、workbench 和 read model 从同一来源派生，保持接口、文档和投影一致。
+   关键 action、stage、descriptor、contract 和 routing metadata 由 canonical source 统一表达。CLI、MCP、Skill、product-entry、domain_action_adapter、status、workbench 和 read model 从同一来源派生，保持接口、文档和投影一致。
 
 7. **历史面及时退役**
 

@@ -24,7 +24,7 @@ import {
 } from '../../apps/redcube-cli/dist/cli.js';
 
 const execFileAsync = promisify(execFile);
-const gatewayResolve = createRequire(path.resolve('packages/redcube-gateway/package.json'));
+const domainEntryResolve = createRequire(path.resolve('packages/redcube-domain-entry/package.json'));
 const CLI_STDIO_MAX_BUFFER = 8 * 1024 * 1024;
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
@@ -38,15 +38,15 @@ function createIsolatedCliInstall() {
   const installRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-isolated-'));
   const cliDir = path.join(installRoot, 'dist');
   const consumerNodeModulesDir = path.join(installRoot, 'node_modules', '@redcube');
-  const gatewayPackagePath = path.join(consumerNodeModulesDir, 'gateway');
-  const gatewayNodeModulesDir = path.join(gatewayPackagePath, 'node_modules', '@redcube');
-  const runtimeProtocolPackagePath = path.join(gatewayNodeModulesDir, 'runtime-protocol');
+  const domainEntryPackagePath = path.join(consumerNodeModulesDir, 'domain-entry');
+  const domainEntryNodeModulesDir = path.join(domainEntryPackagePath, 'node_modules', '@redcube');
+  const runtimeProtocolPackagePath = path.join(domainEntryNodeModulesDir, 'runtime-protocol');
 
   mkdirSync(cliDir, { recursive: true });
   mkdirSync(consumerNodeModulesDir, { recursive: true });
 
-  const gatewaySourcePackageJson = JSON.parse(
-    readFileSync(path.resolve('packages/redcube-gateway/package.json'), 'utf-8'),
+  const domainEntrySourcePackageJson = JSON.parse(
+    readFileSync(path.resolve('packages/redcube-domain-entry/package.json'), 'utf-8'),
   );
 
   copyFileSync(
@@ -72,15 +72,15 @@ function createIsolatedCliInstall() {
       private: true,
       type: 'module',
       dependencies: {
-        '@redcube/gateway': gatewaySourcePackageJson.version,
+        '@redcube/domain-entry': domainEntrySourcePackageJson.version,
       },
     }, null, 2),
     'utf-8',
   );
 
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-gateway'),
-    gatewayPackagePath,
+    path.resolve('packages/redcube-domain-entry'),
+    domainEntryPackagePath,
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-protocol'),
@@ -88,87 +88,87 @@ function createIsolatedCliInstall() {
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime'),
-    path.join(gatewayNodeModulesDir, 'runtime'),
+    path.join(domainEntryNodeModulesDir, 'runtime'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-config'),
-    path.join(gatewayNodeModulesDir, 'redcube-config'),
+    path.join(domainEntryNodeModulesDir, 'redcube-config'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-governance'),
-    path.join(gatewayNodeModulesDir, 'governance'),
+    path.join(domainEntryNodeModulesDir, 'governance'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-reference-os'),
-    path.join(gatewayNodeModulesDir, 'reference-os'),
+    path.join(domainEntryNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-ppt'),
-    path.join(gatewayNodeModulesDir, 'pack-ppt'),
+    path.join(domainEntryNodeModulesDir, 'pack-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'pack-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'pack-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-pack-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'pack-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'pack-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-ppt'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'runtime-family-ppt'),
+    path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-poster-onepager'),
-    path.join(gatewayPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
+    path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-registry'),
-    path.join(gatewayNodeModulesDir, 'runtime-family-registry'),
+    path.join(domainEntryNodeModulesDir, 'runtime-family-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-core'),
-    path.join(gatewayNodeModulesDir, 'overlay-core'),
+    path.join(domainEntryNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
-    path.join(gatewayNodeModulesDir, 'codex-cli-client'),
+    path.join(domainEntryNodeModulesDir, 'codex-cli-client'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-codex-cli-client'),
-    path.join(gatewayNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
+    path.join(domainEntryNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
   );
   copyPackageIntoInstall(
     path.resolve('prompts'),
-    path.join(gatewayPackagePath, 'node_modules', 'prompts'),
+    path.join(domainEntryPackagePath, 'node_modules', 'prompts'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-registry'),
-    path.join(gatewayNodeModulesDir, 'overlay-registry'),
+    path.join(domainEntryNodeModulesDir, 'overlay-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-ppt'),
-    path.join(gatewayNodeModulesDir, 'overlay-ppt'),
+    path.join(domainEntryNodeModulesDir, 'overlay-ppt'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-xiaohongshu'),
-    path.join(gatewayNodeModulesDir, 'overlay-xiaohongshu'),
+    path.join(domainEntryNodeModulesDir, 'overlay-xiaohongshu'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-poster-onepager'),
-    path.join(gatewayNodeModulesDir, 'overlay-poster-onepager'),
+    path.join(domainEntryNodeModulesDir, 'overlay-poster-onepager'),
   );
   copyPackageIntoInstall(
     path.resolve('contracts'),
@@ -176,18 +176,18 @@ function createIsolatedCliInstall() {
   );
   copyPackageIntoInstall(
     path.resolve('contracts'),
-    path.join(gatewayPackagePath, 'node_modules', 'contracts'),
+    path.join(domainEntryPackagePath, 'node_modules', 'contracts'),
   );
-  const oplGatewaySharedDist = gatewayResolve.resolve('opl-framework-shared/family-orchestration');
-  const oplGatewaySharedPackageRoot = path.resolve(path.dirname(oplGatewaySharedDist), '..');
+  const oplFrameworkSharedDist = domainEntryResolve.resolve('opl-framework-shared/family-orchestration');
+  const oplFrameworkSharedPackageRoot = path.resolve(path.dirname(oplFrameworkSharedDist), '..');
   copyPackageIntoInstall(
-    oplGatewaySharedPackageRoot,
-    path.join(gatewayPackagePath, 'node_modules', 'opl-framework-shared'),
+    oplFrameworkSharedPackageRoot,
+    path.join(domainEntryPackagePath, 'node_modules', 'opl-framework-shared'),
   );
 
   return {
     cliPath: path.join(cliDir, 'cli.js'),
-    gatewayPackagePath,
+    domainEntryPackagePath,
     runtimeProtocolPackagePath,
     installRoot,
   };
@@ -329,7 +329,7 @@ test('CLI deliverable execute returns an OPL stage execution plan instead of sta
   });
 });
 
-test('CLI product status, product invoke, product sidecar, and product session proxy the product-entry service surface', async () => {
+test('CLI product status, product invoke, product domain_action_adapter, and product session proxy the product-entry service surface', async () => {
   await withMockCodexRuntimeCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
@@ -479,9 +479,9 @@ test('CLI product status, product invoke, product sidecar, and product session p
       directParsed.family_orchestration.resume_contract.checkpoint_locator_field,
     );
 
-    const sidecarTaskFile = path.join(runtimeStateRoot, 'opl-hosted-sidecar-task.json');
+    const domain_action_adapterTaskFile = path.join(runtimeStateRoot, 'opl-hosted-domain_action_adapter-task.json');
     writeFileSync(
-      sidecarTaskFile,
+      domain_action_adapterTaskFile,
       JSON.stringify({
         action: 'notification_receipt',
         workspace_locator: {
@@ -492,14 +492,14 @@ test('CLI product status, product invoke, product sidecar, and product session p
       'utf-8',
     );
 
-    const oplHostedSidecar = await execCliAsync(
+    const oplHostedDomainActionAdapter = await execCliAsync(
       cliPath,
       [
         'product',
-        'sidecar',
+        'domain_action_adapter',
         'dispatch',
         '--task',
-        sidecarTaskFile,
+        domain_action_adapterTaskFile,
         '--format',
         'json',
       ],
@@ -511,11 +511,11 @@ test('CLI product status, product invoke, product sidecar, and product session p
         },
       },
     );
-    assert.equal(oplHostedSidecar.ok, true);
-    assert.equal(oplHostedSidecar.surface_kind, 'product_sidecar_dispatch');
-    assert.equal(oplHostedSidecar.action, 'notification_receipt');
+    assert.equal(oplHostedDomainActionAdapter.ok, true);
+    assert.equal(oplHostedDomainActionAdapter.surface_kind, 'domain_action_adapter_dispatch');
+    assert.equal(oplHostedDomainActionAdapter.action, 'notification_receipt');
 
-    const oplHostedParsed = oplHostedSidecar.result_surface;
+    const oplHostedParsed = oplHostedDomainActionAdapter.result_surface;
     assert.equal(oplHostedParsed.ok, true);
     assert.equal(oplHostedParsed.surface_kind, 'notification_receipt');
     assert.equal(oplHostedParsed.notification_id, 'notice-oplHosted');
@@ -660,8 +660,8 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
   assert.equal(proof.request.route, 'author_pptx_native');
 });
 
-test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', async () => {
-  const taskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-sidecar-task-')), 'task.json');
+test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-owned actions', async () => {
+  const taskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain_action_adapter-task-')), 'task.json');
   writeFileSync(
     taskFile,
     JSON.stringify({
@@ -670,12 +670,12 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     }),
     'utf-8',
   );
-  const evidenceTaskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-sidecar-evidence-task-')), 'task.json');
+  const evidenceTaskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain_action_adapter-evidence-task-')), 'task.json');
   writeFileSync(
     evidenceTaskFile,
     JSON.stringify({
       action: 'emit_no_regression_evidence',
-      workspace_root: '/tmp/redcube-sidecar-workspace',
+      workspace_root: '/tmp/redcube-domain_action_adapter-workspace',
       evidence_id: 'cli-no-regression',
     }),
     'utf-8',
@@ -683,17 +683,17 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
 
   const exported = await executeCli([
     'product',
-    'sidecar',
+    'domain_action_adapter',
     'export',
     '--workspace-root',
-    '/tmp/redcube-sidecar-workspace',
+    '/tmp/redcube-domain_action_adapter-workspace',
     '--format',
     'json',
   ], {
     domainActions: {
-      exportProductSidecar: async (request) => ({
+      exportDomainActionAdapter: async (request) => ({
         ok: true,
-        surface_kind: 'product_sidecar_export',
+        surface_kind: 'domain_action_adapter_export',
         request,
         owner_boundary: {
           hermes_owns_visual_truth: false,
@@ -705,8 +705,8 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
   });
 
   assert.equal(exported.ok, true);
-  assert.equal(exported.surface_kind, 'product_sidecar_export');
-  assert.equal(exported.request.workspace_root, '/tmp/redcube-sidecar-workspace');
+  assert.equal(exported.surface_kind, 'domain_action_adapter_export');
+  assert.equal(exported.request.workspace_root, '/tmp/redcube-domain_action_adapter-workspace');
   assert.equal(exported.request.format, 'json');
   assert.equal(exported.owner_boundary.hermes_owns_visual_truth, false);
   assert.equal(exported.owner_boundary.opl_owns_publication_gate, false);
@@ -714,7 +714,7 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
 
   const dispatched = await executeCli([
     'product',
-    'sidecar',
+    'domain_action_adapter',
     'dispatch',
     '--task',
     taskFile,
@@ -722,11 +722,11 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     'json',
   ], {
     domainActions: {
-      dispatchProductSidecar: async (request) => ({
+      dispatchDomainActionAdapter: async (request) => ({
         ok: true,
-        surface_kind: 'product_sidecar_dispatch',
+        surface_kind: 'domain_action_adapter_dispatch',
         request,
-        sidecar_policy: {
+        domain_action_adapter_policy: {
           writes_visual_truth: false,
           writes_review_verdict: false,
           writes_publication_gate: false,
@@ -736,16 +736,16 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
   });
 
   assert.equal(dispatched.ok, true);
-  assert.equal(dispatched.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(dispatched.surface_kind, 'domain_action_adapter_dispatch');
   assert.equal(dispatched.request.task_file, taskFile);
   assert.equal(dispatched.request.format, 'json');
-  assert.equal(dispatched.sidecar_policy.writes_visual_truth, false);
-  assert.equal(dispatched.sidecar_policy.writes_review_verdict, false);
-  assert.equal(dispatched.sidecar_policy.writes_publication_gate, false);
+  assert.equal(dispatched.domain_action_adapter_policy.writes_visual_truth, false);
+  assert.equal(dispatched.domain_action_adapter_policy.writes_review_verdict, false);
+  assert.equal(dispatched.domain_action_adapter_policy.writes_publication_gate, false);
 
   const evidenceDispatched = await executeCli([
     'product',
-    'sidecar',
+    'domain_action_adapter',
     'dispatch',
     '--task',
     evidenceTaskFile,
@@ -753,9 +753,9 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
     'json',
   ], {
     domainActions: {
-      dispatchProductSidecar: async (request) => ({
+      dispatchDomainActionAdapter: async (request) => ({
         ok: true,
-        surface_kind: 'product_sidecar_dispatch',
+        surface_kind: 'domain_action_adapter_dispatch',
         request,
         result_surface: {
           surface_kind: 'no_regression_evidence',
@@ -766,7 +766,7 @@ test('CLI product sidecar export and dispatch proxy guarded RCA-owned actions', 
   });
 
   assert.equal(evidenceDispatched.ok, true);
-  assert.equal(evidenceDispatched.surface_kind, 'product_sidecar_dispatch');
+  assert.equal(evidenceDispatched.surface_kind, 'domain_action_adapter_dispatch');
   assert.equal(evidenceDispatched.request.task_file, evidenceTaskFile);
   assert.equal(evidenceDispatched.result_surface.surface_kind, 'no_regression_evidence');
   assert.equal(evidenceDispatched.result_surface.evidence_ref, 'rca-no-regression:visual-stage:cli-no-regression');
@@ -789,9 +789,9 @@ test('CLI product read surfaces pass workspace receipt scaleout roots as refs-on
       surface_kind: 'product_entry_session',
       request,
     }),
-    exportProductSidecar: async (request) => ({
+    exportDomainActionAdapter: async (request) => ({
       ok: true,
-      surface_kind: 'product_sidecar_export',
+      surface_kind: 'domain_action_adapter_export',
       request,
     }),
   };
@@ -822,14 +822,14 @@ test('CLI product read surfaces pass workspace receipt scaleout roots as refs-on
     [
       [
         'product',
-        'sidecar',
+        'domain_action_adapter',
         'export',
         '--workspace-root',
         '/tmp/redcube-scaleout-a',
         '--workspace-receipt-scaleout-root',
         '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
       ],
-      'product_sidecar_export',
+      'domain_action_adapter_export',
     ],
     [
       [

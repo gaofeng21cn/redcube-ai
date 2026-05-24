@@ -6,7 +6,7 @@ import {
   assertRuntimeLoopClosureShape,
   existsSync,
   getProductEntrySession,
-  importGatewaySharedModule,
+  importDomainEntrySharedModule,
   invokeOplHostedProductEntry,
   invokeProductEntry,
   path,
@@ -54,7 +54,7 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
 
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
-    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
+    const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const response = await invokeProductEntry({
@@ -236,7 +236,7 @@ test('invokeProductEntry rejects retired deliverable task intent without compati
 
 test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
-    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
+    const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const first = await invokeProductEntry({
@@ -399,7 +399,7 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
 
 test('invokeOplHostedProductEntry validates the OPL envelope and converges onto the same downstream product-entry surface', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
-    const sharedCompanions = await importGatewaySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
+    const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
     const response = await invokeOplHostedProductEntry({
@@ -511,8 +511,8 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
   });
 });
 
-test('gateway shared family orchestration surface exposes the product-entry preset builder', async () => {
-  const familyOrchestration = await importGatewaySharedModule('opl-framework-shared/family-orchestration');
+test('domain-entry shared family orchestration surface exposes the product-entry preset builder', async () => {
+  const familyOrchestration = await importDomainEntrySharedModule('opl-framework-shared/family-orchestration');
 
   assert.equal(
     typeof familyOrchestration.buildFamilyProductEntryPresetOrchestration,
@@ -521,7 +521,7 @@ test('gateway shared family orchestration surface exposes the product-entry pres
 });
 
 test('session continuation family orchestration companion uses the shared continuation refs', async () => {
-  const companionModule = await import('../../packages/redcube-gateway/dist/actions/family-orchestration-companion.js');
+  const companionModule = await import('../../packages/redcube-domain-entry/dist/actions/family-orchestration-companion.js');
   const buildSessionContinuationFamilyOrchestration = companionModule.buildSessionContinuationFamilyOrchestration;
   assert.equal(typeof buildSessionContinuationFamilyOrchestration, 'function');
 

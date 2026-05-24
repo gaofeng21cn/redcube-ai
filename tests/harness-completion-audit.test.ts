@@ -60,7 +60,7 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
 });
 
 test('harness audit: source truth remains canonical through the current source intake path', () => {
-  const intakeAction = readImplementation('packages/redcube-gateway/src/actions/intake-source.ts');
+  const intakeAction = readImplementation('packages/redcube-domain-entry/src/actions/intake-source.ts');
   const sharedSourceTruth = readImplementation('packages/redcube-runtime/src/shared-source-truth.ts');
 
   assert.equal(intakeAction.includes("surface_kind: 'source_intake'"), true);
@@ -108,14 +108,14 @@ test('harness audit: reference quality is a formal operating surface, not only t
 test('harness audit: product/domain surface is stable across success and failure paths', () => {
   const cli = readCliSource();
   const mcp = read('apps/redcube-mcp/src/server.ts');
-  const getDeliverable = readImplementation('packages/redcube-gateway/src/actions/get-deliverable.ts');
+  const getDeliverable = readImplementation('packages/redcube-domain-entry/src/actions/get-deliverable.ts');
   const runRoute = [
-    readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route.ts'),
-    readImplementation('packages/redcube-gateway/src/actions/run-deliverable-route-parts/gateway-response.ts'),
+    readImplementation('packages/redcube-domain-entry/src/actions/run-deliverable-route.ts'),
+    readImplementation('packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts'),
   ].join('\n');
-  const doctor = readImplementation('packages/redcube-gateway/src/actions/doctor-workspace.ts');
-  const listTopics = readImplementation('packages/redcube-gateway/src/actions/list-topics.ts');
-  const gatewayIndex = readImplementation('packages/redcube-gateway/src/index.ts');
+  const doctor = readImplementation('packages/redcube-domain-entry/src/actions/doctor-workspace.ts');
+  const listTopics = readImplementation('packages/redcube-domain-entry/src/actions/list-topics.ts');
+  const domainEntryIndex = readImplementation('packages/redcube-domain-entry/src/index.ts');
 
   assert.equal(cli.includes("error_kind: 'cli_usage_error'"), true);
   assert.equal(cli.includes("recommended_action: 'read_help'"), true);
@@ -129,14 +129,14 @@ test('harness audit: product/domain surface is stable across success and failure
   assert.equal(runRoute.includes("'route_failure'"), true);
   assert.equal(doctor.includes("surface_kind: 'workspace_doctor'"), true);
   assert.equal(listTopics.includes("surface_kind: 'topic_catalog'"), true);
-  assert.equal(gatewayIndex.includes('getDefaultOverlayCatalog'), true);
-  assert.equal(gatewayIndex.includes("recommended_action: 'create_deliverable'"), true);
+  assert.equal(domainEntryIndex.includes('getDefaultOverlayCatalog'), true);
+  assert.equal(domainEntryIndex.includes("recommended_action: 'create_deliverable'"), true);
 });
 
 test('harness audit: extension proof shows onboarding is registry-driven instead of trunk hardcoded', () => {
   const overlayRegistryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
-  const createDeliverable = read('packages/redcube-gateway/src/actions/create-deliverable.ts');
-  const auditDeliverable = read('packages/redcube-gateway/src/actions/audit-deliverable.ts');
+  const createDeliverable = read('packages/redcube-domain-entry/src/actions/create-deliverable.ts');
+  const auditDeliverable = read('packages/redcube-domain-entry/src/actions/audit-deliverable.ts');
 
   assert.deepEqual(
     overlayRegistryPackage.redcube.defaultOverlayModules.map((item) => item.overlayId),

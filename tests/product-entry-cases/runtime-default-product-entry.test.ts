@@ -1,6 +1,6 @@
 // @ts-nocheck
 import {
-  GATEWAY_PACKAGE_JSON,
+  DOMAIN_ENTRY_PACKAGE_JSON,
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
   assert,
@@ -8,7 +8,7 @@ import {
   getProductEntrySession,
   getProductStart,
   getProductStatus,
-  importGatewaySharedModule,
+  importDomainEntrySharedModule,
   invokeProductEntry,
   prepareProductEntryWorkspace,
   readJson,
@@ -189,12 +189,12 @@ test('getProductStart exposes the same direct-entry start companion as the manif
 });
 
 test('product preflight consumes OPL shared program builders from the pinned owner commit', async () => {
-  const gatewayPackage = readJson(GATEWAY_PACKAGE_JSON);
+  const domainEntryPackage = readJson(DOMAIN_ENTRY_PACKAGE_JSON);
   assert.match(
-    gatewayPackage.dependencies['opl-framework-shared'],
+    domainEntryPackage.dependencies['opl-framework-shared'],
     /^git\+https:\/\/github\.com\/gaofeng21cn\/one-person-lab\.git#[0-9a-f]{40}$/,
   );
-  const companions = await importGatewaySharedModule(PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER);
+  const companions = await importDomainEntrySharedModule(PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER);
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
   assert.equal(typeof companions.buildProgramCheck, 'function');
 });

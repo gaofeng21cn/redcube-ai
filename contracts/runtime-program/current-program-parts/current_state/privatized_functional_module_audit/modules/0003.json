@@ -13,15 +13,15 @@
   "rca_scope": "visual_artifact_export_authority_and_locator_refs",
   "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/product-sidecar.ts#/mapped_surfaces/artifact_locator",
-    "packages/redcube-gateway/src/actions/product-sidecar.ts#apply_visual_workspace_lifecycle",
-    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+    "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts"
   ],
   "activeCallers": [
     "artifact locator contract",
     "export_pptx route",
     "workspace lifecycle guarded apply",
-    "product sidecar export"
+    "product domain_action_adapter export"
   ],
   "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
   "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",

@@ -39,7 +39,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
   <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI 主示意图" width="100%" />
 </p>
 
-> `RedCube AI` 是 RedCube Foundry Agent：它把源材料、生成过程、审阅轮次、进度反馈和导出文件放在同一条交付线上；发布形态统一为单一 `redcube-ai` app skill、service-safe domain entry、sidecar / projection 和 stage control projection。
+> `RedCube AI` 是 RedCube Foundry Agent：它把源材料、生成过程、审阅轮次、进度反馈和导出文件放在同一条交付线上；发布形态统一为单一 `redcube-ai` app skill、service-safe domain entry、domain_action_adapter / projection 和 stage control projection。
 
 ## 一句话快速启动
 
@@ -72,7 +72,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 当前边界
 
 - `RedCube AI` 是独立的视觉交付 Foundry Agent。它对外第一身份是视觉交付：接收材料、分阶段完成视觉创作、审阅、回修、导出和文件交付。
-- 公开发布形态：`RedCube AI Foundry Agent`，一个 built on OPL Framework 的 OPL-compatible package。这个 package 由单一 `redcube-ai` app skill、service-safe domain entry（`invokeDomainEntry`）、product sidecar / projection surface 和只读 stage control projection 组成。
+- 公开发布形态：`RedCube AI Foundry Agent`，一个 built on OPL Framework 的 OPL-compatible package。这个 package 由单一 `redcube-ai` app skill、service-safe domain entry（`invokeDomainEntry`）、product domain_action_adapter / projection surface 和只读 stage control projection 组成。
 - 对外第一入口是单一 `redcube-ai` 应用技能；`status` / `invoke` / `session` 继续作为这个技能下面的机器可读命令合同。其中 `status` 指面向智能体的产品入口概览、材料接收和入口壳，不代表已经落地 GUI、WebUI 或最终用户前台。
 - 它对外稳定暴露的可调用面是本地 CLI、MCP / 产品入口命令、`invokeDomainEntry`、本地脚本与仓库跟踪合同，方便 `Codex` 或其他操作者直接调用。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
@@ -106,7 +106,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 - 先读 [文档索引](./docs/README.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
-- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product sidecar / projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
+- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product domain_action_adapter / projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
 - 当前已验证的公开入口面是单一 `redcube-ai` 应用技能、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与仓库跟踪合同，就构成了稳定可调用面。OPL/Temporal 托管调度是任务启动后的默认运行口径，本地默认具体 stage executor 仍是 `Codex CLI`，非默认 executor / proof adapter 继续只在显式选择时出现。
 - RedCube 可以通过 Codex 应用技能直接调用，也可以作为外部领域智能体被 OPL 托管调用。两条路径必须回到同一套 RedCube 持有的 route、review、artifact 和 export surface。
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。

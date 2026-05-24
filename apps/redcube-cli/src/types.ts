@@ -22,7 +22,7 @@ import type {
   SourceIntakeResponse,
   TopicCatalogResponse,
   WorkspaceDoctorResponse,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 
 export interface CliOptions extends Record<string, string | boolean> {}
 

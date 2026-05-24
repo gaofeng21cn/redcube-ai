@@ -13,7 +13,7 @@
   "rca_scope": "python_native_helper_implementation",
   "audit_readout": "retain_rca_implementation_project_opl_envelope",
   "codePaths": [
-    "packages/redcube-gateway/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
+    "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
     "contracts/runtime-program/python-native-helper-catalog.json",
     "python/redcube_ai"
   ],

@@ -19,7 +19,7 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
 ]);
 
 async function getProductEntryManifest(request) {
-  const module = await import('../packages/redcube-gateway/dist/index.js');
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
   return module.getProductEntryManifest(request);
 }
 
@@ -110,17 +110,17 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'standard_domain_agent_skeleton',
         'artifact_locator_contract',
         'domain_memory_descriptor_locator',
-        'product_sidecar_receipt_refs',
+        'domain_action_adapter_receipt_refs',
       ],
     );
     assert.deepEqual(
       registration.consumable_projection_refs.slice(-4),
-      ['/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/product_sidecar_receipt_refs'],
+      ['/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/domain_action_adapter_receipt_refs'],
     );
     assert.equal(registration.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
     assert.equal(registration.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
     assert.deepEqual(registration.standard_domain_agent_skeleton.runtime_declares_only, [
-      'product_sidecar_adapter',
+      'domain_action_adapter_adapter',
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',

@@ -8,7 +8,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync
 import {
   createDeliverable,
   runDeliverableRoute,
-} from '@redcube/gateway';
+} from '@redcube/domain-entry';
 import {
   startMockCodexCli,
   withEnv,

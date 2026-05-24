@@ -27,7 +27,7 @@
     "review_repair_transport",
     "restart_dead_letter_repair_human_gate_state_chain",
     "native_helper_generic_envelope",
-    "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+    "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
   ],
   "opl_owned_generic_primitives": [
     "standard_domain_agent_scaffold",
@@ -48,7 +48,7 @@
     "review_repair_transport",
     "restart_dead_letter_repair_human_gate_state_chain",
     "native_helper_generic_envelope",
-    "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper"
+    "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
   ],
   "rca_retained_authority": [
     "visual_truth",
@@ -138,7 +138,7 @@
   "rca_thin_program_surfaces": [
     "single redcube-ai app skill",
     "service-safe domain entry",
-    "product sidecar projection",
+    "product domain_action_adapter projection",
     "stage control projection",
     "visual transition spec",
     "artifact locator refs",
@@ -151,43 +151,43 @@
       "primitive": "standard_domain_agent_scaffold",
       "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
       "manifest_ref": "/standard_domain_agent_skeleton",
-      "sidecar_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
+      "domain_action_adapter_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
     },
     {
       "primitive": "generic_scheduler",
       "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
       "manifest_ref": "/family_scheduler_replacement",
-      "sidecar_ref": "/runtime_framework/family_scheduler_replacement"
+      "domain_action_adapter_ref": "/runtime_framework/family_scheduler_replacement"
     },
     {
       "primitive": "memory_transport",
       "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
       "manifest_ref": "/domain_memory_descriptor_locator",
-      "sidecar_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
+      "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
     },
     {
       "primitive": "artifact_lifecycle",
       "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
       "manifest_ref": "/lifecycle_guarded_apply_proof",
-      "sidecar_ref": "/mapped_surfaces/lifecycle_guarded_apply"
+      "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
     },
     {
       "primitive": "review_repair_transport",
       "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/quality_projection",
       "manifest_ref": "/review_state",
-      "sidecar_ref": "/mapped_surfaces/review_projection"
+      "domain_action_adapter_ref": "/mapped_surfaces/review_projection"
     },
     {
       "primitive": "native_helper_generic_envelope",
       "contract_ref": "contracts/runtime-program/python-native-helper-catalog.json",
       "manifest_ref": "/native_ppt_operator_ux",
-      "sidecar_ref": "/mapped_surfaces/native_helper_implementation"
+      "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
     },
     {
-      "primitive": "generated_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper",
+      "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
       "contract_ref": "rca.visual_pack_compiler_handoff.v1",
       "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-      "sidecar_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
+      "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
     }
   ],
   "forbidden_rca_generic_owner_flags": {
@@ -207,6 +207,6 @@
     "rca_review_repair_transport_owner": false,
     "rca_restart_dead_letter_repair_human_gate_state_chain_owner": false,
     "rca_native_helper_generic_envelope_owner": false,
-    "rca_cli_mcp_product_entry_sidecar_status_session_workbench_wrapper_owner": false
+    "rca_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper_owner": false
   }
 }

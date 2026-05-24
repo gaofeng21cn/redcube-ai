@@ -62,8 +62,8 @@
       ]
     },
     {
-      "directory": "packages/redcube-gateway",
-      "package_name": "@redcube/gateway",
+      "directory": "packages/redcube-domain-entry",
+      "package_name": "@redcube/domain-entry",
       "exports": [
         {
           "subpath": ".",

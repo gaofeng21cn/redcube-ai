@@ -134,7 +134,7 @@ test('workspace packages and apps participate in package-level tsconfig layering
   const paths = [
     'apps/redcube-cli/tsconfig.json',
     'apps/redcube-mcp/tsconfig.json',
-    'packages/redcube-gateway/tsconfig.json',
+    'packages/redcube-domain-entry/tsconfig.json',
     'packages/redcube-governance/tsconfig.json',
     'packages/redcube-reference-os/tsconfig.json',
     'packages/redcube-runtime-protocol/tsconfig.json',
@@ -167,8 +167,8 @@ test('root package build graph lists dist-export dependencies before consumers',
   before('./packages/redcube-runtime-protocol', './packages/redcube-overlay-core');
   before('./packages/redcube-overlay-core', './packages/redcube-governance');
   before('./packages/redcube-governance', './packages/redcube-runtime');
-  before('./packages/redcube-runtime', './packages/redcube-gateway');
-  before('./packages/redcube-gateway', './apps/redcube-cli');
+  before('./packages/redcube-runtime', './packages/redcube-domain-entry');
+  before('./packages/redcube-domain-entry', './apps/redcube-cli');
 });
 
 test('typescript package build contract requires runtime exports to resolve through compiled dist artifacts', () => {
@@ -273,7 +273,7 @@ test('compiled dist runtime entrypoints preserve package runtime exports', async
       exports: ['probeCodexCli', 'generateStructuredArtifactViaCodexCli'],
     },
     {
-      packageName: '@redcube/gateway',
+      packageName: '@redcube/domain-entry',
       exports: ['getProductStatus', 'runDeliverableRoute'],
     },
     {

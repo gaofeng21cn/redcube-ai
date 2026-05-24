@@ -16,7 +16,7 @@ export const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-l
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
-  'packages/redcube-gateway',
+  'packages/redcube-domain-entry',
   'packages/redcube-governance',
   'packages/redcube-reference-os',
   'packages/redcube-overlay-core',

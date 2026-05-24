@@ -459,14 +459,14 @@
     "mcp",
     "skill",
     "product_entry_manifest",
-    "sidecar_export_dispatch",
+    "domain_action_adapter_export_dispatch",
     "status_read_model",
     "workbench_drilldown",
     "functional_harness_cases",
     "product_entry",
     "product_status",
     "product_session",
-    "sidecar",
+    "domain_action_adapter",
     "workbench"
   ],
   "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
@@ -475,17 +475,17 @@
     "redcube_mcp",
     "invokeProductEntry",
     "invokeDomainEntry",
-    "product_sidecar",
-    "product_entry_session_snapshot_refs_adapter"
+    "domain_action_adapter",
+    "product_entry_continuity_refs_adapter"
   ],
   "repo_local_handlers_are_generated_surface_owners": false,
   "domain_repo_can_own_generated_surface": false,
   "source_refs": {
     "canonical_semantic_pack": "agent/",
-    "action_catalog": "packages/redcube-gateway/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata",
-    "stage_control_plane": "packages/redcube-gateway/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane",
-    "memory_descriptor": "packages/redcube-gateway/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor",
-    "functional_audit": "packages/redcube-gateway/src/actions/product-sidecar-guarded-actions.ts::buildPrivatizedFunctionalModuleAuditProjection"
+    "action_catalog": "packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata",
+    "stage_control_plane": "packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane",
+    "memory_descriptor": "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor",
+    "functional_audit": "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection"
   },
   "authority_boundary": {
     "opl_can_write_domain_truth": false,

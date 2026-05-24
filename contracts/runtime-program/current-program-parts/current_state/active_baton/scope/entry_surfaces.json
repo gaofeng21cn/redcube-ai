@@ -3,9 +3,9 @@
   "invokeOplHostedProductEntry",
   "getProductEntrySession",
   "redcube product invoke",
-  "redcube product sidecar",
+  "redcube product domain_action_adapter",
   "redcube product session",
   "invoke_product_entry",
-  "product_sidecar_dispatch",
+  "domain_action_adapter_dispatch",
   "get_product_entry_session"
 ]

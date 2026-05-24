@@ -8,7 +8,7 @@ import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildCommandHelp, buildHelp, executeCli, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
 import { getDomainActions as getMcpDomainActions, listDomainTools } from '../apps/redcube-mcp/dist/server.js';
-import { buildRedCubeActionMetadata } from '../packages/redcube-gateway/dist/index.js';
+import { buildRedCubeActionMetadata } from '../packages/redcube-domain-entry/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
 function runCli(args, options = {}) {
@@ -150,10 +150,10 @@ test('CLI product-entry and proof command help is projected from family action m
   }
 });
 
-test('CLI product sidecar subcommand help uses family action metadata at runtime', async () => {
+test('CLI product domain_action_adapter subcommand help uses family action metadata at runtime', async () => {
   for (const [argv, actionId] of [
-    [['product', 'sidecar', 'export', '--help'], 'export_product_sidecar'],
-    [['product', 'sidecar', 'dispatch', '--help'], 'dispatch_product_sidecar'],
+    [['product', 'domain_action_adapter', 'export', '--help'], 'export_domain_action_adapter'],
+    [['product', 'domain_action_adapter', 'dispatch', '--help'], 'dispatch_domain_action_adapter'],
   ]) {
     const help = await executeCli(argv);
     const commandKey = argv.slice(0, 3).join(' ');

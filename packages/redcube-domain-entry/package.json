@@ -1,0 +1,18 @@
+{
+  "name": "@redcube/domain-entry",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "dependencies": {
+    "@redcube/overlay-core": "0.1.0",
+    "@redcube/overlay-registry": "0.1.0",
+    "@redcube/runtime": "0.1.0",
+    "@redcube/runtime-protocol": "0.1.0",
+    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#c5d4a93bd4bb64adf1228ecf7f2a9038c7dce278"
+  },
+  "license": "Apache-2.0"
+}

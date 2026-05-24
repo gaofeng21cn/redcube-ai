@@ -40,10 +40,10 @@
   "target_runtime_consumption_refs": [
     "redcube product manifest#/rca_efficiency_handoff_projection",
     "redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection",
-    "redcube product sidecar#/mapped_surfaces/rca_efficiency_handoff_projection",
-    "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
-    "redcube product sidecar#/mapped_surfaces/external_work_order_owner_closeout",
-    "redcube product sidecar#/source_manifest_refs/external_work_order_owner_closeout_ref"
+    "redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection",
+    "redcube product domain_action_adapter#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
+    "redcube product domain_action_adapter#/mapped_surfaces/external_work_order_owner_closeout",
+    "redcube product domain_action_adapter#/source_manifest_refs/external_work_order_owner_closeout_ref"
   ],
   "efficiency_signal_refs": {
     "duration_refs": [
@@ -156,7 +156,7 @@
       "target_surface": "target_agent_owner_route_ref",
       "target_repo_refs": [
         "redcube product manifest#/owner_route",
-        "redcube product sidecar#/source_manifest_refs/rca_efficiency_handoff_projection_ref"
+        "redcube product domain_action_adapter#/source_manifest_refs/rca_efficiency_handoff_projection_ref"
       ],
       "verifies_ref": "target-runtime-read-model-consumption:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4/source-patch",
       "refs_only": true,
@@ -215,7 +215,7 @@
     "workspace-runtime-ref:review-export:<run-id>",
     "workspace-runtime-ref:export-result:<run-id>",
     "target-verification:redcube-ai/product-manifest-read",
-    "target-verification:redcube-ai/product-sidecar-export-read",
+    "target-verification:redcube-ai/domain-action-adapter-export-read",
     "target-verification:redcube-ai/typecheck",
     "target-verification:redcube-ai/test-fast",
     "target-verification:redcube-ai/targeted-efficiency-tests"

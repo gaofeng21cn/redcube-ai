@@ -46,4 +46,4 @@ Machine boundary: 人读 tombstone。当前机器真相继续归 contracts、sou
 
 ## Physical follow-through note
 
-2026-05-13 follow-through 后，默认 active path 只读作 direct product entry、service-safe domain entry、product sidecar、stage descriptor 与 OPL-hosted handoff parity。旧 Hermes/Gateway/local-manager 文件名若仍在 `docs/history/` 或 `docs/references/` 出现，原因只能是 `human_doc:*` 合同引用、proof provenance 或 tombstone 可检索性；无合同引用的旧 active-path 物理入口不得重新进入 active code/tests/package surface。
+2026-05-13 follow-through 后，默认 active path 只读作 direct product entry、service-safe domain entry、product domain_action_adapter、stage descriptor 与 OPL-hosted handoff parity。旧 Hermes/Gateway/local-manager 文件名若仍在 `docs/history/` 或 `docs/references/` 出现，原因只能是 `human_doc:*` 合同引用、proof provenance 或 tombstone 可检索性；无合同引用的旧 active-path 物理入口不得重新进入 active code/tests/package surface。

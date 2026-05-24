@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 import { inspectCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
 
-test('gateway package and lock stay aligned with the current OPL family shared release pin contract', () => {
+test('domain entry package and lock stay aligned with the current OPL family shared release pin contract', () => {
   const inspection = inspectCurrentRepoSharedPinAlignment({
     repoRoot: process.cwd(),
     consumerRepoId: 'redcube',
@@ -15,7 +15,7 @@ test('gateway package and lock stay aligned with the current OPL family shared r
   assert.equal(inspection.status, 'aligned');
   assert.deepEqual(
     inspection.findings.map((entry) => entry.file),
-    ['packages/redcube-gateway/package.json', 'package-lock.json'],
+    ['packages/redcube-domain-entry/package.json', 'package-lock.json'],
   );
   assert.deepEqual(
     inspection.findings.map((entry) => entry.status),

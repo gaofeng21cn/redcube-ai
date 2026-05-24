@@ -17,8 +17,8 @@
     "rca_owns_replacement_runtime": false
   },
   "codePaths": [
-    "packages/redcube-gateway/src/actions/product-sidecar-parts/visual-pack-compiler-handoff.ts",
-    "packages/redcube-gateway/src/actions/product-sidecar.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
+    "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
     "packages/redcube-runtime/src"
   ],
   "activeCallers": [

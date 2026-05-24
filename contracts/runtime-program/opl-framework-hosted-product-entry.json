@@ -18,7 +18,7 @@
   "callable_surface": {
     "action_ref": "opl_framework:hosted_product_entry",
     "api_surface": "invokeOplHostedProductEntry",
-    "sidecar_dispatch": "redcube product sidecar dispatch"
+    "domain_action_adapter_dispatch": "redcube product domain_action_adapter dispatch"
   },
   "hosted_handoff_contract": {
     "target_domain_id": "redcube_ai",
@@ -38,7 +38,7 @@
     "shared_downstream_contract": "contracts/runtime-program/redcube-product-entry-mvp.json"
   },
   "behavior_contract": {
-    "delegate_to": "@redcube/gateway invokeProductEntry",
+    "delegate_to": "@redcube/domain-entry invokeProductEntry",
     "preserve_visual_domain_boundary": true,
     "fail_closed_on": [
       "unsupported_target_domain_id",

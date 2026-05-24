@@ -2,8 +2,8 @@
 import {
   SERIAL_ENV_TEST,
   assert,
-  dispatchProductSidecar,
-  exportProductSidecar,
+  dispatchDomainActionAdapter,
+  exportDomainActionAdapter,
   getProductEntrySession,
   getProductEntryManifest,
   invokeProductEntry,
@@ -17,14 +17,14 @@ import path from 'node:path';
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const sidecar = await exportProductSidecar({ workspace_root: workspaceRoot });
+    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
 
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.surface_kind,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.surface_kind,
       'rca_visual_production_evidence_scaleout_refs',
     );
     assert.deepEqual(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.stage_sequence_refs,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.stage_sequence_refs,
       [
         'author_image_pages',
         'visual_director_review',
@@ -33,75 +33,75 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       ],
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.route_id,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.route_id,
       'ppt_deck.image_first.artifact_producing.v1',
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.html_or_native_route_selected,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.selected_artifact_producing_visual_route.html_or_native_route_selected,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.contains_memory_body,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.contains_memory_body,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs.length >= 2,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs.length >= 2,
       true,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.authority_boundary.opl_can_authorize_review_export_verdict,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.authority_boundary.opl_can_authorize_review_export_verdict,
       false,
     );
     assert.equal(
-      sidecar.source_manifest_refs.production_evidence_scaleout_refs_ref,
+      domain_action_adapter.source_manifest_refs.production_evidence_scaleout_refs_ref,
       '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.surface_kind,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.surface_kind,
       'rca_opl_expected_receipt_monitor_freshness_handoff',
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.status,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.status,
       'body_free_refs_ready_for_opl_workorder',
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_owner_receipt_ref.payload_body_included,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_owner_receipt_ref.payload_body_included,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_visual_memory_reuse_ref.payload_body_included,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.body_free_visual_memory_reuse_ref.payload_body_included,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
       true,
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_monitor_freshness_refs,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_monitor_freshness_refs,
       true,
     );
     assert.equal(
-      sidecar.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_write_rca_visual_truth,
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_write_rca_visual_truth,
       false,
     );
     assert.equal(
-      sidecar.source_manifest_refs.opl_expected_receipt_monitor_freshness_handoff_ref,
+      domain_action_adapter.source_manifest_refs.opl_expected_receipt_monitor_freshness_handoff_ref,
       '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
     );
 
-    await dispatchProductSidecar({
+    await dispatchDomainActionAdapter({
       task: {
         action: 'emit_workspace_receipt_proof',
         workspace_root: workspaceRoot,
@@ -113,7 +113,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
         artifact_refs: ['workspace-runtime-ref:artifact:scaleout-slide'],
       },
     });
-    await dispatchProductSidecar({
+    await dispatchDomainActionAdapter({
       task: {
         action: 'emit_workspace_receipt_proof',
         workspace_root: workspaceRoot,
@@ -275,7 +275,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       false,
     );
 
-    const repeatProof = await dispatchProductSidecar({
+    const repeatProof = await dispatchDomainActionAdapter({
       task: {
         action: 'emit_workspace_receipt_proof',
         workspace_root: workspaceRoot,
@@ -324,7 +324,7 @@ test('workspace receipt inventory aggregates refs across two workspaces without 
       [secondWorkspaceRoot, 'scaleout-workspace-b'],
       [secondWorkspaceRoot, 'scaleout-workspace-b-repeat'],
     ]) {
-      await dispatchProductSidecar({
+      await dispatchDomainActionAdapter({
         task: {
           action: 'emit_workspace_receipt_proof',
           workspace_root: workspaceRoot,
@@ -379,28 +379,28 @@ test('workspace receipt inventory aggregates refs across two workspaces without 
       false,
     );
 
-    const sidecar = await exportProductSidecar({
+    const domain_action_adapter = await exportDomainActionAdapter({
       workspace_root: firstWorkspaceRoot,
       workspace_receipt_scaleout_roots: [secondWorkspaceRoot],
     });
     assert.equal(
-      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.observed_workspace_count,
+      domain_action_adapter.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.observed_workspace_count,
       2,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.observed_workspace_count,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.observed_workspace_count,
       2,
     );
     assert.equal(
-      sidecar.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed,
       false,
     );
     assert.equal(
-      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.declares_production_soak_complete,
+      domain_action_adapter.mapped_surfaces.workspace_receipt_inventory_projection.scaleout_projection.declares_production_soak_complete,
       false,
     );
     assert.deepEqual(
-      sidecar.mapped_surfaces.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs.map(
+      domain_action_adapter.mapped_surfaces.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.workspace_receipt_source_refs.map(
         (source) => source.workspace_root,
       ),
       [path.resolve(firstWorkspaceRoot), path.resolve(secondWorkspaceRoot)],
@@ -437,7 +437,7 @@ test('product-entry session reads explicit workspace receipt scaleout roots with
       [secondWorkspaceRoot, 'session-scaleout-workspace-b'],
       [secondWorkspaceRoot, 'session-scaleout-workspace-b-repeat'],
     ]) {
-      await dispatchProductSidecar({
+      await dispatchDomainActionAdapter({
         task: {
           action: 'emit_workspace_receipt_proof',
           workspace_root: workspaceRoot,
@@ -482,7 +482,7 @@ test('workspace receipt inventory excludes invalid-only roots from observed scal
       'scaleout-valid-workspace',
       'scaleout-valid-workspace-repeat',
     ]) {
-      await dispatchProductSidecar({
+      await dispatchDomainActionAdapter({
         task: {
           action: 'emit_workspace_receipt_proof',
           workspace_root: validWorkspaceRoot,

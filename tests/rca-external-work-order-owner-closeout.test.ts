@@ -4,10 +4,10 @@ import { existsSync } from 'node:fs';
 import test from 'node:test';
 
 import {
-  dispatchProductSidecar,
-  exportProductSidecar,
+  dispatchDomainActionAdapter,
+  exportDomainActionAdapter,
   getProductEntryManifest,
-  getProductSidecarGuardedActionMetadata,
+  getDomainActionAdapterGuardedActionMetadata,
   prepareProductEntryWorkspace,
   SERIAL_ENV_TEST,
   withMockCodexRuntimeState,
@@ -55,12 +55,12 @@ function validCloseoutTask(workspaceRoot, overrides = {}) {
   };
 }
 
-test('RCA manifest and sidecar expose external work-order owner closeout as an owner-owned refs-only action', SERIAL_ENV_TEST, async () => {
+test('RCA manifest and domain_action_adapter expose external work-order owner closeout as an owner-owned refs-only action', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    const sidecar = await exportProductSidecar({ workspace_root: workspaceRoot });
-    const metadata = await getProductSidecarGuardedActionMetadata();
+    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
+    const metadata = await getDomainActionAdapterGuardedActionMetadata();
 
     assert.equal(
       metadata.guardedActionIds.includes('emit_external_work_order_owner_closeout'),
@@ -79,11 +79,11 @@ test('RCA manifest and sidecar expose external work-order owner closeout as an o
       'no_forbidden_write_refs',
     ]);
 
-    const sidecarAction = manifest.family_action_catalog.actions.find(
-      (entry) => entry.action_id === 'dispatch_product_sidecar',
+    const domain_action_adapterAction = manifest.family_action_catalog.actions.find(
+      (entry) => entry.action_id === 'dispatch_domain_action_adapter',
     );
     assert.equal(
-      sidecarAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
+      domain_action_adapterAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
       true,
     );
     assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.action, 'emit_external_work_order_owner_closeout');
@@ -103,17 +103,17 @@ test('RCA manifest and sidecar expose external work-order owner closeout as an o
     );
 
     assert.equal(
-      sidecar.mapped_surfaces.external_work_order_owner_closeout.action,
+      domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.action,
       'emit_external_work_order_owner_closeout',
     );
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.owner, 'redcube_ai');
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.refs_only, true);
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.writes_visual_truth, false);
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.writes_artifact_body, false);
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.writes_memory_body, false);
-    assert.equal(sidecar.mapped_surfaces.external_work_order_owner_closeout.authorizes_quality_or_export, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.owner, 'redcube_ai');
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.refs_only, true);
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_visual_truth, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_artifact_body, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.writes_memory_body, false);
+    assert.equal(domain_action_adapter.mapped_surfaces.external_work_order_owner_closeout.authorizes_quality_or_export, false);
     assert.equal(
-      sidecar.source_manifest_refs.external_work_order_owner_closeout_ref,
+      domain_action_adapter.source_manifest_refs.external_work_order_owner_closeout_ref,
       '/domain_owner_receipt_contract/external_work_order_owner_closeout',
     );
   });
@@ -122,7 +122,7 @@ test('RCA manifest and sidecar expose external work-order owner closeout as an o
 test('RCA owner closeout returns refs-only no-regression evidence for absorbed external work orders', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const result = await dispatchProductSidecar({
+    const result = await dispatchDomainActionAdapter({
       task: validCloseoutTask(workspaceRoot),
     });
 
@@ -179,7 +179,7 @@ test('RCA owner closeout returns typed blockers for insufficient or forbidden ex
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const missing = await dispatchProductSidecar({
+    const missing = await dispatchDomainActionAdapter({
       task: {
         action: 'emit_external_work_order_owner_closeout',
         workspace_root: workspaceRoot,
@@ -204,7 +204,7 @@ test('RCA owner closeout returns typed blockers for insufficient or forbidden ex
       false,
     );
 
-    const forbidden = await dispatchProductSidecar({
+    const forbidden = await dispatchDomainActionAdapter({
       task: validCloseoutTask(workspaceRoot, {
         work_order_id: 'forbidden-body-work-order',
         visual_truth_body: { slides: [] },
