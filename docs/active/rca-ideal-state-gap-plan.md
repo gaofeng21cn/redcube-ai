@@ -47,6 +47,15 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Direct / hosted boundary | done structurally | product-entry manifest、family action catalog、product domain_action_adapter export/dispatch、stage control projection |
 | Current-program source shape | done | `contracts/runtime-program/current-program.index.json` 与 `contracts/runtime-program/current-program-parts/**` |
 
+## 当前完成进度
+
+| Area | 当前进度 | 当前读法 |
+| --- | --- | --- |
+| Standard OPL Agent structure | `done` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
+| Functional / structural gaps | `closed_with_evidence_tail` | `functional_structure_gap_count=0` 只表示结构和 owner 边界闭合；production evidence tail 仍需要 RCA-owned receipt / visual verdict / artifact evidence。 |
+| Retained authority surfaces | `active_authority` | Visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt 留在 RCA；OPL 只消费 refs 和 generated/default caller。 |
+| Docs lifecycle | `single_active_truth_owner` | 本文持有 current truth、gap、结构卫生尾项、下一轮 prompt 和验证口径；历史路线和 retired surface 进入 history/tombstone/provenance。 |
+
 已闭合为标准 OPL consumer 口径的 8 项：
 
 - `opl_generated_surface_production_consumption`
@@ -126,6 +135,48 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 
 5. `compatibility_free_retirement`
    active caller 迁出后直接删除旧 CLI/MCP alias、product wrapper、gateway/runtime facade、domain_action_adapter compatibility path 和只保护旧 public path 的测试；保留的测试只断言 current contract、fail-closed negative input、owner receipt、typed blocker、semantic-id tombstone 或 no-forbidden-write proof。
+
+## 下一轮 Agent prompt
+
+Objective:
+
+- 继续治理 `/Users/gaofeng/workspace/redcube-ai` 的 RCA production evidence tail、generated/default caller thinning 和 naming/contract hygiene；保持 RCA visual authority 不被 OPL 或 docs 误上收。
+
+Write scope:
+
+- `docs/active/rca-ideal-state-gap-plan.md`、`docs/status.md`、`docs/active/opl-private-implementation-migration-inventory.md`、runtime-program contracts、product/domain_action_adapter surfaces、tests 和 source 中仍影响 RCA owner boundary 的部分。
+
+Live truth inputs:
+
+- `AGENTS.md`、`TASTE.md`、核心五件套、本文、RCA target-state/reference docs。
+- `contracts/runtime-program/current-program.json`、`contracts/runtime-program/current-program.index.json`、functional privatization / physical morphology contracts、owner receipt / memory / artifact / review/export contracts。
+- OPL `agents interfaces --domain rca --json`、OPL framework readiness / App drilldown 中 RCA refs-only evidence 读面、RCA focused tests 和 `scripts/verify.sh`。
+
+Required actions:
+
+- 推进 `production_evidence_tail`、`runtime_evidence_scaleout`、`generated_default_caller_thinning`、`naming_contract_hygiene` 和 `compatibility_free_retirement`。
+- 对 retained surfaces 核实 active caller、OPL default caller parity、owner receipt roundtrip、tombstone/provenance 和 no-compatibility-alias proof。
+- 已满足门槛的 legacy public entry、alias、facade、domain_action_adapter compatibility path 或保护旧路径的测试直接删除、archive 或 tombstone。
+
+Non-goals:
+
+- 不把 structural pass、provider completion、focused proof、stage evidence receipt 或 no-regression ref 写成 visual ready、artifact ready、domain ready 或 production ready。
+- 不写 artifact body、visual memory body、review/export verdict 或 owner receipt body。
+- 不恢复 `managed`、gateway/runtime/session/domain_action_adapter compatibility alias 或 Hermes-first active path。
+
+Verification commands:
+
+- Docs-only：`rtk git diff --check`、`rtk rg -n "<<<<<<<|>>>>>>>|=======" docs`。
+- 触及 source/contracts/tests：`rtk ./scripts/verify.sh`、`rtk npm run test:fast` 或相关 focused test group。
+
+Completion gate:
+
+- Active plan 只保留 current truth、still-open evidence gap、结构卫生尾项和下一步；closed gap 不以 dated closeout 形式留在 active path。
+- main checkout 上完成触及面验证；worktree/branch 已吸收清理，或明确因近期写入/未提交改动保留。
+
+Foldback target:
+
+- Durable current truth 折回本文、核心五件套、private inventory 或 machine-readable contracts；历史 route、旧计划、proof 流水和 retired surface 进入 `docs/history/**`、tombstone/provenance、ledger 或提交历史。
 
 ## 完成门槛
 
