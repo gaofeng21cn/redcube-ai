@@ -1,10 +1,8 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
@@ -13,7 +11,6 @@ const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
 const pluginIconSourcePath = path.join(pluginRoot, 'assets', 'icon.svg');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
-const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.ts');
 function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
@@ -46,44 +43,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /author_image_pages` 是默认视觉实现路线/i);
 });
 
-test('codex plugin installer keeps plugin and skill paths repo-local with machine-readable output', () => {
-  const homeDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));
-  const marketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
-
-  const output = execFileSync(
-    'node',
-    [installerPath, '--repo-root', repoRoot, '--home', homeDir],
-    { cwd: repoRoot, encoding: 'utf-8' },
-  );
-  const result = JSON.parse(output);
-  const installedPluginRoot = path.join(homeDir, 'plugins', 'rca');
-  const installedSkillRoot = path.join(homeDir, '.agents', 'skills', 'rca');
-  const marketplace = readJson(marketplacePath);
-  const pluginEntry = marketplace.plugins.find((item) => item.name === 'rca');
-
-  assert.equal(result.ok, true);
-  assert.equal(result.plugin_name, 'rca');
-  assert.equal(result.repo_root, repoRoot);
-  assert.equal(result.home, homeDir);
-  assert.equal(existsSync(installedPluginRoot), false);
-  assert.equal(existsSync(installedSkillRoot), false);
-  assert.equal(result.plugin_root, pluginRoot);
-  assert.equal(result.skill_root, path.dirname(pluginSkillPath));
-  assert.equal(existsSync(path.join(homeDir, '.codex', 'skills', 'rca')), false);
-  assert.equal(existsSync(path.join(homeDir, '.agents', 'plugins', 'marketplace.json')), false);
-  assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
-  assert.deepEqual(pluginEntry, {
-    name: 'rca',
-    source: {
-      source: 'local',
-      path: './plugins/rca',
-    },
-    policy: {
-      installation: 'AVAILABLE',
-      authentication: 'ON_INSTALL',
-    },
-    languageSurface: result.language_surface,
-    category: 'Creative',
-  });
-  assert.match(result.language_surface.javascriptPolicy, /Repo-tracked JavaScript is retired/i);
+test('codex plugin repo-local installer and marketplace surfaces stay retired', () => {
+  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
+  assert.equal(existsSync(path.join(repoRoot, '.agents', 'plugins', 'marketplace.json')), false);
 });

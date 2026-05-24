@@ -68,8 +68,12 @@ if [ -n "$unignored_generated" ]; then
   exit 1
 fi
 
-agents_files="$(git ls-files -- .agents)"
-if [ "$agents_files" != ".agents/plugins/marketplace.json" ]; then
+agents_files="$(git ls-files -- .agents | while IFS= read -r path; do
+  if [ -e "$path" ]; then
+    printf '%s\n' "$path"
+  fi
+done)"
+if [ -n "$agents_files" ]; then
   printf '%s\n%s\n' 'repo hygiene: unexpected tracked .agents paths:' "$agents_files" >&2
   exit 1
 fi
