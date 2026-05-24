@@ -429,21 +429,15 @@ test('Runtime and test proof callers do not prefer ppt deck wrapper scripts', ()
   assert.match(testProofSource, /PYTHONPATH/);
 });
 
-test('Retired wrapper paths have no active callers or contract anchors', () => {
-  const retiredWrapperPaths = [
-    'packages/redcube-runtime/scripts/ppt_deck_review.py',
-    'packages/redcube-runtime/scripts/ppt_deck_export.py',
-    'packages/redcube-runtime/scripts/ppt_deck_native.py',
-    'python/redcube_ai/hermes/agent_loop_bridge.py',
-  ];
-  const allowedFiles = new Set([
-    'tests/python-native-helper-catalog.test.ts',
-    'tests/rca-retired-surface-guard.test.ts',
-    'docs/status.md',
-    'docs/active/rca-ideal-state-gap-plan.md',
-  ]);
+test('Retired wrapper script invocation shape has no active callers or contract anchors', () => {
   const activeRoots = ['apps', 'packages', 'contracts', 'scripts', 'tests', 'tools', 'python'];
   const textExtensions = new Set(['.json', '.ts', '.tsx', '.js', '.mjs', '.cjs', '.py', '.sh', '.yaml', '.yml']);
+  const activeWrapperInvocationPatterns = [
+    /packages\/redcube-runtime\/scripts\/ppt_deck_[a-z_]+\.py/,
+    /python\/redcube_ai\/hermes\/agent_loop_bridge\.py/,
+    /compatibility_script/i,
+    /compatibilityScript/,
+  ];
   const listFiles = (root) => {
     if (!existsSync(path.resolve(root))) return [];
     return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -456,24 +450,17 @@ test('Retired wrapper paths have no active callers or contract anchors', () => {
     });
   };
 
-  for (const retiredPath of retiredWrapperPaths) {
-    assert.equal(existsSync(path.resolve(retiredPath)), false, retiredPath);
-  }
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/scripts')), false);
 
   const violations = [];
   for (const file of activeRoots.flatMap(listFiles)) {
     const normalized = file.split(path.sep).join('/');
-    if (allowedFiles.has(normalized)) continue;
+    if (normalized === 'tests/python-native-helper-catalog.test.ts') continue;
     const text = readFileSync(file, 'utf-8');
-    for (const retiredPath of retiredWrapperPaths) {
-      if (text.includes(retiredPath)) {
-        violations.push(`${normalized}: ${retiredPath}`);
+    for (const pattern of activeWrapperInvocationPatterns) {
+      if (pattern.test(text)) {
+        violations.push(`${normalized}: ${pattern}`);
       }
-    }
-    const legacyWrapperMarker = ['compatibility', 'script'].join('_');
-    const legacyWrapperCamelMarker = ['compatibility', 'Script'].join('');
-    if (text.includes(legacyWrapperMarker) || text.includes(legacyWrapperCamelMarker)) {
-      violations.push(`${normalized}: legacy wrapper marker`);
     }
   }
 

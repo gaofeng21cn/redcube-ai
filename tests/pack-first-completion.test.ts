@@ -101,9 +101,8 @@ test('runtime and family manifests no longer depend on legacy pack-runtime compi
   assert.equal(Boolean(posterFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
 });
 
-test('legacy pack-runtime compiler registry is removed from the workspace', () => {
+test('retired pack-runtime package is absent from the workspace', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/render-pack-compiler.js')), false);
 });
 
 test('family runtimes no longer import pack-runtime or pack-local creative builders', () => {

@@ -5,6 +5,7 @@
 RTK.md
 .superpowers/
 .worktrees/
+.codegraph/
 
 # 运行产物
 .redcube_pi/

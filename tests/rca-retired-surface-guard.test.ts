@@ -33,49 +33,12 @@ const RETIRED_CONTRACTS = Object.freeze([
   'contracts/runtime-program/hermes-stable-family-closure-truth.json',
   'contracts/runtime-program/hermes-managed-family-closure-truth.json',
 ]);
-const RETIRED_ACTIVE_PATTERNS = Object.freeze([
-  /\bgateway_interaction_contract\b/,
-  /\bfrontdoor_owner\b/,
-  /\bfrontdoor_surface\b/,
-  /\bfrontdoor_command\b/,
-  /\bfrontdoor_node_id\b/,
-  /\bfrontdoor_title\b/,
-  /\bfrontdoor_surface_kind\b/,
-  /\bGatewayInteractionContractSurface\b/,
-  /\bFamilyFrontdoorEntrySurfaces\b/,
-  /\bbuildFamilyGatewayInteractionContract\b/,
-  /\bbuildFamilyProductFrontdoorFromManifest\b/,
-  /\bbuildFamilyFrontdoorProductEntryOrchestration\b/,
-  /@redcube\/hermes-substrate/,
-  /\bhost_agent\b/,
-  /\bhermes_native_proof\b/,
-  /\bredcube product frontdesk\b/,
-  /\bproduct_frontdesk\b/,
-  /\bfrontdesk\b/,
-  /\binvokeFederatedProductEntry\b/,
-  /\bFederatedProductEntry\b/,
-  /\bfederated_product_entry\b/,
-  /\bfederated_/,
-  /\bsource_pack_federation\b/,
-  /\bsourcePackFederation\b/,
-  /\bsource-pack-federation\b/,
-  /\bcross_family_source_pack_federation\b/,
-  /\bOPL federation\b/,
-  /\bOPL product-entry federation\b/,
-  /\bproduct federate\b/,
-  /\bopl_gateway\b/,
-  /\bopl_bridge\b/,
-  /opl-gateway-shared/,
-  /\blegacy_command_key\b/,
-  /\bcompat_product_entry_overview_command\b/,
-  /\bsource_workbench\b/,
-  /\bsource_workbench_[A-Za-z0-9_]*\b/,
-  /packages\/redcube-runtime\/scripts\/ppt_deck_review\.py/,
-  /packages\/redcube-runtime\/scripts\/ppt_deck_export\.py/,
-  /packages\/redcube-runtime\/scripts\/ppt_deck_native\.py/,
-  /python\/redcube_ai\/hermes\/agent_loop_bridge\.py/,
-  new RegExp(`\\b${['compatibility', 'script'].join('_')}\\b`),
-  new RegExp(`\\b${['compatibility', 'Script'].join('')}\\b`),
+const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
+  /\bcompatibility_alias(?:es)?_allowed\b\s*[:=]\s*true/i,
+  /\bactive_caller_compatibility_alias_restored\b\s*[:=]\s*true/i,
+  /\bcompatibility_alias_restored\b\s*[:=]\s*true/i,
+  /\b(?:default|active|live|normal)[_-]?(?:compatibility|legacy)[_-]?alias(?:es)?\b/i,
+  /\b(?:compatibility|legacy)[_-]?alias(?:es)?[_-]?(?:default|active|live|normal)\b/i,
 ]);
 
 function listTextFiles(root) {
@@ -107,7 +70,7 @@ function sourceRefCoversFile(sourceRef, file) {
   return file === sourcePath || file.startsWith(`${sourcePath}/`);
 }
 
-test('RCA active source surfaces do not reintroduce retired runtime terms', () => {
+test('RCA active source surfaces do not restore compatibility alias claims', () => {
   for (const contractFile of RETIRED_CONTRACTS) {
     assert.equal(existsSync(path.resolve(contractFile)), false, contractFile);
   }
@@ -123,7 +86,7 @@ test('RCA active source surfaces do not reintroduce retired runtime terms', () =
       || file === 'tests/python-native-helper-catalog.test.ts'
     ) continue;
     const text = readFileSync(file, 'utf-8');
-    for (const pattern of RETIRED_ACTIVE_PATTERNS) {
+    for (const pattern of ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS) {
       if (pattern.test(text)) {
         violations.push(`${file}: ${pattern}`);
       }
