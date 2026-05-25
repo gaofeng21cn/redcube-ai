@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-05-24`
+Date: `2026-05-25`
 
 ## 当前唯一真相
 
@@ -79,7 +79,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 
 - 新增或恢复 RCA-owned generic scheduler、runner、attempt ledger、session/workbench shell、artifact gallery/handoff shell、review/repair transport、workspace/source shell、observability/SLO、generic native-helper envelope 或 generated wrapper owner。
 - retained authority surface 缺少接口、active caller、不能上收原因、receipt/blocker/ref 输出边界或 no-forbidden-write 证据。
-- 旧 `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter`、retired public entry、federation、bridge 或 Hermes-first 口径重新成为 active public entry、callable alias、compatibility facade 或 generic owner。
+- 旧 `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter`、retired public entry、federation、bridge 或 Hermes-first 口径不得恢复为 active public entry、callable alias、compatibility facade 或 generic owner。
 - 测试重新保护旧 public path 可调用性，而不是 current contract、no-resurrection guard、fail-closed negative input、owner receipt、typed blocker 或 tombstone semantics。
 
 ## 测试/证据差距
