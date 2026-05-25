@@ -83,3 +83,46 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 - `managed`、`session`、`gateway`、`domain_action_adapter`、`runtime` 等历史词如果仍出现在 active docs，必须同时说明它是 semantic-id、refs-only adapter、domain handler target、retired guard 或 provenance，不得表达 RCA-owned generic runtime。
 - 长表只保留当前 owner、当前状态、证据门和下一步；dated proof、命令输出、旧分支名和 absorbed tranche 进入 `docs/history/**`。
 - 若历史文档中的规则仍 current，先抽取到核心五件套、active gap plan、policy/runtime/delivery/source owner、contract 或 source surface；不在历史文件中继续追加新状态。
+
+## Coverage Ledger
+
+### 2026-05-26 active-doc retired-alias wording tranche
+
+本轮覆盖 RCA active plan 与 status 中的 retired alias / no-resurrection wording。目标是清理 OPL Doc Governance doctor 对 active docs 报出的 retired-alias legacy vocabulary warning，同时保留 RCA machine contracts 与 tests 对旧 payload field、retired legacy surface id 和 public alias 复活的 fail-closed guard。
+
+Live truth inputs:
+
+- Core docs and governance: `AGENTS.md`, `TASTE.md`, `docs/docs_portfolio_consolidation.md`, `docs/status.md`, `docs/active/rca-ideal-state-gap-plan.md`.
+- Machine contracts: `contracts/physical_source_morphology_policy.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/runtime-program/current-program.json`, and current-program leaf parts that carry retired surface guard refs.
+- Tests / guard evidence: `tests/rca-retired-surface-guard.test.ts` and `tests/rca-production-acceptance.test.ts`.
+- Doctor evidence: OPL Doc Governance doctor reported two active-path warnings before the edit and `finding_count=0` after the edit.
+
+Fresh semantic result:
+
+- Root cause: active docs used the literal retired vocabulary string as current prose while the live machine contracts correctly classify it as forbidden / negative-guard / tombstone policy. The issue was active-doc wording pollution, not a contract or test failure.
+- `contracts/physical_source_morphology_policy.json` still owns the machine-readable policy for retired legacy surface ids and retired compatibility payload fields.
+- `tests/rca-retired-surface-guard.test.ts` and `tests/rca-production-acceptance.test.ts` still guard that retired fields stay in negative-guard / forbidden-payload positions and do not become active payload template, success payload, public action key, readiness claim or runtime owner.
+- Active docs now use `retired-alias no-resurrection`, `retired-alias resurrection`, or `active public alias` wording where the prose is about current governance, avoiding a doctor false-positive while preserving the no-resurrection meaning.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | `docs/active/rca-ideal-state-gap-plan.md` completion truth, functional/structural gaps, production evidence tail, structure hygiene tail, next prompt; `docs/status.md` current evidence/accounting and naming hygiene tail; live contract/test evidence listed above. | `docs/active/rca-ideal-state-gap-plan.md`; `docs/status.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The active plan and status remain current owner docs; this tranche only removed stale active wording.
+
+Unreviewed docs:
+
+- RCA full repo-wide paragraph coverage remains open outside the touched active plan/status sections and prior covered docs. Product/runtime/delivery/source/policies/references/history bodies still require tranche-by-tranche semantic coverage.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Any future active doc wording that reintroduces retired alias terminology as an active public path, active caller, active payload template, success payload, readiness claim, runtime owner, wrapper, facade or compatibility promise is stale pollution.
+- Machine contract and test names may still contain `compatibility_alias` where they identify forbidden fields or guard payloads; those are machine truth, not prose pollution.
+- RCA still has production evidence tails for memory/lifecycle receipt scaleout, Temporal controlled visual-stage long soak and cross-family repeated no-regression; this wording tranche does not close those gates.
+
+Next tranche write scope:
+
+- RCA product/runtime/delivery/source support docs that mention generated/default caller thinning, domain handler, product-entry/session, runtimeWatch or retired route vocabulary; or an OPL family ledger tranche for another repo with clean ownership.
