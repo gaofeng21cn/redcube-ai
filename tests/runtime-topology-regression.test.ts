@@ -128,6 +128,11 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
   assert.equal(completed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(completed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
   assert.equal(completed.runtime_topology.deployment_host_status, 'active_primary');
+  assert.equal(
+    completed.runtime_topology.domain_entry_protocol_role,
+    'visual_deliverable_domain_entry_protocol_boundary',
+  );
+  assert.equal('gateway_role' in completed.runtime_topology, false);
 });
 
 test('failed route runs keep Codex runtime topology for Codex-native executor', () => {
@@ -154,6 +159,11 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
   assert.equal(failed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(failed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
   assert.equal(failed.runtime_topology.deployment_host_status, 'active_primary');
+  assert.equal(
+    failed.runtime_topology.domain_entry_protocol_role,
+    'visual_deliverable_domain_entry_protocol_boundary',
+  );
+  assert.equal('gateway_role' in failed.runtime_topology, false);
 });
 
 test('Hermes-Agent API structured_call posts chat completions and records server-selected proof', async () => {

@@ -8,7 +8,7 @@ const CODEX_RUNTIME_TOPOLOGY = Object.freeze({
   runtime_substrate_surface: 'codex_cli_runtime',
   deployment_host: 'codex_local_operator_host',
   deployment_host_status: 'active_primary',
-  gateway_role: 'visual_deliverable_domain_gateway',
+  domain_entry_protocol_role: 'visual_deliverable_domain_entry_protocol_boundary',
   domain_harness_os: 'RedCube Domain Harness OS',
   family_pack_boundary: 'family_profile_pack_harness_execution',
   product_mode: 'auto_only',

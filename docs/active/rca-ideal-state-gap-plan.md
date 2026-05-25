@@ -108,7 +108,7 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 | direct `runtimeWatch` | direct review/progress refs-only read model | OPL App/workbench live route parity 后收薄为 domain ref provider；不恢复 domain_action_adapter default dispatch。 |
 | product domain_action_adapter export/dispatch | domain domain_action_adapter target、guarded visual authority action adapter | OPL generated domain_action_adapter wrapper default 化后，只保留 guarded domain action handlers。 |
 | operator evidence / stability / efficiency projections | refs-only read model 和 migration input | OPL App/workbench/observability shell 稳定后，RCA 只输出 owner receipt、typed blocker、artifact/memory evidence refs。 |
-| executor route-run record adapter | route-level executor policy、receipt refs 与 route-run record materialization | OPL Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 成为 default caller。 |
+| executor route-run record adapter | route-level executor policy、receipt refs 与 route-run record materialization；runtime topology 已使用 `domain_entry_protocol_role`，不保留 active `gateway_role`。 | OPL Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 成为 default caller。 |
 | legacy historical strings | semantic-id、tombstone/provenance、negative input、refs-only read model、domain handler target 或 package/protocol boundary | provenance consumer 迁出后 rename/delete/tombstone；不新增 public entry、alias、facade 或 compatibility command。 |
 
 不能直接删除的 explicit remainder：
