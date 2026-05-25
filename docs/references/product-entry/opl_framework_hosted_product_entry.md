@@ -6,14 +6,15 @@ State: `contract_linked_support`
 Machine boundary: 人读 product-entry support。机器真相继续归 `contracts/runtime-program/opl-framework-hosted-product-entry.json`、product-entry manifest、CLI/MCP/API behavior、source、runtime artifacts 和 owner receipts。
 
 状态锚点：`2026-04-12`
+当前治理复核：`2026-05-26`
 
 生命周期说明：本文是 contract-linked support brief，由早期 `OPL Gateway` handoff brief 迁移而来。唯一任务是解释 OPL Framework 托管路径如何进入同一 RCA service-safe domain entry。它由旧 `docs/program/` active baton 层迁入 reference support，不再承担新的 active plan。当前口径以 `OPL Framework` 的 stage-led、以 Agent executor 为最小执行单位的通用运行框架为准；它不是 RedCube 对外第一身份，也不授权 OPL 接管 visual-domain truth、review/export verdict、canonical artifact 或 domain memory body。
 
 ## 一句话结论
 
-OPL stage-led hosted integration 作为 OPL Framework 侧的通用 runtime / queue / wakeup / projection 路径，可以通过 RCA thin domain_action_adapter / product-entry surface，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
+OPL stage-led hosted integration 作为 OPL Framework 侧的通用 runtime / queue / wakeup / projection 路径，可以通过 OPL-generated `domain_action_adapter` descriptor 与 RCA `domain-handler export|dispatch` target，把 handoff 收到同一个 `RedCube Product Entry` 下游合同上。
 
-RCA 在这里暴露的是 domain package 薄程序面：descriptor、domain_action_adapter、projection、receipt refs、typed blocker 和 domain entry。它不维护第二套 generic scheduler、generic queue、generic runtime manager 或 workbench runtime。
+RCA 在这里暴露的是 domain package 薄程序面：descriptor refs、domain-handler target、projection、receipt refs、typed blocker 和 domain entry。它不维护第二套 generic scheduler、generic queue、generic runtime manager、generated product wrapper 或 workbench runtime。
 
 ## 这一步解决什么
 
@@ -33,7 +34,9 @@ RCA 在这里暴露的是 domain package 薄程序面：descriptor、domain_acti
 - contract：`contracts/runtime-program/opl-framework-hosted-product-entry.json`
 - action ref：`opl_framework:hosted_product_entry`
 - API surface：`invokeOplHostedProductEntry`
-- domain_action_adapter dispatch：`redcube product domain_action_adapter dispatch`
+- OPL-generated descriptor：`domain_action_adapter`
+- RCA dispatch target：`redcube domain-handler dispatch`
+- RCA projection target：`redcube domain-handler export`
 
 ## 最小 handoff envelope
 
@@ -49,6 +52,7 @@ RCA 在这里暴露的是 domain package 薄程序面：descriptor、domain_acti
 
 - 不把 `OPL` 写成 RedCube 内部控制面
 - 不让 hosted handoff 反向改写 visual-domain truth
+- 不把 OPL-generated `domain_action_adapter` descriptor 写成 RCA-owned generic wrapper
 - 不因为 handoff landed 就过度宣称 end-user product shell 已成熟
 - 不把 repo-local Hermes wrapper 或旧 Gateway 命名写成 external `Hermes-Agent` substrate proof
 - 不恢复 `OPL Gateway`、retired public entry、federation、source-pack-federation 或 product frontdesk 作为 active API / source surface

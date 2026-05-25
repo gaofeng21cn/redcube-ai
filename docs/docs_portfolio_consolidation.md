@@ -126,3 +126,47 @@ Remaining stale / retire candidates:
 Next tranche write scope:
 
 - RCA product/runtime/delivery/source support docs that mention generated/default caller thinning, domain handler, product-entry/session, runtimeWatch or retired route vocabulary; or an OPL family ledger tranche for another repo with clean ownership.
+
+### 2026-05-26 product-entry support current-caller tranche
+
+本轮覆盖 RCA product-entry support reference 三件套，把 2026-04-12 合同冻结说明读回当前 live CLI/source/tests/contract truth。目标是避免 support brief 继续把 repo-local product status/session/manifest/domain_action_adapter wrapper 写成 RCA 长期 owner，同时保留 direct `invokeProductEntry`、direct `getProductEntrySession` API 与 RCA `domain-handler export|dispatch` target 的当前事实。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/README.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, and this governance ledger.
+- Reviewed support docs: `docs/references/product-entry/redcube_product_entry_mvp.md`, `docs/references/product-entry/product_entry_session_continuity.md`, `docs/references/product-entry/opl_framework_hosted_product_entry.md`.
+- Machine/source refs: `contracts/runtime-program/redcube-product-entry-mvp.json`, `contracts/runtime-program/product-entry-session-continuity.json`, `contracts/runtime-program/opl-framework-hosted-product-entry.json`, `contracts/runtime-program/current-program.json`, `contracts/physical_source_morphology_policy.json`, `apps/redcube-cli/src/cli-parts/dispatch.ts`, `apps/redcube-cli/src/cli-parts/help.ts`, and `packages/redcube-domain-entry/src/index.ts`.
+- Test refs: `tests/product-entry-cases/direct-and-oplHosted-entry.test.ts`, `tests/product-domain-action-api-cases/product-and-operator-surfaces.test.ts`, `tests/product-domain-action-api-cases/definitions-and-delegation.test.ts`, `tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts`, and `tests/rca-retired-surface-guard.test.ts`.
+- CodeGraph context for product-entry live source found `invokeProductEntry`, `ProductEntryRequest`, and `ProductEntryResponse` under `packages/redcube-domain-entry` / product-entry types.
+
+Fresh semantic result:
+
+- Repo-local `redcube product` currently only keeps `invoke` as the direct domain target; CLI rejects product `status` / `session` / `manifest` / `domain_action_adapter` as generated/default wrapper responsibilities owned by OPL.
+- RCA `domain-handler export|dispatch` is the current RCA target for OPL-generated `domain_action_adapter` descriptor / shell consumption. Support docs now name `domain_action_adapter` as OPL-generated descriptor/shell, not an RCA-owned generic wrapper.
+- `getProductEntrySession` remains a direct API and OPL generated session-shell continuation target, but the support brief now describes it as a refs-only entry-session domain snapshot adapter rather than a repo-local generic session shell.
+- OPL-hosted product entry support now points to `redcube domain-handler export|dispatch` for RCA projection/dispatch target and avoids the obsolete `redcube product domain_action_adapter dispatch` CLI wording.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full paragraph read of the three product-entry support briefs; role/index read of `docs/references/product-entry/README.md`; live source/contract/test refs listed above. | `docs/references/product-entry/redcube_product_entry_mvp.md`; `docs/references/product-entry/product_entry_session_continuity.md`; `docs/references/product-entry/opl_framework_hosted_product_entry.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The product-entry support briefs remain contract-linked support references; stale CLI/caller wording was corrected in place.
+
+Unreviewed docs:
+
+- RCA product-entry support reference bodies are now covered for current-caller / generated-wrapper ownership.
+- RCA runtimeWatch/runtime architecture, integration support, delivery/source support and history/reference bodies remain open outside previously covered chunks.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Any future support doc wording that treats `redcube product status/session/manifest/domain_action_adapter` as current repo-local CLI surfaces or RCA-owned wrapper owners is stale pollution.
+- Any wording that treats OPL-generated `domain_action_adapter` descriptor as RCA-owned generic runtime/workbench/session shell is stale pollution.
+- Any session-continuity wording that implies artifact body, visual truth, memory body, review/export verdict or generic session runtime ownership has moved into RCA product-entry continuity is stale pollution.
+
+Next tranche write scope:
+
+- RCA runtimeWatch / runtime architecture support and integration docs that mention OPL generated/default caller thinning, `domain_action_adapter`, operator projection, `runtimeWatch`, or retired route vocabulary.
+- Or RCA delivery/source support docs that mention route-run records, artifact lifecycle, source truth, review/repair transport, native-helper envelope or retired route vocabulary.
