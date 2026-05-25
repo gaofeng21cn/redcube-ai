@@ -1,8 +1,8 @@
 {
   "module_id": "codex_executor_adapter",
   "surface_ref": "/domain_entry_contract/executor",
-  "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
-  "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
+  "status": "route_executor_policy_refs_adapter_landed",
+  "classification": "refs_only_adapter",
   "opl_generic_primitive": "agent_executor_adapter",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -29,10 +29,22 @@
     "domain entry contract",
     "runtime route executor tests"
   ],
-  "activeCallerStatus": "route_run_record_adapter_split_landed_opl_attempt_shell_pending",
-  "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
+  "activeCallerStatus": "route_run_record_refs_adapter_landed_default_caller_tail",
+  "migrationAction": "Keep concrete executor lifecycle/provisioning/receipt adapter, attempt ledger, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy and receipt refs only.",
   "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.",
   "cannotAbsorbReason": "OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.",
+  "semantic_equivalence_status": "cleared_by_boundary",
+  "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+  "semantic_equivalence_evidence_refs": [
+    "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+    "/domain_entry_contract/executor"
+  ],
+  "semantic_equivalence_typed_blocker_refs": [
+    "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+  ],
+  "semantic_equivalence_no_regression_refs": [
+    "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
+  ],
   "tombstone_required": false,
   "migration_class": "refs_only_adapter",
   "active_reader_facing_classification": "refs_only_adapter",
@@ -49,12 +61,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "codex_executor_adapter_bridge_exit_gate",
-    "bridge_role": "route_executor_policy_adapter_until_opl_executor_adapter_live",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "route_executor_policy_refs_adapter_default_caller_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_agent_executor_adapter",
     "exit_gate_ref": "/domain_entry_contract/executor",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -65,6 +77,9 @@
       "executor_receipt_refs"
     ],
     "after_exit_rca_surface": "route_level_executor_policy_refs",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -86,6 +101,9 @@
     "domain_repo_physical_delete_authorized": false,
     "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "/domain_entry_contract/executor"
+  ],
   "rca_projection_mode": "route_level_executor_policy_refs_only",
   "rca_exports_only": [
     "executor_requirement_refs",
@@ -122,20 +140,5 @@
   "declares_visual_ready": false,
   "declares_exportable": false,
   "declares_handoffable": false,
-  "declares_production_soak_complete": false,
-  "current_surface_refs": [
-    "/domain_entry_contract/executor"
-  ],
-  "semantic_equivalence_status": "cleared_by_boundary",
-  "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
-  "semantic_equivalence_evidence_refs": [
-    "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
-    "/domain_entry_contract/executor"
-  ],
-  "semantic_equivalence_typed_blocker_refs": [
-    "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
-  ],
-  "semantic_equivalence_no_regression_refs": [
-    "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
-  ]
+  "declares_production_soak_complete": false
 }

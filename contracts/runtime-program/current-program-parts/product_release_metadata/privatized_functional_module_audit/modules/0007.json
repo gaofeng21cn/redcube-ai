@@ -2,7 +2,7 @@
   "module_id": "generic_cli_mcp_wrappers",
   "surface_ref": "/family_action_catalog_parity",
   "status": "canonical_metadata_parity_landed",
-  "classification": "opl_discoverable_projection_rca_owned_action_metadata",
+  "classification": "domain_handler_target",
   "opl_generic_primitive": "standard_domain_agent_scaffold",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -26,7 +26,7 @@
     "product domain_action_adapter guarded action list refs"
   ],
   "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
-  "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
+  "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
   "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
   "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
   "tombstone_required": false,
@@ -45,12 +45,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "generic_cli_mcp_wrappers_bridge_exit_gate",
-    "bridge_role": "domain_handler_target_until_opl_generated_wrappers_are_default_callers",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "domain_handler_target_default_generated_wrapper_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "one-person-lab",
     "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
     "exit_gate_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -60,6 +60,9 @@
       "safe_action_refs"
     ],
     "after_exit_rca_surface": "domain_handler_target_only",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -81,6 +84,15 @@
     "domain_repo_physical_delete_authorized": false,
     "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "cli",
+    "mcp",
+    "skill",
+    "domain_action_adapter",
+    "domain_action_adapter_export_dispatch",
+    "family_action_catalog",
+    "guarded_action_catalog"
+  ],
   "rca_projection_mode": "canonical_action_metadata_refs_only",
   "rca_exports_only": [
     "family_action_catalog_refs",
@@ -120,12 +132,5 @@
   "declares_visual_ready": false,
   "declares_exportable": false,
   "declares_handoffable": false,
-  "declares_production_soak_complete": false,
-  "current_surface_refs": [
-    "cli",
-    "mcp",
-    "skill",
-    "family_action_catalog",
-    "guarded_action_catalog"
-  ]
+  "declares_production_soak_complete": false
 }

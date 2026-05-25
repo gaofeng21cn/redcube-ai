@@ -638,10 +638,16 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
   for (const surface of surfaces) {
     assert.equal(surface.bridge_exit_gate.gate_id, 'rca.private_generic_residue_bridge_exit.v1');
     assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_remaining_repo_local_bridges, [
+    ]);
+    assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_adapter_tail_modules, [
       'domain_authority_refs_preserved',
       'no_regression_proof_recorded',
     ]);
-    assert.equal(surface.bridge_exit_gate.remaining_bridge_module_ids.includes('generic_cli_mcp_wrappers'), true);
+    assert.deepEqual(surface.bridge_exit_gate.remaining_bridge_module_ids, []);
+    assert.equal(surface.bridge_exit_gate.adapter_thinning_module_ids.includes('generic_cli_mcp_wrappers'), true);
+    assert.equal(surface.bridge_exit_gate.source_shape_status, 'landed');
+    assert.equal(surface.bridge_exit_gate.functional_structure_gap_count, 0);
+    assert.equal(surface.bridge_exit_gate.declares_no_active_bridge_modules, true);
     assert.equal(surface.bridge_exit_gate.forbidden_after_exit_rca_surface_classes.includes('generic_session_shell'), true);
     assert.equal(surface.bridge_exit_gate.declares_generated_surface_consumption_complete, true);
     assert.equal(surface.bridge_exit_gate.declares_production_consumption_complete, true);

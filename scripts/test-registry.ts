@@ -23,6 +23,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/overlay-registry.test.ts',
     'tests/opl-agent-pack-contracts.test.ts',
     'tests/opl-family-contract-adoption.test.ts',
+    'tests/opl-family-contract-adoption-source-shape.test.ts',
     'tests/opl-agent-lab-longline-migration.test.ts',
     'tests/opl-transition-hosted-attempt-receipt.test.ts',
     'tests/pack-first-completion.test.ts',

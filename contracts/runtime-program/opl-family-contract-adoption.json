@@ -1630,16 +1630,133 @@
       "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
       "required_before_remaining_physical_delete": []
     },
+    "fresh_large_private_surface_scan": {
+      "surface_kind": "rca_large_private_platform_surface_scan",
+      "scan_date": "2026-05-25",
+      "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
+      "line_count_thresholds": {
+        "primary_attention_lines": 800,
+        "preferred_source_limit_lines": 1000,
+        "hard_split_signal_lines": 1500
+      },
+      "scan_command_refs": [
+        "git ls-files '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' '*.py' | xargs wc -l | sort -nr | head -80",
+        "node --experimental-strip-types scripts/line-budget.ts --list"
+      ],
+      "current_clean_truth": {
+        "no_tracked_code_file_exceeds_1500_lines": true,
+        "line_budget_baseline_only_tracks": [
+          "tests/opl-family-contract-adoption.test.ts"
+        ],
+        "no_obvious_safe_large_generic_control_plane_split_found": true,
+        "functional_structure_gap_reopened": false
+      },
+      "large_surface_readout": [
+        {
+          "path": "packages/redcube-overlay-ppt/src/profiles.ts",
+          "observed_lines": 910,
+          "classification": "visual_domain_profile_authority",
+          "retained_authority": [
+            "deliverable_family_profile_policy",
+            "visual_route_profile_truth"
+          ],
+          "migration_action": "retain_in_rca_until_profile_contract_can_be_declarative_without_losing_visual_truth"
+        },
+        {
+          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
+          "observed_lines": 902,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "native_ppt_authoring_helper",
+            "export_helper_behavior"
+          ],
+          "migration_action": "retain_as_rca_native_helper_implementation; OPL may own helper envelope only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
+          "observed_lines": 881,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "ppt_layout_materialization_helper"
+          ],
+          "migration_action": "retain_as_domain_native_helper; do not move Office/PPT layout body to OPL"
+        },
+        {
+          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/image-pages.ts",
+          "observed_lines": 850,
+          "classification": "visual_artifact_creation_route",
+          "retained_authority": [
+            "image_first_visual_route_materialization",
+            "artifact_creation_refs"
+          ],
+          "migration_action": "retain route implementation; OPL owns attempt runtime and queue only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
+          "observed_lines": 826,
+          "classification": "review_export_helper_authority",
+          "retained_authority": [
+            "screenshot_layout_review_helper",
+            "blocked_item_materialization"
+          ],
+          "migration_action": "retain review helper body; OPL may transport review/repair refs only"
+        },
+        {
+          "path": "python/redcube_ai/native_helpers/ppt_deck/native.py",
+          "observed_lines": 804,
+          "classification": "native_helper_implementation",
+          "retained_authority": [
+            "native_ppt_operation_helper"
+          ],
+          "migration_action": "retain helper body; keep no-forbidden-write and receipt boundaries"
+        }
+      ],
+      "high_risk_surfaces_not_migrated": [
+        "visual route truth and family profile policy",
+        "image-first artifact creation body",
+        "native PPT/Office helper implementation",
+        "screenshot/layout review helper behavior",
+        "review/export verdict and blocked-item materialization"
+      ],
+      "generic_surfaces_for_opl_or_shared_runtime": [
+        "provider-backed stage attempt runtime",
+        "attempt ledger and route-run event persistence",
+        "generic session/workbench shell",
+        "workspace/source locator shell",
+        "artifact gallery/handoff shell",
+        "review/repair transport shell",
+        "native helper execution envelope",
+        "operator projection/workbench shell",
+        "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
+      ],
+      "migration_gates_before_code_retirement": [
+        "generated/default caller parity proven for the replacement OPL surface",
+        "domain authority refs preserved",
+        "owner receipt roundtrip or no-regression proof recorded",
+        "no compatibility alias or retired public path restored",
+        "no visual truth, artifact blob, memory body, review/export verdict, or owner receipt authority moved to OPL"
+      ],
+      "verification_entry": [
+        "scripts/verify.sh line-budget",
+        "npm run contracts:current-program:check",
+        "npm run test:meta"
+      ]
+    },
     "bridge_exit_gate": {
       "gate_id": "rca.private_generic_residue_bridge_exit.v1",
       "status": "functional_bridge_exited_physical_cleanup_closed",
+      "source_shape_status": "landed",
+      "functional_structure_gap_count": 0,
+      "remaining_tail_class": "generated_default_caller_and_refs_only_adapter_thinning_only",
       "owner": "redcube_ai",
       "replacement_owner": "opl",
-      "required_before_retiring_remaining_repo_local_bridges": [
+      "required_before_retiring_remaining_repo_local_bridges": [],
+      "required_before_retiring_adapter_tail_modules": [
         "domain_authority_refs_preserved",
         "no_regression_proof_recorded"
       ],
-      "remaining_bridge_module_ids": [
+      "remaining_bridge_module_ids": [],
+      "adapter_thinning_module_ids": [
         "product_entry_continuity_refs_adapter",
         "workspace_source_intake",
         "memory_writeback_receipt_transport",
@@ -1670,7 +1787,8 @@
       "declares_production_consumption_complete": true,
       "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
       "declares_visual_stage_long_soak_complete": false,
-      "declares_no_active_callers": true,
+      "declares_no_active_generic_owner_callers": true,
+      "declares_no_active_bridge_modules": true,
       "remaining_blocker_ids": [],
       "remaining_evidence_gate_ids": [
         "real_artifact_producing_domain_owner_receipt",
@@ -1704,7 +1822,7 @@
         "module_id": "product_entry_continuity_refs_adapter",
         "surface_ref": "/session_continuity",
         "status": "opl_generated_workbench_session_surface_consumed",
-        "classification": "split_owner_boundary",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "workbench_shell",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -1727,7 +1845,7 @@
           "operator loop domain locator refs"
         ],
         "activeCallerStatus": "opl_generated_session_shell_domain_refs",
-        "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
+        "migrationAction": "Use OPL/App generic session shell, resume token, operator navigation and workbench state as the default shell; RCA returns entry-session domain snapshot refs only.",
         "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
         "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
         "tombstone_required": false,
@@ -1746,12 +1864,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
-          "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "entry_session_snapshot_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_app_session_shell_and_workbench",
           "exit_gate_ref": "/opl_generated_interface_consumption",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -1762,6 +1880,9 @@
             "latest_visual_run_ref"
           ],
           "after_exit_rca_surface": "domain_session_snapshot_refs_only",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -1783,6 +1904,10 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "product_session",
+          "/session_continuity"
+        ],
         "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
         "rca_exports_only": [
           "entry_session_id",
@@ -1821,16 +1946,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/session_continuity"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "workspace_source_intake",
         "surface_ref": "/source_intake",
-        "status": "workspace_source_shell_bridge_with_exit_gate",
-        "classification": "split_owner_boundary",
+        "status": "source_readiness_refs_adapter_landed",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "workspace_source_intake_shell",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -1852,7 +1974,7 @@
           "product-entry manifest source readiness refs"
         ],
         "activeCallerStatus": "opl_workspace_source_shell_domain_handler_refs",
-        "migrationAction": "Move generic workspace locator, source receipt shell, material gap queue and provenance navigation to OPL.",
+        "migrationAction": "Keep generic workspace locator, source receipt shell, material gap queue and provenance navigation in OPL; RCA returns source readiness and visual source pack refs only.",
         "retentionReason": "RCA must judge visual source readiness, audience promise inputs and communication strategy source adequacy.",
         "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
         "tombstone_required": false,
@@ -1871,12 +1993,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "workspace_source_intake_bridge_exit_gate",
-          "bridge_role": "source_readiness_adapter_until_opl_workspace_source_shell_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "source_readiness_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_workspace_source_intake_shell",
           "exit_gate_ref": "/opl_substrate_adapter_export",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -1887,6 +2009,9 @@
             "visual_source_pack_refs"
           ],
           "after_exit_rca_surface": "source_readiness_verdict_and_source_pack_refs",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -1908,6 +2033,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/source_intake"
+        ],
         "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
         "rca_exports_only": [
           "source_locator_refs",
@@ -1944,16 +2072,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/source_intake"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "memory_writeback_receipt_transport",
         "surface_ref": "/controlled_memory_apply_proof",
-        "status": "split_owner_boundary_landed",
-        "classification": "split_owner_boundary",
+        "status": "memory_receipt_refs_adapter_landed",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "memory_refs_only_writeback_chain",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -1974,7 +2099,7 @@
           "operator evidence readiness projection"
         ],
         "activeCallerStatus": "active_refs_only_transport",
-        "migrationAction": "Move body-free memory transport, freshness grouping and receipt inventory shell to OPL.",
+        "migrationAction": "Keep body-free memory transport, freshness grouping and receipt inventory shell in OPL; RCA returns memory decision and receipt refs only.",
         "retentionReason": "RCA owns visual pattern memory body, accept/reject decision and lesson quality semantics.",
         "cannotAbsorbReason": "OPL must not store visual memory body or decide whether a visual pattern is reusable for RCA deliverables.",
         "tombstone_required": false,
@@ -1993,12 +2118,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "memory_writeback_receipt_transport_bridge_exit_gate",
-          "bridge_role": "memory_receipt_locator_adapter_until_opl_memory_transport_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "memory_receipt_locator_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_memory_locator_writeback_transport",
           "exit_gate_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2009,6 +2134,9 @@
             "owner_receipt_refs"
           ],
           "after_exit_rca_surface": "visual_memory_decision_and_receipt_refs",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2030,6 +2158,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/controlled_memory_apply_proof"
+        ],
         "rca_projection_mode": "memory_receipt_locator_refs_only",
         "rca_exports_only": [
           "memory_locator_refs",
@@ -2066,16 +2197,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/controlled_memory_apply_proof"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "artifact_export_lifecycle",
         "surface_ref": "/artifact_locator_contract",
         "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
-        "classification": "split_owner_boundary",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "artifact_lifecycle",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2116,12 +2244,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "artifact_export_lifecycle_bridge_exit_gate",
-          "bridge_role": "artifact_locator_authority_adapter_until_opl_gallery_handoff_shell_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "artifact_locator_authority_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2132,6 +2260,9 @@
             "artifact_locator_refs"
           ],
           "after_exit_rca_surface": "artifact_authority_and_export_verdict_refs",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2153,6 +2284,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/artifact_locator_contract"
+        ],
         "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
         "rca_exports_only": [
           "artifact_locator_refs",
@@ -2189,16 +2323,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/artifact_locator_contract"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "review_repair_transport",
         "surface_ref": "/review_state",
-        "status": "split_owner_boundary_landed",
-        "classification": "split_owner_boundary",
+        "status": "review_repair_refs_adapter_landed",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "review_repair_transport",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2220,7 +2351,7 @@
           "product domain_action_adapter review projection"
         ],
         "activeCallerStatus": "active_domain_review_gate",
-        "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
+        "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
         "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
         "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
         "tombstone_required": false,
@@ -2239,12 +2370,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "review_repair_transport_bridge_exit_gate",
-          "bridge_role": "review_repair_refs_adapter_until_opl_review_repair_transport_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "review_repair_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_review_repair_transport",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2255,6 +2386,9 @@
             "typed_blocker"
           ],
           "after_exit_rca_surface": "review_export_verdict_and_repair_refs",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2276,6 +2410,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/review_state"
+        ],
         "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
         "rca_exports_only": [
           "review_state_refs",
@@ -2313,16 +2450,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/review_state"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "native_helper_envelope",
         "surface_ref": "/native_ppt_operator_ux",
-        "status": "split_owner_boundary_landed",
-        "classification": "split_owner_boundary",
+        "status": "native_helper_implementation_opl_envelope_tail",
+        "classification": "native_helper_implementation",
         "opl_generic_primitive": "native_helper_generic_envelope",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2344,7 +2478,7 @@
           "python native helper catalog tests"
         ],
         "activeCallerStatus": "active_rca_native_implementation_package_module_only",
-        "migrationAction": "Move helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope to OPL.",
+        "migrationAction": "Keep helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope in OPL; RCA owns the native helper implementation and route-specific proof refs.",
         "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
         "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
         "tombstone_required": false,
@@ -2363,12 +2497,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "native_helper_envelope_bridge_exit_gate",
-          "bridge_role": "native_helper_execution_adapter_until_opl_generic_envelope_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "native_helper_implementation_opl_envelope_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_native_helper_execution_envelope",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2378,6 +2512,9 @@
             "helper_proof_refs"
           ],
           "after_exit_rca_surface": "native_helper_package_module_implementation",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2399,6 +2536,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/native_ppt_operator_ux"
+        ],
         "rca_projection_mode": "native_helper_implementation_and_proof_refs_only",
         "rca_exports_only": [
           "helper_catalog_refs",
@@ -2435,16 +2575,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/native_ppt_operator_ux"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "operator_projection_shell",
         "surface_ref": "/operator_evidence_readiness_projection",
-        "status": "opl_app_workbench_shell_bridge_with_exit_gate",
-        "classification": "opl_owned_workbench_consumer_projection",
+        "status": "operator_evidence_refs_projection_landed",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "workbench_shell",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2466,7 +2603,7 @@
           "operator evidence readiness tests"
         ],
         "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
-        "migrationAction": "Move generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell to OPL App.",
+        "migrationAction": "Keep generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell in OPL App; RCA returns domain evidence refs, blocker meaning and safe repair hints only.",
         "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
         "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
         "tombstone_required": false,
@@ -2485,12 +2622,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "operator_projection_shell_bridge_exit_gate",
-          "bridge_role": "operator_evidence_refs_adapter_until_opl_app_workbench_shell_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "operator_evidence_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_app_operator_workbench_shell",
           "exit_gate_ref": "/operator_evidence_readiness_projection",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2501,6 +2638,9 @@
             "safe_repair_hint_refs"
           ],
           "after_exit_rca_surface": "operator_evidence_refs_only",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2522,6 +2662,13 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "product_status",
+          "status_read_model",
+          "workbench",
+          "workbench_drilldown",
+          "operator_evidence_readiness_projection"
+        ],
         "rca_projection_mode": "operator_evidence_readiness_refs_only",
         "rca_exports_only": [
           "evidence_gap_refs",
@@ -2558,20 +2705,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "product_status",
-          "status_read_model",
-          "workbench",
-          "workbench_drilldown",
-          "operator_evidence_readiness_projection"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "generic_cli_mcp_wrappers",
         "surface_ref": "/family_action_catalog_parity",
         "status": "canonical_metadata_parity_landed",
-        "classification": "opl_discoverable_projection_rca_owned_action_metadata",
+        "classification": "domain_handler_target",
         "opl_generic_primitive": "standard_domain_agent_scaffold",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2595,7 +2735,7 @@
           "product domain_action_adapter guarded action list refs"
         ],
         "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
-        "migrationAction": "Move generic wrapper generation, command surface registration and MCP action scaffolding to OPL standard domain-agent scaffold.",
+        "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
         "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
         "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
         "tombstone_required": false,
@@ -2614,12 +2754,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "generic_cli_mcp_wrappers_bridge_exit_gate",
-          "bridge_role": "domain_handler_target_until_opl_generated_wrappers_are_default_callers",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "domain_handler_target_default_generated_wrapper_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "one-person-lab",
           "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
           "exit_gate_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2629,6 +2769,9 @@
             "safe_action_refs"
           ],
           "after_exit_rca_surface": "domain_handler_target_only",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2650,6 +2793,15 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "cli",
+          "mcp",
+          "skill",
+          "domain_action_adapter",
+          "domain_action_adapter_export_dispatch",
+          "family_action_catalog",
+          "guarded_action_catalog"
+        ],
         "rca_projection_mode": "canonical_action_metadata_refs_only",
         "rca_exports_only": [
           "family_action_catalog_refs",
@@ -2689,20 +2841,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "cli",
-          "mcp",
-          "skill",
-          "family_action_catalog",
-          "guarded_action_catalog"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "codex_executor_adapter",
         "surface_ref": "/domain_entry_contract/executor",
-        "status": "route_runner_source_split_landed_opl_attempt_shell_pending",
-        "classification": "opl_owned_executor_adapter_rca_default_executor_policy",
+        "status": "route_executor_policy_refs_adapter_landed",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "agent_executor_adapter",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2729,10 +2874,22 @@
           "domain entry contract",
           "runtime route executor tests"
         ],
-        "activeCallerStatus": "route_run_record_adapter_split_landed_opl_attempt_shell_pending",
-        "migrationAction": "Move concrete executor lifecycle/provisioning/receipt adapter, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration to OPL generic Agent Executor Adapter and route attempt shell.",
+        "activeCallerStatus": "route_run_record_refs_adapter_landed_default_caller_tail",
+        "migrationAction": "Keep concrete executor lifecycle/provisioning/receipt adapter, attempt ledger, route-run record persistence, event append/read, stale-running-run audit and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy and receipt refs only.",
         "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.",
         "cannotAbsorbReason": "OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.",
+        "semantic_equivalence_status": "cleared_by_boundary",
+        "semantic_equivalence_reason": "RCA exposes only route-level executor policy, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",
+        "semantic_equivalence_evidence_refs": [
+          "semantic-equivalence:rca/codex-executor-adapter/refs-only-route-policy-boundary",
+          "/domain_entry_contract/executor"
+        ],
+        "semantic_equivalence_typed_blocker_refs": [
+          "typed-blocker:rca/default-caller-deletion/codex_executor_adapter/physical-delete-requires-explicit-owner-receipt"
+        ],
+        "semantic_equivalence_no_regression_refs": [
+          "no-forbidden-write:rca/default-caller-deletion/codex_executor_adapter/refs-only-boundary"
+        ],
         "tombstone_required": false,
         "migration_class": "refs_only_adapter",
         "active_reader_facing_classification": "refs_only_adapter",
@@ -2749,12 +2906,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "codex_executor_adapter_bridge_exit_gate",
-          "bridge_role": "route_executor_policy_adapter_until_opl_executor_adapter_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "route_executor_policy_refs_adapter_default_caller_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_agent_executor_adapter",
           "exit_gate_ref": "/domain_entry_contract/executor",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2765,6 +2922,9 @@
             "executor_receipt_refs"
           ],
           "after_exit_rca_surface": "route_level_executor_policy_refs",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2786,6 +2946,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/domain_entry_contract/executor"
+        ],
         "rca_projection_mode": "route_level_executor_policy_refs_only",
         "rca_exports_only": [
           "executor_requirement_refs",
@@ -2822,16 +2985,13 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/domain_entry_contract/executor"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "observability_stability_read_model",
         "surface_ref": "/opl_stability_read_model_consumption",
         "status": "refs_only_consumer_projection_landed",
-        "classification": "opl_owned_observability_stability_read_model_consumed_by_rca",
+        "classification": "refs_only_adapter",
         "opl_generic_primitive": "runtime_observability_exporter",
         "oplAbsorbCandidate": true,
         "rcaRetains": [
@@ -2871,12 +3031,12 @@
         },
         "bridge_exit_gate": {
           "gate_id": "observability_stability_read_model_bridge_exit_gate",
-          "bridge_role": "stability_refs_consumer_until_opl_observability_read_model_live",
-          "bridge_owner": "redcube_ai_migration_bridge",
+          "bridge_role": "stability_refs_consumer_default_read_model_tail",
+          "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_stability_read_model_and_observability_export",
           "exit_gate_ref": "/opl_stability_read_model_consumption",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "source_shape_landed_default_caller_tail_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
             "no_regression_proof_recorded"
@@ -2887,6 +3047,9 @@
             "no_regression_evidence_refs"
           ],
           "after_exit_rca_surface": "visual_domain_status_refs_only",
+          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -2908,6 +3071,9 @@
           "domain_repo_physical_delete_authorized": false,
           "physical_delete_authorized_by_refs": false
         },
+        "current_surface_refs": [
+          "/opl_stability_read_model_consumption"
+        ],
         "rca_projection_mode": "observability_refs_only",
         "rca_exports_only": [
           "owner_receipt_refs",
@@ -2945,10 +3111,7 @@
         "declares_visual_ready": false,
         "declares_exportable": false,
         "declares_handoffable": false,
-        "declares_production_soak_complete": false,
-        "current_surface_refs": [
-          "/opl_stability_read_model_consumption"
-        ]
+        "declares_production_soak_complete": false
       },
       {
         "module_id": "visual_pack_compiler_handoff",
@@ -3011,7 +3174,7 @@
           "replacement_owner": "redcube_ai",
           "replacement_surface": "opl_pack_compiler_generated_surface",
           "exit_gate_ref": "/visual_pack_compiler_handoff",
-          "current_status": "bridge_until_exit_gates_pass",
+          "current_status": "declarative_pack_landed",
           "required_before_retire": [],
           "retained_rca_authority": [
             "visual_stage_pack",
@@ -3019,6 +3182,9 @@
             "receipt_schema_refs"
           ],
           "after_exit_rca_surface": "declarative_visual_pack_input",
+          "tail_class": "retained_domain_surface",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -3518,6 +3684,9 @@
             "safe_action_refs"
           ],
           "after_exit_rca_surface": "minimal_domain_authority_functions",
+          "tail_class": "retained_domain_surface",
+          "declares_source_shape_landed": true,
+          "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
           "declares_replacement_complete": false,
           "rca_can_own_replacement_runtime": false,
@@ -3792,118 +3961,6 @@
       "rca_artifact_lifecycle_owner": false,
       "rca_review_repair_transport_owner": false,
       "rca_observability_export_owner": false
-    },
-    "fresh_large_private_surface_scan": {
-      "surface_kind": "rca_large_private_platform_surface_scan",
-      "scan_date": "2026-05-22",
-      "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
-      "line_count_thresholds": {
-        "primary_attention_lines": 800,
-        "preferred_source_limit_lines": 1000,
-        "hard_split_signal_lines": 1500
-      },
-      "scan_command_refs": [
-        "git ls-files '*.ts' '*.tsx' '*.js' '*.mjs' '*.cjs' '*.py' | xargs wc -l | sort -nr | head -80",
-        "node --experimental-strip-types scripts/line-budget.ts --list"
-      ],
-      "current_clean_truth": {
-        "no_tracked_code_file_exceeds_1500_lines": true,
-        "line_budget_baseline_only_tracks": [
-          "tests/opl-family-contract-adoption.test.ts"
-        ],
-        "no_obvious_safe_large_generic_control_plane_split_found": true,
-        "functional_structure_gap_reopened": false
-      },
-      "large_surface_readout": [
-        {
-          "path": "packages/redcube-overlay-ppt/src/profiles.ts",
-          "observed_lines": 910,
-          "classification": "visual_domain_profile_authority",
-          "retained_authority": [
-            "deliverable_family_profile_policy",
-            "visual_route_profile_truth"
-          ],
-          "migration_action": "retain_in_rca_until_profile_contract_can_be_declarative_without_losing_visual_truth"
-        },
-        {
-          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
-          "observed_lines": 902,
-          "classification": "native_helper_implementation",
-          "retained_authority": [
-            "native_ppt_authoring_helper",
-            "export_helper_behavior"
-          ],
-          "migration_action": "retain_as_rca_native_helper_implementation; OPL may own helper envelope only"
-        },
-        {
-          "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-          "observed_lines": 881,
-          "classification": "native_helper_implementation",
-          "retained_authority": [
-            "ppt_layout_materialization_helper"
-          ],
-          "migration_action": "retain_as_domain_native_helper; do not move Office/PPT layout body to OPL"
-        },
-        {
-          "path": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/image-pages.ts",
-          "observed_lines": 850,
-          "classification": "visual_artifact_creation_route",
-          "retained_authority": [
-            "image_first_visual_route_materialization",
-            "artifact_creation_refs"
-          ],
-          "migration_action": "retain route implementation; OPL owns attempt runtime and queue only"
-        },
-        {
-          "path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
-          "observed_lines": 826,
-          "classification": "review_export_helper_authority",
-          "retained_authority": [
-            "screenshot_layout_review_helper",
-            "blocked_item_materialization"
-          ],
-          "migration_action": "retain review helper body; OPL may transport review/repair refs only"
-        },
-        {
-          "path": "python/redcube_ai/native_helpers/ppt_deck/native.py",
-          "observed_lines": 804,
-          "classification": "native_helper_implementation",
-          "retained_authority": [
-            "native_ppt_operation_helper"
-          ],
-          "migration_action": "retain helper body; keep no-forbidden-write and receipt boundaries"
-        }
-      ],
-      "high_risk_surfaces_not_migrated": [
-        "visual route truth and family profile policy",
-        "image-first artifact creation body",
-        "native PPT/Office helper implementation",
-        "screenshot/layout review helper behavior",
-        "review/export verdict and blocked-item materialization"
-      ],
-      "generic_surfaces_for_opl_or_shared_runtime": [
-        "provider-backed stage attempt runtime",
-        "attempt ledger and route-run event persistence",
-        "generic session/workbench shell",
-        "workspace/source locator shell",
-        "artifact gallery/handoff shell",
-        "review/repair transport shell",
-        "native helper execution envelope",
-        "operator projection/workbench shell",
-        "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
-      ],
-      "migration_gates_before_code_retirement": [
-        "generated/default caller parity proven for the replacement OPL surface",
-        "domain authority refs preserved",
-        "owner receipt roundtrip or no-regression proof recorded",
-        "no compatibility alias or retired public path restored",
-        "no visual truth, artifact blob, memory body, review/export verdict, or owner receipt authority moved to OPL"
-      ],
-      "verification_entry": [
-        "scripts/verify.sh line-budget",
-        "npm run contracts:current-program:check",
-        "npm run test:meta"
-      ]
     }
   },
   "opl_substrate_adapter_export": {

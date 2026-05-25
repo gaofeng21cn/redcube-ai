@@ -1,8 +1,8 @@
 {
   "module_id": "review_repair_transport",
   "surface_ref": "/review_state",
-  "status": "split_owner_boundary_landed",
-  "classification": "split_owner_boundary",
+  "status": "review_repair_refs_adapter_landed",
+  "classification": "refs_only_adapter",
   "opl_generic_primitive": "review_repair_transport",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -24,7 +24,7 @@
     "product domain_action_adapter review projection"
   ],
   "activeCallerStatus": "active_domain_review_gate",
-  "migrationAction": "Move blocked-item queue, rerun envelope, human approval lane and repair transport shell to OPL.",
+  "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
   "retentionReason": "RCA owns visual review/export verdicts, blocked-item meaning and repair target selection.",
   "cannotAbsorbReason": "OPL transport cannot decide if a slide/page is visually acceptable, exportable or needs a specific RCA repair route.",
   "tombstone_required": false,
@@ -43,12 +43,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "review_repair_transport_bridge_exit_gate",
-    "bridge_role": "review_repair_refs_adapter_until_opl_review_repair_transport_live",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "review_repair_refs_adapter_default_caller_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_review_repair_transport",
     "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -59,6 +59,9 @@
       "typed_blocker"
     ],
     "after_exit_rca_surface": "review_export_verdict_and_repair_refs",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -66,8 +69,23 @@
     "opl_can_store_artifact_blob": false,
     "opl_can_write_memory_body": false,
     "opl_can_authorize_review_export_verdict": false,
-    "opl_can_issue_owner_receipt": false
+    "opl_can_issue_owner_receipt": false,
+    "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
+    "typed_blocker_refs": [
+      "typed-blocker:rca/default-caller-deletion/review_repair_transport/physical-delete-requires-explicit-owner-receipt"
+    ],
+    "no_forbidden_write_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/review_repair_transport/refs-only-boundary"
+    ],
+    "no_forbidden_write_evidence_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/review_repair_transport/refs-only-boundary"
+    ],
+    "domain_repo_physical_delete_authorized": false,
+    "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "/review_state"
+  ],
   "rca_projection_mode": "review_export_verdict_and_repair_target_refs_only",
   "rca_exports_only": [
     "review_state_refs",

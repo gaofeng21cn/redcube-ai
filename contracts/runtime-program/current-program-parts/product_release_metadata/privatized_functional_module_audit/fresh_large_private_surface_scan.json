@@ -1,6 +1,6 @@
 {
   "surface_kind": "rca_large_private_platform_surface_scan",
-  "scan_date": "2026-05-22",
+  "scan_date": "2026-05-25",
   "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
   "line_count_thresholds": {
     "primary_attention_lines": 800,

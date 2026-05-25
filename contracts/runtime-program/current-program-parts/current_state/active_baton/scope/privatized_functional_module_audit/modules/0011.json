@@ -472,6 +472,9 @@
       "safe_action_refs"
     ],
     "after_exit_rca_surface": "minimal_domain_authority_functions",
+    "tail_class": "retained_domain_surface",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,

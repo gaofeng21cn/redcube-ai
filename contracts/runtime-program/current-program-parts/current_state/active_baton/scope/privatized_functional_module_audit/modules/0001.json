@@ -1,8 +1,8 @@
 {
   "module_id": "workspace_source_intake",
   "surface_ref": "/source_intake",
-  "status": "workspace_source_shell_bridge_with_exit_gate",
-  "classification": "split_owner_boundary",
+  "status": "source_readiness_refs_adapter_landed",
+  "classification": "refs_only_adapter",
   "opl_generic_primitive": "workspace_source_intake_shell",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -24,7 +24,7 @@
     "product-entry manifest source readiness refs"
   ],
   "activeCallerStatus": "opl_workspace_source_shell_domain_handler_refs",
-  "migrationAction": "Move generic workspace locator, source receipt shell, material gap queue and provenance navigation to OPL.",
+  "migrationAction": "Keep generic workspace locator, source receipt shell, material gap queue and provenance navigation in OPL; RCA returns source readiness and visual source pack refs only.",
   "retentionReason": "RCA must judge visual source readiness, audience promise inputs and communication strategy source adequacy.",
   "cannotAbsorbReason": "OPL can host source transport but cannot own RCA source readiness verdict or narrative/visual source interpretation.",
   "tombstone_required": false,
@@ -43,12 +43,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "workspace_source_intake_bridge_exit_gate",
-    "bridge_role": "source_readiness_adapter_until_opl_workspace_source_shell_live",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "source_readiness_refs_adapter_default_caller_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_workspace_source_intake_shell",
     "exit_gate_ref": "/opl_substrate_adapter_export",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -59,6 +59,9 @@
       "visual_source_pack_refs"
     ],
     "after_exit_rca_surface": "source_readiness_verdict_and_source_pack_refs",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -80,6 +83,9 @@
     "domain_repo_physical_delete_authorized": false,
     "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "/source_intake"
+  ],
   "rca_projection_mode": "source_readiness_and_source_pack_refs_only",
   "rca_exports_only": [
     "source_locator_refs",
@@ -116,8 +122,5 @@
   "declares_visual_ready": false,
   "declares_exportable": false,
   "declares_handoffable": false,
-  "declares_production_soak_complete": false,
-  "current_surface_refs": [
-    "/source_intake"
-  ]
+  "declares_production_soak_complete": false
 }

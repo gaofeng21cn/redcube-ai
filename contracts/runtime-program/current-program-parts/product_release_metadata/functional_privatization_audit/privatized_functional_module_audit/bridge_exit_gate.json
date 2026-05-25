@@ -1,13 +1,18 @@
 {
   "gate_id": "rca.private_generic_residue_bridge_exit.v1",
   "status": "functional_bridge_exited_physical_cleanup_closed",
+  "source_shape_status": "landed",
+  "functional_structure_gap_count": 0,
+  "remaining_tail_class": "generated_default_caller_and_refs_only_adapter_thinning_only",
   "owner": "redcube_ai",
   "replacement_owner": "opl",
-  "required_before_retiring_remaining_repo_local_bridges": [
+  "required_before_retiring_remaining_repo_local_bridges": [],
+  "required_before_retiring_adapter_tail_modules": [
     "domain_authority_refs_preserved",
     "no_regression_proof_recorded"
   ],
-  "remaining_bridge_module_ids": [
+  "remaining_bridge_module_ids": [],
+  "adapter_thinning_module_ids": [
     "product_entry_continuity_refs_adapter",
     "workspace_source_intake",
     "memory_writeback_receipt_transport",
@@ -38,7 +43,8 @@
   "declares_production_consumption_complete": true,
   "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
   "declares_visual_stage_long_soak_complete": false,
-  "declares_no_active_callers": true,
+  "declares_no_active_generic_owner_callers": true,
+  "declares_no_active_bridge_modules": true,
   "remaining_blocker_ids": [],
   "remaining_evidence_gate_ids": [
     "real_artifact_producing_domain_owner_receipt",

@@ -17,7 +17,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | 功能/结构差距 | `functional_structure_gap_count=0` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
 | 生产证据 | `partial_refs_closed_with_soak_gap` | `contracts/production_acceptance/rca-production-acceptance.json` 已记录 body-free artifact-producing owner receipt refs；仍需 memory/lifecycle receipt scaleout、Temporal controlled visual-stage long soak 与 cross-family repeated no-regression。 |
 | 命名/合同卫生 | `active_hygiene_tail` | `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter` 等历史词只能按 semantic-id、tombstone、refs-only adapter、domain handler target 或 package/protocol boundary 读取。 |
-| 物理源码形态 | `active_hygiene_tail` | repo-local session / domain_action_adapter / watch / operator projection / executor record adapter 仍可见，但只能作为 refs-only adapter、domain handler target、native helper implementation 或迁移输入。 |
+| 物理源码形态 | `source_shape_landed_with_thinning_tail` | repo-local session / domain_action_adapter / watch / operator projection / executor record adapter 仍可见，但只能作为 refs-only adapter、domain handler target、native helper implementation 或 default-caller thinning tail。 |
 
 这些状态不能互相升级：结构闭合不等于 visual ready、exportable、handoffable，也不等于 production visual-stage long soak 完成。
 
@@ -100,15 +100,15 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 
 ## 结构卫生尾项
 
-这些尾项不重开功能/结构差距，但会影响读者是否误解 RCA 仍持有私有平台。它们按 active caller、OPL default caller parity、owner receipt roundtrip 和 no-compatibility-alias proof 继续收薄。
+这些尾项不重开功能/结构差距，也不表示 RCA 仍持有私有平台。它们只记录 OPL generated/default caller、owner receipt roundtrip 和 no-compatibility-alias proof 继续默认化后的 refs-only adapter thinning。
 
 | Surface | 当前角色 | 退役门 |
 | --- | --- | --- |
-| `getProductEntrySession` / session continuity refs | entry-session domain snapshot refs adapter | OPL generated session shell 成为 default caller，RCA 仅返回 visual/domain snapshot refs。 |
-| direct `runtimeWatch` | direct review/progress refs-only read model | OPL App/workbench live route parity 后收薄为 domain ref provider；不恢复 domain_action_adapter default dispatch。 |
+| `getProductEntrySession` / session continuity refs | entry-session domain snapshot refs adapter | OPL generated session shell default 化后继续收薄，RCA 仅返回 visual/domain snapshot refs。 |
+| direct `runtimeWatch` | direct review/progress refs-only read model | OPL App/workbench live route parity 后继续收薄为 domain ref provider；不恢复 domain_action_adapter default dispatch。 |
 | product domain_action_adapter export/dispatch | domain domain_action_adapter target、guarded visual authority action adapter | OPL generated domain_action_adapter wrapper default 化后，只保留 guarded domain action handlers。 |
-| operator evidence / stability / efficiency projections | refs-only read model 和 migration input | OPL App/workbench/observability shell 稳定后，RCA 只输出 owner receipt、typed blocker、artifact/memory evidence refs。 |
-| executor route-run record adapter | route-level executor policy、receipt refs 与 route-run record materialization；runtime topology 已使用 `domain_entry_protocol_role`，不保留 active `gateway_role`。 | OPL Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 成为 default caller。 |
+| operator evidence / stability / efficiency projections | refs-only read model 和 OPL/App consumer projection | OPL App/workbench/observability shell 默认化后，RCA 只输出 owner receipt、typed blocker、artifact/memory evidence refs。 |
+| executor route-run record adapter | route-level executor policy、receipt refs 与 route-run record materialization refs；runtime topology 已使用 `domain_entry_protocol_role`，不保留 active `gateway_role`。 | OPL Agent Executor Adapter、attempt ledger、runtime record/event log 和 stale attempt audit read model 成为 default caller。 |
 | legacy historical strings | semantic-id、tombstone/provenance、negative input、refs-only read model、domain handler target 或 package/protocol boundary | provenance consumer 迁出后 rename/delete/tombstone；不新增 public entry、alias、facade 或 compatibility command。 |
 
 不能直接删除的 explicit remainder：
@@ -128,7 +128,7 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
    扩大真实 visual memory accepted/rejected receipts、workspace receipt inventory、lifecycle receipt、Temporal long soak 和 cross-family repeated no-regression evidence。refs-only projection 只做 accounting，不升级为完成声明。
 
 3. `generated_default_caller_thinning`
-   随 OPL generated/default session、domain_action_adapter、product-entry、workbench、Agent Executor Adapter、attempt ledger 和 native-helper envelope 成为 live caller，继续收薄 RCA repo-local adapter，只保留 domain handler target、visual authority function、native helper implementation 和 refs-only return shape。
+   随 OPL generated/default session、domain_action_adapter、product-entry、workbench、Agent Executor Adapter、attempt ledger 和 native-helper envelope 持续默认化，继续收薄 RCA repo-local adapter，只保留 domain handler target、visual authority function、native helper implementation 和 refs-only return shape。
 
 4. `naming_contract_hygiene`
    将历史 `managed`、generic session store、gateway/runtime/domain_action_adapter 读者可见语义继续降到 provenance / semantic-id / tombstone。任何改名必须先确认 active caller、runtime-program pointer、test contract 和 no-compatibility-alias policy。

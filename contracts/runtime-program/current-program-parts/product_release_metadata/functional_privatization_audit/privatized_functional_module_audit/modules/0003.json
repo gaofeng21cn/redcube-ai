@@ -2,7 +2,7 @@
   "module_id": "artifact_export_lifecycle",
   "surface_ref": "/artifact_locator_contract",
   "status": "opl_artifact_lifecycle_shell_consumed_refs_only",
-  "classification": "split_owner_boundary",
+  "classification": "refs_only_adapter",
   "opl_generic_primitive": "artifact_lifecycle",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -43,12 +43,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "artifact_export_lifecycle_bridge_exit_gate",
-    "bridge_role": "artifact_locator_authority_adapter_until_opl_gallery_handoff_shell_live",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "artifact_locator_authority_refs_adapter_default_caller_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
     "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -59,6 +59,9 @@
       "artifact_locator_refs"
     ],
     "after_exit_rca_surface": "artifact_authority_and_export_verdict_refs",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -66,8 +69,23 @@
     "opl_can_store_artifact_blob": false,
     "opl_can_write_memory_body": false,
     "opl_can_authorize_review_export_verdict": false,
-    "opl_can_issue_owner_receipt": false
+    "opl_can_issue_owner_receipt": false,
+    "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
+    "typed_blocker_refs": [
+      "typed-blocker:rca/default-caller-deletion/artifact_export_lifecycle/physical-delete-requires-explicit-owner-receipt"
+    ],
+    "no_forbidden_write_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/artifact_export_lifecycle/refs-only-boundary"
+    ],
+    "no_forbidden_write_evidence_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/artifact_export_lifecycle/refs-only-boundary"
+    ],
+    "domain_repo_physical_delete_authorized": false,
+    "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "/artifact_locator_contract"
+  ],
   "rca_projection_mode": "artifact_locator_export_verdict_refs_only",
   "rca_exports_only": [
     "artifact_locator_refs",

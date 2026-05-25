@@ -2,7 +2,7 @@
   "module_id": "product_entry_continuity_refs_adapter",
   "surface_ref": "/session_continuity",
   "status": "opl_generated_workbench_session_surface_consumed",
-  "classification": "split_owner_boundary",
+  "classification": "refs_only_adapter",
   "opl_generic_primitive": "workbench_shell",
   "oplAbsorbCandidate": true,
   "rcaRetains": [
@@ -25,7 +25,7 @@
     "operator loop domain locator refs"
   ],
   "activeCallerStatus": "opl_generated_session_shell_domain_refs",
-  "migrationAction": "Consume OPL/App generic session shell, resume token, operator navigation and workbench state; keep RCA entry-session domain snapshot refs only.",
+  "migrationAction": "Use OPL/App generic session shell, resume token, operator navigation and workbench state as the default shell; RCA returns entry-session domain snapshot refs only.",
   "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
   "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
   "tombstone_required": false,
@@ -44,12 +44,12 @@
   },
   "bridge_exit_gate": {
     "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
-    "bridge_role": "entry_session_snapshot_adapter_until_opl_generated_session_shell_live",
-    "bridge_owner": "redcube_ai_migration_bridge",
+    "bridge_role": "entry_session_snapshot_refs_adapter_default_caller_tail",
+    "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_app_session_shell_and_workbench",
     "exit_gate_ref": "/opl_generated_interface_consumption",
-    "current_status": "bridge_until_exit_gates_pass",
+    "current_status": "source_shape_landed_default_caller_tail_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
@@ -60,6 +60,9 @@
       "latest_visual_run_ref"
     ],
     "after_exit_rca_surface": "domain_session_snapshot_refs_only",
+    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "declares_source_shape_landed": true,
+    "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
     "declares_replacement_complete": false,
     "rca_can_own_replacement_runtime": false,
@@ -67,8 +70,24 @@
     "opl_can_store_artifact_blob": false,
     "opl_can_write_memory_body": false,
     "opl_can_authorize_review_export_verdict": false,
-    "opl_can_issue_owner_receipt": false
+    "opl_can_issue_owner_receipt": false,
+    "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
+    "typed_blocker_refs": [
+      "typed-blocker:rca/default-caller-deletion/product_entry_continuity_refs_adapter/physical-delete-requires-explicit-owner-receipt"
+    ],
+    "no_forbidden_write_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
+    ],
+    "no_forbidden_write_evidence_refs": [
+      "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
+    ],
+    "domain_repo_physical_delete_authorized": false,
+    "physical_delete_authorized_by_refs": false
   },
+  "current_surface_refs": [
+    "product_session",
+    "/session_continuity"
+  ],
   "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
   "rca_exports_only": [
     "entry_session_id",
