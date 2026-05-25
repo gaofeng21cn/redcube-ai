@@ -70,6 +70,15 @@ function sourceRefCoversFile(sourceRef, file) {
   return file === sourcePath || file.startsWith(`${sourcePath}/`);
 }
 
+function assertRepoRefResolves(sourceRef, label) {
+  const [sourcePath, anchor] = String(sourceRef).split('#');
+  const fullPath = path.resolve(sourcePath);
+  assert.equal(existsSync(fullPath), true, `${label}: ${sourceRef}`);
+  if (!anchor) return;
+  const text = readFileSync(fullPath, 'utf-8');
+  assert.equal(text.includes(anchor), true, `${label}: ${sourceRef}`);
+}
+
 function listJsonFiles(root) {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(root, entry.name);
@@ -496,6 +505,24 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.consumer, 'opl');
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
   assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
+  assert.deepEqual(policy.source_ref_integrity_gate, {
+    policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
+    applies_to: [
+      'active_surface_classifications[*].source_refs',
+      'active_surface_classifications[*].machine_boundary_refs',
+    ],
+    accepted_ref_shapes: [
+      'repo_path',
+      'repo_directory',
+      'repo_path_anchor',
+    ],
+    anchor_separator: '#',
+    stale_source_ref_reopens_gap: true,
+    missing_source_ref_allowed: false,
+    missing_machine_boundary_anchor_allowed: false,
+    generic_owner_classification_from_unresolved_ref_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
   assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
     'managed',
     'runtime',
@@ -696,6 +723,16 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     callable_alias_allowed: false,
     active_caller_allowed: false,
   });
+
+  for (const entry of policy.active_surface_classifications) {
+    assert.notDeepEqual(entry.source_refs ?? [], [], entry.surface_id);
+    for (const sourceRef of entry.source_refs ?? []) {
+      assertRepoRefResolves(sourceRef, `${entry.surface_id}.source_refs`);
+    }
+    for (const sourceRef of entry.machine_boundary_refs ?? []) {
+      assertRepoRefResolves(sourceRef, `${entry.surface_id}.machine_boundary_refs`);
+    }
+  }
 });
 
 test('RCA active CLI source legacy names are covered by explicit morphology allowance', () => {
