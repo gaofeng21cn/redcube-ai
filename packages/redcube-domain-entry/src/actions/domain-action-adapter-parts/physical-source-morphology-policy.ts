@@ -379,6 +379,31 @@ export function buildPhysicalSourceMorphologyPolicy() {
       forbidden_active_surface_ids: [
         'legacy_managed_runtime_gateway_names',
       ],
+      retired_legacy_surface_id_pointer_policy: {
+        policy_kind: 'retired_legacy_surface_ids_must_stay_inside_tombstone_or_provenance_fields',
+        allowed_json_pointer_suffixes: [
+          '/physical_deletion_guard/retired_legacy_surface_ids/*',
+          '/retired_no_resurrection_guards/*/retired_legacy_surface_id',
+        ],
+        allowed_leaf_file_pointer_suffixes: [
+          {
+            file_suffix: '/physical_deletion_guard.json',
+            pointer_suffix: '/retired_legacy_surface_ids/*',
+          },
+          {
+            file_suffix: '/retired_no_resurrection_guards.json',
+            pointer_suffix: '/*/retired_legacy_surface_id',
+          },
+        ],
+        generated_read_through_snapshot_refs: [
+          'contracts/runtime-program/current-program.json',
+          'contracts/runtime-program/current-program-parts/',
+          'contracts/runtime-program/opl-family-contract-adoption.json',
+        ],
+        active_callable_path_allowed: false,
+        compatibility_alias_allowed: false,
+        production_readiness_claim_allowed: false,
+      },
       allowance_required_for_active_surface_text_matches: true,
       allowance_guard_required_fields: [
         'compatibility_alias_allowed',

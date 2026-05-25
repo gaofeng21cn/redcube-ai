@@ -70,6 +70,34 @@ function sourceRefCoversFile(sourceRef, file) {
   return file === sourcePath || file.startsWith(`${sourcePath}/`);
 }
 
+function listJsonFiles(root) {
+  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      return listJsonFiles(file);
+    }
+    return entry.isFile() && entry.name.endsWith('.json') ? [file] : [];
+  });
+}
+
+function visitJsonPointers(value, pointer, visitor) {
+  visitor(value, pointer);
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => visitJsonPointers(entry, `${pointer}/${index}`, visitor));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, entry] of Object.entries(value)) {
+      visitJsonPointers(entry, `${pointer}/${key}`, visitor);
+    }
+  }
+}
+
+function pointerMatchesAllowedSuffix(pointer, suffix) {
+  const pattern = suffix.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[^/]+');
+  return new RegExp(`${pattern}$`).test(pointer);
+}
+
 test('RCA active source surfaces do not restore compatibility alias claims', () => {
   for (const contractFile of RETIRED_CONTRACTS) {
     assert.equal(existsSync(path.resolve(contractFile)), false, contractFile);
@@ -733,4 +761,59 @@ test('retired managed product-entry contract is tombstoned without compatibility
   assert.equal(retired.active_caller_retained, false);
   assert.equal(replacement.product_entry_session_continuity_id, 'product_entry_session_continuity');
   assert.equal(replacement.callable_surface.api_surface, 'getProductEntrySession');
+});
+
+test('retired legacy surface ids only appear in tombstone or provenance pointer paths', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const pointerPolicy = policy.legacy_name_policy.retired_legacy_surface_id_pointer_policy;
+  assert.equal(
+    pointerPolicy.policy_kind,
+    'retired_legacy_surface_ids_must_stay_inside_tombstone_or_provenance_fields',
+  );
+  assert.deepEqual(pointerPolicy.allowed_json_pointer_suffixes, [
+    '/physical_deletion_guard/retired_legacy_surface_ids/*',
+    '/retired_no_resurrection_guards/*/retired_legacy_surface_id',
+  ]);
+  assert.deepEqual(pointerPolicy.allowed_leaf_file_pointer_suffixes, [
+    {
+      file_suffix: '/physical_deletion_guard.json',
+      pointer_suffix: '/retired_legacy_surface_ids/*',
+    },
+    {
+      file_suffix: '/retired_no_resurrection_guards.json',
+      pointer_suffix: '/*/retired_legacy_surface_id',
+    },
+  ]);
+  assert.equal(pointerPolicy.active_callable_path_allowed, false);
+  assert.equal(pointerPolicy.compatibility_alias_allowed, false);
+  assert.equal(pointerPolicy.production_readiness_claim_allowed, false);
+
+  const retiredLegacySurfaceIds = new Set(JSON.parse(readFileSync(
+    path.resolve('contracts/functional_privatization_audit.json'),
+    'utf-8',
+  )).physical_deletion_guard.retired_legacy_surface_ids);
+
+  const violations = [];
+  for (const file of listJsonFiles('contracts')) {
+    const normalizedFile = normalizePath(file);
+    const parsed = JSON.parse(readFileSync(file, 'utf-8'));
+    visitJsonPointers(parsed, '', (value, pointer) => {
+      if (!retiredLegacySurfaceIds.has(value)) return;
+      if (pointerPolicy.allowed_json_pointer_suffixes.some((suffix) => pointerMatchesAllowedSuffix(pointer, suffix))) {
+        return;
+      }
+      if (pointerPolicy.allowed_leaf_file_pointer_suffixes.some((entry) => (
+        normalizedFile.endsWith(entry.file_suffix)
+        && pointerMatchesAllowedSuffix(pointer, entry.pointer_suffix)
+      ))) {
+        return;
+      }
+      violations.push(`${normalizedFile}${pointer}`);
+    });
+  }
+
+  assert.deepEqual(violations, []);
 });
