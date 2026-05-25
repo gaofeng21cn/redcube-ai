@@ -88,6 +88,26 @@ const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
   }),
 ]);
 
+const RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS = Object.freeze([
+  'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+  'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+  'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+]);
+
+const RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES = Object.freeze([
+  'domain_owner_receipt_ref',
+  'no_regression_evidence_ref',
+  'owner_chain_ref',
+  'typed_blocker_ref',
+]);
+
+const RCA_OWNER_PAYLOAD_PATH_POLICY =
+  'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks';
+
+function uniqueRefs(values) {
+  return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0))];
+}
+
 export function buildProductionEvidenceScaleoutRefs({
   standardDomainAgentSkeleton,
   workspaceReceiptInventoryProjection,
@@ -96,6 +116,49 @@ export function buildProductionEvidenceScaleoutRefs({
   const memoryApplyProof = standardDomainAgentSkeleton.controlled_memory_apply_proof || {};
   const noRegressionProof = standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof || {};
   const physicalSkeleton = standardDomainAgentSkeleton.physical_skeleton_follow_through || {};
+  const actualWorkspaceReceiptRefs =
+    workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs?.artifact_producing_owner_receipt_refs || [];
+  const domainOwnerReceiptRefs = uniqueRefs([
+    'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+    ...actualWorkspaceReceiptRefs,
+  ]);
+  const noRegressionEvidenceRefs = uniqueRefs([
+    'rca-no-regression:visual-stage:transition-hosted-no-regression',
+    'rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression',
+  ]);
+  const ownerChainRefs = uniqueRefs([
+    'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
+    '/domain_owner_receipt_contract',
+    '/artifact_locator_contract',
+    '/workspace_receipt_inventory_projection',
+    '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
+    '/controlled_memory_apply_proof',
+    '/no_regression_owner_receipt_opl_consumption_proof',
+    'workspace-runtime-ref:review-export:transition-run',
+    ...domainOwnerReceiptRefs,
+    ...noRegressionEvidenceRefs,
+    ...(workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs?.memory_lifecycle_receipt_refs || []),
+  ]);
+  const acceptedPayloadPaths = {
+    success_refs_path: {
+      required_any_operator_payload_refs: [
+        'domain_owner_receipt_refs',
+        'no_regression_evidence_refs',
+        'owner_chain_refs',
+      ],
+      typed_blocker_refs_must_be_absent: true,
+      closes_owner_chain: false,
+      closes_domain_ready: false,
+      closes_production_ready: false,
+    },
+    typed_blocker_path: {
+      required_operator_payload_refs: ['typed_blocker_refs'],
+      success_claimed: false,
+      closes_owner_chain: false,
+      closes_domain_ready: false,
+      closes_production_ready: false,
+    },
+  };
   return {
     surface_kind: 'rca_visual_production_evidence_scaleout_refs',
     owner: 'redcube_ai',
@@ -132,6 +195,19 @@ export function buildProductionEvidenceScaleoutRefs({
       visual_readiness_claimed: false,
       export_readiness_claimed: false,
     },
+    domain_owner_receipt_refs: domainOwnerReceiptRefs,
+    typed_blocker_refs: [...RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS],
+    owner_chain_refs: ownerChainRefs,
+    no_regression_evidence_refs: noRegressionEvidenceRefs,
+    domain_receipt_refs: domainOwnerReceiptRefs,
+    no_regression_refs: noRegressionEvidenceRefs,
+    required_return_shapes: [...RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES],
+    payload_path_policy: RCA_OWNER_PAYLOAD_PATH_POLICY,
+    accepted_payload_paths: acceptedPayloadPaths,
+    legacy_payload_field_aliases: {
+      domain_receipt_refs: 'domain_owner_receipt_refs',
+      no_regression_refs: 'no_regression_evidence_refs',
+    },
     workspace_receipt_scaleout_refs: {
       status: workspaceReceiptInventoryProjection?.scaleout_projection?.status || 'workspace_receipt_scaleout_ref_model_pending',
       workspace_receipt_inventory_ref: '/workspace_receipt_inventory_projection',
@@ -166,10 +242,7 @@ export function buildProductionEvidenceScaleoutRefs({
       generator_action: 'emit_no_regression_evidence',
       proof_contract_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       proof_status: noRegressionProof.status || 'unknown',
-      evidence_refs: [
-        'rca-no-regression:visual-stage:transition-hosted-no-regression',
-        'rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression',
-      ],
+      evidence_refs: noRegressionEvidenceRefs,
       deliverable_family_refs: [
         'ppt_deck',
         'xiaohongshu',
@@ -286,11 +359,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
     },
     typed_blocker_backfill_refs: {
       status: 'remaining_gates_reported_as_rca_typed_blockers',
-      blocker_refs: [
-        'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
-        'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
-        'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
-      ],
+      blocker_refs: productionEvidenceScaleoutRefs.typed_blocker_refs || [],
       blocker_owner: 'redcube_ai',
       payload_body_included: false,
     },

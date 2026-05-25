@@ -176,6 +176,47 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assertRefString(scaleout.owner_receipt_refs.contract_ref, 'production_evidence_scaleout_refs.owner_receipt_refs.contract_ref');
   assert.equal(scaleout.owner_receipt_refs.visual_readiness_claimed, false);
   assert.equal(scaleout.owner_receipt_refs.export_readiness_claimed, false);
+  assert.deepEqual(scaleout.domain_owner_receipt_refs, [
+    'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+    'rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner',
+  ]);
+  assert.deepEqual(scaleout.domain_receipt_refs, scaleout.domain_owner_receipt_refs);
+  assert.deepEqual(scaleout.no_regression_evidence_refs, scaleout.repeated_no_regression_evidence_refs.evidence_refs);
+  assert.deepEqual(scaleout.no_regression_refs, scaleout.no_regression_evidence_refs);
+  assert.deepEqual(scaleout.typed_blocker_refs, [
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+    'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+    'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+  ]);
+  assert.equal(scaleout.owner_chain_refs.includes(evidenceFixturePath), true);
+  assert.deepEqual(scaleout.required_return_shapes, [
+    'domain_owner_receipt_ref',
+    'no_regression_evidence_ref',
+    'owner_chain_ref',
+    'typed_blocker_ref',
+  ]);
+  assert.equal(
+    scaleout.payload_path_policy,
+    'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks',
+  );
+  assert.deepEqual(
+    scaleout.accepted_payload_paths.success_refs_path.required_any_operator_payload_refs,
+    [
+      'domain_owner_receipt_refs',
+      'no_regression_evidence_refs',
+      'owner_chain_refs',
+    ],
+  );
+  assert.equal(scaleout.accepted_payload_paths.success_refs_path.closes_domain_ready, false);
+  assert.deepEqual(
+    scaleout.accepted_payload_paths.typed_blocker_path.required_operator_payload_refs,
+    ['typed_blocker_refs'],
+  );
+  assert.equal(scaleout.accepted_payload_paths.typed_blocker_path.success_claimed, false);
+  assert.deepEqual(scaleout.legacy_payload_field_aliases, {
+    domain_receipt_refs: 'domain_owner_receipt_refs',
+    no_regression_refs: 'no_regression_evidence_refs',
+  });
 
   assert.equal(
     scaleout.workspace_receipt_scaleout_refs.status,
@@ -706,6 +747,7 @@ test('RCA production acceptance surface does not introduce ready-claim keys or b
       || key.startsWith('forbidden_claims.')
       || key.startsWith('structural_conformance.')
       || key.startsWith('visual_artifact_receipt_chain.chain_declares_')
+      || key.startsWith('production_evidence_scaleout_refs.accepted_payload_paths.')
     )
   );
 

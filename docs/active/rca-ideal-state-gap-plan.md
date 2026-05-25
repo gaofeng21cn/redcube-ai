@@ -52,7 +52,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Area | 当前进度 | 当前读法 |
 | --- | --- | --- |
 | Standard OPL Agent structure | `done` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
-| Functional / structural gaps | `closed_with_evidence_tail` | `functional_structure_gap_count=0` 只表示结构和 owner 边界闭合；production evidence tail 已有 RCA-owned body-free artifact-producing owner receipt refs，但仍需要 scaleout、long-soak 和 visual verdict 证据。 |
+| Functional / structural gaps | `closed_with_evidence_tail` | `functional_structure_gap_count=0` 只表示结构和 owner 边界闭合；production evidence tail 已有 RCA-owned body-free artifact-producing owner receipt refs，并已暴露 OPL owner-payload group 可消费的 return shape / payload path；仍需要 scaleout、long-soak 和 visual verdict 证据。 |
 | Retained authority surfaces | `active_authority` | Visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt 留在 RCA；OPL 只消费 refs 和 generated/default caller。 |
 | Docs lifecycle | `single_active_truth_owner` | 本文持有 current truth、gap、结构卫生尾项、下一轮 prompt 和验证口径；历史路线和 retired surface 进入 history/tombstone/provenance。 |
 

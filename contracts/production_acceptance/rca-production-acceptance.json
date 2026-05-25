@@ -126,6 +126,76 @@
       "visual_readiness_claimed": false,
       "export_readiness_claimed": false
     },
+    "domain_owner_receipt_refs": [
+      "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
+    ],
+    "typed_blocker_refs": [
+      "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+      "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+      "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+    ],
+    "owner_chain_refs": [
+      "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+      "contracts/owner_receipt_contract.json#/receipt_cases/0",
+      "contracts/artifact_locator_contract.json",
+      "redcube product manifest#/workspace_receipt_inventory_projection",
+      "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
+      "redcube product manifest#/controlled_memory_apply_proof",
+      "redcube product manifest#/no_regression_owner_receipt_opl_consumption_proof",
+      "workspace-runtime-ref:review-export:transition-run",
+      "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first",
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+      "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+      "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+      "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+    ],
+    "no_regression_evidence_refs": [
+      "rca-no-regression:visual-stage:transition-hosted-no-regression",
+      "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+    ],
+    "domain_receipt_refs": [
+      "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+      "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
+    ],
+    "no_regression_refs": [
+      "rca-no-regression:visual-stage:transition-hosted-no-regression",
+      "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+    ],
+    "required_return_shapes": [
+      "domain_owner_receipt_ref",
+      "no_regression_evidence_ref",
+      "owner_chain_ref",
+      "typed_blocker_ref"
+    ],
+    "payload_path_policy": "operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks",
+    "accepted_payload_paths": {
+      "success_refs_path": {
+        "required_any_operator_payload_refs": [
+          "domain_owner_receipt_refs",
+          "no_regression_evidence_refs",
+          "owner_chain_refs"
+        ],
+        "typed_blocker_refs_must_be_absent": true,
+        "closes_owner_chain": false,
+        "closes_domain_ready": false,
+        "closes_production_ready": false
+      },
+      "typed_blocker_path": {
+        "required_operator_payload_refs": [
+          "typed_blocker_refs"
+        ],
+        "success_claimed": false,
+        "closes_owner_chain": false,
+        "closes_domain_ready": false,
+        "closes_production_ready": false
+      }
+    },
+    "legacy_payload_field_aliases": {
+      "domain_receipt_refs": "domain_owner_receipt_refs",
+      "no_regression_refs": "no_regression_evidence_refs"
+    },
     "workspace_receipt_scaleout_refs": {
       "status": "scaleout_ref_model_landed_more_workspaces_pending",
       "workspace_receipt_inventory_ref": "redcube product manifest#/workspace_receipt_inventory_projection",

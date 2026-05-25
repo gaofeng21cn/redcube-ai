@@ -52,6 +52,74 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs.length >= 2,
       true,
     );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.domain_owner_receipt_refs,
+      [
+        'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+      ],
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.no_regression_evidence_refs,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs,
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.typed_blocker_refs,
+      [
+        'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+        'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+        'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+      ],
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_chain_refs.includes(
+        'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
+      ),
+      true,
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.required_return_shapes,
+      [
+        'domain_owner_receipt_ref',
+        'no_regression_evidence_ref',
+        'owner_chain_ref',
+        'typed_blocker_ref',
+      ],
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.payload_path_policy,
+      'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks',
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.accepted_payload_paths.success_refs_path.required_any_operator_payload_refs,
+      [
+        'domain_owner_receipt_refs',
+        'no_regression_evidence_refs',
+        'owner_chain_refs',
+      ],
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.accepted_payload_paths.typed_blocker_path.required_operator_payload_refs,
+      ['typed_blocker_refs'],
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.legacy_payload_field_aliases,
+      {
+        domain_receipt_refs: 'domain_owner_receipt_refs',
+        no_regression_refs: 'no_regression_evidence_refs',
+      },
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.domain_receipt_refs,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.domain_owner_receipt_refs,
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.no_regression_refs,
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.no_regression_evidence_refs,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.accepted_payload_paths.typed_blocker_path.closes_domain_ready,
+      false,
+    );
     assert.equal(
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,
       false,
@@ -202,6 +270,31 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.owner_receipt_refs.actual_workspace_receipt_refs_visible,
       true,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.domain_owner_receipt_refs,
+      [
+        'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
+        ...manifestWithReceipts.workspace_receipt_inventory_projection.actual_workspace_receipt_refs.artifact_producing_owner_receipt_refs,
+      ],
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.owner_chain_refs.includes(
+        manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_inventory_ref,
+      ),
+      true,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.no_regression_evidence_refs,
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.typed_blocker_refs,
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.typed_blocker_backfill_refs.blocker_refs,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.accepted_payload_paths.success_refs_path.closes_domain_ready,
+      false,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.actual_workspace_receipt_refs.route_id,
