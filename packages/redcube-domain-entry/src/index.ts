@@ -186,6 +186,16 @@ async function dispatchDomainActionAdapterJs(request: any) {
   return module.dispatchDomainActionAdapter(request);
 }
 
+async function exportDomainHandlerJs(request: any) {
+  const module = await import('./actions/domain-handler.js');
+  return module.exportDomainHandler(request);
+}
+
+async function dispatchDomainHandlerJs(request: any) {
+  const module = await import('./actions/domain-handler.js');
+  return module.dispatchDomainHandler(request);
+}
+
 async function auditDeliverableJs(request: any) {
   const module = await import('./actions/audit-deliverable.js');
   return module.auditDeliverable(request);
@@ -323,6 +333,14 @@ export function exportDomainActionAdapter(request: Record<string, unknown>): Pro
 
 export function dispatchDomainActionAdapter(request: Record<string, unknown>): Promise<Record<string, unknown>> {
   return dispatchDomainActionAdapterJs(request) as Promise<Record<string, unknown>>;
+}
+
+export function exportDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return exportDomainHandlerJs(request) as Promise<Record<string, unknown>>;
+}
+
+export function dispatchDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>> {
+  return dispatchDomainHandlerJs(request) as Promise<Record<string, unknown>>;
 }
 
 export function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunResponse> {

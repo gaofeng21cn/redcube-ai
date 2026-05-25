@@ -79,11 +79,11 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
       'no_forbidden_write_refs',
     ]);
 
-    const domain_action_adapterAction = manifest.family_action_catalog.actions.find(
-      (entry) => entry.action_id === 'dispatch_domain_action_adapter',
+    const domainHandlerAction = manifest.family_action_catalog.actions.find(
+      (entry) => entry.action_id === 'dispatch_domain_handler',
     );
     assert.equal(
-      domain_action_adapterAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
+      domainHandlerAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
       true,
     );
     assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.action, 'emit_external_work_order_owner_closeout');

@@ -18,8 +18,8 @@
     "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
   ],
   "activeCallers": [
-    "product status",
-    "product domain_action_adapter runtime framework",
+    "product status refs",
+    "domain-handler runtime framework refs",
     "operator evidence readiness projection"
   ],
   "activeCallerStatus": "active_refs_only_consumer_projection",

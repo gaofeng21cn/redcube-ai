@@ -11,7 +11,7 @@
       "package_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product domain_action_adapter projection",
+        "domain-handler projection backed by internal domain_action_adapter implementation",
         "stage control projection",
         "standard domain-agent skeleton mapping",
         "OPL generic primitive consumer projection",
@@ -95,9 +95,9 @@
         "redcube product invoke",
         "redcube product session"
       ],
-      "domain_action_adapter_surfaces": [
-        "redcube product domain_action_adapter export",
-        "redcube product domain_action_adapter dispatch"
+      "domain_handler_surfaces": [
+        "redcube domain-handler export",
+        "redcube domain-handler dispatch"
       ],
       "stage_control_projection": "redcube product manifest#/stage_control_projection"
     },
@@ -185,7 +185,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
       ],
       "opl_owned_generic_primitives": [
         "standard_domain_agent_scaffold",
@@ -206,7 +206,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
       ],
       "rca_retained_authority": [
         "visual_truth",
@@ -296,7 +296,7 @@
       "rca_thin_program_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product domain_action_adapter projection",
+        "domain-handler projection backed by internal domain_action_adapter implementation",
         "stage control projection",
         "visual transition spec",
         "artifact locator refs",
@@ -342,7 +342,7 @@
           "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
         },
         {
-          "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+          "primitive": "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
           "contract_ref": "rca.visual_pack_compiler_handoff.v1",
           "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
           "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
@@ -479,7 +479,7 @@
         "native helper envelope",
         "operator projection shell",
         "generic CLI/MCP wrappers",
-        "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
+        "generated CLI/MCP/product-entry/domain_action_adapter descriptor/status/session/workbench wrappers with RCA domain-handler targets",
         "Codex executor adapter",
         "observability/stability read model"
       ],
@@ -520,13 +520,13 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -773,7 +773,7 @@
           "review/repair transport shell",
           "native helper execution envelope",
           "operator projection/workbench shell",
-          "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
+          "OPL-generated CLI/MCP/product-entry/domain_action_adapter descriptor/status wrappers with RCA domain-handler targets"
         ],
         "migration_gates_before_code_retirement": [
           "generated/default caller parity proven for the replacement OPL surface",
@@ -890,7 +890,7 @@
             "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
-            "redcube product session domain snapshot refs",
+            "OPL generated product session domain snapshot refs",
             "OPL generated session shell continuation target",
             "operator loop domain locator refs"
           ],
@@ -1146,7 +1146,7 @@
             "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
           ],
           "activeCallers": [
-            "apply_visual_memory_writeback domain_action_adapter action",
+            "apply_visual_memory_writeback domain handler action",
             "workspace receipt inventory",
             "operator evidence readiness projection"
           ],
@@ -1275,7 +1275,7 @@
             "artifact locator contract",
             "export_pptx route",
             "workspace lifecycle guarded apply",
-            "product domain_action_adapter export"
+            "domain-handler export internal projection"
           ],
           "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
           "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -1402,7 +1402,7 @@
             "visual director review",
             "screenshot review",
             "repair_image_pages",
-            "product domain_action_adapter review projection"
+            "domain-handler review projection refs"
           ],
           "activeCallerStatus": "active_domain_review_gate",
           "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
@@ -1655,7 +1655,7 @@
           "activeCallers": [
             "OPL generated product status/workbench consumes RCA operator evidence refs",
             "product-entry manifest domain projection refs",
-            "product domain_action_adapter export refs-only projection",
+            "domain-handler export refs-only projection",
             "operator evidence readiness tests"
           ],
           "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -1776,7 +1776,7 @@
             "domain_action_handlers",
             "safe_action_refs"
           ],
-          "rca_scope": "domain_action_adapter_status_action_metadata_projection",
+          "rca_scope": "domain_handler_status_action_metadata_projection",
           "audit_readout": "retain_thin_projection_project_generated_wrappers",
           "codePaths": [
             "apps/redcube-cli/src/cli.ts",
@@ -1789,12 +1789,12 @@
             "redcube CLI direct diagnostic entry",
             "redcube MCP direct protocol adapter",
             "family action catalog refs",
-            "product domain_action_adapter guarded action list refs"
+            "domain-handler guarded action list refs"
           ],
           "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
           "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
           "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
+          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain handler authority.",
           "tombstone_required": false,
           "migration_class": "domain_handler_target",
           "active_reader_facing_classification": "domain_handler_target",
@@ -1856,7 +1856,8 @@
             "mcp",
             "skill",
             "domain_action_adapter",
-            "domain_action_adapter_export_dispatch",
+            "domain_handler",
+            "domain_handler",
             "family_action_catalog",
             "guarded_action_catalog"
           ],
@@ -2066,8 +2067,8 @@
             "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
           ],
           "activeCallers": [
-            "product status",
-            "product domain_action_adapter runtime framework",
+            "product status refs",
+            "domain-handler runtime framework refs",
             "operator evidence readiness projection"
           ],
           "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -2196,11 +2197,11 @@
           ],
           "activeCallers": [
             "product-entry manifest",
-            "product domain_action_adapter export",
-            "product status"
+            "domain-handler export",
+            "OPL generated product status refs"
           ],
           "activeCallerStatus": "declarative_pack_input_active",
-          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
+          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.",
           "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
           "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
           "rca_projection_mode": "declarative_pack_refs_only",
@@ -2797,7 +2798,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
         "family_conflict_envelope_schema",
         "control_loop_summary_builder",
         "usage_projection_aggregator",
@@ -2834,13 +2835,13 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -3527,7 +3528,7 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "domain_action_adapter",
+            "domain_handler",
             "product_entry_continuity_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
@@ -3597,7 +3598,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "domain_action_adapter_wrapper",
+          "domain_handler_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -3618,7 +3619,7 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
@@ -3676,7 +3677,7 @@
           "domain_handler_owner": "redcube_ai",
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -3709,7 +3710,8 @@
           },
           "domain_action_adapter": {
             "owner": "opl",
-            "current_rca_role": "domain_domain_action_adapter_target",
+            "current_rca_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
+            "domain_handler_target": "domain_handler",
             "long_term_rca_owner": false
           },
           "status": {
@@ -3737,7 +3739,7 @@
           "opl_can_generate_cli_wrapper": true,
           "opl_can_generate_mcp_wrapper": true,
           "opl_can_generate_product_entry_wrapper": true,
-          "opl_can_generate_domain_action_adapter_wrapper": true,
+          "opl_can_generate_domain_handler_wrapper": true,
           "opl_can_generate_status_projection": true,
           "opl_can_generate_session_shell": true,
           "opl_can_generate_workbench_shell": true,
@@ -4163,7 +4165,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "domain_action_adapter_wrapper",
+          "domain_handler_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -4233,7 +4235,7 @@
           "native helper envelope",
           "operator projection shell",
           "generic CLI/MCP wrappers",
-          "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
+          "generated CLI/MCP/product-entry/domain_action_adapter descriptor/status/session/workbench wrappers with RCA domain-handler targets",
           "Codex executor adapter",
           "observability/stability read model"
         ],
@@ -4274,13 +4276,13 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "domain_action_adapter",
+            "domain_handler",
             "product_entry_continuity_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-            "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+            "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
             "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
@@ -4527,7 +4529,7 @@
             "review/repair transport shell",
             "native helper execution envelope",
             "operator projection/workbench shell",
-            "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
+            "OPL-generated CLI/MCP/product-entry/domain_action_adapter descriptor/status wrappers with RCA domain-handler targets"
           ],
           "migration_gates_before_code_retirement": [
             "generated/default caller parity proven for the replacement OPL surface",
@@ -4644,7 +4646,7 @@
               "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
             ],
             "activeCallers": [
-              "redcube product session domain snapshot refs",
+              "OPL generated product session domain snapshot refs",
               "OPL generated session shell continuation target",
               "operator loop domain locator refs"
             ],
@@ -4900,7 +4902,7 @@
               "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
             ],
             "activeCallers": [
-              "apply_visual_memory_writeback domain_action_adapter action",
+              "apply_visual_memory_writeback domain handler action",
               "workspace receipt inventory",
               "operator evidence readiness projection"
             ],
@@ -5029,7 +5031,7 @@
               "artifact locator contract",
               "export_pptx route",
               "workspace lifecycle guarded apply",
-              "product domain_action_adapter export"
+              "domain-handler export internal projection"
             ],
             "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
             "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -5156,7 +5158,7 @@
               "visual director review",
               "screenshot review",
               "repair_image_pages",
-              "product domain_action_adapter review projection"
+              "domain-handler review projection refs"
             ],
             "activeCallerStatus": "active_domain_review_gate",
             "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
@@ -5409,7 +5411,7 @@
             "activeCallers": [
               "OPL generated product status/workbench consumes RCA operator evidence refs",
               "product-entry manifest domain projection refs",
-              "product domain_action_adapter export refs-only projection",
+              "domain-handler export refs-only projection",
               "operator evidence readiness tests"
             ],
             "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -5530,7 +5532,7 @@
               "domain_action_handlers",
               "safe_action_refs"
             ],
-            "rca_scope": "domain_action_adapter_status_action_metadata_projection",
+            "rca_scope": "domain_handler_status_action_metadata_projection",
             "audit_readout": "retain_thin_projection_project_generated_wrappers",
             "codePaths": [
               "apps/redcube-cli/src/cli.ts",
@@ -5543,12 +5545,12 @@
               "redcube CLI direct diagnostic entry",
               "redcube MCP direct protocol adapter",
               "family action catalog refs",
-              "product domain_action_adapter guarded action list refs"
+              "domain-handler guarded action list refs"
             ],
             "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
             "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
             "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-            "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
+            "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain handler authority.",
             "tombstone_required": false,
             "migration_class": "domain_handler_target",
             "active_reader_facing_classification": "domain_handler_target",
@@ -5610,7 +5612,8 @@
               "mcp",
               "skill",
               "domain_action_adapter",
-              "domain_action_adapter_export_dispatch",
+              "domain_handler",
+              "domain_handler",
               "family_action_catalog",
               "guarded_action_catalog"
             ],
@@ -5820,8 +5823,8 @@
               "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
             ],
             "activeCallers": [
-              "product status",
-              "product domain_action_adapter runtime framework",
+              "product status refs",
+              "domain-handler runtime framework refs",
               "operator evidence readiness projection"
             ],
             "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -5950,11 +5953,11 @@
             ],
             "activeCallers": [
               "product-entry manifest",
-              "product domain_action_adapter export",
-              "product status"
+              "domain-handler export",
+              "OPL generated product status refs"
             ],
             "activeCallerStatus": "declarative_pack_input_active",
-            "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
+            "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.",
             "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
             "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
             "rca_projection_mode": "declarative_pack_refs_only",
@@ -6551,7 +6554,7 @@
           "review_repair_transport",
           "restart_dead_letter_repair_human_gate_state_chain",
           "native_helper_generic_envelope",
-          "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+          "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
           "family_conflict_envelope_schema",
           "control_loop_summary_builder",
           "usage_projection_aggregator",
@@ -6588,13 +6591,13 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "domain_action_adapter",
+            "domain_handler",
             "product_entry_continuity_refs_adapter"
           ],
           "repo_local_launcher_policy": {
             "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
             "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-            "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+            "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
             "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
             "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
             "default_generic_dispatch_owner": "one-person-lab",
@@ -6802,13 +6805,13 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -7350,12 +7353,12 @@
         "audience_language_policy": {
           "visible_operator_language_allowed": false,
           "forbidden_visible_fragments": [
-            "汇报讨论用途",
-            "客观专业版",
-            "本次汇报边界",
-            "不在展示页暴露",
-            "本地原始文件名",
-            "清洗脚本名",
+            "\u6c47\u62a5\u8ba8\u8bba\u7528\u9014",
+            "\u5ba2\u89c2\u4e13\u4e1a\u7248",
+            "\u672c\u6b21\u6c47\u62a5\u8fb9\u754c",
+            "\u4e0d\u5728\u5c55\u793a\u9875\u66b4\u9732",
+            "\u672c\u5730\u539f\u59cb\u6587\u4ef6\u540d",
+            "\u6e05\u6d17\u811a\u672c\u540d",
             "RCA",
             "RedCube",
             "source intake",
@@ -7873,7 +7876,7 @@
           "invokeOplHostedProductEntry",
           "getProductEntrySession",
           "redcube product invoke",
-          "redcube product domain_action_adapter",
+          "redcube domain-handler export",
           "redcube product session",
           "invoke_product_entry",
           "domain_action_adapter_dispatch",
@@ -8145,7 +8148,7 @@
           "owner": "redcube_ai",
           "no_regression_evidence": {
             "action": "emit_no_regression_evidence",
-            "dispatch_surface": "redcube product domain_action_adapter dispatch",
+            "dispatch_surface": "redcube domain-handler dispatch",
             "surface_kind": "no_regression_evidence",
             "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
             "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
@@ -8301,7 +8304,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+            "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
           ],
           "opl_owned_generic_primitives": [
             "standard_domain_agent_scaffold",
@@ -8322,7 +8325,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+            "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
           ],
           "rca_retained_authority": [
             "visual_truth",
@@ -8412,7 +8415,7 @@
           "rca_thin_program_surfaces": [
             "single redcube-ai app skill",
             "service-safe domain entry",
-            "product domain_action_adapter projection",
+            "domain-handler projection backed by internal domain_action_adapter implementation",
             "stage control projection",
             "visual transition spec",
             "artifact locator refs",
@@ -8458,7 +8461,7 @@
               "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
             },
             {
-              "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+              "primitive": "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
               "contract_ref": "rca.visual_pack_compiler_handoff.v1",
               "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
               "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
@@ -8487,7 +8490,7 @@
         "opl_stability_read_model_consumption": {
           "status": "refs_only_consumer_projection_landed",
           "source_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
-          "source_domain_action_adapter_surface": "redcube product domain_action_adapter export#/mapped_surfaces/opl_stability_read_model_consumption",
+          "source_domain_handler_surface": "redcube domain-handler export#/mapped_surfaces/opl_stability_read_model_consumption",
           "contract_ref": "opl.family_operator_stability_read_model.v1",
           "owner": "opl",
           "consumer": "redcube_ai",
@@ -8692,7 +8695,7 @@
             "native helper envelope",
             "operator projection shell",
             "generic CLI/MCP wrappers",
-            "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
+            "generated CLI/MCP/product-entry/domain_action_adapter descriptor/status/session/workbench wrappers with RCA domain-handler targets",
             "Codex executor adapter",
             "observability/stability read model"
           ],
@@ -8733,13 +8736,13 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "domain_action_adapter",
+              "domain_handler",
               "product_entry_continuity_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
               "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
@@ -8986,7 +8989,7 @@
               "review/repair transport shell",
               "native helper execution envelope",
               "operator projection/workbench shell",
-              "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
+              "OPL-generated CLI/MCP/product-entry/domain_action_adapter descriptor/status wrappers with RCA domain-handler targets"
             ],
             "migration_gates_before_code_retirement": [
               "generated/default caller parity proven for the replacement OPL surface",
@@ -9103,7 +9106,7 @@
                 "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
               ],
               "activeCallers": [
-                "redcube product session domain snapshot refs",
+                "OPL generated product session domain snapshot refs",
                 "OPL generated session shell continuation target",
                 "operator loop domain locator refs"
               ],
@@ -9359,7 +9362,7 @@
                 "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
               ],
               "activeCallers": [
-                "apply_visual_memory_writeback domain_action_adapter action",
+                "apply_visual_memory_writeback domain handler action",
                 "workspace receipt inventory",
                 "operator evidence readiness projection"
               ],
@@ -9488,7 +9491,7 @@
                 "artifact locator contract",
                 "export_pptx route",
                 "workspace lifecycle guarded apply",
-                "product domain_action_adapter export"
+                "domain-handler export internal projection"
               ],
               "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
               "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -9615,7 +9618,7 @@
                 "visual director review",
                 "screenshot review",
                 "repair_image_pages",
-                "product domain_action_adapter review projection"
+                "domain-handler review projection refs"
               ],
               "activeCallerStatus": "active_domain_review_gate",
               "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
@@ -9868,7 +9871,7 @@
               "activeCallers": [
                 "OPL generated product status/workbench consumes RCA operator evidence refs",
                 "product-entry manifest domain projection refs",
-                "product domain_action_adapter export refs-only projection",
+                "domain-handler export refs-only projection",
                 "operator evidence readiness tests"
               ],
               "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -9989,7 +9992,7 @@
                 "domain_action_handlers",
                 "safe_action_refs"
               ],
-              "rca_scope": "domain_action_adapter_status_action_metadata_projection",
+              "rca_scope": "domain_handler_status_action_metadata_projection",
               "audit_readout": "retain_thin_projection_project_generated_wrappers",
               "codePaths": [
                 "apps/redcube-cli/src/cli.ts",
@@ -10002,12 +10005,12 @@
                 "redcube CLI direct diagnostic entry",
                 "redcube MCP direct protocol adapter",
                 "family action catalog refs",
-                "product domain_action_adapter guarded action list refs"
+                "domain-handler guarded action list refs"
               ],
               "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
               "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
               "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-              "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
+              "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain handler authority.",
               "tombstone_required": false,
               "migration_class": "domain_handler_target",
               "active_reader_facing_classification": "domain_handler_target",
@@ -10069,7 +10072,8 @@
                 "mcp",
                 "skill",
                 "domain_action_adapter",
-                "domain_action_adapter_export_dispatch",
+                "domain_handler",
+                "domain_handler",
                 "family_action_catalog",
                 "guarded_action_catalog"
               ],
@@ -10279,8 +10283,8 @@
                 "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
               ],
               "activeCallers": [
-                "product status",
-                "product domain_action_adapter runtime framework",
+                "product status refs",
+                "domain-handler runtime framework refs",
                 "operator evidence readiness projection"
               ],
               "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -10409,11 +10413,11 @@
               ],
               "activeCallers": [
                 "product-entry manifest",
-                "product domain_action_adapter export",
-                "product status"
+                "domain-handler export",
+                "OPL generated product status refs"
               ],
               "activeCallerStatus": "declarative_pack_input_active",
-              "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
+              "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.",
               "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
               "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
               "rca_projection_mode": "declarative_pack_refs_only",
@@ -11010,7 +11014,7 @@
             "review_repair_transport",
             "restart_dead_letter_repair_human_gate_state_chain",
             "native_helper_generic_envelope",
-            "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+            "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
             "family_conflict_envelope_schema",
             "control_loop_summary_builder",
             "usage_projection_aggregator",
@@ -11047,13 +11051,13 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "domain_action_adapter",
+              "domain_handler",
               "product_entry_continuity_refs_adapter"
             ],
             "repo_local_launcher_policy": {
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
               "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
@@ -11740,7 +11744,7 @@
                 "redcube_mcp",
                 "invokeProductEntry",
                 "invokeDomainEntry",
-                "domain_action_adapter",
+                "domain_handler",
                 "product_entry_continuity_refs_adapter"
               ],
               "repo_local_handlers_are_generated_surface_owners": false,
@@ -11810,7 +11814,7 @@
               "mcp_wrapper",
               "skill_wrapper",
               "product_entry_wrapper",
-              "domain_action_adapter_wrapper",
+              "domain_handler_wrapper",
               "status_projection_wrapper",
               "session_wrapper",
               "workbench_wrapper",
@@ -11831,7 +11835,7 @@
               "redcube_mcp",
               "invokeProductEntry",
               "invokeDomainEntry",
-              "domain_action_adapter",
+              "domain_handler",
               "product_entry_continuity_refs_adapter"
             ],
             "rca_generated_surface_owner": false,
@@ -11889,7 +11893,7 @@
               "domain_handler_owner": "redcube_ai",
               "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
               "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-              "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+              "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
               "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
               "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
               "default_generic_dispatch_owner": "one-person-lab",
@@ -11922,7 +11926,8 @@
               },
               "domain_action_adapter": {
                 "owner": "opl",
-                "current_rca_role": "domain_domain_action_adapter_target",
+                "current_rca_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
+                "domain_handler_target": "domain_handler",
                 "long_term_rca_owner": false
               },
               "status": {
@@ -11950,7 +11955,7 @@
               "opl_can_generate_cli_wrapper": true,
               "opl_can_generate_mcp_wrapper": true,
               "opl_can_generate_product_entry_wrapper": true,
-              "opl_can_generate_domain_action_adapter_wrapper": true,
+              "opl_can_generate_domain_handler_wrapper": true,
               "opl_can_generate_status_projection": true,
               "opl_can_generate_session_shell": true,
               "opl_can_generate_workbench_shell": true,
@@ -12376,7 +12381,7 @@
               "mcp_wrapper",
               "skill_wrapper",
               "product_entry_wrapper",
-              "domain_action_adapter_wrapper",
+              "domain_handler_wrapper",
               "status_projection_wrapper",
               "session_wrapper",
               "workbench_wrapper",
@@ -12504,7 +12509,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
       ],
       "opl_owned_generic_primitives": [
         "standard_domain_agent_scaffold",
@@ -12525,7 +12530,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
       ],
       "rca_retained_authority": [
         "visual_truth",
@@ -12615,7 +12620,7 @@
       "rca_thin_program_surfaces": [
         "single redcube-ai app skill",
         "service-safe domain entry",
-        "product domain_action_adapter projection",
+        "domain-handler projection backed by internal domain_action_adapter implementation",
         "stage control projection",
         "visual transition spec",
         "artifact locator refs",
@@ -12661,7 +12666,7 @@
           "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
         },
         {
-          "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+          "primitive": "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
           "contract_ref": "rca.visual_pack_compiler_handoff.v1",
           "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
           "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"
@@ -12798,7 +12803,7 @@
         "native helper envelope",
         "operator projection shell",
         "generic CLI/MCP wrappers",
-        "generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench wrappers",
+        "generated CLI/MCP/product-entry/domain_action_adapter descriptor/status/session/workbench wrappers with RCA domain-handler targets",
         "Codex executor adapter",
         "observability/stability read model"
       ],
@@ -12839,13 +12844,13 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -13092,7 +13097,7 @@
           "review/repair transport shell",
           "native helper execution envelope",
           "operator projection/workbench shell",
-          "generated CLI/MCP/product-entry/domain_action_adapter/status wrappers"
+          "OPL-generated CLI/MCP/product-entry/domain_action_adapter descriptor/status wrappers with RCA domain-handler targets"
         ],
         "migration_gates_before_code_retirement": [
           "generated/default caller parity proven for the replacement OPL surface",
@@ -13209,7 +13214,7 @@
             "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
           ],
           "activeCallers": [
-            "redcube product session domain snapshot refs",
+            "OPL generated product session domain snapshot refs",
             "OPL generated session shell continuation target",
             "operator loop domain locator refs"
           ],
@@ -13465,7 +13470,7 @@
             "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
           ],
           "activeCallers": [
-            "apply_visual_memory_writeback domain_action_adapter action",
+            "apply_visual_memory_writeback domain handler action",
             "workspace receipt inventory",
             "operator evidence readiness projection"
           ],
@@ -13594,7 +13599,7 @@
             "artifact locator contract",
             "export_pptx route",
             "workspace lifecycle guarded apply",
-            "product domain_action_adapter export"
+            "domain-handler export internal projection"
           ],
           "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
           "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",
@@ -13721,7 +13726,7 @@
             "visual director review",
             "screenshot review",
             "repair_image_pages",
-            "product domain_action_adapter review projection"
+            "domain-handler review projection refs"
           ],
           "activeCallerStatus": "active_domain_review_gate",
           "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",
@@ -13974,7 +13979,7 @@
           "activeCallers": [
             "OPL generated product status/workbench consumes RCA operator evidence refs",
             "product-entry manifest domain projection refs",
-            "product domain_action_adapter export refs-only projection",
+            "domain-handler export refs-only projection",
             "operator evidence readiness tests"
           ],
           "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
@@ -14095,7 +14100,7 @@
             "domain_action_handlers",
             "safe_action_refs"
           ],
-          "rca_scope": "domain_action_adapter_status_action_metadata_projection",
+          "rca_scope": "domain_handler_status_action_metadata_projection",
           "audit_readout": "retain_thin_projection_project_generated_wrappers",
           "codePaths": [
             "apps/redcube-cli/src/cli.ts",
@@ -14108,12 +14113,12 @@
             "redcube CLI direct diagnostic entry",
             "redcube MCP direct protocol adapter",
             "family action catalog refs",
-            "product domain_action_adapter guarded action list refs"
+            "domain-handler guarded action list refs"
           ],
           "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
           "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
           "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
+          "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain handler authority.",
           "tombstone_required": false,
           "migration_class": "domain_handler_target",
           "active_reader_facing_classification": "domain_handler_target",
@@ -14175,7 +14180,8 @@
             "mcp",
             "skill",
             "domain_action_adapter",
-            "domain_action_adapter_export_dispatch",
+            "domain_handler",
+            "domain_handler",
             "family_action_catalog",
             "guarded_action_catalog"
           ],
@@ -14385,8 +14391,8 @@
             "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework"
           ],
           "activeCallers": [
-            "product status",
-            "product domain_action_adapter runtime framework",
+            "product status refs",
+            "domain-handler runtime framework refs",
             "operator evidence readiness projection"
           ],
           "activeCallerStatus": "active_refs_only_consumer_projection",
@@ -14515,11 +14521,11 @@
           ],
           "activeCallers": [
             "product-entry manifest",
-            "product domain_action_adapter export",
-            "product status"
+            "domain-handler export",
+            "OPL generated product status refs"
           ],
           "activeCallerStatus": "declarative_pack_input_active",
-          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.",
+          "migrationAction": "Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.",
           "retentionReason": "RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.",
           "cannotAbsorbReason": "OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.",
           "rca_projection_mode": "declarative_pack_refs_only",
@@ -15116,7 +15122,7 @@
         "review_repair_transport",
         "restart_dead_letter_repair_human_gate_state_chain",
         "native_helper_generic_envelope",
-        "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+        "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
         "family_conflict_envelope_schema",
         "control_loop_summary_builder",
         "usage_projection_aggregator",
@@ -15153,13 +15159,13 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "repo_local_launcher_policy": {
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -15846,7 +15852,7 @@
             "redcube_mcp",
             "invokeProductEntry",
             "invokeDomainEntry",
-            "domain_action_adapter",
+            "domain_handler",
             "product_entry_continuity_refs_adapter"
           ],
           "repo_local_handlers_are_generated_surface_owners": false,
@@ -15916,7 +15922,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "domain_action_adapter_wrapper",
+          "domain_handler_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",
@@ -15937,7 +15943,7 @@
           "redcube_mcp",
           "invokeProductEntry",
           "invokeDomainEntry",
-          "domain_action_adapter",
+          "domain_handler",
           "product_entry_continuity_refs_adapter"
         ],
         "rca_generated_surface_owner": false,
@@ -15995,7 +16001,7 @@
           "domain_handler_owner": "redcube_ai",
           "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
           "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-          "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+          "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
           "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
           "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
           "default_generic_dispatch_owner": "one-person-lab",
@@ -16028,7 +16034,8 @@
           },
           "domain_action_adapter": {
             "owner": "opl",
-            "current_rca_role": "domain_domain_action_adapter_target",
+            "current_rca_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
+            "domain_handler_target": "domain_handler",
             "long_term_rca_owner": false
           },
           "status": {
@@ -16056,7 +16063,7 @@
           "opl_can_generate_cli_wrapper": true,
           "opl_can_generate_mcp_wrapper": true,
           "opl_can_generate_product_entry_wrapper": true,
-          "opl_can_generate_domain_action_adapter_wrapper": true,
+          "opl_can_generate_domain_handler_wrapper": true,
           "opl_can_generate_status_projection": true,
           "opl_can_generate_session_shell": true,
           "opl_can_generate_workbench_shell": true,
@@ -16482,7 +16489,7 @@
           "mcp_wrapper",
           "skill_wrapper",
           "product_entry_wrapper",
-          "domain_action_adapter_wrapper",
+          "domain_handler_wrapper",
           "status_projection_wrapper",
           "session_wrapper",
           "workbench_wrapper",

@@ -370,7 +370,7 @@ async function emitExternalWorkOrderOwnerCloseout(task) {
       external_work_order_owner_closeout_contract_ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
       rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
       operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
-      domain_action_adapter_ref: '/product_entry_shell/domain_action_adapter',
+      domain_handler_ref: '/product_entry_shell/domain_handler',
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
     },
     coverage: {
@@ -606,7 +606,7 @@ export async function dispatchDomainActionAdapter(request) {
   const task = readTaskPayload(request);
   const action = normalizeAction(task);
   if (!GUARDED_ACTIONS.has(action)) {
-    throw new Error(`product domain_action_adapter action 不允许: ${action || '<empty>'}`);
+    throw new Error(`domain-handler action 不允许: ${action || '<empty>'}`);
   }
 
   let result;

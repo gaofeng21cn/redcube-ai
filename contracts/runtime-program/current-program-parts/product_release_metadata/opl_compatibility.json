@@ -4,7 +4,7 @@
   "package_surfaces": [
     "single redcube-ai app skill",
     "service-safe domain entry",
-    "product domain_action_adapter projection",
+    "domain-handler projection backed by internal domain_action_adapter implementation",
     "stage control projection",
     "standard domain-agent skeleton mapping",
     "OPL generic primitive consumer projection",

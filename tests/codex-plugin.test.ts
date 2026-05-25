@@ -31,8 +31,8 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$rca/);
   assert.match(metadataText, /TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit/);
-  assert.match(skillText, /redcube product status/i);
   assert.match(skillText, /redcube product invoke/i);
+  assert.match(skillText, /redcube domain-handler export/i);
   assert.match(skillText, /TypeScript orchestration \+ Python native helpers[\s\S]*已跟踪 JavaScript 已退役[\s\S]*不得把新 agent 工作写成 JavaScript/);
   assert.doesNotMatch(skillText, /\bmanaged runtime\b/i);
   assert.doesNotMatch(skillText, /\bgateway contract\b/i);

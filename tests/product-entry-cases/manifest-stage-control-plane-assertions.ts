@@ -16,7 +16,7 @@ export function assertManifestActionAndStageControlPlane({
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
     repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-    domain_action_adapter_role: 'domain_action_target_or_refs_only_adapter',
+    domain_handler_role: 'domain_handler_target_or_refs_only_adapter',
     generic_session_shell_owner: 'one-person-lab',
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
@@ -32,8 +32,8 @@ export function assertManifestActionAndStageControlPlane({
       'invoke_product_entry',
       'get_product_entry_session',
       'get_product_entry_manifest',
-      'export_domain_action_adapter',
-      'dispatch_domain_action_adapter',
+      'export_domain_handler',
+      'dispatch_domain_handler',
       'run_image_ppt_proof',
       'run_native_ppt_proof',
       'invoke_domain_entry',
@@ -44,21 +44,19 @@ export function assertManifestActionAndStageControlPlane({
       .filter((action) => action.supported_surfaces.skill)
       .map((action) => action.source_command.command),
     [
-      'redcube product status',
       'redcube product invoke',
-      'redcube product session',
       'redcube image-ppt proof',
       'redcube native-ppt proof',
     ],
   );
-  const domain_action_adapterDispatchAction = manifest.family_action_catalog.actions
-    .find((action) => action.action_id === 'dispatch_domain_action_adapter');
+  const domainHandlerDispatchAction = manifest.family_action_catalog.actions
+    .find((action) => action.action_id === 'dispatch_domain_handler');
   assert.deepEqual(
-    domain_action_adapterDispatchAction.authority_boundary.allowed_actions,
+    domainHandlerDispatchAction.authority_boundary.allowed_actions,
     domain_action_adapterGuardedActionMetadata.guardedActionIds,
   );
   assert.deepEqual(
-    domain_action_adapterDispatchAction.authority_boundary.forbidden_writes,
+    domainHandlerDispatchAction.authority_boundary.forbidden_writes,
     domain_action_adapterGuardedActionMetadata.forbiddenWrites,
   );
   assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');

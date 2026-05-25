@@ -20,7 +20,7 @@
     "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
   ],
   "activeCallers": [
-    "redcube product session domain snapshot refs",
+    "OPL generated product session domain snapshot refs",
     "OPL generated session shell continuation target",
     "operator loop domain locator refs"
   ],

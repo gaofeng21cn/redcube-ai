@@ -1,7 +1,7 @@
 {
   "status": "refs_only_consumer_projection_landed",
   "source_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
-  "source_domain_action_adapter_surface": "redcube product domain_action_adapter export#/mapped_surfaces/opl_stability_read_model_consumption",
+  "source_domain_handler_surface": "redcube domain-handler export#/mapped_surfaces/opl_stability_read_model_consumption",
   "contract_ref": "opl.family_operator_stability_read_model.v1",
   "owner": "opl",
   "consumer": "redcube_ai",

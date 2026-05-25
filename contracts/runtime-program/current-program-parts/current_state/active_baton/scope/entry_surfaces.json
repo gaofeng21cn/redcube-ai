@@ -3,7 +3,7 @@
   "invokeOplHostedProductEntry",
   "getProductEntrySession",
   "redcube product invoke",
-  "redcube product domain_action_adapter",
+  "redcube domain-handler export",
   "redcube product session",
   "invoke_product_entry",
   "domain_action_adapter_dispatch",

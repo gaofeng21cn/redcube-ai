@@ -12,13 +12,6 @@ import {
   getDeliverable,
   invokeDomainEntry,
   invokeProductEntry,
-  getProductEntryManifest,
-  getProductEntrySession,
-  getProductStatus,
-  getProductStart,
-  getProductPreflight,
-  exportDomainActionAdapter,
-  dispatchDomainActionAdapter,
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
@@ -32,7 +25,6 @@ import {
   listTopics,
   reviewRenderOutput,
   runDeliverableRoute,
-  runtimeWatch,
   buildRedCubeActionMetadata,
 } from '@redcube/domain-entry';
 import * as z from 'zod/v4';
@@ -47,13 +39,6 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   getOverlayCatalog,
   invokeDomainEntry,
   invokeProductEntry,
-  getProductEntryManifest,
-  getProductEntrySession,
-  getProductStatus,
-  getProductStart,
-  getProductPreflight,
-  exportDomainActionAdapter,
-  dispatchDomainActionAdapter,
   createDeliverable,
   getDeliverable,
   getPublicationProjection,
@@ -68,7 +53,6 @@ export const DEFAULT_DOMAIN_ACTIONS = {
   invokeOplStageExecutionPlan,
   runDeliverableRoute,
   getRun,
-  runtimeWatch,
   getReviewState,
   applyReviewMutation,
 };
@@ -137,7 +121,6 @@ const TOOL_ROUTE_DEFINITIONS = {
       review_render_output: 'reviewRenderOutput',
       get_review_state: 'getReviewState',
       apply_review_mutation: 'applyReviewMutation',
-      runtime_watch: 'runtimeWatch',
     },
   },
   redcube_product_entry: {
@@ -226,7 +209,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_review',
     description: MCP_TOOL_METADATA.get('redcube_review')?.description
-      || 'Grouped deliverable boundary review surface for publication projection, audit, review mutation, and runtime watch actions.',
+      || 'Grouped deliverable boundary review surface for publication projection, audit, and review mutation actions.',
     action_catalog_projection: getMcpToolProjection('redcube_review'),
     inputSchema: {
       action: ACTION_STRING,
@@ -245,7 +228,7 @@ export const TOOL_DEFINITIONS = [
   {
     name: 'redcube_product_entry',
     description: MCP_TOOL_METADATA.get('redcube_product_entry')?.description
-      || 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, domain_action_adapter, and domain-entry actions.',
+      || 'RCA product-entry domain handler target; generated status/session/manifest/domain_action_adapter wrappers are owned by OPL.',
     action_catalog_projection: getMcpToolProjection('redcube_product_entry'),
     inputSchema: {
       action: ACTION_STRING,

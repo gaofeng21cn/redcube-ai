@@ -93,7 +93,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     assert.equal(registration.registration_id, 'rca.opl_runtime_manager.registration.v1');
     assert.equal(registration.domain_id, 'redcube');
     assert.equal(registration.domain_owner, 'redcube_ai');
-    assert.equal(registration.registration_surface.command, 'redcube product manifest');
+    assert.equal(registration.registration_surface.command, 'opl_generated:product_entry_manifest');
     assert.equal(registration.opl_hosted_handoff_surface.action_ref, 'opl_framework:hosted_product_entry');
     assert.equal(registration.state_index_inputs.artifact_projection_index, '/artifact_inventory');
     assert.equal(registration.state_index_inputs.runtime_health_snapshot_index, '/runtime_inventory');
@@ -120,7 +120,7 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     assert.equal(registration.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
     assert.equal(registration.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
     assert.deepEqual(registration.standard_domain_agent_skeleton.runtime_declares_only, [
-      'domain_action_adapter_adapter',
+      'domain_handler_target',
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',

@@ -10,7 +10,7 @@
     "generated_interface_owner": "one-person-lab",
     "repo_local_redcube_cli_role": "domain_handler_target_or_direct_entry_only",
     "repo_local_redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-    "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+    "domain_handler_role": "domain_handler_target_or_refs_only_adapter",
     "generic_session_shell_owner": "one-person-lab",
     "generic_workbench_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",
@@ -21,11 +21,11 @@
     {
       "action_id": "get_product_status",
       "title": "Read RedCube product status",
-      "summary": "读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。",
+      "summary": "读取 OPL generated product-entry overview/status shell 所需的 RCA refs；RCA 不再发布 repo-local product status 默认 wrapper。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product status",
+        "command": "opl_generated:product_status",
         "surface_kind": "product_status"
       },
       "input_schema_ref": "schema:redcube.product_status.request.v1",
@@ -33,21 +33,10 @@
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_status"
-        },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "get_product_status"
-        },
-        "skill": {
-          "surface_kind": "product_status",
-          "command_contract_id": "get_product_status"
-        },
-        "product_entry": {
-          "surface_kind": "product_status",
-          "action_key": "get_product_status"
-        },
+        "cli": null,
+        "mcp": null,
+        "skill": null,
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -56,11 +45,11 @@
     {
       "action_id": "get_product_start",
       "title": "Read RedCube product start surface",
-      "summary": "读取统一的 product-entry start surface，直接查看 overview / direct / OPL-hosted handoff / resume 四类启动方式。",
+      "summary": "读取 OPL generated product-entry start shell 所需的 RCA refs；RCA repo-local public caller 只保留 direct invoke target。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product start",
+        "command": "opl_generated:product_start",
         "surface_kind": "product_entry_start"
       },
       "input_schema_ref": "schema:redcube.product_start.request.v1",
@@ -68,18 +57,10 @@
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_entry_start"
-        },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "get_product_start"
-        },
+        "cli": null,
+        "mcp": null,
         "skill": null,
-        "product_entry": {
-          "surface_kind": "product_entry_start",
-          "action_key": "get_product_start"
-        },
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -88,11 +69,11 @@
     {
       "action_id": "get_product_preflight",
       "title": "Read RedCube product preflight",
-      "summary": "读取当前 direct product-entry overview contract 的开机前真实自检面。",
+      "summary": "读取 OPL generated preflight shell 所需的 RCA workspace/runtime refs；RCA 不持有通用 preflight wrapper owner。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product preflight",
+        "command": "opl_generated:product_preflight",
         "surface_kind": "product_entry_preflight"
       },
       "input_schema_ref": "schema:redcube.product_preflight.request.v1",
@@ -100,18 +81,10 @@
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_entry_preflight"
-        },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "get_product_preflight"
-        },
+        "cli": null,
+        "mcp": null,
         "skill": null,
-        "product_entry": {
-          "surface_kind": "product_entry_preflight",
-          "action_key": "get_product_preflight"
-        },
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -166,7 +139,7 @@
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product session",
+        "command": "opl_generated:product_session",
         "surface_kind": "product_entry_session"
       },
       "input_schema_ref": "schema:redcube.product_entry.session.request.v1",
@@ -176,21 +149,10 @@
       ],
       "human_gate_ids": [],
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_entry_session"
-        },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "get_product_entry_session"
-        },
-        "skill": {
-          "surface_kind": "product_entry_session",
-          "command_contract_id": "get_product_entry_session"
-        },
-        "product_entry": {
-          "surface_kind": "product_entry_session",
-          "action_key": "continue_session"
-        },
+        "cli": null,
+        "mcp": null,
+        "skill": null,
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -204,11 +166,11 @@
     {
       "action_id": "get_product_entry_manifest",
       "title": "Read RedCube product-entry manifest",
-      "summary": "读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / OPL-hosted handoff / session 三个入口面。",
+      "summary": "读取 OPL generated manifest shell 所需的 RCA machine-readable descriptor、domain handler target 与 authority refs。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product manifest",
+        "command": "opl_generated:product_entry_manifest",
         "surface_kind": "product_entry_manifest"
       },
       "input_schema_ref": "schema:redcube.product_entry.manifest.request.v1",
@@ -216,18 +178,10 @@
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
-        "cli": {
-          "surface_kind": "product_entry_manifest"
-        },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "get_product_entry_manifest"
-        },
+        "cli": null,
+        "mcp": null,
         "skill": null,
-        "product_entry": {
-          "surface_kind": "product_entry_manifest",
-          "action_key": "get_product_entry_manifest"
-        },
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -238,32 +192,26 @@
       }
     },
     {
-      "action_id": "export_domain_action_adapter",
-      "title": "Export RedCube product domain_action_adapter adapter",
-      "summary": "导出 RCA product domain_action_adapter adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
+      "action_id": "export_domain_handler",
+      "title": "Export RedCube product domain handler projection",
+      "summary": "导出 RCA OPL standard domain handler refs-only projection，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。",
       "owner": "redcube_ai",
       "effect": "read_only",
       "source_command": {
-        "command": "redcube product domain_action_adapter export",
-        "surface_kind": "domain_action_adapter_export"
+        "command": "redcube domain-handler export",
+        "surface_kind": "product_domain_handler_export"
       },
-      "input_schema_ref": "schema:redcube.domain_action_adapter.export.request.v1",
-      "output_schema_ref": "schema:redcube.domain_action_adapter.export.response.v1",
+      "input_schema_ref": "schema:redcube.domain_handler.export.request.v1",
+      "output_schema_ref": "schema:redcube.domain_handler.export.response.v1",
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
         "cli": {
-          "surface_kind": "domain_action_adapter_export"
+          "surface_kind": "product_domain_handler_export"
         },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "export_domain_action_adapter"
-        },
+        "mcp": null,
         "skill": null,
-        "product_entry": {
-          "surface_kind": "domain_action_adapter_export",
-          "action_key": "export_domain_action_adapter"
-        },
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -271,37 +219,32 @@
         "opl_role": "typed_family_control_plane",
         "provider_role": "stage_attempt_queue_wakeup_transport",
         "generated_surface_owner": "one-person-lab",
-        "rca_role": "domain_action_target_or_refs_only_adapter",
+        "rca_role": "domain_handler_target_or_refs_only_adapter",
+        "internal_implementation_ref": "exportDomainActionAdapter",
         "write_policy": "read_projection_only"
       }
     },
     {
-      "action_id": "dispatch_domain_action_adapter",
-      "title": "Dispatch RedCube product domain_action_adapter guarded action",
-      "summary": "调度 RCA-owned guarded actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA domain_action_adapter 默认派发面暴露。",
+      "action_id": "dispatch_domain_handler",
+      "title": "Dispatch RedCube product domain handler guarded action",
+      "summary": "调度 RCA-owned guarded domain handler actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA handler 默认派发面暴露。",
       "owner": "redcube_ai",
       "effect": "mutating",
       "source_command": {
-        "command": "redcube product domain_action_adapter dispatch",
-        "surface_kind": "domain_action_adapter_dispatch"
+        "command": "redcube domain-handler dispatch",
+        "surface_kind": "product_domain_handler_dispatch"
       },
-      "input_schema_ref": "schema:redcube.domain_action_adapter.dispatch.request.v1",
-      "output_schema_ref": "schema:redcube.domain_action_adapter.dispatch.response.v1",
+      "input_schema_ref": "schema:redcube.domain_handler.dispatch.request.v1",
+      "output_schema_ref": "schema:redcube.domain_handler.dispatch.response.v1",
       "workspace_locator_fields": [],
       "human_gate_ids": [],
       "supported_surfaces": {
         "cli": {
-          "surface_kind": "domain_action_adapter_dispatch"
+          "surface_kind": "product_domain_handler_dispatch"
         },
-        "mcp": {
-          "tool_name": "redcube_product_entry",
-          "action_key": "dispatch_domain_action_adapter"
-        },
+        "mcp": null,
         "skill": null,
-        "product_entry": {
-          "surface_kind": "domain_action_adapter_dispatch",
-          "action_key": "dispatch_domain_action_adapter"
-        },
+        "product_entry": null,
         "openai": null,
         "ai_sdk": null
       },
@@ -324,7 +267,8 @@
         ],
         "default_generic_dispatch_owner": "one-person-lab",
         "default_supervision_owner": "one-person-lab",
-        "rca_role": "guarded_domain_action_target_only"
+        "rca_role": "guarded_domain_handler_target_only",
+        "internal_implementation_ref": "dispatchDomainActionAdapter"
       }
     },
     {

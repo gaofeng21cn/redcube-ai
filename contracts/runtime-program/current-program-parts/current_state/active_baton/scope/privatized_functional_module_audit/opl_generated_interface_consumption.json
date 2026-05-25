@@ -23,13 +23,13 @@
     "redcube_mcp",
     "invokeProductEntry",
     "invokeDomainEntry",
-    "domain_action_adapter",
+    "domain_handler",
     "product_entry_continuity_refs_adapter"
   ],
   "repo_local_launcher_policy": {
     "redcube_cli_role": "domain_handler_target_or_direct_domain_entry_only",
     "redcube_mcp_role": "domain_handler_target_or_direct_protocol_adapter_only",
-    "domain_action_adapter_role": "domain_action_target_or_refs_only_adapter",
+    "domain_handler_role": "domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only",
     "product_entry_continuity_refs_adapter_role": "entry_session_domain_snapshot_refs_only_adapter",
     "cli_mcp_skill_product_status_workbench_metadata_owner": "one-person-lab",
     "default_generic_dispatch_owner": "one-person-lab",

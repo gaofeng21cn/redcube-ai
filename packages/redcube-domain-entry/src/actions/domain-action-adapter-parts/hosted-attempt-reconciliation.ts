@@ -219,13 +219,13 @@ export function buildHostedAttemptBridgeFixture({
     throw new Error(`visual_transition_spec 缺少 transition: ${transitionId}`);
   }
   if (domain_action_adapterVisualTransitionSpec?.ref !== '/visual_transition_spec') {
-    throw new Error('product domain_action_adapter 未映射 /visual_transition_spec');
+    throw new Error('domain-handler internal projection 未映射 /visual_transition_spec');
   }
   if (domain_action_adapterVisualTransitionSpec.spec_id !== visualTransitionSpec.spec_id) {
-    throw new Error('product domain_action_adapter visual_transition_spec spec_id 与 manifest 不一致');
+    throw new Error('domain-handler internal projection visual_transition_spec spec_id 与 manifest 不一致');
   }
   if (domain_action_adapterVisualTransitionSpec.transition_count !== visualTransitionSpec.transition_table.length) {
-    throw new Error('product domain_action_adapter visual_transition_spec transition_count 与 manifest 不一致');
+    throw new Error('domain-handler internal projection visual_transition_spec transition_count 与 manifest 不一致');
   }
   if (transition.owner_action !== 'export_or_return_typed_blocker') {
     throw new Error(`transition ${transitionId} owner_action 不允许: ${transition.owner_action}`);

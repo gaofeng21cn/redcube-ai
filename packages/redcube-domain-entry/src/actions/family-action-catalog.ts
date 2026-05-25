@@ -8,6 +8,9 @@ import {
 import {
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_MANIFEST_COMMAND,
+  PRODUCT_PREFLIGHT_COMMAND,
+  DOMAIN_HANDLER_DISPATCH_COMMAND,
+  DOMAIN_HANDLER_EXPORT_COMMAND,
   PRODUCT_SESSION_COMMAND,
   PRODUCT_START_COMMAND,
   PRODUCT_STATUS_COMMAND,
@@ -19,12 +22,16 @@ import {
 
 type JsonMap = Record<string, any>;
 
-const PRODUCT_PREFLIGHT_COMMAND = 'redcube product preflight';
-const PRODUCT_SIDECAR_EXPORT_COMMAND = 'redcube product domain_action_adapter export';
-const PRODUCT_SIDECAR_DISPATCH_COMMAND = 'redcube product domain_action_adapter dispatch';
 const IMAGE_PPT_PROOF_COMMAND = 'redcube image-ppt proof';
 const NATIVE_PPT_PROOF_COMMAND = 'redcube native-ppt proof';
 const SERVICE_SAFE_DOMAIN_ENTRY_COMMAND = 'redcube service-safe domain entry';
+const RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS = new Set([
+  'get_product_status',
+  'get_product_start',
+  'get_product_preflight',
+  'get_product_entry_session',
+  'get_product_entry_manifest',
+]);
 
 const MCP_TOOLS = [
   {
@@ -45,27 +52,27 @@ const MCP_TOOLS = [
   {
     name: 'redcube_review',
     selector: 'action',
-    description: 'Grouped deliverable boundary review surface for publication projection, audit, review mutation, and runtime watch actions.',
+    description: 'Grouped deliverable boundary review surface for publication projection, audit, and review mutation actions; runtime watch default wrapper is owned by OPL status/workbench/read-model callers.',
   },
   {
     name: 'redcube_product_entry',
     selector: 'action',
-    description: 'Grouped product-entry surface for status, start, preflight, direct, session, manifest, domain_action_adapter, and domain-entry actions. OPL-hosted stage runtime handoff is exposed through framework-side contracts, not a public CLI/MCP action.',
+    description: 'RCA product-entry and domain-handler target. Generated product status/session/manifest/workbench wrappers are owned by OPL.',
   },
 ];
 
 const PROJECTION_METADATA: Record<string, JsonMap> = {
   get_product_status: {
-    cli: help('redcube product status --workspace-root <dir>', 'getProductStatus', ['workspaceRoot'], 'status'),
-    mcp: surface('redcube_product_entry', 'get_product_status', 'getProductStatus'),
+    cli: null,
+    mcp: null,
   },
   get_product_start: {
-    cli: help('redcube product start --workspace-root <dir>', 'getProductStart', ['workspaceRoot']),
-    mcp: surface('redcube_product_entry', 'get_product_start', 'getProductStart'),
+    cli: null,
+    mcp: null,
   },
   get_product_preflight: {
-    cli: help('redcube product preflight --workspace-root <dir>', 'getProductPreflight', ['workspaceRoot']),
-    mcp: surface('redcube_product_entry', 'get_product_preflight', 'getProductPreflight'),
+    cli: null,
+    mcp: null,
   },
   invoke_product_entry: {
     cli: help(
@@ -77,30 +84,30 @@ const PROJECTION_METADATA: Record<string, JsonMap> = {
     mcp: surface('redcube_product_entry', 'invoke_product_entry', 'invokeProductEntry'),
   },
   get_product_entry_session: {
-    cli: help('redcube product session --entry-session-id <id>', 'getProductEntrySession', ['entrySessionId'], 'session'),
-    mcp: surface('redcube_product_entry', 'get_product_entry_session', 'getProductEntrySession'),
+    cli: null,
+    mcp: null,
   },
   get_product_entry_manifest: {
-    cli: help('redcube product manifest --workspace-root <dir>', 'getProductEntryManifest', ['workspaceRoot']),
-    mcp: surface('redcube_product_entry', 'get_product_entry_manifest', 'getProductEntryManifest'),
+    cli: null,
+    mcp: null,
   },
-  export_domain_action_adapter: {
+  export_domain_handler: {
     cli: help(
-      'redcube product domain_action_adapter export --workspace-root <dir> --format json',
-      'exportDomainActionAdapter',
-      ['workspaceRoot'],
-      'domain_action_adapter_export',
+      'redcube domain-handler export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json',
+      'exportDomainHandler',
+      ['workspaceRoot', 'workspaceReceiptScaleoutRoot'],
+      'domain_handler_export',
     ),
-    mcp: surface('redcube_product_entry', 'export_domain_action_adapter', 'exportDomainActionAdapter'),
+    mcp: null,
   },
-  dispatch_domain_action_adapter: {
+  dispatch_domain_handler: {
     cli: help(
-      'redcube product domain_action_adapter dispatch --task <task.json> --format json',
-      'dispatchDomainActionAdapter',
+      'redcube domain-handler dispatch --task <task.json> --format json',
+      'dispatchDomainHandler',
       ['task'],
-      'domain_action_adapter_dispatch',
+      'domain_handler_dispatch',
     ),
-    mcp: surface('redcube_product_entry', 'dispatch_domain_action_adapter', 'dispatchDomainActionAdapter'),
+    mcp: null,
   },
   run_image_ppt_proof: {
     cli: help(
@@ -168,7 +175,8 @@ function action({
     generated_interface_owner: 'one-person-lab',
     domain_handler_owner: 'redcube_ai',
     owner_model: 'opl_generated_descriptor_invokes_rca_domain_handler',
-    repo_local_handler_target_only: true,
+    repo_local_handler_target_only: !RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS.has(actionId),
+    repo_local_default_wrapper_retired: RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS.has(actionId),
     effect,
     source_command: {
       command,
@@ -205,7 +213,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
     repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-    domain_action_adapter_role: 'domain_action_target_or_refs_only_adapter',
+    domain_handler_role: 'domain_handler_target_or_refs_only_adapter',
     generic_session_shell_owner: 'one-person-lab',
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
@@ -216,47 +224,47 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_status',
       title: 'Read RedCube product status',
-      summary: '读取 RedCube agent-facing product-entry overview；`status` 是当前 product overview 命令，用于查看 direct / session 入口、当前主线状态和 OPL-hosted stage runtime handoff 合同。',
+      summary: '读取 OPL generated product-entry overview/status shell 所需的 RCA refs；RCA 不再发布 repo-local product status 默认 wrapper。',
       effect: 'read_only',
       command: PRODUCT_STATUS_COMMAND,
       surfaceKind: 'product_status',
       inputSchemaRef: 'schema:redcube.product_status.request.v1',
       outputSchemaRef: 'schema:redcube.product_status.response.v1',
       supportedSurfaces: {
-        cli: { surface_kind: 'product_status' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_status' },
-        skill: { command_contract_id: 'get_product_status', surface_kind: 'product_status' },
-        product_entry: { action_key: 'get_product_status', surface_kind: 'product_status' },
+        cli: null,
+        mcp: null,
+        skill: null,
+        product_entry: null,
       },
     }),
     action({
       actionId: 'get_product_start',
       title: 'Read RedCube product start surface',
-      summary: '读取统一的 product-entry start surface，直接查看 overview / direct / OPL-hosted handoff / resume 四类启动方式。',
+      summary: '读取 OPL generated product-entry start shell 所需的 RCA refs；RCA repo-local public caller 只保留 direct invoke target。',
       effect: 'read_only',
       command: PRODUCT_START_COMMAND,
       surfaceKind: 'product_entry_start',
       inputSchemaRef: 'schema:redcube.product_start.request.v1',
       outputSchemaRef: 'schema:redcube.product_start.response.v1',
       supportedSurfaces: {
-        cli: { surface_kind: 'product_entry_start' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_start' },
-        product_entry: { action_key: 'get_product_start', surface_kind: 'product_entry_start' },
+        cli: null,
+        mcp: null,
+        product_entry: null,
       },
     }),
     action({
       actionId: 'get_product_preflight',
       title: 'Read RedCube product preflight',
-      summary: '读取当前 direct product-entry overview contract 的开机前真实自检面。',
+      summary: '读取 OPL generated preflight shell 所需的 RCA workspace/runtime refs；RCA 不持有通用 preflight wrapper owner。',
       effect: 'read_only',
       command: PRODUCT_PREFLIGHT_COMMAND,
       surfaceKind: 'product_entry_preflight',
       inputSchemaRef: 'schema:redcube.product_preflight.request.v1',
       outputSchemaRef: 'schema:redcube.product_preflight.response.v1',
       supportedSurfaces: {
-        cli: { surface_kind: 'product_entry_preflight' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_preflight' },
-        product_entry: { action_key: 'get_product_preflight', surface_kind: 'product_entry_preflight' },
+        cli: null,
+        mcp: null,
+        product_entry: null,
       },
     }),
     action({
@@ -288,10 +296,10 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       outputSchemaRef: 'schema:redcube.product_entry.session.response.v1',
       workspaceLocatorFields: ['entry_session_id'],
       supportedSurfaces: {
-        cli: { surface_kind: 'product_entry_session' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_entry_session' },
-        skill: { command_contract_id: 'get_product_entry_session', surface_kind: 'product_entry_session' },
-        product_entry: { action_key: 'continue_session', surface_kind: 'product_entry_session' },
+        cli: null,
+        mcp: null,
+        skill: null,
+        product_entry: null,
       },
       authorityBoundary: {
         generic_session_shell_owner: 'one-person-lab',
@@ -303,16 +311,16 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'get_product_entry_manifest',
       title: 'Read RedCube product-entry manifest',
-      summary: '读取当前 direct product-entry shell 的 machine-readable manifest，并查看 direct / OPL-hosted handoff / session 三个入口面。',
+      summary: '读取 OPL generated manifest shell 所需的 RCA machine-readable descriptor、domain handler target 与 authority refs。',
       effect: 'read_only',
       command: PRODUCT_MANIFEST_COMMAND,
       surfaceKind: 'product_entry_manifest',
       inputSchemaRef: 'schema:redcube.product_entry.manifest.request.v1',
       outputSchemaRef: 'schema:redcube.product_entry.manifest.response.v2',
       supportedSurfaces: {
-        cli: { surface_kind: 'product_entry_manifest' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'get_product_entry_manifest' },
-        product_entry: { action_key: 'get_product_entry_manifest', surface_kind: 'product_entry_manifest' },
+        cli: null,
+        mcp: null,
+        product_entry: null,
       },
       authorityBoundary: {
         manifest_owner: 'redcube_ai',
@@ -321,47 +329,49 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
       },
     }),
     action({
-      actionId: 'export_domain_action_adapter',
-      title: 'Export RedCube product domain_action_adapter adapter',
-      summary: '导出 RCA product domain_action_adapter adapter，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。',
+      actionId: 'export_domain_handler',
+      title: 'Export RedCube product domain handler projection',
+      summary: '导出 RCA OPL standard domain handler refs-only projection，供 OPL typed family queue / configured family runtime provider 索引；不授予 visual truth、review verdict 或 publication gate 写权。',
       effect: 'read_only',
-      command: PRODUCT_SIDECAR_EXPORT_COMMAND,
-      surfaceKind: 'domain_action_adapter_export',
-      inputSchemaRef: 'schema:redcube.domain_action_adapter.export.request.v1',
-      outputSchemaRef: 'schema:redcube.domain_action_adapter.export.response.v1',
+      command: DOMAIN_HANDLER_EXPORT_COMMAND,
+      surfaceKind: 'product_domain_handler_export',
+      inputSchemaRef: 'schema:redcube.domain_handler.export.request.v1',
+      outputSchemaRef: 'schema:redcube.domain_handler.export.response.v1',
       supportedSurfaces: {
-        cli: { surface_kind: 'domain_action_adapter_export' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'export_domain_action_adapter' },
-        product_entry: { action_key: 'export_domain_action_adapter', surface_kind: 'domain_action_adapter_export' },
+        cli: { surface_kind: 'product_domain_handler_export' },
+        mcp: null,
+        product_entry: null,
       },
       authorityBoundary: {
         opl_role: 'typed_family_control_plane',
         provider_role: 'stage_attempt_queue_wakeup_transport',
         generated_surface_owner: 'one-person-lab',
-        rca_role: 'domain_action_target_or_refs_only_adapter',
+        rca_role: 'domain_handler_target_or_refs_only_adapter',
+        internal_implementation_ref: 'exportDomainActionAdapter',
         write_policy: 'read_projection_only',
       },
     }),
     action({
-      actionId: 'dispatch_domain_action_adapter',
-      title: 'Dispatch RedCube product domain_action_adapter guarded action',
-      summary: '调度 RCA-owned guarded actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA domain_action_adapter 默认派发面暴露。',
+      actionId: 'dispatch_domain_handler',
+      title: 'Dispatch RedCube product domain handler guarded action',
+      summary: '调度 RCA-owned guarded domain handler actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA handler 默认派发面暴露。',
       effect: 'mutating',
-      command: PRODUCT_SIDECAR_DISPATCH_COMMAND,
-      surfaceKind: 'domain_action_adapter_dispatch',
-      inputSchemaRef: 'schema:redcube.domain_action_adapter.dispatch.request.v1',
-      outputSchemaRef: 'schema:redcube.domain_action_adapter.dispatch.response.v1',
+      command: DOMAIN_HANDLER_DISPATCH_COMMAND,
+      surfaceKind: 'product_domain_handler_dispatch',
+      inputSchemaRef: 'schema:redcube.domain_handler.dispatch.request.v1',
+      outputSchemaRef: 'schema:redcube.domain_handler.dispatch.response.v1',
       supportedSurfaces: {
-        cli: { surface_kind: 'domain_action_adapter_dispatch' },
-        mcp: { tool_name: 'redcube_product_entry', action_key: 'dispatch_domain_action_adapter' },
-        product_entry: { action_key: 'dispatch_domain_action_adapter', surface_kind: 'domain_action_adapter_dispatch' },
+        cli: { surface_kind: 'product_domain_handler_dispatch' },
+        mcp: null,
+        product_entry: null,
       },
       authorityBoundary: {
         allowed_actions: listDomainActionAdapterGuardedActionIds(),
         forbidden_writes: listDomainActionAdapterForbiddenWrites(),
         default_generic_dispatch_owner: 'one-person-lab',
         default_supervision_owner: 'one-person-lab',
-        rca_role: 'guarded_domain_action_target_only',
+        rca_role: 'guarded_domain_handler_target_only',
+        internal_implementation_ref: 'dispatchDomainActionAdapter',
       },
     }),
     action({
@@ -510,7 +520,7 @@ export function buildRedCubeActionMetadata() {
       'redcube_mcp',
       'invokeProductEntry',
       'invokeDomainEntry',
-      'domain_action_adapter',
+      'domain_handler',
     ],
     family_action_catalog: catalog,
     cli_commands: cliCommands,

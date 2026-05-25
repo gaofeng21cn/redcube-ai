@@ -9,14 +9,12 @@ import type {
   OverlayCatalogResponse,
   ProductEntryRequest,
   ProductEntryResponse,
-  ProductEntrySessionResponse,
   PublicationProjectionResponse,
   ReviewMutationRequest,
   ReviewMutationResponse,
   ReviewStateResponse,
   RouteRunResponse,
   RunRecordResponse,
-  RuntimeWatchResponse,
   SourceAugmentationResponse,
   SourceAugmentationExecutionResponse,
   SourceIntakeResponse,
@@ -61,13 +59,10 @@ export interface CliDomainActions {
   doctorWorkspace(request: { workspaceRoot: string }): Promise<WorkspaceDoctorResponse>;
   listTopics(request: { workspaceRoot: string }): Promise<TopicCatalogResponse>;
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
+  exportDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>>;
+  dispatchDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>>;
   invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
   invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
-  getProductEntrySession(request: {
-    entry_session_id?: string;
-    entrySessionId?: string;
-    workspace_receipt_scaleout_roots?: string[];
-  }): Promise<ProductEntrySessionResponse>;
   runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>>;
   intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
   prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
@@ -78,7 +73,6 @@ export interface CliDomainActions {
   getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<ReviewStateResponse>;
   getRun(request: { workspaceRoot: string; runId: string }): Promise<RunRecordResponse>;
   auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse>;
-  runtimeWatch(request: Record<string, unknown>): Promise<RuntimeWatchResponse>;
   applyReviewMutation(request: ReviewMutationRequest): Promise<ReviewMutationResponse>;
   runDeliverableRoute(request: {
     workspaceRoot: string;
@@ -111,11 +105,9 @@ export type CliRunSurface =
   | DeliverableAuditResponse
   | RouteRunResponse
   | ProductEntryResponse
-  | ProductEntrySessionResponse
   | RunRecordResponse
   | PublicationProjectionResponse
   | ReviewStateResponse
-  | RuntimeWatchResponse
   | ReviewMutationResponse
   | CliPrivateProfileResult
   | Record<string, unknown>;

@@ -98,7 +98,7 @@ const STAGES = [
     title: 'Package and handoff',
     goal: 'Export final files, preview metadata, resume handles, and operator handoff refs.',
     domain_stage_refs: ['export_pptx', 'publish_copy', 'export_bundle', 'export_poster'],
-    allowed_action_refs: ['get_product_entry_session', 'get_product_entry_manifest', 'export_domain_action_adapter'],
+    allowed_action_refs: ['get_product_entry_session', 'get_product_entry_manifest', 'export_domain_handler'],
     requires: ['visual_review_gate_receipt_recorded'],
     ensures: ['export_handoff_receipt_recorded'],
     next_stage_refs: [],

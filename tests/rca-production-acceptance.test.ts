@@ -386,7 +386,7 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
   assert.equal(handoff.projection_ref, 'redcube product manifest#/rca_efficiency_handoff_projection');
   assert.equal(
     handoff.domain_action_adapter_projection_ref,
-    'redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection',
+    'redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection',
   );
   assert.equal(handoff.contract_ref, 'contracts/production_acceptance/rca-efficiency-handoff-projection.json');
   assert.equal(
@@ -396,7 +396,7 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
   assert.equal(handoff.external_work_order_owner_closeout_action, 'emit_external_work_order_owner_closeout');
   assertRefArray(handoff.runtime_consumption_refs, 'efficiency_handoff_projection_refs.runtime_consumption_refs');
   assert.equal(
-    handoff.runtime_consumption_refs.includes('redcube product domain_action_adapter#/mapped_surfaces/external_work_order_owner_closeout'),
+    handoff.runtime_consumption_refs.includes('redcube domain-handler export#/mapped_surfaces/external_work_order_owner_closeout'),
     true,
   );
   assertRefArray(handoff.quality_floor_refs, 'efficiency_handoff_projection_refs.quality_floor_refs');
@@ -406,7 +406,7 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
     'workspace-runtime-ref:review-export:<run-id>',
     'workspace-runtime-ref:export-result:<run-id>',
     'target-verification:redcube-ai/product-manifest-read',
-    'target-verification:redcube-ai/domain-action-adapter-export-read',
+    'target-verification:redcube-ai/domain-handler-export-read',
     'target-verification:redcube-ai/typecheck',
     'target-verification:redcube-ai/test-fast',
     'target-verification:redcube-ai/targeted-efficiency-tests',

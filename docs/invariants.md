@@ -36,7 +36,7 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 
 ## Legacy 退役与 forbidden surface
 
-- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境；active surface 必须以 direct route / service-safe domain entry / product domain_action_adapter / stage descriptor / OPL-hosted handoff parity 为准。
+- 旧 `external Hermes-Agent runtime substrate` route wording、历史 `OPL Gateway` 文件名、repo-local managed runtime pilot、`status` command key 与旧 bridge wording 只能作为 migration provenance、internal integration contract 或 tombstone 语境；active surface 必须以 direct route / service-safe domain entry / RCA domain handler target / OPL-generated `domain_action_adapter` descriptor / stage descriptor / OPL-hosted handoff parity 为准。
 - 已物理删除的旧 repo-local deliverable runner、run store、DAG scheduler、managed helper/types 和 public managed action handler 不得以兼容别名、diagnostic fixture 或 standard domain_action_adapter template 名义恢复。
 - 已退役的 active 接口不保留兼容别名：`REDCUBE_WORKBENCH_ROOT`、standalone upstream Hermes probe script、`GatewayActionMap` / `getCliGatewayActions`、`callGatewayTool` / `listGatewayTools` / `GatewayTool*`、`source_workbench*`、retired public entry / federation / product frontdesk / source-pack-federation 等旧入口不得重新进入源码、测试、contracts 或 package surface。
 - 若历史合同名仍带 `managed`，只能按 provenance / semantic-id 迁移处理，不能解释成 active runtime owner。仍被合同引用的旧文档只能作为 provenance 原位保留。

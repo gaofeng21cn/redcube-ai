@@ -152,10 +152,10 @@ export function buildManifestExtraPayload({
         },
         {
           file_id: 'domain_action_adapter_receipt_refs',
-          label: 'RCA product domain_action_adapter receipt refs',
+          label: 'RCA domain-handler receipt refs',
           kind: 'supporting',
           path: '/domain_action_adapter_receipt_refs',
-          summary: 'RCA-owned domain_action_adapter receipt refs; OPL may index refs but cannot issue owner receipts.',
+          summary: 'RCA-owned domain-handler receipt refs backed by internal domain_action_adapter implementation; OPL may index refs but cannot issue owner receipts.',
           ref: { ref_kind: 'json_pointer', ref: '/domain_action_adapter_receipt_refs' },
         },
       ],

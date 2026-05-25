@@ -150,13 +150,13 @@ test('CLI product-entry and proof command help is projected from family action m
   }
 });
 
-test('CLI product domain_action_adapter subcommand help uses family action metadata at runtime', async () => {
+test('CLI domain-handler subcommand help uses family action metadata at runtime', async () => {
   for (const [argv, actionId] of [
-    [['product', 'domain_action_adapter', 'export', '--help'], 'export_domain_action_adapter'],
-    [['product', 'domain_action_adapter', 'dispatch', '--help'], 'dispatch_domain_action_adapter'],
+    [['domain-handler', 'export', '--help'], 'export_domain_handler'],
+    [['domain-handler', 'dispatch', '--help'], 'dispatch_domain_handler'],
   ]) {
     const help = await executeCli(argv);
-    const commandKey = argv.slice(0, 3).join(' ');
+    const commandKey = argv.slice(0, 2).join(' ');
     const catalogHelp = buildCommandHelp(commandKey);
 
     assert.equal(help.surface_kind, 'command_help');

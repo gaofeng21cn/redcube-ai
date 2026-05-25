@@ -153,7 +153,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime', 'session', 'domain_action_adapter'],
       allowed_as: ['service_safe_domain_entry', 'domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
-      rationale: 'CLI help and dispatch expose current OPL runtime/session/domain action adapter refs; RCA remains a direct domain entry adapter and cannot own generated wrappers or generic runtime/session shells.',
+      rationale: 'CLI help and dispatch expose current OPL runtime/session/domain-handler refs; RCA remains a direct domain entry adapter and cannot own generated wrappers or generic runtime/session shells.',
     }),
   },
   {
@@ -167,7 +167,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     allowed_outputs: [
       'typed_domain_action_exports',
       'product_entry_protocol_exports',
-      'domain_action_adapter_protocol_exports',
+      'domain_handler_protocol_exports',
       'pack_contract_builder_exports',
     ],
   },

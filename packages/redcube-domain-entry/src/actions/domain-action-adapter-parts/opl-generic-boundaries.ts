@@ -34,7 +34,7 @@ export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
   'review_repair_transport',
   'restart_dead_letter_repair_human_gate_state_chain',
   'native_helper_generic_envelope',
-  'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+  'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
 ]);
 
 export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
@@ -54,7 +54,7 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
     'product_entry',
     'product_status',
     'product_session',
-    'domain_action_adapter',
+    'domain_handler',
     'workbench',
   ],
   repo_local_handler_targets: [
@@ -62,13 +62,13 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
     'redcube_mcp',
     'invokeProductEntry',
     'invokeDomainEntry',
-    'domain_action_adapter',
+    'domain_handler',
     'product_entry_continuity_refs_adapter',
   ],
   repo_local_launcher_policy: {
     redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
     redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-    domain_action_adapter_role: 'domain_action_target_or_refs_only_adapter',
+    domain_handler_role: 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
     product_entry_continuity_refs_adapter_role: 'entry_session_domain_snapshot_refs_only_adapter',
     cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
@@ -281,7 +281,7 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
     rca_thin_program_surfaces: [
       'single redcube-ai app skill',
       'service-safe domain entry',
-      'product domain_action_adapter projection',
+      'domain-handler projection backed by internal domain_action_adapter implementation',
       'stage control projection',
       'visual transition spec',
       'artifact locator refs',
@@ -327,7 +327,7 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
         domain_action_adapter_ref: '/mapped_surfaces/native_helper_implementation',
       },
       {
-        primitive: 'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+        primitive: 'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
         contract_ref: 'rca.visual_pack_compiler_handoff.v1',
         manifest_ref: '/visual_pack_compiler_handoff/generated_surface_handoff',
         domain_action_adapter_ref: '/mapped_surfaces/visual_pack_compiler_handoff',
@@ -354,7 +354,7 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
       rca_review_repair_transport_owner: false,
       rca_restart_dead_letter_repair_human_gate_state_chain_owner: false,
       rca_native_helper_generic_envelope_owner: false,
-      rca_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper_owner: false,
+      rca_cli_mcp_product_entry_domain_handler_status_session_workbench_wrapper_owner: false,
     },
   };
 }

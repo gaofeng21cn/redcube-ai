@@ -18,7 +18,7 @@
   "callable_surface": {
     "action_ref": "opl_framework:hosted_product_entry",
     "api_surface": "invokeOplHostedProductEntry",
-    "domain_action_adapter_dispatch": "redcube product domain_action_adapter dispatch"
+    "domain_handler_dispatch": "redcube domain-handler dispatch"
   },
   "hosted_handoff_contract": {
     "target_domain_id": "redcube_ai",

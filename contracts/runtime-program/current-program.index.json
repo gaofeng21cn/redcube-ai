@@ -352,7 +352,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0007.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 137
+      "line_count": 138
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/8",
@@ -562,7 +562,7 @@
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 166
+      "line_count": 167
     },
     {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -856,7 +856,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0007.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 137
+      "line_count": 138
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/8",
@@ -1036,7 +1036,7 @@
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 166
+      "line_count": 167
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -1300,7 +1300,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0007.json",
       "role": "current_program_leaf_source",
-      "line_count": 137
+      "line_count": 138
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/8",
@@ -1600,7 +1600,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0007.json",
       "role": "current_program_leaf_source",
-      "line_count": 137
+      "line_count": 138
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/8",
@@ -1756,7 +1756,7 @@
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "current_program_leaf_source",
-      "line_count": 166
+      "line_count": 167
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff_ref",

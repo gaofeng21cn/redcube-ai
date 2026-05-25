@@ -4,7 +4,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { SERIAL_ENV_TEST, assert, getProductEntryManifest, exportDomainActionAdapter, dispatchDomainActionAdapter, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
 
-test('product domain_action_adapter receipt actions emit refs-only workspace proof without promoting visual readiness', SERIAL_ENV_TEST, async () => {
+test('domain-handler receipt actions emit refs-only workspace proof without promoting visual readiness', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 

@@ -66,26 +66,26 @@ export function buildReturnedManifestProjection({
     },
     product_entry_shell: {
       ...manifest.product_entry_shell,
-      domain_action_adapter: productEntryShell.domain_action_adapter,
       native_ppt_proof: productEntryShell.native_ppt_proof,
       image_ppt_proof: productEntryShell.image_ppt_proof,
+      domain_handler: productEntryShell.domain_handler,
     },
     operator_loop_actions: {
       ...manifest.operator_loop_actions,
-      export_domain_action_adapter: {
-        command: 'redcube product domain_action_adapter export',
-        surface_kind: 'domain_action_adapter_export',
-        summary: 'Export the RCA product domain_action_adapter adapter for OPL family runtime provider control-plane indexing.',
-        requires: ['workspace_root'],
-      },
-      dispatch_domain_action_adapter: {
-        command: 'redcube product domain_action_adapter dispatch',
-        surface_kind: 'domain_action_adapter_dispatch',
-        summary: 'Dispatch RCA-owned guarded domain_action_adapter actions only.',
-        requires: ['task'],
-      },
       run_native_ppt_proof: operatorLoopActions.run_native_ppt_proof,
       run_image_ppt_proof: operatorLoopActions.run_image_ppt_proof,
+    },
+    opl_generated_public_wrappers: {
+      surface_kind: 'opl_generated_public_wrapper_refs',
+      owner: 'one-person-lab',
+      domain_handler_owner: 'redcube_ai',
+      repo_local_default_wrapper_retired: true,
+      compatibility_alias_allowed: false,
+      wrappers: {
+        status: productEntryShell.status,
+        session: productEntryShell.session,
+      },
+      domain_handler_target: productEntryShell.domain_handler,
     },
     skill_catalog: {
       ...manifest.skill_catalog,

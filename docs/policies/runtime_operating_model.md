@@ -159,7 +159,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
   - `xiaohongshu`
   - `poster_onepager`（当前只代表 knowledge poster，不代表 academic poster closeout）
 - 新交付物类型应通过 overlay 扩展，而不是重新引入独立主线
-- 新入口应通过 product/domain action、service-safe domain entry、product domain_action_adapter 或 RCA-owned route/gate 接入；不得恢复 Gateway / retired public entry / federation alias 或在外面包一层平行系统
+- 新入口应通过 product/domain action、service-safe domain entry、RCA domain handler target、OPL-generated descriptor 或 RCA-owned route/gate 接入；不得恢复 Gateway / retired public entry / federation alias 或在外面包一层平行系统
 - 新的质量规则应进入 contract / gate / policy，而不是依赖 prompt 补救
 - 在 `OPL` 顶层语义里，`RedCube AI` 是独立 visual-deliverable domain agent，不是 `OPL` 顶层 gateway 的替代物
 - 不允许把 deterministic code authorship 重新包装成 `pack-first` 或 `typed` 进展

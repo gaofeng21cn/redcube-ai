@@ -12,11 +12,6 @@ import {
   getRun as getDomainEntryRun,
   invokeDomainEntry,
   invokeProductEntry,
-  getProductStatus,
-  getProductEntryManifest,
-  getProductStart,
-  getProductPreflight,
-  getProductEntrySession,
   buildPerformanceReport,
   intakeSource,
   researchSource,
@@ -25,7 +20,6 @@ import {
   writeSourceAugmentationResult,
   executeSourceAugmentation,
   listTopics as listTopicsDomainEntry,
-  runtimeWatch,
   runDeliverableRoute,
 } from '@redcube/domain-entry';
 
@@ -46,21 +40,16 @@ const DEFAULT_DOMAIN_ACTIONS = {
   getPublicationProjection,
   getReviewState,
   getRun: getDomainEntryRun,
+  exportDomainHandler: async (request: Record<string, unknown>) => {
+    const domainEntry = await import('@redcube/domain-entry');
+    return (domainEntry as Record<string, any>).exportDomainHandler(request);
+  },
+  dispatchDomainHandler: async (request: Record<string, unknown>) => {
+    const domainEntry = await import('@redcube/domain-entry');
+    return (domainEntry as Record<string, any>).dispatchDomainHandler(request);
+  },
   invokeDomainEntry,
   invokeProductEntry,
-  getProductStatus,
-  getProductEntryManifest,
-  getProductStart,
-  getProductPreflight,
-  getProductEntrySession,
-  exportDomainActionAdapter: async (request: Record<string, unknown>) => {
-    const domainEntry = await import('@redcube/domain-entry');
-    return (domainEntry as Record<string, any>).exportDomainActionAdapter(request);
-  },
-  dispatchDomainActionAdapter: async (request: Record<string, unknown>) => {
-    const domainEntry = await import('@redcube/domain-entry');
-    return (domainEntry as Record<string, any>).dispatchDomainActionAdapter(request);
-  },
   runNativePptProductEntryProof: async (request: Record<string, unknown>) => {
     const domainEntry = await import('@redcube/domain-entry');
     return (domainEntry as Record<string, any>).runNativePptProductEntryProof(request);
@@ -73,7 +62,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
   writeSourceAugmentationResult,
   executeSourceAugmentation,
   listTopics: listTopicsDomainEntry,
-  runtimeWatch,
   runDeliverableRoute,
 };
 
@@ -102,17 +90,6 @@ function workspaceReceiptScaleoutRoots(options: JsonMap): string[] {
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
-}
-
-function productReadRequest(options: JsonMap, cwd: () => string): JsonMap {
-  const scaleoutRoots = workspaceReceiptScaleoutRoots(options);
-  const request: JsonMap = {
-    workspace_root: resolveWorkspaceRoot(options, cwd),
-  };
-  if (scaleoutRoots.length > 0) {
-    request.workspace_receipt_scaleout_roots = scaleoutRoots;
-  }
-  return request;
 }
 
 function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap {
@@ -165,7 +142,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (options.help === true) {
     const commandHelp = buildCommandHelp(
-      command === 'product' && subcommand === 'domain_action_adapter'
+      command === 'domain-handler'
         ? [command, subcommand, rest[1]].filter(Boolean).join(' ')
         : [command, subcommand].filter(Boolean).join(' '),
     );
@@ -329,22 +306,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   }
 
   if (command === 'product') {
-    if (subcommand === 'status') {
-      return domainEntry.getProductStatus(productReadRequest(options, cwd));
-    }
-
-    if (subcommand === 'start') {
-      return domainEntry.getProductStart({
-        workspace_root: resolveWorkspaceRoot(options, cwd),
-      });
-    }
-
-    if (subcommand === 'preflight') {
-      return domainEntry.getProductPreflight({
-        workspace_root: resolveWorkspaceRoot(options, cwd),
-      });
-    }
-
     if (subcommand === 'invoke') {
       return domainEntry.invokeProductEntry({
         workspace_locator: {
@@ -372,41 +333,30 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    if (subcommand === 'session') {
-      const request: JsonMap = {
-        entry_session_id: options.entrySessionId || '',
-      };
+    throw new Error('product 命令仅保留 invoke domain handler target；status/session/manifest/domain_action_adapter 等 generated/default wrapper 由 OPL 持有');
+  }
+
+  if (command === 'domain-handler') {
+    if (subcommand === 'export') {
       const scaleoutRoots = workspaceReceiptScaleoutRoots(options);
+      const request: JsonMap = {
+        workspace_root: resolveWorkspaceRoot(options, cwd),
+        format: options.format || 'json',
+      };
       if (scaleoutRoots.length > 0) {
         request.workspace_receipt_scaleout_roots = scaleoutRoots;
       }
-      return domainEntry.getProductEntrySession(request);
+      return domainEntry.exportDomainHandler(request);
     }
 
-    if (subcommand === 'manifest') {
-      return domainEntry.getProductEntryManifest(productReadRequest(options, cwd));
+    if (subcommand === 'dispatch') {
+      return domainEntry.dispatchDomainHandler({
+        task_file: options.task || options.taskFile || '',
+        format: options.format || 'json',
+      });
     }
 
-    if (subcommand === 'domain_action_adapter') {
-      const domain_action_adapterAction = rest[1];
-      if (domain_action_adapterAction === 'export') {
-        return domainEntry.exportDomainActionAdapter({
-          ...productReadRequest(options, cwd),
-          format: options.format || 'json',
-        });
-      }
-
-      if (domain_action_adapterAction === 'dispatch') {
-        return domainEntry.dispatchDomainActionAdapter({
-          task_file: options.task || options.taskFile || '',
-          format: options.format || 'json',
-        });
-      }
-
-      throw new Error('product domain_action_adapter 命令仅支持 export|dispatch');
-    }
-
-    throw new Error('product 命令支持 status|start|preflight|invoke|session|manifest|domain_action_adapter；OPL-hosted stage runtime handoff 由 product domain_action_adapter 或 framework caller 调用');
+    throw new Error('domain-handler 命令仅支持 export|dispatch');
   }
 
   if (command === 'native-ppt') {
@@ -450,15 +400,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    if (subcommand === 'watch') {
-      return domainEntry.runtimeWatch({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        topicId: options.topicId || '',
-        deliverableId: options.deliverableId || '',
-        runId: options.runId || '',
-      });
-    }
-
     if (subcommand === 'mutate') {
       const issues = String(options.issues || '').trim();
       return domainEntry.applyReviewMutation({
@@ -477,7 +418,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       });
     }
 
-    throw new Error('review 命令仅支持 get|projection|watch|mutate');
+    throw new Error('review 命令仅支持 get|projection|mutate；runtimeWatch default wrapper 由 OPL status/workbench/read-model caller 持有');
   }
 
   if (command === 'runs') {

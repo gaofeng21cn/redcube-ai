@@ -180,7 +180,7 @@ export function buildNoRegressionOwnerReceiptOplConsumptionProof() {
       repo_tracks_production_soak_result: false,
     },
     source_refs: [
-      '/product_entry_shell/domain_action_adapter',
+      '/product_entry_shell/domain_handler',
       '/controlled_soak_no_regression_attempt',
       '/domain_owner_receipt_contract',
       '/controlled_memory_apply_proof/forbidden_write_audit',

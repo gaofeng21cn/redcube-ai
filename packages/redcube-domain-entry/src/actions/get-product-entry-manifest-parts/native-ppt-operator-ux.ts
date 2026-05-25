@@ -119,7 +119,7 @@ export function buildNativePptOperatorUx({
           check_id: 'product_entry_preflight',
           status: productEntryPreflight?.ready_to_try_now === true ? 'pass' : 'fail',
           blocking: true,
-          command: `redcube product preflight --workspace-root ${workspaceRoot}`,
+          command: `opl_generated:product_preflight --workspace-root ${workspaceRoot}`,
           blocked_reason: productEntryPreflight?.ready_to_try_now === true
             ? null
             : 'product_entry_preflight_not_ready',

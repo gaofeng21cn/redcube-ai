@@ -16,7 +16,7 @@ import {
   withOperation,
 } from '../product-domain-action-case-shared.ts';
 
-test('callDomainTool delegates product-entry product/domain actions', async () => {
+test('callDomainTool keeps product-entry MCP limited to direct domain entry targets', async () => {
   const direct = await callDomainTool(
     'redcube_product_entry',
     withAction('invoke_product_entry', {
@@ -53,126 +53,22 @@ test('callDomainTool delegates product-entry product/domain actions', async () =
       }),
     },
   );
-  const domain_action_adapterReceipt = await callDomainTool(
-    'redcube_product_entry',
-    withAction('dispatch_domain_action_adapter', {
-      task: {
-        action: 'notification_receipt',
-        workspace_locator: { workspace_root: '/tmp/redcube-workspace' },
-        notification_id: 'notice-a',
-      },
-    }),
-    {
-      dispatchDomainActionAdapter: async (request) => ({
-        ok: true,
-        surface_kind: 'domain_action_adapter_dispatch',
-        action: request.task.action,
-        domain_action_adapter_policy: {
-          writes_visual_truth: false,
-        },
-        result_surface: {
-          ok: true,
-          surface_kind: 'notification_receipt',
-          notification_id: request.task.notification_id,
-          receipt_status: 'acknowledged',
-        },
-      }),
-    },
-  );
-  const session = await callDomainTool(
-    'redcube_product_entry',
-    withAction('get_product_entry_session', {
-      entry_session_id: 'session-a',
-    }),
-    {
-      getProductEntrySession: async (request) => ({
-        ok: true,
-        surface_kind: 'product_entry_session',
-        entry_session: {
-          entry_session_id: request.entry_session_id,
-        },
-        family_orchestration: {
-          action_graph_ref: {
-            ref_kind: 'json_pointer',
-            ref: '/family_orchestration/action_graph',
-          },
-          action_graph: {
-            graph_id: 'redcube_product_entry_overview_graph',
-          },
-          human_gates: [{ gate_id: 'redcube_operator_review_gate' }],
-          resume_contract: {
-            surface_kind: 'product_entry_session',
-            session_locator_field: 'entry_session.entry_session_id',
-          },
-        },
-      }),
-    },
-  );
-  const status = await callDomainTool(
-    'redcube_product_entry',
-    withAction('get_product_status', {
-      workspaceRoot: '/tmp/redcube-workspace',
-    }),
-    {
-      getProductStatus: async (request) => ({
-        ok: true,
-        surface_kind: 'product_status',
-        entry_status_surface: {
-          command: 'redcube product status',
-          workspace_root: request.workspaceRoot,
-        },
-      }),
-    },
-  );
-  const start = await callDomainTool(
-    'redcube_product_entry',
-    withAction('get_product_start', {
-      workspaceRoot: '/tmp/redcube-workspace',
-    }),
-    {
-      getProductStart: async (request) => ({
-        ok: true,
-        surface_kind: 'product_entry_start',
-        workspace_locator: {
-          workspace_root: request.workspaceRoot,
-        },
-      }),
-    },
-  );
-  const preflight = await callDomainTool(
-    'redcube_product_entry',
-    withAction('get_product_preflight', {
-      workspaceRoot: '/tmp/redcube-workspace',
-    }),
-    {
-      getProductPreflight: async (request) => ({
-        ok: true,
-        surface_kind: 'product_entry_preflight',
-        workspace_locator: {
-          workspace_root: request.workspaceRoot,
-        },
-      }),
-    },
-  );
-
   assert.equal(direct.surface_kind, 'product_entry');
   assert.equal(direct.entry_session.entry_session_id, 'session-a');
   assert.equal(direct.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
   assert.equal(direct.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-  assert.equal(domain_action_adapterReceipt.surface_kind, 'domain_action_adapter_dispatch');
-  assert.equal(domain_action_adapterReceipt.action, 'notification_receipt');
-  assert.equal(domain_action_adapterReceipt.domain_action_adapter_policy.writes_visual_truth, false);
-  assert.equal(domain_action_adapterReceipt.result_surface.surface_kind, 'notification_receipt');
-  assert.equal(domain_action_adapterReceipt.result_surface.notification_id, 'notice-a');
-  assert.equal(session.surface_kind, 'product_entry_session');
-  assert.equal(session.entry_session.entry_session_id, 'session-a');
-  assert.equal(session.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-  assert.equal(status.surface_kind, 'product_status');
-  assert.equal(status.entry_status_surface.command, 'redcube product status');
-  assert.equal(start.surface_kind, 'product_entry_start');
-  assert.equal(start.workspace_locator.workspace_root, '/tmp/redcube-workspace');
-  assert.equal(preflight.surface_kind, 'product_entry_preflight');
-  assert.equal(preflight.workspace_locator.workspace_root, '/tmp/redcube-workspace');
+  for (const action of [
+    'dispatch_domain_action_adapter',
+    'get_product_entry_session',
+    'get_product_status',
+    'get_product_start',
+    'get_product_preflight',
+  ]) {
+    await assert.rejects(
+      () => callDomainTool('redcube_product_entry', withAction(action, {}), {}),
+      new RegExp(`Unsupported redcube_product_entry action: ${action}`),
+    );
+  }
 });
 
 test('callDomainTool can return normalized discovery surfaces for doctor and topic catalog', async () => {
@@ -370,7 +266,7 @@ test('callDomainTool can return operator-facing quality summary surfaces', async
   assert.equal(result.surface_kind, 'review_state');
 });
 
-test('listDomainTools descriptions mention quality-facing runtime watch and review mutation surfaces', () => {
+test('listDomainTools descriptions keep review mutation and product-entry domain-handler ownership visible', () => {
   const tools = listDomainTools();
   const reviewTool = tools.find((tool) => tool.name === 'redcube_review');
   const deliverableTool = tools.find((tool) => tool.name === 'redcube_deliverable');
@@ -379,9 +275,10 @@ test('listDomainTools descriptions mention quality-facing runtime watch and revi
   const productEntryTool = tools.find((tool) => tool.name === 'redcube_product_entry');
 
   assert.match(reviewTool.description, /mutation/i);
-  assert.match(reviewTool.description, /runtime watch/i);
+  assert.match(reviewTool.description, /runtime watch default wrapper is owned by OPL/i);
   assert.match(deliverableTool.description, /route/i);
   assert.match(sourcesTool.description, /augmentation/i);
   assert.match(workspaceTool.description, /topic/i);
-  assert.match(productEntryTool.description, /OPL-hosted.*handoff/i);
+  assert.match(productEntryTool.description, /domain-handler target/i);
+  assert.match(productEntryTool.description, /wrappers are owned by OPL/i);
 });

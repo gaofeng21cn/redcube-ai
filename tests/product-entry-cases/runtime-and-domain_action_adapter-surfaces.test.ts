@@ -2,7 +2,7 @@
 import { SERIAL_ENV_TEST, assert, getDomainActionAdapterGuardedActionMetadata, exportDomainActionAdapter, dispatchDomainActionAdapter, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
 
-test('product domain_action_adapter export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
+test('domain-handler export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -270,7 +270,7 @@ test('product domain_action_adapter export and dispatch preserve RCA authority w
         'review_repair_transport',
         'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
-        'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+        'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
       ],
     );
     assert.equal(
@@ -593,7 +593,7 @@ test('product domain_action_adapter export and dispatch preserve RCA authority w
         'mcp_wrapper',
         'skill_wrapper',
         'product_entry_wrapper',
-        'domain_action_adapter_wrapper',
+        'domain_handler_wrapper',
         'status_projection_wrapper',
         'session_wrapper',
         'workbench_wrapper',
@@ -609,7 +609,7 @@ test('product domain_action_adapter export and dispatch preserve RCA authority w
         'product_entry',
         'product_status',
         'product_session',
-        'domain_action_adapter',
+        'domain_handler',
         'workbench',
       ],
     );
@@ -888,7 +888,7 @@ test('product domain_action_adapter export and dispatch preserve RCA authority w
             ...retiredAction,
           },
         }),
-        new RegExp(`product domain_action_adapter action 不允许: ${retiredAction.action}`),
+        new RegExp(`domain-handler action 不允许: ${retiredAction.action}`),
       );
     }
 
@@ -899,7 +899,7 @@ test('product domain_action_adapter export and dispatch preserve RCA authority w
           workspace_root: workspaceRoot,
         },
       }),
-      /product domain_action_adapter action 不允许/,
+      /domain-handler action 不允许/,
     );
   });
 });

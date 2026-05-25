@@ -24,22 +24,21 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。这个 launcher 只用于命中 RCA domain handler / direct domain entry；不要把它写成 CLI/MCP/Skill/product/status/session/workbench metadata owner，也不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
 
-- `npm run --prefix <redcube-ai-repo> redcube -- product manifest --workspace-root <dir>`
-- `npm run --prefix <redcube-ai-repo> redcube -- product status --workspace-root <dir>`
 - `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
-- `npm run --prefix <redcube-ai-repo> redcube -- product session --entry-session-id <entry-session-id>`
+- `npm run --prefix <redcube-ai-repo> redcube -- domain-handler export --workspace-root <dir> --format json`
+- `npm run --prefix <redcube-ai-repo> redcube -- domain-handler dispatch --task <task.json> --format json`
 
-`product manifest` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、direct diagnostic entry 和 visual authority functions。
+`domain-handler export` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、direct diagnostic entry 和 visual authority functions。
 
-`redcube product status` 是当前 product overview 命令；语义是读取 agent-facing product-entry overview / intake / entry-shell contract，不表示 GUI、WebUI 或最终用户前台壳。
+`opl_generated:product_status` / `opl_generated:product_session` 是 OPL generated wrapper refs，不是 RCA repo-local 默认命令。需要在 RCA worktree 里直接命中当前 active handler target 时，使用 `redcube product invoke` 或 `redcube domain-handler export|dispatch`。
 
-默认先读取 status/manifest，再根据已知标识走 direct invoke 或 session continuation；OPL-hosted handoff 通过 `invokeOplHostedProductEntry` / product domain_action_adapter 进入同一 downstream RedCube product-entry contract，不作为第二个公开 skill。
+默认先读取 OPL generated descriptor refs 或 `domain-handler export`，再根据已知标识走 direct invoke。OPL-hosted handoff 通过 `invokeOplHostedProductEntry` / domain handler target 进入同一 downstream RedCube product-entry contract，不作为第二个公开 skill。
 
 默认交付运行方式：
 
 - 对于不需要人工中途审阅的新交付，使用一次 `redcube product invoke`，不指定 `route`、不指定 `stop_after_stage`，让 RCA service-safe product-entry loop 按 `auto_to_terminal` 自主推进到 review/export gate。
 - 只有在用户明确要求先审阅计划、批准后继续、定点回修、重跑某个 stage，或 product-entry gate 已给出明确 `rerun_from_stage` 时，才使用 route-level invoke，例如 `--route repair_image_pages`。
-- `redcube product session` 是 entry-session domain snapshot refs adapter；generic session shell、resume/workbench navigation 与默认 product/session wrapper 归 OPL generated surface，不应被当成外层 Codex 逐 stage 手工创作的替代品。
+- entry-session domain snapshot refs 由 OPL generated session shell 消费；generic session shell、resume/workbench navigation 与默认 product/session wrapper 归 OPL generated surface，不应被当成外层 Codex 逐 stage 手工创作的替代品。
 
 ## Domain 执行护栏
 
@@ -68,12 +67,12 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 当用户要求 RCA / RedCube AI 制作较长 PPT、资料较多的 deck、或任何容易超过单轮 prompt 的 visual deliverable 时，不要把完整任务压成一个巨大 prompt 直接生成。默认采用同一 `entry_session_id` 下的可恢复阶段流：
 
-1. `source/material intake`：用 status / manifest 读取 workspace、资料包、缺口与交付目标；这里的 status 是 product-entry overview / intake shell，不是 GUI 前台，随后冻结 source package 和 missing materials。
+1. `source/material intake`：用 OPL generated descriptor refs 或 `domain-handler export` 读取 workspace、资料包、缺口与交付目标；这里的 status/session shell 归 OPL，不是 RCA repo-local 默认命令或 GUI 前台，随后冻结 source package 和 missing materials。
 2. `plan`：在 product-entry session 内生成 storyline、outline、slide blueprint 或执行计划，并把阶段产物写入同一 deliverable loop。
-3. `deliverable`：按 plan 继续生成 PPT artifacts；长运行中用 session surface 读取 progress / artifact inventory，而不是重新开一轮 prompt-only 任务。
+3. `deliverable`：按 plan 继续生成 PPT artifacts；长运行中用 OPL generated session surface 读取 progress / artifact inventory，而不是重新开一轮 prompt-only 任务。
 4. `review`：通过 review state、publication projection 与 operator review gate 判断是否需要从明确 stage rerun。
 
-每一阶段都要保留 `entry_session_id`、`topic_id`、`deliverable_id`，并优先用 `redcube product session --entry-session-id <entry-session-id>` 恢复、检查进度和拾取 artifact。
+每一阶段都要保留 `entry_session_id`、`topic_id`、`deliverable_id`，并优先通过 OPL generated session surface 恢复、检查进度和拾取 artifact。
 这套可恢复阶段流是 RCA product-entry loop 的断点与治理模型；如果没有显式人工审阅或 product-entry 阻塞，外层操作者应让 `product invoke` 一次性跑到终态，而不是逐个调用 `storyline`、`detailed_outline`、`author_image_pages` 等内部 stage。
 
 ## 操作约束
@@ -81,7 +80,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 - 任何写操作前，先读取当前 workspace 与 product-entry manifest
 - 把 `product_entry_manifest`、`domain_entry_contract`、`task_lifecycle` 当作正式 contract surface
 - 把 `opl_generated_interface_consumption`、`generated_surface_handoff` 与 `pack_compiler_input` 当作 OPL generated metadata owner 的当前机器合同；repo-local redcube/redcube-mcp 只按 handler target / direct entry 读取
-- 保持 `status -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 `status` 指 machine-readable product-entry overview / intake shell
+- 保持 `OPL generated status/session refs -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 status/session 指 OPL generated machine-readable product-entry refs
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 domain handler / product-entry contract 直接手改运行状态或 artifact state
 - 不把 OPL-hosted handoff 写成新的独立用户 skill；它继续是内部集成 contract
@@ -94,7 +93,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 典型任务
 
-- 读取当前 workspace 的 RedCube product-entry status overview / intake shell
-- 检查 product-entry manifest 和 task lifecycle
+- 读取当前 workspace 的 RedCube domain-handler export / OPL generated product-entry refs
+- 检查 domain handler projection、product-entry manifest refs 和 task lifecycle
 - 继续同一 entry session 下的 deliverable loop
 - 通过结构化命令驱动 visual deliverable 生成与审阅

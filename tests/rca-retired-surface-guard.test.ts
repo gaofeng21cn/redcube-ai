@@ -204,7 +204,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     'review_repair_transport',
     'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
-    'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+    'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
   ];
   const expectedRetainedAuthority = [
     'visual_truth',
@@ -249,7 +249,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
       'artifact_lifecycle',
       'review_repair_transport',
       'native_helper_generic_envelope',
-      'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+      'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
     ],
   );
   for (const value of Object.values(adoption.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {

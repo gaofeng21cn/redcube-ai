@@ -133,7 +133,8 @@ export async function buildOplStageExecutionPlan({
     })),
     full_stage_sequence_refs: stages.map((stage) => stage.stage_id),
     authority_refs: {
-      domain_action_adapter_ref: '/domain_action_adapter',
+      domain_handler_ref: '/product_entry_shell/domain_handler',
+      domain_action_adapter_ref: '/product_entry_shell/domain_handler',
       family_action_catalog_ref: '/family_action_catalog',
       family_stage_control_plane_ref: '/family_stage_control_plane',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
@@ -142,7 +143,7 @@ export async function buildOplStageExecutionPlan({
       review_state_ref: '/review_state',
       publication_projection_ref: '/publication_projection',
       owner_receipt_contract_ref: '/domain_owner_receipt_contract',
-      guarded_action_catalog_ref: '/family_action_catalog/actions/dispatch_domain_action_adapter',
+      guarded_action_catalog_ref: '/family_action_catalog/actions/dispatch_domain_handler',
     },
     forbidden_opl_writes: [
       'visual_truth',

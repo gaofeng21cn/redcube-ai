@@ -47,7 +47,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.recommended_shell, 'direct');
     assert.equal(manifest.recommended_command, 'redcube product invoke');
     assert.equal(manifest.entry_status_surface.shell_key, 'status');
-    assert.equal(manifest.entry_status_surface.command, 'redcube product status');
+    assert.equal(manifest.entry_status_surface.command, 'opl_generated:product_status');
     assert.equal(manifest.entry_status_surface.surface_kind, 'product_status');
     assert.match(manifest.entry_status_surface.summary, /product-entry overview/i);
     assert.deepEqual(manifest.product_entry_surface, manifest.entry_status_surface);
@@ -55,73 +55,67 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.operator_loop_surface.command, 'redcube product invoke');
     assert.equal(manifest.operator_loop_surface.surface_kind, 'product_entry');
     assert.equal(manifest.operator_loop_surface.continuation_shell_key, 'session');
-    assert.equal(manifest.operator_loop_surface.continuation_command, 'redcube product session');
+    assert.equal(manifest.operator_loop_surface.continuation_command, 'opl_generated:product_session');
     assert.match(manifest.operator_loop_surface.summary, /entry_session_id/);
     assert.equal(manifest.operator_loop_actions.start_deliverable.command, 'redcube product invoke');
     assert.equal(manifest.operator_loop_actions.start_deliverable.surface_kind, 'product_entry');
     assert.deepEqual(manifest.operator_loop_actions.start_deliverable.requires, ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id']);
-    assert.equal(manifest.operator_loop_actions.continue_session.command, 'redcube product session');
+    assert.equal(manifest.operator_loop_actions.continue_session.command, 'opl_generated:product_session');
     assert.deepEqual(manifest.operator_loop_actions.continue_session.requires, ['entry_session_id']);
     assert.equal(manifest.operator_loop_actions.opl_hosted_handoff.command, 'opl_framework:hosted_product_entry');
     assert.equal(manifest.product_entry_quickstart.surface_kind, 'product_entry_quickstart');
-    assert.equal(manifest.product_entry_quickstart.recommended_step_id, 'open_status');
+    assert.equal(manifest.product_entry_quickstart.recommended_step_id, 'continue_current_loop');
     assert.deepEqual(manifest.product_entry_quickstart.human_gate_ids, ['redcube_operator_review_gate']);
     assert.deepEqual(
       manifest.product_entry_quickstart.steps.map((step) => step.step_id),
-      ['open_status', 'continue_current_loop', 'inspect_current_progress', 'default_image_ppt_proof', 'optional_native_ppt_proof'],
+      ['continue_current_loop', 'inspect_current_progress', 'default_image_ppt_proof', 'optional_native_ppt_proof'],
     );
     assert.equal(
       manifest.product_entry_quickstart.steps[0].command,
-      `redcube product status --workspace-root ${workspaceRoot}`,
-    );
-    assert.equal(
-      manifest.product_entry_quickstart.steps[1].command,
       `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
-    assert.deepEqual(manifest.product_entry_quickstart.steps[2].requires, ['entry_session_id']);
-    assert.equal(manifest.product_entry_quickstart.steps[3].surface_kind, 'image_ppt_product_entry_proof');
-    assert.match(manifest.product_entry_quickstart.steps[3].command, /redcube image-ppt proof/);
-    assert.equal(manifest.product_entry_quickstart.steps[4].surface_kind, 'native_ppt_product_entry_proof');
-    assert.match(manifest.product_entry_quickstart.steps[4].command, /redcube native-ppt proof/);
+    assert.equal(manifest.product_entry_quickstart.steps[1].command, 'opl_generated:product_session --entry-session-id <entry-session-id>');
+    assert.deepEqual(manifest.product_entry_quickstart.steps[1].requires, ['entry_session_id']);
+    assert.equal(manifest.product_entry_quickstart.steps[2].surface_kind, 'image_ppt_product_entry_proof');
+    assert.match(manifest.product_entry_quickstart.steps[2].command, /redcube image-ppt proof/);
+    assert.equal(manifest.product_entry_quickstart.steps[3].surface_kind, 'native_ppt_product_entry_proof');
+    assert.match(manifest.product_entry_quickstart.steps[3].command, /redcube native-ppt proof/);
     assert.equal(manifest.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(typeof manifest.product_entry_overview.summary, 'string');
-    assert.match(manifest.product_entry_overview.summary, /product-entry overview\/intake surface/);
-    assert.equal(manifest.product_entry_overview.product_entry_command, 'redcube product status');
-    assert.equal(manifest.product_entry_overview.entry_status_command, 'redcube product status');
+    assert.match(manifest.product_entry_overview.summary, /direct product-entry domain handler target/);
+    assert.equal(manifest.product_entry_overview.product_entry_command, 'redcube product invoke');
+    assert.equal(manifest.product_entry_overview.entry_status_command, 'opl_generated:product_status');
     assert.equal(manifest.product_entry_overview.recommended_command, 'redcube product invoke');
     assert.equal(manifest.product_entry_overview.operator_loop_command, 'redcube product invoke');
     assert.deepEqual(manifest.product_entry_overview.progress_surface, {
       surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
+      command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       step_id: 'inspect_current_progress',
     });
     assert.deepEqual(manifest.product_entry_overview.resume_surface, {
       surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
+      command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       session_locator_field: 'entry_session_contract.entry_session_id',
       checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     });
-    assert.equal(manifest.product_entry_overview.recommended_step_id, 'open_status');
+    assert.equal(manifest.product_entry_overview.recommended_step_id, 'continue_current_loop');
     assert.deepEqual(manifest.product_entry_overview.human_gate_ids, ['redcube_operator_review_gate']);
     assert.equal(manifest.product_entry_start.surface_kind, 'product_entry_start');
-    assert.equal(manifest.product_entry_start.recommended_mode_id, 'open_status');
+    assert.equal(manifest.product_entry_start.recommended_mode_id, 'start_direct_session');
     assert.deepEqual(
       manifest.product_entry_start.modes.map((mode) => mode.mode_id),
-      ['open_status', 'start_direct_session', 'opl_hosted_handoff', 'resume_session'],
+      ['start_direct_session', 'opl_hosted_handoff', 'resume_session'],
     );
-    assert.equal(
-      manifest.product_entry_start.modes[0].command,
-      `redcube product status --workspace-root ${workspaceRoot}`,
-    );
+    assert.match(manifest.product_entry_start.modes[0].command, /redcube product invoke/);
     assert.deepEqual(
-      manifest.product_entry_start.modes[1].requires,
+      manifest.product_entry_start.modes[0].requires,
       ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
     );
-    assert.equal(manifest.product_entry_start.modes[2].surface_kind, 'opl_hosted_product_entry');
-    assert.equal(manifest.product_entry_start.modes[3].surface_kind, 'product_entry_session');
+    assert.equal(manifest.product_entry_start.modes[1].surface_kind, 'opl_hosted_product_entry');
+    assert.equal(manifest.product_entry_start.modes[2].surface_kind, 'product_entry_session');
     assert.deepEqual(manifest.product_entry_start.resume_surface, {
       surface_kind: 'product_entry_session',
-      command: 'redcube product session --entry-session-id <entry-session-id>',
+      command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       session_locator_field: 'entry_session_contract.entry_session_id',
       checkpoint_locator_field: 'continuation_snapshot.latest_stage_execution_plan_ref',
     });
@@ -136,7 +130,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.product_entry_preflight.recommended_start_command,
-      `redcube product status --workspace-root ${workspaceRoot}`,
+      `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
     assert.deepEqual(manifest.product_entry_preflight.blocking_check_ids, []);
     assert.deepEqual(
@@ -300,8 +294,8 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.product_entry_readiness.usable_now, true);
     assert.equal(manifest.product_entry_readiness.good_to_use_now, false);
     assert.equal(manifest.product_entry_readiness.fully_automatic, false);
-    assert.equal(manifest.product_entry_readiness.recommended_start_surface, 'product_status');
-    assert.equal(manifest.product_entry_readiness.recommended_start_command, 'redcube product status');
+    assert.equal(manifest.product_entry_readiness.recommended_start_surface, 'product_entry');
+    assert.equal(manifest.product_entry_readiness.recommended_start_command, 'redcube product invoke');
     assert.equal(manifest.product_entry_readiness.recommended_loop_surface, 'product_entry');
     assert.equal(manifest.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
     assert.deepEqual(manifest.product_entry_readiness.blocking_gaps, [
@@ -349,11 +343,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.task_lifecycle.status, 'resumable');
     assert.equal(
       manifest.task_lifecycle.progress_surface.command,
-      'redcube product session --entry-session-id <entry-session-id>',
+      'opl_generated:product_session --entry-session-id <entry-session-id>',
     );
     assert.equal(
       manifest.task_lifecycle.resume_surface.command,
-      'redcube product session --entry-session-id <entry-session-id>',
+      'opl_generated:product_session --entry-session-id <entry-session-id>',
     );
     assert.equal(manifest.task_lifecycle.checkpoint_summary.surface_kind, 'checkpoint_summary');
     assert.equal(manifest.task_lifecycle.checkpoint_summary.status, 'operator_review_required');
@@ -389,7 +383,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(manifest.standard_domain_agent_skeleton.repo_source_boundary.repo_tracks_runtime_artifact_blobs, false);
     assert.deepEqual(manifest.standard_domain_agent_skeleton.runtime_declarations.declares_only, [
-      'domain_action_adapter_adapter',
+      'domain_handler_target',
       'projection_builder',
       'lifecycle_adapter',
       'visual_transition_spec',
@@ -398,7 +392,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'domain_owner_receipt_contract',
       'lifecycle_guarded_apply_proof',
     ]);
-    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_action_adapter_adapter_ref, '/product_entry_shell/domain_action_adapter');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_handler_target_ref, '/product_entry_shell/domain_handler');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
@@ -441,7 +435,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         'review_repair_transport',
         'restart_dead_letter_repair_human_gate_state_chain',
         'native_helper_generic_envelope',
-        'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+        'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
       ],
     );
     assert.deepEqual(
@@ -518,14 +512,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(
       manifest.action_metadata.product_entry.map((entry) => [entry.action_key, entry.command, entry.surface_kind]),
       [
-        ['get_product_status', 'redcube product status', 'product_status'],
-        ['get_product_start', 'redcube product start', 'product_entry_start'],
-        ['get_product_preflight', 'redcube product preflight', 'product_entry_preflight'],
         ['start_deliverable', 'redcube product invoke', 'product_entry'],
-        ['continue_session', 'redcube product session', 'product_entry_session'],
-        ['get_product_entry_manifest', 'redcube product manifest', 'product_entry_manifest'],
-        ['export_domain_action_adapter', 'redcube product domain_action_adapter export', 'domain_action_adapter_export'],
-        ['dispatch_domain_action_adapter', 'redcube product domain_action_adapter dispatch', 'domain_action_adapter_dispatch'],
         ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
         ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
         ['invoke_domain_entry', 'redcube service-safe domain entry', 'domain_entry'],
@@ -534,13 +521,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.skill_catalog.surface_kind, 'skill_catalog');
     assert.equal(manifest.skill_catalog.skills.length, 1); assert.equal(manifest.skill_catalog.skills.some((skill) => skill.skill_id === 'ui-ux-pro-max'), false);
     assert.deepEqual(manifest.skill_catalog.supported_commands, [
-      'redcube product status',
       'redcube product invoke',
-      'redcube product session',
       'redcube image-ppt proof',
       'redcube native-ppt proof',
     ]);
-    assert.equal(manifest.skill_catalog.command_contracts.length, 5);
+    assert.equal(manifest.skill_catalog.command_contracts.length, 3);
     assert.deepEqual(
       manifest.skill_catalog.command_contracts.map((contract) => [
         contract.action_id,
@@ -548,17 +533,15 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         contract.target_surface_kind,
       ]),
       [
-        ['get_product_status', 'redcube product status', 'product_status'],
         ['invoke_product_entry', 'redcube product invoke', 'product_entry'],
-        ['get_product_entry_session', 'redcube product session', 'product_entry_session'],
         ['run_image_ppt_proof', 'redcube image-ppt proof', 'image_ppt_product_entry_proof'],
         ['run_native_ppt_proof', 'redcube native-ppt proof', 'native_ppt_product_entry_proof'],
       ],
     );
     assert.equal(manifest.skill_catalog.skills[0].skill_id, 'redcube-ai');
     assert.equal(manifest.skill_catalog.skills[0].title, 'RedCube AI');
-    assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product status');
-    assert.equal(manifest.skill_catalog.skills[0].target_surface_kind, 'product_status');
+    assert.equal(manifest.skill_catalog.skills[0].command, 'redcube product invoke');
+    assert.equal(manifest.skill_catalog.skills[0].target_surface_kind, 'product_entry');
     assert.deepEqual(manifest.skill_catalog.skills[0].tags, ['domain-app', 'product-entry', 'visual-deliverables']);
     assert.deepEqual(
       manifest.skill_catalog.skills[0].domain_projection.domain_memory_descriptor_locator_ref,
@@ -578,21 +561,27 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         domain_handler_owner: 'redcube_ai',
         repo_local_redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
         repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-        entry_shell_key: 'status',
-        entry_command: 'redcube product status',
-        supporting_shell_keys: ['direct', 'session'],
+        entry_shell_key: 'direct',
+        entry_command: 'redcube product invoke',
+        supporting_shell_keys: ['direct', 'session', 'native_ppt_proof', 'image_ppt_proof'],
+        opl_generated_shell_keys: ['status', 'session'],
+        domain_handler_keys: ['domain_handler'],
         shell_commands: {
           status: {
-            command: 'redcube product status',
+            command: 'opl_generated:product_status',
             target_surface_kind: 'product_status',
+            owner: 'one-person-lab',
+            repo_local_command_available: false,
           },
           direct: {
             command: 'redcube product invoke',
             target_surface_kind: 'product_entry',
           },
           session: {
-            command: 'redcube product session',
+            command: 'opl_generated:product_session',
             target_surface_kind: 'product_entry_session',
+            owner: 'one-person-lab',
+            repo_local_command_available: false,
           },
           image_ppt_proof: {
             command: 'redcube image-ppt proof',
@@ -635,9 +624,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
           ref: '/session_continuity/restore_point',
           label: 'restore point surface',
         },
-        recommended_resume_command: 'redcube product session --entry-session-id <entry-session-id>',
-        recommended_progress_command: 'redcube product session --entry-session-id <entry-session-id>',
-        recommended_artifact_command: 'redcube product session --entry-session-id <entry-session-id>',
+        recommended_resume_command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+        recommended_progress_command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+        recommended_artifact_command: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       },
     );
     assert.equal(manifest.automation.surface_kind, 'automation');
@@ -650,24 +639,24 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.automation.automations[1].trigger_kind, 'operator_review_gate');
     assert.equal(manifest.automation.automations[1].readiness_status, 'repo_tracked');
     assert.equal(manifest.automation.automations[1].gate_policy, 'human_gate_required');
-    assert.equal(manifest.product_entry_shell.status.command, 'redcube product status');
+    assert.equal(manifest.product_entry_shell.status.command, 'opl_generated:product_status');
     assert.equal(manifest.product_entry_shell.direct.command, 'redcube product invoke');
     assert.equal(manifest.product_entry_shell.opl_hosted.command, 'opl_framework:hosted_product_entry');
-    assert.equal(manifest.product_entry_shell.session.command, 'redcube product session');
-    assert.equal(manifest.product_entry_shell.domain_action_adapter.command, 'redcube product domain_action_adapter');
-    assert.equal(manifest.product_entry_shell.domain_action_adapter.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.product_entry_shell.domain_action_adapter.provider_transport_owner, 'opl_family_runtime_provider');
-    assert.equal(manifest.product_entry_shell.domain_action_adapter.control_plane_owner, 'opl');
+    assert.equal(manifest.product_entry_shell.session.command, 'opl_generated:product_session');
+    assert.equal(manifest.product_entry_shell.domain_handler.command, 'redcube domain-handler export');
+    assert.equal(manifest.product_entry_shell.domain_handler.runtime_owner, 'configured_family_runtime_provider');
+    assert.equal(manifest.product_entry_shell.domain_handler.provider_transport_owner, 'opl_family_runtime_provider');
+    assert.equal(manifest.product_entry_shell.domain_handler.control_plane_owner, 'opl');
     assert.equal(
-      manifest.product_entry_shell.domain_action_adapter.opl_generic_primitive_consumption.status,
+      manifest.product_entry_shell.domain_handler.opl_generic_primitive_consumption.status,
       'functional_consumer_follow_through_landed',
     );
     assert.deepEqual(
-      manifest.product_entry_shell.domain_action_adapter.allowed_actions,
+      manifest.product_entry_shell.domain_handler.allowed_actions,
       domain_action_adapterGuardedActionMetadata.guardedActionIds,
     );
     assert.deepEqual(
-      manifest.product_entry_shell.domain_action_adapter.forbidden_writes,
+      manifest.product_entry_shell.domain_handler.forbidden_writes,
       domain_action_adapterGuardedActionMetadata.forbiddenWrites,
     );
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
@@ -749,27 +738,14 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.shared_handoff.opl_return_surface.surface_kind, 'product_entry');
     assert.equal(manifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
     assert.equal(manifest.domain_entry_contract.service_safe_surface_kind, 'domain_entry');
-    assert.equal(manifest.domain_entry_contract.product_entry_builder_command, 'redcube product manifest');
-    assert.deepEqual(manifest.domain_entry_contract.supported_entry_modes, ['direct', 'opl_hosted', 'session']);
+    assert.equal(manifest.domain_entry_contract.product_entry_builder_command, 'redcube product invoke');
+    assert.deepEqual(manifest.domain_entry_contract.supported_entry_modes, ['direct', 'opl_hosted']);
     assert.deepEqual(manifest.domain_entry_contract.supported_commands, [
-      'redcube product manifest',
-      'redcube product status',
-      'redcube product start',
       'redcube product invoke',
-      'redcube product session',
     ]);
-    assert.equal(manifest.domain_entry_contract.command_contracts.length, 5);
-    assert.equal(manifest.domain_entry_contract.command_contracts[0].command, 'redcube product manifest');
-    assert.deepEqual(manifest.domain_entry_contract.command_contracts[0].required_fields, ['workspace_root']);
-    assert.equal(manifest.domain_entry_contract.command_contracts[3].command, 'redcube product invoke');
-    assert.deepEqual(manifest.domain_entry_contract.command_contracts[3].required_fields, [
-      'workspace_root',
-      'entry_session_id',
-      'overlay',
-      'topic_id',
-      'deliverable_id',
-    ]);
-    assert.equal(manifest.domain_entry_contract.command_contracts[4].command, 'redcube product session');
+    assert.equal(manifest.domain_entry_contract.command_contracts.length, 1);
+    assert.equal(manifest.domain_entry_contract.command_contracts[0].command, 'redcube product invoke');
+    assert.deepEqual(manifest.domain_entry_contract.command_contracts[0].required_fields, ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id']);
     assert.equal(
       manifest.domain_entry_contract.domain_agent_entry_spec.surface_kind,
       'domain_agent_entry_spec',
@@ -800,11 +776,11 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.domain_entry_contract.domain_agent_entry_spec.entry_command,
-      'redcube product status',
+      'redcube product invoke',
     );
     assert.equal(
       manifest.domain_entry_contract.domain_agent_entry_spec.manifest_command,
-      'redcube product manifest',
+      'opl_generated:product_entry_manifest',
     );
     assert.deepEqual(
       manifest.domain_entry_contract.domain_agent_entry_spec.locator_schema,
@@ -845,7 +821,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
 	    assert.equal(manifest.session_continuity.surface_kind, 'session_continuity');
 	    assert.equal(manifest.session_continuity.owner, 'redcube_ai');
 	    assert.equal(manifest.session_continuity.status, 'repo_tracked');
-	    assert.equal(manifest.session_continuity.session_command_template, 'redcube product session --entry-session-id <entry-session-id>');
+	    assert.equal(manifest.session_continuity.session_command_template, 'opl_generated:product_session --entry-session-id <entry-session-id>');
 	    assert.equal(manifest.session_continuity.restore_point_surface_ref.ref, '/session_continuity/restore_point');
 	    assert.equal(manifest.session_continuity.progress_surface_ref.ref, '/progress_projection');
 	    assert.equal(manifest.session_continuity.artifact_surface_ref.ref, '/artifact_inventory');
@@ -872,7 +848,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
       assert.equal(
         manifest.runtime_loop_closure.resume_point.resume_command_template,
-        'redcube product session --entry-session-id <entry-session-id>',
+        'opl_generated:product_session --entry-session-id <entry-session-id>',
       );
       assert.equal(manifest.runtime_loop_closure.continuity_cursor.surface_ref, '/session_continuity');
       assert.equal(manifest.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');

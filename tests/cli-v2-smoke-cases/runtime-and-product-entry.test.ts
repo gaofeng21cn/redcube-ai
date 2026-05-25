@@ -329,7 +329,7 @@ test('CLI deliverable execute returns an OPL stage execution plan instead of sta
   });
 });
 
-test('CLI product status, product invoke, product domain_action_adapter, and product session proxy the product-entry service surface', async () => {
+test('CLI product invoke and domain-handler dispatch keep RCA as handler target while retired product wrappers fail closed', async () => {
   await withMockCodexRuntimeCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-product-'));
@@ -358,69 +358,6 @@ test('CLI product status, product invoke, product domain_action_adapter, and pro
         },
       },
     );
-
-    const statusParsed = await execCliAsync(
-      cliPath,
-      [
-        'product',
-        'status',
-        '--workspace-root',
-        workspaceRoot,
-      ],
-      {
-        cwd: installRoot,
-        env: {
-          ...process.env,
-          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
-        },
-      },
-    );
-    assert.equal(statusParsed.ok, true);
-    assert.equal(statusParsed.surface_kind, 'product_status');
-    assert.equal(statusParsed.entry_status_surface.command, 'redcube product status');
-    assert.equal(statusParsed.product_entry_manifest.entry_status_surface.command, 'redcube product status');
-    assert.equal(statusParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(statusParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-    assert.equal(statusParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(statusParsed.family_orchestration.resume_contract.surface_kind, 'product_entry_session');
-    assert.equal(statusParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(statusParsed.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
-    assert.equal(statusParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(statusParsed.product_entry_readiness.verdict, 'service_surface_ready_not_end_user_shell');
-    assert.equal(statusParsed.product_entry_readiness.usable_now, true);
-    assert.equal(statusParsed.product_entry_readiness.recommended_loop_command, 'redcube product invoke');
-    assert.equal(statusParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
-    assert.equal(statusParsed.product_entry_preflight.ready_to_try_now, true);
-    assert.equal(statusParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
-    assert.equal(statusParsed.native_ppt_operator_ux.proof_runner.helper_command, 'redcube native-ppt proof');
-    assert.equal(
-      statusParsed.product_entry_preflight.recommended_check_command,
-      `redcube workspace doctor --workspace-root ${workspaceRoot}`,
-    );
-
-    const preflightParsed = await execCliAsync(
-      cliPath,
-      [
-        'product',
-        'preflight',
-        '--workspace-root',
-        workspaceRoot,
-      ],
-      {
-        cwd: installRoot,
-        env: {
-          ...process.env,
-          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
-        },
-      },
-    );
-    assert.equal(preflightParsed.ok, true);
-    assert.equal(preflightParsed.surface_kind, 'product_entry_preflight');
-    assert.equal(preflightParsed.workspace_locator.workspace_root, workspaceRoot);
-    assert.equal(preflightParsed.ready_to_try_now, true);
-    assert.equal(preflightParsed.checks.length, 4);
-    assert.equal(preflightParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(preflightParsed.runtime_loop_closure.source_linkage.current_source, 'preflight');
 
     const directParsed = await execCliAsync(
       cliPath,
@@ -466,22 +403,10 @@ test('CLI product status, product invoke, product domain_action_adapter, and pro
     assert.equal(directParsed.summary.latest_handle, directParsed.summary.target_handle);
     assert.equal(directParsed.summary.approval_required, directParsed.runtime_loop_closure.control_policy.approval_required);
     assert.equal(directParsed.summary.gate_status, directParsed.runtime_loop_closure.control_policy.gate_status);
-    assert.equal(
-      directParsed.summary.resume_command,
-      directParsed.runtime_loop_closure.control_policy.continue_action.command,
-    );
-    assert.equal(
-      directParsed.summary.session_locator_field,
-      directParsed.family_orchestration.resume_contract.session_locator_field,
-    );
-    assert.equal(
-      directParsed.summary.checkpoint_locator_field,
-      directParsed.family_orchestration.resume_contract.checkpoint_locator_field,
-    );
 
-    const domain_action_adapterTaskFile = path.join(runtimeStateRoot, 'opl-hosted-domain_action_adapter-task.json');
+    const domainHandlerTaskFile = path.join(runtimeStateRoot, 'opl-hosted-domain-handler-task.json');
     writeFileSync(
-      domain_action_adapterTaskFile,
+      domainHandlerTaskFile,
       JSON.stringify({
         action: 'notification_receipt',
         workspace_locator: {
@@ -492,14 +417,13 @@ test('CLI product status, product invoke, product domain_action_adapter, and pro
       'utf-8',
     );
 
-    const oplHostedDomainActionAdapter = await execCliAsync(
+    const domainHandlerDispatch = await execCliAsync(
       cliPath,
       [
-        'product',
-        'domain_action_adapter',
+        'domain-handler',
         'dispatch',
         '--task',
-        domain_action_adapterTaskFile,
+        domainHandlerTaskFile,
         '--format',
         'json',
       ],
@@ -511,121 +435,40 @@ test('CLI product status, product invoke, product domain_action_adapter, and pro
         },
       },
     );
-    assert.equal(oplHostedDomainActionAdapter.ok, true);
-    assert.equal(oplHostedDomainActionAdapter.surface_kind, 'domain_action_adapter_dispatch');
-    assert.equal(oplHostedDomainActionAdapter.action, 'notification_receipt');
+    assert.equal(domainHandlerDispatch.ok, true);
+    assert.equal(domainHandlerDispatch.surface_kind, 'product_domain_handler_dispatch');
+    assert.equal(domainHandlerDispatch.handler_id, 'redcube_product_domain_handler.v1');
+    assert.equal(domainHandlerDispatch.wrapped_dispatch_surface_kind, 'domain_action_adapter_dispatch');
+    assert.equal(domainHandlerDispatch.repo_local_legacy_product_domain_action_adapter_command_available, false);
+    assert.equal(domainHandlerDispatch.compatibility_alias_allowed, false);
+    assert.equal(domainHandlerDispatch.action, 'notification_receipt');
 
-    const oplHostedParsed = oplHostedDomainActionAdapter.result_surface;
-    assert.equal(oplHostedParsed.ok, true);
-    assert.equal(oplHostedParsed.surface_kind, 'notification_receipt');
-    assert.equal(oplHostedParsed.notification_id, 'notice-oplHosted');
-    assert.equal(oplHostedParsed.receipt_status, 'accepted');
+    const resultSurface = domainHandlerDispatch.result_surface;
+    assert.equal(resultSurface.ok, true);
+    assert.equal(resultSurface.surface_kind, 'notification_receipt');
+    assert.equal(resultSurface.notification_id, 'notice-oplHosted');
+    assert.equal(resultSurface.receipt_status, 'accepted');
 
-    const sessionParsed = await execCliAsync(
-      cliPath,
-      [
-        'product',
-        'session',
-        '--entry-session-id',
-        'session-a',
-      ],
-      {
+    for (const args of [
+      ['product', 'status', '--workspace-root', workspaceRoot],
+      ['product', 'preflight', '--workspace-root', workspaceRoot],
+      ['product', 'start', '--workspace-root', workspaceRoot],
+      ['product', 'session', '--entry-session-id', 'session-a'],
+      ['product', 'manifest', '--workspace-root', workspaceRoot],
+      ['product', 'domain_action_adapter', 'export', '--workspace-root', workspaceRoot, '--format', 'json'],
+      ['product', 'domain_action_adapter', 'dispatch', '--task', domainHandlerTaskFile, '--format', 'json'],
+    ]) {
+      const failure = execCliExpectFailure(cliPath, args, {
         cwd: installRoot,
         env: {
           ...process.env,
           REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
         },
-      },
-    );
-    assert.equal(sessionParsed.ok, true);
-    assert.equal(sessionParsed.surface_kind, 'product_entry_session');
-    assert.equal(sessionParsed.entry_session.entry_session_id, 'session-a');
-    assert.equal(sessionParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(sessionParsed.family_orchestration.action_graph.exit_nodes[0], 'step:inspect_current_progress');
-    assert.equal(sessionParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(sessionParsed.family_orchestration.resume_contract.session_locator_field, 'entry_session.entry_session_id');
-    assert.equal(sessionParsed.summary.target_handle, sessionParsed.summary.latest_handle);
-    assert.equal(sessionParsed.summary.approval_required, sessionParsed.runtime_loop_closure.control_policy.approval_required);
-    assert.equal(sessionParsed.summary.gate_status, sessionParsed.runtime_loop_closure.control_policy.gate_status);
-    assert.equal(
-      sessionParsed.summary.resume_command,
-      sessionParsed.runtime_loop_closure.control_policy.continue_action.command,
-    );
-    assert.equal(
-      sessionParsed.summary.session_locator_field,
-      sessionParsed.family_orchestration.resume_contract.session_locator_field,
-    );
-    assert.equal(
-      sessionParsed.summary.checkpoint_locator_field,
-      sessionParsed.family_orchestration.resume_contract.checkpoint_locator_field,
-    );
-
-    const manifestParsed = await execCliAsync(
-      cliPath,
-      [
-        'product',
-        'manifest',
-        '--workspace-root',
-        workspaceRoot,
-      ],
-      {
-        cwd: installRoot,
-        env: {
-          ...process.env,
-          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
-        },
-      },
-    );
-    assert.equal(manifestParsed.ok, true);
-    assert.equal(manifestParsed.surface_kind, 'product_entry_manifest');
-    assert.equal(manifestParsed.manifest_kind, 'redcube_product_entry_manifest');
-    assert.equal(manifestParsed.manifest_version, 2);
-    assert.equal(manifestParsed.workspace_locator.workspace_root, workspaceRoot);
-    assert.equal(manifestParsed.entry_status_surface.command, 'redcube product status');
-    assert.equal(manifestParsed.product_entry_shell.direct.command, 'redcube product invoke');
-    assert.equal(manifestParsed.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
-    assert.equal(manifestParsed.family_orchestration.action_graph.graph_id, 'redcube_product_entry_overview_graph');
-    assert.equal(manifestParsed.family_orchestration.human_gates[0].gate_id, 'redcube_operator_review_gate');
-    assert.equal(
-      manifestParsed.family_orchestration.resume_contract.session_locator_field,
-      'entry_session_contract.entry_session_id',
-    );
-    assert.equal(manifestParsed.product_entry_readiness.surface_kind, 'product_entry_readiness');
-    assert.equal(manifestParsed.product_entry_readiness.good_to_use_now, false);
-    assert.equal(manifestParsed.product_entry_readiness.recommended_start_command, 'redcube product status');
-    assert.equal(manifestParsed.product_entry_start.surface_kind, 'product_entry_start');
-    assert.equal(manifestParsed.product_entry_start.recommended_mode_id, 'open_status');
-    assert.equal(manifestParsed.product_entry_start.modes[1].mode_id, 'start_direct_session');
-    assert.equal(manifestParsed.product_entry_start.modes[2].mode_id, 'opl_hosted_handoff');
-    assert.equal(manifestParsed.product_entry_start.modes[3].mode_id, 'resume_session');
-    assert.equal(manifestParsed.product_entry_preflight.surface_kind, 'product_entry_preflight');
-    assert.equal(manifestParsed.product_entry_preflight.ready_to_try_now, true);
-    assert.equal(manifestParsed.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(manifestParsed.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
-    assert.equal(manifestParsed.operator_loop_actions.run_native_ppt_proof.command, 'redcube native-ppt proof');
-
-    const startParsed = await execCliAsync(
-      cliPath,
-      [
-        'product',
-        'start',
-        '--workspace-root',
-        workspaceRoot,
-      ],
-      {
-        cwd: path.resolve('.'),
-        env: {
-          ...process.env,
-          REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
-        },
-      },
-    );
-    assert.equal(startParsed.ok, true);
-    assert.equal(startParsed.surface_kind, 'product_entry_start');
-    assert.equal(startParsed.recommended_mode_id, 'open_status');
-    assert.equal(startParsed.modes[0].command, `redcube product status --workspace-root ${workspaceRoot}`);
-    assert.equal(startParsed.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(startParsed.runtime_loop_closure.source_linkage.current_source, 'start');
+      });
+      assert.equal(failure.ok, false);
+      assert.equal(failure.error_kind, 'cli_usage_error');
+      assert.match(failure.error, /generated\/default wrapper 由 OPL 持有|product 命令仅保留 invoke/);
+    }
   });
 });
 
@@ -660,8 +503,8 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
   assert.equal(proof.request.route, 'author_pptx_native');
 });
 
-test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-owned actions', async () => {
-  const taskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain_action_adapter-task-')), 'task.json');
+test('CLI domain-handler export and dispatch proxy guarded RCA-owned actions without legacy product alias', async () => {
+  const taskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain-handler-task-')), 'task.json');
   writeFileSync(
     taskFile,
     JSON.stringify({
@@ -670,30 +513,30 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
     }),
     'utf-8',
   );
-  const evidenceTaskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain_action_adapter-evidence-task-')), 'task.json');
+  const evidenceTaskFile = path.join(mkdtempSync(path.join(os.tmpdir(), 'redcube-domain-handler-evidence-task-')), 'task.json');
   writeFileSync(
     evidenceTaskFile,
     JSON.stringify({
       action: 'emit_no_regression_evidence',
-      workspace_root: '/tmp/redcube-domain_action_adapter-workspace',
+      workspace_root: '/tmp/redcube-domain-handler-workspace',
       evidence_id: 'cli-no-regression',
     }),
     'utf-8',
   );
 
   const exported = await executeCli([
-    'product',
-    'domain_action_adapter',
+    'domain-handler',
     'export',
     '--workspace-root',
-    '/tmp/redcube-domain_action_adapter-workspace',
+    '/tmp/redcube-domain-handler-workspace',
     '--format',
     'json',
   ], {
     domainActions: {
-      exportDomainActionAdapter: async (request) => ({
+      exportDomainHandler: async (request) => ({
         ok: true,
-        surface_kind: 'domain_action_adapter_export',
+        surface_kind: 'product_domain_handler_export',
+        handler_id: 'redcube_product_domain_handler.v1',
         request,
         owner_boundary: {
           hermes_owns_visual_truth: false,
@@ -705,16 +548,16 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
   });
 
   assert.equal(exported.ok, true);
-  assert.equal(exported.surface_kind, 'domain_action_adapter_export');
-  assert.equal(exported.request.workspace_root, '/tmp/redcube-domain_action_adapter-workspace');
+  assert.equal(exported.surface_kind, 'product_domain_handler_export');
+  assert.equal(exported.handler_id, 'redcube_product_domain_handler.v1');
+  assert.equal(exported.request.workspace_root, '/tmp/redcube-domain-handler-workspace');
   assert.equal(exported.request.format, 'json');
   assert.equal(exported.owner_boundary.hermes_owns_visual_truth, false);
   assert.equal(exported.owner_boundary.opl_owns_publication_gate, false);
   assert.equal(exported.owner_boundary.rca_owns_visual_truth, true);
 
   const dispatched = await executeCli([
-    'product',
-    'domain_action_adapter',
+    'domain-handler',
     'dispatch',
     '--task',
     taskFile,
@@ -722,9 +565,9 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
     'json',
   ], {
     domainActions: {
-      dispatchDomainActionAdapter: async (request) => ({
+      dispatchDomainHandler: async (request) => ({
         ok: true,
-        surface_kind: 'domain_action_adapter_dispatch',
+        surface_kind: 'product_domain_handler_dispatch',
         request,
         domain_action_adapter_policy: {
           writes_visual_truth: false,
@@ -736,7 +579,7 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
   });
 
   assert.equal(dispatched.ok, true);
-  assert.equal(dispatched.surface_kind, 'domain_action_adapter_dispatch');
+  assert.equal(dispatched.surface_kind, 'product_domain_handler_dispatch');
   assert.equal(dispatched.request.task_file, taskFile);
   assert.equal(dispatched.request.format, 'json');
   assert.equal(dispatched.domain_action_adapter_policy.writes_visual_truth, false);
@@ -744,8 +587,7 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
   assert.equal(dispatched.domain_action_adapter_policy.writes_publication_gate, false);
 
   const evidenceDispatched = await executeCli([
-    'product',
-    'domain_action_adapter',
+    'domain-handler',
     'dispatch',
     '--task',
     evidenceTaskFile,
@@ -753,9 +595,9 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
     'json',
   ], {
     domainActions: {
-      dispatchDomainActionAdapter: async (request) => ({
+      dispatchDomainHandler: async (request) => ({
         ok: true,
-        surface_kind: 'domain_action_adapter_dispatch',
+        surface_kind: 'product_domain_handler_dispatch',
         request,
         result_surface: {
           surface_kind: 'no_regression_evidence',
@@ -766,94 +608,38 @@ test('CLI product domain_action_adapter export and dispatch proxy guarded RCA-ow
   });
 
   assert.equal(evidenceDispatched.ok, true);
-  assert.equal(evidenceDispatched.surface_kind, 'domain_action_adapter_dispatch');
+  assert.equal(evidenceDispatched.surface_kind, 'product_domain_handler_dispatch');
   assert.equal(evidenceDispatched.request.task_file, evidenceTaskFile);
   assert.equal(evidenceDispatched.result_surface.surface_kind, 'no_regression_evidence');
   assert.equal(evidenceDispatched.result_surface.evidence_ref, 'rca-no-regression:visual-stage:cli-no-regression');
 });
 
-test('CLI product read surfaces pass workspace receipt scaleout roots as refs-only read input', async () => {
+test('CLI domain-handler export passes workspace receipt scaleout roots as refs-only read input', async () => {
   const domainActions = {
-    getProductStatus: async (request) => ({
+    exportDomainHandler: async (request) => ({
       ok: true,
-      surface_kind: 'product_status',
-      request,
-    }),
-    getProductEntryManifest: async (request) => ({
-      ok: true,
-      surface_kind: 'product_entry_manifest',
-      request,
-    }),
-    getProductEntrySession: async (request) => ({
-      ok: true,
-      surface_kind: 'product_entry_session',
-      request,
-    }),
-    exportDomainActionAdapter: async (request) => ({
-      ok: true,
-      surface_kind: 'domain_action_adapter_export',
+      surface_kind: 'product_domain_handler_export',
       request,
     }),
   };
 
-  for (const [argv, expectedSurface] of [
-    [
-      [
-        'product',
-        'status',
-        '--workspace-root',
-        '/tmp/redcube-scaleout-a',
-        '--workspace-receipt-scaleout-root',
-        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
-      ],
-      'product_status',
-    ],
-    [
-      [
-        'product',
-        'manifest',
-        '--workspace-root',
-        '/tmp/redcube-scaleout-a',
-        '--workspace-receipt-scaleout-root',
-        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
-      ],
-      'product_entry_manifest',
-    ],
-    [
-      [
-        'product',
-        'domain_action_adapter',
-        'export',
-        '--workspace-root',
-        '/tmp/redcube-scaleout-a',
-        '--workspace-receipt-scaleout-root',
-        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
-      ],
-      'domain_action_adapter_export',
-    ],
-    [
-      [
-        'product',
-        'session',
-        '--entry-session-id',
-        'session-scaleout-cli',
-        '--workspace-receipt-scaleout-root',
-        '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
-      ],
-      'product_entry_session',
-    ],
-  ]) {
-    const result = await executeCli(argv, { domainActions });
+  const result = await executeCli([
+    'domain-handler',
+    'export',
+    '--workspace-root',
+    '/tmp/redcube-scaleout-a',
+    '--workspace-receipt-scaleout-root',
+    '/tmp/redcube-scaleout-b,/tmp/redcube-scaleout-c',
+  ], { domainActions });
 
-    assert.equal(result.ok, true);
-    assert.equal(result.surface_kind, expectedSurface);
-    assert.deepEqual(result.request.workspace_receipt_scaleout_roots, [
-      '/tmp/redcube-scaleout-b',
-      '/tmp/redcube-scaleout-c',
-    ]);
-    assert.equal(result.request.workspace_receipt_scaleout_claimed, undefined);
-    assert.equal(result.request.declares_production_soak_complete, undefined);
-  }
+  assert.equal(result.ok, true);
+  assert.equal(result.surface_kind, 'product_domain_handler_export');
+  assert.deepEqual(result.request.workspace_receipt_scaleout_roots, [
+    '/tmp/redcube-scaleout-b',
+    '/tmp/redcube-scaleout-c',
+  ]);
+  assert.equal(result.request.workspace_receipt_scaleout_claimed, undefined);
+  assert.equal(result.request.declares_production_soak_complete, undefined);
 });
 
 test('CLI image-ppt proof runs repo-owned lightweight mock runner by default', async () => {

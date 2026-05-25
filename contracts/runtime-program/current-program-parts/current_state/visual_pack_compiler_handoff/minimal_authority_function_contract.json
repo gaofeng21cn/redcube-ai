@@ -409,7 +409,7 @@
     "mcp_wrapper",
     "skill_wrapper",
     "product_entry_wrapper",
-    "domain_action_adapter_wrapper",
+    "domain_handler_wrapper",
     "status_projection_wrapper",
     "session_wrapper",
     "workbench_wrapper",

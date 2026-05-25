@@ -171,15 +171,12 @@ test('getProductStart exposes the same direct-entry start companion as the manif
 
     assert.equal(start.ok, true);
     assert.equal(start.surface_kind, 'product_entry_start');
-    assert.equal(start.recommended_mode_id, 'open_status');
+    assert.equal(start.recommended_mode_id, 'start_direct_session');
     assert.deepEqual(
       start.modes.map((mode) => mode.mode_id),
-      ['open_status', 'start_direct_session', 'opl_hosted_handoff', 'resume_session'],
+      ['start_direct_session', 'opl_hosted_handoff', 'resume_session'],
     );
-    assert.equal(
-      start.modes[0].command,
-      `redcube product status --workspace-root ${workspaceRoot}`,
-    );
+    assert.match(start.modes[0].command, /redcube product invoke/);
     assert.equal(start.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
     assert.equal(start.runtime_loop_closure.source_linkage.current_source, 'start');
     assert.equal(start.runtime_loop_closure.source_linkage.entry_mode, 'start_projection');

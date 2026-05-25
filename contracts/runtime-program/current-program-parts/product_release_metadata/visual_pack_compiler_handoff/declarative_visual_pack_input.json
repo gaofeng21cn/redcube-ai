@@ -488,7 +488,7 @@
       "redcube_mcp",
       "invokeProductEntry",
       "invokeDomainEntry",
-      "domain_action_adapter",
+      "domain_handler",
       "product_entry_continuity_refs_adapter"
     ],
     "repo_local_handlers_are_generated_surface_owners": false,

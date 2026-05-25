@@ -51,7 +51,7 @@ export function buildStandardDomainAgentSkeleton({
   runtime,
   productEntrySessionCommand,
   familyStageControlPlaneRef = '/family_stage_control_plane',
-  domainActionAdapterRef = '/product_entry_shell/domain_action_adapter',
+  domainActionAdapterRef = '/product_entry_shell/domain_handler',
   lifecycleAdapterRef = '/opl_family_lifecycle_adapter',
 } = {}) {
   const artifactLocatorContract = buildArtifactLocatorContract({
@@ -88,7 +88,7 @@ export function buildStandardDomainAgentSkeleton({
     },
     runtime_declarations: {
       declares_only: [
-        'domain_action_adapter_adapter',
+        'domain_handler_target',
         'projection_builder',
         'lifecycle_adapter',
         'visual_transition_spec',
@@ -97,13 +97,13 @@ export function buildStandardDomainAgentSkeleton({
         'domain_owner_receipt_contract',
         'lifecycle_guarded_apply_proof',
       ],
-      domain_action_adapter_adapter_ref: domainActionAdapterRef,
+      domain_handler_target_ref: domainActionAdapterRef,
       projection_builder_ref: familyStageControlPlaneRef,
       lifecycle_adapter_ref: lifecycleAdapterRef,
       visual_transition_spec_ref: '/visual_transition_spec',
       visual_transition_evaluator_ref: '/visual_transition_evaluator',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
-      session_command_template: productEntrySessionCommand || 'redcube product session --entry-session-id <entry-session-id>',
+      session_command_template: productEntrySessionCommand || 'opl_generated:product_session --entry-session-id <entry-session-id>',
       runtime_owner: runtime?.runtime_owner || 'configured_family_runtime_provider',
       executor_owner: 'configured_by_opl_runtime_provider',
       creates_visual_artifacts_in_repo: false,
@@ -137,11 +137,11 @@ export function buildStandardDomainAgentSkeleton({
         'publication_projection_truth',
         'canonical_artifact_content',
       ],
-      domain_action_adapter_dispatch_policy: 'guarded_rca_owned_actions_only',
+      domain_handler_dispatch_policy: 'guarded_rca_owned_actions_only',
     },
     source_refs: [
       { ref_kind: 'json_pointer', ref: familyStageControlPlaneRef, role: 'projection_builder' },
-      { ref_kind: 'json_pointer', ref: domainActionAdapterRef, role: 'domain_action_adapter_adapter' },
+      { ref_kind: 'json_pointer', ref: domainActionAdapterRef, role: 'domain_handler_target' },
       { ref_kind: 'json_pointer', ref: lifecycleAdapterRef, role: 'lifecycle_adapter' },
       { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_refs' },
       { ref_kind: 'json_pointer', ref: '/domain_memory_descriptor_locator', role: 'domain_memory_locator_refs' },

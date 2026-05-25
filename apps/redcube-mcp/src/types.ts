@@ -27,8 +27,6 @@ export interface DomainActionMap {
   getOverlayCatalog?: (args?: unknown) => Promise<unknown>;
   invokeDomainEntry?: (args: Record<string, unknown>) => Promise<unknown>;
   invokeProductEntry?: (args: Record<string, unknown>) => Promise<unknown>;
-  getProductEntryManifest?: (args: Record<string, unknown>) => Promise<unknown>;
-  getProductEntrySession?: (args: Record<string, unknown>) => Promise<unknown>;
   createDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getDeliverable?: (args: Record<string, unknown>) => Promise<unknown>;
   getPublicationProjection?: (args: Record<string, unknown>) => Promise<unknown>;
@@ -38,7 +36,6 @@ export interface DomainActionMap {
   invokeOplStageExecutionPlan?: (args: Record<string, unknown>) => Promise<unknown>;
   runDeliverableRoute?: (args: Record<string, unknown>) => Promise<unknown>;
   getRun?: (args: Record<string, unknown>) => Promise<unknown>;
-  runtimeWatch?: (args: Record<string, unknown>) => Promise<unknown>;
   getReviewState?: (args: Record<string, unknown>) => Promise<unknown>;
   applyReviewMutation?: (args: Record<string, unknown>) => Promise<unknown>;
   [key: string]: ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>) | undefined;

@@ -27,7 +27,7 @@
     "review_repair_transport",
     "restart_dead_letter_repair_human_gate_state_chain",
     "native_helper_generic_envelope",
-    "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+    "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
   ],
   "opl_owned_generic_primitives": [
     "standard_domain_agent_scaffold",
@@ -48,7 +48,7 @@
     "review_repair_transport",
     "restart_dead_letter_repair_human_gate_state_chain",
     "native_helper_generic_envelope",
-    "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper"
+    "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper"
   ],
   "rca_retained_authority": [
     "visual_truth",
@@ -138,7 +138,7 @@
   "rca_thin_program_surfaces": [
     "single redcube-ai app skill",
     "service-safe domain entry",
-    "product domain_action_adapter projection",
+    "domain-handler projection backed by internal domain_action_adapter implementation",
     "stage control projection",
     "visual transition spec",
     "artifact locator refs",
@@ -184,7 +184,7 @@
       "domain_action_adapter_ref": "/mapped_surfaces/native_helper_implementation"
     },
     {
-      "primitive": "generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper",
+      "primitive": "generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper",
       "contract_ref": "rca.visual_pack_compiler_handoff.v1",
       "manifest_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
       "domain_action_adapter_ref": "/mapped_surfaces/visual_pack_compiler_handoff"

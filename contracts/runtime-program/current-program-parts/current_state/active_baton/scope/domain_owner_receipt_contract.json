@@ -18,7 +18,7 @@
   "owner": "redcube_ai",
   "no_regression_evidence": {
     "action": "emit_no_regression_evidence",
-    "dispatch_surface": "redcube product domain_action_adapter dispatch",
+    "dispatch_surface": "redcube domain-handler dispatch",
     "surface_kind": "no_regression_evidence",
     "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
     "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",

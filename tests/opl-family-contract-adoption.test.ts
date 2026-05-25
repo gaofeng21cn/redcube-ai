@@ -220,7 +220,7 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
     'review_repair_transport',
     'restart_dead_letter_repair_human_gate_state_chain',
     'native_helper_generic_envelope',
-    'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+    'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
   ];
   const expectedRetainedAuthority = [
     'visual_truth',
@@ -289,7 +289,7 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
       'artifact_lifecycle',
       'review_repair_transport',
       'native_helper_generic_envelope',
-      'generated_cli_mcp_product_entry_domain_action_adapter_status_session_workbench_wrapper',
+      'generated_cli_mcp_product_entry_domain_handler_descriptor_status_session_workbench_wrapper',
     ],
   );
   for (const value of Object.values(payload.opl_generic_primitive_consumption.forbidden_rca_generic_owner_flags)) {
@@ -574,7 +574,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
   assert.equal(byId.operator_projection_shell.activeCallerStatus, 'opl_app_workbench_shell_domain_evidence_refs');
-  assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'domain_action_adapter_status_action_metadata_projection');
+  assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'domain_handler_status_action_metadata_projection');
   assert.equal(byId.generic_cli_mcp_wrappers.activeCallerStatus, 'opl_generated_wrappers_domain_handler_targets');
   assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'domain_handler_target');
   assert.equal(byId.codex_executor_adapter.opl_generic_primitive, 'agent_executor_adapter');
@@ -604,7 +604,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     'mcp_wrapper',
     'skill_wrapper',
     'product_entry_wrapper',
-    'domain_action_adapter_wrapper',
+    'domain_handler_wrapper',
     'status_projection_wrapper',
     'session_wrapper',
     'workbench_wrapper',

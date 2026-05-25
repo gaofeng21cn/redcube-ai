@@ -21,7 +21,7 @@
     "visual director review",
     "screenshot review",
     "repair_image_pages",
-    "product domain_action_adapter review projection"
+    "domain-handler review projection refs"
   ],
   "activeCallerStatus": "active_domain_review_gate",
   "migrationAction": "Keep blocked-item queue, rerun envelope, human approval lane and repair transport shell in OPL; RCA returns review/export verdict and repair target refs only.",

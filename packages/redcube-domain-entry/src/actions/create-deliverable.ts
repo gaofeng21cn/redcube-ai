@@ -35,15 +35,15 @@ const WORKSPACE_AGENTS_TEMPLATE = `# RedCube AI 交付工作区约束
 
 ## 默认入口
 
-- 当前工作区的视觉交付任务必须从 RedCube AI / RCA product-entry 入口开始：\`redcube product status\`、\`redcube product invoke\`、\`redcube product session\`。
+- 当前工作区的视觉交付任务必须从 RedCube AI / RCA direct product-entry handler target 开始：\`redcube product invoke\`；overview/status/session shell 由 OPL generated caller 提供。
 - PPT deck 默认路线是 \`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx\`。
 - Image-first 是默认视觉实现路线；HTML/native routes 只能在 manifest/status/session surface 明确显示可选且 operator 显式选择时使用。
 - \`style_reference_dir\` 通过 \`delivery_request.style_reference_dir\` 输入，provider diagnostics 的 blocked_reason 以 product-entry surface 为准。
 
 ## 防偏航规则
 
-- 修改或生成交付物前，先读取当前 workspace 的 RedCube manifest/status/session surface。
-- 长 PPT 或多资料任务必须保留同一 \`entry_session_id\`、\`topic_id\`、\`deliverable_id\`，通过 session surface 恢复，不重新开 prompt-only 任务。
+- 修改或生成交付物前，先读取 OPL generated 的 RedCube manifest/status/session refs 或 direct RCA handler 返回的 authority refs。
+- 长 PPT 或多资料任务必须保留同一 \`entry_session_id\`、\`topic_id\`、\`deliverable_id\`，通过 OPL generated session surface 恢复，不重新开 prompt-only 任务。
 - 截图质控或 visual director review 未通过时，从明确 stage rerun 或 repair_image_pages 回修；不要跳过 review gate 直接交付。
 - 除非用户明确要求探索替代技术路线，否则不要绕开 RCA product-entry/runtime。
 

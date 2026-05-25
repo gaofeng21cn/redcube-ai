@@ -2,12 +2,15 @@
 export const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const OPL_PROVIDER_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
-export const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
-export const PRODUCT_STATUS_COMMAND = 'redcube product status';
-export const PRODUCT_START_COMMAND = 'redcube product start';
 export const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
+export const PRODUCT_MANIFEST_COMMAND = 'opl_generated:product_entry_manifest';
+export const PRODUCT_STATUS_COMMAND = 'opl_generated:product_status';
+export const PRODUCT_START_COMMAND = 'opl_generated:product_start';
+export const PRODUCT_PREFLIGHT_COMMAND = 'opl_generated:product_preflight';
+export const PRODUCT_SESSION_COMMAND = 'opl_generated:product_session';
+export const DOMAIN_HANDLER_EXPORT_COMMAND = 'redcube domain-handler export';
+export const DOMAIN_HANDLER_DISPATCH_COMMAND = 'redcube domain-handler dispatch';
 export const OPL_HOSTED_HANDOFF_REF = 'opl_framework:hosted_product_entry';
-export const PRODUCT_SESSION_COMMAND = 'redcube product session';
 export const PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/redcube-product-entry-mvp.json';
 export const OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF = 'contracts/runtime-program/opl-framework-hosted-product-entry.json';
 export const SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF = 'contracts/runtime-program/product-entry-session-continuity.json';
@@ -81,8 +84,8 @@ export const LONG_TASK_STAGE_POLICY = {
   ],
   operator_rule: (
     'For long PPT tasks, do not compress the whole request into one prompt. '
-    + 'Start from product-entry overview/source intake, create or reuse an entry_session_id, checkpoint each stage, '
-    + 'and resume through product session before moving to the next stage. '
+    + 'Start from the OPL generated product-entry overview/source intake or direct domain handler target, create or reuse an entry_session_id, checkpoint each stage, '
+    + 'and resume through the OPL generated product session surface before moving to the next stage. '
     + 'When no stop_after_stage is requested, product invoke continues autonomously to terminal export unless a runtime review gate blocks it.'
   ),
 };

@@ -60,7 +60,7 @@ export function assertManifestSubstrateAdapterExport(manifest) {
     false,
   );
   assert.equal(
-    manifest.product_entry_shell.domain_action_adapter.opl_substrate_adapter_export.ref,
+    manifest.product_entry_shell.domain_handler.opl_substrate_adapter_export.ref,
     '/opl_substrate_adapter_export',
   );
   assert.equal(manifest.source_provenance.surface_kind, 'source_provenance');

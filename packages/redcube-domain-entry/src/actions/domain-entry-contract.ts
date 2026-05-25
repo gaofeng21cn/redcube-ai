@@ -26,8 +26,8 @@ export const RCA_DOMAIN_AGENT_ENTRY_SPEC_V1 = {
   codex_entry_strategy: 'domain_agent_entry',
   artifact_conventions: 'deck_and_visual_delivery',
   progress_conventions: 'deliverable_build_narration',
-  entry_command: 'redcube product status',
-  manifest_command: 'redcube product manifest',
+  entry_command: 'redcube product invoke',
+  manifest_command: 'opl_generated:product_entry_manifest',
 };
 
 export function buildRedCubeDomainEntryContract({
@@ -43,30 +43,6 @@ export function buildRedCubeDomainEntryContract({
 }) {
   const commandCatalog = buildDomainEntryCommandCatalog([
     {
-      command: productManifestCommand,
-      required_fields: ['workspace_root'],
-      extra_payload: {
-        api_surface: 'getProductEntryManifest',
-        target_surface_kind: 'product_entry_manifest',
-      },
-    },
-    {
-      command: productStatusCommand,
-      required_fields: ['workspace_root'],
-      extra_payload: {
-        api_surface: 'getProductStatus',
-        target_surface_kind: 'product_status',
-      },
-    },
-    {
-      command: productStartCommand,
-      required_fields: ['workspace_root'],
-      extra_payload: {
-        api_surface: 'getProductStart',
-        target_surface_kind: 'product_entry_start',
-      },
-    },
-    {
       command: productInvokeCommand,
       required_fields: ['workspace_root', 'entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
       optional_fields: ['profile_id', 'title', 'goal', 'task_intent', 'route', 'user_intent', 'stop_after_stage'],
@@ -75,22 +51,14 @@ export function buildRedCubeDomainEntryContract({
         target_surface_kind: 'product_entry',
       },
     },
-    {
-      command: productSessionCommand,
-      required_fields: ['entry_session_id'],
-      extra_payload: {
-        api_surface: 'getProductEntrySession',
-        target_surface_kind: 'product_entry_session',
-      },
-    },
   ]);
 
   return buildFamilyDomainEntryContract({
     entry_adapter: REDCUBE_DOMAIN_ENTRY_ADAPTER,
     service_safe_surface_kind: 'domain_entry',
-    product_entry_builder_command: productManifestCommand,
+    product_entry_builder_command: productInvokeCommand,
     product_entry_kind: PRODUCT_ENTRY_KIND,
-    supported_entry_modes: ['direct', 'opl_hosted', 'session'],
+    supported_entry_modes: ['direct', 'opl_hosted'],
     supported_commands: commandCatalog.supported_commands,
     command_contracts: commandCatalog.command_contracts,
     extra_payload: {
@@ -99,6 +67,12 @@ export function buildRedCubeDomainEntryContract({
       opl_hosted_product_entry_contract_ref: oplHostedProductEntryContractRef,
       session_continuity_provenance_contract_ref: sessionContinuityProvenanceContractRef,
       opl_hosted_handoff_ref: oplHostedProductEntryContractRef,
+      opl_generated_wrapper_refs: {
+        manifest: productManifestCommand,
+        status: productStatusCommand,
+        start: productStartCommand,
+        session: productSessionCommand,
+      },
       domain_agent_entry_spec: RCA_DOMAIN_AGENT_ENTRY_SPEC_V1,
     },
   });
@@ -120,6 +94,7 @@ export function buildRedCubeUserInteractionContract({
     extra_payload: {
       entry_status_command: productStatusCommand,
       manifest_command: productManifestCommand,
+      repo_local_default_wrapper_retired: true,
       opl_hosted_contract_ref: oplHostedProductEntryContractRef,
     },
   });

@@ -10,7 +10,7 @@
     "domain_action_handlers",
     "safe_action_refs"
   ],
-  "rca_scope": "domain_action_adapter_status_action_metadata_projection",
+  "rca_scope": "domain_handler_status_action_metadata_projection",
   "audit_readout": "retain_thin_projection_project_generated_wrappers",
   "codePaths": [
     "apps/redcube-cli/src/cli.ts",
@@ -23,12 +23,12 @@
     "redcube CLI direct diagnostic entry",
     "redcube MCP direct protocol adapter",
     "family action catalog refs",
-    "product domain_action_adapter guarded action list refs"
+    "domain-handler guarded action list refs"
   ],
   "activeCallerStatus": "opl_generated_wrappers_domain_handler_targets",
   "migrationAction": "Use OPL standard domain-agent scaffold for generic wrapper generation, command surface registration and MCP action scaffolding; RCA keeps action metadata and domain handlers only.",
   "retentionReason": "RCA retains canonical action metadata and domain handlers because they encode visual deliverable authority boundaries.",
-  "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain_action_adapter handler authority.",
+  "cannotAbsorbReason": "OPL can generate wrappers but cannot own RCA action semantics or guarded domain handler authority.",
   "tombstone_required": false,
   "migration_class": "domain_handler_target",
   "active_reader_facing_classification": "domain_handler_target",
@@ -90,7 +90,8 @@
     "mcp",
     "skill",
     "domain_action_adapter",
-    "domain_action_adapter_export_dispatch",
+    "domain_handler",
+    "domain_handler",
     "family_action_catalog",
     "guarded_action_catalog"
   ],

@@ -20,7 +20,7 @@
   "activeCallers": [
     "OPL generated product status/workbench consumes RCA operator evidence refs",
     "product-entry manifest domain projection refs",
-    "product domain_action_adapter export refs-only projection",
+    "domain-handler export refs-only projection",
     "operator evidence readiness tests"
   ],
   "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",

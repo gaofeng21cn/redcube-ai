@@ -18,7 +18,7 @@
     "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
   ],
   "activeCallers": [
-    "apply_visual_memory_writeback domain_action_adapter action",
+    "apply_visual_memory_writeback domain handler action",
     "workspace receipt inventory",
     "operator evidence readiness projection"
   ],

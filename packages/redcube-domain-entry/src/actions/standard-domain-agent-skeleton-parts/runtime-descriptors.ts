@@ -96,7 +96,7 @@ export function buildControlledVisualStageAttemptFixture() {
       '/ppt_deck_visual_route_truth',
     ],
     domain_action_adapter_refs: [
-      '/product_entry_shell/domain_action_adapter',
+      '/product_entry_shell/domain_handler',
       '/domain_action_adapter_receipt_refs',
     ],
   };
@@ -194,7 +194,7 @@ export function buildControlledVisualStageAttemptFixture() {
     opl_hosted_attempt: {
       entry_surface: 'OPL Runtime Manager configured family runtime provider',
       runtime_owner: 'configured_family_runtime_provider',
-      domain_action_adapter_dispatch_ref: '/product_entry_shell/domain_action_adapter',
+      domain_action_adapter_dispatch_ref: '/product_entry_shell/domain_handler',
       convergence_ref: '/domain_entry_surface',
       consumed_memory_refs: sharedRefs.consumed_memory_refs,
       writeback_receipt_ref: 'rca-memory-receipt:visual-pattern:<receipt-id>',
@@ -260,7 +260,7 @@ export function buildDomainActionAdapterReceiptRefs() {
     surface_kind: 'domain_action_adapter_receipt_refs',
     receipt_contract_id: 'rca.domain_action_adapter.receipt_refs.v1',
     owner: DOMAIN_OWNER,
-    domain_action_adapter_adapter_ref: '/product_entry_shell/domain_action_adapter',
+    domain_handler_target_ref: '/product_entry_shell/domain_handler',
     receipt_refs: [
       {
         receipt_kind: 'control_plane_ack',

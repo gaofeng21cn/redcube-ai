@@ -8,7 +8,7 @@ const RCA_EFFICIENCY_TARGET_VERIFICATION_REFS = Object.freeze([
   'workspace-runtime-ref:review-export:<run-id>',
   'workspace-runtime-ref:export-result:<run-id>',
   'target-verification:redcube-ai/product-manifest-read',
-  'target-verification:redcube-ai/domain-action-adapter-export-read',
+  'target-verification:redcube-ai/domain-handler-export-read',
   'target-verification:redcube-ai/typecheck',
   'target-verification:redcube-ai/test-fast',
   'target-verification:redcube-ai/targeted-efficiency-tests',
@@ -34,7 +34,7 @@ const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
     target_surface: 'target_agent_owner_route_ref',
     target_repo_refs: [
       'redcube product manifest#/owner_route',
-      'redcube product domain_action_adapter#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
+      'redcube domain-handler export#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
     ],
     verifies_ref: 'target-runtime-read-model-consumption:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4/source-patch',
     refs_only: true,
@@ -525,7 +525,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
       production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
       workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
-      domain_action_adapter_export_ref: '/product_entry_shell/domain_action_adapter',
+      domain_handler_export_ref: '/product_entry_shell/domain_handler',
     },
     body_free_owner_receipt_ref: {
       expected_receipt_slot: 'artifact_producing_owner_receipt',
@@ -659,19 +659,19 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
     target_runtime_consumption_refs: [
       'redcube product manifest#/rca_efficiency_handoff_projection',
       'redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
-      'redcube product domain_action_adapter#/mapped_surfaces/rca_efficiency_handoff_projection',
-      'redcube product domain_action_adapter#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
-      'redcube product domain_action_adapter#/mapped_surfaces/external_work_order_owner_closeout',
-      'redcube product domain_action_adapter#/source_manifest_refs/external_work_order_owner_closeout_ref',
+      'redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection',
+      'redcube domain-handler export#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
+      'redcube domain-handler export#/mapped_surfaces/external_work_order_owner_closeout',
+      'redcube domain-handler export#/source_manifest_refs/external_work_order_owner_closeout_ref',
     ],
     efficiency_signal_refs: {
       duration_refs: [
         'workspace-runtime-ref:route-summary:<run-id>#/elapsed_ms',
-        'redcube product session#/runtime_loop_closure/elapsed_ms',
+        'opl_generated:product_session#/runtime_loop_closure/elapsed_ms',
       ],
       cost_refs: [
         'workspace-runtime-ref:route-summary:<run-id>#/cost_summary',
-        'redcube product session#/runtime_loop_closure/cost_summary',
+        'opl_generated:product_session#/runtime_loop_closure/cost_summary',
       ],
       cache_refs: [
         'workspace-runtime-ref:route-summary:<run-id>#/cache_status',

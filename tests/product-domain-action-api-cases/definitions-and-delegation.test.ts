@@ -40,7 +40,7 @@ test('listDomainTools exposes deliverable-centric product/domain action API tool
 });
 
 
-test('MCP tool definitions keep runtime_watch on the same run-boundary locator truth as CLI review watch', () => {
+test('MCP tool definitions keep RCA as direct protocol adapter and generated wrapper target', () => {
   const definitions = getToolDefinitions();
   const workspace = definitions.find((tool) => tool.name === 'redcube_workspace');
   const sources = definitions.find((tool) => tool.name === 'redcube_sources');
@@ -52,9 +52,9 @@ test('MCP tool definitions keep runtime_watch on the same run-boundary locator t
   assert.equal(sources?.description.includes('source intake/research'), true);
   assert.equal(deliverable?.description.includes('deliverable lifecycle execution'), true);
   assert.equal(review?.description.includes('deliverable boundary'), true);
-  assert.equal(review?.description.includes('runtime watch'), true);
-  assert.equal(productEntry?.description.includes('status'), true);
-  assert.equal(productEntry?.description.includes('preflight'), true);
+  assert.equal(review?.description.includes('runtime watch default wrapper is owned by OPL'), true);
+  assert.equal(productEntry?.description.includes('domain-handler target'), true);
+  assert.equal(productEntry?.description.includes('Generated product status/session/manifest/workbench wrappers are owned by OPL'), true);
   assert.equal(productEntry?.description.includes('product-entry'), true);
   const listedDeliverable = listDomainTools().find((tool) => tool.name === 'redcube_deliverable');
   const retiredSupervisionKeys = [
@@ -109,8 +109,8 @@ test('MCP catalog definitions are projected from the RedCube family action catal
     productEntryTool?.action_catalog_projection?.action_ids,
   );
   assert.equal(productEntryActionIds.every((actionId) => catalogActionIds.has(actionId)), true);
-  assert.equal(productEntryActions.includes('export_domain_action_adapter'), true);
-  assert.equal(productEntryActions.includes('dispatch_domain_action_adapter'), true);
+  assert.equal(productEntryActions.includes('export_domain_action_adapter'), false);
+  assert.equal(productEntryActions.includes('dispatch_domain_action_adapter'), false);
   assert.equal(productEntryActions.includes('invoke_domain_entry'), true);
   assert.equal(productEntryActions.includes('invoke_opl_hosted_product_entry'), false);
   assert.equal(productEntryTool?.description, metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.description);
@@ -365,7 +365,7 @@ test('callDomainTool rejects unknown tool names', async () => {
   );
 });
 
-test('stdio MCP server exposes tools and can execute runtime_watch', async () => {
+test('stdio MCP server rejects runtime_watch as a retired MCP default wrapper', async () => {
   const serverPath = fileURLToPath(
     new URL('../../apps/redcube-mcp/dist/server.js', import.meta.url),
   );
@@ -404,10 +404,9 @@ test('stdio MCP server exposes tools and can execute runtime_watch', async () =>
       }),
     });
 
-    assert.equal(result.isError, undefined);
-    assert.equal(result.structuredContent.status, 'review_pending');
-    assert.equal(result.structuredContent.current_stage, 'storyline');
-    assert.deepEqual(result.structuredContent.pending_reviews, ['render_review']);
+    assert.equal(result.isError, true);
+    assert.match(result.structuredContent.error, /Unsupported redcube_review action: runtime_watch/);
+    assert.equal(result.structuredContent.error_kind, 'domain_tool_error');
   } finally {
     await transport.close();
   }
@@ -451,21 +450,18 @@ test('stdio MCP server exposes current product-entry overview surfaces', async (
       arguments: withAction('get_product_preflight', { workspaceRoot }),
     });
 
-    assert.equal(status.isError, undefined);
-    assert.equal(status.structuredContent.surface_kind, 'product_status');
-    assert.equal(status.structuredContent.entry_status_surface.command, 'redcube product status');
-    assert.equal(start.isError, undefined);
-    assert.equal(start.structuredContent.surface_kind, 'product_entry_start');
-    assert.equal(start.structuredContent.workspace_locator.workspace_root, workspaceRoot);
-    assert.equal(preflight.isError, undefined);
-    assert.equal(preflight.structuredContent.surface_kind, 'product_entry_preflight');
-    assert.equal(preflight.structuredContent.workspace_locator.workspace_root, workspaceRoot);
+    assert.equal(status.isError, true);
+    assert.match(status.structuredContent.error, /Unsupported redcube_product_entry action: get_product_status/);
+    assert.equal(start.isError, true);
+    assert.match(start.structuredContent.error, /Unsupported redcube_product_entry action: get_product_start/);
+    assert.equal(preflight.isError, true);
+    assert.match(preflight.structuredContent.error, /Unsupported redcube_product_entry action: get_product_preflight/);
   } finally {
     await transport.close();
   }
 });
 
-test('stdio MCP server rejects runtime_watch when the topic locator does not match the persisted run identity', async () => {
+test('stdio MCP server rejects runtime_watch before domain runtime lookup', async () => {
   await withMockCodexRuntime(async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-mcp-watch-mismatch-'));
   await completeSourceReadiness({
@@ -531,7 +527,7 @@ test('stdio MCP server rejects runtime_watch when the topic locator does not mat
     });
 
     assert.equal(result.isError, true);
-    assert.match(result.content[0].text, /runtimeWatch topicId 与 run\.topic_id 不一致/);
+    assert.match(result.content[0].text, /Unsupported redcube_review action: runtime_watch/);
     assert.equal(result.structuredContent.ok, false);
     assert.equal(result.structuredContent.error_kind, 'domain_tool_error');
   } finally {
@@ -732,8 +728,9 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
       }),
     });
 
-    assert.equal(watch.structuredContent.run_id, runResult.structuredContent.run.run_id);
-    assert.equal(watch.structuredContent.current_stage, 'detailed_outline');
+    assert.equal(watch.isError, true);
+    assert.match(watch.structuredContent.error, /Unsupported redcube_review action: runtime_watch/);
+    assert.equal(watch.structuredContent.error_kind, 'domain_tool_error');
   } finally {
     await transport.close();
   }

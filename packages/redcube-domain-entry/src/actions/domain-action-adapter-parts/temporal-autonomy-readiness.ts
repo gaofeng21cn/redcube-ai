@@ -113,7 +113,7 @@ export function buildTemporalAutonomyReadinessProjection({
         gate_id: 'queue_wakeup_handoff',
         owner: OPL_OWNER,
         status: 'ready',
-        rca_surface_ref: '/product_entry_shell/domain_action_adapter',
+        rca_surface_ref: '/product_entry_shell/domain_handler',
         required_domain_action_adapter_actions: [
           'emit_no_regression_evidence',
           'emit_domain_owner_receipt',
@@ -180,7 +180,7 @@ export function buildTemporalAutonomyReadinessProjection({
       },
       {
         owner: DOMAIN_ID,
-        action_ref: 'redcube product domain_action_adapter dispatch:emit_domain_owner_receipt',
+        action_ref: 'opl_generated:domain_action_adapter dispatch:emit_domain_owner_receipt',
         purpose: 'return RCA-owned owner receipt or typed blocker for the hosted attempt',
       },
     ],

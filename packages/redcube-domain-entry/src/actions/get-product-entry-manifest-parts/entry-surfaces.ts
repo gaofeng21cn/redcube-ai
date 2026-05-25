@@ -23,18 +23,10 @@ export function buildProductEntryManifestEntrySurfaces({
 }) {
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
-      'Open the RedCube product-entry overview first via the `status` command; if the user requested plan/storyline review, invoke with lifecycle_policy=operator_review_after_plan; otherwise direct invoke runs to terminal export unless explicit stop_after_stage or a runtime review gate stops it.'
+      'Start from the RCA direct product-entry domain handler target; OPL-generated status/session shells can inspect overview and progress, but RCA no longer publishes those repo-local default wrappers.'
     ),
-    recommended_step_id: 'open_status',
+    recommended_step_id: 'continue_current_loop',
     steps: [
-      {
-        step_id: 'open_status',
-        title: 'Open RedCube product-entry overview',
-        command: `${PRODUCT_STATUS_COMMAND} --workspace-root ${workspaceRoot}`,
-        surface_kind: 'product_status',
-        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the product overview command, not a GUI shell.',
-        requires: [],
-      },
       {
         step_id: 'continue_current_loop',
         title: 'Continue current deliverable loop',
@@ -49,10 +41,10 @@ export function buildProductEntryManifestEntrySurfaces({
       },
       {
         step_id: 'inspect_current_progress',
-        title: 'Inspect current session progress',
+        title: 'Inspect current session progress through OPL generated session shell',
         command: productEntrySessionCommand,
         surface_kind: 'product_entry_session',
-        summary: 'Inspect the current session progress for the same deliverable.',
+        summary: 'OPL generated session shell consumes RCA entry-session refs; this is not a repo-local RCA default CLI/MCP wrapper.',
         requires: ['entry_session_id'],
       },
       {
@@ -77,8 +69,8 @@ export function buildProductEntryManifestEntrySurfaces({
   });
   const productEntryOverview = {
     ...buildProductEntryOverview({
-      summary: 'Repo-verified product-entry overview/intake surface 已 landed；默认 invoke 生成 OPL stage execution plan 并交给 OPL provider 推进；`status` 是当前 product overview 命令，成熟终端用户前台壳仍未 landed。',
-      product_entry_command: PRODUCT_STATUS_COMMAND,
+      summary: 'RCA exposes the direct product-entry domain handler target; OPL owns generated product-entry overview/status/session wrappers and consumes RCA refs.',
+      product_entry_command: PRODUCT_INVOKE_COMMAND,
       recommended_command: PRODUCT_INVOKE_COMMAND,
       operator_loop_command: PRODUCT_INVOKE_COMMAND,
       progress_surface: {
@@ -99,22 +91,16 @@ export function buildProductEntryManifestEntrySurfaces({
       human_gate_ids: humanGateIds,
     }),
     entry_status_command: PRODUCT_STATUS_COMMAND,
+    entry_status_owner: 'one-person-lab',
+    repo_local_entry_status_command_available: false,
   };
   const productEntryStart = buildProductEntryStart({
     summary: (
-      '先读取 RedCube product-entry overview（`status` 命令）；direct session 默认自动推进到终态，'
-      + '需要给 OPL framework 托管时使用 OPL-hosted stage runtime handoff，已有 session 则直接恢复。'
+      'RCA repo-local public caller 只保留 direct invoke domain handler target；'
+      + 'overview/status、session 和 hosted runtime handoff 由 OPL generated/hosted caller 承担。'
     ),
-    recommended_mode_id: 'open_status',
+    recommended_mode_id: 'start_direct_session',
     modes: [
-      {
-        mode_id: 'open_status',
-        title: 'Open RedCube product-entry overview',
-        command: `${PRODUCT_STATUS_COMMAND} --workspace-root ${workspaceRoot}`,
-        surface_kind: 'product_status',
-        summary: 'Read the agent-facing product-entry overview for the current workspace; `status` is the product overview command, not a GUI shell.',
-        requires: [],
-      },
       {
         mode_id: 'start_direct_session',
         title: 'Start direct session',
@@ -138,10 +124,10 @@ export function buildProductEntryManifestEntrySurfaces({
       },
       {
         mode_id: 'resume_session',
-        title: 'Resume session',
+        title: 'Resume session through OPL generated shell',
         command: productEntrySessionCommand,
         surface_kind: 'product_entry_session',
-        summary: 'Resume an existing RedCube product-entry session by entry_session_id.',
+        summary: 'OPL generated session shell targets RCA session refs; repo-local RCA CLI/MCP no longer exposes the default session wrapper.',
         requires: ['entry_session_id'],
       },
     ],
@@ -157,12 +143,11 @@ export function buildProductEntryManifestEntrySurfaces({
     good_to_use_now: false,
     fully_automatic: false,
     summary: (
-      '当前可以作为 RedCube 的 agent-facing product-entry overview / CLI product-entry 主线使用，'
-      + '默认 product-entry 已返回 OPL stage execution plan / RCA authority refs，'
-      + '但还不是成熟的最终用户前台或托管 Web 产品。'
+      '当前可以作为 RedCube 的 direct product-entry domain handler target 使用；'
+      + '默认 product-entry 已返回 OPL stage execution plan / RCA authority refs，generated overview/session/workbench shell 归 OPL。'
     ),
-    recommended_start_surface: 'product_status',
-    recommended_start_command: PRODUCT_STATUS_COMMAND,
+    recommended_start_surface: 'product_entry',
+    recommended_start_command: PRODUCT_INVOKE_COMMAND,
     recommended_loop_surface: 'product_entry',
     recommended_loop_command: PRODUCT_INVOKE_COMMAND,
     blocking_gaps: [

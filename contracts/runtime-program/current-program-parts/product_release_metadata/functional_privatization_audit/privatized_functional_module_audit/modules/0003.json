@@ -21,7 +21,7 @@
     "artifact locator contract",
     "export_pptx route",
     "workspace lifecycle guarded apply",
-    "product domain_action_adapter export"
+    "domain-handler export internal projection"
   ],
   "activeCallerStatus": "refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell",
   "migrationAction": "Consume OPL/App generic artifact inventory, gallery, restore/provenance navigation and handoff shell; keep RCA artifact authority and export verdict refs only.",

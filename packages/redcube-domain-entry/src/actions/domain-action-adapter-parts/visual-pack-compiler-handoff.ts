@@ -144,7 +144,7 @@ export const OPL_GENERATED_SURFACE_TARGETS = Object.freeze([
   'mcp_wrapper',
   'skill_wrapper',
   'product_entry_wrapper',
-  'domain_action_adapter_wrapper',
+  'domain_handler_wrapper',
   'status_projection_wrapper',
   'session_wrapper',
   'workbench_wrapper',
@@ -158,7 +158,7 @@ export const OPL_GENERATED_DESCRIPTOR_SCOPE = Object.freeze([
   'product_entry',
   'product_status',
   'product_session',
-  'domain_action_adapter',
+  'domain_handler',
   'workbench',
 ]);
 
@@ -167,7 +167,7 @@ export const RCA_REPO_LOCAL_HANDLER_TARGETS = Object.freeze([
   'redcube_mcp',
   'invokeProductEntry',
   'invokeDomainEntry',
-  'domain_action_adapter',
+  'domain_handler',
   'product_entry_continuity_refs_adapter',
 ]);
 
@@ -310,7 +310,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         domain_handler_owner: 'redcube_ai',
         redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
         redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
-        domain_action_adapter_role: 'domain_action_target_or_refs_only_adapter',
+        domain_handler_role: 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
         product_entry_continuity_refs_adapter_role: 'entry_session_domain_snapshot_refs_only_adapter',
         cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
         default_generic_dispatch_owner: 'one-person-lab',
@@ -325,7 +325,12 @@ export function buildVisualPackCompilerHandoffProjection() {
         mcp: { owner: 'opl', current_rca_role: 'domain_handler_target', long_term_rca_owner: false },
         skill: { owner: 'opl', current_rca_role: 'generated_domain_app_skill_descriptor', long_term_rca_owner: false },
         product_entry: { owner: 'opl', current_rca_role: 'direct_domain_entry_target', long_term_rca_owner: false },
-        domain_action_adapter: { owner: 'opl', current_rca_role: 'domain_domain_action_adapter_target', long_term_rca_owner: false },
+        domain_handler: {
+          owner: 'opl',
+          current_rca_role: 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
+          domain_handler_target: 'domain_handler',
+          long_term_rca_owner: false,
+        },
         status: { owner: 'opl', current_rca_role: 'domain_status_projection_target', long_term_rca_owner: false },
         session: { owner: 'opl', current_rca_role: 'domain_session_snapshot_refs_adapter', long_term_rca_owner: false },
         workbench: { owner: 'opl', current_rca_role: 'generated_surface', long_term_rca_owner: false },
@@ -335,7 +340,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         opl_can_generate_cli_wrapper: true,
         opl_can_generate_mcp_wrapper: true,
         opl_can_generate_product_entry_wrapper: true,
-        opl_can_generate_domain_action_adapter_wrapper: true,
+        opl_can_generate_domain_handler_wrapper: true,
         opl_can_generate_status_projection: true,
         opl_can_generate_session_shell: true,
         opl_can_generate_workbench_shell: true,

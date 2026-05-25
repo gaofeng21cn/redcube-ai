@@ -12,7 +12,7 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
-const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'redcube product session --entry-session-id <entry-session-id>';
+const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'opl_generated:product_session --entry-session-id <entry-session-id>';
 const REDCUBE_LOOP_OWNER = 'redcube_ai';
 const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
 const DEFAULT_INTERRUPT_POLICY = 'continue_autonomously_until_runtime_gate';
@@ -329,8 +329,8 @@ export function buildOplFamilyLifecycleAdapterSurface({
   });
 }
 
-const PRODUCT_MANIFEST_COMMAND = 'redcube product manifest';
-const PRODUCT_STATUS_COMMAND = 'redcube product status';
+const PRODUCT_MANIFEST_COMMAND = 'opl_generated:product_entry_manifest';
+const PRODUCT_STATUS_COMMAND = 'opl_generated:product_status';
 const OPL_HOSTED_HANDOFF_REF = 'opl_framework:hosted_product_entry';
 
 export function buildOplRuntimeManagerRegistration({
@@ -349,8 +349,8 @@ export function buildOplRuntimeManagerRegistration({
     runtime_owner: runtimeContinuityEnvelope.runtime_owner,
     executor_owner: runtimeContinuityEnvelope.executor_owner,
     domain_entry_surface: {
-      surface_kind: 'product_status',
-      command: PRODUCT_STATUS_COMMAND,
+      surface_kind: 'product_entry',
+      command: 'redcube product invoke',
       manifest_command: PRODUCT_MANIFEST_COMMAND,
     },
     registration_surface: {
@@ -388,7 +388,7 @@ export function buildOplRuntimeManagerRegistration({
       skeleton_id: standardDomainAgentSkeleton?.skeleton_id || 'rca.standard_domain_agent_skeleton.v1',
       mapping_model: standardDomainAgentSkeleton?.mapping_model || 'manifest_descriptor_mapping_only',
       runtime_declares_only: standardDomainAgentSkeleton?.runtime_declarations?.declares_only || [
-        'domain_action_adapter_adapter',
+        'domain_handler_target',
         'projection_builder',
         'lifecycle_adapter',
       ],

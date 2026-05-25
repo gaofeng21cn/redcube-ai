@@ -8,9 +8,9 @@
     "redcube product invoke",
     "redcube product session"
   ],
-  "domain_action_adapter_surfaces": [
-    "redcube product domain_action_adapter export",
-    "redcube product domain_action_adapter dispatch"
+  "domain_handler_surfaces": [
+    "redcube domain-handler export",
+    "redcube domain-handler dispatch"
   ],
   "stage_control_projection": "redcube product manifest#/stage_control_projection"
 }

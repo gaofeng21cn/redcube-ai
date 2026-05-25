@@ -47,7 +47,7 @@ const OPL_CANONICAL_GENERATED_SURFACES = [
   'mcp',
   'skill',
   'product_entry_manifest',
-  'domain_action_adapter_export_dispatch',
+  'domain_handler',
   'status_read_model',
   'workbench_drilldown',
   'functional_harness_cases',
@@ -57,7 +57,7 @@ const GENERATED_WRAPPER_DESCRIPTOR_SCOPE = [
   'product_entry',
   'product_status',
   'product_session',
-  'domain_action_adapter',
+  'domain_handler',
   'workbench',
 ];
 
@@ -114,7 +114,7 @@ function buildSkeleton() {
       runtime_state_root: '<runtime_state_root>',
       session_continuity_root: '<session_continuity_root>',
     },
-    productEntrySessionCommand: 'redcube product session --entry-session-id <entry-session-id>',
+    productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
 }
 

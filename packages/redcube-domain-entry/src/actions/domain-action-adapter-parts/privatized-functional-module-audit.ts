@@ -326,9 +326,9 @@ export function buildVisualPackCompilerHandoffAuditModule() {
     codePaths: [
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts',
     ],
-    activeCallers: ['product-entry manifest', 'product domain_action_adapter export', 'product status'],
+    activeCallers: ['product-entry manifest', 'domain-handler export', 'OPL generated product status refs'],
     activeCallerStatus: 'declarative_pack_input_active',
-    migrationAction: 'Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain_action_adapter/status/session/workbench/harness surfaces.',
+    migrationAction: 'Provide declarative visual pack input for OPL-generated CLI/MCP/product-entry/domain-handler/status/session/workbench/harness surfaces.',
     retentionReason: 'RCA retains visual stage, action, policy, receipt and fixture declarations as domain pack input.',
     cannotAbsorbReason: 'OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.',
     rca_projection_mode: 'declarative_pack_refs_only',

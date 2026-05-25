@@ -54,7 +54,7 @@ const oplCanonicalGeneratedSurfaceIds = [
   'mcp',
   'skill',
   'product_entry_manifest',
-  'domain_action_adapter_export_dispatch',
+  'domain_handler',
   'status_read_model',
   'workbench_drilldown',
   'functional_harness_cases',
@@ -64,7 +64,7 @@ const wrapperDescriptorScopeIds = [
   'product_entry',
   'product_status',
   'product_session',
-  'domain_action_adapter',
+  'domain_handler',
   'workbench',
 ];
 
@@ -126,7 +126,7 @@ function buildCanonicalPack() {
       runtime_state_root: '<runtime_state_root>',
       session_continuity_root: '<session_continuity_root>',
     },
-    productEntrySessionCommand: 'redcube product session --entry-session-id <entry-session-id>',
+    productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
   const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
@@ -175,7 +175,7 @@ function buildCanonicalPack() {
       minimal_authority_surface_contracts: (
         visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_contracts
       ),
-      generated_surfaces_requested: generatedSurfaceIds,
+    generated_surfaces_requested: [...new Set(generatedSurfaceIds)],
       generated_interface_consumption_ref: '/opl_generated_interface_consumption',
       repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
       repo_local_handlers_are_generated_surface_owners: false,
@@ -546,8 +546,8 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     'one-person-lab',
   );
   assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.domain_action_adapter_role,
-    'domain_action_target_or_refs_only_adapter',
+    generatedSurfaceHandoff.repo_local_launcher_policy.domain_handler_role,
+    'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
   );
   assert.equal(
     generatedSurfaceHandoff.repo_local_launcher_policy.default_supervision_owner,
