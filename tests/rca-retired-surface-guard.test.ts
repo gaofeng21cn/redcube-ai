@@ -817,3 +817,52 @@ test('retired legacy surface ids only appear in tombstone or provenance pointer 
 
   assert.deepEqual(violations, []);
 });
+
+test('retired compatibility payload fields only appear in negative guard fields', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const payloadFieldPolicy = policy.legacy_name_policy.retired_compatibility_payload_field_policy;
+  assert.equal(
+    payloadFieldPolicy.policy_kind,
+    'retired_compatibility_payload_fields_must_stay_inside_negative_guard_fields',
+  );
+  assert.deepEqual(payloadFieldPolicy.retired_field_ids, [
+    'managed_runtime_compatibility_alias',
+  ]);
+  assert.deepEqual(payloadFieldPolicy.policy_declaration_pointer_suffixes, [
+    '/legacy_name_policy/retired_compatibility_payload_field_policy/retired_field_ids/*',
+  ]);
+  assert.deepEqual(payloadFieldPolicy.allowed_json_pointer_suffixes, [
+    '/forbidden_payload_fields/*',
+    '/forbidden_receipt_fields/*',
+  ]);
+  assert.equal(payloadFieldPolicy.active_payload_template_allowed, false);
+  assert.equal(payloadFieldPolicy.compatibility_alias_allowed, false);
+  assert.equal(payloadFieldPolicy.success_payload_field_allowed, false);
+  assert.equal(payloadFieldPolicy.production_readiness_claim_allowed, false);
+
+  const retiredFields = new Set(payloadFieldPolicy.retired_field_ids);
+  const violations = [];
+  for (const file of listJsonFiles('contracts')) {
+    const normalizedFile = normalizePath(file);
+    const parsed = JSON.parse(readFileSync(file, 'utf-8'));
+    visitJsonPointers(parsed, '', (value, pointer) => {
+      if (!retiredFields.has(value)) return;
+      if (payloadFieldPolicy.policy_declaration_pointer_suffixes.some(
+        (suffix) => pointerMatchesAllowedSuffix(pointer, suffix),
+      )) {
+        return;
+      }
+      if (payloadFieldPolicy.allowed_json_pointer_suffixes.some(
+        (suffix) => pointerMatchesAllowedSuffix(pointer, suffix),
+      )) {
+        return;
+      }
+      violations.push(`${normalizedFile}${pointer}`);
+    });
+  }
+
+  assert.deepEqual(violations, []);
+});

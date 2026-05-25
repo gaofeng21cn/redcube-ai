@@ -612,6 +612,23 @@
       "compatibility_alias_allowed": false,
       "production_readiness_claim_allowed": false
     },
+    "retired_compatibility_payload_field_policy": {
+      "policy_kind": "retired_compatibility_payload_fields_must_stay_inside_negative_guard_fields",
+      "retired_field_ids": [
+        "managed_runtime_compatibility_alias"
+      ],
+      "policy_declaration_pointer_suffixes": [
+        "/legacy_name_policy/retired_compatibility_payload_field_policy/retired_field_ids/*"
+      ],
+      "allowed_json_pointer_suffixes": [
+        "/forbidden_payload_fields/*",
+        "/forbidden_receipt_fields/*"
+      ],
+      "active_payload_template_allowed": false,
+      "compatibility_alias_allowed": false,
+      "success_payload_field_allowed": false,
+      "production_readiness_claim_allowed": false
+    },
     "allowance_required_for_active_surface_text_matches": true,
     "allowance_guard_required_fields": [
       "compatibility_alias_allowed",
