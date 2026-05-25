@@ -738,6 +738,91 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(fixture.forbidden_payload_fields.includes('managed_runtime_compatibility_alias'), true);
 });
 
+test('RCA production evidence tail workorder keeps evidence-after-contract refs open and body-free', () => {
+  const acceptance = readJson(acceptancePath);
+  const fixture = readJson(evidenceFixturePath);
+  const workorder = acceptance.production_evidence_tail_workorder;
+
+  assert.equal(workorder.surface_kind, 'rca_production_evidence_tail_workorder');
+  assert.equal(workorder.workorder_id, 'rca.production_evidence_tail_workorder.v1');
+  assert.equal(workorder.owner, 'redcube_ai');
+  assert.equal(workorder.consumer, 'one_person_lab');
+  assert.equal(workorder.status, 'open_typed_blocker_workorder');
+  assert.equal(workorder.workorder_scope, 'production_evidence_tail_after_contract');
+  assert.equal(workorder.refs_only, true);
+  assert.equal(workorder.read_only, true);
+  assert.equal(workorder.payload_body_required, false);
+  assert.equal(workorder.payload_body_allowed, false);
+  assert.equal(workorder.evidence_after_contract_required, true);
+  assertRefString(
+    workorder.source_projection_refs.production_evidence_scaleout_refs_ref,
+    'production_evidence_tail_workorder.source_projection_refs.production_evidence_scaleout_refs_ref',
+  );
+  assertRefString(
+    workorder.source_projection_refs.remaining_evidence_gate_blockers_contract_ref,
+    'production_evidence_tail_workorder.source_projection_refs.remaining_evidence_gate_blockers_contract_ref',
+  );
+  assert.deepEqual(workorder.work_items.map((item) => item.item_id), [
+    'owner_chain_apply',
+    'memory_lifecycle_receipt_scaleout',
+    'temporal_controlled_visual_stage_long_soak',
+    'cross_family_repeated_no_regression',
+  ]);
+  assert.deepEqual(workorder.work_items.map((item) => item.sequence), [1, 2, 3, 4]);
+  assert.deepEqual(workorder.work_items.map((item) => item.typed_blocker_ref), [
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+    'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+    'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+  ]);
+  for (const item of workorder.work_items) {
+    assertRefArray(item.required_input_refs, `production_evidence_tail_workorder.${item.item_id}.required_input_refs`);
+    assertRefArray(item.expected_output_refs, `production_evidence_tail_workorder.${item.item_id}.expected_output_refs`);
+    assertRefArray(
+      item.next_verification_command_refs,
+      `production_evidence_tail_workorder.${item.item_id}.next_verification_command_refs`,
+    );
+    assert.equal(item.success_claims_allowed, false, item.item_id);
+    assert.equal(item.payload_body_allowed, false, item.item_id);
+    assert.equal(item.visual_readiness_claimed, false, item.item_id);
+    assert.equal(item.export_readiness_claimed, false, item.item_id);
+    assert.equal(item.handoff_readiness_claimed, false, item.item_id);
+    assert.equal(item.domain_readiness_claimed, false, item.item_id);
+    assert.equal(item.production_soak_complete_claimed, false, item.item_id);
+  }
+  assert.deepEqual(workorder.forbidden_payload_classes, [
+    'visual_truth_body',
+    'review_export_verdict_body',
+    'export_verdict_body',
+    'artifact_blob',
+    'artifact_body',
+    'visual_memory_body',
+    'memory_body',
+    'generic_runtime_state',
+    'generic_attempt_ledger_record',
+    'runtime_queue_state',
+  ]);
+  assert.equal(workorder.authority_boundary.opl_can_store_workorder_refs, true);
+  assert.equal(workorder.authority_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(workorder.authority_boundary.opl_can_store_artifact_blob, false);
+  assert.equal(workorder.authority_boundary.opl_can_store_memory_body, false);
+  assert.equal(workorder.authority_boundary.opl_can_authorize_review_export_verdict, false);
+  assert.equal(workorder.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
+  assert.equal(workorder.success_boundary.owner_chain_closed_by_workorder, false);
+  assert.equal(workorder.success_boundary.production_soak_complete_claimed, false);
+
+  const fixtureWorkorder = fixture.production_evidence_tail_workorder;
+  assert.equal(fixtureWorkorder.surface_kind, 'rca_production_evidence_tail_workorder_fixture_refs');
+  assert.deepEqual(fixtureWorkorder.work_item_ids, workorder.work_items.map((item) => item.item_id));
+  assert.equal(fixtureWorkorder.payload_body_allowed, false);
+  assert.equal(fixtureWorkorder.declares_visual_ready, false);
+  assert.equal(fixtureWorkorder.declares_exportable, false);
+  assert.equal(fixtureWorkorder.declares_handoffable, false);
+  assert.equal(fixtureWorkorder.declares_domain_ready, false);
+  assert.equal(fixtureWorkorder.declares_production_soak_complete, false);
+  assert.deepEqual(fixtureWorkorder.forbidden_payload_classes, workorder.forbidden_payload_classes);
+});
+
 test('RCA production acceptance surface does not introduce ready-claim keys or blob fields', () => {
   const acceptance = readJson(acceptancePath);
   const keys = collectKeys(acceptance);

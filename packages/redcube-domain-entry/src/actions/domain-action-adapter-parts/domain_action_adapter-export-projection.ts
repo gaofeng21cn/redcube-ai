@@ -135,6 +135,9 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
     || manifest.operator_evidence_readiness_projection?.rca_efficiency_handoff_projection
     || {}
   );
+  const productionEvidenceTailWorkOrder = (
+    manifest.operator_evidence_readiness_projection?.production_evidence_tail_workorder || {}
+  );
   const temporalAutonomyReadiness = (
     manifest.temporal_autonomy_readiness
     || buildTemporalAutonomyReadinessProjection({
@@ -422,6 +425,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       opl_expected_receipt_monitor_freshness_handoff: (
         manifest.operator_evidence_readiness_projection?.opl_expected_receipt_monitor_freshness_handoff || {}
       ),
+      production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
       rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
       lifecycle_guarded_apply: {
         ref: '/lifecycle_guarded_apply_proof',
@@ -485,6 +489,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
       production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
       opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+      production_evidence_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
       rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
       temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',

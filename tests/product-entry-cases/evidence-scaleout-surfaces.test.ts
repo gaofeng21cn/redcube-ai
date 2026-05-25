@@ -179,6 +179,54 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       domain_action_adapter.source_manifest_refs.opl_expected_receipt_monitor_freshness_handoff_ref,
       '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
     );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.surface_kind,
+      'rca_production_evidence_tail_workorder',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.status,
+      'open_typed_blocker_workorder',
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.work_items.map((item) => item.item_id),
+      [
+        'owner_chain_apply',
+        'memory_lifecycle_receipt_scaleout',
+        'temporal_controlled_visual_stage_long_soak',
+        'cross_family_repeated_no_regression',
+      ],
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.payload_body_allowed,
+      false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.success_boundary.production_soak_complete_claimed,
+      false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.authority_boundary.opl_can_write_rca_visual_truth,
+      false,
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.forbidden_payload_classes,
+      [
+        'visual_truth_body',
+        'review_export_verdict_body',
+        'export_verdict_body',
+        'artifact_blob',
+        'artifact_body',
+        'visual_memory_body',
+        'memory_body',
+        'generic_runtime_state',
+        'generic_attempt_ledger_record',
+        'runtime_queue_state',
+      ],
+    );
+    assert.equal(
+      domain_action_adapter.source_manifest_refs.production_evidence_tail_workorder_ref,
+      '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
+    );
 
     await dispatchDomainActionAdapter({
       task: {
@@ -377,6 +425,37 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_claim_visual_stage_soak_complete,
       false,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.source_refs.some(
+        (source) => source.source_id === 'production_evidence_tail_workorder'
+          && source.workorder_id === 'rca.production_evidence_tail_workorder.v1',
+      ),
+      true,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items[1].receipt_accounting_refs.observed_receipt_count,
+      manifestWithReceipts.workspace_receipt_inventory_projection.receipt_counts.total,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items[2].temporal_readiness_refs.production_visual_stage_long_soak_complete,
+      false,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items.every(
+        (item) => item.success_claims_allowed === false && item.payload_body_allowed === false,
+      ),
+      true,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.next_evidence_gaps.map(
+        (gap) => gap.workorder_item_ref,
+      ),
+      [
+        '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
+        '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1',
+        '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3',
+      ],
     );
 
     const repeatProof = await dispatchDomainActionAdapter({

@@ -40,6 +40,7 @@ export function buildReturnedManifestProjection({
     standardDomainAgentSkeleton,
     visualTransitionEvaluator,
     workspaceReceiptInventoryProjection,
+    temporalAutonomyReadiness,
   });
   return {
     ...manifest,

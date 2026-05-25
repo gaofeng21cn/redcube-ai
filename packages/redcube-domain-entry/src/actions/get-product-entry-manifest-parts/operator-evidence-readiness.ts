@@ -3,6 +3,7 @@
 import {
   buildOplExpectedReceiptMonitorFreshnessHandoff,
   buildProductionEvidenceScaleoutRefs,
+  buildProductionEvidenceTailWorkOrder,
   buildRcaEfficiencyHandoffProjection,
 } from './operator-evidence-refs.js';
 
@@ -13,6 +14,7 @@ export function buildOperatorEvidenceReadinessProjection({
   standardDomainAgentSkeleton,
   visualTransitionEvaluator,
   workspaceReceiptInventoryProjection,
+  temporalAutonomyReadiness,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
   const productionEvidenceScaleoutRefs = buildProductionEvidenceScaleoutRefs({
@@ -22,6 +24,12 @@ export function buildOperatorEvidenceReadinessProjection({
   const oplExpectedReceiptMonitorFreshnessHandoff = buildOplExpectedReceiptMonitorFreshnessHandoff({
     productionEvidenceScaleoutRefs,
     workspaceReceiptInventoryProjection,
+  });
+  const productionEvidenceTailWorkOrder = buildProductionEvidenceTailWorkOrder({
+    productionEvidenceScaleoutRefs,
+    oplExpectedReceiptMonitorFreshnessHandoff,
+    workspaceReceiptInventoryProjection,
+    temporalAutonomyReadiness,
   });
   const rcaEfficiencyHandoffProjection = buildRcaEfficiencyHandoffProjection({
     productionEvidenceScaleoutRefs,
@@ -67,6 +75,12 @@ export function buildOperatorEvidenceReadinessProjection({
         ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
         status: oplExpectedReceiptMonitorFreshnessHandoff.status,
         evidence_receipt_fixture_ref: oplExpectedReceiptMonitorFreshnessHandoff.evidence_receipt_fixture_ref,
+      },
+      {
+        source_id: 'production_evidence_tail_workorder',
+        ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
+        status: productionEvidenceTailWorkOrder.status,
+        workorder_id: productionEvidenceTailWorkOrder.workorder_id,
       },
       {
         source_id: 'controlled_memory_apply_runtime_receipt_refs',
@@ -148,6 +162,7 @@ export function buildOperatorEvidenceReadinessProjection({
     },
     production_evidence_scaleout_refs: productionEvidenceScaleoutRefs,
     opl_expected_receipt_monitor_freshness_handoff: oplExpectedReceiptMonitorFreshnessHandoff,
+    production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
     rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
     read_only: true,
     refs_only: true,
@@ -171,6 +186,7 @@ export function buildOperatorEvidenceReadinessProjection({
         status: 'pending_production_soak',
         required_evidence: 'A real OPL-hosted controlled visual-stage run repeatedly consumes RCA domain_action_adapter refs and receives RCA domain receipt, typed blocker, or no-regression evidence refs without writing RCA visual truth.',
         current_best_ref: '/controlled_soak_no_regression_attempt',
+        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
       },
       {
         gap_id: 'real_memory_lifecycle_receipt_instances',
@@ -179,6 +195,7 @@ export function buildOperatorEvidenceReadinessProjection({
         required_evidence: 'Accepted/rejected memory writeback and cleanup/restore/retention lifecycle receipts exist in workspace runtime roots and remain refs-only for OPL.',
         current_best_ref: receiptInventoryGapProjection.current_best_ref || '/controlled_memory_apply_proof/runtime_receipt_instances',
         missing_receipt_kinds: receiptInventoryGapProjection.missing_receipt_kinds || [],
+        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1',
       },
       {
         gap_id: 'cross_family_repeated_no_regression_evidence',
@@ -186,6 +203,7 @@ export function buildOperatorEvidenceReadinessProjection({
         status: 'pending_repeated_runtime_evidence',
         required_evidence: 'Repeated no-regression evidence refs across at least two deliverable families without artifact blobs, memory bodies, or review/export verdict payloads in OPL state.',
         current_best_ref: '/no_regression_owner_receipt_opl_consumption_proof',
+        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3',
       },
     ],
     authority_boundary: {

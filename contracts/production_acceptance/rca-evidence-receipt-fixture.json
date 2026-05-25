@@ -306,6 +306,50 @@
       }
     ]
   },
+  "production_evidence_tail_workorder": {
+    "surface_kind": "rca_production_evidence_tail_workorder_fixture_refs",
+    "workorder_id": "rca.production_evidence_tail_workorder.v1",
+    "owner": "redcube_ai",
+    "consumer": "one_person_lab",
+    "state": "open_typed_blocker_workorder",
+    "refs_only": true,
+    "payload_body_allowed": false,
+    "evidence_after_contract_required": true,
+    "work_item_refs": [
+      "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/0",
+      "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1",
+      "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2",
+      "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3"
+    ],
+    "work_item_ids": [
+      "owner_chain_apply",
+      "memory_lifecycle_receipt_scaleout",
+      "temporal_controlled_visual_stage_long_soak",
+      "cross_family_repeated_no_regression"
+    ],
+    "typed_blocker_refs": [
+      "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+      "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+      "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+    ],
+    "forbidden_payload_classes": [
+      "visual_truth_body",
+      "review_export_verdict_body",
+      "export_verdict_body",
+      "artifact_blob",
+      "artifact_body",
+      "visual_memory_body",
+      "memory_body",
+      "generic_runtime_state",
+      "generic_attempt_ledger_record",
+      "runtime_queue_state"
+    ],
+    "declares_visual_ready": false,
+    "declares_exportable": false,
+    "declares_handoffable": false,
+    "declares_domain_ready": false,
+    "declares_production_soak_complete": false
+  },
   "legacy_managed_naming_policy": {
     "active_caller_compatibility_alias_restored": false,
     "allowed_managed_occurrence_classes": [

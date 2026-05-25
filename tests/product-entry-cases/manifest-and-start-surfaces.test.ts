@@ -265,6 +265,33 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       5,
     );
     assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.surface_kind,
+      'rca_production_evidence_tail_workorder',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.workorder_id,
+      'rca.production_evidence_tail_workorder.v1',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.payload_body_allowed,
+      false,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.success_boundary.production_soak_complete_claimed,
+      false,
+    );
+    assert.deepEqual(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items.map(
+        (item) => item.item_id,
+      ),
+      [
+        'owner_chain_apply',
+        'memory_lifecycle_receipt_scaleout',
+        'temporal_controlled_visual_stage_long_soak',
+        'cross_family_repeated_no_regression',
+      ],
+    );
+    assert.equal(
       manifest.operator_evidence_readiness_projection.authority_boundary.opl_app_can_declare_domain_ready,
       false,
     );
