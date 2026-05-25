@@ -311,7 +311,8 @@
     "allowed_managed_occurrence_classes": [
       "provenance",
       "semantic_id",
-      "tombstone"
+      "tombstone",
+      "negative_guard_payload_field"
     ],
     "forbidden_active_occurrence_classes": [
       "compatibility_alias",

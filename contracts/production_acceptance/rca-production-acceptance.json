@@ -379,7 +379,7 @@
         "artifact body",
         "memory body",
         "generic runtime state",
-        "managed runtime compatibility alias"
+        "retired managed runtime compatibility alias negative guard field"
       ]
     },
     "authority_boundary": {

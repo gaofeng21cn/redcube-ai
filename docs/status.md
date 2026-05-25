@@ -71,6 +71,8 @@ Executor runtime protocol 当前是 RCA route-level executor policy、receipt re
 
 RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness projection、workspace receipt inventory projection、product domain_action_adapter projection、production acceptance surface 和 typed blocker refs 可以让 OPL/App/operator 读取缺口状态。Production acceptance 已关闭 artifact-producing owner receipt 槽位，并在 `production_evidence_scaleout_refs` 中显式输出 OPL owner-payload group 可消费的 `domain_owner_receipt_refs`、`owner_chain_refs`、`no_regression_evidence_refs`、`typed_blocker_refs`、success / typed-blocker payload path、required return shapes 和 legacy alias；这只表示 refs-only payload shape 可被 OPL 读取，不声明 visual ready、exportable、handoffable、domain ready 或 production soak complete。剩余 memory/lifecycle scaleout、Temporal long-soak 与 cross-family repeated no-regression 仍保持 open evidence tail。OPL conformance、readiness clean/observable、OPL hosted/provider completion、replay evidence、cleanup proof、stage evidence receipt 或 domain-dispatch receipt 都不能升级为 RCA visual/export/domain ready。
 
+OPL expected receipt / monitor freshness handoff 的 forbidden payload policy 已与 RCA production acceptance 对齐：`visual truth body`、review/export verdict body、artifact blob/body、memory body、generic runtime state 和 retired managed runtime compatibility alias negative-guard field 都只能作为阻断项读取。旧 managed compatibility 字段只允许出现在 negative guard payload field、semantic-id、tombstone 或 provenance 语境中，不是 active compatibility alias、public action key 或 runtime owner。
+
 当前 naming / contract hygiene tail：
 
 - `contracts/runtime-program/managed-product-entry-hardening.json` 是 tombstone-only / semantic-id provenance surface，仍被 current-program、session-continuity 和 provenance tests 消费。

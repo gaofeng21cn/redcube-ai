@@ -727,6 +727,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     'provenance',
     'semantic_id',
     'tombstone',
+    'negative_guard_payload_field',
   ]);
   assert.equal(
     fixture.legacy_managed_naming_policy.forbidden_active_occurrence_classes.includes('compatibility_alias'),

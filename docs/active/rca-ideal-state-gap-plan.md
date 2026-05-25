@@ -98,6 +98,8 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 
 Production acceptance 只能由 RCA-owned machine surface 记录为 owner receipt、typed blocker、artifact/review/export refs、memory/lifecycle refs 和 next verification refs；OPL structural pass 或 provider completion 不能隐式推出 domain-ready。
 
+OPL expected receipt / monitor freshness handoff 与 production acceptance 当前使用同一 forbidden payload policy：visual truth body、review/export verdict body、artifact blob/body、memory body、generic runtime state 和 retired managed runtime compatibility alias negative-guard field 都只能触发阻断或审计。`managed_runtime_compatibility_alias` 这类旧字段只可作为 negative guard payload field 保留，不能作为 active alias、public action key、domain_action_adapter template 或 runtime owner 复活。
+
 ## 结构卫生尾项
 
 这些尾项不重开功能/结构差距，也不表示 RCA 仍持有私有平台。它们只记录 OPL generated/default caller、owner receipt roundtrip 和 no-compatibility-alias proof 继续默认化后的 refs-only adapter thinning。

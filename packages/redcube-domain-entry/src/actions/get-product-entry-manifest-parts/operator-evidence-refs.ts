@@ -378,7 +378,9 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
         'visual truth body',
         'review or export verdict body',
         'artifact blob',
+        'generic runtime state',
         'memory body',
+        'retired managed runtime compatibility alias negative guard field',
       ],
     },
     authority_boundary: {

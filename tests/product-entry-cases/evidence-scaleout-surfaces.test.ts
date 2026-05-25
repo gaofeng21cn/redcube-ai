@@ -152,6 +152,17 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required,
       false,
     );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.opl_payload_policy.forbidden_payload_classes,
+      [
+        'visual truth body',
+        'review or export verdict body',
+        'artifact blob',
+        'generic runtime state',
+        'memory body',
+        'retired managed runtime compatibility alias negative guard field',
+      ],
+    );
     assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
       true,

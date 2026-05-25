@@ -40,7 +40,7 @@ function writeResearchPayload(file) {
   }, null, 2), 'utf-8');
 }
 
-test('CLI help keeps deliverable run as the canonical quickstart surface while managed execute remains available', () => {
+test('CLI help keeps deliverable run as the canonical quickstart surface while retired managed commands stay unavailable', () => {
   const parsed = runCli(['help']);
 
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
