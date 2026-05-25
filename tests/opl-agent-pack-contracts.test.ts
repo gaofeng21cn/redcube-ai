@@ -642,6 +642,7 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
     assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_adapter_tail_modules, [
       'domain_authority_refs_preserved',
       'no_regression_proof_recorded',
+      'explicit_owner_receipt_authorizes_physical_delete',
     ]);
     assert.deepEqual(surface.bridge_exit_gate.remaining_bridge_module_ids, []);
     assert.equal(surface.bridge_exit_gate.adapter_thinning_module_ids.includes('generic_cli_mcp_wrappers'), true);
@@ -649,11 +650,11 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
     assert.equal(surface.bridge_exit_gate.functional_structure_gap_count, 0);
     assert.equal(surface.bridge_exit_gate.declares_no_active_bridge_modules, true);
     assert.equal(surface.bridge_exit_gate.forbidden_after_exit_rca_surface_classes.includes('generic_session_shell'), true);
-    assert.equal(surface.bridge_exit_gate.declares_generated_surface_consumption_complete, true);
-    assert.equal(surface.bridge_exit_gate.declares_production_consumption_complete, true);
+    assert.equal(surface.bridge_exit_gate.declares_generated_surface_consumption_complete, false);
+    assert.equal(surface.bridge_exit_gate.declares_production_consumption_complete, false);
     assert.equal(
       surface.bridge_exit_gate.production_consumption_scope,
-      'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
+      'descriptor_and_contract_consumed_not_production_default_caller_live_soak',
     );
     assert.equal(surface.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
     assert.deepEqual(surface.bridge_exit_gate.remaining_blocker_ids, []);
@@ -674,6 +675,7 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
         assert.deepEqual(entry.bridge_exit_gate.required_before_retire, [
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
+          'explicit_owner_receipt_authorizes_physical_delete',
         ], entry.module_id);
       }
     }
