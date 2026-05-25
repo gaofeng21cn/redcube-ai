@@ -15,7 +15,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | 维度 | 当前状态 | 读法 |
 | --- | --- | --- |
 | 功能/结构差距 | `functional_structure_gap_count=0` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
-| 生产证据 | `evidence_gap` | 仍需真实 artifact-producing owner receipt、memory/lifecycle receipt scaleout、Temporal controlled visual-stage long soak 与 cross-family repeated no-regression。 |
+| 生产证据 | `partial_refs_closed_with_soak_gap` | `contracts/production_acceptance/rca-production-acceptance.json` 已记录 body-free artifact-producing owner receipt refs；仍需 memory/lifecycle receipt scaleout、Temporal controlled visual-stage long soak 与 cross-family repeated no-regression。 |
 | 命名/合同卫生 | `active_hygiene_tail` | `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter` 等历史词只能按 semantic-id、tombstone、refs-only adapter、domain handler target 或 package/protocol boundary 读取。 |
 | 物理源码形态 | `active_hygiene_tail` | repo-local session / domain_action_adapter / watch / operator projection / executor record adapter 仍可见，但只能作为 refs-only adapter、domain handler target、native helper implementation 或迁移输入。 |
 
@@ -52,7 +52,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Area | 当前进度 | 当前读法 |
 | --- | --- | --- |
 | Standard OPL Agent structure | `done` | RCA 已按标准 OPL consumer 口径闭合旧 generic runtime / shell owner 问题。 |
-| Functional / structural gaps | `closed_with_evidence_tail` | `functional_structure_gap_count=0` 只表示结构和 owner 边界闭合；production evidence tail 仍需要 RCA-owned receipt / visual verdict / artifact evidence。 |
+| Functional / structural gaps | `closed_with_evidence_tail` | `functional_structure_gap_count=0` 只表示结构和 owner 边界闭合；production evidence tail 已有 RCA-owned body-free artifact-producing owner receipt refs，但仍需要 scaleout、long-soak 和 visual verdict 证据。 |
 | Retained authority surfaces | `active_authority` | Visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt 留在 RCA；OPL 只消费 refs 和 generated/default caller。 |
 | Docs lifecycle | `single_active_truth_owner` | 本文持有 current truth、gap、结构卫生尾项、下一轮 prompt 和验证口径；历史路线和 retired surface 进入 history/tombstone/provenance。 |
 
@@ -84,14 +84,14 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 
 ## 测试/证据差距
 
-结构 conformance、readiness clean / observable、transition fixture、provider completion、focused proof、stage evidence receipt 或 no-regression ref 都只能证明边界和可观察性；它们不能替代 RCA-owned AI-first review/export verdict 与 owner receipt。
+结构 conformance、readiness clean / observable、transition fixture、provider completion、focused proof、stage evidence receipt 或 no-regression ref 都只能证明边界和可观察性；它们不能替代 RCA-owned AI-first review/export verdict。当前 production acceptance 已经用 RCA-owned refs-only domain receipt 关闭 artifact-producing owner receipt 槽位，但没有声明 visual ready、exportable、handoffable 或 production soak complete。
 
 当前 production evidence tail：
 
 | Evidence gate | Current readout | Needed proof |
 | --- | --- | --- |
-| Artifact-producing owner receipt | evidence gap | 从真实 `ppt_deck` / `xiaohongshu` workspace 产出 artifact、review/export refs 和 RCA-owned `domain_receipt`。 |
-| Visual memory lifecycle | evidence gap | 真实 visual memory body reuse、accepted/rejected receipts、writeback receipt 和 retention/restore receipt scaleout。 |
+| Artifact-producing owner receipt | body-free refs closed | `contracts/production_acceptance/rca-production-acceptance.json` 记录 `artifact_producing_owner_receipt_ref_closed`、artifact/review/export refs 和 RCA-owned `domain_receipt`；不声明 visual ready、exportable 或 handoffable。 |
+| Visual memory lifecycle | partial refs landed | 已有 visual memory body reuse refs 与 memory/lifecycle receipt refs；仍需真实 accepted/rejected receipts、writeback receipt 和 retention/restore receipt scaleout。 |
 | Workspace receipt scaleout | evidence gap | 多 workspace receipt inventory、retention ledger、operator cadence 和 cross-workspace receipt coverage；refs-only projection 不能写成 scaleout complete。 |
 | Temporal controlled visual-stage long soak | evidence gap | OPL/Temporal hosted provider residency、restart/resume/re-query、retry/dead-letter、repair cadence 和 RCA owner receipt / typed blocker refs。 |
 | Cross-family repeated no-regression | evidence gap | 多次跨 family route 的 no-regression proof，且不迁移 visual truth、artifact body、memory body 或 review/export verdict。 |
@@ -122,7 +122,7 @@ Production acceptance 只能由 RCA-owned machine surface 记录为 owner receip
 ## 近期完善计划
 
 1. `production_evidence_tail`
-   用低风险真实 workspace 继续跑 `ppt_deck` 或 `xiaohongshu`，从 OPL-hosted attempt 或 generated continuation shell 进入 RCA service-safe domain entry，累计 `domain_receipt`、`typed_blocker`、`no_regression_evidence`、artifact-producing owner receipt 和 review/export refs。
+   用低风险真实 workspace 继续跑 `ppt_deck` 或 `xiaohongshu`，从 OPL-hosted attempt 或 generated continuation shell 进入 RCA service-safe domain entry，继续累计 `typed_blocker`、`no_regression_evidence`、review/export refs 和 scaleout/long-soak 证据。artifact-producing owner receipt 槽位已由 production acceptance 的 body-free RCA-owned receipt refs 关闭。
 
 2. `runtime_evidence_scaleout`
    扩大真实 visual memory accepted/rejected receipts、workspace receipt inventory、lifecycle receipt、Temporal long soak 和 cross-family repeated no-regression evidence。refs-only projection 只做 accounting，不升级为完成声明。

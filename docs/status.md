@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-更新时间：`2026-05-23`
+更新时间：`2026-05-25`
 
 ## 当前角色
 
@@ -35,7 +35,7 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 
 `functional_structure_gap_count=0`
 
-已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable 仍属于证据门。
+已闭合为标准 OPL consumer 口径的 8 项：`opl_generated_surface_production_consumption`、`repo_local_wrapper_active_caller_migration`、`focused_hosted_attempt_real_path_cutover`、`artifact_gallery_handoff_shell`、`review_repair_transport`、`opl_app_operator_drilldown`、`workspace_source_lifecycle_receipt_shell`、`legacy_physical_cleanup`。这些闭合表示 RCA 不再声明对应 generic shell/runtime owner，且旧 managed runtime 物理实现已删除；production visual-stage long soak、visual ready、exportable 或 handoffable 仍属于证据门。Artifact-producing owner receipt 槽位已由 `contracts/production_acceptance/rca-production-acceptance.json` 里的 body-free RCA-owned receipt refs 关闭，但该 closure 不能升级成 visual/export/production ready。
 
 当前结构闭合依赖 machine surfaces，而不是 docs receipt 流水：
 
@@ -63,13 +63,13 @@ Executor runtime protocol 当前是 RCA route-level executor policy、receipt re
 
 以下是结构闭合后的 production evidence tail，不再计入功能/结构差距：
 
-- 真实 artifact-producing owner receipt。
-- visual memory body reuse 和真实 visual pattern memory accepted/rejected receipts。
+- Artifact-producing owner receipt refs 已由 RCA production acceptance surface 关闭为 body-free `domain_receipt` / artifact / review-export refs；它不声明 visual ready、exportable、handoffable 或 production soak complete。
+- visual memory body reuse refs 已落地；仍需真实 visual pattern memory accepted/rejected receipts、writeback receipt 和 lifecycle scaleout。
 - 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证；当前 product-entry manifest/status、product domain_action_adapter export、product session surface 与 CLI read surfaces 已可用显式 `workspace_receipt_scaleout_roots` / `--workspace-receipt-scaleout-root` 聚合多个 workspace 的 body-free receipt refs，并把 `observed_workspace_count` 投给 OPL/App/operator，但仍保持 `workspace_receipt_scaleout_claimed=false` 与 `declares_production_soak_complete=false`。
 - Temporal controlled visual-stage long soak 和 provider restart/re-query/retry/dead-letter proof。
 - Cross-family repeated no-regression proof。
 
-RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness projection、workspace receipt inventory projection、product domain_action_adapter projection、production acceptance surface 和 typed blocker refs 可以让 OPL/App/operator 读取缺口状态。但这些面只关闭 request / workorder accounting，不关闭真实 visual production evidence tail。OPL conformance、readiness clean/observable、OPL hosted/provider completion、replay evidence、cleanup proof、stage evidence receipt 或 domain-dispatch receipt 都不能升级为 RCA visual/export/domain ready。
+RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness projection、workspace receipt inventory projection、product domain_action_adapter projection、production acceptance surface 和 typed blocker refs 可以让 OPL/App/operator 读取缺口状态。Production acceptance 已关闭 artifact-producing owner receipt 槽位，但剩余 memory/lifecycle scaleout、Temporal long-soak 与 cross-family repeated no-regression 仍保持 open evidence tail。OPL conformance、readiness clean/observable、OPL hosted/provider completion、replay evidence、cleanup proof、stage evidence receipt 或 domain-dispatch receipt 都不能升级为 RCA visual/export/domain ready。
 
 当前 naming / contract hygiene tail：
 
@@ -79,7 +79,7 @@ RCA 当前已有 refs-only evidence accounting 面：operator evidence readiness
 - active `formal_entry.internal_surface` 口径已迁为 `domain_entry_protocol_boundary`；`@redcube/domain-entry` 包名只作为 machine-guarded package/protocol boundary 或 provenance 语境读取，不代表 gateway public identity 或 generic gateway runtime owner。
 - active runtime topology 协议字段已迁为 `domain_entry_protocol_role=visual_deliverable_domain_entry_protocol_boundary`；旧 `gateway_role` / `visual_deliverable_domain_gateway` 不再作为 active protocol 字段或值保留。
 - active product-entry manifest 的 `formal_entry.retired_internal_surface_ids` 已从裸 `gateway` 降为 `retired_gateway_protocol_boundary_public_entry`；这是 tombstone semantic id，不是 public entry、callable alias 或 compatibility surface。
-- active MCP server initialization identity 已收口为 `redcube-ai`；这只清理 reader-facing `gateway` 命名泄漏，不改变 `@redcube/domain-entry` package/protocol boundary，也不声明 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
+- active MCP server initialization identity 已收口为 `redcube-ai`；这只清理 reader-facing `gateway` 命名泄漏，不改变 `@redcube/domain-entry` package/protocol boundary，也不由 MCP identity 本身声明新的 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
 - active product-entry status / manifest / CLI help 的 operator-facing OPL-hosted handoff 口径已收敛为 `framework-side handoff contract`；`bridge contract` 只允许继续作为 contracts/provenance/history 中的 bridge-exit 语境，不作为当前入口说明。
 
 ## 当前物理源码形态差距
@@ -109,8 +109,8 @@ RCA 长期只保留无法声明化的 visual authority surfaces；active machine
 ## 当前不能声明
 
 - 不能声明 RCA 已完成 production visual-stage long soak。
-- 不能把 OPL provider completion、transition hosted-attempt fixture、no-regression evidence、focused receipt proof、stage evidence receipt 或 domain-dispatch receipt 写成 RCA visual ready、exportable、handoffable 或 artifact-producing owner receipt。
-- 不能把 OPL generated/hosted surface consumption 写成 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
+- 不能把 OPL provider completion、transition hosted-attempt fixture、no-regression evidence、focused receipt proof、stage evidence receipt 或 domain-dispatch receipt 写成 RCA visual ready、exportable、handoffable 或 production soak complete；artifact-producing owner receipt 只能按 RCA production acceptance surface 中的 body-free receipt refs 读取。
+- 不能把 OPL generated/hosted surface consumption 写成 production visual-stage long soak、visual ready、exportable、handoffable 或新的 artifact-producing owner receipt。
 - 不能把 OPL legacy cleanup dry-run / apply / verify ready 写成 production evidence tail 已完成；它只证明 cleanup proof refs 可被 OPL gate / refs-only ledger 消费。
 - 不能写成 OPL 持有 RCA visual truth、canonical artifact、review/export verdict、artifact mutation permission 或 visual memory body。
 - 不能把 RCA 当前 artifact-heavy 物理目录写成可直接复制的新 Agent 通用 scaffold。
