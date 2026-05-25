@@ -3,13 +3,14 @@
   "status": "functional_bridge_exited_physical_cleanup_closed",
   "source_shape_status": "landed",
   "functional_structure_gap_count": 0,
-  "remaining_tail_class": "generated_default_caller_and_refs_only_adapter_thinning_only",
+  "remaining_tail_class": "repo_local_wrapper_delete_tail_evidence_gated_only",
   "owner": "redcube_ai",
   "replacement_owner": "opl",
   "required_before_retiring_remaining_repo_local_bridges": [],
   "required_before_retiring_adapter_tail_modules": [
     "domain_authority_refs_preserved",
-    "no_regression_proof_recorded"
+    "no_regression_proof_recorded",
+    "explicit_owner_receipt_authorizes_physical_delete"
   ],
   "remaining_bridge_module_ids": [],
   "adapter_thinning_module_ids": [
@@ -26,9 +27,11 @@
   ],
   "allowed_after_exit_rca_surface_classes": [
     "declarative_pack",
+    "domain_handler_target",
+    "refs_only_adapter",
     "minimal_authority_function",
-    "refs_only_locator_projection",
-    "diagnostic_direct_surface"
+    "native_helper_implementation",
+    "provenance"
   ],
   "forbidden_after_exit_rca_surface_classes": [
     "generic_scheduler",
@@ -39,9 +42,10 @@
     "generic_review_repair_transport",
     "generic_native_helper_envelope"
   ],
-  "declares_generated_surface_consumption_complete": true,
-  "declares_production_consumption_complete": true,
-  "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
+  "declares_generated_surface_descriptor_consumed": true,
+  "declares_generated_surface_consumption_complete": false,
+  "declares_production_consumption_complete": false,
+  "production_consumption_scope": "descriptor_and_contract_consumed_not_production_default_caller_live_soak",
   "declares_visual_stage_long_soak_complete": false,
   "declares_no_active_generic_owner_callers": true,
   "declares_no_active_bridge_modules": true,

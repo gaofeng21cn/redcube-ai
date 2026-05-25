@@ -1747,13 +1747,14 @@
       "status": "functional_bridge_exited_physical_cleanup_closed",
       "source_shape_status": "landed",
       "functional_structure_gap_count": 0,
-      "remaining_tail_class": "generated_default_caller_and_refs_only_adapter_thinning_only",
+      "remaining_tail_class": "repo_local_wrapper_delete_tail_evidence_gated_only",
       "owner": "redcube_ai",
       "replacement_owner": "opl",
       "required_before_retiring_remaining_repo_local_bridges": [],
       "required_before_retiring_adapter_tail_modules": [
         "domain_authority_refs_preserved",
-        "no_regression_proof_recorded"
+        "no_regression_proof_recorded",
+        "explicit_owner_receipt_authorizes_physical_delete"
       ],
       "remaining_bridge_module_ids": [],
       "adapter_thinning_module_ids": [
@@ -1770,9 +1771,11 @@
       ],
       "allowed_after_exit_rca_surface_classes": [
         "declarative_pack",
+        "domain_handler_target",
+        "refs_only_adapter",
         "minimal_authority_function",
-        "refs_only_locator_projection",
-        "diagnostic_direct_surface"
+        "native_helper_implementation",
+        "provenance"
       ],
       "forbidden_after_exit_rca_surface_classes": [
         "generic_scheduler",
@@ -1783,9 +1786,10 @@
         "generic_review_repair_transport",
         "generic_native_helper_envelope"
       ],
-      "declares_generated_surface_consumption_complete": true,
-      "declares_production_consumption_complete": true,
-      "production_consumption_scope": "opl_generated_surface_consumption_only_not_visual_stage_live_soak",
+      "declares_generated_surface_descriptor_consumed": true,
+      "declares_generated_surface_consumption_complete": false,
+      "declares_production_consumption_complete": false,
+      "production_consumption_scope": "descriptor_and_contract_consumed_not_production_default_caller_live_soak",
       "declares_visual_stage_long_soak_complete": false,
       "declares_no_active_generic_owner_callers": true,
       "declares_no_active_bridge_modules": true,
@@ -1864,15 +1868,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "product_entry_continuity_refs_adapter_bridge_exit_gate",
-          "bridge_role": "entry_session_snapshot_refs_adapter_default_caller_tail",
+          "bridge_role": "entry_session_snapshot_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_app_session_shell_and_workbench",
           "exit_gate_ref": "/opl_generated_interface_consumption",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "entry_session_domain_refs",
@@ -1880,7 +1885,7 @@
             "latest_visual_run_ref"
           ],
           "after_exit_rca_surface": "domain_session_snapshot_refs_only",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -1993,15 +1998,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "workspace_source_intake_bridge_exit_gate",
-          "bridge_role": "source_readiness_refs_adapter_default_caller_tail",
+          "bridge_role": "source_readiness_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_workspace_source_intake_shell",
           "exit_gate_ref": "/opl_substrate_adapter_export",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "source_readiness_verdict",
@@ -2009,7 +2015,7 @@
             "visual_source_pack_refs"
           ],
           "after_exit_rca_surface": "source_readiness_verdict_and_source_pack_refs",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2118,15 +2124,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "memory_writeback_receipt_transport_bridge_exit_gate",
-          "bridge_role": "memory_receipt_locator_refs_adapter_default_caller_tail",
+          "bridge_role": "memory_receipt_locator_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_memory_locator_writeback_transport",
           "exit_gate_ref": "/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "visual_memory_accept_reject",
@@ -2134,7 +2141,7 @@
             "owner_receipt_refs"
           ],
           "after_exit_rca_surface": "visual_memory_decision_and_receipt_refs",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2244,15 +2251,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "artifact_export_lifecycle_bridge_exit_gate",
-          "bridge_role": "artifact_locator_authority_refs_adapter_default_caller_tail",
+          "bridge_role": "artifact_locator_authority_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_artifact_lifecycle_gallery_handoff_shell",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "artifact_mutation_authorization",
@@ -2260,7 +2268,7 @@
             "artifact_locator_refs"
           ],
           "after_exit_rca_surface": "artifact_authority_and_export_verdict_refs",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2370,15 +2378,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "review_repair_transport_bridge_exit_gate",
-          "bridge_role": "review_repair_refs_adapter_default_caller_tail",
+          "bridge_role": "review_repair_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_review_repair_transport",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "review_export_verdict",
@@ -2386,7 +2395,7 @@
             "typed_blocker"
           ],
           "after_exit_rca_surface": "review_export_verdict_and_repair_refs",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2502,17 +2511,18 @@
           "replacement_owner": "opl",
           "replacement_surface": "opl_native_helper_execution_envelope",
           "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "native_helper_implementation",
             "helper_proof_refs"
           ],
           "after_exit_rca_surface": "native_helper_package_module_implementation",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2622,15 +2632,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "operator_projection_shell_bridge_exit_gate",
-          "bridge_role": "operator_evidence_refs_adapter_default_caller_tail",
+          "bridge_role": "operator_evidence_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_app_operator_workbench_shell",
           "exit_gate_ref": "/operator_evidence_readiness_projection",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "evidence_gap_refs",
@@ -2638,7 +2649,7 @@
             "safe_repair_hint_refs"
           ],
           "after_exit_rca_surface": "operator_evidence_refs_only",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2754,22 +2765,23 @@
         },
         "bridge_exit_gate": {
           "gate_id": "generic_cli_mcp_wrappers_bridge_exit_gate",
-          "bridge_role": "domain_handler_target_default_generated_wrapper_tail",
+          "bridge_role": "domain_handler_target_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "one-person-lab",
           "replacement_surface": "opl_standard_domain_agent_generated_cli_mcp_wrappers",
           "exit_gate_ref": "/visual_pack_compiler_handoff/generated_surface_handoff",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "domain_handler_refs",
             "safe_action_refs"
           ],
           "after_exit_rca_surface": "domain_handler_target_only",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -2874,7 +2886,7 @@
           "domain entry contract",
           "runtime route executor tests"
         ],
-        "activeCallerStatus": "route_run_record_api_neutralized_default_caller_tail",
+        "activeCallerStatus": "route_run_record_api_refs_only_delete_tail",
         "migrationAction": "Keep executor lifecycle/provisioning, attempt ledger ownership, route-run record persistence policy, event log ownership, stale-running-run audit read model, and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy, neutral route-run refs, and receipt refs only.",
         "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and neutral refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.",
         "cannotAbsorbReason": "OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.",
@@ -2906,15 +2918,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "codex_executor_adapter_bridge_exit_gate",
-          "bridge_role": "route_executor_policy_refs_adapter_default_caller_tail",
+          "bridge_role": "route_executor_policy_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_agent_executor_adapter",
           "exit_gate_ref": "/domain_entry_contract/executor",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "route_policy_refs",
@@ -2922,7 +2935,7 @@
             "executor_receipt_refs"
           ],
           "after_exit_rca_surface": "route_level_executor_policy_refs",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,
@@ -3031,15 +3044,16 @@
         },
         "bridge_exit_gate": {
           "gate_id": "observability_stability_read_model_bridge_exit_gate",
-          "bridge_role": "stability_refs_consumer_default_read_model_tail",
+          "bridge_role": "stability_refs_consumer_refs_only_delete_tail",
           "bridge_owner": "redcube_ai_refs_only_adapter_tail",
           "replacement_owner": "opl",
           "replacement_surface": "opl_stability_read_model_and_observability_export",
           "exit_gate_ref": "/opl_stability_read_model_consumption",
-          "current_status": "source_shape_landed_default_caller_tail_open",
+          "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
           "required_before_retire": [
             "domain_authority_refs_preserved",
-            "no_regression_proof_recorded"
+            "no_regression_proof_recorded",
+            "explicit_owner_receipt_authorizes_physical_delete"
           ],
           "retained_rca_authority": [
             "owner_receipt_refs",
@@ -3047,7 +3061,7 @@
             "no_regression_evidence_refs"
           ],
           "after_exit_rca_surface": "visual_domain_status_refs_only",
-          "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+          "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
           "declares_source_shape_landed": true,
           "declares_functional_structure_gap": false,
           "can_delete_without_no_active_caller_proof": false,

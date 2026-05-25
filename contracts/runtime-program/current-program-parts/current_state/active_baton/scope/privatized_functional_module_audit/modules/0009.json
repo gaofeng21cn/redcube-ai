@@ -42,15 +42,16 @@
   },
   "bridge_exit_gate": {
     "gate_id": "observability_stability_read_model_bridge_exit_gate",
-    "bridge_role": "stability_refs_consumer_default_read_model_tail",
+    "bridge_role": "stability_refs_consumer_refs_only_delete_tail",
     "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_stability_read_model_and_observability_export",
     "exit_gate_ref": "/opl_stability_read_model_consumption",
-    "current_status": "source_shape_landed_default_caller_tail_open",
+    "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
-      "no_regression_proof_recorded"
+      "no_regression_proof_recorded",
+      "explicit_owner_receipt_authorizes_physical_delete"
     ],
     "retained_rca_authority": [
       "owner_receipt_refs",
@@ -58,7 +59,7 @@
       "no_regression_evidence_refs"
     ],
     "after_exit_rca_surface": "visual_domain_status_refs_only",
-    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
     "declares_source_shape_landed": true,
     "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,

@@ -359,7 +359,7 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'tests/rca-executor-backend-contract.test.ts',
     ],
     activeCallers: ['deliverable route runner', 'domain entry contract', 'runtime route executor tests'],
-    activeCallerStatus: 'route_run_record_api_neutralized_default_caller_tail',
+    activeCallerStatus: 'route_run_record_api_refs_only_delete_tail',
     migrationAction: 'Keep executor lifecycle/provisioning, attempt ledger ownership, route-run record persistence policy, event log ownership, stale-running-run audit read model, and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy, neutral route-run refs, and receipt refs only.',
     retentionReason: 'RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and neutral refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.',
     cannotAbsorbReason: 'OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.',

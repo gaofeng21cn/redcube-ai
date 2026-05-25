@@ -92,6 +92,7 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
 export const RCA_BRIDGE_EXIT_REQUIRED_GATES = Object.freeze([
   'domain_authority_refs_preserved',
   'no_regression_proof_recorded',
+  'explicit_owner_receipt_authorizes_physical_delete',
 ]);
 
 export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
@@ -108,35 +109,35 @@ export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
 
 const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
   product_entry_continuity_refs_adapter: {
-    bridge_role: 'entry_session_snapshot_refs_adapter_default_caller_tail',
+    bridge_role: 'entry_session_snapshot_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generated_interface_consumption',
     retained_authority: ['entry_session_domain_refs', 'deliverable_locator_refs', 'latest_visual_run_ref'],
     after_exit_rca_surface: 'domain_session_snapshot_refs_only',
   },
   workspace_source_intake: {
-    bridge_role: 'source_readiness_refs_adapter_default_caller_tail',
+    bridge_role: 'source_readiness_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_substrate_adapter_export',
     retained_authority: ['source_readiness_verdict', 'communication_strategy_inputs', 'visual_source_pack_refs'],
     after_exit_rca_surface: 'source_readiness_verdict_and_source_pack_refs',
   },
   memory_writeback_receipt_transport: {
-    bridge_role: 'memory_receipt_locator_refs_adapter_default_caller_tail',
+    bridge_role: 'memory_receipt_locator_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generic_primitive_consumption/functional_harness_consumer_coverage/chain_authority/memory_refs_only_writeback_chain',
     retained_authority: ['visual_memory_accept_reject', 'visual_memory_body', 'owner_receipt_refs'],
     after_exit_rca_surface: 'visual_memory_decision_and_receipt_refs',
   },
   artifact_export_lifecycle: {
-    bridge_role: 'artifact_locator_authority_refs_adapter_default_caller_tail',
+    bridge_role: 'artifact_locator_authority_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generic_primitive_consumption/consumed_projection_surfaces/artifact_lifecycle',
     retained_authority: ['artifact_mutation_authorization', 'review_export_verdict', 'artifact_locator_refs'],
     after_exit_rca_surface: 'artifact_authority_and_export_verdict_refs',
   },
   review_repair_transport: {
-    bridge_role: 'review_repair_refs_adapter_default_caller_tail',
+    bridge_role: 'review_repair_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generic_primitive_consumption/consumed_projection_surfaces/review_repair_transport',
     retained_authority: ['review_export_verdict', 'repair_decision_refs', 'typed_blocker'],
@@ -150,28 +151,28 @@ const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
     after_exit_rca_surface: 'native_helper_package_module_implementation',
   },
   operator_projection_shell: {
-    bridge_role: 'operator_evidence_refs_adapter_default_caller_tail',
+    bridge_role: 'operator_evidence_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/operator_evidence_readiness_projection',
     retained_authority: ['evidence_gap_refs', 'typed_blocker_refs', 'safe_repair_hint_refs'],
     after_exit_rca_surface: 'operator_evidence_refs_only',
   },
   generic_cli_mcp_wrappers: {
-    bridge_role: 'domain_handler_target_default_generated_wrapper_tail',
+    bridge_role: 'domain_handler_target_only_delete_tail',
     replacement_owner: 'one-person-lab',
     exit_gate_ref: '/visual_pack_compiler_handoff/generated_surface_handoff',
     retained_authority: ['domain_handler_refs', 'safe_action_refs'],
     after_exit_rca_surface: 'domain_handler_target_only',
   },
   codex_executor_adapter: {
-    bridge_role: 'route_executor_policy_refs_adapter_default_caller_tail',
+    bridge_role: 'route_executor_policy_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/domain_entry_contract/executor',
     retained_authority: ['route_policy_refs', 'executor_requirement_refs', 'executor_receipt_refs'],
     after_exit_rca_surface: 'route_level_executor_policy_refs',
   },
   observability_stability_read_model: {
-    bridge_role: 'stability_refs_consumer_default_read_model_tail',
+    bridge_role: 'stability_refs_consumer_refs_only_delete_tail',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_stability_read_model_consumption',
     retained_authority: ['owner_receipt_refs', 'typed_blocker_refs', 'no_regression_evidence_refs'],
@@ -208,7 +209,7 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
     exit_gate_ref: profile.exit_gate_ref || replacementGuard.expectation_ref || '/opl_generic_primitive_consumption',
     current_status: isAuthorityFunction
       ? 'retained_domain_authority'
-      : (isDeclarativePack ? 'declarative_pack_landed' : 'source_shape_landed_default_caller_tail_open'),
+      : (isDeclarativePack ? 'declarative_pack_landed' : 'source_shape_landed_delete_tail_evidence_gate_open'),
     required_before_retire: isAuthorityFunction || isDeclarativePack
       ? []
       : [...RCA_BRIDGE_EXIT_REQUIRED_GATES],
@@ -216,7 +217,7 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
     after_exit_rca_surface: profile.after_exit_rca_surface || 'refs_only_domain_authority_adapter',
     tail_class: isAuthorityFunction || isDeclarativePack
       ? 'retained_domain_surface'
-      : 'generated_default_caller_or_refs_only_adapter_thinning',
+      : 'repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target',
     declares_source_shape_landed: true,
     declares_functional_structure_gap: false,
     can_delete_without_no_active_caller_proof: false,
@@ -262,7 +263,7 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
     status: 'functional_bridge_exited_physical_cleanup_closed',
     source_shape_status: 'landed',
     functional_structure_gap_count: 0,
-    remaining_tail_class: 'generated_default_caller_and_refs_only_adapter_thinning_only',
+    remaining_tail_class: 'repo_local_wrapper_delete_tail_evidence_gated_only',
     owner: 'redcube_ai',
     replacement_owner: 'opl',
     required_before_retiring_remaining_repo_local_bridges: [],
@@ -271,9 +272,11 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
     adapter_thinning_module_ids: moduleItems.map((entry) => entry.module_id),
     allowed_after_exit_rca_surface_classes: [
       'declarative_pack',
+      'domain_handler_target',
+      'refs_only_adapter',
       'minimal_authority_function',
-      'refs_only_locator_projection',
-      'diagnostic_direct_surface',
+      'native_helper_implementation',
+      'provenance',
     ],
     forbidden_after_exit_rca_surface_classes: [
       'generic_scheduler',
@@ -284,9 +287,10 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
       'generic_review_repair_transport',
       'generic_native_helper_envelope',
     ],
-    declares_generated_surface_consumption_complete: true,
-    declares_production_consumption_complete: true,
-    production_consumption_scope: 'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
+    declares_generated_surface_descriptor_consumed: true,
+    declares_generated_surface_consumption_complete: false,
+    declares_production_consumption_complete: false,
+    production_consumption_scope: 'descriptor_and_contract_consumed_not_production_default_caller_live_soak',
     declares_visual_stage_long_soak_complete: false,
     declares_no_active_generic_owner_callers: true,
     declares_no_active_bridge_modules: true,

@@ -42,5 +42,11 @@ test('RCA source-shape tail modules are refs-only or native-helper tails, not br
   assert.equal(byId.native_helper_envelope.status, 'native_helper_implementation_opl_envelope_tail');
   assert.equal(byId.operator_projection_shell.status, 'operator_evidence_refs_projection_landed');
   assert.equal(byId.codex_executor_adapter.status, 'route_executor_policy_refs_adapter_landed');
-  assert.equal(byId.codex_executor_adapter.activeCallerStatus, 'route_run_record_api_neutralized_default_caller_tail');
+  assert.equal(byId.codex_executor_adapter.activeCallerStatus, 'route_run_record_api_refs_only_delete_tail');
+  for (const entry of Object.values(byId)) {
+    if (entry.bridge_exit_gate?.tail_class) {
+      assert.notEqual(entry.bridge_exit_gate.tail_class, 'generated_default_caller_or_refs_only_adapter_thinning');
+      assert.notEqual(entry.bridge_exit_gate.current_status, 'source_shape_landed_default_caller_tail_open');
+    }
+  }
 });

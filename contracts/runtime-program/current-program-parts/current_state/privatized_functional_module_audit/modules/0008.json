@@ -29,7 +29,7 @@
     "domain entry contract",
     "runtime route executor tests"
   ],
-  "activeCallerStatus": "route_run_record_api_neutralized_default_caller_tail",
+  "activeCallerStatus": "route_run_record_api_refs_only_delete_tail",
   "migrationAction": "Keep executor lifecycle/provisioning, attempt ledger ownership, route-run record persistence policy, event log ownership, stale-running-run audit read model, and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy, neutral route-run refs, and receipt refs only.",
   "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and neutral refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.",
   "cannotAbsorbReason": "OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.",
@@ -61,15 +61,16 @@
   },
   "bridge_exit_gate": {
     "gate_id": "codex_executor_adapter_bridge_exit_gate",
-    "bridge_role": "route_executor_policy_refs_adapter_default_caller_tail",
+    "bridge_role": "route_executor_policy_refs_only_delete_tail",
     "bridge_owner": "redcube_ai_refs_only_adapter_tail",
     "replacement_owner": "opl",
     "replacement_surface": "opl_agent_executor_adapter",
     "exit_gate_ref": "/domain_entry_contract/executor",
-    "current_status": "source_shape_landed_default_caller_tail_open",
+    "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
     "required_before_retire": [
       "domain_authority_refs_preserved",
-      "no_regression_proof_recorded"
+      "no_regression_proof_recorded",
+      "explicit_owner_receipt_authorizes_physical_delete"
     ],
     "retained_rca_authority": [
       "route_policy_refs",
@@ -77,7 +78,7 @@
       "executor_receipt_refs"
     ],
     "after_exit_rca_surface": "route_level_executor_policy_refs",
-    "tail_class": "generated_default_caller_or_refs_only_adapter_thinning",
+    "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
     "declares_source_shape_landed": true,
     "declares_functional_structure_gap": false,
     "can_delete_without_no_active_caller_proof": false,
