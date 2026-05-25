@@ -18,7 +18,7 @@ Deliverable route runner 入口也已做源码责任拆分：`run-deliverable-ro
 
 Executor runtime protocol 当前只保留 route-level executor policy、topology descriptor、receipt refs 与 refs-only route-run record materialization。route-run record / event persistence 是迁移输入和当前 active adapter，不是 RCA 新建长期 generic run store；OPL attempt ledger / runtime record primitive 成为 default caller 后继续退役。
 
-本文里的“仍需 OPL primitive / replacement / default caller”表示退役手段尚未完全默认化或尚未以 active caller 证明，不表示 RCA 私有平台化目标暂停，也不表示 OPL 已经完全接管。已提供并被 RCA 消费的能力会写成 `consumed`、`default caller live` 或 `generated/hosted surface active`；尚未默认化的能力继续作为迁移/退役门槛，而不是保留私有平台的理由。
+本文里的“仍需 OPL primitive / replacement / default caller”表示退役手段尚未完全默认化或尚未以 active caller 证明，不表示 RCA 私有平台化目标暂停，也不表示 OPL 已经完全接管。已提供并被 RCA 消费的能力会写成 `consumed`、`default caller live` 或 `generated/hosted surface active`；尚未默认化的能力继续作为迁移/退役门槛，而不是保留私有平台的理由。按 strict purity，active repo-local refs adapter / wrapper / compatibility path 在 cutover 后应删除或收薄到 visual handler target，不作为标准 OPL Agent 长期组成。
 
 本台账只维护当前 active surface 的分类、保留 authority、可上收 generic 子域和退役门。dated scan、line-count 变化、拆分过程、proof 命令和 closeout receipt 进入 contracts 或 `docs/history/**`，不在本文继续追加流水。
 
@@ -27,7 +27,8 @@ Executor runtime protocol 当前只保留 route-level executor policy、topology
 | class | 含义 |
 | --- | --- |
 | `domain_authority_retained` | visual judgment、artifact authority、memory accept/reject、owner receipt、native helper implementation。 |
-| `default_caller_tail` | 当前 repo-local refs adapter 已按 landed source shape 分类；后续只随 OPL generated/hosted primitive default 化继续收薄。 |
+| `default_caller_tail` | 当前 repo-local refs adapter 已按 landed source shape 分类；后续随 OPL generated/hosted primitive default 化继续收薄或删除。 |
+| `strict_delete_after_cutover` | 仍有 active caller 的 repo-local generic wrapper / adapter / compatibility path；当前可运行不构成完成态，必须在 OPL cutover 后删除或降到纯 domain handler target。 |
 | `already_thin_adapter` | 已收薄为 refs-only adapter/projection/provenance，仍因 direct route、domain handler 或测试暂留。 |
 | `source_split_landed_default_caller_tail` | Source split 已 landed；仍等待 OPL generated/default caller 或 proof parity 进一步收薄 repo-local refs adapter。 |
 
