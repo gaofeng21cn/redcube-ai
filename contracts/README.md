@@ -1,5 +1,10 @@
 # 合同目录说明
 
+Owner: `RedCube AI`
+Purpose: `machine_contract_index`
+State: `active_support`
+Machine boundary: 本文是人读合同索引。机器真相继续归本目录下的 JSON contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和验证命令输出；本文不作为机器接口。
+
 这个目录只保留 machine-readable contract surface。
 
 - narrative 协作规则看仓库根 `AGENTS.md`

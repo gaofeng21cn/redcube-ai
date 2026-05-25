@@ -1,5 +1,10 @@
 # 本地私有配置
 
+Owner: `RedCube AI`
+Purpose: `local_private_config_boundary`
+State: `active_support`
+Machine boundary: 本文是人读本机配置说明。机器真相继续归 `config/defaults/`、配置 schema、source、CLI/MCP/API 行为和用户本机未跟踪配置；本文不定义 secret、executor provider 或 runtime readiness。
+
 这个目录用于保存**仅本机使用**、**不进入 git** 的运行时配置。
 
 可选文件：

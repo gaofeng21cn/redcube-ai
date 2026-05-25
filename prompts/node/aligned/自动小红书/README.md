@@ -1,5 +1,10 @@
 # 自动小红书引擎层说明
 
+Owner: `RedCube AI`
+Purpose: `xiaohongshu_prompt_engine_index`
+State: `active_prompt_asset_support`
+Machine boundary: 本文是人读提示词资产索引。机器真相继续归 RCA stage pack、`agent/` prompt policy、contracts、source、workspace artifacts 和 RCA-owned review/export gates；本文不定义 runtime owner、production readiness 或 generated surface ownership。
+
 `system/自动小红书/` 是当前工作台的“引擎层”，不是整个工作台的入口层。
 
 它负责：

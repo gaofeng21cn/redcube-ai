@@ -1,5 +1,10 @@
 # 故事指南候选命名规范
 
+Owner: `RedCube AI`
+Purpose: `xiaohongshu_story_guide_candidate_naming`
+State: `active_prompt_asset_support`
+Machine boundary: 本文是人读候选提示词命名说明。机器真相继续归 RCA stage pack、prompt policy、source、workspace artifacts 和 RCA-owned review/export gates；本文不作为脚本路由、runtime readiness 或 production evidence。
+
 本目录下的候选文件由大语言模型自动扫描命中，不使用脚本路由。
 
 ## 文件名格式
