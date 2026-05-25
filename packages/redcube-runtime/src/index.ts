@@ -24,8 +24,8 @@ import {
 } from '@redcube/reference-os';
 
 import {
-  appendHermesEvent as appendEventJs,
-  readHermesEvents as readEventsJs,
+  appendRouteRunEvent as appendEventJs,
+  readRouteRunEvents as readEventsJs,
 } from '@redcube/runtime-protocol';
 import {
   planCandidateRace as planCandidateRaceJs,
@@ -53,10 +53,10 @@ import {
 } from './product-entry-continuity-ref-adapter.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import {
-  completeHermesRun as completeRunJs,
-  failHermesRun as failRunJs,
-  loadHermesRun as loadRunJs,
-  startHermesRun as startRunJs,
+  completeRouteRun as completeRunJs,
+  failRouteRun as failRunJs,
+  loadRouteRun as loadRunJs,
+  startRouteRun as startRunJs,
 } from '@redcube/runtime-protocol';
 import { executeSourceAugmentation as executeSourceAugmentationJs } from './source-augmentation-execution.js';
 import { buildPerformanceReport as buildPerformanceReportJs } from './performance-report.js';

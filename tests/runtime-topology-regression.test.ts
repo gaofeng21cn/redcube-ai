@@ -8,11 +8,11 @@ import { createServer } from 'node:http';
 
 import {
   buildCodexExecutorDescriptor,
-  completeHermesRun,
-  failHermesRun,
+  completeRouteRun,
+  failRouteRun,
   generateStructuredArtifactViaHermesAgentStructuredCall,
   runAgentLoopViaHermesAgentApi,
-  startHermesRun,
+  startRouteRun,
   structuredCallViaHermesAgentApi,
 } from './package-surfaces.ts';
 
@@ -106,7 +106,7 @@ async function startMockHermesAgentApiServer() {
 test('completed route runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
-  const run = startHermesRun({
+  const run = startRouteRun({
     workspaceRoot,
     route: 'storyline',
     overlay: 'ppt_deck',
@@ -116,7 +116,7 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
     executor,
   });
 
-  const completed = completeHermesRun({
+  const completed = completeRouteRun({
     workspaceRoot,
     runId: run.run_id,
     currentStage: 'storyline',
@@ -138,7 +138,7 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
 test('failed route runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
-  const run = startHermesRun({
+  const run = startRouteRun({
     workspaceRoot,
     route: 'storyline',
     overlay: 'ppt_deck',
@@ -148,7 +148,7 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
     executor,
   });
 
-  const failed = failHermesRun({
+  const failed = failRouteRun({
     workspaceRoot,
     runId: run.run_id,
     currentStage: 'storyline',

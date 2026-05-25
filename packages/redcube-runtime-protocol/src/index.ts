@@ -217,7 +217,7 @@ export {
   HERMES_AGENT_LOOP_RUNTIME_SURFACE,
   HERMES_RUNTIME_SURFACE,
   STRUCTURED_CALL_EXECUTION_SHAPE,
-  appendHermesEvent,
+  appendRouteRunEvent,
   buildCodexExecutorDescriptor,
   buildCodexExecutionModel,
   buildExecutorBackendContract,
@@ -226,12 +226,12 @@ export {
   buildHermesExecutorDescriptor,
   buildHermesExecutionModel,
   buildHermesRuntimeTopology,
-  completeHermesRun,
-  failHermesRun,
-  loadHermesRun,
+  completeRouteRun,
+  failRouteRun,
+  loadRouteRun,
   normalizeExecutorBackend,
-  readHermesEvents,
-  startHermesRun,
+  readRouteRunEvents,
+  startRouteRun,
 } from './executor-runtime.js';
 
 export {

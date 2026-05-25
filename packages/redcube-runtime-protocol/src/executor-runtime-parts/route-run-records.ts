@@ -165,7 +165,7 @@ function normalizeError(error) {
   };
 }
 
-function loadHermesRunRaw({ workspaceRoot, runId }) {
+function loadRouteRunRaw({ workspaceRoot, runId }) {
   const file = runFile(workspaceRoot, runId);
   if (!existsSync(file)) {
     throw new Error(`Run not found: ${runId}`);
@@ -178,7 +178,7 @@ function loadHermesRunRaw({ workspaceRoot, runId }) {
 }
 
 function markStaleRunningRunIfNeeded({ workspaceRoot, runId, checkedSurface = 'loadRun' }) {
-  const { file, run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const { file, run } = loadRouteRunRaw({ workspaceRoot, runId });
   const staleAudit = runningRunStaleAudit(run);
   if (!staleAudit) {
     return run;
@@ -231,7 +231,7 @@ function requireRuntimeTopologyResolver(deps) {
   return resolver;
 }
 
-export function startHermesRun({
+export function startRouteRun({
   workspaceRoot,
   runId = null,
   route,
@@ -277,7 +277,7 @@ export function startHermesRun({
   return run;
 }
 
-export function completeHermesRun({
+export function completeRouteRun({
   workspaceRoot,
   runId,
   currentStage,
@@ -289,7 +289,7 @@ export function completeHermesRun({
   errorKind = null,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const { run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const { run } = loadRouteRunRaw({ workspaceRoot, runId });
   const runStatus = String(status || '').trim() || 'completed';
   const completedRun = {
     ...run,
@@ -317,7 +317,7 @@ export function completeHermesRun({
   return completedRun;
 }
 
-export function failHermesRun({
+export function failRouteRun({
   workspaceRoot,
   runId,
   currentStage,
@@ -328,7 +328,7 @@ export function failHermesRun({
   status = 'failed',
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const { run } = loadHermesRunRaw({ workspaceRoot, runId });
+  const { run } = loadRouteRunRaw({ workspaceRoot, runId });
   const runStatus = String(status || '').trim() || 'failed';
   const failedRun = {
     ...run,
@@ -355,15 +355,15 @@ export function failHermesRun({
   return failedRun;
 }
 
-export function loadHermesRun({ workspaceRoot, runId }) {
+export function loadRouteRun({ workspaceRoot, runId }) {
   return markStaleRunningRunIfNeeded({ workspaceRoot, runId });
 }
 
-export function appendHermesEvent(workspaceRoot, runId, event) {
+export function appendRouteRunEvent(workspaceRoot, runId, event) {
   appendFileSync(eventFile(workspaceRoot, runId), `${JSON.stringify(event)}\n`, 'utf-8');
 }
 
-export function readHermesEvents(workspaceRoot, runId) {
+export function readRouteRunEvents(workspaceRoot, runId) {
   const file = eventFile(workspaceRoot, runId);
   if (!existsSync(file)) {
     return [];

@@ -4,12 +4,12 @@ import {
 } from './runtime-topology.js';
 import {
   RUNNING_RUN_STALE_TTL_MS as RUNNING_RUN_STALE_TTL_MS_FROM_ROUTE_RUN_RECORDS,
-  appendHermesEvent as appendHermesEventFromRouteRunRecords,
-  completeHermesRun as completeHermesRunFromRouteRunRecords,
-  failHermesRun as failHermesRunFromRouteRunRecords,
-  loadHermesRun as loadHermesRunFromRouteRunRecords,
-  readHermesEvents as readHermesEventsFromRouteRunRecords,
-  startHermesRun as startHermesRunFromRouteRunRecords,
+  appendRouteRunEvent as appendRouteRunEventFromRouteRunRecords,
+  completeRouteRun as completeRouteRunFromRouteRunRecords,
+  failRouteRun as failRouteRunFromRouteRunRecords,
+  loadRouteRun as loadRouteRunFromRouteRunRecords,
+  readRouteRunEvents as readRouteRunEventsFromRouteRunRecords,
+  startRouteRun as startRouteRunFromRouteRunRecords,
 } from './executor-runtime-parts/route-run-records.js';
 
 export const HERMES_SUBSTRATE_OWNER = 'Hermes';
@@ -368,7 +368,7 @@ export function createHermesReviewExecution({
   };
 }
 
-export function startHermesRun({
+export function startRouteRun({
   workspaceRoot,
   runId = null,
   route,
@@ -380,7 +380,7 @@ export function startHermesRun({
   baselineDeliverableId = '',
   executor,
 }) {
-  return startHermesRunFromRouteRunRecords({
+  return startRouteRunFromRouteRunRecords({
     workspaceRoot,
     runId,
     route,
@@ -394,7 +394,7 @@ export function startHermesRun({
   }, { resolveRuntimeTopologyForExecutor });
 }
 
-export function completeHermesRun({
+export function completeRouteRun({
   workspaceRoot,
   runId,
   currentStage,
@@ -405,7 +405,7 @@ export function completeHermesRun({
   status = 'completed',
   errorKind = null,
 }) {
-  return completeHermesRunFromRouteRunRecords({
+  return completeRouteRunFromRouteRunRecords({
     workspaceRoot,
     runId,
     currentStage,
@@ -418,7 +418,7 @@ export function completeHermesRun({
   }, { resolveRuntimeTopologyForExecutor });
 }
 
-export function failHermesRun({
+export function failRouteRun({
   workspaceRoot,
   runId,
   currentStage,
@@ -428,7 +428,7 @@ export function failHermesRun({
   telemetry = {},
   status = 'failed',
 }) {
-  return failHermesRunFromRouteRunRecords({
+  return failRouteRunFromRouteRunRecords({
     workspaceRoot,
     runId,
     currentStage,
@@ -440,14 +440,14 @@ export function failHermesRun({
   }, { resolveRuntimeTopologyForExecutor });
 }
 
-export function loadHermesRun({ workspaceRoot, runId }) {
-  return loadHermesRunFromRouteRunRecords({ workspaceRoot, runId });
+export function loadRouteRun({ workspaceRoot, runId }) {
+  return loadRouteRunFromRouteRunRecords({ workspaceRoot, runId });
 }
 
-export function appendHermesEvent(workspaceRoot, runId, event) {
-  return appendHermesEventFromRouteRunRecords(workspaceRoot, runId, event);
+export function appendRouteRunEvent(workspaceRoot, runId, event) {
+  return appendRouteRunEventFromRouteRunRecords(workspaceRoot, runId, event);
 }
 
-export function readHermesEvents(workspaceRoot, runId) {
-  return readHermesEventsFromRouteRunRecords(workspaceRoot, runId);
+export function readRouteRunEvents(workspaceRoot, runId) {
+  return readRouteRunEventsFromRouteRunRecords(workspaceRoot, runId);
 }

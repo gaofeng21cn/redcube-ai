@@ -7,12 +7,12 @@ import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,
   HERMES_AGENT_ADAPTER,
-  appendHermesEvent,
-  completeHermesRun,
-  failHermesRun,
+  appendRouteRunEvent,
+  completeRouteRun,
+  failRouteRun,
   readHermesAgentLoopContract,
-  readHermesEvents,
-  startHermesRun,
+  readRouteRunEvents,
+  startRouteRun,
 } from '@redcube/runtime-protocol';
 
 import { readCodexCliContract } from '@redcube/codex-cli-client';
@@ -468,7 +468,7 @@ function buildCompletedRouteResponse({
   executor,
 }) {
   const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
-  const completedRun = completeHermesRun({
+  const completedRun = completeRouteRun({
     workspaceRoot,
     runId: run.run_id,
     currentStage: safeRoute,
@@ -483,7 +483,7 @@ function buildCompletedRouteResponse({
     errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
   });
 
-  appendHermesEvent(workspaceRoot, completedRun.run_id, {
+  appendRouteRunEvent(workspaceRoot, completedRun.run_id, {
     type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
     route: safeRoute,
     overlay,
@@ -496,7 +496,7 @@ function buildCompletedRouteResponse({
   return {
     ok: true,
     run: completedRun,
-    events: readHermesEvents(workspaceRoot, completedRun.run_id),
+    events: readRouteRunEvents(workspaceRoot, completedRun.run_id),
     artifactFile: routeResult.artifact_file,
     artifact: routeResult.artifact,
     cache_status: routeResult.cache_status || 'miss',
@@ -545,7 +545,7 @@ function buildFailedRouteResponse({
 }) {
   const { failure, qualityBlocked } = normalizeRouteFailure(error);
   const failedArtifact = failedArtifactForError(error, failure);
-  const failedRun = failHermesRun({
+  const failedRun = failRouteRun({
     workspaceRoot,
     runId: run.run_id,
     currentStage: safeRoute,
@@ -561,7 +561,7 @@ function buildFailedRouteResponse({
       : {},
   });
 
-  appendHermesEvent(workspaceRoot, failedRun.run_id, {
+  appendRouteRunEvent(workspaceRoot, failedRun.run_id, {
     type: qualityBlocked ? 'run_quality_blocked' : 'run_failed',
     route: safeRoute,
     overlay,
@@ -572,7 +572,7 @@ function buildFailedRouteResponse({
   return {
     ok: false,
     run: failedRun,
-    events: readHermesEvents(workspaceRoot, failedRun.run_id),
+    events: readRouteRunEvents(workspaceRoot, failedRun.run_id),
     error: failedRun.error,
   };
 }
@@ -601,7 +601,7 @@ export async function runDeliverableRoute(request) {
     adapter,
   });
 
-  const run = startHermesRun({
+  const run = startRouteRun({
     workspaceRoot,
     runId: String(runId || '').trim() || null,
     route: safeRoute,
@@ -613,7 +613,7 @@ export async function runDeliverableRoute(request) {
     executor,
   });
 
-  appendHermesEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
+  appendRouteRunEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
     executor,
     safeRoute,
     overlay,
