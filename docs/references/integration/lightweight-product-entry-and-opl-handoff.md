@@ -29,14 +29,14 @@ Machine boundary: 人读 integration support。机器真相继续归 runtime-pro
 
 在 `OPL` 家族级入口下，也必须兼容同一条下游形态，但这条路径在这里仅作为 hosted integration / reference surface：
 
-`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry / domain-handler target -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
 这也是当前“最终目标形态”冻结件要表达的主线；较早的 Hermes 优先 program 文档只保留 provenance，当前按 provider-backed / Temporal-target 口径读取。
 
 这意味着：
 
 - `OPL` 只保留 family-level session/runtime/projection 编排与 shared modules/contracts/indexes
-- OPL hosted integration 是 thin product-managed adapter/projection layer，不持有 RedCube visual-domain truth 或 concrete executor
+- OPL hosted integration 是 generated product/status/session/workbench/runtime projection layer，通过 RCA `domain-handler export|dispatch` target 和 service-safe domain entry 消费 refs，不持有 RedCube visual-domain truth、review/export verdict、canonical artifacts、visual memory body 或 concrete executor
 - `RedCube AI` 是独立 visual domain agent，提供自己的 lightweight direct entry
 - 两者都存在，但作用域不同
 
@@ -86,7 +86,8 @@ Machine boundary: 人读 integration support。机器真相继续归 runtime-pro
 - 当前可以把 repo-verified `RedCube Product Entry` service surface 与 `OPL -> RedCube` hosted integration 写成已落地
 - 但不能把它们写成成熟的最终用户前台壳或真实线上托管产品入口
 - 当前 OPL-hosted route / stage-run 口径已切到 provider-backed / Temporal-target family runtime；`Hermes-Agent` 只作为显式 opt-in executor adapter、hosted/proof backend 或 provenance reference 保留
-- 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行
+- 默认 concrete executor 仍是 `Codex CLI`，通过 executor adapter 在 domain 内执行；OPL/Temporal 可以调度、唤醒、重查和投影 attempt，但 provider completion 不能写成 RedCube visual ready、exportable、handoffable 或 production visual-stage long soak complete
+- `runtimeWatch` 保留为 direct review/progress read model；`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役，OPL runtime 查询走 status/workbench runtime read-model target
 - 所以这份文档现在冻结的是目标边界、调用合同与 repo-verified service surface，不是过度宣称“前台产品已经做完”
 
 ## 6. 支撑边界

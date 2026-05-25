@@ -11,9 +11,9 @@ Machine boundary: 人读 OPL family contract support。机器真相继续归 run
 
 ## Runtime Attempt Projection
 
-RCA 通过 product-entry session、`runtimeWatch`、artifact inventory 和 runtime health 映射 `opl_family_runtime_attempt_contract.v1`。这些 surface 可以向 `OPL` 投影 attempt state、retry/backoff、workspace boundary、failure reason、reconciliation status 和 last observed projection。
+RCA 通过 product-entry session、direct `runtimeWatch`、artifact inventory、runtime health、`domain-handler export|dispatch` 与 `temporal_autonomy_readiness` 映射 `opl_family_runtime_attempt_contract.v1`。这些 surface 向 `OPL` 投影 stage descriptor、attempt locator、retry/backoff refs、workspace boundary、failure reason、reconciliation status、last observed projection 和 owner receipt / typed blocker refs。
 
-OPL hosted integration 只能读取和索引；visual deliverable runtime、route truth、canonical artifacts 继续由 RCA 持有。
+OPL hosted integration 可以托管、排队、唤醒、retry/dead-letter、重新查询并投影 provider-backed attempt；它不能把 provider completion 写成 visual ready、exportable、handoffable 或 production visual-stage long soak complete。RCA 继续持有 visual route truth、review/export verdict、canonical artifacts、publication projection truth、visual memory body 和 owner receipt authority。
 
 ## Quality Projection
 
@@ -39,9 +39,9 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 ## Lifecycle Adapter Surface
 
-`opl_family_lifecycle_adapter` 是 RCA 侧的厚 adapter 投影。它把 OPL stage-plan / route-run refs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射为 OPL family persistence / lifecycle / owner-route discovery / adoption surface。
+`opl_family_lifecycle_adapter` 当前是 refs-only lifecycle adoption projection，不是 RCA-owned generic lifecycle adapter。它把 OPL stage-plan / route-run refs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射给 OPL family persistence / lifecycle / owner-route discovery；RCA 不因此拥有 generic runner、attempt ledger、queue、workbench、session shell 或 lifecycle runtime。
 
-manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。
+manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。`runtimeWatch` 继续是 direct review/progress read model，`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；OPL 的 runtime 查询目标是 status/workbench runtime read-model，而不是 RCA repo-local default wrapper。
 
 该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite domain_action_adapter 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
 
