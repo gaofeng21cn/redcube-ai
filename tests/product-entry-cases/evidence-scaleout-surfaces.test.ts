@@ -164,6 +164,20 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       ],
     );
     assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.opl_payload_policy.allowed_payload_ref_groups.includes(
+        'typed_blocker_backfill_refs',
+      ),
+      false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.status,
+      'linked_not_stage_handoff_payload',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs,
+      false,
+    );
+    assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
       true,
     );
@@ -349,7 +363,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.typed_blocker_refs,
-      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.typed_blocker_backfill_refs.blocker_refs,
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocker_refs,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.accepted_payload_paths.success_refs_path.closes_domain_ready,
@@ -411,12 +425,16 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.owner_receipt_refs.receipt_ref,
     );
     assert.deepEqual(
-      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.typed_blocker_backfill_refs.blocker_refs,
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocker_refs,
       [
         'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
         'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
         'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
       ],
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs,
+      false,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.opl_payload_policy.payload_body_allowed,

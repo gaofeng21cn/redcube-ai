@@ -201,14 +201,17 @@
       "monitor_freshness_payload_body_required": false,
       "production_soak_claimed": false
     },
-    "typed_blocker_backfill_refs": {
+    "production_tail_typed_blocker_refs": {
+      "status": "linked_not_stage_handoff_payload",
       "blocker_refs": [
         "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
         "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
         "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
       ],
       "blocker_owner": "redcube_ai",
-      "payload_body_included": false
+      "payload_body_included": false,
+      "blocks_stage_expected_receipt_or_monitor_refs": false,
+      "production_tail_workorder_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder"
     },
     "opl_payload_policy": {
       "payload_kind": "stage_production_evidence_receipt_record_body_free_refs",

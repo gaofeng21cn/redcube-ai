@@ -574,11 +574,13 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       monitor_freshness_payload_body_required: false,
       production_soak_claimed: false,
     },
-    typed_blocker_backfill_refs: {
-      status: 'remaining_gates_reported_as_rca_typed_blockers',
+    production_tail_typed_blocker_refs: {
+      status: 'linked_not_stage_handoff_payload',
       blocker_refs: productionEvidenceScaleoutRefs.typed_blocker_refs || [],
       blocker_owner: 'redcube_ai',
       payload_body_included: false,
+      blocks_stage_expected_receipt_or_monitor_refs: false,
+      production_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
     },
     opl_payload_policy: {
       payload_kind: 'stage_production_evidence_receipt_record_body_free_refs',
@@ -589,7 +591,6 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
         'body_free_workspace_receipt_ref',
         'body_free_visual_memory_reuse_ref',
         'body_free_repeated_no_regression_refs',
-        'typed_blocker_backfill_refs',
       ],
       forbidden_payload_classes: [
         'visual truth body',

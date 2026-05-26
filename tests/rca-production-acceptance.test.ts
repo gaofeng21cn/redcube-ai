@@ -346,13 +346,15 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.equal(handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required, false);
   assert.equal(handoff.monitor_freshness_backfill_refs.production_soak_claimed, false);
 
-  assert.deepEqual(handoff.typed_blocker_backfill_refs.blocker_refs, [
+  assert.equal(handoff.production_tail_typed_blocker_refs.status, 'linked_not_stage_handoff_payload');
+  assert.deepEqual(handoff.production_tail_typed_blocker_refs.blocker_refs, [
     'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
     'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
     'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
   ]);
-  assert.equal(handoff.typed_blocker_backfill_refs.blocker_owner, 'redcube_ai');
-  assert.equal(handoff.typed_blocker_backfill_refs.payload_body_included, false);
+  assert.equal(handoff.production_tail_typed_blocker_refs.blocker_owner, 'redcube_ai');
+  assert.equal(handoff.production_tail_typed_blocker_refs.payload_body_included, false);
+  assert.equal(handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs, false);
 
   assert.equal(handoff.opl_payload_policy.payload_kind, 'stage_production_evidence_receipt_record_body_free_refs');
   assert.equal(handoff.opl_payload_policy.payload_body_required, false);
@@ -362,7 +364,6 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
     'body_free_workspace_receipt_ref',
     'body_free_visual_memory_reuse_ref',
     'body_free_repeated_no_regression_refs',
-    'typed_blocker_backfill_refs',
   ]);
 
   assert.equal(handoff.authority_boundary.opl_can_store_handoff_refs, true);
@@ -640,8 +641,9 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(oplHandoff.body_free_repeated_no_regression_refs.repeated_no_regression_claimed_as_soak, false);
   assert.equal(oplHandoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required, false);
   assert.equal(oplHandoff.monitor_freshness_backfill_refs.production_soak_claimed, false);
-  assert.equal(oplHandoff.typed_blocker_backfill_refs.blocker_owner, 'redcube_ai');
-  assert.equal(oplHandoff.typed_blocker_backfill_refs.payload_body_included, false);
+  assert.equal(oplHandoff.production_tail_typed_blocker_refs.blocker_owner, 'redcube_ai');
+  assert.equal(oplHandoff.production_tail_typed_blocker_refs.payload_body_included, false);
+  assert.equal(oplHandoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs, false);
   assert.equal(oplHandoff.opl_payload_policy.payload_body_allowed, false);
   assert.equal(oplHandoff.authority_boundary.opl_can_record_expected_receipt_refs, true);
   assert.equal(oplHandoff.authority_boundary.opl_can_record_monitor_freshness_refs, true);
