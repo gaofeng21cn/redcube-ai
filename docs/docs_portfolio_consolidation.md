@@ -479,3 +479,45 @@ Remaining stale / retire candidates:
 Next tranche write scope:
 
 - RCA north-star reference body if future changes reopen it, or switch to OPL / MAS / App uncovered docs. Keep App docs delayed until active release / GUI lanes are safe or explicitly handed to this governance goal.
+
+### 2026-05-26 north-star reference coverage tranche
+
+本轮覆盖 RCA north-star reference 主体 `docs/references/rca-visual-deliverable-agent-ideal-state.md`。目标是确认该文档只承担长期目标态与 owner boundary 参考职责，不承担当前闭合状态、执行顺序、production evidence tail、generated/default caller cutover 或 readiness 证明；当前 truth 继续回到核心五件套、active gap plan 与 machine-readable contracts。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `README.md`, `docs/README.md`, `docs/project.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, and this governance ledger.
+- Reviewed reference: full paragraph read of `docs/references/rca-visual-deliverable-agent-ideal-state.md`.
+- Machine refs: `contracts/functional_privatization_audit.json`, `contracts/physical_source_morphology_policy.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/stage_control_plane.json`, and `package.json`.
+- Doctor evidence: OPL Doc Governance doctor preflight for RCA reported `finding_count=0`, active truth `pass`; this remained a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- The north-star reference already separates target-state boundary from current progress: current completion status, `functional_structure_gap_count`, evidence gaps and execution order are delegated to `docs/active/rca-ideal-state-gap-plan.md`.
+- The document matches live contracts on the key owner split: RCA owns visual truth, route truth, review/export verdict, artifact authority, visual memory accept/reject, owner receipt and native helper implementation; OPL owns/generated-hosts generic runtime, queue, wakeup, attempt ledger, workbench, wrapper and refs-only projection surfaces.
+- The document correctly treats structural conformance, provider completion, OPL-generated descriptor readiness, transition proof and no-regression refs as non-readiness evidence. It does not claim visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak completion.
+- The only direct-route wording that still names ideal `redcube product status / manifest / invoke / session` is explicitly in the ideal target section and is constrained by the same document's current-read note that current repo-local generic wrappers remain OPL generated/default-caller thinning tails. No current CLI surface correction was needed in the north-star body.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of `docs/references/rca-visual-deliverable-agent-ideal-state.md`; support read of core docs, active truth owner, machine contracts and package verification surface listed above. | this coverage ledger only |
+
+Archived / tombstoned / deleted docs:
+
+- none. The north-star reference remains active support with a unique reference role; no body text required rewrite in this tranche.
+
+Unreviewed docs:
+
+- RCA previously covered product-entry / integration / memory / executor / governance references plus history, policy, delivery/source, runtime and active/status chunks remain as recorded above.
+- With this tranche, the previously named uncovered RCA reference body `docs/references/rca-visual-deliverable-agent-ideal-state.md` is covered for current owner, support role, target-state boundary and no-readiness-upgrade wording.
+- Any RCA docs created or modified after this tranche still require future coverage. OPL, MAS and App repo-wide coverage remains governed by the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Future north-star wording that treats target-state examples, ideal direct product commands, OPL descriptor readiness, structural conformance, provider completion, generated/default-caller consumption or proof refs as current CLI availability, visual ready, exportable, handoffable, domain ready, production ready, production visual-stage long-soak evidence, artifact authority transfer or OPL ownership of RCA visual truth is stale pollution.
+- Future target-state text that reintroduces RCA-owned generic scheduler, queue, attempt ledger, session/workbench shell, artifact gallery/handoff shell, review/repair transport, workspace/source shell, observability shell, native-helper generic envelope or generated wrapper owner must be rejected unless live contracts/source/tests reopen a narrow authority function with owner receipt and no-forbidden-write proof.
+
+Next tranche write scope:
+
+- Switch to MAS remaining repo-wide coverage or App docs after active release / GUI lanes are safe or explicitly assigned.
+- RCA can move toward final inventory reconcile only after confirming no newly created/modified README/docs files remain outside the previously recorded chunks.
