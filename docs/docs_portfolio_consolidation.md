@@ -86,6 +86,49 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-26 Phase 2 history/provenance index tranche
+
+本轮覆盖 RCA `docs/history/phase-2/` history/provenance 文档，重点核对 absorbed Phase 2 tranche、continuation board、proof lane、manual-test brief、HTML/native route closeout 与当前 RCA owner boundary 的读法。目标是把 Phase 2 历史材料继续锁在 provenance / proof 语境，并明确唯一当前真相回到核心五件套、active gap plan、runtime/delivery/source/policy owner docs 和 machine-readable contracts。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, and this governance ledger.
+- Reviewed history docs: `docs/history/README.md`, `docs/history/phase-2/README.md`, and all 17 `docs/history/phase-2/*.md` bodies.
+- Machine refs: `contracts/runtime-program/current-program.json`, Phase 2 runtime-program contracts, `ppt-image-first-production-route.json`, `ppt-native-authoring-proof-lane.json`, current-program leaf refs for source intake, publication projection, native PPT operator UX, `runtimeWatch`, retired `domain_action_adapter` tombstones, physical morphology and default-caller deletion evidence.
+- Doctor evidence: OPL Doc Governance doctor preflight reported `finding_count=0`, active truth `pass`; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- Phase 2 body docs already carry `Owner` / `Purpose` / `State` / `Machine boundary` or first-screen lifecycle notes. Several bodies intentionally preserve old `当前状态`、`Backlog`、`下一步`、`停车结论` or closeout language, but the lifecycle notes bind those terms to historical tranche context.
+- The directory index had the same weakness as Hermes before the prior tranche: it had lifecycle rules, but still used an English-first title and a bare file list. It is now a Chinese canonical history index with current truth owner refs, a per-brief role/read table, and explicit stale wording/no-resurrection rules.
+- The only Phase 2 brief with current support semantics is `phase_2_ppt_native_authoring_proof_lane.md`: it still supports the optional native editable PPTX route. It does not change the default image-first PPT route and does not bypass source truth, review, `runtimeWatch` or export gates.
+- Phase 2 history does not authorize controller expansion, academic poster activation, managed web runtime, OPL-first runtime owner, generated/default caller ownership, visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak completion.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full paragraph read of `docs/history/phase-2/README.md` and all 17 `docs/history/phase-2/*.md` bodies; role read of `docs/history/README.md`; live contract/core-doc refs listed above. | `docs/history/phase-2/README.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. Phase 2 history bodies remain provenance/proof records. No body-level rewrite was needed because each body already carries lifecycle metadata; the index now provides per-brief current read and no-resurrection guidance.
+
+Unreviewed docs:
+
+- RCA `docs/history/phase-2/` bodies are now covered for current owner, historical role, current optional-route support and no-resurrection boundaries.
+- RCA remaining reference bodies and non-Hermes/non-Phase-2 history bodies remain open outside already-covered chunks.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Any future RCA prose that treats Phase 2 history, continuation boards, old manual-test brief, old HTML lane closeout, old `gateway` / `harness` / `managed` wording, or old OPL-hosted runtime language as current default runtime owner, active backlog, generated/default caller, public identity, visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak evidence is stale pollution.
+- Any current rule still embedded only in a Phase 2 history body should be extracted to core docs, active gap plan, runtime/delivery/source/policy owner docs, machine-readable contracts or source/test surface before being relied on.
+
+Next tranche write scope:
+
+- Remaining RCA `docs/history/plans/`, `docs/history/positioning/`, `docs/history/runtime/`, `docs/history/tombstones/` and uncovered reference bodies with old managed/gateway/runtime/session/domain_action_adapter vocabulary.
+- Or MAS product/status/workbench and progress/domain-ref projection shell reconciliation outside already-covered blocks.
+- Keep App docs delayed until active release/GUI lanes are safe to govern.
+
 ### 2026-05-26 Hermes history/provenance no-resurrection tranche
 
 本轮覆盖 RCA `docs/history/hermes/` history/provenance 文档，重点核对 repo-local Hermes migration line、upstream `Hermes-Agent` proof lane、service-safe domain entry proof、historical blocker / closeout 与当前 OPL-hosted provider boundary 的读法。目标是把 history body 继续锁在 provenance / proof 语境，防止旧 `Hermes-backed`、`managed runtime`、`current/next/cutover` wording 回流成当前 default runtime owner、public entry、generated/default caller、production readiness 或 RCA-owned generic runtime shell。
