@@ -35,6 +35,25 @@ export function artifactRequestsFixHtml(artifact: unknown): boolean {
     );
 }
 
+export function artifactRerunFromStage(artifact: unknown): string {
+  const record = artifact as {
+    review_state_patch?: {
+      rerun_from_stage?: unknown;
+      rerun_policy?: {
+        status?: unknown;
+        rerun_from_stage?: unknown;
+      };
+    };
+  } | undefined;
+  const rerunPolicy = record?.review_state_patch?.rerun_policy;
+  return safeText(record?.review_state_patch?.rerun_from_stage)
+    || (
+      safeText(rerunPolicy?.status) === 'rerun_required'
+        ? safeText(rerunPolicy?.rerun_from_stage)
+        : ''
+    );
+}
+
 export function readHydratedContractForRequest(request: RunDeliverableRouteRequest): JsonObject {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,

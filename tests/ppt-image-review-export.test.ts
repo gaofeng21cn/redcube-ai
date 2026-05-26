@@ -6,6 +6,7 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
+import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core-profile-presets.js';
 
 const PNG_16_9 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAyaZf6AAAADElEQVR42u3BMQEAAADCoPVPbQo/oAAAAAAA4G0CxwAAATXs5kEAAAAASUVORK5CYII=',
@@ -288,4 +289,67 @@ test('ppt image-first screenshot review fails closed on operator language and la
   assert.equal(screenshot.slide_reviews[0].metrics.operator_language_fragments.includes('汇报讨论用途'), true);
   assert.equal(screenshot.slide_reviews[0].metrics.table_min_font_pt, 9);
   assert.equal(screenshot.slide_reviews[0].metrics.card_blank_ratio, 0.52);
+});
+
+const profilePresetParts = createPptDeckProfilePresetParts({ safeArray, safeText });
+
+test('ppt lecture_student one-slide deck can satisfy teaching progression without four page types', () => {
+  const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
+    slide_blueprint: {
+      slides: [
+        {
+          slide_id: 'S01',
+          title: '自主工作流闭环证明',
+          page_type: 'cover_signal',
+          page_goal: '用单页闭环展示从输入到交付的关键链路。',
+          core_sentence: '输入清楚、链路可追踪、证据可审阅、边界可见，最终交付才可信。',
+          page_core_content: [
+            '输入：任务目标、受众、格式和约束。',
+            '执行链路：目标理解、故事线、页面结构、视觉设计、检查和导出。',
+            '证据：每一步留下可回看产物。',
+            '阻断边界：事实不足、视觉不足、导出失败或需人工判断时停下。',
+          ],
+          evidence_points: [
+            '执行侧按标准流程推进。',
+            '审阅侧保留可复核证据。',
+          ],
+          visual_presentation: {
+            layout_family: 'cover_signal',
+            anchor_tracks: ['横向五段流程展示完整推进。'],
+          },
+        },
+      ],
+    },
+  }, {});
+
+  assert.equal(checks.term_explained_on_first_use, true);
+  assert.equal(checks.teaching_progression_clear, true);
+});
+
+test('ppt lecture_student multi-slide deck still requires the full teaching page progression', () => {
+  const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
+    slide_blueprint: {
+      slides: [
+        {
+          slide_id: 'S01',
+          title: '只有开场页',
+          page_type: 'cover_signal',
+          page_goal: '先讲开场。',
+          core_sentence: '只有开场不能代表完整教学推进。',
+          page_core_content: ['概念一', '概念二'],
+        },
+        {
+          slide_id: 'S02',
+          title: '只有补充页',
+          page_type: 'central_axis',
+          page_goal: '补充概念。',
+          core_sentence: '还缺少机制、判断和收束。',
+          page_core_content: ['概念三', '概念四'],
+        },
+      ],
+    },
+  }, {});
+
+  assert.equal(checks.term_explained_on_first_use, true);
+  assert.equal(checks.teaching_progression_clear, false);
 });

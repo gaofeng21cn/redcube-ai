@@ -1,7 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
@@ -18,6 +18,48 @@ const ONE_PIXEL_PNG = Buffer.from(
   '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000000020001e221bc330000000049454e44ae426082',
   'hex',
 );
+
+function codexImagegenStdout(usage = { prompt_tokens: 19, completion_tokens: 3, total_tokens: 22 }) {
+  return [
+    JSON.stringify({ type: 'item.completed', item: { type: 'image_generation_call', id: 'ig_mock' } }),
+    JSON.stringify({ event: 'run.completed', run_id: 'mock-run', usage }),
+  ].join('\n');
+}
+
+function codexGeneratedImagesStdout({ generatedDir, generatedFile, outputFile, threadId = '019e6462-8396-7062-bdcb-461ddc160d19' }) {
+  return [
+    JSON.stringify({ type: 'thread.started', thread_id: threadId }),
+    JSON.stringify({ type: 'turn.started' }),
+    JSON.stringify({
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: `/bin/zsh -lc "rtk find ${generatedDir} -type f -name '*.png' -maxdepth 1 2>/dev/null | tail -1"`,
+        aggregated_output: generatedFile,
+        exit_code: 0,
+        status: 'completed',
+      },
+    }),
+    JSON.stringify({
+      type: 'item.completed',
+      item: {
+        type: 'command_execution',
+        command: `/bin/zsh -lc 'rtk cp ${generatedDir}/*.png ${outputFile} && rtk file ${outputFile}'`,
+        aggregated_output: `${outputFile}: PNG image data, 1 x 1, 8-bit/color RGBA, non-interlaced`,
+        exit_code: 0,
+        status: 'completed',
+      },
+    }),
+    JSON.stringify({
+      type: 'item.completed',
+      item: {
+        type: 'agent_message',
+        text: JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+      },
+    }),
+    JSON.stringify({ type: 'turn.completed', usage: { prompt_tokens: 19, completion_tokens: 3, total_tokens: 22 } }),
+  ].join('\n');
+}
 
 test('readCodexCliContract falls back to local Codex defaults', () => {
   const homeRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-home-'));
@@ -178,6 +220,9 @@ test('generateImageViaCodexNativeImagegen delegates raster output to Codex nativ
       REDCUBE_CODEX_MODEL: 'gpt-5.4',
     }),
     spawnSyncImpl(_command, args, options) {
+      assert.equal(args.includes('--enable'), true);
+      assert.equal(args.includes('image_generation'), true);
+      assert.equal(options.cwd, workspaceRoot);
       assert.match(String(options.input), /Codex 原生 imagegen|built-in|内置 imagegen|image_generation/);
       assert.match(String(options.input), /不要使用.*OPENAI_API_KEY|不要使用.*REDCUBE_IMAGE_GENERATION_TOKEN/s);
       writeFileSync(outputFile, ONE_PIXEL_PNG);
@@ -189,11 +234,7 @@ test('generateImageViaCodexNativeImagegen delegates raster output to Codex nativ
       );
       return {
         status: 0,
-        stdout: JSON.stringify({
-          event: 'run.completed',
-          run_id: 'mock-run',
-          usage: { prompt_tokens: 19, completion_tokens: 3, total_tokens: 22 },
-        }),
+        stdout: codexImagegenStdout(),
         stderr: '',
         error: null,
       };
@@ -208,9 +249,394 @@ test('generateImageViaCodexNativeImagegen delegates raster output to Codex nativ
     assert.equal(result.generationRuntime.provider_token_source, 'codex_executor_native_tool');
     assert.equal(result.generationRuntime.explicit_provider_token_required, false);
     assert.equal(result.generationRuntime.token_persisted, false);
+    assert.equal(result.generationRuntime.cwd, workspaceRoot);
   } finally {
     rmSync(workspaceRoot, { recursive: true, force: true });
   }
+});
+
+test('generateImageViaCodexNativeImagegen defaults Codex cwd to the artifact output directory', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-cwd-'));
+  const outputDir = path.join(workspaceRoot, 'artifacts', 'image_pages', 'author_image_pages');
+  const outputFile = path.join(outputDir, 'S01.png');
+
+  const result = await generateImageViaCodexNativeImagegen({
+    family: 'ppt_deck',
+    route: 'author_image_pages',
+    slideId: 'S01',
+    prompt: '生成一张 16:9 中文 PPT 页面。',
+    outputFile,
+    toolOptions: { type: 'image_generation', size: '1536x864' },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args, options) {
+      assert.equal(options.cwd, outputDir);
+      writeFileSync(outputFile, ONE_PIXEL_PNG);
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: codexImagegenStdout(),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+
+  try {
+    assert.equal(result.imageFile, outputFile);
+    assert.equal(result.generationRuntime.cwd, outputDir);
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test('generateImageViaCodexNativeImagegen materializes Codex generated image when sandbox blocks target write', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-sandbox-'));
+  const generatedRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-generated-images-'));
+  const generatedFile = path.join(generatedRoot, 'ig_mock.png');
+  const outputFile = path.join(workspaceRoot, 'artifacts', 'N01.png');
+  writeFileSync(generatedFile, ONE_PIXEL_PNG);
+
+  const result = await generateImageViaCodexNativeImagegen({
+    family: 'ppt_deck',
+    route: 'author_image_pages',
+    slideId: 'N01',
+    prompt: '生成一张 16:9 中文 PPT 页面。',
+    outputFile,
+    toolOptions: { type: 'image_generation', size: '1536x864' },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args) {
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        JSON.stringify({
+          ok: false,
+          image_file: generatedFile,
+          mode: 'codex_native_imagegen',
+          error: 'sandbox_denied_target_write',
+        }),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: codexImagegenStdout(),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+
+  try {
+    assert.equal(result.imageFile, outputFile);
+    assert.equal(existsSync(outputFile), true);
+    assert.deepEqual(readFileSync(outputFile), ONE_PIXEL_PNG);
+    assert.equal(result.dimensions.width, 1);
+    assert.equal(result.generationRuntime.codex_generated_image_file, generatedFile);
+    assert.equal(result.generationRuntime.materialized_from_codex_generated_image, true);
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+    rmSync(generatedRoot, { recursive: true, force: true });
+  }
+});
+
+test('generateImageViaCodexNativeImagegen accepts generated_image_file from Codex native imagegen result', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-generated-field-'));
+  const generatedRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-generated-images-'));
+  const generatedFile = path.join(generatedRoot, 'ig_mock.png');
+  const outputFile = path.join(workspaceRoot, 'artifacts', 'S01.png');
+  writeFileSync(generatedFile, ONE_PIXEL_PNG);
+
+  const result = await generateImageViaCodexNativeImagegen({
+    family: 'ppt_deck',
+    route: 'author_image_pages',
+    slideId: 'S01',
+    prompt: '生成一张 16:9 中文 PPT 页面。',
+    outputFile,
+    toolOptions: { type: 'image_generation', size: '1536x864' },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args) {
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        JSON.stringify({
+          ok: false,
+          image_file: outputFile,
+          generated_image_file: generatedFile,
+          mode: 'codex_native_imagegen',
+          error: 'native imagegen succeeded, but sandbox denied writing to the requested output_file outside writable roots',
+        }),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: codexImagegenStdout(),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+
+  try {
+    assert.equal(result.imageFile, outputFile);
+    assert.equal(existsSync(outputFile), true);
+    assert.deepEqual(readFileSync(outputFile), ONE_PIXEL_PNG);
+    assert.equal(result.generationRuntime.codex_generated_image_file, generatedFile);
+    assert.equal(result.generationRuntime.materialized_from_codex_generated_image, true);
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+    rmSync(generatedRoot, { recursive: true, force: true });
+  }
+});
+
+test('generateImageViaCodexNativeImagegen accepts sandbox-denied image_file when it is the generated PNG', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-copy-denied-'));
+  const generatedRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-generated-images-'));
+  const generatedFile = path.join(generatedRoot, 'ig_mock.png');
+  const outputFile = path.join(workspaceRoot, 'artifacts', 'S01.png');
+  writeFileSync(generatedFile, ONE_PIXEL_PNG);
+
+  const result = await generateImageViaCodexNativeImagegen({
+    family: 'ppt_deck',
+    route: 'author_image_pages',
+    slideId: 'S01',
+    prompt: '生成一张 16:9 中文 PPT 页面。',
+    outputFile,
+    toolOptions: { type: 'image_generation', size: '1536x864' },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args) {
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        JSON.stringify({
+          ok: false,
+          image_file: generatedFile,
+          mode: 'codex_native_imagegen',
+          error: 'sandbox_denied_copy_to_output_file',
+        }),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: codexImagegenStdout(),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+
+  try {
+    assert.equal(result.imageFile, outputFile);
+    assert.equal(existsSync(outputFile), true);
+    assert.deepEqual(readFileSync(outputFile), ONE_PIXEL_PNG);
+    assert.equal(result.generationRuntime.codex_generated_image_file, generatedFile);
+    assert.equal(result.generationRuntime.materialized_from_codex_generated_image, true);
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+    rmSync(generatedRoot, { recursive: true, force: true });
+  }
+});
+
+test('generateImageViaCodexNativeImagegen accepts current Codex generated_images materialization provenance', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-events-'));
+  const threadId = '019e6462-8396-7062-bdcb-461ddc160d19';
+  const generatedDir = path.join(workspaceRoot, '.codex', 'generated_images', threadId);
+  const generatedFile = path.join(generatedDir, 'ig_0f22c17f7ae304ab016a159a4ff2208198a67ca05eae7f83b7.png');
+  const outputFile = path.join(workspaceRoot, 'artifacts', 'S01.png');
+  mkdirSync(generatedDir, { recursive: true });
+  writeFileSync(generatedFile, ONE_PIXEL_PNG);
+
+  const result = await generateImageViaCodexNativeImagegen({
+    family: 'ppt_deck',
+    route: 'author_image_pages',
+    slideId: 'S01',
+    prompt: '生成一张 16:9 中文 PPT 页面。',
+    outputFile,
+    toolOptions: { type: 'image_generation', size: '1536x864' },
+    contract: readCodexCliContract({
+      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    }),
+    spawnSyncImpl(_command, args) {
+      mkdirSync(path.dirname(outputFile), { recursive: true });
+      writeFileSync(outputFile, ONE_PIXEL_PNG);
+      const outputFlagIndex = args.indexOf('--output-last-message');
+      writeFileSync(
+        args[outputFlagIndex + 1],
+        JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+        'utf-8',
+      );
+      return {
+        status: 0,
+        stdout: codexGeneratedImagesStdout({ generatedDir, generatedFile, outputFile, threadId }),
+        stderr: '',
+        error: null,
+      };
+    },
+  });
+
+  try {
+    assert.equal(result.imageFile, outputFile);
+    assert.equal(result.generationRuntime.codex_generated_image_file, generatedFile);
+    assert.equal(result.generationRuntime.materialized_from_codex_generated_image, true);
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+  }
+});
+
+test('generateImageViaCodexNativeImagegen rejects command-rendered PNGs that only claim native imagegen', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-command-render-'));
+  const outputFile = path.join(workspaceRoot, 'S01.png');
+
+  await assert.rejects(
+    generateImageViaCodexNativeImagegen({
+      family: 'ppt_deck',
+      route: 'author_image_pages',
+      slideId: 'S01',
+      prompt: '生成一张 16:9 中文 PPT 页面。',
+      outputFile,
+      toolOptions: { type: 'image_generation', size: '1536x864' },
+      contract: readCodexCliContract({
+        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+      }),
+      spawnSyncImpl(_command, args) {
+        writeFileSync(outputFile, ONE_PIXEL_PNG);
+        const outputFlagIndex = args.indexOf('--output-last-message');
+        writeFileSync(
+          args[outputFlagIndex + 1],
+          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+          'utf-8',
+        );
+        return {
+          status: 0,
+          stdout: JSON.stringify({
+            type: 'item.completed',
+            item: {
+              type: 'command_execution',
+              command: `/bin/zsh -lc 'magick -size 1536x864 xc:white ${outputFile}'`,
+              exit_code: 0,
+              status: 'completed',
+            },
+          }),
+          stderr: '',
+          error: null,
+        };
+      },
+    }),
+    /native image_generation\/generated_images provenance/,
+  );
+
+  rmSync(workspaceRoot, { recursive: true, force: true });
+});
+
+test('generateImageViaCodexNativeImagegen rejects generated_images probes without a copy to the target', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-probe-only-'));
+  const threadId = '019e6462-8396-7062-bdcb-461ddc160d19';
+  const generatedDir = path.join(workspaceRoot, '.codex', 'generated_images', threadId);
+  const generatedFile = path.join(generatedDir, 'ig_probe_only.png');
+  const outputFile = path.join(workspaceRoot, 'S01.png');
+  mkdirSync(generatedDir, { recursive: true });
+  writeFileSync(generatedFile, ONE_PIXEL_PNG);
+
+  await assert.rejects(
+    generateImageViaCodexNativeImagegen({
+      family: 'ppt_deck',
+      route: 'author_image_pages',
+      slideId: 'S01',
+      prompt: '生成一张 16:9 中文 PPT 页面。',
+      outputFile,
+      toolOptions: { type: 'image_generation', size: '1536x864' },
+      contract: readCodexCliContract({
+        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+      }),
+      spawnSyncImpl(_command, args) {
+        writeFileSync(outputFile, ONE_PIXEL_PNG);
+        const outputFlagIndex = args.indexOf('--output-last-message');
+        writeFileSync(
+          args[outputFlagIndex + 1],
+          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+          'utf-8',
+        );
+        return {
+          status: 0,
+          stdout: [
+            JSON.stringify({ type: 'thread.started', thread_id: threadId }),
+            JSON.stringify({
+              type: 'item.completed',
+              item: {
+                type: 'command_execution',
+                command: `/bin/zsh -lc "rtk find ${generatedDir} -type f -name '*.png' -maxdepth 1"`,
+                aggregated_output: generatedFile,
+                exit_code: 0,
+                status: 'completed',
+              },
+            }),
+            JSON.stringify({
+              type: 'item.completed',
+              item: {
+                type: 'command_execution',
+                command: `/bin/zsh -lc 'python3 - <<PY\nfrom pathlib import Path\nPath("${outputFile}").write_bytes(b"fake")\nPY'`,
+                exit_code: 0,
+                status: 'completed',
+              },
+            }),
+          ].join('\n'),
+          stderr: '',
+          error: null,
+        };
+      },
+    }),
+    /native image_generation\/generated_images provenance/,
+  );
+
+  rmSync(workspaceRoot, { recursive: true, force: true });
+});
+
+test('generateImageViaCodexNativeImagegen rejects PNGs created without native imagegen provenance', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-no-tool-'));
+  const outputFile = path.join(workspaceRoot, 'S01.png');
+
+  await assert.rejects(
+    generateImageViaCodexNativeImagegen({
+      family: 'ppt_deck',
+      route: 'author_image_pages',
+      slideId: 'S01',
+      prompt: '生成一张 16:9 中文 PPT 页面。',
+      outputFile,
+      toolOptions: { type: 'image_generation', size: '1536x864' },
+      contract: readCodexCliContract({
+        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+      }),
+      spawnSyncImpl(_command, args) {
+        writeFileSync(outputFile, ONE_PIXEL_PNG);
+        const outputFlagIndex = args.indexOf('--output-last-message');
+        writeFileSync(
+          args[outputFlagIndex + 1],
+          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
+          'utf-8',
+        );
+        return {
+          status: 0,
+          stdout: JSON.stringify({ type: 'item.completed', item: { type: 'command_execution' } }),
+          stderr: '',
+          error: null,
+        };
+      },
+    }),
+    /native image_generation\/generated_images provenance/,
+  );
+
+  rmSync(workspaceRoot, { recursive: true, force: true });
 });
 
 test('codex-cli client keeps async codex exec attached while preserving timeout cleanup', () => {
@@ -219,7 +645,7 @@ test('codex-cli client keeps async codex exec attached while preserving timeout 
     'utf-8',
   );
 
-  assert.match(source, /detached:\s*false/);
+  assert.match(source, /detached:\s*process\.platform\s*!==\s*'win32'/);
   assert.match(source, /process\.kill\(-pid,\s*'SIGKILL'\)/);
   assert.match(source, /child\.kill\('SIGKILL'\)/);
 });

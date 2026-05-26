@@ -76,6 +76,9 @@ test('ppt_deck screenshot rerun policy targets image page repair by default', ()
   assert.equal(contract.review_surface.rerun_from_stage.block_content_fit_ok, 'repair_image_pages');
   assert.deepEqual(contract.stage_requirements.repair_image_pages.requires_artifacts, [
     'author_image_pages',
+  ]);
+  assert.deepEqual(contract.stage_requirements.repair_image_pages.requires_review_from_any, [
+    'visual_director_review',
     'screenshot_review',
   ]);
 });

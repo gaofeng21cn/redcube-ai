@@ -33,7 +33,10 @@ function injectImagePageRoutes(contract) {
     output_artifact: 'repair_image_pages.json',
   });
   contract.stage_requirements.author_image_pages = { requires_artifacts: ['slide_blueprint', 'visual_direction'] };
-  contract.stage_requirements.repair_image_pages = { requires_artifacts: ['author_image_pages', 'screenshot_review'] };
+  contract.stage_requirements.repair_image_pages = {
+    requires_artifacts: ['author_image_pages'],
+    requires_review_from_any: ['visual_director_review', 'screenshot_review'],
+  };
   contract.lifecycle_model.route_to_stage.author_image_pages = 'visual_authorship';
   contract.lifecycle_model.route_to_stage.repair_image_pages = 'visual_authorship';
   return contract;
@@ -163,6 +166,13 @@ test('ppt repair_image_pages regenerates only blocked screenshot-review pages', 
     route: 'screenshot_review',
     status: 'block',
     blocked_slide_ids: ['S02'],
+    review_state_patch: {
+      rerun_from_stage: 'repair_image_pages',
+      rerun_policy: {
+        status: 'rerun_required',
+        rerun_from_stage: 'repair_image_pages',
+      },
+    },
     slide_reviews: [
       {
         slide_id: 'S01',
@@ -210,4 +220,70 @@ test('ppt repair_image_pages regenerates only blocked screenshot-review pages', 
     preserved_slide_hash: s01Before.hash,
     image_file: s01Before.image_file,
   }]);
+});
+
+test('ppt repair_image_pages targets reviewed pages when deck-level image review blocks without slide ids', async () => {
+  const { workspaceRoot, topicId, deliverableId, contract, paths } = seedWorkspace();
+  process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+
+  const authored = await runPptDeckRoute({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    route: 'author_image_pages',
+    contract,
+  });
+  writeJson(stageArtifactFile(paths, contract, 'author_image_pages'), authored);
+  writeJson(stageArtifactFile(paths, contract, 'screenshot_review'), {
+    route: 'screenshot_review',
+    status: 'block',
+    checks: {
+      teaching_progression_clear: false,
+    },
+    review_execution: {
+      reviewed_slide_ids: ['S01', 'S02'],
+    },
+    review_state_patch: {
+      rerun_from_stage: 'repair_image_pages',
+      blocking_reasons: ['teaching_progression_clear'],
+      rerun_policy: {
+        status: 'rerun_required',
+        rerun_from_stage: 'repair_image_pages',
+      },
+    },
+    slide_reviews: [
+      {
+        slide_id: 'S01',
+        title: 'Opening signal',
+        status: 'pass',
+        checks: { block_content_fit_ok: true },
+        issues: [],
+        ai_review: { judgement: 'pass', visual_findings: ['ok'], recommended_fix: 'none' },
+      },
+      {
+        slide_id: 'S02',
+        title: 'Blocked page',
+        status: 'pass',
+        checks: { block_content_fit_ok: true },
+        issues: [],
+        ai_review: { judgement: 'pass', visual_findings: ['ok'], recommended_fix: 'none' },
+      },
+    ],
+  });
+
+  const repaired = await runPptDeckRoute({
+    workspaceRoot,
+    topicId,
+    deliverableId,
+    route: 'repair_image_pages',
+    contract,
+  });
+
+  assert.equal(repaired.image_generation_calls.length, 2);
+  assert.deepEqual(repaired.repair_image_pages.blocked_slide_ids, ['S01', 'S02']);
+  assert.deepEqual(repaired.repair_image_pages.preserved_slide_hashes, []);
+  assert.equal(
+    repaired.image_page_manifest.slides.every((slide) => slide.preserved === false),
+    true,
+  );
 });

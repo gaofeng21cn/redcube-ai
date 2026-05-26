@@ -425,19 +425,94 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       safeArray(reviewArtifact?.blocked_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean),
     );
     const slideReviews = safeArray(reviewArtifact?.slide_reviews);
-    const feedbackSlides = explicitBlockedSlideIds.size > 0
+    const targetedSlides = explicitBlockedSlideIds.size > 0
       ? slideReviews.filter((slide) => explicitBlockedSlideIds.has(safeText(slide?.slide_id)))
       : collectSlidesNeedingTargetedRevision(slideReviews);
+    const rerunFromStage = safeText(reviewArtifact?.review_state_patch?.rerun_from_stage)
+      || (
+        safeText(reviewArtifact?.review_state_patch?.rerun_policy?.status) === 'rerun_required'
+          ? safeText(reviewArtifact?.review_state_patch?.rerun_policy?.rerun_from_stage)
+          : ''
+      );
+    const reviewedSlideIds = new Set(
+      safeArray(reviewArtifact?.review_execution?.reviewed_slide_ids)
+        .map((slideId) => safeText(slideId))
+        .filter(Boolean),
+    );
+    const fallbackSlides = targetedSlides.length > 0 || rerunFromStage !== 'repair_image_pages'
+      ? []
+      : slideReviews.filter((slide) => {
+        const slideId = safeText(slide?.slide_id);
+        return slideId && (reviewedSlideIds.size === 0 || reviewedSlideIds.has(slideId));
+      });
+    const directorWeakPages = safeArray(reviewArtifact?.visual_director_review?.weak_pages)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean);
+    const directorFallbackSlideIds = slideReviews.length > 0 || rerunFromStage !== 'repair_image_pages'
+      ? []
+      : (directorWeakPages.length > 0 ? directorWeakPages : [...reviewedSlideIds]);
+    const directorFallbackSlides = directorFallbackSlideIds.map((slideId) => ({
+      slide_id: slideId,
+      title: '',
+      issues: safeArray(reviewArtifact?.review_state_patch?.blocking_reasons),
+      mechanical_issues: [],
+      ai_review: {
+        visual_findings: [
+          safeText(reviewArtifact?.visual_director_review?.review_summary),
+        ].filter(Boolean),
+        recommended_fix: safeText(
+          reviewArtifact?.visual_director_review?.rewrite_action,
+          'Regenerate the page so the visual director review blocking reasons are resolved.',
+        ),
+      },
+    }));
+    const feedbackSlides = targetedSlides.length > 0
+      ? targetedSlides
+      : (fallbackSlides.length > 0 ? fallbackSlides : directorFallbackSlides);
     return feedbackSlides
       .map((slide) => ({
         slide_id: safeText(slide?.slide_id),
         title: safeText(slide?.title),
-        issues: safeArray(slide?.issues).map((issue) => safeText(issue)).filter(Boolean),
+        issues: [
+          ...safeArray(slide?.issues).map((issue) => safeText(issue)).filter(Boolean),
+          ...safeArray(reviewArtifact?.review_state_patch?.blocking_reasons)
+            .map((issue) => safeText(issue))
+            .filter(Boolean),
+        ],
         mechanical_issues: safeArray(slide?.mechanical_issues).map((issue) => safeText(issue)).filter(Boolean),
         visual_findings: safeArray(slide?.ai_review?.visual_findings).map((item) => safeText(item)).filter(Boolean),
-        recommended_fix: safeText(slide?.ai_review?.recommended_fix),
+        recommended_fix: safeText(
+          slide?.ai_review?.recommended_fix,
+          'Revise the page so the deck-level screenshot review blocking reasons are resolved.',
+        ),
       }))
       .filter((slide) => slide.slide_id);
+  }
+
+  function repairReviewRerunFromStage(reviewArtifact: JsonRecord | null): string {
+    return safeText(reviewArtifact?.review_state_patch?.rerun_from_stage)
+      || (
+        safeText(reviewArtifact?.review_state_patch?.rerun_policy?.status) === 'rerun_required'
+          ? safeText(reviewArtifact?.review_state_patch?.rerun_policy?.rerun_from_stage)
+          : ''
+      );
+  }
+
+  function repairReviewSource(contract: JsonRecord, deliverablePaths: JsonRecord): {
+    stageId: string;
+    artifact: JsonRecord | null;
+  } {
+    for (const stageId of ['screenshot_review', 'visual_director_review']) {
+      const artifact = readStageArtifact(contract, deliverablePaths, stageId);
+      if (safeText(artifact?.status) === 'block'
+        && repairReviewRerunFromStage(artifact) === 'repair_image_pages') {
+        return { stageId, artifact };
+      }
+    }
+    return {
+      stageId: 'screenshot_review',
+      artifact: readStageArtifact(contract, deliverablePaths, 'screenshot_review'),
+    };
   }
 
   function priorImagePageArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord | null {
@@ -471,9 +546,11 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
   }) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
-    const reviewArtifact = route === 'repair_image_pages'
-      ? readStageArtifact(contract, deliverablePaths, 'screenshot_review')
+    const repairReview = route === 'repair_image_pages'
+      ? repairReviewSource(contract, deliverablePaths)
       : null;
+    const reviewArtifact = repairReview?.artifact || null;
+    const repairSourceReviewStage = repairReview?.stageId || 'screenshot_review';
     const priorArtifact = route === 'repair_image_pages' ? priorImagePageArtifact(contract, deliverablePaths) : null;
     const priorSlides = imageSlidesById(priorArtifact);
     const repairFeedback = route === 'repair_image_pages' ? repairFeedbackFromReview(reviewArtifact) : [];
@@ -731,7 +808,7 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       repair_scope: route === 'repair_image_pages'
         ? {
             policy: 'blocked_slide_ids_only',
-            source_review_stage: 'screenshot_review',
+            source_review_stage: repairSourceReviewStage,
             blocked_slide_ids: targetSlideIds,
             freshly_rendered_slide_ids: freshlyRenderedSlideIds,
             preserved_slide_hashes: preservedSlideHashes,
@@ -790,7 +867,7 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       quality_non_regression_read_model: qualityNonRegressionReadModel,
       repair_image_pages: route === 'repair_image_pages'
         ? {
-            source_review_stage: 'screenshot_review',
+            source_review_stage: repairSourceReviewStage,
             blocked_slide_ids: targetSlideIds,
             preserved_slide_hashes: preservedSlideHashes,
           }

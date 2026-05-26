@@ -13,6 +13,7 @@ import {
   summarizeDependencyRoute,
 } from './shared.js';
 import {
+  artifactRerunFromStage,
   artifactRequestsFixHtml,
   nextLinearStageId,
   readHydratedContractForRequest,
@@ -20,6 +21,28 @@ import {
   routeSequenceStageIds,
   stageDefinitions,
 } from './stage-artifacts.js';
+
+const VISUAL_REPAIR_ROUTES = new Set(['fix_html', 'repair_image_pages', 'repair_pptx_native']);
+
+function canRevisitContinuationEdgeAfterRepair({
+  currentRoute,
+  nextRoute,
+  currentResult,
+  continuationRouteRuns,
+}: {
+  currentRoute: string;
+  nextRoute: string;
+  currentResult: RuntimeRouteResult;
+  continuationRouteRuns: DependencyRouteRun[];
+}): boolean {
+  if (currentResult.ok !== true) return false;
+  if (currentRoute !== 'visual_director_review' || nextRoute !== 'screenshot_review') return false;
+  const lastRoute = continuationRouteRuns.at(-1)?.route || '';
+  const previousRoute = lastRoute === currentRoute
+    ? continuationRouteRuns.at(-2)?.route || ''
+    : lastRoute;
+  return VISUAL_REPAIR_ROUTES.has(previousRoute);
+}
 
 function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
   const route = request.route;
@@ -53,17 +76,33 @@ function nextContinuationStageId({
   contract: JsonObject;
   currentRoute: string;
 }): string | null {
-  if (currentRoute === 'fix_html') {
+  if (VISUAL_REPAIR_ROUTES.has(currentRoute)) {
     return 'visual_director_review';
   }
   const nextStage = nextLinearStageId(contract, currentRoute);
-  if (currentRoute === 'screenshot_review' && nextStage === 'fix_html') {
+  if (currentRoute === 'screenshot_review' && nextStage && VISUAL_REPAIR_ROUTES.has(nextStage)) {
     const reviewArtifact = readStageArtifactForRequest(request, 'screenshot_review');
-    if (!artifactRequestsFixHtml(reviewArtifact)) {
-      return nextLinearStageId(contract, 'fix_html');
+    if (artifactRerunFromStage(reviewArtifact) !== nextStage) {
+      return nextLinearStageId(contract, nextStage);
     }
   }
   return nextStage;
+}
+
+function blockedStageRecommendedRepairRoute({
+  request,
+  currentRoute,
+  result,
+}: {
+  request: RunDeliverableRouteRequest;
+  currentRoute: string;
+  result: RuntimeRouteResult;
+}): string | null {
+  if (result.ok === true) return null;
+  const artifact = readStageArtifactForRequest(request, currentRoute) as { status?: unknown } | null;
+  if (safeText(artifact?.status) !== 'block') return null;
+  const repairRoute = artifactRerunFromStage(artifact);
+  return VISUAL_REPAIR_ROUTES.has(repairRoute) ? repairRoute : null;
 }
 
 function dependencyRouteCanContinue({
@@ -182,19 +221,31 @@ export async function continueToStopAfterStage({
     if (currentRoute === stopAfterStage) {
       return { result: currentResult, continuationRouteRuns };
     }
-    if (currentResult.ok !== true) {
+    const nextRoute = currentResult.ok === true
+      ? nextContinuationStageId({
+          request,
+          contract,
+          currentRoute,
+        })
+      : blockedStageRecommendedRepairRoute({
+          request,
+          currentRoute,
+          result: currentResult,
+        });
+    if (!nextRoute) {
       return { result: currentResult, continuationRouteRuns };
     }
-
-    const nextRoute = nextContinuationStageId({
-      request,
-      contract,
+    const edgeKey = `${currentRoute}->${nextRoute}`;
+    const canRevisitEdge = canRevisitContinuationEdgeAfterRepair({
       currentRoute,
+      nextRoute,
+      currentResult,
+      continuationRouteRuns,
     });
-    if (!nextRoute || visited.has(`${currentRoute}->${nextRoute}`)) {
+    if (visited.has(edgeKey) && !canRevisitEdge) {
       return { result: currentResult, continuationRouteRuns };
     }
-    visited.add(`${currentRoute}->${nextRoute}`);
+    visited.add(edgeKey);
 
     currentResult = await runHostedRoute({
       ...request,

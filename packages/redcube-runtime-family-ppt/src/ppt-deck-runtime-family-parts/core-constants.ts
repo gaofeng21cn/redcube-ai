@@ -25,7 +25,7 @@ export const STAGE_REQUIREMENTS = Object.freeze({
   author_image_pages: { requires_artifacts: ['slide_blueprint', 'visual_direction'] },
   fix_html: { requires_artifacts: ['render_html', 'screenshot_review'] },
   repair_pptx_native: { requires_artifacts: ['author_pptx_native', 'screenshot_review'] },
-  repair_image_pages: { requires_artifacts: ['author_image_pages', 'screenshot_review'] },
+  repair_image_pages: { requires_artifacts: ['author_image_pages'] },
   visual_director_review: { requires_artifacts: [] },
   screenshot_review: { requires_artifacts: ['visual_director_review'] },
   export_pptx: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },

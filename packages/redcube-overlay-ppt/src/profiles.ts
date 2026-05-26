@@ -333,7 +333,8 @@ const FAMILY_STAGE_SEQUENCE = {
       stage_id: 'repair_image_pages',
       prompt_file: 'repair_image_pages.md',
       output_artifact: 'image_pages_repair_bundle.json',
-      requires_stages: ['author_image_pages', 'screenshot_review'],
+      requires_stages: ['author_image_pages'],
+      requires_review_from_any: ['visual_director_review', 'screenshot_review'],
     },
     {
       stage_id: 'export_pptx',
@@ -389,8 +390,9 @@ const FAMILY_STAGE_SEQUENCE = {
     },
     {
       stage_id: 'repair_image_pages',
-      requires_stage_outputs: ['author_image_pages', 'screenshot_review'],
-      rerun_from_stage: 'screenshot_review',
+      requires_stage_outputs: ['author_image_pages'],
+      requires_review_from_any: ['visual_director_review', 'screenshot_review'],
+      rerun_from_stage: 'visual_director_review|screenshot_review',
     },
     {
       stage_id: 'export_pptx',
@@ -527,7 +529,8 @@ const FAMILY_STAGE_REQUIREMENTS = {
     requires_artifacts: ['render_html', 'screenshot_review'],
   },
   repair_image_pages: {
-    requires_artifacts: ['author_image_pages', 'screenshot_review'],
+    requires_artifacts: ['author_image_pages'],
+    requires_review_from_any: ['visual_director_review', 'screenshot_review'],
   },
   repair_pptx_native: {
     requires_artifacts: ['author_pptx_native', 'screenshot_review'],

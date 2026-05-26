@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 import { REDCUBE_CODEX_RUNTIME_OWNER } from './index-parts/constants.js';
@@ -120,6 +120,138 @@ function pngDimensions(buffer) {
   return null;
 }
 
+function parseNativeImagegenTaskResult(output) {
+  const raw = safeText(output);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+function eventLooksLikeImageGenerationToolCall(event) {
+  const item = event?.item || event?.call || event || {};
+  const candidates = [
+    item?.type,
+    item?.tool,
+    item?.tool_name,
+    item?.name,
+    event?.tool,
+    event?.tool_name,
+    event?.name,
+  ].map((value) => safeText(value));
+  return candidates.some((value) => (
+    value === 'image_gen'
+    || value === 'image_generation'
+    || value === 'image_generation_call'
+    || value === 'image_generation_tool'
+  ));
+}
+
+function codexEventTextCandidates(event) {
+  const item = event?.item || {};
+  return [
+    event?.type,
+    event?.text,
+    event?.message,
+    event?.command,
+    event?.aggregated_output,
+    item?.type,
+    item?.text,
+    item?.command,
+    item?.aggregated_output,
+  ].map((value) => safeText(value)).filter(Boolean);
+}
+
+function uniquePush(list, value) {
+  const safeValue = safeText(value);
+  if (safeValue && !list.includes(safeValue)) list.push(safeValue);
+}
+
+function isReadableFile(file) {
+  try {
+    return statSync(file).isFile();
+  } catch {
+    return false;
+  }
+}
+
+function generatedImageFilesFromDir(dir) {
+  try {
+    return readdirSync(dir)
+      .filter((name) => /^ig_[A-Za-z0-9_.-]+\.(png|webp|jpe?g)$/i.test(name))
+      .map((name) => path.join(dir, name))
+      .filter((file) => isReadableFile(file))
+      .sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs);
+  } catch {
+    return [];
+  }
+}
+
+function generatedImageProvenanceFromEvents(events = []) {
+  const dirs = [];
+  const files = [];
+  const fileNames = [];
+  for (const event of Array.isArray(events) ? events : []) {
+    for (const text of codexEventTextCandidates(event)) {
+      for (const match of text.matchAll(/([^\s"'`]*\.codex\/generated_images\/[A-Za-z0-9-]+\/ig_[A-Za-z0-9_.-]+\.(?:png|webp|jpe?g))/gi)) {
+        uniquePush(files, path.resolve(match[1]));
+      }
+      for (const match of text.matchAll(/([^\s"'`]*\.codex\/generated_images\/[A-Za-z0-9-]+)/g)) {
+        uniquePush(dirs, path.resolve(match[1]));
+      }
+      for (const match of text.matchAll(/\big_[A-Za-z0-9_.-]+\.(?:png|webp|jpe?g)\b/gi)) {
+        uniquePush(fileNames, match[0]);
+      }
+    }
+  }
+  for (const file of files) {
+    if (isReadableFile(file)) return file;
+  }
+  for (const dir of dirs) {
+    for (const fileName of fileNames) {
+      const candidate = path.join(dir, fileName);
+      if (isReadableFile(candidate)) return candidate;
+    }
+  }
+  for (const dir of dirs) {
+    const [candidate] = generatedImageFilesFromDir(dir);
+    if (candidate) return candidate;
+  }
+  return '';
+}
+
+function eventLooksLikeGeneratedImagesMaterialization(event, targetFile) {
+  const text = codexEventTextCandidates(event).join('\n');
+  if (!safeText(targetFile) || !text.includes(targetFile)) return false;
+  if (!/\.codex\/generated_images\/[A-Za-z0-9-]+/.test(text)) return false;
+  return /\b(cp|mv|rsync|install)\b/.test(text);
+}
+
+function codexRunUsedNativeImageGeneration(events = [], targetFile = '') {
+  if (!Array.isArray(events)) return false;
+  if (events.some((event) => eventLooksLikeImageGenerationToolCall(event))) return true;
+  return events.some((event) => eventLooksLikeGeneratedImagesMaterialization(event, targetFile));
+}
+
+function generatedImageFileFromTaskResult(result, targetFile) {
+  if (!result || safeText(result.mode) !== 'codex_native_imagegen') return '';
+  const directGeneratedImageFile = safeText(result.generated_image_file);
+  if (directGeneratedImageFile) {
+    const resolvedDirectGeneratedImageFile = path.resolve(directGeneratedImageFile);
+    if (resolvedDirectGeneratedImageFile !== targetFile) return resolvedDirectGeneratedImageFile;
+  }
+  const generatedImageFile = safeText(result.image_file);
+  if (!generatedImageFile) return '';
+  const resolvedGeneratedImageFile = path.resolve(generatedImageFile);
+  if (resolvedGeneratedImageFile === targetFile) return '';
+  if (result.ok === true) return resolvedGeneratedImageFile;
+  if (safeText(result.error).includes('sandbox_denied')) return resolvedGeneratedImageFile;
+  return '';
+}
+
 function buildNativeImagegenPrompt({
   prompt,
   outputFile,
@@ -159,7 +291,7 @@ export async function generateImageViaCodexNativeImagegen({
   outputFile = '',
   toolOptions = {},
   timeoutMs = 900000,
-  cwd = process.cwd(),
+  cwd = '',
   contract = readCodexCliContract(),
   spawnSyncImpl = null,
 } = {}) {
@@ -170,6 +302,10 @@ export async function generateImageViaCodexNativeImagegen({
   if (!safeRoute) throw new Error('route 不能为空');
   if (!safePrompt) throw new Error('image prompt 不能为空');
   if (!safeText(outputFile)) throw new Error('outputFile 不能为空');
+  mkdirSync(path.dirname(safeOutputFile), { recursive: true });
+  const imagegenCwd = safeText(cwd)
+    ? path.resolve(safeText(cwd))
+    : path.dirname(safeOutputFile);
 
   const taskPrompt = buildNativeImagegenPrompt({
     prompt: safePrompt,
@@ -180,9 +316,12 @@ export async function generateImageViaCodexNativeImagegen({
     toolOptions,
   });
   const execution = await runCodexPrompt({
-    contract,
+    contract: {
+      ...contract,
+      enable_image_generation: true,
+    },
     prompt: taskPrompt,
-    cwd,
+    cwd: imagegenCwd,
     timeoutMs,
     spawnSyncImpl,
   });
@@ -192,8 +331,22 @@ export async function generateImageViaCodexNativeImagegen({
       safeText(execution.codexRun.error, `Codex native imagegen task failed: ${safeFamily}:${safeRoute}:${slideId}`),
     );
   }
+  if (!codexRunUsedNativeImageGeneration(execution.codexRun.events, safeOutputFile)) {
+    throw new Error('Codex native imagegen task did not provide native image_generation/generated_images provenance');
+  }
+  const taskResult = parseNativeImagegenTaskResult(execution.codexRun.output);
+  const generatedImageFile = generatedImageFileFromTaskResult(taskResult, safeOutputFile)
+    || generatedImageProvenanceFromEvents(execution.codexRun.events);
   if (!existsSync(safeOutputFile)) {
-    throw new Error(`Codex native imagegen task did not create output PNG: ${safeOutputFile}`);
+    if (!generatedImageFile || !existsSync(generatedImageFile)) {
+      throw new Error(`Codex native imagegen task did not create output PNG: ${safeOutputFile}`);
+    }
+    const generatedImageBytes = readFileSync(generatedImageFile);
+    if (!pngDimensions(generatedImageBytes)) {
+      throw new Error(`Codex native imagegen generated file is not a PNG: ${generatedImageFile}`);
+    }
+    mkdirSync(path.dirname(safeOutputFile), { recursive: true });
+    copyFileSync(generatedImageFile, safeOutputFile);
   }
   const imageBytes = readFileSync(safeOutputFile);
   const dimensions = pngDimensions(imageBytes);
@@ -216,6 +369,7 @@ export async function generateImageViaCodexNativeImagegen({
       model_selection: execution.contract.model_selection,
       reasoning_selection: execution.contract.reasoning_selection,
       sandbox: execution.contract.sandbox,
+      cwd: imagegenCwd,
       family: safeFamily,
       route: safeRoute,
       slide_id: safeText(slideId),
@@ -226,6 +380,8 @@ export async function generateImageViaCodexNativeImagegen({
       explicit_provider_token_required: false,
       provider_token_source: 'codex_executor_native_tool',
       imagegen_mode: 'built_in_tool',
+      codex_generated_image_file: generatedImageFile || null,
+      materialized_from_codex_generated_image: Boolean(generatedImageFile),
       usage,
     },
   };

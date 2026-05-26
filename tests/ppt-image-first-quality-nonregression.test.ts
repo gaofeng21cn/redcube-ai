@@ -50,7 +50,10 @@ function injectImagePageRoutes(contract) {
     output_artifact: 'repair_image_pages.json',
   });
   contract.stage_requirements.author_image_pages = { requires_artifacts: ['slide_blueprint', 'visual_direction'] };
-  contract.stage_requirements.repair_image_pages = { requires_artifacts: ['author_image_pages', 'screenshot_review'] };
+  contract.stage_requirements.repair_image_pages = {
+    requires_artifacts: ['author_image_pages'],
+    requires_review_from_any: ['visual_director_review', 'screenshot_review'],
+  };
   contract.lifecycle_model.route_to_stage.author_image_pages = 'visual_authorship';
   contract.lifecycle_model.route_to_stage.repair_image_pages = 'visual_authorship';
   contract.prompt_pack.render_contract.image_page_authoring_lane = {
@@ -246,6 +249,13 @@ test('ppt image-first runtime emits refs-only quality non-regression read models
     route: 'screenshot_review',
     status: 'block',
     blocked_slide_ids: ['S02'],
+    review_state_patch: {
+      rerun_from_stage: 'repair_image_pages',
+      rerun_policy: {
+        status: 'rerun_required',
+        rerun_from_stage: 'repair_image_pages',
+      },
+    },
     slide_reviews: [
       {
         slide_id: 'S01',

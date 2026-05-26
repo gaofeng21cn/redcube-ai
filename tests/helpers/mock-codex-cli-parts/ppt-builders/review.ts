@@ -10,6 +10,21 @@ export function buildMockPptDirectorReview(meta) {
       .map((item) => safeText(item))
       .filter(Boolean),
   );
+  if (variants.has('block_author_image_pages_until_repair')
+    && slides.some((slide) => safeText(slide?.png_file).includes('author_image_pages'))
+    && !slides.some((slide) => safeText(slide?.png_file).includes('repair_image_pages'))) {
+    const blockedSlideId = safeText(slides[0]?.slide_id, 'S01');
+    return {
+      director_intent_landed: false,
+      anti_template_ok: false,
+      peak_pages_landed: false,
+      memory_hook_present: true,
+      homogeneous_layout_risk: 0.74,
+      weak_pages: [blockedSlideId],
+      review_summary: `${blockedSlideId} 仍像模板化信息图，导演意图和反模板要求没有充分落到画面。`,
+      rewrite_action: 'repair_image_pages',
+    };
+  }
   if (variants.has('require_page_local_delta_review')) {
     if (reviewScope !== 'incremental_page_review' && reviewScope !== 'delta_page_review') {
       throw new Error(`mock ppt director review expected incremental page review scope, got ${reviewScope}`);

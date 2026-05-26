@@ -250,6 +250,10 @@ test('artifact-producing PPT workflow reaches export_pptx through image-first, H
           assert.equal(visualArtifact.html_bundle.page_count > 0, true);
           assert.equal(fs.existsSync(visualArtifact.html_bundle.html_file), true);
           assert.equal(fs.existsSync(visualArtifact.html_bundle.slides_file), true);
+          const html = fs.readFileSync(visualArtifact.html_bundle.html_file, 'utf8');
+          assert.equal(html.includes('[object Object]'), false);
+          assert.equal(html.includes('04 / 03'), false);
+          assert.equal(html.includes('08 / 08'), true);
           assertCommonExport({ exported });
           assert.equal(fs.existsSync(exported.export_bundle.source_html), true);
           assert.equal(exported.export_bundle.review_capture.source_visual_route, 'render_html');

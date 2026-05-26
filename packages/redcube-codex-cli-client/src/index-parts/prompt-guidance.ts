@@ -110,12 +110,20 @@ export function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = [], 
   if (Number.isFinite(Number(timeoutMs)) && Number(timeoutMs) > 0) {
     return Number(timeoutMs);
   }
+  const envDefaultTimeoutMs = Number(process.env.REDCUBE_CODEX_GENERATION_TIMEOUT_MS);
+  const defaultGenerationTimeoutMs = Number.isFinite(envDefaultTimeoutMs) && envDefaultTimeoutMs > 0
+    ? envDefaultTimeoutMs
+    : DEFAULT_CODEX_GENERATION_TIMEOUT_MS;
+  const envVisualTimeoutMs = Number(process.env.REDCUBE_CODEX_VISUAL_REVIEW_TIMEOUT_MS);
+  const defaultVisualTimeoutMs = Number.isFinite(envVisualTimeoutMs) && envVisualTimeoutMs > 0
+    ? envVisualTimeoutMs
+    : DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS;
   if (safeText(options?.route) === 'render_html') {
-    return DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS;
+    return defaultVisualTimeoutMs;
   }
   const hasImageInspection = normalizeLocalFileInspection(localFileInspection)
     .some((entry) => safeText(entry?.media_type).startsWith('image/'));
-  return hasImageInspection ? DEFAULT_CODEX_VISUAL_REVIEW_TIMEOUT_MS : DEFAULT_CODEX_GENERATION_TIMEOUT_MS;
+  return hasImageInspection ? defaultVisualTimeoutMs : defaultGenerationTimeoutMs;
 }
 
 export function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {

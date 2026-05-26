@@ -114,6 +114,9 @@ export function buildCodexExecArgs({ contract, cwd, lastMessageFile }) {
   if (contract.model) {
     args.push('--model', contract.model);
   }
+  if (contract.enable_image_generation === true) {
+    args.push('--enable', 'image_generation');
+  }
   args.push('--output-last-message', lastMessageFile, '-');
   return args;
 }
@@ -195,7 +198,7 @@ export async function runCodexPrompt({
         {
           cwd: resolvedCwd,
           env: process.env,
-          detached: false,
+          detached: process.platform !== 'win32',
           stdio: ['pipe', 'pipe', 'pipe'],
         },
       );

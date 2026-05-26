@@ -197,6 +197,7 @@ export function createPptDeckRenderStageParts(deps) {
       ],
       ui_ux_quality_companion: htmlDesignCompanion(contract),
       html_route_quality_companion: htmlQualityCompanion,
+      deck_slide_count: blueprintSlides.length,
     };
     const slideBatches = renderPlan.mode === 'targeted_revision_only'
       ? chunkArray(renderPlan.slides_to_render, renderBatchSize)

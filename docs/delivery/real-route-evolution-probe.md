@@ -11,6 +11,14 @@ Machine boundary: 人读运行说明。机器真相继续归 product-entry invok
 
 它验证的是“RCA 能真实运行、真实产出 artifact、真实复跑命中 cache、真实返回 typed blocker”。它不替代 `visual_director_review`、`screenshot_review`、`export_pptx`，也不把 OPL Agent Lab score 写成 RCA visual quality verdict。
 
+对外 artifact-producing 证据的正式命令入口是 RCA product-entry route handler：
+
+```bash
+npm run --prefix /Users/gaofeng/workspace/redcube-ai redcube -- product invoke ... --task-intent run_deliverable_route
+```
+
+AgentLab / OPL Meta Agent / AgentLab takeover 只作为 refs-only、control-plane、handoff 或 takeover 证据；独立手写脚本、HTML 页面或 Python 样片不能替代上述 product-entry route 证据。
+
 ## Route Lanes
 
 支持的 lane：

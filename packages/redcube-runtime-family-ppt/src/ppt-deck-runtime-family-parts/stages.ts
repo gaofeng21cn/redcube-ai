@@ -140,6 +140,21 @@ export function createPptDeckStageParts(deps) {
     readCurrentVisualArtifact,
   });
 
+  function reviewArtifactRerunFromStage(artifact) {
+    const rerunPolicy = artifact?.review_state_patch?.rerun_policy || {};
+    return safeText(artifact?.review_state_patch?.rerun_from_stage)
+      || (
+        safeText(rerunPolicy?.status) === 'rerun_required'
+          ? safeText(rerunPolicy?.rerun_from_stage)
+          : ''
+      );
+  }
+
+  function reviewArtifactRequestsRoute(artifact, routeId) {
+    return safeText(artifact?.status) === 'block'
+      && reviewArtifactRerunFromStage(artifact) === routeId;
+  }
+
   function ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const contract = readJson(path.join(deliverablePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -179,10 +194,19 @@ export function createPptDeckStageParts(deps) {
       }
     }
     if (route === 'repair_image_pages') {
+      const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+      const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
+      const repairMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'repair_image_pages'));
       const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const screenshotReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
       const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_image_pages'));
-      if (screenshotReviewMtimeMs < authorMtimeMs) {
-        throw new Error('Route repair_image_pages requires screenshot_review based on the current image pages; rerun screenshot_review first');
+      const currentImageMtimeMs = Math.max(authorMtimeMs, repairMtimeMs);
+      const hasFreshScreenshotRepairRequest = screenshotReviewMtimeMs >= currentImageMtimeMs
+        && reviewArtifactRequestsRoute(screenshotReviewArtifact, 'repair_image_pages');
+      const hasFreshDirectorRepairRequest = directorReviewMtimeMs >= currentImageMtimeMs
+        && reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_image_pages');
+      if (!hasFreshScreenshotRepairRequest && !hasFreshDirectorRepairRequest) {
+        throw new Error('Route repair_image_pages requires visual_director_review or screenshot_review based on the current image pages and requesting repair_image_pages; rerun visual_director_review or screenshot_review first');
       }
     }
     if (route === 'visual_director_review' && !currentVisualStage) {

@@ -186,7 +186,7 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
     if (['render_html', 'fix_html'].includes(route)) {
       files.push(pptOperatorRevisionFile(deliverablePaths));
     }
-    if (route === 'fix_html') {
+    if (['fix_html', 'repair_image_pages', 'repair_pptx_native'].includes(route)) {
       files.push(
         stageArtifactFile(deliverablePaths, contract, 'visual_director_review'),
         stageArtifactFile(deliverablePaths, contract, 'screenshot_review'),

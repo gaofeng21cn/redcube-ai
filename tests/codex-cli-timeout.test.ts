@@ -84,3 +84,17 @@ test('codex cli grants render_html routes the same longer default timeout as ima
     600000,
   );
 });
+
+test('codex cli structured generation timeout can be extended by environment without per-route code changes', async () => {
+  const original = process.env.REDCUBE_CODEX_GENERATION_TIMEOUT_MS;
+  process.env.REDCUBE_CODEX_GENERATION_TIMEOUT_MS = '1200000';
+  try {
+    assert.equal(await captureGenerationTimeout({ family: 'ppt_deck', route: 'detailed_outline' }), 1200000);
+  } finally {
+    if (original === undefined) {
+      delete process.env.REDCUBE_CODEX_GENERATION_TIMEOUT_MS;
+    } else {
+      process.env.REDCUBE_CODEX_GENERATION_TIMEOUT_MS = original;
+    }
+  }
+});

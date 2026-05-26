@@ -22,13 +22,15 @@ export function createPptDeckProfilePresetParts(deps) {
 
   function deriveProfileChecks(contract, blueprintArtifact, storylineArtifact) {
     const slides = safeArray(blueprintArtifact?.slide_blueprint?.slides);
-    const pageTypes = slides.map((slide) => slide.page_type);
+    const pageTypes = slides.map((slide) => safeText(slide.page_type || slide?.visual_presentation?.layout_family));
     const layoutFamilies = slides.map((slide) => safeText(slide?.visual_presentation?.layout_family));
     switch (contract.profile_id) {
       case 'lecture_student':
         return {
           term_explained_on_first_use: slides.some((slide) => ['central_axis', 'myth_fact_split', 'cover_signal'].includes(slide.page_type) && safeArray(slide.page_core_content).length >= 2),
-          teaching_progression_clear: ['cover_signal', 'mechanism_track', 'decision_gate', 'closure_peak'].every((type) => pageTypes.includes(type)),
+          teaching_progression_clear: slides.length === 1
+            ? singleSlideTeachingProgressionClear(slides[0])
+            : ['cover_signal', 'mechanism_track', 'decision_gate', 'closure_peak'].every((type) => pageTypes.includes(type)),
         };
       case 'lecture_peer':
         return {
@@ -50,6 +52,24 @@ export function createPptDeckProfilePresetParts(deps) {
       default:
         return {};
     }
+  }
+
+  function slideTextItems(value) {
+    return safeArray(value)
+      .map((item) => safeText(item?.text || item?.label || item))
+      .filter(Boolean);
+  }
+
+  function singleSlideTeachingProgressionClear(slide) {
+    if (!slide) return false;
+    const coreContent = slideTextItems(slide.page_core_content);
+    const evidencePoints = slideTextItems(slide.evidence_points);
+    const anchorTracks = slideTextItems(slide?.visual_presentation?.anchor_tracks);
+    const hasGoalAndTakeaway = safeText(slide.page_goal).length > 0
+      && safeText(slide.core_sentence).length > 0;
+    const hasStructuredProgression = coreContent.length >= 4;
+    const hasEvidenceOrVisualTrack = evidencePoints.length >= 2 || anchorTracks.length >= 1;
+    return hasGoalAndTakeaway && hasStructuredProgression && hasEvidenceOrVisualTrack;
   }
   
   function deckPreset(profileId) {

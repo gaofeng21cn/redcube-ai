@@ -1,11 +1,19 @@
 // @ts-nocheck
 import { recordParallelOverlap, safeArray, safeText } from '../shared.ts';
 
+function contentText(item) {
+  if (item && typeof item === 'object') {
+    return safeText(item.text || item.title || item.summary || item.label || item.value || item.core_sentence);
+  }
+  return safeText(item);
+}
+
 export function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
   const pageGoal = safeText(slide.page_goal).replace(/\s+/g, ' ').slice(0, 22);
   const title = safeText(slide.title).replace(/\s+/g, ' ').slice(0, 26);
   const coreSentence = safeText(slide.core_sentence).replace(/\s+/g, ' ').slice(0, 54);
   const sourceLabel = safeText(safeArray(slide.public_sources || []).at(0), '公开来源');
+  const normalizedTotalSlides = Number(totalSlides || slide.total_slides || slide.deck_slide_count || slide.slide_no || 0);
   const renderVariants = new Set(
     safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT)
       .split(',')
@@ -15,14 +23,14 @@ export function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
   const driftPageNumber = renderVariants.has('drift_page_number_s05') && safeText(slide.slide_id) === 'S05';
   const pageNumberText = driftPageNumber
     ? String(slide.slide_no).padStart(2, '0')
-    : `${String(slide.slide_no).padStart(2, '0')} / ${String(totalSlides).padStart(2, '0')}`;
+    : `${String(slide.slide_no).padStart(2, '0')} / ${String(normalizedTotalSlides).padStart(2, '0')}`;
   const pageNumberStyle = driftPageNumber
     ? 'font-weight:700;font-size:20px;color:#111827;transform:translateX(-42px);'
     : 'font-weight:700;font-size:14px;color:#475569;';
   const cards = safeArray(slide.page_core_content)
     .slice(0, 2)
     .map((item, index) => `
-      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:14px 16px;border-radius:18px;background:${index === 0 ? 'rgba(37,99,235,0.12)' : '#FFFFFF'};border:1px solid #CBD5E1;font-size:${index === 0 ? '22px' : '18px'};line-height:1.45;color:#0F172A;">${safeText(item).replace(/\s+/g, ' ').slice(0, 40)}</article>
+      <article data-qa-block="card-${index + 1}" data-primary-point="${index === 0 ? 'true' : 'false'}" style="padding:14px 16px;border-radius:18px;background:${index === 0 ? 'rgba(37,99,235,0.12)' : '#FFFFFF'};border:1px solid #CBD5E1;font-size:${index === 0 ? '22px' : '18px'};line-height:1.45;color:#0F172A;">${contentText(item).replace(/\s+/g, ' ').slice(0, 40)}</article>
     `)
     .join('');
   return `
@@ -45,6 +53,10 @@ export function buildPptSlideMarkup(slide, totalSlides, peakPage = false) {
 
 export function buildMockPptRender(meta) {
   const slides = safeArray(meta?.context?.blueprint?.slides);
+  const deckSlideCount = Number(meta?.context?.deck_slide_count || meta?.context?.total_slides || Math.max(
+    slides.length,
+    ...slides.map((slide) => Number(slide?.slide_no || 0)),
+  ));
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
   const variants = new Set(
     safeText(process.env.REDCUBE_MOCK_PPT_RENDER_VARIANT)
@@ -60,12 +72,12 @@ export function buildMockPptRender(meta) {
   if (variants.has('require_section_batches') && renderScope !== 'summary') {
     const batch = meta?.context?.render_batch || {};
     if (safeText(meta?.context?.rerender_mode) !== 'full_regeneration') {
-      return {
-        slides: slides.map((slide) => ({
-          slide_id: slide.slide_id,
-          content_html: buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id)),
-        })),
-        render_summary: ['targeted revision keeps its own small-batch contract'],
+        return {
+          slides: slides.map((slide) => ({
+            slide_id: slide.slide_id,
+            content_html: buildPptSlideMarkup(slide, deckSlideCount, peakPages.has(slide.slide_id)),
+          })),
+          render_summary: ['targeted revision keeps its own small-batch contract'],
       };
     }
     if (safeText(batch?.batch_mode) !== 'section_batch') {
@@ -239,7 +251,7 @@ export function buildMockPptRender(meta) {
             throw new Error(`mock ppt render expected scoped revision_context for ${currentSlideId}: ${JSON.stringify(revisionContext)}`);
           }
         }
-        const markup = buildPptSlideMarkup(slide, slides.length, peakPages.has(slide.slide_id));
+        const markup = buildPptSlideMarkup(slide, deckSlideCount, peakPages.has(slide.slide_id));
         if (variants.has('missing_root_meta')) {
           return markup
             .replace(/\sdata-title="[^"]*"/g, '')
