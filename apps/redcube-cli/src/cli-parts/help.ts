@@ -229,6 +229,10 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
         command: 'redcube review projection --workspace-root <dir> --topic-id <id>',
       },
       {
+        task: '读取交付物运行与 review watch 投影',
+        command: 'redcube review watch --workspace-root <dir> --topic-id <id> --deliverable-id <id> [--run-id <id>]',
+      },
+      {
         task: '汇总 workspace / deliverable 的性能与 token telemetry',
         command: 'redcube report performance --workspace-root <dir> [--topic-id <id>] [--deliverable-id <id>]',
       },
