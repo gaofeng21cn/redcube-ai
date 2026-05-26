@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -11,7 +12,9 @@ import {
   exportDomainActionAdapter,
   invokeOplHostedProductEntry,
   prepareProductEntryWorkspace,
+  runDeliverableRoute,
   SERIAL_ENV_TEST,
+  withMockCodexRuntime,
   withMockCodexRuntimeState,
 } from './product-domain-action-case-shared.ts';
 
@@ -56,6 +59,16 @@ function assertGoalWorkflowSuiteShape(suite) {
   assert.equal(suite.required_observations.includes('forbidden_authority_flags_all_false'), true);
   assert.equal(suite.handoff_surface.agent_lab_handoff_contract_ref, agentLabHandoffPath);
   assert.equal(suite.handoff_surface.agent_lab_suite_ref, suitePath);
+  assert.equal(suite.artifact_sample_policy.sample_kind, 'mock_provider_artifact_producing_e2e');
+  assert.equal(suite.artifact_sample_policy.proves_artifact_export_chain, true);
+  assert.equal(suite.artifact_sample_policy.proves_live_image_provider, false);
+  assert.equal(suite.artifact_sample_policy.route_chain.at(-1), 'export_bundle');
+  assert.equal(
+    suite.artifact_sample_refs.includes(
+      'artifact-sample:test:rca-goal-workflow-agent-lab-suite#artifact-producing-xiaohongshu-export-bundle',
+    ),
+    true,
+  );
   assert.equal(suite.goal_mode.input_style, '/goal');
   assert.equal(suite.goal_mode.single_goal_required, true);
   assert.equal(suite.goal_mode.stage_by_stage_operator_plan_required, false);
@@ -147,6 +160,95 @@ test('OPL AgentLab runner consumes the RCA /goal workflow suite without missing 
   assert.deepEqual(suiteResult.missing_observations, []);
   assert.equal(suiteResult.summary.forbidden_authority_flag_count, 0);
   assert.equal(suiteResult.summary.memory_body_observed, false);
+});
+
+test('artifact-producing xiaohongshu goal workflow reaches export bundle without operator monitoring', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'redcube-goal-xhs-artifact-'));
+    const previousImageGenerationMock = process.env.REDCUBE_IMAGE_GENERATION_MOCK;
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+    try {
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        profileId: 'standard_note',
+        topicId: 'topic-a',
+        deliverableId: 'note-series',
+        title: '甲状腺门诊科普系列',
+        goal: '验证 RCA 从单一目标自主推进到小红书图文导出 bundle',
+      });
+
+      const common = {
+        workspaceRoot,
+        overlay: 'xiaohongshu',
+        topicId: 'topic-a',
+        deliverableId: 'note-series',
+      };
+      const routes = [
+        'research',
+        'storyline',
+        'single_note_plan',
+        'visual_direction',
+        'author_image_pages',
+        'visual_director_review',
+        'screenshot_review',
+        'publish_copy',
+        'export_bundle',
+      ];
+      const results = [];
+      for (const route of routes) {
+        const result = await runDeliverableRoute({ ...common, route });
+        assert.equal(result.ok, true, route);
+        results.push({ route, result });
+      }
+
+      const authorArtifact = JSON.parse(fs.readFileSync(
+        results.find((entry) => entry.route === 'author_image_pages').result.artifactFile,
+        'utf8',
+      ));
+      assert.equal(authorArtifact.status, 'completed');
+      assert.equal(authorArtifact.image_pages_bundle.source_visual_route, 'author_image_pages');
+      assert.equal(authorArtifact.image_pages_bundle.dimensions.ratio, '3:4');
+      assert.equal(authorArtifact.image_page_manifest.slides.length > 0, true);
+      assert.equal(
+        authorArtifact.image_page_manifest.slides.every((slide) => fs.existsSync(slide.image_file)),
+        true,
+      );
+
+      const reviewArtifact = JSON.parse(fs.readFileSync(
+        results.find((entry) => entry.route === 'screenshot_review').result.artifactFile,
+        'utf8',
+      ));
+      assert.equal(typeof reviewArtifact.checks.overflow_free, 'boolean');
+      assert.equal(
+        reviewArtifact.slide_reviews.every((slide) => fs.existsSync(slide.screenshot_file)),
+        true,
+      );
+
+      const exportArtifact = JSON.parse(fs.readFileSync(results.at(-1).result.artifactFile, 'utf8'));
+      assert.equal(exportArtifact.status, 'completed');
+      assert.equal(exportArtifact.export_bundle.source_surface_kind, 'image_pages');
+      assert.equal(exportArtifact.export_bundle.source_visual_route, 'author_image_pages');
+      assert.equal(exportArtifact.export_bundle.delivery_state.current, 'output_ready');
+      assert.equal(exportArtifact.export_bundle.png_files.length, authorArtifact.image_page_manifest.slides.length);
+      assert.equal(exportArtifact.export_bundle.publish_image_files.length, exportArtifact.export_bundle.png_files.length);
+      assert.equal(
+        exportArtifact.export_bundle.publish_image_files.every((file) => fs.existsSync(file)),
+        true,
+      );
+      assert.equal(fs.existsSync(exportArtifact.export_bundle.caption_file), true);
+      assert.equal(fs.existsSync(path.join(workspaceRoot, 'topics', 'topic-a', 'publication-state.json')), true);
+      assert.equal(fs.existsSync(exportArtifact.series_surfaces.delivery_overview_file), true);
+      assert.equal(fs.existsSync(exportArtifact.series_surfaces.path_mapping_file), true);
+      assert.equal(fs.existsSync(exportArtifact.series_surfaces.cadence_file), true);
+    } finally {
+      if (previousImageGenerationMock === undefined) {
+        delete process.env.REDCUBE_IMAGE_GENERATION_MOCK;
+      } else {
+        process.env.REDCUBE_IMAGE_GENERATION_MOCK = previousImageGenerationMock;
+      }
+    }
+  });
 });
 
 test('manifest and domain-handler export expose the RCA /goal workflow AgentLab suite', SERIAL_ENV_TEST, async () => {

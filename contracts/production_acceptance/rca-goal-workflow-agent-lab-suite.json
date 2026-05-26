@@ -37,6 +37,32 @@
     "agent_lab_handoff_contract_ref": "contracts/agent_lab_handoff.json",
     "refs_only": true
   },
+  "artifact_sample_policy": {
+    "sample_kind": "mock_provider_artifact_producing_e2e",
+    "route_chain": [
+      "research",
+      "storyline",
+      "single_note_plan",
+      "visual_direction",
+      "author_image_pages",
+      "visual_director_review",
+      "screenshot_review",
+      "publish_copy",
+      "export_bundle"
+    ],
+    "proof_test_ref": "tests/rca-goal-workflow-agent-lab-suite.test.ts#artifact-producing-xiaohongshu-export-bundle",
+    "expected_files": [
+      "artifacts/image_pages/author_image_pages/N01.png",
+      "publish/screenshots/N01.png",
+      "artifacts/publish_bundle.json",
+      "publish/manifest.json",
+      "publish/note-series-caption.txt"
+    ],
+    "live_provider_required": false,
+    "mock_provider_reason": "deterministic CI-safe proof of RCA route, artifact, review, and export file plumbing",
+    "proves_artifact_export_chain": true,
+    "proves_live_image_provider": false
+  },
   "tasks": [
     {
       "task_id": "agent-lab-task:rca/goal-workflow/minimal-autonomous-visual-delivery",
@@ -245,7 +271,14 @@
     "target-verification:redcube-ai/goal-workflow-product-entry",
     "target-verification:redcube-ai/domain-handler-export-read",
     "target-verification:redcube-ai/agent-lab-run-suite",
+    "target-verification:redcube-ai/mock-artifact-producing-xhs-export-bundle",
     "target-verification:redcube-ai/test-fast"
+  ],
+  "artifact_sample_refs": [
+    "artifact-sample:test:rca-goal-workflow-agent-lab-suite#artifact-producing-xiaohongshu-export-bundle",
+    "artifact-sample:path:artifacts/image_pages/author_image_pages/N01.png",
+    "artifact-sample:path:publish/screenshots/N01.png",
+    "artifact-sample:path:artifacts/publish_bundle.json"
   ],
   "no_forbidden_write_refs": [
     "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only",
