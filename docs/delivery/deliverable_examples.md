@@ -7,6 +7,8 @@ Machine boundary: 人读交付示例。机器真相继续归 contracts、runtime
 
 这份文档展示 `RedCube AI` 当前两类最重要的交付面：`PPT` 与 `小红书图文`。
 
+这些示例是 family / route 读者上下文，不是 readiness proof。示例指令、典型输入和期望输出不能替代 source readiness、route artifact、review/export gate、artifact manifest、owner receipt 或 handoff verdict。
+
 ## 示例一：给学生讲课的 PPT
 
 ### 适用场景

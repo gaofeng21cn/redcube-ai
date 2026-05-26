@@ -86,6 +86,50 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-26 delivery/source support authority-boundary tranche
+
+本轮覆盖 RCA delivery/source support 文档中容易被读成 readiness proof 或 authority transfer 的边界语句。目标是把 `source augmentation`、delivery examples、route/proof/export support 读回 live source/contracts/tests：source augmentation 只更新 canonical source truth 与 source readiness report；delivery docs/examples 只提供 family / route / proof / export 读者上下文；最终 visual ready、exportable、handoffable、artifact authority 和 review/export verdict 仍来自 RCA-owned review/export gates、workspace artifacts、artifact manifests、review/export receipts 与 owner receipts。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/README.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, and this governance ledger.
+- Reviewed support docs: `docs/source/README.md`, `docs/source/source_augmentation_executor_contract.md`, `docs/delivery/README.md`, `docs/delivery/deliverable_examples.md`, `docs/delivery/html-ppt-route-quality.md`, `docs/delivery/image-first-ppt-production-route.md`, `docs/delivery/native-ppt-proof-environment.md`, `docs/delivery/real-route-evolution-probe.md`.
+- Machine/source refs: `packages/redcube-runtime/src/source-augmentation-request.ts`, `packages/redcube-runtime/src/source-augmentation-result.ts`, `packages/redcube-runtime/src/source-augmentation-execution.ts`, `packages/redcube-runtime/src/source-augmentation-executor.ts`, `packages/redcube-runtime/src/source-research.ts`, `apps/redcube-cli/src/cli-parts/dispatch.ts`, `packages/redcube-domain-entry/src/actions/run-deliverable-route.ts`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/runtime-program/ppt-html-route-quality-nonregression.json`, and `contracts/runtime-program/ppt-image-first-production-route.json`.
+- Test refs: `tests/source-research.test.ts`, `tests/source-intake.test.ts`, `tests/source-intake-cases/augmentation-execution.test.ts`, `tests/real-route-evolution-probe.test.ts`, `tests/runtime-deliverable-route-cases/cache-liveness-and-repeat-blocks.test.ts`, `tests/ppt-html-route-quality-nonregression.test.ts`, `tests/render-html-guardrails.test.ts`, `tests/ppt-deliverable-e2e.test.ts`, and `tests/xiaohongshu-deliverable-e2e.test.ts`.
+- Doctor evidence: OPL Doc Governance doctor preflight reported no RCA structural findings for the worktree before edit; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- `source intake -> source augment -> source execute-augmentation` and `source research` are current source readiness surfaces. `external_command` and `result_file` adapters are strict contract consumers; invalid request/result, unsupported adapter, missing result file or unconfigured executor return explicit blocked reports instead of silent success.
+- Valid source augmentation writes `source-index.json`, `extracted-materials.json`, `source-brief.json`, `source-audit.json`, `source-readiness-pack.json`, and `source-augmentation-report.json`. Its `planning_ready` means source truth can support downstream Storyline / Plan consumption; it is not visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak complete.
+- Delivery route docs remain active support: image-first is default for `ppt_deck`; HTML and native PPTX are explicit optional routes; proof runners and examples explain route behavior but do not replace `visual_director_review`, `screenshot_review`, `export_pptx`, review/export receipts or owner receipts.
+- OPL / generated shell and Agent Lab can consume refs-only source, route, quality, cache and suite input refs; they cannot write artifact body, visual truth, review/export verdict, visual memory body, owner receipt body, or authorize artifact authority / review-export readiness.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full paragraph read of `docs/source/README.md`, `docs/source/source_augmentation_executor_contract.md`, `docs/delivery/README.md`, `docs/delivery/deliverable_examples.md`, `docs/delivery/html-ppt-route-quality.md`, `docs/delivery/image-first-ppt-production-route.md`, `docs/delivery/native-ppt-proof-environment.md`, `docs/delivery/real-route-evolution-probe.md`; live source/contract/test refs listed above. | `docs/source/README.md`; `docs/source/source_augmentation_executor_contract.md`; `docs/delivery/README.md`; `docs/delivery/deliverable_examples.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The delivery/source docs remain active support references; stale authority ambiguity was corrected in place.
+
+Unreviewed docs:
+
+- RCA delivery/source support docs listed above are now covered for source readiness, route/proof/example and review/export authority wording.
+- RCA policy support, remaining reference bodies and history/provenance bodies remain open outside previously covered chunks.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Any wording that treats source augmentation `planning_ready`, delivery examples, proof runner success, route cache, Agent Lab suite score or OPL refs-only projection as RCA visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak complete is stale pollution.
+- Any wording that lets source augmentation, OPL generated shell, Agent Lab or proof examples write artifact body, visual truth, review/export verdict, visual memory body, owner receipt body or artifact authority is stale pollution.
+- Any support wording that turns HTML/native optional routes into hidden fallback chains or weakens image-first default route / review-export gates is stale pollution.
+
+Next tranche write scope:
+
+- RCA policy support docs that mention visual memory, AI-first route authority, review/export memory or deliverable contract model.
+- Or remaining RCA references/history bodies with old managed/gateway/runtime/session/domain_action_adapter vocabulary, after confirming current role and no-resurrection boundaries from live contracts/tests.
+
 ### 2026-05-26 runtimeWatch / integration support current-caller tranche
 
 本轮覆盖 RCA runtimeWatch、runtime architecture 与 OPL integration support 文档中涉及 generated/default caller thinning、`domain_action_adapter`、Temporal provider、lifecycle adapter 和 runtime read-model 的当前边界。目标是把 support reference 读回 live source/contracts/tests：`runtimeWatch` 是 direct review/progress refs-only read model；`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；OPL/Temporal 持有 provider-backed scheduling / wakeup / retry-dead-letter / query projection，但不持有 RCA visual truth、review/export verdict、canonical artifacts、visual memory body 或 owner receipt authority。

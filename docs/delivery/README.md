@@ -9,6 +9,8 @@ Machine boundary: 人读 delivery 索引。机器真相继续归 runtime-family 
 
 本层说明 visual deliverables 如何成形与检查。可执行 delivery contract 继续归 runtime-family code、schemas、contract JSON 和 generated artifact manifests。
 
+Delivery support docs 和示例只提供 route / proof / export 读法。最终 visual ready、exportable、handoffable、artifact authority 与 review/export verdict 仍必须来自 RCA-owned review/export gates、workspace artifacts、artifact manifests、review/export receipts 和 owner receipts。
+
 ## 当前角色
 
 Delivery docs 解释当前 deliverable families、default routes、proof environments 和 examples。描述旧 rendering paths 的 route notes 必须标明 explicit optional route、route-level repair/recovery 或 historical support，避免被读成当前默认 route 或 hidden fallback chain。

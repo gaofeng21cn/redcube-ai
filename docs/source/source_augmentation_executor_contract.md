@@ -233,6 +233,14 @@ redcube source write-augmentation-result --workspace-root /ABS/PATH --topic-id t
 - `sufficiency_status = planning_ready`
 - `deep_research_state = completed`
 
+## Authority boundary
+
+Source augmentation 只更新 canonical source truth 与 source readiness report。`planning_ready` 只表示 topic 级 source readiness 已足够支撑后续 Storyline / Plan 消费；它不是 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak 完成。
+
+外部执行器只能通过 `shared_source_readiness_augmentation_result` 合同返回可校验的 references、facts、quality notes 和 evidence gap resolution。它不能写 artifact body、visual truth、review/export verdict、visual memory body、owner receipt body，也不能替代 `visual_director_review`、`screenshot_review`、`export_pptx` 或 RCA-owned review/export gates。
+
+OPL / generated shell 可以消费这些 source refs 和 readiness report，驱动后续 stage 或展示 next action；它仍不能据此授权 artifact authority、review/export verdict、handoff packet 或 production readiness。
+
 ## 对执行器开发者的建议
 
 - 不要输出旧格式字段，比如裸 `resolved_evidence_gaps`

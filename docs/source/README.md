@@ -9,6 +9,8 @@ Machine boundary: 人读 source 索引。机器真相继续归 workspace artifac
 
 本层只解释 source 职责。Canonical source truth 继续归 workspace artifacts、runtime-family contracts、schemas 和 generated reports。
 
+Source readiness / augmentation 的 `planning_ready` 只说明 source truth 可以被后续 Storyline / Plan 消费；它不授权 visual ready、exportable、handoffable、artifact authority、review/export verdict、domain ready 或 production ready。
+
 ## 当前角色
 
 Source docs 解释当前 source readiness、augmentation、deep research trigger/gate 行为和 source truth consumption。已完成的 source-readiness plans 进入 history；仍生效的 source contracts 留在本目录或 contracts/source surfaces，并写清 machine boundary。
