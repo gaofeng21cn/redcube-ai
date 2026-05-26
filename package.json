@@ -31,8 +31,16 @@
     "contracts:current-program:check": "node --experimental-strip-types scripts/sync-current-program-leaf-index.ts --check",
     "typecheck": "npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "build": "tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts",
+    "audit:fallow:production": "npx --yes fallow@latest --root . --no-cache --production --format json --summary",
     "audit:typescript-closeout": "node --experimental-strip-types scripts/run-typescript-closeout-audit.ts",
     "line-budget": "node --experimental-strip-types scripts/line-budget.ts"
+  },
+  "dependencies": {
+    "@redcube/codex-cli-client": "0.1.0",
+    "@redcube/domain-entry": "0.1.0",
+    "@redcube/runtime": "0.1.0",
+    "@redcube/runtime-protocol": "0.1.0",
+    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#c5d4a93bd4bb64adf1228ecf7f2a9038c7dce278"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

@@ -17,6 +17,11 @@ interface OverlayRegistryPackageJson {
 }
 
 const packageJson = packageJsonData as OverlayRegistryPackageJson;
+const defaultOverlayModuleLoaders: Record<string, () => Promise<Record<string, unknown>>> = {
+  '@redcube/overlay-ppt': async () => await import('@redcube/overlay-ppt') as Record<string, unknown>,
+  '@redcube/overlay-xiaohongshu': async () => await import('@redcube/overlay-xiaohongshu') as Record<string, unknown>,
+  '@redcube/overlay-poster-onepager': async () => await import('@redcube/overlay-poster-onepager') as Record<string, unknown>,
+};
 
 function isOverlayDefinition(value: unknown): value is OverlayDefinition {
   return Boolean(value)
@@ -27,7 +32,11 @@ function isOverlayDefinition(value: unknown): value is OverlayDefinition {
 async function loadDefaultOverlayEntries(): Promise<Array<readonly [string, OverlayDefinition]>> {
   const specs = packageJson.redcube?.defaultOverlayModules || [];
   return Promise.all(specs.map(async ({ overlayId, module, exportName }) => {
-    const namespace = await import(module);
+    const loader = defaultOverlayModuleLoaders[module];
+    if (!loader) {
+      throw new Error(`Overlay module is not declared as a direct registry dependency: ${module}`);
+    }
+    const namespace = await loader();
     const overlay = namespace?.[exportName];
     if (!isOverlayDefinition(overlay)) {
       throw new Error(`Overlay export not found: ${module}#${exportName}`);

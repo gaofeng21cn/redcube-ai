@@ -21,6 +21,11 @@ interface RuntimeFamilyRegistryPackageJson {
 }
 
 const packageJson = packageJsonData as RuntimeFamilyRegistryPackageJson;
+const defaultRuntimeFamilyModuleLoaders: Record<string, () => Promise<Record<string, unknown>>> = {
+  '@redcube/runtime-family-ppt': async () => await import('@redcube/runtime-family-ppt') as Record<string, unknown>,
+  '@redcube/runtime-family-xiaohongshu': async () => await import('@redcube/runtime-family-xiaohongshu') as Record<string, unknown>,
+  '@redcube/runtime-family-poster-onepager': async () => await import('@redcube/runtime-family-poster-onepager') as Record<string, unknown>,
+};
 
 function safeText(value: unknown, fallback = ''): string {
   const text = String(value || '').trim();
@@ -69,7 +74,11 @@ export async function loadRuntimeFamilyRunner(contract: RuntimeFamilyContract): 
   const moduleRef = resolveRuntimeFamilyModule(contract);
   let loaded: Record<string, unknown>;
   try {
-    loaded = await import(moduleRef.module_name) as Record<string, unknown>;
+    const loader = defaultRuntimeFamilyModuleLoaders[moduleRef.module_name];
+    if (!loader) {
+      throw new Error(`Runtime family module is not declared as a direct registry dependency: ${moduleRef.module_name}`);
+    }
+    loaded = await loader();
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to load runtime family package ${moduleRef.module_name}: ${detail}`, { cause: error });

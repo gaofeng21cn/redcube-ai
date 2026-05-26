@@ -36,8 +36,8 @@ import {
 } from './surface-helpers.js';
 
 /**
- * @typedef {import('./types.js').PosterRuntimeRunRequest} PosterRuntimeRunRequest
- * @typedef {import('./types.js').PosterRuntimeRouteResult} PosterRuntimeRouteResult
+ * @typedef {import('../types.js').PosterRuntimeRunRequest} PosterRuntimeRunRequest
+ * @typedef {import('../types.js').PosterRuntimeRouteResult} PosterRuntimeRouteResult
  */
 
 export function createPosterOnepagerRuntimeCore() {

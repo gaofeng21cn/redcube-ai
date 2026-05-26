@@ -88,7 +88,7 @@ function buildTeamGate() {
 }
 
 /**
- * @returns {import('../packages/redcube-runtime/dist/types.js').RuntimeCreativeOwnershipCloseoutAudit}
+ * @returns {import('@redcube/runtime').RuntimeCreativeOwnershipCloseoutAudit}
  */
 export function buildCreativeOwnershipAudit(): any {
   const residueAudit = buildCreativeOwnershipResidueAudit();
@@ -152,7 +152,7 @@ export function writeAuditFile(audit: any): void {
 
 /**
  * @param {{ currentMode?: string }} [options]
- * @returns {import('../packages/redcube-runtime/dist/types.js').RuntimeCreativeOwnershipProgramStatus}
+ * @returns {import('@redcube/runtime').RuntimeCreativeOwnershipProgramStatus}
  */
 export function buildCreativeOwnershipStatus({ currentMode = 'ralph' } = {}): any {
   const residueAudit = buildCreativeOwnershipResidueAudit();

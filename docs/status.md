@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-更新时间：`2026-05-25`
+更新时间：`2026-05-26`
 
 ## 当前角色
 
@@ -125,6 +125,9 @@ RCA 长期只保留无法声明化的 visual authority surfaces；active machine
 
 - 测试分组唯一机器可读入口是 `scripts/test-registry.ts`；`scripts/run-test-group.ts` 从注册表推导 smoke、fast、meta、integration、full 等执行组，并 fail-closed 拒绝未登记的根级测试文件。
 - `scripts/verify.sh` 与 `scripts/run-test-group.ts` 先执行 `scripts/repo-hygiene.sh`；tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/` 或 `.agent-contract-baseline.json`。
+- Fallow production dead-code / dependency hygiene 的当前可复现入口是 `npm run audit:fallow:production`，等价于 `npx --yes fallow@latest --root . --no-cache --production --format json --summary`；需要先有当前 checkout 的 workspace `node_modules`，否则 fallow 会提示 resolution 不可信。
+- 2026-05-26 hygiene pass 已关闭三类高信号问题：root build graph 不再把文件型 `tsconfig.tests.json` 放入 package/app project references；root scripts 的直接 workspace/upstream helper imports 已在 root `package.json`/lockfile 声明；overlay/runtime-family registry 的 manifest-driven modules 已通过显式 literal loader 绑定到真实 direct dependency owner，pack type packages 也暴露 type-only package surface。
+- 当前 fallow residual 中，`@redcube/redcube-config` 在 CLI private-profile、runtime executor routing、source intake author template 和 xiaohongshu author profile 路径有源码、dist 与 Node resolution 证据，不能按 unused dependency 删除；待 analyzer 能正确计入 subpath package usage 或包入口形态进一步调整后再关闭。公共 API / namespace barrel 重名和有 docs/tests 入口的维护脚本只记录为 fallow triage residual，不做破坏性删除。
 - 旧 gateway、retired public entry、Hermes-default 等污染 guard 只覆盖源码、contracts、plugins、scripts、tests、tools 与 Python helper 等机器 / 源码面；`README*` 与 `docs/**` 是人读 prose，不作为测试断言对象。
 
 ## 下一跳
