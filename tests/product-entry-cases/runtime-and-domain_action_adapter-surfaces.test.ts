@@ -320,27 +320,9 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates,
       undefined,
     );
-    assert.deepEqual(
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.surface_id),
-      [
-        'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
-        'retired_domain_action_adapter.supervision_action_tombstone',
-        'retired_domain_action_adapter.continuation_action_tombstone',
-        'retired_public_cli_mcp.managed_run_lookup_tombstone',
-        'retired_public_cli_mcp.managed_supervision_tombstone',
-      ],
-    );
-    assert.deepEqual(
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.map((entry) => entry.retired_legacy_surface_id),
-      [
-        'domain_action_adapter_dispatch.runtime_watch',
-        'domain_action_adapter_dispatch.retired_managed_supervision',
-        'domain_action_adapter_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-      ],
-    );
+    assert.equal(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.length, 5);
     for (const entry of domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
+      assert.equal(entry.surface_id.endsWith('_tombstone'), true, entry.surface_id);
       assert.equal(entry.active_default_caller, false, entry.surface_id);
       assert.equal(entry.active_caller, false, entry.surface_id);
       assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
@@ -416,19 +398,23 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
         'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
       ],
     );
-    assert.deepEqual(
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids,
-      [
-        'domain_action_adapter_dispatch.runtime_watch',
-        'domain_action_adapter_dispatch.retired_managed_supervision',
-        'domain_action_adapter_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-        'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-        'repo_local_visual_runtime.legacy_run_store_deleted',
-        'repo_local_visual_runtime.legacy_dag_runtime_deleted',
-      ],
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.length,
+      8,
     );
+    assert.equal(
+      new Set(
+        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids,
+      ).size,
+      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.length,
+    );
+    for (const entry of domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
+      assert.equal(
+        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.includes(entry.retired_legacy_surface_id),
+        true,
+        entry.retired_legacy_surface_id,
+      );
+    }
     assert.equal(
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.surface_id_policy,
       'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',

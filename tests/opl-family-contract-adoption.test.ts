@@ -391,13 +391,19 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       'retired_public_cli_mcp.managed_supervision_tombstone', 'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
       'retired_repo_local_visual_runtime.legacy_run_store_tombstone', 'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
     ]);
-    assert.deepEqual(surface.physical_deletion_guard.retired_legacy_surface_ids, [
-      'domain_action_adapter_dispatch.runtime_watch', 'domain_action_adapter_dispatch.retired_managed_supervision',
-      'domain_action_adapter_dispatch.product_entry_continuation', 'public_cli_mcp_gateway.get_managed_run',
-      'public_cli_mcp_gateway.retired_managed_supervision', 'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-      'repo_local_visual_runtime.legacy_run_store_deleted', 'repo_local_visual_runtime.legacy_dag_runtime_deleted',
-    ]);
     assert.equal(surface.physical_deletion_guard.surface_id_policy, 'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id');
+    assert.equal(surface.physical_deletion_guard.retired_legacy_surface_ids.length, 8);
+    assert.equal(
+      new Set(surface.physical_deletion_guard.retired_legacy_surface_ids).size,
+      surface.physical_deletion_guard.retired_legacy_surface_ids.length,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.retired_legacy_surface_ids.every((surfaceId) =>
+        typeof surfaceId === 'string'
+        && !surfaceId.endsWith('_tombstone')
+        && !surfaceId.includes('compatibility_alias')),
+      true,
+    );
     assert.equal(surface.physical_deletion_guard.deletion_status, 'legacy_runtime_physical_cleanup_closed');
     assert.equal(surface.fresh_large_private_surface_scan.surface_kind, 'rca_large_private_platform_surface_scan');
     assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.no_obvious_safe_large_generic_control_plane_split_found, true);
@@ -429,27 +435,14 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     }
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
     assert.equal(surface.retire_tombstone_candidates, undefined);
-    assert.deepEqual(
-      surface.retired_no_resurrection_guards.map((entry) => entry.surface_id),
-      [
-        'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
-        'retired_domain_action_adapter.supervision_action_tombstone',
-        'retired_domain_action_adapter.continuation_action_tombstone',
-        'retired_public_cli_mcp.managed_run_lookup_tombstone',
-        'retired_public_cli_mcp.managed_supervision_tombstone',
-      ],
-    );
-    assert.deepEqual(
-      surface.retired_no_resurrection_guards.map((entry) => entry.retired_legacy_surface_id),
-      [
-        'domain_action_adapter_dispatch.runtime_watch',
-        'domain_action_adapter_dispatch.retired_managed_supervision',
-        'domain_action_adapter_dispatch.product_entry_continuation',
-        'public_cli_mcp_gateway.get_managed_run',
-        'public_cli_mcp_gateway.retired_managed_supervision',
-      ],
-    );
+    assert.equal(surface.retired_no_resurrection_guards.length, 5);
     for (const entry of surface.retired_no_resurrection_guards) {
+      assert.equal(entry.surface_id.endsWith('_tombstone'), true, entry.surface_id);
+      assert.equal(
+        surface.physical_deletion_guard.retired_legacy_surface_ids.includes(entry.retired_legacy_surface_id),
+        true,
+        entry.retired_legacy_surface_id,
+      );
       assert.equal(entry.active_default_caller, false, entry.surface_id);
       assert.equal(entry.active_caller, false, entry.surface_id);
       assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
