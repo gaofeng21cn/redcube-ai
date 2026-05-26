@@ -564,3 +564,93 @@ Next tranche write scope:
 
 - Switch to MAS repo-wide coverage from its remaining uncovered docs if the active owner-route dirty lanes are safe or explicitly assigned.
 - Keep App docs delayed until release / GUI lanes are safe or explicitly assigned.
+
+### 2026-05-27 exact path ledger reconcile tranche
+
+本轮覆盖 RCA final inventory reconcile 之后留下的 47 个 exact-path ledger gap。目标是把 grouped coverage 和当前 `README*` / `docs/**/*.md` exact inventory 对齐，避免把“路径没有逐字出现在本地 ledger”误读成未审文档。本轮不新增 readiness 结论，不关闭 OPL series 全局 `/goal`，也不把 RCA docs coverage 写成 RCA visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak complete。
+
+Fresh live truth inputs:
+
+- RCA `AGENTS.md`, `TASTE.md`, root `README.md`, `docs/README.md`, core five, `docs/active/rca-ideal-state-gap-plan.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `contracts/runtime-program/current-program.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/functional_privatization_audit.json`, and this governance ledger.
+- Current inventory script over repo-root `README*` plus all `docs/**/*.md`, compared against this coverage ledger.
+- First-screen / role read of the 47 exact paths missing from the ledger before this tranche:
+  - `docs/active/README.md`
+  - `docs/active/opl-private-implementation-migration-inventory.md`
+  - `docs/decisions.md`
+  - `docs/history/hermes/hermes_managed_family_closure_truth.md`
+  - `docs/history/hermes/hermes_runtime_capability_extraction_map.md`
+  - `docs/history/hermes/hermes_runtime_substrate_activation_package.md`
+  - `docs/history/hermes/hermes_runtime_substrate_canonical_closure.md`
+  - `docs/history/hermes/hermes_stable_family_closure_truth.md`
+  - `docs/history/hermes/upstream_hermes_agent_activation_package.md`
+  - `docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md`
+  - `docs/history/hermes/upstream_hermes_agent_final_target_shape.md`
+  - `docs/history/hermes/upstream_hermes_agent_live_verification_blocker.md`
+  - `docs/history/hermes/upstream_hermes_agent_live_verification_closeout.md`
+  - `docs/history/hermes/upstream_hermes_agent_service_safe_domain_entry.md`
+  - `docs/history/phase-2/phase_2_architecture_boundary_governance.md`
+  - `docs/history/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md`
+  - `docs/history/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md`
+  - `docs/history/phase-2/phase_2_family_parity_autopilot_continuation_board.md`
+  - `docs/history/phase-2/phase_2_family_parity_governance_surface_convergence.md`
+  - `docs/history/phase-2/phase_2_family_source_truth_consumption_convergence.md`
+  - `docs/history/phase-2/phase_2_operator_surface_consistency_hardening.md`
+  - `docs/history/phase-2/phase_2_ppt_native_authoring_proof_lane.md`
+  - `docs/history/phase-2/phase_2_publication_projection_delivery_contract_convergence.md`
+  - `docs/history/phase-2/phase_2_review_export_gate_audit_hardening.md`
+  - `docs/history/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md`
+  - `docs/history/phase-2/phase_2_source_intake_activation_package_freeze.md`
+  - `docs/history/phase-2/phase_2_source_intake_shared_source_truth_baseline.md`
+  - `docs/history/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md`
+  - `docs/history/phase-2/phase_2_workspace_operator_quickstart_convergence.md`
+  - `docs/history/phase-2/ppt_mainline_quality_closeout.md`
+  - `docs/history/phase-2/stable_deliverable_manual_test_brief.md`
+  - `docs/history/plans/2026-04-08-deep-research-auto-first-product-contract.md`
+  - `docs/history/plans/2026-04-08-deep-research-source-readiness-pack-phase-1.md`
+  - `docs/history/plans/2026-04-09-direct-delivery-longrun-target-state.md`
+  - `docs/history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md`
+  - `docs/history/plans/2026-05-20-doc-lifecycle-governance-audit.md`
+  - `docs/history/plans/rca-production-acceptance-readiness-closeout-2026-05-20.md`
+  - `docs/history/plans/rca-standard-agent-doc-process-history-2026-05.md`
+  - `docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md`
+  - `docs/history/tombstones/retired-route-narratives-2026-05-11.md`
+  - `docs/invariants.md`
+  - `docs/product/README.md`
+  - `docs/product/human_quickstart.md`
+  - `docs/product/private-profile-setup.md`
+  - `docs/product/public-github-publish.md`
+  - `docs/public/README.md`
+  - `docs/specs/README.md`
+
+Fresh semantic result:
+
+- All 47 exact paths already have a durable role through first-screen `Owner` / `Purpose` / `State` / `Machine boundary`, directory index current-read rules, or prior focused tranches. The local gap was exact-path accounting, not stale current-truth prose.
+- `docs/active/README.md`, `docs/active/opl-private-implementation-migration-inventory.md`, `docs/decisions.md`, and `docs/invariants.md` remain current support / active inventory / stable policy surfaces. They point machine truth back to contracts, source, CLI/MCP/API behavior, runtime artifacts, owner receipts, artifact locator and RCA-owned review/export gates.
+- `docs/product/**`, `docs/public/README.md`, and `docs/specs/README.md` remain active support indexes or guides. They do not define machine-readable runtime truth, mature GUI/WebUI readiness, OPL ownership of visual truth, or production readiness.
+- `docs/history/hermes/**`, `docs/history/phase-2/**`, `docs/history/plans/**`, and `docs/history/tombstones/**` remain history / provenance / tombstone surfaces. Their directory indexes and first-screen metadata bind old `managed`, `gateway`, `runtime`, `session`, `domain_action_adapter`, Hermes-first, Phase 2 and closeout wording to dated historical or no-resurrection contexts.
+- No RCA prose body required rewrite. This tranche records the 47 exact paths directly, closing the local accounting ambiguity without changing current machine truth.
+
+Reviewed documents / sections:
+
+| Repo | Reviewed docs / sections | Edited docs this tranche |
+| --- | --- | --- |
+| `redcube-ai` | First-screen / role read of the 47 exact paths listed above, with supporting current-boundary read of core docs, active truth plan, ideal-state reference and machine contracts. | this coverage ledger only |
+
+Archived / tombstoned / deleted docs:
+
+- none. The reviewed paths already have legitimate long-term roles as active support, active inventory, current policy, product/public/spec index, history provenance or tombstone.
+
+Unreviewed docs:
+
+- `redcube-ai`: exact-string inventory now has no uncovered repo-root `README*` / `docs/**/*.md` path in the current 91-file scope once this entry is counted. RCA remains part of the larger OPL series goal, and global closure still depends on all six repos.
+- Future new RCA README/docs files, or substantive edits after this tranche, must be covered by a new ledger entry.
+
+Remaining stale / retire candidates:
+
+- RCA docs coverage is now exact-path reconciled; remaining RCA work is implementation/evidence/source-purity tail: production evidence scaleout, generated/default-caller thinning, naming/contract hygiene, compatibility-free retirement, and future source/contract/test drift.
+- Any future prose that promotes historical Hermes / Phase 2 / managed / gateway / runtime / session / domain_action_adapter wording, product support guides, public/spec indexes, structural conformance, provider completion, OPL projection or zero open worklist into current visual ready, exportable, handoffable, domain ready, production ready, generic runtime owner or OPL-owned RCA visual truth is stale pollution.
+
+Next tranche write scope:
+
+- Switch to App docs only when release / GUI lanes are safe or explicitly handed to this governance goal.
+- If App remains unsafe, continue with any newly reopened MAS / OPL / MAG / RCA exact inventory tail caused by later edits; otherwise keep the global `/goal` active and do not mark complete until all six repos' current inventories and ledgers are clean.
