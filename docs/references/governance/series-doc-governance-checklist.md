@@ -7,7 +7,7 @@ Machine boundary: 人读治理清单。机器真相继续归各 repo 的 contrac
 
 ## 目标
 
-本清单用于把 `RedCube AI` 放进 `One Person Lab`、`Med Auto Science`、`Med Auto Grant`、`RedCube AI` 这组系列项目的统一文档管理口径里做巡检。
+本清单用于把 `RedCube AI` 放进 OPL family 六仓统一文档管理口径里做巡检：`One Person Lab`、`One Person Lab App`、`Med Auto Science`、`Med Auto Grant`、`RedCube AI`、`OPL Meta Agent`。
 它服务跨仓 docs intake、回归与持续对齐，不替代核心五件套、`docs/active/**`、`docs/policies/**`、typed boundary audit 或 machine-readable contracts。
 
 ## 一、默认入口
@@ -39,8 +39,8 @@ Machine boundary: 人读治理清单。机器真相继续归各 repo 的 contrac
 
 ## 四、系列一致性检查
 
-- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不承担公开第一身份。默认 direct route、OPL-hosted route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` 最小执行单元必须写成同一条 repo-verified 链路。OPL 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架；Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只可写成显式非默认 executor/proof lane、hosted proof backend 或历史 provenance。
-- 系列项目名称与角色要与四仓当前真相同步：`One Person Lab` 是 stage-led、以 Agent executor 为最小执行单位 agent runtime framework 与 shared runtime/contracts owner，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`，`RedCube AI` 是视觉交付 domain agent。
+- 文档必须把 `RedCube AI` 写成 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不承担公开第一身份。默认 direct route、OPL-hosted route、configured family runtime provider、`RedCube service-safe domain entry` 与默认 `Codex CLI` 最小执行单元必须写成同一条 repo-verified 链路。OPL Framework 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架；One Person Lab App 是面向人的 workbench / operator surface；Temporal 是 production online runtime 的必需 substrate；external `Hermes-Agent` 只可写成显式非默认 executor/proof lane、hosted proof backend 或历史 provenance。
+- 系列项目名称与角色要与六仓当前真相同步：`One Person Lab` 是 framework / shared runtime / contracts owner，`One Person Lab App` 是人用 workbench 与 operator entry，`Med Auto Science` 是 `Research Ops`，`Med Auto Grant` 是 author-side `Grant Ops`，`RedCube AI` 是视觉交付 domain agent，`OPL Meta Agent` 是面向 OPL family 的 meta-agent / improvement package。`MAS`、`MAG`、`RCA` 和 `OMA` 持有各自 domain truth、authority function、owner receipt 和 direct app skill path；OPL/App 只消费 refs、projection 和 action route。
 - 若提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内 runtime package、pilot、shim 或迁移材料都只能写成 repo-side adapter 或 service-safe consumption surface。
 - 根层公开入口、docs 中文 canonical 层、program brief、内部参考、稳定规则、typed boundary audit 与历史 provenance 必须继续分层，不把 reference/history 重新挤进公开默认入口。旧 gateway、frontdoor、federation、harness-first、OPL-hosted handoff 或 Hermes-first 计划只在 internal integration、provenance、contract reference 或 tombstone 语境保留。
 - 仍被 runtime-program contracts 通过 `human_doc:*` 指向的旧 brief 原位保留并补 lifecycle note；无合同引用且不服务当前 baton 的旧计划移动到 `docs/history/` 或 tombstone 语境。

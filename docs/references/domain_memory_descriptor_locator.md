@@ -1,11 +1,13 @@
-# RCA Domain Memory Descriptor And Migration Locator
+# RCA domain memory descriptor 与迁移 locator
 
 Owner: `RedCube AI`
-Purpose: define the RCA-owned descriptor, migration plan, seed fixture locator, writeback proposal, accept/reject command, writeback receipt locator, controlled apply proof, and operator receipt projection boundary for visual pattern memory consumed by OPL-family surfaces.
-State: `active reference`
-Machine boundary: executable truth is `redcube product manifest#/domain_memory_descriptor_locator`, `redcube product manifest#/controlled_memory_apply_proof`, `redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances`, `contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator`, and `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`.
+Purpose: `domain_memory_descriptor_locator_support`
+State: `active_support`
+Machine boundary: 人读 contract-linked reference。机器真相继续归 `redcube product manifest#/domain_memory_descriptor_locator`, `redcube product manifest#/controlled_memory_apply_proof`, `redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances`, `contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator`, `contracts/runtime-program/current-program.json#/current_state/active_baton/scope/domain_memory_descriptor_locator`, source/tests、workspace runtime memory state 和 RCA-owned receipts。
 
-## Boundary
+Lifecycle note: 本文只解释 RCA-owned visual pattern memory descriptor、migration plan、seed fixture locator、writeback proposal、accept/reject command、writeback receipt locator、controlled apply proof 与 operator receipt projection 边界。当前 machine readout 是 `descriptor_proof_contract_landed_runtime_writeback_pending`：repo-source 已有 descriptor / no-forbidden-write / controlled apply proof，真实 memory body、receipt instance materialization 和 writeback apply 仍在 runtime / domain-memory owner 面。本文不承担 active plan；下一步顺序和 evidence tail 回到 [RCA 理想目标态差距与完善计划](../active/rca-ideal-state-gap-plan.md)。
+
+## 边界
 
 Visual pattern memory is RCA domain knowledge. It can guide source readiness, story architecture, visual authorship, review overlay, and delivery packaging, but it does not own visual route selection, review/export verdicts, publication projection, or canonical artifacts.
 
@@ -15,7 +17,7 @@ OPL may consume:
 - memory provenance refs;
 - writeback receipt refs.
 
-OPL must not store memory content, choose the RCA visual route, issue review/export verdicts, or mutate canonical artifacts.
+OPL must not store memory content, choose the RCA visual route, accept/reject memory writeback, issue review/export verdicts, write owner receipt bodies, or mutate canonical artifacts.
 
 ## Descriptor Shape
 
