@@ -60,6 +60,8 @@ function assertGoalWorkflowSuiteShape(suite) {
   assert.equal(suite.handoff_surface.agent_lab_handoff_contract_ref, agentLabHandoffPath);
   assert.equal(suite.handoff_surface.agent_lab_suite_ref, suitePath);
   assert.equal(suite.artifact_sample_policy.sample_kind, 'mock_provider_artifact_producing_e2e');
+  assert.equal(suite.artifact_sample_policy.codex_native_imagegen_policy.executor_task_surface, 'codex_native_imagegen_skill');
+  assert.equal(suite.artifact_sample_policy.codex_native_imagegen_policy.explicit_provider_token_required, false);
   assert.equal(suite.artifact_sample_policy.proves_artifact_export_chain, true);
   assert.equal(suite.artifact_sample_policy.proves_live_image_provider, false);
   assert.equal(suite.artifact_sample_policy.route_chain.at(-1), 'export_bundle');
@@ -67,6 +69,10 @@ function assertGoalWorkflowSuiteShape(suite) {
     suite.artifact_sample_refs.includes(
       'artifact-sample:test:rca-goal-workflow-agent-lab-suite#artifact-producing-xiaohongshu-export-bundle',
     ),
+    true,
+  );
+  assert.equal(
+    suite.target_verification_refs.includes('target-verification:redcube-ai/codex-native-imagegen-executor-task'),
     true,
   );
   assert.equal(suite.goal_mode.input_style, '/goal');

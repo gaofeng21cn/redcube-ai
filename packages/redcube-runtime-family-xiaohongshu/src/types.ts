@@ -361,10 +361,12 @@ export interface XhsImagePagesArtifact extends XhsRuntimeArtifactBase {
   image_generation_runtime: {
     provider?: string;
     base_url_host?: string;
-    endpoint: '/responses';
+    endpoint: string;
     request_model: string;
     tool_options?: unknown;
     token_persisted: false;
+    provider_token_required?: false;
+    provider_token_source?: string;
   };
   image_pages_bundle: {
     kind: 'xiaohongshu_image_pages_bundle';

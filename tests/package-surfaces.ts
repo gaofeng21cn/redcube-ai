@@ -87,6 +87,7 @@ export {
 export {
   generateStructuredArtifactBatchViaCodexCli,
   generateStructuredArtifactViaCodexCli,
+  generateImageViaCodexNativeImagegen,
   probeCodexCli,
   readCodexCliContract,
   REDCUBE_STAGE_JSON_BEGIN,

@@ -97,7 +97,7 @@ export function buildCreativeRunOutput(meta) {
     case 'repair_image_pages':
       return {
         image_pages: [],
-        render_summary: ['image pages are produced by the runtime Responses image adapter, not the structured mock CLI.'],
+        render_summary: ['image pages are produced by the runtime image-generation adapter, not the structured mock CLI.'],
       };
     case 'author_pptx_native':
     case 'repair_pptx_native':

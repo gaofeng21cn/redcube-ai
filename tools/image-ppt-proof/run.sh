@@ -18,12 +18,12 @@ usage() {
     'Runs the repo-owned image-first PPT proof lane:' \
     '  1. optional native PPT proof dependency install' \
     '  2. deterministic prompt manifest creation' \
-    '  3. mock or explicit live Responses image_generation' \
+    '  3. mock image generation or Codex-native live imagegen task execution' \
     '  4. PPTX/PDF/export bundle/gallery/final delivery manifest emission' \
     '  5. artifact-index.json retention contract build' \
     '' \
     'Default mode is --mock-image-generation and never calls a real API.' \
-    'Live mode uses REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD, OPENAI_API_KEY/explicit API env, or the current Codex provider config.'
+    'Live mode delegates raster generation to the Codex executor native imagegen skill; RCA does not read provider Base URL or API tokens.'
 }
 
 python_is_usable() {

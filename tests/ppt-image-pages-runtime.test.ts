@@ -97,7 +97,7 @@ function seedWorkspace() {
   return { workspaceRoot, topicId, deliverableId, contract, paths };
 }
 
-test('ppt author_image_pages writes mocked Responses PNG pages and generation metadata', async () => {
+test('ppt author_image_pages writes mocked PNG pages and generation metadata', async () => {
   const { workspaceRoot, topicId, deliverableId, contract, paths } = seedWorkspace();
   const restoreMock = Object.assign(process.env, { REDCUBE_IMAGE_GENERATION_MOCK: '1' });
   assert.equal(restoreMock.REDCUBE_IMAGE_GENERATION_MOCK, '1');

@@ -19,6 +19,8 @@ RCA runtime docs 只描述 domain-agent runtime boundary：service-safe domain e
 
 - [Runtime architecture](./runtime_architecture.md)
 
-最小 `/goal` 自动化 smoke 由 `contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json` 承载，可用 OPL `agent-lab run --suite ... --json` 直接验证 RCA 从单一 goal 进入 OPL-hosted `auto_to_terminal` product-entry workflow。配套 focused test 还用 mock image provider 跑 `xiaohongshu` route chain 到 `export_bundle`，检查 PNG、publish bundle、caption、publication-state 和 reports 已落盘。它是 runtime handoff / recovery / artifact plumbing observation，不是 live image provider、visual ready、exportable、handoffable 或 production soak 证明。
+最小 `/goal` 自动化 smoke 由 `contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json` 承载，可用 OPL `agent-lab run --suite ... --json` 直接验证 RCA 从单一 goal 进入 OPL-hosted `auto_to_terminal` product-entry workflow。配套 focused test 还用 mock image provider 跑 `xiaohongshu` route chain 到 `export_bundle`，检查 PNG、publish bundle、caption、publication-state 和 reports 已落盘。它是 runtime handoff / recovery / artifact plumbing observation。
+
+真实图片生成证明单独由 Codex executor native imagegen task 提供：live mode 不读取 `OPENAI_API_KEY`、Base URL、Codex provider token 或 `REDCUBE_IMAGE_GENERATION_TOKEN`，而是让 Codex executor 自己调用原生 imagegen / image_generation 能力并把 PNG 落到 RCA artifact path。mock artifact smoke 与 Codex-native live image sample 合起来证明“可自动推进 + 可真实生成图片 + 可导出文件链路”，但仍不声明 visual ready、exportable、handoffable 或 production soak。
 
 Runtime docs 可以被 contracts 通过稳定 `human_doc:*` semantic IDs 引用，但 Markdown path 不是机器 API。

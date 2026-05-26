@@ -87,7 +87,7 @@ test('xiaohongshu ships dedicated official prompt pack', () => {
   }
 });
 
-test('xiaohongshu author_image_pages writes mocked GPT-Image-2 full-page assets and repair preserves passing pages', async () => {
+test('xiaohongshu author_image_pages writes mocked full-page image assets and repair preserves passing pages', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-image-pages-'));
     const created = await createDeliverable({

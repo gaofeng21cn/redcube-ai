@@ -199,8 +199,8 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 
 - `TypeScript` 继续承担 product entry、CLI/MCP、contracts、domain entry package/protocol boundary、runtime-family shell、typed service boundaries 与测试主干。
 - `Python` 承担 native Office/PPT 操作、截图/导出 helper、文档/PPT 修复循环，以及可与 MAS/MAG 共享的自动化工具链；当前 repo-tracked helper catalog 是 `contracts/runtime-program/python-native-helper-catalog.json`。
-- `ppt_deck` 当前默认 visual route 是 `author_image_pages`：runtime 继续持有叙事、大纲、蓝图和视觉导演稿，页面视觉通过 Responses `image_generation` 生成完整 16:9 PNG，并继续进入 `visual_director_review`、`screenshot_review` 与 `export_pptx`。HTML `render_html/fix_html` 与 native editable PPTX `author_pptx_native/repair_pptx_native` 是生产可选、显式选择路线；native PPT 只在用户要求可编辑 / 原生 PPTX / DrawingML 时作为可编辑交付路线启用。
-- `xiaohongshu` 当前默认 visual route 也收敛到 `author_image_pages`：runtime 持有 source truth、故事线、单篇策划与视觉导演稿，GPT-Image-2 生成完整 3:4 PNG note pages，随后进入 `visual_director_review`、`screenshot_review`、必要时 `repair_image_pages`，最后由 `publish_copy` 与 `export_bundle` 产出发布文案、PNG 序列和 manifest。`render_html/fix_html` 只作为显式 HTML authoring lane，用于确定性网页稿或历史 HTML 维护。
+- `ppt_deck` 当前默认 visual route 是 `author_image_pages`：runtime 继续持有叙事、大纲、蓝图和视觉导演稿，页面视觉通过 Codex executor 原生 imagegen 任务生成完整 16:9 PNG，并继续进入 `visual_director_review`、`screenshot_review` 与 `export_pptx`。RCA 不直接读取 Base URL / API key 调 provider；HTML `render_html/fix_html` 与 native editable PPTX `author_pptx_native/repair_pptx_native` 是生产可选、显式选择路线；native PPT 只在用户要求可编辑 / 原生 PPTX / DrawingML 时作为可编辑交付路线启用。
+- `xiaohongshu` 当前默认 visual route 也收敛到 `author_image_pages`：runtime 持有 source truth、故事线、单篇策划与视觉导演稿，由 Codex executor 原生 imagegen 任务生成完整 3:4 PNG note pages，随后进入 `visual_director_review`、`screenshot_review`、必要时 `repair_image_pages`，最后由 `publish_copy` 与 `export_bundle` 产出发布文案、PNG 序列和 manifest。`render_html/fix_html` 只作为显式 HTML authoring lane，用于确定性网页稿或历史 HTML 维护。
 
 ## Service-Safe Domain Entry
 

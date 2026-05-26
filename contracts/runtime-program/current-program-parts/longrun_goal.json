@@ -37,8 +37,8 @@
     "python_owner": "native Office/PPT manipulation, screenshot/export helpers, document/PPT repair loops, and MAS/MAG shared automation ecosystem",
     "python_native_helper_catalog": "contracts/runtime-program/python-native-helper-catalog.json",
     "legacy_javascript_policy": "repo-tracked JavaScript is retired and must remain at zero files; new creative/runtime truth belongs in TypeScript or Python-owned helper surfaces",
-    "ppt_deck_direction": "use image-first full-slide PNG authoring through Responses image_generation as the default visual route; keep HTML and native editable PPTX as explicit selectable optional routes",
-    "xiaohongshu_direction": "use GPT-Image-2 full-page 3:4 PNG authoring through author_image_pages as the default visual route; keep HTML render_html/fix_html only as explicit selectable maintenance routes"
+    "ppt_deck_direction": "use image-first full-slide PNG authoring through Codex executor native imagegen as the default visual route; keep HTML and native editable PPTX as explicit selectable optional routes",
+    "xiaohongshu_direction": "use Codex executor native imagegen full-page 3:4 PNG authoring through author_image_pages as the default visual route; keep HTML render_html/fix_html only as explicit selectable maintenance routes"
   },
   "persistence_policy": {
     "authority_model": "file_authority_plus_rebuildable_artifact_indexes",

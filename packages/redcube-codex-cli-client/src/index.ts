@@ -50,6 +50,16 @@ export interface StructuredArtifactGenerationResult {
   generationRuntime: StructuredArtifactGenerationRuntime;
 }
 
+export interface CodexNativeImagegenResult {
+  imageFile: string;
+  imageBytes: Buffer;
+  dimensions: {
+    width: number;
+    height: number;
+  };
+  generationRuntime: Record<string, unknown>;
+}
+
 export interface CodexCliBatchStageOptions {
   stage_id?: string;
   family?: string;
@@ -105,6 +115,7 @@ export {
   REDCUBE_STAGE_JSON_END,
   generateStructuredArtifactBatchViaCodexCli,
   generateStructuredArtifactViaCodexCli,
+  generateImageViaCodexNativeImagegen,
   probeCodexCli,
   readCodexCliContract,
 } from './index.impl.js';

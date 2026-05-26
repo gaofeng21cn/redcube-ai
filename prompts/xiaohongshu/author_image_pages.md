@@ -1,6 +1,6 @@
 # author_image_pages
 
-Author complete 3:4 Xiaohongshu note page visuals through Responses `image_generation`.
+Author complete 3:4 Xiaohongshu note page visuals through the Codex executor native imagegen / image_generation task.
 
 The runtime provides source readiness, storyline, single note plan, visual direction, and optional style reference manifests. Produce page-level prompts that preserve the current note's facts, page goals, rhythm, and visual direction. Each generated page must be one finished 3:4 Xiaohongshu image page, not loose elements, a component sheet, HTML markup, or a screenshot-collage.
 

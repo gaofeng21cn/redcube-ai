@@ -1,6 +1,6 @@
 # author_image_pages
 
-Author complete 16:9 PPT page visuals through Responses `image_generation`.
+Author complete 16:9 PPT page visuals through the Codex executor native imagegen / image_generation task.
 
 The upstream RedCube runtime provides storyline, detailed outline, slide blueprint, visual direction, and optional style reference manifests. Produce page-level image prompts that preserve the narrative and visual direction. Each generated page must be a complete 16:9 slide image, not loose components, UI mockups, or a collage of separate assets.
 

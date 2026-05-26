@@ -9,6 +9,7 @@ import {
   readFileSync,
   statSync,
 } from 'node:fs';
+import { generateImageViaCodexNativeImagegen } from '@redcube/codex-cli-client';
 
 const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 const DEFAULT_IMAGE_SIZE = '1086x1448';
@@ -153,41 +154,20 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
     };
   }
 
-  function parseCodexConfig() {
-    const configFile = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || '', '.codex'), 'config.toml');
-    if (!existsSync(configFile)) return {};
-    const raw = readFileSync(configFile, 'utf-8');
-    const modelProvider = raw.match(/^model_provider\s*=\s*"([^"]+)"/m)?.[1] || '';
-    const providerBlock = modelProvider
-      ? raw.match(new RegExp(`\\[model_providers\\.${modelProvider.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]([\\s\\S]*?)(?:\\n\\[|$)`))?.[1] || ''
-      : '';
+  function imageGenerationConfig() {
+    if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
+      return {
+        provider: 'mock_responses_image_generation',
+        base_url_host: 'mock',
+        endpoint: '/responses',
+        model: DEFAULT_IMAGE_MODEL,
+      };
+    }
     return {
-      provider: modelProvider,
-      base_url: providerBlock.match(/base_url\s*=\s*"([^"]+)"/)?.[1] || '',
-      token: providerBlock.match(/experimental_bearer_token\s*=\s*"([^"]+)"/)?.[1] || '',
-    };
-  }
-
-  function responsesConfig() {
-    const codex = parseCodexConfig();
-    const provider = safeText(process.env.REDCUBE_IMAGE_GENERATION_PROVIDER, safeText(codex.provider, 'codex_default'));
-    const baseUrl = safeText(process.env.REDCUBE_IMAGE_GENERATION_BASE_URL, safeText(codex.base_url, 'https://api.openai.com/v1'));
-    const model = safeText(process.env.REDCUBE_IMAGE_GENERATION_MODEL, DEFAULT_IMAGE_MODEL);
-    const token = safeText(process.env.REDCUBE_IMAGE_GENERATION_TOKEN, safeText(codex.token));
-    const host = (() => {
-      try {
-        return new URL(baseUrl).host;
-      } catch {
-        return '';
-      }
-    })();
-    return {
-      provider,
-      base_url: baseUrl,
-      base_url_host: host,
-      endpoint: `${baseUrl.replace(/\/+$/, '')}/responses`,
-      model,
-      token,
+      provider: 'codex_native_imagegen',
+      base_url_host: 'codex_executor',
+      endpoint: 'codex_native_imagegen_skill',
+      model: 'codex_native_imagegen',
     };
   }
 
@@ -297,7 +277,7 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
       .find((item) => safeText(item?.type) === 'image_generation_call') || {};
   }
 
-  async function callResponsesImageGeneration({ config, prompt, toolOptions, route, slideId }) {
+  async function callImageGeneration({ config, prompt, toolOptions, route, slideId, imageFile }) {
     if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
       const mockBytes = solidPngBuffer(CANVAS.width, CANVAS.height, `${route}:${slideId}:${prompt}`);
       return {
@@ -310,31 +290,29 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
         }],
       };
     }
-    if (!safeText(config.token)) {
-      throw new Error('Responses image_generation requires Codex provider token or REDCUBE_IMAGE_GENERATION_TOKEN');
-    }
-    const response = await fetch(safeText(config.endpoint), {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${safeText(config.token)}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: safeText(config.model),
-        input: prompt,
-        tools: [toolOptions],
-        tool_choice: { type: 'image_generation' },
-      }),
+    const result = await generateImageViaCodexNativeImagegen({
+      family: 'xiaohongshu',
+      route,
+      slideId,
+      prompt,
+      outputFile: imageFile,
+      toolOptions,
     });
-    if (!response.ok) {
-      throw new Error(`Responses image_generation failed: ${response.status} ${await response.text()}`);
-    }
-    return response.json();
+    return {
+      id: safeText(result?.generationRuntime?.run_id, `codex_imagegen_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`),
+      codex_native_imagegen_runtime: result.generationRuntime,
+      output: [{
+        type: 'image_generation_call',
+        id: `codex_imagegen_${sha256(`${slideId}:${prompt}`).slice(0, 16)}`,
+        revised_prompt: prompt,
+        result: result.imageBytes.toString('base64'),
+      }],
+    };
   }
 
   return {
     DEFAULT_IMAGE_MODEL,
-    callResponsesImageGeneration,
+    callImageGeneration,
     copyStyleReferences,
     defaultPromptTemplate,
     defaultStyleProfile,
@@ -343,7 +321,7 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
     normalizeImageBase64,
     pngDimensions,
     responseImageCall,
-    responsesConfig,
+    imageGenerationConfig,
     sha256,
     stableJson,
     styleReferenceFileCount,

@@ -21,7 +21,7 @@ export function createXiaohongshuImagePageParts(deps) {
   } = deps;
   const {
     DEFAULT_IMAGE_MODEL,
-    callResponsesImageGeneration,
+    callImageGeneration,
     copyStyleReferences,
     defaultPromptTemplate,
     defaultStyleProfile,
@@ -30,7 +30,7 @@ export function createXiaohongshuImagePageParts(deps) {
     normalizeImageBase64,
     pngDimensions,
     responseImageCall,
-    responsesConfig,
+    imageGenerationConfig,
     sha256,
     stableJson,
     styleReferenceFileCount,
@@ -134,7 +134,7 @@ export function createXiaohongshuImagePageParts(deps) {
       : allSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
     const targetSet = new Set(targetSlideIds);
     const paths = imagePagePaths(deliverablePaths, deliverableId, route);
-    const config = responsesConfig();
+    const config = imageGenerationConfig();
     const toolOptions = imageGenerationToolOptions(contract);
     const styleProfile = defaultStyleProfile(contract);
     const promptTemplate = defaultPromptTemplate();
@@ -246,16 +246,17 @@ export function createXiaohongshuImagePageParts(deps) {
       const promptFile = path.join(paths.promptDir, `${slideId}.prompt.txt`);
       const promptManifestFile = path.join(paths.promptDir, `${slideId}.prompt.json`);
       const styleManifestFile = path.join(paths.styleDir, `${slideId}.style.json`);
-      const response = await callResponsesImageGeneration({
+      const response = await callImageGeneration({
         config,
         prompt,
         toolOptions,
         route,
         slideId,
+        imageFile,
       });
       const imageCall = responseImageCall(response);
       const imageBase64 = normalizeImageBase64(response);
-      if (!imageBase64) throw new Error(`Responses image_generation did not return PNG data for ${slideId}`);
+      if (!imageBase64) throw new Error(`Codex native imagegen did not return PNG data for ${slideId}`);
       const imageBytes = Buffer.from(imageBase64, 'base64');
       writeFileSync(imageFile, imageBytes);
       const imageHash = sha256(imageBytes);
@@ -283,12 +284,13 @@ export function createXiaohongshuImagePageParts(deps) {
       const metadata = {
         provider: safeText(config.provider),
         base_url_host: safeText(config.base_url_host),
-        endpoint: '/responses',
+        endpoint: safeText(config.endpoint),
         request_model: safeText(config.model),
-        default_image_model: DEFAULT_IMAGE_MODEL,
+        default_image_model: safeText(config.model, DEFAULT_IMAGE_MODEL),
         image_generation_tool_options: toolOptions,
         response_id: safeText(response?.id),
         image_call_id: safeText(imageCall?.id),
+        codex_native_imagegen_runtime: response?.codex_native_imagegen_runtime || null,
         revised_prompt: safeText(imageCall?.revised_prompt, prompt),
         prompt_hash: promptHash,
         image_sha256: imageHash,
@@ -401,10 +403,14 @@ export function createXiaohongshuImagePageParts(deps) {
       image_generation_runtime: {
         provider: safeText(config.provider),
         base_url_host: safeText(config.base_url_host),
-        endpoint: '/responses',
+        endpoint: safeText(config.endpoint),
         request_model: safeText(config.model),
         tool_options: toolOptions,
         token_persisted: false,
+        provider_token_required: false,
+        provider_token_source: process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1'
+          ? 'mock'
+          : 'codex_executor_native_tool',
       },
       image_pages_bundle: imagePagesBundle,
       image_page_manifest: manifest,

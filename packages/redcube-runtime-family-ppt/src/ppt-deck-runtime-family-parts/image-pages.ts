@@ -9,6 +9,7 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
+import { generateImageViaCodexNativeImagegen } from '@redcube/codex-cli-client';
 
 type JsonRecord = Record<string, any>;
 type ImagePageRoute = 'author_image_pages' | 'repair_image_pages';
@@ -184,41 +185,21 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     };
   }
 
-  function parseCodexConfig(): JsonRecord {
-    const configFile = path.join(process.env.CODEX_HOME || path.join(process.env.HOME || '', '.codex'), 'config.toml');
-    if (!existsSync(configFile)) return {};
-    const raw = readFileSync(configFile, 'utf-8');
-    const modelProvider = raw.match(/^model_provider\s*=\s*"([^"]+)"/m)?.[1] || '';
-    const model = raw.match(/^model\s*=\s*"([^"]+)"/m)?.[1] || '';
-    const providerBlock = modelProvider
-      ? raw.match(new RegExp(`\\[model_providers\\.${modelProvider.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\]([\\s\\S]*?)(?:\\n\\[|$)`))?.[1] || ''
-      : '';
+  function resolveImageGenerationConfig(route: ImagePageRoute): JsonRecord {
+    if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
+      return {
+        provider: 'mock_responses_image_generation',
+        base_url_host: 'mock',
+        endpoint: '/responses',
+        model: DEFAULT_IMAGE_MODEL,
+      };
+    }
     return {
-      provider: modelProvider,
-      model,
-      base_url: providerBlock.match(/base_url\s*=\s*"([^"]+)"/)?.[1] || '',
-      token: providerBlock.match(/experimental_bearer_token\s*=\s*"([^"]+)"/)?.[1] || '',
+      provider: 'codex_native_imagegen',
+      base_url_host: 'codex_executor',
+      endpoint: 'codex_native_imagegen_skill',
+      model: 'codex_native_imagegen',
     };
-  }
-
-  function resolveResponsesConfig(route: ImagePageRoute): JsonRecord {
-    const codex = parseCodexConfig();
-    const provider = safeText(process.env.REDCUBE_IMAGE_GENERATION_PROVIDER, safeText(codex.provider, 'codex_default'));
-    const baseUrl = safeText(process.env.REDCUBE_IMAGE_GENERATION_BASE_URL, safeText(codex.base_url, 'https://api.openai.com/v1'));
-    const endpoint = `${baseUrl.replace(/\/+$/, '')}/responses`;
-    const model = safeText(
-      process.env.REDCUBE_IMAGE_GENERATION_MODEL,
-      DEFAULT_IMAGE_MODEL,
-    );
-    const token = safeText(process.env.REDCUBE_IMAGE_GENERATION_TOKEN, safeText(codex.token));
-    const host = (() => {
-      try {
-        return new URL(baseUrl).host;
-      } catch {
-        return '';
-      }
-    })();
-    return { provider, base_url: baseUrl, base_url_host: host, endpoint, model, token };
   }
 
   function defaultStyleProfile(): JsonRecord {
@@ -392,18 +373,20 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
     return safeArray(response?.output).find((item) => safeText(item?.type) === 'image_generation_call') || {};
   }
 
-  async function callResponsesImageGeneration({
+  async function callImageGeneration({
     config,
     prompt,
     toolOptions,
     route,
     slideId,
+    imageFile,
   }: {
     config: JsonRecord;
     prompt: string;
     toolOptions: JsonRecord;
     route: ImagePageRoute;
     slideId: string;
+    imageFile: string;
   }): Promise<JsonRecord> {
     if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
       const mockBytes = solidPngBuffer(1536, 864, `${route}:${slideId}:${prompt}`);
@@ -417,27 +400,24 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         }],
       };
     }
-    if (!safeText(config.token)) {
-      throw new Error('Responses image_generation requires Codex provider token or REDCUBE_IMAGE_GENERATION_TOKEN');
-    }
-    const body = {
-      model: safeText(config.model),
-      input: prompt,
-      tools: [toolOptions],
-      tool_choice: { type: 'image_generation' },
-    };
-    const response = await fetch(safeText(config.endpoint), {
-      method: 'POST',
-      headers: {
-        authorization: `Bearer ${safeText(config.token)}`,
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify(body),
+    const result = await generateImageViaCodexNativeImagegen({
+      family: 'ppt_deck',
+      route,
+      slideId,
+      prompt,
+      outputFile: imageFile,
+      toolOptions,
     });
-    if (!response.ok) {
-      throw new Error(`Responses image_generation failed: ${response.status} ${await response.text()}`);
-    }
-    return response.json() as Promise<JsonRecord>;
+    return {
+      id: safeText(result?.generationRuntime?.run_id, `codex_imagegen_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`),
+      codex_native_imagegen_runtime: result.generationRuntime,
+      output: [{
+        type: 'image_generation_call',
+        id: `codex_imagegen_${sha256(`${slideId}:${prompt}`).slice(0, 16)}`,
+        revised_prompt: prompt,
+        result: result.imageBytes.toString('base64'),
+      }],
+    };
   }
 
   function repairFeedbackFromReview(reviewArtifact: JsonRecord | null): JsonRecord[] {
@@ -504,7 +484,7 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       : allSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
     const targetSet = new Set(targetSlideIds);
     const paths = imagePagePaths(deliverablePaths, deliverableId, route);
-    const config = resolveResponsesConfig(route);
+    const config = resolveImageGenerationConfig(route);
     const toolOptions = normalizeImageGenerationToolOptions(contract);
     const styleProfile = defaultStyleProfile();
     const promptTemplate = defaultPromptTemplate();
@@ -566,16 +546,17 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       const promptFile = path.join(paths.promptDir, `${slideId}.prompt.txt`);
       const promptManifestFile = path.join(paths.promptDir, `${slideId}.prompt.json`);
       const styleManifestFile = path.join(paths.styleDir, `${slideId}.style.json`);
-      const response = await callResponsesImageGeneration({
+      const response = await callImageGeneration({
         config,
         prompt,
         toolOptions,
         route,
         slideId,
+        imageFile,
       });
       const imageCall = responseImageCall(response);
       const imageBase64 = normalizeImageBase64(response);
-      if (!imageBase64) throw new Error(`Responses image_generation did not return PNG data for ${slideId}`);
+      if (!imageBase64) throw new Error(`Codex native imagegen did not return PNG data for ${slideId}`);
       const imageBytes = Buffer.from(imageBase64, 'base64');
       writeFileSync(imageFile, imageBytes);
       const imageHash = sha256(imageBytes);
@@ -614,12 +595,13 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       const metadata = {
         provider: safeText(config.provider),
         base_url_host: safeText(config.base_url_host),
-        endpoint: '/responses',
+        endpoint: safeText(config.endpoint),
         request_model: safeText(config.model),
-        default_image_model: DEFAULT_IMAGE_MODEL,
+        default_image_model: safeText(config.model, DEFAULT_IMAGE_MODEL),
         image_generation_tool_options: toolOptions,
         response_id: safeText(response?.id),
         image_call_id: safeText(imageCall?.id),
+        codex_native_imagegen_runtime: response?.codex_native_imagegen_runtime || null,
         revised_prompt: safeText(imageCall?.revised_prompt, prompt),
         prompt_hash: promptHash,
         image_sha256: imageHash,
@@ -793,10 +775,14 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
       image_generation_runtime: {
         provider: safeText(config.provider),
         base_url_host: safeText(config.base_url_host),
-        endpoint: '/responses',
+        endpoint: safeText(config.endpoint),
         request_model: safeText(config.model),
         tool_options: toolOptions,
         token_persisted: false,
+        provider_token_required: false,
+        provider_token_source: process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1'
+          ? 'mock'
+          : 'codex_executor_native_tool',
       },
       image_pages_bundle: imagePagesBundle,
       image_page_manifest: manifest,

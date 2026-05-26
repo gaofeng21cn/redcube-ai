@@ -18,9 +18,10 @@
       "export_pptx"
     ],
     "api_surface": {
-      "endpoint": "/responses",
+      "endpoint": "codex_native_imagegen_skill",
       "tool": "image_generation",
-      "default_image_model": "gpt-image-2",
+      "model_selection": "inherited_from_codex_executor_native_imagegen",
+      "explicit_provider_token_required": false,
       "token_persisted_in_artifacts": false
     },
     "style_system": {
@@ -148,8 +149,7 @@
       "max_default_slide_count": 6,
       "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
       "live_mode_requires": [
-        "REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD",
-        "or OPENAI_API_KEY"
+        "codex_executor_native_imagegen_available"
       ]
     },
     "ci_optional_lane": {

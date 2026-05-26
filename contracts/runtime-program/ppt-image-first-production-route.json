@@ -17,16 +17,15 @@
     "export_pptx"
   ],
   "api_contract": {
-    "endpoint": "/responses",
+    "endpoint": "codex_native_imagegen_skill",
     "tool": "image_generation",
-    "default_image_model": "gpt-image-2",
+    "model_selection": "inherited_from_codex_executor_native_imagegen",
+    "explicit_provider_token_required": false,
     "token_persistence_allowed": false,
     "artifact_provenance_fields": [
       "provider",
-      "base_url_host",
       "endpoint",
       "request_model",
-      "default_image_model",
       "tool_options",
       "response_id",
       "image_call_id",
@@ -245,8 +244,7 @@
     "full_colorectal_ai_long_deck_regression_allowed_by_default": false,
     "live_mode": "explicit",
     "live_mode_requires": [
-      "REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD",
-      "or OPENAI_API_KEY"
+      "codex_executor_native_imagegen_available"
     ]
   },
   "runtime_hardening": {

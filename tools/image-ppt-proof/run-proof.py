@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 import argparse
-import base64
 import hashlib
 import json
 import os
 import subprocess
 import zipfile
 import zlib
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import Request, urlopen
 from pathlib import Path
 
 
@@ -178,153 +174,117 @@ def write_style_manifest(output_root, fixture, style_reference_dir):
     return style_manifest
 
 
-def parse_codex_config():
-    config_file = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex")) / "config.toml"
-    if not config_file.exists():
-        return {}
-    raw = config_file.read_text(encoding="utf-8")
+def parse_codex_command(raw):
+    value = (raw or "").strip()
+    if value:
+        if value.startswith("["):
+            parsed = json.loads(value)
+            if not isinstance(parsed, list) or not parsed:
+                raise SystemExit("REDCUBE_CODEX_COMMAND JSON array must be non-empty")
+            return [str(item).strip() for item in parsed if str(item).strip()]
+        return [value]
+    canonical = Path.home() / "bin" / "codex-canonical"
+    if canonical.is_file() and os.access(canonical, os.X_OK):
+        return [canonical.as_posix()]
+    return ["codex"]
 
-    def match_top_level(key):
-        prefix = f"{key} = "
-        for line in raw.splitlines():
-            stripped = line.strip()
-            if stripped.startswith(prefix) and '"' in stripped:
-                return stripped.split('"', 2)[1]
-        return ""
 
-    provider = match_top_level("model_provider")
-    model = match_top_level("model")
-    provider_block = ""
-    if provider:
-        header = f"[model_providers.{provider}]"
-        in_block = False
-        lines = []
-        for line in raw.splitlines():
-            stripped = line.strip()
-            if stripped == header:
-                in_block = True
-                continue
-            if in_block and stripped.startswith("[") and stripped.endswith("]"):
-                break
-            if in_block:
-                lines.append(line)
-        provider_block = "\n".join(lines)
-
-    def match_provider(key):
-        prefix = f"{key} = "
-        for line in provider_block.splitlines():
-            stripped = line.strip()
-            if stripped.startswith(prefix) and '"' in stripped:
-                return stripped.split('"', 2)[1]
-        return ""
-
+def resolve_codex_contract():
     return {
-        "provider": provider,
-        "model": model,
-        "base_url": match_provider("base_url"),
-        "token": match_provider("experimental_bearer_token"),
+        "command": parse_codex_command(os.environ.get("REDCUBE_CODEX_COMMAND")),
+        "sandbox": os.environ.get("REDCUBE_CODEX_SANDBOX") or "workspace-write",
+        "model": os.environ.get("REDCUBE_CODEX_MODEL") or "",
+        "reasoning_effort": os.environ.get("REDCUBE_CODEX_REASONING_EFFORT") or "",
+        "model_selection": os.environ.get("REDCUBE_CODEX_MODEL") or "inherit_local_codex_default",
+        "reasoning_selection": os.environ.get("REDCUBE_CODEX_REASONING_EFFORT") or "inherit_local_codex_default",
     }
 
 
-def resolve_responses_config():
-    codex = parse_codex_config()
-    base_url = (
-        os.environ.get("REDCUBE_IMAGE_GENERATION_BASE_URL")
-        or os.environ.get("OPENAI_BASE_URL")
-        or codex.get("base_url")
-        or "https://api.openai.com/v1"
-    ).rstrip("/")
-    token = (
-        os.environ.get("REDCUBE_IMAGE_GENERATION_TOKEN")
-        or os.environ.get("OPENAI_API_KEY")
-        or codex.get("token")
-        or ""
+def build_codex_native_imagegen_prompt(output_file, prompt, slide_id):
+    return "\n".join([
+        "你是 RedCube AI 的 Codex executor，负责执行一个 RCA image-first PPT proof visual artifact task。",
+        "必须使用 Codex 原生 imagegen / image_generation 能力生成 raster PNG。不要使用脚本绘图、SVG、HTML 截图、占位图、外部 curl/fetch、显式 Base URL、显式 API key、OPENAI_API_KEY 或 REDCUBE_IMAGE_GENERATION_TOKEN。",
+        "使用内置 imagegen 默认路径生成后，把最终 PNG 复制或移动到指定 output_file。不要把 project-bound asset 只留在 $CODEX_HOME/generated_images。",
+        "如果需要读取 imagegen skill，请按本机 Codex skill 指南执行；不要切换到 CLI/API fallback。",
+        f"family: ppt_deck",
+        f"route: image_ppt_proof",
+        f"slide_id: {slide_id}",
+        f"output_file: {output_file}",
+        'image_tool_options: {"type":"image_generation","size":"1536x864","quality":"high","format":"png","background":"opaque"}',
+        "",
+        "Image prompt:",
+        prompt,
+        "",
+        "完成后只回复一行 JSON，不要附加说明：",
+        json.dumps({"ok": True, "image_file": str(output_file), "mode": "codex_native_imagegen"}, ensure_ascii=False),
+    ])
+
+
+def parse_codex_events(stdout):
+    events = []
+    for line in (stdout or "").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            events.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    return events
+
+
+def write_live_png(path, prompt, slide_id):
+    contract = resolve_codex_contract()
+    last_message_file = path.parent / f".{path.stem}.codex-imagegen-last-message.json"
+    args = [
+        "exec",
+        "--json",
+        "--ephemeral",
+        "--cd",
+        Path.cwd().as_posix(),
+        "--skip-git-repo-check",
+        "-s",
+        contract["sandbox"],
+        "-c",
+        'approval_policy="never"',
+    ]
+    if contract["reasoning_effort"]:
+        args.extend(["-c", f'model_reasoning_effort="{contract["reasoning_effort"]}"'])
+    if contract["model"]:
+        args.extend(["--model", contract["model"]])
+    args.extend(["--output-last-message", last_message_file.as_posix(), "-"])
+
+    task_prompt = build_codex_native_imagegen_prompt(path.resolve().as_posix(), prompt, slide_id)
+    result = subprocess.run(
+        [contract["command"][0], *contract["command"][1:], *args],
+        input=task_prompt,
+        text=True,
+        capture_output=True,
+        timeout=900,
+        check=False,
     )
-    request_model = (
-        os.environ.get("REDCUBE_IMAGE_PPT_PROOF_MODEL")
-        or os.environ.get("REDCUBE_IMAGE_GENERATION_MODEL")
-        or codex.get("model")
-        or "gpt-5.4"
-    )
-    provider = os.environ.get("REDCUBE_IMAGE_GENERATION_PROVIDER") or codex.get("provider") or "openai"
+    events = parse_codex_events(result.stdout)
+    run_id = next((event.get("run_id") for event in reversed(events) if event.get("run_id")), None)
+    if result.returncode != 0:
+        detail = (result.stderr or result.stdout or "Codex native imagegen task failed").strip()
+        raise SystemExit(detail)
+    if not path.exists():
+        raise SystemExit(f"Codex native imagegen task did not create output PNG: {path}")
+    dimensions = png_dimensions(path)
+    if dimensions["width"] <= 0 or dimensions["height"] <= 0:
+        raise SystemExit(f"Codex native imagegen output is not a PNG: {path}")
     return {
-        "provider": provider,
-        "base_url": base_url,
-        "base_url_host": urlparse(base_url).netloc,
-        "endpoint": f"{base_url}/responses",
-        "request_model": request_model,
-        "default_image_model": "gpt-image-2",
-        "token": token,
-    }
-
-
-def write_live_png(path, prompt):
-    command = os.environ.get("REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD")
-    if command:
-        subprocess.run(
-            command,
-            input=json.dumps({"prompt": prompt, "output_file": str(path)}, ensure_ascii=False),
-            text=True,
-            shell=True,
-            check=True,
-        )
-        return
-
-    config = resolve_responses_config()
-    if not config["token"]:
-        raise SystemExit("--live-image-generation requires a Codex provider token, REDCUBE_IMAGE_GENERATION_TOKEN, OPENAI_API_KEY, or REDCUBE_CODEX_RESPONSES_IMAGE_GENERATION_CMD")
-    request = Request(
-        config["endpoint"],
-        data=json.dumps({
-            "model": config["request_model"],
-            "input": prompt,
-            "tools": [{
-                "type": "image_generation",
-                "size": "1536x864",
-                "quality": "high",
-                "format": "png",
-                "background": "opaque",
-            }],
-            "tool_choice": {"type": "image_generation"},
-        }).encode("utf-8"),
-        headers={
-            "authorization": f"Bearer {config['token']}",
-            "content-type": "application/json",
-        },
-        method="POST",
-    )
-    try:
-        with urlopen(request, timeout=240) as response:
-            response_payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="replace")
-        raise SystemExit(f"Responses image_generation failed: {exc.code} {detail}") from exc
-    except URLError as exc:
-        raise SystemExit(f"Responses image_generation failed: {exc.reason}") from exc
-
-    image_b64 = None
-    for item in response_payload.get("output", []) or []:
-        if item.get("type") == "image_generation_call":
-            image_b64 = item.get("result")
-            break
-        for content in item.get("content", []) or []:
-            image_b64 = content.get("image_base64") or content.get("b64_json")
-            if image_b64:
-                break
-        if image_b64:
-            break
-    image_b64 = (image_b64 or "").replace("data:image/png;base64,", "")
-    if not image_b64:
-        raise SystemExit("Responses image_generation returned no image_generation_call result")
-    path.write_bytes(base64.b64decode(image_b64))
-    return {
-        "provider": config["provider"],
-        "base_url_host": config["base_url_host"],
-        "endpoint": "/responses",
-        "request_model": config["request_model"],
-        "default_image_model": config["default_image_model"],
-        "response_id": response_payload.get("id"),
-        "image_call_id": next((item.get("id") for item in response_payload.get("output", []) or [] if item.get("type") == "image_generation_call"), None),
+        "provider": "codex_native_imagegen",
+        "base_url_host": "codex_executor",
+        "endpoint": "codex_native_imagegen_skill",
+        "request_model": contract["model_selection"],
+        "default_image_model": "codex_native_imagegen",
+        "response_id": run_id,
+        "image_call_id": None,
+        "task_surface": "codex_native_imagegen_skill",
+        "provider_token_required": False,
+        "provider_token_source": "codex_executor_native_tool",
+        "token_persisted": False,
     }
 
 
@@ -340,9 +300,9 @@ def write_images(output_root, mode, fixture, prompts):
             api_mode = "none"
             provenance = {}
         else:
-            provenance = write_live_png(png_file, item["prompt"])
-            provider = provenance.get("provider") or "codex_config_or_openai_responses"
-            api_mode = "responses.image_generation"
+            provenance = write_live_png(png_file, item["prompt"], item["slide_id"])
+            provider = provenance.get("provider") or "codex_native_imagegen"
+            api_mode = "codex_native_imagegen_skill"
         images.append({
             "image_id": item["prompt_id"],
             "slide_id": item["slide_id"],
