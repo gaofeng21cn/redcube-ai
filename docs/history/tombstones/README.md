@@ -25,5 +25,12 @@ Machine boundary: 人读 tombstone 索引。机器真相继续归 contracts、sc
 
 当前 tombstone：
 
-- `retired-route-narratives-2026-05-11.md`: gateway-first, frontdoor-first, federation-first, harness-first, OPL-first, OPL bridge, Hermes-first, and open-ended Phase 2 public-direction wording.
-- `retired-managed-product-entry-contract-2026-05-20.md`: legacy managed product-entry contract naming; active contract is product-entry session continuity.
+- `retired-route-narratives-2026-05-11.md`：gateway-first、frontdoor-first、federation-first、harness-first、OPL-first、OPL bridge、Hermes-first 与 open-ended Phase 2 public-direction wording。
+- `retired-managed-product-entry-contract-2026-05-20.md`：legacy managed product-entry contract naming；active contract 是 product-entry session continuity。
+
+No-resurrection boundary:
+
+- tombstone 只保留可检索性和迁移解释，不允许旧词恢复为 active caller、public action key、default runtime owner、generated/default caller、domain_action_adapter template、compatibility alias、facade、wrapper 或 compatibility-only test。
+- `gateway` / `harness` 在当前代码或文档里只能是内部边界层、包名、历史执行层或 tombstone 词；公开身份与用户入口使用 RedCube AI visual-deliverable domain agent / product-domain action 体系。
+- `managed` 在当前 RCA 中只允许作为 session-continuity provenance、semantic id、tombstone、refs-only adapter 或历史 owner-boundary wording；不得恢复为 repo-local generic runtime shell。
+- `Hermes` / `Hermes-Agent` 只允许作为上游外部 runtime 项目、显式 hosted/proof backend、非默认 executor adapter、diagnostic 或历史 proof lane；不得写成默认 runtime owner 或 OPL production substrate。

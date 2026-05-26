@@ -86,6 +86,50 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-26 history plans/runtime/tombstone no-resurrection tranche
+
+本轮覆盖 RCA `docs/history/plans/`、`docs/history/positioning/`、`docs/history/runtime/` 与 `docs/history/tombstones/` 的 history/provenance 入口读法。目标是把剩余非 Hermes、非 Phase 2 的历史计划、历史定位、历史 managed-runtime owner-boundary 和 tombstone 继续锁在 provenance / no-resurrection 语境，避免旧 `managed`、`gateway`、`frontdoor`、`federation`、`upstream Hermes`、`current/next/backlog` 或 `domain_action_adapter` wording 回流成当前 runtime owner、active backlog、generated/default caller、visual readiness、artifact authority 或 production readiness。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/history/README.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, and this governance ledger.
+- Reviewed history docs: `docs/history/plans/README.md`, all 8 `docs/history/plans/*.md` bodies by lifecycle header / heading / stale-term risk map, `docs/history/positioning/README.md`, `docs/history/positioning/domain-harness-os-positioning.md`, `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`, `docs/history/tombstones/README.md`, and both `docs/history/tombstones/*.md` bodies.
+- Machine refs: `contracts/runtime-program/current-program.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/functional_privatization_audit.json`, and `contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/retired_no_resurrection_guards.json`.
+- Doctor evidence: OPL Doc Governance doctor preflight reported `finding_count=0`, active truth `pass`; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- `docs/history/plans/README.md` was the main lifecycle gap: it listed historical files but did not give the same per-file current-read table used by newer Hermes / Phase 2 indexes. It now maps every historical plan to its current read and states that `当前状态`、`下一步`、`Backlog`、`planned`、`done` and `deferred` headings are date-bound historical wording.
+- `docs/history/positioning/README.md` now states the current read for `Domain Harness OS` / `Domain Gateway` positioning: RCA public identity remains the visual-deliverable domain agent, and OPL-hosted path consumes descriptor/domain-action/receipt/operator/source/artifact refs without owning visual truth, review/export verdict, artifact body, memory body or owner receipt body.
+- `docs/history/runtime/opl-managed-runtime-three-layer-contract.md` now has a first-screen current-read guard: `managed runtime / session / run / watch / resume owner` is historical owner-boundary wording; current truth is OPL provider-backed stage runtime / attempt ledger / queue / wakeup / projection, with Temporal as required production online substrate and Codex CLI as first-class executor.
+- `docs/history/tombstones/README.md` now carries an explicit no-resurrection boundary for `gateway` / `harness`, `managed`, and `Hermes` / `Hermes-Agent`, matching runtime-program retired no-resurrection guards.
+- No history body in this tranche was promoted to current support. If a historical body still contains a rule that should remain current, it must be extracted to core docs, source/delivery/runtime/policy owner docs, active gap plan, machine-readable contracts or source/test surface before use.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of `docs/history/plans/README.md`, `docs/history/positioning/README.md`, `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`, `docs/history/tombstones/README.md` and tombstone bodies; lifecycle-header / heading / stale-term risk-map pass across all `docs/history/plans/*.md` bodies and `docs/history/positioning/domain-harness-os-positioning.md`; live contract refs listed above. | `docs/history/plans/README.md`; `docs/history/positioning/README.md`; `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`; `docs/history/tombstones/README.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The governed docs remain history/provenance/tombstone surfaces; the correction was missing directory/current-read and no-resurrection guidance, not a doc-path retirement.
+
+Unreviewed docs:
+
+- RCA `docs/history/plans/`, `docs/history/positioning/`, `docs/history/runtime/` and `docs/history/tombstones/` are now covered at index/no-resurrection level. Large historical plan bodies remain provenance bodies; they were risk-mapped for lifecycle header, headings and stale terms, but not rewritten paragraph by paragraph in this tranche.
+- RCA uncovered reference bodies remain open, especially `docs/references/README.md`, `docs/references/domain_memory_descriptor_locator.md`, `docs/references/governance/series-doc-governance-checklist.md`, `docs/references/product-entry/*.md`, and `docs/references/rca_executor_routing_config.md`.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger; OMA README/docs coverage remains covered by the earlier OMA tranche.
+
+Remaining stale / retire candidates:
+
+- Future RCA prose that treats historical plans, historical positioning, managed runtime three-layer wording, tombstone ids, old `gateway` / `harness` / `frontdoor` / `federation` / `managed` / `Hermes` / `domain_action_adapter` wording or historical checklist headings as current default runtime owner, active backlog, generated/default caller, public identity, visual ready, exportable, handoffable, domain ready, production ready or production visual-stage long-soak evidence is stale pollution.
+- Any current rule still embedded only in a historical plan body should be extracted to the correct owner doc or machine surface before being relied on.
+
+Next tranche write scope:
+
+- RCA uncovered reference bodies with old managed/gateway/runtime/session/domain_action_adapter vocabulary, after confirming current role and no-resurrection boundaries from live contracts/tests.
+- Or MAS product/status/workbench and progress/domain-ref projection shell reconciliation outside already-covered blocks.
+- Keep App docs delayed until active release/GUI lanes are safe to govern.
+
 ### 2026-05-26 Phase 2 history/provenance index tranche
 
 本轮覆盖 RCA `docs/history/phase-2/` history/provenance 文档，重点核对 absorbed Phase 2 tranche、continuation board、proof lane、manual-test brief、HTML/native route closeout 与当前 RCA owner boundary 的读法。目标是把 Phase 2 历史材料继续锁在 provenance / proof 语境，并明确唯一当前真相回到核心五件套、active gap plan、runtime/delivery/source/policy owner docs 和 machine-readable contracts。
