@@ -1,6 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
 import {
   buildDeliverableRecord,
@@ -10,6 +11,14 @@ import {
   pptDeckOverlay,
   xiaohongshuOverlay,
 } from './package-surfaces.ts';
+
+function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function readText(file) {
+  return readFileSync(file, 'utf-8');
+}
 
 test('buildDeliverableRecord emits canonical visual-deliverable metadata', () => {
   const deliverable = buildDeliverableRecord({
@@ -348,4 +357,37 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       },
     },
   );
+});
+
+test('registry package manifests stay aligned with literal loader dependencies', () => {
+  const overlayPackage = readJson('packages/redcube-overlay-registry/package.json');
+  const overlaySource = readText('packages/redcube-overlay-registry/src/index.ts');
+  const runtimePackage = readJson('packages/redcube-runtime-family-registry/package.json');
+  const runtimeSource = readText('packages/redcube-runtime-family-registry/src/index.ts');
+
+  for (const { module } of overlayPackage.redcube.defaultOverlayModules) {
+    assert.equal(
+      overlayPackage.dependencies[module],
+      '0.1.0',
+      `${module} must be a direct overlay-registry dependency`,
+    );
+    assert.match(
+      overlaySource,
+      new RegExp(`['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]:\\s*async`),
+      `${module} must have a literal overlay loader`,
+    );
+  }
+
+  for (const { module } of runtimePackage.redcube.defaultRuntimeFamilyModules) {
+    assert.equal(
+      runtimePackage.dependencies[module],
+      '0.1.0',
+      `${module} must be a direct runtime-family-registry dependency`,
+    );
+    assert.match(
+      runtimeSource,
+      new RegExp(`['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]:\\s*async`),
+      `${module} must have a literal runtime-family loader`,
+    );
+  }
 });
