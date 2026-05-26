@@ -108,6 +108,50 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
         no_regression_refs: 'no_regression_evidence_refs',
       },
     );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.surface_kind,
+      'rca_owner_payload_item_summary',
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.work_items.map(
+        (item) => item.item_id,
+      ),
+      [
+        'owner_chain_apply',
+        'memory_lifecycle_receipt_scaleout',
+        'temporal_controlled_visual_stage_long_soak',
+        'cross_family_repeated_no_regression',
+      ],
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.work_items[0].current_payload_template,
+      {
+        domain_owner_receipt_refs: [],
+        no_regression_evidence_refs: [],
+        owner_chain_refs: [],
+        typed_blocker_refs: [],
+      },
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.accepted_payload_paths_ref,
+      '/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.work_items[1].typed_blocker_path_payload,
+      {
+        typed_blocker_refs: ['rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'],
+      },
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.work_items.every(
+        (item) => item.payload_body_allowed === false
+          && item.operator_payload_submitted === false
+          && item.success_refs_visible_is_completion === false
+          && item.domain_readiness_claimed === false
+          && item.authority_boundary.can_write_domain_truth === false,
+      ),
+      true,
+    );
     assert.deepEqual(
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.domain_receipt_refs,
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.domain_owner_receipt_refs,
@@ -176,6 +220,46 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs,
       false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.surface_kind,
+      'rca_stage_expected_receipt_payload_summary',
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stages.map(
+        (stage) => stage.stage_id,
+      ),
+      [
+        'source_intake',
+        'communication_strategy',
+        'visual_direction',
+        'artifact_creation',
+        'review_and_revision',
+        'package_and_handoff',
+      ],
+    );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stages[0].current_payload_template,
+      {
+        domain_receipt_refs: [],
+        monitor_freshness_refs: [],
+        runtime_event_refs: [],
+        typed_blocker_refs: [],
+      },
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.accepted_payload_paths_ref,
+      '/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stages.every(
+        (stage) => stage.payload_body_allowed === false
+          && stage.operator_payload_submitted === false
+          && stage.success_refs_visible_is_completion === false
+          && stage.domain_readiness_claimed === false
+          && stage.authority_boundary.can_create_owner_receipt === false,
+      ),
+      true,
     );
     assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
@@ -364,6 +448,29 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.typed_blocker_refs,
       manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocker_refs,
+    );
+    const memoryPayloadItem =
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs
+        .owner_payload_item_summary.work_items.find(
+          (item) => item.item_id === 'memory_lifecycle_receipt_scaleout',
+        );
+    assert.equal(
+      memoryPayloadItem.success_refs_path_payload.owner_chain_refs.some(
+        (ref) => ref.startsWith('rca-memory-receipt:visual-pattern:'),
+      ),
+      true,
+    );
+    assert.equal(memoryPayloadItem.success_refs_visible_is_completion, false);
+    const visualDirectionStage =
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff
+        .stage_expected_receipt_payload_summary.stages.find((stage) => stage.stage_id === 'visual_direction');
+    assert.deepEqual(
+      visualDirectionStage.success_refs_path_payload.runtime_event_refs,
+      ['runtime_event:rca.visual_direction.expected_receipt_or_monitor_freshness'],
+    );
+    assert.deepEqual(
+      visualDirectionStage.typed_blocker_path_payload.typed_blocker_refs,
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.typed_blocker_refs,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.accepted_payload_paths.success_refs_path.closes_domain_ready,

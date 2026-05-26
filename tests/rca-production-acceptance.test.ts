@@ -217,6 +217,58 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     domain_receipt_refs: 'domain_owner_receipt_refs',
     no_regression_refs: 'no_regression_evidence_refs',
   });
+  assert.equal(scaleout.owner_payload_item_summary.surface_kind, 'rca_owner_payload_item_summary');
+  assert.equal(scaleout.owner_payload_item_summary.payload_kind, 'domain_owner_receipt_or_typed_blocker_refs');
+  assert.equal(scaleout.owner_payload_item_summary.payload_body_allowed, false);
+  assert.equal(scaleout.owner_payload_item_summary.empty_payload_template_is_success_evidence, false);
+  assert.deepEqual(scaleout.owner_payload_item_summary.required_operator_payload_refs, [
+    'domain_owner_receipt_refs',
+    'no_regression_evidence_refs',
+    'owner_chain_refs',
+    'typed_blocker_refs',
+  ]);
+  assert.equal(
+    scaleout.owner_payload_item_summary.accepted_payload_paths_ref,
+    'redcube product manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
+  );
+  assert.deepEqual(
+    scaleout.owner_payload_item_summary.work_items.map((item) => item.item_id),
+    [
+      'owner_chain_apply',
+      'memory_lifecycle_receipt_scaleout',
+      'temporal_controlled_visual_stage_long_soak',
+      'cross_family_repeated_no_regression',
+    ],
+  );
+  assert.deepEqual(
+    scaleout.owner_payload_item_summary.work_items[0].current_payload_template,
+    {
+      domain_owner_receipt_refs: [],
+      no_regression_evidence_refs: [],
+      owner_chain_refs: [],
+      typed_blocker_refs: [],
+    },
+  );
+  assert.deepEqual(
+    scaleout.owner_payload_item_summary.work_items[1].typed_blocker_path_payload,
+    {
+      typed_blocker_refs: ['rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'],
+    },
+  );
+  assert.equal(
+    scaleout.owner_payload_item_summary.work_items.every((item) => (
+      item.operator_payload_submitted === false
+      && item.recommended_current_payload_path === 'typed_blocker_path'
+      && item.success_refs_visible_is_completion === false
+      && item.payload_body_allowed === false
+      && item.domain_readiness_claimed === false
+      && item.production_soak_complete_claimed === false
+    )),
+    true,
+  );
+  assert.equal(scaleout.owner_payload_item_summary.authority_boundary.can_write_domain_truth, false);
+  assert.equal(scaleout.owner_payload_item_summary.authority_boundary.can_create_owner_receipt, false);
+  assert.equal(scaleout.owner_payload_item_summary.authority_boundary.refs_only, true);
 
   assert.equal(
     scaleout.workspace_receipt_scaleout_refs.status,
@@ -355,6 +407,41 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.equal(handoff.production_tail_typed_blocker_refs.blocker_owner, 'redcube_ai');
   assert.equal(handoff.production_tail_typed_blocker_refs.payload_body_included, false);
   assert.equal(handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs, false);
+
+  assert.equal(handoff.stage_expected_receipt_payload_summary.surface_kind, 'rca_stage_expected_receipt_payload_summary');
+  assert.equal(handoff.stage_expected_receipt_payload_summary.payload_kind, 'stage_expected_receipt_or_monitor_freshness_refs');
+  assert.equal(handoff.stage_expected_receipt_payload_summary.payload_body_allowed, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.empty_payload_template_is_success_evidence, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.stage_count, 6);
+  assert.equal(
+    handoff.stage_expected_receipt_payload_summary.accepted_payload_paths_ref,
+    'redcube product manifest#/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
+  );
+  assert.deepEqual(handoff.stage_expected_receipt_payload_summary.stage_ids, [
+    'source_intake',
+    'communication_strategy',
+    'visual_direction',
+    'artifact_creation',
+    'review_and_revision',
+    'package_and_handoff',
+  ]);
+  assert.deepEqual(handoff.stage_expected_receipt_payload_summary.stage_payload_template, {
+    domain_receipt_refs: [],
+    monitor_freshness_refs: [],
+    runtime_event_refs: [],
+    typed_blocker_refs: [],
+  });
+  assert.equal(
+    handoff.stage_expected_receipt_payload_summary.success_ref_models.runtime_event_ref_model,
+    'runtime_event:rca.<stage-id>.expected_receipt_or_monitor_freshness',
+  );
+  assert.equal(handoff.stage_expected_receipt_payload_summary.operator_payload_submitted, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.success_refs_visible_is_completion, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.domain_readiness_claimed, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.production_soak_complete_claimed, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.can_write_domain_truth, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.can_create_owner_receipt, false);
+  assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.refs_only, true);
 
   assert.equal(handoff.opl_payload_policy.payload_kind, 'stage_production_evidence_receipt_record_body_free_refs');
   assert.equal(handoff.opl_payload_policy.payload_body_required, false);

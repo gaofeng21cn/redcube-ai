@@ -1,5 +1,10 @@
 // @ts-nocheck
 
+import {
+  buildOwnerPayloadItemSummaries,
+  buildStageExpectedReceiptPayloadSummary,
+} from './operator-evidence-payload-summaries.js';
+
 const RCA_EFFICIENCY_WORK_ORDER_ID = 'oma_developer_patch_work_order_5a1b68cacbd4';
 
 const RCA_EFFICIENCY_TARGET_VERIFICATION_REFS = Object.freeze([
@@ -210,6 +215,12 @@ export function buildProductionEvidenceScaleoutRefs({
       domain_receipt_refs: 'domain_owner_receipt_refs',
       no_regression_refs: 'no_regression_evidence_refs',
     },
+    owner_payload_item_summary: buildOwnerPayloadItemSummaries({
+      domainOwnerReceiptRefs,
+      noRegressionEvidenceRefs,
+      ownerChainRefs,
+      typedBlockerRefs: [...RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS],
+    }),
     workspace_receipt_scaleout_refs: {
       status: workspaceReceiptInventoryProjection?.scaleout_projection?.status || 'workspace_receipt_scaleout_ref_model_pending',
       workspace_receipt_inventory_ref: '/workspace_receipt_inventory_projection',
@@ -582,6 +593,10 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       blocks_stage_expected_receipt_or_monitor_refs: false,
       production_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
     },
+    stage_expected_receipt_payload_summary: buildStageExpectedReceiptPayloadSummary({
+      productionEvidenceScaleoutRefs,
+      workspaceReceiptInventoryProjection,
+    }),
     opl_payload_policy: {
       payload_kind: 'stage_production_evidence_receipt_record_body_free_refs',
       payload_body_required: false,

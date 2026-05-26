@@ -196,6 +196,201 @@
       "domain_receipt_refs": "domain_owner_receipt_refs",
       "no_regression_refs": "no_regression_evidence_refs"
     },
+    "owner_payload_item_summary": {
+      "surface_kind": "rca_owner_payload_item_summary",
+      "owner": "redcube_ai",
+      "consumer": "one_person_lab",
+      "status": "per_work_item_owner_payload_refs_ready",
+      "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
+      "payload_path_policy": "operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks",
+      "payload_body_allowed": false,
+      "empty_payload_template_is_success_evidence": false,
+      "required_operator_payload_refs": [
+        "domain_owner_receipt_refs",
+        "no_regression_evidence_refs",
+        "owner_chain_refs",
+        "typed_blocker_refs"
+      ],
+      "required_return_shapes": [
+        "domain_owner_receipt_ref",
+        "no_regression_evidence_ref",
+        "owner_chain_ref",
+        "typed_blocker_ref"
+      ],
+      "accepted_payload_paths_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths",
+      "work_items": [
+        {
+          "item_id": "owner_chain_apply",
+          "sequence": 1,
+          "remaining_gap_id": "owner_chain_apply_to_real_opl_attempt",
+          "workorder_item_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/0",
+          "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
+          "current_payload_template": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [],
+            "typed_blocker_refs": []
+          },
+          "success_refs_path_payload": {
+            "domain_owner_receipt_refs": [
+              "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+              "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
+            ],
+            "no_regression_evidence_refs": [
+              "rca-no-regression:visual-stage:transition-hosted-no-regression",
+              "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+            ],
+            "owner_chain_refs": [
+              "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+              "contracts/owner_receipt_contract.json#/receipt_cases/0",
+              "contracts/artifact_locator_contract.json",
+              "redcube product manifest#/workspace_receipt_inventory_projection"
+            ]
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
+            ]
+          },
+          "operator_payload_submitted": false,
+          "recommended_current_payload_path": "typed_blocker_path",
+          "success_refs_visible_is_completion": false,
+          "success_claimed": false,
+          "payload_body_allowed": false,
+          "owner_chain_closed": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false
+        },
+        {
+          "item_id": "memory_lifecycle_receipt_scaleout",
+          "sequence": 2,
+          "remaining_gap_id": "real_memory_lifecycle_receipt_instances",
+          "workorder_item_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1",
+          "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
+          "current_payload_template": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [],
+            "typed_blocker_refs": []
+          },
+          "success_refs_path_payload": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [
+              "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+              "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+              "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+              "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+              "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+            ]
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending"
+            ]
+          },
+          "operator_payload_submitted": false,
+          "recommended_current_payload_path": "typed_blocker_path",
+          "success_refs_visible_is_completion": false,
+          "success_claimed": false,
+          "payload_body_allowed": false,
+          "owner_chain_closed": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false
+        },
+        {
+          "item_id": "temporal_controlled_visual_stage_long_soak",
+          "sequence": 3,
+          "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak",
+          "workorder_item_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2",
+          "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
+          "current_payload_template": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [],
+            "typed_blocker_refs": []
+          },
+          "success_refs_path_payload": {
+            "domain_owner_receipt_refs": [
+              "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt"
+            ],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [
+              "workspace-runtime-ref:review-export:transition-run"
+            ]
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
+            ]
+          },
+          "operator_payload_submitted": false,
+          "recommended_current_payload_path": "typed_blocker_path",
+          "success_refs_visible_is_completion": false,
+          "success_claimed": false,
+          "payload_body_allowed": false,
+          "owner_chain_closed": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false
+        },
+        {
+          "item_id": "cross_family_repeated_no_regression",
+          "sequence": 4,
+          "remaining_gap_id": "cross_family_repeated_no_regression_evidence",
+          "workorder_item_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3",
+          "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
+          "current_payload_template": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [],
+            "owner_chain_refs": [],
+            "typed_blocker_refs": []
+          },
+          "success_refs_path_payload": {
+            "domain_owner_receipt_refs": [],
+            "no_regression_evidence_refs": [
+              "rca-no-regression:visual-stage:transition-hosted-no-regression",
+              "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+            ],
+            "owner_chain_refs": [
+              "redcube product manifest#/workspace_receipt_inventory_projection"
+            ]
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+            ]
+          },
+          "operator_payload_submitted": false,
+          "recommended_current_payload_path": "typed_blocker_path",
+          "success_refs_visible_is_completion": false,
+          "success_claimed": false,
+          "payload_body_allowed": false,
+          "owner_chain_closed": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false
+        }
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_owner_receipt": false,
+        "can_create_owner_receipt": false,
+        "can_generate_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "refs_only": true
+      }
+    },
     "workspace_receipt_scaleout_refs": {
       "status": "scaleout_ref_model_landed_more_workspaces_pending",
       "workspace_receipt_inventory_ref": "redcube product manifest#/workspace_receipt_inventory_projection",
@@ -362,6 +557,73 @@
       "payload_body_included": false,
       "blocks_stage_expected_receipt_or_monitor_refs": false,
       "production_tail_workorder_ref": "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder"
+    },
+    "stage_expected_receipt_payload_summary": {
+      "surface_kind": "rca_stage_expected_receipt_payload_summary",
+      "owner": "redcube_ai",
+      "consumer": "one_person_lab",
+      "status": "per_stage_expected_receipt_payload_refs_ready",
+      "payload_kind": "stage_expected_receipt_or_monitor_freshness_refs",
+      "payload_path_policy": "operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks",
+      "payload_body_allowed": false,
+      "empty_payload_template_is_success_evidence": false,
+      "required_operator_payload_refs": [
+        "domain_receipt_refs",
+        "monitor_freshness_refs",
+        "runtime_event_refs",
+        "typed_blocker_refs"
+      ],
+      "required_return_shapes": [
+        "domain_receipt_ref",
+        "monitor_freshness_ref",
+        "runtime_event_ref",
+        "typed_blocker_ref"
+      ],
+      "accepted_payload_paths_ref": "redcube product manifest#/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths",
+      "stage_count": 6,
+      "stage_ids": [
+        "source_intake",
+        "communication_strategy",
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "stage_payload_template": {
+        "domain_receipt_refs": [],
+        "monitor_freshness_refs": [],
+        "runtime_event_refs": [],
+        "typed_blocker_refs": []
+      },
+      "typed_blocker_path_payload": {
+        "typed_blocker_refs": [
+          "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+          "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+          "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+        ]
+      },
+      "success_ref_models": {
+        "monitor_freshness_ref_model": "redcube product manifest#/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>",
+        "runtime_event_ref_model": "runtime_event:rca.<stage-id>.expected_receipt_or_monitor_freshness"
+      },
+      "operator_payload_submitted": false,
+      "recommended_current_payload_path": "typed_blocker_path",
+      "success_refs_visible_is_completion": false,
+      "success_claimed": false,
+      "owner_chain_closed": false,
+      "domain_readiness_claimed": false,
+      "production_readiness_claimed": false,
+      "visual_readiness_claimed": false,
+      "export_readiness_claimed": false,
+      "production_soak_complete_claimed": false,
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_owner_receipt": false,
+        "can_create_owner_receipt": false,
+        "can_generate_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "refs_only": true
+      }
     },
     "opl_payload_policy": {
       "payload_kind": "stage_production_evidence_receipt_record_body_free_refs",

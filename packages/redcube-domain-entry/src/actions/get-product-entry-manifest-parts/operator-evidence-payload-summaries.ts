@@ -1,0 +1,244 @@
+// @ts-nocheck
+
+const RCA_OWNER_PAYLOAD_PATH_POLICY =
+  'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks';
+
+const RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES = Object.freeze([
+  'domain_owner_receipt_ref',
+  'no_regression_evidence_ref',
+  'owner_chain_ref',
+  'typed_blocker_ref',
+]);
+
+const RCA_OWNER_PAYLOAD_ITEM_DEFINITIONS = Object.freeze([
+  Object.freeze({
+    item_id: 'owner_chain_apply',
+    sequence: 1,
+    remaining_gap_id: 'owner_chain_apply_to_real_opl_attempt',
+    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/0',
+    typed_blocker_ref_index: 0,
+  }),
+  Object.freeze({
+    item_id: 'memory_lifecycle_receipt_scaleout',
+    sequence: 2,
+    remaining_gap_id: 'real_memory_lifecycle_receipt_instances',
+    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1',
+    typed_blocker_ref_index: 1,
+  }),
+  Object.freeze({
+    item_id: 'temporal_controlled_visual_stage_long_soak',
+    sequence: 3,
+    remaining_gap_id: 'opl_hosted_controlled_visual_stage_long_soak',
+    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
+    typed_blocker_ref_index: 0,
+  }),
+  Object.freeze({
+    item_id: 'cross_family_repeated_no_regression',
+    sequence: 4,
+    remaining_gap_id: 'cross_family_repeated_no_regression_evidence',
+    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3',
+    typed_blocker_ref_index: 2,
+  }),
+]);
+
+const RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS = Object.freeze([
+  'source_intake',
+  'communication_strategy',
+  'visual_direction',
+  'artifact_creation',
+  'review_and_revision',
+  'package_and_handoff',
+]);
+
+function uniqueRefs(values) {
+  return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0))];
+}
+
+function ownerPayloadClaimBoundary() {
+  return {
+    success_claimed: false,
+    payload_body_allowed: false,
+    closes_owner_chain: false,
+    closes_production_ready: false,
+    visual_readiness_claimed: false,
+    export_readiness_claimed: false,
+    domain_readiness_claimed: false,
+    production_soak_complete_claimed: false,
+  };
+}
+
+function ownerPayloadAuthorityBoundary() {
+  return {
+    can_write_domain_truth: false,
+    can_write_owner_receipt: false,
+    can_create_owner_receipt: false,
+    can_generate_typed_blocker: false,
+    can_authorize_quality_or_export: false,
+    refs_only: true,
+  };
+}
+
+function ownerPayloadTemplate(keys) {
+  return Object.fromEntries(keys.map((key) => [key, []]));
+}
+
+function refsByPrefix(refs, prefixes) {
+  return uniqueRefs(refs.filter((ref) => prefixes.some((prefix) => ref.startsWith(prefix))));
+}
+
+function successRefsForOwnerPayloadItem({
+  itemId,
+  domainOwnerReceiptRefs,
+  noRegressionEvidenceRefs,
+  ownerChainRefs,
+}) {
+  if (itemId === 'owner_chain_apply') {
+    return {
+      domain_owner_receipt_refs: domainOwnerReceiptRefs,
+      no_regression_evidence_refs: noRegressionEvidenceRefs,
+      owner_chain_refs: ownerChainRefs,
+    };
+  }
+  if (itemId === 'memory_lifecycle_receipt_scaleout') {
+    return {
+      domain_owner_receipt_refs: [],
+      no_regression_evidence_refs: [],
+      owner_chain_refs: refsByPrefix(ownerChainRefs, [
+        'rca-memory-receipt:',
+        'rca-lifecycle-receipt:',
+      ]),
+    };
+  }
+  if (itemId === 'temporal_controlled_visual_stage_long_soak') {
+    return {
+      domain_owner_receipt_refs: domainOwnerReceiptRefs,
+      no_regression_evidence_refs: [],
+      owner_chain_refs: refsByPrefix(ownerChainRefs, [
+        'workspace-runtime-ref:review-export:',
+        'workspace-runtime-ref:temporal-stage-attempt:',
+        'workspace-runtime-ref:retry-dead-letter:',
+        'workspace-runtime-ref:requery-resume:',
+      ]),
+    };
+  }
+  if (itemId === 'cross_family_repeated_no_regression') {
+    return {
+      domain_owner_receipt_refs: [],
+      no_regression_evidence_refs: noRegressionEvidenceRefs,
+      owner_chain_refs: ownerChainRefs.filter((ref) => ref.includes('workspace_receipt_inventory_projection')),
+    };
+  }
+  return {
+    domain_owner_receipt_refs: [],
+    no_regression_evidence_refs: [],
+    owner_chain_refs: [],
+  };
+}
+
+export function buildOwnerPayloadItemSummaries({
+  domainOwnerReceiptRefs,
+  noRegressionEvidenceRefs,
+  ownerChainRefs,
+  typedBlockerRefs,
+}) {
+  const requiredOperatorPayloadRefs = [
+    'domain_owner_receipt_refs',
+    'no_regression_evidence_refs',
+    'owner_chain_refs',
+    'typed_blocker_refs',
+  ];
+  return {
+    surface_kind: 'rca_owner_payload_item_summary',
+    owner: 'redcube_ai',
+    consumer: 'one_person_lab',
+    status: 'per_work_item_owner_payload_refs_ready',
+    payload_kind: 'domain_owner_receipt_or_typed_blocker_refs',
+    payload_path_policy: RCA_OWNER_PAYLOAD_PATH_POLICY,
+    payload_body_allowed: false,
+    empty_payload_template_is_success_evidence: false,
+    required_operator_payload_refs: requiredOperatorPayloadRefs,
+    required_return_shapes: [...RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES],
+    accepted_payload_paths_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
+    work_items: RCA_OWNER_PAYLOAD_ITEM_DEFINITIONS.map((item) => {
+      const successRefs = successRefsForOwnerPayloadItem({
+        itemId: item.item_id,
+        domainOwnerReceiptRefs,
+        noRegressionEvidenceRefs,
+        ownerChainRefs,
+      });
+      return {
+        item_id: item.item_id,
+        sequence: item.sequence,
+        remaining_gap_id: item.remaining_gap_id,
+        workorder_item_ref: item.workorder_item_ref,
+        payload_kind: 'domain_owner_receipt_or_typed_blocker_refs',
+        current_payload_template: ownerPayloadTemplate(requiredOperatorPayloadRefs),
+        success_refs_path_payload: successRefs,
+        typed_blocker_path_payload: {
+          typed_blocker_refs: [typedBlockerRefs[item.typed_blocker_ref_index]].filter(Boolean),
+        },
+        operator_payload_submitted: false,
+        recommended_current_payload_path: 'typed_blocker_path',
+        success_refs_visible_is_completion: false,
+        ...ownerPayloadClaimBoundary(),
+        authority_boundary: ownerPayloadAuthorityBoundary(),
+      };
+    }),
+  };
+}
+
+export function buildStageExpectedReceiptPayloadSummary({
+  productionEvidenceScaleoutRefs,
+  workspaceReceiptInventoryProjection,
+}) {
+  const requiredOperatorPayloadRefs = [
+    'domain_receipt_refs',
+    'monitor_freshness_refs',
+    'runtime_event_refs',
+    'typed_blocker_refs',
+  ];
+  const typedBlockerRefs = productionEvidenceScaleoutRefs.typed_blocker_refs || [];
+  return {
+    surface_kind: 'rca_stage_expected_receipt_payload_summary',
+    owner: 'redcube_ai',
+    consumer: 'one_person_lab',
+    status: 'per_stage_expected_receipt_payload_refs_ready',
+    payload_kind: 'stage_expected_receipt_or_monitor_freshness_refs',
+    payload_path_policy: RCA_OWNER_PAYLOAD_PATH_POLICY,
+    payload_body_allowed: false,
+    empty_payload_template_is_success_evidence: false,
+    required_operator_payload_refs: requiredOperatorPayloadRefs,
+    required_return_shapes: [
+      'domain_receipt_ref',
+      'monitor_freshness_ref',
+      'runtime_event_ref',
+      'typed_blocker_ref',
+    ],
+    accepted_payload_paths_ref: '/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
+    stage_count: RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS.length,
+    stages: RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS.map((stageId, index) => ({
+      stage_id: stageId,
+      sequence: index + 1,
+      payload_kind: 'stage_expected_receipt_or_monitor_freshness_refs',
+      current_payload_template: ownerPayloadTemplate(requiredOperatorPayloadRefs),
+      success_refs_path_payload: {
+        domain_receipt_refs: [],
+        monitor_freshness_refs: [
+          `/workspace_receipt_inventory_projection/stage_monitor_freshness/${stageId}`,
+        ],
+        runtime_event_refs: [
+          `runtime_event:rca.${stageId}.expected_receipt_or_monitor_freshness`,
+        ],
+      },
+      typed_blocker_path_payload: {
+        typed_blocker_refs: typedBlockerRefs,
+      },
+      monitor_status: workspaceReceiptInventoryProjection?.status || 'unknown',
+      operator_payload_submitted: false,
+      recommended_current_payload_path: 'typed_blocker_path',
+      success_refs_visible_is_completion: false,
+      ...ownerPayloadClaimBoundary(),
+      authority_boundary: ownerPayloadAuthorityBoundary(),
+    })),
+  };
+}
