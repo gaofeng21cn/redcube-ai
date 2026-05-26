@@ -86,6 +86,49 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-26 Hermes history/provenance no-resurrection tranche
+
+本轮覆盖 RCA `docs/history/hermes/` history/provenance 文档，重点核对 repo-local Hermes migration line、upstream `Hermes-Agent` proof lane、service-safe domain entry proof、historical blocker / closeout 与当前 OPL-hosted provider boundary 的读法。目标是把 history body 继续锁在 provenance / proof 语境，防止旧 `Hermes-backed`、`managed runtime`、`current/next/cutover` wording 回流成当前 default runtime owner、public entry、generated/default caller、production readiness 或 RCA-owned generic runtime shell。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/status.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, and this governance ledger.
+- Reviewed history docs: `docs/history/README.md`, `docs/history/hermes/README.md`, and all 11 `docs/history/hermes/*.md` provenance bodies.
+- Machine refs: `contracts/runtime-program/current-program.json` and runtime-program leaf refs around provider-backed OPL hosting, default `Codex CLI` route policy, `domain-handler export|dispatch`, retired `domain_action_adapter` dispatch tombstones, functional privatization and default-caller deletion evidence.
+- Doctor evidence: OPL Doc Governance doctor preflight reported `finding_count=0`, active truth `pass`; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- All 11 Hermes history bodies already carry `Owner` / `Purpose` / `State` / `Machine boundary` and a history/provenance note. Several bodies intentionally preserve old `当前状态`、`下一步`、`cutover` or `current target` language, but their first-screen lifecycle notes already bind those words to the original tranche date or proof lane.
+- The lifecycle drift was at the directory index: `docs/history/hermes/README.md` remained English-first and too thin to tell readers how to read each proof brief. It is now a Chinese canonical history index with current truth owner refs, a per-brief role table and explicit no-resurrection boundary.
+- Current RCA default remains direct RedCube entry plus OPL-hosted provider integration and `Codex CLI` as first-class concrete executor. `Hermes-Agent` remains explicit optional / proof backend, executor adapter evaluation, diagnostic or historical reference only.
+- The Hermes history directory does not authorize visual ready, exportable, handoffable, domain ready, production ready, generic session/workbench/runtime ownership, generated/default caller ownership, or Hermes-first public identity.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full paragraph read of `docs/history/hermes/README.md` and all 11 `docs/history/hermes/*.md` bodies; role read of `docs/history/README.md`; live contract/core-doc refs listed above. | `docs/history/hermes/README.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. Hermes history bodies remain provenance/proof records. No body-level rewrite was needed because each body already carries lifecycle metadata; the index now provides the missing directory-level canonical read.
+
+Unreviewed docs:
+
+- RCA `docs/history/hermes/` bodies are now covered for current owner, historical role and no-resurrection boundaries.
+- RCA remaining reference bodies and non-Hermes history/provenance bodies remain open outside already-covered chunks.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger.
+
+Remaining stale / retire candidates:
+
+- Any future RCA prose that treats Hermes history proof lane, repo-local `Hermes`, upstream `Hermes-Agent`, `managed runtime`, `runManagedDeliverable / getManagedRun / superviseManagedRun`, historical cutover board or historical closeout as current default runtime owner, public identity, generated/default caller, generic session/workbench/runtime shell, domain ready, production ready, visual ready, exportable or handoffable is stale pollution.
+- Any current rule still embedded only in a Hermes history body should be extracted to core docs, active gap plan, runtime/delivery/source/policy owner docs, machine-readable contracts or source/test surface before being relied on.
+
+Next tranche write scope:
+
+- Remaining RCA references and non-Hermes history bodies with old managed/gateway/runtime/session/domain_action_adapter vocabulary, after confirming current role and no-resurrection boundaries from live contracts/tests.
+- Or MAS product/status/workbench and progress/domain-ref projection shell reconciliation outside already-covered blocks.
+- Keep App docs delayed until active release/GUI lanes are safe to govern.
+
 ### 2026-05-26 policy support visual-memory boundary tranche
 
 本轮覆盖 RCA policy support 文档，重点核对 AI-first quality、deliverable contract、runtime operating model、TypeScript migration 与 visual pattern memory 边界。目标是把 policy support 读回 live contracts/tests/source：RCA policy 可以规定长期人读规则，但不能把 OPL / Agent Lab / generated shell / product projection / mechanical scorecard 写成 visual truth、route choice、review/export verdict、artifact authority、visual memory body 或 production readiness owner。
