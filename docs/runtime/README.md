@@ -23,4 +23,8 @@ RCA runtime docs 只描述 domain-agent runtime boundary：service-safe domain e
 
 真实图片生成证明单独由 Codex executor native imagegen task 提供：live mode 不读取 `OPENAI_API_KEY`、Base URL、Codex provider token 或 `REDCUBE_IMAGE_GENERATION_TOKEN`，而是让 Codex executor 自己调用原生 imagegen / image_generation 能力并把 PNG 落到 RCA artifact path。mock artifact smoke 与 Codex-native live image sample 合起来证明“可自动推进 + 可真实生成图片 + 可导出文件链路”，但仍不声明 visual ready、exportable、handoffable 或 production soak。
 
+`ppt_deck` 的三技术路线 AgentLab 面是 runtime refs/read-model observation，不是第二执行入口：image-first 默认线读取 `ppt-image-first-quality-nonregression` refs，HTML 显式线读取 `ppt-html-route-quality-nonregression` refs，native editable PPTX 显式线读取 `ppt-native-pptx-quality-nonregression` refs。`rca-ppt-three-route-agent-lab-suite` 的 focused test 还用 mock provider 让 RCA runtime 分别跑 image-first、HTML、native PPTX 三条 route chain 到 `export_pptx`，检查 PNG/HTML/native PPTX、review screenshots、最终 PPTX/PDF 与 artifact gallery 已落盘。三条线都保持 RCA product-entry、route policy、visual director review、screenshot review 与 export gate 为正式链路；HTML/native 只能由 operator 显式选择，不能作为 silent fallback 或默认路线替换。
+
+本层区分三类证据：`refs-only` 只表示 AgentLab 可读取合同、runtime read-model、gate refs 与 forbidden-authority flags；`mock` 只表示轻量 fixture / mock provider / helper plumbing 可跑通文件链路；真实样片必须显式触发 Codex-native imagegen、live integrated sample 或 native PPT proof lane，并且只证明样例可物化，不声明 visual ready、exportable、handoffable 或 production soak。
+
 Runtime docs 可以被 contracts 通过稳定 `human_doc:*` semantic IDs 引用，但 Markdown path 不是机器 API。

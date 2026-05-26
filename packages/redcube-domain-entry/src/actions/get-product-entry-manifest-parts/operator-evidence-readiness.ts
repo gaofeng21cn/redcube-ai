@@ -7,6 +7,7 @@ import {
   buildRcaEfficiencyHandoffProjection,
 } from './operator-evidence-refs.js';
 import { buildRcaGoalWorkflowAgentLabSuite } from './goal-workflow-agent-lab-suite.js';
+import { buildRcaPptThreeRouteAgentLabSuite } from './ppt-three-route-agent-lab-suite.js';
 
 export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
@@ -36,6 +37,7 @@ export function buildOperatorEvidenceReadinessProjection({
     productionEvidenceScaleoutRefs,
   });
   const goalWorkflowAgentLabSuite = buildRcaGoalWorkflowAgentLabSuite();
+  const pptThreeRouteAgentLabSuite = buildRcaPptThreeRouteAgentLabSuite();
   const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
     'repo_local_wrapper_active_caller_migration',
@@ -90,6 +92,13 @@ export function buildOperatorEvidenceReadinessProjection({
         status: goalWorkflowAgentLabSuite.status,
         suite_id: goalWorkflowAgentLabSuite.suite_id,
         suite_ref: goalWorkflowAgentLabSuite.handoff_surface.agent_lab_suite_ref,
+      },
+      {
+        source_id: 'ppt_three_route_agent_lab_suite',
+        ref: '/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+        status: pptThreeRouteAgentLabSuite.status,
+        suite_id: pptThreeRouteAgentLabSuite.suite_id,
+        suite_ref: pptThreeRouteAgentLabSuite.handoff_surface.agent_lab_suite_ref,
       },
       {
         source_id: 'controlled_memory_apply_runtime_receipt_refs',
@@ -174,6 +183,7 @@ export function buildOperatorEvidenceReadinessProjection({
     production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
     rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
     goal_workflow_agent_lab_suite: goalWorkflowAgentLabSuite,
+    ppt_three_route_agent_lab_suite: pptThreeRouteAgentLabSuite,
     read_only: true,
     refs_only: true,
     writes_visual_truth: false,

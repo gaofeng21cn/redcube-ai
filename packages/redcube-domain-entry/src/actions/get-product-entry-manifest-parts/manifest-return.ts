@@ -161,6 +161,7 @@ export function buildReturnedManifestProjection({
     operator_evidence_readiness_projection: operatorEvidenceReadinessProjection,
     rca_efficiency_handoff_projection: operatorEvidenceReadinessProjection.rca_efficiency_handoff_projection,
     goal_workflow_agent_lab_suite: operatorEvidenceReadinessProjection.goal_workflow_agent_lab_suite,
+    ppt_three_route_agent_lab_suite: operatorEvidenceReadinessProjection.ppt_three_route_agent_lab_suite,
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,

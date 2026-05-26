@@ -391,6 +391,16 @@ export function buildProductEntryManifestShellProjections({
         ref: '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
         label: 'operator evidence readiness /goal workflow suite',
       },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/ppt_three_route_agent_lab_suite',
+        label: 'Agent Lab PPT three-route suite',
+      },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+        label: 'operator evidence readiness PPT three-route suite',
+      },
     ],
   };
   return {
