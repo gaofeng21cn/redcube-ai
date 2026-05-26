@@ -86,6 +86,52 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-26 policy support visual-memory boundary tranche
+
+本轮覆盖 RCA policy support 文档，重点核对 AI-first quality、deliverable contract、runtime operating model、TypeScript migration 与 visual pattern memory 边界。目标是把 policy support 读回 live contracts/tests/source：RCA policy 可以规定长期人读规则，但不能把 OPL / Agent Lab / generated shell / product projection / mechanical scorecard 写成 visual truth、route choice、review/export verdict、artifact authority、visual memory body 或 production readiness owner。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/status.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, and this governance ledger.
+- Reviewed policy docs: `docs/policies/README.md`, `docs/policies/ai_first_quality_boundary.md`, `docs/policies/deliverable_contract_model.md`, `docs/policies/runtime_operating_model.md`, `docs/policies/typescript_migration_policy.md`, `docs/policies/visual_pattern_memory_policy.md`.
+- Machine/source refs: `contracts/memory_descriptor.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/functional_privatization_audit.json`, `contracts/pack_compiler_input.json`, `contracts/stage_control_plane.json`, `contracts/runtime-program/js-residue-line-lock.json`, `contracts/runtime-program/typescript-package-build-contract.json`, and AI-first review helper source surfaced by CodeGraph.
+- Test refs: `tests/ai-first-authoring-boundary.test.ts`, `tests/screenshot-review-ai-first.test.ts`, `tests/ppt-creative-ownership.test.ts`, `tests/xiaohongshu-creative-ownership.test.ts`, `tests/poster-creative-ownership.test.ts`, `tests/review-platform.test.ts`, `tests/product-entry-cases/domain-memory-ref-adapter.test.ts`, `tests/rca-production-acceptance.test.ts`, `tests/typescript-closeout-audit.test.ts`, `tests/typescript-baseline.test.ts`, `tests/typescript-package-surfaces.test.ts`, `tests/typescript-service-boundaries.test.ts`.
+- Doctor evidence: OPL Doc Governance doctor preflight reported `finding_count=0`, active truth `pass`; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- AI-first quality policy matches live tests and contracts: story / visual / markup authorship and final review judgment must come from AI author / reviewer artifacts; code, schema, scorecard, projection and layout metrics only provide evidence, blockers and refs.
+- Runtime and deliverable contract policies already preserve current owner split: direct / hosted paths return to RCA-owned service-safe domain entry, route truth and review/export gates; OPL / provider completion cannot authorize visual ready, exportable, handoffable, domain ready or production ready.
+- TypeScript policy matches current JS residue lock: repo-tracked JS remains retired with zero product-source JS budget, while Python native helper surfaces stay allowed for Office/PPT/document automation.
+- Visual memory policy had the only lifecycle drift: it was still an English dated Now/Next/Defer process note. It is now a Chinese current policy with explicit owner/purpose/state/machine boundary, `descriptor_proof_contract_landed_runtime_writeback_pending` readout, OPL locator-only boundary, and open evidence tail.
+- `contracts/memory_descriptor.json` and `tests/product-entry-cases/domain-memory-ref-adapter.test.ts` prove OPL consumes locator / receipt refs only; OPL cannot write memory body, choose visual route, accept/reject writeback, issue review/export verdict or mutate artifacts.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full paragraph read of all six `docs/policies/*.md`; live contract/test/source refs listed above. | `docs/policies/visual_pattern_memory_policy.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. Policy support docs remain active support/current policy; stale process framing in visual memory policy was rewritten in place.
+
+Unreviewed docs:
+
+- RCA policy support docs are now covered for AI-first, route/review/export authority, visual memory locator/writeback boundary, TypeScript migration and production-readiness wording.
+- RCA remaining reference bodies and history/provenance bodies remain open outside already-covered chunks.
+- OPL, MAS, MAG and App repo-wide coverage remains open outside already-recorded chunks; OMA README/docs coverage remains covered by the earlier OMA tranche.
+
+Remaining stale / retire candidates:
+
+- Future policy/support wording that lets OPL, Agent Lab, product shell, generated wrapper, memory descriptor, mechanical scorecard or projection authorize RCA visual ready, exportable, handoffable, domain ready, production ready, route choice, artifact mutation or review/export verdict is stale pollution.
+- Future visual memory wording that writes memory body, current deliverable content, review verdict, export truth, artifact state or hidden layout recipe into memory is stale pollution.
+- Future TypeScript policy wording that reopens repo-tracked JS implementation/test/script surfaces without explicit contract and audit support is stale pollution.
+
+Next tranche write scope:
+
+- Remaining RCA references/history bodies with old managed/gateway/runtime/session/domain_action_adapter vocabulary, after confirming current role and no-resurrection boundaries from live contracts/tests.
+- Or MAS product/status/workbench and progress/domain-ref projection shell reconciliation outside already-covered blocks.
+- Keep App docs delayed until active release/GUI lanes are safe to govern.
+
 ### 2026-05-26 delivery/source support authority-boundary tranche
 
 本轮覆盖 RCA delivery/source support 文档中容易被读成 readiness proof 或 authority transfer 的边界语句。目标是把 `source augmentation`、delivery examples、route/proof/export support 读回 live source/contracts/tests：source augmentation 只更新 canonical source truth 与 source readiness report；delivery docs/examples 只提供 family / route / proof / export 读者上下文；最终 visual ready、exportable、handoffable、artifact authority 和 review/export verdict 仍来自 RCA-owned review/export gates、workspace artifacts、artifact manifests、review/export receipts 与 owner receipts。
