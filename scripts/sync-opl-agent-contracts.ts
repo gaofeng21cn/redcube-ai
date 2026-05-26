@@ -135,6 +135,7 @@ function buildDomainDescriptor() {
       action_catalog: 'contracts/action_catalog.json',
       stage_control_plane: 'contracts/stage_control_plane.json',
       pack_compiler_input: 'contracts/pack_compiler_input.json',
+      agent_lab_handoff: 'contracts/agent_lab_handoff.json',
       generated_surface_handoff: 'contracts/generated_surface_handoff.json',
       functional_privatization_audit: 'contracts/functional_privatization_audit.json',
       physical_source_morphology_policy: 'contracts/physical_source_morphology_policy.json',

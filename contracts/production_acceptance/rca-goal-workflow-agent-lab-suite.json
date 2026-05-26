@@ -1,0 +1,289 @@
+{
+  "surface_kind": "rca_goal_workflow_agent_lab_suite_handoff",
+  "projection_id": "rca.goal_workflow_agent_lab_suite.v1",
+  "owner": "redcube_ai",
+  "consumer": "opl_agent_lab",
+  "status": "refs_only_standard_agent_lab_suite_ready",
+  "suite_kind": "agent_lab_external_suite",
+  "suite_id": "redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1",
+  "domain_id": "redcube-ai",
+  "goal_mode": {
+    "input_style": "/goal",
+    "goal_text_ref": "goal-ref:rca/minimal-autonomous-visual-delivery",
+    "single_goal_required": true,
+    "stage_by_stage_operator_plan_required": false,
+    "codex_app_outer_loop_required_after_task_start": false,
+    "human_monitoring_required_after_task_start": false
+  },
+  "target_workflow": {
+    "entry_surface": "redcube product invoke",
+    "entry_api_surface": "invokeProductEntry",
+    "entry_mode": "opl_hosted",
+    "task_intent": "run_opl_stage_execution_plan",
+    "deliverable_family": "xiaohongshu",
+    "profile_id": "standard_note",
+    "default_lifecycle_policy": "auto_to_terminal",
+    "explicit_stop_after_stage": null,
+    "expected_runtime_owner": "configured_family_runtime_provider",
+    "expected_provider_owner": "one-person-lab",
+    "expected_executor": "codex_cli",
+    "expected_terminal_evidence_mode": "domain_owner_receipt_or_typed_blocker_refs",
+    "artifact_body_required_in_suite": false
+  },
+  "handoff_surface": {
+    "agent_lab_suite_ref": "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+    "agent_lab_runner_command": "opl agent-lab run --suite contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json --json",
+    "meta_agent_improvement_command": "opl-meta-agent improve:external-suite --suite contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json --target-agent-dir <redcube-ai> --output-dir <out-dir>",
+    "agent_lab_handoff_contract_ref": "contracts/agent_lab_handoff.json",
+    "refs_only": true
+  },
+  "tasks": [
+    {
+      "task_id": "agent-lab-task:rca/goal-workflow/minimal-autonomous-visual-delivery",
+      "domain_id": "redcube-ai",
+      "task_family": "visual_deliverable_goal_workflow",
+      "environment": {
+        "environment_kind": "local_workspace",
+        "workspace_locator_ref": "workspace-locator:rca/goal-workflow-runtime-artifact-root",
+        "sandbox_policy": "runtime_artifacts_externalized_no_repo_source_writes",
+        "network_policy": "model_provider_required_by_executor",
+        "resource_limits": {
+          "max_minutes": 30,
+          "max_stage_attempts": 1
+        }
+      },
+      "instructions_ref": "goal-ref:rca/minimal-autonomous-visual-delivery",
+      "agent_entry_ref": "redcube product invoke#/task_intent=run_opl_stage_execution_plan",
+      "stage_refs": [
+        "agent/stages/source_intake.md",
+        "agent/stages/communication_strategy.md",
+        "agent/stages/visual_direction.md",
+        "agent/stages/artifact_creation.md",
+        "agent/stages/review_and_revision.md",
+        "agent/stages/package_and_handoff.md"
+      ],
+      "oracle_refs": [
+        "contracts/production_acceptance/rca-production-acceptance.json",
+        "contracts/production_acceptance/rca-evidence-receipt-fixture.json"
+      ],
+      "scorer_refs": [
+        "scorer:rca/domain-owner-receipt-or-typed-blocker",
+        "scorer:rca/no-forbidden-write-boundary"
+      ],
+      "recovery_probes": [
+        {
+          "probe_ref": "recovery-probe:rca/goal-workflow/session-requery",
+          "probe_kind": "resume_after_interruption",
+          "expected_status": "passed",
+          "observed_status": "passed",
+          "source_refs": [
+            "redcube product manifest#/temporal_autonomy_readiness",
+            "redcube product session#/runtime_loop_closure"
+          ]
+        },
+        {
+          "probe_ref": "recovery-probe:rca/goal-workflow/typed-blocker-closeout",
+          "probe_kind": "dead_letter_repair",
+          "expected_status": "passed",
+          "observed_status": "passed",
+          "source_refs": [
+            "redcube domain-handler export#/mapped_surfaces/production_evidence_tail_workorder",
+            "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers"
+          ]
+        }
+      ],
+      "trajectory": {
+        "trajectory_ref": "trajectory:rca/goal-workflow/minimal-autonomous-visual-delivery",
+        "run_ref": "workspace-runtime-ref:goal-workflow:<run-id>",
+        "agent_executor": "codex_cli",
+        "stage_attempt_refs": [
+          "opl-stage-attempt:rca/goal-workflow/minimal-autonomous-visual-delivery"
+        ],
+        "tool_call_refs": [
+          "redcube product invoke",
+          "redcube domain-handler export",
+          "redcube domain-handler dispatch"
+        ],
+        "artifact_refs": [
+          "workspace-runtime-ref:artifact-locator:goal-workflow"
+        ],
+        "receipt_refs": [
+          "rca-owner-receipt:visual-stage:goal-workflow-or-typed-blocker"
+        ],
+        "repair_refs": [
+          "rca-typed-blocker:goal-workflow:domain-owner-closeout-required"
+        ],
+        "trace_refs": [
+          "redcube product session#/continuation_snapshot/latest_stage_execution_plan_ref"
+        ],
+        "command_refs": [
+          "redcube product invoke --task-intent run_opl_stage_execution_plan --lifecycle-policy auto_to_terminal",
+          "opl agent-lab run --suite contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json --json"
+        ],
+        "file_refs": [
+          "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+        ],
+        "subagent_refs": [
+          "subagent-ref:codex/rca-goal-workflow-executor"
+        ],
+        "worktree_refs": [
+          "worktree-ref:codex/rca-goal-workflow-suite"
+        ],
+        "test_refs": [
+          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+        ],
+        "web_source_refs": [],
+        "typed_blocker_refs": [
+          "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
+        ],
+        "review_receipt_refs": [
+          "review-receipt-ref:rca/goal-workflow/domain-owner-review-export"
+        ],
+        "authority_boundary": {
+          "can_write_domain_truth": false,
+          "can_write_memory_body": false,
+          "can_authorize_quality_verdict": false,
+          "can_authorize_export_verdict": false,
+          "can_mutate_domain_artifact": false,
+          "can_write_owner_receipt": false
+        }
+      },
+      "scorecard": {
+        "scorecard_ref": "quality-scorecard:rca/goal-workflow/minimal-autonomous-visual-delivery",
+        "domain_owned": true,
+        "opl_scorecard_role": "scorecard_ref_projection_only",
+        "passed": true,
+        "metric_refs": [
+          "metric-ref:rca/goal-workflow/one-shot-start-to-closeout",
+          "metric-ref:rca/goal-workflow/no-codex-app-monitor"
+        ],
+        "evidence_refs": [
+          "redcube product manifest#/temporal_autonomy_readiness",
+          "redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder",
+          "redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite"
+        ],
+        "review_refs": [
+          "agent/quality_gates/review_export_memory.md",
+          "agent/quality_gates/artifact_authority.md"
+        ],
+        "quality_gate_refs": [
+          "agent/quality_gates/visual_authority_boundaries.md",
+          "agent/quality_gates/artifact_authority.md",
+          "agent/quality_gates/review_export_memory.md"
+        ],
+        "quality_floor_refs": [
+          "quality-floor:rca/goal-workflow/visual-authority-boundary",
+          "agent/quality_gates/visual_authority_boundaries.md",
+          "agent/quality_gates/artifact_authority.md",
+          "agent/quality_gates/review_export_memory.md"
+        ],
+        "authority_boundary": {
+          "can_write_domain_truth": false,
+          "can_write_memory_body": false,
+          "can_authorize_quality_verdict": false,
+          "can_authorize_export_verdict": false,
+          "can_mutate_domain_artifact": false,
+          "can_write_owner_receipt": false
+        }
+      },
+      "improvement_candidate": {
+        "candidate_ref": "improvement-candidate:rca/goal-workflow/no-patch-required",
+        "candidate_kind": "test_metadata",
+        "target_ref": "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+        "evidence_refs": [
+          "quality-scorecard:rca/goal-workflow/minimal-autonomous-visual-delivery"
+        ],
+        "allowed_change_scope": "candidate_config_only",
+        "promotion_gate_ref": "promotion-gate:rca/goal-workflow/no-default-promotion"
+      },
+      "promotion_gate": {
+        "gate_ref": "promotion-gate:rca/goal-workflow/no-default-promotion",
+        "gate_status": "passed",
+        "required_refs": [
+          "quality-scorecard:rca/goal-workflow/minimal-autonomous-visual-delivery"
+        ],
+        "regression_suite_refs": [
+          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+        ],
+        "no_forbidden_write_proof_refs": [
+          "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only"
+        ],
+        "advisory_only_refs": [
+          "provider-completion:rca/goal-workflow/not-visual-ready",
+          "scorecard:rca/goal-workflow/regression-guard-only"
+        ]
+      },
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_authorize_quality_verdict": false,
+        "can_authorize_export_verdict": false,
+        "can_mutate_domain_artifact": false,
+        "can_write_owner_receipt": false
+      }
+    }
+  ],
+  "required_observations": [
+    "task_manifests_observed",
+    "agent_trajectories_observed",
+    "recovery_probes_observed",
+    "domain_quality_scorecard_refs_observed",
+    "failure_taxonomy_observed",
+    "improvement_candidates_observed",
+    "promotion_gates_observed",
+    "no_memory_body_observed",
+    "forbidden_authority_flags_all_false"
+  ],
+  "target_runtime_consumption_refs": [
+    "redcube product manifest#/goal_workflow_agent_lab_suite",
+    "redcube product manifest#/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite",
+    "redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite",
+    "redcube domain-handler export#/source_manifest_refs/goal_workflow_agent_lab_suite_ref"
+  ],
+  "target_verification_refs": [
+    "target-verification:redcube-ai/goal-workflow-product-entry",
+    "target-verification:redcube-ai/domain-handler-export-read",
+    "target-verification:redcube-ai/agent-lab-run-suite",
+    "target-verification:redcube-ai/test-fast"
+  ],
+  "no_forbidden_write_refs": [
+    "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only",
+    "no-forbidden-write:rca/goal-workflow/runtime-artifacts-not-repo-source"
+  ],
+  "quality_floor_refs": [
+    "quality-floor:rca/goal-workflow/visual-authority-boundary",
+    "agent/quality_gates/visual_authority_boundaries.md",
+    "agent/quality_gates/artifact_authority.md",
+    "agent/quality_gates/review_export_memory.md"
+  ],
+  "accepted_terminal_shapes": [
+    "domain_receipt",
+    "typed_blocker",
+    "no_regression_evidence"
+  ],
+  "not_authorized_claims": [
+    "visual_ready",
+    "exportable",
+    "handoffable",
+    "production_soak_complete",
+    "domain_ready",
+    "artifact_authority"
+  ],
+  "authority_boundary": {
+    "refs_only": true,
+    "opl_agent_lab_can_run_suite": true,
+    "can_write_domain_truth": false,
+    "can_write_memory_body": false,
+    "can_authorize_quality_verdict": false,
+    "can_authorize_export_verdict": false,
+    "can_mutate_domain_artifact": false,
+    "can_write_owner_receipt": false,
+    "opl_agent_lab_can_write_rca_visual_truth": false,
+    "opl_agent_lab_can_authorize_quality_verdict": false,
+    "opl_agent_lab_can_authorize_export_verdict": false,
+    "opl_agent_lab_can_mutate_artifact_body": false,
+    "opl_agent_lab_can_write_owner_receipt": false,
+    "rca_owner_receipt_or_typed_blocker_required": true
+  }
+}

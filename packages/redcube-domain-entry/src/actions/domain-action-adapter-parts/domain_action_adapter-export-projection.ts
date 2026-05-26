@@ -135,6 +135,11 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
     || manifest.operator_evidence_readiness_projection?.rca_efficiency_handoff_projection
     || {}
   );
+  const goalWorkflowAgentLabSuite = (
+    manifest.goal_workflow_agent_lab_suite
+    || manifest.operator_evidence_readiness_projection?.goal_workflow_agent_lab_suite
+    || {}
+  );
   const productionEvidenceTailWorkOrder = (
     manifest.operator_evidence_readiness_projection?.production_evidence_tail_workorder || {}
   );
@@ -431,6 +436,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       ),
       production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
       rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
+      goal_workflow_agent_lab_suite: goalWorkflowAgentLabSuite,
       lifecycle_guarded_apply: {
         ref: '/lifecycle_guarded_apply_proof',
         owner: DOMAIN_ID,
@@ -495,6 +501,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
       production_evidence_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
       rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
+      goal_workflow_agent_lab_suite_ref: '/goal_workflow_agent_lab_suite',
       temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
       opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',

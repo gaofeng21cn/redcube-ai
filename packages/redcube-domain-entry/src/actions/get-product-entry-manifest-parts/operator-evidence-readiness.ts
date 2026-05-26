@@ -6,6 +6,7 @@ import {
   buildProductionEvidenceTailWorkOrder,
   buildRcaEfficiencyHandoffProjection,
 } from './operator-evidence-refs.js';
+import { buildRcaGoalWorkflowAgentLabSuite } from './goal-workflow-agent-lab-suite.js';
 
 export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
@@ -34,6 +35,7 @@ export function buildOperatorEvidenceReadinessProjection({
   const rcaEfficiencyHandoffProjection = buildRcaEfficiencyHandoffProjection({
     productionEvidenceScaleoutRefs,
   });
+  const goalWorkflowAgentLabSuite = buildRcaGoalWorkflowAgentLabSuite();
   const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
     'repo_local_wrapper_active_caller_migration',
@@ -81,6 +83,13 @@ export function buildOperatorEvidenceReadinessProjection({
         ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
         status: productionEvidenceTailWorkOrder.status,
         workorder_id: productionEvidenceTailWorkOrder.workorder_id,
+      },
+      {
+        source_id: 'goal_workflow_agent_lab_suite',
+        ref: '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+        status: goalWorkflowAgentLabSuite.status,
+        suite_id: goalWorkflowAgentLabSuite.suite_id,
+        suite_ref: goalWorkflowAgentLabSuite.handoff_surface.agent_lab_suite_ref,
       },
       {
         source_id: 'controlled_memory_apply_runtime_receipt_refs',
@@ -164,6 +173,7 @@ export function buildOperatorEvidenceReadinessProjection({
     opl_expected_receipt_monitor_freshness_handoff: oplExpectedReceiptMonitorFreshnessHandoff,
     production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
     rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
+    goal_workflow_agent_lab_suite: goalWorkflowAgentLabSuite,
     read_only: true,
     refs_only: true,
     writes_visual_truth: false,

@@ -381,6 +381,16 @@ export function buildProductEntryManifestShellProjections({
         ref: '/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
         label: 'operator evidence readiness efficiency handoff',
       },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/goal_workflow_agent_lab_suite',
+        label: 'Agent Lab /goal workflow suite',
+      },
+      {
+        ref_kind: 'json_pointer',
+        ref: '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+        label: 'operator evidence readiness /goal workflow suite',
+      },
     ],
   };
   return {

@@ -19,4 +19,6 @@ RCA runtime docs 只描述 domain-agent runtime boundary：service-safe domain e
 
 - [Runtime architecture](./runtime_architecture.md)
 
+最小 `/goal` 自动化 smoke 由 `contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json` 承载，可用 OPL `agent-lab run --suite ... --json` 直接验证 RCA 从单一 goal 进入 OPL-hosted `auto_to_terminal` product-entry workflow。它是 refs-only runtime handoff / recovery observation，不是 visual ready、exportable、handoffable 或 production soak 证明。
+
 Runtime docs 可以被 contracts 通过稳定 `human_doc:*` semantic IDs 引用，但 Markdown path 不是机器 API。

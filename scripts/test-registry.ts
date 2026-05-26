@@ -42,6 +42,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/publish-governance-single-owner.test.ts',
     'tests/rca-production-acceptance.test.ts',
     'tests/rca-efficiency-handoff-projection.test.ts',
+    'tests/rca-goal-workflow-agent-lab-suite.test.ts',
     'tests/rca-external-work-order-owner-closeout.test.ts',
     'tests/rca-one-shot-closeout.test.ts',
     'tests/rca-retired-surface-guard.test.ts',
@@ -165,6 +166,7 @@ const FAST_FILES = Object.freeze([
   'tests/product-entry-session-checkpoint.test.ts',
   'tests/real-route-evolution-probe.test.ts',
   'tests/product-entry.test.ts',
+  'tests/rca-goal-workflow-agent-lab-suite.test.ts',
   'tests/source-augmentation-provider.test.ts',
 ]);
 
