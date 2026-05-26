@@ -326,6 +326,39 @@ test('ppt lecture_student one-slide deck can satisfy teaching progression withou
   assert.equal(checks.teaching_progression_clear, true);
 });
 
+test('ppt lecture_student mechanism track satisfies term explanation with labeled content', () => {
+  const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
+    slide_blueprint: {
+      slides: [
+        {
+          slide_id: 'S01',
+          title: '可复核交付闭环',
+          page_type: 'mechanism_track',
+          page_goal: '用一页流程图呈现从单一交付目标到可验收输出的完整闭环。',
+          core_sentence: '自主工作流要把目标输入、连续执行、质量门禁、有限回修和导出证据连成可检查的闭环。',
+          page_core_content: [
+            { text: '目标输入：明确要交付什么、讲给谁听、用什么形式呈现，以及怎样判断合格。' },
+            { text: '自主执行：将目标转成视觉交付路线，完成结构组织、页面生成与叙事一致性控制。' },
+            { text: '质量门禁：检查内容是否完整、视觉是否清晰、课堂是否可讲、证据是否可解释。' },
+            { text: '有限回修：只处理未通过的质量点，回到对应执行环节修正，避免无边界重写。' },
+          ],
+          evidence_points: [
+            '输入端以明确交付目标为起点。',
+            '终态验收依赖成品质量、回修范围和导出留痕。',
+          ],
+          visual_presentation: {
+            layout_family: 'timeline_band',
+            anchor_tracks: ['横向五段流水线。'],
+          },
+        },
+      ],
+    },
+  }, {});
+
+  assert.equal(checks.term_explained_on_first_use, true);
+  assert.equal(checks.teaching_progression_clear, true);
+});
+
 test('ppt lecture_student multi-slide deck still requires the full teaching page progression', () => {
   const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
     slide_blueprint: {
@@ -344,7 +377,7 @@ test('ppt lecture_student multi-slide deck still requires the full teaching page
           page_type: 'central_axis',
           page_goal: '补充概念。',
           core_sentence: '还缺少机制、判断和收束。',
-          page_core_content: ['概念三', '概念四'],
+          page_core_content: ['核心概念：解释本页要讲的术语。', '判断边界：说明学生需要带走的限制。'],
         },
       ],
     },

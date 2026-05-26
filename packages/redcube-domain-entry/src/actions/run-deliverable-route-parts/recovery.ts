@@ -22,7 +22,13 @@ import {
   stageDefinitions,
 } from './stage-artifacts.js';
 
-const VISUAL_REPAIR_ROUTES = new Set(['fix_html', 'repair_image_pages', 'repair_pptx_native']);
+const VISUAL_AUTHOR_ALTERNATE_ROUTES = new Set(['render_html', 'author_pptx_native']);
+const VISUAL_REVISION_ROUTES = new Set([
+  'fix_html',
+  'render_html',
+  'repair_image_pages',
+  'repair_pptx_native',
+]);
 
 function canRevisitContinuationEdgeAfterRepair({
   currentRoute,
@@ -41,12 +47,20 @@ function canRevisitContinuationEdgeAfterRepair({
   const previousRoute = lastRoute === currentRoute
     ? continuationRouteRuns.at(-2)?.route || ''
     : lastRoute;
-  return VISUAL_REPAIR_ROUTES.has(previousRoute);
+  return VISUAL_REVISION_ROUTES.has(previousRoute);
 }
 
 function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
   const route = request.route;
   const message = routeResultErrorMessage(result);
+  if (VISUAL_AUTHOR_ALTERNATE_ROUTES.has(route) && /requires completed stage artifacts:/i.test(message)) {
+    const requestedMissing = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
+      .filter((stageId) => new RegExp(`\\b${stageId}\\b`).test(message));
+    if (requestedMissing.length > 0) {
+      return ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
+        .filter((stageId) => !readStageArtifactForRequest(request, stageId));
+    }
+  }
   if (route === 'fix_html' && /requires screenshot_review based on the current HTML/i.test(message)) {
     return ['visual_director_review', 'screenshot_review'];
   }
@@ -76,11 +90,11 @@ function nextContinuationStageId({
   contract: JsonObject;
   currentRoute: string;
 }): string | null {
-  if (VISUAL_REPAIR_ROUTES.has(currentRoute)) {
+  if (VISUAL_REVISION_ROUTES.has(currentRoute) || VISUAL_AUTHOR_ALTERNATE_ROUTES.has(currentRoute)) {
     return 'visual_director_review';
   }
   const nextStage = nextLinearStageId(contract, currentRoute);
-  if (currentRoute === 'screenshot_review' && nextStage && VISUAL_REPAIR_ROUTES.has(nextStage)) {
+  if (currentRoute === 'screenshot_review' && nextStage && VISUAL_REVISION_ROUTES.has(nextStage)) {
     const reviewArtifact = readStageArtifactForRequest(request, 'screenshot_review');
     if (artifactRerunFromStage(reviewArtifact) !== nextStage) {
       return nextLinearStageId(contract, nextStage);
@@ -102,7 +116,7 @@ function blockedStageRecommendedRepairRoute({
   const artifact = readStageArtifactForRequest(request, currentRoute) as { status?: unknown } | null;
   if (safeText(artifact?.status) !== 'block') return null;
   const repairRoute = artifactRerunFromStage(artifact);
-  return VISUAL_REPAIR_ROUTES.has(repairRoute) ? repairRoute : null;
+  return VISUAL_REVISION_ROUTES.has(repairRoute) ? repairRoute : null;
 }
 
 function dependencyRouteCanContinue({

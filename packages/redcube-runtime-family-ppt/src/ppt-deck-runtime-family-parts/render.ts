@@ -93,6 +93,14 @@ export function createPptDeckRenderStageParts(deps) {
     renderContract,
   } = createPptDeckRenderRevisionParts(deps);
 
+  function renderedSlideTitle(contentHtml, fallbackTitle) {
+    const headingMatch = safeText(contentHtml).match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i);
+    const headingText = headingMatch
+      ? normalizeInlineText(headingMatch[1].replace(/<[^>]+>/g, ' '), 160)
+      : '';
+    return headingText || safeText(fallbackTitle);
+  }
+
   async function generateRenderHtmlDraft({
     workspaceRoot,
     deliverableId,
@@ -433,7 +441,7 @@ export function createPptDeckRenderStageParts(deps) {
         || slide.visual_presentation.layout_family;
       const content = validateRenderedReviewAnchors(
         hydrateRenderedSlideRootMetadata(rawContent, {
-          'data-title': slide.title,
+          'data-title': renderedSlideTitle(rawContent, slide.title),
           'data-layout-family': slide.visual_presentation.layout_family,
           'data-speaker-seconds': Number(slide.speaker_seconds || 0),
           'data-recipe-id': slide.render_recipe_id,
@@ -446,7 +454,7 @@ export function createPptDeckRenderStageParts(deps) {
       return {
         slide_id: slide.slide_id,
         slide_no: slide.slide_no,
-        title: slide.title,
+        title: renderedSlideTitle(content, slide.title),
         layout_family: slide.visual_presentation.layout_family,
         recipe_id: slide.render_recipe_id,
         template_id: 'upstream_ai_html',

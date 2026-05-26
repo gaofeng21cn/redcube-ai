@@ -43,6 +43,44 @@ async function withMockCodexRuntime(testFn) {
   }
 }
 
+async function preparePptPlan({
+  workspaceRoot,
+  topicId = 'topic-a',
+  deliverableId,
+  title,
+  goal,
+  profileId = 'lecture_student',
+}) {
+  await completeSourceReadiness({
+    workspaceRoot,
+    topicId,
+    title,
+    brief: goal,
+    keywords: ['ppt', 'route', 'export'],
+  });
+
+  await createDeliverable({
+    workspaceRoot,
+    overlay: 'ppt_deck',
+    profileId,
+    topicId,
+    deliverableId,
+    title,
+    goal,
+  });
+
+  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId,
+      deliverableId,
+      route,
+    });
+    assert.equal(result.ok, true, `${deliverableId}:${route}`);
+  }
+}
+
 test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix_html', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-recovery-'));
@@ -224,6 +262,102 @@ test('runDeliverableRoute continues from ppt fix_html to requested stop-after re
     } finally {
       restoreFixVariant();
     }
+  });
+});
+
+test('runDeliverableRoute continues explicit ppt visual routes through review and export', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-explicit-visual-export-'));
+    const routeCases = [
+      { deliverableId: 'deck-html', visualRoute: 'render_html' },
+      { deliverableId: 'deck-native', visualRoute: 'author_pptx_native' },
+    ];
+
+    for (const routeCase of routeCases) {
+      await preparePptPlan({
+        workspaceRoot,
+        deliverableId: routeCase.deliverableId,
+        title: `Explicit ${routeCase.visualRoute} export proof`,
+        goal: '验证显式 PPT 技术路线可以由 product-entry route 入口自主续跑到导出。',
+      });
+
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: routeCase.deliverableId,
+        route: routeCase.visualRoute,
+        stopAfterStage: 'export_pptx',
+      });
+
+      assert.equal(result.ok, true, routeCase.visualRoute);
+      assert.equal(result.summary.requested_route, routeCase.visualRoute);
+      assert.equal(result.summary.executed_route, 'export_pptx');
+      assert.deepEqual(result.summary.continued_route_sequence, [
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ]);
+      assert.deepEqual(
+        result.continuation_route_runs.map((entry) => entry.route),
+        ['visual_director_review', 'screenshot_review', 'export_pptx'],
+      );
+      assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
+      assert.equal(
+        result.artifact?.export_bundle?.source_visual_route
+          || result.artifact?.export_bundle?.review_capture?.source_visual_route,
+        routeCase.visualRoute,
+      );
+    }
+  });
+});
+
+test('runDeliverableRoute recovers explicit ppt visual route planning prerequisites before export', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-explicit-visual-plan-recovery-'));
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Explicit native plan recovery proof',
+      brief: '验证显式 native PPT route 可以从空 plan 自主补齐 planning 依赖并导出。',
+      keywords: ['ppt', 'native', 'plan', 'recovery'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-native',
+      title: 'Explicit native plan recovery proof',
+      goal: '验证显式 PPT 技术路线可以从 product-entry route 入口自主补齐计划并续跑到导出。',
+    });
+
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-native',
+      route: 'author_pptx_native',
+      stopAfterStage: 'export_pptx',
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.summary.requested_route, 'author_pptx_native');
+    assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
+      'storyline',
+      'detailed_outline',
+      'slide_blueprint',
+      'visual_direction',
+    ]);
+    assert.equal(result.summary.executed_route, 'export_pptx');
+    assert.deepEqual(result.summary.continued_route_sequence, [
+      'visual_director_review',
+      'screenshot_review',
+      'export_pptx',
+    ]);
+    assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
+    assert.equal(result.artifact?.export_bundle?.source_visual_route, 'author_pptx_native');
   });
 });
 

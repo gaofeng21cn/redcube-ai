@@ -198,6 +198,11 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
 
   function buildDirectorReviewStatePatch(status, decision, rerunFromStage = 'render_html') {
     const blockedRerunStage = safeText(rerunFromStage, 'render_html');
+    const blockingReasons = [
+      !decision.directorIntentLanded ? 'director_intent_not_landed' : '',
+      !decision.antiTemplateOk ? 'anti_template_failed' : '',
+      !decision.peakPagesLanded ? 'peak_pages_not_landed' : '',
+    ].filter(Boolean);
     return {
       current_status: status === 'pass' ? 'director_review_passed' : 'blocked_for_revision',
       ready_for_export: false,
@@ -207,8 +212,8 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
         anti_template_ok: decision.antiTemplateOk,
         memory_hook_present: decision.memoryHookPresent,
       },
-      pending_reviews: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
-      blocking_reasons: status === 'pass' ? [] : ['director_intent_landed', 'anti_template_ok'],
+      pending_reviews: status === 'pass' ? [] : blockingReasons,
+      blocking_reasons: status === 'pass' ? [] : blockingReasons,
       rerun_from_stage: status === 'pass' ? null : blockedRerunStage,
       rerun_policy: {
         status: status === 'pass' ? 'idle' : 'rerun_required',

@@ -10,8 +10,8 @@
 - 对 `multi_zone_compare` 的“左拆右并”页面，检查左侧辅助区是否明显轻于右侧主峰区；若读感接近等权双栏，也必须计为弱页
 - 检查页码语法是否跨页一致；若个别页单独切换页码样式并打断整套连续性，也必须计为弱页
 - 若同一页面家族重复出现，检查后续页是否真正切换了首眼信号、构图重心或风险张力；若只是上一页的弱化复写，必须计为弱页
-- 若读者可见 HTML 泄漏“当前节点 / 下一步进入 / 制作目标 / operator / internal / prompt”等制作者层文案，必须计为弱页并 block
-- 若读者可见页面出现“汇报讨论用途”“客观专业版”“本次汇报边界”“不在展示页暴露”“RCA”“RedCube”“source intake”“author_pptx_native”“slide_blueprint”“visual_direction”等操作者或系统层文案，必须计为弱页并 block
+- 若读者可见 HTML 泄漏“当前节点 / 下一步进入 / 制作目标 / operator / internal / prompt”等制作者层文案，必须计为弱页并 block；只检查 slide page visible content，不要把 `<title>`、`script[type="application/json"]`、render plan、runtime metadata、artifact path 或 JSON 内部字段当成读者可见正文。
+- 若读者可见页面出现“汇报讨论用途”“客观专业版”“本次汇报边界”“不在展示页暴露”“RCA”“RedCube”“source intake”“author_pptx_native”“slide_blueprint”“visual_direction”等操作者或系统层文案，必须计为弱页并 block；同样只检查 slide page visible content，不要因为 shell metadata 或 render plan 中保存原始 contract title/goal 而阻断。
 - 若左上角 section chip、角标卡片、badge、tag 或装饰标签侵入主标题安全区，必须计为弱页并 block
 - 若表格正文低于 11pt、单元格因过大行高或 padding 形成明显空白、或表格/卡片留白超过内容承载需要，必须计为弱页并 block
 - 若连续页面退化为同构白色卡片或白色父面板堆叠，必须将 anti_template_ok 判为 false，并要求回到 render_html

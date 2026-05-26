@@ -27,7 +27,7 @@ export function createPptDeckProfilePresetParts(deps) {
     switch (contract.profile_id) {
       case 'lecture_student':
         return {
-          term_explained_on_first_use: slides.some((slide) => ['central_axis', 'myth_fact_split', 'cover_signal'].includes(slide.page_type) && safeArray(slide.page_core_content).length >= 2),
+          term_explained_on_first_use: slides.some((slide) => slideHasTermExplanation(slide)),
           teaching_progression_clear: slides.length === 1
             ? singleSlideTeachingProgressionClear(slides[0])
             : ['cover_signal', 'mechanism_track', 'decision_gate', 'closure_peak'].every((type) => pageTypes.includes(type)),
@@ -58,6 +58,16 @@ export function createPptDeckProfilePresetParts(deps) {
     return safeArray(value)
       .map((item) => safeText(item?.text || item?.label || item))
       .filter(Boolean);
+  }
+
+  function slideHasTermExplanation(slide) {
+    if (!slide) return false;
+    const content = slideTextItems(slide.page_core_content);
+    if (content.length < 2) return false;
+    return content.some((item) => /[:：]/.test(item))
+      || safeArray(slide.page_core_content).some((item) => (
+        safeText(item?.label).length > 0 && safeText(item?.text).length > 0
+      ));
   }
 
   function singleSlideTeachingProgressionClear(slide) {

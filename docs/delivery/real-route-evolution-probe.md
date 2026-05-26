@@ -60,6 +60,31 @@ node --experimental-strip-types scripts/run-real-route-evolution-probe.ts \
 
 Mock mode 注入测试 Codex CLI、测试 Python helper 和 mock image generation，只证明 product-entry route、artifact 写入、cache、review/export gate wiring 与 typed blocker。Live mode 会调用真实 Codex / image / native helper provider，完整三 lane 可能显著超过 30 分钟；耗时本身是正常信号，不应被外层 refs-only 流程掩盖。
 
+一页 proof / smoke 类输入建议显式使用低延迟执行策略：
+
+```bash
+REDCUBE_CODEX_REASONING_EFFORT=minimal \
+  npm run --prefix /Users/gaofeng/workspace/redcube-ai redcube -- product invoke \
+  --workspace-root /Users/gaofeng/workspace/projects/redcube-ai/runtime-state/<run> \
+  --entry-session-id <session> \
+  --overlay ppt_deck \
+  --topic-id <topic> \
+  --deliverable-id <deliverable> \
+  --profile-id lecture_student \
+  --task-intent run_deliverable_route \
+  --route <author_image_pages|render_html|author_pptx_native> \
+  --stop-after-stage export_pptx
+```
+
+该策略只改变 Codex executor reasoning effort，不跳过 `visual_director_review`、`screenshot_review` 或 `export_pptx`。如果路线缺少 planning artifact，product-entry 必须自动补齐 `storyline -> detailed_outline -> slide_blueprint -> visual_direction` 后继续 visual route；不能要求外层 Codex 逐 stage 盯跑。
+
+2026-05-26 的真实一页 PPT 三路线测试给出如下效率读法：
+
+- 默认 image-first 成功链路约 18 分 42 秒，其中 `author_image_pages` 约 6 分 13 秒，`repair_image_pages` 约 6 分 49 秒；这是 Codex native imagegen 与回修成本，不是 AgentLab 或脚本生成。
+- HTML route 在 `REDCUBE_CODEX_REASONING_EFFORT=minimal` 下 planning 可稳定落到约 2-3 分钟，但单次 `render_html` 仍约 9 分 23 秒；质量门禁阻断后应通过 `fix_html` 或代码/提示词根因修复收敛，不能绕过 gate。
+- Native PPTX route 需要 LibreOffice headless true-render proof；成功链路可能经历 `repair_pptx_native`，最终必须以 screenshot review pass 和 export artifact 为准。
+- AgentLab / OPL Meta Agent 运行结果只能证明 refs-only control-plane、suite observation、forbidden-authority boundary 或 takeover/work-order 闭环；真实 PPTX/PDF/PNG 样片证明必须来自 RCA product-entry workspace artifacts。
+
 ## Output
 
 Probe 写入：

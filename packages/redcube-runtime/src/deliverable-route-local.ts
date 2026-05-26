@@ -182,6 +182,10 @@ function pptOperatorRevisionFile(deliverablePaths) {
 function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract, deliverableId }) {
   const files = routeRequiresArtifacts(contract, route)
     .map((stageId) => stageArtifactFile(deliverablePaths, contract, stageId));
+  const promptFile = safeText(contract?.prompt_pack?.routes?.[route]);
+  if (promptFile) {
+    files.push(path.resolve(promptFile));
+  }
   if (overlay === 'ppt_deck') {
     if (['render_html', 'fix_html'].includes(route)) {
       files.push(pptOperatorRevisionFile(deliverablePaths));

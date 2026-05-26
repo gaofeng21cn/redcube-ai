@@ -36,6 +36,8 @@
 - render shell 已加载 Font Awesome Free；PPT 默认使用 Font Awesome Free 图标，只有确有必要才使用 emoji，且同一页锚点语法必须一致
 - 视觉锚点必须语义明确；禁止用孤立单字贴纸、无意义角标或疑似内部标签充当页面抓手
 - 中文讲课页默认中文优先表达；除 contract / review state / publish surface 等必要术语外，不要无意义中英混用
+- Visible text must be project-facing. Do not copy operator constraints, local filenames, route names, prompt names, `RCA`, `RedCube`, `product-entry`, `source intake`, or “do not expose” instructions into slide titles, badges, body text, footers, captions, or speaker labels.
+- 如果 slide_blueprint、visual_direction、title、goal 或 user_intent 里已经含有 `RCA`、`RedCube`、`product-entry`、`author_pptx_native`、`slide_blueprint`、`visual_direction` 等内部词，HTML 可见文案必须改写为听众可读的项目表达，例如“自主交付链路”“可复核交付闭环”“从目标到导出的验收路径”，不能照抄内部词。
 - 所有正文、标签、节点和卡片文案都必须在自然语义处换行；如果空间不足，优先减字和重排，不要让文字溢出、被截断或硬挤成一行
 - 中文短术语和核心词组必须完整阅读；不得把“科研路径”“质量边界”“署名责任”“可审查”“医生监督”“垂体功能减退”“术后垂体功能减退”“持续性术后垂体功能减退”“随机森林”“校准斜率”“阈值区间”“净获益”等词拆成单字尾行。空间不足时用更短文案、更宽容器、语义换行，或用 inline-block/word-break: keep-all 保护短词
 - 页面纵向信息分布必须均衡；不要把标题以下的大部分信息都堆在中段，而让底部只剩薄条或大块空白

@@ -191,6 +191,9 @@ export function createPptDeckDirectorReviewParts(deps) {
       reviewedSlideIds,
     });
     const status = decision.status;
+    const rerunFromStage = sourceSurfaceKind === 'image_pages'
+      ? 'repair_image_pages'
+      : sourceSurfaceKind === 'native_pptx' ? 'repair_pptx_native' : 'render_html';
     const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
     const reviewOwner = primarySurface(generationRuntime, adapter);
     writeDirectorReviewReport(reviewFile, reviewOwner, decision);
@@ -239,7 +242,7 @@ export function createPptDeckDirectorReviewParts(deps) {
       review_state_patch: buildDirectorReviewStatePatch(
         status,
         decision,
-        sourceSurfaceKind === 'image_pages' ? 'repair_image_pages' : 'render_html',
+        rerunFromStage,
       ),
     };
   }
