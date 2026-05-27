@@ -41,6 +41,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/python-native-helper-catalog.test.ts',
     'tests/publish-governance-single-owner.test.ts',
     'tests/rca-production-acceptance.test.ts',
+    'tests/rca-workspace-receipt-scaleout-evidence.test.ts',
     'tests/rca-efficiency-handoff-projection.test.ts',
     'tests/rca-goal-workflow-agent-lab-suite.test.ts',
     'tests/rca-ppt-three-route-agent-lab-suite.test.ts',
