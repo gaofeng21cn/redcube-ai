@@ -770,6 +770,27 @@ test('native PPTX officecli materializer rejects incomplete or unreadable AI sha
   assert.match(mechanical.stderr, /ai_first_mechanical_card_template_detected/);
 });
 
+test('native PPTX quality gate blocks operator-facing proof language in visible text', () => {
+  const leaked = createAiSlide({
+    slideId: 'S01',
+    title: 'Native PPT live product-entry proof',
+    core: '这页把 product-entry proof lane 讲给观众看，属于内部验证口径泄漏。',
+    points: [
+      'product-entry 只是内部入口，不应作为观众可见的页面概念。',
+      'live proof 是测试标签，必须改写成可复核交付闭环。',
+    ],
+  });
+  const result = runNativeMaterializer(materializerPayload([leaked]));
+  const [slide] = result.slides;
+  assert.equal(slide.checks.external_audience_language_ok, false);
+  assert.equal(slide.issues.includes('operator_language_leak_detected'), true);
+  assert.deepEqual(slide.metrics.operator_language_fragments, [
+    'live proof',
+    'product-entry',
+    'proof lane',
+  ]);
+});
+
 test('native PPTX shape quality flags missing slots, low content, overlap, and unbalanced grids', () => {
   const missingSlot = createAiSlide({
     slideId: 'S01',

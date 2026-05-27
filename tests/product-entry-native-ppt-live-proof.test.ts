@@ -83,8 +83,8 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
       topic_id: TOPIC_ID,
       deliverable_id: DELIVERABLE_ID,
       profile_id: 'lecture_student',
-      title: 'Native PPT live product-entry proof',
-      goal: '证明 RedCube product-entry 可以通过真实 native PPT helper 完成交付证明。',
+      title: '可编辑演示交付闭环验证',
+      goal: '证明从目标到可编辑演示文件的交付链路可以自动推进，并保留可复核的审查与导出证据。',
       route,
       stop_after_stage: stopAfterStage,
       user_intent: userIntent,
@@ -130,9 +130,9 @@ test('live product-entry native PPT proof reaches review and export gates with r
     const sourceReadiness = await completeSourceReadiness({
       workspaceRoot,
       topicId: TOPIC_ID,
-      title: 'Native PPT live proof source readiness',
-      brief: '验证 source readiness 到 native PPT product-entry 交付链路。',
-      keywords: ['native PPT', 'LibreOffice', 'Poppler', 'product-entry'],
+      title: '可编辑演示交付源材料准备',
+      brief: '验证源材料准备到可编辑演示交付链路的审查与导出证据。',
+      keywords: ['editable PPTX', 'LibreOffice', 'Poppler', 'review evidence'],
     });
     assert.equal(sourceReadiness.planningReady, true);
     assert.equal(sourceReadiness.recommended_action, 'create_deliverable');
@@ -142,7 +142,7 @@ test('live product-entry native PPT proof reaches review and export gates with r
       entrySessionId,
       route: 'storyline',
       stopAfterStage: 'visual_direction',
-      userIntent: '先完成 source-backed planning artifacts，然后进入 native PPT authoring live proof。',
+      userIntent: '先完成 source-backed planning artifacts，然后进入可编辑演示文件生成与审查。',
     });
     assert.equal(planned.ok, true);
     assert.equal(routeSurface(planned).summary.executed_route, 'visual_direction');
@@ -153,7 +153,7 @@ test('live product-entry native PPT proof reaches review and export gates with r
       workspaceRoot,
       entrySessionId,
       route: 'author_pptx_native',
-      userIntent: '使用 native PPT proof lane 生成可编辑 PPTX，保持后续 review/export gates。',
+      userIntent: '生成可编辑 PPTX，保持后续 review/export gates。',
     });
     const nativeArtifact = artifactFor(authored);
     assert.equal(nativeArtifact.route, 'author_pptx_native');
@@ -176,7 +176,7 @@ test('live product-entry native PPT proof reaches review and export gates with r
       workspaceRoot,
       entrySessionId,
       route: 'visual_director_review',
-      userIntent: 'review the native PPT visual artifact before screenshot review',
+      userIntent: 'review the editable presentation visual artifact before screenshot review',
     });
     const directorArtifact = artifactFor(director);
     assert.equal(directorArtifact.status, 'pass');
@@ -185,7 +185,7 @@ test('live product-entry native PPT proof reaches review and export gates with r
       workspaceRoot,
       entrySessionId,
       route: 'screenshot_review',
-      userIntent: 'review native PPT render-proof screenshots and shape manifest metrics',
+      userIntent: 'review rendered editable presentation screenshots and shape manifest metrics',
     });
     const screenshotArtifact = artifactFor(screenshot);
     assert.equal(screenshotArtifact.status, 'pass');
