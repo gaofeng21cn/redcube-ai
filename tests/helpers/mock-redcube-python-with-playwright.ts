@@ -388,6 +388,9 @@ function buildNativePayload(args) {
         audience_label_readability_ok: true,
         content_depth_ok: true,
         grid_balance_ok: true,
+        visual_structure_present: true,
+        non_text_visual_specific_ok: true,
+        mechanical_card_template_absent: true,
         title_underline_absent_ok: true,
       },
       metrics: {

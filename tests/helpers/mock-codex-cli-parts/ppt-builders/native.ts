@@ -370,11 +370,11 @@ function nativeShapePlanForSlide(slide, index) {
       ? { left_in: 8.0, top_in: 7.58, width_in: 6.2, height_in: 1.08 }
       : panelGeometry(layoutFamily, Math.max(panelCount, 1), Math.min(pointIndex, panelCount - 1));
     const pointNumber = pointIndex + 1;
-    const textTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + (layoutFamily === 'ring_cross' ? 0.55 : 0.78);
+    const textTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + (layoutFamily === 'ring_cross' ? 0.48 : 0.78);
     const indexTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + 0.16;
     const textLeft = overflowSummaryText
       ? panelBounds.left_in + 1.0
-      : panelBounds.left_in + (layoutFamily === 'ring_cross' ? 0.9 : 0.24);
+      : panelBounds.left_in + (layoutFamily === 'ring_cross' ? 1.12 : 0.24);
     const textWidth = overflowSummaryText
       ? panelBounds.width_in - 1.2
       : panelBounds.width_in - (layoutFamily === 'ring_cross' ? 1.15 : 0.48);
@@ -399,7 +399,7 @@ function nativeShapePlanForSlide(slide, index) {
         left_in: textLeft,
         top_in: textTop,
         width_in: textWidth,
-        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 1.0 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
+        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 0.82 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
       },
       font_size: 18,
       color: '#171C24',

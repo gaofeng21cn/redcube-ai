@@ -12,6 +12,7 @@ import {
 } from './product-domain-action-test-api.ts';
 import { withEnv, withMockCodexRuntime } from './mock-codex-cli.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
+import { buildMockPptNativeShapePlan } from './helpers/mock-codex-cli-parts/ppt-builders/native.ts';
 
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,
@@ -40,6 +41,74 @@ function fileSha256(file) {
 
 function nativeEngineContract() {
   return readJson(path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'));
+}
+
+function rectFromInches(shape) {
+  const bounds = shape?.bounds || {};
+  return {
+    left: Number(bounds.left_in || 0),
+    top: Number(bounds.top_in || 0),
+    right: Number(bounds.left_in || 0) + Number(bounds.width_in || 0),
+    bottom: Number(bounds.top_in || 0) + Number(bounds.height_in || 0),
+  };
+}
+
+function overlapArea(leftShape, rightShape) {
+  const left = rectFromInches(leftShape);
+  const right = rectFromInches(rightShape);
+  const width = Math.max(0, Math.min(left.right, right.right) - Math.max(left.left, right.left));
+  const height = Math.max(0, Math.min(left.bottom, right.bottom) - Math.max(left.top, right.top));
+  return Number((width * height).toFixed(5));
+}
+
+function contentTextOverlapPairs(shapes) {
+  const textShapes = shapes.filter((shape) => (
+    shape?.kind === 'text_box'
+    && ['title', 'core_sentence', 'point_index', 'point_text', 'body', 'content'].includes(String(shape?.role || ''))
+  ));
+  const overlaps = [];
+  for (let leftIndex = 0; leftIndex < textShapes.length; leftIndex += 1) {
+    for (const rightShape of textShapes.slice(leftIndex + 1)) {
+      const area = overlapArea(textShapes[leftIndex], rightShape);
+      if (area > 0) {
+        overlaps.push({
+          a: textShapes[leftIndex].shape_id,
+          b: rightShape.shape_id,
+          area,
+        });
+      }
+    }
+  }
+  return overlaps;
+}
+
+function weightedTextWidthPx(text, fontSize) {
+  return [...String(text || '')].reduce((width, char) => {
+    if (/\s/.test(char)) return width + fontSize * 0.32;
+    if (char.codePointAt(0) > 127) return width + fontSize * 0.95;
+    if (/[A-Z]/.test(char)) return width + fontSize * 0.68;
+    if (['-', '/', ':'].includes(char)) return width + fontSize * 0.38;
+    return width + fontSize * 0.56;
+  }, 0);
+}
+
+function textCapacityFailures(shapes) {
+  return shapes
+    .filter((shape) => shape?.kind === 'text_box' && shape?.role === 'point_text')
+    .map((shape) => {
+      const bounds = shape.bounds || {};
+      const widthPx = Number(bounds.width_in || 0) * 72;
+      const heightPx = Number(bounds.height_in || 0) * 72;
+      const fontSize = Number(shape.font_size || 18);
+      const estimatedLines = Math.max(1, Math.ceil(weightedTextWidthPx(shape.editable_text, fontSize) / Math.max(widthPx - 12, 1)));
+      const maxLines = Math.max(1, Math.floor(heightPx / Math.max(fontSize * 1.16, 1)));
+      return estimatedLines > maxLines ? {
+        shape_id: shape.shape_id,
+        estimatedLines,
+        maxLines,
+      } : null;
+    })
+    .filter(Boolean);
 }
 
 async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native' }) {
@@ -235,6 +304,11 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(nativeMechanicalSlide.checks.title_safe_zone_clear, true);
     assert.equal(nativeMechanicalSlide.checks.table_legibility_ok, true);
     assert.equal(nativeMechanicalSlide.checks.layout_density_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.visual_structure_present, true);
+    assert.equal(nativeMechanicalSlide.checks.non_text_visual_specific_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.mechanical_card_template_absent, true);
+    assert.equal(nativeMechanicalSlide.metrics.structural_visual_count >= 1, true);
+    assert.equal(nativeMechanicalSlide.metrics.mechanical_card_template_absent, true);
     assert.equal(Array.isArray(nativeMechanicalSlide.metrics.operator_language_fragments), true);
     assert.equal(nativeMechanicalSlide.metrics.title_safe_zone_clearance_ok, true);
 
@@ -292,6 +366,32 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(exported.artifact_refs.includes(exported.export_bundle.operator_proof_summary.final_artifact_refs.pdf_file), true);
     assert.equal(exported.artifact_refs.includes(exported.export_bundle.artifact_gallery.index_file), true);
   });
+});
+
+test('native PPT AI shape plan keeps ring_cross index labels and body text non-overlapping', () => {
+  const shapePlan = buildMockPptNativeShapePlan({
+    route: 'author_pptx_native',
+    context: {
+      blueprint: {
+        slides: [{
+          slide_id: 'S07',
+          title: 'Ring cross overlap regression',
+          core_sentence: '中心轴解释四个动作如何互相支撑。',
+          visual_presentation: { layout_family: 'ring_cross' },
+          page_core_content: [
+            '先定义任务，说明证据如何支撑交付判断。',
+            '再补事实层，说明证据如何支撑交付判断。',
+            '再跑正式主链，说明证据如何支撑交付判断。',
+            '最后审阅与发布，说明证据如何支撑交付判断。',
+          ],
+        }],
+      },
+    },
+  });
+  const ringSlide = shapePlan.editable_shape_plan.slides[0];
+  assert.equal(ringSlide.layout_family, 'ring_cross');
+  assert.deepEqual(contentTextOverlapPairs(ringSlide.native_shapes), []);
+  assert.deepEqual(textCapacityFailures(ringSlide.native_shapes), []);
 });
 
 test('native PPT route rejects stale desktop-app proof provenance before screenshot review', async () => {
