@@ -515,6 +515,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       'audience_label_readability_ok',
       'content_depth_ok',
       'grid_balance_ok',
+      'visual_structure_present',
+      'non_text_visual_specific_ok',
+      'mechanical_card_template_absent',
     ];
     return Object.fromEntries(
       checkKeys.map((key) => [
@@ -556,12 +559,18 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (typeof metrics.content_depth_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.grid_balance_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.title_underline_absent_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.visual_structure_present !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.non_text_visual_specific_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.mechanical_card_template_absent !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof manifestSlide.checks?.title_core_overlap_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.slot_fill_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.audience_label_readability_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.content_depth_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.grid_balance_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.title_underline_absent_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.visual_structure_present !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.non_text_visual_specific_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.mechanical_card_template_absent !== 'boolean') return ['native_quality_checks_missing'];
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
@@ -644,6 +653,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           audience_label_readability_ok: booleanCheck(manifestSlide, 'audience_label_readability_ok', missingQuality),
           content_depth_ok: booleanCheck(manifestSlide, 'content_depth_ok', missingQuality),
           grid_balance_ok: booleanCheck(manifestSlide, 'grid_balance_ok', missingQuality),
+          visual_structure_present: booleanCheck(manifestSlide, 'visual_structure_present', missingQuality),
+          non_text_visual_specific_ok: booleanCheck(manifestSlide, 'non_text_visual_specific_ok', missingQuality),
+          mechanical_card_template_absent: booleanCheck(manifestSlide, 'mechanical_card_template_absent', missingQuality),
         },
         metrics: {
           title_font_size: Number(slide?.title_font_size || 32),
@@ -688,6 +700,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           grid_balance_ok: manifestSlide?.metrics?.grid_balance_ok === true,
           grid_balance_ratio: finiteNumberOrNull(manifestSlide?.metrics?.grid_balance_ratio),
           grid_balance_failures: safeArray(manifestSlide?.metrics?.grid_balance_failures),
+          visual_structure_present: manifestSlide?.metrics?.visual_structure_present === true,
+          non_text_visual_specific_ok: manifestSlide?.metrics?.non_text_visual_specific_ok === true,
+          mechanical_card_template_absent: manifestSlide?.metrics?.mechanical_card_template_absent === true,
+          mechanical_card_template_detected: manifestSlide?.metrics?.mechanical_card_template_detected === true,
+          structural_visual_count: finiteNumberOrNull(manifestSlide?.metrics?.structural_visual_count),
+          structural_visual_roles: safeArray(manifestSlide?.metrics?.structural_visual_roles).map((role) => safeText(role)),
+          card_panel_count: finiteNumberOrNull(manifestSlide?.metrics?.card_panel_count),
           title_underline_absent_ok: manifestSlide?.metrics?.title_underline_absent_ok === true,
           title_underline_failures: safeArray(manifestSlide?.metrics?.title_underline_failures),
           table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
@@ -732,6 +751,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       composition_signature: safeText(slide?.metrics?.composition_signature),
       expected_slot_count: Number(slide?.metrics?.expected_slot_count || 0),
       filled_slot_count: Number(slide?.metrics?.filled_slot_count || 0),
+      structural_visual_count: Number(slide?.metrics?.structural_visual_count || 0),
+      structural_visual_roles: safeArray(slide?.metrics?.structural_visual_roles).map((role) => safeText(role)),
+      mechanical_card_template_absent: slide?.metrics?.mechanical_card_template_absent === true,
+      non_text_visual_specific_ok: slide?.metrics?.non_text_visual_specific_ok === true,
       shape_count: Number(slide?.shape_count || 0),
       text_box_count: Number(slide?.text_box_count || 0),
       preview_screenshot_file: safeText(slide?.preview_screenshot_file),

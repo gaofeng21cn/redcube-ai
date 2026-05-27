@@ -296,6 +296,9 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
         audience_label_readability_ok: aiFirstMechanicalCheckValue(slideReviews, 'audience_label_readability_ok'),
         content_depth_ok: aiFirstMechanicalCheckValue(slideReviews, 'content_depth_ok'),
         grid_balance_ok: aiFirstMechanicalCheckValue(slideReviews, 'grid_balance_ok'),
+        visual_structure_present: aiFirstMechanicalCheckValue(slideReviews, 'visual_structure_present'),
+        non_text_visual_specific_ok: aiFirstMechanicalCheckValue(slideReviews, 'non_text_visual_specific_ok'),
+        mechanical_card_template_absent: aiFirstMechanicalCheckValue(slideReviews, 'mechanical_card_template_absent'),
       } : {}),
       ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
     };

@@ -24,6 +24,31 @@ MIN_POINT_TEXT_CONTENT_CHARS = 12
 MIN_TABLE_BODY_FONT_PT = 11.0
 MAX_TABLE_CELL_BLANK_RATIO = 0.38
 COMPOSITION_BUCKET_PX = 36.0
+STRUCTURAL_VISUAL_ROLE_HINTS = [
+    'axis',
+    'band',
+    'bridge',
+    'connector',
+    'flow',
+    'hub',
+    'ladder',
+    'map',
+    'metric',
+    'rail',
+    'stack',
+    'table',
+    'timeline',
+    'track',
+]
+MECHANICAL_CARD_PANEL_ROLES = {
+    'compare_panel',
+    'signal_panel',
+    'timeline_panel',
+    'judgement_step',
+    'axis_panel',
+    'takeaway_panel',
+    'structured_note_panel',
+}
 OPERATOR_LANGUAGE_FRAGMENTS = [
     '汇报讨论用途',
     '客观专业版',
@@ -500,6 +525,33 @@ def title_underline_failures(native_shapes: list[dict]) -> list[dict]:
     return failures
 
 
+def structural_visual_shapes(native_shapes: list[dict]) -> list[dict]:
+    results = []
+    for shape in native_shapes:
+        role = safe_text(shape.get('role')).lower()
+        kind = safe_text(shape.get('kind')).lower()
+        if kind in {'chart', 'table', 'metric_grid'}:
+            results.append(shape)
+            continue
+        if kind in {'line', 'connector', 'oval'} and role not in {'accent_dot', 'page_number'}:
+            results.append(shape)
+            continue
+        if any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS):
+            results.append(shape)
+    return results
+
+
+def mechanical_card_panel_count(native_shapes: list[dict]) -> int:
+    count = 0
+    for shape in native_shapes:
+        role = safe_text(shape.get('role')).lower()
+        if role in MECHANICAL_CARD_PANEL_ROLES:
+            count += 1
+        elif role.endswith('_panel') and not any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS):
+            count += 1
+    return count
+
+
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
     decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
@@ -595,6 +647,14 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     grid_audit = grid_balance_audit(content_shapes)
     table_failures = table_legibility_failures(table_metrics)
     underline_failures = title_underline_failures(native_shapes)
+    structural_shapes = structural_visual_shapes(native_shapes)
+    structural_visual_count = len(structural_shapes)
+    card_panel_count = mechanical_card_panel_count(native_shapes)
+    mechanical_card_template_detected = (
+        card_panel_count >= 2
+        and len(shapes_with_role(native_shapes, 'point_text')) >= 2
+        and structural_visual_count < 1
+    )
     composition = composition_signature(native_shapes)
     coordinate_payload = [
         {
@@ -650,6 +710,9 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'title_safe_zone_clear': len(title_zone_failures) == 0,
         'table_legibility_ok': len(table_failures) == 0,
         'layout_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and card_blank_ratio <= MAX_TABLE_CELL_BLANK_RATIO,
+        'visual_structure_present': structural_visual_count >= 1,
+        'non_text_visual_specific_ok': structural_visual_count >= 1,
+        'mechanical_card_template_absent': not mechanical_card_template_detected,
     }
     issues = []
     if not checks['visual_density_ok']:
@@ -694,6 +757,12 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('table_cell_fit_failed')
     if not checks['layout_density_ok']:
         issues.append('layout_density_too_sparse')
+    if not checks['visual_structure_present']:
+        issues.append('native_visual_structure_missing')
+    if not checks['non_text_visual_specific_ok']:
+        issues.append('native_non_text_visual_too_generic')
+    if not checks['mechanical_card_template_absent']:
+        issues.append('native_mechanical_card_template_detected')
     return {
         'checks': checks,
         'issues': issues,
@@ -761,5 +830,12 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'numeric_label_overflow_count': len(numeric_label_overflows),
             'numeric_label_overflows': numeric_label_overflows,
             'coordinate_determinism_hash': coordinate_determinism_hash,
+            'structural_visual_count': structural_visual_count,
+            'structural_visual_roles': [safe_text(shape.get('role')) for shape in structural_shapes],
+            'card_panel_count': card_panel_count,
+            'visual_structure_present': checks['visual_structure_present'],
+            'non_text_visual_specific_ok': checks['non_text_visual_specific_ok'],
+            'mechanical_card_template_detected': mechanical_card_template_detected,
+            'mechanical_card_template_absent': checks['mechanical_card_template_absent'],
         },
     }

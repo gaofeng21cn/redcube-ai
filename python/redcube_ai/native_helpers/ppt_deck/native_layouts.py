@@ -65,13 +65,56 @@ CONTENT_ROLES = {
     'takeaway_panel',
     'structured_note_panel',
 }
+LAYOUT_INTENT_REQUIRED_FIELDS = [
+    'rhetorical_role',
+    'composition_signature',
+    'primary_grid',
+    'visual_weight',
+    'negative_space_strategy',
+    'non_text_visual',
+    'forbidden_template_reuse_checked',
+]
+GENERIC_NON_TEXT_VISUAL_FRAGMENTS = [
+    'card',
+    'cards',
+    'panel',
+    'panels',
+    'filled comparison panels',
+    'editable shape system',
+    'shape system',
+]
+STRUCTURAL_VISUAL_ROLE_HINTS = [
+    'axis',
+    'band',
+    'bridge',
+    'connector',
+    'flow',
+    'hub',
+    'ladder',
+    'map',
+    'metric',
+    'rail',
+    'stack',
+    'table',
+    'timeline',
+    'track',
+]
+MECHANICAL_CARD_PANEL_ROLES = {
+    'compare_panel',
+    'signal_panel',
+    'timeline_panel',
+    'judgement_step',
+    'axis_panel',
+    'takeaway_panel',
+    'structured_note_panel',
+}
 AI_FIRST_MIN_SHAPES = 7
 AI_FIRST_MIN_CONTENT_SHAPES = 4
 AI_FIRST_MIN_DECORATIVE_SHAPES = 2
 AI_FIRST_MIN_POINT_TEXT = 1
 BODY_TEXT_READABILITY_FLOOR_PT = 18.0
 POINT_INDEX_FLOOR_PT = 16.0
-OFFICECLI_DEFAULT_TEXT_MARGIN_IN = 0.08
+OFFICECLI_DEFAULT_TEXT_MARGIN_IN = 0.02
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -265,9 +308,74 @@ def native_ai_design_shapes(slide_data: dict) -> list[dict]:
     ]
 
 
+def layout_intent_failures(slide_data: dict) -> list[dict]:
+    layout_intent = slide_data.get('layout_intent')
+    if not isinstance(layout_intent, dict):
+        return [{'reason': 'ai_first_layout_intent_missing'}]
+    failures = []
+    missing_fields = [
+        field for field in LAYOUT_INTENT_REQUIRED_FIELDS
+        if field not in layout_intent or (
+            field != 'forbidden_template_reuse_checked'
+            and not safe_text(layout_intent.get(field))
+        )
+    ]
+    if missing_fields:
+        failures.append({
+            'reason': 'ai_first_layout_intent_incomplete',
+            'missing_fields': missing_fields,
+        })
+    if layout_intent.get('forbidden_template_reuse_checked') is not True:
+        failures.append({'reason': 'ai_first_template_reuse_not_checked'})
+    non_text_visual = safe_text(layout_intent.get('non_text_visual')).lower()
+    if non_text_visual and any(fragment in non_text_visual for fragment in GENERIC_NON_TEXT_VISUAL_FRAGMENTS):
+        failures.append({
+            'reason': 'ai_first_non_text_visual_too_generic',
+            'non_text_visual': layout_intent.get('non_text_visual'),
+        })
+    return failures
+
+
+def structural_visual_shape(shape_spec: dict) -> bool:
+    role = safe_text(shape_spec.get('role')).lower()
+    kind = shape_kind(shape_spec)
+    if kind in {'chart', 'table', 'metric_grid'}:
+        return True
+    if kind in {'line', 'connector', 'oval', 'circle'} and role not in {'accent_dot', 'page_number'}:
+        return True
+    return any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS)
+
+
+def mechanical_card_panel_shape(shape_spec: dict) -> bool:
+    role = safe_text(shape_spec.get('role')).lower()
+    if role in MECHANICAL_CARD_PANEL_ROLES:
+        return True
+    return role.endswith('_panel') and not any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS)
+
+
+def visual_structure_failures(shapes: list[dict]) -> list[dict]:
+    structural_count = sum(1 for shape in shapes if structural_visual_shape(shape))
+    panel_count = sum(1 for shape in shapes if mechanical_card_panel_shape(shape))
+    point_text_count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    failures = []
+    if structural_count < 1:
+        failures.append({
+            'reason': 'ai_first_visual_structure_missing',
+            'structural_visual_count': structural_count,
+        })
+    if panel_count >= 2 and point_text_count >= 2 and structural_count < 1:
+        failures.append({
+            'reason': 'ai_first_mechanical_card_template_detected',
+            'panel_count': panel_count,
+            'point_text_count': point_text_count,
+        })
+    return failures
+
+
 def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
     shapes = native_ai_design_shapes(slide_data)
     failures = []
+    failures.extend(layout_intent_failures(slide_data))
     if len(shapes) < AI_FIRST_MIN_SHAPES:
         failures.append({'reason': 'ai_first_shape_plan_too_thin', 'actual': len(shapes), 'minimum': AI_FIRST_MIN_SHAPES})
     content_count = sum(1 for shape in shapes if ai_shape_quality_role(shape) == 'content')
@@ -279,6 +387,7 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
         failures.append({'reason': 'ai_first_decorative_shape_count_too_low', 'actual': decorative_count, 'minimum': AI_FIRST_MIN_DECORATIVE_SHAPES})
     if point_text_count < AI_FIRST_MIN_POINT_TEXT:
         failures.append({'reason': 'ai_first_point_text_missing', 'actual': point_text_count, 'minimum': AI_FIRST_MIN_POINT_TEXT})
+    failures.extend(visual_structure_failures(shapes))
     for shape in shapes:
         shape_id = safe_text(shape.get('shape_id'), '<missing-shape-id>')
         kind = shape_kind(shape)
@@ -459,7 +568,7 @@ def officecli_shape_props(shape_spec: dict, bounds_in: dict, bounds_px: dict) ->
             'align': safe_text(shape_spec.get('align'), 'left'),
             'valign': safe_text(shape_spec.get('valign'), 'top'),
             'autoFit': 'none',
-            'margin': safe_text(shape_spec.get('margin'), '0.08in'),
+            'margin': safe_text(shape_spec.get('margin'), f'{OFFICECLI_DEFAULT_TEXT_MARGIN_IN:g}in'),
         })
     return props
 
@@ -488,6 +597,16 @@ def parse_json_output(completed: subprocess.CompletedProcess, fallback):
         return json.loads(text)
     except json.JSONDecodeError:
         return {'raw_stdout': text}
+
+
+def issue_count(payload: dict) -> int:
+    raw = (payload.get('data') or {}).get('count') if isinstance(payload.get('data'), dict) else None
+    if raw is None:
+        raw = payload.get('count')
+    try:
+        return int(raw or 0)
+    except (TypeError, ValueError):
+        return 0
 
 
 def pptx_geometry_audit(pptx_file: Path) -> dict:
@@ -674,6 +793,21 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
         text = run_officecli(['view', str(output_pptx), 'text', '--json'])
     finally:
         run_officecli(['close', str(output_pptx)])
+    validate_payload = parse_json_output(validate, {})
+    issues_payload = parse_json_output(issues, {})
+    text_payload = parse_json_output(text, {})
+    validate_count = issue_count(validate_payload)
+    issues_count = issue_count(issues_payload)
+    if validate_count > 0 or issues_count > 0:
+        raise RuntimeError(
+            'native PPTX officecli quality gate failed: '
+            + json.dumps({
+                'validate_count': validate_count,
+                'issues_count': issues_count,
+                'validate': validate_payload,
+                'view_issues': issues_payload,
+            }, ensure_ascii=False, sort_keys=True)
+        )
     geometry_audit = pptx_geometry_audit(output_pptx)
     if not geometry_audit['ok']:
         raise RuntimeError(
@@ -687,9 +821,9 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             'materializer': 'officecli_pptx_materializer',
             'command_count': len(officecli_commands),
             'save_before_close': True,
-            'validate': parse_json_output(validate, {}),
-            'view_issues': parse_json_output(issues, {}),
-            'view_text': parse_json_output(text, {}),
+            'validate': validate_payload,
+            'view_issues': issues_payload,
+            'view_text': text_payload,
             'expected_text_fragments': officecli_text_probe,
             'geometry_audit': geometry_audit,
         },

@@ -36,45 +36,45 @@ function layoutIntentForSlide(slide, index, slotCount) {
   const intents = {
     cover_signal: {
       rhetorical_role: 'cover',
-      primary_grid: 'hero_callout_with_signal_stack',
-      visual_weight: 'centered',
+      primary_grid: 'hero_callout_with_signal_hub',
+      visual_weight: 'left_hero_right_signal_hub',
       negative_space_strategy: 'right side and lower-right breathing area frame the opening claim',
-      non_text_visual: 'top band plus signal panels',
+      non_text_visual: 'signal hub with vertical connector rail',
     },
     multi_zone_compare: {
       rhetorical_role: 'comparison',
-      primary_grid: `${slotCount}_column_comparison`,
-      visual_weight: slotCount === 2 ? 'left_right_balanced' : 'distributed_columns',
-      negative_space_strategy: 'wide gutter between comparison panels',
-      non_text_visual: 'filled comparison panels',
+      primary_grid: `${slotCount}_zone_comparison_with_bridge_rail`,
+      visual_weight: slotCount === 2 ? 'left_right_balanced_bridge' : 'distributed_columns_bridge',
+      negative_space_strategy: 'wide connector gutter keeps comparison claims separated',
+      non_text_visual: 'bridge connector rail linking comparison zones',
     },
     timeline_band: {
       rhetorical_role: 'timeline',
-      primary_grid: 'horizontal_timeline_rail',
+      primary_grid: 'horizontal_timeline_rail_with_milestone_nodes',
       visual_weight: 'bottom_band',
       negative_space_strategy: 'open upper narrative band above the rail',
-      non_text_visual: 'timeline rail with milestone panels',
+      non_text_visual: 'timeline rail with milestone nodes',
     },
     judgement_ladder: {
       rhetorical_role: 'gate',
       primary_grid: 'vertical_gate_ladder',
       visual_weight: 'right_heavy',
       negative_space_strategy: 'left evidence column kept open for scanability',
-      non_text_visual: 'stacked gate steps',
+      non_text_visual: 'gate ladder spine connecting judgement steps',
     },
     ring_cross: {
       rhetorical_role: 'system_map',
-      primary_grid: 'radial_axes',
+      primary_grid: 'radial_hub_and_axes',
       visual_weight: 'centered_radial',
       negative_space_strategy: 'corners stay open around the system axis',
-      non_text_visual: 'radial axis panels',
+      non_text_visual: 'center hub with radial axis connectors',
     },
     summary_peak: {
       rhetorical_role: 'synthesis',
-      primary_grid: 'hero_takeaway_plus_support_band',
+      primary_grid: 'hero_takeaway_plus_closure_band',
       visual_weight: 'top_heavy',
       negative_space_strategy: 'large lower-right quiet zone after the final judgement',
-      non_text_visual: 'takeaway panel plus support band',
+      non_text_visual: 'takeaway band with closure rail',
     },
   };
   const intent = intents[layoutFamily] || intents.multi_zone_compare;
@@ -191,6 +191,90 @@ function coreBounds(layoutFamily) {
   return { left_in: 1.0, top_in: 2.08, width_in: 11.9, height_in: 0.98 };
 }
 
+function structuralShapes(layoutFamily, slideId) {
+  if (layoutFamily === 'cover_signal') {
+    return [
+      {
+        shape_id: `${slideId}-ai-signal-hub`,
+        kind: 'oval',
+        role: 'signal_hub',
+        quality_role: 'decorative',
+        bounds: { left_in: 13.18, top_in: 2.72, width_in: 0.74, height_in: 0.74 },
+        fill: '#B94624',
+        line: 'none',
+      },
+      {
+        shape_id: `${slideId}-ai-signal-connector`,
+        kind: 'line',
+        role: 'signal_connector',
+        quality_role: 'decorative',
+        bounds: { left_in: 13.52, top_in: 3.48, width_in: 0.06, height_in: 2.12 },
+        line: '#B94624',
+      },
+    ];
+  }
+  if (layoutFamily === 'timeline_band') {
+    return [{
+      shape_id: `${slideId}-ai-timeline-rail`,
+      kind: 'line',
+      role: 'timeline_rail',
+      quality_role: 'decorative',
+      bounds: { left_in: 1.08, top_in: 4.12, width_in: 13.22, height_in: 0.06 },
+      line: '#B94624',
+    }];
+  }
+  if (layoutFamily === 'judgement_ladder') {
+    return [{
+      shape_id: `${slideId}-ai-gate-ladder-spine`,
+      kind: 'line',
+      role: 'gate_ladder_spine',
+      quality_role: 'decorative',
+      bounds: { left_in: 7.58, top_in: 2.68, width_in: 0.08, height_in: 4.95 },
+      line: '#B94624',
+    }];
+  }
+  if (layoutFamily === 'ring_cross') {
+    return [
+      {
+        shape_id: `${slideId}-ai-center-hub`,
+        kind: 'oval',
+        role: 'center_hub',
+        quality_role: 'decorative',
+        bounds: { left_in: 7.28, top_in: 4.12, width_in: 1.0, height_in: 1.0 },
+        fill: '#B94624',
+        line: 'none',
+      },
+      {
+        shape_id: `${slideId}-ai-axis-connector-horizontal`,
+        kind: 'line',
+        role: 'axis_connector',
+        quality_role: 'decorative',
+        bounds: { left_in: 2.95, top_in: 4.6, width_in: 9.58, height_in: 0.05 },
+        line: '#B94624',
+      },
+    ];
+  }
+  if (layoutFamily === 'summary_peak') {
+    return [{
+      shape_id: `${slideId}-ai-takeaway-band`,
+      kind: 'rect',
+      role: 'takeaway_band',
+      quality_role: 'decorative',
+      bounds: { left_in: 0.95, top_in: 4.5, width_in: 13.58, height_in: 0.18 },
+      fill: '#B94624',
+      line: 'none',
+    }];
+  }
+  return [{
+    shape_id: `${slideId}-ai-bridge-connector-rail`,
+    kind: 'line',
+    role: 'bridge_connector_rail',
+    quality_role: 'decorative',
+    bounds: { left_in: 1.08, top_in: 6.18, width_in: 13.22, height_in: 0.06 },
+    line: '#B94624',
+  }];
+}
+
 function nativeShapePlanForSlide(slide, index) {
   const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
   const title = safeText(slide?.title, `Slide ${index + 1}`);
@@ -266,6 +350,7 @@ function nativeShapePlanForSlide(slide, index) {
       align: 'right',
     },
   ];
+  shapes.push(...structuralShapes(layoutFamily, slideId));
   for (let pointIndex = 0; pointIndex < panelCount; pointIndex += 1) {
     const panelBounds = panelGeometry(layoutFamily, panelCount, pointIndex);
     const pointNumber = pointIndex + 1;
@@ -298,7 +383,7 @@ function nativeShapePlanForSlide(slide, index) {
       kind: 'text_box',
       role: 'point_index',
       editable_text: `${String(pointNumber).padStart(2, '0')}`,
-      bounds: { left_in: panelBounds.left_in + 0.22, top_in: indexTop, width_in: 0.62, height_in: 0.46 },
+      bounds: { left_in: panelBounds.left_in + 0.22, top_in: indexTop, width_in: 0.78, height_in: 0.52 },
       font_size: 16,
       color: '#B94624',
       fill: 'none',

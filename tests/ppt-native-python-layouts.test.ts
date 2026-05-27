@@ -214,7 +214,145 @@ function slotGeometry(slotCount, index) {
   };
 }
 
+function layoutVisualIntent(layoutFamily) {
+  return {
+    cover_signal: {
+      rhetorical_role: 'opening_signal',
+      primary_grid: 'left_hero_right_signal_stack',
+      visual_weight: 'hero_left_with_signal_stack',
+      negative_space_strategy: 'right edge and lower field stay open around the opening signal',
+      non_text_visual: 'signal hub with connector rail',
+    },
+    multi_zone_compare: {
+      rhetorical_role: 'comparison',
+      primary_grid: 'split_compare_with_bridge_rail',
+      visual_weight: 'balanced_columns_with_center_bridge',
+      negative_space_strategy: 'wide bridge gap separates the compared claims',
+      non_text_visual: 'center bridge rail linking comparison zones',
+    },
+    timeline_band: {
+      rhetorical_role: 'timeline',
+      primary_grid: 'horizontal_timeline_with_milestone_nodes',
+      visual_weight: 'lower_track',
+      negative_space_strategy: 'upper narrative band stays open above the timeline',
+      non_text_visual: 'horizontal timeline rail with milestone nodes',
+    },
+    judgement_ladder: {
+      rhetorical_role: 'decision_gate',
+      primary_grid: 'left_context_right_gate_ladder',
+      visual_weight: 'right_ladder',
+      negative_space_strategy: 'left context area stays open while gates climb on the right',
+      non_text_visual: 'vertical gate ladder spine',
+    },
+    ring_cross: {
+      rhetorical_role: 'system_map',
+      primary_grid: 'radial_hub_and_four_axes',
+      visual_weight: 'centered_radial',
+      negative_space_strategy: 'corners stay open around the central hub',
+      non_text_visual: 'center hub with radial axis connectors',
+    },
+    summary_peak: {
+      rhetorical_role: 'synthesis',
+      primary_grid: 'hero_takeaway_and_closure_band',
+      visual_weight: 'top_heavy_takeaway',
+      negative_space_strategy: 'lower right stays calm after the conclusion band',
+      non_text_visual: 'takeaway band with closure rail',
+    },
+  }[layoutFamily] || {
+    rhetorical_role: 'comparison',
+    primary_grid: 'split_compare_with_bridge_rail',
+    visual_weight: 'balanced_columns_with_center_bridge',
+    negative_space_strategy: 'wide bridge gap separates the compared claims',
+    non_text_visual: 'center bridge rail linking comparison zones',
+  };
+}
+
+function structuralShapes(layoutFamily, slideId) {
+  if (layoutFamily === 'cover_signal') {
+    return [
+      {
+        shape_id: `${slideId}-ai-signal-hub`,
+        kind: 'oval',
+        role: 'signal_hub',
+        quality_role: 'decorative',
+        bounds: { left_in: 13.05, top_in: 2.7, width_in: 0.72, height_in: 0.72 },
+        fill: '#B94624',
+        line: 'none',
+      },
+      {
+        shape_id: `${slideId}-ai-signal-connector`,
+        kind: 'line',
+        role: 'signal_connector',
+        quality_role: 'decorative',
+        bounds: { left_in: 13.38, top_in: 3.44, width_in: 0.06, height_in: 2.05 },
+        line: '#B94624',
+      },
+    ];
+  }
+  if (layoutFamily === 'timeline_band') {
+    return [{
+      shape_id: `${slideId}-ai-timeline-rail`,
+      kind: 'line',
+      role: 'timeline_rail',
+      quality_role: 'decorative',
+      bounds: { left_in: 1.1, top_in: 4.08, width_in: 13.3, height_in: 0.06 },
+      line: '#B94624',
+    }];
+  }
+  if (layoutFamily === 'judgement_ladder') {
+    return [{
+      shape_id: `${slideId}-ai-gate-ladder-spine`,
+      kind: 'line',
+      role: 'gate_ladder_spine',
+      quality_role: 'decorative',
+      bounds: { left_in: 7.58, top_in: 2.7, width_in: 0.08, height_in: 4.92 },
+      line: '#B94624',
+    }];
+  }
+  if (layoutFamily === 'ring_cross') {
+    return [
+      {
+        shape_id: `${slideId}-ai-center-hub`,
+        kind: 'oval',
+        role: 'center_hub',
+        quality_role: 'decorative',
+        bounds: { left_in: 7.28, top_in: 4.1, width_in: 1.0, height_in: 1.0 },
+        fill: '#B94624',
+        line: 'none',
+      },
+      {
+        shape_id: `${slideId}-ai-axis-cross-horizontal`,
+        kind: 'line',
+        role: 'axis_connector',
+        quality_role: 'decorative',
+        bounds: { left_in: 3.0, top_in: 4.58, width_in: 9.5, height_in: 0.05 },
+        line: '#B94624',
+      },
+    ];
+  }
+  if (layoutFamily === 'summary_peak') {
+    return [{
+      shape_id: `${slideId}-ai-takeaway-band`,
+      kind: 'rect',
+      role: 'takeaway_band',
+      quality_role: 'decorative',
+      bounds: { left_in: 0.92, top_in: 4.52, width_in: 13.6, height_in: 0.18 },
+      fill: '#B94624',
+      line: 'none',
+    }];
+  }
+  return [{
+    shape_id: `${slideId}-ai-bridge-rail`,
+    kind: 'line',
+    role: 'bridge_connector_rail',
+    quality_role: 'decorative',
+    bounds: { left_in: 1.1, top_in: 6.18, width_in: 13.15, height_in: 0.06 },
+    line: '#B94624',
+  }];
+}
+
 function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
+  const visualIntent = layoutVisualIntent(layoutFamily);
   const signatureRoles = new Set([
     'title',
     'core_sentence',
@@ -255,12 +393,12 @@ function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
     .map((role) => `${role}:${signaturePayload.filter((item) => item.role === role).length}`)
     .join('-') || 'empty';
   return {
-    rhetorical_role: layoutFamily === 'summary_peak' ? 'synthesis' : layoutFamily,
+    rhetorical_role: visualIntent.rhetorical_role,
     composition_signature: `native-composition:${digest}:${roleSummary}`,
-    primary_grid: `${layoutFamily}_${slotCount}_slot_grid`,
-    visual_weight: layoutFamily === 'judgement_ladder' ? 'right_heavy' : 'distributed',
-    negative_space_strategy: `intentional breathing space for ${slideId}`,
-    non_text_visual: `${layoutFamily} editable shape system`,
+    primary_grid: `${visualIntent.primary_grid}__slots_${slotCount}`,
+    visual_weight: visualIntent.visual_weight,
+    negative_space_strategy: `${visualIntent.negative_space_strategy} (${slideId})`,
+    non_text_visual: visualIntent.non_text_visual,
     forbidden_template_reuse_checked: true,
   };
 }
@@ -274,6 +412,7 @@ function createAiSlide({
   slotCount = null,
   pointFontSize = 18,
   indexFontSize = 16,
+  includeStructuralVisual = true,
   panelMutator = null,
   textMutator = null,
 } = {}) {
@@ -336,7 +475,7 @@ function createAiSlide({
       kind: 'text_box',
       role: 'page_number',
       editable_text: slideId.replace(/^S/, '').padStart(2, '0'),
-      bounds: { left_in: 14.05, top_in: 7.95, width_in: 0.9, height_in: 0.38 },
+      bounds: { left_in: 14.05, top_in: 7.95, width_in: 0.9, height_in: 0.44 },
       font_size: 18,
       color: '#5B6570',
       fill: 'none',
@@ -344,6 +483,9 @@ function createAiSlide({
       align: 'right',
     },
   ];
+  if (includeStructuralVisual) {
+    shapes.push(...structuralShapes(layoutFamily, slideId));
+  }
   for (let index = 0; index < actualPanelCount; index += 1) {
     const basePanel = {
       shape_id: `${slideId}-slot-${index + 1}-panel`,
@@ -370,8 +512,8 @@ function createAiSlide({
       bounds: {
         left_in: base.left_in + 0.24,
         top_in: base.top_in + (overflowSummaryText ? 0.02 : 0.25),
-        width_in: 0.68,
-        height_in: 0.36,
+        width_in: 0.78,
+        height_in: 0.52,
       },
       font_size: indexFontSize,
       color: '#B94624',
@@ -514,6 +656,10 @@ function assertMaterializedQuality({ fixture, suite, result, previewMetrics = []
   assert.equal(slides.every((slide) => slide.metrics.overlap_pairs === 0), true);
   assert.equal(slides.every((slide) => slide.metrics.occupied_ratio > fixture.suite_defaults.min_density), true);
   assert.equal(slides.every((slide) => slide.metrics.occupied_ratio < fixture.suite_defaults.max_density), true);
+  assert.equal(slides.every((slide) => slide.checks.visual_structure_present), true);
+  assert.equal(slides.every((slide) => slide.checks.non_text_visual_specific_ok), true);
+  assert.equal(slides.every((slide) => slide.checks.mechanical_card_template_absent), true);
+  assert.equal(slides.every((slide) => slide.metrics.structural_visual_count >= 1), true);
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.save_before_close, true);
   assert.equal(result.officecli_gate.command_count >= slides.length * 12, true);
@@ -612,6 +758,16 @@ test('native PPTX officecli materializer rejects incomplete or unreadable AI sha
   const unreadable = runNativeMaterializerFailure(materializerPayload([unreadableIndex]));
   assert.notEqual(unreadable.status, 0);
   assert.match(unreadable.stderr, /ai_first_point_index_too_small/);
+
+  const mechanicalCards = createAiSlide({
+    slideId: 'S03',
+    layoutFamily: 'multi_zone_compare',
+    includeStructuralVisual: false,
+  });
+  const mechanical = runNativeMaterializerFailure(materializerPayload([mechanicalCards]));
+  assert.notEqual(mechanical.status, 0);
+  assert.match(mechanical.stderr, /ai_first_visual_structure_missing/);
+  assert.match(mechanical.stderr, /ai_first_mechanical_card_template_detected/);
 });
 
 test('native PPTX shape quality flags missing slots, low content, overlap, and unbalanced grids', () => {

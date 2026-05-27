@@ -105,6 +105,18 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native PPT shape manifest too thin`);
       }
+      if (Number(slide.structural_visual_count || 0) < 1) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native visual structure missing`);
+      }
+      if (slide.mechanical_card_template_absent === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native mechanical card template detected`);
+      }
+      if (slide.non_text_visual_specific_ok === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native non-text visual is too generic`);
+      }
       if (!safeText(slide.preview_screenshot_file) || !(mainExistsSync || existsSync)(slide.preview_screenshot_file)) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native PPT preview screenshot missing`);
