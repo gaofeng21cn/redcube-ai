@@ -4,6 +4,8 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$repo_root"
 
+export PATH="$HOME/.local/bin:$PATH"
+
 output_root="${REDCUBE_NATIVE_PPT_PROOF_OUTPUT_DIR:-artifacts/native-ppt-proof}"
 skip_system_deps="${REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS:-0}"
 proof_python=""
@@ -86,6 +88,7 @@ summary_report="$output_root/proof-summary.json"
 artifact_index_report="$output_root/artifact-index.json"
 native_dir="$output_root/native-helper"
 preview_dir="$native_dir/previews"
+suite_id="data_charts"
 
 mkdir -p "$output_root" "$workspace_root" "$native_dir" "$preview_dir"
 
@@ -122,7 +125,7 @@ NODE
 node tools/native-ppt-proof/build-fixture-input.mjs \
   "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
   "$fixture_input" \
-  data_charts
+  "$suite_id"
 
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
   REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="$renderer_auto_install" \

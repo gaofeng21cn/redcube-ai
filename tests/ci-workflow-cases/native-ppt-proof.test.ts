@@ -15,10 +15,15 @@ test('native PPT Linux proof environment is documented without adding a desktop-
     assert.match(source, /poppler-utils|Poppler/);
     assert.match(source, /fonts-noto-cjk/);
   }
+  assert.match(installScript, /iOfficeAI\/OfficeCLI\/releases\/download\/\$version\/\$asset/);
+  assert.match(installScript, /version="v1\.0\.100"/);
+  assert.match(installScript, /sha256sum|shasum -a 256/);
+  assert.match(installScript, /officecli --version/);
 
   assert.match(runner, /LibreOffice\/Poppler/);
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
   assert.match(runner, /renderer_auto_install=1/);
+  assert.match(runner, /\$HOME\/\.local\/bin:\$PATH/);
   assert.match(runner, /REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="\$renderer_auto_install"/);
   assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
   assert.match(installScript, /brew install --cask libreoffice/);
@@ -36,9 +41,11 @@ test('native PPT Linux proof environment is documented without adding a desktop-
     /"\$\(command -v python3 2>\/dev\/null \|\| true\)"[\s\S]*"\$HOME\/\.codex\/projects\/redcube-ai\/runtime-state\/python\/stable-playwright\/venv\/bin\/python"[\s\S]*"\/usr\/bin\/python3"/,
   );
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
-  assert.match(runner, /synthetic preview/);
+  assert.match(runner, /synthetic_preview/);
   assert.match(dockerfile, /COPY \.github\/requirements\/ci-python\.txt/);
   assert.match(dockerfile, /python3 -m pip install .*\/tmp\/redcube-ci-python\.txt/);
+  assert.match(dockerfile, /iOfficeAI\/OfficeCLI\/releases\/download\/v1\.0\.100\/officecli-linux-x64/);
+  assert.match(dockerfile, /sha256sum -c -/);
   for (const source of [dockerfile, runner]) {
     assert.doesNotMatch(source, new RegExp(['powerpoint', '_applescript'].join(''), 'i'));
     assert.doesNotMatch(source, new RegExp(['osa', 'script'].join(''), 'i'));
