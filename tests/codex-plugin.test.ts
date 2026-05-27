@@ -28,6 +28,10 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(manifest.description, /Codex plugin/i);
   assert.equal(existsSync(pluginIconPath), true);
   assert.equal(existsSync(pluginIconSourcePath), true);
+  const iconSource = readFileSync(pluginIconSourcePath, 'utf-8');
+  assert.match(iconSource, /<rect width="512" height="512" rx="112"/);
+  assert.match(iconSource, /stroke-width="34"/);
+  assert.match(iconSource, /stroke="#FFB18A"/);
   assert.match(metadataText, /display_name: "RedCube AI"/);
   assert.match(metadataText, /default_prompt: "Use \$rca/);
   assert.match(metadataText, /TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit/);
