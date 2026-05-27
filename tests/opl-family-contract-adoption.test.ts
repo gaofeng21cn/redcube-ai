@@ -9,7 +9,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const CONTRACT_PATH = 'contracts/runtime-program/opl-family-contract-adoption.json';
 const CURRENT_PROGRAM_PATH = 'contracts/runtime-program/current-program.json';
+const STAGE_CONTROL_PLANE_PATH = 'contracts/stage_control_plane.json';
 const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
+const USER_STAGE_LOG_REQUIRED_FIELDS = [
+  'stage_name',
+  'problem_summary',
+  'stage_goal',
+  'stage_work_done',
+  'changed_stage_surfaces',
+  'outcome',
+  'remaining_blockers',
+  'evidence_refs',
+];
 
 function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
@@ -21,6 +32,10 @@ function contract() {
 
 function currentProgram() {
   return JSON.parse(read(CURRENT_PROGRAM_PATH));
+}
+
+function stageControlPlane() {
+  return JSON.parse(read(STAGE_CONTROL_PLANE_PATH));
 }
 
 test('RCA declares thin OPL family contract adoption', () => {
@@ -147,6 +162,45 @@ test('RCA stage control projection maps route stages without owning runtime cont
     repo_local_stage_runner_retired: true,
     repo_local_stage_runner_role: 'tombstone_or_historical_regression_only',
   });
+});
+
+test('RCA stage control plane requires visual-facing user stage log semantics', () => {
+  const plane = stageControlPlane();
+
+  assert.deepEqual(plane.stages.map((stage) => stage.stage_id), [
+    'source_intake',
+    'communication_strategy',
+    'visual_direction',
+    'artifact_creation',
+    'review_and_revision',
+    'package_and_handoff',
+  ]);
+
+  for (const stage of plane.stages) {
+    const userStageLog = stage.stage_contract.user_stage_log_contract;
+
+    assert.equal(userStageLog.surface_kind, 'opl_standard_agent_user_stage_log_contract');
+    assert.equal(userStageLog.version, 'standard-user-stage-log.v1');
+    assert.equal(
+      userStageLog.standard_agent_requirement,
+      'domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker',
+    );
+    assert.equal(userStageLog.opl_projection_surface, 'stage_progress_log.user_stage_log');
+    assert.deepEqual(userStageLog.required_domain_semantic_fields, USER_STAGE_LOG_REQUIRED_FIELDS);
+    assert.deepEqual(userStageLog.required_observability_fields, ['duration', 'token_usage', 'cost']);
+    assert.equal(
+      userStageLog.missing_semantics_policy,
+      'typed_blocker_or_missing_domain_semantic_summary_no_opl_inference',
+    );
+    assert.equal(userStageLog.token_policy, 'observed_or_explicit_missing_null_no_zero_fill');
+    assert.deepEqual(userStageLog.authority_boundary, {
+      opl_can_infer_domain_semantics: false,
+      opl_can_read_artifact_body: false,
+      opl_can_write_domain_truth: false,
+      opl_can_authorize_quality_or_export: false,
+      provider_completion_can_claim_stage_semantics_complete: false,
+    });
+  }
 });
 
 test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts separate', () => {

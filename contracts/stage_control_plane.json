@@ -412,6 +412,43 @@
         "owner_receipt_refs": [
           "owner_receipt:source_intake"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -800,6 +837,43 @@
         "owner_receipt_refs": [
           "owner_receipt:communication_strategy"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1167,6 +1241,43 @@
         "owner_receipt_refs": [
           "owner_receipt:visual_direction"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1549,6 +1660,43 @@
         "owner_receipt_refs": [
           "owner_receipt:artifact_creation"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -1962,6 +2110,43 @@
         "owner_receipt_refs": [
           "owner_receipt:review_and_revision"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
@@ -2375,6 +2560,43 @@
         "owner_receipt_refs": [
           "owner_receipt:package_and_handoff"
         ],
+        "user_stage_log_contract": {
+          "surface_kind": "opl_standard_agent_user_stage_log_contract",
+          "version": "standard-user-stage-log.v1",
+          "owner": "one-person-lab",
+          "standard_agent_requirement": "domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker",
+          "opl_projection_surface": "stage_progress_log.user_stage_log",
+          "domain_semantic_sources": [
+            "typed_closeout_packet.user_stage_log",
+            "typed_closeout_packet.stage_log_summary",
+            "route_impact.user_stage_log",
+            "route_impact.stage_log_summary"
+          ],
+          "required_domain_semantic_fields": [
+            "stage_name",
+            "problem_summary",
+            "stage_goal",
+            "stage_work_done",
+            "changed_stage_surfaces",
+            "outcome",
+            "remaining_blockers",
+            "evidence_refs"
+          ],
+          "required_observability_fields": [
+            "duration",
+            "token_usage",
+            "cost"
+          ],
+          "missing_semantics_policy": "typed_blocker_or_missing_domain_semantic_summary_no_opl_inference",
+          "token_policy": "observed_or_explicit_missing_null_no_zero_fill",
+          "authority_boundary": {
+            "opl_can_infer_domain_semantics": false,
+            "opl_can_read_artifact_body": false,
+            "opl_can_write_domain_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "provider_completion_can_claim_stage_semantics_complete": false
+          }
+        },
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."

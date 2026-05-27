@@ -117,6 +117,42 @@ const STAGES = [
   },
 ];
 
+const USER_STAGE_LOG_REQUIRED_FIELDS = [
+  'stage_name',
+  'problem_summary',
+  'stage_goal',
+  'stage_work_done',
+  'changed_stage_surfaces',
+  'outcome',
+  'remaining_blockers',
+  'evidence_refs',
+];
+
+const USER_STAGE_LOG_CONTRACT = {
+  surface_kind: 'opl_standard_agent_user_stage_log_contract',
+  version: 'standard-user-stage-log.v1',
+  owner: 'one-person-lab',
+  standard_agent_requirement: 'domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker',
+  opl_projection_surface: 'stage_progress_log.user_stage_log',
+  domain_semantic_sources: [
+    'typed_closeout_packet.user_stage_log',
+    'typed_closeout_packet.stage_log_summary',
+    'route_impact.user_stage_log',
+    'route_impact.stage_log_summary',
+  ],
+  required_domain_semantic_fields: USER_STAGE_LOG_REQUIRED_FIELDS,
+  required_observability_fields: ['duration', 'token_usage', 'cost'],
+  missing_semantics_policy: 'typed_blocker_or_missing_domain_semantic_summary_no_opl_inference',
+  token_policy: 'observed_or_explicit_missing_null_no_zero_fill',
+  authority_boundary: {
+    opl_can_infer_domain_semantics: false,
+    opl_can_read_artifact_body: false,
+    opl_can_write_domain_truth: false,
+    opl_can_authorize_quality_or_export: false,
+    provider_completion_can_claim_stage_semantics_complete: false,
+  },
+};
+
 const PLANE_SOURCE_REFS = [
   { ref_kind: 'json_pointer', ref: '/family_action_catalog', role: 'allowed_action_catalog' },
   { ref_kind: 'json_pointer', ref: '/deliverable_facade/family_route_policy', role: 'route_stage_policy' },
@@ -376,6 +412,7 @@ function stageDescriptor(stage, actionIds) {
       runtime_event_refs: stage.runtime_event_refs || [],
       ...buildCohortLoopRefs(stage),
       ...buildReplayEvidenceRefs(stage),
+      user_stage_log_contract: USER_STAGE_LOG_CONTRACT,
       boundary_assumptions: [
         'RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.',
         'OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable.',

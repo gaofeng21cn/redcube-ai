@@ -42,6 +42,7 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 当前结构闭合依赖 machine surfaces，而不是 docs receipt 流水：
 
 - `agent/` 与 `contracts/stage_control_plane.json` 持有 Declarative Visual Pack、stage prompt policy、runtime event refs、cohort loop refs 和 OPL queue / monitor refs。
+- `contracts/stage_control_plane.json` 的 6 个 visual stage 现在都声明 OPL 标准 `user_stage_log_contract`。RCA stage closeout 必须提供面向用户的人话摘要：本 stage 的视觉交付问题、目标、做了什么视觉工作、改动 surface、结果、剩余 blocker 和证据 refs；OPL `stage_progress_log.user_stage_log` 只投影这些 RCA-owned 语义和通用 duration/token/cost，不能替 RCA 推断 visual ready、exportable、handoffable 或 production-ready。
 - product-entry manifest、family action catalog、RCA `domain-handler export|dispatch` target、OPL-generated `domain_action_adapter` descriptor refs 和 standard domain-agent skeleton mapping 只向 OPL 暴露 descriptor、domain handler target、refs-only projection、owner receipt shape 与 typed blocker。
 - `/goal` AgentLab suite 同步出现在 product-entry manifest、operator evidence readiness projection、domain-handler export mapped surface 和 source manifest refs：`/goal_workflow_agent_lab_suite`、`/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite`、`/mapped_surfaces/goal_workflow_agent_lab_suite`、`/source_manifest_refs/goal_workflow_agent_lab_suite_ref`。
 - `runtimeWatch` 是 direct review/progress refs-only read model；`runtime_watch` 已从 generated `domain_action_adapter` default dispatch 退役。
