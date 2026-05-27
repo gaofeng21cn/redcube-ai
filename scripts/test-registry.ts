@@ -157,7 +157,6 @@ const FAST_FILES = Object.freeze([
   'tests/ppt-hermes-generation.test.ts',
   'tests/ppt-native-ppt-runtime.test.ts',
   'tests/ppt-native-ppt-repair-runtime.test.ts',
-  'tests/ppt-native-python-layouts.test.ts',
   'tests/ppt-image-pages-runtime.test.ts',
   'tests/ppt-image-review-export.test.ts',
   'tests/ppt-image-route-selection.test.ts',

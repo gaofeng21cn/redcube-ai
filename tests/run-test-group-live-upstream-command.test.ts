@@ -189,7 +189,7 @@ test('run-test-group exposes an integration remainder lane for local fast-then-i
   const fast = GROUPS.fast;
 
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(GROUPS['integration:remaining'].length, 35);
+  assert.equal(GROUPS['integration:remaining'].length, 36);
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
@@ -331,6 +331,8 @@ test('serialized route-heavy verification files stay on the mock Codex runtime i
 });
 
 test('native PPT fast runtime tests use the mock Python helper instead of launching the native renderer', () => {
+  assert.equal(GROUPS.fast.includes('tests/ppt-native-python-layouts.test.ts'), false);
+  assert.equal(GROUPS.integration.includes('tests/ppt-native-python-layouts.test.ts'), true);
   for (const file of [
     'tests/ppt-native-ppt-runtime.test.ts',
     'tests/ppt-hermes-generation.test.ts',
