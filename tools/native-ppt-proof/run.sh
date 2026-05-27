@@ -102,30 +102,27 @@ npm run --silent build
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
   "$proof_python" -m redcube_ai.native_helpers.doctor > "$doctor_report"
 
-node apps/redcube-cli/dist/cli.js product manifest \
-  --workspace-root "$workspace_root" > "$manifest_report"
+node --input-type=module - "$workspace_root" "$manifest_report" "$status_report" <<'NODE'
+import fs from 'node:fs';
 
-node apps/redcube-cli/dist/cli.js product status \
-  --workspace-root "$workspace_root" > "$status_report"
+import {
+  getProductEntryManifest,
+  getProductStatus,
+} from './packages/redcube-domain-entry/dist/index.js';
 
-"$proof_python" - "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" "$fixture_input" <<'PY'
-import json
-import sys
-from pathlib import Path
+const [, , workspaceRoot, manifestReport, statusReport] = process.argv;
+const request = { workspace_root: workspaceRoot };
+const manifest = await getProductEntryManifest(request);
+const status = await getProductStatus(request);
 
-fixture = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
-suite = next(
-    (item for item in fixture.get("suites", []) if item.get("suite_id") == "data_charts"),
-    (fixture.get("suites") or [fixture])[0],
-)
-payload = {
-    "fixture_id": fixture["fixture_id"],
-    "suite_id": suite.get("suite_id"),
-    "route": "author_pptx_native",
-    "editable_shape_plan": suite["editable_shape_plan"],
-}
-Path(sys.argv[2]).write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-PY
+fs.writeFileSync(manifestReport, `${JSON.stringify(manifest, null, 2)}\n`);
+fs.writeFileSync(statusReport, `${JSON.stringify(status, null, 2)}\n`);
+NODE
+
+node tools/native-ppt-proof/build-fixture-input.mjs \
+  "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
+  "$fixture_input" \
+  data_charts
 
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
   REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="$renderer_auto_install" \
