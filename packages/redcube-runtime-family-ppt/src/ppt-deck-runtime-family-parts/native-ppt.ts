@@ -5,6 +5,13 @@ import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 import { buildNativePptQualityNonregressionReadModel } from './native-ppt-quality-nonregression.js';
 import { createNativePptPlanIntegrityParts } from './native-ppt-plan-integrity.js';
 import { createNativePptRepairEvidenceParts } from './native-ppt-repair-evidence.js';
+import {
+  NATIVE_PPT_AGGREGATED_CHECK_KEYS,
+  NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS,
+  NATIVE_QUALITY_REQUIRED_BOOLEAN_METRIC_KEYS,
+  NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS,
+  REQUIRED_ENGINE_CAPABILITIES,
+} from './native-ppt-quality-contract.js';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
@@ -87,17 +94,6 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     python_helper_role: 'execute_validate_export_only',
     template_substitution_allowed: false,
     preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
-  });
-  const REQUIRED_ENGINE_CAPABILITIES = Object.freeze({
-    authoring_ir: 'redcube_svg_ir',
-    authoring_ir_version: 1,
-    pptx_writer: 'officecli_pptx_materializer',
-    editable_pptx: true,
-    strict_svg_preflight: true,
-    true_render_proof_required: true,
-    true_render_proof_renderer: 'libreoffice_headless',
-    cross_platform_render_required: true,
-    screenshot_packaging: false,
   });
   const OFFICECLI_MATERIALIZER_POLICY = Object.freeze({
     policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
@@ -495,32 +491,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   }
 
   function aggregateNativeChecks(slideReviews: JsonRecord[]): JsonRecord {
-    const checkKeys = [
-      'overflow_free',
-      'occlusion_free',
-      'visual_density_ok',
-      'speaker_fit_ok',
-      'edge_clearance_ok',
-      'block_content_fit_ok',
-      'title_typography_ok',
-      'body_text_readability_ok',
-      'typography_hierarchy_ok',
-      'title_core_overlap_ok',
-      'page_number_consistency_ok',
-      'external_audience_language_ok',
-      'title_safe_zone_clear',
-      'table_legibility_ok',
-      'layout_density_ok',
-      'slot_fill_ok',
-      'audience_label_readability_ok',
-      'content_depth_ok',
-      'grid_balance_ok',
-      'visual_structure_present',
-      'non_text_visual_specific_ok',
-      'mechanical_card_template_absent',
-    ];
     return Object.fromEntries(
-      checkKeys.map((key) => [
+      NATIVE_PPT_AGGREGATED_CHECK_KEYS.map((key) => [
         key,
         slideReviews.every((slide) => slide?.checks?.[key] !== false),
       ]),
@@ -535,42 +507,17 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   function nativeQualityMissingIssues(manifestSlide: JsonRecord | undefined, expectedProof: JsonRecord): string[] {
     if (!manifestSlide) return ['native_quality_metrics_missing'];
     const metrics = manifestSlide.metrics || {};
-    const missing = [
-      ['text_char_count', metrics.text_char_count],
-      ['block_count', metrics.block_count],
-      ['overlap_pairs', metrics.overlap_pairs],
-      ['clipped_nodes', metrics.clipped_nodes],
-      ['occupied_ratio', metrics.occupied_ratio],
-      ['primary_points', metrics.primary_points],
-      ['title_safe_zone_clearance_ok', metrics.title_safe_zone_clearance_ok],
-      ['min_body_font_pt', metrics.min_body_font_pt],
-      ['typography_hierarchy_ratio', metrics.typography_hierarchy_ratio],
-      ['title_core_overlap_count', metrics.title_core_overlap_count],
-      ['expected_slot_count', metrics.expected_slot_count],
-      ['filled_slot_count', metrics.filled_slot_count],
-    ].filter(([, value]) => finiteNumberOrNull(value) === null);
+    const missing = NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS
+      .filter((key) => finiteNumberOrNull(metrics[key]) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!safeText(metrics.composition_signature)) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
-    if (typeof metrics.body_text_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.typography_hierarchy_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.slot_fill_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.audience_label_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.content_depth_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.grid_balance_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.title_underline_absent_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.visual_structure_present !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.non_text_visual_specific_ok !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof metrics.mechanical_card_template_absent !== 'boolean') return ['native_quality_metrics_missing'];
-    if (typeof manifestSlide.checks?.title_core_overlap_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.slot_fill_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.audience_label_readability_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.content_depth_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.grid_balance_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.title_underline_absent_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.visual_structure_present !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.non_text_visual_specific_ok !== 'boolean') return ['native_quality_checks_missing'];
-    if (typeof manifestSlide.checks?.mechanical_card_template_absent !== 'boolean') return ['native_quality_checks_missing'];
+    if (NATIVE_QUALITY_REQUIRED_BOOLEAN_METRIC_KEYS.some((key) => typeof metrics[key] !== 'boolean')) {
+      return ['native_quality_metrics_missing'];
+    }
+    if (NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS.some((key) => typeof manifestSlide.checks?.[key] !== 'boolean')) {
+      return ['native_quality_checks_missing'];
+    }
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
