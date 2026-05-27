@@ -20,7 +20,7 @@ RCA remains the native PPTX workflow owner. The `officecli-pptx` skill is not ad
 The adopted boundary is a materializer / QA discipline:
 
 - `author_pptx_native` and `repair_pptx_native` stay RCA routes.
-- The current PPTX writer remains `redcube_drawingml_writer`.
+- The current PPTX writer remains `officecli_pptx_materializer`.
 - Future officecli writer adapters must still report into the RCA native route artifact, shape manifest, review state, and export bundle.
 - `officecli save` before `close`, `officecli validate`, `officecli view issues`, and `officecli view text` are gate refs for editable PPTX QA.
 - `officecli validate` and `officecli view issues` can catch writer or text-box defects, but they cannot substitute for LibreOffice headless true render proof or RCA screenshot review.

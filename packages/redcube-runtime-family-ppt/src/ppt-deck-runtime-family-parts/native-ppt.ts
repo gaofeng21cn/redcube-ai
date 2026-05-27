@@ -1,9 +1,10 @@
 import path from 'node:path';
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 import { buildNativePptQualityNonregressionReadModel } from './native-ppt-quality-nonregression.js';
+import { createNativePptPlanIntegrityParts } from './native-ppt-plan-integrity.js';
+import { createNativePptRepairEvidenceParts } from './native-ppt-repair-evidence.js';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
@@ -65,6 +66,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     stageArtifactPath,
     writeJson,
   } = deps;
+  const {
+    buildRepairEvidence,
+  } = createNativePptRepairEvidenceParts({ safeArray, safeText });
+  const {
+    assertNativeDeckCompleteness,
+    mergeRepairEditableShapePlan,
+  } = createNativePptPlanIntegrityParts({ existsSync, safeArray, safeText });
 
   let cachedNativeEngineContract: JsonRecord | null = null;
   const AI_FIRST_EDITING_CONTRACT = Object.freeze({
@@ -79,7 +87,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   const REQUIRED_ENGINE_CAPABILITIES = Object.freeze({
     authoring_ir: 'redcube_svg_ir',
     authoring_ir_version: 1,
-    pptx_writer: 'redcube_drawingml_writer',
+    pptx_writer: 'officecli_pptx_materializer',
     editable_pptx: true,
     strict_svg_preflight: true,
     true_render_proof_required: true,
@@ -92,9 +100,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     adoption_status: 'qa_materializer_discipline_only',
     rca_main_workflow_owner: 'redcube_stage_review_export',
     skill_authoring_loop_adopted: false,
-    materializer_role: 'executor_adapter_materializer_and_qa_gate',
-    current_pptx_writer: 'redcube_drawingml_writer',
-    officecli_writer_adapter_default_enabled: false,
+    materializer_role: 'default_editable_pptx_materializer_and_qa_gate',
+    current_pptx_writer: 'officecli_pptx_materializer',
+    officecli_writer_adapter_default_enabled: true,
     required_gate_refs: [
       'officecli_save_before_close',
       'officecli_validate',
@@ -236,11 +244,18 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           allowed_svg_tags: ['svg', 'g', 'rect', 'text'],
           unsupported_svg_tags: ['image', 'foreignObject', 'script'],
         },
+        materializer: {
+          kind: 'officecli_pptx_materializer',
+          role: 'execute_ai_spatial_plan_only',
+          helper_template_layout_allowed: false,
+          officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
+        },
         slides: [
           {
             slide_id: 'S01',
             title: '<audience-facing title>',
-            layout_family: '<visual layout family>',
+            background: '#FFFFFF',
+            layout_family: '<visual layout family label for reporting only>',
             core_sentence: '<audience-facing core sentence>',
             page_core_content: ['<editable text>'],
             native_shapes: [
@@ -249,6 +264,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
                 kind: 'text_box',
                 role: 'title',
                 editable_text: '<text>',
+                bounds: { left_in: 1.0, top_in: 0.6, width_in: 13.8, height_in: 0.9 },
+                font_size: 40,
+                color: '#171C24',
+                fill: 'none',
+                line: 'none',
               },
             ],
             redcube_svg_ir_intent: {
@@ -267,6 +287,40 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const slides = safeArray(plan?.slides);
     if (slides.length === 0) {
       throw new Error(`Native PPT ${route} requires an AI-authored editable_shape_plan.slides array`);
+    }
+    const invalidSlides = slides
+      .map((slide, index) => {
+        const slideId = safeText(slide?.slide_id, `slide-${index + 1}`);
+        const shapes = safeArray(slide?.native_shapes);
+        const missingShapePlan = shapes.length === 0;
+        const invalidShapes = shapes
+          .map((shape, shapeIndex) => {
+            const shapeId = safeText(shape?.shape_id, `${slideId}-shape-${shapeIndex + 1}`);
+            const bounds = shape?.bounds && typeof shape.bounds === 'object' ? shape.bounds : {};
+            const hasBounds = ['left_in', 'top_in', 'width_in', 'height_in']
+              .every((key) => Number.isFinite(Number(bounds?.[key])));
+            const kind = safeText(shape?.kind || shape?.type);
+            const role = safeText(shape?.role);
+            const text = safeText(shape?.editable_text || shape?.text || shape?.label);
+            const textShape = ['text_box', 'text'].includes(kind) || ['title', 'core_sentence', 'point_text', 'body', 'content', 'point_index'].includes(role);
+            const missingText = textShape && !text;
+            return (!hasBounds || !kind || missingText) ? {
+              shape_id: shapeId,
+              missing_bounds: !hasBounds,
+              missing_kind: !kind,
+              missing_text: missingText,
+            } : null;
+          })
+          .filter(Boolean);
+        return (missingShapePlan || invalidShapes.length > 0) ? {
+          slide_id: slideId,
+          missing_native_shapes: missingShapePlan,
+          invalid_shapes: invalidShapes,
+        } : null;
+      })
+      .filter(Boolean);
+    if (invalidSlides.length > 0) {
+      throw new Error(`Native PPT ${route} requires a complete AI-authored editable spatial shape plan: ${JSON.stringify(invalidSlides)}`);
     }
     return {
       ...plan,
@@ -393,126 +447,6 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     return JSON.parse(readFileSync(file, 'utf-8'));
   }
 
-  function stableJson(value: unknown): string {
-    if (Array.isArray(value)) {
-      return `[${value.map((item) => stableJson(item)).join(',')}]`;
-    }
-    if (value && typeof value === 'object') {
-      return `{${Object.keys(value as JsonRecord).sort().map((key) => (
-        `${JSON.stringify(key)}:${stableJson((value as JsonRecord)[key])}`
-      )).join(',')}}`;
-    }
-    return JSON.stringify(value);
-  }
-
-  function slideEvidencePayload(slide: JsonRecord | undefined): JsonRecord | null {
-    if (!slide) return null;
-    const {
-      preview_screenshot_file: _previewScreenshotFile,
-      screenshot_file: _screenshotFile,
-      redcube_svg_ir_file: _redcubeSvgIrFile,
-      ...content
-    } = slide;
-    return content;
-  }
-
-  function slideEvidenceHash(slide: JsonRecord | undefined): string | null {
-    const payload = slideEvidencePayload(slide);
-    if (!payload) return null;
-    return createHash('sha256').update(stableJson(payload)).digest('hex');
-  }
-
-  function repairReasonFromFeedback(feedback: JsonRecord | undefined): JsonRecord {
-    return {
-      issues: safeArray(feedback?.issues).map((issue) => safeText(issue)).filter(Boolean),
-      mechanical_issues: safeArray(feedback?.mechanical_issues).map((issue) => safeText(issue)).filter(Boolean),
-      visual_findings: safeArray(feedback?.visual_findings).map((issue) => safeText(issue)).filter(Boolean),
-      recommended_fix: safeText(feedback?.recommended_fix),
-    };
-  }
-
-  function buildRepairEvidence({
-    route,
-    priorShapeManifest,
-    shapeManifest,
-    repairFeedback,
-    unitRepairScope,
-  }: {
-    route: NativePptRoute;
-    priorShapeManifest: JsonRecord;
-    shapeManifest: JsonRecord;
-    repairFeedback: JsonRecord[];
-    unitRepairScope: JsonRecord;
-  }): JsonRecord {
-    const priorSlidesById = new Map(
-      safeArray(priorShapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
-    );
-    const afterSlides = safeArray(shapeManifest?.slides);
-    const afterSlidesById = new Map(afterSlides.map((slide) => [safeText(slide?.slide_id), slide]));
-    const feedbackById = new Map(safeArray(repairFeedback).map((slide) => [safeText(slide?.slide_id), slide]));
-    const targetSlideIds = safeArray(unitRepairScope?.target_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean);
-    const preservedSlideIds = safeArray(unitRepairScope?.preserved_slide_ids).map((slideId) => safeText(slideId)).filter(Boolean);
-    const targetSet = new Set(targetSlideIds);
-    const allSlideIds = [...new Set([
-      ...safeArray(priorShapeManifest?.slides).map((slide) => safeText(slide?.slide_id)).filter(Boolean),
-      ...afterSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean),
-    ])];
-    const perSlideHashes = allSlideIds.map((slideId) => {
-      const beforeSlide = priorSlidesById.get(slideId);
-      const afterSlide = afterSlidesById.get(slideId);
-      const beforeHash = slideEvidenceHash(beforeSlide);
-      const afterHash = slideEvidenceHash(afterSlide);
-      const targeted = targetSet.has(slideId);
-      return {
-        slide_id: slideId,
-        targeted,
-        before_slide_hash: beforeHash,
-        after_slide_hash: afterHash,
-        preserved_slide_hash: targeted ? null : beforeHash,
-        hash_status: beforeHash && afterHash && beforeHash === afterHash ? 'unchanged' : targeted ? 'changed_by_targeted_repair' : 'changed_without_target',
-        targeted_repair_reason: targeted ? repairReasonFromFeedback(feedbackById.get(slideId)) : null,
-      };
-    });
-    const preservedSlideHashes = preservedSlideIds.map((slideId) => {
-      const evidence = perSlideHashes.find((slide) => slide.slide_id === slideId);
-      return {
-        slide_id: slideId,
-        before_slide_hash: evidence?.before_slide_hash || null,
-        after_slide_hash: evidence?.after_slide_hash || null,
-        preserved_slide_hash: evidence?.preserved_slide_hash || null,
-        proof_status: evidence?.hash_status === 'unchanged' ? 'unchanged' : 'changed_without_target',
-      };
-    });
-    const repairUnits = targetSlideIds.map((slideId) => {
-      const feedback = feedbackById.get(slideId);
-      const beforeSlide = priorSlidesById.get(slideId);
-      const afterSlide = afterSlidesById.get(slideId);
-      return {
-        slide_id: slideId,
-        reason: repairReasonFromFeedback(feedback),
-        input: {
-          source_review_stage: 'screenshot_review',
-          review_feedback: feedback || null,
-          before_slide_hash: slideEvidenceHash(beforeSlide),
-          before_slide_manifest: beforeSlide || null,
-        },
-        output: {
-          after_slide_hash: slideEvidenceHash(afterSlide),
-          after_slide_manifest: afterSlide || null,
-        },
-      };
-    });
-    return {
-      evidence_surface: 'native_ppt_repair_evidence_v1',
-      route,
-      source_review_stage: route === 'repair_pptx_native' ? 'screenshot_review' : null,
-      per_slide_hashes: perSlideHashes,
-      preserved_slide_hashes: preservedSlideHashes,
-      repair_units: repairUnits,
-      non_blocking_slide_reuse_ok: preservedSlideHashes.every((slide) => slide.proof_status === 'unchanged'),
-    };
-  }
-
   function aggregateNativeChecks(slideReviews: JsonRecord[]): JsonRecord {
     const checkKeys = [
       'overflow_free',
@@ -530,6 +464,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       'title_safe_zone_clear',
       'table_legibility_ok',
       'layout_density_ok',
+      'slot_fill_ok',
+      'audience_label_readability_ok',
+      'content_depth_ok',
+      'grid_balance_ok',
     ];
     return Object.fromEntries(
       checkKeys.map((key) => [
@@ -558,12 +496,22 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       ['min_body_font_pt', metrics.min_body_font_pt],
       ['typography_hierarchy_ratio', metrics.typography_hierarchy_ratio],
       ['title_core_overlap_count', metrics.title_core_overlap_count],
+      ['expected_slot_count', metrics.expected_slot_count],
+      ['filled_slot_count', metrics.filled_slot_count],
     ].filter(([, value]) => finiteNumberOrNull(value) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
     if (typeof metrics.body_text_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.typography_hierarchy_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.slot_fill_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.audience_label_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.content_depth_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.grid_balance_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof manifestSlide.checks?.title_core_overlap_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.slot_fill_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.audience_label_readability_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.content_depth_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.grid_balance_ok !== 'boolean') return ['native_quality_checks_missing'];
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
@@ -642,6 +590,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           title_safe_zone_clear: booleanCheck(manifestSlide, 'title_safe_zone_clear', missingQuality),
           table_legibility_ok: booleanCheck(manifestSlide, 'table_legibility_ok', missingQuality),
           layout_density_ok: booleanCheck(manifestSlide, 'layout_density_ok', missingQuality),
+          slot_fill_ok: booleanCheck(manifestSlide, 'slot_fill_ok', missingQuality),
+          audience_label_readability_ok: booleanCheck(manifestSlide, 'audience_label_readability_ok', missingQuality),
+          content_depth_ok: booleanCheck(manifestSlide, 'content_depth_ok', missingQuality),
+          grid_balance_ok: booleanCheck(manifestSlide, 'grid_balance_ok', missingQuality),
         },
         metrics: {
           title_font_size: Number(slide?.title_font_size || 32),
@@ -671,6 +623,20 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           typography_hierarchy_ok: manifestSlide?.metrics?.typography_hierarchy_ok === true,
           title_core_overlap_count: finiteNumberOrNull(manifestSlide?.metrics?.title_core_overlap_count),
           title_core_overlap_failures: safeArray(manifestSlide?.metrics?.title_core_overlap_failures),
+          layout_variant: safeText(manifestSlide?.metrics?.layout_variant),
+          expected_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.expected_slot_count),
+          filled_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.filled_slot_count),
+          slot_fill_ok: manifestSlide?.metrics?.slot_fill_ok === true,
+          slot_fill_failures: safeArray(manifestSlide?.metrics?.slot_fill_failures),
+          audience_label_readability_ok: manifestSlide?.metrics?.audience_label_readability_ok === true,
+          audience_label_font_floor_pt: finiteNumberOrNull(manifestSlide?.metrics?.audience_label_font_floor_pt),
+          audience_label_readability_failures: safeArray(manifestSlide?.metrics?.audience_label_readability_failures),
+          content_depth_ok: manifestSlide?.metrics?.content_depth_ok === true,
+          content_depth_floor_chars: finiteNumberOrNull(manifestSlide?.metrics?.content_depth_floor_chars),
+          content_depth_failures: safeArray(manifestSlide?.metrics?.content_depth_failures),
+          grid_balance_ok: manifestSlide?.metrics?.grid_balance_ok === true,
+          grid_balance_ratio: finiteNumberOrNull(manifestSlide?.metrics?.grid_balance_ratio),
+          grid_balance_failures: safeArray(manifestSlide?.metrics?.grid_balance_failures),
           table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
           card_blank_ratio: finiteNumberOrNull(manifestSlide?.metrics?.card_blank_ratio),
           table_metrics: manifestSlide?.metrics?.table_metrics || [],
@@ -709,6 +675,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       slide_id: safeText(slide?.slide_id),
       title: safeText(slide?.title),
       layout_family: safeText(slide?.layout_family),
+      layout_variant: safeText(slide?.metrics?.layout_variant),
+      expected_slot_count: Number(slide?.metrics?.expected_slot_count || 0),
+      filled_slot_count: Number(slide?.metrics?.filled_slot_count || 0),
       shape_count: Number(slide?.shape_count || 0),
       text_box_count: Number(slide?.text_box_count || 0),
       preview_screenshot_file: safeText(slide?.preview_screenshot_file),
@@ -744,11 +713,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       : [];
     const unitRepairScope = buildUnitRepairScope({ route, blueprintArtifact, repairFeedback });
     const paths = nativeArtifactPaths({ deliverablePaths, deliverableId, route });
-    const {
-      editableShapePlan,
-      generationRuntime,
-      modelContract,
-    } = await generateEditableShapePlan({
+    const generatedPlan = await generateEditableShapePlan({
       route,
       contract,
       deliverablePaths,
@@ -758,6 +723,21 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       unitRepairScope,
       adapter,
     });
+    const {
+      editableShapePlan,
+      generationRuntime,
+      modelContract,
+    } = route === 'repair_pptx_native'
+      ? {
+          ...generatedPlan,
+          editableShapePlan: mergeRepairEditableShapePlan({
+            editableShapePlan: generatedPlan.editableShapePlan,
+            priorNativeArtifact,
+            blueprintArtifact,
+            unitRepairScope,
+          }),
+        }
+      : generatedPlan;
     writeJson(paths.editableShapePlanFile, editableShapePlan);
     writeJson(paths.inputFile, {
       route,
@@ -793,6 +773,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const shapeManifest = existsSync(paths.shapeManifestFile)
       ? JSON.parse(readFileSync(paths.shapeManifestFile, 'utf-8'))
       : {};
+    assertNativeDeckCompleteness({ route, shapeManifest, payload, unitRepairScope });
     const renderProof = requireTrueRenderProof(payload, shapeManifest);
     writeJson(paths.shapeManifestFile, {
       ...shapeManifest,
@@ -855,6 +836,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         officecli_materializer_policy: payload.officecli_materializer_policy
           || shapeManifest.officecli_materializer_policy
           || OFFICECLI_MATERIALIZER_POLICY,
+        officecli_gate: payload.officecli_gate || shapeManifest.officecli_gate || null,
         render_proof: renderProof,
         redcube_svg_ir: payload.redcube_svg_ir || shapeManifest.redcube_svg_ir || null,
         ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,

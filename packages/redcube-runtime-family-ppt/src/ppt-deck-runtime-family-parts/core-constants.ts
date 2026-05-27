@@ -55,6 +55,10 @@ export const TARGETED_SCREENSHOT_MECHANICAL_ISSUES = new Set([
   'table_font_below_minimum',
   'table_cell_fit_failed',
   'layout_density_too_sparse',
+  'native_slot_fill_failed',
+  'audience_label_below_readability_floor',
+  'native_content_depth_failed',
+  'native_grid_balance_failed',
 ]);
 export const HARD_SCREENSHOT_BLOCKING_ISSUES = TARGETED_SCREENSHOT_MECHANICAL_ISSUES;
 export const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
@@ -70,6 +74,10 @@ export const TARGETED_SCREENSHOT_RERUN_CHECKS = new Set([
   'title_safe_zone_clear',
   'table_legibility_ok',
   'layout_density_ok',
+  'slot_fill_ok',
+  'audience_label_readability_ok',
+  'content_depth_ok',
+  'grid_balance_ok',
 ]);
 export const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
   storyline: 'story_architecture',

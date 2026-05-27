@@ -62,9 +62,9 @@ function assertOfficecliMaterializerPolicy(policy) {
   assert.equal(policy.adoption_status, 'qa_materializer_discipline_only');
   assert.equal(policy.rca_main_workflow_owner, 'redcube_stage_review_export');
   assert.equal(policy.skill_authoring_loop_adopted, false);
-  assert.equal(policy.materializer_role, 'executor_adapter_materializer_and_qa_gate');
-  assert.equal(policy.current_pptx_writer, 'redcube_drawingml_writer');
-  assert.equal(policy.officecli_writer_adapter_default_enabled, false);
+  assert.equal(policy.materializer_role, 'default_editable_pptx_materializer_and_qa_gate');
+  assert.equal(policy.current_pptx_writer, 'officecli_pptx_materializer');
+  assert.equal(policy.officecli_writer_adapter_default_enabled, true);
   assert.deepEqual(policy.required_gate_refs, [
     'officecli_save_before_close',
     'officecli_validate',
@@ -141,7 +141,7 @@ test('product-entry manifest exposes image-first default and explicit native PPT
   });
   assert.deepEqual(pptPolicy.native_ppt_proof_lane.engine_capabilities, {
     authoring_ir: 'redcube_svg_ir',
-    pptx_writer: 'redcube_drawingml_writer',
+    pptx_writer: 'officecli_pptx_materializer',
     editable_pptx: true,
     strict_svg_preflight: true,
     true_render_proof_required: true,

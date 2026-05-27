@@ -25,7 +25,7 @@ from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_sl
 ENGINE_CAPABILITIES = {
     'authoring_ir': 'redcube_svg_ir',
     'authoring_ir_version': 1,
-    'pptx_writer': 'redcube_drawingml_writer',
+    'pptx_writer': 'officecli_pptx_materializer',
     'editable_pptx': True,
     'strict_svg_preflight': True,
     'true_render_proof_required': True,
@@ -38,9 +38,9 @@ OFFICECLI_MATERIALIZER_POLICY = {
     'adoption_status': 'qa_materializer_discipline_only',
     'rca_main_workflow_owner': 'redcube_stage_review_export',
     'skill_authoring_loop_adopted': False,
-    'materializer_role': 'executor_adapter_materializer_and_qa_gate',
-    'current_pptx_writer': 'redcube_drawingml_writer',
-    'officecli_writer_adapter_default_enabled': False,
+    'materializer_role': 'default_editable_pptx_materializer_and_qa_gate',
+    'current_pptx_writer': 'officecli_pptx_materializer',
+    'officecli_writer_adapter_default_enabled': True,
     'required_gate_refs': [
         'officecli_save_before_close',
         'officecli_validate',
@@ -487,9 +487,11 @@ def main() -> None:
     preview_dir = Path(args.preview_dir).resolve()
     svg_ir_dir = preview_dir.parent / f'{preview_dir.name}-redcube-svg-ir'
     try:
-        manifest_slides = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids, evaluate_native_slide_quality)
+        deck_build = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids, evaluate_native_slide_quality)
     except RuntimeError as exc:
         fail(str(exc))
+    manifest_slides = deck_build['slides']
+    officecli_gate = deck_build['officecli_gate']
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
     render_proof = render_pptx(output_pptx, preview_dir, output_pdf, renderer_name=args.renderer)
     manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
@@ -518,13 +520,13 @@ def main() -> None:
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
         'builder': {
-            'kind': 'redcube_drawingml_writer',
-            'implementation': 'python_pptx_native_shapes',
+            'kind': 'officecli_pptx_materializer',
+            'implementation': 'officecli_batch_from_ai_spatial_plan',
             'surface': 'editable_native_pptx',
             'screenshot_packaging': False,
         },
         'capability': {
-            'kind': 'RedCube DrawingML writer',
+            'kind': 'officecli materializer adapter',
             'editable_artifact': True,
             'native_shapes': True,
             'redcube_svg_ir': True,
@@ -539,14 +541,35 @@ def main() -> None:
                 'bounds',
                 'text_char_count',
                 'primary_points',
+                'min_body_font_pt',
+                'body_text_readability_ok',
+                'typography_hierarchy_ratio',
+                'typography_hierarchy_ok',
+                'title_core_overlap_count',
+                'layout_variant',
+                'expected_slot_count',
+                'filled_slot_count',
+                'slot_fill_ok',
+                'audience_label_readability_ok',
+                'content_depth_ok',
+                'grid_balance_ok',
                 'occupied_ratio',
                 'edge_clearance',
                 'overlap_pairs',
+                'decorative_shape_count',
+                'shape_kind_count',
+                'role_count',
+                'layout_richness_score',
                 'chart_bounds',
                 'table_bounds',
+                'metric_grid_bounds',
+                'chart_metrics',
+                'table_metrics',
+                'metric_grid_metrics',
                 'axis_label_count',
                 'legend_label_count',
                 'table_cell_fit_ok',
+                'table_cell_fit_failures',
                 'table_min_font_pt',
                 'title_safe_zone_clearance_ok',
                 'operator_language_fragments',
@@ -559,6 +582,7 @@ def main() -> None:
         },
         'engine_capabilities': ENGINE_CAPABILITIES,
         'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
+        'officecli_gate': officecli_gate,
         'render_proof': render_proof,
         'redcube_svg_ir': {
             'kind': 'redcube_svg_ir',
@@ -587,6 +611,7 @@ def main() -> None:
         'engine_contract_file': str(engine_contract_file),
         'engine_capabilities': ENGINE_CAPABILITIES,
         'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
+        'officecli_gate': officecli_gate,
         'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
         'page_count': len(slides),

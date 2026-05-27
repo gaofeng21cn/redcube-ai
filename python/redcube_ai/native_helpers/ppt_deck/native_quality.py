@@ -17,6 +17,10 @@ MIN_NATIVE_BODY_FONT_PT = 18.0
 MIN_NATIVE_TITLE_FONT_PT = 36.0
 MIN_NATIVE_TYPOGRAPHY_HIERARCHY_RATIO = 2.0
 MIN_NATIVE_TITLE_CORE_GAP_PX = 8.0
+MIN_AUDIENCE_LABEL_FONT_PT = 16.0
+MIN_GRID_BALANCE_RATIO = 0.56
+MAX_GRID_BALANCE_RATIO = 1.78
+MIN_POINT_TEXT_CONTENT_CHARS = 12
 MIN_TABLE_BODY_FONT_PT = 11.0
 MAX_TABLE_CELL_BLANK_RATIO = 0.38
 OPERATOR_LANGUAGE_FRAGMENTS = [
@@ -246,6 +250,185 @@ def title_core_overlap_failures(native_shapes: list[dict]) -> list[dict]:
     return failures
 
 
+def shapes_with_role(native_shapes: list[dict], role: str) -> list[dict]:
+    return [
+        shape for shape in native_shapes
+        if shape.get('quality_role') == 'content' and safe_text(shape.get('role')) == role
+    ]
+
+
+def layout_variant(native_shapes: list[dict]) -> str:
+    roles = {safe_text(shape.get('role')) for shape in native_shapes}
+    zone_count = len(shapes_with_role(native_shapes, 'compare_panel'))
+    timeline_count = len(shapes_with_role(native_shapes, 'timeline_panel'))
+    gate_count = len(shapes_with_role(native_shapes, 'judgement_step'))
+    axis_count = len(shapes_with_role(native_shapes, 'axis_panel'))
+    signal_count = len(shapes_with_role(native_shapes, 'signal_panel'))
+    takeaway_count = len(shapes_with_role(native_shapes, 'takeaway_panel'))
+    if zone_count == 2:
+        return 'compare_two_column'
+    if zone_count == 3:
+        return 'compare_three_column'
+    if zone_count == 4:
+        return 'compare_four_zone'
+    if 'structured_note_panel' in roles:
+        return 'structured_compare'
+    if timeline_count:
+        return 'timeline_band'
+    if gate_count <= 2 and gate_count > 0:
+        return 'judgement_two_gate'
+    if gate_count > 2:
+        return 'judgement_ladder'
+    if axis_count:
+        return 'ring_cross'
+    if signal_count:
+        return 'cover_signal'
+    if takeaway_count:
+        return 'summary_peak'
+    return 'unknown'
+
+
+def expected_slot_roles(native_shapes: list[dict]) -> list[str]:
+    variant = layout_variant(native_shapes)
+    if variant.startswith('compare_'):
+        return ['compare_panel', 'point_text']
+    if variant == 'structured_compare':
+        return ['structured_note_panel', 'point_text']
+    if variant == 'timeline_band':
+        return ['timeline_panel', 'point_text']
+    if variant.startswith('judgement_'):
+        return ['judgement_step', 'point_text']
+    if variant == 'ring_cross':
+        return ['axis_panel', 'point_text']
+    if variant == 'cover_signal':
+        return ['signal_panel', 'point_text']
+    if variant == 'summary_peak':
+        return ['takeaway_panel']
+    return []
+
+
+def slot_fill_audit(native_shapes: list[dict], primary_points: int) -> dict:
+    variant = layout_variant(native_shapes)
+    roles = expected_slot_roles(native_shapes)
+    if not roles:
+        return {
+            'layout_variant': variant,
+            'expected_slot_count': max(1, min(primary_points, MAX_NATIVE_PRIMARY_POINTS)),
+            'filled_slot_count': 0,
+            'slot_fill_ok': False,
+            'slot_fill_failures': [{'reason': 'unknown_layout_variant'}],
+        }
+    panel_role = roles[0]
+    panel_count = len(shapes_with_role(native_shapes, panel_role))
+    text_role = roles[1] if len(roles) > 1 else ''
+    text_count = len([
+        shape for shape in shapes_with_role(native_shapes, text_role)
+        if safe_text(shape.get('text'))
+    ]) if text_role else panel_count
+    if variant == 'summary_peak':
+        expected_slots = max(1, min(max(primary_points - 1, 1), 3))
+    elif variant == 'structured_compare':
+        expected_slots = min(max(1, primary_points), max(panel_count, 1))
+    else:
+        expected_slots = max(1, min(primary_points, 4))
+    filled_slots = min(panel_count, text_count)
+    failures = []
+    if panel_count != expected_slots:
+        failures.append({
+            'reason': 'panel_count_mismatch',
+            'role': panel_role,
+            'expected': expected_slots,
+            'actual': panel_count,
+        })
+    if text_count < expected_slots:
+        failures.append({
+            'reason': 'text_slot_count_mismatch',
+            'role': text_role,
+            'expected': expected_slots,
+            'actual': text_count,
+        })
+    return {
+        'layout_variant': variant,
+        'expected_slot_count': expected_slots,
+        'filled_slot_count': filled_slots,
+        'slot_fill_ok': len(failures) == 0,
+        'slot_fill_failures': failures,
+    }
+
+
+def audience_label_readability_failures(native_shapes: list[dict]) -> list[dict]:
+    failures = []
+    for shape in shapes_with_role(native_shapes, 'point_index'):
+        font_size = float(shape.get('font_size') or 0.0)
+        if font_size < MIN_AUDIENCE_LABEL_FONT_PT:
+            failures.append({
+                'shape_id': shape.get('shape_id'),
+                'font_size': round(font_size, 2),
+                'threshold': MIN_AUDIENCE_LABEL_FONT_PT,
+            })
+    return failures
+
+
+def normalized_content_char_count(text: str) -> int:
+    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
+
+
+def content_depth_audit(native_shapes: list[dict]) -> dict:
+    point_text_shapes = [
+        shape for shape in shapes_with_role(native_shapes, 'point_text')
+        if safe_text(shape.get('text'))
+    ]
+    failures = []
+    for shape in point_text_shapes:
+        char_count = normalized_content_char_count(shape.get('text'))
+        if char_count < MIN_POINT_TEXT_CONTENT_CHARS:
+            failures.append({
+                'shape_id': shape.get('shape_id'),
+                'role': shape.get('role'),
+                'text_char_count': char_count,
+                'threshold': MIN_POINT_TEXT_CONTENT_CHARS,
+            })
+    return {
+        'content_depth_ok': len(failures) == 0,
+        'content_depth_floor_chars': MIN_POINT_TEXT_CONTENT_CHARS,
+        'content_depth_failures': failures,
+    }
+
+
+def grid_balance_audit(native_shapes: list[dict]) -> dict:
+    variant = layout_variant(native_shapes)
+    slot_roles = expected_slot_roles(native_shapes)
+    panel_role = slot_roles[0] if slot_roles else ''
+    panels = shapes_with_role(native_shapes, panel_role) if panel_role else []
+    if len(panels) <= 1:
+        return {
+            'grid_balance_ratio': 1.0,
+            'grid_balance_ok': True,
+            'grid_balance_failures': [],
+        }
+    areas = []
+    for panel in panels:
+        rect = panel.get('bounds') or {}
+        areas.append(float(rect.get('width') or 0.0) * float(rect.get('height') or 0.0))
+    smallest = min((area for area in areas if area > 0), default=0.0)
+    largest = max(areas, default=0.0)
+    ratio = largest / smallest if smallest > 0 else float('inf')
+    failures = []
+    if ratio < MIN_GRID_BALANCE_RATIO or ratio > MAX_GRID_BALANCE_RATIO:
+        failures.append({
+            'reason': 'panel_area_ratio_out_of_range',
+            'layout_variant': variant,
+            'ratio': round(ratio, 4) if math.isfinite(ratio) else None,
+            'min': MIN_GRID_BALANCE_RATIO,
+            'max': MAX_GRID_BALANCE_RATIO,
+        })
+    return {
+        'grid_balance_ratio': round(ratio, 4) if math.isfinite(ratio) else None,
+        'grid_balance_ok': len(failures) == 0,
+        'grid_balance_failures': failures,
+    }
+
+
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
     decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
@@ -335,6 +518,10 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     language_fragments = operator_language_fragments(content_shapes)
     title_zone_failures = title_safe_zone_failures(content_shapes)
     title_core_failures = title_core_overlap_failures(content_shapes)
+    slot_audit = slot_fill_audit(content_shapes, primary_points)
+    label_failures = audience_label_readability_failures(content_shapes)
+    content_depth = content_depth_audit(content_shapes)
+    grid_audit = grid_balance_audit(content_shapes)
     table_failures = table_legibility_failures(table_metrics)
     coordinate_payload = [
         {
@@ -381,6 +568,10 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'title_core_overlap_ok': len(title_core_failures) == 0,
         'page_number_consistency_ok': page_number_consistency_ok,
         'layout_richness_ok': layout_richness_score >= MIN_NATIVE_LAYOUT_RICHNESS,
+        'slot_fill_ok': slot_audit['slot_fill_ok'],
+        'audience_label_readability_ok': len(label_failures) == 0,
+        'content_depth_ok': content_depth['content_depth_ok'],
+        'grid_balance_ok': grid_audit['grid_balance_ok'],
         'external_audience_language_ok': len(language_fragments) == 0,
         'title_safe_zone_clear': len(title_zone_failures) == 0,
         'table_legibility_ok': len(table_failures) == 0,
@@ -409,6 +600,14 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('page_number_missing')
     if not checks['layout_richness_ok']:
         issues.append('layout_richness_below_threshold')
+    if not checks['slot_fill_ok']:
+        issues.append('native_slot_fill_failed')
+    if not checks['audience_label_readability_ok']:
+        issues.append('audience_label_below_readability_floor')
+    if not checks['content_depth_ok']:
+        issues.append('native_content_depth_failed')
+    if not checks['grid_balance_ok']:
+        issues.append('native_grid_balance_failed')
     if not checks['external_audience_language_ok']:
         issues.append('operator_language_leak_detected')
     if not checks['title_safe_zone_clear']:
@@ -439,6 +638,20 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'shape_kind_count': len(shape_kinds),
             'role_count': len(shape_roles),
             'layout_richness_score': layout_richness_score,
+            'layout_variant': slot_audit['layout_variant'],
+            'expected_slot_count': slot_audit['expected_slot_count'],
+            'filled_slot_count': slot_audit['filled_slot_count'],
+            'slot_fill_ok': slot_audit['slot_fill_ok'],
+            'slot_fill_failures': slot_audit['slot_fill_failures'],
+            'audience_label_readability_ok': len(label_failures) == 0,
+            'audience_label_font_floor_pt': MIN_AUDIENCE_LABEL_FONT_PT,
+            'audience_label_readability_failures': label_failures,
+            'content_depth_ok': content_depth['content_depth_ok'],
+            'content_depth_floor_chars': content_depth['content_depth_floor_chars'],
+            'content_depth_failures': content_depth['content_depth_failures'],
+            'grid_balance_ok': grid_audit['grid_balance_ok'],
+            'grid_balance_ratio': grid_audit['grid_balance_ratio'],
+            'grid_balance_failures': grid_audit['grid_balance_failures'],
             'overlap_pairs': len(overlap_pairs),
             'overlaps': overlap_pairs,
             'clipped_nodes': clipped_nodes,

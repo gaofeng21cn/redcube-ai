@@ -56,6 +56,13 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
     };
   }
 
+  function hasNativeQualitySurface(slideReviews) {
+    return safeArray(slideReviews).some((slide) => (
+      safeText(slide?.metrics?.native_quality_source) === 'shape_manifest'
+      || safeText(slide?.metrics?.native_quality_model).includes('shape_manifest')
+    ));
+  }
+
   function titleConsistencyExempt(review) {
     return safeText(review?.slide_id) === 'S01' || safeText(review?.layout_family) === 'cover_signal';
   }
@@ -265,6 +272,7 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
     slideReviews,
     baselineReview,
   }) {
+    const nativeQualitySurface = hasNativeQualitySurface(slideReviews);
     const checks = {
       director_intent_landed: Boolean(directorReviewArtifact?.visual_director_review?.director_intent_landed)
         && Boolean(data?.director_intent_landed),
@@ -283,6 +291,12 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
       title_safe_zone_clear: aiFirstMechanicalCheckValue(slideReviews, 'title_safe_zone_clear'),
       table_legibility_ok: aiFirstMechanicalCheckValue(slideReviews, 'table_legibility_ok'),
       layout_density_ok: aiFirstMechanicalCheckValue(slideReviews, 'layout_density_ok'),
+      ...(nativeQualitySurface ? {
+        slot_fill_ok: aiFirstMechanicalCheckValue(slideReviews, 'slot_fill_ok'),
+        audience_label_readability_ok: aiFirstMechanicalCheckValue(slideReviews, 'audience_label_readability_ok'),
+        content_depth_ok: aiFirstMechanicalCheckValue(slideReviews, 'content_depth_ok'),
+        grid_balance_ok: aiFirstMechanicalCheckValue(slideReviews, 'grid_balance_ok'),
+      } : {}),
       ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),
     };
     if (baselineReview) checks.baseline_comparison_passed = baselineReview.passed;

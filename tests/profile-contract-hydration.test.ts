@@ -95,7 +95,7 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   );
   assert.equal(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.current_pptx_writer,
-    'redcube_drawingml_writer',
+    'officecli_pptx_materializer',
   );
   assert.deepEqual(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.required_gate_refs,

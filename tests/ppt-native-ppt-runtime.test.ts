@@ -127,12 +127,12 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       true,
     );
     assert.equal(shapeManifest.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
-    assert.equal(shapeManifest.engine_capabilities?.pptx_writer, 'redcube_drawingml_writer');
+    assert.equal(shapeManifest.engine_capabilities?.pptx_writer, 'officecli_pptx_materializer');
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_required, true);
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_renderer, 'libreoffice_headless');
     assert.equal(shapeManifest.engine_capabilities?.cross_platform_render_required, true);
     assert.equal(shapeManifest.officecli_materializer_policy?.skill_authoring_loop_adopted, false);
-    assert.equal(shapeManifest.officecli_materializer_policy?.current_pptx_writer, 'redcube_drawingml_writer');
+    assert.equal(shapeManifest.officecli_materializer_policy?.current_pptx_writer, 'officecli_pptx_materializer');
     assert.equal(shapeManifest.officecli_materializer_policy?.view_issues_required, true);
     assert.equal(shapeManifest.officecli_materializer_policy?.true_render_proof_substitute_allowed, false);
     assert.equal(shapeManifest.render_proof?.source_surface_kind, 'native_pptx');
@@ -158,7 +158,11 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       ['cover_signal', 'multi_zone_compare', 'timeline_band', 'judgement_ladder', 'ring_cross', 'summary_peak'],
     );
     assert.equal(
-      authored.native_ppt_bundle.slides.every((slide) => slide.layout_writer === `${slide.layout_family}_native_writer`),
+      authored.native_ppt_bundle.slides.every((slide) => slide.layout_writer === 'officecli_pptx_materializer'),
+      true,
+    );
+    assert.equal(
+      authored.native_ppt_bundle.slides.every((slide) => slide.ai_first_spatial_plan?.helper_template_layout_used === false),
       true,
     );
     const visibleText = flattenNativeVisibleText(authored, shapeManifest);
@@ -176,7 +180,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authored.native_ppt_bundle?.render_proof?.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
     assert.equal(authored.native_ppt_bundle?.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
     assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.skill_authoring_loop_adopted, false);
-    assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.current_pptx_writer, 'redcube_drawingml_writer');
+    assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.current_pptx_writer, 'officecli_pptx_materializer');
 
     let screenshotReviewArtifact = null;
     for (const route of ['visual_director_review', 'screenshot_review', 'export_pptx']) {
@@ -453,6 +457,218 @@ test('native PPT screenshot review blocks from shape-manifest quality metrics in
   });
 });
 
+test('native PPT screenshot review blocks incomplete slots, unreadable labels, and unbalanced native layout', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-layout-gates-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-layout-gates' });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-layout-gates',
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+    const authored = readJson(authorResult.artifactFile);
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    shapeManifest.slides[1] = {
+      ...shapeManifest.slides[1],
+      checks: {
+        ...shapeManifest.slides[1].checks,
+        slot_fill_ok: false,
+        audience_label_readability_ok: false,
+        content_depth_ok: false,
+        grid_balance_ok: false,
+      },
+      metrics: {
+        ...shapeManifest.slides[1].metrics,
+        layout_variant: 'compare_four_zone',
+        expected_slot_count: 4,
+        filled_slot_count: 3,
+        slot_fill_ok: false,
+        slot_fill_failures: [{
+          reason: 'panel_count_mismatch',
+          role: 'compare_panel',
+          expected: 4,
+          actual: 3,
+        }],
+        audience_label_readability_ok: false,
+        audience_label_font_floor_pt: 16,
+        audience_label_readability_failures: [{
+          shape_id: `${shapeManifest.slides[1].slide_id}-zone-1-index`,
+          font_size: 12.5,
+          threshold: 16,
+        }],
+        content_depth_ok: false,
+        content_depth_floor_chars: 12,
+        content_depth_failures: [{
+          shape_id: `${shapeManifest.slides[1].slide_id}-zone-1-text`,
+          role: 'point_text',
+          text_char_count: 4,
+          threshold: 12,
+        }],
+        grid_balance_ok: false,
+        grid_balance_ratio: 2.24,
+        grid_balance_failures: [{
+          reason: 'panel_area_ratio_out_of_range',
+          layout_variant: 'compare_four_zone',
+          ratio: 2.24,
+          min: 0.56,
+          max: 1.78,
+        }],
+      },
+      issues: [
+        'native_slot_fill_failed',
+        'audience_label_below_readability_floor',
+        'native_content_depth_failed',
+        'native_grid_balance_failed',
+      ],
+    };
+    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
+
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-layout-gates',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorResult.ok, true);
+
+    const screenshotResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-layout-gates',
+      route: 'screenshot_review',
+    });
+    assert.equal(screenshotResult.ok, false);
+    const screenshotReview = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-layout-gates',
+      'artifacts',
+      'quality_gate.json',
+    ));
+    assert.equal(screenshotReview.status, 'block');
+    assert.equal(screenshotReview.checks.slot_fill_ok, false);
+    assert.equal(screenshotReview.checks.audience_label_readability_ok, false);
+    assert.equal(screenshotReview.checks.content_depth_ok, false);
+    assert.equal(screenshotReview.checks.grid_balance_ok, false);
+    assert.equal(screenshotReview.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.equal(
+      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_slot_fill_failed'),
+      true,
+    );
+    assert.equal(
+      screenshotReview.slide_reviews[1].mechanical_issues.includes('audience_label_below_readability_floor'),
+      true,
+    );
+    assert.equal(
+      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_content_depth_failed'),
+      true,
+    );
+    assert.equal(
+      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_grid_balance_failed'),
+      true,
+    );
+    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.layout_variant, 'compare_four_zone');
+    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.expected_slot_count, 4);
+    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.filled_slot_count, 3);
+    assert.equal(
+      screenshotReview.mechanical_review.slide_reviews[1].metrics.audience_label_readability_failures[0].font_size,
+      12.5,
+    );
+    assert.equal(
+      screenshotReview.mechanical_review.slide_reviews[1].metrics.content_depth_failures[0].threshold,
+      12,
+    );
+    assert.equal(
+      screenshotReview.mechanical_review.slide_reviews[1].metrics.grid_balance_failures[0].reason,
+      'panel_area_ratio_out_of_range',
+    );
+  });
+});
+
+test('native PPT visual director review blocks repeated native layout variants before screenshot review', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-layout-repetition-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-layout-repetition' });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-layout-repetition',
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+    const authored = readJson(authorResult.artifactFile);
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    for (const slide of shapeManifest.slides.slice(1, 4)) {
+      slide.layout_family = 'multi_zone_compare';
+      slide.metrics = {
+        ...slide.metrics,
+        layout_variant: 'compare_four_zone',
+        expected_slot_count: 4,
+        filled_slot_count: 4,
+      };
+    }
+    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
+
+    const poisonedAuthored = {
+      ...authored,
+      native_ppt_bundle: {
+        ...authored.native_ppt_bundle,
+        slides: authored.native_ppt_bundle.slides.map((slide, index) => (
+          index >= 1 && index <= 3
+            ? {
+                ...slide,
+                layout_family: 'multi_zone_compare',
+                metrics: {
+                  ...(slide.metrics || {}),
+                  layout_variant: 'compare_four_zone',
+                  expected_slot_count: 4,
+                  filled_slot_count: 4,
+                },
+              }
+            : slide
+        )),
+      },
+    };
+    writeJson(authorResult.artifactFile, poisonedAuthored);
+
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-layout-repetition',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorResult.ok, false);
+    const directorArtifact = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-layout-repetition',
+      'artifacts',
+      'director_review.json',
+    ));
+    assert.equal(directorArtifact.status, 'block');
+    assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
+    assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.match(directorArtifact.visual_director_review.review_summary, /native homogeneous layout run/);
+    assert.deepEqual(
+      directorArtifact.visual_director_review.weak_pages.filter((slideId) => ['S02', 'S03', 'S04'].includes(slideId)),
+      ['S02', 'S03', 'S04'],
+    );
+  });
+});
+
 test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
   const engineContract = nativeEngineContract();
   const proofLane = readJson(path.resolve('contracts/runtime-program/ppt-native-authoring-proof-lane.json'));
@@ -476,7 +692,7 @@ test('native PPT proof lane records the Python engine contract as the single own
     'shape_manifest_layout_metrics_v1',
   );
   assert.equal(engineContract.engine_capabilities.authoring_ir, 'redcube_svg_ir');
-  assert.equal(engineContract.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(engineContract.engine_capabilities.pptx_writer, 'officecli_pptx_materializer');
   assert.equal(engineContract.officecli_materializer_policy.skill_authoring_loop_adopted, false);
   assert.equal(engineContract.officecli_materializer_policy.view_issues_required, true);
   assert.equal(engineContract.officecli_materializer_policy.true_render_proof_substitute_allowed, false);

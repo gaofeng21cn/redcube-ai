@@ -13,7 +13,7 @@ const PNG_1X1 = Buffer.from(
 const NATIVE_ENGINE_CAPABILITIES = {
   authoring_ir: 'redcube_svg_ir',
   authoring_ir_version: 1,
-  pptx_writer: 'redcube_drawingml_writer',
+  pptx_writer: 'officecli_pptx_materializer',
   editable_pptx: true,
   strict_svg_preflight: true,
   true_render_proof_required: true,
@@ -27,9 +27,9 @@ const OFFICECLI_MATERIALIZER_POLICY = {
   adoption_status: 'qa_materializer_discipline_only',
   rca_main_workflow_owner: 'redcube_stage_review_export',
   skill_authoring_loop_adopted: false,
-  materializer_role: 'executor_adapter_materializer_and_qa_gate',
-  current_pptx_writer: 'redcube_drawingml_writer',
-  officecli_writer_adapter_default_enabled: false,
+  materializer_role: 'default_editable_pptx_materializer_and_qa_gate',
+  current_pptx_writer: 'officecli_pptx_materializer',
+  officecli_writer_adapter_default_enabled: true,
   required_gate_refs: [
     'officecli_save_before_close',
     'officecli_validate',
@@ -287,7 +287,7 @@ function buildNativePayload(args) {
       ? input.repair_feedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean)
       : [],
   );
-  const layoutWriterFor = (layoutFamily) => `${layoutFamily || 'multi_zone_compare'}_native_writer`;
+  const layoutWriterFor = () => 'officecli_pptx_materializer';
   ensureDir(previewDir);
   const slides = blueprintSlides.map((slide, index) => {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
@@ -317,6 +317,13 @@ function buildNativePayload(args) {
       title: String(slide?.title || `Slide ${index + 1}`),
       layout_family: layoutFamily,
       layout_writer: layoutWriterFor(layoutFamily),
+      ai_first_spatial_plan: {
+        required: true,
+        materialized: true,
+        helper_template_layout_used: false,
+        materializer: 'officecli_pptx_materializer',
+        shape_count: Array.isArray(planSlide?.native_shapes) ? planSlide.native_shapes.length : 0,
+      },
       text_box_count: 3,
       shape_count: 5,
       screenshot_file: screenshotFile,
@@ -373,6 +380,10 @@ function buildNativePayload(args) {
         title_safe_zone_clear: true,
         table_legibility_ok: true,
         layout_density_ok: true,
+        slot_fill_ok: true,
+        audience_label_readability_ok: true,
+        content_depth_ok: true,
+        grid_balance_ok: true,
       },
       metrics: {
         title_font_size: layoutFamily === 'cover_signal' ? 56 : 44,
@@ -384,6 +395,20 @@ function buildNativePayload(args) {
         typography_hierarchy_ok: true,
         title_core_overlap_count: 0,
         title_core_overlap_failures: [],
+        layout_variant: layoutFamily,
+        expected_slot_count: 2,
+        filled_slot_count: 2,
+        slot_fill_ok: true,
+        slot_fill_failures: [],
+        audience_label_readability_ok: true,
+        audience_label_font_floor_pt: 16,
+        audience_label_readability_failures: [],
+        content_depth_ok: true,
+        content_depth_floor_chars: 12,
+        content_depth_failures: [],
+        grid_balance_ok: true,
+        grid_balance_ratio: 1,
+        grid_balance_failures: [],
         text_char_count: 72,
         block_count: 3,
         shape_count: 5,
@@ -455,6 +480,13 @@ function buildNativePayload(args) {
         'typography_hierarchy_ratio',
         'typography_hierarchy_ok',
         'title_core_overlap_count',
+        'layout_variant',
+        'expected_slot_count',
+        'filled_slot_count',
+        'slot_fill_ok',
+        'audience_label_readability_ok',
+        'content_depth_ok',
+        'grid_balance_ok',
         'occupied_ratio',
         'edge_clearance',
         'overlap_pairs',
@@ -497,13 +529,13 @@ function buildNativePayload(args) {
   return {
     status: 'completed',
     builder: {
-      kind: 'redcube_drawingml_writer',
-      implementation: 'mock_python_pptx_native_shapes',
+      kind: 'officecli_pptx_materializer',
+      implementation: 'mock_officecli_batch_from_ai_spatial_plan',
       surface: 'editable_native_pptx',
       screenshot_packaging: false,
     },
     capability: {
-      kind: 'RedCube DrawingML writer',
+      kind: 'officecli materializer adapter',
       editable_artifact: true,
       native_shapes: true,
       redcube_svg_ir: true,

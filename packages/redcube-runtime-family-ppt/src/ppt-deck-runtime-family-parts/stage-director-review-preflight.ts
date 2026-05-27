@@ -97,6 +97,8 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     const slides = summarizeNativeSlides(nativeArtifact);
     const weakPages = [];
     const findings = [];
+    const layoutRuns = [];
+    let currentRun = [];
     for (const slide of slides) {
       if (Number(slide.shape_count || 0) < 3 || Number(slide.text_box_count || 0) < 2) {
         weakPages.push(slide.slide_id);
@@ -106,11 +108,26 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native PPT preview screenshot missing`);
       }
+      const layoutVariant = safeText(slide.layout_variant || slide.layout_family);
+      const isRepetitiveCandidate = !['cover_signal', 'summary_peak'].includes(layoutVariant);
+      const lastVariant = safeText(currentRun.at(-1)?.layout_variant || currentRun.at(-1)?.layout_family);
+      currentRun = isRepetitiveCandidate && layoutVariant && layoutVariant === lastVariant
+        ? [...currentRun, slide]
+        : (isRepetitiveCandidate && layoutVariant ? [slide] : []);
+      if (currentRun.length >= 3) {
+        layoutRuns.push([...currentRun]);
+      }
+    }
+    const longestRun = layoutRuns.sort((left, right) => right.length - left.length)[0] || [];
+    if (longestRun.length >= 3) {
+      for (const slide of longestRun) weakPages.push(slide.slide_id);
+      const variant = safeText(longestRun[0]?.layout_variant || longestRun[0]?.layout_family, 'unknown');
+      findings.push(`native homogeneous layout run (${variant}): ${longestRun.map((slide) => safeText(slide.slide_id)).join(',')}`);
     }
     return {
       antiTemplateOk: findings.length === 0,
       weakPages: [...new Set(weakPages)].filter(Boolean),
-      homogeneousLayoutRisk: 0.12,
+      homogeneousLayoutRisk: longestRun.length >= 3 ? Math.min(0.95, 0.42 + (longestRun.length / Math.max(slides.length, 1))) : 0.12,
       findings,
     };
   }

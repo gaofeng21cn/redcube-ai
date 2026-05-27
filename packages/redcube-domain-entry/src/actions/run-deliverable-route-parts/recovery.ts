@@ -29,6 +29,11 @@ const VISUAL_REVISION_ROUTES = new Set([
   'repair_image_pages',
   'repair_pptx_native',
 ]);
+const REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK = new Set([
+  'fix_html',
+  'repair_pptx_native',
+]);
+const MAX_REPAIR_CONTINUATION_CYCLES = 3;
 
 function canRevisitContinuationEdgeAfterRepair({
   currentRoute,
@@ -48,6 +53,31 @@ function canRevisitContinuationEdgeAfterRepair({
     ? continuationRouteRuns.at(-2)?.route || ''
     : lastRoute;
   return VISUAL_REVISION_ROUTES.has(previousRoute);
+}
+
+function continuationRouteCount(route: string, continuationRouteRuns: DependencyRouteRun[]): number {
+  return continuationRouteRuns.filter((entry) => entry.route === route).length;
+}
+
+function blockedDirectorRepairRouteRequiringScreenshotFeedback(request: RunDeliverableRouteRequest): string | null {
+  const artifact = readStageArtifactForRequest(request, 'visual_director_review') as { status?: unknown } | null;
+  if (safeText(artifact?.status) !== 'block') return null;
+  const repairRoute = artifactRerunFromStage(artifact);
+  return REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK.has(repairRoute) ? repairRoute : null;
+}
+
+function canContinueNativePptRepairCycle({
+  request,
+  nextRoute,
+  continuationRouteRuns,
+}: {
+  request: RunDeliverableRouteRequest;
+  nextRoute: string;
+  continuationRouteRuns: DependencyRouteRun[];
+}): boolean {
+  if (nextRoute !== 'repair_pptx_native') return false;
+  if (blockedDirectorRepairRouteRequiringScreenshotFeedback(request) !== 'repair_pptx_native') return false;
+  return continuationRouteCount(nextRoute, continuationRouteRuns) < MAX_REPAIR_CONTINUATION_CYCLES;
 }
 
 function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
@@ -93,6 +123,10 @@ function nextContinuationStageId({
   if (VISUAL_REVISION_ROUTES.has(currentRoute) || VISUAL_AUTHOR_ALTERNATE_ROUTES.has(currentRoute)) {
     return 'visual_director_review';
   }
+  if (currentRoute === 'screenshot_review') {
+    const pendingDirectorRepairRoute = blockedDirectorRepairRouteRequiringScreenshotFeedback(request);
+    if (pendingDirectorRepairRoute) return pendingDirectorRepairRoute;
+  }
   const nextStage = nextLinearStageId(contract, currentRoute);
   if (currentRoute === 'screenshot_review' && nextStage && VISUAL_REVISION_ROUTES.has(nextStage)) {
     const reviewArtifact = readStageArtifactForRequest(request, 'screenshot_review');
@@ -116,6 +150,9 @@ function blockedStageRecommendedRepairRoute({
   const artifact = readStageArtifactForRequest(request, currentRoute) as { status?: unknown } | null;
   if (safeText(artifact?.status) !== 'block') return null;
   const repairRoute = artifactRerunFromStage(artifact);
+  if (currentRoute === 'visual_director_review' && blockedDirectorRepairRouteRequiringScreenshotFeedback(request)) {
+    return 'screenshot_review';
+  }
   return VISUAL_REVISION_ROUTES.has(repairRoute) ? repairRoute : null;
 }
 
@@ -255,7 +292,7 @@ export async function continueToStopAfterStage({
       nextRoute,
       currentResult,
       continuationRouteRuns,
-    });
+    }) || canContinueNativePptRepairCycle({ request, nextRoute, continuationRouteRuns });
     if (visited.has(edgeKey) && !canRevisitEdge) {
       return { result: currentResult, continuationRouteRuns };
     }

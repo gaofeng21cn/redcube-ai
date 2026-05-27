@@ -54,9 +54,9 @@ function assertOfficecliMaterializerPolicy(policy) {
   assert.equal(policy.adoption_status, 'qa_materializer_discipline_only');
   assert.equal(policy.rca_main_workflow_owner, 'redcube_stage_review_export');
   assert.equal(policy.skill_authoring_loop_adopted, false);
-  assert.equal(policy.materializer_role, 'executor_adapter_materializer_and_qa_gate');
-  assert.equal(policy.current_pptx_writer, 'redcube_drawingml_writer');
-  assert.equal(policy.officecli_writer_adapter_default_enabled, false);
+  assert.equal(policy.materializer_role, 'default_editable_pptx_materializer_and_qa_gate');
+  assert.equal(policy.current_pptx_writer, 'officecli_pptx_materializer');
+  assert.equal(policy.officecli_writer_adapter_default_enabled, true);
   assert.deepEqual(policy.required_gate_refs, [
     'officecli_save_before_close',
     'officecli_validate',
@@ -107,6 +107,13 @@ function assertQualityContractShape(contract) {
     'shape_kind_count',
     'role_count',
     'layout_richness_score',
+    'layout_variant',
+    'expected_slot_count',
+    'filled_slot_count',
+    'slot_fill_ok',
+    'audience_label_readability_ok',
+    'content_depth_ok',
+    'grid_balance_ok',
     'chart_metrics',
     'table_metrics',
     'metric_grid_metrics',

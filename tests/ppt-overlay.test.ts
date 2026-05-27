@@ -149,7 +149,7 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
   );
   assert.equal(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.current_pptx_writer,
-    'redcube_drawingml_writer',
+    'officecli_pptx_materializer',
   );
   assert.equal(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.view_issues_required,

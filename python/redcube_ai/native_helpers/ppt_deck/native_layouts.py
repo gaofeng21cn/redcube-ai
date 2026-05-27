@@ -1,24 +1,14 @@
 import hashlib
+import json
+import shutil
+import subprocess
 from pathlib import Path
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape as xml_escape
 
-from pptx import Presentation
-from pptx.dml.color import RGBColor
-from pptx.chart.data import CategoryChartData
-from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION
-from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
-from pptx.util import Inches, Pt
-
 
 CANVAS_PX = (1152, 648)
-SLIDE_W = Inches(16)
-SLIDE_H = Inches(9)
-EMU_PER_INCH = 914400
 PX_PER_INCH = CANVAS_PX[0] / 16
-MIN_TABLE_BODY_FONT_PT = 11.0
-MAX_TABLE_CELL_BLANK_RATIO = 0.38
-BODY_TEXT_READABILITY_FLOOR_PT = 18.0
 SVG_NS = 'http://www.w3.org/2000/svg'
 STRICT_SVG_ALLOWED_TAGS = {
     f'{{{SVG_NS}}}svg',
@@ -26,41 +16,53 @@ STRICT_SVG_ALLOWED_TAGS = {
     f'{{{SVG_NS}}}rect',
     f'{{{SVG_NS}}}text',
 }
-
-PALETTES = [
-    {'bg': '#F6F2EA', 'ink': '#171C24', 'muted': '#5B6570', 'accent': '#B94624', 'panel': '#EFE6D6', 'line': '#D8C8B2'},
-    {'bg': '#EDF4F2', 'ink': '#10211D', 'muted': '#53645F', 'accent': '#147C72', 'panel': '#DCEAE4', 'line': '#B9D1C8'},
-    {'bg': '#F5F2F8', 'ink': '#211B2B', 'muted': '#625B6E', 'accent': '#6E4AA8', 'panel': '#E6E0F0', 'line': '#CFC3E3'},
-    {'bg': '#F4F6F8', 'ink': '#152033', 'muted': '#5D6675', 'accent': '#2E6FBB', 'panel': '#E1E8F0', 'line': '#C4D0DD'},
-]
-
-RECIPE_TO_LAYOUT = {
-    'ppt.hero_signal': 'cover_signal',
-    'ppt.compare_zones': 'multi_zone_compare',
-    'ppt.timeline_rail': 'timeline_band',
-    'ppt.judgement_ladder': 'judgement_ladder',
-    'ppt.ring_cross': 'ring_cross',
-    'ppt.summary_peak': 'summary_peak',
+PALETTE = {
+    'bg': '#F6F2EA',
+    'ink': '#171C24',
+    'muted': '#5B6570',
+    'accent': '#B94624',
+    'panel': '#EFE6D6',
+    'line': '#D8C8B2',
+    'white': '#FFFFFF',
+    'none': 'none',
 }
-
-SUPPORTED_LAYOUTS = {
-    'cover_signal',
-    'multi_zone_compare',
-    'timeline_band',
-    'judgement_ladder',
-    'ring_cross',
-    'summary_peak',
+OFFICECLI_SHAPE_KINDS = {
+    'rect',
+    'rectangle',
+    'rounded_rect',
+    'panel',
+    'text_box',
+    'text',
+    'oval',
+    'circle',
+    'line',
+    'connector',
 }
-
-DEFAULT_TYPOGRAPHY_PLAN = {
-    'cover_title': 56.0,
-    'body_title': 44.0,
-    'section_lead': 24.0,
-    'card_title': 21.0,
-    'card_body': 18.0,
-    'meta_label': 12.5,
-    'page_no': 18.0,
+CONTENT_ROLES = {
+    'title',
+    'subtitle',
+    'core_sentence',
+    'point_text',
+    'body',
+    'content',
+    'content_stack',
+    'point_index',
+    'page_number',
+    'cover_meta',
+    'compare_panel',
+    'signal_panel',
+    'timeline_panel',
+    'judgement_step',
+    'axis_panel',
+    'takeaway_panel',
+    'structured_note_panel',
 }
+AI_FIRST_MIN_SHAPES = 7
+AI_FIRST_MIN_CONTENT_SHAPES = 4
+AI_FIRST_MIN_DECORATIVE_SHAPES = 2
+AI_FIRST_MIN_POINT_TEXT = 1
+BODY_TEXT_READABILITY_FLOOR_PT = 18.0
+POINT_INDEX_FLOOR_PT = 16.0
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -70,67 +72,6 @@ def safe_text(value, fallback: str = '') -> str:
 
 def safe_list(value):
     return value if isinstance(value, list) else []
-
-
-def typography_plan(slide_data: dict) -> dict:
-    plan = slide_data.get('_typography_plan')
-    return plan if isinstance(plan, dict) else {}
-
-
-def typography_size(slide_data: dict, tier: str, fallback_tier: str | None = None) -> float:
-    plan = typography_plan(slide_data)
-    value = plan.get(tier)
-    if isinstance(value, dict):
-        value = value.get('font_size')
-    if value is None and fallback_tier:
-        value = plan.get(fallback_tier)
-        if isinstance(value, dict):
-            value = value.get('font_size')
-    try:
-        size = float(value)
-    except (TypeError, ValueError):
-        size = DEFAULT_TYPOGRAPHY_PLAN[tier]
-    if tier == 'card_body':
-        return max(BODY_TEXT_READABILITY_FLOOR_PT, size)
-    return size
-
-
-def title_size_for_layout(slide_data: dict, layout: str) -> float:
-    return typography_size(slide_data, 'cover_title') if layout == 'cover_signal' else typography_size(slide_data, 'body_title')
-
-
-def rgb(hex_value: str) -> RGBColor:
-    value = hex_value.strip().lstrip('#')
-    return RGBColor(int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
-
-
-def emu_to_px(value) -> float:
-    return float(value) / EMU_PER_INCH * PX_PER_INCH
-
-
-def shape_rect(left, top, width, height) -> dict:
-    x = emu_to_px(left)
-    y = emu_to_px(top)
-    w = emu_to_px(width)
-    h = emu_to_px(height)
-    return {
-        'left': round(x, 2),
-        'top': round(y, 2),
-        'width': round(w, 2),
-        'height': round(h, 2),
-        'right': round(x + w, 2),
-        'bottom': round(y + h, 2),
-    }
-
-
-def file_sha256(file: Path) -> str:
-    if not file.exists():
-        return ''
-    digest = hashlib.sha256()
-    with file.open('rb') as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def visible_text(value, fallback: str = '') -> str:
@@ -143,7 +84,7 @@ def visible_text(value, fallback: str = '') -> str:
     if isinstance(value, list):
         return safe_text('\n'.join(visible_text(item) for item in value if visible_text(item)), fallback)
     if isinstance(value, dict):
-        for key in ('editable_text', 'text', 'body', 'title', 'core_sentence'):
+        for key in ('editable_text', 'text', 'body', 'title', 'core_sentence', 'label'):
             text = visible_text(value.get(key))
             if text:
                 return text
@@ -151,163 +92,200 @@ def visible_text(value, fallback: str = '') -> str:
     return fallback
 
 
-def visible_text_lines(value, limit: int = 5) -> list[str]:
-    lines = []
-    source = value if isinstance(value, list) else [value]
-    for item in source:
-        text = visible_text(item)
-        for line in text.splitlines():
-            line = safe_text(line)
-            if line:
-                lines.append(line)
-    return lines[:limit]
-
-
-def weighted_text_width_px(text: str, font_size: float) -> float:
-    width = 0.0
-    for char in safe_text(text):
-        codepoint = ord(char)
-        if char.isspace():
-            width += font_size * 0.32
-        elif codepoint > 127:
-            width += font_size * 0.95
-        elif char.isupper():
-            width += font_size * 0.68
-        elif char in {'-', '/', ':'}:
-            width += font_size * 0.38
-        else:
-            width += font_size * 0.56
-    return width
-
-
-def estimated_text_lines(text: str, font_size: float, width) -> int:
-    available_px = max(1.0, emu_to_px(width) - 12.0)
-    text_width = weighted_text_width_px(text, font_size)
-    return max(1, int((text_width / available_px) + 0.999))
-
-
-def estimated_text_height(text: str, font_size: float, width, *, minimum_inches: float) -> int:
-    lines = estimated_text_lines(text, font_size, width)
-    height_inches = max(minimum_inches, (lines * font_size * 1.16 / 72.0) + 0.16)
-    return Inches(height_inches)
-
-
-def layout_family(slide_data: dict) -> str:
-    nested = slide_data.get('visual_presentation') if isinstance(slide_data.get('visual_presentation'), dict) else {}
-    layout = safe_text(slide_data.get('layout_family') or nested.get('layout_family'))
-    if not layout:
-        layout = RECIPE_TO_LAYOUT.get(safe_text(slide_data.get('render_recipe_id')), '')
-    return layout if layout in SUPPORTED_LAYOUTS else 'multi_zone_compare'
-
-
-def layout_writer_id(layout: str) -> str:
-    return f'{layout}_native_writer'
-
-
-def shape_text(shape: dict) -> str:
-    return visible_text(shape.get('editable_text') or shape.get('text'))
-
-
 def shape_kind(shape: dict) -> str:
     return safe_text(shape.get('kind') or shape.get('type') or shape.get('role')).lower()
 
 
-def native_structural_shapes(slide_data: dict) -> list[dict]:
+def ai_shape_text(shape_spec: dict) -> str:
+    return visible_text(shape_spec.get('editable_text') or shape_spec.get('text') or shape_spec.get('label'))
+
+
+def ai_shape_bounds_in(shape_spec: dict):
+    bounds = shape_spec.get('bounds') if isinstance(shape_spec.get('bounds'), dict) else {}
+    values = []
+    for primary, alternate in (
+        ('left_in', 'x_in'),
+        ('top_in', 'y_in'),
+        ('width_in', 'w_in'),
+        ('height_in', 'h_in'),
+    ):
+        raw = bounds.get(primary) if bounds.get(primary) is not None else bounds.get(alternate)
+        try:
+            values.append(float(raw))
+        except (TypeError, ValueError):
+            return None
+    left, top, width, height = values
+    if left < 0 or top < 0 or width <= 0 or height <= 0:
+        return None
+    if left + width > 16.0 or top + height > 9.0:
+        return None
+    return {
+        'left_in': left,
+        'top_in': top,
+        'width_in': width,
+        'height_in': height,
+    }
+
+
+def shape_rect_from_ai_bounds(shape_spec: dict) -> dict:
+    bounds = ai_shape_bounds_in(shape_spec)
+    if bounds is None:
+        raise ValueError(f"native AI-first shape has invalid bounds: {safe_text(shape_spec.get('shape_id'), '<missing-shape-id>')}")
+    left = bounds['left_in'] * PX_PER_INCH
+    top = bounds['top_in'] * PX_PER_INCH
+    width = bounds['width_in'] * PX_PER_INCH
+    height = bounds['height_in'] * PX_PER_INCH
+    return {
+        'left': round(left, 2),
+        'top': round(top, 2),
+        'width': round(width, 2),
+        'height': round(height, 2),
+        'right': round(left + width, 2),
+        'bottom': round(top + height, 2),
+    }
+
+
+def ai_shape_quality_role(shape_spec: dict) -> str:
+    quality_role = safe_text(shape_spec.get('quality_role')).lower()
+    if quality_role in {'content', 'decorative'}:
+        return quality_role
+    role = safe_text(shape_spec.get('role')).lower()
+    kind = shape_kind(shape_spec)
+    if kind in {'text', 'text_box'} or role in CONTENT_ROLES or role.endswith('_panel'):
+        return 'content'
+    return 'decorative'
+
+
+def ai_shape_font_size(shape_spec: dict, role: str) -> float:
+    try:
+        explicit = float(shape_spec.get('font_size') or shape_spec.get('size_pt') or shape_spec.get('size') or 0)
+    except (TypeError, ValueError):
+        explicit = 0
+    if explicit > 0:
+        return explicit
+    if role == 'title':
+        return 44.0
+    if role in {'subtitle', 'core_sentence'}:
+        return 24.0
+    if role == 'point_index':
+        return POINT_INDEX_FLOOR_PT
+    if role == 'page_number':
+        return 18.0
+    return BODY_TEXT_READABILITY_FLOOR_PT
+
+
+def resolve_color(value, default_key: str) -> str:
+    color = safe_text(value, default_key)
+    return PALETTE.get(color, color)
+
+
+def ai_shape_fill(shape_spec: dict, *, text: str) -> str:
+    fallback = 'none' if text else 'panel'
+    return resolve_color(shape_spec.get('fill') or shape_spec.get('fill_color'), fallback)
+
+
+def ai_shape_line(shape_spec: dict, *, text: str) -> str:
+    fallback = 'none' if text else 'line'
+    return resolve_color(shape_spec.get('line') or shape_spec.get('line_color') or shape_spec.get('stroke'), fallback)
+
+
+def ai_shape_color(shape_spec: dict) -> str:
+    return resolve_color(shape_spec.get('color') or shape_spec.get('text_color'), 'ink')
+
+
+def native_ai_design_shapes(slide_data: dict) -> list[dict]:
     return [
         shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
-        if isinstance(shape, dict) and shape_kind(shape) in {'chart', 'table', 'metric_grid'}
+        if isinstance(shape, dict)
     ]
 
 
-def spec_bounds(shape_spec: dict, default_left, default_top, default_width, default_height):
-    bounds = shape_spec.get('bounds') if isinstance(shape_spec.get('bounds'), dict) else {}
-    left = float(bounds.get('left_in') if bounds.get('left_in') is not None else bounds.get('x_in') if bounds.get('x_in') is not None else -1)
-    top = float(bounds.get('top_in') if bounds.get('top_in') is not None else bounds.get('y_in') if bounds.get('y_in') is not None else -1)
-    width = float(bounds.get('width_in') if bounds.get('width_in') is not None else bounds.get('w_in') if bounds.get('w_in') is not None else -1)
-    height = float(bounds.get('height_in') if bounds.get('height_in') is not None else bounds.get('h_in') if bounds.get('h_in') is not None else -1)
-    if min(left, top, width, height) <= 0:
-        return default_left, default_top, default_width, default_height
-    return Inches(left), Inches(top), Inches(width), Inches(height)
+def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
+    shapes = native_ai_design_shapes(slide_data)
+    failures = []
+    if len(shapes) < AI_FIRST_MIN_SHAPES:
+        failures.append({'reason': 'ai_first_shape_plan_too_thin', 'actual': len(shapes), 'minimum': AI_FIRST_MIN_SHAPES})
+    content_count = sum(1 for shape in shapes if ai_shape_quality_role(shape) == 'content')
+    decorative_count = sum(1 for shape in shapes if ai_shape_quality_role(shape) == 'decorative')
+    point_text_count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    if content_count < AI_FIRST_MIN_CONTENT_SHAPES:
+        failures.append({'reason': 'ai_first_content_shape_count_too_low', 'actual': content_count, 'minimum': AI_FIRST_MIN_CONTENT_SHAPES})
+    if decorative_count < AI_FIRST_MIN_DECORATIVE_SHAPES:
+        failures.append({'reason': 'ai_first_decorative_shape_count_too_low', 'actual': decorative_count, 'minimum': AI_FIRST_MIN_DECORATIVE_SHAPES})
+    if point_text_count < AI_FIRST_MIN_POINT_TEXT:
+        failures.append({'reason': 'ai_first_point_text_missing', 'actual': point_text_count, 'minimum': AI_FIRST_MIN_POINT_TEXT})
+    for shape in shapes:
+        shape_id = safe_text(shape.get('shape_id'), '<missing-shape-id>')
+        kind = shape_kind(shape)
+        role = safe_text(shape.get('role'))
+        text = ai_shape_text(shape)
+        if not safe_text(shape.get('shape_id')):
+            failures.append({'reason': 'ai_first_shape_id_missing', 'shape_id': shape_id})
+        if kind not in OFFICECLI_SHAPE_KINDS:
+            failures.append({'reason': 'ai_first_shape_kind_not_officecli_materializable', 'shape_id': shape_id, 'kind': kind})
+        if ai_shape_bounds_in(shape) is None:
+            failures.append({'reason': 'ai_first_shape_bounds_invalid', 'shape_id': shape_id})
+        if kind in {'text', 'text_box'} and not text:
+            failures.append({'reason': 'ai_first_text_missing', 'shape_id': shape_id})
+        font_size = ai_shape_font_size(shape, role)
+        if role == 'point_index' and font_size < POINT_INDEX_FLOOR_PT:
+            failures.append({'reason': 'ai_first_point_index_too_small', 'shape_id': shape_id, 'font_size': round(font_size, 2)})
+        if kind in {'text', 'text_box'} and ai_shape_quality_role(shape) == 'content':
+            if role not in {'page_number', 'point_index'} and font_size < BODY_TEXT_READABILITY_FLOOR_PT:
+                failures.append({'reason': 'ai_first_body_text_too_small', 'shape_id': shape_id, 'font_size': round(font_size, 2)})
+        if not text and resolve_color(shape.get('fill') or shape.get('fill_color'), 'none') == 'none' and resolve_color(shape.get('line') or shape.get('line_color') or shape.get('stroke'), 'none') == 'none':
+            failures.append({'reason': 'ai_first_non_text_shape_invisible', 'shape_id': shape_id})
+    return failures
 
 
 def slide_title(slide_data, index: int) -> str:
-    for shape in safe_list(slide_data.get('_editable_native_shapes')):
-        if isinstance(shape, dict) and safe_text(shape.get('role')) == 'title':
-            text = shape_text(shape)
+    for shape in native_ai_design_shapes(slide_data):
+        if safe_text(shape.get('role')) == 'title':
+            text = ai_shape_text(shape)
             if text:
                 return text
     return visible_text(slide_data.get('title'), f'Slide {index}')
 
 
-def slide_core_sentence(slide_data) -> str:
-    for shape in safe_list(slide_data.get('_editable_native_shapes')):
-        if isinstance(shape, dict) and safe_text(shape.get('role')) in {'core_sentence', 'subtitle'}:
-            text = shape_text(shape)
-            if text:
-                return text
-    return visible_text(slide_data.get('core_sentence'))
+def layout_family(slide_data: dict) -> str:
+    nested = slide_data.get('visual_presentation') if isinstance(slide_data.get('visual_presentation'), dict) else {}
+    return safe_text(slide_data.get('layout_family') or nested.get('layout_family'), 'ai_spatial_plan')
 
 
-def slide_points(slide_data) -> list[str]:
-    plan_points = []
-    for shape in safe_list(slide_data.get('_editable_native_shapes')):
-        if not isinstance(shape, dict):
-            continue
-        if safe_text(shape.get('role')) not in {'point_text', 'bullet', 'body', 'content', 'content_stack'}:
-            continue
-        plan_points.extend(visible_text_lines(shape_text(shape), limit=6))
-    if plan_points:
-        return plan_points[:5]
-    points = visible_text_lines(slide_data.get('page_core_content'), limit=5)
-    if points:
-        return points
-    points = visible_text_lines(slide_data.get('evidence_points'), limit=5)
-    if points:
-        return points
-    return [visible_text(slide_data.get('core_sentence'), 'Key message')]
+def primary_point_count(shapes: list[dict]) -> int:
+    count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    return max(1, min(count, 5))
 
 
-def assert_authoring_text_capacity(text: str, limit: int, shape_id: str) -> str:
-    text = safe_text(text)
-    if len(text) > limit:
-        raise ValueError(
-            'native PPT authoring text exceeds deterministic writer capacity: '
-            f'{shape_id} has {len(text)} chars, limit {limit}'
-        )
-    return text
+def file_sha256(file: Path) -> str:
+    if not file.exists():
+        return ''
+    digest = hashlib.sha256()
+    with file.open('rb') as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b''):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
-def svg_rect(x, y, width, height, fill, intent, shape_id='', stroke='none', rx=0):
-    attrs = [
-        f'x="{x}"',
-        f'y="{y}"',
-        f'width="{width}"',
-        f'height="{height}"',
-        f'fill="{xml_escape(fill)}"',
-        f'stroke="{xml_escape(stroke)}"',
-        f'data-intent="{xml_escape(intent)}"',
-    ]
-    if shape_id:
-        attrs.append(f'id="{xml_escape(shape_id)}"')
-    if rx:
-        attrs.append(f'rx="{rx}"')
-    return f'    <rect {" ".join(attrs)} />'
+def svg_rect_from_bounds(bounds: dict, fill: str, intent: str, shape_id: str, stroke: str = 'none') -> str:
+    return (
+        f'    <rect x="{bounds["left"]:.2f}" y="{bounds["top"]:.2f}" '
+        f'width="{bounds["width"]:.2f}" height="{bounds["height"]:.2f}" '
+        f'fill="{xml_escape(fill)}" stroke="{xml_escape(stroke)}" '
+        f'data-intent="{xml_escape(intent)}" id="{xml_escape(shape_id)}" />'
+    )
 
 
-def svg_text(x, y, text, size, fill, intent, shape_id='', weight='400'):
-    checked_text = assert_authoring_text_capacity(text, 160, shape_id or intent)
-    attrs = [
-        f'x="{x}"',
-        f'y="{y}"',
-        f'font-size="{size}"',
-        f'font-family="Aptos, Arial, sans-serif"',
-        f'font-weight="{weight}"',
-        f'fill="{xml_escape(fill)}"',
-        f'data-intent="{xml_escape(intent)}"',
-    ]
-    if shape_id:
-        attrs.append(f'id="{xml_escape(shape_id)}"')
-    return f'    <text {" ".join(attrs)}>{xml_escape(checked_text)}</text>'
+def svg_text_from_bounds(bounds: dict, text: str, size: float, fill: str, intent: str, shape_id: str, weight: str) -> str:
+    x = bounds['left'] + 10
+    y = bounds['top'] + max(18, size)
+    checked = safe_text(text)[:180]
+    return (
+        f'    <text x="{x:.2f}" y="{y:.2f}" font-size="{size:g}" '
+        f'font-family="Aptos, Arial, sans-serif" font-weight="{weight}" '
+        f'fill="{xml_escape(fill)}" data-intent="{xml_escape(intent)}" '
+        f'id="{xml_escape(shape_id)}-text">{xml_escape(checked)}</text>'
+    )
 
 
 def strict_svg_preflight(svg_file: Path) -> dict:
@@ -340,657 +318,233 @@ def strict_svg_preflight(svg_file: Path) -> dict:
     }
 
 
-def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repaired: bool) -> str:
+def render_slide_svg_ir(slide_data, index: int, total: int, svg_dir: Path, repaired: bool) -> dict:
     slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-    layout = layout_family(slide_data)
-    points = slide_points(slide_data)
-    title_size = title_size_for_layout(slide_data, layout)
-    section_lead_size = typography_size(slide_data, 'section_lead')
-    card_body_size = typography_size(slide_data, 'card_body')
-    meta_label_size = typography_size(slide_data, 'meta_label')
-    page_no_size = typography_size(slide_data, 'page_no')
+    background = resolve_color(slide_data.get('background'), 'bg')
     lines = [
-        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}" data-layout-writer="{xml_escape(layout_writer_id(layout))}">',
-        '  <g id="slide-root" data-intent="group:slide">',
-        svg_rect(0, 0, CANVAS_PX[0], CANVAS_PX[1], palette['bg'], 'rect:background', f'{slide_id}-background'),
-        svg_text(72, 76, slide_title(slide_data, index), title_size, palette['ink'], 'text:title', f'{slide_id}-title', '700'),
+        f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}" data-materializer="officecli_pptx_materializer">',
+        '  <g id="slide-root" data-intent="group:ai_spatial_plan">',
+        f'    <rect x="0" y="0" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" fill="{xml_escape(background)}" data-intent="rect:background" id="{xml_escape(slide_id)}-background" />',
     ]
+    for shape in native_ai_design_shapes(slide_data):
+        shape_id = safe_text(shape.get('shape_id'))
+        role = safe_text(shape.get('role'), 'shape')
+        kind = shape_kind(shape)
+        text = ai_shape_text(shape)
+        bounds = shape_rect_from_ai_bounds(shape)
+        fill = ai_shape_fill(shape, text=text)
+        line = ai_shape_line(shape, text=text)
+        color = ai_shape_color(shape)
+        rect_height = bounds['height'] if kind not in {'line', 'connector'} else max(2.0, bounds['height'])
+        rect_bounds = {**bounds, 'height': rect_height}
+        lines.append(f'  <g id="{xml_escape(shape_id)}" data-intent="group:{xml_escape(role)}">')
+        lines.append(svg_rect_from_bounds(rect_bounds, fill if kind not in {'line', 'connector'} else line, f'{kind}:{role}', shape_id, line))
+        if text:
+            weight = '700' if role in {'title', 'point_index'} or bool(shape.get('bold')) else '500'
+            lines.append(svg_text_from_bounds(bounds, text, ai_shape_font_size(shape, role), color, f'text:{role}', shape_id, weight))
+        lines.append('  </g>')
     if repaired:
-        lines.append(svg_rect(1032, 36, 52, 12, palette['accent'], 'rect:repair_marker', f'{slide_id}-repair-marker'))
-    if layout == 'cover_signal':
-        lines.extend([
-            svg_rect(72, 148, 720, 6, palette['accent'], 'rect:hero_rule', f'{slide_id}-hero-rule'),
-            svg_text(72, 214, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'),
-        ])
-        x = 92
-        for point_index, point in enumerate(points[:3], 1):
-            lines.extend([
-                f'    <g id="{xml_escape(f"{slide_id}-signal-{point_index}")}" data-intent="group:signal_point">',
-                svg_rect(x, 408, 288, 92, palette['panel'], 'rect:signal_panel', f'{slide_id}-signal-{point_index}-panel', palette['line'], 16),
-                svg_text(x + 24, 462, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-signal-{point_index}-text', '600'),
-                '    </g>',
-            ])
-            x += 330
-    elif layout == 'timeline_band':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
-        lines.append(svg_rect(104, 326, 944, 8, palette['accent'], 'rect:timeline_rail', f'{slide_id}-timeline-rail'))
-        for point_index, point in enumerate(points[:4], 1):
-            x = 92 + ((point_index - 1) * 252)
-            lines.extend([
-                f'    <g id="{xml_escape(f"{slide_id}-milestone-{point_index}")}" data-intent="group:timeline_point">',
-                svg_rect(x, 254, 198, 118, palette['panel'], 'rect:timeline_panel', f'{slide_id}-milestone-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 18, 296, f'{point_index:02d}', meta_label_size + 8, palette['accent'], 'text:point_index', f'{slide_id}-milestone-{point_index}-index', '700'),
-                svg_text(x + 18, 340, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-milestone-{point_index}-text', '600'),
-                '    </g>',
-            ])
-    elif layout == 'judgement_ladder':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
-        for point_index, point in enumerate(points[:4], 1):
-            x = 118 + ((point_index - 1) * 220)
-            y = 428 - ((point_index - 1) * 58)
-            lines.extend([
-                f'    <g id="{xml_escape(f"{slide_id}-gate-{point_index}")}" data-intent="group:judgement_gate">',
-                svg_rect(x, y, 210, 112, palette['panel'], 'rect:judgement_step', f'{slide_id}-gate-{point_index}-panel', palette['line'], 12),
-                svg_text(x + 18, y + 38, f'Gate {point_index}', meta_label_size + 5, palette['accent'], 'text:point_index', f'{slide_id}-gate-{point_index}-index', '700'),
-                svg_text(x + 18, y + 78, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-gate-{point_index}-text', '600'),
-                '    </g>',
-            ])
-    elif layout == 'ring_cross':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
-        lines.append(svg_rect(462, 262, 228, 118, palette['accent'], 'rect:center_hub', f'{slide_id}-center-hub', palette['accent'], 24))
-        lines.append(svg_text(496, 326, 'Core', 24, '#FFFFFF', 'text:center_hub', f'{slide_id}-center-text', '700'))
-        positions = [(122, 214), (758, 214), (758, 426), (122, 426)]
-        for point_index, point in enumerate(points[:4], 1):
-            x, y = positions[point_index - 1]
-            lines.extend([
-                f'    <g id="{xml_escape(f"{slide_id}-axis-{point_index}")}" data-intent="group:ring_cross_axis">',
-                svg_rect(x, y, 286, 116, palette['panel'], 'rect:axis_panel', f'{slide_id}-axis-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 22, y + 48, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-axis-{point_index}-text', '600'),
-                '    </g>',
-            ])
-    elif layout == 'summary_peak':
-        lines.append(svg_text(72, 146, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'))
-        lines.append(svg_rect(96, 214, 960, 120, palette['accent'], 'rect:summary_peak', f'{slide_id}-summary-peak', palette['accent'], 26))
-        lines.append(svg_text(132, 284, points[0] if points else slide_core_sentence(slide_data), section_lead_size, '#FFFFFF', 'text:summary_peak', f'{slide_id}-peak-text', '700'))
-        for point_index, point in enumerate(points[1:4], 1):
-            x = 96 + ((point_index - 1) * 326)
-            lines.extend([
-                svg_rect(x, 394, 296, 96, palette['panel'], 'rect:takeaway_panel', f'{slide_id}-takeaway-{point_index}-panel', palette['line'], 16),
-                svg_text(x + 22, 452, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-takeaway-{point_index}-text', '600'),
-            ])
-    else:
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
-        columns = [(84, 220, 456, 242), (612, 220, 456, 242)]
-        for point_index, point in enumerate(points[:4], 1):
-            column = 0 if point_index <= 2 else 1
-            row = 0 if point_index in {1, 3} else 1
-            x, y, width, height = columns[column]
-            panel_y = y + row * 124
-            lines.extend([
-                f'    <g id="{xml_escape(f"{slide_id}-zone-{point_index}")}" data-intent="group:compare_zone">',
-                svg_rect(x, panel_y, width, 102, palette['panel'], 'rect:compare_panel', f'{slide_id}-zone-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 24, panel_y + 58, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-zone-{point_index}-text', '600'),
-                '    </g>',
-            ])
-    footer = f'{slide_id} / {index} of {total}'
-    lines.extend([
-        svg_text(72, 614, footer, page_no_size, palette['muted'], 'text:page_number', f'{slide_id}-footer'),
-        '  </g>',
-        '</svg>',
-    ])
-    return '\n'.join(lines) + '\n'
-
-
-def render_slide_svg_ir(slide_data, index: int, total: int, svg_dir: Path, palette: dict, repaired: bool) -> dict:
-    slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-    svg_file = svg_dir / f'{index:02d}-{slide_id}.svg'
-    svg_file.parent.mkdir(parents=True, exist_ok=True)
-    svg_file.write_text(build_slide_svg_ir(slide_data, index, total, palette, repaired), encoding='utf-8')
-    preflight = strict_svg_preflight(svg_file)
+        lines.append(f'    <rect x="1032" y="36" width="52" height="12" fill="{xml_escape(PALETTE["accent"])}" data-intent="rect:repair_marker" id="{xml_escape(slide_id)}-repair-marker" />')
+    lines.extend(['  </g>', '</svg>'])
+    svg_dir.mkdir(parents=True, exist_ok=True)
+    svg_file = svg_dir / f'{slide_id}.svg'
+    svg_file.write_text('\n'.join(lines), encoding='utf-8')
     return {
         'file': str(svg_file),
         'sha256': file_sha256(svg_file),
-        'preflight': preflight,
+        'preflight': strict_svg_preflight(svg_file),
     }
 
 
-class SlideBuilder:
-    def __init__(self, slide, palette: dict, slide_id: str):
-        self.slide = slide
-        self.palette = palette
-        self.slide_id = slide_id
-        self.native_shapes = []
-
-    def record_shape(self, shape_id, kind, left, top, width, height, role, text='', font_size=0, quality_role='content'):
-        self.native_shapes.append({
-            'shape_id': shape_id,
-            'kind': kind,
-            'role': role,
-            'quality_role': quality_role,
-            'bounds': shape_rect(left, top, width, height),
-            'text': safe_text(text),
-            'font_size': font_size,
+def officecli_shape_props(shape_spec: dict, bounds_in: dict, bounds_px: dict) -> dict:
+    kind = shape_kind(shape_spec)
+    role = safe_text(shape_spec.get('role'), 'shape')
+    text = ai_shape_text(shape_spec)
+    fill = ai_shape_fill(shape_spec, text=text)
+    line = ai_shape_line(shape_spec, text=text)
+    color = ai_shape_color(shape_spec)
+    geometry = 'rect'
+    if kind in {'rounded_rect', 'panel'}:
+        geometry = 'roundRect'
+    elif kind in {'oval', 'circle'}:
+        geometry = 'ellipse'
+    props = {
+        'name': safe_text(shape_spec.get('shape_id')),
+        'x': f"{bounds_in['left_in']:.4f}in",
+        'y': f"{bounds_in['top_in']:.4f}in",
+        'width': f"{bounds_in['width_in']:.4f}in",
+        'height': f"{bounds_in['height_in']:.4f}in",
+        'preset': 'rect' if kind in {'line', 'connector'} else geometry,
+        'fill': line if kind in {'line', 'connector'} else fill,
+        'line': 'none' if kind in {'line', 'connector'} else line,
+        'lineWidth': f"{float(shape_spec.get('line_width') or shape_spec.get('stroke_width') or 1.0)}pt",
+    }
+    if text:
+        props.update({
+            'text': text,
+            'font': safe_text(shape_spec.get('font'), 'Aptos'),
+            'font.ea': safe_text(shape_spec.get('font_ea') or shape_spec.get('font.ea'), 'Noto Sans CJK SC'),
+            'size': f'{ai_shape_font_size(shape_spec, role):g}',
+            'color': color,
+            'bold': bool(shape_spec.get('bold')) or role in {'title', 'point_index'},
+            'align': safe_text(shape_spec.get('align'), 'left'),
+            'valign': safe_text(shape_spec.get('valign'), 'top'),
+            'autoFit': 'none',
+            'margin': safe_text(shape_spec.get('margin'), '0.08in'),
         })
-
-    def record_structured_shape(
-        self,
-        shape_id,
-        kind,
-        left,
-        top,
-        width,
-        height,
-        role,
-        metrics: dict,
-        quality_role='content',
-    ):
-        self.native_shapes.append({
-            'shape_id': shape_id,
-            'kind': kind,
-            'role': role,
-            'quality_role': quality_role,
-            'bounds': shape_rect(left, top, width, height),
-            'text': '',
-            'font_size': 0,
-            'metrics': metrics,
-        })
-
-    def rect(self, shape_id, left, top, width, height, fill_key, role, quality_role='decorative', line_key=None, radius=True):
-        shape_type = MSO_SHAPE.ROUNDED_RECTANGLE if radius else MSO_SHAPE.RECTANGLE
-        shape = self.slide.shapes.add_shape(shape_type, left, top, width, height)
-        shape.fill.solid()
-        shape.fill.fore_color.rgb = rgb(self.palette[fill_key] if fill_key in self.palette else fill_key)
-        line_color = self.palette.get(line_key or fill_key, self.palette.get(fill_key, fill_key))
-        shape.line.color.rgb = rgb(line_color)
-        shape.line.width = Pt(1)
-        shape.name = shape_id
-        self.record_shape(shape_id, 'rounded_rect' if radius else 'rect', left, top, width, height, role, quality_role=quality_role)
-        return shape
-
-    def oval(self, shape_id, left, top, width, height, fill_key, role, quality_role='decorative', line_key=None):
-        shape = self.slide.shapes.add_shape(MSO_SHAPE.OVAL, left, top, width, height)
-        shape.fill.solid()
-        shape.fill.fore_color.rgb = rgb(self.palette[fill_key] if fill_key in self.palette else fill_key)
-        line_color = self.palette.get(line_key or fill_key, self.palette.get(fill_key, fill_key))
-        shape.line.color.rgb = rgb(line_color)
-        shape.line.width = Pt(1)
-        shape.name = shape_id
-        self.record_shape(shape_id, 'oval', left, top, width, height, role, quality_role=quality_role)
-        return shape
-
-    def line(self, shape_id, begin_x, begin_y, end_x, end_y, color_key='line', width=1.2, role='connector', quality_role='decorative'):
-        begin_x = int(begin_x)
-        begin_y = int(begin_y)
-        end_x = int(end_x)
-        end_y = int(end_y)
-        shape = self.slide.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, begin_x, begin_y, end_x, end_y)
-        shape.name = shape_id
-        shape.line.color.rgb = rgb(self.palette[color_key] if color_key in self.palette else color_key)
-        shape.line.width = Pt(width)
-        left = min(begin_x, end_x)
-        top = min(begin_y, end_y)
-        box_width = abs(end_x - begin_x)
-        box_height = abs(end_y - begin_y)
-        self.record_shape(shape_id, 'line', left, top, box_width, box_height, role, quality_role=quality_role)
-        return shape
-
-    def text(self, shape_id, left, top, width, height, text, size, color_key, role, bold=False, quality_role='content'):
-        text = assert_authoring_text_capacity(text, 220, shape_id)
-        box = self.slide.shapes.add_textbox(left, top, width, height)
-        box.name = shape_id
-        frame = box.text_frame
-        frame.clear()
-        frame.word_wrap = True
-        frame.margin_left = Inches(0.05)
-        frame.margin_right = Inches(0.05)
-        frame.margin_top = Inches(0.03)
-        frame.margin_bottom = Inches(0.03)
-        paragraph = frame.paragraphs[0]
-        run = paragraph.add_run()
-        run.text = text
-        run.font.size = Pt(size)
-        run.font.bold = bold
-        run.font.color.rgb = rgb(self.palette[color_key] if color_key in self.palette else color_key)
-        self.record_shape(shape_id, 'text_box', left, top, width, height, role, text, size, quality_role)
-        return box
-
-    def chart(self, shape_spec: dict, default_index: int):
-        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-chart-{default_index}')
-        categories = visible_text_lines(shape_spec.get('categories'), limit=8)
-        raw_values = safe_list(shape_spec.get('values'))
-        values = [float(value) for value in raw_values[:len(categories)] if isinstance(value, (int, float))]
-        if len(categories) < 2 or len(values) != len(categories):
-            raise ValueError(f'native chart {shape_id} requires matching categories and numeric values')
-        chart_data = CategoryChartData()
-        chart_data.categories = categories
-        chart_data.add_series(visible_text(shape_spec.get('series_name'), 'Series 1'), values)
-        left, top, width, height = spec_bounds(shape_spec, Inches(1.0), Inches(2.15), Inches(6.2), Inches(3.65))
-        chart_shape = self.slide.shapes.add_chart(
-            XL_CHART_TYPE.COLUMN_CLUSTERED,
-            left,
-            top,
-            width,
-            height,
-            chart_data,
-        )
-        chart_shape.name = shape_id
-        chart = chart_shape.chart
-        chart.has_legend = True
-        chart.legend.position = XL_LEGEND_POSITION.BOTTOM
-        chart.value_axis.has_major_gridlines = True
-        label_overflows = [
-            {'label': label, 'char_count': len(label), 'limit': 18}
-            for label in categories
-            if len(label) > 18
-        ]
-        numeric_overflows = [
-            {'value': value, 'char_count': len(f'{value:g}'), 'limit': 8}
-            for value in values
-            if len(f'{value:g}') > 8
-        ]
-        metrics = {
-            'kind': 'chart',
-            'chart_type': 'column_clustered',
-            'axis_label_count': len(categories),
-            'legend_label_count': 1,
-            'series_count': 1,
-            'data_point_count': len(values),
-            'label_overflow_count': len(label_overflows),
-            'label_overflows': label_overflows,
-            'numeric_label_overflow_count': len(numeric_overflows),
-            'numeric_label_overflows': numeric_overflows,
-        }
-        self.record_structured_shape(shape_id, 'chart', left, top, width, height, 'chart', metrics)
-        return chart_shape
-
-    def table(self, shape_spec: dict, default_index: int):
-        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-table-{default_index}')
-        headers = visible_text_lines(shape_spec.get('headers'), limit=6)
-        rows = [
-            visible_text_lines(row, limit=len(headers) or 6)
-            for row in safe_list(shape_spec.get('rows'))
-            if isinstance(row, list)
-        ][:8]
-        column_count = len(headers) or max((len(row) for row in rows), default=0)
-        if column_count < 2 or not rows:
-            raise ValueError(f'native table {shape_id} requires at least two columns and one row')
-        headers = (headers or [f'Column {index + 1}' for index in range(column_count)])[:column_count]
-        rows = [(row + [''] * column_count)[:column_count] for row in rows]
-        left, top, width, height = spec_bounds(shape_spec, Inches(7.65), Inches(2.15), Inches(6.35), Inches(3.65))
-        table_shape = self.slide.shapes.add_table(len(rows) + 1, column_count, left, top, width, height)
-        table_shape.name = shape_id
-        table = table_shape.table
-        for column_index in range(column_count):
-            table.columns[column_index].width = int(width / column_count)
-        row_height = int(height / (len(rows) + 1))
-        for row_index in range(len(rows) + 1):
-            table.rows[row_index].height = row_height
-        for column_index, header in enumerate(headers):
-            cell = table.cell(0, column_index)
-            cell.text = assert_authoring_text_capacity(header, 80, f'{shape_id}-header-{column_index + 1}')
-            cell.fill.solid()
-            cell.fill.fore_color.rgb = rgb(self.palette['panel'])
-            for paragraph in cell.text_frame.paragraphs:
-                for run in paragraph.runs:
-                    run.font.bold = True
-                    run.font.size = Pt(11)
-                    run.font.color.rgb = rgb(self.palette['ink'])
-        cell_failures = []
-        for row_index, row in enumerate(rows, 1):
-            for column_index, value in enumerate(row):
-                cell = table.cell(row_index, column_index)
-                cell.text = assert_authoring_text_capacity(value, 90, f'{shape_id}-r{row_index}c{column_index + 1}')
-                for paragraph in cell.text_frame.paragraphs:
-                    for run in paragraph.runs:
-                        run.font.size = Pt(MIN_TABLE_BODY_FONT_PT)
-                        run.font.color.rgb = rgb(self.palette['ink'])
-                if len(value) > 34:
-                    cell_failures.append({
-                        'row': row_index,
-                        'column': column_index + 1,
-                        'char_count': len(value),
-                        'limit': 34,
-                    })
-        metrics = {
-            'kind': 'table',
-            'row_count': len(rows) + 1,
-            'column_count': column_count,
-            'body_row_count': len(rows),
-            'cell_count': (len(rows) + 1) * column_count,
-            'min_font_pt': MIN_TABLE_BODY_FONT_PT,
-            'max_cell_blank_ratio': 0.24,
-            'max_cell_blank_ratio_allowed': MAX_TABLE_CELL_BLANK_RATIO,
-            'cell_fit_ok': len(cell_failures) == 0,
-            'cell_fit_failure_count': len(cell_failures),
-            'cell_fit_failures': cell_failures,
-        }
-        self.record_structured_shape(shape_id, 'table', left, top, width, height, 'table', metrics)
-        return table_shape
-
-    def metric_grid(self, shape_spec: dict, default_index: int):
-        shape_id = safe_text(shape_spec.get('shape_id'), f'{self.slide_id}-metric-grid-{default_index}')
-        items = [
-            item for item in safe_list(shape_spec.get('items'))
-            if isinstance(item, dict)
-        ][:4]
-        if len(items) < 2:
-            raise ValueError(f'native metric grid {shape_id} requires at least two metric items')
-        left, top, width, height = spec_bounds(shape_spec, Inches(1.0), Inches(5.95), Inches(13.7), Inches(1.2))
-        columns = len(items)
-        numeric_overflows = []
-        for item_index, item in enumerate(items, 1):
-            cell_left = left + int((item_index - 1) * width / columns)
-            cell_width = int(width / columns) - Inches(0.12)
-            value = visible_text(item.get('value'), '0')
-            label = visible_text(item.get('label'), f'Metric {item_index}')
-            if len(value) > 10:
-                numeric_overflows.append({
-                    'item_index': item_index,
-                    'value': value,
-                    'char_count': len(value),
-                    'limit': 10,
-                })
-            self.rect(f'{shape_id}-{item_index}-panel', cell_left, top, cell_width, height, 'panel', 'metric_cell', 'content', 'line')
-            self.text(f'{shape_id}-{item_index}-value', cell_left + Inches(0.18), top + Inches(0.16), cell_width - Inches(0.36), Inches(0.38), value, 18, 'accent', 'metric_value', True)
-            self.text(f'{shape_id}-{item_index}-label', cell_left + Inches(0.18), top + Inches(0.62), cell_width - Inches(0.36), Inches(0.32), label, 9.5, 'muted', 'metric_label')
-        metrics = {
-            'kind': 'metric_grid',
-            'item_count': len(items),
-            'numeric_label_overflow_count': len(numeric_overflows),
-            'numeric_label_overflows': numeric_overflows,
-        }
-        self.record_structured_shape(shape_id, 'metric_grid', left, top, width, height, 'metric_grid', metrics)
+    return props
 
 
-def add_background(ctx: SlideBuilder):
-    ctx.rect(f'{ctx.slide_id}-background', 0, 0, SLIDE_W, SLIDE_H, 'bg', 'background', radius=False)
-    ctx.rect(f'{ctx.slide_id}-top-rule', Inches(1.0), Inches(0.36), Inches(1.85), Inches(0.08), 'accent', 'accent_rule', radius=False)
-    ctx.line(f'{ctx.slide_id}-left-rail', Inches(0.62), Inches(0.8), Inches(0.62), Inches(7.7), 'line', 1.1, 'layout_rail')
-    ctx.oval(f'{ctx.slide_id}-corner-dot', Inches(14.42), Inches(0.48), Inches(0.18), Inches(0.18), 'accent', 'accent_dot')
-    ctx.rect(f'{ctx.slide_id}-corner-chip', Inches(14.7), Inches(0.54), Inches(0.34), Inches(0.08), 'line', 'accent_chip', radius=False)
+def native_shape_manifest_record(shape_spec: dict) -> dict:
+    kind = shape_kind(shape_spec)
+    role = safe_text(shape_spec.get('role'), 'shape')
+    text = ai_shape_text(shape_spec)
+    return {
+        'shape_id': safe_text(shape_spec.get('shape_id')),
+        'kind': 'line' if kind in {'line', 'connector'} else ('text_box' if kind in {'text', 'text_box'} else ('oval' if kind in {'oval', 'circle'} else 'rounded_rect' if kind in {'rounded_rect', 'panel'} else 'rect')),
+        'role': role,
+        'quality_role': ai_shape_quality_role(shape_spec),
+        'bounds': shape_rect_from_ai_bounds(shape_spec),
+        'text': text,
+        'font_size': ai_shape_font_size(shape_spec, role) if text else 0,
+        'officecli_materialized': True,
+    }
 
 
-def add_footer(ctx: SlideBuilder, slide_data: dict, index: int, total: int):
-    ctx.text(
-        f'{ctx.slide_id}-footer',
-        Inches(1.0),
-        Inches(8.2),
-        Inches(13.7),
-        Inches(0.38),
-        f'{ctx.slide_id} / {index} of {total}',
-        typography_size(slide_data, 'page_no'),
-        'muted',
-        'page_number',
-        quality_role='decorative',
-    )
-
-
-def add_title_band(ctx: SlideBuilder, slide_data: dict, title: str, core: str):
-    title_size = typography_size(slide_data, 'body_title')
-    section_lead_size = typography_size(slide_data, 'section_lead')
-    title_left = Inches(1.0)
-    title_top = Inches(0.46)
-    title_width = Inches(13.9)
-    title_height = estimated_text_height(title, title_size, title_width, minimum_inches=0.82)
-    ctx.text(f'{ctx.slide_id}-title', title_left, title_top, title_width, title_height, title, title_size, 'ink', 'title', True)
-    band_bottom = title_top + title_height
-    if core:
-        core_top = title_top + title_height + Inches(0.18)
-        core_width = Inches(13.5)
-        core_height = estimated_text_height(core, section_lead_size, core_width, minimum_inches=0.66)
-        ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.0), core_top, core_width, core_height, core, section_lead_size, 'muted', 'core_sentence')
-        band_bottom = core_top + core_height
-    return band_bottom
-
-
-def write_cover_signal(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    title = slide_title(slide_data, index)
-    core = slide_core_sentence(slide_data)
-    points = slide_points(slide_data)
-    title_size = typography_size(slide_data, 'cover_title')
-    section_lead_size = typography_size(slide_data, 'section_lead')
-    card_body_size = typography_size(slide_data, 'card_body')
-    title_left = Inches(1.28)
-    title_top = Inches(1.18)
-    title_width = Inches(9.45)
-    title_height = estimated_text_height(title, title_size, title_width, minimum_inches=1.12)
-    core_top = title_top + title_height + Inches(0.2)
-    core_width = Inches(9.4)
-    core_height = estimated_text_height(core, section_lead_size, core_width, minimum_inches=0.72)
-    hero_bottom = max(Inches(3.62), core_top + core_height + Inches(0.2))
-    ctx.rect(f'{ctx.slide_id}-hero-block', Inches(0.95), Inches(0.96), Inches(10.25), hero_bottom - Inches(0.96), 'panel', 'hero_panel', 'content', 'line')
-    ctx.text(f'{ctx.slide_id}-title', title_left, title_top, title_width, title_height, title, title_size, 'ink', 'title', True)
-    ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.28), core_top, core_width, core_height, core, section_lead_size, 'muted', 'core_sentence')
-    ctx.rect(f'{ctx.slide_id}-accent-slab', Inches(12.0), Inches(0.95), Inches(2.55), Inches(6.6), 'accent', 'hero_accent', 'decorative', radius=False)
-    ctx.line(f'{ctx.slide_id}-hero-vector', Inches(10.8), Inches(2.18), Inches(12.0), Inches(2.18), 'accent', 1.6, 'hero_vector')
-    ctx.oval(f'{ctx.slide_id}-hero-node', Inches(11.24), Inches(2.04), Inches(0.28), Inches(0.28), 'bg', 'hero_node', 'decorative', 'accent')
-    for point_index, point in enumerate(points[:3], 1):
-        x = Inches(1.0 + ((point_index - 1) * 4.55))
-        ctx.rect(f'{ctx.slide_id}-signal-{point_index}-panel', x, Inches(5.35), Inches(3.95), Inches(1.0), 'panel', 'signal_panel', 'content', 'line')
-        ctx.oval(f'{ctx.slide_id}-signal-{point_index}-dot', x + Inches(0.18), Inches(5.12), Inches(0.18), Inches(0.18), 'accent', 'signal_dot')
-        ctx.text(f'{ctx.slide_id}-signal-{point_index}-text', x + Inches(0.24), Inches(5.5), Inches(3.4), Inches(0.68), point, card_body_size, 'ink', 'point_text', True)
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_multi_zone_compare(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
-    points = slide_points(slide_data)
-    card_body_size = typography_size(slide_data, 'card_body')
-    meta_label_size = typography_size(slide_data, 'meta_label')
-    if native_structural_shapes(slide_data):
-        for point_index, point in enumerate(points[:3], 1):
-            left = Inches(1.0 + ((point_index - 1) * 4.35))
-            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-panel', left, Inches(6.82), Inches(3.78), Inches(0.95), 'panel', 'structured_note_panel', 'content', 'line')
-            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-tab', left + Inches(0.18), Inches(7.23), Inches(0.6), Inches(0.09), 'accent', 'structured_note_tab', radius=False)
-            ctx.text(f'{ctx.slide_id}-structured-note-{point_index}-text', left + Inches(0.9), Inches(6.98), Inches(2.62), Inches(0.62), point, card_body_size, 'ink', 'point_text')
-        ctx.line(f'{ctx.slide_id}-structured-baseline', Inches(1.0), Inches(6.94), Inches(14.2), Inches(6.94), 'line', 1.1, 'structured_baseline')
-        add_footer(ctx, slide_data, index, total)
-        return
-    top_row = max(Inches(2.25), band_bottom + Inches(0.28))
-    zones = [
-        (Inches(0.95), top_row, Inches(6.65), Inches(2.0)),
-        (Inches(8.05), top_row, Inches(6.65), Inches(2.0)),
-        (Inches(0.95), top_row + Inches(2.28), Inches(6.65), Inches(1.72)),
-        (Inches(8.05), top_row + Inches(2.28), Inches(6.65), Inches(1.72)),
-    ]
-    for point_index, point in enumerate(points[:4], 1):
-        left, top, width, height = zones[point_index - 1]
-        ctx.rect(f'{ctx.slide_id}-zone-{point_index}-panel', left, top, width, height, 'panel', 'compare_panel', 'content', 'line')
-        ctx.rect(f'{ctx.slide_id}-zone-{point_index}-tab', left + Inches(0.28), top + Inches(0.18), Inches(1.05), Inches(0.12), 'accent', 'zone_tab', radius=False)
-        ctx.text(f'{ctx.slide_id}-zone-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(0.6), Inches(0.38), f'{point_index:02d}', meta_label_size, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-zone-{point_index}-text', left + Inches(0.28), top + Inches(0.7), width - Inches(0.58), height - Inches(0.82), point, card_body_size, 'ink', 'point_text')
-    ctx.rect(f'{ctx.slide_id}-bridge-rule', Inches(7.78), top_row + Inches(0.13), Inches(0.08), Inches(3.75), 'accent', 'compare_divider', radius=False)
-    ctx.line(f'{ctx.slide_id}-horizontal-bridge', Inches(1.2), top_row + Inches(2.16), Inches(14.55), top_row + Inches(2.16), 'line', 1.1, 'compare_bridge')
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_timeline_band(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
-    points = slide_points(slide_data)
-    card_body_size = typography_size(slide_data, 'card_body')
-    meta_label_size = typography_size(slide_data, 'meta_label')
-    panel_width = Inches(3.25)
-    panel_height = Inches(1.82)
-    text_height = Inches(1.22)
-    rail_top = max(Inches(4.02), band_bottom + Inches(2.05))
-    ctx.rect(f'{ctx.slide_id}-timeline-rail', Inches(1.3), rail_top, Inches(13.0), Inches(0.08), 'accent', 'timeline_rail', radius=False)
-    for point_index, point in enumerate(points[:4], 1):
-        left = Inches(1.0 + ((point_index - 1) * 3.65))
-        top = rail_top - panel_height - Inches(0.22) if point_index % 2 else rail_top + Inches(0.42)
-        center_x = left + Inches(1.52)
-        ctx.line(f'{ctx.slide_id}-milestone-{point_index}-stem', center_x, rail_top + Inches(0.04), center_x, top + Inches(0.08), 'line', 1.1, 'timeline_stem')
-        ctx.oval(f'{ctx.slide_id}-milestone-{point_index}-node', center_x - Inches(0.11), rail_top - Inches(0.09), Inches(0.22), Inches(0.22), 'accent', 'timeline_node')
-        ctx.rect(f'{ctx.slide_id}-milestone-{point_index}-panel', left, top, panel_width, panel_height, 'panel', 'timeline_panel', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-index', left + Inches(0.22), top + Inches(0.16), Inches(0.65), Inches(0.32), f'{point_index:02d}', meta_label_size, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-text', left + Inches(0.22), top + Inches(0.48), panel_width - Inches(0.48), text_height, point, card_body_size, 'ink', 'point_text')
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_judgement_ladder(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
-    points = slide_points(slide_data)
-    card_body_size = typography_size(slide_data, 'card_body')
-    meta_label_size = typography_size(slide_data, 'meta_label')
-    if len(points) <= 2:
-        top_start = max(Inches(2.62), band_bottom + Inches(0.28))
-        ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(1.1), top_start + Inches(0.96), Inches(13.9), top_start + Inches(2.9), 'line', 1.5, 'ladder_spine')
-        positions = [
-            (Inches(1.05), top_start, Inches(6.1), Inches(2.12)),
-            (Inches(7.95), top_start + Inches(1.2), Inches(6.1), Inches(2.12)),
-        ]
-        for point_index, point in enumerate(points, 1):
-            left, top, width, height = positions[point_index - 1]
-            ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.2), top + Inches(0.28), Inches(0.24), Inches(0.24), 'accent', 'gate_node')
-            ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, width, height, 'panel', 'judgement_step', 'content', 'line')
-            ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(1.35), Inches(0.32), f'Gate {point_index}', meta_label_size, 'accent', 'point_index', True)
-            ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.28), top + Inches(0.72), width - Inches(0.56), height - Inches(0.92), point, card_body_size, 'ink', 'point_text')
-        add_footer(ctx, slide_data, index, total)
-        return
-    base_top = max(Inches(5.8), band_bottom + Inches(3.2))
-    ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(0.95), base_top + Inches(0.82), Inches(12.85), base_top - Inches(1.14), 'line', 1.5, 'ladder_spine')
-    for point_index, point in enumerate(points[:4], 1):
-        left = Inches(1.08 + ((point_index - 1) * 3.18))
-        top = base_top - Inches((point_index - 1) * 0.72)
-        height = Inches(1.3 + ((point_index - 1) * 0.24))
-        ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.18), top + Inches(0.16), Inches(0.22), Inches(0.22), 'accent', 'gate_node')
-        ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, Inches(2.76), height, 'panel', 'judgement_step', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.2), top + Inches(0.16), Inches(1.3), Inches(0.3), f'Gate {point_index}', meta_label_size, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.2), top + Inches(0.5), Inches(2.3), height - Inches(0.58), point, card_body_size, 'ink', 'point_text')
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_ring_cross(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
-    points = slide_points(slide_data)
-    card_body_size = typography_size(slide_data, 'card_body')
-    content_offset = max(0, band_bottom - Inches(2.15))
-    hub_top = Inches(3.36) + content_offset
-    ctx.rect(f'{ctx.slide_id}-center-hub', Inches(6.25), hub_top, Inches(3.18), Inches(1.05), 'accent', 'center_hub', 'content')
-    ctx.text(f'{ctx.slide_id}-center-text', Inches(6.72), hub_top + Inches(0.22), Inches(2.25), Inches(0.52), 'Core', card_body_size, '#FFFFFF', 'center_hub', True)
-    positions = [
-        (Inches(1.02), Inches(2.42) + content_offset, Inches(4.35), Inches(1.3)),
-        (Inches(10.55), Inches(2.42) + content_offset, Inches(4.35), Inches(1.3)),
-        (Inches(10.55), Inches(5.06) + content_offset, Inches(4.35), Inches(1.3)),
-        (Inches(1.02), Inches(5.06) + content_offset, Inches(4.35), Inches(1.3)),
-    ]
-    hub_points = [
-        (Inches(6.25), hub_top + Inches(0.26)),
-        (Inches(9.43), hub_top + Inches(0.26)),
-        (Inches(9.43), hub_top + Inches(0.76)),
-        (Inches(6.25), hub_top + Inches(0.76)),
-    ]
-    for point_index, point in enumerate(points[:4], 1):
-        left, top, width, height = positions[point_index - 1]
-        end_x, end_y = hub_points[point_index - 1]
-        start_x = left + (width if point_index in {1, 4} else 0)
-        start_y = top + (height / 2)
-        ctx.line(f'{ctx.slide_id}-axis-{point_index}-connector', start_x, start_y, end_x, end_y, 'line', 1.2, 'axis_connector')
-        ctx.rect(f'{ctx.slide_id}-axis-{point_index}-panel', left, top, width, height, 'panel', 'axis_panel', 'content', 'line')
-        ctx.oval(f'{ctx.slide_id}-axis-{point_index}-node', left + Inches(0.16), top + Inches(0.16), Inches(0.18), Inches(0.18), 'accent', 'axis_node')
-        ctx.text(f'{ctx.slide_id}-axis-{point_index}-text', left + Inches(0.24), top + Inches(0.26), width - Inches(0.5), Inches(0.82), point, card_body_size, 'ink', 'point_text', True)
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_summary_peak(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
-    add_background(ctx)
-    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
-    points = slide_points(slide_data)
-    primary = points[0] if points else slide_core_sentence(slide_data)
-    section_lead_size = typography_size(slide_data, 'section_lead')
-    card_body_size = typography_size(slide_data, 'card_body')
-    peak_top = max(Inches(2.38), band_bottom + Inches(0.3))
-    ctx.rect(f'{ctx.slide_id}-summary-peak', Inches(1.0), peak_top, Inches(13.7), Inches(1.35), 'accent', 'summary_peak', 'content')
-    ctx.rect(f'{ctx.slide_id}-peak-shadow', Inches(1.26), peak_top + Inches(1.44), Inches(13.18), Inches(0.12), 'line', 'peak_shadow', radius=False)
-    ctx.text(f'{ctx.slide_id}-peak-text', Inches(1.48), peak_top + Inches(0.28), Inches(12.5), Inches(0.72), primary, section_lead_size, '#FFFFFF', 'summary_peak', True)
-    for point_index, point in enumerate(points[1:4] or points[:3], 1):
-        left = Inches(1.0 + ((point_index - 1) * 4.63))
-        takeaway_top = peak_top + Inches(2.17)
-        ctx.oval(f'{ctx.slide_id}-takeaway-{point_index}-node', left + Inches(0.2), takeaway_top - Inches(0.27), Inches(0.22), Inches(0.22), 'accent', 'takeaway_node')
-        ctx.rect(f'{ctx.slide_id}-takeaway-{point_index}-panel', left, takeaway_top, Inches(4.05), Inches(1.25), 'panel', 'takeaway_panel', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-takeaway-{point_index}-text', left + Inches(0.26), takeaway_top + Inches(0.27), Inches(3.5), Inches(0.68), point, card_body_size, 'ink', 'point_text', True)
-    add_footer(ctx, slide_data, index, total)
-
-
-def write_structural_native_shapes(ctx: SlideBuilder, slide_data: dict):
-    for shape_index, shape_spec in enumerate(native_structural_shapes(slide_data), 1):
-        kind = shape_kind(shape_spec)
-        if kind == 'chart':
-            ctx.chart(shape_spec, shape_index)
-        elif kind == 'table':
-            ctx.table(shape_spec, shape_index)
-        elif kind == 'metric_grid':
-            ctx.metric_grid(shape_spec, shape_index)
-
-
-LAYOUT_WRITERS = {
-    'cover_signal': write_cover_signal,
-    'multi_zone_compare': write_multi_zone_compare,
-    'timeline_band': write_timeline_band,
-    'judgement_ladder': write_judgement_ladder,
-    'ring_cross': write_ring_cross,
-    'summary_peak': write_summary_peak,
-}
+def parse_json_output(completed: subprocess.CompletedProcess, fallback):
+    text = safe_text(completed.stdout)
+    if not text:
+        return fallback
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        return {'raw_stdout': text}
 
 
 def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, evaluate_native_slide_quality):
-    prs = Presentation()
-    prs.slide_width = SLIDE_W
-    prs.slide_height = SLIDE_H
-    blank_layout = prs.slide_layouts[6]
+    officecli = shutil.which('officecli')
+    if not officecli:
+        raise RuntimeError('native PPT officecli materializer requires officecli on PATH')
+
     manifest_slides = []
+    output_pptx.parent.mkdir(parents=True, exist_ok=True)
+    output_pptx.unlink(missing_ok=True)
+    officecli_commands = []
+    officecli_text_probe = []
     for index, slide_data in enumerate(slides, 1):
-        palette = PALETTES[(index - 1) % len(PALETTES)]
-        slide = prs.slides.add_slide(blank_layout)
         slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
-        repaired = slide_id in repaired_slide_ids
-        layout = layout_family(slide_data)
-        writer = LAYOUT_WRITERS[layout]
+        failures = validate_ai_first_design_plan(slide_data)
+        if failures:
+            raise RuntimeError(
+                'native PPT AI-first editable_shape_plan failed: '
+                + json.dumps(failures, ensure_ascii=False, sort_keys=True)
+            )
         try:
-            svg_ir = render_slide_svg_ir(slide_data, index, len(slides), svg_ir_dir, palette, repaired)
+            svg_ir = render_slide_svg_ir(slide_data, index, len(slides), svg_ir_dir, slide_id in repaired_slide_ids)
         except ValueError as exc:
             raise RuntimeError(str(exc)) from exc
-        ctx = SlideBuilder(slide, palette, slide_id)
-        writer(ctx, slide_data, index, len(slides), repaired)
-        try:
-            write_structural_native_shapes(ctx, slide_data)
-        except ValueError as exc:
-            raise RuntimeError(str(exc)) from exc
-        if repaired:
-            ctx.rect(f'{slide_id}-repair-marker', Inches(14.18), Inches(0.38), Inches(0.72), Inches(0.12), 'accent', 'repair_marker', radius=False)
-        points = slide_points(slide_data)
-        quality = evaluate_native_slide_quality(ctx.native_shapes, len(points))
+
+        ai_shapes = native_ai_design_shapes(slide_data)
+        native_shapes = []
+        officecli_commands.append({
+            'command': 'add',
+            'parent': '/',
+            'type': 'slide',
+            'props': {
+                'layout': 'blank',
+                'background': resolve_color(slide_data.get('background'), 'bg'),
+            },
+        })
+        for shape_spec in ai_shapes:
+            bounds_in = ai_shape_bounds_in(shape_spec)
+            bounds_px = shape_rect_from_ai_bounds(shape_spec)
+            officecli_commands.append({
+                'command': 'add',
+                'parent': f'/slide[{index}]',
+                'type': 'shape',
+                'props': officecli_shape_props(shape_spec, bounds_in, bounds_px),
+            })
+            native_shape = native_shape_manifest_record(shape_spec)
+            native_shapes.append(native_shape)
+            if native_shape['text']:
+                officecli_text_probe.append(native_shape['text'])
+
+        quality = evaluate_native_slide_quality(native_shapes, primary_point_count(ai_shapes))
+        title_sizes = [
+            shape['font_size'] for shape in native_shapes
+            if shape['role'] == 'title' and shape['font_size'] > 0
+        ]
         manifest_slides.append({
             'slide_id': slide_id,
             'title': slide_title(slide_data, index),
-            'layout_family': layout,
-            'layout_writer': layout_writer_id(layout),
-            'title_font_size': title_size_for_layout(slide_data, layout),
-            'shape_count': len(slide.shapes),
-            'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
+            'layout_family': layout_family(slide_data),
+            'layout_writer': 'officecli_pptx_materializer',
+            'ai_first_spatial_plan': {
+                'required': True,
+                'materialized': True,
+                'helper_template_layout_used': False,
+                'materializer': 'officecli_pptx_materializer',
+                'shape_count': len(ai_shapes),
+            },
+            'title_font_size': max(title_sizes, default=0),
+            'shape_count': len(native_shapes),
+            'text_box_count': sum(1 for shape in native_shapes if shape['kind'] == 'text_box'),
             'redcube_svg_ir_file': svg_ir['file'],
             'redcube_svg_ir_sha256': svg_ir['sha256'],
             'redcube_svg_ir_preflight': svg_ir['preflight'],
-            'redcube_svg_ir': {
-                'file': svg_ir['file'],
-                'sha256': svg_ir['sha256'],
-                'preflight': svg_ir['preflight'],
-            },
+            'redcube_svg_ir': svg_ir,
             'preview_screenshot_file': '',
             'preview_screenshot_sha256': '',
             'preview_screenshot_dimensions': None,
             'render_proof_source': '',
             'synthetic_preview': False,
-            'native_shapes': ctx.native_shapes,
+            'native_shapes': native_shapes,
             'checks': quality['checks'],
             'metrics': quality['metrics'],
             'issues': quality['issues'],
-            'repaired': repaired,
+            'repaired': slide_id in repaired_slide_ids,
         })
-    output_pptx.parent.mkdir(parents=True, exist_ok=True)
-    prs.save(str(output_pptx))
-    return manifest_slides
+
+    def run_officecli(args, *, input_text: str | None = None) -> subprocess.CompletedProcess:
+        completed = subprocess.run(
+            [officecli, *args],
+            text=True,
+            input=input_text,
+            capture_output=True,
+            check=False,
+        )
+        if completed.returncode != 0:
+            raise RuntimeError(
+                'officecli materializer command failed: '
+                + json.dumps({
+                    'args': args,
+                    'stdout': completed.stdout,
+                    'stderr': completed.stderr,
+                    'returncode': completed.returncode,
+                }, ensure_ascii=False, sort_keys=True)
+            )
+        return completed
+
+    run_officecli(['create', str(output_pptx)])
+    run_officecli(['open', str(output_pptx)])
+    try:
+        run_officecli(['batch', str(output_pptx)], input_text=json.dumps(officecli_commands, ensure_ascii=False))
+        run_officecli(['save', str(output_pptx)])
+        validate = run_officecli(['validate', str(output_pptx), '--json'])
+        issues = run_officecli(['view', str(output_pptx), 'issues', '--json'])
+        text = run_officecli(['view', str(output_pptx), 'text', '--json'])
+    finally:
+        run_officecli(['close', str(output_pptx)])
+
+    return {
+        'slides': manifest_slides,
+        'officecli_gate': {
+            'materializer': 'officecli_pptx_materializer',
+            'command_count': len(officecli_commands),
+            'save_before_close': True,
+            'validate': parse_json_output(validate, {}),
+            'view_issues': parse_json_output(issues, {}),
+            'view_text': parse_json_output(text, {}),
+            'expected_text_fragments': officecli_text_probe,
+        },
+    }

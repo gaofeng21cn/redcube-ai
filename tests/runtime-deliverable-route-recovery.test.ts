@@ -525,6 +525,91 @@ test('runDeliverableRoute auto-repairs ppt image pages after visual director rev
   });
 });
 
+test('runDeliverableRoute runs screenshot review before native PPT repair after visual director block', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-director-native-repair-'));
+    await completeSourceReadiness({
+      workspaceRoot,
+      topicId: 'topic-a',
+      title: 'Director native repair export proof',
+      brief: '验证 native PPT visual director 阻断后先补截图质控，再回修并继续导出。',
+      keywords: ['ppt', 'native', 'director-review', 'screenshot-review', 'repair', 'export'],
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-native',
+      title: 'Director native repair export proof',
+      goal: '验证 visual director review 到 native repair 再到 export 的自主续跑',
+    });
+
+    for (const route of [
+      'storyline',
+      'detailed_outline',
+      'slide_blueprint',
+      'visual_direction',
+      'author_pptx_native',
+    ]) {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-native',
+        route,
+      });
+      assert.equal(result.ok, true, route);
+    }
+
+    const restoreDirectorVariant = withEnv({
+      REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT: 'block_author_pptx_native_until_repair',
+    });
+    try {
+      const result = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-native',
+        route: 'visual_director_review',
+        stopAfterStage: 'export_pptx',
+      });
+
+      assert.equal(result.ok, true);
+      assert.equal(result.summary.requested_route, 'visual_director_review');
+      assert.equal(result.summary.executed_route, 'export_pptx');
+      assert.deepEqual(result.summary.continued_route_sequence, [
+        'screenshot_review',
+        'repair_pptx_native',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ]);
+      assert.deepEqual(
+        result.continuation_route_runs.map((entry) => entry.route),
+        ['screenshot_review', 'repair_pptx_native', 'visual_director_review', 'screenshot_review', 'export_pptx'],
+      );
+      assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
+      assert.equal(result.artifact?.export_bundle?.source_visual_route, 'repair_pptx_native');
+
+      const repairArtifact = JSON.parse(readFileSync(path.join(
+        workspaceRoot,
+        'topics',
+        'topic-a',
+        'deliverables',
+        'deck-native',
+        'artifacts',
+        'native_ppt_repair_bundle.json',
+      ), 'utf-8'));
+      assert.equal(repairArtifact.native_ppt_repair_log?.consumed_review_stage, 'screenshot_review');
+      assert.equal(repairArtifact.native_ppt_bundle?.source_visual_route, 'repair_pptx_native');
+    } finally {
+      restoreDirectorVariant();
+    }
+  });
+});
+
 test('runDeliverableRoute reports repeated ppt screenshot blocks after image repair instead of earlier visual pass', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-repeated-image-review-block-'));

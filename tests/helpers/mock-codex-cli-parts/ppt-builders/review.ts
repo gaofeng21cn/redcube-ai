@@ -25,6 +25,21 @@ export function buildMockPptDirectorReview(meta) {
       rewrite_action: 'repair_image_pages',
     };
   }
+  if (variants.has('block_author_pptx_native_until_repair')
+    && slides.some((slide) => safeText(slide?.source_pptx).includes('author_pptx_native'))
+    && !slides.some((slide) => safeText(slide?.source_pptx).includes('repair_pptx_native'))) {
+    const blockedSlideId = safeText(slides[0]?.slide_id, 'S01');
+    return {
+      director_intent_landed: false,
+      anti_template_ok: false,
+      peak_pages_landed: false,
+      memory_hook_present: true,
+      homogeneous_layout_risk: 0.78,
+      weak_pages: [blockedSlideId],
+      review_summary: `${blockedSlideId} 原生 PPTX 仍有模板化和结构节奏问题，必须先进入截图质控再回修。`,
+      rewrite_action: 'repair_pptx_native',
+    };
+  }
   if (variants.has('require_page_local_delta_review')) {
     if (reviewScope !== 'incremental_page_review' && reviewScope !== 'delta_page_review') {
       throw new Error(`mock ppt director review expected incremental page review scope, got ${reviewScope}`);

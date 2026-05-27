@@ -214,7 +214,10 @@ export function createPptDeckStageParts(deps) {
     }
     if (route === 'screenshot_review') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-      if (!directorReviewArtifact || directorReviewArtifact.status !== 'pass') {
+      const screenshotFeedbackOnlyRoute = reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_pptx_native')
+        ? 'repair_pptx_native'
+        : '';
+      if (!directorReviewArtifact || (directorReviewArtifact.status !== 'pass' && !screenshotFeedbackOnlyRoute)) {
         throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
       }
       const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));

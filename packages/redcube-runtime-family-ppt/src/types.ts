@@ -345,7 +345,7 @@ export interface PptNativePptEngineContract {
   engine_capabilities: {
     authoring_ir: 'redcube_svg_ir';
     authoring_ir_version: 1;
-    pptx_writer: 'redcube_drawingml_writer';
+    pptx_writer: 'officecli_pptx_materializer';
     editable_pptx: true;
     strict_svg_preflight: true;
     true_render_proof_required: true;
@@ -358,9 +358,9 @@ export interface PptNativePptEngineContract {
     adoption_status: 'qa_materializer_discipline_only';
     rca_main_workflow_owner: 'redcube_stage_review_export';
     skill_authoring_loop_adopted: false;
-    materializer_role: 'executor_adapter_materializer_and_qa_gate';
-    current_pptx_writer: 'redcube_drawingml_writer';
-    officecli_writer_adapter_default_enabled: false;
+    materializer_role: 'default_editable_pptx_materializer_and_qa_gate';
+    current_pptx_writer: 'officecli_pptx_materializer';
+    officecli_writer_adapter_default_enabled: true;
     required_gate_refs: string[];
     save_before_close_required: true;
     validate_required: true;

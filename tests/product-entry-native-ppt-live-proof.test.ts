@@ -160,13 +160,14 @@ test('live product-entry native PPT proof reaches review and export gates with r
     assert.equal(nativeArtifact.native_ppt_bundle.editable_artifact, true);
     assert.equal(nativeArtifact.native_ppt_bundle.source_visual_route, 'author_pptx_native');
     assert.equal(nativeArtifact.native_ppt_bundle.python_helper_invocation.package_module, 'redcube_ai.native_helpers.ppt_deck.native');
+    assert.equal(nativeArtifact.native_ppt_bundle.officecli_gate.view_issues.data.count, 0);
     assert.equal(existsSync(nativeArtifact.native_ppt_bundle.pptx_file), true);
     assert.equal(existsSync(nativeArtifact.native_ppt_bundle.pdf_file), true);
     assert.equal(existsSync(nativeArtifact.native_ppt_bundle.shape_manifest_file), true);
     assertRealNativeRenderProof(nativeArtifact.native_ppt_bundle.render_proof);
 
     const shapeManifest = readJson(nativeArtifact.native_ppt_bundle.shape_manifest_file);
-    assert.equal(shapeManifest.builder.kind, 'redcube_drawingml_writer');
+    assert.equal(shapeManifest.builder.kind, 'officecli_pptx_materializer');
     assert.equal(shapeManifest.builder.screenshot_packaging, false);
     assert.equal(shapeManifest.render_proof.synthetic_preview, false);
     assertRealNativeRenderProof(shapeManifest.render_proof);

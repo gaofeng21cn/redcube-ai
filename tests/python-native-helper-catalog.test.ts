@@ -391,7 +391,7 @@ test('Python native helper doctor does not create a bypass around review/export 
   assert.equal(nativeHelper.capability_status, 'production_selectable_optional');
   assert.equal(nativeHelper.default_enabled, false);
   assert.equal(nativeHelper.engine_capabilities.authoring_ir, 'redcube_svg_ir');
-  assert.equal(nativeHelper.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(nativeHelper.engine_capabilities.pptx_writer, 'officecli_pptx_materializer');
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_required, true);
   assert.equal(nativeHelper.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
   assert.equal(nativeHelper.true_render_proof.required, true);
@@ -561,7 +561,7 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
   );
   assert.equal(helpers.ppt_deck_native.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
   assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.skill_authoring_loop_adopted, false);
-  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.current_pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.current_pptx_writer, 'officecli_pptx_materializer');
   assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.view_issues_required, true);
   assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.true_render_proof_substitute_allowed, false);
   assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless');

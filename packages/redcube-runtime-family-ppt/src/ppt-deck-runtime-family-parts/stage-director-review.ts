@@ -98,7 +98,12 @@ export function createPptDeckDirectorReviewParts(deps) {
           slide_id: slide.slide_id,
           title: slide.title,
           layout_family: slide.layout_family,
+          layout_variant: slide.layout_variant,
+          expected_slot_count: slide.expected_slot_count,
+          filled_slot_count: slide.filled_slot_count,
           peak_page: false,
+          source_pptx: renderArtifact?.native_ppt_bundle?.pptx_file || null,
+          shape_manifest_file: renderArtifact?.native_ppt_bundle?.shape_manifest_file || null,
           text_excerpt: `native editable PPTX: ${slide.shape_count} shapes, ${slide.text_box_count} text boxes`,
         }))
       : safeArray(renderArtifact?.html_bundle?.slides).map((slide) => ({
