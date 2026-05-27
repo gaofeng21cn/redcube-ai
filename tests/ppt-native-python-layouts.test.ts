@@ -403,6 +403,24 @@ function enrichFixtureSuitePayload(suite) {
   })), suite.editable_shape_plan.route);
 }
 
+let benchmarkFixtureMaterializations = null;
+
+function materializedBenchmarkFixture() {
+  if (benchmarkFixtureMaterializations) {
+    return benchmarkFixtureMaterializations;
+  }
+  const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
+  const suites = fixture.suites.map((suite) => ({
+    suite,
+    result: runNativeMaterializer(
+      enrichFixtureSuitePayload(suite),
+      `redcube-native-visual-benchmark-${suite.suite_id}-`,
+    ),
+  }));
+  benchmarkFixtureMaterializations = { fixture, suites };
+  return benchmarkFixtureMaterializations;
+}
+
 function contentShapes(slide, role = null) {
   return slide.native_shapes.filter((shape) => (
     shape.quality_role === 'content'
@@ -621,14 +639,11 @@ test('native PPTX shape quality flags missing slots, low content, overlap, and u
 });
 
 test('native PPT visual benchmark fixture is materialized from AI shapes without helper templates', () => {
-  const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
+  const { fixture, suites } = materializedBenchmarkFixture();
   assert.equal(fixture.route_policy.native_default_route, false);
   assert.equal(fixture.route_policy.comparison_only, true);
   assert.equal(fixture.suites.length, 4);
-  const reportRows = fixture.suites.map((suite) => {
-    const result = runNativeMaterializer(enrichFixtureSuitePayload(suite), `redcube-native-visual-benchmark-${suite.suite_id}-`);
-    return assertMaterializedQuality({ fixture, suite, result });
-  });
+  const reportRows = suites.map(({ suite, result }) => assertMaterializedQuality({ fixture, suite, result }));
   const requiredFields = fixture.quality_comparison_report.required_record_fields;
   assert.equal(reportRows.every((row) => requiredFields.every((field) => Object.hasOwn(row, field))), true);
   assert.equal(reportRows.every((row) => row.route === 'author_pptx_native'), true);
@@ -639,9 +654,8 @@ test('native PPT visual benchmark fixture is materialized from AI shapes without
 });
 
 test('native render preview attachment records PNG manifest metrics without packaging screenshots into PPTX', () => {
-  const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
-  for (const suite of fixture.suites) {
-    const result = runNativeMaterializer(enrichFixtureSuitePayload(suite), `redcube-native-render-preview-${suite.suite_id}-`);
+  const { fixture, suites } = materializedBenchmarkFixture();
+  for (const { suite, result } of suites) {
     const previewDir = path.join(result.workspaceRoot, 'previews');
     mkdirSync(previewDir, { recursive: true });
     const previewMetrics = result.slides.map((slide, index) => {
