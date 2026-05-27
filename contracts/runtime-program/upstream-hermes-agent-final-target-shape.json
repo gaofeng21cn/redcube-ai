@@ -33,7 +33,7 @@
       ]
     },
     "redcube_owns": [
-      "domain-agent authority across gateway -> family -> profile -> pack boundaries",
+      "domain-agent authority across service-safe domain entry -> family -> profile -> pack boundaries",
       "visual-domain truth and canonical artifacts",
       "auditDeliverable",
       "runtimeWatch",

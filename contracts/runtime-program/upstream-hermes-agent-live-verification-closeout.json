@@ -57,7 +57,7 @@
     "guarded poster_onepager remains limited to the knowledge-poster boundary and does not activate academic poster semantics"
   ],
   "verification": {
-    "current_host_gateway_command": "hermes gateway run -q --replace",
+    "current_host_upstream_launch_command": "hermes gateway run -q --replace",
     "current_host_python_command": "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "commands": [
       "npm run test:e2e",

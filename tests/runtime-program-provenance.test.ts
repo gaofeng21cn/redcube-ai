@@ -183,6 +183,7 @@ test('active machine-readable surfaces use neutral action naming instead of reti
       ['downstream', 'gateway', 'action'],
     ].map((parts) => parts.join('_')).join('|')})\\b`,
   );
+  const retiredRouteChain = /\bgateway\s*->/i;
 
   for (const file of ACTIVE_MACHINE_READABLE_ROOTS.flatMap((root) => {
     if (!existsSync(path.resolve(root))) return [];
@@ -190,9 +191,36 @@ test('active machine-readable surfaces use neutral action naming instead of reti
   })) {
     if (file === 'tests/runtime-program-provenance.test.ts') continue;
     const text = readFileSync(file, 'utf-8');
-    if (forbidden.test(text)) {
+    if (forbidden.test(text) || retiredRouteChain.test(text)) {
       violations.push(file);
     }
+  }
+
+  assert.deepEqual(violations, []);
+});
+
+test('historical upstream Hermes contracts keep gateway command prose out of object keys', () => {
+  const violations = [];
+  const forbiddenKey = /(?:gateway.*command|command.*gateway)/i;
+
+  function collectViolations(value, pointer, file) {
+    if (Array.isArray(value)) {
+      value.forEach((item, index) => collectViolations(item, `${pointer}/${index}`, file));
+      return;
+    }
+    if (value === null || typeof value !== 'object') return;
+
+    for (const [key, child] of Object.entries(value)) {
+      const childPointer = `${pointer}/${key}`;
+      if (forbiddenKey.test(key)) {
+        violations.push(`${file}${childPointer}`);
+      }
+      collectViolations(child, childPointer, file);
+    }
+  }
+
+  for (const historicalContract of HISTORICAL_CONTRACTS) {
+    collectViolations(readJson(historicalContract.contract), '', historicalContract.contract);
   }
 
   assert.deepEqual(violations, []);

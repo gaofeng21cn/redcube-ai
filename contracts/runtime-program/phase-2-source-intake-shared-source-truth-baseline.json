@@ -99,7 +99,7 @@
   },
   "operator_flow": [
     {"step": 1, "action": "hydrate canonical source truth", "surface": "CLI/MCP source intake", "expected_result": "canonical quartet written under topics/<topic>/canonical"},
-    {"step": 2, "action": "create deliverable on the same substrate", "surface": "gateway -> family -> profile -> pack -> harness execution", "expected_result": "hydrated deliverable contract references shared source truth"},
+    {"step": 2, "action": "create deliverable on the same substrate", "surface": "service-safe domain entry -> family -> profile -> pack -> execution", "expected_result": "hydrated deliverable contract references shared source truth"},
     {"step": 3, "action": "run family stages against shared source truth", "surface": "ppt_deck / xiaohongshu route chain", "expected_result": "story and visual stages consume canonical shared source truth"},
     {"step": 4, "action": "review and audit closeout", "surface": "audit/review/runtime watch surfaces", "expected_result": "review/export/gate/audit surfaces remain aligned to hydrated truth"},
     {"step": 5, "action": "absorb tranche to main", "surface": "program closeout", "expected_result": "Phase 2 baseline is repo-tracked, verified, and reproducible"}

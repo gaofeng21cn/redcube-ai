@@ -12,7 +12,7 @@
     "required_runtime_owner": "upstream_hermes_agent",
     "adapter_surface": "@redcube/runtime-protocol Hermes-Agent API client and loop bridge",
     "probe_script": "node --experimental-strip-types --test tests/runtime-topology-regression.test.ts tests/python-native-helper-catalog.test.ts",
-    "live_gateway_command_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
+    "upstream_launch_command_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
     "python_command_env": "REDCUBE_PYTHON_COMMAND",
     "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
     "required_surfaces": [
