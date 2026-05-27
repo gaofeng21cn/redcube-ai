@@ -144,6 +144,22 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
     'libreoffice_headless',
   );
   assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.skill_authoring_loop_adopted,
+    false,
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.current_pptx_writer,
+    'redcube_drawingml_writer',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.view_issues_required,
+    true,
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.true_render_proof_substitute_allowed,
+    false,
+  );
+  assert.equal(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
     'libreoffice_headless',
   );

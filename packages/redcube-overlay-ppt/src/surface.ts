@@ -179,6 +179,10 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.native_ppt_proof_lane?.review_input_surface === 'rendered_pptx_screenshots'
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.authoring_ir === 'redcube_svg_ir'
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.pptx_writer === 'redcube_drawingml_writer'
+    && content.render_contract.native_ppt_proof_lane?.officecli_materializer_policy?.skill_authoring_loop_adopted === false
+    && content.render_contract.native_ppt_proof_lane?.officecli_materializer_policy?.current_pptx_writer === 'redcube_drawingml_writer'
+    && content.render_contract.native_ppt_proof_lane?.officecli_materializer_policy?.view_issues_required === true
+    && content.render_contract.native_ppt_proof_lane?.officecli_materializer_policy?.true_render_proof_substitute_allowed === false
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.required === true
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.true_render_proof_renderer === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.cross_platform_render_required === true

@@ -21,6 +21,31 @@ const REQUIRED_NATIVE_QUALITY_METRIC_REFS = Object.freeze([
   'shape_manifest#/slides/*/preview_screenshot_dimensions',
 ]);
 
+const OFFICECLI_MATERIALIZER_POLICY = Object.freeze({
+  policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
+  adoption_status: 'qa_materializer_discipline_only',
+  rca_main_workflow_owner: 'redcube_stage_review_export',
+  skill_authoring_loop_adopted: false,
+  materializer_role: 'executor_adapter_materializer_and_qa_gate',
+  current_pptx_writer: 'redcube_drawingml_writer',
+  officecli_writer_adapter_default_enabled: false,
+  required_gate_refs: [
+    'officecli_save_before_close',
+    'officecli_validate',
+    'officecli_view_issues',
+    'officecli_view_text',
+  ],
+  save_before_close_required: true,
+  validate_required: true,
+  view_issues_required: true,
+  view_text_required: true,
+  true_render_proof_required_after_officecli_gate: true,
+  true_render_proof_substitute_allowed: false,
+  deterministic_cjk_font_family: 'Noto Sans CJK SC',
+  default_visual_route_changed: false,
+  default_executor_changed: false,
+});
+
 function safeText(value: unknown, fallback = ''): string {
   const text = String(value || '').trim();
   return text || fallback;
@@ -77,6 +102,18 @@ export function buildNativePptQualityNonregressionReadModel({
       helper_can_replace_ai_creative_owner: false,
       fail_closed_when_missing: true,
     },
+    officecli_materializer_policy_ref: {
+      policy_id: OFFICECLI_MATERIALIZER_POLICY.policy_id,
+      contract_ref: `${QUALITY_NONREGRESSION_CONTRACT_REF}#/officecli_materializer_policy`,
+      source_ref: 'native_ppt_bundle.officecli_materializer_policy',
+      refs_only: true,
+      fail_closed_when_missing_when_adapter_active: true,
+    },
+    officecli_quality_gate: {
+      ...OFFICECLI_MATERIALIZER_POLICY,
+      officecli_skill_can_replace_rca_workflow: false,
+      officecli_validate_can_replace_true_render_proof: false,
+    },
     true_render_proof_ref: {
       source_ref: 'native_ppt_bundle.render_proof',
       renderer_kind: safeText(renderProof.renderer_kind),
@@ -102,6 +139,10 @@ export function buildNativePptQualityNonregressionReadModel({
     quality_gate_refs: [
       'agent/quality_gates/screenshot_review.md',
       'agent/quality_gates/review_export_memory.md',
+      'officecli_save_before_close',
+      'officecli_validate',
+      'officecli_view_issues',
+      'officecli_view_text',
       'workspace-runtime-ref:screenshot_review:<run-id>',
       'workspace-runtime-ref:export_pptx:<run-id>#/operator_proof_summary',
     ],
@@ -121,6 +162,9 @@ export function buildNativePptQualityNonregressionReadModel({
       python_helper_can_write_visual_truth: false,
       python_helper_can_authorize_quality_verdict: false,
       python_helper_can_authorize_exportable: false,
+      officecli_skill_can_replace_rca_workflow: false,
+      officecli_validate_can_replace_true_render_proof: false,
+      officecli_authoring_loop_adopted: false,
       default_executor_changed: false,
       rca_quality_floor_owner: 'redcube_ai',
       rca_export_authority_owner: 'redcube_ai',

@@ -90,6 +90,22 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
     'libreoffice_headless',
   );
   assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.skill_authoring_loop_adopted,
+    false,
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.current_pptx_writer,
+    'redcube_drawingml_writer',
+  );
+  assert.deepEqual(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.required_gate_refs,
+    ['officecli_save_before_close', 'officecli_validate', 'officecli_view_issues', 'officecli_view_text'],
+  );
+  assert.equal(
+    contract.prompt_pack.render_contract.native_ppt_proof_lane.officecli_materializer_policy.true_render_proof_substitute_allowed,
+    false,
+  );
+  assert.equal(
     contract.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_kind,
     'libreoffice_headless',
   );

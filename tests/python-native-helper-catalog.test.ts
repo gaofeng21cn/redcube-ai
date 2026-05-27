@@ -560,6 +560,10 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
   assert.equal(helpers.ppt_deck_native.engine_capabilities.true_render_proof_renderer, 'libreoffice_headless');
+  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.skill_authoring_loop_adopted, false);
+  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.current_pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.view_issues_required, true);
+  assert.equal(helpers.ppt_deck_native.officecli_materializer_policy.true_render_proof_substitute_allowed, false);
   assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_kind, 'libreoffice_headless');
   assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
   assert.equal(helpers.ppt_deck_native.true_render_proof.runtime, 'libreoffice_headless');
@@ -592,6 +596,14 @@ test('Native PPT true-render contracts use probe-selected bootstrap renderer and
   assert.deepEqual(
     helpers.ppt_deck_native.true_render_proof,
     engineContract.true_render_proof,
+  );
+  assert.deepEqual(
+    helpers.ppt_deck_native.officecli_materializer_policy,
+    engineContract.officecli_materializer_policy,
+  );
+  assert.deepEqual(
+    proofLane.candidate_route_model.officecli_materializer_policy,
+    engineContract.officecli_materializer_policy,
   );
 });
 

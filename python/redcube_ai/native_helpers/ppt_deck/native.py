@@ -57,6 +57,30 @@ ENGINE_CAPABILITIES = {
     'cross_platform_render_required': True,
     'screenshot_packaging': False,
 }
+OFFICECLI_MATERIALIZER_POLICY = {
+    'policy_id': 'ppt_native_officecli_materializer_quality_gate_v1',
+    'adoption_status': 'qa_materializer_discipline_only',
+    'rca_main_workflow_owner': 'redcube_stage_review_export',
+    'skill_authoring_loop_adopted': False,
+    'materializer_role': 'executor_adapter_materializer_and_qa_gate',
+    'current_pptx_writer': 'redcube_drawingml_writer',
+    'officecli_writer_adapter_default_enabled': False,
+    'required_gate_refs': [
+        'officecli_save_before_close',
+        'officecli_validate',
+        'officecli_view_issues',
+        'officecli_view_text',
+    ],
+    'save_before_close_required': True,
+    'validate_required': True,
+    'view_issues_required': True,
+    'view_text_required': True,
+    'true_render_proof_required_after_officecli_gate': True,
+    'true_render_proof_substitute_allowed': False,
+    'deterministic_cjk_font_family': 'Noto Sans CJK SC',
+    'default_visual_route_changed': False,
+    'default_executor_changed': False,
+}
 RENDERER_PIPELINE = 'libreoffice_headless_pdf_png_v1'
 RENDERER_KIND = 'libreoffice_headless'
 REPO_ROOT = Path(__file__).resolve().parents[4]
@@ -424,6 +448,10 @@ def load_engine_contract(contract_file: Path) -> dict:
     for key, expected in ENGINE_CAPABILITIES.items():
         if capabilities.get(key) != expected:
             fail(f'engine contract capability mismatch: {key}')
+    officecli_policy = contract.get('officecli_materializer_policy') or {}
+    for key, expected in OFFICECLI_MATERIALIZER_POLICY.items():
+        if officecli_policy.get(key) != expected:
+            fail(f'engine contract officecli_materializer_policy mismatch: {key}')
     render_proof = contract.get('true_render_proof') or {}
     if render_proof.get('required') is not True:
         fail('engine contract true_render_proof.required mismatch')
@@ -862,6 +890,7 @@ def main() -> None:
             'fail_closed_when_missing': True,
         },
         'engine_capabilities': ENGINE_CAPABILITIES,
+        'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
         'render_proof': render_proof,
         'redcube_svg_ir': {
             'kind': 'redcube_svg_ir',
@@ -889,6 +918,7 @@ def main() -> None:
         'engine_contract': engine_contract,
         'engine_contract_file': str(engine_contract_file),
         'engine_capabilities': ENGINE_CAPABILITIES,
+        'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
         'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
         'page_count': len(slides),

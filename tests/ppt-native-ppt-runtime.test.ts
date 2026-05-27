@@ -131,6 +131,10 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_required, true);
     assert.equal(shapeManifest.engine_capabilities?.true_render_proof_renderer, 'libreoffice_headless');
     assert.equal(shapeManifest.engine_capabilities?.cross_platform_render_required, true);
+    assert.equal(shapeManifest.officecli_materializer_policy?.skill_authoring_loop_adopted, false);
+    assert.equal(shapeManifest.officecli_materializer_policy?.current_pptx_writer, 'redcube_drawingml_writer');
+    assert.equal(shapeManifest.officecli_materializer_policy?.view_issues_required, true);
+    assert.equal(shapeManifest.officecli_materializer_policy?.true_render_proof_substitute_allowed, false);
     assert.equal(shapeManifest.render_proof?.source_surface_kind, 'native_pptx');
     assert.equal(shapeManifest.render_proof?.renderer_kind, 'libreoffice_headless');
     assert.equal(shapeManifest.render_proof?.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
@@ -171,6 +175,8 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authored.native_ppt_bundle?.render_proof?.renderer_kind, 'libreoffice_headless');
     assert.equal(authored.native_ppt_bundle?.render_proof?.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
     assert.equal(authored.native_ppt_bundle?.engine_capabilities?.authoring_ir, 'redcube_svg_ir');
+    assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.skill_authoring_loop_adopted, false);
+    assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.current_pptx_writer, 'redcube_drawingml_writer');
 
     let screenshotReviewArtifact = null;
     for (const route of ['visual_director_review', 'screenshot_review', 'export_pptx']) {
@@ -471,6 +477,9 @@ test('native PPT proof lane records the Python engine contract as the single own
   );
   assert.equal(engineContract.engine_capabilities.authoring_ir, 'redcube_svg_ir');
   assert.equal(engineContract.engine_capabilities.pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(engineContract.officecli_materializer_policy.skill_authoring_loop_adopted, false);
+  assert.equal(engineContract.officecli_materializer_policy.view_issues_required, true);
+  assert.equal(engineContract.officecli_materializer_policy.true_render_proof_substitute_allowed, false);
   assert.equal(engineContract.true_render_proof.required, true);
   assert.equal(
     proofLane.candidate_route_model.runtime_executor_proof.engine_capabilities.true_render_proof_required,

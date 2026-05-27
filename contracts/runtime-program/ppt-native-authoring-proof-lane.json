@@ -83,6 +83,30 @@
       "cross_platform_render_required": true,
       "screenshot_packaging": false
     },
+    "officecli_materializer_policy": {
+      "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",
+      "adoption_status": "qa_materializer_discipline_only",
+      "rca_main_workflow_owner": "redcube_stage_review_export",
+      "skill_authoring_loop_adopted": false,
+      "materializer_role": "executor_adapter_materializer_and_qa_gate",
+      "current_pptx_writer": "redcube_drawingml_writer",
+      "officecli_writer_adapter_default_enabled": false,
+      "required_gate_refs": [
+        "officecli_save_before_close",
+        "officecli_validate",
+        "officecli_view_issues",
+        "officecli_view_text"
+      ],
+      "save_before_close_required": true,
+      "validate_required": true,
+      "view_issues_required": true,
+      "view_text_required": true,
+      "true_render_proof_required_after_officecli_gate": true,
+      "true_render_proof_substitute_allowed": false,
+      "deterministic_cjk_font_family": "Noto Sans CJK SC",
+      "default_visual_route_changed": false,
+      "default_executor_changed": false
+    },
     "true_render_proof": {
       "required": true,
       "source_surface_kind": "native_pptx",
@@ -169,23 +193,26 @@
       "review_behavior": "screenshot_review consumes native shape manifest metrics and blocks on missing or failing quality checks",
       "chart_table_metric_grid_review_behavior": "screenshot_review blocks native slides that contain editable chart/table/metric-grid shapes when required manifest metrics are missing"
     },
-    "runtime_executor_proof": {
-      "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
-      "native_writer_package_module": "redcube_ai.native_helpers.ppt_deck.native",
+      "runtime_executor_proof": {
+        "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
+        "native_writer_package_module": "redcube_ai.native_helpers.ppt_deck.native",
       "native_writer_module_command": "python -m redcube_ai.native_helpers.ppt_deck.native",
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "route_surface": "runDeliverableRoute",
       "stage_sequence_model": "explicit_selectable_alternate_stages",
       "default_stage_sequence_changed": false,
-      "engine_capabilities": {
-        "authoring_ir": "redcube_svg_ir",
-        "pptx_writer": "redcube_drawingml_writer",
-        "true_render_proof_required": true,
-        "true_render_proof_renderer": "libreoffice_headless",
-        "cross_platform_render_required": true
+        "engine_capabilities": {
+          "authoring_ir": "redcube_svg_ir",
+          "pptx_writer": "redcube_drawingml_writer",
+          "true_render_proof_required": true,
+          "true_render_proof_renderer": "libreoffice_headless",
+          "cross_platform_render_required": true
+        },
+        "officecli_materializer_policy_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/officecli_materializer_policy",
+        "officecli_skill_authoring_loop_adopted": false,
+        "officecli_validate_substitutes_true_render_proof": false,
+        "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
       },
-      "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
-    },
     "production_hardening": {
       "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
       "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",

@@ -22,6 +22,31 @@ const NATIVE_ENGINE_CAPABILITIES = {
   screenshot_packaging: false,
 };
 
+const OFFICECLI_MATERIALIZER_POLICY = {
+  policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
+  adoption_status: 'qa_materializer_discipline_only',
+  rca_main_workflow_owner: 'redcube_stage_review_export',
+  skill_authoring_loop_adopted: false,
+  materializer_role: 'executor_adapter_materializer_and_qa_gate',
+  current_pptx_writer: 'redcube_drawingml_writer',
+  officecli_writer_adapter_default_enabled: false,
+  required_gate_refs: [
+    'officecli_save_before_close',
+    'officecli_validate',
+    'officecli_view_issues',
+    'officecli_view_text',
+  ],
+  save_before_close_required: true,
+  validate_required: true,
+  view_issues_required: true,
+  view_text_required: true,
+  true_render_proof_required_after_officecli_gate: true,
+  true_render_proof_substitute_allowed: false,
+  deterministic_cjk_font_family: 'Noto Sans CJK SC',
+  default_visual_route_changed: false,
+  default_executor_changed: false,
+};
+
 function mockNativeRendererKind() {
   return String(process.env.REDCUBE_MOCK_NATIVE_RENDERER_KIND || 'libreoffice_headless').trim();
 }
@@ -402,6 +427,7 @@ function buildNativePayload(args) {
     engine_contract: engineContract,
     engine_contract_file: engineContractFile || null,
     engine_capabilities: NATIVE_ENGINE_CAPABILITIES,
+    officecli_materializer_policy: OFFICECLI_MATERIALIZER_POLICY,
     native_quality_model: 'shape_manifest_layout_metrics_v1',
     native_quality_surface: {
       quality_model: 'shape_manifest_layout_metrics_v1',
@@ -466,6 +492,7 @@ function buildNativePayload(args) {
       render_proof_required: true,
     },
     engine_capabilities: NATIVE_ENGINE_CAPABILITIES,
+    officecli_materializer_policy: OFFICECLI_MATERIALIZER_POLICY,
     shape_manifest_schema_version: 1,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,

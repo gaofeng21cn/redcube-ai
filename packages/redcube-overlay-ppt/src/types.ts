@@ -298,6 +298,30 @@ export interface PptDeckNativePptProofLane {
     cross_platform_render_required: true;
     screenshot_packaging: false;
   };
+  officecli_materializer_policy: {
+    policy_id: 'ppt_native_officecli_materializer_quality_gate_v1';
+    adoption_status: 'qa_materializer_discipline_only';
+    rca_main_workflow_owner: 'redcube_stage_review_export';
+    skill_authoring_loop_adopted: false;
+    materializer_role: 'executor_adapter_materializer_and_qa_gate';
+    current_pptx_writer: 'redcube_drawingml_writer';
+    officecli_writer_adapter_default_enabled: false;
+    required_gate_refs: ReadonlyArray<
+      'officecli_save_before_close'
+      | 'officecli_validate'
+      | 'officecli_view_issues'
+      | 'officecli_view_text'
+    >;
+    save_before_close_required: true;
+    validate_required: true;
+    view_issues_required: true;
+    view_text_required: true;
+    true_render_proof_required_after_officecli_gate: true;
+    true_render_proof_substitute_allowed: false;
+    deterministic_cjk_font_family: 'Noto Sans CJK SC';
+    default_visual_route_changed: false;
+    default_executor_changed: false;
+  };
   true_render_proof: {
     required: true;
     source_surface_kind: 'native_pptx';

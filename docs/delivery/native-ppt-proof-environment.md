@@ -13,6 +13,19 @@ Native PPT production proof requires true render proof from a supported renderer
 
 Microsoft PowerPoint, AppleScript, synthetic previews, HTML rendering, and `officecli validate` are not accepted proof surfaces for native PPT true render proof.
 
+## OfficeCLI Materializer Discipline
+
+RCA remains the native PPTX workflow owner. The `officecli-pptx` skill is not adopted as the native authoring loop, and it does not replace RCA `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx`.
+
+The adopted boundary is a materializer / QA discipline:
+
+- `author_pptx_native` and `repair_pptx_native` stay RCA routes.
+- The current PPTX writer remains `redcube_drawingml_writer`.
+- Future officecli writer adapters must still report into the RCA native route artifact, shape manifest, review state, and export bundle.
+- `officecli save` before `close`, `officecli validate`, `officecli view issues`, and `officecli view text` are gate refs for editable PPTX QA.
+- `officecli validate` and `officecli view issues` can catch writer or text-box defects, but they cannot substitute for LibreOffice headless true render proof or RCA screenshot review.
+- Native CJK rendering should prefer `Noto Sans CJK SC` when an officecli-backed adapter materializes or validates Chinese PPTX output.
+
 ## Quality Non-Regression Surface
 
 Native editable PPTX exposes a refs-only quality non-regression surface for OPL Agent Lab at `contracts/runtime-program/ppt-native-pptx-quality-nonregression.json`.

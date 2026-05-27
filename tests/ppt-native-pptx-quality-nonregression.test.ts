@@ -43,7 +43,35 @@ function assertNoForbiddenAuthority(authority) {
   assert.equal(authority.opl_agent_lab_can_authorize_exportable, false);
   assert.equal(authority.opl_agent_lab_can_claim_visual_ready, false);
   assert.equal(authority.python_helper_can_replace_ai_creative_owner, false);
+  assert.equal(authority.officecli_skill_can_replace_rca_workflow, false);
+  assert.equal(authority.officecli_validate_can_replace_true_render_proof, false);
+  assert.equal(authority.officecli_authoring_loop_adopted, false);
   assert.equal(authority.default_executor_changed, false);
+}
+
+function assertOfficecliMaterializerPolicy(policy) {
+  assert.equal(policy.policy_id, 'ppt_native_officecli_materializer_quality_gate_v1');
+  assert.equal(policy.adoption_status, 'qa_materializer_discipline_only');
+  assert.equal(policy.rca_main_workflow_owner, 'redcube_stage_review_export');
+  assert.equal(policy.skill_authoring_loop_adopted, false);
+  assert.equal(policy.materializer_role, 'executor_adapter_materializer_and_qa_gate');
+  assert.equal(policy.current_pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(policy.officecli_writer_adapter_default_enabled, false);
+  assert.deepEqual(policy.required_gate_refs, [
+    'officecli_save_before_close',
+    'officecli_validate',
+    'officecli_view_issues',
+    'officecli_view_text',
+  ]);
+  assert.equal(policy.save_before_close_required, true);
+  assert.equal(policy.validate_required, true);
+  assert.equal(policy.view_issues_required, true);
+  assert.equal(policy.view_text_required, true);
+  assert.equal(policy.true_render_proof_required_after_officecli_gate, true);
+  assert.equal(policy.true_render_proof_substitute_allowed, false);
+  assert.equal(policy.deterministic_cjk_font_family, 'Noto Sans CJK SC');
+  assert.equal(policy.default_visual_route_changed, false);
+  assert.equal(policy.default_executor_changed, false);
 }
 
 function assertQualityContractShape(contract) {
@@ -92,6 +120,9 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.editable_shape_plan_contract.required, true);
   assert.equal(contract.editable_shape_plan_contract.creative_owner, 'llm_agent');
   assert.equal(contract.editable_shape_plan_contract.python_helper_role, 'execute_validate_export_only');
+  assertOfficecliMaterializerPolicy(contract.officecli_materializer_policy);
+  assert.equal(contract.officecli_materializer_policy.officecli_skill_can_replace_rca_workflow, false);
+  assert.equal(contract.officecli_materializer_policy.officecli_validate_can_replace_true_render_proof, false);
   assert.equal(contract.true_render_proof.required, true);
   assert.equal(contract.true_render_proof.fail_closed_when_missing, true);
   assert.equal(contract.true_render_proof.synthetic_preview_allowed, false);
@@ -101,6 +132,10 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.repair_policy.target_source, 'screenshot_review.blocked_slide_ids');
   assert.equal(contract.export_proof_summary.required, true);
   assert.equal(contract.export_proof_summary.summary_surface, 'native_export_bundle_operator_proof_summary_v1');
+  assert.equal(contract.quality_gate_refs.includes('officecli_save_before_close'), true);
+  assert.equal(contract.quality_gate_refs.includes('officecli_validate'), true);
+  assert.equal(contract.quality_gate_refs.includes('officecli_view_issues'), true);
+  assert.equal(contract.quality_gate_refs.includes('officecli_view_text'), true);
   assertNoForbiddenAuthority(contract.authority_boundary);
 }
 
@@ -159,6 +194,12 @@ test('native PPTX quality non-regression contract is refs-only and keeps Agent L
     contract.editable_shape_plan_contract.python_helper_role,
     engineContract.ai_first_boundary.helper_role,
   );
+  assert.deepEqual(
+    contract.officecli_materializer_policy.required_gate_refs,
+    engineContract.officecli_materializer_policy.required_gate_refs,
+  );
+  assert.equal(engineContract.officecli_materializer_policy.skill_authoring_loop_adopted, false);
+  assert.equal(engineContract.officecli_materializer_policy.true_render_proof_substitute_allowed, false);
 });
 
 test('product-entry manifest still exposes native PPTX as explicit optional route', async () => {
@@ -182,6 +223,7 @@ test('product-entry manifest still exposes native PPTX as explicit optional rout
     pptPolicy.native_ppt_proof_lane.preserved_gates,
     ['visual_director_review', 'screenshot_review', 'export_pptx'],
   );
+  assertOfficecliMaterializerPolicy(pptPolicy.native_ppt_proof_lane.officecli_materializer_policy);
 });
 
 test('native PPTX authoring artifact exposes Agent Lab quality non-regression refs without verdict authority', async () => {
@@ -203,6 +245,10 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.agent_lab_suite_input.claims_exportable, false);
       assert.equal(readModel.true_render_proof_ref.fail_closed_when_missing, true);
       assert.equal(readModel.true_render_proof_ref.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
+      assert.equal(readModel.officecli_materializer_policy_ref.contract_ref, 'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json#/officecli_materializer_policy');
+      assertOfficecliMaterializerPolicy(readModel.officecli_quality_gate);
+      assert.equal(readModel.officecli_quality_gate.officecli_skill_can_replace_rca_workflow, false);
+      assert.equal(readModel.officecli_quality_gate.officecli_validate_can_replace_true_render_proof, false);
       assert.equal(readModel.shape_manifest_ref.required_metric_refs.includes('shape_manifest#/slides/*/metrics/occupied_ratio'), true);
       assert.equal(readModel.shape_manifest_ref.required_metric_refs.includes('shape_manifest#/slides/*/preview_screenshot_sha256'), true);
       assert.equal(existsSync(readModel.shape_manifest_ref.file), true);
@@ -210,6 +256,7 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.repair_policy.blocked_page_only, true);
       assert.equal(readModel.repair_policy.target_source, 'screenshot_review.blocked_slide_ids');
       assert.equal(readModel.quality_gate_refs.includes('agent/quality_gates/screenshot_review.md'), true);
+      assert.equal(readModel.quality_gate_refs.includes('officecli_view_issues'), true);
       assert.equal(readModel.quality_gate_refs.includes('workspace-runtime-ref:export_pptx:<run-id>#/operator_proof_summary'), true);
       assertNoForbiddenAuthority(readModel.authority_boundary);
       assert.equal(

@@ -57,6 +57,31 @@ function assertNativeTrueRenderPolicy(policy) {
   });
 }
 
+function assertOfficecliMaterializerPolicy(policy) {
+  assert.equal(policy.policy_id, 'ppt_native_officecli_materializer_quality_gate_v1');
+  assert.equal(policy.adoption_status, 'qa_materializer_discipline_only');
+  assert.equal(policy.rca_main_workflow_owner, 'redcube_stage_review_export');
+  assert.equal(policy.skill_authoring_loop_adopted, false);
+  assert.equal(policy.materializer_role, 'executor_adapter_materializer_and_qa_gate');
+  assert.equal(policy.current_pptx_writer, 'redcube_drawingml_writer');
+  assert.equal(policy.officecli_writer_adapter_default_enabled, false);
+  assert.deepEqual(policy.required_gate_refs, [
+    'officecli_save_before_close',
+    'officecli_validate',
+    'officecli_view_issues',
+    'officecli_view_text',
+  ]);
+  assert.equal(policy.save_before_close_required, true);
+  assert.equal(policy.validate_required, true);
+  assert.equal(policy.view_issues_required, true);
+  assert.equal(policy.view_text_required, true);
+  assert.equal(policy.true_render_proof_required_after_officecli_gate, true);
+  assert.equal(policy.true_render_proof_substitute_allowed, false);
+  assert.equal(policy.deterministic_cjk_font_family, 'Noto Sans CJK SC');
+  assert.equal(policy.default_visual_route_changed, false);
+  assert.equal(policy.default_executor_changed, false);
+}
+
 test('product-entry manifest exposes image-first default and explicit native PPT proof lane', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-manifest-'));
   const manifest = await getProductEntryManifest({
@@ -124,6 +149,7 @@ test('product-entry manifest exposes image-first default and explicit native PPT
     cross_platform_render_required: true,
     screenshot_packaging: false,
   });
+  assertOfficecliMaterializerPolicy(pptPolicy.native_ppt_proof_lane.officecli_materializer_policy);
   assertNativeTrueRenderPolicy(pptPolicy.native_ppt_proof_lane.true_render_proof);
   assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
   assert.equal(manifest.native_ppt_operator_ux.status, 'blocked');
