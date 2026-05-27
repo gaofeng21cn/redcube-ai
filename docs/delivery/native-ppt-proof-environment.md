@@ -32,6 +32,8 @@ Native editable PPTX exposes a refs-only quality non-regression surface for OPL 
 
 The surface contains shape manifest metric refs, editable shape plan refs, true render proof refs, blocked-page-only `repair_pptx_native` evidence refs, export proof summary refs, and standard Agent Lab suite input refs. Agent Lab may compare and score those refs for optimization, but that score is not an RCA visual verdict and cannot authorize visual ready, exportable, handoffable, artifact writes, memory body writes, or quality/export verdicts.
 
+Native PPTX proof is valid only when the shape manifest carries readable typography and layout gates in addition to true render proof: body text must stay at or above the readability floor, title/body hierarchy must remain explicit, title and core sentence text must not collide, and block-content overflow must fail closed. These gates are part of the RCA `screenshot_review` input surface, not post-export manual inspection.
+
 The route boundary remains unchanged:
 
 - `author_pptx_native` and `repair_pptx_native` are explicit optional native PPTX routes.

@@ -318,6 +318,133 @@ test('native Python layout writer extracts audience text and emits distinct layo
   assert.match(visibleText, /Audience point 1A/);
 });
 
+test('native Python layout writer honors typography plan and blocks unreadable body text', () => {
+  const typographyPlan = {
+    cover_title: { font_size: 56, line_height: 1.08, font_weight: 800 },
+    body_title: { font_size: 44, line_height: 1.12, font_weight: 780 },
+    section_lead: { font_size: 24, line_height: 1.4, font_weight: 650 },
+    card_title: { font_size: 21, line_height: 1.18, font_weight: 720 },
+    card_body: { font_size: 18, line_height: 1.45, font_weight: 600 },
+    meta_label: { font_size: 12.5, line_height: 1.1, font_weight: 600 },
+    page_no: { font_size: 18, line_height: 1.0, font_weight: 600 },
+  };
+  const result = runNativeLayoutWriter({
+    visual_direction: {
+      typography_plan: typographyPlan,
+    },
+    editable_shape_plan: {
+      contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
+      route: 'author_pptx_native',
+      slides: [
+        {
+          slide_id: 'S01',
+          title: '从一个目标到可验收交付',
+          layout_family: 'cover_signal',
+          core_sentence: '可信的自主交付，要能把单一目标推进成完整交付，并留下可复核的质量与导出证据。',
+          page_core_content: [
+            '明确目标：生成什么交付、给谁看、验收口径是什么。',
+            '自主执行：形成页面结构、核心句、证据点与视觉组织。',
+            '质量门禁：判断是否讲得清、看得懂、证据可用。',
+          ],
+        },
+        {
+          slide_id: 'S02',
+          title: '闭环成立需要四个证据同时出现',
+          layout_family: 'multi_zone_compare',
+          core_sentence: '端到端不是文件存在，而是目标、执行、审查、导出四个证据彼此能对上。',
+          page_core_content: [
+            '目标输入：任务边界和验收口径可追溯。',
+            '自主执行：计划和页面物化不依赖人工补写。',
+            '审查门：渲染截图和版式指标参与判断。',
+            '导出门：PPTX/PDF 与证据索引一并产生。',
+          ],
+        },
+        {
+          slide_id: 'S03',
+          title: '导出证据不是视觉质量的替代物',
+          layout_family: 'summary_peak',
+          core_sentence: '链路闭合只能说明流程能跑通，仍然需要版式门禁证明结果适合展示。',
+          page_core_content: [
+            '第一，PPTX/PDF 存在证明交付面闭合。',
+            '第二，截图渲染证明真实页面可检查。',
+            '第三，字号、层级、密度和留白决定能否给人看。',
+          ],
+        },
+      ],
+    },
+  }, 'redcube-native-typography-plan-');
+
+  const cover = result.slides[0];
+  const body = result.slides[1];
+  const summary = result.slides[2];
+
+  assert.equal(cover.metrics.title_font_size, typographyPlan.cover_title.font_size);
+  assert.equal(body.metrics.title_font_size, typographyPlan.body_title.font_size);
+  assert.equal(summary.metrics.title_font_size, typographyPlan.body_title.font_size);
+  assert.equal(result.slides.every((slide) => slide.metrics.min_body_font_pt >= typographyPlan.card_body.font_size), true);
+  assert.equal(result.slides.every((slide) => slide.metrics.body_text_readability_ok), true);
+  assert.equal(result.slides.every((slide) => slide.metrics.typography_hierarchy_ratio >= 2), true);
+  assert.equal(result.slides.every((slide) => slide.checks.body_text_readability_ok), true);
+  assert.equal(result.slides.every((slide) => slide.checks.typography_hierarchy_ok), true);
+  assert.equal(result.slides.every((slide) => slide.checks.title_core_overlap_ok), true);
+  assert.equal(result.slides.every((slide) => slide.metrics.title_core_overlap_count === 0), true);
+  assert.equal(result.slides.every((slide) => slide.checks.title_typography_ok), true);
+  assert.equal(result.slides.every((slide) => slide.issues.length === 0), true);
+
+  const visibleTextShapes = result.slides.flatMap((slide) => (
+    slide.native_shapes.filter((shape) => shape.kind === 'text_box' && shape.quality_role === 'content')
+  ));
+  assert.equal(visibleTextShapes.some((shape) => shape.role === 'point_text' && shape.font_size >= 18), true);
+  assert.equal(visibleTextShapes.every((shape) => (
+    shape.role === 'page_number' || shape.role === 'point_index' || shape.font_size >= 18
+  )), true);
+});
+
+test('native Python layout writer keeps long planned titles clear of core sentence', () => {
+  const result = runNativeLayoutWriter({
+    visual_direction: {
+      typography_plan: {
+        cover_title: { font_size: 56 },
+        body_title: { font_size: 44 },
+        section_lead: { font_size: 24 },
+        card_body: { font_size: 18 },
+        meta_label: { font_size: 12.5 },
+        page_no: { font_size: 18 },
+      },
+    },
+    editable_shape_plan: {
+      contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
+      route: 'author_pptx_native',
+      slides: [
+        {
+          slide_id: 'S01',
+          title: 'Native PPT live product-entry proof',
+          layout_family: 'cover_signal',
+          core_sentence: 'Native PPT live product-entry proof 的重点是讲清一条可复述的系统主线',
+          page_core_content: [
+            '今天先讲这套系统为什么能推动自动科研',
+            '再讲主链步骤、复用模块与人工边界',
+          ],
+        },
+        {
+          slide_id: 'S02',
+          title: '为什么 Native PPT live product-entry proof 需要按顺序讲清',
+          layout_family: 'multi_zone_compare',
+          core_sentence: '少背更多概念，而是把 Native PPT live product-entry proof 的判断顺序讲清。',
+          page_core_content: [
+            '左侧讲常见误区：先背碎片、后看顺序，结果越学越乱。',
+            '右侧讲正确收益：先把判断轨道讲清，后面的概念才有位置。',
+          ],
+        },
+      ],
+    },
+  }, 'redcube-native-long-title-clearance-');
+
+  assert.equal(result.slides.every((slide) => slide.checks.title_core_overlap_ok), true);
+  assert.equal(result.slides.every((slide) => slide.metrics.title_core_overlap_count === 0), true);
+  assert.equal(result.slides.every((slide) => slide.issues.length === 0), true);
+});
+
 test('native PPT visual benchmark fixture captures four domain suites with layout, shape, leakage, metrics, and render provenance contract', () => {
   const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
   assert.equal(fixture.route_policy.native_default_route, false);

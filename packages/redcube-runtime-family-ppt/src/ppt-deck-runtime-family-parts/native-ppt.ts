@@ -522,6 +522,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       'edge_clearance_ok',
       'block_content_fit_ok',
       'title_typography_ok',
+      'body_text_readability_ok',
+      'typography_hierarchy_ok',
+      'title_core_overlap_ok',
       'page_number_consistency_ok',
       'external_audience_language_ok',
       'title_safe_zone_clear',
@@ -552,9 +555,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       ['occupied_ratio', metrics.occupied_ratio],
       ['primary_points', metrics.primary_points],
       ['title_safe_zone_clearance_ok', metrics.title_safe_zone_clearance_ok],
+      ['min_body_font_pt', metrics.min_body_font_pt],
+      ['typography_hierarchy_ratio', metrics.typography_hierarchy_ratio],
+      ['title_core_overlap_count', metrics.title_core_overlap_count],
     ].filter(([, value]) => finiteNumberOrNull(value) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
+    if (typeof metrics.body_text_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.typography_hierarchy_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof manifestSlide.checks?.title_core_overlap_ok !== 'boolean') return ['native_quality_checks_missing'];
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
@@ -625,6 +634,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           edge_clearance_ok: booleanCheck(manifestSlide, 'edge_clearance_ok', missingQuality),
           block_content_fit_ok: booleanCheck(manifestSlide, 'block_content_fit_ok', missingQuality),
           title_typography_ok: booleanCheck(manifestSlide, 'title_typography_ok', missingQuality),
+          body_text_readability_ok: booleanCheck(manifestSlide, 'body_text_readability_ok', missingQuality),
+          typography_hierarchy_ok: booleanCheck(manifestSlide, 'typography_hierarchy_ok', missingQuality),
+          title_core_overlap_ok: booleanCheck(manifestSlide, 'title_core_overlap_ok', missingQuality),
           page_number_consistency_ok: booleanCheck(manifestSlide, 'page_number_consistency_ok', missingQuality),
           external_audience_language_ok: booleanCheck(manifestSlide, 'external_audience_language_ok', missingQuality),
           title_safe_zone_clear: booleanCheck(manifestSlide, 'title_safe_zone_clear', missingQuality),
@@ -651,6 +663,14 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           block_content_failures: safeArray(manifestSlide?.metrics?.block_content_failures),
           operator_language_fragments: safeArray(manifestSlide?.metrics?.operator_language_fragments),
           title_safe_zone_clearance_ok: manifestSlide?.metrics?.title_safe_zone_clearance_ok === true,
+          min_body_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.min_body_font_pt),
+          body_text_readability_floor_pt: finiteNumberOrNull(manifestSlide?.metrics?.body_text_readability_floor_pt),
+          body_text_readability_ok: manifestSlide?.metrics?.body_text_readability_ok === true,
+          body_text_font_failures: safeArray(manifestSlide?.metrics?.body_text_font_failures),
+          typography_hierarchy_ratio: finiteNumberOrNull(manifestSlide?.metrics?.typography_hierarchy_ratio),
+          typography_hierarchy_ok: manifestSlide?.metrics?.typography_hierarchy_ok === true,
+          title_core_overlap_count: finiteNumberOrNull(manifestSlide?.metrics?.title_core_overlap_count),
+          title_core_overlap_failures: safeArray(manifestSlide?.metrics?.title_core_overlap_failures),
           table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
           card_blank_ratio: finiteNumberOrNull(manifestSlide?.metrics?.card_blank_ratio),
           table_metrics: manifestSlide?.metrics?.table_metrics || [],

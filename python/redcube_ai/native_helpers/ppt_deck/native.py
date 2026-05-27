@@ -2,7 +2,6 @@
 import argparse
 import hashlib
 import json
-import math
 import os
 import platform
 import shutil
@@ -20,32 +19,9 @@ from redcube_ai.native_helpers.renderer_dependencies import (
     poppler_probe,
 )
 from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_slide_quality
 
 
-CANVAS_PX = (1152, 648)
-FRAME_AREA = float(CANVAS_PX[0] * CANVAS_PX[1])
-MIN_NATIVE_DENSITY = 0.18
-MAX_NATIVE_DENSITY = 0.82
-MIN_NATIVE_EDGE_CLEARANCE = 24.0
-MAX_NATIVE_PRIMARY_POINTS = 5
-MIN_NATIVE_LAYOUT_RICHNESS = 0.68
-TITLE_SAFE_ZONE_BOTTOM = 128.0
-MIN_TABLE_BODY_FONT_PT = 11.0
-MAX_TABLE_CELL_BLANK_RATIO = 0.38
-OPERATOR_LANGUAGE_FRAGMENTS = [
-    '汇报讨论用途',
-    '客观专业版',
-    '本次汇报边界',
-    '不在展示页暴露',
-    '本地原始文件名',
-    '清洗脚本名',
-    'RCA',
-    'RedCube',
-    'source intake',
-    'author_pptx_native',
-    'slide_blueprint',
-    'visual_direction',
-]
 ENGINE_CAPABILITIES = {
     'authoring_ir': 'redcube_svg_ir',
     'authoring_ir_version': 1,
@@ -97,49 +73,6 @@ def fail(message: str) -> None:
     raise SystemExit(1)
 
 
-def clamp(value: float, lower: float, upper: float) -> float:
-    return max(lower, min(upper, value))
-
-
-def rect_overlap_area(rect_a: dict, rect_b: dict) -> float:
-    overlap_w = max(0.0, min(rect_a['right'], rect_b['right']) - max(rect_a['left'], rect_b['left']))
-    overlap_h = max(0.0, min(rect_a['bottom'], rect_b['bottom']) - max(rect_a['top'], rect_b['top']))
-    return overlap_w * overlap_h
-
-
-def rect_union_area(rects: list[dict]) -> float:
-    if not rects:
-        return 0.0
-    x_edges = sorted({
-        float(rect[key])
-        for rect in rects
-        for key in ('left', 'right')
-    })
-    y_edges = sorted({
-        float(rect[key])
-        for rect in rects
-        for key in ('top', 'bottom')
-    })
-    area = 0.0
-    for x_index, left in enumerate(x_edges[:-1]):
-        right = x_edges[x_index + 1]
-        if right <= left:
-            continue
-        for y_index, top in enumerate(y_edges[:-1]):
-            bottom = y_edges[y_index + 1]
-            if bottom <= top:
-                continue
-            center_x = (left + right) / 2.0
-            center_y = (top + bottom) / 2.0
-            if any(
-                float(rect['left']) <= center_x <= float(rect['right'])
-                and float(rect['top']) <= center_y <= float(rect['bottom'])
-                for rect in rects
-            ):
-                area += (right - left) * (bottom - top)
-    return area
-
-
 def file_sha256(file: Path) -> str:
     if not file.exists():
         return ''
@@ -153,278 +86,6 @@ def file_sha256(file: Path) -> str:
 def image_dimensions(file: Path) -> dict:
     with Image.open(file) as image:
         return {'width': int(image.width), 'height': int(image.height)}
-
-
-def text_capacity_failure(shape: dict) -> dict | None:
-    if shape.get('kind') in {'chart', 'table', 'metric_grid'}:
-        return None
-    text = safe_text(shape.get('text'))
-    if not text:
-        return None
-    rect = shape.get('bounds') or {}
-    width = float(rect.get('width') or 0)
-    height = float(rect.get('height') or 0)
-    font_size = float(shape.get('font_size') or 14)
-    chars_per_line = max(8, int(width / max(font_size * 0.52, 1)))
-    estimated_lines = max(1, math.ceil(len(text) / chars_per_line))
-    max_lines = max(1, int(height / max(font_size * 1.05, 1))) + 2
-    if estimated_lines <= max_lines:
-        return None
-    return {
-        'shape_id': shape.get('shape_id'),
-        'overflow_reason': 'native_text_capacity_exceeded',
-        'text_char_count': len(text),
-        'estimated_lines': estimated_lines,
-        'max_lines': max_lines,
-    }
-
-
-def operator_language_fragments(native_shapes: list[dict]) -> list[str]:
-    visible_text = '\n'.join(
-        safe_text(shape.get('text'))
-        for shape in native_shapes
-        if shape.get('quality_role') == 'content'
-    )
-    return sorted({fragment for fragment in OPERATOR_LANGUAGE_FRAGMENTS if fragment in visible_text})
-
-
-def title_safe_zone_shape(shape: dict) -> bool:
-    if shape.get('quality_role') != 'content':
-        return False
-    if shape.get('role') in {'title', 'core_sentence'}:
-        return False
-    if safe_text(shape.get('text')):
-        return True
-    return shape.get('kind') in {'chart', 'table', 'metric_grid'}
-
-
-def title_safe_zone_failures(native_shapes: list[dict]) -> list[dict]:
-    failures = []
-    for shape in native_shapes:
-        if not title_safe_zone_shape(shape):
-            continue
-        rect = shape.get('bounds') or {}
-        top = float(rect.get('top') or 0.0)
-        if top < TITLE_SAFE_ZONE_BOTTOM:
-            failures.append({
-                'shape_id': shape.get('shape_id'),
-                'role': shape.get('role'),
-                'top': round(top, 2),
-                'safe_zone_bottom': TITLE_SAFE_ZONE_BOTTOM,
-            })
-    return failures
-
-
-def table_legibility_failures(table_metrics: list[dict]) -> list[dict]:
-    failures = []
-    for metrics in table_metrics:
-        min_font_pt = float(metrics.get('min_font_pt') or 0.0)
-        max_blank_ratio = float(metrics.get('max_cell_blank_ratio') or 0.0)
-        if min_font_pt < MIN_TABLE_BODY_FONT_PT:
-            failures.append({
-                'shape_id': metrics.get('shape_id'),
-                'reason': 'table_font_below_minimum',
-                'value': round(min_font_pt, 2),
-                'threshold': MIN_TABLE_BODY_FONT_PT,
-            })
-        if max_blank_ratio > MAX_TABLE_CELL_BLANK_RATIO:
-            failures.append({
-                'shape_id': metrics.get('shape_id'),
-                'reason': 'table_cell_blank_ratio_too_high',
-                'value': round(max_blank_ratio, 4),
-                'threshold': MAX_TABLE_CELL_BLANK_RATIO,
-            })
-        failures.extend(metrics.get('cell_fit_failures') or [])
-    return failures
-
-
-def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
-    content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
-    decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
-    overlap_shapes = [shape for shape in content_shapes if shape.get('kind') == 'text_box']
-    shape_kinds = {safe_text(shape.get('kind')) for shape in native_shapes if safe_text(shape.get('kind'))}
-    shape_roles = {safe_text(shape.get('role')) for shape in native_shapes if safe_text(shape.get('role'))}
-    title_shapes = [
-        shape for shape in native_shapes
-        if shape.get('role') == 'title' and shape.get('kind') == 'text_box' and safe_text(shape.get('text'))
-    ]
-    title_font_size = max((float(shape.get('font_size') or 0) for shape in title_shapes), default=0.0)
-    page_number_shapes = [
-        shape for shape in native_shapes
-        if shape.get('role') == 'page_number' and safe_text(shape.get('text'))
-    ]
-    occupied_area = rect_union_area([shape['bounds'] for shape in content_shapes])
-    occupied_ratio = clamp(occupied_area / FRAME_AREA, 0.0, 1.0)
-    if content_shapes:
-        edge_clearance = {
-            'left': min(float(shape['bounds']['left']) for shape in content_shapes),
-            'top': min(float(shape['bounds']['top']) for shape in content_shapes),
-            'right': min(CANVAS_PX[0] - float(shape['bounds']['right']) for shape in content_shapes),
-            'bottom': min(CANVAS_PX[1] - float(shape['bounds']['bottom']) for shape in content_shapes),
-        }
-    else:
-        edge_clearance = {'left': 0.0, 'top': 0.0, 'right': 0.0, 'bottom': 0.0}
-    overlap_pairs = []
-    for left_index, shape_a in enumerate(overlap_shapes):
-        for shape_b in overlap_shapes[left_index + 1:]:
-            overlap_area = rect_overlap_area(shape_a['bounds'], shape_b['bounds'])
-            if overlap_area > 12.0:
-                overlap_pairs.append({
-                    'a': shape_a.get('shape_id'),
-                    'b': shape_b.get('shape_id'),
-                    'overlap_area': round(overlap_area, 2),
-                })
-    block_content_failures = [
-        failure for failure in (text_capacity_failure(shape) for shape in content_shapes)
-        if failure
-    ]
-    chart_shapes = [shape for shape in native_shapes if shape.get('kind') == 'chart']
-    table_shapes = [shape for shape in native_shapes if shape.get('kind') == 'table']
-    metric_grid_shapes = [shape for shape in native_shapes if shape.get('kind') == 'metric_grid']
-    chart_metrics = []
-    table_metrics = []
-    metric_grid_metrics = []
-    numeric_label_overflows = []
-    table_cell_fit_failures = []
-    for shape in chart_shapes:
-        metrics = dict(shape.get('metrics') or {})
-        metrics['shape_id'] = shape.get('shape_id')
-        metrics['bounds'] = shape.get('bounds')
-        chart_metrics.append(metrics)
-        numeric_label_overflows.extend(metrics.get('numeric_label_overflows') or [])
-    for shape in table_shapes:
-        metrics = dict(shape.get('metrics') or {})
-        metrics['shape_id'] = shape.get('shape_id')
-        metrics['bounds'] = shape.get('bounds')
-        table_metrics.append(metrics)
-        table_cell_fit_failures.extend(metrics.get('cell_fit_failures') or [])
-    for shape in metric_grid_shapes:
-        metrics = dict(shape.get('metrics') or {})
-        metrics['shape_id'] = shape.get('shape_id')
-        metrics['bounds'] = shape.get('bounds')
-        metric_grid_metrics.append(metrics)
-        numeric_label_overflows.extend(metrics.get('numeric_label_overflows') or [])
-    language_fragments = operator_language_fragments(content_shapes)
-    title_zone_failures = title_safe_zone_failures(content_shapes)
-    table_failures = table_legibility_failures(table_metrics)
-    coordinate_payload = [
-        {
-            'shape_id': shape.get('shape_id'),
-            'kind': shape.get('kind'),
-            'role': shape.get('role'),
-            'bounds': shape.get('bounds'),
-        }
-        for shape in native_shapes
-    ]
-    coordinate_determinism_hash = hashlib.sha256(
-        json.dumps(coordinate_payload, ensure_ascii=False, sort_keys=True).encode('utf-8')
-    ).hexdigest()
-    text_char_count = sum(len(safe_text(shape.get('text'))) for shape in content_shapes)
-    clipped_nodes = len(block_content_failures)
-    title_typography_ok = bool(title_shapes) and title_font_size >= 28.0
-    page_number_consistency_ok = bool(page_number_shapes)
-    table_min_font_pt = min(
-        (float(metrics.get('min_font_pt') or MIN_TABLE_BODY_FONT_PT) for metrics in table_metrics),
-        default=MIN_TABLE_BODY_FONT_PT,
-    )
-    card_blank_ratio = max(
-        (float(metrics.get('max_cell_blank_ratio') or 0.0) for metrics in table_metrics),
-        default=0.24,
-    )
-    layout_richness_score = round(clamp(
-        (min(len(native_shapes), 20) / 20.0 * 0.34)
-        + (min(len(shape_kinds), 4) / 4.0 * 0.22)
-        + (min(len(shape_roles), 10) / 10.0 * 0.22)
-        + (min(len(decorative_shapes), 7) / 7.0 * 0.22),
-        0.0,
-        1.0,
-    ), 4)
-    checks = {
-        'overflow_free': clipped_nodes == 0,
-        'occlusion_free': len(overlap_pairs) == 0,
-        'visual_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and primary_points <= MAX_NATIVE_PRIMARY_POINTS,
-        'speaker_fit_ok': text_char_count <= 950,
-        'edge_clearance_ok': min(edge_clearance.values()) >= MIN_NATIVE_EDGE_CLEARANCE,
-        'block_content_fit_ok': clipped_nodes == 0,
-        'title_typography_ok': title_typography_ok,
-        'page_number_consistency_ok': page_number_consistency_ok,
-        'layout_richness_ok': layout_richness_score >= MIN_NATIVE_LAYOUT_RICHNESS,
-        'external_audience_language_ok': len(language_fragments) == 0,
-        'title_safe_zone_clear': len(title_zone_failures) == 0,
-        'table_legibility_ok': len(table_failures) == 0,
-        'layout_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and card_blank_ratio <= MAX_TABLE_CELL_BLANK_RATIO,
-    }
-    issues = []
-    if not checks['visual_density_ok']:
-        issues.append('visual_density_out_of_range')
-    if not checks['edge_clearance_ok']:
-        issues.append('edge_clearance_out_of_range')
-    if not checks['occlusion_free']:
-        issues.append('occlusion_detected')
-    if not checks['block_content_fit_ok']:
-        issues.append('block_content_overflow_detected')
-    if not checks['speaker_fit_ok']:
-        issues.append('speaker_fit_exceeded')
-    if not checks['title_typography_ok']:
-        issues.append('title_typography_missing_or_too_small')
-    if not checks['page_number_consistency_ok']:
-        issues.append('page_number_missing')
-    if not checks['layout_richness_ok']:
-        issues.append('layout_richness_below_threshold')
-    if not checks['external_audience_language_ok']:
-        issues.append('operator_language_leak_detected')
-    if not checks['title_safe_zone_clear']:
-        issues.append('title_safe_zone_obstructed')
-    if any(failure.get('reason') == 'table_font_below_minimum' for failure in table_failures):
-        issues.append('table_font_below_minimum')
-    if table_failures and 'table_font_below_minimum' not in issues:
-        issues.append('table_cell_fit_failed')
-    if not checks['layout_density_ok']:
-        issues.append('layout_density_too_sparse')
-    return {
-        'checks': checks,
-        'issues': issues,
-        'metrics': {
-            'title_font_size': round(title_font_size, 2),
-            'text_char_count': text_char_count,
-            'block_count': len(content_shapes),
-            'decorative_shape_count': len(decorative_shapes),
-            'shape_count': len(native_shapes),
-            'shape_kind_count': len(shape_kinds),
-            'role_count': len(shape_roles),
-            'layout_richness_score': layout_richness_score,
-            'overlap_pairs': len(overlap_pairs),
-            'overlaps': overlap_pairs,
-            'clipped_nodes': clipped_nodes,
-            'occupied_ratio': round(occupied_ratio, 4),
-            'primary_points': primary_points,
-            'edge_clearance': {key: round(value, 2) for key, value in edge_clearance.items()},
-            'block_content_failures': block_content_failures,
-            'bounds': [shape['bounds'] for shape in content_shapes],
-            'chart_count': len(chart_shapes),
-            'table_count': len(table_shapes),
-            'metric_grid_count': len(metric_grid_shapes),
-            'chart_metrics': chart_metrics,
-            'table_metrics': table_metrics,
-            'metric_grid_metrics': metric_grid_metrics,
-            'operator_language_fragments': language_fragments,
-            'title_safe_zone_failures': title_zone_failures,
-            'title_safe_zone_clearance_ok': len(title_zone_failures) == 0,
-            'table_min_font_pt': round(table_min_font_pt, 2),
-            'table_legibility_failures': table_failures,
-            'card_blank_ratio': round(card_blank_ratio, 4),
-            'chart_bounds': [shape['bounds'] for shape in chart_shapes],
-            'table_bounds': [shape['bounds'] for shape in table_shapes],
-            'metric_grid_bounds': [shape['bounds'] for shape in metric_grid_shapes],
-            'axis_label_count': sum(int(metrics.get('axis_label_count') or 0) for metrics in chart_metrics),
-            'legend_label_count': sum(int(metrics.get('legend_label_count') or 0) for metrics in chart_metrics),
-            'table_cell_fit_ok': len(table_cell_fit_failures) == 0,
-            'table_cell_fit_failures': table_cell_fit_failures,
-            'numeric_label_overflow_count': len(numeric_label_overflows),
-            'numeric_label_overflows': numeric_label_overflows,
-            'coordinate_determinism_hash': coordinate_determinism_hash,
-        },
-    }
 
 
 def load_engine_contract(contract_file: Path) -> dict:
@@ -469,6 +130,12 @@ def normalize_slide_data(payload: dict) -> list:
     plan_slides = safe_list(plan.get('slides'))
     blueprint = payload.get('blueprint') or {}
     blueprint_slides = safe_list(blueprint.get('slides'))
+    visual_direction = payload.get('visual_direction') if isinstance(payload.get('visual_direction'), dict) else {}
+    typography_plan = (
+        visual_direction.get('typography_plan')
+        if isinstance(visual_direction.get('typography_plan'), dict)
+        else {}
+    )
     blueprint_by_id = {
         safe_text(slide.get('slide_id'), f'S{index + 1:02d}'): slide
         for index, slide in enumerate(blueprint_slides)
@@ -489,6 +156,7 @@ def normalize_slide_data(payload: dict) -> list:
             if isinstance(shape, dict)
         ]
         merged['_editable_native_shapes'] = plan_shapes
+        merged['_typography_plan'] = typography_plan
         slides.append(merged)
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')

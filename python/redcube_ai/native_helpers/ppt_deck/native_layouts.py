@@ -18,6 +18,7 @@ EMU_PER_INCH = 914400
 PX_PER_INCH = CANVAS_PX[0] / 16
 MIN_TABLE_BODY_FONT_PT = 11.0
 MAX_TABLE_CELL_BLANK_RATIO = 0.38
+BODY_TEXT_READABILITY_FLOOR_PT = 18.0
 SVG_NS = 'http://www.w3.org/2000/svg'
 STRICT_SVG_ALLOWED_TAGS = {
     f'{{{SVG_NS}}}svg',
@@ -51,6 +52,16 @@ SUPPORTED_LAYOUTS = {
     'summary_peak',
 }
 
+DEFAULT_TYPOGRAPHY_PLAN = {
+    'cover_title': 56.0,
+    'body_title': 44.0,
+    'section_lead': 24.0,
+    'card_title': 21.0,
+    'card_body': 18.0,
+    'meta_label': 12.5,
+    'page_no': 18.0,
+}
+
 
 def safe_text(value, fallback: str = '') -> str:
     text = str(value or '').strip()
@@ -59,6 +70,33 @@ def safe_text(value, fallback: str = '') -> str:
 
 def safe_list(value):
     return value if isinstance(value, list) else []
+
+
+def typography_plan(slide_data: dict) -> dict:
+    plan = slide_data.get('_typography_plan')
+    return plan if isinstance(plan, dict) else {}
+
+
+def typography_size(slide_data: dict, tier: str, fallback_tier: str | None = None) -> float:
+    plan = typography_plan(slide_data)
+    value = plan.get(tier)
+    if isinstance(value, dict):
+        value = value.get('font_size')
+    if value is None and fallback_tier:
+        value = plan.get(fallback_tier)
+        if isinstance(value, dict):
+            value = value.get('font_size')
+    try:
+        size = float(value)
+    except (TypeError, ValueError):
+        size = DEFAULT_TYPOGRAPHY_PLAN[tier]
+    if tier == 'card_body':
+        return max(BODY_TEXT_READABILITY_FLOOR_PT, size)
+    return size
+
+
+def title_size_for_layout(slide_data: dict, layout: str) -> float:
+    return typography_size(slide_data, 'cover_title') if layout == 'cover_signal' else typography_size(slide_data, 'body_title')
 
 
 def rgb(hex_value: str) -> RGBColor:
@@ -123,6 +161,35 @@ def visible_text_lines(value, limit: int = 5) -> list[str]:
             if line:
                 lines.append(line)
     return lines[:limit]
+
+
+def weighted_text_width_px(text: str, font_size: float) -> float:
+    width = 0.0
+    for char in safe_text(text):
+        codepoint = ord(char)
+        if char.isspace():
+            width += font_size * 0.32
+        elif codepoint > 127:
+            width += font_size * 0.95
+        elif char.isupper():
+            width += font_size * 0.68
+        elif char in {'-', '/', ':'}:
+            width += font_size * 0.38
+        else:
+            width += font_size * 0.56
+    return width
+
+
+def estimated_text_lines(text: str, font_size: float, width) -> int:
+    available_px = max(1.0, emu_to_px(width) - 12.0)
+    text_width = weighted_text_width_px(text, font_size)
+    return max(1, int((text_width / available_px) + 0.999))
+
+
+def estimated_text_height(text: str, font_size: float, width, *, minimum_inches: float) -> int:
+    lines = estimated_text_lines(text, font_size, width)
+    height_inches = max(minimum_inches, (lines * font_size * 1.16 / 72.0) + 0.16)
+    return Inches(height_inches)
 
 
 def layout_family(slide_data: dict) -> str:
@@ -277,54 +344,59 @@ def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repair
     slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')
     layout = layout_family(slide_data)
     points = slide_points(slide_data)
+    title_size = title_size_for_layout(slide_data, layout)
+    section_lead_size = typography_size(slide_data, 'section_lead')
+    card_body_size = typography_size(slide_data, 'card_body')
+    meta_label_size = typography_size(slide_data, 'meta_label')
+    page_no_size = typography_size(slide_data, 'page_no')
     lines = [
         f'<svg xmlns="{SVG_NS}" width="{CANVAS_PX[0]}" height="{CANVAS_PX[1]}" viewBox="0 0 {CANVAS_PX[0]} {CANVAS_PX[1]}" data-redcube-ir="redcube_svg_ir_v1" data-slide-id="{xml_escape(slide_id)}" data-layout-writer="{xml_escape(layout_writer_id(layout))}">',
         '  <g id="slide-root" data-intent="group:slide">',
         svg_rect(0, 0, CANVAS_PX[0], CANVAS_PX[1], palette['bg'], 'rect:background', f'{slide_id}-background'),
-        svg_text(72, 76, slide_title(slide_data, index), 34 if layout != 'cover_signal' else 48, palette['ink'], 'text:title', f'{slide_id}-title', '700'),
+        svg_text(72, 76, slide_title(slide_data, index), title_size, palette['ink'], 'text:title', f'{slide_id}-title', '700'),
     ]
     if repaired:
         lines.append(svg_rect(1032, 36, 52, 12, palette['accent'], 'rect:repair_marker', f'{slide_id}-repair-marker'))
     if layout == 'cover_signal':
         lines.extend([
             svg_rect(72, 148, 720, 6, palette['accent'], 'rect:hero_rule', f'{slide_id}-hero-rule'),
-            svg_text(72, 214, slide_core_sentence(slide_data), 25, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'),
+            svg_text(72, 214, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'),
         ])
         x = 92
         for point_index, point in enumerate(points[:3], 1):
             lines.extend([
                 f'    <g id="{xml_escape(f"{slide_id}-signal-{point_index}")}" data-intent="group:signal_point">',
                 svg_rect(x, 408, 288, 92, palette['panel'], 'rect:signal_panel', f'{slide_id}-signal-{point_index}-panel', palette['line'], 16),
-                svg_text(x + 24, 462, point, 18, palette['ink'], 'text:point_text', f'{slide_id}-signal-{point_index}-text', '600'),
+                svg_text(x + 24, 462, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-signal-{point_index}-text', '600'),
                 '    </g>',
             ])
             x += 330
     elif layout == 'timeline_band':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), 18, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
+        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
         lines.append(svg_rect(104, 326, 944, 8, palette['accent'], 'rect:timeline_rail', f'{slide_id}-timeline-rail'))
         for point_index, point in enumerate(points[:4], 1):
             x = 92 + ((point_index - 1) * 252)
             lines.extend([
                 f'    <g id="{xml_escape(f"{slide_id}-milestone-{point_index}")}" data-intent="group:timeline_point">',
                 svg_rect(x, 254, 198, 118, palette['panel'], 'rect:timeline_panel', f'{slide_id}-milestone-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 18, 296, f'{point_index:02d}', 22, palette['accent'], 'text:point_index', f'{slide_id}-milestone-{point_index}-index', '700'),
-                svg_text(x + 18, 340, point, 16, palette['ink'], 'text:point_text', f'{slide_id}-milestone-{point_index}-text', '600'),
+                svg_text(x + 18, 296, f'{point_index:02d}', meta_label_size + 8, palette['accent'], 'text:point_index', f'{slide_id}-milestone-{point_index}-index', '700'),
+                svg_text(x + 18, 340, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-milestone-{point_index}-text', '600'),
                 '    </g>',
             ])
     elif layout == 'judgement_ladder':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), 18, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
+        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
         for point_index, point in enumerate(points[:4], 1):
             x = 118 + ((point_index - 1) * 220)
             y = 428 - ((point_index - 1) * 58)
             lines.extend([
                 f'    <g id="{xml_escape(f"{slide_id}-gate-{point_index}")}" data-intent="group:judgement_gate">',
                 svg_rect(x, y, 210, 112, palette['panel'], 'rect:judgement_step', f'{slide_id}-gate-{point_index}-panel', palette['line'], 12),
-                svg_text(x + 18, y + 38, f'Gate {point_index}', 18, palette['accent'], 'text:point_index', f'{slide_id}-gate-{point_index}-index', '700'),
-                svg_text(x + 18, y + 78, point, 15, palette['ink'], 'text:point_text', f'{slide_id}-gate-{point_index}-text', '600'),
+                svg_text(x + 18, y + 38, f'Gate {point_index}', meta_label_size + 5, palette['accent'], 'text:point_index', f'{slide_id}-gate-{point_index}-index', '700'),
+                svg_text(x + 18, y + 78, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-gate-{point_index}-text', '600'),
                 '    </g>',
             ])
     elif layout == 'ring_cross':
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), 18, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
+        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
         lines.append(svg_rect(462, 262, 228, 118, palette['accent'], 'rect:center_hub', f'{slide_id}-center-hub', palette['accent'], 24))
         lines.append(svg_text(496, 326, 'Core', 24, '#FFFFFF', 'text:center_hub', f'{slide_id}-center-text', '700'))
         positions = [(122, 214), (758, 214), (758, 426), (122, 426)]
@@ -333,21 +405,21 @@ def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repair
             lines.extend([
                 f'    <g id="{xml_escape(f"{slide_id}-axis-{point_index}")}" data-intent="group:ring_cross_axis">',
                 svg_rect(x, y, 286, 116, palette['panel'], 'rect:axis_panel', f'{slide_id}-axis-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 22, y + 48, point, 16, palette['ink'], 'text:point_text', f'{slide_id}-axis-{point_index}-text', '600'),
+                svg_text(x + 22, y + 48, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-axis-{point_index}-text', '600'),
                 '    </g>',
             ])
     elif layout == 'summary_peak':
-        lines.append(svg_text(72, 146, slide_core_sentence(slide_data), 20, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'))
+        lines.append(svg_text(72, 146, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence', '600'))
         lines.append(svg_rect(96, 214, 960, 120, palette['accent'], 'rect:summary_peak', f'{slide_id}-summary-peak', palette['accent'], 26))
-        lines.append(svg_text(132, 284, points[0] if points else slide_core_sentence(slide_data), 24, '#FFFFFF', 'text:summary_peak', f'{slide_id}-peak-text', '700'))
+        lines.append(svg_text(132, 284, points[0] if points else slide_core_sentence(slide_data), section_lead_size, '#FFFFFF', 'text:summary_peak', f'{slide_id}-peak-text', '700'))
         for point_index, point in enumerate(points[1:4], 1):
             x = 96 + ((point_index - 1) * 326)
             lines.extend([
                 svg_rect(x, 394, 296, 96, palette['panel'], 'rect:takeaway_panel', f'{slide_id}-takeaway-{point_index}-panel', palette['line'], 16),
-                svg_text(x + 22, 452, point, 16, palette['ink'], 'text:point_text', f'{slide_id}-takeaway-{point_index}-text', '600'),
+                svg_text(x + 22, 452, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-takeaway-{point_index}-text', '600'),
             ])
     else:
-        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), 18, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
+        lines.append(svg_text(72, 142, slide_core_sentence(slide_data), section_lead_size, palette['muted'], 'text:core_sentence', f'{slide_id}-core-sentence'))
         columns = [(84, 220, 456, 242), (612, 220, 456, 242)]
         for point_index, point in enumerate(points[:4], 1):
             column = 0 if point_index <= 2 else 1
@@ -357,12 +429,12 @@ def build_slide_svg_ir(slide_data, index: int, total: int, palette: dict, repair
             lines.extend([
                 f'    <g id="{xml_escape(f"{slide_id}-zone-{point_index}")}" data-intent="group:compare_zone">',
                 svg_rect(x, panel_y, width, 102, palette['panel'], 'rect:compare_panel', f'{slide_id}-zone-{point_index}-panel', palette['line'], 14),
-                svg_text(x + 24, panel_y + 58, point, 16, palette['ink'], 'text:point_text', f'{slide_id}-zone-{point_index}-text', '600'),
+                svg_text(x + 24, panel_y + 58, point, card_body_size, palette['ink'], 'text:point_text', f'{slide_id}-zone-{point_index}-text', '600'),
                 '    </g>',
             ])
     footer = f'{slide_id} / {index} of {total}'
     lines.extend([
-        svg_text(72, 614, footer, 15, palette['muted'], 'text:page_number', f'{slide_id}-footer'),
+        svg_text(72, 614, footer, page_no_size, palette['muted'], 'text:page_number', f'{slide_id}-footer'),
         '  </g>',
         '</svg>',
     ])
@@ -638,25 +710,37 @@ def add_background(ctx: SlideBuilder):
     ctx.rect(f'{ctx.slide_id}-corner-chip', Inches(14.7), Inches(0.54), Inches(0.34), Inches(0.08), 'line', 'accent_chip', radius=False)
 
 
-def add_footer(ctx: SlideBuilder, index: int, total: int):
+def add_footer(ctx: SlideBuilder, slide_data: dict, index: int, total: int):
     ctx.text(
         f'{ctx.slide_id}-footer',
         Inches(1.0),
-        Inches(8.27),
+        Inches(8.2),
         Inches(13.7),
-        Inches(0.3),
+        Inches(0.38),
         f'{ctx.slide_id} / {index} of {total}',
-        10,
+        typography_size(slide_data, 'page_no'),
         'muted',
         'page_number',
         quality_role='decorative',
     )
 
 
-def add_title_band(ctx: SlideBuilder, title: str, core: str, title_size=30):
-    ctx.text(f'{ctx.slide_id}-title', Inches(1.0), Inches(0.58), Inches(13.9), Inches(0.72), title, title_size, 'ink', 'title', True)
+def add_title_band(ctx: SlideBuilder, slide_data: dict, title: str, core: str):
+    title_size = typography_size(slide_data, 'body_title')
+    section_lead_size = typography_size(slide_data, 'section_lead')
+    title_left = Inches(1.0)
+    title_top = Inches(0.46)
+    title_width = Inches(13.9)
+    title_height = estimated_text_height(title, title_size, title_width, minimum_inches=0.82)
+    ctx.text(f'{ctx.slide_id}-title', title_left, title_top, title_width, title_height, title, title_size, 'ink', 'title', True)
+    band_bottom = title_top + title_height
     if core:
-        ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.0), Inches(1.38), Inches(13.5), Inches(0.58), core, 15, 'muted', 'core_sentence')
+        core_top = title_top + title_height + Inches(0.18)
+        core_width = Inches(13.5)
+        core_height = estimated_text_height(core, section_lead_size, core_width, minimum_inches=0.66)
+        ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.0), core_top, core_width, core_height, core, section_lead_size, 'muted', 'core_sentence')
+        band_bottom = core_top + core_height
+    return band_bottom
 
 
 def write_cover_signal(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
@@ -664,9 +748,20 @@ def write_cover_signal(ctx: SlideBuilder, slide_data, index: int, total: int, re
     title = slide_title(slide_data, index)
     core = slide_core_sentence(slide_data)
     points = slide_points(slide_data)
-    ctx.rect(f'{ctx.slide_id}-hero-block', Inches(0.95), Inches(1.38), Inches(10.25), Inches(2.2), 'panel', 'hero_panel', 'content', 'line')
-    ctx.text(f'{ctx.slide_id}-title', Inches(1.28), Inches(1.68), Inches(9.45), Inches(0.92), title, 34, 'ink', 'title', True)
-    ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.28), Inches(2.68), Inches(9.4), Inches(0.54), core, 17, 'muted', 'core_sentence')
+    title_size = typography_size(slide_data, 'cover_title')
+    section_lead_size = typography_size(slide_data, 'section_lead')
+    card_body_size = typography_size(slide_data, 'card_body')
+    title_left = Inches(1.28)
+    title_top = Inches(1.18)
+    title_width = Inches(9.45)
+    title_height = estimated_text_height(title, title_size, title_width, minimum_inches=1.12)
+    core_top = title_top + title_height + Inches(0.2)
+    core_width = Inches(9.4)
+    core_height = estimated_text_height(core, section_lead_size, core_width, minimum_inches=0.72)
+    hero_bottom = max(Inches(3.62), core_top + core_height + Inches(0.2))
+    ctx.rect(f'{ctx.slide_id}-hero-block', Inches(0.95), Inches(0.96), Inches(10.25), hero_bottom - Inches(0.96), 'panel', 'hero_panel', 'content', 'line')
+    ctx.text(f'{ctx.slide_id}-title', title_left, title_top, title_width, title_height, title, title_size, 'ink', 'title', True)
+    ctx.text(f'{ctx.slide_id}-core-sentence', Inches(1.28), core_top, core_width, core_height, core, section_lead_size, 'muted', 'core_sentence')
     ctx.rect(f'{ctx.slide_id}-accent-slab', Inches(12.0), Inches(0.95), Inches(2.55), Inches(6.6), 'accent', 'hero_accent', 'decorative', radius=False)
     ctx.line(f'{ctx.slide_id}-hero-vector', Inches(10.8), Inches(2.18), Inches(12.0), Inches(2.18), 'accent', 1.6, 'hero_vector')
     ctx.oval(f'{ctx.slide_id}-hero-node', Inches(11.24), Inches(2.04), Inches(0.28), Inches(0.28), 'bg', 'hero_node', 'decorative', 'accent')
@@ -674,104 +769,120 @@ def write_cover_signal(ctx: SlideBuilder, slide_data, index: int, total: int, re
         x = Inches(1.0 + ((point_index - 1) * 4.55))
         ctx.rect(f'{ctx.slide_id}-signal-{point_index}-panel', x, Inches(5.35), Inches(3.95), Inches(1.0), 'panel', 'signal_panel', 'content', 'line')
         ctx.oval(f'{ctx.slide_id}-signal-{point_index}-dot', x + Inches(0.18), Inches(5.12), Inches(0.18), Inches(0.18), 'accent', 'signal_dot')
-        ctx.text(f'{ctx.slide_id}-signal-{point_index}-text', x + Inches(0.24), Inches(5.58), Inches(3.4), Inches(0.48), point, 14, 'ink', 'point_text', True)
-    add_footer(ctx, index, total)
+        ctx.text(f'{ctx.slide_id}-signal-{point_index}-text', x + Inches(0.24), Inches(5.5), Inches(3.4), Inches(0.68), point, card_body_size, 'ink', 'point_text', True)
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_multi_zone_compare(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
     add_background(ctx)
-    add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
+    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
+    card_body_size = typography_size(slide_data, 'card_body')
+    meta_label_size = typography_size(slide_data, 'meta_label')
     if native_structural_shapes(slide_data):
         for point_index, point in enumerate(points[:3], 1):
             left = Inches(1.0 + ((point_index - 1) * 4.35))
-            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-panel', left, Inches(7.08), Inches(3.78), Inches(0.62), 'panel', 'structured_note_panel', 'content', 'line')
+            ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-panel', left, Inches(6.82), Inches(3.78), Inches(0.95), 'panel', 'structured_note_panel', 'content', 'line')
             ctx.rect(f'{ctx.slide_id}-structured-note-{point_index}-tab', left + Inches(0.18), Inches(7.23), Inches(0.6), Inches(0.09), 'accent', 'structured_note_tab', radius=False)
-            ctx.text(f'{ctx.slide_id}-structured-note-{point_index}-text', left + Inches(0.9), Inches(7.2), Inches(2.62), Inches(0.25), point, 9.5, 'ink', 'point_text')
+            ctx.text(f'{ctx.slide_id}-structured-note-{point_index}-text', left + Inches(0.9), Inches(6.98), Inches(2.62), Inches(0.62), point, card_body_size, 'ink', 'point_text')
         ctx.line(f'{ctx.slide_id}-structured-baseline', Inches(1.0), Inches(6.94), Inches(14.2), Inches(6.94), 'line', 1.1, 'structured_baseline')
-        add_footer(ctx, index, total)
+        add_footer(ctx, slide_data, index, total)
         return
+    top_row = max(Inches(2.25), band_bottom + Inches(0.28))
     zones = [
-        (Inches(0.95), Inches(2.25), Inches(6.65), Inches(2.15)),
-        (Inches(8.05), Inches(2.25), Inches(6.65), Inches(2.15)),
-        (Inches(0.95), Inches(4.72), Inches(6.65), Inches(1.78)),
-        (Inches(8.05), Inches(4.72), Inches(6.65), Inches(1.78)),
+        (Inches(0.95), top_row, Inches(6.65), Inches(2.0)),
+        (Inches(8.05), top_row, Inches(6.65), Inches(2.0)),
+        (Inches(0.95), top_row + Inches(2.28), Inches(6.65), Inches(1.72)),
+        (Inches(8.05), top_row + Inches(2.28), Inches(6.65), Inches(1.72)),
     ]
     for point_index, point in enumerate(points[:4], 1):
         left, top, width, height = zones[point_index - 1]
         ctx.rect(f'{ctx.slide_id}-zone-{point_index}-panel', left, top, width, height, 'panel', 'compare_panel', 'content', 'line')
         ctx.rect(f'{ctx.slide_id}-zone-{point_index}-tab', left + Inches(0.28), top + Inches(0.18), Inches(1.05), Inches(0.12), 'accent', 'zone_tab', radius=False)
-        ctx.text(f'{ctx.slide_id}-zone-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(0.6), Inches(0.38), f'{point_index:02d}', 14, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-zone-{point_index}-text', left + Inches(0.28), top + Inches(0.74), width - Inches(0.58), height - Inches(0.9), point, 14, 'ink', 'point_text')
-    ctx.rect(f'{ctx.slide_id}-bridge-rule', Inches(7.78), Inches(2.38), Inches(0.08), Inches(4.0), 'accent', 'compare_divider', radius=False)
-    ctx.line(f'{ctx.slide_id}-horizontal-bridge', Inches(1.2), Inches(4.55), Inches(14.55), Inches(4.55), 'line', 1.1, 'compare_bridge')
-    add_footer(ctx, index, total)
+        ctx.text(f'{ctx.slide_id}-zone-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(0.6), Inches(0.38), f'{point_index:02d}', meta_label_size, 'accent', 'point_index', True)
+        ctx.text(f'{ctx.slide_id}-zone-{point_index}-text', left + Inches(0.28), top + Inches(0.7), width - Inches(0.58), height - Inches(0.82), point, card_body_size, 'ink', 'point_text')
+    ctx.rect(f'{ctx.slide_id}-bridge-rule', Inches(7.78), top_row + Inches(0.13), Inches(0.08), Inches(3.75), 'accent', 'compare_divider', radius=False)
+    ctx.line(f'{ctx.slide_id}-horizontal-bridge', Inches(1.2), top_row + Inches(2.16), Inches(14.55), top_row + Inches(2.16), 'line', 1.1, 'compare_bridge')
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_timeline_band(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
     add_background(ctx)
-    add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
+    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
-    ctx.rect(f'{ctx.slide_id}-timeline-rail', Inches(1.3), Inches(4.02), Inches(13.0), Inches(0.08), 'accent', 'timeline_rail', radius=False)
+    card_body_size = typography_size(slide_data, 'card_body')
+    meta_label_size = typography_size(slide_data, 'meta_label')
+    panel_width = Inches(3.25)
+    panel_height = Inches(1.82)
+    text_height = Inches(1.22)
+    rail_top = max(Inches(4.02), band_bottom + Inches(2.05))
+    ctx.rect(f'{ctx.slide_id}-timeline-rail', Inches(1.3), rail_top, Inches(13.0), Inches(0.08), 'accent', 'timeline_rail', radius=False)
     for point_index, point in enumerate(points[:4], 1):
         left = Inches(1.0 + ((point_index - 1) * 3.65))
-        top = Inches(2.55 if point_index % 2 else 4.45)
+        top = rail_top - panel_height - Inches(0.22) if point_index % 2 else rail_top + Inches(0.42)
         center_x = left + Inches(1.52)
-        ctx.line(f'{ctx.slide_id}-milestone-{point_index}-stem', center_x, Inches(4.06), center_x, top + Inches(0.08), 'line', 1.1, 'timeline_stem')
-        ctx.oval(f'{ctx.slide_id}-milestone-{point_index}-node', center_x - Inches(0.11), Inches(3.93), Inches(0.22), Inches(0.22), 'accent', 'timeline_node')
-        ctx.rect(f'{ctx.slide_id}-milestone-{point_index}-panel', left, top, Inches(3.05), Inches(1.15), 'panel', 'timeline_panel', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-index', left + Inches(0.22), top + Inches(0.18), Inches(0.65), Inches(0.32), f'{point_index:02d}', 13, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-text', left + Inches(0.22), top + Inches(0.56), Inches(2.55), Inches(0.46), point, 12.5, 'ink', 'point_text')
-    add_footer(ctx, index, total)
+        ctx.line(f'{ctx.slide_id}-milestone-{point_index}-stem', center_x, rail_top + Inches(0.04), center_x, top + Inches(0.08), 'line', 1.1, 'timeline_stem')
+        ctx.oval(f'{ctx.slide_id}-milestone-{point_index}-node', center_x - Inches(0.11), rail_top - Inches(0.09), Inches(0.22), Inches(0.22), 'accent', 'timeline_node')
+        ctx.rect(f'{ctx.slide_id}-milestone-{point_index}-panel', left, top, panel_width, panel_height, 'panel', 'timeline_panel', 'content', 'line')
+        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-index', left + Inches(0.22), top + Inches(0.16), Inches(0.65), Inches(0.32), f'{point_index:02d}', meta_label_size, 'accent', 'point_index', True)
+        ctx.text(f'{ctx.slide_id}-milestone-{point_index}-text', left + Inches(0.22), top + Inches(0.48), panel_width - Inches(0.48), text_height, point, card_body_size, 'ink', 'point_text')
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_judgement_ladder(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
     add_background(ctx)
-    add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
+    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
+    card_body_size = typography_size(slide_data, 'card_body')
+    meta_label_size = typography_size(slide_data, 'meta_label')
     if len(points) <= 2:
-        ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(1.1), Inches(3.58), Inches(13.9), Inches(5.52), 'line', 1.5, 'ladder_spine')
+        top_start = max(Inches(2.62), band_bottom + Inches(0.28))
+        ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(1.1), top_start + Inches(0.96), Inches(13.9), top_start + Inches(2.9), 'line', 1.5, 'ladder_spine')
         positions = [
-            (Inches(1.05), Inches(2.62), Inches(6.1), Inches(2.12)),
-            (Inches(7.95), Inches(3.82), Inches(6.1), Inches(2.12)),
+            (Inches(1.05), top_start, Inches(6.1), Inches(2.12)),
+            (Inches(7.95), top_start + Inches(1.2), Inches(6.1), Inches(2.12)),
         ]
         for point_index, point in enumerate(points, 1):
             left, top, width, height = positions[point_index - 1]
             ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.2), top + Inches(0.28), Inches(0.24), Inches(0.24), 'accent', 'gate_node')
             ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, width, height, 'panel', 'judgement_step', 'content', 'line')
-            ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(1.35), Inches(0.32), f'Gate {point_index}', 13, 'accent', 'point_index', True)
-            ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.28), top + Inches(0.76), width - Inches(0.56), height - Inches(0.98), point, 14, 'ink', 'point_text')
-        add_footer(ctx, index, total)
+            ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.28), top + Inches(0.24), Inches(1.35), Inches(0.32), f'Gate {point_index}', meta_label_size, 'accent', 'point_index', True)
+            ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.28), top + Inches(0.72), width - Inches(0.56), height - Inches(0.92), point, card_body_size, 'ink', 'point_text')
+        add_footer(ctx, slide_data, index, total)
         return
-    ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(0.95), Inches(6.62), Inches(12.85), Inches(3.84), 'line', 1.5, 'ladder_spine')
+    base_top = max(Inches(5.8), band_bottom + Inches(3.2))
+    ctx.line(f'{ctx.slide_id}-ladder-spine', Inches(0.95), base_top + Inches(0.82), Inches(12.85), base_top - Inches(1.14), 'line', 1.5, 'ladder_spine')
     for point_index, point in enumerate(points[:4], 1):
         left = Inches(1.08 + ((point_index - 1) * 3.18))
-        top = Inches(5.8 - ((point_index - 1) * 0.72))
-        height = Inches(0.92 + ((point_index - 1) * 0.32))
+        top = base_top - Inches((point_index - 1) * 0.72)
+        height = Inches(1.3 + ((point_index - 1) * 0.24))
         ctx.oval(f'{ctx.slide_id}-gate-{point_index}-node', left - Inches(0.18), top + Inches(0.16), Inches(0.22), Inches(0.22), 'accent', 'gate_node')
         ctx.rect(f'{ctx.slide_id}-gate-{point_index}-panel', left, top, Inches(2.76), height, 'panel', 'judgement_step', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.2), top + Inches(0.16), Inches(1.3), Inches(0.3), f'Gate {point_index}', 13, 'accent', 'point_index', True)
-        ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.2), top + Inches(0.54), Inches(2.3), height - Inches(0.68), point, 12.5, 'ink', 'point_text')
-    add_footer(ctx, index, total)
+        ctx.text(f'{ctx.slide_id}-gate-{point_index}-index', left + Inches(0.2), top + Inches(0.16), Inches(1.3), Inches(0.3), f'Gate {point_index}', meta_label_size, 'accent', 'point_index', True)
+        ctx.text(f'{ctx.slide_id}-gate-{point_index}-text', left + Inches(0.2), top + Inches(0.5), Inches(2.3), height - Inches(0.58), point, card_body_size, 'ink', 'point_text')
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_ring_cross(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
     add_background(ctx)
-    add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data))
+    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
-    ctx.rect(f'{ctx.slide_id}-center-hub', Inches(6.25), Inches(3.36), Inches(3.18), Inches(1.05), 'accent', 'center_hub', 'content')
-    ctx.text(f'{ctx.slide_id}-center-text', Inches(6.72), Inches(3.64), Inches(2.25), Inches(0.4), 'Core', 18, '#FFFFFF', 'center_hub', True)
+    card_body_size = typography_size(slide_data, 'card_body')
+    content_offset = max(0, band_bottom - Inches(2.15))
+    hub_top = Inches(3.36) + content_offset
+    ctx.rect(f'{ctx.slide_id}-center-hub', Inches(6.25), hub_top, Inches(3.18), Inches(1.05), 'accent', 'center_hub', 'content')
+    ctx.text(f'{ctx.slide_id}-center-text', Inches(6.72), hub_top + Inches(0.22), Inches(2.25), Inches(0.52), 'Core', card_body_size, '#FFFFFF', 'center_hub', True)
     positions = [
-        (Inches(1.02), Inches(2.42), Inches(4.35), Inches(1.3)),
-        (Inches(10.55), Inches(2.42), Inches(4.35), Inches(1.3)),
-        (Inches(10.55), Inches(5.06), Inches(4.35), Inches(1.3)),
-        (Inches(1.02), Inches(5.06), Inches(4.35), Inches(1.3)),
+        (Inches(1.02), Inches(2.42) + content_offset, Inches(4.35), Inches(1.3)),
+        (Inches(10.55), Inches(2.42) + content_offset, Inches(4.35), Inches(1.3)),
+        (Inches(10.55), Inches(5.06) + content_offset, Inches(4.35), Inches(1.3)),
+        (Inches(1.02), Inches(5.06) + content_offset, Inches(4.35), Inches(1.3)),
     ]
     hub_points = [
-        (Inches(6.25), Inches(3.62)),
-        (Inches(9.43), Inches(3.62)),
-        (Inches(9.43), Inches(4.12)),
-        (Inches(6.25), Inches(4.12)),
+        (Inches(6.25), hub_top + Inches(0.26)),
+        (Inches(9.43), hub_top + Inches(0.26)),
+        (Inches(9.43), hub_top + Inches(0.76)),
+        (Inches(6.25), hub_top + Inches(0.76)),
     ]
     for point_index, point in enumerate(points[:4], 1):
         left, top, width, height = positions[point_index - 1]
@@ -781,24 +892,28 @@ def write_ring_cross(ctx: SlideBuilder, slide_data, index: int, total: int, repa
         ctx.line(f'{ctx.slide_id}-axis-{point_index}-connector', start_x, start_y, end_x, end_y, 'line', 1.2, 'axis_connector')
         ctx.rect(f'{ctx.slide_id}-axis-{point_index}-panel', left, top, width, height, 'panel', 'axis_panel', 'content', 'line')
         ctx.oval(f'{ctx.slide_id}-axis-{point_index}-node', left + Inches(0.16), top + Inches(0.16), Inches(0.18), Inches(0.18), 'accent', 'axis_node')
-        ctx.text(f'{ctx.slide_id}-axis-{point_index}-text', left + Inches(0.24), top + Inches(0.32), width - Inches(0.5), Inches(0.62), point, 13.5, 'ink', 'point_text', True)
-    add_footer(ctx, index, total)
+        ctx.text(f'{ctx.slide_id}-axis-{point_index}-text', left + Inches(0.24), top + Inches(0.26), width - Inches(0.5), Inches(0.82), point, card_body_size, 'ink', 'point_text', True)
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_summary_peak(ctx: SlideBuilder, slide_data, index: int, total: int, repaired: bool):
     add_background(ctx)
-    add_title_band(ctx, slide_title(slide_data, index), slide_core_sentence(slide_data), 31)
+    band_bottom = add_title_band(ctx, slide_data, slide_title(slide_data, index), slide_core_sentence(slide_data))
     points = slide_points(slide_data)
     primary = points[0] if points else slide_core_sentence(slide_data)
-    ctx.rect(f'{ctx.slide_id}-summary-peak', Inches(1.0), Inches(2.38), Inches(13.7), Inches(1.35), 'accent', 'summary_peak', 'content')
-    ctx.rect(f'{ctx.slide_id}-peak-shadow', Inches(1.26), Inches(3.82), Inches(13.18), Inches(0.12), 'line', 'peak_shadow', radius=False)
-    ctx.text(f'{ctx.slide_id}-peak-text', Inches(1.48), Inches(2.75), Inches(12.5), Inches(0.54), primary, 18, '#FFFFFF', 'summary_peak', True)
+    section_lead_size = typography_size(slide_data, 'section_lead')
+    card_body_size = typography_size(slide_data, 'card_body')
+    peak_top = max(Inches(2.38), band_bottom + Inches(0.3))
+    ctx.rect(f'{ctx.slide_id}-summary-peak', Inches(1.0), peak_top, Inches(13.7), Inches(1.35), 'accent', 'summary_peak', 'content')
+    ctx.rect(f'{ctx.slide_id}-peak-shadow', Inches(1.26), peak_top + Inches(1.44), Inches(13.18), Inches(0.12), 'line', 'peak_shadow', radius=False)
+    ctx.text(f'{ctx.slide_id}-peak-text', Inches(1.48), peak_top + Inches(0.28), Inches(12.5), Inches(0.72), primary, section_lead_size, '#FFFFFF', 'summary_peak', True)
     for point_index, point in enumerate(points[1:4] or points[:3], 1):
         left = Inches(1.0 + ((point_index - 1) * 4.63))
-        ctx.oval(f'{ctx.slide_id}-takeaway-{point_index}-node', left + Inches(0.2), Inches(4.28), Inches(0.22), Inches(0.22), 'accent', 'takeaway_node')
-        ctx.rect(f'{ctx.slide_id}-takeaway-{point_index}-panel', left, Inches(4.55), Inches(4.05), Inches(1.25), 'panel', 'takeaway_panel', 'content', 'line')
-        ctx.text(f'{ctx.slide_id}-takeaway-{point_index}-text', left + Inches(0.26), Inches(4.92), Inches(3.5), Inches(0.48), point, 13.5, 'ink', 'point_text', True)
-    add_footer(ctx, index, total)
+        takeaway_top = peak_top + Inches(2.17)
+        ctx.oval(f'{ctx.slide_id}-takeaway-{point_index}-node', left + Inches(0.2), takeaway_top - Inches(0.27), Inches(0.22), Inches(0.22), 'accent', 'takeaway_node')
+        ctx.rect(f'{ctx.slide_id}-takeaway-{point_index}-panel', left, takeaway_top, Inches(4.05), Inches(1.25), 'panel', 'takeaway_panel', 'content', 'line')
+        ctx.text(f'{ctx.slide_id}-takeaway-{point_index}-text', left + Inches(0.26), takeaway_top + Inches(0.27), Inches(3.5), Inches(0.68), point, card_body_size, 'ink', 'point_text', True)
+    add_footer(ctx, slide_data, index, total)
 
 
 def write_structural_native_shapes(ctx: SlideBuilder, slide_data: dict):
@@ -854,7 +969,7 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             'title': slide_title(slide_data, index),
             'layout_family': layout,
             'layout_writer': layout_writer_id(layout),
-            'title_font_size': 34 if layout == 'cover_signal' else 30,
+            'title_font_size': title_size_for_layout(slide_data, layout),
             'shape_count': len(slide.shapes),
             'text_box_count': sum(1 for shape in slide.shapes if getattr(shape, 'has_text_frame', False)),
             'redcube_svg_ir_file': svg_ir['file'],
