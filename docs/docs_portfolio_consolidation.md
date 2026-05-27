@@ -86,6 +86,48 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-28 native PPT AI-first sample boundary revalidation tranche
+
+本轮覆盖 RCA main 最近 native editable PPTX 路线改动后的 delivery/status 读法。目标是确认 `native PPTX` 仍是显式可选路线，`officecli` 只作为 editable PPTX materializer / QA gate，mock Codex helper 只作为 deterministic test double；live sample、AgentLab refs-only quality surface 或 native proof plumbing 都不能升级为 visual ready、exportable、handoffable、domain ready、production ready、artifact authority、review/export verdict 或 production visual-stage long-soak evidence。本轮不改变 RCA active truth，不关闭 OPL series 全局 `/goal`。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/status.md`, `docs/delivery/native-ppt-proof-environment.md`, and this governance ledger.
+- Machine / contract refs: `contracts/runtime-program/ppt-native-authoring-proof-lane.json`, `contracts/runtime-program/ppt-native-pptx-quality-nonregression.json`, and `contracts/runtime-program/ppt-native-python-engine-contract.json`.
+- Source / test refs: `packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts`, `packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt-quality-nonregression.ts`, `tests/helpers/mock-codex-cli-parts/ppt-builders/native.ts`, `tests/ppt-native-ppt-runtime.test.ts`, and `tests/ppt-native-pptx-quality-nonregression.test.ts`.
+- Fresh repo-state refs: main commits `3977949 fix(native-ppt): enforce ai-first sample boundary` and `7f8409a evidence(rca): refresh workspace receipt scaleout snapshot`.
+
+Fresh semantic result:
+
+- `docs/status.md` already states the three-route AgentLab suite boundary: image-first remains the default `ppt_deck` route; HTML and native editable PPTX remain explicit optional routes; mock provider / mock Codex / native helper plumbing only prove file-chain, contract, gate-ref and no-forbidden-authority behavior.
+- `docs/delivery/native-ppt-proof-environment.md` already carries the current native PPT discipline: AI-authored `editable_shape_plan` owns concrete slide design; the Python helper validates/materializes/renders; `officecli` is a materializer / QA gate, not the designer or workflow owner; true render proof still requires LibreOffice headless -> PDF -> Poppler PNG.
+- `ppt-native-pptx-quality-nonregression` remains a refs-only OPL AgentLab quality surface. It lets AgentLab compare non-regression refs but explicitly does not authorize visual truth, artifact blob writes, memory body writes, quality/export verdicts, exportability, handoffability, visual readiness or production readiness.
+- The current tests enforce the sample boundary: mock native shape plans are deterministic plumbing fixtures and cannot be displayed as native PPT visual quality samples; any real visual sample claim still requires live Codex executor shape plan, `editable_shape_plan.design_spec_lock`, per-slide layout intent, true render screenshots, RCA visual director review, screenshot review and export evidence.
+- No prose body rewrite, archive, tombstone or deletion was needed outside this coverage ledger entry.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of native PPT status/delivery sections, native proof environment support doc, three native PPT runtime contracts, focused runtime / quality tests and native mock helper source listed above. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. The governed native PPT docs retain legitimate support roles.
+
+Unreviewed docs:
+
+- RCA exact-path docs coverage remains governed by prior inventory reconcile entries. This tranche only covers reopened native PPT sample / AgentLab / officecli materializer wording after the latest native PPT source and contract changes.
+- OPL, MAS and App coverage remains open under the global OPL series ledger; App body governance remains delayed while active release / GUI lanes are dirty or recently written.
+
+Remaining stale / retire candidates:
+
+- Future RCA prose that treats native PPT mock fixtures, native helper plumbing, `officecli validate`, AgentLab score, live sample proof, route-chain file output, workspace receipt refs or provider completion as RCA visual verdict, exportable/handoffable authority, artifact authority, production readiness or production visual-stage long soak is stale pollution.
+- Future native PPT code/docs that move design authorship from AI-authored `editable_shape_plan` to Python helper, officecli, static template, synthetic preview or HTML proof must reopen the native route ownership gap.
+
+Next tranche write scope:
+
+- Continue MAS remaining repo-wide coverage or OPL safe support clusters.
+- Return to RCA only for newly changed docs, reopened source/contract/read-model sections, or implementation/evidence owner lanes that close a current production evidence / default-caller / strict-purity tail and need doc foldback.
+
 ### 2026-05-28 support owner index revalidation tranche
 
 本轮覆盖 RCA `docs/product/`、`docs/runtime/`、`docs/delivery/`、`docs/source/`、`docs/policies/`、`docs/specs/` 与 `docs/public/` 的 owner index 读法。目标是确认这些 canonical support 层继续只承担人读索引 / support 角色，不把 product、runtime、delivery、source、policy、spec 或 public 入口写成第二 active truth、RCA-owned generic runtime、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。本轮不改 active truth，不关闭 OPL series 全局 `/goal`。
