@@ -169,7 +169,7 @@ RCA 现在也暴露 `opl_substrate_adapter_export`：这是 RCA domain-owned OPL
 
 这意味着 RedCube 现在的 family runtime 并不是“写死 Codex-only”，而是：
 
-`gateway -> runtime family contract -> executor adapter -> concrete agent runtime`
+`service-safe domain entry -> runtime family contract -> executor adapter -> concrete agent runtime`
 
 其中：
 
