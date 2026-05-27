@@ -7,9 +7,11 @@ Machine boundary: 人读 proof environment support。机器真相继续归 nativ
 
 ## Scope
 
-This environment is for renderer diagnostics and Linux native proof readiness checks. It does not replace RedCube product-entry, runtime-family routes, `visual_director_review`, `screenshot_review`, or `export_pptx`.
+This environment is for renderer diagnostics and native proof readiness checks. It does not replace RedCube product-entry, runtime-family routes, `visual_director_review`, `screenshot_review`, or `export_pptx`.
 
-Native PPT production proof uses LibreOffice headless -> PDF -> Poppler PNG. Microsoft PowerPoint, AppleScript, and synthetic previews are not accepted proof surfaces.
+Native PPT production proof requires true render proof from a supported renderer selected by RCA capability probe / auto bootstrap. The current supported renderer stack is LibreOffice headless -> PDF -> Poppler PNG. Operators do not need to preinstall LibreOffice as a precondition for selecting the native lane; RCA probes the host, may bootstrap through the repo-owned installer or proof container, and fails closed with typed blocker `missing_renderer_dependency` when no supported renderer can be resolved.
+
+Microsoft PowerPoint, AppleScript, synthetic previews, HTML rendering, and `officecli validate` are not accepted proof surfaces for native PPT true render proof.
 
 ## Quality Non-Regression Surface
 
@@ -24,9 +26,18 @@ The route boundary remains unchanged:
 - `visual_director_review`, `screenshot_review`, and `export_pptx` remain required RCA-owned gates.
 - The Python helper can execute, validate, render/export, and emit shape/render/repair refs; it cannot replace the AI creative owner or write visual truth.
 
-## Dependencies
+## Renderer Resolution
 
-Required Linux packages:
+Native proof dependency handling is contract-backed:
+
+- `renderer_selection_policy`: `capability_probe_auto_bootstrap`
+- `supported_renderers`: `libreoffice_headless` with pipeline `libreoffice_headless_pdf_png_v1`
+- required capabilities: `soffice_headless`, `pdftoppm`
+- repo-owned installer: `tools/native-ppt-proof/install-deps.sh`
+- proof container: `tools/native-ppt-proof/Dockerfile`
+- fail-closed typed blocker: `missing_renderer_dependency`
+
+RCA may install or provide these system dependencies for proof execution:
 
 - `libreoffice`
 - `poppler-utils`
@@ -37,7 +48,7 @@ Required project dependencies:
 - Python packages from `.github/requirements/ci-python.txt`
 - Node packages from `npm ci`
 
-Install native proof system dependencies on the current machine:
+Manually running the installer is optional operator preparation, not a product-entry precondition:
 
 ```bash
 tools/native-ppt-proof/install-deps.sh
@@ -59,7 +70,7 @@ Run the repo-owned native proof runner:
 tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
 ```
 
-The runner installs native proof system dependencies unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/status native lane, and renders the `data_charts` suite from the V2 native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-status.json`, `native-helper-output.json`, `proof-summary.json`, `artifact-index.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
+The runner probes native proof system dependencies and installs them unless `--skip-system-deps` or `REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS=1` is set, builds the TypeScript packages, checks the product-entry manifest/status native lane, and renders the `data_charts` suite from the V2 native PPT benchmark through LibreOffice headless -> PDF -> Poppler PNG. It writes `doctor.json`, `product-manifest.json`, `product-status.json`, `native-helper-output.json`, `proof-summary.json`, `artifact-index.json`, editable PPTX/PDF, shape manifest, and PNG screenshots under the output directory.
 
 The native proof CI job is intentionally optional. It runs on `workflow_dispatch`, the nightly schedule, or a pull request labeled `native-ppt-proof`; default push and PR quality jobs keep true renderer execution out of the fast/meta lane.
 
@@ -77,4 +88,4 @@ docker build -f tools/native-ppt-proof/Dockerfile -t redcube-native-ppt-proof .
 docker run --rm -it -v "$PWD:/workspace" -w /workspace redcube-native-ppt-proof bash -lc "npm ci && tools/native-ppt-proof/run.sh --skip-system-deps --output-dir artifacts/native-ppt-proof"
 ```
 
-The doctor reports `renderer_availability.linux_native_proof` with blocked reasons and the suggested Docker command. Fast/meta tests only read diagnostics and importability; they must not invoke the real native PPT renderer or review/export gates.
+The doctor reports `renderer_availability.linux_native_proof` with blocked reasons and the suggested Docker command. If capability probing and auto bootstrap cannot resolve LibreOffice headless plus Poppler, the native proof lane remains fail-closed with `missing_renderer_dependency`; synthetic previews, HTML proof, and `officecli validate` remain disallowed substitutes. Fast/meta tests only read diagnostics and importability; they must not invoke the real native PPT renderer or review/export gates.

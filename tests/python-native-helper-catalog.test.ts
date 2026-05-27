@@ -46,6 +46,53 @@ function readImplementation(file) {
   return shell ? readFileSync(path.resolve(path.dirname(file), shell[1]), 'utf-8') : source;
 }
 
+function assertNativeTrueRenderRendererPolicy(policy, label) {
+  assert.equal(policy.required, true, `${label}.required`);
+  assert.equal(policy.source_surface_kind, 'native_pptx', `${label}.source_surface_kind`);
+  assert.equal(
+    policy.renderer_selection_policy,
+    'capability_probe_auto_bootstrap',
+    `${label}.renderer_selection_policy`,
+  );
+  assert.equal(
+    policy.user_preinstalled_libreoffice_required,
+    false,
+    `${label}.user_preinstalled_libreoffice_required`,
+  );
+  assert.deepEqual(policy.supported_renderers, [
+    {
+      renderer_kind: 'libreoffice_headless',
+      renderer_stack: 'libreoffice_headless_plus_poppler',
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+      runtime: 'libreoffice_headless',
+      components: ['LibreOffice headless', 'Poppler pdftoppm'],
+      proof_chain: ['pptx_to_pdf', 'pdf_to_png'],
+      required_capabilities: ['soffice_headless', 'pdftoppm'],
+    },
+  ], `${label}.supported_renderers`);
+  assert.deepEqual(policy.bootstrap_policy, {
+    capability_probe: 'native_ppt_renderer_capability_probe',
+    automatic_bootstrap_allowed: true,
+    user_preinstall_required: false,
+    repo_owned_installer: 'tools/native-ppt-proof/install-deps.sh',
+    proof_container: 'tools/native-ppt-proof/Dockerfile',
+  }, `${label}.bootstrap_policy`);
+  assert.deepEqual(policy.fail_closed_blocker, {
+    typed_blocker: 'missing_renderer_dependency',
+    emitted_when: 'capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer',
+  }, `${label}.fail_closed_blocker`);
+  assert.equal(policy.synthetic_preview_allowed, false, `${label}.synthetic_preview_allowed`);
+  assert.equal(policy.html_render_substitute_allowed, false, `${label}.html_render_substitute_allowed`);
+  assert.equal(policy.officecli_validate_substitute_allowed, false, `${label}.officecli_validate_substitute_allowed`);
+  assert.deepEqual(policy.disallowed_substitutes, [
+    'synthetic_preview',
+    'html_render',
+    'officecli_validate',
+    'desktop_powerpoint_automation',
+    'apple_script_preview',
+  ], `${label}.disallowed_substitutes`);
+}
+
 function helperById(catalog) {
   return Object.fromEntries(catalog.helpers.map((helper) => [helper.helper_id, helper]));
 }
@@ -517,7 +564,35 @@ test('Native PPT helper routes stay tied to the engine contract and review/expor
   assert.equal(helpers.ppt_deck_native.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
   assert.equal(helpers.ppt_deck_native.true_render_proof.runtime, 'libreoffice_headless');
   assert.equal(helpers.ppt_deck_native.true_render_proof.cross_platform_render_required, true);
-  assert.deepEqual(helpers.ppt_deck_native.requires, ['Pillow', 'python-pptx', 'LibreOffice headless']);
+  assert.deepEqual(helpers.ppt_deck_native.requires, ['Pillow', 'python-pptx', 'LibreOffice headless', 'Poppler pdftoppm']);
+});
+
+test('Native PPT true-render contracts use probe-selected bootstrap renderer and typed missing dependency blocker', () => {
+  const catalog = readJson(CATALOG_FILE);
+  const helpers = helperById(catalog);
+  const engineContract = readJson(ENGINE_CONTRACT_FILE);
+  const proofLane = readJson(PROOF_LANE_FILE);
+
+  assertNativeTrueRenderRendererPolicy(
+    proofLane.candidate_route_model.true_render_proof,
+    'proofLane.true_render_proof',
+  );
+  assertNativeTrueRenderRendererPolicy(
+    engineContract.true_render_proof,
+    'engineContract.true_render_proof',
+  );
+  assertNativeTrueRenderRendererPolicy(
+    helpers.ppt_deck_native.true_render_proof,
+    'helpers.ppt_deck_native.true_render_proof',
+  );
+  assert.deepEqual(
+    proofLane.candidate_route_model.true_render_proof,
+    engineContract.true_render_proof,
+  );
+  assert.deepEqual(
+    helpers.ppt_deck_native.true_render_proof,
+    engineContract.true_render_proof,
+  );
 });
 
 test('Review and export helpers stay scoped to their existing runtime gates', () => {
