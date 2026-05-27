@@ -10,6 +10,7 @@ import { buildRcaGoalWorkflowAgentLabSuite } from './goal-workflow-agent-lab-sui
 import { buildRcaPptThreeRouteAgentLabSuite } from './ppt-three-route-agent-lab-suite.js';
 
 export function buildOperatorEvidenceReadinessProjection({
+  familyStageControlPlane,
   oplGenericPrimitiveConsumption,
   oplGeneratedInterfaceConsumption,
   oplStabilityReadModelConsumption,
@@ -24,6 +25,7 @@ export function buildOperatorEvidenceReadinessProjection({
     workspaceReceiptInventoryProjection,
   });
   const oplExpectedReceiptMonitorFreshnessHandoff = buildOplExpectedReceiptMonitorFreshnessHandoff({
+    familyStageControlPlane,
     productionEvidenceScaleoutRefs,
     workspaceReceiptInventoryProjection,
   });

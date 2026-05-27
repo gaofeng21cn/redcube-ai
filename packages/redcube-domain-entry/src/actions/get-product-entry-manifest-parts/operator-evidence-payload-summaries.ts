@@ -50,6 +50,15 @@ const RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS = Object.freeze([
   'package_and_handoff',
 ]);
 
+const RCA_STAGE_EXPECTED_RECEIPT_RUNTIME_EVENT_REFS = Object.freeze({
+  source_intake: Object.freeze(['runtime_event:rca.source_intake.source_truth_frozen']),
+  communication_strategy: Object.freeze(['runtime_event:rca.communication_strategy.accepted']),
+  visual_direction: Object.freeze(['runtime_event:rca.visual_direction.accepted']),
+  artifact_creation: Object.freeze(['runtime_event:rca.artifact_creation.candidate_rendered']),
+  review_and_revision: Object.freeze(['runtime_event:rca.review_and_revision.gate_recorded']),
+  package_and_handoff: Object.freeze(['runtime_event:rca.package_and_handoff.export_handoff_recorded']),
+});
+
 function uniqueRefs(values) {
   return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0))];
 }
@@ -188,6 +197,7 @@ export function buildOwnerPayloadItemSummaries({
 }
 
 export function buildStageExpectedReceiptPayloadSummary({
+  familyStageControlPlane,
   productionEvidenceScaleoutRefs,
   workspaceReceiptInventoryProjection,
 }) {
@@ -198,6 +208,15 @@ export function buildStageExpectedReceiptPayloadSummary({
     'typed_blocker_refs',
   ];
   const typedBlockerRefs = productionEvidenceScaleoutRefs.typed_blocker_refs || [];
+  const stageRuntimeEventRefs = new Map(
+    (Array.isArray(familyStageControlPlane?.stages) ? familyStageControlPlane.stages : [])
+      .map((stage) => [
+        stage.stage_id,
+        uniqueRefs(stage.stage_contract?.runtime_event_refs || stage.runtime_event_refs || []),
+      ]),
+  );
+  const stagePayloadTemplate = ownerPayloadTemplate(requiredOperatorPayloadRefs);
+  const stageIds = [...RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS];
   return {
     surface_kind: 'rca_stage_expected_receipt_payload_summary',
     owner: 'redcube_ai',
@@ -215,20 +234,32 @@ export function buildStageExpectedReceiptPayloadSummary({
       'typed_blocker_ref',
     ],
     accepted_payload_paths_ref: '/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
-    stage_count: RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS.length,
-    stages: RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS.map((stageId, index) => ({
+    stage_count: stageIds.length,
+    stage_ids: stageIds,
+    stage_payload_template: stagePayloadTemplate,
+    typed_blocker_path_payload: {
+      typed_blocker_refs: typedBlockerRefs,
+    },
+    success_ref_models: {
+      monitor_freshness_ref_model: '/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>',
+      runtime_event_ref_model: 'family_stage_control_plane.stages[*].stage_contract.runtime_event_refs',
+      source_runtime_event_ref: '/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
+    },
+    stages: stageIds.map((stageId, index) => ({
       stage_id: stageId,
       sequence: index + 1,
       payload_kind: 'stage_expected_receipt_or_monitor_freshness_refs',
-      current_payload_template: ownerPayloadTemplate(requiredOperatorPayloadRefs),
+      current_payload_template: stagePayloadTemplate,
       success_refs_path_payload: {
         domain_receipt_refs: [],
         monitor_freshness_refs: [
           `/workspace_receipt_inventory_projection/stage_monitor_freshness/${stageId}`,
         ],
-        runtime_event_refs: [
-          `runtime_event:rca.${stageId}.expected_receipt_or_monitor_freshness`,
-        ],
+        runtime_event_refs: (
+          stageRuntimeEventRefs.get(stageId)?.length
+            ? stageRuntimeEventRefs.get(stageId)
+            : RCA_STAGE_EXPECTED_RECEIPT_RUNTIME_EVENT_REFS[stageId]
+        ),
       },
       typed_blocker_path_payload: {
         typed_blocker_refs: typedBlockerRefs,

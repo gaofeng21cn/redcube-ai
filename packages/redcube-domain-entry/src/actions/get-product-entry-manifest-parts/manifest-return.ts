@@ -34,6 +34,7 @@ export function buildReturnedManifestProjection({
   temporalAutonomyReadiness,
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
+    familyStageControlPlane,
     oplGenericPrimitiveConsumption,
     oplGeneratedInterfaceConsumption,
     oplStabilityReadModelConsumption,

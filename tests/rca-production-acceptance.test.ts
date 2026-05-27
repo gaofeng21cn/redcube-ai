@@ -433,7 +433,11 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   });
   assert.equal(
     handoff.stage_expected_receipt_payload_summary.success_ref_models.runtime_event_ref_model,
-    'runtime_event:rca.<stage-id>.expected_receipt_or_monitor_freshness',
+    'family_stage_control_plane.stages[*].stage_contract.runtime_event_refs',
+  );
+  assert.equal(
+    handoff.stage_expected_receipt_payload_summary.success_ref_models.source_runtime_event_ref,
+    'redcube product manifest#/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
   );
   assert.equal(handoff.stage_expected_receipt_payload_summary.operator_payload_submitted, false);
   assert.equal(handoff.stage_expected_receipt_payload_summary.success_refs_visible_is_completion, false);

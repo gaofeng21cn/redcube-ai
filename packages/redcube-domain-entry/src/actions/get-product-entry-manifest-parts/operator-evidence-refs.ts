@@ -516,6 +516,7 @@ export function buildProductionEvidenceTailWorkOrder({
 }
 
 export function buildOplExpectedReceiptMonitorFreshnessHandoff({
+  familyStageControlPlane,
   productionEvidenceScaleoutRefs,
   workspaceReceiptInventoryProjection,
 }) {
@@ -594,6 +595,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       production_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
     },
     stage_expected_receipt_payload_summary: buildStageExpectedReceiptPayloadSummary({
+      familyStageControlPlane,
       productionEvidenceScaleoutRefs,
       workspaceReceiptInventoryProjection,
     }),

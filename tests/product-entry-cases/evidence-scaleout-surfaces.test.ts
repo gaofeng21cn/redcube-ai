@@ -17,6 +17,7 @@ import path from 'node:path';
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
+    const productEntryManifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
     const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
 
     assert.equal(
@@ -251,6 +252,37 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.accepted_payload_paths_ref,
       '/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
     );
+    assert.deepEqual(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stage_ids,
+      [
+        'source_intake',
+        'communication_strategy',
+        'visual_direction',
+        'artifact_creation',
+        'review_and_revision',
+        'package_and_handoff',
+      ],
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.success_ref_models.runtime_event_ref_model,
+      'family_stage_control_plane.stages[*].stage_contract.runtime_event_refs',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.success_ref_models.source_runtime_event_ref,
+      '/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
+    );
+    const stageRuntimeEventRefs = new Map(
+      productEntryManifest.family_stage_control_plane.stages.map((stage) => [
+        stage.stage_id,
+        stage.stage_contract.runtime_event_refs,
+      ]),
+    );
+    for (const stage of domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stages) {
+      assert.deepEqual(
+        stage.success_refs_path_payload.runtime_event_refs,
+        stageRuntimeEventRefs.get(stage.stage_id),
+      );
+    }
     assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.stage_expected_receipt_payload_summary.stages.every(
         (stage) => stage.payload_body_allowed === false
@@ -466,7 +498,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
         .stage_expected_receipt_payload_summary.stages.find((stage) => stage.stage_id === 'visual_direction');
     assert.deepEqual(
       visualDirectionStage.success_refs_path_payload.runtime_event_refs,
-      ['runtime_event:rca.visual_direction.expected_receipt_or_monitor_freshness'],
+      ['runtime_event:rca.visual_direction.accepted'],
     );
     assert.deepEqual(
       visualDirectionStage.typed_blocker_path_payload.typed_blocker_refs,

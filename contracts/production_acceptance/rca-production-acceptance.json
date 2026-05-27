@@ -604,7 +604,8 @@
       },
       "success_ref_models": {
         "monitor_freshness_ref_model": "redcube product manifest#/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>",
-        "runtime_event_ref_model": "runtime_event:rca.<stage-id>.expected_receipt_or_monitor_freshness"
+        "runtime_event_ref_model": "family_stage_control_plane.stages[*].stage_contract.runtime_event_refs",
+        "source_runtime_event_ref": "redcube product manifest#/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs"
       },
       "operator_payload_submitted": false,
       "recommended_current_payload_path": "typed_blocker_path",
