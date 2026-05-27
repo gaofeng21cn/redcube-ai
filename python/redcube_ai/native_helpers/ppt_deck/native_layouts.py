@@ -63,6 +63,7 @@ AI_FIRST_MIN_DECORATIVE_SHAPES = 2
 AI_FIRST_MIN_POINT_TEXT = 1
 BODY_TEXT_READABILITY_FLOOR_PT = 18.0
 POINT_INDEX_FLOOR_PT = 16.0
+OFFICECLI_DEFAULT_TEXT_MARGIN_IN = 0.08
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -174,6 +175,62 @@ def ai_shape_font_size(shape_spec: dict, role: str) -> float:
     return BODY_TEXT_READABILITY_FLOOR_PT
 
 
+def weighted_text_width_pt(text: str, font_size: float) -> float:
+    width = 0.0
+    for char in safe_text(text):
+        codepoint = ord(char)
+        if char.isspace():
+            width += font_size * 0.32
+        elif codepoint > 127:
+            width += font_size * 0.95
+        elif char.isupper():
+            width += font_size * 0.68
+        elif char in {'-', '/', ':'}:
+            width += font_size * 0.38
+        else:
+            width += font_size * 0.56
+    return width
+
+
+def margin_inches(shape_spec: dict) -> float:
+    raw = safe_text(shape_spec.get('margin'), f'{OFFICECLI_DEFAULT_TEXT_MARGIN_IN}in').lower()
+    try:
+        return float(raw[:-2]) if raw.endswith('in') else float(raw)
+    except ValueError:
+        return OFFICECLI_DEFAULT_TEXT_MARGIN_IN
+
+
+def ai_text_capacity_failure(shape_spec: dict) -> dict | None:
+    kind = shape_kind(shape_spec)
+    if kind not in {'text', 'text_box'}:
+        return None
+    text = ai_shape_text(shape_spec)
+    if not text:
+        return None
+    bounds = ai_shape_bounds_in(shape_spec)
+    if bounds is None:
+        return None
+    role = safe_text(shape_spec.get('role'))
+    font_size = ai_shape_font_size(shape_spec, role)
+    margin_in = margin_inches(shape_spec)
+    usable_width_pt = max((bounds['width_in'] - (2 * margin_in)) * 72.0, 1.0)
+    usable_height_pt = max((bounds['height_in'] - (2 * margin_in)) * 72.0, 1.0)
+    estimated_lines = max(1, int((weighted_text_width_pt(text, font_size) + usable_width_pt - 1.0) // usable_width_pt))
+    required_height_pt = estimated_lines * font_size
+    if required_height_pt <= usable_height_pt:
+        return None
+    return {
+        'reason': 'ai_first_text_capacity_exceeded',
+        'shape_id': safe_text(shape_spec.get('shape_id'), '<missing-shape-id>'),
+        'role': role,
+        'font_size': round(font_size, 2),
+        'estimated_lines': estimated_lines,
+        'required_height_pt': round(required_height_pt, 2),
+        'usable_height_pt': round(usable_height_pt, 2),
+        'suggested_height_in': round((required_height_pt / 72.0) + (2 * margin_in), 3),
+    }
+
+
 def resolve_color(value, default_key: str) -> str:
     color = safe_text(value, default_key)
     return PALETTE.get(color, color)
@@ -233,6 +290,10 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
         if kind in {'text', 'text_box'} and ai_shape_quality_role(shape) == 'content':
             if role not in {'page_number', 'point_index'} and font_size < BODY_TEXT_READABILITY_FLOOR_PT:
                 failures.append({'reason': 'ai_first_body_text_too_small', 'shape_id': shape_id, 'font_size': round(font_size, 2)})
+            if role not in {'page_number', 'point_index'}:
+                capacity_failure = ai_text_capacity_failure(shape)
+                if capacity_failure:
+                    failures.append(capacity_failure)
         if not text and resolve_color(shape.get('fill') or shape.get('fill_color'), 'none') == 'none' and resolve_color(shape.get('line') or shape.get('line_color') or shape.get('stroke'), 'none') == 'none':
             failures.append({'reason': 'ai_first_non_text_shape_invisible', 'shape_id': shape_id})
     return failures

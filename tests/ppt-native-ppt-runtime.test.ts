@@ -96,6 +96,10 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       creative_owner: 'llm_agent',
       editable_shape_plan_required: true,
       editable_shape_manifest_required: true,
+      layout_intent_required: true,
+      composition_signature_required: true,
+      title_underline_motif_allowed: false,
+      concrete_layout_variant_repetition_limit: 2,
       python_helper_role: 'execute_validate_export_only',
       template_substitution_allowed: false,
       preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -107,6 +111,20 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(editableShapePlan.contract_kind, 'redcube_ai_first_native_ppt_shape_plan');
     assert.equal(editableShapePlan.slides.length, authored.native_ppt_bundle?.slides.length);
     assert.equal(editableShapePlan.slides.every((slide) => Array.isArray(slide.native_shapes) && slide.native_shapes.length >= 2), true);
+    assert.equal(
+      editableShapePlan.slides.every((slide) => typeof slide.layout_intent?.composition_signature === 'string'),
+      true,
+    );
+    const compositionSignatures = editableShapePlan.slides
+      .map((slide) => slide.layout_intent?.composition_signature)
+      .filter(Boolean);
+    assert.equal(new Set(compositionSignatures).size >= Math.ceil(compositionSignatures.length * 0.75), true);
+    assert.equal(
+      editableShapePlan.slides
+        .flatMap((slide) => slide.native_shapes)
+        .some((shape) => shape?.role === 'accent_rule'),
+      false,
+    );
     const expectedEngineContract = nativeEngineContract();
     assert.deepEqual(authored.native_ppt_bundle?.engine_contract, expectedEngineContract);
     assert.equal(
@@ -163,6 +181,15 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     );
     assert.equal(
       authored.native_ppt_bundle.slides.every((slide) => slide.ai_first_spatial_plan?.helper_template_layout_used === false),
+      true,
+    );
+    assert.equal(
+      authored.native_ppt_bundle.slides.every((slide) => typeof slide.metrics?.composition_signature === 'string'),
+      true,
+    );
+    assert.equal(
+      new Set(authored.native_ppt_bundle.slides.map((slide) => slide.metrics?.composition_signature)).size
+        >= Math.ceil(authored.native_ppt_bundle.slides.length * 0.75),
       true,
     );
     const visibleText = flattenNativeVisibleText(authored, shapeManifest);
@@ -669,6 +696,82 @@ test('native PPT visual director review blocks repeated native layout variants b
   });
 });
 
+test('native PPT visual director review blocks repeated composition signatures even when variant labels differ', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-composition-repetition-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-composition-repetition' });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-composition-repetition',
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+    const authored = readJson(authorResult.artifactFile);
+    const repeatedSignature = 'top-title__core-under__lower-card-row__two-column-balanced';
+    const repeatedVariants = ['compare_two_column', 'timeline_band', 'judgement_ladder'];
+    const shapeManifest = readJson(authored.native_ppt_bundle.shape_manifest_file);
+    for (const [offset, slide] of shapeManifest.slides.slice(1, 4).entries()) {
+      slide.layout_family = ['multi_zone_compare', 'timeline_band', 'judgement_ladder'][offset];
+      slide.metrics = {
+        ...slide.metrics,
+        layout_variant: repeatedVariants[offset],
+        composition_signature: repeatedSignature,
+      };
+    }
+    writeJson(authored.native_ppt_bundle.shape_manifest_file, shapeManifest);
+
+    const poisonedAuthored = {
+      ...authored,
+      native_ppt_bundle: {
+        ...authored.native_ppt_bundle,
+        slides: authored.native_ppt_bundle.slides.map((slide, index) => (
+          index >= 1 && index <= 3
+            ? {
+                ...slide,
+                layout_family: ['multi_zone_compare', 'timeline_band', 'judgement_ladder'][index - 1],
+                metrics: {
+                  ...(slide.metrics || {}),
+                  layout_variant: repeatedVariants[index - 1],
+                  composition_signature: repeatedSignature,
+                },
+              }
+            : slide
+        )),
+      },
+    };
+    writeJson(authorResult.artifactFile, poisonedAuthored);
+
+    const directorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-composition-repetition',
+      route: 'visual_director_review',
+    });
+    assert.equal(directorResult.ok, false);
+    const directorArtifact = readJson(path.join(
+      workspaceRoot,
+      'topics',
+      'topic-a',
+      'deliverables',
+      'deck-composition-repetition',
+      'artifacts',
+      'director_review.json',
+    ));
+    assert.equal(directorArtifact.status, 'block');
+    assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
+    assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.match(directorArtifact.visual_director_review.review_summary, /native repeated composition signature/);
+    assert.deepEqual(
+      directorArtifact.visual_director_review.weak_pages.filter((slideId) => ['S02', 'S03', 'S04'].includes(slideId)),
+      ['S02', 'S03', 'S04'],
+    );
+  });
+});
+
 test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
   const engineContract = nativeEngineContract();
   const proofLane = readJson(path.resolve('contracts/runtime-program/ppt-native-authoring-proof-lane.json'));
@@ -682,6 +785,10 @@ test('native PPT proof lane records the Python engine contract as the single own
     template_substitution_allowed: false,
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
+    layout_intent_required: true,
+    composition_signature_required: true,
+    title_underline_motif_allowed: false,
+    concrete_layout_variant_repetition_limit: 2,
   });
   assert.equal(
     proofLane.candidate_route_model.runtime_executor_proof.engine_contract,

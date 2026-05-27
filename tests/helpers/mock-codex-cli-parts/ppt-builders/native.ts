@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createHash } from 'node:crypto';
+
 import { safeArray, safeText } from '../shared.ts';
 
 function pointText(item, fallback) {
@@ -29,6 +31,166 @@ function slidePoints(slide) {
   ]).slice(0, 4).map((text, index) => qualityPointText(text, index));
 }
 
+function layoutIntentForSlide(slide, index, slotCount) {
+  const layoutFamily = safeText(slide?.visual_presentation?.layout_family || slide?.layout_family, 'multi_zone_compare');
+  const intents = {
+    cover_signal: {
+      rhetorical_role: 'cover',
+      primary_grid: 'hero_callout_with_signal_stack',
+      visual_weight: 'centered',
+      negative_space_strategy: 'right side and lower-right breathing area frame the opening claim',
+      non_text_visual: 'top band plus signal panels',
+    },
+    multi_zone_compare: {
+      rhetorical_role: 'comparison',
+      primary_grid: `${slotCount}_column_comparison`,
+      visual_weight: slotCount === 2 ? 'left_right_balanced' : 'distributed_columns',
+      negative_space_strategy: 'wide gutter between comparison panels',
+      non_text_visual: 'filled comparison panels',
+    },
+    timeline_band: {
+      rhetorical_role: 'timeline',
+      primary_grid: 'horizontal_timeline_rail',
+      visual_weight: 'bottom_band',
+      negative_space_strategy: 'open upper narrative band above the rail',
+      non_text_visual: 'timeline rail with milestone panels',
+    },
+    judgement_ladder: {
+      rhetorical_role: 'gate',
+      primary_grid: 'vertical_gate_ladder',
+      visual_weight: 'right_heavy',
+      negative_space_strategy: 'left evidence column kept open for scanability',
+      non_text_visual: 'stacked gate steps',
+    },
+    ring_cross: {
+      rhetorical_role: 'system_map',
+      primary_grid: 'radial_axes',
+      visual_weight: 'centered_radial',
+      negative_space_strategy: 'corners stay open around the system axis',
+      non_text_visual: 'radial axis panels',
+    },
+    summary_peak: {
+      rhetorical_role: 'synthesis',
+      primary_grid: 'hero_takeaway_plus_support_band',
+      visual_weight: 'top_heavy',
+      negative_space_strategy: 'large lower-right quiet zone after the final judgement',
+      non_text_visual: 'takeaway panel plus support band',
+    },
+  };
+  const intent = intents[layoutFamily] || intents.multi_zone_compare;
+  return {
+    ...intent,
+    composition_signature: [
+      layoutFamily,
+      intent.primary_grid,
+      intent.visual_weight,
+      `slots_${slotCount}`,
+      `page_${index + 1}`,
+    ].join('__'),
+    forbidden_template_reuse_checked: true,
+  };
+}
+
+function stableCompositionSignature(nativeShapes) {
+  const signatureRoles = new Set([
+    'title',
+    'core_sentence',
+    'compare_panel',
+    'signal_panel',
+    'timeline_panel',
+    'judgement_step',
+    'axis_panel',
+    'takeaway_panel',
+    'structured_note_panel',
+    'chart',
+    'table',
+    'metric_grid',
+  ]);
+  const payload = nativeShapes
+    .filter((shape) => signatureRoles.has(safeText(shape?.role)))
+    .map((shape) => {
+      const bounds = shape?.bounds || {};
+      return {
+        role: safeText(shape?.role),
+        kind: safeText(shape?.kind),
+        x: Math.round((Number(bounds.left_in || 0) * 72) / 36),
+        y: Math.round((Number(bounds.top_in || 0) * 72) / 36),
+        w: Math.round((Number(bounds.width_in || 0) * 72) / 36),
+        h: Math.round((Number(bounds.height_in || 0) * 72) / 36),
+      };
+    })
+    .sort((left, right) => (
+      left.role.localeCompare(right.role)
+      || left.y - right.y
+      || left.x - right.x
+      || left.w - right.w
+      || left.h - right.h
+    ));
+  const digest = createHash('sha256').update(JSON.stringify(payload)).digest('hex').slice(0, 12);
+  const roleSummary = [...new Set(payload.map((item) => item.role))]
+    .sort()
+    .map((role) => `${role}:${payload.filter((item) => item.role === role).length}`)
+    .join('-') || 'empty';
+  return `native-composition:${digest}:${roleSummary}`;
+}
+
+function panelRole(layoutFamily) {
+  return {
+    cover_signal: 'signal_panel',
+    timeline_band: 'timeline_panel',
+    judgement_ladder: 'judgement_step',
+    ring_cross: 'axis_panel',
+    summary_peak: 'takeaway_panel',
+  }[layoutFamily] || 'compare_panel';
+}
+
+function panelGeometry(layoutFamily, panelCount, index) {
+  if (layoutFamily === 'cover_signal') {
+    return [
+      { left_in: 1.05, top_in: 3.0, width_in: 4.25, height_in: 2.45 },
+      { left_in: 5.7, top_in: 3.45, width_in: 4.25, height_in: 2.45 },
+      { left_in: 10.35, top_in: 3.0, width_in: 4.25, height_in: 2.45 },
+    ][index] || { left_in: 1.05, top_in: 3.0, width_in: 4.25, height_in: 2.45 };
+  }
+  if (layoutFamily === 'timeline_band') {
+    const gap = panelCount === 2 ? 0.86 : 0.58;
+    const width = panelCount === 2 ? 6.1 : panelCount === 3 ? 4.02 : 3.0;
+    return { left_in: 1.05 + (width + gap) * index, top_in: 4.35, width_in: width, height_in: 2.15 };
+  }
+  if (layoutFamily === 'judgement_ladder') {
+    return { left_in: index % 2 === 0 ? 8.1 : 9.0, top_in: 2.75 + index * 2.65, width_in: 5.55, height_in: 2.32 };
+  }
+  if (layoutFamily === 'ring_cross') {
+    const positions = [
+      { left_in: 6.0, top_in: 2.0, width_in: 4.0, height_in: 1.45 },
+      { left_in: 10.0, top_in: 4.7, width_in: 4.15, height_in: 1.45 },
+      { left_in: 6.0, top_in: 6.35, width_in: 4.0, height_in: 1.45 },
+      { left_in: 1.85, top_in: 4.7, width_in: 4.15, height_in: 1.45 },
+    ];
+    return positions[index] || positions[0];
+  }
+  if (layoutFamily === 'summary_peak') {
+    const width = panelCount === 1 ? 7.5 : 5.85;
+    return { left_in: 1.05 + (width + 0.72) * index, top_in: 4.95, width_in: width, height_in: 1.78 };
+  }
+  const gap = panelCount === 2 ? 0.8 : 0.54;
+  const width = panelCount === 2 ? 6.1 : panelCount === 3 ? 3.9 : 2.85;
+  return { left_in: 1.05 + (width + gap) * index, top_in: 3.36, width_in: width, height_in: 2.45 };
+}
+
+function titleBounds(layoutFamily) {
+  if (layoutFamily === 'summary_peak') return { left_in: 0.95, top_in: 0.58, width_in: 8.6, height_in: 2.05 };
+  if (layoutFamily === 'judgement_ladder') return { left_in: 0.95, top_in: 0.56, width_in: 7.7, height_in: 2.05 };
+  return { left_in: 0.95, top_in: 0.56, width_in: 12.95, height_in: 1.42 };
+}
+
+function coreBounds(layoutFamily) {
+  if (layoutFamily === 'judgement_ladder') return { left_in: 1.0, top_in: 2.82, width_in: 5.65, height_in: 1.9 };
+  if (layoutFamily === 'ring_cross') return { left_in: 5.2, top_in: 3.7, width_in: 5.6, height_in: 0.86 };
+  if (layoutFamily === 'summary_peak') return { left_in: 9.85, top_in: 0.72, width_in: 4.9, height_in: 1.55 };
+  return { left_in: 1.0, top_in: 2.08, width_in: 11.9, height_in: 0.98 };
+}
+
 function nativeShapePlanForSlide(slide, index) {
   const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
   const title = safeText(slide?.title, `Slide ${index + 1}`);
@@ -36,24 +198,10 @@ function nativeShapePlanForSlide(slide, index) {
   const slotCount = Math.max(2, Math.min(points.length, 4));
   const layoutFamily = safeText(slide?.visual_presentation?.layout_family || slide?.layout_family, 'multi_zone_compare');
   const panelCount = layoutFamily === 'summary_peak' ? Math.max(1, slotCount - 1) : slotCount;
-  const panelWidth = panelCount === 2 ? 6.1 : panelCount === 3 ? 3.9 : 2.85;
-  const gap = panelCount === 2 ? 0.7 : 0.45;
-  const left = panelCount === 2 ? 1.15 : 1.0;
-  const panelTop = 3.45;
-  const panelRole = layoutFamily === 'cover_signal'
-    ? 'signal_panel'
-    : layoutFamily === 'timeline_band'
-      ? 'timeline_panel'
-      : layoutFamily === 'judgement_ladder'
-        ? 'judgement_step'
-        : layoutFamily === 'ring_cross'
-          ? 'axis_panel'
-          : layoutFamily === 'summary_peak'
-            ? 'takeaway_panel'
-            : 'compare_panel';
+  const role = panelRole(layoutFamily);
   const titleFontSize = layoutFamily === 'cover_signal' ? 44 : 38;
-  const titleHeight = 1.28;
-  const coreTop = 1.95;
+  const titleRect = titleBounds(layoutFamily);
+  const coreRect = coreBounds(layoutFamily);
   const shapes = [
     {
       shape_id: `${slideId}-bg-accent`,
@@ -69,7 +217,7 @@ function nativeShapePlanForSlide(slide, index) {
       kind: 'text_box',
       role: 'title',
       editable_text: title,
-      bounds: { left_in: 0.9, top_in: 0.55, width_in: 13.55, height_in: titleHeight },
+      bounds: titleRect,
       font_size: titleFontSize,
       color: '#171C24',
       fill: 'none',
@@ -81,20 +229,20 @@ function nativeShapePlanForSlide(slide, index) {
       kind: 'text_box',
       role: 'core_sentence',
       editable_text: safeText(slide?.core_sentence, points[0]),
-      bounds: { left_in: 0.95, top_in: coreTop, width_in: 12.8, height_in: 0.72 },
+      bounds: coreRect,
       font_size: 20,
       color: '#5B6570',
       fill: 'none',
       line: 'none',
     },
     {
-      shape_id: `${slideId}-decor-line`,
-      kind: 'line',
-      role: 'accent_rule',
+      shape_id: `${slideId}-side-anchor`,
+      kind: 'rect',
+      role: 'accent_anchor',
       quality_role: 'decorative',
-      bounds: { left_in: 0.95, top_in: 2.85, width_in: 13.2, height_in: 0.02 },
-      line: '#B94624',
-      line_width: 1.4,
+      bounds: { left_in: 0.48, top_in: 0.72, width_in: 0.1, height_in: 2.6 },
+      fill: '#B94624',
+      line: 'none',
     },
     {
       shape_id: `${slideId}-decor-dot`,
@@ -119,34 +267,38 @@ function nativeShapePlanForSlide(slide, index) {
     },
   ];
   for (let pointIndex = 0; pointIndex < panelCount; pointIndex += 1) {
-    const x = left + (panelWidth + gap) * pointIndex;
+    const panelBounds = panelGeometry(layoutFamily, panelCount, pointIndex);
     const pointNumber = pointIndex + 1;
     shapes.push({
       shape_id: `${slideId}-slot-${pointNumber}-panel`,
       kind: 'rounded_rect',
-      role: panelRole,
+      role,
       quality_role: 'content',
-      bounds: { left_in: x, top_in: panelTop, width_in: panelWidth, height_in: 2.55 },
+      bounds: panelBounds,
       fill: '#EFE6D6',
       line: '#D8C8B2',
     });
   }
   for (let pointIndex = 0; pointIndex < slotCount; pointIndex += 1) {
     const overflowSummaryText = layoutFamily === 'summary_peak' && pointIndex >= panelCount;
-    const x = overflowSummaryText
-      ? 1.15
-      : left + (panelWidth + gap) * Math.min(pointIndex, panelCount - 1);
+    const panelBounds = overflowSummaryText
+      ? { left_in: 8.0, top_in: 7.58, width_in: 6.2, height_in: 1.08 }
+      : panelGeometry(layoutFamily, Math.max(panelCount, 1), Math.min(pointIndex, panelCount - 1));
     const pointNumber = pointIndex + 1;
-    const textTop = overflowSummaryText ? 6.35 : panelTop + 0.78;
-    const indexTop = overflowSummaryText ? 6.35 : panelTop + 0.22;
-    const textLeft = overflowSummaryText ? x + 1.05 : x + 0.24;
-    const textWidth = overflowSummaryText ? 12.0 : panelWidth - 0.48;
+    const textTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + (layoutFamily === 'ring_cross' ? 0.55 : 0.78);
+    const indexTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + 0.16;
+    const textLeft = overflowSummaryText
+      ? panelBounds.left_in + 1.0
+      : panelBounds.left_in + (layoutFamily === 'ring_cross' ? 0.9 : 0.24);
+    const textWidth = overflowSummaryText
+      ? panelBounds.width_in - 1.2
+      : panelBounds.width_in - (layoutFamily === 'ring_cross' ? 1.15 : 0.48);
     shapes.push({
       shape_id: `${slideId}-slot-${pointNumber}-index`,
       kind: 'text_box',
       role: 'point_index',
       editable_text: `${String(pointNumber).padStart(2, '0')}`,
-      bounds: { left_in: x + 0.22, top_in: indexTop, width_in: 0.62, height_in: 0.46 },
+      bounds: { left_in: panelBounds.left_in + 0.22, top_in: indexTop, width_in: 0.62, height_in: 0.46 },
       font_size: 16,
       color: '#B94624',
       fill: 'none',
@@ -158,7 +310,12 @@ function nativeShapePlanForSlide(slide, index) {
       kind: 'text_box',
       role: 'point_text',
       editable_text: pointText(points[pointIndex], `Concrete audience point ${pointNumber}`),
-      bounds: { left_in: textLeft, top_in: textTop, width_in: textWidth, height_in: overflowSummaryText ? 0.78 : 1.58 },
+      bounds: {
+        left_in: textLeft,
+        top_in: textTop,
+        width_in: textWidth,
+        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 1.0 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
+      },
       font_size: 18,
       color: '#171C24',
       fill: 'none',
@@ -201,6 +358,7 @@ export function buildMockPptNativeShapePlan(meta) {
       consumed_feedback_count: repairFeedback.length,
       slides: slides.map((slide, index) => {
         const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
+        const nativeShapes = nativeShapePlanForSlide(slide, index);
         return {
           slide_id: slideId,
           title: safeText(slide?.title, `Slide ${index + 1}`),
@@ -208,7 +366,13 @@ export function buildMockPptNativeShapePlan(meta) {
           core_sentence: safeText(slide?.core_sentence),
           page_core_content: safeArray(slide?.page_core_content),
           evidence_and_sources: safeArray(slide?.evidence_and_sources),
-          native_shapes: nativeShapePlanForSlide(slide, index),
+          layout_intent: (() => {
+            return {
+              ...layoutIntentForSlide(slide, index, slidePoints(slide).length),
+              composition_signature: stableCompositionSignature(nativeShapes),
+            };
+          })(),
+          native_shapes: nativeShapes,
           redcube_svg_ir_intent: {
             root_viewbox: '0 0 1152 648',
             editable_text_required: true,

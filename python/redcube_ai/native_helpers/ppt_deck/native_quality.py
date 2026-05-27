@@ -23,6 +23,7 @@ MAX_GRID_BALANCE_RATIO = 1.78
 MIN_POINT_TEXT_CONTENT_CHARS = 12
 MIN_TABLE_BODY_FONT_PT = 11.0
 MAX_TABLE_CELL_BLANK_RATIO = 0.38
+COMPOSITION_BUCKET_PX = 36.0
 OPERATOR_LANGUAGE_FRAGMENTS = [
     '汇报讨论用途',
     '客观专业版',
@@ -429,6 +430,76 @@ def grid_balance_audit(native_shapes: list[dict]) -> dict:
     }
 
 
+def bucket_px(value: float) -> int:
+    return int(round(float(value or 0.0) / COMPOSITION_BUCKET_PX))
+
+
+def composition_signature(native_shapes: list[dict]) -> str:
+    signature_shapes = []
+    signature_roles = {
+        'title',
+        'core_sentence',
+        'compare_panel',
+        'signal_panel',
+        'timeline_panel',
+        'judgement_step',
+        'axis_panel',
+        'takeaway_panel',
+        'structured_note_panel',
+        'chart',
+        'table',
+        'metric_grid',
+    }
+    for shape in native_shapes:
+        role = safe_text(shape.get('role'))
+        if role not in signature_roles:
+            continue
+        rect = shape.get('bounds') or {}
+        signature_shapes.append({
+            'role': role,
+            'kind': safe_text(shape.get('kind')),
+            'x': bucket_px(float(rect.get('left') or 0.0)),
+            'y': bucket_px(float(rect.get('top') or 0.0)),
+            'w': bucket_px(float(rect.get('width') or 0.0)),
+            'h': bucket_px(float(rect.get('height') or 0.0)),
+        })
+    signature_shapes.sort(key=lambda item: (item['role'], item['y'], item['x'], item['w'], item['h']))
+    payload = json.dumps(signature_shapes, ensure_ascii=False, sort_keys=True)
+    digest = hashlib.sha256(payload.encode('utf-8')).hexdigest()[:12]
+    role_summary = '-'.join(
+        f'{role}:{sum(1 for item in signature_shapes if item["role"] == role)}'
+        for role in sorted({item['role'] for item in signature_shapes})
+    )
+    return f'native-composition:{digest}:{role_summary or "empty"}'
+
+
+def title_underline_failures(native_shapes: list[dict]) -> list[dict]:
+    failures = []
+    for shape in native_shapes:
+        role = safe_text(shape.get('role'))
+        kind = safe_text(shape.get('kind'))
+        rect = shape.get('bounds') or {}
+        width = float(rect.get('width') or 0.0)
+        height = float(rect.get('height') or 0.0)
+        top = float(rect.get('top') or 0.0)
+        if role != 'accent_rule' and not (
+            kind == 'line'
+            and width >= CANVAS_PX[0] * 0.45
+            and height <= 4.0
+            and TITLE_SAFE_ZONE_BOTTOM <= top <= TITLE_SAFE_ZONE_BOTTOM + 120.0
+        ):
+            continue
+        failures.append({
+            'shape_id': shape.get('shape_id'),
+            'role': role,
+            'kind': kind,
+            'top': round(top, 2),
+            'width': round(width, 2),
+            'reason': 'title_underline_motif_forbidden',
+        })
+    return failures
+
+
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
     decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
@@ -523,6 +594,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     content_depth = content_depth_audit(content_shapes)
     grid_audit = grid_balance_audit(content_shapes)
     table_failures = table_legibility_failures(table_metrics)
+    underline_failures = title_underline_failures(native_shapes)
+    composition = composition_signature(native_shapes)
     coordinate_payload = [
         {
             'shape_id': shape.get('shape_id'),
@@ -572,6 +645,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'audience_label_readability_ok': len(label_failures) == 0,
         'content_depth_ok': content_depth['content_depth_ok'],
         'grid_balance_ok': grid_audit['grid_balance_ok'],
+        'title_underline_absent_ok': len(underline_failures) == 0,
         'external_audience_language_ok': len(language_fragments) == 0,
         'title_safe_zone_clear': len(title_zone_failures) == 0,
         'table_legibility_ok': len(table_failures) == 0,
@@ -608,6 +682,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('native_content_depth_failed')
     if not checks['grid_balance_ok']:
         issues.append('native_grid_balance_failed')
+    if not checks['title_underline_absent_ok']:
+        issues.append('title_underline_motif_detected')
     if not checks['external_audience_language_ok']:
         issues.append('operator_language_leak_detected')
     if not checks['title_safe_zone_clear']:
@@ -652,6 +728,9 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'grid_balance_ok': grid_audit['grid_balance_ok'],
             'grid_balance_ratio': grid_audit['grid_balance_ratio'],
             'grid_balance_failures': grid_audit['grid_balance_failures'],
+            'composition_signature': composition,
+            'title_underline_absent_ok': len(underline_failures) == 0,
+            'title_underline_failures': underline_failures,
             'overlap_pairs': len(overlap_pairs),
             'overlaps': overlap_pairs,
             'clipped_nodes': clipped_nodes,

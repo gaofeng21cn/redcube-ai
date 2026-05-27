@@ -114,6 +114,8 @@ function assertQualityContractShape(contract) {
     'audience_label_readability_ok',
     'content_depth_ok',
     'grid_balance_ok',
+    'composition_signature',
+    'title_underline_absent_ok',
     'chart_metrics',
     'table_metrics',
     'metric_grid_metrics',
@@ -127,6 +129,11 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.editable_shape_plan_contract.required, true);
   assert.equal(contract.editable_shape_plan_contract.creative_owner, 'llm_agent');
   assert.equal(contract.editable_shape_plan_contract.python_helper_role, 'execute_validate_export_only');
+  assert.equal(contract.editable_shape_plan_contract.template_substitution_allowed, false);
+  assert.equal(contract.editable_shape_plan_contract.layout_intent_required, true);
+  assert.equal(contract.editable_shape_plan_contract.composition_signature_required, true);
+  assert.equal(contract.editable_shape_plan_contract.title_underline_motif_allowed, false);
+  assert.equal(contract.editable_shape_plan_contract.concrete_layout_variant_repetition_limit, 2);
   assertOfficecliMaterializerPolicy(contract.officecli_materializer_policy);
   assert.equal(contract.officecli_materializer_policy.officecli_skill_can_replace_rca_workflow, false);
   assert.equal(contract.officecli_materializer_policy.officecli_validate_can_replace_true_render_proof, false);
@@ -260,6 +267,10 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.shape_manifest_ref.required_metric_refs.includes('shape_manifest#/slides/*/preview_screenshot_sha256'), true);
       assert.equal(existsSync(readModel.shape_manifest_ref.file), true);
       assert.equal(existsSync(readModel.editable_shape_plan_ref.file), true);
+      assert.equal(readModel.editable_shape_plan_ref.layout_intent_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.composition_signature_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.title_underline_motif_allowed, false);
+      assert.equal(readModel.editable_shape_plan_ref.concrete_layout_variant_repetition_limit, 2);
       assert.equal(readModel.repair_policy.blocked_page_only, true);
       assert.equal(readModel.repair_policy.target_source, 'screenshot_review.blocked_slide_ids');
       assert.equal(readModel.quality_gate_refs.includes('agent/quality_gates/screenshot_review.md'), true);

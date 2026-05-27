@@ -6,6 +6,10 @@ Treat operator-language leakage, title-safe-zone conflicts, table text below 11p
 
 When screenshot review reports `native_slot_fill_failed`, `native_content_depth_failed`, `block_content_overflow_detected`, `audience_label_below_readability_floor`, `native_grid_balance_failed`, or `anti_template_failed`, repair the actual native page structure:
 
+- Preserve the AI-first boundary: update `layout_intent` and `native_shapes`; do not rely on Python helper templates, notes, hidden text, or officecli defaults for design repair.
+- When feedback mentions repeated layout, repeated composition, or `composition_signature`, change the concrete geometry and write a new `layout_intent.composition_signature`. A renamed variant with the same top-title/core/card-row skeleton is still a failed repair.
+- Remove decorative title-underlines and long horizontal rules under headings. Use a different motif such as side rail, corner anchor, connector path, map axis, chart/table/metric grid, or visual band.
+- Re-apply the spec lock: title >= 36pt, body >= 18pt, index labels >= 16pt, table body >= 11pt, sufficient margins/gaps, and no content outside bounds.
 - Match the number of visual slots to the number of real points; do not keep an empty 4-slot template for 2 or 3 points.
 - Rewrite thin labels into complete audience-facing sentences with enough explanation to stand alone on a projected slide.
 - Do not replace a complete point with a route or stage label such as `source readiness`, `storyline`, `detailed outline`, `slide blueprint`, `visual direction`, `screenshot review`, or `export`. Those labels may appear only inside a complete audience-facing sentence that explains the action and proof.

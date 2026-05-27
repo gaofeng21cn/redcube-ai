@@ -80,6 +80,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     creative_owner: 'llm_agent',
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
+    layout_intent_required: true,
+    composition_signature_required: true,
+    title_underline_motif_allowed: false,
+    concrete_layout_variant_repetition_limit: 2,
     python_helper_role: 'execute_validate_export_only',
     template_substitution_allowed: false,
     preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -250,6 +254,26 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           helper_template_layout_allowed: false,
           officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
         },
+        design_system: {
+          borrowed_principles: ['spec_lock', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
+          owner: 'llm_agent',
+          grid: {
+            canvas_in: { width: 16, height: 9 },
+            edge_margin_in_min: 0.6,
+            inter_block_gap_in_min: 0.32,
+          },
+          typography_floor: {
+            title_pt_min: 36,
+            body_pt_min: 18,
+            point_index_pt_min: 16,
+            table_body_pt_min: 11,
+          },
+          forbidden_motifs: ['decorative_title_underline', 'empty_four_card_template', 'consecutive_same_composition'],
+          layout_rhythm: {
+            repeated_concrete_composition_limit: 2,
+            required_distinct_composition_share: 0.75,
+          },
+        },
         slides: [
           {
             slide_id: 'S01',
@@ -258,6 +282,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
             layout_family: '<visual layout family label for reporting only>',
             core_sentence: '<audience-facing core sentence>',
             page_core_content: ['<editable text>'],
+            layout_intent: {
+              rhetorical_role: '<cover | comparison | timeline | gate | system_map | synthesis>',
+              composition_signature: '<stable human-readable signature from concrete geometry>',
+              visual_weight: '<left_heavy | right_heavy | centered | diagonal | radial | bottom_band>',
+              primary_grid: '<2_column | 3_card | timeline_rail | gate_ladder | radial_axes | hero_callout>',
+              negative_space_strategy: '<where the breathing space is intentionally left>',
+              non_text_visual: '<shape/chart/table/connector/metric grid used as first-glance signal>',
+              forbidden_template_reuse_checked: true,
+            },
             native_shapes: [
               {
                 shape_id: 'S01-title',
@@ -274,7 +307,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
             redcube_svg_ir_intent: {
               root_viewbox: '0 0 1152 648',
               editable_text_required: true,
-              required_intents: ['text:title', 'text:point_text', 'rect:content_panel', 'group:content_point'],
+              required_intents: [
+                'text:title',
+                'text:point_text',
+                'rect:content_panel',
+                'group:content_point',
+                'layout_intent:composition_signature',
+              ],
             },
           },
         ],
@@ -292,7 +331,14 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       .map((slide, index) => {
         const slideId = safeText(slide?.slide_id, `slide-${index + 1}`);
         const shapes = safeArray(slide?.native_shapes);
+        const layoutIntent = slide?.layout_intent && typeof slide.layout_intent === 'object'
+          ? slide.layout_intent
+          : {};
         const missingShapePlan = shapes.length === 0;
+        const missingLayoutIntent = !safeText(layoutIntent?.composition_signature)
+          || !safeText(layoutIntent?.primary_grid)
+          || !safeText(layoutIntent?.non_text_visual)
+          || layoutIntent?.forbidden_template_reuse_checked !== true;
         const invalidShapes = shapes
           .map((shape, shapeIndex) => {
             const shapeId = safeText(shape?.shape_id, `${slideId}-shape-${shapeIndex + 1}`);
@@ -312,9 +358,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
             } : null;
           })
           .filter(Boolean);
-        return (missingShapePlan || invalidShapes.length > 0) ? {
+        return (missingShapePlan || missingLayoutIntent || invalidShapes.length > 0) ? {
           slide_id: slideId,
           missing_native_shapes: missingShapePlan,
+          missing_layout_intent: missingLayoutIntent,
           invalid_shapes: invalidShapes,
         } : null;
       })
@@ -500,6 +547,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       ['filled_slot_count', metrics.filled_slot_count],
     ].filter(([, value]) => finiteNumberOrNull(value) === null);
     if (missing.length > 0) return ['native_quality_metrics_missing'];
+    if (!safeText(metrics.composition_signature)) return ['native_quality_metrics_missing'];
     if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
     if (typeof metrics.body_text_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.typography_hierarchy_ok !== 'boolean') return ['native_quality_metrics_missing'];
@@ -507,11 +555,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (typeof metrics.audience_label_readability_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.content_depth_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof metrics.grid_balance_ok !== 'boolean') return ['native_quality_metrics_missing'];
+    if (typeof metrics.title_underline_absent_ok !== 'boolean') return ['native_quality_metrics_missing'];
     if (typeof manifestSlide.checks?.title_core_overlap_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.slot_fill_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.audience_label_readability_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.content_depth_ok !== 'boolean') return ['native_quality_checks_missing'];
     if (typeof manifestSlide.checks?.grid_balance_ok !== 'boolean') return ['native_quality_checks_missing'];
+    if (typeof manifestSlide.checks?.title_underline_absent_ok !== 'boolean') return ['native_quality_checks_missing'];
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
@@ -521,10 +571,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
       return text.includes('table');
     });
-    if (hasChartShape && (!metrics.chart_metrics || typeof metrics.chart_metrics !== 'object')) {
+    if (hasChartShape && (!Array.isArray(metrics.chart_metrics) || metrics.chart_metrics.length === 0)) {
       return ['native_chart_metrics_missing'];
     }
-    if (hasTableShape && (!metrics.table_metrics || typeof metrics.table_metrics !== 'object')) {
+    if (hasTableShape && (!Array.isArray(metrics.table_metrics) || metrics.table_metrics.length === 0)) {
       return ['native_table_metrics_missing'];
     }
     if (hasTableShape && finiteNumberOrNull(metrics.table_min_font_pt) === null) {
@@ -624,6 +674,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           title_core_overlap_count: finiteNumberOrNull(manifestSlide?.metrics?.title_core_overlap_count),
           title_core_overlap_failures: safeArray(manifestSlide?.metrics?.title_core_overlap_failures),
           layout_variant: safeText(manifestSlide?.metrics?.layout_variant),
+          composition_signature: safeText(manifestSlide?.metrics?.composition_signature),
           expected_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.expected_slot_count),
           filled_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.filled_slot_count),
           slot_fill_ok: manifestSlide?.metrics?.slot_fill_ok === true,
@@ -637,6 +688,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           grid_balance_ok: manifestSlide?.metrics?.grid_balance_ok === true,
           grid_balance_ratio: finiteNumberOrNull(manifestSlide?.metrics?.grid_balance_ratio),
           grid_balance_failures: safeArray(manifestSlide?.metrics?.grid_balance_failures),
+          title_underline_absent_ok: manifestSlide?.metrics?.title_underline_absent_ok === true,
+          title_underline_failures: safeArray(manifestSlide?.metrics?.title_underline_failures),
           table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
           card_blank_ratio: finiteNumberOrNull(manifestSlide?.metrics?.card_blank_ratio),
           table_metrics: manifestSlide?.metrics?.table_metrics || [],
@@ -676,6 +729,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       title: safeText(slide?.title),
       layout_family: safeText(slide?.layout_family),
       layout_variant: safeText(slide?.metrics?.layout_variant),
+      composition_signature: safeText(slide?.metrics?.composition_signature),
       expected_slot_count: Number(slide?.metrics?.expected_slot_count || 0),
       filled_slot_count: Number(slide?.metrics?.filled_slot_count || 0),
       shape_count: Number(slide?.shape_count || 0),

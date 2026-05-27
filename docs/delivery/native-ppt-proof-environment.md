@@ -26,6 +26,22 @@ The adopted boundary is a materializer / QA discipline:
 - `officecli validate` and `officecli view issues` can catch writer or text-box defects, but they cannot substitute for LibreOffice headless true render proof or RCA screenshot review.
 - Native CJK rendering should prefer `Noto Sans CJK SC` when an officecli-backed adapter materializes or validates Chinese PPTX output.
 
+## Design Discipline
+
+Native PPTX adopts the useful design discipline from `ppt-master` and `officecli-pptx` without adopting either as the RCA authoring owner. The AI-authored `editable_shape_plan` must hold the concrete slide design: coordinates, shape roles, text, `layout_intent`, `composition_signature`, primary grid, non-text visual signal, and a checked anti-template-reuse statement.
+
+The native helper does not choose templates or redesign pages. It validates and materializes the plan, runs officecli writer / QA gates, renders the PPTX through LibreOffice / Poppler, and emits the shape manifest consumed by RCA review gates.
+
+The hard design floor is:
+
+- explicit layout intent and composition signature for every slide;
+- no decorative title underline motif;
+- no empty four-card template posing as design;
+- no three-slide repeated concrete composition;
+- distinct concrete composition for at least 75% of slides in normal decks;
+- readable typography, filled slots, content depth, grid balance, and non-text visual metrics in the shape manifest;
+- chart, table, and metric-grid shapes require non-empty matching metrics, otherwise screenshot review fails closed.
+
 ## Quality Non-Regression Surface
 
 Native editable PPTX exposes a refs-only quality non-regression surface for OPL Agent Lab at `contracts/runtime-program/ppt-native-pptx-quality-nonregression.json`.

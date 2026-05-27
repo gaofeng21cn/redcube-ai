@@ -98,6 +98,7 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     const weakPages = [];
     const findings = [];
     const layoutRuns = [];
+    const compositionBuckets = new Map();
     let currentRun = [];
     for (const slide of slides) {
       if (Number(slide.shape_count || 0) < 3 || Number(slide.text_box_count || 0) < 2) {
@@ -107,6 +108,14 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
       if (!safeText(slide.preview_screenshot_file) || !(mainExistsSync || existsSync)(slide.preview_screenshot_file)) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native PPT preview screenshot missing`);
+      }
+      const compositionSignature = safeText(slide.composition_signature);
+      if (!compositionSignature) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native composition signature missing`);
+      } else {
+        const existing = compositionBuckets.get(compositionSignature) || [];
+        compositionBuckets.set(compositionSignature, [...existing, slide]);
       }
       const layoutVariant = safeText(slide.layout_variant || slide.layout_family);
       const isRepetitiveCandidate = !['cover_signal', 'summary_peak'].includes(layoutVariant);
@@ -124,10 +133,22 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
       const variant = safeText(longestRun[0]?.layout_variant || longestRun[0]?.layout_family, 'unknown');
       findings.push(`native homogeneous layout run (${variant}): ${longestRun.map((slide) => safeText(slide.slide_id)).join(',')}`);
     }
+    const repeatedCompositions = [...compositionBuckets.entries()]
+      .map(([signature, members]) => ({ signature, members }))
+      .filter((entry) => entry.members.length >= 3);
+    for (const repeated of repeatedCompositions) {
+      for (const slide of repeated.members) weakPages.push(slide.slide_id);
+      findings.push(
+        `native repeated composition signature (${repeated.signature}): ${repeated.members.map((slide) => safeText(slide.slide_id)).join(',')}`,
+      );
+    }
     return {
       antiTemplateOk: findings.length === 0,
       weakPages: [...new Set(weakPages)].filter(Boolean),
-      homogeneousLayoutRisk: longestRun.length >= 3 ? Math.min(0.95, 0.42 + (longestRun.length / Math.max(slides.length, 1))) : 0.12,
+      homogeneousLayoutRisk: Math.max(
+        longestRun.length >= 3 ? Math.min(0.95, 0.42 + (longestRun.length / Math.max(slides.length, 1))) : 0.12,
+        repeatedCompositions.length > 0 ? 0.9 : 0.12,
+      ),
       findings,
     };
   }

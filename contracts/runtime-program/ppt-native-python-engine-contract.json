@@ -126,6 +126,8 @@
       "audience_label_readability_ok",
       "content_depth_ok",
       "grid_balance_ok",
+      "title_underline_absent_ok",
+      "composition_signature",
       "occupied_ratio",
       "edge_clearance",
       "overlap_pairs",
@@ -179,6 +181,10 @@
     "helper_role": "execute_validate_export_only",
     "template_substitution_allowed": false,
     "editable_shape_plan_required": true,
-    "editable_shape_manifest_required": true
+    "editable_shape_manifest_required": true,
+    "layout_intent_required": true,
+    "composition_signature_required": true,
+    "title_underline_motif_allowed": false,
+    "concrete_layout_variant_repetition_limit": 2
   }
 }

@@ -298,6 +298,10 @@ function buildNativePayload(args) {
         || slide?.layout_family
         || 'multi_zone_compare',
     );
+    const compositionSignature = String(
+      planSlide?.layout_intent?.composition_signature
+        || `${layoutFamily}__mock_native_composition__page_${index + 1}`,
+    );
     const screenshotFile = path.join(previewDir, `${slideId}.png`);
     writeBinary(screenshotFile, PNG_1X1);
     const bounds = [
@@ -384,6 +388,7 @@ function buildNativePayload(args) {
         audience_label_readability_ok: true,
         content_depth_ok: true,
         grid_balance_ok: true,
+        title_underline_absent_ok: true,
       },
       metrics: {
         title_font_size: layoutFamily === 'cover_signal' ? 56 : 44,
@@ -409,9 +414,16 @@ function buildNativePayload(args) {
         grid_balance_ok: true,
         grid_balance_ratio: 1,
         grid_balance_failures: [],
+        composition_signature: compositionSignature,
+        title_underline_absent_ok: true,
+        title_underline_failures: [],
         text_char_count: 72,
         block_count: 3,
+        decorative_shape_count: 2,
         shape_count: 5,
+        shape_kind_count: 3,
+        role_count: 5,
+        layout_richness_score: 0.72,
         overlap_pairs: 0,
         overlaps: [],
         clipped_nodes: 0,
@@ -423,6 +435,21 @@ function buildNativePayload(args) {
         title_safe_zone_clearance_ok: true,
         table_min_font_pt: 11,
         card_blank_ratio: 0.24,
+        chart_bounds: [],
+        table_bounds: [],
+        metric_grid_bounds: [],
+        chart_metrics: [],
+        table_metrics: [],
+        metric_grid_metrics: [],
+        axis_label_count: 0,
+        legend_label_count: 0,
+        table_cell_fit_ok: true,
+        table_cell_fit_failures: [],
+        numeric_label_overflow_count: 0,
+        numeric_label_overflows: [],
+        coordinate_determinism_hash: createHash('sha256')
+          .update(JSON.stringify({ slideId, layoutFamily, compositionSignature }))
+          .digest('hex'),
         bounds,
       },
       redcube_svg_ir_file: path.join(previewDir, `${slideId}.svg`),
@@ -487,6 +514,8 @@ function buildNativePayload(args) {
         'audience_label_readability_ok',
         'content_depth_ok',
         'grid_balance_ok',
+        'composition_signature',
+        'title_underline_absent_ok',
         'occupied_ratio',
         'edge_clearance',
         'overlap_pairs',

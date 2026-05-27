@@ -553,6 +553,8 @@ def main() -> None:
                 'audience_label_readability_ok',
                 'content_depth_ok',
                 'grid_balance_ok',
+                'composition_signature',
+                'title_underline_absent_ok',
                 'occupied_ratio',
                 'edge_clearance',
                 'overlap_pairs',

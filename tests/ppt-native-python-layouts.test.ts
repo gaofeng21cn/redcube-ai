@@ -188,6 +188,57 @@ function slotGeometry(slotCount, index) {
   };
 }
 
+function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
+  const signatureRoles = new Set([
+    'title',
+    'core_sentence',
+    'compare_panel',
+    'signal_panel',
+    'timeline_panel',
+    'judgement_step',
+    'axis_panel',
+    'takeaway_panel',
+    'structured_note_panel',
+    'chart',
+    'table',
+    'metric_grid',
+  ]);
+  const signaturePayload = shapes
+    .filter((shape) => signatureRoles.has(String(shape.role || '')))
+    .map((shape) => {
+      const bounds = shape.bounds || {};
+      return {
+        role: shape.role,
+        kind: shape.kind,
+        x: Math.round((Number(bounds.left_in || 0) * 72) / 36),
+        y: Math.round((Number(bounds.top_in || 0) * 72) / 36),
+        w: Math.round((Number(bounds.width_in || 0) * 72) / 36),
+        h: Math.round((Number(bounds.height_in || 0) * 72) / 36),
+      };
+    })
+    .sort((left, right) => (
+      String(left.role).localeCompare(String(right.role))
+      || left.y - right.y
+      || left.x - right.x
+      || left.w - right.w
+      || left.h - right.h
+    ));
+  const digest = createHash('sha256').update(JSON.stringify(signaturePayload)).digest('hex').slice(0, 12);
+  const roleSummary = [...new Set(signaturePayload.map((item) => item.role))]
+    .sort()
+    .map((role) => `${role}:${signaturePayload.filter((item) => item.role === role).length}`)
+    .join('-') || 'empty';
+  return {
+    rhetorical_role: layoutFamily === 'summary_peak' ? 'synthesis' : layoutFamily,
+    composition_signature: `native-composition:${digest}:${roleSummary}`,
+    primary_grid: `${layoutFamily}_${slotCount}_slot_grid`,
+    visual_weight: layoutFamily === 'judgement_ladder' ? 'right_heavy' : 'distributed',
+    negative_space_strategy: `intentional breathing space for ${slideId}`,
+    non_text_visual: `${layoutFamily} editable shape system`,
+    forbidden_template_reuse_checked: true,
+  };
+}
+
 function createAiSlide({
   slideId = 'S01',
   title = 'Native PPTX materializer proof',
@@ -218,7 +269,7 @@ function createAiSlide({
       kind: 'text_box',
       role: 'title',
       editable_text: title,
-      bounds: { left_in: 0.9, top_in: 0.54, width_in: 12.7, height_in: 0.76 },
+      bounds: { left_in: 0.9, top_in: 0.54, width_in: 12.7, height_in: layoutFamily === 'cover_signal' ? 1.12 : 1.02 },
       font_size: layoutFamily === 'cover_signal' ? 56 : 44,
       color: '#171C24',
       fill: 'none',
@@ -230,20 +281,20 @@ function createAiSlide({
       kind: 'text_box',
       role: 'core_sentence',
       editable_text: core,
-      bounds: { left_in: 0.95, top_in: 1.48, width_in: 12.3, height_in: 0.52 },
+      bounds: { left_in: 0.95, top_in: 1.78, width_in: 12.3, height_in: 0.62 },
       font_size: 20,
       color: '#5B6570',
       fill: 'none',
       line: 'none',
     },
     {
-      shape_id: `${slideId}-rule`,
-      kind: 'line',
-      role: 'accent_rule',
+      shape_id: `${slideId}-side-anchor`,
+      kind: 'rect',
+      role: 'accent_anchor',
       quality_role: 'decorative',
-      bounds: { left_in: 0.95, top_in: 2.28, width_in: 13.2, height_in: 0.02 },
-      line: '#B94624',
-      line_width: 1.2,
+      bounds: { left_in: 0.52, top_in: 0.72, width_in: 0.1, height_in: 2.3 },
+      fill: '#B94624',
+      line: 'none',
     },
     {
       shape_id: `${slideId}-dot`,
@@ -311,7 +362,7 @@ function createAiSlide({
         left_in: base.left_in + (overflowSummaryText ? 1.05 : 0.28),
         top_in: base.top_in + (overflowSummaryText ? 0.02 : 0.82),
         width_in: base.width_in - (overflowSummaryText ? 1.4 : 0.56),
-        height_in: overflowSummaryText ? 0.5 : 1.24,
+        height_in: overflowSummaryText ? 0.62 : 1.24,
       },
       font_size: pointFontSize,
       color: '#171C24',
@@ -326,6 +377,7 @@ function createAiSlide({
     layout_family: layoutFamily,
     core_sentence: core,
     page_core_content: primaryPoints,
+    layout_intent: layoutIntentForSlide({ slideId, layoutFamily, slotCount: desiredSlots, shapes }),
     native_shapes: shapes,
   };
 }
@@ -383,13 +435,26 @@ function buildRenderProvenance({ result, rendererKind, fixtureId }) {
   };
 }
 
+function repeatedCompositionSignatures(slides) {
+  return slides
+    .map((slide) => slide.metrics?.composition_signature)
+    .filter(Boolean)
+    .filter((signature, index, all) => all.indexOf(signature) !== index);
+}
+
 function assertMaterializedQuality({ fixture, suite, result, previewMetrics = [] }) {
   const slides = result.slides;
   const layoutFamilies = slides.map((slide) => slide.layout_family);
+  const compositionSignatures = slides
+    .map((slide) => slide.metrics?.composition_signature)
+    .filter(Boolean);
   assert.equal(slides.length, suite.expected_page_count);
   assert.equal(result.pptx_slides.length, suite.expected_page_count);
   assert.deepEqual(layoutFamilies, suite.expected_layout_families);
   assert.equal(new Set(layoutFamilies).size >= fixture.suite_defaults.min_layout_family_count, true);
+  assert.equal(compositionSignatures.length, slides.length);
+  assert.equal(new Set(compositionSignatures).size >= Math.ceil(slides.length * 0.75), true);
+  assert.deepEqual(repeatedCompositionSignatures(slides), []);
   assert.equal(slides.every((slide) => slide.layout_writer === 'officecli_pptx_materializer'), true);
   assert.equal(slides.every((slide) => slide.ai_first_spatial_plan.helper_template_layout_used === false), true);
   assert.equal(slides.every((slide) => slide.ai_first_spatial_plan.materializer === 'officecli_pptx_materializer'), true);
@@ -413,6 +478,7 @@ function assertMaterializedQuality({ fixture, suite, result, previewMetrics = []
   for (const legacyAnchor of suite.expected_anchor_shapes) {
     assert.equal(shapeNames.includes(legacyAnchor), false, `${legacyAnchor} must not be helper-generated`);
   }
+  assert.equal(shapeNames.some((name) => /-rule$|-decor-line$/i.test(name)), false);
 
   const visibleText = JSON.stringify(slides.flatMap((slide) => (
     slide.native_shapes.map((shape) => shape.text).filter(Boolean)
@@ -471,6 +537,8 @@ test('native PPTX officecli materializer accepts only complete AI spatial plans'
   assert.equal(result.slides.every((slide) => slide.issues.length === 0), true);
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.expected_text_fragments.includes('Native cover proof'), true);
+  assert.equal(result.slides.every((slide) => typeof slide.metrics.composition_signature === 'string'), true);
+  assert.equal(new Set(result.slides.map((slide) => slide.metrics.composition_signature)).size >= 5, true);
 });
 
 test('native PPTX officecli materializer rejects incomplete or unreadable AI shape plans', () => {
