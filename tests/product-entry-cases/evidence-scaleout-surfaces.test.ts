@@ -14,9 +14,11 @@ import {
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-const REAL_NO_REGRESSION_REFS_20260527 = [
+const REAL_NO_REGRESSION_REFS = [
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
 ];
 
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
@@ -527,19 +529,19 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.required_minimum_evidence_ref_count,
-      2,
+      4,
     );
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.real_runtime_evidence_refs,
-      REAL_NO_REGRESSION_REFS_20260527,
+      REAL_NO_REGRESSION_REFS,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
-      'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
+      'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs',
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
-      'repeated_family_refs_only',
+      'cross_route_cross_window_repeated_refs_only',
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.review_export_verdict_refs.verdict_body_projected_to_opl,

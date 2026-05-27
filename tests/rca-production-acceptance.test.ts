@@ -12,6 +12,8 @@ const evidenceFixturePath = 'contracts/production_acceptance/rca-evidence-receip
 const realNoRegressionRefs = [
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
 ];
 
 function readJson(relativePath) {
@@ -325,10 +327,10 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
   }
   assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
-  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 2);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 4);
   assert.equal(
     scaleout.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
-    'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
+    'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs',
   );
   assert.deepEqual(
     scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_provenance.map(
@@ -340,7 +342,10 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     'ppt_deck',
     'xiaohongshu',
   ]);
-  assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_cadence, 'repeated_family_refs_only');
+  assert.equal(
+    scaleout.repeated_no_regression_evidence_refs.evidence_cadence,
+    'cross_route_cross_window_repeated_refs_only',
+  );
   assert.equal(scaleout.repeated_no_regression_evidence_refs.repeated_no_regression_claimed_as_soak, false);
 
   assert.equal(scaleout.review_export_verdict_refs.status, 'review_export_refs_routed_through_artifact_producing_route');
@@ -731,7 +736,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     scaleoutFixture.visual_memory_body_reuse_refs.reuse_ref_scope,
     'visual_pattern_memory_locator_and_content_ref_only',
   );
-  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 2);
+  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 4);
   assertRefArray(
     scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs,
     'production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs',
@@ -740,7 +745,10 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
   }
   assert.deepEqual(scaleoutFixture.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
-  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.evidence_cadence, 'repeated_family_refs_only');
+  assert.equal(
+    scaleoutFixture.repeated_no_regression_evidence_refs.evidence_cadence,
+    'cross_route_cross_window_repeated_refs_only',
+  );
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.declares_production_soak_complete, false);
   assert.equal(scaleoutFixture.review_export_verdict_refs.verdict_body_projected_to_opl, false);
   assert.equal(scaleoutFixture.naming_tombstone_follow_through.active_caller_compatibility_alias_restored, false);
