@@ -86,6 +86,49 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-28 reference memory / product-entry support tranche
+
+本轮覆盖 RCA uncovered reference bodies 中与 memory locator、product-entry support、series governance checklist 和 executor routing 相关的 current-read 口径。目标是确认 reference 层只解释已落地 contract / support surface，不把旧 `managed`、`gateway`、`session`、`domain_action_adapter`、repo-local `product manifest/status/session` wrapper 或 Hermes proof lane 写成当前 RCA generic runtime owner、active backlog、generated/default wrapper owner、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/status.md`, `docs/architecture.md`, `docs/decisions.md`, and this governance ledger.
+- Reviewed reference docs: `docs/references/README.md`, `docs/references/domain_memory_descriptor_locator.md`, `docs/references/governance/series-doc-governance-checklist.md`, `docs/references/product-entry/README.md`, `docs/references/product-entry/redcube_product_entry_mvp.md`, `docs/references/product-entry/product_entry_session_continuity.md`, `docs/references/product-entry/opl_framework_hosted_product_entry.md`, and `docs/references/rca_executor_routing_config.md`.
+- Machine / live read-model refs: `contracts/functional_privatization_audit.json`, `contracts/physical_source_morphology_policy.json`, `contracts/runtime-program/current-program.json`, `contracts/runtime-program/current-program.index.json`, `contracts/pack_compiler_input.json`, `contracts/generated_surface_handoff.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `redcube domain-handler export --json`, and focused tests under `tests/product-entry-cases/*memory*`, `tests/product-entry-cases/*domain_action_adapter*`, and `tests/opl-family-contract-adoption*.test.ts`.
+- Doctor evidence: OPL Doc Governance doctor preflight reported `finding_count=0`, active truth `pass`; this stayed a risk-map input, not semantic proof.
+
+Fresh semantic result:
+
+- Product-entry support bodies already carry lifecycle metadata and correctly read as contract-linked support, not active plan. Their old `managed_product_entry_hardening`, `OPL Gateway`, `domain_action_adapter`, `session`, `status`, and wrapper wording is bounded as direct service surface, OPL generated/default wrapper target, refs-only adapter, tombstone/provenance, or no-resurrection context.
+- Live RCA CLI confirms repo-local `redcube product manifest/status/session/domain_action_adapter` is no longer a callable product wrapper: it returns a usage error stating those generated/default wrappers are owned by OPL and RCA `redcube product` retains `invoke` only. Current machine read-model for this tranche is `redcube domain-handler export --json`.
+- `docs/references/domain_memory_descriptor_locator.md` was stale at the current-read line: it still collapsed all runtime receipt work into `runtime_writeback_pending`. It now distinguishes the still-pending descriptor / memory-body migration claim from the current refs-only evidence: `controlled_memory_apply_proof/runtime_receipt_instances` and `workspace_receipt_inventory_projection` can show accepted/rejected visual memory receipt refs and lifecycle receipt refs, but these body-free refs do not declare production soak complete, visual ready, exportable, handoffable, domain ready, or artifact authority.
+- The executor routing reference remains valid as opt-in operator support: `hermes_agent` stays explicit proof / optional route backend, while default concrete executor remains `codex_cli` through OPL/provider-selected policy. No edit was needed there.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of the eight reference docs listed above; stale-term scan across active/reference/product/runtime/delivery/source/policy/spec/public docs; machine/read-model refs listed above. | `docs/references/domain_memory_descriptor_locator.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The governed reference docs retain their support roles. This tranche corrected stale current-read wording rather than retiring a path.
+
+Unreviewed docs:
+
+- RCA `docs/references/README.md`, `docs/references/governance/series-doc-governance-checklist.md`, `docs/references/product-entry/*.md`, `docs/references/rca_executor_routing_config.md`, and `docs/references/domain_memory_descriptor_locator.md` are now covered for current owner, lifecycle role, stale wrapper vocabulary, and no-resurrection boundaries.
+- RCA remaining uncovered reference/support bodies still include `docs/references/integration/*.md`, `docs/references/product-entry` already covered at support-role level but not exhaustively compared against every package source line, and non-reference public/product/runtime/delivery/source/policy/spec docs outside prior covered chunks.
+- OPL, MAS, MAG, OMA and App coverage remains open per the OPL family ledger; App body governance remains delayed while release/GUI lanes are unsafe.
+
+Remaining stale / retire candidates:
+
+- Any future reference text that treats repo-local `product manifest/status/session/domain_action_adapter` wrappers, old `managed` product-entry hardening, `OPL Gateway`, `runtime_watch` dispatch, `product_entry_continuation`, Hermes proof lane, or `session` wording as current RCA-owned generic wrapper, active public CLI/MCP surface, retained legacy synonym surface, production readiness, visual readiness, export authority, artifact authority or long-soak completion is stale pollution.
+- `visual_pattern_memory_writeback.status=descriptor_proof_contract_landed_runtime_writeback_pending` must not be rewritten as full memory lifecycle completion. The correct current read is descriptor/proof landed plus runtime receipt refs visible, with production-scale evidence still in the active plan.
+
+Next tranche write scope:
+
+- RCA remaining integration reference bodies (`docs/references/integration/*.md`) and selected public/product/runtime/delivery/source/policy/spec owner docs, after confirming current role and no-resurrection boundaries from live contracts/tests/read-models.
+- Or MAS product/status/workbench and progress/domain-ref projection shell reconciliation outside already-covered blocks.
+- Keep App docs delayed until active release/GUI lanes are safe to govern.
+
 ### 2026-05-26 history plans/runtime/tombstone no-resurrection tranche
 
 本轮覆盖 RCA `docs/history/plans/`、`docs/history/positioning/`、`docs/history/runtime/` 与 `docs/history/tombstones/` 的 history/provenance 入口读法。目标是把剩余非 Hermes、非 Phase 2 的历史计划、历史定位、历史 managed-runtime owner-boundary 和 tombstone 继续锁在 provenance / no-resurrection 语境，避免旧 `managed`、`gateway`、`frontdoor`、`federation`、`upstream Hermes`、`current/next/backlog` 或 `domain_action_adapter` wording 回流成当前 runtime owner、active backlog、generated/default caller、visual readiness、artifact authority 或 production readiness。
