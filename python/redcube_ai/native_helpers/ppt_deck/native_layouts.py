@@ -2,14 +2,22 @@ import hashlib
 import json
 import shutil
 import subprocess
+from zipfile import ZipFile
 from pathlib import Path
 from xml.etree import ElementTree
 from xml.sax.saxutils import escape as xml_escape
 
 
 CANVAS_PX = (1152, 648)
-PX_PER_INCH = CANVAS_PX[0] / 16
+SLIDE_WIDTH_IN = 16.0
+SLIDE_HEIGHT_IN = 9.0
+EMU_PER_INCH = 914400.0
+PX_PER_INCH = CANVAS_PX[0] / SLIDE_WIDTH_IN
 SVG_NS = 'http://www.w3.org/2000/svg'
+PPTX_NS = {
+    'p': 'http://schemas.openxmlformats.org/presentationml/2006/main',
+    'a': 'http://schemas.openxmlformats.org/drawingml/2006/main',
+}
 STRICT_SVG_ALLOWED_TAGS = {
     f'{{{SVG_NS}}}svg',
     f'{{{SVG_NS}}}g',
@@ -118,7 +126,7 @@ def ai_shape_bounds_in(shape_spec: dict):
     left, top, width, height = values
     if left < 0 or top < 0 or width <= 0 or height <= 0:
         return None
-    if left + width > 16.0 or top + height > 9.0:
+    if left + width > SLIDE_WIDTH_IN or top + height > SLIDE_HEIGHT_IN:
         return None
     return {
         'left_in': left,
@@ -482,6 +490,67 @@ def parse_json_output(completed: subprocess.CompletedProcess, fallback):
         return {'raw_stdout': text}
 
 
+def pptx_geometry_audit(pptx_file: Path) -> dict:
+    overflows = []
+    with ZipFile(pptx_file) as package:
+        presentation = ElementTree.fromstring(package.read('ppt/presentation.xml'))
+        slide_size = presentation.find('p:sldSz', PPTX_NS)
+        if slide_size is None:
+            raise ValueError('PPTX geometry audit failed: missing ppt/presentation.xml p:sldSz')
+        slide_width_emu = int(slide_size.attrib.get('cx') or 0)
+        slide_height_emu = int(slide_size.attrib.get('cy') or 0)
+        slide_width_in = slide_width_emu / EMU_PER_INCH
+        slide_height_in = slide_height_emu / EMU_PER_INCH
+        slide_files = sorted(
+            (name for name in package.namelist() if name.startswith('ppt/slides/slide') and name.endswith('.xml')),
+            key=lambda name: int(''.join(ch for ch in Path(name).stem if ch.isdigit()) or 0),
+        )
+        for slide_index, slide_file in enumerate(slide_files, 1):
+            slide = ElementTree.fromstring(package.read(slide_file))
+            for shape in slide.findall('.//p:sp', PPTX_NS):
+                xfrm = shape.find('.//a:xfrm', PPTX_NS)
+                if xfrm is None:
+                    continue
+                offset = xfrm.find('a:off', PPTX_NS)
+                extent = xfrm.find('a:ext', PPTX_NS)
+                if offset is None or extent is None:
+                    continue
+                left = int(offset.attrib.get('x') or 0)
+                top = int(offset.attrib.get('y') or 0)
+                width = int(extent.attrib.get('cx') or 0)
+                height = int(extent.attrib.get('cy') or 0)
+                right = left + width
+                bottom = top + height
+                if left < 0 or top < 0 or right > slide_width_emu or bottom > slide_height_emu:
+                    shape_name = ''
+                    non_visual = shape.find('p:nvSpPr/p:cNvPr', PPTX_NS)
+                    if non_visual is not None:
+                        shape_name = safe_text(non_visual.attrib.get('name'))
+                    text = safe_text(''.join(item.text or '' for item in shape.findall('.//a:t', PPTX_NS)))
+                    overflows.append({
+                        'slide_index': slide_index,
+                        'shape_name': shape_name,
+                        'text': text[:80],
+                        'left_in': round(left / EMU_PER_INCH, 4),
+                        'top_in': round(top / EMU_PER_INCH, 4),
+                        'width_in': round(width / EMU_PER_INCH, 4),
+                        'height_in': round(height / EMU_PER_INCH, 4),
+                        'right_in': round(right / EMU_PER_INCH, 4),
+                        'bottom_in': round(bottom / EMU_PER_INCH, 4),
+                    })
+    size_ok = abs(slide_width_in - SLIDE_WIDTH_IN) < 0.001 and abs(slide_height_in - SLIDE_HEIGHT_IN) < 0.001
+    return {
+        'slide_width_in': round(slide_width_in, 4),
+        'slide_height_in': round(slide_height_in, 4),
+        'expected_slide_width_in': SLIDE_WIDTH_IN,
+        'expected_slide_height_in': SLIDE_HEIGHT_IN,
+        'slide_size_ok': size_ok,
+        'overflow_count': len(overflows),
+        'overflows': overflows,
+        'ok': size_ok and len(overflows) == 0,
+    }
+
+
 def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, evaluate_native_slide_quality):
     officecli = shutil.which('officecli')
     if not officecli:
@@ -589,6 +658,15 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
     run_officecli(['create', str(output_pptx)])
     run_officecli(['open', str(output_pptx)])
     try:
+        run_officecli([
+            'set',
+            str(output_pptx),
+            '/',
+            '--prop',
+            f'slideWidth={SLIDE_WIDTH_IN:g}in',
+            '--prop',
+            f'slideHeight={SLIDE_HEIGHT_IN:g}in',
+        ])
         run_officecli(['batch', str(output_pptx)], input_text=json.dumps(officecli_commands, ensure_ascii=False))
         run_officecli(['save', str(output_pptx)])
         validate = run_officecli(['validate', str(output_pptx), '--json'])
@@ -596,6 +674,12 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
         text = run_officecli(['view', str(output_pptx), 'text', '--json'])
     finally:
         run_officecli(['close', str(output_pptx)])
+    geometry_audit = pptx_geometry_audit(output_pptx)
+    if not geometry_audit['ok']:
+        raise RuntimeError(
+            'native PPTX geometry audit failed: '
+            + json.dumps(geometry_audit, ensure_ascii=False, sort_keys=True)
+        )
 
     return {
         'slides': manifest_slides,
@@ -607,5 +691,6 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             'view_issues': parse_json_output(issues, {}),
             'view_text': parse_json_output(text, {}),
             'expected_text_fragments': officecli_text_probe,
+            'geometry_audit': geometry_audit,
         },
     }

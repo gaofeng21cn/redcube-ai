@@ -52,10 +52,15 @@ manifest = build_deck(
     evaluate_native_slide_quality,
 )
 pptx = Presentation(${JSON.stringify(outputPptx)})
+slide_width = int(pptx.slide_width)
+slide_height = int(pptx.slide_height)
+emu_per_in = 914400
 pptx_slides = []
+overflows = []
 for slide in pptx.slides:
-    pptx_slides.append([
-        {
+    slide_shapes = []
+    for shape in slide.shapes:
+        record = {
             'name': shape.name,
             'left': int(shape.left),
             'top': int(shape.top),
@@ -63,9 +68,30 @@ for slide in pptx.slides:
             'height': int(shape.height),
             'text': getattr(shape, 'text', ''),
         }
-        for shape in slide.shapes
-    ])
-print(json.dumps({'slides': manifest['slides'], 'officecli_gate': manifest['officecli_gate'], 'pptx_slides': pptx_slides, 'pptx_file': ${JSON.stringify(outputPptx)}}, ensure_ascii=False))
+        slide_shapes.append(record)
+        right = record['left'] + record['width']
+        bottom = record['top'] + record['height']
+        if record['left'] < 0 or record['top'] < 0 or right > slide_width or bottom > slide_height:
+            overflows.append({
+                'slide_index': len(pptx_slides) + 1,
+                'name': record['name'],
+                'text': record['text'][:80],
+                'right_in': round(right / emu_per_in, 4),
+                'bottom_in': round(bottom / emu_per_in, 4),
+            })
+    pptx_slides.append(slide_shapes)
+print(json.dumps({
+    'slides': manifest['slides'],
+    'officecli_gate': manifest['officecli_gate'],
+    'pptx_slides': pptx_slides,
+    'pptx_file': ${JSON.stringify(outputPptx)},
+    'pptx_geometry': {
+        'slide_width_in': round(slide_width / emu_per_in, 4),
+        'slide_height_in': round(slide_height / emu_per_in, 4),
+        'overflow_count': len(overflows),
+        'overflows': overflows,
+    },
+}, ensure_ascii=False))
 `;
 }
 
@@ -491,6 +517,13 @@ function assertMaterializedQuality({ fixture, suite, result, previewMetrics = []
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.save_before_close, true);
   assert.equal(result.officecli_gate.command_count >= slides.length * 12, true);
+  assert.equal(result.officecli_gate.geometry_audit.ok, true);
+  assert.equal(result.officecli_gate.geometry_audit.slide_width_in, 16);
+  assert.equal(result.officecli_gate.geometry_audit.slide_height_in, 9);
+  assert.equal(result.officecli_gate.geometry_audit.overflow_count, 0);
+  assert.equal(result.pptx_geometry.slide_width_in, 16);
+  assert.equal(result.pptx_geometry.slide_height_in, 9);
+  assert.equal(result.pptx_geometry.overflow_count, 0);
 
   const shapeNames = result.pptx_slides.flatMap((pptxSlide) => pptxSlide.map((shape) => shape.name));
   for (const legacyAnchor of suite.expected_anchor_shapes) {
@@ -555,6 +588,10 @@ test('native PPTX officecli materializer accepts only complete AI spatial plans'
   assert.equal(result.slides.every((slide) => slide.issues.length === 0), true);
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.expected_text_fragments.includes('Native cover proof'), true);
+  assert.equal(result.officecli_gate.geometry_audit.ok, true);
+  assert.equal(result.pptx_geometry.slide_width_in, 16);
+  assert.equal(result.pptx_geometry.slide_height_in, 9);
+  assert.deepEqual(result.pptx_geometry.overflows, []);
   assert.equal(result.slides.every((slide) => typeof slide.metrics.composition_signature === 'string'), true);
   assert.equal(new Set(result.slides.map((slide) => slide.metrics.composition_signature)).size >= 5, true);
 });
