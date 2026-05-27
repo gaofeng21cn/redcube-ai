@@ -138,13 +138,17 @@
         "rca-no-regression:visual-stage:transition-hosted-no-regression",
         "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b"
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
       ],
       "real_runtime_evidence_refs": [
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b"
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
       ],
-      "real_runtime_evidence_ref_count": 2,
+      "real_runtime_evidence_ref_count": 4,
       "real_runtime_evidence_provenance": [
         {
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
@@ -155,15 +159,25 @@
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
           "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b",
           "sha256": "668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-ppt-window2",
+          "sha256": "e0e965fa14c15c9b6d6b076d4ed1d45b9872fb82dafcdfb8b415426ca4c08acd"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-xhs-window2",
+          "sha256": "d476325dfa59bf8f6443a46882630be60001f6b0197f91d71ecf58e3a65d4744"
         }
       ],
-      "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs",
+      "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs",
       "deliverable_family_refs": [
         "ppt_deck",
         "xiaohongshu"
       ],
-      "evidence_cadence": "repeated_family_refs_only",
-      "minimum_ref_count": 2,
+      "evidence_cadence": "cross_route_cross_window_repeated_refs_only",
+      "minimum_ref_count": 4,
       "declares_production_soak_complete": false
     },
     "naming_tombstone_follow_through": {
@@ -176,7 +190,23 @@
       "tombstone_refs": [
         "human_doc:retired_route_narratives_tombstone"
       ]
-    }
+    },
+    "no_regression_evidence_refs": [
+      "rca-no-regression:visual-stage:transition-hosted-no-regression",
+      "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+    ],
+    "no_regression_refs": [
+      "rca-no-regression:visual-stage:transition-hosted-no-regression",
+      "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+      "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+    ]
   },
   "opl_expected_receipt_monitor_freshness_handoff": {
     "surface_kind": "rca_opl_expected_receipt_monitor_freshness_handoff_fixture_refs",
@@ -210,9 +240,13 @@
       "generator_action": "emit_no_regression_evidence",
       "evidence_refs": [
         "rca-no-regression:visual-stage:transition-hosted-no-regression",
-        "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+        "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
       ],
-      "evidence_cadence": "repeated_family_refs_only",
+      "evidence_cadence": "cross_route_cross_window_repeated_refs_only",
       "repeated_no_regression_claimed_as_soak": false
     },
     "monitor_freshness_backfill_refs": {

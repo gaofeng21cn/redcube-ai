@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-更新时间：`2026-05-27`
+更新时间：`2026-05-28`
 
 ## 当前角色
 
@@ -70,7 +70,7 @@ Executor runtime protocol 当前是 RCA route-level executor policy、receipt re
 - Artifact-producing owner receipt refs 已由 RCA production acceptance surface 关闭为 body-free `domain_receipt` / artifact / review-export refs；它不声明 visual ready、exportable、handoffable 或 production soak complete。
 - visual memory body reuse refs 已落地；2026-05-27 fresh `domain-handler dispatch` 已在 5 个用户级 runtime-state workspace 写出 10 条 accepted/rejected visual pattern memory writeback receipt refs 与 15 条 cleanup/restore/retention lifecycle receipt refs。它们仍是 body-free refs-only receipt instances，不写 memory body、artifact blob 或 review/export verdict。
 - 真实 workspace receipt scaleout、跨 workspace retention ledger / inventory 规模化验证；当前 product-entry manifest/status、domain-handler export、product session surface 与 CLI read surfaces 已可用显式 `workspace_receipt_scaleout_roots` / `--workspace-receipt-scaleout-root` 聚合多个 workspace 的 body-free receipt refs。Fresh export 对 5 个 runtime-state workspace 读到 `observed_workspace_count=5`、`observed_receipt_count=30`、`receipt_kind_coverage_ready=true` 和 `missing_receipt_kinds=[]`，但仍保持 `workspace_receipt_scaleout_claimed=false` 与 `declares_production_soak_complete=false`。
-- Cross-family repeated no-regression 现在已有 2 条 2026-05-27 RCA domain-handler 生成的真实 body-free refs：`rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a` 与 `rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b`，并由 OPL refs-only ledger 记录/验证为 `opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs`。这只证明 RCA owner surface 能生成并向 OPL 投影真实 no-regression refs，不声明 repeated family route soak、visual ready、exportable 或 production ready。
+- Cross-family repeated no-regression 现在已有 4 条 RCA domain-handler 生成的真实 body-free refs：2026-05-27 的 `rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a` / `rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b`，以及 2026-05-28 跨 route / 跨窗口补充的 `rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2` / `rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2`；OPL refs-only ledger 已记录/验证为 `opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs`。这只证明 RCA owner surface 能跨 route / 跨窗口生成并向 OPL 投影真实 no-regression refs，不声明 repeated route soak、visual ready、exportable 或 production ready。
 - Temporal controlled visual-stage long soak 和 provider restart/re-query/retry/dead-letter proof。
 - Cross-family repeated no-regression 的长线尾项仍是跨 route / 跨窗口 repeated proof 与 no-regression 在 production-like visual-stage attempt 中持续出现。
 

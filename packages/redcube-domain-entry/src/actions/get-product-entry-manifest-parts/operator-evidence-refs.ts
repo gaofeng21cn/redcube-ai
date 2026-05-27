@@ -99,12 +99,18 @@ const RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS = Object.freeze([
   'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
 ]);
 
-const RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527 = Object.freeze([
+const RCA_REAL_NO_REGRESSION_EVIDENCE_REFS = Object.freeze([
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
+  'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
 ]);
 
-const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE_20260527 = Object.freeze([
+const RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE = 'cross_route_cross_window_repeated_refs_only';
+const RCA_OPL_EXTERNAL_NO_REGRESSION_RECEIPT_REF =
+  'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs';
+
+const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE = Object.freeze([
   Object.freeze({
     evidence_ref: 'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
     workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-a',
@@ -114,6 +120,16 @@ const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE_20260527 = Object.freeze([
     evidence_ref: 'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
     workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b',
     sha256: '668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a',
+  }),
+  Object.freeze({
+    evidence_ref: 'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
+    workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-ppt-window2',
+    sha256: 'e0e965fa14c15c9b6d6b076d4ed1d45b9872fb82dafcdfb8b415426ca4c08acd',
+  }),
+  Object.freeze({
+    evidence_ref: 'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
+    workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-xhs-window2',
+    sha256: 'd476325dfa59bf8f6443a46882630be60001f6b0197f91d71ecf58e3a65d4744',
   }),
 ]);
 
@@ -150,7 +166,7 @@ export function buildProductionEvidenceScaleoutRefs({
   const noRegressionEvidenceRefs = uniqueRefs([
     'rca-no-regression:visual-stage:transition-hosted-no-regression',
     'rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression',
-    ...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527,
+    ...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS,
   ]);
   const ownerChainRefs = uniqueRefs([
     'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
@@ -275,17 +291,16 @@ export function buildProductionEvidenceScaleoutRefs({
       proof_contract_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       proof_status: noRegressionProof.status || 'unknown',
       evidence_refs: noRegressionEvidenceRefs,
-      real_runtime_evidence_refs: [...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527],
-      real_runtime_evidence_ref_count: RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527.length,
-      real_runtime_evidence_provenance: [...RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE_20260527],
-      opl_external_evidence_receipt_ref:
-        'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
+      real_runtime_evidence_refs: [...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS],
+      real_runtime_evidence_ref_count: RCA_REAL_NO_REGRESSION_EVIDENCE_REFS.length,
+      real_runtime_evidence_provenance: [...RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE],
+      opl_external_evidence_receipt_ref: RCA_OPL_EXTERNAL_NO_REGRESSION_RECEIPT_REF,
       deliverable_family_refs: [
         'ppt_deck',
         'xiaohongshu',
       ],
-      evidence_cadence: 'repeated_family_refs_only',
-      required_minimum_evidence_ref_count: 2,
+      evidence_cadence: RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE,
+      required_minimum_evidence_ref_count: 4,
       repeated_no_regression_claimed_as_soak: false,
     },
     review_export_verdict_refs: {
@@ -597,7 +612,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       generator_action: 'emit_no_regression_evidence',
       evidence_refs: noRegressionRefs.evidence_refs || [],
       deliverable_family_refs: noRegressionRefs.deliverable_family_refs || [],
-      evidence_cadence: noRegressionRefs.evidence_cadence || 'repeated_family_refs_only',
+      evidence_cadence: noRegressionRefs.evidence_cadence || RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE,
       repeated_no_regression_claimed_as_soak: false,
     },
     monitor_freshness_backfill_refs: {

@@ -262,7 +262,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
-      'repeated_family_refs_only',
+      'cross_route_cross_window_repeated_refs_only',
     );
     assert.equal(
       manifest.operator_evidence_readiness_projection.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored,
