@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
-const scaleoutSnapshotPath = 'contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260527.json';
+const scaleoutSnapshotPath = 'contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json';
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
@@ -35,12 +35,12 @@ function assertOptionalRefArray(values, label) {
   }
 }
 
-test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs without claiming production readiness', () => {
+test('RCA workspace receipt scaleout evidence snapshot records 6-workspace refs without claiming production readiness', () => {
   assert.equal(fs.existsSync(path.join(repoRoot, scaleoutSnapshotPath)), true);
   const snapshot = readJson(scaleoutSnapshotPath);
 
   assert.equal(snapshot.surface_kind, 'rca_workspace_receipt_scaleout_evidence_snapshot');
-  assert.equal(snapshot.snapshot_id, 'rca.workspace_receipt_scaleout.2026-05-27.5-workspaces');
+  assert.equal(snapshot.snapshot_id, 'rca.workspace_receipt_scaleout.2026-05-28.6-workspaces');
   assert.equal(snapshot.owner, 'redcube_ai');
   assert.equal(snapshot.consumer, 'one_person_lab');
   assert.equal(snapshot.status, 'runtime_receipt_refs_visible_not_production_soak');
@@ -76,8 +76,8 @@ test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs 
   assert.equal(scaleout.status, 'workspace_receipt_scaleout_ref_model_ready_more_workspaces_pending');
   assert.equal(scaleout.evidence_model, 'receipt_refs_only_multi_receipt_kind_coverage');
   assert.equal(scaleout.required_workspace_count_for_scaleout, 2);
-  assert.equal(scaleout.observed_workspace_count, 5);
-  assert.equal(scaleout.observed_receipt_count, 30);
+  assert.equal(scaleout.observed_workspace_count, 6);
+  assert.equal(scaleout.observed_receipt_count, 36);
   assert.equal(scaleout.receipt_kind_coverage_ready, true);
   assert.equal(scaleout.workspace_receipt_scaleout_claimed, false);
   assert.equal(scaleout.declares_production_soak_complete, false);
@@ -87,19 +87,19 @@ test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs 
   assert.deepEqual(scaleout.missing_receipt_kinds, []);
 
   assert.deepEqual(snapshot.receipt_counts, {
-    total: 30,
-    domain_owner: 5,
-    memory_visual_pattern: 10,
-    lifecycle_cleanup: 5,
-    lifecycle_restore: 5,
-    lifecycle_retention: 5,
+    total: 36,
+    domain_owner: 6,
+    memory_visual_pattern: 12,
+    lifecycle_cleanup: 6,
+    lifecycle_restore: 6,
+    lifecycle_retention: 6,
     other: 0,
     invalid: 0,
   });
 
   const workspaceSources = snapshot.workspace_source_summary.workspace_sources;
   assert.equal(snapshot.workspace_source_summary.workspace_source_ref_model, 'workspace_receipt_source:<index>');
-  assert.equal(workspaceSources.length, 5);
+  assert.equal(workspaceSources.length, 6);
   assert.deepEqual(
     workspaceSources.map((source) => source.workspace_source_ref),
     [
@@ -108,6 +108,7 @@ test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs 
       'workspace_receipt_source:2',
       'workspace_receipt_source:3',
       'workspace_receipt_source:4',
+      'workspace_receipt_source:5',
     ],
   );
   for (const source of workspaceSources) {
@@ -129,31 +130,31 @@ test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs 
     actualRefs.artifact_producing_owner_receipt_refs,
     'actual_workspace_receipt_refs.artifact_producing_owner_receipt_refs',
   );
-  assert.equal(actualRefs.artifact_producing_owner_receipt_refs.length, 5);
+  assert.equal(actualRefs.artifact_producing_owner_receipt_refs.length, 6);
   assertRefArray(
     actualRefs.memory_lifecycle_receipt_refs,
     'actual_workspace_receipt_refs.memory_lifecycle_receipt_refs',
   );
-  assert.equal(actualRefs.memory_lifecycle_receipt_refs.length, 25);
+  assert.equal(actualRefs.memory_lifecycle_receipt_refs.length, 30);
   assert.equal(
     actualRefs.memory_lifecycle_receipt_refs.filter((ref) => ref.includes('accepted-memory-accepted')).length,
-    5,
+    6,
   );
   assert.equal(
     actualRefs.memory_lifecycle_receipt_refs.filter((ref) => ref.includes('rejected-memory-rejected')).length,
-    5,
+    6,
   );
   assert.equal(
     actualRefs.memory_lifecycle_receipt_refs.filter((ref) => ref.startsWith('rca-lifecycle-receipt:cleanup:')).length,
-    5,
+    6,
   );
   assert.equal(
     actualRefs.memory_lifecycle_receipt_refs.filter((ref) => ref.startsWith('rca-lifecycle-receipt:restore:')).length,
-    5,
+    6,
   );
   assert.equal(
     actualRefs.memory_lifecycle_receipt_refs.filter((ref) => ref.startsWith('rca-lifecycle-receipt:retention:')).length,
-    5,
+    6,
   );
   assertOptionalRefArray(
     actualRefs.no_regression_evidence_refs,
@@ -165,6 +166,28 @@ test('RCA workspace receipt scaleout evidence snapshot records 5-workspace refs 
   );
   assert.deepEqual(actualRefs.no_regression_evidence_refs, []);
   assert.deepEqual(actualRefs.review_export_verdict_refs, []);
+
+  assert.equal(snapshot.generated_dispatch_receipt_refs.length, 6);
+  for (const [index, receipt] of snapshot.generated_dispatch_receipt_refs.entries()) {
+    const workspaceId = String(index + 1).padStart(2, '0');
+    assertRefString(receipt.proof_ref, `generated_dispatch_receipt_refs[${index}].proof_ref`);
+    assertRefString(
+      receipt.domain_owner_receipt_ref,
+      `generated_dispatch_receipt_refs[${index}].domain_owner_receipt_ref`,
+    );
+    assertRefString(
+      receipt.no_regression_evidence_ref,
+      `generated_dispatch_receipt_refs[${index}].no_regression_evidence_ref`,
+    );
+    assert.equal(
+      receipt.no_regression_evidence_ref,
+      `rca-no-regression:visual-stage:20260528-rca-workspace-receipt-scaleout-refresh-workspace-${workspaceId}-no-regression`,
+    );
+    assertRefString(
+      receipt.runtime_locator_ref,
+      `generated_dispatch_receipt_refs[${index}].runtime_locator_ref`,
+    );
+  }
 
   assert.equal(snapshot.authority_boundary.opl_can_store_projection_refs, true);
   assert.equal(snapshot.authority_boundary.opl_can_write_rca_visual_truth, false);

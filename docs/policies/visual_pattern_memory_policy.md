@@ -56,7 +56,7 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 - repo 不跟踪 memory body entries；
 - OPL apply 不被允许，也不能写 memory body、artifact blob、review/export verdict 或 owner receipt body。
 
-Product-entry manifest 与 `domain-handler export --json` 继续暴露 `domain_memory_descriptor`、controlled consumed-memory proof refs、writeback proposal refs、writeback receipt refs、operator receipt projection refs、`controlled_memory_apply_proof` refs、`workspace_receipt_inventory_projection` 和 `visual_pattern_memory_writeback.runtime_receipt_instances_ref`。默认 export 可以显示 receipt inventory / runtime receipt ref model；显式 workspace receipt scaleout export 和 repo-tracked `contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260527.json` 已记录 5 个 runtime-state workspace / 30 条 body-free receipt refs 与 `receipt_kind_coverage_ready=true`。
+Product-entry manifest 与 `domain-handler export --json` 继续暴露 `domain_memory_descriptor`、controlled consumed-memory proof refs、writeback proposal refs、writeback receipt refs、operator receipt projection refs、`controlled_memory_apply_proof` refs、`workspace_receipt_inventory_projection` 和 `visual_pattern_memory_writeback.runtime_receipt_instances_ref`。默认 export 可以显示 receipt inventory / runtime receipt ref model；显式 workspace receipt scaleout export 和 repo-tracked `contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json` 已记录 6 个 runtime-state workspace / 36 条 body-free receipt refs 与 `receipt_kind_coverage_ready=true`。
 
 这些 refs 只证明 direct path 与 OPL-hosted path 能共享 locator / receipt / accounting read model。它们不证明 memory body 已迁入 OPL，不声明 visual memory lifecycle complete，不声明 `workspace_receipt_scaleout_claimed`，也不关闭 production visual-stage long soak。
 

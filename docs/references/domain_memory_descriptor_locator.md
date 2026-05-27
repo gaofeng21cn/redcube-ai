@@ -68,7 +68,7 @@ Forbidden seed fields include memory content bodies, generated slide/page conten
 
 `rca.visual_pattern_memory.controlled_apply_proof.v1` is the landed controlled apply proof. It exposes consumed visual pattern memory refs, a locator-only writeback proposal projection, accepted/rejected receipt projection cases, accepted/rejected runtime receipt refs, and a no-forbidden-write audit. It intentionally excludes memory content bodies, slide/page content, review/export verdicts, visual truth, canonical artifact blobs, and live receipt bodies from repo source.
 
-This proof closes the repo-source/audit and receipt-ref part of the memory apply lane. Runtime receipt refs are now visible through `redcube domain-handler export` and the workspace receipt inventory projection, while real reusable visual lesson body migration, receipt body storage, and domain-owned memory body writeback remain runtime/domain-memory responsibilities outside repo-tracked source. Receipt refs and 5-workspace / 30-receipt scaleout evidence do not declare production visual-stage soak complete, visual ready, exportable, handoffable, domain ready, or artifact authority.
+This proof closes the repo-source/audit and receipt-ref part of the memory apply lane. Runtime receipt refs are now visible through `redcube domain-handler export` and the workspace receipt inventory projection, while real reusable visual lesson body migration, receipt body storage, and domain-owned memory body writeback remain runtime/domain-memory responsibilities outside repo-tracked source. Receipt refs and 6-workspace / 36-receipt scaleout evidence do not declare production visual-stage soak complete, visual ready, exportable, handoffable, domain ready, or artifact authority.
 
 ## Authority
 
