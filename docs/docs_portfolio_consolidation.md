@@ -86,6 +86,47 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-28 integration memory receipt readout tranche
+
+本轮覆盖 RCA integration support 与 visual memory policy 中 reopened 的 memory / receipt readout 口径。目标是把 `descriptor_proof_contract_landed_runtime_writeback_pending`、`controlled_memory_apply_proof`、`workspace_receipt_inventory_projection`、workspace receipt scaleout snapshot 与 production acceptance flags 分层读取：descriptor / memory body / production-scale writeback 仍 pending；body-free runtime receipt refs 和 inventory / scaleout accounting refs 已可见；二者都不能升级为 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/status.md`, `docs/architecture.md`, `docs/runtime/runtime_architecture.md`, `docs/runtime/README.md`, and this governance ledger.
+- Reviewed support docs: `docs/references/integration/opl-family-contract-adoption.md`, `docs/references/integration/lightweight-product-entry-and-opl-handoff.md`, and `docs/policies/visual_pattern_memory_policy.md`.
+- Machine / read-model refs: `contracts/memory_descriptor.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260527.json`, `contracts/production_acceptance/rca-evidence-receipt-fixture.json`, `contracts/runtime-program/current-program.json`, `contracts/runtime-program/current-program.index.json`, and fresh `redcube domain-handler export --json` after `npm run --silent build`.
+- Source / test refs: `packages/redcube-domain-entry/src/actions/get-product-entry-session.ts`, `packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts`, `packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs.ts`, `tests/product-entry-cases/evidence-scaleout-surfaces.test.ts`, `tests/rca-production-acceptance.test.ts`, and `tests/rca-workspace-receipt-scaleout-evidence.test.ts`.
+
+Fresh semantic result:
+
+- `docs/references/integration/opl-family-contract-adoption.md` still collapsed receipt instances into a broad pending statement. It now states the two-layer readout: descriptor / proof contract landed and memory body / production-scale writeback pending; `domain-handler export` and scaleout snapshot expose locator / receipt / accounting refs only.
+- `docs/policies/visual_pattern_memory_policy.md` had the same coarse pending readout. It now distinguishes memory body migration from refs-only receipt visibility, names the workspace receipt scaleout snapshot, and keeps `workspace_receipt_scaleout_claimed=false` / production long-soak open.
+- `docs/references/integration/lightweight-product-entry-and-opl-handoff.md` already preserves the correct direct/hosted service-safe domain entry boundary. No edit was needed.
+- Fresh `domain-handler export --json` in the tranche worktree exposes `visual_pattern_memory_writeback`, `workspace_receipt_inventory_projection`, `temporal_autonomy_readiness`, generated/default refs and guarded actions. Default export without explicit scaleout roots can have zero observed receipt instances; scaleout evidence comes from explicit workspace roots and the repo-tracked snapshot.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of both `docs/references/integration/*.md`; full read of `docs/policies/visual_pattern_memory_policy.md`; support read of runtime docs and machine/source/test refs listed above. | `docs/references/integration/opl-family-contract-adoption.md`; `docs/policies/visual_pattern_memory_policy.md`; this coverage ledger. |
+
+Archived / tombstoned / deleted docs:
+
+- none. The governed docs retain their support / policy roles; this tranche corrected stale current-read wording rather than retiring paths.
+
+Unreviewed docs:
+
+- `redcube-ai`: no new repo-root `README*` / `docs/**/*.md` path was introduced. Current RCA exact-path coverage remains governed by the final inventory reconcile and exact path ledger entries below; this tranche only covers reopened memory / receipt readout wording in the listed integration/policy docs.
+- OPL series global coverage remains open for remaining non-RCA repo bodies according to the OPL family ledger, especially MAS and App carry-forward scopes. This RCA tranche does not close the global `/goal`.
+
+Remaining stale / retire candidates:
+
+- Future RCA prose that treats `descriptor_proof_contract_landed_runtime_writeback_pending`, `controlled_memory_apply_proof`, `workspace_receipt_inventory_projection`, workspace receipt scaleout refs, provider completion, OPL generated/default refs, AgentLab refs or no-regression refs as memory lifecycle complete, visual ready, exportable, handoffable, domain ready, production ready, production visual-stage long soak, artifact authority, review/export verdict or OPL-owned visual truth is stale pollution.
+- Future prose that says RCA repo tracks memory body entries or that OPL can apply visual memory body / accept-reject decisions is stale pollution.
+
+Next tranche write scope:
+
+- Switch to MAS remaining repo-wide coverage, or App docs only after release / GUI lanes are safe or explicitly handed to this governance goal.
+- If RCA docs are reopened by new source/contract/read-model changes, govern the exact changed docs and update this ledger rather than treating prior final inventory reconcile as permanent proof.
+
 ### 2026-05-28 reference memory / product-entry support tranche
 
 本轮覆盖 RCA uncovered reference bodies 中与 memory locator、product-entry support、series governance checklist 和 executor routing 相关的 current-read 口径。目标是确认 reference 层只解释已落地 contract / support surface，不把旧 `managed`、`gateway`、`session`、`domain_action_adapter`、repo-local `product manifest/status/session` wrapper 或 Hermes proof lane 写成当前 RCA generic runtime owner、active backlog、generated/default wrapper owner、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。

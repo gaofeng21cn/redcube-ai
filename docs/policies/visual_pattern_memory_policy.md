@@ -51,12 +51,14 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 当前 adoption status 是 `descriptor_proof_contract_landed_runtime_writeback_pending`：
 
 - descriptor proof contract 已落地；
-- runtime writeback 仍是 pending；
+- memory body migration、domain-owned runtime apply 与 production-scale writeback 不声明完成；
 - memory body migration 仍是 `domain_owned_runtime_apply_required`；
-- repo 不跟踪 memory entries 或 receipt instances；
-- OPL apply 不被允许。
+- repo 不跟踪 memory body entries；
+- OPL apply 不被允许，也不能写 memory body、artifact blob、review/export verdict 或 owner receipt body。
 
-Product-entry manifest 继续暴露 `domain_memory_descriptor`、controlled consumed-memory proof refs、writeback proposal refs、writeback receipt refs 和 operator receipt projection refs。该投影只证明 direct path 与 OPL-hosted path 能共享 locator / receipt refs，不证明 memory body 已迁入 OPL，也不证明 runtime writeback 已完成。
+Product-entry manifest 与 `domain-handler export --json` 继续暴露 `domain_memory_descriptor`、controlled consumed-memory proof refs、writeback proposal refs、writeback receipt refs、operator receipt projection refs、`controlled_memory_apply_proof` refs、`workspace_receipt_inventory_projection` 和 `visual_pattern_memory_writeback.runtime_receipt_instances_ref`。默认 export 可以显示 receipt inventory / runtime receipt ref model；显式 workspace receipt scaleout export 和 repo-tracked `contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260527.json` 已记录 5 个 runtime-state workspace / 30 条 body-free receipt refs 与 `receipt_kind_coverage_ready=true`。
+
+这些 refs 只证明 direct path 与 OPL-hosted path 能共享 locator / receipt / accounting read model。它们不证明 memory body 已迁入 OPL，不声明 visual memory lifecycle complete，不声明 `workspace_receipt_scaleout_claimed`，也不关闭 production visual-stage long soak。
 
 ## Stage 使用
 
@@ -96,10 +98,10 @@ Family-level governance 读 `/Users/gaofeng/workspace/one-person-lab/docs/refere
 
 仍开放的 evidence tail：
 
-- 真实 visual pattern memory accepted/rejected receipt instances；
-- writeback receipt 与 locator projection 的 runtime writeback scaleout；
+- production-like visual pattern memory accepted/rejected receipt scaleout；
+- writeback receipt 与 locator projection 的 runtime writeback scaleout claim；
 - retention / restore receipt scaleout；
 - OPL-hosted controlled visual-stage long-soak 中的 consumed-memory refs 与 RCA-owned receipt refs 循环；
 - cross-family no-regression proof，且不迁移 memory body、artifact body、route truth 或 review/export verdict。
 
-这些证据尾项关闭前，`descriptor_proof_contract_landed_runtime_writeback_pending` 不能写成 visual memory lifecycle complete、production ready、domain ready、visual ready、exportable 或 handoffable。
+这些证据尾项关闭前，`descriptor_proof_contract_landed_runtime_writeback_pending` 和 refs-only receipt visibility 不能写成 visual memory lifecycle complete、production ready、domain ready、visual ready、exportable 或 handoffable。
