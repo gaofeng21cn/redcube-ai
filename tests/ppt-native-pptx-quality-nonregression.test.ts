@@ -133,11 +133,32 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.editable_shape_plan_contract.creative_owner, 'llm_agent');
   assert.equal(contract.editable_shape_plan_contract.python_helper_role, 'execute_validate_export_only');
   assert.equal(contract.editable_shape_plan_contract.template_substitution_allowed, false);
+  assert.equal(contract.editable_shape_plan_contract.design_spec_lock_required, true);
+  assert.equal(contract.editable_shape_plan_contract.per_page_visual_plan_required, true);
+  assert.deepEqual(contract.editable_shape_plan_contract.ppt_master_style_discipline_adopted, [
+    'spec_lock',
+    'per_page_visual_plan',
+    'svg_qa_before_export',
+    'rendered_quality_gate',
+  ]);
   assert.equal(contract.editable_shape_plan_contract.layout_intent_required, true);
   assert.equal(contract.editable_shape_plan_contract.composition_signature_required, true);
   assert.equal(contract.editable_shape_plan_contract.title_underline_motif_allowed, false);
   assert.equal(contract.editable_shape_plan_contract.concrete_layout_variant_repetition_limit, 2);
   assertOfficecliMaterializerPolicy(contract.officecli_materializer_policy);
+  assert.equal(contract.visual_sample_claim_boundary.mock_fixture_visual_sample_allowed, false);
+  assert.equal(contract.visual_sample_claim_boundary.test_double_can_claim_visual_design_quality, false);
+  assert.equal(contract.visual_sample_claim_boundary.display_test_double_as_native_ppt_visual_sample_allowed, false);
+  assert.equal(contract.visual_sample_claim_boundary.officecli_can_invent_design, false);
+  assert.equal(
+    contract.visual_sample_claim_boundary.real_visual_sample_requires.includes('live_codex_executor_shape_plan'),
+    true,
+  );
+  assert.equal(
+    contract.visual_sample_claim_boundary.real_visual_sample_requires.includes('editable_shape_plan.design_spec_lock'),
+    true,
+  );
+  assert.match(contract.visual_sample_claim_boundary.ppt_master_reference_role, /spec_lock/);
   assert.equal(contract.officecli_materializer_policy.officecli_skill_can_replace_rca_workflow, false);
   assert.equal(contract.officecli_materializer_policy.officecli_validate_can_replace_true_render_proof, false);
   assert.equal(contract.true_render_proof.required, true);
@@ -270,10 +291,24 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.shape_manifest_ref.required_metric_refs.includes('shape_manifest#/slides/*/preview_screenshot_sha256'), true);
       assert.equal(existsSync(readModel.shape_manifest_ref.file), true);
       assert.equal(existsSync(readModel.editable_shape_plan_ref.file), true);
+      assert.equal(readModel.editable_shape_plan_ref.design_spec_lock_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.per_page_visual_plan_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('spec_lock'), true);
       assert.equal(readModel.editable_shape_plan_ref.layout_intent_required, true);
       assert.equal(readModel.editable_shape_plan_ref.composition_signature_required, true);
       assert.equal(readModel.editable_shape_plan_ref.title_underline_motif_allowed, false);
       assert.equal(readModel.editable_shape_plan_ref.concrete_layout_variant_repetition_limit, 2);
+      assert.equal(readModel.visual_sample_claim_boundary.sample_kind, 'deterministic_test_double_plumbing_proof');
+      assert.equal(readModel.visual_sample_claim_boundary.test_double_detected, true);
+      assert.equal(readModel.visual_sample_claim_boundary.mock_fixture_visual_sample_allowed, false);
+      assert.equal(readModel.visual_sample_claim_boundary.test_double_can_claim_visual_design_quality, false);
+      assert.equal(readModel.visual_sample_claim_boundary.display_as_native_ppt_visual_sample_allowed, false);
+      assert.equal(readModel.visual_sample_claim_boundary.proves_artifact_export_chain, true);
+      assert.equal(readModel.visual_sample_claim_boundary.proves_visual_design_quality, false);
+      assert.equal(
+        readModel.visual_sample_claim_boundary.required_for_visual_quality_claim.includes('editable_shape_plan.design_spec_lock'),
+        true,
+      );
       assert.equal(readModel.repair_policy.blocked_page_only, true);
       assert.equal(readModel.repair_policy.target_source, 'screenshot_review.blocked_slide_ids');
       assert.equal(readModel.quality_gate_refs.includes('agent/quality_gates/screenshot_review.md'), true);
@@ -284,6 +319,12 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
         artifact.native_ppt_bundle.quality_nonregression_read_model_ref,
         'native_quality_nonregression_read_model',
       );
+      assert.equal(artifact.native_ppt_bundle.test_double_boundary.kind, 'deterministic_codex_test_double');
+      assert.equal(artifact.native_ppt_bundle.test_double_boundary.proves_visual_design_quality, false);
+      assert.equal(artifact.native_ppt_bundle.visual_sample_claim.sample_kind, 'deterministic_test_double_plumbing_proof');
+      assert.equal(artifact.native_ppt_bundle.visual_sample_claim.proves_visual_design_quality, false);
+      assert.equal(artifact.native_ppt_bundle.visual_sample_claim.display_as_visual_sample_allowed, false);
+      assert.equal(artifact.native_ppt_bundle.visual_sample_claim.mock_fixture_visual_sample_allowed, false);
     });
   } finally {
     restoreEnv();

@@ -32,6 +32,10 @@ Native PPTX adopts the useful design discipline from `ppt-master` and `officecli
 
 The native helper does not choose templates or redesign pages. It validates and materializes the plan, runs officecli writer / QA gates, renders the PPTX through LibreOffice / Poppler, and emits the shape manifest consumed by RCA review gates.
 
+`officecli` is therefore the editable PPTX materializer, not the designer. `ppt-master` is the reference for process discipline: lock a design spec before page authoring, make every page carry a concrete visual plan, run page-level SVG / rendered QA before export, and treat visual drift as a re-authoring problem. RCA keeps those ideas inside its own `visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx` chain; it does not hand product-entry ownership to `ppt-master`.
+
+Mock Codex helpers are only deterministic test doubles. They may generate fixed shape plans so CI can prove route plumbing, contract validation, fail-closed checks, OfficeCLI materialization, true render proof, and export file wiring. They are not templates, not native PPTX design references, and must not be displayed as visual quality samples. Any native PPTX visual sample claim requires a live Codex executor shape plan plus `editable_shape_plan.design_spec_lock`, per-slide layout intent, LibreOffice / Poppler screenshots, RCA visual director review, screenshot review, and export evidence.
+
 The hard design floor is:
 
 - explicit layout intent and composition signature for every slide;

@@ -428,11 +428,46 @@ export function buildMockPptNativeShapePlan(meta) {
       template_substitution_allowed: false,
       preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
     },
+    test_double_boundary: {
+      kind: 'deterministic_codex_test_double',
+      fixture_owner: 'tests/helpers/mock-codex-cli-parts/ppt-builders/native.ts',
+      purpose: 'ci_contract_route_plumbing_and_fail_closed_quality_tests',
+      hardcoded_visual_style_fixture: true,
+      proves_visual_design_quality: false,
+      display_as_native_ppt_visual_sample_allowed: false,
+      replacement_for_live_codex_executor: false,
+    },
     editable_shape_plan: {
       contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
       route,
       scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
       target_slide_ids: [...targetSlideIds],
+      design_spec_lock: {
+        source: 'mock_visual_direction_fixture',
+        design_owner: 'test_double_only',
+        visual_motif: 'hardcoded_ci_fixture_not_a_presentation_template',
+        palette: {
+          canvas: '#F6F2EA',
+          ink: '#171C24',
+          muted: '#5B6570',
+          accent: '#B94624',
+          panel: '#EFE6D6',
+        },
+        typography: {
+          title_pt_min: 36,
+          body_pt_min: 18,
+          point_index_pt_min: 16,
+        },
+        layout_rhythm: {
+          repeated_concrete_composition_limit: 2,
+          required_distinct_composition_share: 0.75,
+        },
+        borrowed_discipline: {
+          from: 'ppt-master',
+          adopted: ['spec_lock', 'per_page_visual_plan', 'rendered_quality_gate'],
+          not_adopted: ['ppt_master_product_entry_owner', 'mock_helper_as_visual_template'],
+        },
+      },
       authoring_ir: {
         kind: 'redcube_svg_ir',
         version: 1,

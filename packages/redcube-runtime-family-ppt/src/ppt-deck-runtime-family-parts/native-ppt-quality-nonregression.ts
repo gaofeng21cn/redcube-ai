@@ -74,13 +74,21 @@ export function buildNativePptQualityNonregressionReadModel({
   shapeManifestFile,
   renderProof,
   repairEvidence,
+  generationRuntime = null,
+  testDoubleBoundary = null,
 }: {
   route: NativePptRoute;
   editableShapePlanFile: string;
   shapeManifestFile: string;
   renderProof: JsonRecord;
   repairEvidence: JsonRecord;
+  generationRuntime?: JsonRecord | null;
+  testDoubleBoundary?: JsonRecord | null;
 }): JsonRecord {
+  const isTestDouble = Boolean(testDoubleBoundary)
+    || safeText(generationRuntime?.run_id).startsWith('mock_')
+    || safeText(generationRuntime?.owner).includes('mock')
+    || safeText(generationRuntime?.adapter_surface).includes('mock');
   return {
     surface_kind: 'ppt_native_pptx_quality_nonregression_read_model',
     owner: 'redcube_ai',
@@ -116,12 +124,34 @@ export function buildNativePptQualityNonregressionReadModel({
       contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
       creative_owner: 'llm_agent',
       python_helper_role: 'execute_validate_export_only',
+      design_spec_lock_required: true,
+      per_page_visual_plan_required: true,
+      ppt_master_style_discipline_adopted: ['spec_lock', 'per_page_visual_plan', 'svg_qa_before_export', 'rendered_quality_gate'],
       layout_intent_required: true,
       composition_signature_required: true,
       title_underline_motif_allowed: false,
       concrete_layout_variant_repetition_limit: 2,
       helper_can_replace_ai_creative_owner: false,
       fail_closed_when_missing: true,
+    },
+    visual_sample_claim_boundary: {
+      sample_kind: isTestDouble ? 'deterministic_test_double_plumbing_proof' : 'live_codex_executor_native_ppt_sample',
+      structured_executor: isTestDouble ? 'mock_codex_test_double' : safeText(generationRuntime?.owner, 'codex_cli'),
+      test_double_detected: isTestDouble,
+      mock_fixture_visual_sample_allowed: false,
+      test_double_can_claim_visual_design_quality: false,
+      display_as_native_ppt_visual_sample_allowed: !isTestDouble,
+      proves_artifact_export_chain: true,
+      proves_visual_design_quality: !isTestDouble,
+      required_for_visual_quality_claim: [
+        'live_codex_executor_shape_plan',
+        'editable_shape_plan.design_spec_lock',
+        'per_slide_layout_intent',
+        'libreoffice_poppler_render_screenshots',
+        'visual_director_review',
+        'screenshot_review',
+        'export_pptx',
+      ],
     },
     officecli_materializer_policy_ref: {
       policy_id: OFFICECLI_MATERIALIZER_POLICY.policy_id,

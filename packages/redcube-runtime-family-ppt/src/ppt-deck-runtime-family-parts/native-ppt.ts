@@ -251,8 +251,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
         },
         design_system: {
-          borrowed_principles: ['spec_lock', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
+          borrowed_principles: ['ppt_master_style_spec_lock', 'per_page_visual_plan', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
           owner: 'llm_agent',
+          spec_lock_required: true,
+          per_page_visual_qa_required: true,
+          mock_fixture_visual_sample_allowed: false,
+          test_double_can_claim_visual_quality: false,
           grid: {
             canvas_in: { width: 16, height: 9 },
             edge_margin_in_min: 0.6,
@@ -269,6 +273,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
             repeated_concrete_composition_limit: 2,
             required_distinct_composition_share: 0.75,
           },
+          evidence_required_for_visual_sample: [
+            'live_codex_executor_shape_plan',
+            'editable_shape_plan.design_spec_lock',
+            'per_slide_layout_intent',
+            'libreoffice_poppler_render_screenshots',
+            'visual_director_review',
+            'screenshot_review',
+            'export_pptx',
+          ],
         },
         slides: [
           {
@@ -367,6 +380,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     }
     return {
       ...plan,
+      ...(data?.test_double_boundary
+        ? {
+            test_double_boundary: data.test_double_boundary,
+          }
+        : {}),
       contract_kind: safeText(plan?.contract_kind, 'redcube_ai_first_native_ppt_shape_plan'),
       route: safeText(plan?.route, route),
       slides,
@@ -842,7 +860,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       shapeManifestFile: paths.shapeManifestFile,
       renderProof,
       repairEvidence,
+      generationRuntime,
+      testDoubleBoundary: editableShapePlan?.test_double_boundary || generatedPlan?.editableShapePlan?.test_double_boundary || null,
     });
+    const isMockStructuredExecutor = safeText(generationRuntime?.run_id).startsWith('mock_')
+      || safeText(generationRuntime?.owner).includes('mock')
+      || safeText(generationRuntime?.adapter_surface).includes('mock')
+      || Boolean(editableShapePlan?.test_double_boundary);
     return {
       ...attachCommon(route, contract, null, adapter),
       status: 'completed',
@@ -854,6 +878,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       },
       native_ppt_bundle: {
         source_visual_route: route,
+        visual_sample_claim: {
+          sample_kind: isMockStructuredExecutor ? 'deterministic_test_double_plumbing_proof' : 'live_codex_executor_native_ppt_sample',
+          proves_artifact_export_chain: true,
+          proves_visual_design_quality: !isMockStructuredExecutor,
+          display_as_visual_sample_allowed: !isMockStructuredExecutor,
+          requires_human_visual_inspection: !isMockStructuredExecutor,
+          mock_fixture_visual_sample_allowed: false,
+        },
+        test_double_boundary: editableShapePlan?.test_double_boundary || null,
         builder: payload.builder || { kind: 'python_pptx_native_shapes' },
         capability: payload.capability || null,
         engine_capabilities: payload.engine_capabilities || shapeManifest.engine_capabilities || REQUIRED_ENGINE_CAPABILITIES,

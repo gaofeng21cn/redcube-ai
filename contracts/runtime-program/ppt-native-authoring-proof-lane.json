@@ -59,6 +59,14 @@
       "editable_shape_manifest_required": true,
       "python_helper_role": "execute_validate_export_only",
       "template_substitution_allowed": false,
+      "design_spec_lock_required": true,
+      "per_page_visual_plan_required": true,
+      "ppt_master_style_discipline_adopted": [
+        "spec_lock",
+        "per_page_visual_plan",
+        "svg_qa_before_export",
+        "rendered_quality_gate"
+      ],
       "preserved_gates": [
         "visual_director_review",
         "screenshot_review",
@@ -232,6 +240,13 @@
       },
     "production_hardening": {
       "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
+      "live_product_entry_proof_scope": "product_entry_route_review_export_and_true_render_proof",
+      "mock_codex_test_double_policy": {
+        "allowed": true,
+        "purpose": "deterministic_contract_route_plumbing_and_fail_closed_tests",
+        "can_claim_visual_design_quality": false,
+        "display_as_visual_sample_allowed": false
+      },
       "proof_runner": "tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof",
       "ci_manual_lane": ".github/workflows/ci.yml workflow_dispatch native-ppt-proof",
       "ci_proof_lane_v2": ".github/workflows/ci.yml workflow_dispatch + schedule + pull_request label native-ppt-proof",
