@@ -86,6 +86,53 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-28 support owner index revalidation tranche
+
+本轮覆盖 RCA `docs/product/`、`docs/runtime/`、`docs/delivery/`、`docs/source/`、`docs/policies/`、`docs/specs/` 与 `docs/public/` 的 owner index 读法。目标是确认这些 canonical support 层继续只承担人读索引 / support 角色，不把 product、runtime、delivery、source、policy、spec 或 public 入口写成第二 active truth、RCA-owned generic runtime、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。本轮不改 active truth，不关闭 OPL series 全局 `/goal`。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/status.md`, `docs/architecture.md`, and this governance ledger.
+- Reviewed owner indexes: `docs/product/README.md`, `docs/runtime/README.md`, `docs/delivery/README.md`, `docs/source/README.md`, `docs/policies/README.md`, `docs/specs/README.md`, and `docs/public/README.md`.
+- Machine truth refs: `contracts/runtime-program/current-program.json`, `contracts/functional_privatization_audit.json`, `contracts/production_acceptance/rca-production-acceptance.json`, and OPL Doc Governance doctor output.
+- Support scan terms: `functional_structure_gap_count`, OPL / Temporal / Codex / Hermes, attempt ledger, workspace receipt scaleout, production soak, visual ready, exportable and handoffable across reviewed support docs and the three machine contracts.
+
+Fresh semantic result:
+
+- The seven reviewed owner indexes already carry first-screen `Owner` / `Purpose` / `State` / `Machine boundary` signals and have one durable role each: product entry/user guidance index, runtime boundary index, delivery route/proof index, source readiness index, stable policy index, active spec index and public narrative index.
+- `docs/runtime/README.md` correctly distinguishes refs-only, mock and real sample evidence. AgentLab / mock route smoke / Codex-native image sample prove observable plumbing or sample materialization only; they do not declare visual ready, exportable, handoffable or production soak.
+- `docs/delivery/README.md` and the delivery docs keep final visual ready / exportable / handoffable authority on RCA-owned review/export gates, workspace artifacts, artifact manifests, review/export receipts and owner receipts. Route notes for HTML/native/image-first remain explicit route/proof/support docs, not hidden fallback chains.
+- `docs/source/README.md` correctly keeps source readiness / augmentation `planning_ready` as downstream consumption readiness only, not artifact authority, review/export verdict, domain ready or production ready.
+- `docs/policies/README.md` preserves policy-layer boundaries: default concrete executor is Codex CLI, `Hermes-Agent` remains explicit hosted/proof backend or adapter lane, and historical repo-local managed runtime pilot remains provenance.
+- `docs/specs/README.md` and `docs/public/README.md` remain thin indexes. They explicitly reject moving old program/capabilities/Gateway/retired public entry/federation/source-pack-federation、early Hermes proof-lane centered workbench narrative into specs or public narrative as a second truth source.
+- `contracts/functional_privatization_audit.json` still reports `functional_structure_gap_count=0` as source-shape / classification evidence while retaining evidence gates for artifact-producing owner receipt, OPL-hosted controlled visual-stage long soak, real memory lifecycle receipt instances and cross-family repeated no-regression evidence.
+- `contracts/production_acceptance/rca-production-acceptance.json` still keeps `workspace_receipt_scaleout_claimed=false` and `declares_production_soak_complete=false`; OPL/provider/conformance remain unable to authorize visual ready, exportable, handoffable or domain ready.
+- No prose body rewrite, archive, tombstone or deletion was needed. This tranche records fresh support-owner index coverage only.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Full read of the seven support owner indexes listed above; support read of core/active/ideal-state docs, current-program, functional privatization audit, production acceptance contract, stale-term scan and OPL Doc Governance doctor. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. The governed indexes keep legitimate current support/index roles.
+
+Unreviewed docs:
+
+- RCA product/runtime/delivery/source/policy/spec/public owner indexes are covered by this tranche. Their child support docs remain governed by prior focused tranches or future exact changed-doc tranches when source/contract/read-model changes reopen a section.
+- OPL, MAS and App coverage remains open under the global OPL series ledger; App body governance remains delayed while the dedicated release / GUI lane is dirty/conflicting and not safe for generic absorb.
+
+Remaining stale / retire candidates:
+
+- Future RCA prose that upgrades owner index content, AgentLab refs-only observation, mock route smoke, Codex-native sample generation, workspace receipt scaleout refs, `functional_structure_gap_count=0`, provider completion, conformance pass or OPL generated/default refs into visual ready, exportable, handoffable, domain ready, production ready, App/workbench ownership, artifact authority, review/export verdict or production visual-stage long soak is stale pollution.
+- Future support docs under these directories must continue to route machine truth to contracts, schemas, source, generated artifacts, runtime artifacts, owner receipts and RCA-owned review/export gates, not to Markdown path or prose wording.
+
+Next tranche write scope:
+
+- Continue MAS remaining repo-wide coverage or OPL support clusters that have safe main/worktree state.
+- Keep App docs delayed until active release / GUI lanes are safe or explicitly handed to this governance goal.
+- Return to RCA only for newly changed docs, reopened source/contract/read-model sections, or implementation/evidence owner lanes that close a current production evidence / default-caller / strict-purity tail and need doc foldback.
+
 ### 2026-05-28 integration memory receipt readout tranche
 
 本轮覆盖 RCA integration support 与 visual memory policy 中 reopened 的 memory / receipt readout 口径。目标是把 `descriptor_proof_contract_landed_runtime_writeback_pending`、`controlled_memory_apply_proof`、`workspace_receipt_inventory_projection`、workspace receipt scaleout snapshot 与 production acceptance flags 分层读取：descriptor / memory body / production-scale writeback 仍 pending；body-free runtime receipt refs 和 inventory / scaleout accounting refs 已可见；二者都不能升级为 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak evidence。
