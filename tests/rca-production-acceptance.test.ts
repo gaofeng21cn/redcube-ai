@@ -9,6 +9,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const acceptancePath = 'contracts/production_acceptance/rca-production-acceptance.json';
 const evidenceFixturePath = 'contracts/production_acceptance/rca-evidence-receipt-fixture.json';
+const realNoRegressionRefs = [
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+];
 
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
@@ -317,6 +321,21 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.equal(scaleout.repeated_no_regression_evidence_refs.generator_action, 'emit_no_regression_evidence');
   assertRefArray(scaleout.repeated_no_regression_evidence_refs.evidence_refs, 'repeated_no_regression_evidence_refs.evidence_refs');
   assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.length >= 2, true);
+  for (const evidenceRef of realNoRegressionRefs) {
+    assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
+  }
+  assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 2);
+  assert.equal(
+    scaleout.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
+    'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
+  );
+  assert.deepEqual(
+    scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_provenance.map(
+      (evidence) => evidence.evidence_ref,
+    ),
+    realNoRegressionRefs,
+  );
   assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.deliverable_family_refs, [
     'ppt_deck',
     'xiaohongshu',
@@ -717,6 +736,10 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs,
     'production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs',
   );
+  for (const evidenceRef of realNoRegressionRefs) {
+    assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
+  }
+  assert.deepEqual(scaleoutFixture.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.evidence_cadence, 'repeated_family_refs_only');
   assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.declares_production_soak_complete, false);
   assert.equal(scaleoutFixture.review_export_verdict_refs.verdict_body_projected_to_opl, false);

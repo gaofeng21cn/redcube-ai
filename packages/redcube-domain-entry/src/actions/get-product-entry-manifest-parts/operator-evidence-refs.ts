@@ -99,6 +99,24 @@ const RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS = Object.freeze([
   'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
 ]);
 
+const RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527 = Object.freeze([
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+]);
+
+const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE_20260527 = Object.freeze([
+  Object.freeze({
+    evidence_ref: 'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
+    workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-a',
+    sha256: '411f05e8b9cd07f8e6789c23dbeae050d9d0f20666d5a78a1370ccba8886e8dd',
+  }),
+  Object.freeze({
+    evidence_ref: 'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+    workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b',
+    sha256: '668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a',
+  }),
+]);
+
 const RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_ID = 'rca.production_evidence_tail_workorder.v1';
 
 const RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES = Object.freeze([
@@ -132,6 +150,7 @@ export function buildProductionEvidenceScaleoutRefs({
   const noRegressionEvidenceRefs = uniqueRefs([
     'rca-no-regression:visual-stage:transition-hosted-no-regression',
     'rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression',
+    ...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527,
   ]);
   const ownerChainRefs = uniqueRefs([
     'contracts/production_acceptance/rca-evidence-receipt-fixture.json',
@@ -256,6 +275,11 @@ export function buildProductionEvidenceScaleoutRefs({
       proof_contract_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       proof_status: noRegressionProof.status || 'unknown',
       evidence_refs: noRegressionEvidenceRefs,
+      real_runtime_evidence_refs: [...RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527],
+      real_runtime_evidence_ref_count: RCA_REAL_NO_REGRESSION_EVIDENCE_REFS_20260527.length,
+      real_runtime_evidence_provenance: [...RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE_20260527],
+      opl_external_evidence_receipt_ref:
+        'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
       deliverable_family_refs: [
         'ppt_deck',
         'xiaohongshu',

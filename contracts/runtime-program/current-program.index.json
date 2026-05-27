@@ -196,7 +196,7 @@
       "json_pointer": "/current_state/active_baton/scope/operator_evidence_readiness_projection",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/operator_evidence_readiness_projection.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 153
+      "line_count": 173
     },
     {
       "json_pointer": "/current_state/active_baton/scope/opl_family_lifecycle_adapter",

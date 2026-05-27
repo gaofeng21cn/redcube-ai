@@ -14,6 +14,11 @@ import {
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
+const REAL_NO_REGRESSION_REFS_20260527 = [
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
+  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
+];
+
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
@@ -523,6 +528,14 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.required_minimum_evidence_ref_count,
       2,
+    );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.real_runtime_evidence_refs,
+      REAL_NO_REGRESSION_REFS_20260527,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
+      'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs',
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,

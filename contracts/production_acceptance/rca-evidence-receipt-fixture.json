@@ -136,8 +136,28 @@
       "proof_contract_ref": "redcube product manifest#/no_regression_owner_receipt_opl_consumption_proof",
       "evidence_refs": [
         "rca-no-regression:visual-stage:transition-hosted-no-regression",
-        "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression"
+        "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b"
       ],
+      "real_runtime_evidence_refs": [
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+        "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b"
+      ],
+      "real_runtime_evidence_ref_count": 2,
+      "real_runtime_evidence_provenance": [
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-a",
+          "sha256": "411f05e8b9cd07f8e6789c23dbeae050d9d0f20666d5a78a1370ccba8886e8dd"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b",
+          "sha256": "668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a"
+        }
+      ],
+      "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260527-2-refs",
       "deliverable_family_refs": [
         "ppt_deck",
         "xiaohongshu"
