@@ -18,6 +18,8 @@ test('native PPT Linux proof environment is documented without adding a desktop-
 
   assert.match(runner, /LibreOffice\/Poppler/);
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
+  assert.match(runner, /renderer_auto_install=1/);
+  assert.match(runner, /REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="\$renderer_auto_install"/);
   assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
   assert.match(installScript, /brew install --cask libreoffice/);
   assert.match(installScript, /brew install poppler/);

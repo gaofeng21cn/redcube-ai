@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import math
+import os
 import platform
 import shutil
 import subprocess
@@ -12,6 +13,7 @@ from pathlib import Path
 from PIL import Image
 
 from redcube_ai.native_helpers.renderer_dependencies import (
+    NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND,
     install_commands,
     libreoffice_probe,
     platform_install_hint,
@@ -57,8 +59,9 @@ ENGINE_CAPABILITIES = {
 }
 RENDERER_PIPELINE = 'libreoffice_headless_pdf_png_v1'
 RENDERER_KIND = 'libreoffice_headless'
+REPO_ROOT = Path(__file__).resolve().parents[4]
 DEFAULT_ENGINE_CONTRACT_FILE = (
-    Path(__file__).resolve().parents[4]
+    REPO_ROOT
     / 'contracts'
     / 'runtime-program'
     / 'ppt-native-python-engine-contract.json'
@@ -485,34 +488,139 @@ def platform_provenance() -> dict:
     }
 
 
-def resolve_renderer(renderer_name: str) -> dict:
-    requested = safe_text(renderer_name, 'auto')
-    if requested not in {'auto', RENDERER_KIND}:
-        fail(f'unsupported native PPT renderer: {requested}; expected auto or {RENDERER_KIND}')
+def renderer_dependency_blocker(
+    message: str,
+    *,
+    probes: list[dict] | None = None,
+    bootstrap: dict | None = None,
+) -> str:
+    payload = {
+        'error_kind': 'missing_renderer_dependency',
+        'typed_blocker_kind': 'missing_renderer_dependency',
+        'renderer_selection': 'capability_probe_auto',
+        'required_surface': 'native_pptx_true_render_proof',
+        'supported_renderers': [
+            {
+                'renderer_kind': RENDERER_KIND,
+                'renderer_pipeline': RENDERER_PIPELINE,
+                'runtime': RENDERER_KIND,
+                'requires': ['LibreOffice headless', 'Poppler pdftoppm'],
+            }
+        ],
+        'synthetic_preview_allowed': False,
+        'fail_closed_when_missing': True,
+        'bootstrap_policy': 'auto_install_then_probe',
+        'dependency_install_commands': install_commands(),
+        'message': message,
+        'probes': probes or [],
+        'bootstrap': bootstrap or {},
+    }
+    return json.dumps(payload, ensure_ascii=False, sort_keys=True)
+
+
+def missing_renderer_reasons(*probes: dict) -> list[str]:
+    return [
+        safe_text(probe.get('blocked_reason'))
+        for probe in probes
+        if not probe.get('available') and safe_text(probe.get('blocked_reason'))
+    ]
+
+
+def renderer_probe() -> dict:
     soffice_probe = libreoffice_probe()
-    soffice = safe_text(soffice_probe.get('path'))
-    install_hint = platform_install_hint()
-    if not soffice:
-        fail(
-            'native PPT true render requires LibreOffice headless (soffice or libreoffice) for '
-            f'{RENDERER_PIPELINE}; run {install_hint} or use Docker'
-        )
     pdftoppm_probe = poppler_probe('pdftoppm')
-    pdftoppm = safe_text(pdftoppm_probe.get('path'))
-    if not pdftoppm:
-        fail(
-            'native PPT true render requires Poppler pdftoppm for PDF-to-PNG previews; '
-            f'run {install_hint} or use Docker'
-        )
+    return {
+        'soffice_probe': soffice_probe,
+        'pdftoppm_probe': pdftoppm_probe,
+        'soffice': safe_text(soffice_probe.get('path')),
+        'pdftoppm': safe_text(pdftoppm_probe.get('path')),
+    }
+
+
+def should_bootstrap_renderer(requested: str) -> bool:
+    if requested != 'auto':
+        return False
+    return safe_text(os.environ.get('REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL'), '1') != '0'
+
+
+def run_renderer_dependency_bootstrap() -> dict:
+    installer = NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND
+    completed = subprocess.run(
+        [installer],
+        text=True,
+        capture_output=True,
+        check=False,
+        cwd=str(REPO_ROOT),
+    )
+    return {
+        'attempted': True,
+        'command': installer,
+        'returncode': completed.returncode,
+        'stdout': safe_text(completed.stdout),
+        'stderr': safe_text(completed.stderr),
+    }
+
+
+def resolve_probed_renderer(probe: dict, bootstrap: dict | None = None) -> dict | None:
+    soffice = safe_text(probe.get('soffice'))
+    pdftoppm = safe_text(probe.get('pdftoppm'))
+    if not soffice or not pdftoppm:
+        return None
     return {
         'kind': RENDERER_KIND,
         'pipeline': RENDERER_PIPELINE,
+        'runtime': RENDERER_KIND,
+        'selection_policy': 'capability_probe_auto',
+        'bootstrap_policy': 'auto_install_then_probe',
+        'bootstrap_attempted': bool(bootstrap and bootstrap.get('attempted')),
+        'bootstrap_command': safe_text((bootstrap or {}).get('command')),
         'soffice': soffice,
         'pdftoppm': pdftoppm,
         'dependency_install_commands': install_commands(),
         'libreoffice_version': command_version([soffice, '--version']),
         'poppler_version': command_version([pdftoppm, '-v']),
     }
+
+
+def resolve_renderer(renderer_name: str) -> dict:
+    requested = safe_text(renderer_name, 'auto')
+    if requested not in {'auto', RENDERER_KIND}:
+        fail(f'unsupported native PPT renderer: {requested}; expected auto or {RENDERER_KIND}')
+    initial_probe = renderer_probe()
+    renderer = resolve_probed_renderer(initial_probe)
+    if renderer:
+        return renderer
+
+    bootstrap = None
+    if should_bootstrap_renderer(requested):
+        bootstrap = run_renderer_dependency_bootstrap()
+        reprobe = renderer_probe()
+        renderer = resolve_probed_renderer(reprobe, bootstrap)
+        if renderer:
+            return renderer
+        probes = [reprobe['soffice_probe'], reprobe['pdftoppm_probe']]
+    else:
+        probes = [initial_probe['soffice_probe'], initial_probe['pdftoppm_probe']]
+
+    reasons = missing_renderer_reasons(*probes)
+    if bootstrap and bootstrap.get('returncode') != 0:
+        reasons.append(
+            safe_text(bootstrap.get('stderr'))
+            or safe_text(bootstrap.get('stdout'))
+            or f"installer exited {bootstrap.get('returncode')}"
+        )
+    install_hint = platform_install_hint()
+    fail(renderer_dependency_blocker(
+        'native PPT true render proof requires a supported renderer capability; '
+        f'current supported pipeline is {RENDERER_PIPELINE}; run {install_hint} or use Docker',
+        probes=probes,
+        bootstrap=bootstrap or {'attempted': False, 'command': NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND},
+    ) if requested == 'auto' else renderer_dependency_blocker(
+        'native PPT true render proof requires LibreOffice headless and Poppler for '
+        f'{RENDERER_PIPELINE}: {"; ".join(reasons)}; run {install_hint} or use Docker',
+        probes=probes,
+        bootstrap=bootstrap or {'attempted': False, 'command': NATIVE_PPT_DEPENDENCY_INSTALL_COMMAND},
+    ))
 
 
 def clean_render_outputs(preview_dir: Path, pdf_target: Path) -> None:

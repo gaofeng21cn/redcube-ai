@@ -92,6 +92,10 @@ mkdir -p "$output_root" "$workspace_root" "$native_dir" "$preview_dir"
 if [ "$skip_system_deps" != "1" ]; then
   tools/native-ppt-proof/install-deps.sh
 fi
+renderer_auto_install=1
+if [ "$skip_system_deps" = "1" ]; then
+  renderer_auto_install=0
+fi
 
 npm run --silent build
 
@@ -124,6 +128,7 @@ Path(sys.argv[2]).write_text(json.dumps(payload, ensure_ascii=False, indent=2), 
 PY
 
 PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
+  REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="$renderer_auto_install" \
   "$proof_python" -m redcube_ai.native_helpers.ppt_deck.native \
     --input-json "$fixture_input" \
     --mode author \

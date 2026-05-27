@@ -271,11 +271,14 @@ function typedBlocker({ lane, route, error, result }) {
     'route execution blocked',
   );
   const lower = message.toLowerCase();
+  const parsedMessage = parseJsonObject(message);
   const errorKind = safeText(
     error?.code
       || error?.failure_kind
       || errorPayload?.code
       || errorPayload?.failure_kind
+      || parsedMessage?.typed_blocker_kind
+      || parsedMessage?.error_kind
       || result?.error_kind,
   );
   let blockerKind = errorKind || 'route_execution_blocked';
@@ -300,6 +303,19 @@ function typedBlocker({ lane, route, error, result }) {
     run_id: safeText(run?.run_id) || null,
     artifact_file: safeText(result?.artifactFile || errorPayload?.artifact_file || error?.artifact_file) || null,
   };
+}
+
+function parseJsonObject(value) {
+  try {
+    const parsed = JSON.parse(safeText(value));
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function typedBlockerForTest(input) {
+  return typedBlocker(input);
 }
 
 function routeSurface(productEntryResult) {

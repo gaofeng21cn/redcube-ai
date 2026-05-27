@@ -5,7 +5,10 @@ import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
-import { runRealRouteEvolutionProbe } from '../scripts/run-real-route-evolution-probe.ts';
+import {
+  runRealRouteEvolutionProbe,
+  typedBlockerForTest,
+} from '../scripts/run-real-route-evolution-probe.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -91,4 +94,24 @@ test('real route evolution probe reports typed blockers for route execution time
   assert.equal(report.quality_gate_policy.agent_lab_score_is_not_visual_quality_verdict, true);
   assert.equal(existsSync(report.report_file), true);
   assert.equal(readJson(report.report_file).typed_blockers[0].blocker_kind, 'route_execution_timeout');
+});
+
+test('real route evolution probe preserves native renderer dependency typed blockers', () => {
+  const blocker = typedBlockerForTest({
+    lane: 'native',
+    route: 'author_pptx_native',
+    error: {
+      message: JSON.stringify({
+        typed_blocker_kind: 'missing_renderer_dependency',
+        error_kind: 'missing_renderer_dependency',
+        renderer_selection: 'capability_probe_auto',
+        bootstrap_policy: 'auto_install_then_probe',
+        message: 'native PPT true render proof requires a supported renderer capability',
+      }),
+    },
+  });
+
+  assert.equal(blocker.blocker_kind, 'missing_renderer_dependency');
+  assert.equal(blocker.lane, 'native');
+  assert.equal(blocker.route, 'author_pptx_native');
 });

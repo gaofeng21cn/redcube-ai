@@ -10,14 +10,68 @@ from redcube_ai.native_helpers.ppt_deck import native
 
 
 class NativePptLibreOfficeRendererTest(unittest.TestCase):
-    def test_auto_renderer_fails_closed_instead_of_selecting_legacy_desktop_renderer(self):
+    def test_auto_renderer_runs_installer_then_reprobes_true_render_capability(self):
+        probe_count = 0
+
+        def fake_which(name):
+            nonlocal probe_count
+            if name == 'soffice':
+                probe_count += 1
+                return '/usr/local/bin/soffice' if probe_count > 1 else None
+            if name == 'pdftoppm':
+                return '/usr/local/bin/pdftoppm' if probe_count > 1 else None
+            return None
+
+        def fake_run(command, text, capture_output, check, cwd=None):
+            if command == ['tools/native-ppt-proof/install-deps.sh']:
+                self.assertEqual(cwd, str(native.REPO_ROOT))
+                return native.subprocess.CompletedProcess(command, 0, stdout='installed\n', stderr='')
+            if command[:2] == ['/usr/local/bin/soffice', '--version']:
+                return native.subprocess.CompletedProcess(command, 0, stdout='LibreOffice 26.2.3\n', stderr='')
+            if command[:2] == ['/usr/local/bin/pdftoppm', '-v']:
+                return native.subprocess.CompletedProcess(command, 0, stdout='', stderr='pdftoppm version 26.04.0\n')
+            raise AssertionError(f'unexpected command: {command}')
+
+        with (
+            mock.patch.object(renderer_dependencies.shutil, 'which', side_effect=fake_which),
+            mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
+            mock.patch.object(native.subprocess, 'run', side_effect=fake_run) as run,
+        ):
+            renderer = native.resolve_renderer('auto')
+
+        self.assertEqual(renderer['kind'], 'libreoffice_headless')
+        self.assertEqual(renderer['pipeline'], 'libreoffice_headless_pdf_png_v1')
+        self.assertEqual(renderer['bootstrap_policy'], 'auto_install_then_probe')
+        self.assertTrue(renderer['bootstrap_attempted'])
+        self.assertEqual(renderer['bootstrap_command'], 'tools/native-ppt-proof/install-deps.sh')
+        self.assertEqual(run.call_args_list[0].args[0], ['tools/native-ppt-proof/install-deps.sh'])
+        self.assertEqual(run.call_args_list[0].kwargs.get('cwd'), str(native.REPO_ROOT))
+
+    def test_auto_renderer_fails_closed_with_typed_blocker_after_install_attempt(self):
+        def fake_run(command, text, capture_output, check, cwd=None):
+            if command == ['tools/native-ppt-proof/install-deps.sh']:
+                self.assertEqual(cwd, str(native.REPO_ROOT))
+                return native.subprocess.CompletedProcess(
+                    command,
+                    127,
+                    stdout='',
+                    stderr='Homebrew is required\n',
+                )
+            raise AssertionError(f'unexpected command: {command}')
+
         with (
             mock.patch.object(renderer_dependencies.shutil, 'which', return_value=None),
             mock.patch.object(renderer_dependencies.Path, 'exists', return_value=False),
-            mock.patch('sys.stderr'),
+            mock.patch.object(native.subprocess, 'run', side_effect=fake_run),
+            mock.patch('sys.stderr') as stderr,
             self.assertRaises(SystemExit),
         ):
             native.resolve_renderer('auto')
+        message = ''.join(call.args[0] for call in stderr.write.call_args_list if call.args)
+        self.assertIn('missing_renderer_dependency', message)
+        self.assertIn('tools/native-ppt-proof/install-deps.sh', message)
+        self.assertIn('Homebrew is required', message)
+        self.assertIn('libreoffice_headless_pdf_png_v1', message)
 
     def test_libreoffice_renderer_fails_closed_when_poppler_is_missing(self):
         def fake_which(name):
