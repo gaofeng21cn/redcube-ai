@@ -40,7 +40,33 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.deepEqual(manifest.formal_entry.retired_internal_surface_ids, [
       'retired_gateway_protocol_boundary_public_entry',
     ]);
-    assert.equal(manifest.formal_entry.retired_internal_surface_ids.includes('gateway'), false);
+    assert.deepEqual(manifest.formal_entry.retired_internal_surface_policy, {
+      surface_kind: 'retired_internal_surface_policy',
+      semantic_id_required: true,
+      required_id_prefix: 'retired_',
+      legacy_raw_surface_ids_forbidden: [
+        'managed',
+        'runtime',
+        'gateway',
+        'session',
+        'domain_action_adapter',
+      ],
+      legacy_terms_allowed_only_inside_retired_semantic_ids: true,
+      compatibility_alias_allowed: false,
+      callable_alias_allowed: false,
+      active_caller_allowed: false,
+      production_readiness_claim_allowed: false,
+    });
+    for (const retiredSurfaceId of manifest.formal_entry.retired_internal_surface_ids) {
+      assert.equal(retiredSurfaceId.startsWith('retired_'), true, retiredSurfaceId);
+      assert.equal(
+        manifest.formal_entry.retired_internal_surface_policy.legacy_raw_surface_ids_forbidden.includes(
+          retiredSurfaceId,
+        ),
+        false,
+        retiredSurfaceId,
+      );
+    }
     assert.equal(manifest.formal_entry.compatibility_alias_allowed, false);
     assert.equal(manifest.workspace_locator.workspace_surface_kind, 'redcube_workspace');
     assert.equal(manifest.workspace_locator.workspace_root, workspaceRoot);

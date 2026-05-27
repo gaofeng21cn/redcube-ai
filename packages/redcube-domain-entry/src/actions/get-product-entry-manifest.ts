@@ -245,6 +245,23 @@ export async function getProductEntryManifest(request) {
       internal_surface: 'domain_entry_protocol_boundary',
       internal_surface_role: 'service_safe_domain_entry_and_protocol_adapter',
       retired_internal_surface_ids: ['retired_gateway_protocol_boundary_public_entry'],
+      retired_internal_surface_policy: {
+        surface_kind: 'retired_internal_surface_policy',
+        semantic_id_required: true,
+        required_id_prefix: 'retired_',
+        legacy_raw_surface_ids_forbidden: [
+          'managed',
+          'runtime',
+          'gateway',
+          'session',
+          'domain_action_adapter',
+        ],
+        legacy_terms_allowed_only_inside_retired_semantic_ids: true,
+        compatibility_alias_allowed: false,
+        callable_alias_allowed: false,
+        active_caller_allowed: false,
+        production_readiness_claim_allowed: false,
+      },
       compatibility_alias_allowed: false,
     },
     workspace_locator: {

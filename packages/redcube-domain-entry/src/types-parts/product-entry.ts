@@ -458,6 +458,17 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     internal_surface: string;
     internal_surface_role?: string;
     retired_internal_surface_ids?: string[];
+    retired_internal_surface_policy?: {
+      surface_kind: 'retired_internal_surface_policy' | string;
+      semantic_id_required: boolean;
+      required_id_prefix: string;
+      legacy_raw_surface_ids_forbidden: string[];
+      legacy_terms_allowed_only_inside_retired_semantic_ids: boolean;
+      compatibility_alias_allowed: boolean;
+      callable_alias_allowed: boolean;
+      active_caller_allowed: boolean;
+      production_readiness_claim_allowed: boolean;
+    };
     compatibility_alias_allowed?: boolean;
   };
   workspace_locator: {
