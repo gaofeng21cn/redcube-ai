@@ -134,18 +134,31 @@ export function buildNativePptOperatorUx({
             : 'workspace_contract_missing',
         },
         {
-          check_id: 'libreoffice_headless',
-          status: 'required_by_runner',
+          check_id: 'native_true_render_capability',
+          status: 'resolved_by_runner_probe',
           blocking: true,
           command: `${NATIVE_PPT_PROOF_COMMAND} --workspace-root ${workspaceRoot} --topic-id <topic-id> --deliverable-id <deliverable-id> --route author_pptx_native`,
-          blocked_reason: 'soffice_headless_missing_or_unusable',
+          renderer_selection_policy: safeText(proofLane?.true_render_proof?.renderer_selection_policy, 'capability_probe_auto_bootstrap'),
+          supported_renderers: Array.isArray(proofLane?.true_render_proof?.supported_renderers)
+            ? proofLane.true_render_proof.supported_renderers
+            : [],
+          typed_blocker: 'missing_renderer_dependency',
+          blocked_reason: 'missing_renderer_dependency',
         },
         {
-          check_id: 'poppler_pdftoppm',
-          status: 'required_by_runner',
+          check_id: 'renderer_auto_bootstrap',
+          status: 'automatic_when_needed',
           blocking: true,
-          command: `${NATIVE_PPT_PROOF_COMMAND} --workspace-root ${workspaceRoot} --topic-id <topic-id> --deliverable-id <deliverable-id> --route author_pptx_native`,
-          blocked_reason: 'pdftoppm_missing_or_unusable',
+          command: safeText(
+            proofLane?.true_render_proof?.bootstrap_policy?.repo_owned_installer,
+            'tools/native-ppt-proof/install-deps.sh',
+          ),
+          proof_container: safeText(
+            proofLane?.true_render_proof?.bootstrap_policy?.proof_container,
+            'tools/native-ppt-proof/Dockerfile',
+          ),
+          user_preinstall_required: proofLane?.true_render_proof?.user_preinstalled_libreoffice_required === true,
+          blocked_reason: null,
         },
       ],
       native_helper_doctor_role: 'diagnostic_only',

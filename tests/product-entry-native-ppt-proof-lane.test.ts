@@ -13,6 +13,50 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
+function assertNativeTrueRenderPolicy(policy) {
+  assert.equal(policy.required, true);
+  assert.equal(policy.source_surface_kind, 'native_pptx');
+  assert.equal(policy.renderer_selection_policy, 'capability_probe_auto_bootstrap');
+  assert.equal(policy.user_preinstalled_libreoffice_required, false);
+  assert.equal(policy.renderer_kind, 'libreoffice_headless');
+  assert.equal(policy.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
+  assert.equal(policy.runtime, 'libreoffice_headless');
+  assert.deepEqual(policy.supported_renderers, [
+    {
+      renderer_kind: 'libreoffice_headless',
+      renderer_stack: 'libreoffice_headless_plus_poppler',
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+      runtime: 'libreoffice_headless',
+      components: ['LibreOffice headless', 'Poppler pdftoppm'],
+      proof_chain: ['pptx_to_pdf', 'pdf_to_png'],
+      required_capabilities: ['soffice_headless', 'pdftoppm'],
+    },
+  ]);
+  assert.deepEqual(policy.bootstrap_policy, {
+    capability_probe: 'native_ppt_renderer_capability_probe',
+    automatic_bootstrap_allowed: true,
+    user_preinstall_required: false,
+    repo_owned_installer: 'tools/native-ppt-proof/install-deps.sh',
+    proof_container: 'tools/native-ppt-proof/Dockerfile',
+  });
+  assert.equal(policy.cross_platform_render_required, true);
+  assert.equal(policy.synthetic_preview_allowed, false);
+  assert.equal(policy.html_render_substitute_allowed, false);
+  assert.equal(policy.officecli_validate_substitute_allowed, false);
+  assert.deepEqual(policy.disallowed_substitutes, [
+    'synthetic_preview',
+    'html_render',
+    'officecli_validate',
+    'desktop_powerpoint_automation',
+    'apple_script_preview',
+  ]);
+  assert.equal(policy.fail_closed_when_missing, true);
+  assert.deepEqual(policy.fail_closed_blocker, {
+    typed_blocker: 'missing_renderer_dependency',
+    emitted_when: 'capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer',
+  });
+}
+
 test('product-entry manifest exposes image-first default and explicit native PPT proof lane', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-manifest-'));
   const manifest = await getProductEntryManifest({
@@ -80,12 +124,7 @@ test('product-entry manifest exposes image-first default and explicit native PPT
     cross_platform_render_required: true,
     screenshot_packaging: false,
   });
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.required, true);
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.renderer_kind, 'libreoffice_headless');
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.runtime, 'libreoffice_headless');
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.cross_platform_render_required, true);
-  assert.equal(pptPolicy.native_ppt_proof_lane.true_render_proof.synthetic_preview_allowed, false);
+  assertNativeTrueRenderPolicy(pptPolicy.native_ppt_proof_lane.true_render_proof);
   assert.equal(manifest.native_ppt_operator_ux.surface_kind, 'native_ppt_operator_ux');
   assert.equal(manifest.native_ppt_operator_ux.status, 'blocked');
   assert.equal(manifest.native_ppt_operator_ux.route_selection.default_visual_route, 'author_image_pages');
@@ -116,9 +155,12 @@ test('product-entry manifest exposes image-first default and explicit native PPT
   assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.surface_kind, 'native_ppt_dependency_diagnostics');
   assert.deepEqual(
     manifest.native_ppt_operator_ux.dependency_diagnostics.checks.map((check) => check.check_id),
-    ['product_entry_preflight', 'workspace_contract_present', 'libreoffice_headless', 'poppler_pdftoppm'],
+    ['product_entry_preflight', 'workspace_contract_present', 'native_true_render_capability', 'renderer_auto_bootstrap'],
   );
-  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].blocked_reason, 'soffice_headless_missing_or_unusable');
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].blocked_reason, 'missing_renderer_dependency');
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].typed_blocker, 'missing_renderer_dependency');
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[3].status, 'automatic_when_needed');
+  assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[3].user_preinstall_required, false);
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.surface_kind, 'image_provider_diagnostics');
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.default_route, 'author_image_pages');
   assert.equal(manifest.native_ppt_operator_ux.image_provider_diagnostics.style_reference_dir_input, 'delivery_request.style_reference_dir');

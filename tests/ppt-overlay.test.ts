@@ -148,6 +148,26 @@ test('hydratePptDeckContract emits profile-specific teaching and executive rules
     'libreoffice_headless',
   );
   assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_selection_policy,
+    'capability_probe_auto_bootstrap',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.user_preinstalled_libreoffice_required,
+    false,
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.supported_renderers[0].renderer_pipeline,
+    'libreoffice_headless_pdf_png_v1',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.bootstrap_policy.repo_owned_installer,
+    'tools/native-ppt-proof/install-deps.sh',
+  );
+  assert.equal(
+    lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.fail_closed_blocker.typed_blocker,
+    'missing_renderer_dependency',
+  );
+  assert.equal(
     lectureStudent.prompt_pack.render_contract.native_ppt_proof_lane.true_render_proof.renderer_pipeline,
     'libreoffice_headless_pdf_png_v1',
   );

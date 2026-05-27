@@ -300,12 +300,44 @@ export interface PptDeckNativePptProofLane {
   };
   true_render_proof: {
     required: true;
+    source_surface_kind: 'native_pptx';
+    renderer_selection_policy: 'capability_probe_auto_bootstrap';
+    user_preinstalled_libreoffice_required: false;
     renderer_kind: 'libreoffice_headless';
     renderer_pipeline: 'libreoffice_headless_pdf_png_v1';
     runtime: 'libreoffice_headless';
+    supported_renderers: ReadonlyArray<{
+      renderer_kind: 'libreoffice_headless';
+      renderer_stack: 'libreoffice_headless_plus_poppler';
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1';
+      runtime: 'libreoffice_headless';
+      components: ReadonlyArray<'LibreOffice headless' | 'Poppler pdftoppm'>;
+      proof_chain: ReadonlyArray<'pptx_to_pdf' | 'pdf_to_png'>;
+      required_capabilities: ReadonlyArray<'soffice_headless' | 'pdftoppm'>;
+    }>;
+    bootstrap_policy: {
+      capability_probe: 'native_ppt_renderer_capability_probe';
+      automatic_bootstrap_allowed: true;
+      user_preinstall_required: false;
+      repo_owned_installer: 'tools/native-ppt-proof/install-deps.sh';
+      proof_container: 'tools/native-ppt-proof/Dockerfile';
+    };
     cross_platform_render_required: true;
     synthetic_preview_allowed: false;
+    html_render_substitute_allowed: false;
+    officecli_validate_substitute_allowed: false;
+    disallowed_substitutes: ReadonlyArray<
+      'synthetic_preview'
+      | 'html_render'
+      | 'officecli_validate'
+      | 'desktop_powerpoint_automation'
+      | 'apple_script_preview'
+    >;
     fail_closed_when_missing: true;
+    fail_closed_blocker: {
+      typed_blocker: 'missing_renderer_dependency';
+      emitted_when: 'capability_probe_and_auto_bootstrap_cannot_resolve_supported_renderer';
+    };
   };
   export_contract_delta: {
     source_artifact_field: 'export_bundle.source_pptx';

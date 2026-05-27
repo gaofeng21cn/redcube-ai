@@ -817,7 +817,10 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       assert.equal(manifest.native_ppt_operator_ux.image_proof_runner.delegates_to, 'tools/image-ppt-proof/run.sh');
       assert.doesNotMatch(manifest.native_ppt_operator_ux.image_proof_runner.command_template, /--workspace-root/);
       assert.equal(manifest.native_ppt_operator_ux.proof_runner.public_skill_policy, 'do_not_register_as_second_public_skill');
-      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].check_id, 'libreoffice_headless');
+      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].check_id, 'native_true_render_capability');
+      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[2].typed_blocker, 'missing_renderer_dependency');
+      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[3].check_id, 'renderer_auto_bootstrap');
+      assert.equal(manifest.native_ppt_operator_ux.dependency_diagnostics.checks[3].user_preinstall_required, false);
 	    assert.equal(manifest.session_continuity.surface_kind, 'session_continuity');
 	    assert.equal(manifest.session_continuity.owner, 'redcube_ai');
 	    assert.equal(manifest.session_continuity.status, 'repo_tracked');

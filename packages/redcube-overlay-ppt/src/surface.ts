@@ -182,10 +182,19 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.required === true
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.true_render_proof_renderer === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.engine_capabilities?.cross_platform_render_required === true
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.source_surface_kind === 'native_pptx'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_selection_policy === 'capability_probe_auto_bootstrap'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.user_preinstalled_libreoffice_required === false
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_kind === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.renderer_pipeline === 'libreoffice_headless_pdf_png_v1'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.runtime === 'libreoffice_headless'
     && content.render_contract.native_ppt_proof_lane?.true_render_proof?.cross_platform_render_required === true
+    && Array.isArray(content.render_contract.native_ppt_proof_lane?.true_render_proof?.supported_renderers)
+    && content.render_contract.native_ppt_proof_lane.true_render_proof.supported_renderers[0]?.renderer_pipeline === 'libreoffice_headless_pdf_png_v1'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.bootstrap_policy?.repo_owned_installer === 'tools/native-ppt-proof/install-deps.sh'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.fail_closed_blocker?.typed_blocker === 'missing_renderer_dependency'
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.html_render_substitute_allowed === false
+    && content.render_contract.native_ppt_proof_lane?.true_render_proof?.officecli_validate_substitute_allowed === false
     && Array.isArray(content.render_contract.selectable_explicit_routes)
     && content.render_contract.selectable_explicit_routes.join(',') === 'render_html,fix_html,author_pptx_native,repair_pptx_native'
     && content.render_contract.explicit_route_policy === 'html_and_native_routes_require_operator_selection'
