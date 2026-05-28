@@ -33,6 +33,7 @@
       "png_non_empty_pages",
       "field_leakage_count",
       "overlap_pairs",
+      "structural_text_collision_count",
       "density_min",
       "density_max",
       "edge_clearance_min",

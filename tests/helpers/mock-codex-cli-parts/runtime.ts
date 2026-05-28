@@ -42,6 +42,64 @@ export function buildCreativeRunOutput(meta) {
   if (safeText(process.env.REDCUBE_MOCK_FAIL_ROUTE) === route) {
     throw new Error(`mock forced route failure: ${route}`);
   }
+  const mutateRoute = safeText(process.env.REDCUBE_MOCK_MUTATE_ROUTE);
+  const mutateKind = safeText(process.env.REDCUBE_MOCK_MUTATE_KIND);
+  const maybeMutateOutput = (output) => {
+    if (mutateRoute !== route) return output;
+    if (mutateKind === 'repair_tiny_native_plan_on_feedback') {
+      const hasValidationFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.validator);
+      if (!hasValidationFeedback) {
+        const pointTextShape = output?.editable_shape_plan?.slides
+          ?.flatMap((slide) => slide?.native_shapes || [])
+          ?.find((shape) => shape?.role === 'point_text');
+        if (pointTextShape?.bounds) {
+          pointTextShape.bounds.height_in = 0.34;
+        }
+      }
+      return output;
+    }
+    if (mutateKind === 'require_validation_retry_contract') {
+      const hasValidationFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.validator);
+      if (!hasValidationFeedback) {
+        const pointTextShape = output?.editable_shape_plan?.slides
+          ?.flatMap((slide) => slide?.native_shapes || [])
+          ?.find((shape) => shape?.role === 'point_text');
+        if (pointTextShape?.bounds) {
+          pointTextShape.bounds.height_in = 0.34;
+        }
+        return output;
+      }
+      const rawPrompt = safeText(meta?.__raw_prompt);
+      if (!rawPrompt.includes('native_shape_plan_validation_feedback_contract')
+        || !rawPrompt.includes('exact_shape_fixes')
+        || !rawPrompt.includes('required_height_in')
+        || !rawPrompt.includes('required_font_size')
+        || !rawPrompt.includes('required_text_char_count')
+        || !rawPrompt.includes('required_gap_in')
+        || !rawPrompt.includes('geometry_repair_instruction')
+        || !rawPrompt.includes('global_shape_class_fixes')) {
+        throw new Error('mock expected native preflight retry output contract with exact_shape_fixes');
+      }
+      return output;
+    }
+    if (mutateKind === 'repair_missing_design_spec_lock') {
+      if (route === 'repair_pptx_native') {
+        delete output?.editable_shape_plan?.design_spec_lock;
+      }
+      return output;
+    }
+    if (mutateKind !== 'remove_point_index_text') return output;
+    const slides = output?.editable_shape_plan?.slides || [];
+    const pointIndexShape = slides
+      .flatMap((slide) => slide?.native_shapes || [])
+      .find((shape) => shape?.role === 'point_index');
+    if (pointIndexShape) {
+      delete pointIndexShape.editable_text;
+      delete pointIndexShape.text;
+      delete pointIndexShape.label;
+    }
+    return output;
+  };
   if (family === 'xiaohongshu') {
     switch (route) {
       case 'storyline':
@@ -101,7 +159,7 @@ export function buildCreativeRunOutput(meta) {
       };
     case 'author_pptx_native':
     case 'repair_pptx_native':
-      return buildMockPptNativeShapePlan(meta);
+      return maybeMutateOutput(buildMockPptNativeShapePlan(meta));
     case 'visual_director_review':
       return buildMockPptDirectorReview(meta);
     case 'screenshot_review':

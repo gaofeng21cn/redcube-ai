@@ -186,7 +186,7 @@ function titleBounds(layoutFamily) {
 
 function coreBounds(layoutFamily) {
   if (layoutFamily === 'judgement_ladder') return { left_in: 1.0, top_in: 2.82, width_in: 5.65, height_in: 1.9 };
-  if (layoutFamily === 'ring_cross') return { left_in: 5.2, top_in: 3.7, width_in: 5.6, height_in: 0.86 };
+  if (layoutFamily === 'ring_cross') return { left_in: 5.2, top_in: 3.66, width_in: 5.6, height_in: 0.98 };
   if (layoutFamily === 'summary_peak') return { left_in: 9.85, top_in: 0.72, width_in: 4.9, height_in: 1.55 };
   return { left_in: 1.0, top_in: 2.08, width_in: 11.9, height_in: 0.98 };
 }
@@ -199,7 +199,7 @@ function structuralShapes(layoutFamily, slideId) {
         kind: 'oval',
         role: 'signal_hub',
         quality_role: 'decorative',
-        bounds: { left_in: 13.18, top_in: 2.72, width_in: 0.74, height_in: 0.74 },
+        bounds: { left_in: 14.22, top_in: 2.72, width_in: 0.74, height_in: 0.74 },
         fill: '#B94624',
         line: 'none',
       },
@@ -208,7 +208,7 @@ function structuralShapes(layoutFamily, slideId) {
         kind: 'line',
         role: 'signal_connector',
         quality_role: 'decorative',
-        bounds: { left_in: 13.52, top_in: 3.48, width_in: 0.06, height_in: 2.12 },
+        bounds: { left_in: 14.58, top_in: 3.48, width_in: 0.06, height_in: 2.12 },
         line: '#B94624',
       },
     ];
@@ -249,7 +249,7 @@ function structuralShapes(layoutFamily, slideId) {
         kind: 'line',
         role: 'axis_connector',
         quality_role: 'decorative',
-        bounds: { left_in: 2.95, top_in: 4.6, width_in: 9.58, height_in: 0.05 },
+        bounds: { left_in: 7.31, top_in: 4.6, width_in: 0.32, height_in: 0.05 },
         line: '#B94624',
       },
     ];
@@ -300,6 +300,7 @@ function nativeShapePlanForSlide(slide, index) {
       shape_id: `${slideId}-title`,
       kind: 'text_box',
       role: 'title',
+      quality_role: 'content',
       editable_text: title,
       bounds: titleRect,
       font_size: titleFontSize,
@@ -312,6 +313,7 @@ function nativeShapePlanForSlide(slide, index) {
       shape_id: `${slideId}-core`,
       kind: 'text_box',
       role: 'core_sentence',
+      quality_role: 'content',
       editable_text: safeText(slide?.core_sentence, points[0]),
       bounds: coreRect,
       font_size: 20,
@@ -341,6 +343,7 @@ function nativeShapePlanForSlide(slide, index) {
       shape_id: `${slideId}-page`,
       kind: 'text_box',
       role: 'page_number',
+      quality_role: 'auxiliary',
       editable_text: `${String(index + 1).padStart(2, '0')}`,
       bounds: { left_in: 14.35, top_in: 8.02, width_in: 0.7, height_in: 0.46 },
       font_size: 18,
@@ -382,6 +385,7 @@ function nativeShapePlanForSlide(slide, index) {
       shape_id: `${slideId}-slot-${pointNumber}-index`,
       kind: 'text_box',
       role: 'point_index',
+      quality_role: 'content',
       editable_text: `${String(pointNumber).padStart(2, '0')}`,
       bounds: { left_in: panelBounds.left_in + 0.22, top_in: indexTop, width_in: 0.78, height_in: 0.52 },
       font_size: 16,
@@ -394,12 +398,13 @@ function nativeShapePlanForSlide(slide, index) {
       shape_id: `${slideId}-slot-${pointNumber}-text`,
       kind: 'text_box',
       role: 'point_text',
+      quality_role: 'content',
       editable_text: pointText(points[pointIndex], `Concrete audience point ${pointNumber}`),
       bounds: {
         left_in: textLeft,
         top_in: textTop,
         width_in: textWidth,
-        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 0.82 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
+        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 0.92 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
       },
       font_size: 18,
       color: '#171C24',
@@ -424,6 +429,14 @@ export function buildMockPptNativeShapePlan(meta) {
       contract_id: 'ppt_native_ai_first_editing_contract_v1',
       creative_owner: 'llm_agent',
       editable_shape_plan_required: true,
+      editable_shape_manifest_required: true,
+      design_spec_lock_required: true,
+      shape_quality_role_required: true,
+      layout_intent_required: true,
+      composition_signature_required: true,
+      structural_visual_required: true,
+      title_underline_motif_allowed: false,
+      concrete_layout_variant_repetition_limit: 2,
       python_helper_role: 'execute_validate_export_only',
       template_substitution_allowed: false,
       preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -443,9 +456,20 @@ export function buildMockPptNativeShapePlan(meta) {
       scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
       target_slide_ids: [...targetSlideIds],
       design_spec_lock: {
+        spec_id: 'native_pptx_mock_spec_lock_v1',
+        owner: 'llm_agent',
         source: 'mock_visual_direction_fixture',
         design_owner: 'test_double_only',
+        motif: 'hardcoded_ci_fixture_not_a_presentation_template',
         visual_motif: 'hardcoded_ci_fixture_not_a_presentation_template',
+        layout_archetypes: [
+          'cover_signal',
+          'multi_zone_compare',
+          'timeline_band',
+          'judgement_ladder',
+          'ring_cross',
+          'summary_peak',
+        ],
         palette: {
           canvas: '#F6F2EA',
           ink: '#171C24',

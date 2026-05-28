@@ -187,6 +187,13 @@ function runRouteInChild({
   return readJson(outputFile);
 }
 
+function laneRouteSequence(lane, options = {}) {
+  if (lane === 'native' && Number(options.nativeSampleSlideCount || 0) > 0) {
+    return ROUTE_SEQUENCES.native;
+  }
+  return ROUTE_SEQUENCES[lane];
+}
+
 function resolvedSourcePayload(request) {
   const gapIds = safeArray(request?.trigger?.blocking_evidence_gaps).length > 0
     ? safeArray(request.trigger.blocking_evidence_gaps)
@@ -208,17 +215,48 @@ function resolvedSourcePayload(request) {
     key_fact_groups: [
       {
         fact_id: 'FACT-REAL-PROBE-001',
-        label: '同一 source readiness pack 被 image-first、HTML 和 native PPTX route 共享消费。',
+        label: [
+          '同一 source readiness pack 被 image-first、HTML 和 native PPTX route 共享消费。',
+          '本次最小验证的结构化数字证据为 topic_count=1.0、route_count=3.0、iteration_count_per_route=1.0。',
+          'native_sample_slide_count=1.0，用于生成 1 页有意义、可编辑、非占位的 native PPTX 视觉样片。',
+        ].join(' '),
         reference_id: 'REF-REAL-PROBE-001',
       },
       {
         fact_id: 'FACT-REAL-PROBE-002',
-        label: '所有 route 必须保留 visual_director_review、screenshot_review 与 export_pptx gate。',
+        label: [
+          '所有 route 必须保留 3 个交付门：visual_director_review、screenshot_review 与 export_pptx。',
+          'required_gate_coverage=3/3，缺少任一交付门都不能声明端到端闭环完成。',
+          'native PPTX 样片必须同时留下 PPTX、PDF、PNG 截图、shape manifest、review receipt 和 export receipt。',
+        ].join(' '),
+        reference_id: 'REF-REAL-PROBE-002',
+      },
+    ],
+    key_numeric_results: [
+      {
+        metric: 'topic_count',
+        value: 1,
+        unit: 'topic',
+        interpretation: '最小端到端验证使用同一个 topic 起点。',
+        reference_id: 'REF-REAL-PROBE-001',
+      },
+      {
+        metric: 'route_count',
+        value: 3,
+        unit: 'routes',
+        interpretation: '同一输入可分别进入 image-first、HTML 和 native PPTX 三条路线。',
+        reference_id: 'REF-REAL-PROBE-001',
+      },
+      {
+        metric: 'required_gate_count',
+        value: 3,
+        unit: 'gates',
+        interpretation: '每条视觉交付路线都必须保留 visual director、screenshot review 和 export gate。',
         reference_id: 'REF-REAL-PROBE-002',
       },
     ],
     source_quality_notes: [
-      'This probe uses minimal public placeholder refs and only proves runtime wiring, cache behavior, and typed blockers.',
+      'This probe uses minimal public placeholder refs and proves runtime wiring, cache behavior, typed blockers, and 3/3 review/export gate preservation.',
     ],
     evidence_gap_resolution: gapIds.map((gapId) => ({
       gap_id: safeText(gapId),
@@ -364,8 +402,15 @@ async function runProductRoute({
   iteration,
   adapter,
   userIntent,
+  nativeSampleSlideCount,
 }) {
   const entrySessionId = `real-route-probe-${lane}-${iteration}-${randomUUID()}`;
+  const scopedGoal = nativeSampleSlideCount > 0
+    ? `${goal}\n\nNative PPTX visual sample constraint: create exactly ${nativeSampleSlideCount} slide(s). The sample must still use the RCA product-entry workflow, author editable native shapes, and pass visual_director_review, screenshot_review, and export_pptx.`
+    : goal;
+  const scopedUserIntent = nativeSampleSlideCount > 0
+    ? `${safeText(userIntent)} native_sample_slide_count=${nativeSampleSlideCount}; make exactly ${nativeSampleSlideCount} meaningful editable native PPTX slide(s), not a placeholder.`
+    : userIntent;
   return invokeProductEntry({
     workspaceRoot,
     entry_session_contract: {
@@ -378,16 +423,23 @@ async function runProductRoute({
       deliverable_id: deliverableId,
       profile_id: 'lecture_student',
       title,
-      goal,
+      goal: scopedGoal,
       route,
       adapter: adapter || undefined,
-      user_intent: userIntent || undefined,
+      user_intent: scopedUserIntent || undefined,
       task_intent: 'run_deliverable_route',
+      constraints: nativeSampleSlideCount > 0
+        ? {
+            expected_slide_count: nativeSampleSlideCount,
+            max_slides: nativeSampleSlideCount,
+            native_visual_sample: true,
+          }
+        : undefined,
     },
   });
 }
 
-async function ensureProbeDeliverable({ workspaceRoot, topicId, deliverableId, title, goal }) {
+async function ensureProbeDeliverable({ workspaceRoot, topicId, deliverableId, title, goal, constraints }) {
   return createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
@@ -396,6 +448,7 @@ async function ensureProbeDeliverable({ workspaceRoot, topicId, deliverableId, t
     deliverableId,
     title,
     goal,
+    constraints,
   });
 }
 
@@ -411,6 +464,7 @@ async function runLane({
   providerMode,
   routeTimeoutMs,
   routeChildOutputDir,
+  nativeSampleSlideCount,
 }) {
   const deliverableId = `deck-${lane}`;
   await ensureProbeDeliverable({
@@ -419,11 +473,18 @@ async function runLane({
     deliverableId,
     title: `${title} (${lane})`,
     goal,
+    constraints: lane === 'native' && nativeSampleSlideCount > 0
+      ? {
+          expected_slide_count: nativeSampleSlideCount,
+          max_slides: nativeSampleSlideCount,
+          native_visual_sample: true,
+        }
+      : undefined,
   });
   const routeRuns = [];
   const blockers = [];
   for (let iteration = 1; iteration <= iterations; iteration += 1) {
-    for (const route of ROUTE_SEQUENCES[lane]) {
+    for (const route of laneRouteSequence(lane, { nativeSampleSlideCount })) {
       try {
         const request = {
           workspaceRoot,
@@ -436,6 +497,7 @@ async function runLane({
           iteration,
           adapter,
           userIntent,
+          nativeSampleSlideCount: lane === 'native' ? nativeSampleSlideCount : 0,
         };
         const result = routeTimeoutMs > 0
           ? runRouteInChild({
@@ -531,6 +593,9 @@ function parseArgs(argv) {
     } else if (token === '--route-timeout-ms') {
       options.routeTimeoutMs = Number(next || 0);
       index += 1;
+    } else if (token === '--native-sample-slide-count') {
+      options.nativeSampleSlideCount = Number(next || 0);
+      index += 1;
     } else if (token === '--json') {
       options.json = true;
     } else if (token === '--skip-codex-probe') {
@@ -546,7 +611,7 @@ function parseArgs(argv) {
 
 function printUsage() {
   process.stdout.write([
-    'Usage: node --experimental-strip-types scripts/run-real-route-evolution-probe.ts [--mock|--live] [--routes image,html,native] [--iterations 2] [--route-timeout-ms <ms>] [--workspace-root <dir>] [--output-dir <dir>] [--json]',
+    'Usage: node --experimental-strip-types scripts/run-real-route-evolution-probe.ts [--mock|--live] [--routes image,html,native] [--iterations 2] [--route-timeout-ms <ms>] [--native-sample-slide-count <n>] [--workspace-root <dir>] [--output-dir <dir>] [--json]',
     '',
     'The probe creates a real RCA workspace, invokes product-entry run_deliverable_route, writes route artifacts, and records typed blockers when live providers are unavailable.',
   ].join('\n'));
@@ -636,9 +701,10 @@ export async function runRealRouteEvolutionProbe(options = {}) {
         goal,
         userIntent: `real-route evolution probe lane=${lane}`,
         providerMode,
-        routeTimeoutMs: Number(options.routeTimeoutMs || 0),
-        routeChildOutputDir,
-      }));
+      routeTimeoutMs: Number(options.routeTimeoutMs || 0),
+      routeChildOutputDir,
+      nativeSampleSlideCount: Number(options.nativeSampleSlideCount || 0),
+    }));
     }
     const performanceReport = await buildPerformanceReport({ workspaceRoot, topicId });
     const performanceReportFile = path.join(outputDir, 'performance-report.json');

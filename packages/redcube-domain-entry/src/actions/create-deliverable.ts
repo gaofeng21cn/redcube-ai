@@ -134,6 +134,7 @@ export async function createDeliverable({
   deliverableId,
   title,
   goal,
+  constraints,
 }) {
   ensureWorkspaceGitBoundary({ workspaceRoot });
   const workspaceAgentsFile = ensureWorkspaceAgentsFile({ workspaceRoot });
@@ -164,6 +165,7 @@ export async function createDeliverable({
     deliverableId,
     title,
     goal,
+    constraints,
   });
   const governanceSurface = buildGovernanceSurfaceContract(hydratedContract);
   const deliverable = overlayDefinition.buildDeliverableRecord({

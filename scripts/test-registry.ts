@@ -88,6 +88,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/ppt-native-ppt-runtime.test.ts',
     'tests/ppt-native-ppt-repair-runtime.test.ts',
     'tests/ppt-native-python-layouts.test.ts',
+    'tests/ppt-native-python-system-map-layouts.test.ts',
     'tests/preflight-gates.test.ts',
     'tests/private-profile.test.ts',
     'tests/product-entry-manuscript-source.test.ts',

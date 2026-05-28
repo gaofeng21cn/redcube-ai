@@ -104,6 +104,8 @@ function assertQualityContractShape(contract) {
     'occupied_ratio',
     'edge_clearance',
     'overlap_pairs',
+    'structural_text_collision_count',
+    'structural_text_collisions',
     'shape_kind_count',
     'role_count',
     'layout_richness_score',

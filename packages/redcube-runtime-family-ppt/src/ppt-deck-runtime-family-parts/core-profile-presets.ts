@@ -77,7 +77,20 @@ export function createPptDeckProfilePresetParts(deps) {
     const anchorTracks = slideTextItems(slide?.visual_presentation?.anchor_tracks);
     const hasGoalAndTakeaway = safeText(slide.page_goal).length > 0
       && safeText(slide.core_sentence).length > 0;
-    const hasStructuredProgression = coreContent.length >= 4;
+    const joinedProgressionText = [
+      ...coreContent,
+      ...evidencePoints,
+      ...anchorTracks,
+      safeText(slide.core_sentence),
+      safeText(slide.page_goal),
+    ].join(' ');
+    const hasStructuredProgression = coreContent.length >= 4
+      || (
+        coreContent.length >= 2
+        && /输入|起点|目标|source|input/i.test(joinedProgressionText)
+        && /执行|生成|通道|路线|route|stage|run/i.test(joinedProgressionText)
+        && /验收|审阅|导出|交付|证据|闭环|review|export|evidence|gate/i.test(joinedProgressionText)
+      );
     const hasEvidenceOrVisualTrack = evidencePoints.length >= 2 || anchorTracks.length >= 1;
     return hasGoalAndTakeaway && hasStructuredProgression && hasEvidenceOrVisualTrack;
   }
@@ -188,6 +201,21 @@ export function createPptDeckProfilePresetParts(deps) {
 
     const hardConstraints = {};
     const planningSignals = [];
+    const requestConstraints = contract?.delivery_request?.constraints && typeof contract.delivery_request.constraints === 'object'
+      ? contract.delivery_request.constraints
+      : {};
+    const explicitExactSlides = numberValue(requestConstraints.exact_slides ?? requestConstraints.expected_slide_count);
+    const explicitMaxSlides = numberValue(requestConstraints.max_slides);
+    const explicitMinSlides = numberValue(requestConstraints.min_slides);
+    if (explicitExactSlides !== null) {
+      hardConstraints.exact_slides = explicitExactSlides;
+    }
+    if (explicitMaxSlides !== null) {
+      hardConstraints.max_slides = explicitMaxSlides;
+    }
+    if (explicitMinSlides !== null) {
+      hardConstraints.min_slides = explicitMinSlides;
+    }
     const addSignal = (signal) => {
       const key = JSON.stringify(signal);
       if (planningSignals.some((item) => JSON.stringify(item) === key)) return;
@@ -196,14 +224,14 @@ export function createPptDeckProfilePresetParts(deps) {
     const firstHardUpperBound = [...directCorpus.matchAll(/(?:不超过|最多|上限|不多于|至多|<=|≤)\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
       .map((match) => numberValue(match[1]))
       .find((value) => value !== null);
-    if (firstHardUpperBound !== undefined) {
+    if (firstHardUpperBound !== undefined && hardConstraints.max_slides === undefined) {
       hardConstraints.max_slides = firstHardUpperBound;
     }
     const firstHardLowerBound = [...directCorpus.matchAll(/(?:不少于|至少|下限|不低于|>=|≥)\s*(\d{1,3})\s*(?:页|张|slides?)/gi)]
       .filter((match) => !/(?:每(?:一)?(?:篇|个|项|部分|研究)|per\s+(?:paper|item|section))\s*$/i.test(directCorpus.slice(Math.max(0, match.index - 12), match.index)))
       .map((match) => numberValue(match[1]))
       .find((value) => value !== null);
-    if (firstHardLowerBound !== undefined) {
+    if (firstHardLowerBound !== undefined && hardConstraints.min_slides === undefined) {
       hardConstraints.min_slides = firstHardLowerBound;
     }
     const firstHardExact = [
@@ -213,7 +241,7 @@ export function createPptDeckProfilePresetParts(deps) {
       .filter((match) => !/(?:不超过|最多|上限|不多于|至多|<=|≤|建议|推荐)\s*$/i.test(directCorpus.slice(Math.max(0, match.index - 10), match.index)))
       .map((match) => numberValue(match[1]))
       .find((value) => value !== null);
-    if (firstHardExact !== undefined) {
+    if (firstHardExact !== undefined && hardConstraints.exact_slides === undefined) {
       hardConstraints.exact_slides = firstHardExact;
     }
 

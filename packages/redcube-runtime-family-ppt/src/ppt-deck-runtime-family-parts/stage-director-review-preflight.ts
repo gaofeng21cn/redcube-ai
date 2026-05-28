@@ -117,6 +117,22 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native non-text visual is too generic`);
       }
+      if (slide.slot_fill_ok === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native content slot fill failed`);
+      }
+      if (slide.content_depth_ok === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native content depth failed`);
+      }
+      if (slide.audience_label_readability_ok === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native audience label readability failed`);
+      }
+      if (slide.grid_balance_ok === false) {
+        weakPages.push(slide.slide_id);
+        findings.push(`${slide.slide_id}: native grid balance failed`);
+      }
       if (!safeText(slide.preview_screenshot_file) || !(mainExistsSync || existsSync)(slide.preview_screenshot_file)) {
         weakPages.push(slide.slide_id);
         findings.push(`${slide.slide_id}: native PPT preview screenshot missing`);
@@ -196,14 +212,15 @@ export function createPptDeckDirectorReviewPreflightParts(deps) {
     const priorWeakPages = incrementalReview
       ? safeArray(priorReview?.weak_pages).filter((slideId) => !targetSlideIds.has(safeText(slideId)))
       : [];
+    const priorBlockingPagesRemain = priorWeakPages.length > 0;
     const directorIntentLanded = Boolean(data?.director_intent_landed)
-      && (!incrementalReview || Boolean(priorReview?.director_intent_landed));
+      && (!incrementalReview || !priorBlockingPagesRemain || Boolean(priorReview?.director_intent_landed));
     const antiTemplateOk = Boolean(data?.anti_template_ok)
       && preflight.antiTemplateOk
-      && (!incrementalReview || Boolean(priorReview?.anti_template_ok));
+      && (!incrementalReview || !priorBlockingPagesRemain || Boolean(priorReview?.anti_template_ok));
     const memoryHookPresent = Boolean(data?.memory_hook_present);
     const peakPagesLanded = Boolean(data?.peak_pages_landed ?? true)
-      && (!incrementalReview || Boolean(priorReview?.peak_pages_landed ?? true));
+      && (!incrementalReview || !priorBlockingPagesRemain || Boolean(priorReview?.peak_pages_landed ?? true));
     const weakPages = [...new Set([
       ...priorWeakPages,
       ...normalizeStringList(data?.weak_pages, 'visual_director_review.weak_pages', { min: 0, max: 4 }),

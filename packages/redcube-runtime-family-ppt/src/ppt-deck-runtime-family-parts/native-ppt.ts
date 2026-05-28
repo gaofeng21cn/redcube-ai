@@ -4,12 +4,12 @@ import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
 import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 import { buildNativePptQualityNonregressionReadModel } from './native-ppt-quality-nonregression.js';
 import { createNativePptPlanIntegrityParts } from './native-ppt-plan-integrity.js';
+import { createNativePptPlanPreflightParts } from './native-ppt-plan-preflight.js';
+import { createNativePptProofReviewParts } from './native-ppt-proof-review.js';
+import { buildNativeShapePlanOutputContract } from './native-ppt-shape-plan-contract.js';
 import { createNativePptRepairEvidenceParts } from './native-ppt-repair-evidence.js';
 import {
   NATIVE_PPT_AGGREGATED_CHECK_KEYS,
-  NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS,
-  NATIVE_QUALITY_REQUIRED_BOOLEAN_METRIC_KEYS,
-  NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS,
   REQUIRED_ENGINE_CAPABILITIES,
 } from './native-ppt-quality-contract.js';
 
@@ -20,6 +20,16 @@ interface NativeArtifactPathRequest {
   deliverablePaths: JsonRecord;
   deliverableId: string;
   route: NativePptRoute;
+}
+
+interface NativePlanAttempt {
+  editableShapePlan: JsonRecord;
+  generationRuntime: JsonRecord;
+  modelContract: JsonRecord | null;
+  validationFeedback: JsonRecord | null;
+  attemptIndex: number;
+  executorRetryCount: number;
+  attemptArtifactRefs: string[];
 }
 
 interface NativePptDeps {
@@ -80,6 +90,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     assertNativeDeckCompleteness,
     mergeRepairEditableShapePlan,
   } = createNativePptPlanIntegrityParts({ existsSync, safeArray, safeText });
+  const nativePlanPreflightParts = createNativePptPlanPreflightParts({
+    nativeShapePlanOutputContract,
+    safeArray,
+    safeText,
+  });
 
   let cachedNativeEngineContract: JsonRecord | null = null;
   const AI_FIRST_EDITING_CONTRACT = Object.freeze({
@@ -87,8 +102,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     creative_owner: 'llm_agent',
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
+    design_spec_lock_required: true,
+    shape_quality_role_required: true,
     layout_intent_required: true,
     composition_signature_required: true,
+    structural_visual_required: true,
     title_underline_motif_allowed: false,
     concrete_layout_variant_repetition_limit: 2,
     python_helper_role: 'execute_validate_export_only',
@@ -137,6 +155,38 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     });
   }
 
+  function runPythonValidation(inputFile: string): JsonRecord {
+    return runRedCubePythonHelper(PYTHON_NATIVE, [
+      '--input-json', inputFile,
+      '--mode', 'validate_plan',
+      '--output-pptx', path.join(path.dirname(inputFile), 'validate-plan.pptx'),
+      '--shape-manifest', path.join(path.dirname(inputFile), 'validate-plan-shape-manifest.json'),
+      '--preview-dir', path.join(path.dirname(inputFile), 'validate-plan-screenshots'),
+      '--output-pdf', path.join(path.dirname(inputFile), 'validate-plan.pdf'),
+      '--repair-log', path.join(path.dirname(inputFile), 'validate-plan-repair-log.json'),
+      '--engine-contract', NATIVE_PPT_ENGINE_CONTRACT,
+    ], {
+      fileExists: existsSync,
+      missingMessagePrefix: 'Missing ppt_deck python helper',
+      failureMessagePrefix: 'ppt_deck python helper failed',
+    });
+  }
+
+  const nativeProofReviewParts = createNativePptProofReviewParts({
+    existsSync,
+    expectedNativeEngineContract,
+    safeArray,
+    safeText,
+  });
+  const {
+    nativeMechanicalReviewPayload,
+    nativeManifestQualityPassed,
+    readNativeShapeManifest,
+    requireNativeEngineContract,
+    requireTrueRenderProof,
+    summarizeNativeSlides,
+  } = nativeProofReviewParts;
+
   function currentNativePptStageId(contract: JsonRecord, deliverablePaths: JsonRecord): NativePptRoute | '' {
     const authorFile = stageArtifactPath(contract, deliverablePaths, 'author_pptx_native');
     const repairFile = stageArtifactPath(contract, deliverablePaths, 'repair_pptx_native');
@@ -151,6 +201,49 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   function readCurrentNativePptArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord | null {
     const stageId = currentNativePptStageId(contract, deliverablePaths);
     return stageId ? readStageArtifact(contract, deliverablePaths, stageId) : null;
+  }
+
+  function readAuthorNativePptArtifact(contract: JsonRecord, deliverablePaths: JsonRecord): JsonRecord | null {
+    return readStageArtifact(contract, deliverablePaths, 'author_pptx_native');
+  }
+
+  function readPriorEditableShapePlan(nativeArtifact: JsonRecord | null): JsonRecord {
+    const file = safeText(nativeArtifact?.native_ppt_bundle?.editable_shape_plan_file);
+    if (!file || !existsSync(file)) return {};
+    return JSON.parse(readFileSync(file, 'utf-8')) as JsonRecord;
+  }
+
+  function completeRepairShapePlanWithLockedSpec(data: JsonRecord, currentNativeArtifact: JsonRecord | null): JsonRecord {
+    const plan = data?.editable_shape_plan || data?.shape_plan || {};
+    const hasDesignSpecLock = plan?.design_spec_lock && typeof plan.design_spec_lock === 'object'
+      && safeText(plan.design_spec_lock?.spec_id)
+      && safeText(plan.design_spec_lock?.owner)
+      && safeText(plan.design_spec_lock?.motif)
+      && Array.isArray(plan.design_spec_lock?.layout_archetypes)
+      && plan.design_spec_lock.layout_archetypes.length >= 3;
+    if (hasDesignSpecLock) return data;
+    const priorPlan = readPriorEditableShapePlan(currentNativeArtifact);
+    const priorDesignSpecLock = priorPlan?.design_spec_lock && typeof priorPlan.design_spec_lock === 'object'
+      ? priorPlan.design_spec_lock
+      : {};
+    const priorHasLockedSpec = safeText(priorDesignSpecLock?.spec_id)
+      && safeText(priorDesignSpecLock?.owner)
+      && safeText(priorDesignSpecLock?.motif)
+      && Array.isArray(priorDesignSpecLock?.layout_archetypes)
+      && priorDesignSpecLock.layout_archetypes.length >= 3;
+    if (!priorHasLockedSpec) return data;
+    return {
+      ...data,
+      editable_shape_plan: {
+        ...plan,
+        design_spec_lock: priorDesignSpecLock,
+        design_spec_lock_inheritance: {
+          source: 'prior_ai_authored_native_shape_plan',
+          reason: 'repair inherits the locked AI design system before applying targeted slide geometry changes',
+          helper_generated_design: false,
+        },
+      },
+    };
   }
 
   function isNativePptArtifact(artifact: JsonRecord | null | undefined): boolean {
@@ -180,7 +273,45 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       editableShapePlanFile: path.join(nativeDir, `${basename}-editable-shape-plan.json`),
       shapeManifestFile: path.join(nativeDir, `${basename}-shape-manifest.json`),
       repairLogFile: path.join(nativeDir, `${basename}-repair-log.json`),
+      planValidationFile: path.join(nativeDir, `${basename}-plan-validation-input.json`),
       previewDir: ensureDir(path.join(reportDir, `${basename}-screenshots`)),
+    };
+  }
+
+  function buildNativeInputPayload({
+    route,
+    unitRepairScope,
+    contract,
+    blueprintArtifact,
+    visualArtifact,
+    editableShapePlan,
+    editableShapePlanFile,
+    repairFeedback,
+  }: {
+    route: NativePptRoute;
+    unitRepairScope: JsonRecord;
+    contract: JsonRecord;
+    blueprintArtifact: JsonRecord | null;
+    visualArtifact: JsonRecord | null;
+    editableShapePlan: JsonRecord;
+    editableShapePlanFile: string;
+    repairFeedback: JsonRecord[];
+  }): JsonRecord {
+    return {
+      route,
+      ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
+      unit_repair_scope: unitRepairScope,
+      contract: {
+        overlay: contract.overlay,
+        profile_id: contract.profile_id,
+        title: contract.title,
+        goal: contract.goal,
+      },
+      blueprint: blueprintArtifact?.slide_blueprint || {},
+      visual_direction: visualArtifact?.visual_direction || {},
+      editable_shape_plan: editableShapePlan,
+      editable_shape_plan_file: editableShapePlanFile,
+      repair_feedback: repairFeedback,
     };
   }
 
@@ -193,8 +324,35 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         mechanical_issues: safeArray(slide?.mechanical_issues),
         visual_findings: safeArray(slide?.ai_review?.visual_findings),
         recommended_fix: safeText(slide?.ai_review?.recommended_fix),
+        source_review_stage: 'screenshot_review',
       }))
       .filter((slide) => slide.slide_id);
+  }
+
+  function repairFeedbackFromDirectorReview(reviewArtifact: JsonRecord | null): JsonRecord[] {
+    const review = reviewArtifact?.visual_director_review || {};
+    const preflight = review?.deterministic_preflight || {};
+    const findings = safeArray(preflight?.findings).map((finding) => safeText(finding)).filter(Boolean);
+    return safeArray(review?.weak_pages)
+      .map((slideId) => safeText(slideId))
+      .filter(Boolean)
+      .map((slideId) => {
+        const slideFindings = findings.filter((finding) => finding.includes(slideId));
+        return {
+          slide_id: slideId,
+          title: '',
+          issues: slideFindings,
+          mechanical_issues: [
+            ...(slideFindings.some((finding) => /slot fill/i.test(finding)) ? ['native_slot_fill_failed'] : []),
+            ...(slideFindings.some((finding) => /content depth/i.test(finding)) ? ['native_content_depth_failed'] : []),
+            ...(slideFindings.some((finding) => /overlap|occlusion/i.test(finding)) ? ['occlusion_detected'] : []),
+            ...(slideFindings.some((finding) => /overflow|fit/i.test(finding)) ? ['block_content_overflow_detected'] : []),
+          ],
+          visual_findings: slideFindings,
+          recommended_fix: safeText(review?.review_summary),
+          source_review_stage: 'visual_director_review',
+        };
+      });
   }
 
   function buildUnitRepairScope({
@@ -229,105 +387,10 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   }
 
   function nativeShapePlanOutputContract(route: NativePptRoute) {
-    return {
-      ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
-      editable_shape_plan: {
-        contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
-        route,
-        scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
-        target_slide_ids: ['S02'],
-        authoring_ir: {
-          kind: 'redcube_svg_ir',
-          version: 1,
-          required: true,
-          strict_svg_preflight_required: true,
-          allowed_svg_tags: ['svg', 'g', 'rect', 'text'],
-          unsupported_svg_tags: ['image', 'foreignObject', 'script'],
-        },
-        materializer: {
-          kind: 'officecli_pptx_materializer',
-          role: 'execute_ai_spatial_plan_only',
-          helper_template_layout_allowed: false,
-          officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
-        },
-        design_system: {
-          borrowed_principles: ['ppt_master_style_spec_lock', 'per_page_visual_plan', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
-          owner: 'llm_agent',
-          spec_lock_required: true,
-          per_page_visual_qa_required: true,
-          mock_fixture_visual_sample_allowed: false,
-          test_double_can_claim_visual_quality: false,
-          grid: {
-            canvas_in: { width: 16, height: 9 },
-            edge_margin_in_min: 0.6,
-            inter_block_gap_in_min: 0.32,
-          },
-          typography_floor: {
-            title_pt_min: 36,
-            body_pt_min: 18,
-            point_index_pt_min: 16,
-            table_body_pt_min: 11,
-          },
-          forbidden_motifs: ['decorative_title_underline', 'empty_four_card_template', 'consecutive_same_composition'],
-          layout_rhythm: {
-            repeated_concrete_composition_limit: 2,
-            required_distinct_composition_share: 0.75,
-          },
-          evidence_required_for_visual_sample: [
-            'live_codex_executor_shape_plan',
-            'editable_shape_plan.design_spec_lock',
-            'per_slide_layout_intent',
-            'libreoffice_poppler_render_screenshots',
-            'visual_director_review',
-            'screenshot_review',
-            'export_pptx',
-          ],
-        },
-        slides: [
-          {
-            slide_id: 'S01',
-            title: '<audience-facing title>',
-            background: '#FFFFFF',
-            layout_family: '<visual layout family label for reporting only>',
-            core_sentence: '<audience-facing core sentence>',
-            page_core_content: ['<editable text>'],
-            layout_intent: {
-              rhetorical_role: '<cover | comparison | timeline | gate | system_map | synthesis>',
-              composition_signature: '<stable human-readable signature from concrete geometry>',
-              visual_weight: '<left_heavy | right_heavy | centered | diagonal | radial | bottom_band>',
-              primary_grid: '<2_column | 3_card | timeline_rail | gate_ladder | radial_axes | hero_callout>',
-              negative_space_strategy: '<where the breathing space is intentionally left>',
-              non_text_visual: '<shape/chart/table/connector/metric grid used as first-glance signal>',
-              forbidden_template_reuse_checked: true,
-            },
-            native_shapes: [
-              {
-                shape_id: 'S01-title',
-                kind: 'text_box',
-                role: 'title',
-                editable_text: '<text>',
-                bounds: { left_in: 1.0, top_in: 0.6, width_in: 13.8, height_in: 0.9 },
-                font_size: 40,
-                color: '#171C24',
-                fill: 'none',
-                line: 'none',
-              },
-            ],
-            redcube_svg_ir_intent: {
-              root_viewbox: '0 0 1152 648',
-              editable_text_required: true,
-              required_intents: [
-                'text:title',
-                'text:point_text',
-                'rect:content_panel',
-                'group:content_point',
-                'layout_intent:composition_signature',
-              ],
-            },
-          },
-        ],
-      },
-    };
+    return buildNativeShapePlanOutputContract({
+      aiFirstEditingContract: AI_FIRST_EDITING_CONTRACT,
+      route,
+    });
   }
 
   function normalizeEditableShapePlan(data: JsonRecord, route: NativePptRoute) {
@@ -335,6 +398,17 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const slides = safeArray(plan?.slides);
     if (slides.length === 0) {
       throw new Error(`Native PPT ${route} requires an AI-authored editable_shape_plan.slides array`);
+    }
+    const designSpecLock = plan?.design_spec_lock && typeof plan.design_spec_lock === 'object'
+      ? plan.design_spec_lock
+      : {};
+    const missingDesignSpecLock = !safeText(designSpecLock?.spec_id)
+      || !safeText(designSpecLock?.owner)
+      || !safeText(designSpecLock?.motif)
+      || !Array.isArray(designSpecLock?.layout_archetypes)
+      || designSpecLock.layout_archetypes.length < 3;
+    if (missingDesignSpecLock) {
+      throw new Error(`Native PPT ${route} requires editable_shape_plan.design_spec_lock with spec_id, owner, motif, and layout_archetypes`);
     }
     const invalidSlides = slides
       .map((slide, index) => {
@@ -356,21 +430,26 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
               .every((key) => Number.isFinite(Number(bounds?.[key])));
             const kind = safeText(shape?.kind || shape?.type);
             const role = safeText(shape?.role);
+            const qualityRole = safeText(shape?.quality_role);
             const text = safeText(shape?.editable_text || shape?.text || shape?.label);
             const textShape = ['text_box', 'text'].includes(kind) || ['title', 'core_sentence', 'point_text', 'body', 'content', 'point_index'].includes(role);
             const missingText = textShape && !text;
-            return (!hasBounds || !kind || missingText) ? {
+            const missingQualityRole = !qualityRole;
+            return (!hasBounds || !kind || missingText || missingQualityRole) ? {
               shape_id: shapeId,
               missing_bounds: !hasBounds,
               missing_kind: !kind,
               missing_text: missingText,
+              missing_quality_role: missingQualityRole,
             } : null;
           })
           .filter(Boolean);
+        const missingShapeQualityRoles = shapes.some((shape) => !safeText(shape?.quality_role));
         return (missingShapePlan || missingLayoutIntent || invalidShapes.length > 0) ? {
           slide_id: slideId,
           missing_native_shapes: missingShapePlan,
           missing_layout_intent: missingLayoutIntent,
+          missing_shape_quality_roles: missingShapeQualityRoles,
           invalid_shapes: invalidShapes,
         } : null;
       })
@@ -400,6 +479,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     repairFeedback,
     unitRepairScope,
     adapter,
+    validationFeedback = null,
+    attemptIndex = 1,
   }: {
     route: NativePptRoute;
     contract: JsonRecord;
@@ -409,322 +490,165 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     repairFeedback: JsonRecord[];
     unitRepairScope: JsonRecord;
     adapter: string;
+    validationFeedback?: JsonRecord | null;
+    attemptIndex?: number;
   }) {
     if (typeof generateStructuredArtifact !== 'function') {
       throw new Error('Native PPT proof lane requires generateStructuredArtifact for AI-first shape planning');
     }
     const currentNativeArtifact = route === 'repair_pptx_native'
-      ? readCurrentNativePptArtifact(contract, deliverablePaths)
+      ? (readCurrentNativePptArtifact(contract, deliverablePaths) || readAuthorNativePptArtifact(contract, deliverablePaths))
       : null;
-    const { data, generationRuntime } = await generateStructuredArtifact({
-      adapter,
-      family: 'ppt_deck',
-      route,
-      promptRelativePath: PROMPT_PACK?.[route],
-      context: {
-        ...(typeof buildAuthoringContext === 'function' ? buildAuthoringContext(contract) : {}),
-        ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
-        unit_repair_scope: unitRepairScope,
-        blueprint: blueprintArtifact?.slide_blueprint || {},
-        visual_direction: visualArtifact?.visual_direction || {},
-        repair_feedback: safeArray(repairFeedback),
-        prior_native_ppt_bundle: route === 'repair_pptx_native'
-          ? {
-              pptx_file: safeText(currentNativeArtifact?.native_ppt_bundle?.pptx_file),
-              shape_manifest_file: safeText(currentNativeArtifact?.native_ppt_bundle?.shape_manifest_file),
-              slides: summarizeNativeSlides(currentNativeArtifact),
-            }
-          : null,
-      },
-      outputContract: nativeShapePlanOutputContract(route),
-      cwd: deliverablePaths.deliverableDir,
-    });
-    return {
-      editableShapePlan: normalizeEditableShapePlan(data, route),
-      generationRuntime,
-      modelContract: data?.ai_first_editing_contract || null,
+    const baseContext = {
+      ...(typeof buildAuthoringContext === 'function' ? buildAuthoringContext(contract) : {}),
+      ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
+      unit_repair_scope: unitRepairScope,
+      blueprint: blueprintArtifact?.slide_blueprint || {},
+      visual_direction: visualArtifact?.visual_direction || {},
+      repair_feedback: safeArray(repairFeedback),
+      native_shape_plan_validation_feedback: validationFeedback,
+      native_shape_plan_attempt_index: attemptIndex,
+      prior_native_ppt_bundle: route === 'repair_pptx_native'
+        ? {
+            pptx_file: safeText(currentNativeArtifact?.native_ppt_bundle?.pptx_file),
+            shape_manifest_file: safeText(currentNativeArtifact?.native_ppt_bundle?.shape_manifest_file),
+            slides: summarizeNativeSlides(currentNativeArtifact),
+          }
+        : null,
     };
-  }
-
-  function requireNativeEngineContract(payload: JsonRecord): JsonRecord {
-    const contract = payload?.engine_contract || {};
-    const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
-    const expected = expectedNativeEngineContract();
-    const expectedRoutes = safeArray(expected?.owned_routes).map((route) => safeText(route)).filter(Boolean);
-    const capabilities = contract?.engine_capabilities || {};
-    const valid = safeText(contract?.kind) === 'redcube_native_ppt_python_engine'
-      && safeText(contract?.language) === 'python'
-      && Number(contract?.contract_version || 0) === 1
-      && expectedRoutes.every((route) => ownedRoutes.includes(route))
-      && safeText(contract?.input_boundary) === safeText(expected?.input_boundary)
-      && safeText(contract?.review_boundary) === safeText(expected?.review_boundary)
-      && Object.entries(REQUIRED_ENGINE_CAPABILITIES).every(([key, value]) => capabilities?.[key] === value)
-      && contract?.true_render_proof?.required === true
-      && contract?.true_render_proof?.renderer_kind === safeText(expected?.true_render_proof?.renderer_kind)
-      && contract?.true_render_proof?.renderer_pipeline === safeText(expected?.true_render_proof?.renderer_pipeline)
-      && contract?.true_render_proof?.runtime === safeText(expected?.true_render_proof?.runtime)
-      && contract?.true_render_proof?.cross_platform_render_required === true;
-    if (!valid) {
-      throw new Error('Native PPT route requires python engine contract v1');
+    const maxExecutorRetries = Math.max(0, Number(process.env.REDCUBE_NATIVE_PPT_STRUCTURED_JSON_MAX_RETRIES || 1));
+    let lastExecutorError: unknown = null;
+    for (let executorRetryIndex = 0; executorRetryIndex <= maxExecutorRetries; executorRetryIndex += 1) {
+      try {
+        const { data, generationRuntime } = await generateStructuredArtifact({
+          adapter,
+          family: 'ppt_deck',
+          route,
+          promptRelativePath: PROMPT_PACK?.[route],
+          context: {
+            ...baseContext,
+            native_shape_plan_executor_retry: executorRetryIndex > 0
+              ? {
+                  retry_index: executorRetryIndex,
+                  retry_reason: 'previous_codex_structured_output_invalid_json',
+                  repair_request: 'Return valid JSON only between REDCUBE_STAGE_JSON_BEGIN and REDCUBE_STAGE_JSON_END. Do not add prose, markdown, comments, trailing commas, or unescaped control characters.',
+                }
+              : null,
+          },
+          outputContract: nativePlanPreflightParts.nativeShapePlanOutputContractForAttempt(route, validationFeedback),
+          cwd: deliverablePaths.deliverableDir,
+        });
+        const normalizedInput = route === 'repair_pptx_native'
+          ? completeRepairShapePlanWithLockedSpec(data, currentNativeArtifact)
+          : data;
+        return {
+          editableShapePlan: normalizeEditableShapePlan(normalizedInput, route),
+          generationRuntime: {
+            ...generationRuntime,
+            native_shape_plan_executor_retry_count: executorRetryIndex,
+          },
+          modelContract: data?.ai_first_editing_contract || null,
+          executorRetryCount: executorRetryIndex,
+        };
+      } catch (error) {
+        lastExecutorError = error;
+        const message = error instanceof Error ? error.message : String(error);
+        if (!/structured generation returned invalid JSON/i.test(message)) {
+          throw error;
+        }
+      }
     }
-    return expected;
+    throw lastExecutorError;
   }
 
-  function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
-    const expected = expectedNativeEngineContract()?.true_render_proof || {};
-    const proof = payload?.render_proof || shapeManifest?.render_proof || {};
-    const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
-    const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
-      && safeText(proof?.renderer_kind) === safeText(expected?.renderer_kind)
-      && safeText(proof?.renderer_pipeline) === safeText(expected?.renderer_pipeline)
-      && safeText(proof?.runtime) === safeText(expected?.runtime)
-      && proof?.cross_platform_render_required === true
-      && proof?.synthetic_preview === false
-      && proof?.required === true
-      && (
-        shapeManifest?.proof_flags == null
-        || shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 === true
-      )
-      && previewScreenshots.length > 0
-      && previewScreenshots.every((file) => existsSync(safeText(file)));
-    if (!valid) {
-      throw new Error('Native PPT route requires LibreOffice headless true-render proof; stale desktop-app, synthetic, or missing preview proof is blocked');
-    }
-    return {
-      ...proof,
-      source_surface_kind: 'native_pptx',
-      renderer_kind: safeText(expected?.renderer_kind),
-      renderer_pipeline: safeText(expected?.renderer_pipeline),
-      runtime: safeText(expected?.runtime),
-      cross_platform_render_required: true,
-      synthetic_preview: false,
-      required: true,
-      preview_screenshots: previewScreenshots.map((file) => safeText(file)).filter(Boolean),
-    };
-  }
-
-  function readNativeShapeManifest(file: string): JsonRecord {
-    if (!file || !existsSync(file)) return {};
-    return JSON.parse(readFileSync(file, 'utf-8'));
-  }
-
-  function aggregateNativeChecks(slideReviews: JsonRecord[]): JsonRecord {
-    return Object.fromEntries(
-      NATIVE_PPT_AGGREGATED_CHECK_KEYS.map((key) => [
-        key,
-        slideReviews.every((slide) => slide?.checks?.[key] !== false),
-      ]),
-    );
-  }
-
-  function finiteNumberOrNull(value: unknown): number | null {
-    const number = Number(value);
-    return Number.isFinite(number) ? number : null;
-  }
-
-  function nativeQualityMissingIssues(manifestSlide: JsonRecord | undefined, expectedProof: JsonRecord): string[] {
-    if (!manifestSlide) return ['native_quality_metrics_missing'];
-    const metrics = manifestSlide.metrics || {};
-    const missing = NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS
-      .filter((key) => finiteNumberOrNull(metrics[key]) === null);
-    if (missing.length > 0) return ['native_quality_metrics_missing'];
-    if (!safeText(metrics.composition_signature)) return ['native_quality_metrics_missing'];
-    if (!manifestSlide.checks || typeof manifestSlide.checks !== 'object') return ['native_quality_checks_missing'];
-    if (NATIVE_QUALITY_REQUIRED_BOOLEAN_METRIC_KEYS.some((key) => typeof metrics[key] !== 'boolean')) {
-      return ['native_quality_metrics_missing'];
-    }
-    if (NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS.some((key) => typeof manifestSlide.checks?.[key] !== 'boolean')) {
-      return ['native_quality_checks_missing'];
-    }
-    const nativeShapes = safeArray(manifestSlide?.native_shapes);
-    const hasChartShape = nativeShapes.some((shape) => {
-      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
-      return text.includes('chart');
-    });
-    const hasTableShape = nativeShapes.some((shape) => {
-      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
-      return text.includes('table');
-    });
-    if (hasChartShape && (!Array.isArray(metrics.chart_metrics) || metrics.chart_metrics.length === 0)) {
-      return ['native_chart_metrics_missing'];
-    }
-    if (hasTableShape && (!Array.isArray(metrics.table_metrics) || metrics.table_metrics.length === 0)) {
-      return ['native_table_metrics_missing'];
-    }
-    if (hasTableShape && finiteNumberOrNull(metrics.table_min_font_pt) === null) {
-      return ['native_table_metrics_missing'];
-    }
-    if (!manifestSlide.preview_screenshot_sha256) return ['native_preview_screenshot_hash_missing'];
-    if (manifestSlide.synthetic_preview !== false) return ['native_true_render_proof_missing'];
-    if (safeText(manifestSlide.render_proof_source) !== safeText(expectedProof?.renderer_kind)) return ['native_true_render_proof_missing'];
-    if (safeText(manifestSlide.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)) return ['native_true_render_proof_missing'];
-    return [];
-  }
-
-  function booleanCheck(manifestSlide: JsonRecord | undefined, key: string, missingQuality: boolean): boolean {
-    if (missingQuality) return false;
-    return manifestSlide?.checks?.[key] === true;
-  }
-
-  function nativeMechanicalReviewPayload(nativeArtifact: JsonRecord | null) {
-    const bundle = nativeArtifact?.native_ppt_bundle || {};
-    const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
-    const expectedProof = expectedNativeEngineContract()?.true_render_proof || {};
-    const renderProof = shapeManifest?.render_proof || {};
-    const renderProofScreenshots = safeArray(renderProof?.preview_screenshots);
-    const missingRenderProof = safeText(renderProof?.source_surface_kind) !== 'native_pptx'
-      || safeText(renderProof?.renderer_kind) !== safeText(expectedProof?.renderer_kind)
-      || safeText(renderProof?.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)
-      || safeText(renderProof?.runtime) !== safeText(expectedProof?.runtime)
-      || renderProof?.cross_platform_render_required !== true
-      || renderProof?.synthetic_preview !== false
-      || renderProof?.required !== true
-      || shapeManifest?.proof_flags?.libreoffice_headless_pdf_png_v1 !== true
-      || renderProofScreenshots.length === 0
-      || !renderProofScreenshots.every((file) => existsSync(safeText(file)));
-    const manifestSlidesById = new Map(
-      safeArray(shapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
-    );
-    const slideReviews = safeArray(bundle?.slides).map((slide) => {
-      const slideId = safeText(slide?.slide_id);
-      const manifestSlide = manifestSlidesById.get(slideId);
-      const missingIssues = [
-        ...nativeQualityMissingIssues(manifestSlide, expectedProof),
-        ...(missingRenderProof ? ['native_true_render_proof_missing'] : []),
-      ];
-      const missingQuality = missingIssues.length > 0;
-      return {
-        slide_id: slideId,
-        title: safeText(slide?.title),
-        layout_family: safeText(slide?.layout_family),
-        screenshot_file: safeText(slide?.preview_screenshot_file),
-        checks: {
-          overflow_free: booleanCheck(manifestSlide, 'overflow_free', missingQuality),
-          occlusion_free: booleanCheck(manifestSlide, 'occlusion_free', missingQuality),
-          visual_density_ok: booleanCheck(manifestSlide, 'visual_density_ok', missingQuality),
-          speaker_fit_ok: booleanCheck(manifestSlide, 'speaker_fit_ok', missingQuality),
-          edge_clearance_ok: booleanCheck(manifestSlide, 'edge_clearance_ok', missingQuality),
-          block_content_fit_ok: booleanCheck(manifestSlide, 'block_content_fit_ok', missingQuality),
-          title_typography_ok: booleanCheck(manifestSlide, 'title_typography_ok', missingQuality),
-          body_text_readability_ok: booleanCheck(manifestSlide, 'body_text_readability_ok', missingQuality),
-          typography_hierarchy_ok: booleanCheck(manifestSlide, 'typography_hierarchy_ok', missingQuality),
-          title_core_overlap_ok: booleanCheck(manifestSlide, 'title_core_overlap_ok', missingQuality),
-          page_number_consistency_ok: booleanCheck(manifestSlide, 'page_number_consistency_ok', missingQuality),
-          external_audience_language_ok: booleanCheck(manifestSlide, 'external_audience_language_ok', missingQuality),
-          title_safe_zone_clear: booleanCheck(manifestSlide, 'title_safe_zone_clear', missingQuality),
-          table_legibility_ok: booleanCheck(manifestSlide, 'table_legibility_ok', missingQuality),
-          layout_density_ok: booleanCheck(manifestSlide, 'layout_density_ok', missingQuality),
-          slot_fill_ok: booleanCheck(manifestSlide, 'slot_fill_ok', missingQuality),
-          audience_label_readability_ok: booleanCheck(manifestSlide, 'audience_label_readability_ok', missingQuality),
-          content_depth_ok: booleanCheck(manifestSlide, 'content_depth_ok', missingQuality),
-          grid_balance_ok: booleanCheck(manifestSlide, 'grid_balance_ok', missingQuality),
-          visual_structure_present: booleanCheck(manifestSlide, 'visual_structure_present', missingQuality),
-          non_text_visual_specific_ok: booleanCheck(manifestSlide, 'non_text_visual_specific_ok', missingQuality),
-          mechanical_card_template_absent: booleanCheck(manifestSlide, 'mechanical_card_template_absent', missingQuality),
-        },
-        metrics: {
-          title_font_size: Number(slide?.title_font_size || 32),
-          text_char_count: finiteNumberOrNull(manifestSlide?.metrics?.text_char_count) ?? 0,
-          block_count: finiteNumberOrNull(manifestSlide?.metrics?.block_count) ?? Number(slide?.shape_count || 0),
-          overlap_pairs: finiteNumberOrNull(manifestSlide?.metrics?.overlap_pairs) ?? 0,
-          clipped_nodes: finiteNumberOrNull(manifestSlide?.metrics?.clipped_nodes) ?? 0,
-          occupied_ratio: finiteNumberOrNull(manifestSlide?.metrics?.occupied_ratio) ?? 0,
-          primary_points: finiteNumberOrNull(manifestSlide?.metrics?.primary_points)
-            ?? Math.max(1, Number(slide?.text_box_count || 0) - 1),
-          edge_clearance: manifestSlide?.metrics?.edge_clearance || null,
-          overlaps: safeArray(manifestSlide?.metrics?.overlaps),
-          native_shape_count: Number(slide?.shape_count || 0),
-          native_text_box_count: Number(slide?.text_box_count || 0),
-          native_quality_source: 'shape_manifest',
-          native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
-          render_proof_source: missingRenderProof ? 'missing_contract_declared_true_render' : safeText(expectedProof?.renderer_kind),
-          synthetic_preview: renderProof?.synthetic_preview !== false,
-          block_content_failures: safeArray(manifestSlide?.metrics?.block_content_failures),
-          operator_language_fragments: safeArray(manifestSlide?.metrics?.operator_language_fragments),
-          title_safe_zone_clearance_ok: manifestSlide?.metrics?.title_safe_zone_clearance_ok === true,
-          min_body_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.min_body_font_pt),
-          body_text_readability_floor_pt: finiteNumberOrNull(manifestSlide?.metrics?.body_text_readability_floor_pt),
-          body_text_readability_ok: manifestSlide?.metrics?.body_text_readability_ok === true,
-          body_text_font_failures: safeArray(manifestSlide?.metrics?.body_text_font_failures),
-          typography_hierarchy_ratio: finiteNumberOrNull(manifestSlide?.metrics?.typography_hierarchy_ratio),
-          typography_hierarchy_ok: manifestSlide?.metrics?.typography_hierarchy_ok === true,
-          title_core_overlap_count: finiteNumberOrNull(manifestSlide?.metrics?.title_core_overlap_count),
-          title_core_overlap_failures: safeArray(manifestSlide?.metrics?.title_core_overlap_failures),
-          layout_variant: safeText(manifestSlide?.metrics?.layout_variant),
-          composition_signature: safeText(manifestSlide?.metrics?.composition_signature),
-          expected_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.expected_slot_count),
-          filled_slot_count: finiteNumberOrNull(manifestSlide?.metrics?.filled_slot_count),
-          slot_fill_ok: manifestSlide?.metrics?.slot_fill_ok === true,
-          slot_fill_failures: safeArray(manifestSlide?.metrics?.slot_fill_failures),
-          audience_label_readability_ok: manifestSlide?.metrics?.audience_label_readability_ok === true,
-          audience_label_font_floor_pt: finiteNumberOrNull(manifestSlide?.metrics?.audience_label_font_floor_pt),
-          audience_label_readability_failures: safeArray(manifestSlide?.metrics?.audience_label_readability_failures),
-          content_depth_ok: manifestSlide?.metrics?.content_depth_ok === true,
-          content_depth_floor_chars: finiteNumberOrNull(manifestSlide?.metrics?.content_depth_floor_chars),
-          content_depth_failures: safeArray(manifestSlide?.metrics?.content_depth_failures),
-          grid_balance_ok: manifestSlide?.metrics?.grid_balance_ok === true,
-          grid_balance_ratio: finiteNumberOrNull(manifestSlide?.metrics?.grid_balance_ratio),
-          grid_balance_failures: safeArray(manifestSlide?.metrics?.grid_balance_failures),
-          visual_structure_present: manifestSlide?.metrics?.visual_structure_present === true,
-          non_text_visual_specific_ok: manifestSlide?.metrics?.non_text_visual_specific_ok === true,
-          mechanical_card_template_absent: manifestSlide?.metrics?.mechanical_card_template_absent === true,
-          mechanical_card_template_detected: manifestSlide?.metrics?.mechanical_card_template_detected === true,
-          structural_visual_count: finiteNumberOrNull(manifestSlide?.metrics?.structural_visual_count),
-          structural_visual_roles: safeArray(manifestSlide?.metrics?.structural_visual_roles).map((role) => safeText(role)),
-          card_panel_count: finiteNumberOrNull(manifestSlide?.metrics?.card_panel_count),
-          title_underline_absent_ok: manifestSlide?.metrics?.title_underline_absent_ok === true,
-          title_underline_failures: safeArray(manifestSlide?.metrics?.title_underline_failures),
-          table_min_font_pt: finiteNumberOrNull(manifestSlide?.metrics?.table_min_font_pt),
-          card_blank_ratio: finiteNumberOrNull(manifestSlide?.metrics?.card_blank_ratio),
-          table_metrics: manifestSlide?.metrics?.table_metrics || [],
-        },
-        issues: [
-          ...safeArray(manifestSlide?.issues).map((issue) => safeText(issue)),
-          ...missingIssues,
-        ],
+  async function generateValidatedEditableShapePlan({
+    route,
+    contract,
+    deliverablePaths,
+    blueprintArtifact,
+    visualArtifact,
+    repairFeedback,
+    unitRepairScope,
+    adapter,
+    validationInputFile,
+    editableShapePlanFile,
+  }: {
+    route: NativePptRoute;
+    contract: JsonRecord;
+    deliverablePaths: JsonRecord;
+    blueprintArtifact: JsonRecord | null;
+    visualArtifact: JsonRecord | null;
+    repairFeedback: JsonRecord[];
+    unitRepairScope: JsonRecord;
+    adapter: string;
+    validationInputFile: string;
+    editableShapePlanFile: string;
+  }): Promise<NativePlanAttempt> {
+    const maxAttempts = Math.max(1, Number(process.env.REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS || 3));
+    let validationFeedback: JsonRecord | null = null;
+    let lastAttempt: NativePlanAttempt | null = null;
+    const attemptArtifactRefs: string[] = [];
+    for (let attemptIndex = 1; attemptIndex <= maxAttempts; attemptIndex += 1) {
+      const generatedPlan = await generateEditableShapePlan({
+        route,
+        contract,
+        deliverablePaths,
+        blueprintArtifact,
+        visualArtifact,
+        repairFeedback,
+        unitRepairScope,
+        adapter,
+        validationFeedback,
+        attemptIndex,
+      });
+      const candidate = route === 'repair_pptx_native'
+        ? {
+            ...generatedPlan,
+            editableShapePlan: mergeRepairEditableShapePlan({
+              editableShapePlan: generatedPlan.editableShapePlan,
+              priorNativeArtifact: readCurrentNativePptArtifact(contract, deliverablePaths),
+              blueprintArtifact,
+              unitRepairScope,
+            }),
+          }
+        : generatedPlan;
+      const validationInputPayload = buildNativeInputPayload({
+        route,
+        unitRepairScope,
+        contract,
+        blueprintArtifact,
+        visualArtifact,
+        editableShapePlan: candidate.editableShapePlan,
+        editableShapePlanFile,
+        repairFeedback,
+      });
+      writeJson(validationInputFile, validationInputPayload);
+      const attemptInputFile = nativePlanPreflightParts.nativeAttemptArtifactFile(validationInputFile, attemptIndex, '');
+      const attemptValidationFile = nativePlanPreflightParts.nativeAttemptArtifactFile(validationInputFile, attemptIndex, '-validation');
+      writeJson(attemptInputFile, validationInputPayload);
+      attemptArtifactRefs.push(attemptInputFile);
+      const validation = runPythonValidation(validationInputFile);
+      writeJson(attemptValidationFile, validation.payload);
+      attemptArtifactRefs.push(attemptValidationFile);
+      lastAttempt = {
+        ...candidate,
+        validationFeedback: validation.payload,
+        attemptIndex,
+        attemptArtifactRefs: [...attemptArtifactRefs],
       };
-    });
-    const checks = aggregateNativeChecks(slideReviews);
-    return {
-      source_surface_kind: 'native_pptx',
-      source_pptx: safeText(bundle?.pptx_file),
-      shape_manifest_file: safeText(bundle?.shape_manifest_file),
-      render_proof: renderProof,
-      page_count: Number(bundle?.page_count || slideReviews.length),
-      device_scale_factor: 1,
-      screenshot_dimensions: bundle?.screenshot_dimensions || null,
-      checks,
-      metrics: {
-        page_count: slideReviews.length,
-        source_surface_kind: 'native_pptx',
-        native_quality_model: shapeManifest?.native_quality_model || 'shape_manifest_layout_metrics',
-        render_proof_source: missingRenderProof ? 'missing_contract_declared_true_render' : safeText(expectedProof?.renderer_kind),
-        synthetic_preview: renderProof?.synthetic_preview !== false,
-        average_density: slideReviews.reduce((sum, slide) => sum + Number(slide?.metrics?.occupied_ratio || 0), 0)
-          / Math.max(slideReviews.length, 1),
-      },
-      slide_reviews: slideReviews,
-    };
+      if (validation.payload?.ok === true) {
+        return lastAttempt;
+      }
+      validationFeedback = nativePlanPreflightParts.buildNativeValidationFeedback({
+        validation,
+        attemptIndex,
+        attemptArtifactRefs,
+      });
+    }
+    throw new Error(`Native PPT ${route} AI-first editable_shape_plan did not pass preflight after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
   }
 
-  function summarizeNativeSlides(nativeArtifact: JsonRecord | null): JsonRecord[] {
-    return safeArray(nativeArtifact?.native_ppt_bundle?.slides).map((slide) => ({
-      slide_id: safeText(slide?.slide_id),
-      title: safeText(slide?.title),
-      layout_family: safeText(slide?.layout_family),
-      layout_variant: safeText(slide?.metrics?.layout_variant),
-      composition_signature: safeText(slide?.metrics?.composition_signature),
-      expected_slot_count: Number(slide?.metrics?.expected_slot_count || 0),
-      filled_slot_count: Number(slide?.metrics?.filled_slot_count || 0),
-      structural_visual_count: Number(slide?.metrics?.structural_visual_count || 0),
-      structural_visual_roles: safeArray(slide?.metrics?.structural_visual_roles).map((role) => safeText(role)),
-      mechanical_card_template_absent: slide?.metrics?.mechanical_card_template_absent === true,
-      non_text_visual_specific_ok: slide?.metrics?.non_text_visual_specific_ok === true,
-      shape_count: Number(slide?.shape_count || 0),
-      text_box_count: Number(slide?.text_box_count || 0),
-      preview_screenshot_file: safeText(slide?.preview_screenshot_file),
-    }));
-  }
+
 
   async function buildNativePptArtifact({
     deliverableId,
@@ -744,18 +668,26 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const reviewArtifact = route === 'repair_pptx_native'
       ? readStageArtifact(contract, deliverablePaths, 'screenshot_review')
       : null;
+    const directorReviewArtifact = route === 'repair_pptx_native'
+      ? readStageArtifact(contract, deliverablePaths, 'visual_director_review')
+      : null;
     const priorNativeArtifact = route === 'repair_pptx_native'
       ? readCurrentNativePptArtifact(contract, deliverablePaths)
       : null;
     const priorShapeManifest = route === 'repair_pptx_native'
       ? readNativeShapeManifest(safeText(priorNativeArtifact?.native_ppt_bundle?.shape_manifest_file))
       : {};
-    const repairFeedback = route === 'repair_pptx_native'
+    const screenshotRepairFeedback = route === 'repair_pptx_native'
       ? repairFeedbackFromReview(reviewArtifact)
+      : [];
+    const repairFeedback = route === 'repair_pptx_native'
+      ? (screenshotRepairFeedback.length > 0
+          ? screenshotRepairFeedback
+          : repairFeedbackFromDirectorReview(directorReviewArtifact))
       : [];
     const unitRepairScope = buildUnitRepairScope({ route, blueprintArtifact, repairFeedback });
     const paths = nativeArtifactPaths({ deliverablePaths, deliverableId, route });
-    const generatedPlan = await generateEditableShapePlan({
+    const generatedPlan = await generateValidatedEditableShapePlan({
       route,
       contract,
       deliverablePaths,
@@ -764,39 +696,28 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       repairFeedback,
       unitRepairScope,
       adapter,
+      validationInputFile: paths.planValidationFile,
+      editableShapePlanFile: paths.editableShapePlanFile,
     });
     const {
       editableShapePlan,
       generationRuntime,
       modelContract,
-    } = route === 'repair_pptx_native'
-      ? {
-          ...generatedPlan,
-          editableShapePlan: mergeRepairEditableShapePlan({
-            editableShapePlan: generatedPlan.editableShapePlan,
-            priorNativeArtifact,
-            blueprintArtifact,
-            unitRepairScope,
-          }),
-        }
-      : generatedPlan;
+      validationFeedback,
+      attemptIndex,
+      attemptArtifactRefs,
+    } = generatedPlan;
     writeJson(paths.editableShapePlanFile, editableShapePlan);
-    writeJson(paths.inputFile, {
+    writeJson(paths.inputFile, buildNativeInputPayload({
       route,
-      ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
-      unit_repair_scope: unitRepairScope,
-      contract: {
-        overlay: contract.overlay,
-        profile_id: contract.profile_id,
-        title: contract.title,
-        goal: contract.goal,
-      },
-      blueprint: blueprintArtifact?.slide_blueprint || {},
-      visual_direction: visualArtifact?.visual_direction || {},
-      editable_shape_plan: editableShapePlan,
-      editable_shape_plan_file: paths.editableShapePlanFile,
-      repair_feedback: repairFeedback,
-    });
+      unitRepairScope,
+      contract,
+      blueprintArtifact,
+      visualArtifact,
+      editableShapePlan,
+      editableShapePlanFile: paths.editableShapePlanFile,
+      repairFeedback,
+    }));
     const python = runPython(PYTHON_NATIVE, [
       '--input-json', paths.inputFile,
       '--mode', route === 'repair_pptx_native' ? 'repair' : 'author',
@@ -817,6 +738,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       : {};
     assertNativeDeckCompleteness({ route, shapeManifest, payload, unitRepairScope });
     const renderProof = requireTrueRenderProof(payload, shapeManifest);
+    const manifestQualityPassed = nativeManifestQualityPassed(shapeManifest);
     writeJson(paths.shapeManifestFile, {
       ...shapeManifest,
       ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
@@ -881,10 +803,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         visual_sample_claim: {
           sample_kind: isMockStructuredExecutor ? 'deterministic_test_double_plumbing_proof' : 'live_codex_executor_native_ppt_sample',
           proves_artifact_export_chain: true,
-          proves_visual_design_quality: !isMockStructuredExecutor,
-          display_as_visual_sample_allowed: !isMockStructuredExecutor,
+          proves_visual_design_quality: !isMockStructuredExecutor && manifestQualityPassed,
+          display_as_visual_sample_allowed: !isMockStructuredExecutor && manifestQualityPassed,
           requires_human_visual_inspection: !isMockStructuredExecutor,
           mock_fixture_visual_sample_allowed: false,
+          manifest_quality_passed: manifestQualityPassed,
+          required_manifest_checks: [...NATIVE_PPT_AGGREGATED_CHECK_KEYS],
         },
         test_double_boundary: editableShapePlan?.test_double_boundary || null,
         builder: payload.builder || { kind: 'python_pptx_native_shapes' },
@@ -898,6 +822,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         redcube_svg_ir: payload.redcube_svg_ir || shapeManifest.redcube_svg_ir || null,
         ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
         ai_first_shape_plan_contract: modelContract || AI_FIRST_EDITING_CONTRACT,
+        ai_first_shape_plan_preflight: {
+          attempts: attemptIndex,
+          validator: validationFeedback,
+          self_repair_used: attemptIndex > 1,
+          attempt_artifact_refs: safeArray(attemptArtifactRefs).map((ref) => safeText(ref)).filter(Boolean),
+        },
         engine_contract: engineContract,
         engine_contract_file: NATIVE_PPT_ENGINE_CONTRACT,
         shape_manifest_schema_version: Number(payload.shape_manifest_schema_version || 0),
@@ -957,6 +887,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         safeText(payload.shape_manifest_file, paths.shapeManifestFile),
         safeText(payload.repair_log_file, paths.repairLogFile),
         NATIVE_PPT_ENGINE_CONTRACT,
+        ...safeArray(attemptArtifactRefs).map((ref) => safeText(ref)).filter(Boolean),
         ...safeArray(renderProof.preview_screenshots),
       ].filter(Boolean),
       review_state_patch: {

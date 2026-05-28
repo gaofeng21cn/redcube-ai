@@ -187,10 +187,16 @@ export function createPptDeckStageParts(deps) {
       }
     }
     if (route === 'repair_pptx_native') {
+      const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
+      const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
       const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
       const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_pptx_native'));
-      if (screenshotReviewMtimeMs < authorMtimeMs) {
-        throw new Error('Route repair_pptx_native requires screenshot_review based on the current native PPTX; rerun screenshot_review first');
+      const hasFreshScreenshotRepairRequest = screenshotReviewMtimeMs >= authorMtimeMs
+        && reviewArtifactRequestsRoute(readStageArtifact(contract, deliverablePaths, 'screenshot_review'), 'repair_pptx_native');
+      const hasFreshDirectorRepairRequest = directorReviewMtimeMs >= authorMtimeMs
+        && reviewArtifactRequestsRoute(directorReviewArtifact, 'repair_pptx_native');
+      if (!hasFreshScreenshotRepairRequest && !hasFreshDirectorRepairRequest) {
+        throw new Error('Route repair_pptx_native requires visual_director_review or screenshot_review based on the current native PPTX and requesting repair_pptx_native; rerun visual_director_review or screenshot_review first');
       }
     }
     if (route === 'repair_image_pages') {

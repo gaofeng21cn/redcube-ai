@@ -216,6 +216,8 @@ export interface PptSlideReviewMetrics {
   title_font_delta?: number | null;
   block_count?: number;
   overlap_pairs?: number;
+  structural_text_collision_count?: number;
+  structural_text_collisions?: Array<Record<string, unknown>>;
   occupied_ratio?: number;
   render_proof_source?: string;
   synthetic_preview?: boolean;

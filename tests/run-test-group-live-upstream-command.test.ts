@@ -189,7 +189,10 @@ test('run-test-group exposes an integration remainder lane for local fast-then-i
   const fast = GROUPS.fast;
 
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(GROUPS['integration:remaining'].length, 36);
+  assert.equal(
+    GROUPS['integration:remaining'].length,
+    excludeCoveredTestFiles(integration, fast).length,
+  );
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
@@ -326,7 +329,8 @@ test('deliverable review loop integration stays on the mock Codex runtime instea
 test('serialized route-heavy verification files stay on the mock Codex runtime instead of the live CLI', () => {
   for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
     const content = readSerializedTestFileWithImportedCases(file);
-    assert.match(content, /withMockCodexRuntime(?:State)?|REDCUBE_CODEX_COMMAND/);
+    const helperAwareContent = readTestFileWithStaticRelativeImports(file);
+    assert.match(`${content}\n${helperAwareContent}`, /withMockCodexRuntime(?:State)?|REDCUBE_CODEX_COMMAND/);
   }
 });
 
@@ -339,7 +343,7 @@ test('native PPT fast runtime tests use the mock Python helper instead of launch
     'tests/runtime-deliverable-route-recovery.test.ts',
     'tests/runtime-deliverable-route-cases/shared.ts',
   ]) {
-    const content = readFileSync(file, 'utf-8');
+    const content = readTestFileWithStaticRelativeImports(file);
     assert.match(content, /mock-redcube-python-with-playwright\.ts/);
     assert.match(content, /REDCUBE_PYTHON_COMMAND/);
     assert.doesNotMatch(content, /redcube_ai\.native_helpers\.ppt_deck\.native/);
@@ -370,6 +374,23 @@ function readSerializedTestFileWithImportedCases(file) {
   const importedCaseFiles = [...content.matchAll(/await import\(['"](.+?)['"]\);/g)]
     .map((match) => path.join(path.dirname(file), match[1]));
   return [content, ...importedCaseFiles.map((importedFile) => readFileSync(importedFile, 'utf-8'))].join('\n');
+}
+
+function readTestFileWithStaticRelativeImports(file) {
+  const seen = new Set();
+  function readRecursive(currentFile) {
+    if (seen.has(currentFile)) return '';
+    seen.add(currentFile);
+    const content = readFileSync(currentFile, 'utf-8');
+    const imports = [...content.matchAll(/from ['"](\.\/[^'"]+|(?:\.\.\/)[^'"]+)['"]/g)]
+      .map((match) => path.normalize(path.join(path.dirname(currentFile), match[1])));
+    return [content, ...imports.map((importedFile) => (
+      importedFile.startsWith('tests/')
+        ? readRecursive(importedFile)
+        : ''
+    ))].join('\n');
+  }
+  return readRecursive(file);
 }
 
 test('serialized verification rule is documented in current program contract', () => {

@@ -106,6 +106,41 @@ export function createPptDeckScreenshotReviewParts(deps) {
     slideIdSet,
   });
 
+  function mechanicalOnlyReviewDraft(slideReviews, reviewPayload) {
+    const blockedSlides = safeArray(slideReviews).filter((slide) => safeArray(slide?.issues).length > 0);
+    return {
+      data: {
+        director_intent_landed: blockedSlides.length === 0,
+        anti_template_ok: blockedSlides.length === 0,
+        weak_pages: blockedSlides.map((slide) => safeText(slide?.slide_id)).filter(Boolean).slice(0, 4),
+        review_summary: blockedSlides.length === 0
+          ? 'Mechanical screenshot review passed without AI escalation.'
+          : 'Mechanical screenshot review blocked native PPTX before AI visual judgement; rerun repair from the indicated native quality issues.',
+      },
+      aiSlideReviews: safeArray(slideReviews).map((slide) => ({
+        slide_id: safeText(slide?.slide_id),
+        judgement: safeArray(slide?.issues).length > 0 ? 'block' : 'pass',
+        visual_findings: safeArray(slide?.issues).length > 0
+          ? safeArray(slide?.issues).map((issue) => `mechanical issue: ${safeText(issue)}`).filter(Boolean).slice(0, 4)
+          : ['mechanical checks passed'],
+        recommended_fix: safeArray(slide?.issues).length > 0
+          ? 'repair_pptx_native'
+          : 'none',
+      })),
+      generationRuntime: {
+        owner: 'redcube_ai',
+        adapter_surface: 'deterministic_native_mechanical_gate',
+        run_id: `mechanical_gate_${safeText(reviewPayload?.source_surface_kind, 'screenshot_review')}`,
+        session_id: 'mechanical_gate',
+        review_scope: 'mechanical_only',
+        prompt_bytes: 0,
+        context_bytes: 0,
+        estimated_prompt_tokens: 0,
+        child_calls: [],
+      },
+    };
+  }
+
   async function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, slideReviews }) {
     const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
     const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -370,21 +405,24 @@ export function createPptDeckScreenshotReviewParts(deps) {
     const mechanicalSlideReviewsForAi = incrementalReview
       ? mechanicalSlideReviews.filter((slide) => slideIdSet(incrementalTargetSlideIds).has(safeText(slide?.slide_id)))
       : mechanicalSlideReviews;
-    const aiReviewPromise = generateScreenshotReviewDraft(
-      contract,
-      deliverablePaths,
-      renderArtifact,
-      mechanicalSlideReviewsForAi,
-      reviewPayload,
-      mode,
-      adapter,
-      {
-        incrementalReview,
-        targetSlideIds: incrementalTargetSlideIds,
-        allSlideReviews: mechanicalSlideReviews,
-        priorReviewArtifact,
-      },
-    );
+    const hasMechanicalBlock = mechanicalSlideReviewsForAi.some((slide) => safeArray(slide?.issues).length > 0);
+    const aiReviewPromise = nativeReviewInput && hasMechanicalBlock
+      ? Promise.resolve(mechanicalOnlyReviewDraft(mechanicalSlideReviewsForAi, reviewPayload))
+      : generateScreenshotReviewDraft(
+        contract,
+        deliverablePaths,
+        renderArtifact,
+        mechanicalSlideReviewsForAi,
+        reviewPayload,
+        mode,
+        adapter,
+        {
+          incrementalReview,
+          targetSlideIds: incrementalTargetSlideIds,
+          allSlideReviews: mechanicalSlideReviews,
+          priorReviewArtifact,
+        },
+      );
     const baselineReviewPromise = mode === 'optimize_existing'
       ? Promise.resolve(baselineComparison({
           workspaceRoot,
@@ -447,6 +485,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
         ...creativeExecution('screenshot_review', generationRuntime, adapter),
         overlay: 'screenshot_review',
         review_scope: incrementalReview ? 'incremental_page_review' : 'full_deck_review',
+        ai_review_skipped_for_native_mechanical_block: nativeReviewInput && hasMechanicalBlock,
         reviewed_slide_ids: incrementalReview
           ? incrementalTargetSlideIds
           : slideReviews.map((slide) => safeText(slide?.slide_id)).filter(Boolean),

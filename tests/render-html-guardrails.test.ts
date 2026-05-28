@@ -172,6 +172,25 @@ test('ppt authoring page budget keeps source page ranges as AI planning signals'
   );
 });
 
+test('ppt authoring page budget consumes machine delivery_request constraints', () => {
+  const pageBudget = loadPptPageBudget();
+  const contract = {
+    goal: '测试样片需要验证 RCA native PPTX 完整闭环。',
+    delivery_request: {
+      constraints: {
+        expected_slide_count: 1,
+        max_slides: 1,
+      },
+    },
+  };
+
+  const budget = pageBudget('lecture_peer', contract);
+  assert.deepEqual(budget.hard_constraints, {
+    exact_slides: 1,
+    max_slides: 1,
+  });
+});
+
 test('ppt authoring page budget treats source slide plans as suggestions only', () => {
   const pageBudget = loadPptPageBudget();
   const slidePlan = [

@@ -2,148 +2,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-
-import {
-  createDeliverable,
-  runDeliverableRoute,
-} from './product-domain-action-test-api.ts';
-import { withEnv, withMockCodexRuntime } from './mock-codex-cli.ts';
+import { existsSync } from 'node:fs';
+import { withEnv } from './mock-codex-cli.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 import { buildMockPptNativeShapePlan } from './helpers/mock-codex-cli-parts/ppt-builders/native.ts';
-
-const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
-  process.execPath,
-  '--experimental-strip-types',
-  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
-]);
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, data) {
-  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
-
-function flattenNativeVisibleText(nativeArtifact, shapeManifest) {
-  return [
-    JSON.stringify(nativeArtifact?.native_ppt_bundle?.slides || []),
-    JSON.stringify(shapeManifest?.slides || []),
-  ].join('\n');
-}
-
-function fileSha256(file) {
-  return createHash('sha256').update(readFileSync(file)).digest('hex');
-}
-
-function nativeEngineContract() {
-  return readJson(path.resolve('contracts/runtime-program/ppt-native-python-engine-contract.json'));
-}
-
-function rectFromInches(shape) {
-  const bounds = shape?.bounds || {};
-  return {
-    left: Number(bounds.left_in || 0),
-    top: Number(bounds.top_in || 0),
-    right: Number(bounds.left_in || 0) + Number(bounds.width_in || 0),
-    bottom: Number(bounds.top_in || 0) + Number(bounds.height_in || 0),
-  };
-}
-
-function overlapArea(leftShape, rightShape) {
-  const left = rectFromInches(leftShape);
-  const right = rectFromInches(rightShape);
-  const width = Math.max(0, Math.min(left.right, right.right) - Math.max(left.left, right.left));
-  const height = Math.max(0, Math.min(left.bottom, right.bottom) - Math.max(left.top, right.top));
-  return Number((width * height).toFixed(5));
-}
-
-function contentTextOverlapPairs(shapes) {
-  const textShapes = shapes.filter((shape) => (
-    shape?.kind === 'text_box'
-    && ['title', 'core_sentence', 'point_index', 'point_text', 'body', 'content'].includes(String(shape?.role || ''))
-  ));
-  const overlaps = [];
-  for (let leftIndex = 0; leftIndex < textShapes.length; leftIndex += 1) {
-    for (const rightShape of textShapes.slice(leftIndex + 1)) {
-      const area = overlapArea(textShapes[leftIndex], rightShape);
-      if (area > 0) {
-        overlaps.push({
-          a: textShapes[leftIndex].shape_id,
-          b: rightShape.shape_id,
-          area,
-        });
-      }
-    }
-  }
-  return overlaps;
-}
-
-function weightedTextWidthPx(text, fontSize) {
-  return [...String(text || '')].reduce((width, char) => {
-    if (/\s/.test(char)) return width + fontSize * 0.32;
-    if (char.codePointAt(0) > 127) return width + fontSize * 0.95;
-    if (/[A-Z]/.test(char)) return width + fontSize * 0.68;
-    if (['-', '/', ':'].includes(char)) return width + fontSize * 0.38;
-    return width + fontSize * 0.56;
-  }, 0);
-}
-
-function textCapacityFailures(shapes) {
-  return shapes
-    .filter((shape) => shape?.kind === 'text_box' && shape?.role === 'point_text')
-    .map((shape) => {
-      const bounds = shape.bounds || {};
-      const widthPx = Number(bounds.width_in || 0) * 72;
-      const heightPx = Number(bounds.height_in || 0) * 72;
-      const fontSize = Number(shape.font_size || 18);
-      const estimatedLines = Math.max(1, Math.ceil(weightedTextWidthPx(shape.editable_text, fontSize) / Math.max(widthPx - 12, 1)));
-      const maxLines = Math.max(1, Math.floor(heightPx / Math.max(fontSize * 1.16, 1)));
-      return estimatedLines > maxLines ? {
-        shape_id: shape.shape_id,
-        estimatedLines,
-        maxLines,
-      } : null;
-    })
-    .filter(Boolean);
-}
-
-async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native' }) {
-  await createDeliverable({
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    profileId: 'lecture_student',
-    topicId: 'topic-a',
-    deliverableId,
-    title: 'Native PPT 探索 deck',
-    goal: '验证 PPT family 可在 HTML 路线之外直接生成可编辑 PPTX',
-  });
-
-  for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
-    const result = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId,
-      route,
-    });
-    assert.equal(result.ok, true, route);
-  }
-}
-
-async function withMockNativePptRuntime(testFn) {
-  const restoreEnv = withEnv({
-    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
-  });
-  try {
-    return await withMockCodexRuntime(testFn);
-  } finally {
-    restoreEnv();
-  }
-}
+import {
+  contentTextOverlapPairs,
+  fileSha256,
+  flattenNativeVisibleText,
+  nativeEngineContract,
+  pointIndexTextFailures,
+  readJson,
+  runNativePlanningChain,
+  textCapacityFailures,
+  withMockNativePptRuntime,
+  writeJson,
+} from './helpers/ppt-native-ppt-runtime-fixtures.ts';
+import { runDeliverableRoute } from './product-domain-action-test-api.ts';
 
 test('native PPT lane authors editable PPTX and still passes review/export gates', async () => {
   await withMockNativePptRuntime(async () => {
@@ -165,8 +40,11 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       creative_owner: 'llm_agent',
       editable_shape_plan_required: true,
       editable_shape_manifest_required: true,
+      design_spec_lock_required: true,
+      shape_quality_role_required: true,
       layout_intent_required: true,
       composition_signature_required: true,
+      structural_visual_required: true,
       title_underline_motif_allowed: false,
       concrete_layout_variant_repetition_limit: 2,
       python_helper_role: 'execute_validate_export_only',
@@ -178,8 +56,16 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(existsSync(authored.native_ppt_bundle?.editable_shape_plan_file), true);
     const editableShapePlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
     assert.equal(editableShapePlan.contract_kind, 'redcube_ai_first_native_ppt_shape_plan');
+    assert.equal(editableShapePlan.design_spec_lock?.owner, 'llm_agent');
+    assert.equal(typeof editableShapePlan.design_spec_lock?.motif, 'string');
+    assert.equal(editableShapePlan.design_spec_lock.layout_archetypes.length >= 3, true);
     assert.equal(editableShapePlan.slides.length, authored.native_ppt_bundle?.slides.length);
     assert.equal(editableShapePlan.slides.every((slide) => Array.isArray(slide.native_shapes) && slide.native_shapes.length >= 2), true);
+    assert.equal(
+      editableShapePlan.slides.every((slide) => slide.native_shapes.every((shape) => typeof shape.quality_role === 'string')),
+      true,
+    );
+    assert.deepEqual(pointIndexTextFailures(editableShapePlan), []);
     assert.equal(
       editableShapePlan.slides.every((slide) => typeof slide.layout_intent?.composition_signature === 'string'),
       true,
@@ -394,6 +280,104 @@ test('native PPT AI shape plan keeps ring_cross index labels and body text non-o
   assert.deepEqual(textCapacityFailures(ringSlide.native_shapes), []);
 });
 
+test('native PPT AI shape plan rejects visible point indexes without editable text', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-missing-index-text-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-missing-index-text' });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'remove_point_index_text',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-missing-index-text',
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, false);
+      assert.match(
+        String(nativeResult.error?.message || nativeResult.error || ''),
+        /point_index|missing_text|editable spatial shape plan/i,
+      );
+    } finally {
+      restoreRoute();
+    }
+  });
+});
+
+test('native PPT AI shape plan preflight self-repairs unreadable live plans before materialization', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-plan-preflight-repair-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-plan-preflight-repair' });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'repair_tiny_native_plan_on_feedback',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-plan-preflight-repair',
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, true);
+      const authored = readJson(nativeResult.artifactFile);
+      assert.equal(authored.native_ppt_bundle.ai_first_shape_plan_preflight.attempts, 2);
+      assert.equal(authored.native_ppt_bundle.ai_first_shape_plan_preflight.self_repair_used, true);
+      assert.equal(authored.native_ppt_bundle.ai_first_shape_plan_preflight.validator.ok, true);
+      const editableShapePlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
+      assert.deepEqual(textCapacityFailures(editableShapePlan.slides.flatMap((slide) => slide.native_shapes)), []);
+    } finally {
+      restoreRoute();
+    }
+  });
+});
+
+test('native PPT AI shape plan retry exposes exact validator fixes in the output contract', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-plan-retry-contract-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-plan-retry-contract' });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'require_validation_retry_contract',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-plan-retry-contract',
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, true);
+      const authored = readJson(nativeResult.artifactFile);
+      assert.equal(authored.native_ppt_bundle.ai_first_shape_plan_preflight.attempts, 2);
+      assert.equal(authored.native_ppt_bundle.ai_first_shape_plan_preflight.self_repair_used, true);
+      assert.equal(
+        authored.native_ppt_bundle.ai_first_shape_plan_preflight.attempt_artifact_refs.length,
+        4,
+      );
+      assert.equal(
+        authored.native_ppt_bundle.ai_first_shape_plan_preflight.attempt_artifact_refs.every((file) => existsSync(file)),
+        true,
+      );
+      assert.equal(
+        authored.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-01-validation.json')),
+        true,
+      );
+      assert.equal(
+        authored.native_ppt_bundle.ai_first_shape_plan_preflight.validator.ok,
+        true,
+      );
+    } finally {
+      restoreRoute();
+    }
+  });
+});
+
 test('native PPT route rejects stale desktop-app proof provenance before screenshot review', async () => {
   const restoreRenderer = withEnv({
     REDCUBE_MOCK_NATIVE_RENDERER_KIND: 'legacy_desktop_renderer',
@@ -581,10 +565,18 @@ test('native PPT screenshot review blocks from shape-manifest quality metrics in
       screenshotReview.mechanical_review.slide_reviews[0].issues.includes('native_chart_metrics_missing'),
       true,
     );
+    assert.equal(
+      screenshotReview.review_execution.ai_review_skipped_for_native_mechanical_block,
+      true,
+    );
+    assert.equal(
+      screenshotReview.review_execution.generation_runtime.adapter_surface,
+      'deterministic_native_mechanical_gate',
+    );
   });
 });
 
-test('native PPT screenshot review blocks incomplete slots, unreadable labels, and unbalanced native layout', async () => {
+test('native PPT visual director preflight blocks incomplete slots, unreadable labels, and unbalanced native layout', async () => {
   await withMockNativePptRuntime(async () => {
     const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-layout-gates-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-layout-gates' });
@@ -661,61 +653,26 @@ test('native PPT screenshot review blocks incomplete slots, unreadable labels, a
       deliverableId: 'deck-layout-gates',
       route: 'visual_director_review',
     });
-    assert.equal(directorResult.ok, true);
-
-    const screenshotResult = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-layout-gates',
-      route: 'screenshot_review',
-    });
-    assert.equal(screenshotResult.ok, false);
-    const screenshotReview = readJson(path.join(
+    assert.equal(directorResult.ok, false);
+    const directorArtifact = readJson(path.join(
       workspaceRoot,
       'topics',
       'topic-a',
       'deliverables',
       'deck-layout-gates',
       'artifacts',
-      'quality_gate.json',
+      'director_review.json',
     ));
-    assert.equal(screenshotReview.status, 'block');
-    assert.equal(screenshotReview.checks.slot_fill_ok, false);
-    assert.equal(screenshotReview.checks.audience_label_readability_ok, false);
-    assert.equal(screenshotReview.checks.content_depth_ok, false);
-    assert.equal(screenshotReview.checks.grid_balance_ok, false);
-    assert.equal(screenshotReview.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.equal(directorArtifact.status, 'block');
+    assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
+    assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
+    assert.match(directorArtifact.visual_director_review.review_summary, /native content slot fill failed/);
+    assert.match(directorArtifact.visual_director_review.review_summary, /native audience label readability failed/);
+    assert.match(directorArtifact.visual_director_review.review_summary, /native content depth failed/);
+    assert.match(directorArtifact.visual_director_review.review_summary, /native grid balance failed/);
     assert.equal(
-      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_slot_fill_failed'),
+      directorArtifact.visual_director_review.weak_pages.includes(shapeManifest.slides[1].slide_id),
       true,
-    );
-    assert.equal(
-      screenshotReview.slide_reviews[1].mechanical_issues.includes('audience_label_below_readability_floor'),
-      true,
-    );
-    assert.equal(
-      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_content_depth_failed'),
-      true,
-    );
-    assert.equal(
-      screenshotReview.slide_reviews[1].mechanical_issues.includes('native_grid_balance_failed'),
-      true,
-    );
-    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.layout_variant, 'compare_four_zone');
-    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.expected_slot_count, 4);
-    assert.equal(screenshotReview.mechanical_review.slide_reviews[1].metrics.filled_slot_count, 3);
-    assert.equal(
-      screenshotReview.mechanical_review.slide_reviews[1].metrics.audience_label_readability_failures[0].font_size,
-      12.5,
-    );
-    assert.equal(
-      screenshotReview.mechanical_review.slide_reviews[1].metrics.content_depth_failures[0].threshold,
-      12,
-    );
-    assert.equal(
-      screenshotReview.mechanical_review.slide_reviews[1].metrics.grid_balance_failures[0].reason,
-      'panel_area_ratio_out_of_range',
     );
   });
 });
@@ -869,6 +826,81 @@ test('native PPT visual director review blocks repeated composition signatures e
       directorArtifact.visual_director_review.weak_pages.filter((slideId) => ['S02', 'S03', 'S04'].includes(slideId)),
       ['S02', 'S03', 'S04'],
     );
+  });
+});
+
+test('native PPT visual director review can clear prior full-deck block after targeted repair covers weak pages', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-director-clear-');
+    const deliverableId = 'deck-native-director-clear';
+    await runNativePlanningChain({ workspaceRoot, deliverableId });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', deliverableId);
+    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
+    writeJson(directorReviewFile, {
+      route: 'visual_director_review',
+      status: 'block',
+      visual_director_review: {
+        director_intent_landed: false,
+        anti_template_ok: false,
+        peak_pages_landed: false,
+        memory_hook_present: true,
+        weak_pages: ['S01'],
+        deterministic_preflight: {
+          findings: ['S01: native content slot fill failed'],
+        },
+      },
+      review_state_patch: {
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        pending_reviews: ['anti_template_failed'],
+        blocking_reasons: ['anti_template_failed'],
+        rerun_from_stage: 'repair_pptx_native',
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: 'repair_pptx_native',
+        },
+      },
+    });
+
+    const repairResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'repair_pptx_native',
+    });
+    assert.equal(repairResult.ok, true);
+
+    const restoreDirectorVariant = withEnv({
+      REDCUBE_MOCK_PPT_DIRECTOR_REVIEW_VARIANT: 'block_author_pptx_native_until_repair',
+    });
+    try {
+      const reviewResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId,
+        route: 'visual_director_review',
+      });
+      assert.equal(reviewResult.ok, true);
+      const review = readJson(reviewResult.artifactFile);
+      assert.equal(review.visual_director_review.director_intent_landed, true);
+      assert.equal(review.visual_director_review.anti_template_ok, true);
+      assert.equal(review.visual_director_review.peak_pages_landed, true);
+      assert.deepEqual(review.visual_director_review.weak_pages, []);
+    } finally {
+      restoreDirectorVariant();
+    }
   });
 });
 

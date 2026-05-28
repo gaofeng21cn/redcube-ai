@@ -39,6 +39,7 @@ export const NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS = Object.freeze([
   'text_char_count',
   'block_count',
   'overlap_pairs',
+  'structural_text_collision_count',
   'clipped_nodes',
   'occupied_ratio',
   'primary_points',

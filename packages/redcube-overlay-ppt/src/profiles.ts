@@ -95,6 +95,11 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
     creative_owner: 'llm_agent',
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
+    design_spec_lock_required: true,
+    shape_quality_role_required: true,
+    layout_intent_required: true,
+    composition_signature_required: true,
+    structural_visual_required: true,
     python_helper_role: 'execute_validate_export_only',
     template_substitution_allowed: false,
     preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
@@ -928,6 +933,7 @@ export function hydratePptDeckContract({
   title,
   goal,
   profileId,
+  constraints,
 }: PptDeckHydrateContractRequest): PptDeckHydratedContract {
   const profile = String(profileId || '').trim();
   if (!isPptDeckProfileId(profile)) {
@@ -944,6 +950,11 @@ export function hydratePptDeckContract({
     deliverable_id: String(deliverableId || '').trim(),
     title: String(title || '').trim(),
     goal: String(goal || '').trim(),
+    delivery_request: {
+      constraints: constraints && typeof constraints === 'object' && !Array.isArray(constraints)
+        ? constraints
+        : {},
+    },
     stage_sequence: FAMILY_STAGE_SEQUENCE,
     review_surface: FAMILY_REVIEW_SURFACE,
     layout_rules: FAMILY_LAYOUT_RULES,

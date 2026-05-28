@@ -1,6 +1,18 @@
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
 
+const REQUIRED_NATIVE_VISUAL_SAMPLE_CHECKS = Object.freeze([
+  'live_codex_executor_shape_plan',
+  'editable_shape_plan.design_spec_lock',
+  'per_slide_layout_intent',
+  'shape_manifest.all_slide_issues_empty',
+  'shape_manifest.all_native_quality_checks_true',
+  'libreoffice_poppler_render_screenshots',
+  'visual_director_review',
+  'screenshot_review',
+  'export_pptx',
+]);
+
 const QUALITY_NONREGRESSION_CONTRACT_REF = 'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json';
 
 const REQUIRED_NATIVE_QUALITY_METRIC_REFS = Object.freeze([
@@ -27,6 +39,8 @@ const REQUIRED_NATIVE_QUALITY_METRIC_REFS = Object.freeze([
   'shape_manifest#/slides/*/metrics/occupied_ratio',
   'shape_manifest#/slides/*/metrics/edge_clearance',
   'shape_manifest#/slides/*/metrics/overlap_pairs',
+  'shape_manifest#/slides/*/metrics/structural_text_collision_count',
+  'shape_manifest#/slides/*/metrics/structural_text_collisions',
   'shape_manifest#/slides/*/metrics/shape_kind_count',
   'shape_manifest#/slides/*/metrics/role_count',
   'shape_manifest#/slides/*/metrics/layout_richness_score',
@@ -143,15 +157,7 @@ export function buildNativePptQualityNonregressionReadModel({
       display_as_native_ppt_visual_sample_allowed: !isTestDouble,
       proves_artifact_export_chain: true,
       proves_visual_design_quality: !isTestDouble,
-      required_for_visual_quality_claim: [
-        'live_codex_executor_shape_plan',
-        'editable_shape_plan.design_spec_lock',
-        'per_slide_layout_intent',
-        'libreoffice_poppler_render_screenshots',
-        'visual_director_review',
-        'screenshot_review',
-        'export_pptx',
-      ],
+      required_for_visual_quality_claim: [...REQUIRED_NATIVE_VISUAL_SAMPLE_CHECKS],
     },
     officecli_materializer_policy_ref: {
       policy_id: OFFICECLI_MATERIALIZER_POLICY.policy_id,

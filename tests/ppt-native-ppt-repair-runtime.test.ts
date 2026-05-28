@@ -221,3 +221,132 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
     assert.deepEqual(screenshotReview.mechanical_review?.incremental_review?.reviewed_slide_ids, ['S02']);
   });
 });
+
+test('native PPT repair can consume visual director native preflight feedback before screenshot review', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-director-repair-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-director-repair' });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-director-repair',
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-director-repair');
+    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
+    writeJson(directorReviewFile, {
+      route: 'visual_director_review',
+      status: 'block',
+      visual_director_review: {
+        director_intent_landed: true,
+        anti_template_ok: false,
+        weak_pages: ['S01'],
+        review_summary: 'deterministic preflight blocked S01: native content slot fill failed; native content depth failed',
+        deterministic_preflight: {
+          findings: [
+            'S01: native content slot fill failed',
+            'S01: native content depth failed',
+          ],
+        },
+      },
+      review_state_patch: {
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        pending_reviews: ['anti_template_failed'],
+        blocking_reasons: ['anti_template_failed'],
+        rerun_from_stage: 'repair_pptx_native',
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: 'repair_pptx_native',
+        },
+      },
+    });
+
+    const repairResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-director-repair',
+      route: 'repair_pptx_native',
+    });
+    assert.equal(repairResult.ok, true);
+    const repaired = readJson(repairResult.artifactFile);
+    assert.equal(repaired.native_ppt_bundle?.source_visual_route, 'repair_pptx_native');
+    assert.equal(repaired.native_ppt_repair_log?.feedback_count, 1);
+    assert.deepEqual(repaired.native_ppt_repair_log?.target_slide_ids, ['S01']);
+    assert.equal(repaired.native_ppt_repair_log?.repair_evidence?.repair_units[0]?.reason?.visual_findings.includes('S01: native content slot fill failed'), true);
+    assert.equal(repaired.native_ppt_repair_log?.repair_evidence?.repair_units[0]?.reason?.visual_findings.includes('S01: native content depth failed'), true);
+  });
+});
+
+test('native PPT repair inherits prior AI design spec lock when targeted repair output omits it', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-repair-spec-lock-');
+    const deliverableId = 'deck-repair-spec-lock';
+    await runNativePlanningChain({ workspaceRoot, deliverableId });
+
+    const authorResult = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'author_pptx_native',
+    });
+    assert.equal(authorResult.ok, true);
+    const authored = readJson(authorResult.artifactFile);
+    const authoredPlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
+    assert.equal(authoredPlan.design_spec_lock?.owner, 'llm_agent');
+
+    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', deliverableId);
+    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
+    writeJson(directorReviewFile, {
+      route: 'visual_director_review',
+      status: 'block',
+      visual_director_review: {
+        director_intent_landed: true,
+        anti_template_ok: false,
+        weak_pages: ['S01'],
+        review_summary: 'deterministic preflight blocked S01: native content depth failed',
+        deterministic_preflight: {
+          findings: ['S01: native content depth failed'],
+        },
+      },
+      review_state_patch: {
+        current_status: 'blocked_for_revision',
+        ready_for_export: false,
+        blocking_reasons: ['anti_template_failed'],
+        rerun_from_stage: 'repair_pptx_native',
+        rerun_policy: {
+          status: 'rerun_required',
+          rerun_from_stage: 'repair_pptx_native',
+        },
+      },
+    });
+
+    const restoreMutation = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'repair_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'repair_missing_design_spec_lock',
+    });
+    try {
+      const repairResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId,
+        route: 'repair_pptx_native',
+      });
+      assert.equal(repairResult.ok, true);
+      const repaired = readJson(repairResult.artifactFile);
+      const repairedPlan = readJson(repaired.native_ppt_bundle.editable_shape_plan_file);
+      assert.deepEqual(repairedPlan.design_spec_lock, authoredPlan.design_spec_lock);
+      assert.equal(repairedPlan.design_spec_lock_inheritance?.source, 'prior_ai_authored_native_shape_plan');
+      assert.equal(repairedPlan.design_spec_lock_inheritance?.helper_generated_design, false);
+    } finally {
+      restoreMutation();
+    }
+  });
+});

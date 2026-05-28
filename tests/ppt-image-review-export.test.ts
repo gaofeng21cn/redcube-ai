@@ -326,6 +326,39 @@ test('ppt lecture_student one-slide deck can satisfy teaching progression withou
   assert.equal(checks.teaching_progression_clear, true);
 });
 
+test('ppt lecture_student one-slide native visual sample accepts compact input route gate progression', () => {
+  const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
+    slide_blueprint: {
+      slides: [
+        {
+          slide_id: 'S01',
+          title: '三条生成路线，怎样才算真正闭环？',
+          page_type: 'cover_signal',
+          page_goal: '用单页把共享输入、三路生成、交付门覆盖和可复查留痕组织成清晰的判断框架。',
+          core_sentence: '能生成文件只是起点；只有同一输入经过三条生成路线，并完成三道交付门与六类结果留痕，才可判断端到端闭环成立。',
+          page_core_content: [
+            { text: '同一输入：一个准备好的内容包同时进入图像优先、网页呈现、可编辑演示文稿三条生成路线。' },
+            { text: '闭环判定：三条路线都要经过视觉审阅、截图审阅、演示文稿导出；任一交付门缺失，都不能判定端到端完成。' },
+          ],
+          evidence_points: [
+            '本次最小探针包含 1 个主题输入包、3 条生成路线，每条路线执行 1 轮。',
+            '完整闭环要求 3/3 交付门覆盖，并留下 PPTX、PDF、PNG 截图、形状清单、审阅回执、导出回执共 6 类结果。',
+          ],
+          visual_presentation: {
+            layout_family: 'cover_signal',
+            anchor_tracks: [
+              '主视觉采用一份输入包分流到三条并行通道，再汇入三道交付门的流程图。',
+            ],
+          },
+        },
+      ],
+    },
+  }, {});
+
+  assert.equal(checks.term_explained_on_first_use, true);
+  assert.equal(checks.teaching_progression_clear, true);
+});
+
 test('ppt lecture_student mechanism track satisfies term explanation with labeled content', () => {
   const checks = profilePresetParts.deriveProfileChecks({ profile_id: 'lecture_student' }, {
     slide_blueprint: {

@@ -40,6 +40,19 @@ export function buildMockPptDirectorReview(meta) {
       rewrite_action: 'repair_pptx_native',
     };
   }
+  if (variants.has('block_author_pptx_native_until_repair')
+    && slides.some((slide) => safeText(slide?.source_pptx).includes('repair_pptx_native'))) {
+    return {
+      director_intent_landed: true,
+      anti_template_ok: true,
+      peak_pages_landed: true,
+      memory_hook_present: true,
+      homogeneous_layout_risk: 0.18,
+      weak_pages: [],
+      review_summary: '原生 PPTX 回修后结构、节奏和反模板要求通过。',
+      rewrite_action: 'none',
+    };
+  }
   if (variants.has('require_page_local_delta_review')) {
     if (reviewScope !== 'incremental_page_review' && reviewScope !== 'delta_page_review') {
       throw new Error(`mock ppt director review expected incremental page review scope, got ${reviewScope}`);

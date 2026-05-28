@@ -630,6 +630,7 @@ export interface PptDeckHydrateContractRequest {
   title: string;
   goal: string;
   profileId: PptDeckProfileId;
+  constraints?: Record<string, unknown>;
 }
 
 export interface PptDeckHydratedContract {
@@ -641,6 +642,9 @@ export interface PptDeckHydratedContract {
   deliverable_id: string;
   title: string;
   goal: string;
+  delivery_request?: {
+    constraints?: Record<string, unknown>;
+  };
   stage_sequence: PptDeckStageSequence;
   review_surface: PptDeckReviewSurface;
   layout_rules: PptDeckLayoutRules;

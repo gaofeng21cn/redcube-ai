@@ -1,0 +1,625 @@
+// @ts-nocheck
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {
+  createAiSlide,
+  materializerPayload,
+  runNativeMaterializer,
+  runNativePlanValidation,
+} from './helpers/ppt-native-python-layout-fixtures.ts';
+
+test('native PPTX quality accepts AI-first system map route-gate-evidence layouts', () => {
+  const slideData = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: '从生成到交付：三路径闭环判断',
+    core: '真实交付不能只看文件是否存在，还要同时核对共同输入、路径执行、交付门覆盖和可追踪证据包。',
+    slotCount: 3,
+  });
+  slideData.layout_intent.rhetorical_role = 'system_map';
+  slideData.layout_intent.non_text_visual = 'shared input panel, three route lanes, gate stack, and evidence band';
+  slideData.native_shapes = [
+    {
+      shape_id: 'S01-bg',
+      kind: 'rect',
+      role: 'canvas_background',
+      quality_role: 'decorative',
+      bounds: { left_in: 0, top_in: 0, width_in: 16, height_in: 9 },
+      fill: '#F7F9FC',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-title',
+      kind: 'text_box',
+      role: 'title',
+      quality_role: 'content',
+      editable_text: slideData.title,
+      bounds: { left_in: 0.8, top_in: 0.5, width_in: 10.9, height_in: 0.98 },
+      font_size: 44,
+      color: '#111827',
+      fill: 'none',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-core',
+      kind: 'text_box',
+      role: 'core_sentence',
+      quality_role: 'content',
+      editable_text: slideData.core_sentence,
+      bounds: { left_in: 0.85, top_in: 1.55, width_in: 12.4, height_in: 0.98 },
+      font_size: 20,
+      color: '#4B5563',
+      fill: 'none',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-input-panel',
+      kind: 'rounded_rect',
+      role: 'input_panel',
+      quality_role: 'structural',
+      bounds: { left_in: 0.85, top_in: 3.0, width_in: 2.85, height_in: 2.2 },
+      fill: '#FFFFFF',
+      line: '#BFDBFE',
+    },
+    {
+      shape_id: 'S01-document-icon',
+      kind: 'rect',
+      role: 'document_icon',
+      quality_role: 'structural',
+      bounds: { left_in: 1.15, top_in: 3.25, width_in: 0.65, height_in: 0.82 },
+      fill: '#2563EB',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-input-title',
+      kind: 'text_box',
+      role: 'panel_title',
+      quality_role: 'content',
+      editable_text: '共同起点',
+      bounds: { left_in: 1.0, top_in: 4.05, width_in: 2.1, height_in: 0.62 },
+      font_size: 20,
+      color: '#111827',
+      fill: 'none',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-input-body',
+      kind: 'text_box',
+      role: 'body_sentence',
+      quality_role: 'content',
+      editable_text: '同一份主题素材包进入三条生成路径，先保证比较对象一致。',
+      bounds: { left_in: 1.0, top_in: 4.8, width_in: 2.45, height_in: 1.0 },
+      font_size: 18,
+      color: '#374151',
+      fill: 'none',
+      line: 'none',
+    },
+    ...[0, 1, 2].flatMap((index) => {
+      const top = 3.02 + index * 0.9;
+      return [
+        {
+          shape_id: `S01-route-${index + 1}-panel`,
+          kind: 'rounded_rect',
+          role: 'route_lane',
+          quality_role: 'structural',
+          bounds: { left_in: 5.0, top_in: top, width_in: 3.55, height_in: 0.72 },
+          fill: index === 0 ? '#DBEAFE' : '#FFFFFF',
+          line: '#93C5FD',
+        },
+        {
+          shape_id: `S01-route-${index + 1}-label`,
+          kind: 'text_box',
+          role: 'route_label',
+          quality_role: 'content',
+          editable_text: ['图像化呈现', '网页预览', '原生演示页'][index],
+          bounds: { left_in: 5.22, top_in: top + 0.04, width_in: 1.65, height_in: 0.58 },
+          font_size: 18,
+          color: '#2563EB',
+          fill: 'none',
+          line: 'none',
+        },
+        {
+          shape_id: `S01-route-${index + 1}-note`,
+          kind: 'text_box',
+          role: 'evidence_item',
+          quality_role: 'content',
+          editable_text: ['先看视觉页是否成形', '再看截图是否可审查', '最后看是否可编辑导出'][index],
+          bounds: { left_in: 7.02, top_in: top + 0.04, width_in: 1.92, height_in: 0.68 },
+          font_size: 18,
+          color: '#374151',
+          fill: 'none',
+          line: 'none',
+        },
+        {
+          shape_id: `S01-route-${index + 1}-connector`,
+          kind: 'line',
+          role: 'route_gate_connector',
+          quality_role: 'structural',
+          bounds: { left_in: 8.9, top_in: top + 0.78, width_in: 1.0, height_in: 0.04 },
+          line: '#0F766E',
+        },
+      ];
+    }),
+    {
+      shape_id: 'S01-gate-panel',
+      kind: 'rounded_rect',
+      role: 'gate_stack_panel',
+      quality_role: 'structural',
+      bounds: { left_in: 10.6, top_in: 2.82, width_in: 3.6, height_in: 2.82 },
+      fill: '#FFFFFF',
+      line: '#5EEAD4',
+    },
+    {
+      shape_id: 'S01-gate-title',
+      kind: 'text_box',
+      role: 'panel_title',
+      quality_role: 'content',
+      editable_text: '三道交付门',
+      bounds: { left_in: 10.9, top_in: 3.0, width_in: 2.4, height_in: 0.6 },
+      font_size: 20,
+      color: '#0F766E',
+      fill: 'none',
+      line: 'none',
+    },
+    ...[0, 1, 2].flatMap((index) => [
+      {
+        shape_id: `S01-gate-${index + 1}-marker`,
+        kind: 'oval',
+        role: 'gate_marker',
+        quality_role: 'structural',
+        editable_text: String(index + 1),
+        bounds: { left_in: 10.95, top_in: 3.72 + index * 0.58, width_in: 0.42, height_in: 0.42 },
+        font_size: 16,
+        fill: '#0F766E',
+        line: 'none',
+      },
+      {
+        shape_id: `S01-gate-${index + 1}-text`,
+        kind: 'text_box',
+        role: 'evidence_item',
+        quality_role: 'content',
+        editable_text: ['视觉审查确认页面结构可读', '截图审查确认问题可以复核', '演示文稿导出确认文件可交付'][index],
+        bounds: { left_in: 11.55, top_in: 3.6 + index * 0.68, width_in: 2.45, height_in: 0.7 },
+        font_size: 18,
+        color: '#111827',
+        fill: 'none',
+        line: 'none',
+      },
+    ]),
+    {
+      shape_id: 'S01-evidence-band',
+      kind: 'rounded_rect',
+      role: 'evidence_band',
+      quality_role: 'structural',
+      bounds: { left_in: 0.72, top_in: 6.28, width_in: 14.6, height_in: 1.96 },
+      fill: '#111827',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-evidence-title',
+      kind: 'text_box',
+      role: 'panel_title',
+      quality_role: 'content',
+      editable_text: '底部证据包要同时说明什么',
+      bounds: { left_in: 1.0, top_in: 6.5, width_in: 4.1, height_in: 0.68 },
+      font_size: 20,
+      color: '#F9FAFB',
+      fill: 'none',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-evidence-body',
+      kind: 'text_box',
+      role: 'takeaway',
+      quality_role: 'content',
+      editable_text: '完整证据包包括演示文件、PDF、PNG 截图、形状清单、审查记录和导出记录；缺一项就不能说闭环完成。',
+      bounds: { left_in: 1.0, top_in: 7.34, width_in: 13.2, height_in: 0.84 },
+      font_size: 18,
+      color: '#F9FAFB',
+      fill: 'none',
+      line: 'none',
+    },
+    ...['1 个主题素材包', '3 条生成路径', '每条 1 次迭代', '1 页原生样片', '交付门覆盖 3/3'].map((text, index) => ({
+      shape_id: `S01-metric-${index + 1}`,
+      kind: 'text_box',
+      role: 'metric',
+      quality_role: 'content',
+      editable_text: text,
+      bounds: { left_in: 5.45 + index * 1.76, top_in: 6.5, width_in: 1.62, height_in: 0.66 },
+      font_size: 18,
+      color: index === 4 ? '#5EEAD4' : '#E5E7EB',
+      fill: 'none',
+      line: 'none',
+    })),
+    {
+      shape_id: 'S01-page',
+      kind: 'text_box',
+      role: 'page_number',
+      quality_role: 'auxiliary',
+      editable_text: '01',
+      bounds: { left_in: 14.3, top_in: 8.08, width_in: 0.6, height_in: 0.36 },
+      font_size: 16,
+      color: '#94A3B8',
+      fill: 'none',
+      line: 'none',
+      align: 'right',
+    },
+  ];
+
+  const result = runNativeMaterializer(materializerPayload([slideData]));
+  const [slide] = result.slides;
+  assert.equal(slide.metrics.layout_variant, 'system_map');
+  assert.equal(slide.checks.slot_fill_ok, true);
+  assert.equal(slide.checks.occlusion_free, true);
+  assert.equal(slide.checks.grid_balance_ok, true);
+  assert.equal(slide.checks.content_depth_ok, true);
+  assert.equal(slide.issues.length, 0, JSON.stringify(slide.issues));
+  assert.equal(slide.metrics.overlap_pairs, 0);
+  assert.equal(slide.metrics.structural_text_collision_count, 0);
+});
+
+test('native PPTX plan preflight and manifest QA reject connector rails crossing readable text', () => {
+  const slideData = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: '连接线不能穿过正文',
+    core: '专业原生 PPT 要把流程线和正文排在不同视觉通道里。',
+    slotCount: 2,
+  });
+  slideData.layout_intent.rhetorical_role = 'system_map';
+  slideData.layout_intent.non_text_visual = 'route connectors that avoid labels and content text';
+  slideData.native_shapes = slideData.native_shapes.filter((shape) => !String(shape.role || '').includes('bridge_connector'));
+  slideData.native_shapes.push(
+    {
+      shape_id: 'S01-route-label',
+      kind: 'text_box',
+      role: 'route_label',
+      quality_role: 'content',
+      editable_text: '三条生成链路各完成 1 次真实产出，才进入同一放行判断。',
+      bounds: { left_in: 1.2, top_in: 6.05, width_in: 6.0, height_in: 0.9 },
+      font_size: 18,
+      color: '#171C24',
+      fill: 'none',
+      line: 'none',
+    },
+    {
+      shape_id: 'S01-rail-through-label',
+      kind: 'connector',
+      role: 'horizontal_route_connector',
+      quality_role: 'structural',
+      bounds: { left_in: 1.05, top_in: 6.45, width_in: 6.4, height_in: 0.06 },
+      line: '#2563EB',
+      fill: 'none',
+    },
+  );
+
+  const rejected = runNativePlanValidation(materializerPayload([slideData]));
+  assert.equal(rejected.ok, false);
+  assert.match(JSON.stringify(rejected.failures), /ai_first_structural_text_collision/);
+
+  const fixed = {
+    ...slideData,
+    native_shapes: slideData.native_shapes.map((shape) => (
+      shape.shape_id === 'S01-rail-through-label'
+        ? { ...shape, bounds: { ...shape.bounds, top_in: 7.1 } }
+        : shape
+    )),
+  };
+  const accepted = runNativePlanValidation(materializerPayload([fixed]));
+  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
+  const result = runNativeMaterializer(materializerPayload([fixed]));
+  const [slide] = result.slides;
+  assert.equal(slide.checks.occlusion_free, true);
+  assert.equal(slide.metrics.structural_text_collision_count, 0);
+});
+
+test('native PPTX system-map QA counts horizontal connectors as route lanes', () => {
+  const slideData = {
+    slide_id: 'S01',
+    title: '三线闭环用同一套证据放行',
+    layout_family: 'workflow_map',
+    core_sentence: '原生可编辑 PPT 的系统图要能看见输入、路径、放行门和证据出口。',
+    page_core_content: [
+      '共同输入先锁定比较对象',
+      '三条路径各自产出可检查文件',
+      '放行门和证据包同时闭合',
+    ],
+    layout_intent: {
+      rhetorical_role: 'system_map',
+      composition_signature: 'native-composition:test-horizontal-connectors-only',
+      primary_grid: 'input_to_routes_to_gate_to_evidence',
+      visual_weight: 'centered_route_map',
+      negative_space_strategy: 'connector lanes use empty gutters while labels sit above the lines',
+      non_text_visual: 'shared input panel, horizontal route connectors, gate stack, and evidence band',
+      forbidden_template_reuse_checked: true,
+    },
+    native_shapes: [
+      {
+        shape_id: 'S01-title',
+        kind: 'text_box',
+        role: 'title',
+        quality_role: 'content',
+        editable_text: '三线闭环用同一套证据放行',
+        bounds: { left_in: 0.8, top_in: 0.5, width_in: 10.9, height_in: 1.0 },
+        font_size: 38,
+        color: '#111827',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-core',
+        kind: 'text_box',
+        role: 'core_sentence',
+        quality_role: 'content',
+        editable_text: '原生可编辑 PPT 的系统图要能看见输入、路径、放行门和证据出口。',
+        bounds: { left_in: 0.85, top_in: 1.62, width_in: 11.8, height_in: 0.96 },
+        font_size: 20,
+        color: '#4B5563',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-input-panel',
+        kind: 'rounded_rect',
+        role: 'content_panel',
+        quality_role: 'structural',
+        bounds: { left_in: 0.9, top_in: 3.1, width_in: 2.95, height_in: 2.1 },
+        fill: '#FFFFFF',
+        line: '#BFDBFE',
+      },
+      {
+        shape_id: 'S01-input-text',
+        kind: 'text_box',
+        role: 'body_sentence',
+        quality_role: 'content',
+        editable_text: '共同输入先锁定比较对象，避免把素材差异误判成路径差异。',
+        bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.06 },
+        font_size: 18,
+        color: '#111827',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-route-label',
+        kind: 'text_box',
+        role: 'route_label',
+        quality_role: 'content',
+        editable_text: '三条路径各自产出可检查文件，再汇入同一放行判断。',
+        bounds: { left_in: 4.25, top_in: 2.7, width_in: 4.25, height_in: 0.9 },
+        font_size: 18,
+        color: '#2563EB',
+        fill: 'none',
+        line: 'none',
+      },
+      ...[0, 1, 2].map((index) => ({
+        shape_id: `S01-route-${index + 1}-connector`,
+        kind: 'connector',
+        role: 'horizontal_route_connector',
+        quality_role: 'structural',
+        bounds: { left_in: 4.15, top_in: 3.92 + index * 0.52, width_in: 4.75, height_in: 0.04 },
+        line: '#2563EB',
+        fill: 'none',
+      })),
+      {
+        shape_id: 'S01-gate-panel',
+        kind: 'rounded_rect',
+        role: 'gate_stack_panel',
+        quality_role: 'structural',
+        bounds: { left_in: 9.7, top_in: 3.05, width_in: 4.4, height_in: 2.3 },
+        fill: '#FFFFFF',
+        line: '#5EEAD4',
+      },
+      {
+        shape_id: 'S01-gate-card',
+        kind: 'text_box',
+        role: 'gate_card',
+        quality_role: 'content',
+        editable_text: '视觉审查、截图审查和演示文稿导出三道门全部通过才放行。',
+        bounds: { left_in: 10.1, top_in: 3.72, width_in: 3.35, height_in: 1.12 },
+        font_size: 18,
+        color: '#0F766E',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-evidence-band',
+        kind: 'rounded_rect',
+        role: 'evidence_band',
+        quality_role: 'structural',
+        bounds: { left_in: 0.9, top_in: 6.28, width_in: 13.2, height_in: 1.3 },
+        fill: '#111827',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-evidence-note',
+        kind: 'text_box',
+        role: 'evidence_item',
+        quality_role: 'content',
+        editable_text: '证据包同时保留演示文件、PDF、截图、形状清单、审查记录和导出记录。',
+        bounds: { left_in: 1.2, top_in: 6.55, width_in: 9.5, height_in: 0.92 },
+        font_size: 18,
+        color: '#F9FAFB',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-page',
+        kind: 'text_box',
+        role: 'page_number',
+        quality_role: 'auxiliary',
+        editable_text: '01',
+        bounds: { left_in: 14.3, top_in: 8.05, width_in: 0.7, height_in: 0.4 },
+        font_size: 16,
+        color: '#94A3B8',
+        fill: 'none',
+        line: 'none',
+      },
+    ],
+  };
+
+  const accepted = runNativePlanValidation(materializerPayload([slideData]));
+  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
+  const result = runNativeMaterializer(materializerPayload([slideData]));
+  const [slide] = result.slides;
+  assert.equal(slide.metrics.layout_variant, 'system_map');
+  assert.equal(slide.checks.grid_balance_ok, true);
+  assert.equal(slide.metrics.grid_balance_failures.length, 0);
+  assert.equal(slide.checks.occlusion_free, true);
+  assert.equal(slide.metrics.structural_text_collision_count, 0);
+});
+
+test('native PPTX system-map QA accepts route flow connectors and takeaway bands as recognized structure', () => {
+  const slideData = {
+    slide_id: 'S01',
+    title: '可靠闭环要看同源执行证据',
+    layout_family: 'workflow_map',
+    core_sentence: '同一输入、三路执行、交付门齐全和证据可复核必须同时成立。',
+    page_core_content: [
+      '同一输入先固定',
+      '三条路线各自执行',
+      '三道交付门同时放行',
+    ],
+    layout_intent: {
+      rhetorical_role: 'system_map',
+      composition_signature: 'native-composition:test-route-flow-connectors-takeaway-band',
+      primary_grid: 'input_routes_gate_takeaway',
+      visual_weight: 'centered_route_map',
+      negative_space_strategy: 'labels sit above connector rails with a separate bottom takeaway band',
+      non_text_visual: 'route flow connectors, input panel, gate stack, and takeaway band',
+      forbidden_template_reuse_checked: true,
+    },
+    native_shapes: [
+      {
+        shape_id: 'S01-title',
+        kind: 'text_box',
+        role: 'title',
+        quality_role: 'content',
+        editable_text: '可靠闭环要看同源执行证据',
+        bounds: { left_in: 0.8, top_in: 0.5, width_in: 10.9, height_in: 1.0 },
+        font_size: 40,
+        color: '#111827',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-core',
+        kind: 'text_box',
+        role: 'core_sentence',
+        quality_role: 'content',
+        editable_text: '同一输入、三路执行、交付门齐全和证据可复核必须同时成立。',
+        bounds: { left_in: 0.85, top_in: 1.62, width_in: 11.8, height_in: 0.96 },
+        font_size: 20,
+        color: '#4B5563',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-input-panel',
+        kind: 'rounded_rect',
+        role: 'content_panel',
+        quality_role: 'structural',
+        bounds: { left_in: 0.9, top_in: 3.1, width_in: 2.95, height_in: 2.1 },
+        fill: '#FFFFFF',
+        line: '#BFDBFE',
+      },
+      {
+        shape_id: 'S01-input-text',
+        kind: 'text_box',
+        role: 'body_sentence',
+        quality_role: 'content',
+        editable_text: '同一份准备资料先固定，后续判断才有可比基础。',
+        bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.06 },
+        font_size: 18,
+        color: '#111827',
+        fill: 'none',
+        line: 'none',
+      },
+      ...[0, 1, 2].map((index) => ({
+        shape_id: `S01-route-${index + 1}-connector`,
+        kind: 'connector',
+        role: 'route_flow_connector',
+        quality_role: 'structural',
+        bounds: { left_in: 4.15, top_in: 3.92 + index * 0.52, width_in: 4.75, height_in: 0.04 },
+        line: '#2563EB',
+        fill: 'none',
+      })),
+      {
+        shape_id: 'S01-route-label',
+        kind: 'text_box',
+        role: 'route_label',
+        quality_role: 'content',
+        editable_text: '三条路径各自产出可检查文件，再汇入同一放行判断。',
+        bounds: { left_in: 4.25, top_in: 2.7, width_in: 4.25, height_in: 0.9 },
+        font_size: 18,
+        color: '#2563EB',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-gate-panel',
+        kind: 'rounded_rect',
+        role: 'gate_stack_panel',
+        quality_role: 'structural',
+        bounds: { left_in: 9.7, top_in: 3.05, width_in: 4.4, height_in: 2.3 },
+        fill: '#FFFFFF',
+        line: '#5EEAD4',
+      },
+      {
+        shape_id: 'S01-gate-card',
+        kind: 'text_box',
+        role: 'gate_card',
+        quality_role: 'content',
+        editable_text: '视觉审查、截图审查和演示文稿导出三道门全部通过才放行。',
+        bounds: { left_in: 10.1, top_in: 3.72, width_in: 3.35, height_in: 1.12 },
+        font_size: 18,
+        color: '#0F766E',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-loop-band',
+        kind: 'rounded_rect',
+        role: 'takeaway_band',
+        quality_role: 'structural',
+        bounds: { left_in: 0.9, top_in: 6.28, width_in: 13.2, height_in: 1.3 },
+        fill: '#111827',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-evidence-note',
+        kind: 'text_box',
+        role: 'evidence_item',
+        quality_role: 'content',
+        editable_text: '证据包同时保留演示文件、PDF、截图、形状清单、审查记录和导出记录。',
+        bounds: { left_in: 1.2, top_in: 6.55, width_in: 9.5, height_in: 0.92 },
+        font_size: 18,
+        color: '#F9FAFB',
+        fill: 'none',
+        line: 'none',
+      },
+      {
+        shape_id: 'S01-page',
+        kind: 'text_box',
+        role: 'page_number',
+        quality_role: 'auxiliary',
+        editable_text: '01',
+        bounds: { left_in: 14.3, top_in: 8.05, width_in: 0.7, height_in: 0.4 },
+        font_size: 16,
+        color: '#94A3B8',
+        fill: 'none',
+        line: 'none',
+      },
+    ],
+  };
+
+  const accepted = runNativePlanValidation(materializerPayload([slideData]));
+  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
+  const result = runNativeMaterializer(materializerPayload([slideData]));
+  const [slide] = result.slides;
+  assert.equal(slide.metrics.layout_variant, 'system_map');
+  assert.equal(slide.checks.grid_balance_ok, true);
+  assert.equal(slide.metrics.grid_balance_failures.length, 0);
+  assert.equal(slide.metrics.structural_visual_roles.includes('route_flow_connector'), true);
+  assert.equal(slide.metrics.structural_visual_roles.includes('takeaway_band'), true);
+});
+

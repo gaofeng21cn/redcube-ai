@@ -2,7 +2,7 @@
 import os from 'node:os';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { accessSync, constants as fsConstants, existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
 
 import { CODEX_DEFAULT_MODEL_SELECTION, CODEX_DEFAULT_REASONING_SELECTION } from '@redcube/runtime-protocol';
@@ -36,6 +36,56 @@ export function killCodexChildProcessTree(child) {
     child.kill('SIGKILL');
   } catch {
     // Ignore best-effort cleanup failures.
+  }
+}
+
+function commandName(command) {
+  return path.basename(safeText(command)).toLowerCase();
+}
+
+function terminateProcessGroup(pid) {
+  const numericPid = Number(pid || 0);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) return false;
+  if (process.platform === 'win32') return false;
+  try {
+    process.kill(-numericPid, 'SIGTERM');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function killProcessGroup(pid) {
+  const numericPid = Number(pid || 0);
+  if (!Number.isInteger(numericPid) || numericPid <= 0) return false;
+  if (process.platform === 'win32') return false;
+  try {
+    process.kill(-numericPid, 'SIGKILL');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function reapTimedOutCodexExecutors(parentPid) {
+  if (process.platform === 'win32') return;
+  const parent = Number(parentPid || 0);
+  if (!Number.isInteger(parent) || parent <= 0) return;
+  const result = spawnSync('ps', ['-axo', 'pid=,ppid=,command='], {
+    encoding: 'utf-8',
+    timeout: 5000,
+  });
+  if (result.status !== 0) return;
+  for (const line of String(result.stdout || '').split('\n')) {
+    const match = line.match(/^\s*(\d+)\s+(\d+)\s+(.+)$/);
+    if (!match) continue;
+    const pid = Number(match[1]);
+    const ppid = Number(match[2]);
+    const command = match[3] || '';
+    if (ppid !== parent) continue;
+    if (!/\bcodex\b/.test(command) && !/codex-canonical/.test(command)) continue;
+    terminateProcessGroup(pid);
+    killProcessGroup(pid);
   }
 }
 
@@ -188,6 +238,27 @@ export async function runCodexPrompt({
     );
 
     if (result.error) {
+      throw result.error;
+    }
+  } else if (commandName(contract.command[0]) === 'node'
+    && contract.command.some((part) => commandName(part) === 'codex' || commandName(part) === 'codex-canonical')) {
+    result = spawnSync(
+      contract.command[0],
+      [...contract.command.slice(1), ...execArgs],
+      {
+        cwd: resolvedCwd,
+        input: safePrompt,
+        encoding: 'utf-8',
+        maxBuffer: 20 * 1024 * 1024,
+        timeout: timeoutMs,
+        env: process.env,
+        detached: process.platform !== 'win32',
+      },
+    );
+    if (result.error) {
+      if (result.error.code === 'ETIMEDOUT') {
+        reapTimedOutCodexExecutors(result.pid);
+      }
       throw result.error;
     }
   } else {

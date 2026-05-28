@@ -525,7 +525,7 @@ test('runDeliverableRoute auto-repairs ppt image pages after visual director rev
   });
 });
 
-test('runDeliverableRoute runs screenshot review before native PPT repair after visual director block', async () => {
+test('runDeliverableRoute can repair native PPT directly from visual director preflight block before export', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-director-native-repair-'));
     await completeSourceReadiness({

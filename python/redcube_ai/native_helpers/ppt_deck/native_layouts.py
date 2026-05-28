@@ -1,5 +1,6 @@
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 from zipfile import ZipFile
@@ -8,113 +9,7 @@ from xml.etree import ElementTree
 from xml.sax.saxutils import escape as xml_escape
 
 
-CANVAS_PX = (1152, 648)
-SLIDE_WIDTH_IN = 16.0
-SLIDE_HEIGHT_IN = 9.0
-EMU_PER_INCH = 914400.0
-PX_PER_INCH = CANVAS_PX[0] / SLIDE_WIDTH_IN
-SVG_NS = 'http://www.w3.org/2000/svg'
-PPTX_NS = {
-    'p': 'http://schemas.openxmlformats.org/presentationml/2006/main',
-    'a': 'http://schemas.openxmlformats.org/drawingml/2006/main',
-}
-STRICT_SVG_ALLOWED_TAGS = {
-    f'{{{SVG_NS}}}svg',
-    f'{{{SVG_NS}}}g',
-    f'{{{SVG_NS}}}rect',
-    f'{{{SVG_NS}}}text',
-}
-PALETTE = {
-    'bg': '#F6F2EA',
-    'ink': '#171C24',
-    'muted': '#5B6570',
-    'accent': '#B94624',
-    'panel': '#EFE6D6',
-    'line': '#D8C8B2',
-    'white': '#FFFFFF',
-    'none': 'none',
-}
-OFFICECLI_SHAPE_KINDS = {
-    'rect',
-    'rectangle',
-    'rounded_rect',
-    'panel',
-    'text_box',
-    'text',
-    'oval',
-    'circle',
-    'line',
-    'connector',
-}
-CONTENT_ROLES = {
-    'title',
-    'subtitle',
-    'core_sentence',
-    'point_text',
-    'body',
-    'content',
-    'content_stack',
-    'point_index',
-    'page_number',
-    'cover_meta',
-    'compare_panel',
-    'signal_panel',
-    'timeline_panel',
-    'judgement_step',
-    'axis_panel',
-    'takeaway_panel',
-    'structured_note_panel',
-}
-LAYOUT_INTENT_REQUIRED_FIELDS = [
-    'rhetorical_role',
-    'composition_signature',
-    'primary_grid',
-    'visual_weight',
-    'negative_space_strategy',
-    'non_text_visual',
-    'forbidden_template_reuse_checked',
-]
-GENERIC_NON_TEXT_VISUAL_FRAGMENTS = [
-    'card',
-    'cards',
-    'panel',
-    'panels',
-    'filled comparison panels',
-    'editable shape system',
-    'shape system',
-]
-STRUCTURAL_VISUAL_ROLE_HINTS = [
-    'axis',
-    'band',
-    'bridge',
-    'connector',
-    'flow',
-    'hub',
-    'ladder',
-    'map',
-    'metric',
-    'rail',
-    'stack',
-    'table',
-    'timeline',
-    'track',
-]
-MECHANICAL_CARD_PANEL_ROLES = {
-    'compare_panel',
-    'signal_panel',
-    'timeline_panel',
-    'judgement_step',
-    'axis_panel',
-    'takeaway_panel',
-    'structured_note_panel',
-}
-AI_FIRST_MIN_SHAPES = 7
-AI_FIRST_MIN_CONTENT_SHAPES = 4
-AI_FIRST_MIN_DECORATIVE_SHAPES = 2
-AI_FIRST_MIN_POINT_TEXT = 1
-BODY_TEXT_READABILITY_FLOOR_PT = 18.0
-POINT_INDEX_FLOOR_PT = 16.0
-OFFICECLI_DEFAULT_TEXT_MARGIN_IN = 0.02
+from redcube_ai.native_helpers.ppt_deck.native_layout_constants import *  # noqa: F403
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -179,6 +74,32 @@ def ai_shape_bounds_in(shape_spec: dict):
     }
 
 
+def ai_line_bounds_failure(shape_spec: dict) -> dict | None:
+    kind = shape_kind(shape_spec)
+    if kind not in {'line', 'connector'}:
+        return None
+    bounds = shape_spec.get('bounds') if isinstance(shape_spec.get('bounds'), dict) else {}
+    try:
+        width = float(bounds.get('width_in') if bounds.get('width_in') is not None else bounds.get('w_in'))
+        height = float(bounds.get('height_in') if bounds.get('height_in') is not None else bounds.get('h_in'))
+    except (TypeError, ValueError):
+        return {
+            'reason': 'ai_first_connector_bounds_not_numeric',
+            'shape_id': safe_text(shape_spec.get('shape_id'), '<missing-shape-id>'),
+            'kind': kind,
+        }
+    if width < MIN_CONNECTOR_THICKNESS_IN or height < MIN_CONNECTOR_THICKNESS_IN:
+        return {
+            'reason': 'ai_first_connector_thickness_too_small',
+            'shape_id': safe_text(shape_spec.get('shape_id'), '<missing-shape-id>'),
+            'kind': kind,
+            'width_in': round(width, 4),
+            'height_in': round(height, 4),
+            'minimum_thickness_in': MIN_CONNECTOR_THICKNESS_IN,
+        }
+    return None
+
+
 def shape_rect_from_ai_bounds(shape_spec: dict) -> dict:
     bounds = ai_shape_bounds_in(shape_spec)
     if bounds is None:
@@ -199,10 +120,14 @@ def shape_rect_from_ai_bounds(shape_spec: dict) -> dict:
 
 def ai_shape_quality_role(shape_spec: dict) -> str:
     quality_role = safe_text(shape_spec.get('quality_role')).lower()
-    if quality_role in {'content', 'decorative'}:
+    if quality_role in {'content', 'decorative', 'auxiliary', 'structural'}:
         return quality_role
     role = safe_text(shape_spec.get('role')).lower()
     kind = shape_kind(shape_spec)
+    if role in AUXILIARY_TEXT_ROLES:
+        return 'auxiliary'
+    if structural_visual_shape(shape_spec):
+        return 'structural'
     if kind in {'text', 'text_box'} or role in CONTENT_ROLES or role.endswith('_panel'):
         return 'content'
     return 'decorative'
@@ -221,7 +146,7 @@ def ai_shape_font_size(shape_spec: dict, role: str) -> float:
         return 24.0
     if role == 'point_index':
         return POINT_INDEX_FLOOR_PT
-    if role == 'page_number':
+    if role in AUXILIARY_TEXT_ROLES:
         return 18.0
     return BODY_TEXT_READABILITY_FLOOR_PT
 
@@ -241,6 +166,17 @@ def weighted_text_width_pt(text: str, font_size: float) -> float:
         else:
             width += font_size * 0.56
     return width
+
+
+def estimated_text_height_in(shape_spec: dict, bounds: dict) -> float:
+    text = ai_shape_text(shape_spec)
+    if not text:
+        return 0.0
+    font_size = ai_shape_font_size(shape_spec, safe_text(shape_spec.get('role')))
+    margin_in = margin_inches(shape_spec)
+    usable_width_pt = max((bounds['width_in'] - (2 * margin_in)) * 72.0, 1.0)
+    estimated_lines = max(1, int((weighted_text_width_pt(text, font_size) + usable_width_pt - 1.0) // usable_width_pt))
+    return (estimated_lines * font_size * 1.18 / 72.0) + (2 * margin_in)
 
 
 def margin_inches(shape_spec: dict) -> float:
@@ -264,10 +200,27 @@ def ai_text_capacity_failure(shape_spec: dict) -> dict | None:
     role = safe_text(shape_spec.get('role'))
     font_size = ai_shape_font_size(shape_spec, role)
     margin_in = margin_inches(shape_spec)
+    compact_min_height_in = MIN_BODY_SENTENCE_TEXT_HEIGHT_IN if role not in {'point_index'} and len(text) >= 18 else MIN_COMPACT_TEXT_HEIGHT_IN
+    if role in LEAD_SENTENCE_TEXT_ROLES and font_size >= 20 and len(text) >= 12:
+        compact_min_height_in = max(compact_min_height_in, MIN_LEAD_SENTENCE_TEXT_HEIGHT_IN)
+    if (
+        font_size >= BODY_TEXT_READABILITY_FLOOR_PT
+        and role not in {'title', 'subtitle', 'page_number', 'page_no', 'meta', 'cover_meta', 'footer', 'point_index'}
+        and bounds['height_in'] < compact_min_height_in
+    ):
+        return {
+            'reason': 'ai_first_text_box_height_below_readability_floor',
+            'shape_id': safe_text(shape_spec.get('shape_id'), '<missing-shape-id>'),
+            'role': role,
+            'font_size': round(font_size, 2),
+            'text_char_count': len(text),
+            'height_in': round(bounds['height_in'], 4),
+            'minimum_height_in': compact_min_height_in,
+        }
     usable_width_pt = max((bounds['width_in'] - (2 * margin_in)) * 72.0, 1.0)
     usable_height_pt = max((bounds['height_in'] - (2 * margin_in)) * 72.0, 1.0)
     estimated_lines = max(1, int((weighted_text_width_pt(text, font_size) + usable_width_pt - 1.0) // usable_width_pt))
-    required_height_pt = estimated_lines * font_size
+    required_height_pt = estimated_lines * font_size * 1.18
     if required_height_pt <= usable_height_pt:
         return None
     return {
@@ -280,6 +233,147 @@ def ai_text_capacity_failure(shape_spec: dict) -> dict | None:
         'usable_height_pt': round(usable_height_pt, 2),
         'suggested_height_in': round((required_height_pt / 72.0) + (2 * margin_in), 3),
     }
+
+
+def ai_text_overlap_failures(shapes: list[dict]) -> list[dict]:
+    text_shapes = [
+        shape for shape in shapes
+        if ai_shape_quality_role(shape) == 'content'
+        and shape_kind(shape) in {'text', 'text_box'}
+        and ai_shape_text(shape)
+        and ai_shape_bounds_in(shape) is not None
+    ]
+    failures = []
+    for left_index, shape_a in enumerate(text_shapes):
+        rect_a = ai_shape_bounds_in(shape_a)
+        if rect_a is None:
+            continue
+        visible_a = {
+            **rect_a,
+            'height_in': min(rect_a['height_in'], estimated_text_height_in(shape_a, rect_a)),
+        }
+        for shape_b in text_shapes[left_index + 1:]:
+            rect_b = ai_shape_bounds_in(shape_b)
+            if rect_b is None:
+                continue
+            visible_b = {
+                **rect_b,
+                'height_in': min(rect_b['height_in'], estimated_text_height_in(shape_b, rect_b)),
+            }
+            overlap_w = max(
+                0.0,
+                min(visible_a['left_in'] + visible_a['width_in'], visible_b['left_in'] + visible_b['width_in'])
+                - max(visible_a['left_in'], visible_b['left_in'])
+            )
+            overlap_h = max(
+                0.0,
+                min(visible_a['top_in'] + visible_a['height_in'], visible_b['top_in'] + visible_b['height_in'])
+                - max(visible_a['top_in'], visible_b['top_in'])
+            )
+            overlap_area = overlap_w * overlap_h
+            if overlap_area <= MIN_TEXT_OVERLAP_AREA_IN2:
+                continue
+            failures.append({
+                'reason': 'ai_first_text_box_overlap',
+                'shape_id': safe_text(shape_a.get('shape_id'), '<missing-shape-id>'),
+                'other_shape_id': safe_text(shape_b.get('shape_id'), '<missing-shape-id>'),
+                'overlap_area_in2': round(overlap_area, 4),
+            })
+    return failures
+
+
+def rect_overlap_area_in(rect_a: dict, rect_b: dict) -> float:
+    overlap_w = max(
+        0.0,
+        min(rect_a['left_in'] + rect_a['width_in'], rect_b['left_in'] + rect_b['width_in'])
+        - max(rect_a['left_in'], rect_b['left_in'])
+    )
+    overlap_h = max(
+        0.0,
+        min(rect_a['top_in'] + rect_a['height_in'], rect_b['top_in'] + rect_b['height_in'])
+        - max(rect_a['top_in'], rect_b['top_in'])
+    )
+    return overlap_w * overlap_h
+
+
+def ai_structural_text_collision_failures(shapes: list[dict]) -> list[dict]:
+    text_shapes = [
+        shape for shape in shapes
+        if ai_shape_quality_role(shape) == 'content'
+        and shape_kind(shape) in {'text', 'text_box'}
+        and safe_text(shape.get('role')) in STRUCTURAL_TEXT_COLLISION_ROLES
+        and ai_shape_text(shape)
+        and ai_shape_bounds_in(shape) is not None
+    ]
+    structural_shapes = [
+        shape for shape in shapes
+        if structural_visual_shape(shape)
+        and shape_kind(shape) in {'line', 'connector'}
+        and ai_shape_bounds_in(shape) is not None
+    ]
+    failures = []
+    for text_shape in text_shapes:
+        text_rect = ai_shape_bounds_in(text_shape)
+        if text_rect is None:
+            continue
+        visible_text_rect = {
+            **text_rect,
+            'height_in': min(text_rect['height_in'], estimated_text_height_in(text_shape, text_rect)),
+        }
+        for structural_shape in structural_shapes:
+            structural_rect = ai_shape_bounds_in(structural_shape)
+            if structural_rect is None:
+                continue
+            overlap_area = rect_overlap_area_in(visible_text_rect, structural_rect)
+            if overlap_area <= MIN_STRUCTURAL_TEXT_COLLISION_AREA_IN2:
+                continue
+            failures.append({
+                'reason': 'ai_first_structural_text_collision',
+                'shape_id': safe_text(text_shape.get('shape_id'), '<missing-shape-id>'),
+                'other_shape_id': safe_text(structural_shape.get('shape_id'), '<missing-shape-id>'),
+                'role': safe_text(text_shape.get('role')),
+                'other_role': safe_text(structural_shape.get('role')),
+                'overlap_area_in2': round(overlap_area, 4),
+                'required_gap_in': MIN_STRUCTURAL_TEXT_CLEARANCE_IN,
+            })
+    return failures
+
+
+def normalized_content_char_count(text: str) -> int:
+    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
+
+
+def ai_content_depth_failures(shapes: list[dict]) -> list[dict]:
+    failures = []
+    for shape in shapes:
+        role = safe_text(shape.get('role'))
+        if ai_shape_quality_role(shape) != 'content':
+            continue
+        if role in CONTENT_DEPTH_EXCLUDED_ROLES:
+            continue
+        text = ai_shape_text(shape)
+        if not text:
+            continue
+        char_count = normalized_content_char_count(text)
+        if char_count < MIN_POINT_TEXT_CONTENT_CHARS:
+            failures.append({
+                'reason': 'ai_first_content_depth_too_low',
+                'shape_id': safe_text(shape.get('shape_id'), '<missing-shape-id>'),
+                'role': role,
+                'text_char_count': char_count,
+                'threshold': MIN_POINT_TEXT_CONTENT_CHARS,
+            })
+    return failures
+
+
+def ai_page_number_failures(shapes: list[dict]) -> list[dict]:
+    if any(
+        safe_text(shape.get('role')) in {'page_number', 'page_no', 'page'}
+        and ai_shape_text(shape)
+        for shape in shapes
+    ):
+        return []
+    return [{'reason': 'ai_first_page_number_missing'}]
 
 
 def resolve_color(value, default_key: str) -> str:
@@ -328,12 +422,23 @@ def layout_intent_failures(slide_data: dict) -> list[dict]:
     if layout_intent.get('forbidden_template_reuse_checked') is not True:
         failures.append({'reason': 'ai_first_template_reuse_not_checked'})
     non_text_visual = safe_text(layout_intent.get('non_text_visual')).lower()
-    if non_text_visual and any(fragment in non_text_visual for fragment in GENERIC_NON_TEXT_VISUAL_FRAGMENTS):
+    has_structural_hint = layout_intent_has_structural_hint(non_text_visual)
+    if (
+        non_text_visual
+        and not has_structural_hint
+        and any(fragment in non_text_visual for fragment in GENERIC_NON_TEXT_VISUAL_FRAGMENTS)
+    ):
         failures.append({
             'reason': 'ai_first_non_text_visual_too_generic',
             'non_text_visual': layout_intent.get('non_text_visual'),
         })
     return failures
+
+
+def layout_intent_has_structural_hint(non_text_visual: str) -> bool:
+    tokens = set(re.findall(r'[a-z0-9_]+', non_text_visual.lower()))
+    singular_tokens = {token[:-1] for token in tokens if len(token) > 3 and token.endswith('s')}
+    return bool((tokens | singular_tokens).intersection(STRUCTURAL_VISUAL_ROLE_HINTS))
 
 
 def structural_visual_shape(shape_spec: dict) -> bool:
@@ -343,7 +448,9 @@ def structural_visual_shape(shape_spec: dict) -> bool:
         return True
     if kind in {'line', 'connector', 'oval', 'circle'} and role not in {'accent_dot', 'page_number'}:
         return True
-    return any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS)
+    return kind in {'line', 'connector', 'oval', 'circle', 'rect', 'rounded_rect', 'panel'} and any(
+        hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS
+    )
 
 
 def mechanical_card_panel_shape(shape_spec: dict) -> bool:
@@ -353,21 +460,38 @@ def mechanical_card_panel_shape(shape_spec: dict) -> bool:
     return role.endswith('_panel') and not any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS)
 
 
+def audience_content_slot_shape(shape_spec: dict) -> bool:
+    if ai_shape_quality_role(shape_spec) != 'content':
+        return False
+    if not ai_shape_text(shape_spec):
+        return False
+    role = safe_text(shape_spec.get('role')).lower()
+    if role in {
+        'title',
+        'subtitle',
+        'core_sentence',
+        'point_index',
+        *AUXILIARY_TEXT_ROLES,
+    }:
+        return False
+    return True
+
+
 def visual_structure_failures(shapes: list[dict]) -> list[dict]:
     structural_count = sum(1 for shape in shapes if structural_visual_shape(shape))
     panel_count = sum(1 for shape in shapes if mechanical_card_panel_shape(shape))
-    point_text_count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    audience_slot_count = sum(1 for shape in shapes if audience_content_slot_shape(shape))
     failures = []
     if structural_count < 1:
         failures.append({
             'reason': 'ai_first_visual_structure_missing',
             'structural_visual_count': structural_count,
         })
-    if panel_count >= 2 and point_text_count >= 2 and structural_count < 1:
+    if panel_count >= 2 and audience_slot_count >= 2 and structural_count < 1:
         failures.append({
             'reason': 'ai_first_mechanical_card_template_detected',
             'panel_count': panel_count,
-            'point_text_count': point_text_count,
+            'audience_content_slot_count': audience_slot_count,
         })
     return failures
 
@@ -380,34 +504,54 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
         failures.append({'reason': 'ai_first_shape_plan_too_thin', 'actual': len(shapes), 'minimum': AI_FIRST_MIN_SHAPES})
     content_count = sum(1 for shape in shapes if ai_shape_quality_role(shape) == 'content')
     decorative_count = sum(1 for shape in shapes if ai_shape_quality_role(shape) == 'decorative')
-    point_text_count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    structural_count = sum(1 for shape in shapes if structural_visual_shape(shape))
+    visual_support_count = decorative_count + structural_count
+    audience_slot_count = sum(1 for shape in shapes if audience_content_slot_shape(shape))
     if content_count < AI_FIRST_MIN_CONTENT_SHAPES:
         failures.append({'reason': 'ai_first_content_shape_count_too_low', 'actual': content_count, 'minimum': AI_FIRST_MIN_CONTENT_SHAPES})
-    if decorative_count < AI_FIRST_MIN_DECORATIVE_SHAPES:
-        failures.append({'reason': 'ai_first_decorative_shape_count_too_low', 'actual': decorative_count, 'minimum': AI_FIRST_MIN_DECORATIVE_SHAPES})
-    if point_text_count < AI_FIRST_MIN_POINT_TEXT:
-        failures.append({'reason': 'ai_first_point_text_missing', 'actual': point_text_count, 'minimum': AI_FIRST_MIN_POINT_TEXT})
+    if visual_support_count < AI_FIRST_MIN_VISUAL_SUPPORT_SHAPES:
+        failures.append({
+            'reason': 'ai_first_visual_support_shape_count_too_low',
+            'actual': visual_support_count,
+            'minimum': AI_FIRST_MIN_VISUAL_SUPPORT_SHAPES,
+            'structural_count': structural_count,
+            'decorative_count': decorative_count,
+        })
+    if audience_slot_count < AI_FIRST_MIN_AUDIENCE_CONTENT_SLOTS:
+        failures.append({
+            'reason': 'ai_first_audience_content_slot_missing',
+            'actual': audience_slot_count,
+            'minimum': AI_FIRST_MIN_AUDIENCE_CONTENT_SLOTS,
+        })
     failures.extend(visual_structure_failures(shapes))
+    failures.extend(ai_text_overlap_failures(shapes))
+    failures.extend(ai_structural_text_collision_failures(shapes))
+    failures.extend(ai_content_depth_failures(shapes))
+    failures.extend(ai_page_number_failures(shapes))
     for shape in shapes:
         shape_id = safe_text(shape.get('shape_id'), '<missing-shape-id>')
         kind = shape_kind(shape)
         role = safe_text(shape.get('role'))
         text = ai_shape_text(shape)
+        quality_role = ai_shape_quality_role(shape)
         if not safe_text(shape.get('shape_id')):
             failures.append({'reason': 'ai_first_shape_id_missing', 'shape_id': shape_id})
         if kind not in OFFICECLI_SHAPE_KINDS:
             failures.append({'reason': 'ai_first_shape_kind_not_officecli_materializable', 'shape_id': shape_id, 'kind': kind})
         if ai_shape_bounds_in(shape) is None:
             failures.append({'reason': 'ai_first_shape_bounds_invalid', 'shape_id': shape_id})
+        line_bounds_failure = ai_line_bounds_failure(shape)
+        if line_bounds_failure:
+            failures.append(line_bounds_failure)
         if kind in {'text', 'text_box'} and not text:
             failures.append({'reason': 'ai_first_text_missing', 'shape_id': shape_id})
         font_size = ai_shape_font_size(shape, role)
         if role == 'point_index' and font_size < POINT_INDEX_FLOOR_PT:
             failures.append({'reason': 'ai_first_point_index_too_small', 'shape_id': shape_id, 'font_size': round(font_size, 2)})
-        if kind in {'text', 'text_box'} and ai_shape_quality_role(shape) == 'content':
-            if role not in {'page_number', 'point_index'} and font_size < BODY_TEXT_READABILITY_FLOOR_PT:
+        if kind in {'text', 'text_box'} and quality_role == 'content':
+            if role not in {'page_number', 'page_no', 'meta', 'cover_meta', 'footer', 'point_index'} and font_size < BODY_TEXT_READABILITY_FLOOR_PT:
                 failures.append({'reason': 'ai_first_body_text_too_small', 'shape_id': shape_id, 'font_size': round(font_size, 2)})
-            if role not in {'page_number', 'point_index'}:
+            if role not in {'page_number', 'page_no', 'meta', 'cover_meta', 'footer', 'point_index'}:
                 capacity_failure = ai_text_capacity_failure(shape)
                 if capacity_failure:
                     failures.append(capacity_failure)
@@ -431,7 +575,7 @@ def layout_family(slide_data: dict) -> str:
 
 
 def primary_point_count(shapes: list[dict]) -> int:
-    count = sum(1 for shape in shapes if safe_text(shape.get('role')) == 'point_text' and ai_shape_text(shape))
+    count = sum(1 for shape in shapes if audience_content_slot_shape(shape))
     return max(1, min(count, 5))
 
 

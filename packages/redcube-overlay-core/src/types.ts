@@ -31,6 +31,7 @@ export interface HydrateDeliverableContractRequest {
   deliverableId?: string;
   title?: string;
   goal?: string;
+  constraints?: JsonObject;
 }
 
 export interface HydratedDeliverableContract extends JsonObject {

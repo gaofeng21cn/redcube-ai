@@ -115,3 +115,38 @@ test('real route evolution probe preserves native renderer dependency typed bloc
   assert.equal(blocker.lane, 'native');
   assert.equal(blocker.route, 'author_pptx_native');
 });
+
+test('real route evolution probe writes numeric evidence into source materials full text', async () => {
+  const workspaceRoot = tempDir('rca-real-route-source-evidence-workspace-');
+  const outputDir = tempDir('rca-real-route-source-evidence-output-');
+
+  const report = await runRealRouteEvolutionProbe({
+    providerMode: 'mock',
+    routes: ['image'],
+    iterations: 1,
+    routeTimeoutMs: 60000,
+    probeCodex: false,
+    workspaceRoot,
+    outputDir,
+    runId: 'test-real-route-probe-source-evidence',
+  });
+
+  assert.equal(report.status, 'completed');
+
+  const extractedMaterialsFile = path.join(
+    workspaceRoot,
+    'topics',
+    'topic-real-route-evolution',
+    'canonical',
+    'extracted-materials.json',
+  );
+  const extracted = readJson(extractedMaterialsFile);
+  const content = extracted.materials
+    .map((material) => String(material.content_text || ''))
+    .join('\n');
+
+  assert.match(content, /topic_count=1\.0/);
+  assert.match(content, /route_count=3\.0/);
+  assert.match(content, /iteration_count_per_route=1\.0/);
+  assert.match(content, /required_gate_coverage=3\/3/);
+});

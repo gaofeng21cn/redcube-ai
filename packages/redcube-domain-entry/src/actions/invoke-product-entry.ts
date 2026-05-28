@@ -84,6 +84,9 @@ function normalizeDeliveryRequest(request) {
     mode: safeText(delivery?.mode),
     baselineDeliverableId: safeText(delivery?.baseline_deliverable_id || delivery?.baselineDeliverableId),
     taskIntent: safeText(delivery?.task_intent || delivery?.taskIntent),
+    constraints: delivery?.constraints && typeof delivery.constraints === 'object' && !Array.isArray(delivery.constraints)
+      ? delivery.constraints
+      : {},
   };
 }
 
@@ -293,6 +296,7 @@ async function ensureDeliverableForProductEntry({
       deliverableId,
       title: requireField('delivery_request.title', deliveryIdentity.title),
       goal: requireField('delivery_request.goal', deliveryIdentity.goal),
+      constraints: delivery.constraints,
     });
     createdDeliverable = true;
   }

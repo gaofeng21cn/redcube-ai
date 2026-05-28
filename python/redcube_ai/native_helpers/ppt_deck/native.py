@@ -127,6 +127,14 @@ def load_engine_contract(contract_file: Path) -> dict:
 
 def normalize_slide_data(payload: dict) -> list:
     plan = payload.get('editable_shape_plan') or {}
+    design_spec_lock = plan.get('design_spec_lock') if isinstance(plan.get('design_spec_lock'), dict) else {}
+    if (
+        not safe_text(design_spec_lock.get('spec_id'))
+        or not safe_text(design_spec_lock.get('owner'))
+        or not safe_text(design_spec_lock.get('motif'))
+        or len(safe_list(design_spec_lock.get('layout_archetypes'))) < 3
+    ):
+        fail('ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires spec_id, owner, motif, and at least three layout_archetypes')
     plan_slides = safe_list(plan.get('slides'))
     blueprint = payload.get('blueprint') or {}
     blueprint_slides = safe_list(blueprint.get('slides'))
@@ -161,6 +169,38 @@ def normalize_slide_data(payload: dict) -> list:
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')
     return slides
+
+
+def validate_ai_first_shape_plan(input_json: Path, engine_contract_file: Path) -> dict:
+    payload = json.loads(input_json.read_text(encoding='utf-8'))
+    load_engine_contract(engine_contract_file)
+    try:
+        slides = normalize_slide_data(payload)
+    except SystemExit as exc:
+        return {
+            'ok': False,
+            'stage': 'normalize_slide_data',
+            'exit_code': int(exc.code or 1) if isinstance(exc.code, int) else 1,
+            'failures': [{'reason': 'ai_first_shape_plan_normalization_failed'}],
+        }
+    from redcube_ai.native_helpers.ppt_deck.native_layouts import validate_ai_first_design_plan
+    failures = []
+    for slide in slides:
+        slide_id = safe_text(slide.get('slide_id'))
+        slide_failures = validate_ai_first_design_plan(slide)
+        if slide_failures:
+            failures.append({
+                'slide_id': slide_id,
+                'title': safe_text(slide.get('title')),
+                'failures': slide_failures,
+            })
+    return {
+        'ok': len(failures) == 0,
+        'stage': 'ai_first_shape_plan_preflight',
+        'slide_count': len(slides),
+        'failure_count': sum(len(slide.get('failures') or []) for slide in failures),
+        'failures': failures,
+    }
 
 
 def command_version(command: list[str]) -> str:
@@ -459,7 +499,7 @@ def attach_rendered_previews(manifest_slides: list, render_proof: dict) -> list:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Build editable native PPTX artifacts for ppt_deck.')
     parser.add_argument('--input-json', required=True)
-    parser.add_argument('--mode', choices=['author', 'repair'], required=True)
+    parser.add_argument('--mode', choices=['author', 'repair', 'validate_plan'], required=True)
     parser.add_argument('--output-pptx', required=True)
     parser.add_argument('--shape-manifest', required=True)
     parser.add_argument('--preview-dir', required=True)
@@ -472,6 +512,13 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    if args.mode == 'validate_plan':
+        validation = validate_ai_first_shape_plan(
+            Path(args.input_json),
+            Path(args.engine_contract).resolve(),
+        )
+        print(json.dumps(validation, ensure_ascii=False))
+        return
     payload = json.loads(Path(args.input_json).read_text(encoding='utf-8'))
     engine_contract_file = Path(args.engine_contract).resolve()
     engine_contract = load_engine_contract(engine_contract_file)
@@ -561,7 +608,11 @@ def main() -> None:
                 'occupied_ratio',
                 'edge_clearance',
                 'overlap_pairs',
+                'structural_text_collision_count',
+                'structural_text_collisions',
                 'decorative_shape_count',
+                'visual_support_shape_count',
+                'audience_content_slot_count',
                 'shape_kind_count',
                 'role_count',
                 'layout_richness_score',

@@ -5,68 +5,7 @@ import math
 from redcube_ai.native_helpers.ppt_deck.native_layouts import safe_text
 
 
-CANVAS_PX = (1152, 648)
-FRAME_AREA = float(CANVAS_PX[0] * CANVAS_PX[1])
-MIN_NATIVE_DENSITY = 0.18
-MAX_NATIVE_DENSITY = 0.82
-MIN_NATIVE_EDGE_CLEARANCE = 24.0
-MAX_NATIVE_PRIMARY_POINTS = 5
-MIN_NATIVE_LAYOUT_RICHNESS = 0.68
-TITLE_SAFE_ZONE_BOTTOM = 128.0
-MIN_NATIVE_BODY_FONT_PT = 18.0
-MIN_NATIVE_TITLE_FONT_PT = 36.0
-MIN_NATIVE_TYPOGRAPHY_HIERARCHY_RATIO = 2.0
-MIN_NATIVE_TITLE_CORE_GAP_PX = 8.0
-MIN_AUDIENCE_LABEL_FONT_PT = 16.0
-MIN_GRID_BALANCE_RATIO = 0.56
-MAX_GRID_BALANCE_RATIO = 1.78
-MIN_POINT_TEXT_CONTENT_CHARS = 12
-MIN_TABLE_BODY_FONT_PT = 11.0
-MAX_TABLE_CELL_BLANK_RATIO = 0.38
-COMPOSITION_BUCKET_PX = 36.0
-STRUCTURAL_VISUAL_ROLE_HINTS = [
-    'axis',
-    'band',
-    'bridge',
-    'connector',
-    'flow',
-    'hub',
-    'ladder',
-    'map',
-    'metric',
-    'rail',
-    'stack',
-    'table',
-    'timeline',
-    'track',
-]
-MECHANICAL_CARD_PANEL_ROLES = {
-    'compare_panel',
-    'signal_panel',
-    'timeline_panel',
-    'judgement_step',
-    'axis_panel',
-    'takeaway_panel',
-    'structured_note_panel',
-}
-OPERATOR_LANGUAGE_FRAGMENTS = [
-    '汇报讨论用途',
-    '客观专业版',
-    '本次汇报边界',
-    '不在展示页暴露',
-    '本地原始文件名',
-    '清洗脚本名',
-    'RCA',
-    'RedCube',
-    'product-entry',
-    'product entry',
-    'live proof',
-    'proof lane',
-    'source intake',
-    'author_pptx_native',
-    'slide_blueprint',
-    'visual_direction',
-]
+from redcube_ai.native_helpers.ppt_deck.native_quality_constants import *  # noqa: F403
 
 
 def clamp(value: float, lower: float, upper: float) -> float:
@@ -216,6 +155,7 @@ def readable_body_text_shapes(native_shapes: list[dict]) -> list[dict]:
         'title',
         'core_sentence',
         'subtitle',
+        *AUXILIARY_TEXT_ROLES,
         'page_number',
         'point_index',
         'metric_label',
@@ -231,6 +171,7 @@ def readable_body_text_shapes(native_shapes: list[dict]) -> list[dict]:
         and shape.get('kind') == 'text_box'
         and safe_text(shape.get('text'))
         and safe_text(shape.get('role')) not in excluded_roles
+        and safe_text(shape.get('role')) not in SYSTEM_MAP_CONTENT_ROLES
     ]
 
 
@@ -287,9 +228,47 @@ def shapes_with_role(native_shapes: list[dict], role: str) -> list[dict]:
     ]
 
 
+def shapes_with_any_role(native_shapes: list[dict], roles: set[str]) -> list[dict]:
+    return [
+        shape for shape in native_shapes
+        if safe_text(shape.get('role')) in roles
+    ]
+
+
+def content_shapes_with_any_role(native_shapes: list[dict], roles: set[str]) -> list[dict]:
+    return [
+        shape for shape in native_shapes
+        if shape.get('quality_role') == 'content' and safe_text(shape.get('role')) in roles
+    ]
+
+
+def has_role_hint(native_shapes: list[dict], hint: str) -> bool:
+    return any(hint in safe_text(shape.get('role')).lower() for shape in native_shapes)
+
+
+def is_system_map_layout(native_shapes: list[dict]) -> bool:
+    roles = {safe_text(shape.get('role')) for shape in native_shapes}
+    has_system_panel = bool(roles.intersection(SYSTEM_MAP_PANEL_ROLES))
+    has_structural_span = sum(1 for hint in SYSTEM_MAP_STRUCTURAL_HINTS if has_role_hint(native_shapes, hint)) >= 3
+    has_content_variety = len(roles.intersection(SYSTEM_MAP_CONTENT_ROLES)) >= 3
+    return has_system_panel and has_structural_span and has_content_variety
+
+
+def content_slot_shapes(native_shapes: list[dict]) -> list[dict]:
+    return [
+        shape for shape in native_shapes
+        if shape.get('quality_role') == 'content'
+        and safe_text(shape.get('text'))
+        and safe_text(shape.get('role')) not in CONTENT_DEPTH_EXCLUDED_ROLES
+    ]
+
+
 def layout_variant(native_shapes: list[dict]) -> str:
     roles = {safe_text(shape.get('role')) for shape in native_shapes}
+    if is_system_map_layout(native_shapes):
+        return 'system_map'
     zone_count = len(shapes_with_role(native_shapes, 'compare_panel'))
+    content_panel_count = len(shapes_with_role(native_shapes, 'content_panel'))
     timeline_count = len(shapes_with_role(native_shapes, 'timeline_panel'))
     gate_count = len(shapes_with_role(native_shapes, 'judgement_step'))
     axis_count = len(shapes_with_role(native_shapes, 'axis_panel'))
@@ -301,6 +280,12 @@ def layout_variant(native_shapes: list[dict]) -> str:
         return 'compare_three_column'
     if zone_count == 4:
         return 'compare_four_zone'
+    if content_panel_count >= 3:
+        return 'content_three_panel'
+    if content_panel_count == 2:
+        return 'content_two_panel'
+    if content_panel_count == 1:
+        return 'content_single_panel'
     if 'structured_note_panel' in roles:
         return 'structured_compare'
     if timeline_count:
@@ -322,6 +307,8 @@ def expected_slot_roles(native_shapes: list[dict]) -> list[str]:
     variant = layout_variant(native_shapes)
     if variant.startswith('compare_'):
         return ['compare_panel', 'point_text']
+    if variant.startswith('content_'):
+        return ['content_panel']
     if variant == 'structured_compare':
         return ['structured_note_panel', 'point_text']
     if variant == 'timeline_band':
@@ -334,11 +321,41 @@ def expected_slot_roles(native_shapes: list[dict]) -> list[str]:
         return ['signal_panel', 'point_text']
     if variant == 'summary_peak':
         return ['takeaway_panel']
+    if variant == 'system_map':
+        return ['system_map_panel', 'system_map_text']
     return []
+
+
+def system_map_slot_fill_audit(native_shapes: list[dict]) -> dict:
+    panel_count = len(shapes_with_any_role(native_shapes, SYSTEM_MAP_PANEL_ROLES))
+    text_count = len(content_shapes_with_any_role(native_shapes, SYSTEM_MAP_CONTENT_ROLES))
+    filled_slots = min(panel_count, text_count)
+    failures = []
+    if panel_count < 3:
+        failures.append({
+            'reason': 'system_map_panel_count_too_low',
+            'expected_minimum': 3,
+            'actual': panel_count,
+        })
+    if text_count < 3:
+        failures.append({
+            'reason': 'system_map_text_count_too_low',
+            'expected_minimum': 3,
+            'actual': text_count,
+        })
+    return {
+        'layout_variant': 'system_map',
+        'expected_slot_count': 3,
+        'filled_slot_count': min(filled_slots, 3),
+        'slot_fill_ok': len(failures) == 0,
+        'slot_fill_failures': failures,
+    }
 
 
 def slot_fill_audit(native_shapes: list[dict], primary_points: int) -> dict:
     variant = layout_variant(native_shapes)
+    if variant == 'system_map':
+        return system_map_slot_fill_audit(native_shapes)
     roles = expected_slot_roles(native_shapes)
     if not roles:
         return {
@@ -351,12 +368,28 @@ def slot_fill_audit(native_shapes: list[dict], primary_points: int) -> dict:
     panel_role = roles[0]
     panel_count = len(shapes_with_role(native_shapes, panel_role))
     text_role = roles[1] if len(roles) > 1 else ''
-    text_count = len([
-        shape for shape in shapes_with_role(native_shapes, text_role)
-        if safe_text(shape.get('text'))
-    ]) if text_role else panel_count
+    if text_role:
+        text_count = len([
+            shape for shape in shapes_with_role(native_shapes, text_role)
+            if safe_text(shape.get('text'))
+        ])
+    elif panel_role == 'content_panel':
+        text_count = max(
+            len([
+                shape for shape in shapes_with_role(native_shapes, panel_role)
+                if safe_text(shape.get('text'))
+            ]),
+            len([
+                shape for shape in content_slot_shapes(native_shapes)
+                if safe_text(shape.get('text'))
+            ]),
+        )
+    else:
+        text_count = panel_count
     if variant == 'summary_peak':
         expected_slots = max(1, min(max(primary_points - 1, 1), 3))
+    elif variant.startswith('content_'):
+        expected_slots = min(max(1, primary_points), max(panel_count, 1))
     elif variant == 'structured_compare':
         expected_slots = min(max(1, primary_points), max(panel_count, 1))
     else:
@@ -404,10 +437,7 @@ def normalized_content_char_count(text: str) -> int:
 
 
 def content_depth_audit(native_shapes: list[dict]) -> dict:
-    point_text_shapes = [
-        shape for shape in shapes_with_role(native_shapes, 'point_text')
-        if safe_text(shape.get('text'))
-    ]
+    point_text_shapes = content_slot_shapes(native_shapes)
     failures = []
     for shape in point_text_shapes:
         char_count = normalized_content_char_count(shape.get('text'))
@@ -427,9 +457,45 @@ def content_depth_audit(native_shapes: list[dict]) -> dict:
 
 def grid_balance_audit(native_shapes: list[dict]) -> dict:
     variant = layout_variant(native_shapes)
-    slot_roles = expected_slot_roles(native_shapes)
-    panel_role = slot_roles[0] if slot_roles else ''
-    panels = shapes_with_role(native_shapes, panel_role) if panel_role else []
+    if variant == 'system_map':
+        route_lane_count = len(shapes_with_any_role(native_shapes, SYSTEM_MAP_ROUTE_ROLES))
+        gate_card_count = len(shapes_with_any_role(native_shapes, {'gate_card', 'gate_ladder_panel', 'gate_stack_panel'}))
+        evidence_band_count = len(shapes_with_any_role(native_shapes, {'evidence_band', 'evidence_panel', 'takeaway_band'}))
+        input_panel_count = len(shapes_with_any_role(native_shapes, {'input_panel', 'source_panel', 'content_panel'}))
+        failures = []
+        if route_lane_count < 2:
+            failures.append({
+                'reason': 'system_map_route_lanes_too_low',
+                'expected_minimum': 2,
+                'actual': route_lane_count,
+            })
+        if gate_card_count < 1:
+            failures.append({
+                'reason': 'system_map_gate_area_missing',
+                'expected_minimum': 1,
+                'actual': gate_card_count,
+            })
+        if evidence_band_count < 1:
+            failures.append({
+                'reason': 'system_map_evidence_band_missing',
+                'expected_minimum': 1,
+                'actual': evidence_band_count,
+            })
+        if input_panel_count < 1:
+            failures.append({
+                'reason': 'system_map_input_panel_missing',
+                'expected_minimum': 1,
+                'actual': input_panel_count,
+            })
+        return {
+            'grid_balance_ratio': 1.0,
+            'grid_balance_ok': len(failures) == 0,
+            'grid_balance_failures': failures,
+        }
+    else:
+        slot_roles = expected_slot_roles(native_shapes)
+        panel_role = slot_roles[0] if slot_roles else ''
+        panels = shapes_with_role(native_shapes, panel_role) if panel_role else []
     if len(panels) <= 1:
         return {
             'grid_balance_ratio': 1.0,
@@ -457,6 +523,49 @@ def grid_balance_audit(native_shapes: list[dict]) -> dict:
         'grid_balance_ok': len(failures) == 0,
         'grid_balance_failures': failures,
     }
+
+
+def generic_overlap_excluded(shape_a: dict, shape_b: dict) -> bool:
+    roles = frozenset({
+        safe_text(shape_a.get('role')),
+        safe_text(shape_b.get('role')),
+    })
+    return roles in GENERIC_OVERLAP_EXCLUDED_ROLE_PAIRS
+
+
+def structural_text_collision_failures(native_shapes: list[dict]) -> list[dict]:
+    text_shapes = [
+        shape for shape in native_shapes
+        if shape.get('quality_role') == 'content'
+        and shape.get('kind') == 'text_box'
+        and safe_text(shape.get('role')) in STRUCTURAL_TEXT_COLLISION_ROLES
+        and safe_text(shape.get('text'))
+    ]
+    structural_shapes = [
+        shape for shape in structural_visual_shapes(native_shapes)
+        if shape.get('kind') in {'line', 'connector'}
+    ]
+    failures = []
+    for text_shape in text_shapes:
+        text_rect = text_shape.get('bounds') or {}
+        visible_text_rect = {
+            **text_rect,
+            'bottom': text_shape_bottom(text_shape),
+        }
+        for structural_shape in structural_shapes:
+            structural_rect = structural_shape.get('bounds') or {}
+            overlap_area = rect_overlap_area(visible_text_rect, structural_rect)
+            if overlap_area <= MIN_STRUCTURAL_TEXT_COLLISION_AREA_PX2:
+                continue
+            failures.append({
+                'text_shape_id': text_shape.get('shape_id'),
+                'structural_shape_id': structural_shape.get('shape_id'),
+                'text_role': text_shape.get('role'),
+                'structural_role': structural_shape.get('role'),
+                'overlap_area': round(overlap_area, 2),
+                'required_gap_px': MIN_STRUCTURAL_TEXT_CLEARANCE_PX,
+            })
+    return failures
 
 
 def bucket_px(value: float) -> int:
@@ -537,10 +646,10 @@ def structural_visual_shapes(native_shapes: list[dict]) -> list[dict]:
         if kind in {'chart', 'table', 'metric_grid'}:
             results.append(shape)
             continue
-        if kind in {'line', 'connector', 'oval'} and role not in {'accent_dot', 'page_number'}:
+        if kind in {'line', 'connector', 'oval'} and role not in {'accent_dot', 'page_number', 'page_no'}:
             results.append(shape)
             continue
-        if any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS):
+        if kind in {'line', 'connector', 'oval', 'rect', 'rounded_rect'} and any(hint in role for hint in STRUCTURAL_VISUAL_ROLE_HINTS):
             results.append(shape)
     return results
 
@@ -558,8 +667,15 @@ def mechanical_card_panel_count(native_shapes: list[dict]) -> int:
 
 def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> dict:
     content_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'content']
-    decorative_shapes = [shape for shape in native_shapes if shape.get('quality_role') == 'decorative']
-    overlap_shapes = [shape for shape in content_shapes if shape.get('kind') == 'text_box']
+    decorative_shapes = [
+        shape for shape in native_shapes
+        if shape.get('quality_role') in {'decorative', 'structural'}
+    ]
+    overlap_shapes = [
+        shape for shape in content_shapes
+        if shape.get('kind') == 'text_box'
+        and safe_text(shape.get('role')) not in SYSTEM_MAP_CONTENT_ROLES
+    ]
     shape_kinds = {safe_text(shape.get('kind')) for shape in native_shapes if safe_text(shape.get('kind'))}
     shape_roles = {safe_text(shape.get('role')) for shape in native_shapes if safe_text(shape.get('role'))}
     title_shapes = [
@@ -589,7 +705,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     )
     page_number_shapes = [
         shape for shape in native_shapes
-        if shape.get('role') == 'page_number' and safe_text(shape.get('text'))
+        if shape.get('role') in {'page_number', 'page_no', 'page'} and safe_text(shape.get('text'))
     ]
     occupied_area = rect_union_area([shape['bounds'] for shape in content_shapes])
     occupied_ratio = clamp(occupied_area / FRAME_AREA, 0.0, 1.0)
@@ -605,6 +721,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     overlap_pairs = []
     for left_index, shape_a in enumerate(overlap_shapes):
         for shape_b in overlap_shapes[left_index + 1:]:
+            if generic_overlap_excluded(shape_a, shape_b):
+                continue
             overlap_area = rect_overlap_area(shape_a['bounds'], shape_b['bounds'])
             if overlap_area > 12.0:
                 overlap_pairs.append({
@@ -645,18 +763,20 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     language_fragments = operator_language_fragments(content_shapes)
     title_zone_failures = title_safe_zone_failures(content_shapes)
     title_core_failures = title_core_overlap_failures(content_shapes)
-    slot_audit = slot_fill_audit(content_shapes, primary_points)
+    structural_text_collisions = structural_text_collision_failures(native_shapes)
+    slot_audit = slot_fill_audit(native_shapes, primary_points)
     label_failures = audience_label_readability_failures(content_shapes)
     content_depth = content_depth_audit(content_shapes)
-    grid_audit = grid_balance_audit(content_shapes)
+    grid_audit = grid_balance_audit(native_shapes)
     table_failures = table_legibility_failures(table_metrics)
     underline_failures = title_underline_failures(native_shapes)
     structural_shapes = structural_visual_shapes(native_shapes)
     structural_visual_count = len(structural_shapes)
     card_panel_count = mechanical_card_panel_count(native_shapes)
+    audience_slot_count = len(content_slot_shapes(native_shapes))
     mechanical_card_template_detected = (
         card_panel_count >= 2
-        and len(shapes_with_role(native_shapes, 'point_text')) >= 2
+        and audience_slot_count >= 2
         and structural_visual_count < 1
     )
     composition = composition_signature(native_shapes)
@@ -694,7 +814,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     ), 4)
     checks = {
         'overflow_free': clipped_nodes == 0,
-        'occlusion_free': len(overlap_pairs) == 0,
+        'occlusion_free': len(overlap_pairs) == 0 and len(structural_text_collisions) == 0,
         'visual_density_ok': MIN_NATIVE_DENSITY <= occupied_ratio <= MAX_NATIVE_DENSITY and primary_points <= MAX_NATIVE_PRIMARY_POINTS,
         'speaker_fit_ok': text_char_count <= 950,
         'edge_clearance_ok': min(edge_clearance.values()) >= MIN_NATIVE_EDGE_CLEARANCE,
@@ -725,6 +845,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('edge_clearance_out_of_range')
     if not checks['occlusion_free']:
         issues.append('occlusion_detected')
+    if structural_text_collisions:
+        issues.append('structural_text_collision_detected')
     if not checks['block_content_fit_ok']:
         issues.append('block_content_overflow_detected')
     if not checks['speaker_fit_ok']:
@@ -783,6 +905,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'text_char_count': text_char_count,
             'block_count': len(content_shapes),
             'decorative_shape_count': len(decorative_shapes),
+            'visual_support_shape_count': len(decorative_shapes),
+            'audience_content_slot_count': audience_slot_count,
             'shape_count': len(native_shapes),
             'shape_kind_count': len(shape_kinds),
             'role_count': len(shape_roles),
@@ -806,6 +930,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'title_underline_failures': underline_failures,
             'overlap_pairs': len(overlap_pairs),
             'overlaps': overlap_pairs,
+            'structural_text_collision_count': len(structural_text_collisions),
+            'structural_text_collisions': structural_text_collisions,
             'clipped_nodes': clipped_nodes,
             'occupied_ratio': round(occupied_ratio, 4),
             'primary_points': primary_points,
