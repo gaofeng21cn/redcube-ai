@@ -148,6 +148,9 @@ function normalizeError(error) {
       blocking_reasons: Array.isArray(error.blocking_reasons) ? error.blocking_reasons : [],
       recommended_action: String(error.recommended_action || '').trim() || null,
       artifact_file: String(error.artifact_file || '').trim() || null,
+      artifact_refs: Array.isArray(error.artifact_refs)
+        ? Array.from(new Set(error.artifact_refs.map((ref) => String(ref || '').trim()).filter(Boolean))).sort()
+        : [],
       requires_human_confirmation: error.requiresHumanConfirmation === true,
       requires_external_secret: error.requiresExternalSecret === true,
     };
@@ -160,6 +163,7 @@ function normalizeError(error) {
     blocking_reasons: [],
     recommended_action: null,
     artifact_file: null,
+    artifact_refs: [],
     requires_human_confirmation: false,
     requires_external_secret: false,
   };
@@ -335,6 +339,9 @@ export function failRouteRun({
     status: runStatus,
     finished_at: new Date().toISOString(),
     current_stage: currentStage,
+    artifact_refs: Array.isArray(error?.artifact_refs)
+      ? Array.from(new Set(error.artifact_refs.map((ref) => String(ref || '').trim()).filter(Boolean))).sort()
+      : (Array.isArray(run?.artifact_refs) ? run.artifact_refs : []),
     error_kind: errorKind,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
     executor: executor || run?.executor,

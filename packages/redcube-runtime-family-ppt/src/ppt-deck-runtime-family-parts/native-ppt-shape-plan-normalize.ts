@@ -85,20 +85,36 @@ export function createNativePptShapePlanNormalizeParts({
               ...(shape?.missing_layout_zone === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].layout_zone_id`] : []),
             ]),
         ];
-        if (!slideId || missingFields.length === 0) return null;
+        const invalidBindingFields = safeArray(slide?.invalid_template_binding_fields)
+          .map((field) => safeText(field))
+          .filter(Boolean);
+        const invalidZones = safeArray(slide?.invalid_template_zones);
+        if (!slideId || (missingFields.length === 0 && invalidBindingFields.length === 0 && invalidZones.length === 0)) {
+          return null;
+        }
+        const invalidBinding = invalidBindingFields.length > 0 || invalidZones.length > 0;
         return {
           scope: 'slide',
           slide_id: slideId,
-          reason: 'native_shape_plan_structural_fields_missing',
+          reason: invalidBinding && missingFields.length === 0
+            ? 'native_shape_plan_template_layout_binding_invalid'
+            : 'native_shape_plan_structural_fields_missing',
           missing_fields: missingFields,
+          invalid_template_binding_fields: invalidBindingFields,
+          invalid_template_zones: invalidZones,
           required_fields: [
             'template_layout_binding.selected_archetype',
             'template_layout_binding.archetype_instance_id',
             'template_layout_binding.rhythm_role',
+            'template_layout_binding.zone_gap_in_min>=0.32',
+            'template_layout_binding.zone_inset_in_min>=0.15',
             'template_layout_binding.zones[]',
+            'template_layout_binding.zones[].safe_inset_in>=0.15',
             'native_shapes[].layout_zone_id',
           ],
-          repair_instruction: 'Return a complete AI-authored slide plan. Add template_layout_binding with declared semantic zones, bind every non-decorative audience-facing shape to a zone on the same slide, and keep all shape bounds inside the declared zone. Do not ask the Python helper or officecli to infer this.',
+          repair_instruction: invalidBinding
+            ? 'Repair the existing AI-authored template_layout_binding instead of treating it as absent. Preserve the slide-level binding, selected archetype, declared zones, and shape layout_zone_id values while fixing invalid binding fields and zone constraints such as safe_inset_in >= 0.15.'
+            : 'Return a complete AI-authored slide plan. Add template_layout_binding with declared semantic zones, bind every non-decorative audience-facing shape to a zone on the same slide, and keep all shape bounds inside the declared zone. Do not ask the Python helper or officecli to infer this.',
         };
       })
       .filter(Boolean);
@@ -220,14 +236,25 @@ export function createNativePptShapePlanNormalizeParts({
       : {};
     const zones = safeArray(templateBinding?.zones);
     const zoneIds = new Set(zones.map((zone) => safeText(zone?.zone_id)).filter(Boolean));
-    const missingTemplateBinding = !safeText(templateBinding?.selected_archetype)
-      || (allowedArchetypes.size > 0 && !allowedArchetypes.has(safeText(templateBinding?.selected_archetype)))
-      || !safeText(templateBinding?.archetype_instance_id)
-      || !safeText(templateBinding?.rhythm_role)
-      || Number(templateBinding?.zone_gap_in_min || 0) < 0.32
-      || Number(templateBinding?.zone_inset_in_min || 0) < 0.15
-      || zones.length < 3
-      || zones.some((zone) => invalidTemplateZone(zone));
+    const selectedArchetype = safeText(templateBinding?.selected_archetype);
+    const missingBindingFields = [
+      ...(!selectedArchetype ? ['selected_archetype'] : []),
+      ...(!safeText(templateBinding?.archetype_instance_id) ? ['archetype_instance_id'] : []),
+      ...(!safeText(templateBinding?.rhythm_role) ? ['rhythm_role'] : []),
+      ...(zones.length < 3 ? ['zones'] : []),
+    ];
+    const invalidBindingFields = [
+      ...(selectedArchetype && allowedArchetypes.size > 0 && !allowedArchetypes.has(selectedArchetype)
+        ? ['selected_archetype']
+        : []),
+      ...(Number(templateBinding?.zone_gap_in_min || 0) < 0.32 ? ['zone_gap_in_min'] : []),
+      ...(Number(templateBinding?.zone_inset_in_min || 0) < 0.15 ? ['zone_inset_in_min'] : []),
+    ];
+    const invalidTemplateZones = zones
+      .map((zone) => invalidTemplateZone(zone))
+      .filter(Boolean);
+    const missingTemplateBinding = missingBindingFields.length > 0;
+    const invalidTemplateBinding = invalidBindingFields.length > 0 || invalidTemplateZones.length > 0;
     const missingShapePlan = shapes.length === 0;
     const missingLayoutIntent = !safeText(layoutIntent?.composition_signature)
       || !safeText(layoutIntent?.primary_grid)
@@ -241,25 +268,47 @@ export function createNativePptShapePlanNormalizeParts({
       }))
       .filter(Boolean);
     const missingShapeQualityRoles = shapes.some((shape) => !safeText(shape?.quality_role));
-    return (missingShapePlan || missingLayoutIntent || missingTemplateBinding || invalidShapes.length > 0) ? {
+    return (missingShapePlan || missingLayoutIntent || missingTemplateBinding || invalidTemplateBinding || invalidShapes.length > 0) ? {
       slide_id: slideId,
       missing_native_shapes: missingShapePlan,
       missing_layout_intent: missingLayoutIntent,
       missing_template_layout_binding: missingTemplateBinding,
+      invalid_template_layout_binding: invalidTemplateBinding,
+      invalid_template_binding_fields: invalidBindingFields,
+      invalid_template_zones: invalidTemplateZones,
       missing_shape_quality_roles: missingShapeQualityRoles,
       invalid_shapes: invalidShapes,
     } : null;
   }
 
-  function invalidTemplateZone(zone: JsonRecord): boolean {
+  function invalidTemplateZone(zone: JsonRecord): JsonRecord | null {
     const bounds = zone?.bounds && typeof zone.bounds === 'object' ? zone.bounds : {};
-    return !safeText(zone?.zone_id)
-      || !safeText(zone?.semantic_role)
-      || !safeText(zone?.intended_content)
-      || !['left_in', 'top_in', 'width_in', 'height_in'].every((key) => Number.isFinite(Number(bounds?.[key])))
-      || Number(bounds?.width_in || 0) <= 0
-      || Number(bounds?.height_in || 0) <= 0
-      || Number(zone?.safe_inset_in || 0) < 0.15;
+    const invalidFields = [
+      ...(!safeText(zone?.zone_id) ? ['zone_id'] : []),
+      ...(!safeText(zone?.semantic_role) ? ['semantic_role'] : []),
+      ...(!safeText(zone?.intended_content) ? ['intended_content'] : []),
+      ...(!['left_in', 'top_in', 'width_in', 'height_in'].every((key) => Number.isFinite(Number(bounds?.[key])))
+        ? ['bounds']
+        : []),
+      ...(Number(bounds?.width_in || 0) <= 0 ? ['bounds.width_in'] : []),
+      ...(Number(bounds?.height_in || 0) <= 0 ? ['bounds.height_in'] : []),
+      ...(Number(zone?.safe_inset_in || 0) < 0.15 ? ['safe_inset_in'] : []),
+    ];
+    if (invalidFields.length === 0) return null;
+    return {
+      zone_id: safeText(zone?.zone_id, '<missing-zone-id>'),
+      invalid_fields: invalidFields,
+      required_fields: [
+        'zone_id',
+        'semantic_role',
+        'intended_content',
+        'bounds.left_in',
+        'bounds.top_in',
+        'bounds.width_in>0',
+        'bounds.height_in>0',
+        'safe_inset_in>=0.15',
+      ],
+    };
   }
 
   function invalidShape({

@@ -7,6 +7,7 @@ import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
 
 import {
   runRealRouteEvolutionProbe,
+  summarizeRouteRunForTest,
   typedBlockerForTest,
 } from '../scripts/run-real-route-evolution-probe.ts';
 
@@ -114,6 +115,39 @@ test('real route evolution probe preserves native renderer dependency typed bloc
   assert.equal(blocker.blocker_kind, 'missing_renderer_dependency');
   assert.equal(blocker.lane, 'native');
   assert.equal(blocker.route, 'author_pptx_native');
+});
+
+test('real route evolution probe summarizes failed route diagnostic artifact refs', () => {
+  const routeRun = summarizeRouteRunForTest({
+    lane: 'native',
+    route: 'author_pptx_native',
+    iteration: 1,
+    productEntryResult: {
+      ok: false,
+      domain_entry_surface: {
+        result_surface: {
+          ok: false,
+          run: {
+            run_id: 'run-native-failed',
+            status: 'failed',
+            artifact_refs: ['/tmp/native-attempt-01.json'],
+            error: {
+              artifact_refs: ['/tmp/native-attempt-01-validation.json'],
+            },
+          },
+          error: {
+            artifact_refs: ['/tmp/native-attempt-02-candidate.json'],
+          },
+        },
+      },
+    },
+  });
+
+  assert.deepEqual([...routeRun.artifact_refs].sort(), [
+    '/tmp/native-attempt-01.json',
+    '/tmp/native-attempt-01-validation.json',
+    '/tmp/native-attempt-02-candidate.json',
+  ].sort());
 });
 
 test('real route evolution probe writes numeric evidence into source materials full text', async () => {

@@ -29,6 +29,33 @@ export function buildNativeShapePlanOutputContract({
           helper_template_layout_allowed: false,
           officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
         },
+        structural_contract: {
+          contract_kind: 'native_pptx_ai_first_structural_plan_v1',
+          required: true,
+          enforcement: 'fail_closed_before_python_materialization',
+          ai_authoring_owner: 'llm_agent',
+          materializer_inference_allowed: false,
+          required_top_level_fields: [
+            'design_spec_lock',
+            'deck_layout_rhythm_plan',
+            'template_layout_grammar',
+            'slides',
+          ],
+          per_slide_required_fields: [
+            'slide_id',
+            'layout_intent',
+            'template_layout_binding',
+            'native_shapes',
+          ],
+          slide_binding_required_before_shapes: true,
+          shape_zone_binding_required: true,
+          slide_acceptance_rule: 'Every returned slide object must include template_layout_binding as a sibling field before native_shapes. The binding must select a catalog archetype, declare semantic zones, and every non-decorative audience-facing native_shape must set layout_zone_id to one of those zones.',
+          forbidden_partial_outputs: [
+            'native_shapes without sibling template_layout_binding',
+            'layout_zone_id values without declared zones',
+            'asking officecli or Python to infer template zones',
+          ],
+        },
         deck_layout_rhythm_plan: {
           required: true,
           owner: 'llm_agent',

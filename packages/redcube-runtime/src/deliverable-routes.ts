@@ -514,6 +514,7 @@ function normalizeRouteFailure(error) {
   failure.blocking_reasons = Array.isArray(error?.blocking_reasons) ? error.blocking_reasons : [];
   failure.recommended_action = String(error?.recommended_action || '').trim() || null;
   failure.artifact_file = String(error?.artifact_file || '').trim() || null;
+  failure.artifact_refs = Array.isArray(error?.artifact_refs) ? error.artifact_refs : [];
   failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
   failure.requiresExternalSecret = error?.requiresExternalSecret === true;
   const failureKind = String(failure.failure_kind || failure.code || '').trim();

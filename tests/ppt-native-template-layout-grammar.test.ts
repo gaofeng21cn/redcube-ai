@@ -187,3 +187,92 @@ test('native PPT AI shape plan retries missing template layout grammar before ma
     }
   });
 });
+
+test('native PPT AI shape plan records structural-failure candidates for live blocker audit', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-structural-candidate-');
+    const deliverableId = 'deck-structural-candidate';
+    await runNativePlanningChain({ workspaceRoot, deliverableId });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'always_remove_template_layout_binding',
+      REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS: '2',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId,
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, false);
+      assert.match(
+        String(nativeResult.error?.message || nativeResult.error || ''),
+        /template_layout_binding/i,
+      );
+      const candidateRefs = nativeResult.run.artifact_refs
+        .filter((file) => file.includes('plan-validation-input-attempt-') && file.endsWith('-candidate.json'));
+      assert.equal(candidateRefs.length >= 1, true);
+      const firstCandidate = readJson(candidateRefs[0]);
+      assert.equal(Boolean(firstCandidate.editable_shape_plan), true);
+      assert.equal(firstCandidate.editable_shape_plan.slides.some((slide) => !slide.template_layout_binding), true);
+      const structuralRefs = nativeResult.run.artifact_refs
+        .filter((file) => file.endsWith('-structural-validation.json'));
+      assert.equal(structuralRefs.length >= 1, true);
+      const firstFeedback = readJson(structuralRefs[0]);
+      assert.equal(
+        firstFeedback.required_structural_fixes
+          .some((fix) => fix.missing_fields.includes('template_layout_binding')),
+        true,
+      );
+    } finally {
+      restoreRoute();
+    }
+  });
+});
+
+test('native PPT AI shape plan reports invalid template zones separately from missing binding', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-invalid-zone-');
+    const deliverableId = 'deck-invalid-zone';
+    await runNativePlanningChain({ workspaceRoot, deliverableId });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'always_invalid_template_zone_safe_inset',
+      REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS: '2',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId,
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, false);
+      const structuralRefs = nativeResult.run.artifact_refs
+        .filter((file) => file.endsWith('-structural-validation.json'));
+      assert.equal(structuralRefs.length >= 1, true);
+      const firstFeedback = readJson(structuralRefs[0]);
+      const invalidZoneFix = firstFeedback.required_structural_fixes
+        .find((fix) => fix.reason === 'native_shape_plan_template_layout_binding_invalid');
+      assert.equal(Boolean(invalidZoneFix), true);
+      assert.equal(
+        invalidZoneFix.missing_fields.includes('template_layout_binding'),
+        false,
+      );
+      assert.equal(
+        invalidZoneFix.invalid_template_zones
+          .some((zone) => (
+            zone.zone_id === 'title_zone'
+            && zone.invalid_fields.includes('safe_inset_in')
+            && zone.required_fields.includes('safe_inset_in>=0.15')
+          )),
+        true,
+      );
+    } finally {
+      restoreRoute();
+    }
+  });
+});

@@ -360,6 +360,13 @@ function routeSurface(productEntryResult) {
   return productEntryResult?.domain_entry_surface?.result_surface || productEntryResult;
 }
 
+function artifactRefsFrom(...values) {
+  return Array.from(new Set(values
+    .flatMap((value) => (Array.isArray(value) ? value : [value]))
+    .map((item) => safeText(item))
+    .filter(Boolean)));
+}
+
 function summarizeRouteRun({ lane, route, iteration, productEntryResult }) {
   const surface = routeSurface(productEntryResult);
   const artifactFile = safeText(surface?.artifactFile);
@@ -377,11 +384,14 @@ function summarizeRouteRun({ lane, route, iteration, productEntryResult }) {
     artifact_file: artifactFile || null,
     artifact_sha256: fileSha256(artifactFile),
     artifact_status: safeText(artifact?.status) || null,
-    artifact_refs: [
+    artifact_refs: artifactRefsFrom(
       artifactFile,
-      ...safeArray(artifact?.artifact_refs),
-      ...safeArray(surface?.artifact_refs),
-    ].map((item) => safeText(item)).filter(Boolean),
+      artifact?.artifact_refs,
+      surface?.artifact_refs,
+      run?.artifact_refs,
+      surface?.error?.artifact_refs,
+      run?.error?.artifact_refs,
+    ),
     gate_refs: {
       visual_director_review_preserved: true,
       screenshot_review_preserved: true,
@@ -389,6 +399,10 @@ function summarizeRouteRun({ lane, route, iteration, productEntryResult }) {
     },
     summary: surface?.summary || null,
   };
+}
+
+export function summarizeRouteRunForTest(input) {
+  return summarizeRouteRun(input);
 }
 
 async function runProductRoute({

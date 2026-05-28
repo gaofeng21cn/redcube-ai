@@ -471,8 +471,17 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         const normalizedInput = route === 'repair_pptx_native'
           ? completeRepairShapePlanWithLockedSpec(data, currentNativeArtifact)
           : data;
+        let editableShapePlan;
+        try {
+          editableShapePlan = normalizeEditableShapePlan(normalizedInput, route);
+        } catch (error) {
+          if (error instanceof Error) {
+            (error as Error & { nativeShapePlanCandidate?: JsonRecord }).nativeShapePlanCandidate = normalizedInput;
+          }
+          throw error;
+        }
         return {
-          editableShapePlan: normalizeEditableShapePlan(normalizedInput, route),
+          editableShapePlan,
           generationRuntime: {
             ...generationRuntime,
             native_shape_plan_executor_retry_count: executorRetryIndex,
@@ -534,6 +543,12 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           attemptIndex,
         });
       } catch (error) {
+        const candidate = (error as Error & { nativeShapePlanCandidate?: JsonRecord })?.nativeShapePlanCandidate;
+        if (candidate && typeof candidate === 'object') {
+          const attemptCandidateFile = nativePlanPreflightParts.nativeAttemptArtifactFile(validationInputFile, attemptIndex, '-candidate');
+          writeJson(attemptCandidateFile, candidate);
+          attemptArtifactRefs.push(attemptCandidateFile);
+        }
         const structuralFeedback = structuralFeedbackFromPlanError({
           route,
           error,
@@ -542,6 +557,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           previousValidationFeedback: validationFeedback,
         });
         if (!structuralFeedback || attemptIndex >= maxAttempts) {
+          if (error instanceof Error && attemptArtifactRefs.length > 0) {
+            (error as Error & { artifact_refs?: string[] }).artifact_refs = [...attemptArtifactRefs];
+          }
           throw error;
         }
         const attemptValidationFile = nativePlanPreflightParts.nativeAttemptArtifactFile(validationInputFile, attemptIndex, '-structural-validation');
@@ -594,7 +612,11 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         attemptArtifactRefs,
       });
     }
-    throw new Error(`Native PPT ${route} AI-first editable_shape_plan did not pass preflight after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
+    const error = new Error(`Native PPT ${route} AI-first editable_shape_plan did not pass preflight after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
+    if (attemptArtifactRefs.length > 0) {
+      (error as Error & { artifact_refs?: string[] }).artifact_refs = [...attemptArtifactRefs];
+    }
+    throw error;
   }
 
 

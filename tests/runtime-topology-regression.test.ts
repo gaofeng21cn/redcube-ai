@@ -166,6 +166,43 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
   assert.equal('gateway_role' in failed.runtime_topology, false);
 });
 
+test('failed route runs retain diagnostic artifact refs from typed errors', () => {
+  const workspaceRoot = tempWorkspaceRoot();
+  const executor = buildCodexExecutorDescriptor();
+  const run = startRouteRun({
+    workspaceRoot,
+    route: 'author_pptx_native',
+    overlay: 'ppt_deck',
+    target: 'deck-a',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    executor,
+  });
+  const error = new Error('native structural blocker');
+  error.artifact_refs = [
+    '/tmp/native-candidate.json',
+    '/tmp/native-structural-validation.json',
+    '/tmp/native-candidate.json',
+  ];
+
+  const failed = failRouteRun({
+    workspaceRoot,
+    runId: run.run_id,
+    currentStage: 'author_pptx_native',
+    error,
+    executor,
+  });
+
+  assert.deepEqual(failed.artifact_refs, [
+    '/tmp/native-candidate.json',
+    '/tmp/native-structural-validation.json',
+  ]);
+  assert.deepEqual(failed.error.artifact_refs, [
+    '/tmp/native-candidate.json',
+    '/tmp/native-structural-validation.json',
+  ]);
+});
+
 test('Hermes-Agent API structured_call posts chat completions and records server-selected proof', async () => {
   const server = await startMockHermesAgentApiServer();
   try {

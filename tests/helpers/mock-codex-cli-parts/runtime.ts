@@ -72,6 +72,9 @@ export function buildCreativeRunOutput(meta) {
       const rawPrompt = safeText(meta?.__raw_prompt);
       if (!rawPrompt.includes('native_shape_plan_validation_feedback_contract')
         || !rawPrompt.includes('exact_shape_fixes')
+        || !rawPrompt.includes('native_shape_plan_structural_preservation_contract')
+        || !rawPrompt.includes('template_layout_binding_preservation_required')
+        || !rawPrompt.includes('zone_safe_inset_in_min')
         || !rawPrompt.includes('required_height_in')
         || !rawPrompt.includes('required_font_size')
         || !rawPrompt.includes('required_text_char_count')
@@ -114,6 +117,15 @@ export function buildCreativeRunOutput(meta) {
       }
       return output;
     }
+    if (mutateKind === 'always_tiny_native_plan') {
+      const pointTextShape = output?.editable_shape_plan?.slides
+        ?.flatMap((slide) => slide?.native_shapes || [])
+        ?.find((shape) => shape?.role === 'point_text');
+      if (pointTextShape?.bounds) {
+        pointTextShape.bounds.height_in = 0.34;
+      }
+      return output;
+    }
     if (mutateKind === 'repair_missing_design_spec_lock') {
       if (route === 'repair_pptx_native') {
         delete output?.editable_shape_plan?.design_spec_lock;
@@ -127,6 +139,8 @@ export function buildCreativeRunOutput(meta) {
         if (!rawPrompt.includes('native_shape_plan_structural_retry_contract')
           || !rawPrompt.includes('required_structural_fixes')
           || !rawPrompt.includes('template_layout_binding')
+          || !rawPrompt.includes('slide_binding_required_before_shapes')
+          || !rawPrompt.includes('per_slide_required_fields')
           || !rawPrompt.includes('materializer_inference_allowed')) {
           throw new Error('mock expected native structural retry output contract with template_layout_binding fixes');
         }
@@ -137,6 +151,24 @@ export function buildCreativeRunOutput(meta) {
         delete slide.template_layout_binding;
         for (const shape of slide?.native_shapes || []) {
           delete shape.layout_zone_id;
+        }
+      }
+      return output;
+    }
+    if (mutateKind === 'always_remove_template_layout_binding') {
+      for (const slide of output?.editable_shape_plan?.slides || []) {
+        delete slide.template_layout_binding;
+        for (const shape of slide?.native_shapes || []) {
+          delete shape.layout_zone_id;
+        }
+      }
+      return output;
+    }
+    if (mutateKind === 'always_invalid_template_zone_safe_inset') {
+      for (const slide of output?.editable_shape_plan?.slides || []) {
+        const firstZone = slide?.template_layout_binding?.zones?.[0];
+        if (firstZone) {
+          firstZone.safe_inset_in = 0.05;
         }
       }
       return output;

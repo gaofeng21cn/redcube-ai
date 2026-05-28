@@ -53,3 +53,40 @@ test('native PPT AI shape plan retry carries panel safe-area fixes with containi
     }
   });
 });
+
+test('native PPT final preflight failure records attempt refs for live blocker audit', async () => {
+  await withMockNativePptRuntime(async () => {
+    const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-final-preflight-refs-');
+    await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-final-preflight-refs' });
+    const restoreRoute = withEnv({
+      REDCUBE_MOCK_MUTATE_ROUTE: 'author_pptx_native',
+      REDCUBE_MOCK_MUTATE_KIND: 'always_tiny_native_plan',
+      REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS: '2',
+    });
+    try {
+      const nativeResult = await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-final-preflight-refs',
+        route: 'author_pptx_native',
+      });
+      assert.equal(nativeResult.ok, false);
+      assert.match(
+        String(nativeResult.error?.message || nativeResult.error || ''),
+        /did not pass preflight after 2 attempt/i,
+      );
+      assert.equal(nativeResult.run.artifact_refs.length >= 4, true);
+      assert.equal(
+        nativeResult.run.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-02-validation.json')),
+        true,
+      );
+      assert.equal(
+        nativeResult.run.error.artifact_refs.some((file) => file.endsWith('plan-validation-input-attempt-01.json')),
+        true,
+      );
+    } finally {
+      restoreRoute();
+    }
+  });
+});
