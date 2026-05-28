@@ -219,9 +219,9 @@ export function buildSourceAuthoringContext({
   const sourceBrief = sharedSourceTruth.source_brief as JsonRecord | undefined;
   const sourceAudit = sharedSourceTruth.source_audit as JsonRecord | undefined;
   return {
-    contract_id: 'managed_ppt_ai_first_source_authoring_context_v1',
+    contract_id: 'ppt_ai_first_source_authoring_context_v1',
     source_input: 'source_materials_full_text',
-    policy: 'Managed product-entry stages must preserve full shared source truth for route authoring; excerpts and first-line snippets are audit-only and cannot replace AI stage context.',
+    policy: 'Product-entry stages must preserve full shared source truth for route authoring; excerpts and first-line snippets are audit-only and cannot replace AI stage context.',
     source_truth: {
       input_mode: safeText(sourceBrief?.input_mode),
       confidence: safeText(sourceBrief?.confidence),

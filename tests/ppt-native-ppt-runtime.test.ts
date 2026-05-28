@@ -193,8 +193,12 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(nativeMechanicalSlide.checks.visual_structure_present, true);
     assert.equal(nativeMechanicalSlide.checks.non_text_visual_specific_ok, true);
     assert.equal(nativeMechanicalSlide.checks.mechanical_card_template_absent, true);
+    assert.equal(nativeMechanicalSlide.checks.panel_text_safe_area_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.short_label_wrap_ok, true);
     assert.equal(nativeMechanicalSlide.metrics.structural_visual_count >= 1, true);
     assert.equal(nativeMechanicalSlide.metrics.mechanical_card_template_absent, true);
+    assert.equal(nativeMechanicalSlide.metrics.panel_text_safe_area_ok, true);
+    assert.equal(nativeMechanicalSlide.metrics.short_label_wrap_ok, true);
     assert.equal(Array.isArray(nativeMechanicalSlide.metrics.operator_language_fragments), true);
     assert.equal(nativeMechanicalSlide.metrics.title_safe_zone_clearance_ok, true);
 

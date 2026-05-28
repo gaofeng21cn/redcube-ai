@@ -338,6 +338,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.allowed_as, [
     'refs_only_read_model',
     'contract_safe_semantic_id',
+    'locator_protocol_boundary',
   ]);
   assert.equal(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.compatibility_alias_allowed, false);
   assert.deepEqual(byId.runtime_watch_projection.legacy_name_allowance.allowed_as, [

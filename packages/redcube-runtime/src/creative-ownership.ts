@@ -255,7 +255,7 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   review_overlay: P19_REVIEW_OVERLAY_CONTRACT,
   research_ownership: P19_RESEARCH_OWNERSHIP_CONTRACT,
   mainline_topology: [
-    'Gateway',
+    'Service-safe domain entry',
     'Harness OS',
     'Codex-default host-agent runtime',
     'family/profile/pack contracts',

@@ -603,6 +603,8 @@ def main() -> None:
                 'visual_structure_present',
                 'non_text_visual_specific_ok',
                 'mechanical_card_template_absent',
+                'panel_text_safe_area_ok',
+                'short_label_wrap_ok',
                 'composition_signature',
                 'title_underline_absent_ok',
                 'occupied_ratio',

@@ -189,9 +189,9 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'operator_navigation_refs',
     ],
     legacy_name_allowance: legacyNameAllowance({
-      legacy_terms: ['session'],
-      allowed_as: ['refs_only_read_model', 'contract_safe_semantic_id'],
-      rationale: 'session wording is constrained to entry-session continuity refs and does not create a generic session runtime owner.',
+      legacy_terms: ['runtime', 'session'],
+      allowed_as: ['refs_only_read_model', 'contract_safe_semantic_id', 'locator_protocol_boundary'],
+      rationale: 'runtime/session wording is constrained to entry-session continuity refs and runtime-state locator refs; it does not create a generic runtime or session owner.',
     }),
   },
   {
@@ -290,7 +290,12 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
   {
     surface_id: 'visual_authority_functions',
     source_refs: [
-      'packages/redcube-runtime/src/',
+      'packages/redcube-runtime/src/creative-ownership.ts',
+      'packages/redcube-runtime/src/deliverable-routes.ts',
+      'packages/redcube-runtime/src/executors.ts',
+      'packages/redcube-runtime/src/source-intake.ts',
+      'packages/redcube-runtime/src/source-readiness-pack.ts',
+      'packages/redcube-runtime/src/shared-source-truth.ts',
       'python/redcube_ai/',
       'contracts/runtime-program/python-native-helper-catalog.json',
     ],

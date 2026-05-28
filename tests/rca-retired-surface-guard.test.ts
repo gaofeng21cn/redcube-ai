@@ -605,8 +605,8 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       allowedAs: ['service_safe_domain_entry', 'domain_handler_target', 'refs_only_read_model', 'package_protocol_boundary'],
     },
     product_entry_continuity_refs_adapter: {
-      terms: ['session'],
-      allowedAs: ['refs_only_read_model', 'contract_safe_semantic_id'],
+      terms: ['runtime', 'session'],
+      allowedAs: ['refs_only_read_model', 'contract_safe_semantic_id', 'locator_protocol_boundary'],
     },
     workspace_run_envelope_helpers: {
       terms: ['runtime'],
@@ -653,6 +653,26 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'apps/redcube-cli/src/cli-parts/help.ts',
     'apps/redcube-cli/src/types.ts',
   ]);
+  assert.deepEqual(byId.visual_authority_functions.source_refs, [
+    'packages/redcube-runtime/src/creative-ownership.ts',
+    'packages/redcube-runtime/src/deliverable-routes.ts',
+    'packages/redcube-runtime/src/executors.ts',
+    'packages/redcube-runtime/src/source-intake.ts',
+    'packages/redcube-runtime/src/source-readiness-pack.ts',
+    'packages/redcube-runtime/src/shared-source-truth.ts',
+    'python/redcube_ai/',
+    'contracts/runtime-program/python-native-helper-catalog.json',
+  ]);
+  assert.equal(
+    byId.visual_authority_functions.source_refs.includes('packages/redcube-runtime/src/'),
+    false,
+  );
+  assert.equal(
+    byId.visual_authority_functions.source_refs.includes(
+      'packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts',
+    ),
+    false,
+  );
   assert.equal(
     byId.redcube_cli_domain_entry_adapter.current_rca_role,
     'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',
@@ -768,6 +788,45 @@ test('RCA active CLI source legacy names are covered by explicit morphology allo
       assert.equal(entry.legacy_name_allowance.active_generic_domain_action_adapter_owner_allowed, false, entry.surface_id);
     }
   }
+});
+
+test('RCA active code source legacy names are covered by explicit morphology allowance', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const trackedTerms = policy.legacy_name_policy.tracked_legacy_terms;
+  const skippedBroadOrProvenanceSurfaceIds = new Set([
+    'runtime_program_machine_contracts',
+    'retired_product_entry_contract_tombstone_refs',
+  ]);
+  const classifiedEntries = policy.active_surface_classifications.filter(
+    (entry) => entry.legacy_name_allowance && !skippedBroadOrProvenanceSurfaceIds.has(entry.surface_id),
+  );
+  const violations = [];
+
+  for (const entry of classifiedEntries) {
+    const allowedTerms = new Set(entry.legacy_name_allowance.legacy_terms);
+    for (const sourceRef of entry.source_refs || []) {
+      const sourcePath = sourceRefPath(sourceRef);
+      if (sourcePath.endsWith('.json')) continue;
+      const sourceFiles = existsSync(path.resolve(sourcePath)) && !path.extname(sourcePath)
+        ? listTextFiles(sourcePath)
+        : [sourcePath];
+      for (const file of sourceFiles) {
+        if (!TEXT_EXTENSIONS.has(path.extname(file))) continue;
+        const text = readFileSync(path.resolve(file), 'utf-8');
+        const uncoveredLegacyHits = trackedTerms.filter((term) => (
+          new RegExp(`\\b${term}\\b`, 'i').test(text) && !allowedTerms.has(term)
+        ));
+        for (const term of uncoveredLegacyHits) {
+          violations.push(`${entry.surface_id}:${normalizePath(file)}:${term}`);
+        }
+      }
+    }
+  }
+
+  assert.deepEqual(violations, []);
 });
 
 test('retired managed product-entry contract is tombstoned without compatibility caller', () => {
