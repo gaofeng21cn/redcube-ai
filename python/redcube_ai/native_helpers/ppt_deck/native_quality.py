@@ -91,6 +91,91 @@ def text_capacity_failure(shape: dict) -> dict | None:
     }
 
 
+def normalized_text_char_count(text: str) -> int:
+    return sum(1 for char in safe_text(text) if not char.isspace() and char not in {'，', '。', '、', ',', '.', ':', '：', ';', '；'})
+
+
+def text_shape_estimated_lines(shape: dict) -> int:
+    rect = shape.get('bounds') or {}
+    width = float(rect.get('width') or 0.0)
+    font_size = float(shape.get('font_size') or 14.0)
+    text = safe_text(shape.get('text'))
+    if not text:
+        return 0
+    return max(1, math.ceil(weighted_text_width_px(text, font_size) / max(width - (2 * MIN_NATIVE_TEXT_PANEL_INSET_PX), 1.0)))
+
+
+def panel_text_safe_area_failures(native_shapes: list[dict]) -> list[dict]:
+    panels = [
+        shape for shape in native_shapes
+        if safe_text(shape.get('role')) in {'content_panel', 'input_panel', 'source_panel'}
+        and shape.get('kind') in {'rect', 'rounded_rect'}
+    ]
+    text_shapes = [
+        shape for shape in native_shapes
+        if shape.get('quality_role') == 'content'
+        and shape.get('kind') == 'text_box'
+        and safe_text(shape.get('text'))
+    ]
+    failures = []
+    for panel in panels:
+        panel_rect = panel.get('bounds') or {}
+        safe_left = float(panel_rect.get('left') or 0.0) + MIN_NATIVE_TEXT_PANEL_INSET_PX
+        safe_top = float(panel_rect.get('top') or 0.0) + MIN_NATIVE_TEXT_PANEL_INSET_PX
+        safe_right = float(panel_rect.get('right') or 0.0) - MIN_NATIVE_TEXT_PANEL_INSET_PX
+        safe_bottom = float(panel_rect.get('bottom') or 0.0) - MIN_NATIVE_TEXT_PANEL_INSET_PX
+        for text_shape in text_shapes:
+            text_rect = text_shape.get('bounds') or {}
+            center_x = float(text_rect.get('left') or 0.0) + (float(text_rect.get('width') or 0.0) / 2.0)
+            center_y = float(text_rect.get('top') or 0.0) + (float(text_rect.get('height') or 0.0) / 2.0)
+            if not (
+                float(panel_rect.get('left') or 0.0) <= center_x <= float(panel_rect.get('right') or 0.0)
+                and float(panel_rect.get('top') or 0.0) <= center_y <= float(panel_rect.get('bottom') or 0.0)
+            ):
+                continue
+            text_right = float(text_rect.get('right') or 0.0)
+            text_bottom = float(text_rect.get('bottom') or 0.0)
+            if (
+                float(text_rect.get('left') or 0.0) >= safe_left
+                and float(text_rect.get('top') or 0.0) >= safe_top
+                and text_right <= safe_right
+                and text_bottom <= safe_bottom
+            ):
+                continue
+            failures.append({
+                'shape_id': text_shape.get('shape_id'),
+                'panel_shape_id': panel.get('shape_id'),
+                'role': text_shape.get('role'),
+                'required_inset_px': MIN_NATIVE_TEXT_PANEL_INSET_PX,
+            })
+    return failures
+
+
+def short_label_wrap_failures(native_shapes: list[dict]) -> list[dict]:
+    failures = []
+    for shape in native_shapes:
+        role = safe_text(shape.get('role'))
+        if role not in {'route_label', 'gate_card'}:
+            continue
+        text = safe_text(shape.get('text'))
+        if not text:
+            continue
+        if normalized_text_char_count(text) > 22:
+            continue
+        estimated_lines = text_shape_estimated_lines(shape)
+        if estimated_lines <= 1:
+            continue
+        rect = shape.get('bounds') or {}
+        failures.append({
+            'shape_id': shape.get('shape_id'),
+            'role': role,
+            'estimated_lines': estimated_lines,
+            'width': round(float(rect.get('width') or 0.0), 2),
+            'reason': 'native_short_label_unbalanced_wrap',
+        })
+    return failures
+
+
 def operator_language_fragments(native_shapes: list[dict]) -> list[str]:
     visible_text = '\n'.join(
         safe_text(shape.get('text'))
