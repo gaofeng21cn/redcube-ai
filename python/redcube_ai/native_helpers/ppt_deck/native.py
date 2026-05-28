@@ -20,6 +20,7 @@ from redcube_ai.native_helpers.renderer_dependencies import (
 )
 from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
     allowed_template_archetypes,
+    archetype_contracts,
     validate_template_layout_grammar,
 )
 from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
@@ -147,6 +148,7 @@ def normalize_slide_data(payload: dict) -> list:
             + json.dumps(grammar_failures, ensure_ascii=False, sort_keys=True)
         )
     allowed_archetypes = allowed_template_archetypes(plan)
+    archetypes_by_id = archetype_contracts(plan)
     plan_slides = safe_list(plan.get('slides'))
     blueprint = payload.get('blueprint') or {}
     blueprint_slides = safe_list(blueprint.get('slides'))
@@ -187,6 +189,7 @@ def normalize_slide_data(payload: dict) -> list:
                 f'slide {slide_id} selected_archetype is not in editable_shape_plan.template_layout_grammar.archetype_catalog'
             )
         merged['template_layout_binding'] = template_binding
+        merged['_template_archetype_contract'] = archetypes_by_id.get(selected_archetype) or {}
         merged['_editable_native_shapes'] = plan_shapes
         merged['_typography_plan'] = typography_plan
         slides.append(merged)

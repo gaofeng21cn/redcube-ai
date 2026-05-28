@@ -22,8 +22,8 @@ import {
 test('native PPTX officecli materializer accepts only complete AI spatial plans', () => {
   const slides = [
     createAiSlide({ slideId: 'S01', layoutFamily: 'cover_signal', title: 'Native cover proof' }),
-    createAiSlide({ slideId: 'S02', layoutFamily: 'multi_zone_compare', title: 'Native compare proof', slotCount: 2 }),
-    createAiSlide({ slideId: 'S03', layoutFamily: 'timeline_band', title: 'Native timeline proof', slotCount: 3 }),
+    createAiSlide({ slideId: 'S02', layoutFamily: 'multi_zone_compare', title: 'Native compare proof', slotCount: 4 }),
+    createAiSlide({ slideId: 'S03', layoutFamily: 'timeline_band', title: 'Native timeline proof', slotCount: 4 }),
     createAiSlide({ slideId: 'S04', layoutFamily: 'judgement_ladder', title: 'Native ladder proof', slotCount: 4 }),
     createAiSlide({ slideId: 'S05', layoutFamily: 'ring_cross', title: 'Native ring proof', slotCount: 4 }),
     createAiSlide({ slideId: 'S06', layoutFamily: 'summary_peak', title: 'Native summary proof', slotCount: 3 }),
@@ -130,7 +130,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
     layoutFamily: 'multi_zone_compare',
     title: '同一输入下比较三条路线',
     core: '先固定输入，再观察可见产物、复核证据和导出闭环。',
-    slotCount: 3,
+    slotCount: 4,
   });
   structuralFlowSlide.native_shapes = [
     ...structuralFlowSlide.native_shapes
@@ -140,7 +140,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
-      bounds: { left_in: 4.96, top_in: 4.34, width_in: 0.34, height_in: 0.05 },
+      bounds: { left_in: 4.96, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
       line: '#2563EB',
       fill: 'none',
     },
@@ -149,7 +149,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
-      bounds: { left_in: 9.34, top_in: 4.34, width_in: 0.34, height_in: 0.05 },
+      bounds: { left_in: 9.34, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
       line: '#2563EB',
       fill: 'none',
     },
@@ -166,7 +166,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
         return {
           ...shape,
           role: 'takeaway',
-          editable_text: `${shape.editable_text}，并形成可复核判断。`,
+          editable_text: shape.editable_text,
         };
       }
       return shape;
@@ -177,8 +177,9 @@ test('native PPTX materializer accepts AI-first content panels with structural f
   assert.equal(slide.checks.visual_structure_present, true);
   assert.equal(slide.checks.slot_fill_ok, true);
   assert.equal(slide.checks.content_depth_ok, true);
-  assert.equal(slide.metrics.layout_variant, 'content_three_panel');
-  assert.equal(slide.metrics.decorative_shape_count, slide.metrics.structural_visual_count);
+  assert.equal(slide.metrics.layout_variant, 'content_four_panel');
+  assert.equal(slide.metrics.structural_visual_count >= 2, true);
+  assert.equal(slide.metrics.structural_visual_roles.includes('flow_connector'), true);
   assert.equal(slide.metrics.visual_support_shape_count >= 2, true);
   assert.equal(slide.metrics.audience_content_slot_count >= 3, true);
   assert.equal(slide.issues.includes('native_visual_structure_missing'), false);
@@ -204,7 +205,7 @@ test('native PPTX quality accepts content panels paired with separate point text
       role: 'evidence_item',
       quality_role: 'content',
       editable_text: '演示文稿文件',
-      bounds: { left_in: 0.72, top_in: 6.55, width_in: 1.95, height_in: 0.82 },
+      bounds: { left_in: 0.72, top_in: 6.55, width_in: 1.95, height_in: 0.9 },
       font_size: 18,
     },
     {
@@ -213,7 +214,7 @@ test('native PPTX quality accepts content panels paired with separate point text
       role: 'evidence_item',
       quality_role: 'content',
       editable_text: '形状清单',
-      bounds: { left_in: 2.9, top_in: 6.55, width_in: 1.45, height_in: 0.82 },
+      bounds: { left_in: 2.9, top_in: 6.55, width_in: 1.45, height_in: 0.9 },
       font_size: 18,
     },
   );
@@ -435,8 +436,15 @@ test('native PPTX content depth ignores auxiliary badges and compact evidence la
     shape.shape_id === 'S01-speaker'
       ? {
           ...shape,
-          bounds: { ...shape.bounds, left_in: 13.3, top_in: 1.55 },
+          quality_role: 'auxiliary',
+          layout_zone_id: 'takeaway_zone',
+          bounds: { ...shape.bounds, left_in: 12.45, top_in: 7.1 },
         }
+      : ['S01-panel-title', 'S01-short-evidence'].includes(shape.shape_id)
+        ? {
+            ...shape,
+            layout_zone_id: 'takeaway_zone',
+          }
       : shape
   ));
 
@@ -501,6 +509,57 @@ test('native PPTX route rejects shape plans without template layout grammar and 
   const bindingRejected = runNativePlanValidation(missingBinding);
   assert.equal(bindingRejected.ok, false);
   assert.match(JSON.stringify(bindingRejected.failures), /ai_first_template_layout_binding_missing|ai_first_shape_layout_zone_binding_missing/);
+});
+
+test('native PPTX route rejects shallow archetype catalogs and shapes outside declared zones', () => {
+  const shallowCatalog = materializerPayload([
+    createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Shallow archetype contract' }),
+  ]);
+  shallowCatalog.editable_shape_plan.template_layout_grammar.archetype_catalog = [
+    { archetype_id: 'risk_control_matrix' },
+    { archetype_id: 'executive_status_board' },
+    { archetype_id: 'decision_dashboard' },
+  ];
+  const catalogRejected = runNativePlanValidation(shallowCatalog);
+  assert.equal(catalogRejected.ok, false);
+  assert.equal(catalogRejected.stage, 'normalize_slide_data');
+  assert.match(JSON.stringify(catalogRejected.failures), /ai_first_shape_plan_normalization_failed/);
+
+  const outsideZone = materializerPayload([
+    createAiSlide({ slideId: 'S02', layoutFamily: 'multi_zone_compare', title: 'Zone containment' }),
+  ]);
+  outsideZone.editable_shape_plan.slides[0].native_shapes = outsideZone.editable_shape_plan.slides[0].native_shapes.map((shape) => (
+    shape.role === 'point_text'
+      ? {
+          ...shape,
+          layout_zone_id: 'matrix_zone',
+          bounds: { ...shape.bounds, left_in: 14.5, top_in: 7.7, width_in: 1.2, height_in: 0.8 },
+        }
+      : shape
+  ));
+  const zoneRejected = runNativePlanValidation(outsideZone);
+  assert.equal(zoneRejected.ok, false);
+  assert.match(JSON.stringify(zoneRejected.failures), /ai_first_shape_outside_template_layout_zone/);
+});
+
+test('native PPTX route rejects archetype declarations that are not fulfilled by slide roles and filled zones', () => {
+  const missingRoleGroup = materializerPayload([
+    createAiSlide({ slideId: 'S03', layoutFamily: 'summary_peak', title: 'Declared archetype without proof role' }),
+  ]);
+  missingRoleGroup.editable_shape_plan.slides[0].native_shapes = missingRoleGroup.editable_shape_plan.slides[0].native_shapes
+    .filter((shape) => !String(shape.role || '').includes('takeaway'));
+  const roleRejected = runNativePlanValidation(missingRoleGroup);
+  assert.equal(roleRejected.ok, false);
+  assert.match(JSON.stringify(roleRejected.failures), /ai_first_template_layout_required_role_group_missing/);
+
+  const unfilledZones = materializerPayload([
+    createAiSlide({ slideId: 'S04', layoutFamily: 'multi_zone_compare', title: 'Declared archetype with empty zones' }),
+  ]);
+  unfilledZones.editable_shape_plan.slides[0].native_shapes = unfilledZones.editable_shape_plan.slides[0].native_shapes
+    .filter((shape) => !['signal_zone', 'takeaway_zone'].includes(shape.layout_zone_id));
+  const zoneCoverageRejected = runNativePlanValidation(unfilledZones);
+  assert.equal(zoneCoverageRejected.ok, false);
+  assert.match(JSON.stringify(zoneCoverageRejected.failures), /ai_first_template_layout_required_zone_coverage_too_low/);
 });
 
 test('native PPTX quality gate blocks operator-facing proof language in visible text', () => {

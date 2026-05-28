@@ -365,12 +365,11 @@ def layout_variant(native_shapes: list[dict]) -> str:
         return 'compare_three_column'
     if zone_count == 4:
         return 'compare_four_zone'
-    if content_panel_count >= 3:
-        return 'content_three_panel'
-    if content_panel_count == 2:
-        return 'content_two_panel'
-    if content_panel_count == 1:
-        return 'content_single_panel'
+    content_panel_variant = {
+        1: 'content_single_panel', 2: 'content_two_panel', 3: 'content_three_panel',
+    }.get(content_panel_count, 'content_four_panel' if content_panel_count >= 4 else '')
+    if content_panel_variant:
+        return content_panel_variant
     if 'structured_note_panel' in roles:
         return 'structured_compare'
     if timeline_count:

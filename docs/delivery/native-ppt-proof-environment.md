@@ -28,9 +28,9 @@ The adopted boundary is a materializer / QA discipline:
 
 ## Design Discipline
 
-Native PPTX adopts the useful design discipline from `ppt-master` and `officecli-pptx` without adopting either as the RCA authoring owner. The AI-authored `editable_shape_plan` must hold the concrete slide design: `design_spec_lock`, `template_layout_grammar`, per-slide `template_layout_binding`, coordinates, shape roles, text, `layout_intent`, `composition_signature`, primary grid, non-text visual signal, and a checked anti-template-reuse statement.
+Native PPTX adopts the useful design discipline from `ppt-master`, `officecli-pptx`, Presentations-style deck planning, template/schema based projects, and reference-analysis agents without adopting any of them as the RCA authoring owner. The AI-authored `editable_shape_plan` must hold the concrete slide design: `design_spec_lock`, `deck_layout_rhythm_plan`, `template_layout_grammar`, per-slide `template_layout_binding`, coordinates, shape roles, text, `layout_intent`, `composition_signature`, primary grid, non-text visual signal, and a checked anti-template-reuse statement.
 
-`design_spec_lock` controls the deck style system. `template_layout_grammar` controls the professional layout skeleton before shapes exist: the AI must select an archetype, declare semantic zones with bounds, gaps and safe insets, then bind non-decorative audience-facing shapes to those zones through `layout_zone_id`. This is the part RCA absorbs from mature PPT agents and skills: design and layout are front-loaded into the AI contract; QA only blocks drift and returns exact repair feedback.
+`design_spec_lock` controls the deck style system. `deck_layout_rhythm_plan` controls the contact-sheet rhythm before page coordinates exist: the AI must plan each slide's rhetorical role, selected archetype, primary grid, composition budget and proof object, with no three-slide repetition and at least 75% distinct concrete composition in normal decks. `template_layout_grammar` controls the professional layout skeleton before shapes exist: the AI must define real archetype contracts with usage, description, required zones, content schema, required role groups and prohibited mistakes, select an archetype, declare semantic zones with bounds, gaps and safe insets, then bind non-decorative audience-facing shapes to those zones through `layout_zone_id` and keep those shapes inside their declared zones. Preflight verifies the selected archetype is actually fulfilled by visible shape roles and filled required zones; an archetype name without matching structure is rejected before the PPTX writer runs. This is the part RCA absorbs from mature PPT agents and skills: design and layout are front-loaded into the AI contract; QA only blocks drift and returns exact repair feedback.
 
 The native helper does not choose templates or redesign pages. It validates and materializes the plan, runs officecli writer / QA gates, renders the PPTX through LibreOffice / Poppler, and emits the shape manifest consumed by RCA review gates.
 
@@ -41,7 +41,11 @@ Mock Codex helpers are only deterministic test doubles. They may generate fixed 
 The hard design floor is:
 
 - explicit layout intent and composition signature for every slide;
+- deck-level rhythm plan before coordinates, with no repeated selected archetype or primary grid for three consecutive slides;
 - top-level `template_layout_grammar` and per-slide `template_layout_binding`;
+- archetype catalog entries that include usage, layout description, required zones, content schema and prohibited mistakes;
+- selected archetypes fulfilled by actual visible role groups and required-zone coverage before materialization;
+- non-decorative audience-facing shapes bound to declared zones and contained by those zones;
 - no decorative title underline motif;
 - no empty four-card template posing as design;
 - no three-slide repeated concrete composition;

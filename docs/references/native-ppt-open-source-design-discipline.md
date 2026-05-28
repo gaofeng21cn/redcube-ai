@@ -18,6 +18,8 @@ RCA 不把 `ppt-master`、`officecli-pptx` skill、Presenton、PptxGenJS、Marp 
 | `ppt-master` | README 明确目标是从 PDF、DOCX、URL 或 Markdown 生成原生可编辑 PowerPoint，输出真实 shapes、text boxes、charts，而不是整页图片；其 skill 规定串行 pipeline、gate-before-entry、每页重读 spec lock，并要求逐页生成。来源：[README](https://github.com/hugohe3/ppt-master)、[SKILL.md](https://github.com/hugohe3/ppt-master/blob/main/skills/ppt-master/SKILL.md)。 | `spec_lock`、serial stage、逐页读取规格、SVG/render 预览、post-processing/export、真实可编辑对象优先。 | RCA 可借鉴流程纪律，不采用其 harness、模板库、脚本或 agent ownership；RCA native PPTX 仍由 `visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx` 管。 |
 | `officecli-pptx` skill / OfficeCLI | OfficeCLI 官方仓库定位为 AI agents 读写 Office 文件的本地 CLI，支持 PowerPoint slides、shapes、images、tables、charts、animations、themes、notes 等，并提供 JSON、path addressing、`validate`、`view issues`、`view screenshot`、`watch`。来源：[OfficeCLI README](https://github.com/iOfficeAI/OfficeCLI)、本机官方 `officecli-pptx` skill。 | explicit coordinates、DOM/path 可寻址、结构化 JSON、validate/issues、自校正、渲染截图和 live preview。 | RCA 可使用 materializer / QA gate 纪律；`officecli validate`、`view issues` 和截图不能代替 LibreOffice/Poppler true render proof 或 RCA visual verdict。 |
 | Presenton | 官方 README 和文档定位为可自托管、开放源码 AI presentation generator/API，支持自带模型、templates/themes、prompt 或文档输入，并导出 PPTX/PDF；README 明确有 fully editable PPTX export。来源：[Presenton README](https://github.com/presenton/presenton)、[Presenton Docs](https://docs.presenton.ai/)。 | BYOK/self-host、模板/主题可控、API workflow、PPTX/PDF export readiness。 | RCA 不把 Presenton 作为 generation service；只吸收“模板/主题是显式输入、导出是可验证交付状态”的纪律。 |
+| `pptx-from-layouts-skill` | 官方 README 定位为面向 Claude Code / Codex 等 coding agent 的 PowerPoint skill：先 profile 模板的 slide master layouts，再把语义内容映射到合适 layout 与 placeholder，避免把模板当背景图后叠文本。来源：[README](https://github.com/tristan-mcinnis/pptx-from-layouts-skill)。 | 模板不是配色皮肤；需要 master layout inventory、semantic layout selection、placeholder fit、保持模板 spacing/typography。 | RCA 当前 native route 不依赖外部模板文件，但 `template_layout_grammar` 应承担同样职责：先定义母版式 semantic zones 与 placeholder 规则，再让 AI 输出 shape 坐标。 |
+| `dom-to-pptx` | 官方 README 定位为把 HTML element 转为 fully editable PowerPoint slide，并保留 gradients、shadows、rounded images 和 responsive layouts；它建立在 PptxGenJS 之上。来源：[README](https://github.com/atharva9167j/dom-to-pptx)。 | 先用成熟 layout/render surface 设计，再转成可编辑 PPTX；执行层要解决字体、间距、CSS 视觉到 PPT 对象的 fidelity。 | RCA 不把 HTML route 伪装成 native route；可借鉴其“先有可视布局系统、再做 editable conversion”的执行纪律，用 render proof 检查 officecli 物化是否偏离 AI plan。 |
 | PptxGenJS | 官方文档定位为 JavaScript 生成 PowerPoint，支持文本、表格、shapes、images、charts、custom slide masters、SVG、Asian fonts，并可写出 `.pptx`、base64、blob、buffer、stream；quick start 显示对象以 `x/y` 等参数显式放置。来源：[PptxGenJS Home](https://gitbrent.github.io/PptxGenJS/)、[Quick Start](https://gitbrent.github.io/PptxGenJS/docs/quick-start/)、[Saving](https://gitbrent.github.io/PptxGenJS/docs/usage-saving.html)。 | editable primitives、coordinate-first API、slide masters、跨运行环境导出、demo corpus。 | RCA 可参考 DrawingML writer/API shape discipline，不把 PptxGenJS API 作为 RCA 设计 owner；writer 只能承接已锁定的 AI shape plan。 |
 | Marp | 官方站点把 Marp 定位为 Markdown presentation ecosystem，可导出 HTML/PDF/PowerPoint；Marp CLI 的 `--pptx` 默认生成渲染页，`--pptx-editable` 是实验能力，并警告可编辑导出复现度更低、复杂样式可能不完整。来源：[Marp](https://marp.app/)、[Marp CLI](https://github.com/marp-team/marp-cli)。 | Markdown source truth、theme/CSS、Chromium render、export commands、明确标注 editable export 风险。 | RCA 应把“可编辑性”和“视觉复现度”分开验证；不能用普通 PPTX export 证明 native editable quality。 |
 | Slidev | 官方导出文档说明 Slidev 可导出 PDF/PPTX/PNG/Markdown，PPTX 导出依赖 Playwright 渲染，且 PPTX 中 slides 作为 images 导出，文本不可选择，notes 可逐页带入。来源：[Slidev Exporting](https://sli.dev/guide/exporting.html)。 | browser render QA、export UI/CLI、notes preservation、截图式分享物。 | Slidev 对 RCA 的参考价值是 screenshot/export QA，不是 native editable PPTX 方案；RCA native lane 必须输出可编辑 shapes。 |
@@ -33,8 +35,11 @@ RCA native PPTX 约束：
 
 - `editable_shape_plan.design_spec_lock` 必须在首个 native slide materialization 前存在。
 - spec lock 至少包含 canvas、grid、margin、font family、type scale、palette、motif、visual density、chart/table rule、image rule 和禁止项。
-- `editable_shape_plan.template_layout_grammar` 必须与 spec lock 同级存在，用来声明可选 archetype、semantic zones、zone gap、safe inset、connector lane 与 shape-to-zone 绑定规则。
-- 每页必须先输出 `template_layout_binding`，选择一个 archetype 并声明本页 zones；非装饰 audience-facing shape 必须通过 `layout_zone_id` 绑定到同页 zone。
+- 如果没有用户提供的 PPT 模板，AI 也必须生成“母版式”模板等价物：layout archetype inventory、semantic zones、placeholder / content schema、spacing rhythm 和禁止项；不能把配色或几张卡片称为模板。
+- `editable_shape_plan.deck_layout_rhythm_plan` 必须与 spec lock 同级存在，用来声明每页 rhetorical role、selected archetype、primary grid、composition budget 和 proof object，防止 contact sheet 先天重复。
+- `editable_shape_plan.template_layout_grammar` 必须与 spec lock 同级存在，用来声明可选 archetype、semantic zones、zone gap、safe inset、connector lane 与 shape-to-zone 绑定规则。每个 archetype 需要 usage、layout description、required zones、content schema、required role groups 和 prohibited mistakes。
+- 每页必须先输出 `template_layout_binding`，选择一个 archetype 并声明本页 zones；非装饰 audience-facing shape 必须通过 `layout_zone_id` 绑定到同页 zone，且坐标必须落在该 zone 内。
+- 每页选中的 archetype 必须由实际 shape roles 和 required-zone coverage 兑现；只声明专业模板名但继续画通用卡片网格会在 materialization 前失败。
 - 后续 `author_pptx_native` 与 `repair_pptx_native` 只能消费并局部修订已锁定规格，不能由 helper 重新选择模板或临时生成视觉系统。
 
 ### 2. Claim Spine 驱动页面，而不是模板填空
@@ -126,8 +131,8 @@ RCA native PPTX 约束：
 ## 对 RCA native PPTX AI-first 的约束清单
 
 1. `design_spec_lock` 是 authoring prerequisite，不是可选注释。
-2. `template_layout_grammar` 与每页 `template_layout_binding` 是 shape 坐标前置条件，不是后置 QA 标签。
-3. 每页必须有 claim spine entry、layout intent、composition signature 和 editable shape plan。
+2. `deck_layout_rhythm_plan`、`template_layout_grammar`、required role groups 与每页 `template_layout_binding` 是 shape 坐标前置条件，不是后置 QA 标签。
+3. 每页必须有 claim spine entry、layout intent、composition signature、proof object 和 editable shape plan。
 4. native helper 不选择模板、不重写视觉系统、不拥有视觉判断。
 5. 可编辑性必须落在真实 DrawingML / Office objects；整页图片 PPTX 只能算 image-first 或 screenshot export。
 6. font floor、grid、bounds、contrast、overflow、chart/table metrics 必须进入 shape manifest。

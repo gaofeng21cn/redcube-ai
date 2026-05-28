@@ -153,11 +153,66 @@ function templateLayoutGrammar() {
       contact_sheet_rhythm_required: true,
     },
     archetype_catalog: [
-      { archetype_id: 'professional_system_map', required_zones: ['title_zone', 'claim_zone', 'system_map_zone', 'gate_zone', 'evidence_zone'] },
-      { archetype_id: 'executive_status_board', required_zones: ['title_zone', 'claim_zone', 'status_zone', 'evidence_zone', 'takeaway_zone'] },
-      { archetype_id: 'evidence_timeline', required_zones: ['title_zone', 'claim_zone', 'timeline_zone', 'evidence_zone', 'takeaway_zone'] },
-      { archetype_id: 'risk_control_matrix', required_zones: ['title_zone', 'claim_zone', 'matrix_zone', 'signal_zone', 'takeaway_zone'] },
-      { archetype_id: 'decision_dashboard', required_zones: ['title_zone', 'claim_zone', 'decision_zone', 'proof_zone', 'takeaway_zone'] },
+      {
+        archetype_id: 'professional_system_map',
+        use_when: 'workflow, route, system, gate, or evidence flow needs to be understood at a glance',
+        layout_description: 'Claim and title above an editable system map; route lanes, gate stack, and evidence band occupy distinct semantic zones with connector lanes outside text.',
+        required_zones: ['title_zone', 'claim_zone', 'system_map_zone', 'gate_zone', 'evidence_zone'],
+        content_schema: {
+          required_shape_roles: ['title', 'core_sentence', 'system_map_panel', 'route_label', 'gate_card', 'evidence_item'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'structural_visual', 'gate_or_route_label', 'evidence_or_metric_text'],
+          min_filled_required_zone_share: 0.8,
+        },
+        prohibited: ['connector crossing readable text', 'three narrow route cards', 'labels placed on rails'],
+      },
+      {
+        archetype_id: 'executive_status_board',
+        use_when: 'one-slide status proof or decision summary',
+        layout_description: 'Large status cards or panels in the middle with a separate proof/takeaway band.',
+        required_zones: ['title_zone', 'claim_zone', 'status_zone', 'evidence_zone', 'takeaway_zone'],
+        content_schema: {
+          required_shape_roles: ['title', 'core_sentence', 'content_panel', 'point_text', 'evidence_item', 'takeaway'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'audience_body_text', 'takeaway_text'],
+          min_filled_required_zone_share: 0.8,
+        },
+        prohibited: ['receipt label pile', 'empty four-card grid', 'tiny KPI badges'],
+      },
+      {
+        archetype_id: 'evidence_timeline',
+        use_when: 'sequence, milestone, or proof evolution',
+        layout_description: 'Timeline rail with milestone nodes, labels off the rail, and separated proof/takeaway zones.',
+        required_zones: ['title_zone', 'claim_zone', 'timeline_zone', 'evidence_zone', 'takeaway_zone'],
+        content_schema: {
+          required_shape_roles: ['title', 'core_sentence', 'timeline_panel', 'point_text', 'evidence_item', 'takeaway'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'timeline_marker', 'audience_body_text', 'evidence_or_metric_text'],
+          min_filled_required_zone_share: 0.8,
+        },
+        prohibited: ['timeline rail through labels', 'milestone text below 18pt'],
+      },
+      {
+        archetype_id: 'risk_control_matrix',
+        use_when: 'compare risks, controls, gates, or quality criteria',
+        layout_description: 'Matrix or comparison field with filled cells and separate signal/takeaway zones.',
+        required_zones: ['title_zone', 'claim_zone', 'matrix_zone', 'signal_zone', 'takeaway_zone'],
+        content_schema: {
+          required_shape_roles: ['title', 'core_sentence', 'compare_panel', 'point_text', 'metric', 'takeaway'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'matrix_or_compare_container', 'audience_body_text', 'evidence_or_metric_text'],
+          min_filled_required_zone_share: 0.8,
+        },
+        prohibited: ['unfilled matrix cell', 'four-card template with fewer than four facts'],
+      },
+      {
+        archetype_id: 'decision_dashboard',
+        use_when: 'decision, recommendation, operating readout, or proof dashboard',
+        layout_description: 'Decision zone with proof objects and takeaway hierarchy.',
+        required_zones: ['title_zone', 'claim_zone', 'decision_zone', 'proof_zone', 'takeaway_zone'],
+        content_schema: {
+          required_shape_roles: ['title', 'core_sentence', 'content_panel', 'point_text', 'metric', 'takeaway'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'evidence_or_metric_text', 'takeaway_text'],
+          min_filled_required_zone_share: 0.8,
+        },
+        prohibited: ['all content in equal cards', 'no first-glance hierarchy'],
+      },
     ],
   };
 }
@@ -185,9 +240,9 @@ function zoneBounds(layoutFamily, slotCount) {
     return {
       title_zone: titleBounds(layoutFamily),
       claim_zone: coreBounds(layoutFamily),
-      evidence_zone: { left_in: 1.0, top_in: 4.95, width_in: 5.65, height_in: 2.25 },
-      gate_zone: { left_in: 7.45, top_in: 2.45, width_in: 6.55, height_in: 5.55 },
-      takeaway_zone: { left_in: 1.0, top_in: 7.45, width_in: 5.65, height_in: 0.7 },
+      system_map_zone: { left_in: 0.8, top_in: 2.45, width_in: 13.8, height_in: 5.6 },
+      evidence_zone: { left_in: 1.0, top_in: 5.45, width_in: 5.8, height_in: 1.15 },
+      gate_zone: { left_in: 1.0, top_in: 6.9, width_in: 5.8, height_in: 1.05 },
     };
   }
   if (layoutFamily === 'ring_cross') {
@@ -195,7 +250,7 @@ function zoneBounds(layoutFamily, slotCount) {
       title_zone: titleBounds(layoutFamily),
       claim_zone: coreBounds(layoutFamily),
       system_map_zone: { left_in: 1.55, top_in: 1.85, width_in: 12.85, height_in: 6.15 },
-      gate_zone: { left_in: 10.0, top_in: 4.65, width_in: 4.25, height_in: 1.6 },
+      gate_zone: { left_in: 10.0, top_in: 1.92, width_in: 4.25, height_in: 1.45 },
       evidence_zone: { left_in: 1.65, top_in: 6.28, width_in: 4.55, height_in: 1.6 },
     };
   }
@@ -270,7 +325,9 @@ function panelGeometry(layoutFamily, panelCount, index) {
     return { left_in: 1.05 + (width + gap) * index, top_in: 4.35, width_in: width, height_in: 2.15 };
   }
   if (layoutFamily === 'judgement_ladder') {
-    return { left_in: index % 2 === 0 ? 8.1 : 9.0, top_in: 2.75 + index * 2.65, width_in: 5.55, height_in: 2.32 };
+    const height = panelCount >= 4 ? 1.1 : 1.32;
+    const step = panelCount >= 4 ? 1.3 : 1.58;
+    return { left_in: index % 2 === 0 ? 8.15 : 8.95, top_in: 2.65 + index * step, width_in: 5.25, height_in: height };
   }
   if (layoutFamily === 'ring_cross') {
     const positions = [
@@ -395,6 +452,62 @@ function structuralShapes(layoutFamily, slideId) {
   }];
 }
 
+function archetypeSupportShapes(layoutFamily, slideId) {
+  const supportText = {
+    evidence: '证据链可复核。',
+    takeaway: '自主链路已经闭合且证据可复核。',
+    metric: '0 溢出。',
+    gate: '出口 gate：审查通过后才导出。',
+  };
+  const textShape = (suffix, role, zone, text, bounds, color = '#5B6570') => ({
+    shape_id: `${slideId}-${suffix}`,
+    kind: 'text_box',
+    role,
+    quality_role: 'content',
+    layout_zone_id: zone,
+    editable_text: text,
+    bounds,
+    font_size: 18,
+    color,
+    fill: 'none',
+    line: 'none',
+  });
+  if (layoutFamily === 'cover_signal') {
+    return [
+      textShape('evidence-note', 'evidence_item', 'evidence_zone', supportText.evidence, { left_in: 1.1, top_in: 7.32, width_in: 7.6, height_in: 0.86 }),
+      textShape('takeaway-note', 'takeaway', 'takeaway_zone', supportText.takeaway, { left_in: 10.25, top_in: 7.32, width_in: 4.05, height_in: 0.86 }, '#171C24'),
+    ];
+  }
+  if (layoutFamily === 'timeline_band') {
+    return [
+      textShape('timeline-evidence', 'evidence_item', 'evidence_zone', supportText.evidence, { left_in: 1.05, top_in: 7.12, width_in: 7.5, height_in: 0.86 }),
+      textShape('timeline-takeaway', 'takeaway', 'takeaway_zone', supportText.takeaway, { left_in: 10.15, top_in: 7.12, width_in: 4.0, height_in: 0.86 }, '#171C24'),
+    ];
+  }
+  if (layoutFamily === 'judgement_ladder') {
+    return [
+      textShape('ladder-evidence', 'evidence_item', 'evidence_zone', supportText.evidence, { left_in: 1.1, top_in: 5.58, width_in: 5.35, height_in: 0.86 }),
+      textShape('gate-label', 'gate_card', 'gate_zone', '质量门通过后才进入最终交付。', { left_in: 1.1, top_in: 7.02, width_in: 5.35, height_in: 0.86 }, '#171C24'),
+    ];
+  }
+  if (layoutFamily === 'ring_cross') {
+    return [
+      textShape('system-gate', 'gate_card', 'gate_zone', supportText.gate, { left_in: 10.2, top_in: 2.18, width_in: 3.7, height_in: 0.86 }, '#171C24'),
+      textShape('system-evidence', 'evidence_item', 'evidence_zone', supportText.evidence, { left_in: 1.85, top_in: 6.55, width_in: 3.85, height_in: 0.86 }),
+    ];
+  }
+  if (layoutFamily === 'summary_peak') {
+    return [
+      textShape('proof-metric', 'metric', 'proof_zone', supportText.metric, { left_in: 1.1, top_in: 7.08, width_in: 6.1, height_in: 0.86 }),
+      textShape('final-takeaway', 'takeaway', 'takeaway_zone', supportText.takeaway, { left_in: 8.25, top_in: 7.08, width_in: 5.9, height_in: 0.86 }, '#171C24'),
+    ];
+  }
+  return [
+    textShape('signal-metric', 'metric', 'signal_zone', supportText.metric, { left_in: 1.1, top_in: 7.24, width_in: 5.75, height_in: 0.86 }),
+    textShape('matrix-takeaway', 'takeaway', 'takeaway_zone', supportText.takeaway, { left_in: 8.0, top_in: 7.24, width_in: 5.95, height_in: 0.86 }, '#171C24'),
+  ];
+}
+
 function nativeShapePlanForSlide(slide, index) {
   const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
   const title = safeText(slide?.title, `Slide ${index + 1}`);
@@ -406,7 +519,7 @@ function nativeShapePlanForSlide(slide, index) {
   const contentZoneByLayout = {
     cover_signal: 'status_zone',
     timeline_band: 'timeline_zone',
-    judgement_ladder: 'gate_zone',
+    judgement_ladder: 'system_map_zone',
     ring_cross: 'system_map_zone',
     summary_peak: 'decision_zone',
   };
@@ -488,6 +601,7 @@ function nativeShapePlanForSlide(slide, index) {
     },
   ];
   shapes.push(...structuralShapes(layoutFamily, slideId));
+  shapes.push(...archetypeSupportShapes(layoutFamily, slideId));
   for (let pointIndex = 0; pointIndex < panelCount; pointIndex += 1) {
     const panelBounds = panelGeometry(layoutFamily, panelCount, pointIndex);
     const pointNumber = pointIndex + 1;
@@ -508,14 +622,17 @@ function nativeShapePlanForSlide(slide, index) {
       ? { left_in: 8.0, top_in: 7.58, width_in: 6.2, height_in: 1.08 }
       : panelGeometry(layoutFamily, Math.max(panelCount, 1), Math.min(pointIndex, panelCount - 1));
     const pointNumber = pointIndex + 1;
-    const textTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + (layoutFamily === 'ring_cross' ? 0.48 : 0.78);
-    const indexTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + 0.16;
+    const ladderSlot = layoutFamily === 'judgement_ladder' && !overflowSummaryText;
+    const textTop = overflowSummaryText
+      ? panelBounds.top_in
+      : panelBounds.top_in + (ladderSlot ? 0.22 : layoutFamily === 'ring_cross' ? 0.48 : 0.78);
+    const indexTop = overflowSummaryText ? panelBounds.top_in : panelBounds.top_in + (ladderSlot ? 0.24 : 0.16);
     const textLeft = overflowSummaryText
       ? panelBounds.left_in + 1.0
-      : panelBounds.left_in + (layoutFamily === 'ring_cross' ? 1.12 : 0.24);
+      : panelBounds.left_in + (ladderSlot ? 1.08 : layoutFamily === 'ring_cross' ? 1.12 : 0.24);
     const textWidth = overflowSummaryText
       ? panelBounds.width_in - 1.2
-      : panelBounds.width_in - (layoutFamily === 'ring_cross' ? 1.15 : 0.48);
+      : panelBounds.width_in - (ladderSlot ? 1.34 : layoutFamily === 'ring_cross' ? 1.15 : 0.48);
     shapes.push({
       shape_id: `${slideId}-slot-${pointNumber}-index`,
       kind: 'text_box',
@@ -541,7 +658,10 @@ function nativeShapePlanForSlide(slide, index) {
         left_in: textLeft,
         top_in: textTop,
         width_in: textWidth,
-        height_in: overflowSummaryText ? 1.08 : layoutFamily === 'ring_cross' ? 0.92 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
+        height_in: overflowSummaryText
+          ? 1.08
+          : ladderSlot ? Math.max(0.84, panelBounds.height_in - 0.44)
+            : layoutFamily === 'ring_cross' ? 0.92 : layoutFamily === 'timeline_band' ? 1.32 : 1.72,
       },
       font_size: 18,
       color: '#171C24',
@@ -594,6 +714,23 @@ export function buildMockPptNativeShapePlan(meta) {
       route,
       scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
       target_slide_ids: [...targetSlideIds],
+      deck_layout_rhythm_plan: {
+        owner: 'llm_agent',
+        required: true,
+        slides: slides.map((slide, index) => {
+          const layoutFamily = safeText(slide?.visual_presentation?.layout_family || slide?.layout_family, 'multi_zone_compare');
+          const binding = templateBindingForSlide(slide, index, slidePoints(slide).length);
+          const layoutIntent = layoutIntentForSlide(slide, index, slidePoints(slide).length);
+          return {
+            slide_id: safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`),
+            rhetorical_role: layoutIntent.rhetorical_role,
+            selected_archetype: binding.selected_archetype,
+            primary_grid: layoutIntent.primary_grid,
+            composition_signature_budget: `${layoutFamily}:budget:${index + 1}`,
+            proof_object: layoutIntent.non_text_visual,
+          };
+        }),
+      },
       design_spec_lock: {
         spec_id: 'native_pptx_mock_spec_lock_v1',
         owner: 'llm_agent',

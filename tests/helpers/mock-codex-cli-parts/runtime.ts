@@ -82,6 +82,38 @@ export function buildCreativeRunOutput(meta) {
       }
       return output;
     }
+    if (mutateKind === 'require_panel_safe_area_retry_contract') {
+      const hasValidationFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.validator);
+      const pointTextShape = output?.editable_shape_plan?.slides
+        ?.flatMap((slide) => slide?.native_shapes || [])
+        ?.find((shape) => shape?.role === 'point_text');
+      const contentPanelShape = output?.editable_shape_plan?.slides
+        ?.flatMap((slide) => slide?.native_shapes || [])
+        ?.find((shape) => (
+          ['content_panel', 'input_panel', 'source_panel', 'compare_panel'].includes(shape?.role)
+          || (['rect', 'rectangle', 'rounded_rect', 'panel'].includes(shape?.kind) && String(shape?.role || '').includes('panel'))
+        ));
+      if (!hasValidationFeedback) {
+        if (pointTextShape?.bounds && contentPanelShape?.bounds) {
+          contentPanelShape.role = 'content_panel';
+          pointTextShape.bounds = {
+            left_in: Number(contentPanelShape.bounds.left_in || 0) + 0.02,
+            top_in: Number(contentPanelShape.bounds.top_in || 0) + 0.85,
+            width_in: Math.max(1.0, Number(contentPanelShape.bounds.width_in || 0) - 0.04),
+            height_in: 1.1,
+          };
+        }
+        return output;
+      }
+      const rawPrompt = safeText(meta?.__raw_prompt);
+      if (!rawPrompt.includes('ai_first_text_panel_safe_area_violation')
+        || !rawPrompt.includes('panel_shape_id')
+        || !rawPrompt.includes('required_inset_in')
+        || !rawPrompt.includes('0.15in inset')) {
+        throw new Error('mock expected native preflight retry output contract with panel_shape_id and required_inset_in');
+      }
+      return output;
+    }
     if (mutateKind === 'repair_missing_design_spec_lock') {
       if (route === 'repair_pptx_native') {
         delete output?.editable_shape_plan?.design_spec_lock;
@@ -89,6 +121,17 @@ export function buildCreativeRunOutput(meta) {
       return output;
     }
     if (mutateKind === 'remove_template_layout_grammar') {
+      const hasStructuralFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.required_structural_fixes);
+      if (hasStructuralFeedback) {
+        const rawPrompt = safeText(meta?.__raw_prompt);
+        if (!rawPrompt.includes('native_shape_plan_structural_retry_contract')
+          || !rawPrompt.includes('required_structural_fixes')
+          || !rawPrompt.includes('template_layout_binding')
+          || !rawPrompt.includes('materializer_inference_allowed')) {
+          throw new Error('mock expected native structural retry output contract with template_layout_binding fixes');
+        }
+        return output;
+      }
       delete output?.editable_shape_plan?.template_layout_grammar;
       for (const slide of output?.editable_shape_plan?.slides || []) {
         delete slide.template_layout_binding;
@@ -96,6 +139,41 @@ export function buildCreativeRunOutput(meta) {
           delete shape.layout_zone_id;
         }
       }
+      return output;
+    }
+    if (mutateKind === 'remove_deck_layout_rhythm_plan') {
+      delete output?.editable_shape_plan?.deck_layout_rhythm_plan;
+      return output;
+    }
+    if (mutateKind === 'repeat_native_deck_layout_rhythm') {
+      const slides = output?.editable_shape_plan?.slides || [];
+      for (const [index, slide] of slides.entries()) {
+        slide.template_layout_binding = {
+          ...(slide.template_layout_binding || {}),
+          selected_archetype: 'executive_status_board',
+          archetype_instance_id: `${slide.slide_id || `S${index + 1}`}-executive_status_board-repeated`,
+        };
+        slide.layout_intent = {
+          ...(slide.layout_intent || {}),
+          primary_grid: 'repeated_equal_card_grid',
+          composition_signature: index < 5
+            ? 'native-composition:repeated-equal-card-grid'
+            : `native-composition:tail-${index}`,
+        };
+      }
+      output.editable_shape_plan.deck_layout_rhythm_plan = {
+        ...(output.editable_shape_plan.deck_layout_rhythm_plan || {}),
+        owner: 'llm_agent',
+        required: true,
+        slides: slides.map((slide, index) => ({
+          slide_id: slide.slide_id || `S${index + 1}`,
+          rhetorical_role: slide.layout_intent?.rhetorical_role || 'proof',
+          selected_archetype: 'executive_status_board',
+          primary_grid: 'repeated_equal_card_grid',
+          composition_signature_budget: 'native-composition:repeated-equal-card-grid',
+          proof_object: 'repeated status cards',
+        })),
+      };
       return output;
     }
     if (mutateKind !== 'remove_point_index_text') return output;

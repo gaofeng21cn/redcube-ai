@@ -5,6 +5,11 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
+import {
+  nativePlanDeckRhythmValidation,
+  nativePlanPanelSafeAreaFailures,
+} from './mock-redcube-python-native-plan-validation.ts';
+
 const PNG_1X1 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO7Z0boAAAAASUVORK5CYII=',
   'base64',
@@ -853,6 +858,8 @@ function buildNativePlanValidationPayload(args) {
     };
   }
   const slides = safeArray(plan?.slides);
+  const rhythmValidation = nativePlanDeckRhythmValidation({ plan, safeArray, safeText, slides });
+  if (rhythmValidation) return rhythmValidation;
   const failures = slides.map((slide, index) => {
     const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
     const slideFailures = [];
@@ -875,6 +882,12 @@ function buildNativePlanValidationPayload(args) {
     }
     const shapes = safeArray(slide?.native_shapes);
     slideFailures.push(...nativePlanTextOverlapFailures(shapes));
+    slideFailures.push(...nativePlanPanelSafeAreaFailures({
+      nativePlanBounds,
+      nativePlanShapeText,
+      safeText,
+      shapes,
+    }));
     slideFailures.push(...nativePlanContentDepthFailures(shapes));
     slideFailures.push(...nativePlanPageNumberFailures(shapes));
     for (const shape of shapes) {
