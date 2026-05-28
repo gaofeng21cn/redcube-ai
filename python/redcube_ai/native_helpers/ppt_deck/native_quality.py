@@ -849,6 +849,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     title_zone_failures = title_safe_zone_failures(content_shapes)
     title_core_failures = title_core_overlap_failures(content_shapes)
     structural_text_collisions = structural_text_collision_failures(native_shapes)
+    panel_safe_area_failures = panel_text_safe_area_failures(native_shapes)
+    label_wrap_failures = short_label_wrap_failures(native_shapes)
     slot_audit = slot_fill_audit(native_shapes, primary_points)
     label_failures = audience_label_readability_failures(content_shapes)
     content_depth = content_depth_audit(content_shapes)
@@ -922,6 +924,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'visual_structure_present': structural_visual_count >= 1,
         'non_text_visual_specific_ok': structural_visual_count >= 1,
         'mechanical_card_template_absent': not mechanical_card_template_detected,
+        'panel_text_safe_area_ok': len(panel_safe_area_failures) == 0,
+        'short_label_wrap_ok': len(label_wrap_failures) == 0,
     }
     issues = []
     if not checks['visual_density_ok']:
@@ -974,6 +978,10 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('native_non_text_visual_too_generic')
     if not checks['mechanical_card_template_absent']:
         issues.append('native_mechanical_card_template_detected')
+    if not checks['panel_text_safe_area_ok']:
+        issues.append('panel_text_safe_area_violation')
+    if not checks['short_label_wrap_ok']:
+        issues.append('short_label_unbalanced_wrap')
     return {
         'checks': checks,
         'issues': issues,
@@ -1052,5 +1060,9 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'non_text_visual_specific_ok': checks['non_text_visual_specific_ok'],
             'mechanical_card_template_detected': mechanical_card_template_detected,
             'mechanical_card_template_absent': checks['mechanical_card_template_absent'],
+            'panel_text_safe_area_ok': checks['panel_text_safe_area_ok'],
+            'panel_text_safe_area_failures': panel_safe_area_failures,
+            'short_label_wrap_ok': checks['short_label_wrap_ok'],
+            'short_label_wrap_failures': label_wrap_failures,
         },
     }

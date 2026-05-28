@@ -210,8 +210,7 @@ def estimated_text_lines(shape_spec: dict, bounds: dict) -> int:
 def ai_panel_safe_area_failures(shapes: list[dict]) -> list[dict]:
     panels = [
         shape for shape in shapes
-        if structural_visual_shape(shape)
-        and ai_shape_bounds_in(shape) is not None
+        if ai_shape_bounds_in(shape) is not None
         and safe_text(shape.get('role')) in {'content_panel', 'input_panel', 'source_panel'}
     ]
     text_shapes = [
