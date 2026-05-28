@@ -88,6 +88,16 @@ export function buildCreativeRunOutput(meta) {
       }
       return output;
     }
+    if (mutateKind === 'remove_template_layout_grammar') {
+      delete output?.editable_shape_plan?.template_layout_grammar;
+      for (const slide of output?.editable_shape_plan?.slides || []) {
+        delete slide.template_layout_binding;
+        for (const shape of slide?.native_shapes || []) {
+          delete shape.layout_zone_id;
+        }
+      }
+      return output;
+    }
     if (mutateKind !== 'remove_point_index_text') return output;
     const slides = output?.editable_shape_plan?.slides || [];
     const pointIndexShape = slides

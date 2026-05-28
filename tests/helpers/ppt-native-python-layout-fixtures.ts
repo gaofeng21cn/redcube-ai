@@ -381,6 +381,143 @@ function structuralShapes(layoutFamily, slideId) {
   }];
 }
 
+function templateLayoutGrammar() {
+  return {
+    grammar_id: 'native_pptx_template_layout_grammar_v1',
+    owner: 'llm_agent',
+    required: true,
+    materializer_role: 'execute_selected_archetype_zones_only',
+    helper_template_layout_allowed: false,
+    archetype_catalog: [
+      { archetype_id: 'professional_system_map' },
+      { archetype_id: 'executive_status_board' },
+      { archetype_id: 'evidence_timeline' },
+      { archetype_id: 'risk_control_matrix' },
+      { archetype_id: 'decision_dashboard' },
+    ],
+  };
+}
+
+function templateZonesForLayout(layoutFamily) {
+  if (layoutFamily === 'cover_signal') {
+    return {
+      title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+      claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+      status_zone: { left_in: 0.9, top_in: 3.0, width_in: 13.9, height_in: 2.9 },
+      evidence_zone: { left_in: 0.9, top_in: 6.25, width_in: 8.8, height_in: 1.2 },
+      takeaway_zone: { left_in: 10.0, top_in: 6.25, width_in: 4.8, height_in: 1.2 },
+    };
+  }
+  if (layoutFamily === 'timeline_band') {
+    return {
+      title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+      claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+      timeline_zone: { left_in: 0.9, top_in: 2.9, width_in: 13.6, height_in: 3.3 },
+      evidence_zone: { left_in: 0.9, top_in: 6.45, width_in: 8.8, height_in: 1.1 },
+      takeaway_zone: { left_in: 10.0, top_in: 6.45, width_in: 4.8, height_in: 1.1 },
+    };
+  }
+  if (layoutFamily === 'judgement_ladder') {
+    return {
+      title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+      claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+      evidence_zone: { left_in: 0.9, top_in: 3.05, width_in: 5.9, height_in: 4.4 },
+      gate_zone: { left_in: 7.2, top_in: 2.55, width_in: 6.9, height_in: 5.3 },
+      takeaway_zone: { left_in: 0.9, top_in: 7.55, width_in: 5.9, height_in: 0.7 },
+    };
+  }
+  if (layoutFamily === 'ring_cross') {
+    return {
+      title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+      claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+      system_map_zone: { left_in: 1.1, top_in: 2.9, width_in: 13.3, height_in: 4.8 },
+      gate_zone: { left_in: 10.0, top_in: 4.45, width_in: 4.3, height_in: 1.6 },
+      evidence_zone: { left_in: 1.25, top_in: 6.2, width_in: 4.7, height_in: 1.4 },
+    };
+  }
+  if (layoutFamily === 'summary_peak') {
+    return {
+      title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+      claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+      decision_zone: { left_in: 0.9, top_in: 3.0, width_in: 13.8, height_in: 3.4 },
+      proof_zone: { left_in: 0.9, top_in: 6.65, width_in: 7.0, height_in: 1.1 },
+      takeaway_zone: { left_in: 8.2, top_in: 6.65, width_in: 6.5, height_in: 1.1 },
+    };
+  }
+  return {
+    title_zone: { left_in: 0.8, top_in: 0.45, width_in: 12.9, height_in: 1.3 },
+    claim_zone: { left_in: 0.9, top_in: 1.65, width_in: 12.7, height_in: 1.1 },
+    matrix_zone: { left_in: 0.9, top_in: 3.0, width_in: 13.7, height_in: 3.2 },
+    signal_zone: { left_in: 0.9, top_in: 6.55, width_in: 6.5, height_in: 1.2 },
+    takeaway_zone: { left_in: 7.7, top_in: 6.55, width_in: 6.9, height_in: 1.2 },
+  };
+}
+
+function contentZoneForLayout(layoutFamily) {
+  return {
+    cover_signal: 'status_zone',
+    timeline_band: 'timeline_zone',
+    judgement_ladder: 'gate_zone',
+    ring_cross: 'system_map_zone',
+    summary_peak: 'decision_zone',
+  }[layoutFamily] || 'matrix_zone';
+}
+
+function archetypeForLayout(layoutFamily) {
+  return {
+    cover_signal: 'executive_status_board',
+    timeline_band: 'evidence_timeline',
+    judgement_ladder: 'professional_system_map',
+    ring_cross: 'professional_system_map',
+    summary_peak: 'decision_dashboard',
+  }[layoutFamily] || 'risk_control_matrix';
+}
+
+function templateBindingForSlide(slideId, layoutFamily) {
+  return {
+    selected_archetype: archetypeForLayout(layoutFamily),
+    archetype_instance_id: `${slideId}-${archetypeForLayout(layoutFamily)}`,
+    rhythm_role: layoutFamily === 'summary_peak' ? 'close' : layoutFamily,
+    zone_gap_in_min: 0.32,
+    zone_inset_in_min: 0.15,
+    zones: Object.entries(templateZonesForLayout(layoutFamily)).map(([zoneId, bounds]) => ({
+      zone_id: zoneId,
+      semantic_role: zoneId.replace(/_zone$/, ''),
+      bounds,
+      intended_content: `${zoneId.replace(/_/g, ' ')} for editable native PPT proof`,
+      min_font_pt: zoneId === 'title_zone' ? 36 : 18,
+      safe_inset_in: 0.15,
+    })),
+  };
+}
+
+function withLayoutZone(shape, layoutFamily) {
+  const role = String(shape.role || '');
+  if (role === 'title' || role === 'background_accent' || role === 'accent_anchor' || role === 'accent_dot') {
+    return { ...shape, layout_zone_id: 'title_zone' };
+  }
+  if (role === 'core_sentence') {
+    return { ...shape, layout_zone_id: 'claim_zone' };
+  }
+  if (role === 'page_number') {
+    return { ...shape, layout_zone_id: 'takeaway_zone' };
+  }
+  return { ...shape, layout_zone_id: contentZoneForLayout(layoutFamily) };
+}
+
+function withTemplateLayoutDefaults(slide) {
+  const slideId = String(slide?.slide_id || 'S01').trim() || 'S01';
+  const layoutFamily = String(slide?.layout_family || 'multi_zone_compare').trim() || 'multi_zone_compare';
+  const nativeShapes = Array.isArray(slide?.native_shapes) ? slide.native_shapes : [];
+  return {
+    ...slide,
+    template_layout_binding: slide?.template_layout_binding || templateBindingForSlide(slideId, layoutFamily),
+    native_shapes: nativeShapes.map((shape) => (
+      shape?.layout_zone_id ? shape : withLayoutZone(shape, layoutFamily)
+    )),
+  };
+}
+
 function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
   const visualIntent = layoutVisualIntent(layoutFamily);
   const signatureRoles = new Set([
@@ -560,7 +697,7 @@ export function createAiSlide({
         left_in: base.left_in + (overflowSummaryText ? 1.05 : 0.28),
         top_in: base.top_in + (overflowSummaryText ? 0.02 : 0.82),
         width_in: base.width_in - (overflowSummaryText ? 1.4 : 0.56),
-        height_in: overflowSummaryText ? 0.92 : 1.24,
+        height_in: overflowSummaryText ? 0.92 : 1.44,
       },
       font_size: pointFontSize,
       color: '#171C24',
@@ -576,7 +713,8 @@ export function createAiSlide({
     core_sentence: core,
     page_core_content: primaryPoints,
     layout_intent: layoutIntentForSlide({ slideId, layoutFamily, slotCount: desiredSlots, shapes }),
-    native_shapes: shapes,
+    template_layout_binding: templateBindingForSlide(slideId, layoutFamily),
+    native_shapes: shapes.map((shape) => withLayoutZone(shape, layoutFamily)),
   };
 }
 
@@ -599,7 +737,8 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
         ],
         qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety'],
       },
-      slides,
+      template_layout_grammar: templateLayoutGrammar(),
+      slides: slides.map((slide) => withTemplateLayoutDefaults(slide)),
     },
   };
 }

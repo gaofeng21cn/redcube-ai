@@ -285,6 +285,22 @@ export interface PptDeckNativePptProofLane {
   legacy_html_replaces_routes: ReadonlyArray<'render_html' | 'fix_html'>;
   preserved_upstream_routes: ReadonlyArray<'storyline' | 'detailed_outline' | 'slide_blueprint' | 'visual_direction'>;
   preserved_gates: ReadonlyArray<'visual_director_review' | 'screenshot_review' | 'export_pptx'>;
+  ai_first_editing_contract: {
+    contract_id: 'ppt_native_ai_first_editing_contract_v1';
+    creative_owner: 'llm_agent';
+    editable_shape_plan_required: true;
+    editable_shape_manifest_required: true;
+    design_spec_lock_required: true;
+    template_layout_grammar_required: true;
+    per_slide_layout_binding_required: true;
+    shape_quality_role_required: true;
+    layout_intent_required: true;
+    composition_signature_required: true;
+    structural_visual_required: true;
+    python_helper_role: 'execute_validate_export_only';
+    template_substitution_allowed: false;
+    preserved_gates: ReadonlyArray<'visual_director_review' | 'screenshot_review' | 'export_pptx'>;
+  };
   authoring_artifact: 'native_pptx_file';
   editable_artifact_required: true;
   review_input_surface: 'rendered_pptx_screenshots';

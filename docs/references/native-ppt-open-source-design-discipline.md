@@ -33,6 +33,8 @@ RCA native PPTX 约束：
 
 - `editable_shape_plan.design_spec_lock` 必须在首个 native slide materialization 前存在。
 - spec lock 至少包含 canvas、grid、margin、font family、type scale、palette、motif、visual density、chart/table rule、image rule 和禁止项。
+- `editable_shape_plan.template_layout_grammar` 必须与 spec lock 同级存在，用来声明可选 archetype、semantic zones、zone gap、safe inset、connector lane 与 shape-to-zone 绑定规则。
+- 每页必须先输出 `template_layout_binding`，选择一个 archetype 并声明本页 zones；非装饰 audience-facing shape 必须通过 `layout_zone_id` 绑定到同页 zone。
 - 后续 `author_pptx_native` 与 `repair_pptx_native` 只能消费并局部修订已锁定规格，不能由 helper 重新选择模板或临时生成视觉系统。
 
 ### 2. Claim Spine 驱动页面，而不是模板填空
@@ -124,15 +126,16 @@ RCA native PPTX 约束：
 ## 对 RCA native PPTX AI-first 的约束清单
 
 1. `design_spec_lock` 是 authoring prerequisite，不是可选注释。
-2. 每页必须有 claim spine entry、layout intent、composition signature 和 editable shape plan。
-3. native helper 不选择模板、不重写视觉系统、不拥有视觉判断。
-4. 可编辑性必须落在真实 DrawingML / Office objects；整页图片 PPTX 只能算 image-first 或 screenshot export。
-5. font floor、grid、bounds、contrast、overflow、chart/table metrics 必须进入 shape manifest。
-6. layout variety 必须由 manifest 和 contact sheet 双重检查。
-7. `officecli`、PptxGenJS、LibreOffice、Poppler、PowerPoint、Marp/Slidev/Presenton/PPTist 只能作为 materialization、render、export 或参考 discipline，不自动获得 RCA route ownership。
-8. native sample claim 必须有 live Codex executor shape plan、true render screenshots、RCA review/export evidence。
-9. mock Codex helper、template fixture、refs-only AgentLab score 和 provider completion 不能展示成视觉质量证明。
-10. 最终完成口径必须落到 `visual_director_review`、`screenshot_review`、`export_pptx`、artifact inventory、hash/ZIP/render proof 和 owner receipt。
+2. `template_layout_grammar` 与每页 `template_layout_binding` 是 shape 坐标前置条件，不是后置 QA 标签。
+3. 每页必须有 claim spine entry、layout intent、composition signature 和 editable shape plan。
+4. native helper 不选择模板、不重写视觉系统、不拥有视觉判断。
+5. 可编辑性必须落在真实 DrawingML / Office objects；整页图片 PPTX 只能算 image-first 或 screenshot export。
+6. font floor、grid、bounds、contrast、overflow、chart/table metrics 必须进入 shape manifest。
+7. layout variety 必须由 manifest 和 contact sheet 双重检查。
+8. `officecli`、PptxGenJS、LibreOffice、Poppler、PowerPoint、Marp/Slidev/Presenton/PPTist 只能作为 materialization、render、export 或参考 discipline，不自动获得 RCA route ownership。
+9. native sample claim 必须有 live Codex executor shape plan、true render screenshots、RCA review/export evidence。
+10. mock Codex helper、template fixture、refs-only AgentLab score 和 provider completion 不能展示成视觉质量证明。
+11. 最终完成口径必须落到 `visual_director_review`、`screenshot_review`、`export_pptx`、artifact inventory、hash/ZIP/render proof 和 owner receipt。
 
 ## 使用建议
 

@@ -153,6 +153,7 @@
     "per_page_visual_plan_required": true,
     "ppt_master_style_discipline_adopted": [
       "spec_lock",
+      "template_layout_grammar",
       "per_page_visual_plan",
       "svg_qa_before_export",
       "rendered_quality_gate"
@@ -162,7 +163,10 @@
     "title_underline_motif_allowed": false,
     "concrete_layout_variant_repetition_limit": 2,
     "helper_can_replace_ai_creative_owner": false,
-    "fail_closed_when_missing": true
+    "fail_closed_when_missing": true,
+    "template_layout_grammar_required": true,
+    "per_slide_layout_binding_required": true,
+    "materializer_executes_selected_archetype_zones_only": true
   },
   "visual_sample_claim_boundary": {
     "mock_fixture_visual_sample_allowed": false,

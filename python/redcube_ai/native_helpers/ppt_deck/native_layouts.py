@@ -10,6 +10,7 @@ from xml.sax.saxutils import escape as xml_escape
 
 
 from redcube_ai.native_helpers.ppt_deck.native_layout_constants import *  # noqa: F403
+from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import template_layout_binding_failures
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -502,10 +503,7 @@ def ai_shape_color(shape_spec: dict) -> str:
 
 
 def native_ai_design_shapes(slide_data: dict) -> list[dict]:
-    return [
-        shape for shape in safe_list(slide_data.get('_editable_native_shapes'))
-        if isinstance(shape, dict)
-    ]
+    return [shape for shape in safe_list(slide_data.get('_editable_native_shapes')) if isinstance(shape, dict)]
 
 
 def layout_intent_failures(slide_data: dict) -> list[dict]:
@@ -605,6 +603,7 @@ def visual_structure_failures(shapes: list[dict]) -> list[dict]:
 def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
     shapes = native_ai_design_shapes(slide_data)
     failures = []
+    failures.extend(template_layout_binding_failures(slide_data, shapes, ai_shape_quality_role))
     failures.extend(layout_intent_failures(slide_data))
     if len(shapes) < AI_FIRST_MIN_SHAPES:
         failures.append({'reason': 'ai_first_shape_plan_too_thin', 'actual': len(shapes), 'minimum': AI_FIRST_MIN_SHAPES})

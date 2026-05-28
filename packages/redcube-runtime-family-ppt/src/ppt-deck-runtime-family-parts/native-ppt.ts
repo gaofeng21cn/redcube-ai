@@ -103,6 +103,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
     design_spec_lock_required: true,
+    template_layout_grammar_required: true,
+    per_slide_layout_binding_required: true,
     shape_quality_role_required: true,
     layout_intent_required: true,
     composition_signature_required: true,
@@ -410,6 +412,19 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     if (missingDesignSpecLock) {
       throw new Error(`Native PPT ${route} requires editable_shape_plan.design_spec_lock with spec_id, owner, motif, and layout_archetypes`);
     }
+    const templateLayoutGrammar = plan?.template_layout_grammar && typeof plan.template_layout_grammar === 'object'
+      ? plan.template_layout_grammar
+      : {};
+    const archetypeCatalog = safeArray(templateLayoutGrammar?.archetype_catalog);
+    const missingTemplateLayoutGrammar = safeText(templateLayoutGrammar?.owner) !== 'llm_agent'
+      || templateLayoutGrammar?.required !== true
+      || safeText(templateLayoutGrammar?.materializer_role) !== 'execute_selected_archetype_zones_only'
+      || templateLayoutGrammar?.helper_template_layout_allowed !== false
+      || archetypeCatalog.length < 3;
+    if (missingTemplateLayoutGrammar) {
+      throw new Error(`Native PPT ${route} requires editable_shape_plan.template_layout_grammar with llm_agent owner, archetype catalog, and execute-selected-zones materializer boundary`);
+    }
+    const allowedArchetypes = new Set(archetypeCatalog.map((entry) => safeText(entry?.archetype_id)).filter(Boolean));
     const invalidSlides = slides
       .map((slide, index) => {
         const slideId = safeText(slide?.slide_id, `slide-${index + 1}`);
@@ -417,6 +432,28 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         const layoutIntent = slide?.layout_intent && typeof slide.layout_intent === 'object'
           ? slide.layout_intent
           : {};
+        const templateBinding = slide?.template_layout_binding && typeof slide.template_layout_binding === 'object'
+          ? slide.template_layout_binding
+          : {};
+        const zones = safeArray(templateBinding?.zones);
+        const zoneIds = new Set(zones.map((zone) => safeText(zone?.zone_id)).filter(Boolean));
+        const missingTemplateBinding = !safeText(templateBinding?.selected_archetype)
+          || (allowedArchetypes.size > 0 && !allowedArchetypes.has(safeText(templateBinding?.selected_archetype)))
+          || !safeText(templateBinding?.archetype_instance_id)
+          || !safeText(templateBinding?.rhythm_role)
+          || Number(templateBinding?.zone_gap_in_min || 0) < 0.32
+          || Number(templateBinding?.zone_inset_in_min || 0) < 0.15
+          || zones.length < 3
+          || zones.some((zone) => {
+            const bounds = zone?.bounds && typeof zone.bounds === 'object' ? zone.bounds : {};
+            return !safeText(zone?.zone_id)
+              || !safeText(zone?.semantic_role)
+              || !safeText(zone?.intended_content)
+              || !['left_in', 'top_in', 'width_in', 'height_in'].every((key) => Number.isFinite(Number(bounds?.[key])))
+              || Number(bounds?.width_in || 0) <= 0
+              || Number(bounds?.height_in || 0) <= 0
+              || Number(zone?.safe_inset_in || 0) < 0.15;
+          });
         const missingShapePlan = shapes.length === 0;
         const missingLayoutIntent = !safeText(layoutIntent?.composition_signature)
           || !safeText(layoutIntent?.primary_grid)
@@ -431,24 +468,37 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
             const kind = safeText(shape?.kind || shape?.type);
             const role = safeText(shape?.role);
             const qualityRole = safeText(shape?.quality_role);
+            const layoutZoneId = safeText(shape?.layout_zone_id);
             const text = safeText(shape?.editable_text || shape?.text || shape?.label);
             const textShape = ['text_box', 'text'].includes(kind) || ['title', 'core_sentence', 'point_text', 'body', 'content', 'point_index'].includes(role);
             const missingText = textShape && !text;
             const missingQualityRole = !qualityRole;
+            const needsLayoutZone = !['decorative'].includes(qualityRole)
+              && !['page_number', 'page_no', 'footer', 'cover_meta', 'meta'].includes(role);
+            const missingLayoutZone = needsLayoutZone && !zoneIds.has(layoutZoneId);
             return (!hasBounds || !kind || missingText || missingQualityRole) ? {
               shape_id: shapeId,
               missing_bounds: !hasBounds,
               missing_kind: !kind,
               missing_text: missingText,
               missing_quality_role: missingQualityRole,
+              missing_layout_zone: missingLayoutZone,
+            } : missingLayoutZone ? {
+              shape_id: shapeId,
+              missing_bounds: false,
+              missing_kind: false,
+              missing_text: false,
+              missing_quality_role: false,
+              missing_layout_zone: true,
             } : null;
           })
           .filter(Boolean);
         const missingShapeQualityRoles = shapes.some((shape) => !safeText(shape?.quality_role));
-        return (missingShapePlan || missingLayoutIntent || invalidShapes.length > 0) ? {
+        return (missingShapePlan || missingLayoutIntent || missingTemplateBinding || invalidShapes.length > 0) ? {
           slide_id: slideId,
           missing_native_shapes: missingShapePlan,
           missing_layout_intent: missingLayoutIntent,
+          missing_template_layout_binding: missingTemplateBinding,
           missing_shape_quality_roles: missingShapeQualityRoles,
           invalid_shapes: invalidShapes,
         } : null;

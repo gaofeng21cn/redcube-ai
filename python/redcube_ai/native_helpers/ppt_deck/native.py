@@ -18,6 +18,10 @@ from redcube_ai.native_helpers.renderer_dependencies import (
     platform_install_hint,
     poppler_probe,
 )
+from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
+    allowed_template_archetypes,
+    validate_template_layout_grammar,
+)
 from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
 from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_slide_quality
 
@@ -135,6 +139,14 @@ def normalize_slide_data(payload: dict) -> list:
         or len(safe_list(design_spec_lock.get('layout_archetypes'))) < 3
     ):
         fail('ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires spec_id, owner, motif, and at least three layout_archetypes')
+    grammar_failures = validate_template_layout_grammar(plan)
+    if grammar_failures:
+        fail(
+            'ai_first_template_layout_grammar_missing: editable_shape_plan.template_layout_grammar '
+            'requires llm_agent owner, required=true, archetype catalog, and execute-selected-zones materializer boundary: '
+            + json.dumps(grammar_failures, ensure_ascii=False, sort_keys=True)
+        )
+    allowed_archetypes = allowed_template_archetypes(plan)
     plan_slides = safe_list(plan.get('slides'))
     blueprint = payload.get('blueprint') or {}
     blueprint_slides = safe_list(blueprint.get('slides'))
@@ -163,6 +175,18 @@ def normalize_slide_data(payload: dict) -> list:
             shape for shape in safe_list(raw_slide.get('native_shapes'))
             if isinstance(shape, dict)
         ]
+        template_binding = (
+            raw_slide.get('template_layout_binding')
+            if isinstance(raw_slide.get('template_layout_binding'), dict)
+            else {}
+        )
+        selected_archetype = safe_text(template_binding.get('selected_archetype'))
+        if selected_archetype and allowed_archetypes and selected_archetype not in allowed_archetypes:
+            fail(
+                'ai_first_template_layout_binding_invalid: '
+                f'slide {slide_id} selected_archetype is not in editable_shape_plan.template_layout_grammar.archetype_catalog'
+            )
+        merged['template_layout_binding'] = template_binding
         merged['_editable_native_shapes'] = plan_shapes
         merged['_typography_plan'] = typography_plan
         slides.append(merged)

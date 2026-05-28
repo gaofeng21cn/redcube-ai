@@ -204,7 +204,7 @@ test('native PPTX quality accepts content panels paired with separate point text
       role: 'evidence_item',
       quality_role: 'content',
       editable_text: '演示文稿文件',
-      bounds: { left_in: 0.72, top_in: 6.55, width_in: 1.6, height_in: 0.62 },
+      bounds: { left_in: 0.72, top_in: 6.55, width_in: 1.95, height_in: 0.82 },
       font_size: 18,
     },
     {
@@ -213,7 +213,7 @@ test('native PPTX quality accepts content panels paired with separate point text
       role: 'evidence_item',
       quality_role: 'content',
       editable_text: '形状清单',
-      bounds: { left_in: 2.55, top_in: 6.55, width_in: 1.35, height_in: 0.62 },
+      bounds: { left_in: 2.9, top_in: 6.55, width_in: 1.45, height_in: 0.82 },
       font_size: 18,
     },
   );
@@ -253,12 +253,12 @@ test('native PPTX materializer blocks CJK title boxes that are too short for wra
     shape.role === 'title'
       ? {
           ...shape,
-          bounds: { ...shape.bounds, height_in: 1.55 },
+          bounds: { ...shape.bounds, height_in: 1.75 },
         }
       : shape.role === 'core_sentence'
         ? {
             ...shape,
-            bounds: { ...shape.bounds, top_in: 2.34 },
+            bounds: { ...shape.bounds, top_in: 2.5 },
           }
       : shape
   ));
@@ -482,6 +482,25 @@ test('native PPTX route rejects shape plans without top-level design spec lock',
   const rejected = runNativeMaterializerFailure(missingSpecLock);
   assert.notEqual(rejected.status, 0);
   assert.match(rejected.stderr, /ai_first_design_spec_lock_missing/);
+});
+
+test('native PPTX route rejects shape plans without template layout grammar and zone bindings', () => {
+  const missingGrammar = materializerPayload([
+    createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Missing template grammar' }),
+  ]);
+  delete missingGrammar.editable_shape_plan.template_layout_grammar;
+  const grammarRejected = runNativeMaterializerFailure(missingGrammar);
+  assert.notEqual(grammarRejected.status, 0);
+  assert.match(grammarRejected.stderr, /ai_first_template_layout_grammar_missing/);
+
+  const missingBinding = materializerPayload([
+    createAiSlide({ slideId: 'S02', layoutFamily: 'ring_cross', title: 'Missing template binding' }),
+  ]);
+  delete missingBinding.editable_shape_plan.slides[0].template_layout_binding;
+  delete missingBinding.editable_shape_plan.slides[0].native_shapes[0].layout_zone_id;
+  const bindingRejected = runNativePlanValidation(missingBinding);
+  assert.equal(bindingRejected.ok, false);
+  assert.match(JSON.stringify(bindingRejected.failures), /ai_first_template_layout_binding_missing|ai_first_shape_layout_zone_binding_missing/);
 });
 
 test('native PPTX quality gate blocks operator-facing proof language in visible text', () => {

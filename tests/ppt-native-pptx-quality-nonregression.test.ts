@@ -138,9 +138,13 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.editable_shape_plan_contract.python_helper_role, 'execute_validate_export_only');
   assert.equal(contract.editable_shape_plan_contract.template_substitution_allowed, false);
   assert.equal(contract.editable_shape_plan_contract.design_spec_lock_required, true);
+  assert.equal(contract.editable_shape_plan_contract.template_layout_grammar_required, true);
+  assert.equal(contract.editable_shape_plan_contract.per_slide_layout_binding_required, true);
+  assert.equal(contract.editable_shape_plan_contract.materializer_executes_selected_archetype_zones_only, true);
   assert.equal(contract.editable_shape_plan_contract.per_page_visual_plan_required, true);
   assert.deepEqual(contract.editable_shape_plan_contract.ppt_master_style_discipline_adopted, [
     'spec_lock',
+    'template_layout_grammar',
     'per_page_visual_plan',
     'svg_qa_before_export',
     'rendered_quality_gate',
@@ -296,8 +300,12 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(existsSync(readModel.shape_manifest_ref.file), true);
       assert.equal(existsSync(readModel.editable_shape_plan_ref.file), true);
       assert.equal(readModel.editable_shape_plan_ref.design_spec_lock_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.template_layout_grammar_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.per_slide_layout_binding_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.materializer_executes_selected_archetype_zones_only, true);
       assert.equal(readModel.editable_shape_plan_ref.per_page_visual_plan_required, true);
       assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('spec_lock'), true);
+      assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('template_layout_grammar'), true);
       assert.equal(readModel.editable_shape_plan_ref.layout_intent_required, true);
       assert.equal(readModel.editable_shape_plan_ref.composition_signature_required, true);
       assert.equal(readModel.editable_shape_plan_ref.title_underline_motif_allowed, false);

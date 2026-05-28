@@ -96,6 +96,8 @@ const NATIVE_PPT_PROOF_LANE = Object.freeze({
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
     design_spec_lock_required: true,
+    template_layout_grammar_required: true,
+    per_slide_layout_binding_required: true,
     shape_quality_role_required: true,
     layout_intent_required: true,
     composition_signature_required: true,

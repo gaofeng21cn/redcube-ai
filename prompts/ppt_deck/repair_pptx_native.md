@@ -4,9 +4,13 @@ Use the latest screenshot review feedback to revise the existing PowerPoint-nati
 
 Treat operator-language leakage, title-safe-zone conflicts, table text below 11pt, and sparse oversized table/card containers as hard repair targets. Repair by changing the editable shape plan and native table/text geometry, not by hiding the issue in notes or reducing visible font size.
 
+Keep the same AI-first authoring boundary during repair. The repaired payload must preserve and, when needed, update `editable_shape_plan.template_layout_grammar`, each slide's `template_layout_binding`, and every non-decorative audience-facing shape's `layout_zone_id`. The materializer is only allowed to execute the selected archetype zones and concrete coordinates from the plan; it must not invent a replacement template, recover missing zones, or rebalance the page by helper logic.
+
 When screenshot review reports `native_slot_fill_failed`, `native_content_depth_failed`, `block_content_overflow_detected`, `audience_label_below_readability_floor`, `native_grid_balance_failed`, or `anti_template_failed`, repair the actual native page structure:
 
 - Preserve the AI-first boundary: update `layout_intent` and `native_shapes`; do not rely on Python helper templates, notes, hidden text, or officecli defaults for design repair.
+- Preserve the design lock: `template_layout_grammar` declares the professional archetype catalog, `template_layout_binding.selected_archetype` chooses the page structure, and `layout_zone_id` binds each visible text/shape to its zone.
+- If feedback reports overflow, awkward wrapping, repeated rhythm, or an unbalanced page, revise the selected archetype, zone bounds, and bound shape coordinates together before changing copy. Do not let a fixed card row survive as the repaired design.
 - When feedback mentions repeated layout, repeated composition, or `composition_signature`, change the concrete geometry and write a new `layout_intent.composition_signature`. A renamed variant with the same top-title/core/card-row skeleton is still a failed repair.
 - Remove decorative title-underlines and long horizontal rules under headings. Use a different motif such as side rail, corner anchor, connector path, map axis, chart/table/metric grid, or visual band.
 - Re-apply the spec lock: title >= 36pt, body >= 18pt, index labels >= 16pt, table body >= 11pt, sufficient margins/gaps, and no content outside bounds.
