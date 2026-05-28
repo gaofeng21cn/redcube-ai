@@ -33,6 +33,8 @@ export const NATIVE_PPT_AGGREGATED_CHECK_KEYS = Object.freeze([
   'visual_structure_present',
   'non_text_visual_specific_ok',
   'mechanical_card_template_absent',
+  'panel_text_safe_area_ok',
+  'short_label_wrap_ok',
 ]);
 
 export const NATIVE_QUALITY_REQUIRED_NUMERIC_METRIC_KEYS = Object.freeze([
@@ -62,6 +64,8 @@ export const NATIVE_QUALITY_REQUIRED_BOOLEAN_METRIC_KEYS = Object.freeze([
   'visual_structure_present',
   'non_text_visual_specific_ok',
   'mechanical_card_template_absent',
+  'panel_text_safe_area_ok',
+  'short_label_wrap_ok',
 ]);
 
 export const NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS = Object.freeze([
@@ -74,4 +78,6 @@ export const NATIVE_QUALITY_REQUIRED_BOOLEAN_CHECK_KEYS = Object.freeze([
   'visual_structure_present',
   'non_text_visual_specific_ok',
   'mechanical_card_template_absent',
+  'panel_text_safe_area_ok',
+  'short_label_wrap_ok',
 ]);
