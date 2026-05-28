@@ -622,4 +622,3 @@ test('native PPTX system-map QA accepts route flow connectors and takeaway bands
   assert.equal(slide.metrics.structural_visual_roles.includes('route_flow_connector'), true);
   assert.equal(slide.metrics.structural_visual_roles.includes('takeaway_band'), true);
 });
-

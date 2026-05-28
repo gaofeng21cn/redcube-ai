@@ -45,7 +45,7 @@ export function createNativePptProofReviewParts({
     }
     return expected;
   }
-  
+
   function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
     const expected = expectedNativeEngineContract()?.true_render_proof || {};
     const proof = payload?.render_proof || shapeManifest?.render_proof || {};
@@ -78,12 +78,12 @@ export function createNativePptProofReviewParts({
       preview_screenshots: previewScreenshots.map((file) => safeText(file)).filter(Boolean),
     };
   }
-  
+
   function readNativeShapeManifest(file: string): JsonRecord {
     if (!file || !existsSync(file)) return {};
     return JSON.parse(readFileSync(file, 'utf-8'));
   }
-  
+
   function aggregateNativeChecks(slideReviews: JsonRecord[]): JsonRecord {
     return Object.fromEntries(
       NATIVE_PPT_AGGREGATED_CHECK_KEYS.map((key) => [
@@ -92,12 +92,12 @@ export function createNativePptProofReviewParts({
       ]),
     );
   }
-  
+
   function nativeManifestIssues(shapeManifest: JsonRecord): string[] {
     return safeArray(shapeManifest?.slides)
       .flatMap((slide) => safeArray(slide?.issues).map((issue) => safeText(issue)).filter(Boolean));
   }
-  
+
   function nativeManifestQualityPassed(shapeManifest: JsonRecord): boolean {
     const slides = safeArray(shapeManifest?.slides);
     if (slides.length === 0) return false;
@@ -105,12 +105,12 @@ export function createNativePptProofReviewParts({
     return nativeManifestIssues(shapeManifest).length === 0
       && NATIVE_PPT_AGGREGATED_CHECK_KEYS.every((key) => checks[key] === true);
   }
-  
+
   function finiteNumberOrNull(value: unknown): number | null {
     const number = Number(value);
     return Number.isFinite(number) ? number : null;
   }
-  
+
   function nativeQualityMissingIssues(manifestSlide: JsonRecord | undefined, expectedProof: JsonRecord): string[] {
     if (!manifestSlide) return ['native_quality_metrics_missing'];
     const metrics = manifestSlide.metrics || {};
@@ -149,12 +149,12 @@ export function createNativePptProofReviewParts({
     if (safeText(manifestSlide.renderer_pipeline) !== safeText(expectedProof?.renderer_pipeline)) return ['native_true_render_proof_missing'];
     return [];
   }
-  
+
   function booleanCheck(manifestSlide: JsonRecord | undefined, key: string, missingQuality: boolean): boolean {
     if (missingQuality) return false;
     return manifestSlide?.checks?.[key] === true;
   }
-  
+
   function nativeMechanicalReviewPayload(nativeArtifact: JsonRecord | null) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
@@ -297,7 +297,7 @@ export function createNativePptProofReviewParts({
       slide_reviews: slideReviews,
     };
   }
-  
+
   function summarizeNativeSlides(nativeArtifact: JsonRecord | null): JsonRecord[] {
     const shapeManifest = readNativeShapeManifest(safeText(nativeArtifact?.native_ppt_bundle?.shape_manifest_file));
     const manifestSlidesById = new Map(
