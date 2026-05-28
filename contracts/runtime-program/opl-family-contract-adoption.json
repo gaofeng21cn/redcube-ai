@@ -1697,6 +1697,8 @@
       "current_clean_truth": {
         "no_tracked_code_file_exceeds_1500_lines": true,
         "line_budget_baseline_only_tracks": [
+          "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
+          "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
           "tests/opl-family-contract-adoption.test.ts"
         ],
         "no_obvious_safe_large_generic_control_plane_split_found": true,

@@ -200,10 +200,6 @@
         "closes_production_ready": false
       }
     },
-    "legacy_payload_field_aliases": {
-      "domain_receipt_refs": "domain_owner_receipt_refs",
-      "no_regression_refs": "no_regression_evidence_refs"
-    },
     "owner_payload_item_summary": {
       "surface_kind": "rca_owner_payload_item_summary",
       "owner": "redcube_ai",

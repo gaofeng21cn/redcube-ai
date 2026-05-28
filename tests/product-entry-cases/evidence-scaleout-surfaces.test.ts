@@ -109,12 +109,9 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.accepted_payload_paths.typed_blocker_path.required_operator_payload_refs,
       ['typed_blocker_refs'],
     );
-    assert.deepEqual(
-      domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.legacy_payload_field_aliases,
-      {
-        domain_receipt_refs: 'domain_owner_receipt_refs',
-        no_regression_refs: 'no_regression_evidence_refs',
-      },
+    assert.equal(
+      'legacy_payload_field_aliases' in domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs,
+      false,
     );
     assert.equal(
       domain_action_adapter.mapped_surfaces.production_evidence_scaleout_refs.owner_payload_item_summary.surface_kind,

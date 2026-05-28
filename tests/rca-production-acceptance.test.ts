@@ -219,10 +219,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     ['typed_blocker_refs'],
   );
   assert.equal(scaleout.accepted_payload_paths.typed_blocker_path.success_claimed, false);
-  assert.deepEqual(scaleout.legacy_payload_field_aliases, {
-    domain_receipt_refs: 'domain_owner_receipt_refs',
-    no_regression_refs: 'no_regression_evidence_refs',
-  });
+  assert.equal('legacy_payload_field_aliases' in scaleout, false);
   assert.equal(scaleout.owner_payload_item_summary.surface_kind, 'rca_owner_payload_item_summary');
   assert.equal(scaleout.owner_payload_item_summary.payload_kind, 'domain_owner_receipt_or_typed_blocker_refs');
   assert.equal(scaleout.owner_payload_item_summary.payload_body_allowed, false);

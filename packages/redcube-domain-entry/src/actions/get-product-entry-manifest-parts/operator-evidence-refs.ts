@@ -246,10 +246,6 @@ export function buildProductionEvidenceScaleoutRefs({
     required_return_shapes: [...RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES],
     payload_path_policy: RCA_OWNER_PAYLOAD_PATH_POLICY,
     accepted_payload_paths: acceptedPayloadPaths,
-    legacy_payload_field_aliases: {
-      domain_receipt_refs: 'domain_owner_receipt_refs',
-      no_regression_refs: 'no_regression_evidence_refs',
-    },
     owner_payload_item_summary: buildOwnerPayloadItemSummaries({
       domainOwnerReceiptRefs,
       noRegressionEvidenceRefs,

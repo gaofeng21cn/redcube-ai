@@ -904,3 +904,17 @@ test('retired compatibility payload fields only appear in negative guard fields'
 
   assert.deepEqual(violations, []);
 });
+
+test('legacy payload field alias maps stay out of active machine contracts', () => {
+  const violations = [];
+  for (const file of listJsonFiles('contracts')) {
+    const normalizedFile = normalizePath(file);
+    const parsed = JSON.parse(readFileSync(file, 'utf-8'));
+    visitJsonPointers(parsed, '', (_value, pointer) => {
+      if (!pointer.endsWith('/legacy_payload_field_aliases')) return;
+      violations.push(`${normalizedFile}${pointer}`);
+    });
+  }
+
+  assert.deepEqual(violations, []);
+});
