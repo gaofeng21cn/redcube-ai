@@ -123,6 +123,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
           kind: 'text_box',
           role: 'evidence_item',
           quality_role: 'content',
+          layout_zone_id: 'matrix_zone',
           editable_text: ['视觉页成形可审', '截图问题可复核', '文件导出可编辑'][index],
           bounds: { left_in: 6.72, top_in: top + 0.08, width_in: 2.05, height_in: 0.8 },
           font_size: 18,
@@ -135,6 +136,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
           kind: 'line',
           role: 'route_gate_connector',
           quality_role: 'structural',
+          layout_zone_id: 'matrix_zone',
           bounds: { left_in: 8.9, top_in: top + 0.98, width_in: 0.75, height_in: 0.04 },
           line: '#0F766E',
         },
@@ -154,6 +156,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
       kind: 'text_box',
       role: 'panel_title',
       quality_role: 'content',
+      layout_zone_id: 'matrix_zone',
       editable_text: '三道交付门',
       bounds: { left_in: 10.35, top_in: 3.12, width_in: 2.4, height_in: 0.68 },
       font_size: 20,
@@ -178,6 +181,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
         kind: 'text_box',
         role: 'evidence_item',
         quality_role: 'content',
+        layout_zone_id: 'matrix_zone',
         editable_text: ['视觉结构可读', '截图问题可复核', '文件导出可交付'][index],
         bounds: { left_in: 11.02, top_in: 3.74 + index * 0.72, width_in: 3.12, height_in: 0.8 },
         font_size: 18,
@@ -191,7 +195,8 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
       kind: 'rounded_rect',
       role: 'evidence_band',
       quality_role: 'structural',
-      bounds: { left_in: 0.72, top_in: 6.28, width_in: 14.6, height_in: 1.96 },
+      layout_zone_id: 'signal_zone',
+      bounds: { left_in: 0.72, top_in: 6.28, width_in: 14.26, height_in: 1.96 },
       fill: '#111827',
       line: 'none',
     },
@@ -200,6 +205,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
       kind: 'text_box',
       role: 'panel_title',
       quality_role: 'content',
+      layout_zone_id: 'signal_zone',
       editable_text: '底部证据包要同时说明什么',
       bounds: { left_in: 1.0, top_in: 6.5, width_in: 4.1, height_in: 0.68 },
       font_size: 20,
@@ -212,6 +218,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
       kind: 'text_box',
       role: 'takeaway',
       quality_role: 'content',
+      layout_zone_id: 'signal_zone',
       editable_text: '完整证据包包括演示文件、PDF、PNG 截图、形状清单、审查记录和导出记录；缺一项就不能说闭环完成。',
       bounds: { left_in: 1.0, top_in: 7.34, width_in: 13.2, height_in: 0.84 },
       font_size: 18,
@@ -268,15 +275,19 @@ test('native PPTX plan preflight and manifest QA reject connector rails crossing
   });
   slideData.layout_intent.rhetorical_role = 'system_map';
   slideData.layout_intent.non_text_visual = 'route connectors that avoid labels and content text';
-  slideData.native_shapes = slideData.native_shapes.filter((shape) => !String(shape.role || '').includes('bridge_connector'));
+  slideData.native_shapes = slideData.native_shapes.filter((shape) => (
+    !String(shape.role || '').includes('bridge_connector')
+    && shape.shape_id !== 'S01-matrix-evidence'
+  ));
   slideData.native_shapes.push(
     {
       shape_id: 'S01-route-label',
       kind: 'text_box',
       role: 'route_label',
       quality_role: 'content',
+      layout_zone_id: 'signal_zone',
       editable_text: '三条生成链路各完成 1 次真实产出，才进入同一放行判断。',
-      bounds: { left_in: 1.2, top_in: 6.05, width_in: 6.0, height_in: 0.9 },
+      bounds: { left_in: 1.2, top_in: 6.32, width_in: 6.0, height_in: 0.9 },
       font_size: 18,
       color: '#171C24',
       fill: 'none',
@@ -287,7 +298,8 @@ test('native PPTX plan preflight and manifest QA reject connector rails crossing
       kind: 'connector',
       role: 'horizontal_route_connector',
       quality_role: 'structural',
-      bounds: { left_in: 1.05, top_in: 6.45, width_in: 6.4, height_in: 0.06 },
+      layout_zone_id: 'signal_zone',
+      bounds: { left_in: 1.05, top_in: 6.68, width_in: 6.4, height_in: 0.06 },
       line: '#2563EB',
       fill: 'none',
     },
@@ -301,7 +313,7 @@ test('native PPTX plan preflight and manifest QA reject connector rails crossing
     ...slideData,
     native_shapes: slideData.native_shapes.map((shape) => (
       shape.shape_id === 'S01-rail-through-label'
-        ? { ...shape, bounds: { ...shape.bounds, top_in: 7.1 } }
+        ? { ...shape, bounds: { ...shape.bounds, top_in: 7.38 } }
         : shape
     )),
   };

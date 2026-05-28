@@ -464,6 +464,9 @@ export function withLayoutZone(shape, layoutFamily) {
     return { ...shape, layout_zone_id: 'decision_zone' };
   }
   if (role.includes('takeaway') || role.includes('loop_band')) {
+    if (['workflow_map', 'ring_cross'].includes(layoutFamily)) {
+      return { ...shape, layout_zone_id: 'evidence_zone' };
+    }
     return { ...shape, layout_zone_id: 'takeaway_zone' };
   }
   if (layoutFamily === 'summary_peak' && top >= 6.0) {
