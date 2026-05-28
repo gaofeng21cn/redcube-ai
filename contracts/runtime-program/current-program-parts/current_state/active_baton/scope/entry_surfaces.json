@@ -6,6 +6,6 @@
   "redcube domain-handler export",
   "redcube product session",
   "invoke_product_entry",
-  "domain_action_adapter_dispatch",
+  "redcube domain-handler dispatch",
   "get_product_entry_session"
 ]

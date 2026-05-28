@@ -7903,7 +7903,7 @@
           "redcube domain-handler export",
           "redcube product session",
           "invoke_product_entry",
-          "domain_action_adapter_dispatch",
+          "redcube domain-handler dispatch",
           "get_product_entry_session"
         ],
         "required_downstream_domain_surfaces": [

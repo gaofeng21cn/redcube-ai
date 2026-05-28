@@ -789,6 +789,18 @@ test('retired managed product-entry contract is tombstoned without compatibility
   assert.equal(replacement.callable_surface.api_surface, 'getProductEntrySession');
 });
 
+test('current program active entry surfaces use domain-handler dispatch naming', () => {
+  const currentProgram = JSON.parse(readFileSync(
+    path.resolve('contracts/runtime-program/current-program.json'),
+    'utf-8',
+  ));
+  const entrySurfaces = currentProgram.current_state.active_baton.scope.entry_surfaces;
+
+  assert.equal(entrySurfaces.includes('redcube domain-handler dispatch'), true);
+  assert.equal(entrySurfaces.includes('redcube domain-handler export'), true);
+  assert.equal(entrySurfaces.includes('domain_action_adapter_dispatch'), false);
+});
+
 test('retired legacy surface ids only appear in tombstone or provenance pointer paths', () => {
   const policy = JSON.parse(readFileSync(
     path.resolve('contracts/physical_source_morphology_policy.json'),
