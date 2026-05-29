@@ -86,6 +86,49 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-29 active stale-wording and retirement-gate tranche
+
+本轮覆盖 RCA active truth / stale wording 复核，不改变 RCA active plan 的完成判断。目标是确认 active docs 里出现的 `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter`、Hermes 和 compatibility 词汇仍被限定为 semantic-id、refs-only adapter、domain handler target、package/protocol boundary、retired guard 或 provenance，不把旧 public path / wrapper / facade / alias 写回 active owner。
+
+Live truth inputs:
+
+- Core / active docs: `AGENTS.md`, `TASTE.md`, `README.md`, `docs/README.md`, `docs/status.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/active/opl-private-implementation-migration-inventory.md`, and this governance ledger.
+- Machine / contract refs: `contracts/functional_privatization_audit.json`, `contracts/physical_source_morphology_policy.json`, `contracts/production_acceptance/rca-production-acceptance.json`, `contracts/domain_descriptor.json`, `contracts/stage_control_plane.json`, and `contracts/README.md`.
+- Source / test surface scan: active-source stale term scan over `README.md`, `docs/active/**`, `docs/status.md`, `docs/README.md`, `contracts/README.md`, source/test paths listed by `package.json`, and current `scripts/test-registry.ts` / verification script entries.
+
+Fresh semantic result:
+
+- `docs/active/rca-ideal-state-gap-plan.md` remains the single active completion plan. It still separates functional/structural tails from production evidence tails and keeps `functional_structure_gap_count=0` as legacy-owner/source-shape classification, not strict source-purity completion.
+- Active docs already say OPL/Temporal owns durable scheduling, wakeup, retry/dead-letter and resume; RCA does not embed daemon/scheduler/attempt loop. `Hermes-Agent` remains explicit opt-in executor/proof backend, not default runtime owner.
+- Active docs still require compatibility-free retirement: after active caller cutover, old CLI/MCP alias, product wrapper, gateway/runtime facade, domain_action_adapter compatibility path and compatibility-only tests must be deleted or tombstoned. No active doc currently asks to preserve a compatibility shim.
+- `docs/status.md` keeps stale terms behind explicit policy: legacy wording needs `legacy_name_allowance`, negative guard, refs-only read-model, domain handler target, package/protocol boundary, or tombstone/provenance context; tests must not protect old managed/gateway/runtime/session path compatibility.
+- `contracts/README.md` correctly lists old `managed-product-entry-hardening.json` as a tombstone, not callable alias or wrapper.
+- No prose body rewrite, archive, tombstone or deletion was needed outside this coverage ledger entry.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Active truth/current status stale-wording scan, contracts overview tombstone wording, private implementation inventory current classes, active gap plan next prompt/completion gate. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. This tranche found no active RCA doc path that had lost its long-term role.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche did not re-read every `docs/**/*.md` body. Prior exact-path coverage remains governed by earlier ledger entries; future changed docs or source/contract reopenings still require exact section-level governance.
+- Other OPL series repos remain open under the global goal. This run intentionally avoided `one-person-lab`, `med-autoscience`, `med-autogrant`, and `one-person-lab-app` because their main checkouts already had unrelated active changes.
+
+Remaining stale / retire candidates:
+
+- Future active docs or tests that protect old managed/gateway/runtime/session/domain_action_adapter public path compatibility instead of current contracts, no-resurrection guard, fail-closed negative input, owner receipt, typed blocker or tombstone semantics are stale pollution.
+- Future RCA source/contract changes that close a default-caller cutover must immediately remove or tombstone the corresponding repo-local wrapper/facade/alias/test path; do not add a compatibility bridge.
+- Future prose that treats Hermes proof lane, OPL generated/default refs, provider completion, conformance pass, workspace receipt refs or no-regression refs as RCA visual ready, exportable, handoffable, domain ready, production ready, artifact authority, review/export verdict or production visual-stage long soak is stale pollution.
+
+Next tranche write scope:
+
+- Continue with MAS or App only after their existing dirty/recent lanes can be safely separated or explicitly handed to this governance goal.
+- Return to RCA only for newly changed docs or for implementation/evidence lanes that close `production_evidence_tail`, `generated_default_caller_thinning`, `naming_contract_hygiene`, or `compatibility_free_retirement`.
+
 ### 2026-05-28 native PPT AI-first sample boundary revalidation tranche
 
 本轮覆盖 RCA main 最近 native editable PPTX 路线改动后的 delivery/status 读法。目标是确认 `native PPTX` 仍是显式可选路线，`officecli` 只作为 editable PPTX materializer / QA gate，mock Codex helper 只作为 deterministic test double；live sample、AgentLab refs-only quality surface 或 native proof plumbing 都不能升级为 visual ready、exportable、handoffable、domain ready、production ready、artifact authority、review/export verdict 或 production visual-stage long-soak evidence。本轮不改变 RCA active truth，不关闭 OPL series 全局 `/goal`。
