@@ -29,6 +29,29 @@ Mock provider、mock Codex helper 和 deterministic fixture 只用于 route plum
 
 当前 native sample proof 只能关闭 native sample materialization / review / export proof lane、hub / connector regression 和 mock hard-count regression。它不声明 production visual-stage long soak、production readiness、domain ready、handoffable、visual ready 或全局完成。
 
+当前 live native sample evidence root：
+
+```text
+/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/native-ai-first-live-20260529-v5/
+```
+
+关键 refs：
+
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pptx`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pdf`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native-shape-manifest.json`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/reports/native_ppt/deck-native-author_pptx_native-screenshots/slide-1.png`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/publish/artifact_gallery/index.json`
+- `agentlab-output/rca-ppt-three-route-agent-lab-suite.json`
+
+AgentLab refs-only suite：
+
+```bash
+opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json
+```
+
+该命令验证 suite 可读性、refs-only handoff 和 forbidden-authority boundary。它不创建 RCA visual truth，不检查 artifact body，也不能授权 `visual_ready`、`exportable`、`handoffable`、production soak complete 或 owner receipt body。
+
 ## OfficeCLI Materializer Discipline
 
 RCA remains the native PPTX workflow owner. The `officecli-pptx` skill is not adopted as the native authoring loop, and it does not replace RCA `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx`.

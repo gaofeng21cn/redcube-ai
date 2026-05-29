@@ -27,7 +27,7 @@ AgentLab / OPL Meta Agent / AgentLab takeover 只作为 refs-only、control-plan
 - `html`: `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> render_html -> visual_director_review -> screenshot_review -> export_pptx`
 - `native`: `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx`
 
-`image` 仍是默认主线。HTML 和 native PPTX 只在显式选择时跑，继续保留相同 review/export gate。
+`image` 仍是默认主线。HTML 和 native PPTX 只在显式选择时跑，继续保留相同 review/export gate。Native PPTX 一旦被选中，内部主流程固定为 RCA AI-first native authoring：live Codex executor 生成 `editable_shape_plan`，officecli-backed writer / validator / QA gate 物化可编辑 PPTX，LibreOffice / Poppler 生成 true-render proof，随后进入 `visual_director_review`、`screenshot_review` 和 `export_pptx`。`ppt-master`、PPTAgent、`officecli-pptx`、Presenton 等只能作为设计纪律参考，不能替代 RCA product-entry route 或 review/export verdict。
 
 ## Commands
 
@@ -78,12 +78,39 @@ REDCUBE_CODEX_REASONING_EFFORT=minimal \
 
 该策略只改变 Codex executor reasoning effort，不跳过 `visual_director_review`、`screenshot_review` 或 `export_pptx`。如果路线缺少 planning artifact，product-entry 必须自动补齐 `storyline -> detailed_outline -> slide_blueprint -> visual_direction` 后继续 visual route；不能要求外层 Codex 逐 stage 盯跑。
 
-2026-05-26 的真实一页 PPT 三路线测试给出如下效率读法：
+AgentLab refs-only 三路线 suite 命令：
+
+```bash
+opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json
+```
+
+该命令读取 suite contract、route refs、gate refs 和 forbidden-authority flags。它不生产视觉质量结论，不替代 workspace artifact，也不声明 native PPTX production soak complete。
+
+2026-05-29 native live 样片的物理 evidence root 是：
+
+```text
+/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/native-ai-first-live-20260529-v5/
+```
+
+关键产物路径：
+
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pptx`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pdf`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native-shape-manifest.json`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/reports/native_ppt/deck-native-author_pptx_native-screenshots/slide-1.png`
+- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/publish/deck-native.pptx`
+- `workspace/交付成果/RCA image-first real route evolution probe (native).pptx`
+- `agentlab-output/rca-ppt-three-route-agent-lab-suite.json`
+
+`.codex/projects` 不作为物理输出根；若出现该路径，只按指向 `/Users/gaofeng/workspace/projects` 的 symlink / provenance 读取。
+
+2026-05-26/29 的真实一页 PPT 三路线测试给出如下效率和证据读法：
 
 - 默认 image-first 成功链路约 18 分 42 秒，其中 `author_image_pages` 约 6 分 13 秒，`repair_image_pages` 约 6 分 49 秒；这是 Codex native imagegen 与回修成本，不是 AgentLab 或脚本生成。
 - HTML route 在 `REDCUBE_CODEX_REASONING_EFFORT=minimal` 下 planning 可稳定落到约 2-3 分钟，但单次 `render_html` 仍约 9 分 23 秒；质量门禁阻断后应通过 `fix_html` 或代码/提示词根因修复收敛，不能绕过 gate。
-- Native PPTX route 需要 LibreOffice headless true-render proof；成功链路可能经历 `repair_pptx_native`，最终必须以 screenshot review pass 和 export artifact 为准。
+- Native PPTX route 需要 officecli writer / validator / QA gate 与 LibreOffice headless true-render proof；成功链路可能经历 `repair_pptx_native`，最终必须以 RCA screenshot review pass 和 export artifact 为准。`native-ai-first-live-20260529-v5` 只证明单次 live sample 可物化、review 和 export，不证明 production soak。
 - AgentLab / OPL Meta Agent 运行结果只能证明 refs-only control-plane、suite observation、forbidden-authority boundary 或 takeover/work-order 闭环；真实 PPTX/PDF/PNG 样片证明必须来自 RCA product-entry workspace artifacts。
+- Mock provider / helper proof 只证明 contract、plumbing、hard-count regression、file wiring 和 fail-closed checks，不是视觉质量证明。
 
 ## Output
 

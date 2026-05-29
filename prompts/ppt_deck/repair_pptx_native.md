@@ -6,6 +6,8 @@ Treat operator-language leakage, title-safe-zone conflicts, table text below 11p
 
 Keep the same AI-first authoring boundary during repair. The repaired payload must preserve and, when needed, update `editable_shape_plan.template_layout_grammar`, each slide's `template_layout_binding`, and every non-decorative audience-facing shape's `layout_zone_id`. The materializer is only allowed to execute the selected archetype zones and concrete coordinates from the plan; it must not invent a replacement template, recover missing zones, or rebalance the page by helper logic.
 
+Preserve `contracts/runtime-program/ppt-native-ai-first-design-pack.json` as the professional design asset source during repair. If a blocked page fails capacity, rhythm, connector, or non-text visual requirements, change the selected archetype, professional style profile, zones, and coordinates together before materialization; do not let helper templates or office defaults take over design repair.
+
 When screenshot review reports `native_slot_fill_failed`, `native_content_depth_failed`, `block_content_overflow_detected`, `audience_label_below_readability_floor`, `native_grid_balance_failed`, or `anti_template_failed`, repair the actual native page structure:
 
 - Preserve the AI-first boundary: update `layout_intent` and `native_shapes`; do not rely on Python helper templates, notes, hidden text, or officecli defaults for design repair.
