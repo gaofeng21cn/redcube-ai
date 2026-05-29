@@ -13,6 +13,22 @@ Native PPT production proof requires true render proof from a supported renderer
 
 Microsoft PowerPoint, AppleScript, synthetic previews, HTML rendering, and `officecli validate` are not accepted proof surfaces for native PPT true render proof.
 
+## AI-first Native PPTX Route
+
+Native editable PPTX 的固定路线是：
+
+`RCA AI-first design pack -> AI-authored editable_shape_plan -> officecli writer / validator -> LibreOffice / Poppler true render QA -> RCA visual_director_review -> RCA screenshot_review -> export_pptx`
+
+其中 `contracts/runtime-program/ppt-native-ai-first-design-pack.json` 是设计纪律合同，不是模板资产、样片库或外部 agent 所有权转移。`editable_shape_plan` 必须由 AI executor 持有具体页面设计、版式语义、坐标、shape role、字体、色彩、connector 和非文字视觉信号；officecli writer / validator 和 Python native helper 只负责物化、保存、校验、渲染、导出 refs 和 fail-closed blocker，不能选择模板、补设计、替换 `design_spec_lock` 或写 RCA visual verdict。
+
+AgentLab suite 只记录 refs：它可以读取 `contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json`、收集 native terminal refs、比较 non-regression refs，并把报告交给 OPL / OMA 使用；它不能写 RCA visual truth、artifact body、visual memory body、owner receipt、quality verdict、export verdict，也不能把 suite score 升级成 `visual_ready`、`exportable`、`handoffable` 或 production soak complete。
+
+Mock provider、mock Codex helper 和 deterministic fixture 只用于 route plumbing、contract validation、fail-closed check、officecli materialization、true render proof wiring 和 export-file wiring。它们不能作为 native visual sample、不能展示为视觉质量样片、不能证明真实设计质量。任何 native PPTX visual sample claim 都必须来自 live Codex executor 生成的 `editable_shape_plan`，并同时具备 `design_spec_lock`、`professional_design_brief`、true render screenshots、RCA visual director review、screenshot review 和 export evidence。
+
+样片和证据实例必须落在真实 workspace / runtime artifact root，例如 `/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/` 或具体交付 workspace 下的 runtime-state / artifacts / reports / publish 目录；开发 checkout 只保存 contract、locator、index、schema、refs-only proof 和文档，不保存 PPTX/PDF/PNG 样片或运行证据实例。
+
+当前 native sample proof 只能关闭 native sample materialization / review / export proof lane、hub / connector regression 和 mock hard-count regression。它不声明 production visual-stage long soak、production readiness、domain ready、handoffable、visual ready 或全局完成。
+
 ## OfficeCLI Materializer Discipline
 
 RCA remains the native PPTX workflow owner. The `officecli-pptx` skill is not adopted as the native authoring loop, and it does not replace RCA `storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_pptx_native -> visual_director_review -> screenshot_review -> export_pptx`.

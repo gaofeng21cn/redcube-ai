@@ -18,10 +18,10 @@ const REQUIRED_TEMPLATE_REFERENCE_DISCIPLINE_FLAGS = [
 
 const REQUIRED_TEMPLATE_REFERENCE_SOURCE_PROJECTS = [
   'ppt-master',
-  'agent-slides',
   'PPTAgent',
-  'pptx-from-layouts-skill',
   'officecli-pptx',
+  'presenton',
+  'ppt-agent-skills',
 ];
 
 const REQUIRED_DESIGN_SPEC_DISCIPLINE = [
@@ -510,9 +510,10 @@ export function createNativePptShapePlanNormalizeParts({
       && typeof templateLayoutGrammar.reference_discipline === 'object'
       ? templateLayoutGrammar.reference_discipline
       : {};
-    const sourceProjects = safeArray(referenceDiscipline?.source_projects)
+    const sourceProjectKeys = safeArray(referenceDiscipline?.source_projects)
       .map((project) => safeText(project))
-      .filter(Boolean);
+      .filter(Boolean)
+      .map((project) => project.toLowerCase());
     const failures: JsonRecord[] = REQUIRED_TEMPLATE_REFERENCE_DISCIPLINE_FLAGS
       .filter((field) => referenceDiscipline?.[field] !== true)
       .map((field) => ({
@@ -520,7 +521,7 @@ export function createNativePptShapePlanNormalizeParts({
         actual: referenceDiscipline?.[field] ?? null,
       }));
     const missingSourceProjects = REQUIRED_TEMPLATE_REFERENCE_SOURCE_PROJECTS
-      .filter((project) => !sourceProjects.includes(project));
+      .filter((project) => !sourceProjectKeys.includes(project.toLowerCase()));
     if (missingSourceProjects.length > 0) {
       failures.push({
         reason: 'template_layout_grammar.reference_discipline.source_projects',

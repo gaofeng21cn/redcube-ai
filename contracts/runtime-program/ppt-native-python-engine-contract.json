@@ -2,6 +2,7 @@
   "kind": "redcube_native_ppt_python_engine",
   "language": "python",
   "contract_version": 1,
+  "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
   "owned_routes": [
     "author_pptx_native",
     "repair_pptx_native"
@@ -228,6 +229,18 @@
     "title_underline_motif_allowed": false,
     "concrete_layout_variant_repetition_limit": 2,
     "template_layout_grammar_required": true,
-    "per_slide_layout_binding_required": true
+    "per_slide_layout_binding_required": true,
+    "professional_design_pack_required": true,
+    "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+    "required_design_pack_sections": [
+      "layout_archetype_taxonomy",
+      "capacity_budgets",
+      "font_floors",
+      "connector_semantics",
+      "layout_rhythm",
+      "non_text_visual_requirements",
+      "reference_discipline",
+      "professional_style_registry"
+    ]
   }
 }

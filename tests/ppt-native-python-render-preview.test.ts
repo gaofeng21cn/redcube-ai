@@ -12,6 +12,7 @@ import {
   pythonTestEnv,
   resolveTestPythonCommand,
   runNativeMaterializer,
+  runNativeMaterializerFailure,
   runNativePlanValidation,
   sha256Hex,
   writeJson,
@@ -57,28 +58,27 @@ test('native PPTX shape quality flags missing slots, low content, overlap, and u
     slotCount: 3,
     panelMutator: (shape, index) => (index === 0
       ? { ...shape, bounds: { ...shape.bounds, width_in: 6.0 } }
-      : { ...shape, bounds: { ...shape.bounds, width_in: 2.0 } }),
+        : { ...shape, bounds: { ...shape.bounds, width_in: 2.0 } }),
   });
 
-  const result = runNativeMaterializer(materializerPayload([missingSlot, unbalanced]));
+  const missingSlotRejected = runNativeMaterializerFailure(materializerPayload([missingSlot]));
+  assert.notEqual(missingSlotRejected.status, 0);
+  assert.match(missingSlotRejected.stderr, /native PPTX manifest QA failed/);
+  assert.match(missingSlotRejected.stderr, /native_slot_fill_failed/);
+
+  const unbalancedRejected = runNativeMaterializerFailure(materializerPayload([unbalanced]));
+  assert.notEqual(unbalancedRejected.status, 0);
+  assert.match(unbalancedRejected.stderr, /native PPTX manifest QA failed/);
+  assert.match(unbalancedRejected.stderr, /native_grid_balance_failed/);
+
   const contentPreflight = runNativePlanValidation(materializerPayload([labelOnly]));
   const overlapPreflight = runNativePlanValidation(materializerPayload([overlapped]));
-  const [slotSlide, balanceSlide] = result.slides;
-
-  assert.equal(slotSlide.checks.slot_fill_ok, false);
-  assert.equal(slotSlide.metrics.expected_slot_count, 4);
-  assert.equal(slotSlide.metrics.filled_slot_count, 3);
-  assert.equal(slotSlide.issues.includes('native_slot_fill_failed'), true);
 
   assert.equal(contentPreflight.ok, false);
   assert.equal(JSON.stringify(contentPreflight.failures).match(/ai_first_content_depth_too_low/g)?.length, 4);
 
   assert.equal(overlapPreflight.ok, false);
   assert.match(JSON.stringify(overlapPreflight.failures), /ai_first_text_box_overlap/);
-
-  assert.equal(balanceSlide.checks.grid_balance_ok, false);
-  assert.equal(balanceSlide.metrics.grid_balance_failures[0].reason, 'panel_area_ratio_out_of_range');
-  assert.equal(balanceSlide.issues.includes('native_grid_balance_failed'), true);
 });
 
 test('native PPT visual benchmark fixture is materialized from AI shapes without helper templates', () => {

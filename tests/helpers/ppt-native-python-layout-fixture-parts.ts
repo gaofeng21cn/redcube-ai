@@ -266,7 +266,7 @@ export function templateLayoutGrammar() {
       placeholder_capacity_required: true,
       reference_deck_analysis_required: true,
       action_title_required: true,
-      source_projects: ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx'],
+      source_projects: ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills'],
       rule: 'Treat templates and reference decks as layout intelligence before coordinates.',
     },
     archetype_catalog: [

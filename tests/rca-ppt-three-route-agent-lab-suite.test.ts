@@ -82,6 +82,11 @@ function assertPptThreeRouteSuiteShape(suite) {
   assert.equal(suite.required_observations.includes('task_manifests_observed'), true);
   assert.equal(suite.required_observations.includes('recovery_probes_observed'), true);
   assert.equal(suite.required_observations.includes('forbidden_authority_flags_all_false'), true);
+  assert.deepEqual(suite.native_pptx_real_route_probe.required_report_observations, [
+    'native_pptx_terminal_export_refs_observed',
+    'agent_lab_run_report_ref_observed',
+    'mock_visual_quality_claims_absent',
+  ]);
   assert.equal(
     suite.target_runtime_consumption_refs.includes('redcube product manifest#/ppt_three_route_agent_lab_suite'),
     true,
@@ -101,6 +106,40 @@ function assertPptThreeRouteSuiteShape(suite) {
   assert.equal(suite.target_verification_refs.includes('target-verification:redcube-ai/product-manifest-read'), true);
   assert.equal(suite.target_verification_refs.includes('target-verification:redcube-ai/domain-handler-export-read'), true);
   assert.equal(
+    suite.target_verification_refs.includes('target-verification:redcube-ai/real-native-pptx-product-entry-route-terminal-refs'),
+    true,
+  );
+  assert.equal(suite.native_pptx_real_route_probe.product_entry_domain_route_required, true);
+  assert.equal(suite.native_pptx_real_route_probe.task_intent, 'run_deliverable_route');
+  assert.equal(suite.native_pptx_real_route_probe.terminal_route, 'export_pptx');
+  assert.deepEqual(suite.native_pptx_real_route_probe.route_chain, [
+    'storyline',
+    'detailed_outline',
+    'slide_blueprint',
+    'visual_direction',
+    'author_pptx_native',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+  ]);
+  assert.deepEqual(suite.native_pptx_real_route_probe.terminal_evidence_required_ref_groups, [
+    'editable_pptx',
+    'pdf',
+    'render_screenshots',
+    'shape_manifest',
+    'visual_director_review_receipt',
+    'screenshot_review_receipt',
+    'export_receipt',
+    'artifact_gallery',
+    'agent_lab_run_report',
+  ]);
+  assert.equal(suite.native_pptx_real_route_probe.forbidden_evidence_sources.includes('handwritten_pptx_script_as_workflow'), true);
+  assert.equal(suite.native_pptx_real_route_probe.forbidden_evidence_sources.includes('mock_provider_visual_quality_claim'), true);
+  assert.equal(suite.terminal_evidence_contract.agent_lab_role.records_refs_only, true);
+  assert.equal(suite.terminal_evidence_contract.agent_lab_role.writes_rca_visual_verdict, false);
+  assert.equal(suite.terminal_evidence_contract.agent_lab_role.writes_owner_receipt, false);
+  assert.equal(suite.terminal_evidence_contract.agent_lab_role.writes_artifact_body, false);
+  assert.equal(
     suite.target_verification_refs.includes(
       'target-verification:redcube-ai/mock-artifact-producing-ppt-three-route-export-bundles',
     ),
@@ -108,6 +147,9 @@ function assertPptThreeRouteSuiteShape(suite) {
   );
   assert.equal(suite.artifact_sample_policy.sample_kind, 'mock_provider_artifact_producing_ppt_three_route_export');
   assert.equal(suite.artifact_sample_policy.proves_artifact_export_chain, true);
+  assert.equal(suite.artifact_sample_policy.proves_visual_design_quality, false);
+  assert.equal(suite.artifact_sample_policy.mock_provider_boundary.proves_visual_sample_quality, false);
+  assert.equal(suite.artifact_sample_policy.mock_provider_boundary.can_claim_visual_ready, false);
   assert.equal(suite.artifact_sample_policy.proves_live_image_provider, false);
   assert.equal(suite.artifact_sample_policy.codex_native_imagegen_policy.executor_task_surface, 'codex_native_imagegen_skill');
   assert.equal(suite.artifact_sample_policy.codex_native_imagegen_policy.explicit_provider_token_required, false);
@@ -120,6 +162,34 @@ function assertPptThreeRouteSuiteShape(suite) {
   );
   assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:publish/<deliverable>.pptx'), true);
   assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:publish/<deliverable>.pdf'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/native_ppt/<deliverable>-shape-manifest.json'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:reports/native_ppt/<deliverable>-screenshots/slide-1.png'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/director_review.json'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/quality_gate.json'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/publish_bundle.json'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:publish/artifact_gallery/index.json'), true);
+  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:<probe-output>/real-route-evolution-probe.json'), true);
+  assert.equal(suite.native_live_evidence_policy.required_for_native_visual_quality_claim, true);
+  assert.equal(suite.native_live_evidence_policy.mock_provider_can_satisfy, false);
+  assert.equal(suite.native_live_evidence_policy.agent_lab_records_refs_only, true);
+  assert.deepEqual(suite.native_live_evidence_policy.required_terminal_routes, [
+    'author_pptx_native',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+  ]);
+  assert.equal(
+    suite.native_live_evidence_policy.required_artifact_refs.includes('editable_pptx_file'),
+    true,
+  );
+  assert.equal(
+    suite.native_live_evidence_policy.required_artifact_refs.includes('render_preview_screenshot_png'),
+    true,
+  );
+  assert.equal(
+    suite.native_live_evidence_policy.required_artifact_refs.includes('artifact_gallery_index_file'),
+    true,
+  );
   assert.deepEqual(suite.accepted_terminal_shapes, [
     'domain_receipt',
     'typed_blocker',
@@ -262,10 +332,28 @@ test('artifact-producing PPT workflow reaches export_pptx through image-first, H
         if (routeCase.visualRoute === 'author_pptx_native') {
           assert.equal(visualArtifact.native_ppt_bundle.source_visual_route, 'author_pptx_native');
           assert.equal(visualArtifact.native_ppt_bundle.editable_artifact, true);
+          assert.equal(visualArtifact.native_ppt_bundle.visual_sample_claim.proves_artifact_export_chain, true);
+          assert.equal(visualArtifact.native_ppt_bundle.visual_sample_claim.proves_visual_design_quality, false);
+          assert.equal(visualArtifact.native_ppt_bundle.visual_sample_claim.mock_fixture_visual_sample_allowed, false);
+          assert.equal(visualArtifact.native_ppt_bundle.test_double_boundary.kind, 'deterministic_codex_test_double');
           assert.equal(fs.existsSync(visualArtifact.native_ppt_bundle.pptx_file), true);
+          assert.equal(fs.existsSync(visualArtifact.native_ppt_bundle.pdf_file), true);
           assert.equal(fs.existsSync(visualArtifact.native_ppt_bundle.shape_manifest_file), true);
+          assert.equal(
+            visualArtifact.native_ppt_bundle.preview_screenshots.every((file) => fs.existsSync(file)),
+            true,
+          );
+          assert.equal(fs.existsSync(results.find((entry) => entry.route === 'visual_director_review').result.artifactFile), true);
+          assert.equal(fs.existsSync(results.find((entry) => entry.route === 'screenshot_review').result.artifactFile), true);
+          assert.equal(fs.existsSync(results.find((entry) => entry.route === 'export_pptx').result.artifactFile), true);
           assertCommonExport({ exported, expectedRoute: 'author_pptx_native' });
           assert.equal(exported.export_bundle.renderer_proof.source_surface_kind, 'native_pptx');
+          assert.equal(exported.export_bundle.source_pptx, visualArtifact.native_ppt_bundle.pptx_file);
+          assert.equal(exported.export_bundle.native_ppt_shape_manifest, visualArtifact.native_ppt_bundle.shape_manifest_file);
+          assert.equal(
+            exported.export_bundle.renderer_proof.preview_screenshots.every((file) => fs.existsSync(file)),
+            true,
+          );
           assert.equal(fs.existsSync(exported.export_bundle.artifact_gallery.index_file), true);
         }
       }

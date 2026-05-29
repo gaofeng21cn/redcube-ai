@@ -42,6 +42,22 @@ test('native PPTX officecli materializer accepts only complete AI spatial plans'
   assert.equal(new Set(result.slides.map((slide) => slide.metrics.composition_signature)).size >= 5, true);
 });
 
+test('native PPTX materializer fails closed when concrete shape manifests repeat one composition too often', () => {
+  const slides = [
+    createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Repeated composition 1', slotCount: 3 }),
+    createAiSlide({ slideId: 'S02', layoutFamily: 'multi_zone_compare', title: 'Repeated composition 2', slotCount: 3 }),
+    createAiSlide({ slideId: 'S03', layoutFamily: 'multi_zone_compare', title: 'Repeated composition 3', slotCount: 3 }),
+  ];
+  const result = runNativeMaterializerFailure(materializerPayload(slides));
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /native PPTX manifest QA failed/);
+  assert.match(result.stderr, /native_deck_repeated_composition_signature_limit_exceeded/);
+  assert.match(result.stderr, /native_deck_distinct_composition_share_too_low/);
+  assert.match(result.stderr, /deck_composition_rhythm_ok/);
+  assert.match(result.stderr, /execute_ai_spatial_plan_only/);
+  assert.match(result.stderr, /helper_fallback_used": false/);
+});
+
 test('native PPTX officecli materializer rejects incomplete or unreadable AI shape plans', () => {
   const missingBounds = runNativeMaterializerFailure(materializerPayload([{
     slide_id: 'S01',
@@ -152,7 +168,8 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       quality_role: 'structural',
       layout_zone_id: 'matrix_zone',
       bounds: { left_in: 4.96, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
-      line: '#2563EB',
+      line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+      tailEnd: 'triangle',
       fill: 'none',
     },
     {
@@ -162,7 +179,8 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       quality_role: 'structural',
       layout_zone_id: 'matrix_zone',
       bounds: { left_in: 9.34, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
-      line: '#2563EB',
+      line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+      tailEnd: 'triangle',
       fill: 'none',
     },
   ]
@@ -178,7 +196,6 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       if (shape.role === 'point_text') {
         return {
           ...shape,
-          role: 'takeaway',
           editable_text: shape.editable_text,
         };
       }
@@ -250,6 +267,46 @@ test('native PPTX officecli writer maps AI line objects and mid vertical alignme
   assert.match(unzip, /<p:cxnSp>/);
 });
 
+test('native PPTX plan preflight rejects connector shapes without explicit semantic direction', () => {
+  const slideData = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: 'Connector direction',
+    core: 'Flow arrows need explicit native direction.',
+    slotCount: 3,
+  });
+  slideData.native_shapes = slideData.native_shapes.map((shape) => (
+    shape.role === 'bridge_connector_rail'
+      ? {
+          ...shape,
+          kind: 'connector',
+          role: 'flow_connector',
+          quality_role: 'structural',
+          line: '#2563EB',
+        }
+      : shape
+  ));
+
+  const rejected = runNativePlanValidation(materializerPayload([slideData]));
+  assert.equal(rejected.ok, false);
+  assert.match(JSON.stringify(rejected.failures), /ai_first_connector_direction_missing/);
+
+  const fixed = {
+    ...slideData,
+    native_shapes: slideData.native_shapes.map((shape) => (
+      shape.role === 'flow_connector'
+        ? {
+            ...shape,
+            line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+            tailEnd: 'triangle',
+          }
+        : shape
+    )),
+  };
+  const accepted = runNativePlanValidation(materializerPayload([fixed]));
+  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
+});
+
 test('native PPTX quality accepts content panels paired with separate point text and short evidence labels', () => {
   const slideData = createAiSlide({
     slideId: 'S01',
@@ -319,12 +376,13 @@ test('native PPTX materializer blocks CJK title boxes that are too short for wra
     shape.role === 'title'
       ? {
           ...shape,
-          bounds: { ...shape.bounds, height_in: 1.75 },
+          bounds: { ...shape.bounds, width_in: 11.2, height_in: 1.35 },
+          font_size: 42,
         }
       : shape.role === 'core_sentence'
         ? {
             ...shape,
-            bounds: { ...shape.bounds, top_in: 2.5 },
+            bounds: { ...shape.bounds, top_in: 2.12, height_in: 0.98 },
           }
       : shape
   ));
@@ -749,16 +807,14 @@ test('native PPTX plan preflight accepts panel text fitted exactly on safe-area 
     if (shape.shape_id === 'S01-slot-1-panel') {
       return {
         ...shape,
-        role: 'content_panel',
         layout_zone_id: 'matrix_zone',
-        bounds: { left_in: 1.0, top_in: 4.98, width_in: 3.9, height_in: 1.35 },
+        bounds: { ...shape.bounds, left_in: 1.08 },
       };
     }
     if (shape.shape_id === 'S01-slot-1-text') {
       return {
         ...shape,
         layout_zone_id: 'matrix_zone',
-        bounds: { left_in: 1.15, top_in: 5.13, width_in: 3.6, height_in: 1.05 },
       };
     }
     return shape;
@@ -792,7 +848,7 @@ test('native PPTX route rejects archetype declarations that are not fulfilled by
   assert.match(JSON.stringify(zoneCoverageRejected.failures), /ai_first_template_layout_required_zone_coverage_too_low/);
 });
 
-test('native PPTX quality gate blocks operator-facing proof language in visible text', () => {
+test('native PPTX materializer fails closed on operator-facing proof language in visible text', () => {
   const leaked = createAiSlide({
     slideId: 'S01',
     title: 'Native PPT live product-entry proof',
@@ -802,13 +858,10 @@ test('native PPTX quality gate blocks operator-facing proof language in visible 
       'live proof 是测试标签，必须改写成可复核交付闭环。',
     ],
   });
-  const result = runNativeMaterializer(materializerPayload([leaked]));
-  const [slide] = result.slides;
-  assert.equal(slide.checks.external_audience_language_ok, false);
-  assert.equal(slide.issues.includes('operator_language_leak_detected'), true);
-  assert.deepEqual(slide.metrics.operator_language_fragments, [
-    'live proof',
-    'product-entry',
-    'proof lane',
-  ]);
+  const rejected = runNativeMaterializerFailure(materializerPayload([leaked]));
+  assert.notEqual(rejected.status, 0);
+  assert.match(rejected.stderr, /native PPTX manifest QA failed/);
+  assert.match(rejected.stderr, /operator_language_leak_detected/);
+  assert.match(rejected.stderr, /live proof/);
+  assert.match(rejected.stderr, /product-entry/);
 });

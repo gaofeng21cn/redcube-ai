@@ -20,6 +20,7 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
+const DESIGN_PACK_CONTRACT_REF = 'contracts/runtime-program/ppt-native-ai-first-design-pack.json';
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -74,11 +75,77 @@ function assertOfficecliMaterializerPolicy(policy) {
   assert.equal(policy.default_executor_changed, false);
 }
 
+function assertProfessionalDesignPackContract(contract) {
+  assert.equal(contract.surface_kind, 'ppt_native_ai_first_design_pack');
+  assert.equal(contract.owner, 'redcube_ai');
+  assert.equal(contract.status, 'active_design_pack_contract');
+  assert.equal(contract.claims_visual_ready, false);
+  assert.equal(contract.claims_production_ready, false);
+  assert.equal(contract.design_pack_boundary.creative_owner, 'llm_agent');
+  assert.equal(contract.design_pack_boundary.python_helper_role, 'execute_selected_archetype_zones_validate_materialize_only');
+  assert.equal(contract.design_pack_boundary.helper_template_layout_allowed, false);
+  assert.equal(contract.design_pack_boundary.helper_can_select_layout_archetype, false);
+  assert.equal(contract.design_pack_boundary.new_runtime_dependency_allowed, false);
+  assert.equal(contract.design_pack_boundary.third_party_code_copied, false);
+
+  const archetypes = contract.layout_archetype_taxonomy.archetype_catalog;
+  assert.equal(contract.layout_archetype_taxonomy.required, true);
+  for (const archetypeId of [
+    'professional_system_map',
+    'executive_status_board',
+    'evidence_timeline',
+    'risk_control_matrix',
+    'decision_dashboard',
+    'sample_status_proof_board',
+    'sample_decision_proof_split',
+  ]) {
+    assert.equal(archetypes.some((archetype) => archetype.archetype_id === archetypeId), true, archetypeId);
+  }
+  for (const archetype of archetypes) {
+    assert.equal(Array.isArray(archetype.required_zones), true, `${archetype.archetype_id}.required_zones`);
+    assert.equal(archetype.required_zones.length > 0, true, `${archetype.archetype_id}.required_zones.length`);
+    assert.equal(typeof archetype.content_schema?.capacity_budget_ref, 'string', `${archetype.archetype_id}.capacity_budget_ref`);
+    assert.equal(typeof archetype.font_floor_ref, 'string', `${archetype.archetype_id}.font_floor_ref`);
+    assert.equal(typeof archetype.connector_semantics_ref, 'string', `${archetype.archetype_id}.connector_semantics_ref`);
+    assert.equal(typeof archetype.non_text_visual_requirement_ref, 'string', `${archetype.archetype_id}.non_text_visual_requirement_ref`);
+  }
+
+  assert.equal(contract.capacity_budgets.global.min_filled_required_zone_share, 0.8);
+  assert.equal(contract.capacity_budgets.global.max_audience_text_shapes_per_slide, 14);
+  assert.equal(contract.capacity_budgets.samples.max_status_card_count, 3);
+  assert.equal(contract.font_floors.title_pt_min, 36);
+  assert.equal(contract.font_floors.sample_title_pt_min, 40);
+  assert.equal(contract.font_floors.body_pt_min, 18);
+  assert.equal(contract.font_floors.table_body_pt_min, 11);
+  assert.equal(contract.connector_semantics.layout_zone_binding_required, true);
+  assert.equal(contract.connector_semantics.text_collision_allowed, false);
+  assert.equal(contract.connector_semantics.connector_crosses_readable_text_allowed, false);
+  assert.equal(contract.layout_rhythm.no_three_consecutive_same_archetype, true);
+  assert.equal(contract.layout_rhythm.repeated_concrete_composition_limit, 2);
+  assert.equal(contract.layout_rhythm.min_distinct_composition_share, 0.75);
+  assert.equal(contract.non_text_visual_requirements.structural_visual_required, true);
+  assert.equal(contract.non_text_visual_requirements.cards_alone_satisfy_requirement, false);
+  assert.equal(contract.reference_discipline.clean_room_only, true);
+  assert.equal(contract.reference_discipline.runtime_dependency_adoption_allowed, false);
+  assert.equal(contract.reference_discipline.reference_projects.some((project) => project.project_id === 'ppt-master'), true);
+  assert.equal(contract.reference_discipline.reference_projects.some((project) => project.project_id === 'Presenton'), true);
+  assert.equal(contract.reference_discipline.reference_projects.some((project) => project.project_id === 'ppt-agent-skills'), true);
+  assert.equal(contract.professional_style_registry.active_profile_id, 'rca_executive_proof_board');
+  assert.equal(contract.professional_style_registry.profiles.length >= 3, true);
+  assert.equal(
+    contract.professional_style_registry.profiles.every((profile) => (
+      profile.palette && profile.typography && profile.layout_motif && profile.forbidden_patterns
+    )),
+    true,
+  );
+}
+
 function assertQualityContractShape(contract) {
   assert.equal(contract.surface_kind, 'ppt_native_pptx_quality_nonregression');
   assert.equal(contract.owner, 'redcube_ai');
   assert.equal(contract.consumer, 'opl_agent_lab');
   assertRefsOnly(contract, 'contract');
+  assert.equal(contract.professional_design_pack_contract_ref, DESIGN_PACK_CONTRACT_REF);
   assert.equal(contract.route_policy.explicit_optional_route, true);
   assert.equal(contract.route_policy.default_visual_route, 'author_image_pages');
   assert.equal(contract.route_policy.default_visual_route_changed, false);
@@ -161,6 +228,60 @@ function assertQualityContractShape(contract) {
   assert.equal(contract.editable_shape_plan_contract.composition_signature_required, true);
   assert.equal(contract.editable_shape_plan_contract.title_underline_motif_allowed, false);
   assert.equal(contract.editable_shape_plan_contract.concrete_layout_variant_repetition_limit, 2);
+  assert.equal(contract.editable_shape_plan_contract.professional_design_pack_required, true);
+  assert.equal(contract.editable_shape_plan_contract.professional_design_pack_contract_ref, DESIGN_PACK_CONTRACT_REF);
+  assert.deepEqual(contract.editable_shape_plan_contract.required_design_pack_sections, [
+    'layout_archetype_taxonomy',
+    'capacity_budgets',
+    'font_floors',
+    'connector_semantics',
+    'layout_rhythm',
+    'non_text_visual_requirements',
+    'reference_discipline',
+    'professional_style_registry',
+  ]);
+  assert.equal(contract.professional_design_pack_contract.required, true);
+  assert.equal(contract.professional_design_pack_contract.owner, 'redcube_ai');
+  assert.equal(contract.professional_design_pack_contract.creative_owner, 'llm_agent');
+  assert.equal(contract.professional_design_pack_contract.materializer_can_select_layout, false);
+  assert.equal(contract.professional_design_pack_contract.layout_archetype_taxonomy.length >= 6, true);
+  assert.equal(
+    contract.professional_design_pack_contract.layout_archetype_taxonomy
+      .some((archetype) => archetype.archetype_id === 'flow_hub_to_cards_proof_band'),
+    true,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.capacity_budgets.body_font_pt_min,
+    18,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.capacity_budgets.card_text_max_lines,
+    2,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.connector_semantics.real_ppt_connector_required,
+    true,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.connector_semantics.horizontal_bus_for_route_cards_allowed,
+    false,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.layout_rhythm.consecutive_same_archetype_max,
+    2,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.design_reference_discipline.source_projects.includes('presenton'),
+    true,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.design_reference_discipline.source_projects.includes('ppt-agent-skills'),
+    true,
+  );
+  assert.equal(
+    contract.professional_design_pack_contract.fail_closed_when_missing,
+    true,
+  );
   assertOfficecliMaterializerPolicy(contract.officecli_materializer_policy);
   assert.equal(contract.visual_sample_claim_boundary.mock_fixture_visual_sample_allowed, false);
   assert.equal(contract.visual_sample_claim_boundary.test_double_can_claim_visual_design_quality, false);
@@ -229,9 +350,22 @@ async function runNativeAuthoring(workspaceRoot) {
 test('native PPTX quality non-regression contract is refs-only and keeps Agent Lab non-authoritative', () => {
   const contract = readJson('contracts/runtime-program/ppt-native-pptx-quality-nonregression.json');
   assertQualityContractShape(contract);
+  assertProfessionalDesignPackContract(readJson(DESIGN_PACK_CONTRACT_REF));
 
   const proofLane = readJson('contracts/runtime-program/ppt-native-authoring-proof-lane.json');
   const engineContract = readJson('contracts/runtime-program/ppt-native-python-engine-contract.json');
+  assert.equal(proofLane.professional_design_pack_contract_ref, DESIGN_PACK_CONTRACT_REF);
+  assert.equal(engineContract.professional_design_pack_contract_ref, DESIGN_PACK_CONTRACT_REF);
+  assert.equal(proofLane.candidate_route_model.ai_first_editing_contract.professional_design_pack_required, true);
+  assert.equal(engineContract.ai_first_boundary.professional_design_pack_required, true);
+  assert.deepEqual(
+    proofLane.candidate_route_model.ai_first_editing_contract.required_design_pack_sections,
+    contract.editable_shape_plan_contract.required_design_pack_sections,
+  );
+  assert.deepEqual(
+    engineContract.ai_first_boundary.required_design_pack_sections,
+    contract.editable_shape_plan_contract.required_design_pack_sections,
+  );
   assert.deepEqual(
     contract.route_policy.preserved_review_export_gates,
     proofLane.scope.preserved_gate_routes,
@@ -323,6 +457,25 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.editable_shape_plan_ref.action_title_required, true);
       assert.equal(readModel.editable_shape_plan_ref.title_underline_motif_allowed, false);
       assert.equal(readModel.editable_shape_plan_ref.concrete_layout_variant_repetition_limit, 2);
+      assert.equal(readModel.professional_design_pack_ref.required, true);
+      assert.equal(readModel.professional_design_pack_ref.creative_owner, 'llm_agent');
+      assert.equal(readModel.professional_design_pack_ref.materializer_can_select_layout, false);
+      assert.equal(
+        readModel.professional_design_pack_ref.contract_ref,
+        'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json#/professional_design_pack_contract',
+      );
+      assert.equal(
+        readModel.professional_design_pack_ref.required_design_pack_refs.includes('layout_archetype_taxonomy'),
+        true,
+      );
+      assert.equal(
+        readModel.professional_design_pack_ref.required_design_pack_refs.includes('connector_semantics'),
+        true,
+      );
+      assert.equal(
+        readModel.professional_design_pack_ref.required_design_pack_refs.includes('layout_rhythm'),
+        true,
+      );
       assert.equal(readModel.visual_sample_claim_boundary.sample_kind, 'deterministic_test_double_plumbing_proof');
       assert.equal(readModel.visual_sample_claim_boundary.test_double_detected, true);
       assert.equal(readModel.visual_sample_claim_boundary.mock_fixture_visual_sample_allowed, false);

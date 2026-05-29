@@ -18,6 +18,7 @@ from redcube_ai.native_helpers.ppt_deck.native_layout_text_safety import (
     ai_text_overlap_failures as layout_text_overlap_failures,
     recommended_quality_role as text_safety_recommended_quality_role,
 )
+from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import connector_direction_failure, fail_closed_on_manifest_qa
 
 
 def safe_text(value, fallback: str = '') -> str:
@@ -500,6 +501,7 @@ def audience_content_slot_shape(shape_spec: dict) -> bool:
         'subtitle',
         'core_sentence',
         'point_index',
+        *CONTENT_DEPTH_EXCLUDED_ROLES,
         *AUXILIARY_TEXT_ROLES,
     }:
         return False
@@ -595,6 +597,7 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
         line_bounds_failure = ai_line_bounds_failure(shape)
         if line_bounds_failure:
             failures.append(line_bounds_failure)
+        if kind == 'connector' and ai_shape_line_end(shape, end='head') == 'none' and ai_shape_line_end(shape, end='tail') == 'none': failures.append(connector_direction_failure(shape_id, role))
         if kind in {'text', 'text_box'} and not text:
             failures.append({'reason': 'ai_first_text_missing', 'shape_id': shape_id})
         font_size = ai_shape_font_size(shape, role)
@@ -641,7 +644,7 @@ def layout_family(slide_data: dict) -> str:
 
 
 def primary_point_count(shapes: list[dict]) -> int:
-    count = sum(1 for shape in shapes if audience_content_slot_shape(shape))
+    count = sum(1 for shape in shapes if audience_content_slot_shape(shape) and safe_text(shape.get('role')).lower() in {'point_text', 'body', 'body_sentence', 'content'})
     return max(1, min(count, 5))
 
 
@@ -969,6 +972,7 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
         ]
         manifest_slides.append({
             'slide_id': slide_id,
+            '_deck_layout_rhythm': slide_data.get('_deck_layout_rhythm') if isinstance(slide_data.get('_deck_layout_rhythm'), dict) else {},
             'title': slide_title(slide_data, index),
             'layout_family': layout_family(slide_data),
             'layout_writer': 'officecli_pptx_materializer',
@@ -997,6 +1001,10 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
             'issues': quality['issues'],
             'repaired': slide_id in repaired_slide_ids,
         })
+
+    fail_closed_on_manifest_qa(manifest_slides)
+    for slide in manifest_slides:
+        slide.pop('_deck_layout_rhythm', None)
 
     def run_officecli(args, *, input_text: str | None = None) -> subprocess.CompletedProcess:
         completed = subprocess.run(

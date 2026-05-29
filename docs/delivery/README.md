@@ -21,7 +21,7 @@ Delivery docs 解释当前 deliverable families、default routes、proof environ
 - [Image-first PPT production route](./image-first-ppt-production-route.md)
 - [RCA real route evolution probe](./real-route-evolution-probe.md)
 - [HTML PPT route quality](./html-ppt-route-quality.md)
-- [Native PPT proof environment](./native-ppt-proof-environment.md)
+- [Native PPT proof environment](./native-ppt-proof-environment.md)：解释 native editable PPTX 的 AI-first design pack、`editable_shape_plan`、officecli writer / validator、true render QA、AgentLab refs-only 和 mock-not-sample 边界。
 历史 stable deliverable 手工测试简报已进入 [history/phase-2](../history/phase-2/stable_deliverable_manual_test_brief.md)，不再作为当前 delivery 材料读取。
 
 Runtime contracts 应使用 `human_doc:*` semantic pointers 作为读者上下文，不把本目录布局当稳定机器接口。

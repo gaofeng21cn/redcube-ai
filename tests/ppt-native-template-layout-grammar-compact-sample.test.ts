@@ -69,13 +69,29 @@ test('native PPT compact sample output contract carries safe zone blueprints for
     sampleProfile,
   }).editable_shape_plan;
   const grammar = contract.template_layout_grammar;
+  assert.equal(contract.professional_design_pack_contract.required, true);
+  assert.equal(contract.professional_design_pack_contract.creative_owner, 'llm_agent');
+  assert.equal(contract.professional_design_pack_contract.materializer_can_select_layout, false);
+  assert.equal(
+    contract.professional_design_pack_contract.layout_archetype_taxonomy
+      .some((archetype) => archetype.archetype_id === 'flow_hub_to_cards_proof_band'),
+    true,
+  );
+  assert.equal(contract.professional_design_pack_contract.capacity_budgets.body_font_pt_min, 18);
+  assert.equal(contract.professional_design_pack_contract.connector_semantics.real_ppt_connector_required, true);
+  assert.equal(contract.professional_design_pack_contract.connector_semantics.horizontal_bus_for_route_cards_allowed, false);
+  assert.equal(contract.professional_design_pack_contract.design_reference_discipline.source_projects.includes('presenton'), true);
+  assert.equal(contract.professional_design_pack_contract.design_reference_discipline.source_projects.includes('ppt-agent-skills'), true);
   assert.equal(grammar.global_rules.safe_zone_blueprint_must_be_used_before_coordinates, true);
   assert.equal(contract.sample_capacity_contract.safe_zone_blueprints_required_before_coordinates, true);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /sample_status_proof_board/);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /title_zone:title:0\.85,0\.45,14\.3,1\.15,0\.15/);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /proof_zone:proof/);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /title:title_zone:0\.95,0\.58,13\.6,0\.9/);
-  assert.match(grammar.safe_zone_blueprints.tuple_contract, /core_sentence:claim_zone:0\.95,1\.86,13\.6,0\.88/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /core_sentence:claim_zone:0\.95,1\.86,13\.6,0\.95/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /point_text:status_zone:1\.25\|6\.0\|10\.75,4\.9,4\.0,1\.05/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /proof_text:proof_zone:1\.25,6\.88,12\.9,1\.05/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /no_route_label/);
   assert.equal(grammar.safe_zone_blueprint_rule.includes('Copy tuple zones'), true);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /kind=connector/);
   assert.deepEqual(
@@ -118,6 +134,8 @@ test('native PPT compact sample output contract exposes capacity budgets from li
   assert.equal(sampleStatus.content_schema.core_sentence_height_in_min, 0.95);
   assert.equal(sampleStatus.content_schema.evidence_item_height_in_min, 0.84);
   assert.equal(sampleStatus.content_schema.status_card_point_text_min_cjk_chars, 12);
+  assert.equal(sampleStatus.content_schema.status_card_separate_route_label_allowed, false);
+  assert.equal(sampleStatus.content_schema.status_card_single_point_text_required, true);
   assert.equal(sampleStatus.content_schema.input_hub_label_height_in_min, 0.54);
   assert.equal(sampleStatus.content_schema.input_hub_label_width_in_min, 10.4);
   assert.equal(sampleStatus.content_schema.input_hub_width_in_min, 10.4);
@@ -138,6 +156,12 @@ test('native PPT compact sample output contract exposes capacity budgets from li
   assert.match(sampleStatus.layout_description, /proof band/);
   assert.equal(contract.design_spec_lock.borrowed_principles.includes('semantic_layout_selection'), true);
   assert.equal(contract.design_spec_lock.borrowed_principles.includes('per_page_visual_plan'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('ppt_master_style_spec_lock'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('template_layout_grammar'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('template_profile'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('reference_deck_analysis'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('layout_rhythm'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('rendered_quality_gate'), true);
   assert.equal(contract.design_spec_lock.qa_gates.includes('layout_variety'), true);
   const profile = nativePptSampleLayoutProfile({
     delivery_request: {
@@ -155,6 +179,8 @@ test('native PPT compact sample output contract exposes capacity budgets from li
   assert.equal(profile.capacity_rules.input_hub_label_max_cjk_chars, 16);
   assert.deepEqual(profile.capacity_rules.title_font_pt_range, [40, 44]);
   assert.equal(profile.capacity_rules.status_card_point_text_min_cjk_chars, 12);
+  assert.equal(profile.capacity_rules.status_card_separate_route_label_allowed, false);
+  assert.equal(profile.capacity_rules.status_card_single_point_text_required, true);
   assert.equal(profile.capacity_rules.connector_thickness_in_min, 0.03);
   assert.equal(profile.capacity_rules.connector_text_clearance_in_min, 0.12);
   assert.equal(profile.capacity_rules.status_card_quality_role_required, 'content');
@@ -526,7 +552,7 @@ test('native PPT one-slide visual sample uses compact Codex invocation while pre
     assert.equal(runtime.prompt_pack_file, 'prompts/ppt_deck/author_pptx_native_sample.md');
     assert.deepEqual(runtime.slide_scope.slide_ids, ['S01']);
     assert.equal(runtime.context_bytes < 16000, true, `context_bytes=${runtime.context_bytes}`);
-    assert.equal(runtime.prompt_bytes < 29500, true, `prompt_bytes=${runtime.prompt_bytes}`);
+    assert.equal(runtime.prompt_bytes < 31000, true, `prompt_bytes=${runtime.prompt_bytes}`);
 
     const contract = authored.native_ppt_bundle.ai_first_shape_plan_output_contract?.editable_shape_plan || {};
     assert.equal(contract.contract_kind, 'redcube_ai_first_native_ppt_shape_plan');
@@ -547,7 +573,7 @@ test('native PPT one-slide visual sample uses compact Codex invocation while pre
     assert.equal(editableShapePlan.template_layout_grammar.helper_template_layout_allowed, false);
     assert.equal(editableShapePlan.template_layout_grammar.reference_discipline.action_title_required, true);
     assert.equal(
-      ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx']
+      ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills']
         .every((project) => editableShapePlan.template_layout_grammar.reference_discipline.source_projects.includes(project)),
       true,
     );

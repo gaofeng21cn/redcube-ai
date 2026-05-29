@@ -646,7 +646,7 @@ test('native PPT AI shape plan records template layout grammar and per-slide zon
     assert.equal(editableShapePlan.template_layout_grammar?.reference_discipline?.reference_deck_analysis_required, true);
     assert.equal(editableShapePlan.template_layout_grammar?.reference_discipline?.action_title_required, true);
     assert.equal(
-      ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx']
+      ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills']
         .every((project) => editableShapePlan.template_layout_grammar.reference_discipline.source_projects.includes(project)),
       true,
     );

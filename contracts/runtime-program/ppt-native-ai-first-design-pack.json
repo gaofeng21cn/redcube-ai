@@ -1,0 +1,606 @@
+{
+  "surface_kind": "ppt_native_ai_first_design_pack",
+  "contract_id": "ppt-native-ai-first-design-pack",
+  "projection_id": "redcube-ai.ppt-native-ai-first-design-pack.v1",
+  "date_anchor": "2026-05-29",
+  "owner": "redcube_ai",
+  "consumer": "author_pptx_native_shape_plan",
+  "status": "active_design_pack_contract",
+  "deliverable_family": "ppt_deck",
+  "route_scope": [
+    "author_pptx_native",
+    "repair_pptx_native"
+  ],
+  "claims_visual_ready": false,
+  "claims_exportable": false,
+  "claims_handoffable": false,
+  "claims_production_ready": false,
+  "design_pack_boundary": {
+    "creative_owner": "llm_agent",
+    "python_helper_role": "execute_selected_archetype_zones_validate_materialize_only",
+    "helper_template_layout_allowed": false,
+    "helper_can_select_layout_archetype": false,
+    "helper_can_replace_design_profile": false,
+    "new_runtime_dependency_allowed": false,
+    "third_party_code_copied": false,
+    "third_party_template_asset_copied": false,
+    "discipline_adoption_mode": "clean_room_design_discipline_only"
+  },
+  "layout_archetype_taxonomy": {
+    "required": true,
+    "selection_owner": "llm_agent",
+    "selected_archetype_field": "editable_shape_plan.slides[].template_layout_binding.selected_archetype",
+    "helper_selection_allowed": false,
+    "archetype_catalog": [
+      {
+        "archetype_id": "professional_system_map",
+        "use_when": "workflow, route, system, gate, or evidence flow needs first-glance structure",
+        "layout_description": "A title and claim sit above an editable system map with route lanes, gate stack, evidence band, and connector lanes kept outside readable text.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "system_map_zone",
+          "gate_zone",
+          "evidence_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "system_map_panel",
+            "route_label",
+            "gate_card",
+            "evidence_item"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "structural_visual",
+            "gate_or_route_label",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/professional_system_map"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "connector crossing readable text",
+          "labels placed on rails",
+          "route labels without explanatory audience text"
+        ]
+      },
+      {
+        "archetype_id": "executive_status_board",
+        "use_when": "status proof, executive readout, or low-density route outcome summary",
+        "layout_description": "Large status panels occupy the middle, supported by a separate proof or takeaway band and a visible hierarchy object.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "status_zone",
+          "evidence_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "point_text",
+            "evidence_item",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "content_container",
+            "audience_body_text",
+            "evidence_or_metric_text",
+            "takeaway_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/executive_status_board"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "receipt label pile",
+          "empty four-card grid",
+          "tiny KPI badges"
+        ]
+      },
+      {
+        "archetype_id": "evidence_timeline",
+        "use_when": "sequence, milestone, causal evolution, or proof chronology",
+        "layout_description": "A timeline rail with milestone nodes and off-rail labels, with evidence and takeaway zones separated from the sequence.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "timeline_zone",
+          "evidence_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "timeline_panel",
+            "point_text",
+            "evidence_item",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "timeline_marker",
+            "audience_body_text",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/evidence_timeline"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "timeline rail through labels",
+          "milestone text below floor",
+          "more milestones than the selected zone capacity"
+        ]
+      },
+      {
+        "archetype_id": "risk_control_matrix",
+        "use_when": "risks, controls, gates, criteria, or comparative quality readout",
+        "layout_description": "A matrix or comparison field with filled cells, clear row and column grammar, and a separate signal or takeaway area.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "matrix_zone",
+          "signal_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "compare_panel",
+            "point_text",
+            "metric",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "matrix_or_compare_container",
+            "audience_body_text",
+            "evidence_or_metric_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/risk_control_matrix"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "unfilled matrix cell",
+          "four-card template for fewer than four facts",
+          "flat equal panels without comparison semantics"
+        ]
+      },
+      {
+        "archetype_id": "decision_dashboard",
+        "use_when": "decision, recommendation, operating readout, or proof dashboard",
+        "layout_description": "A decision or recommendation zone creates first-glance hierarchy, with proof objects and takeaway separated by zones.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "decision_zone",
+          "proof_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "point_text",
+            "metric",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "content_container",
+            "audience_body_text",
+            "evidence_or_metric_text",
+            "takeaway_text"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/archetype_budgets/decision_dashboard"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements",
+        "prohibited": [
+          "all content in equal cards",
+          "no first-glance hierarchy",
+          "decision hidden below proof details"
+        ]
+      },
+      {
+        "archetype_id": "sample_status_proof_board",
+        "use_when": "native_visual_sample true with one-slide route status proof",
+        "layout_description": "One title, one claim, one wide input hub, three status cards, three vertical connector drops, and one proof band.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "status_zone",
+          "proof_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "input_hub",
+            "content_panel",
+            "point_text",
+            "flow_connector",
+            "proof_band"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "structural_input_hub",
+            "status_card_triplet",
+            "vertical_connector_triplet",
+            "single_proof_sentence"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/sample_budgets/sample_status_proof_board"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics/sample_status_proof_board",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements/sample_status_proof_board",
+        "prohibited": [
+          "horizontal bus",
+          "separate takeaway zone",
+          "artifact inventory",
+          "more or fewer than three status cards"
+        ]
+      },
+      {
+        "archetype_id": "sample_decision_proof_split",
+        "use_when": "native_visual_sample true with one-slide decision and proof split",
+        "layout_description": "One title, one claim, left decision panel, right proof stack, visible rail, and bottom takeaway band.",
+        "required_zones": [
+          "title_zone",
+          "claim_zone",
+          "decision_zone",
+          "proof_zone",
+          "takeaway_zone"
+        ],
+        "content_schema": {
+          "required_shape_roles": [
+            "title",
+            "core_sentence",
+            "content_panel",
+            "decision_rail",
+            "proof_rail",
+            "takeaway"
+          ],
+          "required_shape_role_groups": [
+            "title_text",
+            "core_claim_text",
+            "decision_panel",
+            "proof_stack",
+            "structural_rail",
+            "takeaway_band"
+          ],
+          "capacity_budget_ref": "#/capacity_budgets/sample_budgets/sample_decision_proof_split"
+        },
+        "font_floor_ref": "#/font_floors",
+        "connector_semantics_ref": "#/connector_semantics",
+        "non_text_visual_requirement_ref": "#/non_text_visual_requirements/sample_decision_proof_split",
+        "prohibited": [
+          "status-board geometry",
+          "three equal route cards",
+          "missing decision or proof rail"
+        ]
+      }
+    ]
+  },
+  "capacity_budgets": {
+    "global": {
+      "min_filled_required_zone_share": 0.8,
+      "max_audience_text_shapes_per_slide": 14,
+      "max_primary_points_per_slide": 5,
+      "min_edge_margin_in": 0.6,
+      "min_zone_gap_in": 0.32,
+      "min_zone_inset_in": 0.15,
+      "fit_strategy_order": [
+        "select_lower_density_archetype",
+        "reduce_slot_count",
+        "shorten_copy",
+        "resize_zones",
+        "emit_coordinates"
+      ],
+      "font_shrink_to_fit_allowed": false
+    },
+    "archetype_budgets": {
+      "professional_system_map": {
+        "max_route_labels": 5,
+        "max_gate_cards": 4,
+        "max_evidence_items": 3
+      },
+      "executive_status_board": {
+        "max_status_cards": 4,
+        "min_card_width_in": 3.3,
+        "min_card_height_in": 1.55
+      },
+      "evidence_timeline": {
+        "max_milestone_count": 4,
+        "max_evidence_items": 3
+      },
+      "risk_control_matrix": {
+        "max_matrix_cells": 9,
+        "empty_cell_allowed": false
+      },
+      "decision_dashboard": {
+        "max_proof_objects": 4,
+        "first_glance_hierarchy_required": true
+      }
+    },
+    "samples": {
+      "max_audience_text_shapes_per_slide": 12,
+      "max_status_card_count": 3,
+      "max_proof_text_count": 1,
+      "artifact_inventory_visible_allowed": false
+    },
+    "sample_budgets": {
+      "sample_status_proof_board": {
+        "status_card_count": 3,
+        "min_input_hub_width_in": 10.4,
+        "min_input_hub_height_in": 0.82,
+        "min_status_zone_height_in": 3.45,
+        "min_proof_zone_height_in": 1.35,
+        "connector_count": 3
+      },
+      "sample_decision_proof_split": {
+        "max_decision_points": 2,
+        "max_proof_items": 3,
+        "min_takeaway_zone_height_in": 1.2
+      }
+    }
+  },
+  "font_floors": {
+    "title_pt_min": 36,
+    "sample_title_pt_min": 40,
+    "body_pt_min": 18,
+    "core_sentence_pt_min": 18,
+    "point_index_pt_min": 16,
+    "table_body_pt_min": 11,
+    "input_hub_pt_min": 22,
+    "title_to_body_ratio_min": 2,
+    "font_floor_repair_policy": "change_geometry_copy_or_archetype_before_lowering_font"
+  },
+  "connector_semantics": {
+    "layout_zone_binding_required": true,
+    "connector_quality_role": "structural",
+    "text_collision_allowed": false,
+    "connector_crosses_readable_text_allowed": false,
+    "connector_lane_must_be_claimed_by_zone": true,
+    "required_connector_roles": [
+      "flow_connector",
+      "merge_connector",
+      "bridge_connector",
+      "decision_rail",
+      "proof_rail",
+      "evidence_axis"
+    ],
+    "sample_status_proof_board": {
+      "vertical_drop_count": 3,
+      "horizontal_bus_allowed": false,
+      "max_vertical_drop_width_in": 0.04,
+      "min_vertical_drop_height_in": 0.66,
+      "directional_arrow_required": true
+    }
+  },
+  "layout_rhythm": {
+    "deck_layout_rhythm_plan_required": true,
+    "no_three_consecutive_same_archetype": true,
+    "no_three_consecutive_same_primary_grid": true,
+    "repeated_concrete_composition_limit": 2,
+    "min_distinct_composition_share": 0.75,
+    "composition_signature_must_describe_geometry": true,
+    "repair_must_change_repeated_concrete_geometry": true
+  },
+  "non_text_visual_requirements": {
+    "structural_visual_required": true,
+    "cards_alone_satisfy_requirement": false,
+    "min_structural_shape_count_per_slide": 1,
+    "structural_shape_roles": [
+      "proof_band",
+      "decision_rail",
+      "input_hub",
+      "evidence_axis",
+      "gate_stack_panel",
+      "flow_connector",
+      "bridge_connector",
+      "metric_grid",
+      "timeline_panel",
+      "system_map_panel"
+    ],
+    "sample_status_proof_board": {
+      "required_non_text_objects": [
+        "input_hub",
+        "flow_connector",
+        "proof_band"
+      ],
+      "cards_alone_satisfy_requirement": false
+    },
+    "sample_decision_proof_split": {
+      "required_non_text_objects": [
+        "decision_rail",
+        "proof_rail",
+        "takeaway_band"
+      ],
+      "cards_alone_satisfy_requirement": false
+    }
+  },
+  "reference_discipline": {
+    "clean_room_only": true,
+    "runtime_dependency_adoption_allowed": false,
+    "third_party_code_copy_allowed": false,
+    "third_party_template_copy_allowed": false,
+    "reference_projects": [
+      {
+        "project_id": "ppt-master",
+        "adopted_discipline": [
+          "spec_lock",
+          "per_page_visual_plan",
+          "rendered_quality_gate"
+        ],
+        "not_adopted": [
+          "runtime code",
+          "template assets"
+        ]
+      },
+      {
+        "project_id": "PPTAgent",
+        "adopted_discipline": [
+          "semantic_layout_selection",
+          "template_profile",
+          "reference_deck_analysis"
+        ],
+        "not_adopted": [
+          "agent runtime",
+          "template corpus"
+        ]
+      },
+      {
+        "project_id": "officecli-pptx",
+        "adopted_discipline": [
+          "font_floor",
+          "validate_before_close",
+          "editable_shape_manifest"
+        ],
+        "not_adopted": [
+          "authoring loop owner",
+          "visual verdict authority"
+        ]
+      },
+      {
+        "project_id": "Presenton",
+        "adopted_discipline": [
+          "slide_archetype_catalog",
+          "non_text_visual_first_glance",
+          "export_preview_check"
+        ],
+        "not_adopted": [
+          "runtime dependency",
+          "theme pack"
+        ]
+      },
+      {
+        "project_id": "ppt-agent-skills",
+        "adopted_discipline": [
+          "professional_design_profile",
+          "capacity_budget_before_coordinates",
+          "repair_against_visible_artifact"
+        ],
+        "not_adopted": [
+          "skill runtime",
+          "third_party prompt text"
+        ]
+      }
+    ]
+  },
+  "professional_style_registry": {
+    "active_profile_id": "rca_executive_proof_board",
+    "selection_field": "editable_shape_plan.design_spec_lock.professional_design_brief.design_register",
+    "profiles": [
+      {
+        "profile_id": "rca_executive_proof_board",
+        "use_when": "operator proof, executive status, or route evidence board",
+        "palette": {
+          "canvas": "#F6F2EA",
+          "ink": "#171C24",
+          "muted": "#5B6570",
+          "accent": "#B94624",
+          "panel": "#EFE6D6"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "warm canvas, strong action title, proof band, restrained connector rails",
+        "forbidden_patterns": [
+          "generic equal-card grid",
+          "decorative title underline",
+          "visible artifact receipt inventory"
+        ]
+      },
+      {
+        "profile_id": "rca_clinical_evidence_timeline",
+        "use_when": "academic or evidence chronology deck",
+        "palette": {
+          "canvas": "#F7FAF9",
+          "ink": "#1B2430",
+          "muted": "#64748B",
+          "accent": "#0F766E",
+          "panel": "#E5F2EF"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "quiet evidence field, timeline rail, proof notes outside the rail",
+        "forbidden_patterns": [
+          "rail crossing label text",
+          "dense citation receipt wall",
+          "body text under floor"
+        ]
+      },
+      {
+        "profile_id": "rca_decision_control_matrix",
+        "use_when": "risk, gate, control, or tradeoff deck",
+        "palette": {
+          "canvas": "#F8F7F3",
+          "ink": "#1F2937",
+          "muted": "#667085",
+          "accent": "#315C7A",
+          "panel": "#E8EDF0"
+        },
+        "typography": {
+          "title_family": "Noto Sans CJK SC",
+          "body_family": "Noto Sans CJK SC",
+          "title_weight": 700,
+          "body_weight": 400
+        },
+        "layout_motif": "decision-first hierarchy, matrix field, explicit gate rail",
+        "forbidden_patterns": [
+          "flat dashboard cards",
+          "empty matrix cells",
+          "unexplained stage labels"
+        ]
+      }
+    ]
+  },
+  "shape_plan_required_fields": {
+    "design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+    "deck_layout_rhythm_plan_required": true,
+    "design_spec_lock_required": true,
+    "professional_design_brief_required": true,
+    "template_layout_grammar_required": true,
+    "template_layout_binding_required": true,
+    "layout_zone_id_required_for_visible_non_auxiliary_shapes": true,
+    "selected_archetype_must_be_from_catalog": true,
+    "style_profile_must_be_from_registry": true
+  },
+  "quality_claim_boundary": {
+    "contract_presence_claims_design_assets_available": true,
+    "contract_presence_claims_visual_ready": false,
+    "contract_presence_claims_production_ready": false,
+    "visual_quality_requires_live_shape_plan_render_review_export": true
+  }
+}

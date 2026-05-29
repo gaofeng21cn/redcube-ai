@@ -15,6 +15,7 @@ import {
 } from '@redcube/domain-entry';
 import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import { collectNativeTerminalEvidence } from './real-route-evolution-probe-parts/terminal-evidence.ts';
 
 const DEFAULT_ROUTE_LANES = ['image', 'html', 'native'];
 const MOCK_CODEX_BIN = path.join(process.cwd(), 'tests/helpers/mock-codex-cli-bin.ts');
@@ -721,6 +722,7 @@ async function runLane({
         ? routeRuns.filter((run) => run.iteration === 2).every((run) => run.cache_status === 'hit')
         : null,
     },
+    terminal_evidence_pending: lane === 'native',
   };
 }
 
@@ -894,6 +896,19 @@ export async function runRealRouteEvolutionProbe(options = {}) {
     writeJson(performanceReportFile, performanceReport);
     const typedBlockers = lanes.flatMap((lane) => safeArray(lane.typed_blockers));
     const status = typedBlockers.length > 0 ? 'blocked' : 'completed';
+    const reportFile = path.join(outputDir, 'real-route-evolution-probe.json');
+    for (const lane of lanes) {
+      if (lane.lane !== 'native' || lane.status !== 'completed') continue;
+      lane.terminal_evidence = collectNativeTerminalEvidence({
+        workspaceRoot,
+        topicId,
+        deliverableId: lane.deliverable_id,
+        routeRuns: lane.route_runs,
+        reportFile,
+        providerMode,
+      });
+      lane.terminal_evidence_pending = false;
+    }
     const report = {
       schema_version: 1,
       surface_kind: 'rca_real_route_evolution_probe',
@@ -925,7 +940,6 @@ export async function runRealRouteEvolutionProbe(options = {}) {
         artifact_writes_confined_to_workspace_root: workspaceRoot,
       },
     };
-    const reportFile = path.join(outputDir, 'real-route-evolution-probe.json');
     writeJson(reportFile, report);
     return { ...report, report_file: reportFile };
   });
