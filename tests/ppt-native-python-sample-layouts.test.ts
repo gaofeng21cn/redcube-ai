@@ -7,6 +7,161 @@ import {
   runNativePlanValidation,
 } from './helpers/ppt-native-python-layout-fixtures.ts';
 
+function safeText(value) {
+  return String(value || '').trim();
+}
+
+function statusProofBoardCapacityRules(overrides = {}) {
+  return {
+    input_hub_width_in_min: 10.4,
+    input_hub_height_in_min: 0.82,
+    input_hub_font_pt_min: 22,
+    input_hub_spans_route_card_centers_required: true,
+    input_hub_card_flow_geometry_required: true,
+    input_hub_center_tolerance_in: 0.35,
+    connector_card_center_tolerance_in: 0.22,
+    connector_vertical_width_in_max: 0.04,
+    connector_vertical_height_in_min: 0.66,
+    connector_hub_gap_in_max: 0.12,
+    horizontal_connector_bus_allowed: false,
+    connector_direction_required: true,
+    route_card_connector_kind_required: 'connector',
+    ...overrides,
+  };
+}
+
+function nativeSampleProfile({ capacityRules, zoneFloors, overrides = {} } = {}) {
+  return {
+    required: true,
+    allowed_sample_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
+    forbidden_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map'],
+    ...(capacityRules === null ? {} : { capacity_rules: capacityRules || statusProofBoardCapacityRules() }),
+    ...(zoneFloors === null ? {} : { archetype_contracts: [{ archetype_id: 'sample_status_proof_board', zone_floor_in: zoneFloors || { title_zone: 1.15, claim_zone: 1.05, status_zone: 3.45, proof_zone: 1.35 } }] }),
+    ...overrides,
+  };
+}
+
+function createCapacitySafeStatusProofBoardSample() {
+  const sample = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'cover_signal',
+    title: '三条生成路线，怎样才算闭环？',
+    core: '同一输入完成三条路线，并留下文件、截图和审阅记录，才算最小闭环成立。',
+    points: [
+      '同一资料包控制输入。',
+      '三条路线各有真实产物。',
+      '截图、审阅、导出齐备。',
+    ],
+    slotCount: 3,
+  });
+  sample.template_layout_binding = {
+    selected_archetype: 'sample_status_proof_board',
+    archetype_instance_id: 'S01-sample-status-proof-board',
+    rhythm_role: 'opening_sample',
+    zone_gap_in_min: 0.32,
+    zone_inset_in_min: 0.15,
+    zones: [
+      { zone_id: 'title_zone', semantic_role: 'title', bounds: { left_in: 0.85, top_in: 0.45, width_in: 14.3, height_in: 1.15 }, intended_content: 'title', min_font_pt: 40, safe_inset_in: 0.15 },
+      { zone_id: 'claim_zone', semantic_role: 'claim', bounds: { left_in: 0.85, top_in: 1.67, width_in: 14.3, height_in: 1.05 }, intended_content: 'claim', min_font_pt: 18, safe_inset_in: 0.15 },
+      { zone_id: 'status_zone', semantic_role: 'status', bounds: { left_in: 0.85, top_in: 2.95, width_in: 14.3, height_in: 3.55 }, intended_content: 'three status cards', min_font_pt: 18, safe_inset_in: 0.15 },
+      { zone_id: 'proof_zone', semantic_role: 'proof', bounds: { left_in: 0.85, top_in: 6.65, width_in: 14.3, height_in: 1.5 }, intended_content: 'proof band', min_font_pt: 18, safe_inset_in: 0.15 },
+    ],
+  };
+  sample.layout_intent.primary_grid = 'sample_status_proof_board';
+  sample.layout_intent.non_text_visual = 'proof band with status board cards';
+  sample.native_shapes = sample.native_shapes
+    .filter((shape) => !['takeaway', 'takeaway_panel', 'page_number'].includes(shape.role) && shape.shape_id !== 'S01-evidence-summary')
+    .map((shape) => {
+      if (shape.role === 'title') {
+        return { ...shape, layout_zone_id: 'title_zone', bounds: { left_in: 0.95, top_in: 0.58, width_in: 13.5, height_in: 0.92 }, font_size: 40 };
+      }
+      if (shape.role === 'core_sentence') {
+        return { ...shape, layout_zone_id: 'claim_zone', bounds: { left_in: 0.95, top_in: 1.86, width_in: 13.5, height_in: 0.88 }, font_size: 18 };
+      }
+      if (shape.role === 'signal_hub') {
+        return { ...shape, role: 'proof_hub', layout_zone_id: 'proof_zone', bounds: { left_in: 1.2, top_in: 6.32, width_in: 0.46, height_in: 0.46 } };
+      }
+      if (shape.role === 'signal_connector') {
+        return { ...shape, role: 'proof_connector', layout_zone_id: 'proof_zone', bounds: { left_in: 1.75, top_in: 6.52, width_in: 0.74, height_in: 0.04 } };
+      }
+      if (shape.role === 'signal_panel') {
+        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
+        return {
+          ...shape,
+          role: 'content_panel',
+          layout_zone_id: 'status_zone',
+          bounds: { left_in: [1.1, 5.85, 10.6][index] || shape.bounds.left_in, top_in: 4.68, width_in: 4.3, height_in: 1.5 },
+        };
+      }
+      if (shape.role === 'point_index') return null;
+      if (shape.role === 'point_text') {
+        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
+        const concisePoints = [
+          '同源输入材料已固定可复核',
+          '三条路线产物均可检查留证',
+          '截图审阅导出证据齐备可查',
+        ];
+        return {
+          ...shape,
+          layout_zone_id: 'status_zone',
+          editable_text: concisePoints[index] || shape.editable_text,
+          bounds: { left_in: ([1.1, 5.85, 10.6][index] || shape.bounds.left_in) + 0.22, top_in: 4.9, width_in: 3.86, height_in: 1.02 },
+          font_size: 18,
+          margin: '0.08in',
+        };
+      }
+      if (shape.role === 'evidence_item') {
+        if (shape.shape_id === 'S01-evidence-summary') {
+          return null;
+        }
+        return { ...shape, role: 'evidence_item', quality_role: 'content', layout_zone_id: 'proof_zone', editable_text: '文件、截图、审阅记录三项齐备。', bounds: { left_in: 2.7, top_in: 6.96, width_in: 11.8, height_in: 0.88 }, font_size: 18 };
+      }
+      return shape;
+    })
+    .filter(Boolean);
+  sample.native_shapes.push(
+    {
+      shape_id: 'S01-input-hub',
+      kind: 'rounded_rect',
+      role: 'input_hub',
+      quality_role: 'structural',
+      layout_zone_id: 'status_zone',
+      editable_text: '同一材料同步进入三条路线验证',
+      bounds: { left_in: 2.8, top_in: 3.08, width_in: 10.4, height_in: 0.86 },
+      font_size: 22,
+      align: 'center',
+      valign: 'center',
+      color: '#FFFFFF',
+      fill: '#2563EB',
+      line: '#2563EB',
+    },
+    ...[3.25, 8.0, 12.75].map((center, index) => ({
+      shape_id: `S01-flow-drop-${index + 1}`,
+      kind: 'connector',
+      role: 'flow_connector',
+      quality_role: 'structural',
+      layout_zone_id: 'status_zone',
+      bounds: { left_in: center - 0.015, top_in: 3.94, width_in: 0.03, height_in: 0.74 },
+      fill: 'none',
+      line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+      tailEnd: 'triangle',
+    })),
+    {
+      shape_id: 'S01-page',
+      kind: 'text_box',
+      role: 'page_number',
+      quality_role: 'auxiliary',
+      editable_text: '01',
+      bounds: { left_in: 14.2, top_in: 8.08, width_in: 0.55, height_in: 0.32 },
+      font_size: 12,
+      color: '#5B6570',
+      fill: 'none',
+      line: 'none',
+    },
+  );
+  return sample;
+}
+
 test('native PPTX one-slide sample preflight rejects overloaded general board layouts', () => {
   const overloaded = createAiSlide({
     slideId: 'S01',
@@ -79,139 +234,12 @@ test('native PPTX one-slide sample preflight rejects overloaded general board la
 });
 
 test('native PPTX one-slide sample accepts capacity-safe status proof board', () => {
-  const sample = createAiSlide({
-    slideId: 'S01',
-    layoutFamily: 'cover_signal',
-    title: '三条生成路线，怎样才算闭环？',
-    core: '同一输入完成三条路线，并留下文件、截图和审阅记录，才算最小闭环成立。',
-    points: [
-      '同一资料包控制输入。',
-      '三条路线各有真实产物。',
-      '截图、审阅、导出齐备。',
-    ],
-    slotCount: 3,
-  });
-  sample.template_layout_binding = {
-    selected_archetype: 'sample_status_proof_board',
-    archetype_instance_id: 'S01-sample-status-proof-board',
-    rhythm_role: 'opening_sample',
-    zone_gap_in_min: 0.32,
-    zone_inset_in_min: 0.15,
-    zones: [
-      { zone_id: 'title_zone', semantic_role: 'title', bounds: { left_in: 0.85, top_in: 0.45, width_in: 14.3, height_in: 1.2 }, intended_content: 'title', min_font_pt: 36, safe_inset_in: 0.15 },
-      { zone_id: 'claim_zone', semantic_role: 'claim', bounds: { left_in: 0.85, top_in: 1.72, width_in: 14.3, height_in: 1.1 }, intended_content: 'claim', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'status_zone', semantic_role: 'status', bounds: { left_in: 0.85, top_in: 3.05, width_in: 14.3, height_in: 2.4 }, intended_content: 'three status cards', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'proof_zone', semantic_role: 'proof', bounds: { left_in: 0.85, top_in: 6.0, width_in: 14.3, height_in: 1.5 }, intended_content: 'proof band', min_font_pt: 18, safe_inset_in: 0.15 },
-    ],
-  };
-  sample.layout_intent.primary_grid = 'sample_status_proof_board';
-  sample.layout_intent.non_text_visual = 'proof band with status board cards';
-  sample.native_shapes = sample.native_shapes
-    .filter((shape) => !['takeaway', 'takeaway_panel', 'page_number'].includes(shape.role) && shape.shape_id !== 'S01-evidence-summary')
-    .map((shape) => {
-      if (shape.role === 'title') {
-        return { ...shape, layout_zone_id: 'title_zone', bounds: { left_in: 0.95, top_in: 0.58, width_in: 13.5, height_in: 0.96 }, font_size: 36 };
-      }
-      if (shape.role === 'core_sentence') {
-        return { ...shape, layout_zone_id: 'claim_zone', bounds: { left_in: 0.95, top_in: 1.9, width_in: 13.5, height_in: 0.9 }, font_size: 18 };
-      }
-      if (shape.role === 'signal_hub') {
-        return { ...shape, role: 'proof_hub', layout_zone_id: 'proof_zone', bounds: { left_in: 1.2, top_in: 6.32, width_in: 0.46, height_in: 0.46 } };
-      }
-      if (shape.role === 'signal_connector') {
-        return { ...shape, role: 'proof_connector', layout_zone_id: 'proof_zone', bounds: { left_in: 1.75, top_in: 6.52, width_in: 0.74, height_in: 0.04 } };
-      }
-      if (shape.role === 'signal_panel') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        return {
-          ...shape,
-          role: 'content_panel',
-          layout_zone_id: 'status_zone',
-          bounds: { left_in: [0.95, 5.8, 10.65][index] || shape.bounds.left_in, top_in: 3.18, width_in: 4.4, height_in: 2.08 },
-        };
-      }
-      if (shape.role === 'point_index') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        return {
-          ...shape,
-          layout_zone_id: 'status_zone',
-          bounds: { ...shape.bounds, left_in: ([0.95, 5.8, 10.65][index] || shape.bounds.left_in) + 0.24, top_in: 3.45 },
-        };
-      }
-      if (shape.role === 'point_text') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        const concisePoints = [
-          '同源输入材料已固定可复核',
-          '三条路线产物均可检查留证',
-          '截图审阅导出证据齐备可查',
-        ];
-        return {
-          ...shape,
-          layout_zone_id: 'status_zone',
-          editable_text: concisePoints[index] || shape.editable_text,
-          bounds: { left_in: ([0.95, 5.8, 10.65][index] || shape.bounds.left_in) + 0.24, top_in: shape.bounds.top_in - 0.04, width_in: 3.92, height_in: 1.1 },
-          font_size: 18,
-          margin: '0.08in',
-        };
-      }
-      if (shape.role === 'evidence_item') {
-        if (shape.shape_id === 'S01-evidence-summary') {
-          return null;
-        }
-        return { ...shape, role: 'evidence_item', quality_role: 'content', layout_zone_id: 'proof_zone', editable_text: '文件、截图、审阅记录三项齐备。', bounds: { left_in: 2.7, top_in: 6.34, width_in: 11.8, height_in: 0.88 }, font_size: 18 };
-      }
-      return shape;
-    })
-    .filter(Boolean);
-  sample.native_shapes.push(
-    {
-      shape_id: 'S01-input-hub',
-      kind: 'oval',
-      role: 'input_hub',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 7.38, top_in: 3.12, width_in: 0.72, height_in: 0.72 },
-      fill: '#DBEAFE',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-flow-left',
-      kind: 'connector',
-      role: 'flow_connector',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 4.92, top_in: 3.56, width_in: 2.3, height_in: 0.04 },
-      fill: 'none',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-flow-right',
-      kind: 'connector',
-      role: 'merge_connector',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 8.32, top_in: 3.56, width_in: 2.3, height_in: 0.04 },
-      fill: 'none',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-page',
-      kind: 'text_box',
-      role: 'page_number',
-      quality_role: 'auxiliary',
-      editable_text: '01',
-      bounds: { left_in: 14.2, top_in: 8.08, width_in: 0.55, height_in: 0.32 },
-      font_size: 12,
-      color: '#5B6570',
-      fill: 'none',
-      line: 'none',
-    },
-  );
+  const sample = createCapacitySafeStatusProofBoardSample();
   const payload = materializerPayload([sample]);
   payload.editable_shape_plan.template_layout_grammar.archetype_catalog.unshift({
     archetype_id: 'sample_status_proof_board',
     use_when: 'one slide native visual sample',
-    layout_description: 'title, claim, three status cards, and one proof band only',
+    layout_description: 'title, claim, dominant input hub, three status cards, connector drops, and one proof band only',
     required_zones: ['title_zone', 'claim_zone', 'status_zone', 'proof_zone'],
     content_schema: {
       required_shape_roles: ['title', 'core_sentence', 'input_hub', 'flow_connector', 'content_panel', 'point_text', 'proof_band', 'evidence_item'],
@@ -220,54 +248,39 @@ test('native PPTX one-slide sample accepts capacity-safe status proof board', ()
     },
     prohibited: ['takeaway_zone', 'takeaway_panel'],
   });
-  payload.native_ppt_sample_layout_profile = {
-    required: true,
-    allowed_sample_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
-    forbidden_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map'],
-    archetype_contracts: [
-      {
-        archetype_id: 'sample_status_proof_board',
-        zone_floor_in: {
-          title_zone: 1.15,
-          claim_zone: 1.05,
-          status_zone: 2.1,
-          proof_zone: 1.35,
-        },
-      },
-    ],
-  };
+  payload.native_ppt_sample_layout_profile = nativeSampleProfile();
   const accepted = runNativePlanValidation(payload);
   assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
 });
 
-test('native PPTX one-slide sample accepts compact two-archetype grammar', () => {
+test('native PPTX one-slide sample rejects narrow hub and unaligned connector ticks', () => {
   const sample = createAiSlide({
     slideId: 'S01',
     layoutFamily: 'cover_signal',
-    title: '三条生成路线，怎样才算闭环？',
-    core: '同一输入完成三条路线，并留下文件、截图和审阅记录，才算最小闭环成立。',
+    title: '三条视觉路径，怎样算真正闭环',
+    core: '最小闭环要证明同一材料进入三条路线，并完成可复核交付。',
     points: [
-      '同源输入已固定。',
-      '三条路线有产物。',
-      '截图审阅导出齐备。',
+      '图像优先路线产出可审阅页面',
+      'HTML 路线保留页面级表达',
+      'Native PPTX 路线交付可编辑样片',
     ],
     slotCount: 3,
   });
   sample.template_layout_binding = {
     selected_archetype: 'sample_status_proof_board',
-    archetype_instance_id: 'S01-sample-status-proof-board',
+    archetype_instance_id: 'S01-sample-status-proof-board-bad-flow',
     rhythm_role: 'opening_sample',
     zone_gap_in_min: 0.32,
     zone_inset_in_min: 0.15,
     zones: [
       { zone_id: 'title_zone', semantic_role: 'title', bounds: { left_in: 0.85, top_in: 0.45, width_in: 14.3, height_in: 1.2 }, intended_content: 'title', min_font_pt: 36, safe_inset_in: 0.15 },
       { zone_id: 'claim_zone', semantic_role: 'claim', bounds: { left_in: 0.85, top_in: 1.72, width_in: 14.3, height_in: 1.1 }, intended_content: 'claim', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'status_zone', semantic_role: 'status', bounds: { left_in: 0.85, top_in: 3.05, width_in: 14.3, height_in: 2.4 }, intended_content: 'three status cards', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'proof_zone', semantic_role: 'proof', bounds: { left_in: 0.85, top_in: 6.0, width_in: 14.3, height_in: 1.5 }, intended_content: 'proof band', min_font_pt: 18, safe_inset_in: 0.15 },
+      { zone_id: 'status_zone', semantic_role: 'status', bounds: { left_in: 0.85, top_in: 3.05, width_in: 14.3, height_in: 3.45 }, intended_content: 'bad narrow hub and misaligned ticks', min_font_pt: 18, safe_inset_in: 0.15 },
+      { zone_id: 'proof_zone', semantic_role: 'proof', bounds: { left_in: 0.85, top_in: 6.65, width_in: 14.3, height_in: 1.5 }, intended_content: 'proof band', min_font_pt: 18, safe_inset_in: 0.15 },
     ],
   };
   sample.layout_intent.primary_grid = 'sample_status_proof_board';
-  sample.layout_intent.non_text_visual = 'input hub with route cards and proof band';
+  sample.layout_intent.non_text_visual = 'narrow input label with isolated vertical connector ticks';
   sample.native_shapes = [
     {
       shape_id: 'S01-title',
@@ -275,7 +288,7 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
       role: 'title',
       quality_role: 'content',
       layout_zone_id: 'title_zone',
-      editable_text: '三条生成路线，怎样才算闭环？',
+      editable_text: '三条视觉路径，怎样算真正闭环',
       bounds: { left_in: 0.95, top_in: 0.58, width_in: 13.5, height_in: 0.96 },
       font_size: 36,
       fill: 'none',
@@ -287,7 +300,7 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
       role: 'core_sentence',
       quality_role: 'content',
       layout_zone_id: 'claim_zone',
-      editable_text: '同一输入完成三条路线，并留下文件、截图和审阅记录。',
+      editable_text: '同一材料进入三条路线，并完成文件、截图与审阅记录。',
       bounds: { left_in: 0.95, top_in: 1.9, width_in: 13.5, height_in: 0.9 },
       font_size: 18,
       fill: 'none',
@@ -295,55 +308,71 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
     },
     {
       shape_id: 'S01-input-hub',
-      kind: 'oval',
+      kind: 'rounded_rect',
       role: 'input_hub',
       quality_role: 'structural',
       layout_zone_id: 'status_zone',
-      bounds: { left_in: 7.38, top_in: 3.12, width_in: 0.72, height_in: 0.72 },
+      editable_text: '同一材料同步进入三条路线验证',
+      bounds: { left_in: 1.15, top_in: 3.34, width_in: 4.95, height_in: 0.58 },
+      font_size: 18,
       fill: '#DBEAFE',
       line: '#2563EB',
     },
-    ...[0.95, 5.8, 10.65].flatMap((left, index) => ([
+    ...[
+      { id: 'image', left: 0.95, text: '图像优先默认\n先产出可审阅视觉结果' },
+      { id: 'html', left: 5.8, text: 'HTML 显式路径\n验证页面级表达能力' },
+      { id: 'native', left: 10.65, text: 'Native PPTX 显式路径\n交付可编辑样片' },
+    ].flatMap((item, index) => ([
       {
-        shape_id: `S01-card-${index + 1}`,
+        shape_id: `S01-card-${item.id}`,
         kind: 'rounded_rect',
         role: 'content_panel',
         quality_role: 'content',
         layout_zone_id: 'status_zone',
-        bounds: { left_in: left, top_in: 3.18, width_in: 4.4, height_in: 2.08 },
+        bounds: { left_in: item.left, top_in: 4.56, width_in: 4.4, height_in: 1.72 },
         fill: '#FFFFFF',
-        line: '#99F6E4',
+        line: '#BFDBFE',
       },
       {
-        shape_id: `S01-text-${index + 1}`,
+        shape_id: `S01-text-${item.id}`,
         kind: 'text_box',
         role: 'point_text',
         quality_role: 'content',
         layout_zone_id: 'status_zone',
-        editable_text: ['同源输入材料已经固定可复核', '三条生成路线产物均可检查', '截图审阅导出证据齐备可查'][index],
-        bounds: { left_in: left + 0.24, top_in: 3.74, width_in: 3.92, height_in: 1.1 },
+        editable_text: ['图像路线产物可审阅', 'HTML 路线页面可复核', '原生路线样片可编辑'][index],
+        bounds: { left_in: item.left + 0.24, top_in: 4.82, width_in: 3.92, height_in: 1.1 },
         font_size: 18,
         fill: 'none',
         line: 'none',
       },
     ])),
     {
-      shape_id: 'S01-flow-left',
+      shape_id: 'S01-connector-to-image',
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
       layout_zone_id: 'status_zone',
-      bounds: { left_in: 4.92, top_in: 3.28, width_in: 2.3, height_in: 0.04 },
+      bounds: { left_in: 3.32, top_in: 4.04, width_in: 0.05, height_in: 0.42 },
       fill: 'none',
       line: '#2563EB',
     },
     {
-      shape_id: 'S01-flow-right',
+      shape_id: 'S01-connector-to-html',
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
       layout_zone_id: 'status_zone',
-      bounds: { left_in: 8.32, top_in: 3.28, width_in: 2.3, height_in: 0.04 },
+      bounds: { left_in: 7.99, top_in: 3.92, width_in: 0.05, height_in: 0.54 },
+      fill: 'none',
+      line: '#2563EB',
+    },
+    {
+      shape_id: 'S01-connector-to-native',
+      kind: 'connector',
+      role: 'flow_connector',
+      quality_role: 'structural',
+      layout_zone_id: 'status_zone',
+      bounds: { left_in: 12.66, top_in: 4.04, width_in: 0.05, height_in: 0.42 },
       fill: 'none',
       line: '#2563EB',
     },
@@ -353,9 +382,9 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
       role: 'proof_band',
       quality_role: 'structural',
       layout_zone_id: 'proof_zone',
-      bounds: { left_in: 1.05, top_in: 6.2, width_in: 13.95, height_in: 1.06 },
-      fill: '#0F766E',
-      line: 'none',
+      bounds: { left_in: 1.05, top_in: 6.85, width_in: 13.95, height_in: 1.06 },
+      fill: '#ECFDF5',
+      line: '#0F766E',
     },
     {
       shape_id: 'S01-proof-text',
@@ -363,8 +392,8 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
       role: 'evidence_item',
       quality_role: 'content',
       layout_zone_id: 'proof_zone',
-      editable_text: '文件、截图、审阅记录三项齐备。',
-      bounds: { left_in: 1.6, top_in: 6.34, width_in: 12.2, height_in: 0.72 },
+      editable_text: '三路各完成一次最小验证，并留下可复核交付门与产物记录。',
+      bounds: { left_in: 1.6, top_in: 6.98, width_in: 12.2, height_in: 0.72 },
       font_size: 18,
       fill: 'none',
       line: 'none',
@@ -381,6 +410,86 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
       line: 'none',
     },
   ];
+  const payload = materializerPayload([sample]);
+  payload.editable_shape_plan.template_layout_grammar.archetype_catalog.unshift({
+    archetype_id: 'sample_status_proof_board',
+    use_when: 'one slide native visual sample',
+    layout_description: 'title, claim, input hub, three status cards, flow connectors, and one proof band only',
+    required_zones: ['title_zone', 'claim_zone', 'status_zone', 'proof_zone'],
+    content_schema: {
+      required_shape_roles: ['title', 'core_sentence', 'input_hub', 'flow_connector', 'content_panel', 'point_text', 'proof_band', 'evidence_item'],
+      required_shape_role_groups: ['title_text', 'core_claim_text', 'input_hub', 'flow_connector', 'content_container', 'audience_body_text', 'structural_visual', 'evidence_or_metric_text'],
+      min_filled_required_zone_share: 1,
+    },
+    prohibited: ['takeaway_zone', 'takeaway_panel', 'boundary_note'],
+  });
+  payload.native_ppt_sample_layout_profile = nativeSampleProfile();
+  const rejected = runNativePlanValidation(payload);
+  assert.equal(rejected.ok, false);
+  const failures = JSON.stringify(rejected.failures);
+  assert.match(failures, /ai_first_native_sample_input_hub_too_small/);
+  assert.match(failures, /ai_first_native_sample_input_hub_not_centered/);
+  assert.match(failures, /ai_first_native_sample_input_hub_does_not_span_card_centers/);
+  assert.match(failures, /ai_first_native_sample_connector_direction_missing/);
+  assert.match(failures, /ai_first_native_sample_connector_not_vertical_drop/);
+});
+
+test('native PPTX one-slide sample rejects structural quality role on status cards', () => {
+  const sample = createCapacitySafeStatusProofBoardSample();
+  sample.native_shapes = sample.native_shapes.map((shape) => (
+    shape.role === 'content_panel'
+      ? { ...shape, quality_role: 'structural' }
+      : shape
+  ));
+  const payload = materializerPayload([sample]);
+  payload.editable_shape_plan.template_layout_grammar.archetype_catalog.unshift({
+    archetype_id: 'sample_status_proof_board',
+    use_when: 'one slide native visual sample',
+    layout_description: 'title, claim, input hub, three status cards, flow connectors, and one proof band only',
+    required_zones: ['title_zone', 'claim_zone', 'status_zone', 'proof_zone'],
+    content_schema: {
+      required_shape_roles: ['title', 'core_sentence', 'input_hub', 'flow_connector', 'content_panel', 'point_text', 'proof_band', 'evidence_item'],
+      required_shape_role_groups: ['title_text', 'core_claim_text', 'input_hub', 'flow_connector', 'content_container', 'audience_body_text', 'structural_visual', 'evidence_or_metric_text'],
+      min_filled_required_zone_share: 1,
+    },
+    prohibited: ['takeaway_zone', 'takeaway_panel'],
+  });
+  payload.native_ppt_sample_layout_profile = nativeSampleProfile({
+    capacityRules: statusProofBoardCapacityRules({ status_card_quality_role_required: 'content' }),
+  });
+  const rejected = runNativePlanValidation(payload);
+  assert.equal(rejected.ok, false);
+  assert.match(JSON.stringify(rejected.failures), /ai_first_native_sample_status_card_quality_role_invalid/);
+});
+
+test('native PPTX one-slide sample rejects line-based card arrows before officecli materialization', () => {
+  const sample = createCapacitySafeStatusProofBoardSample();
+  sample.native_shapes = sample.native_shapes.map((shape) => (
+    safeText(shape.role) === 'flow_connector' && Number(shape?.bounds?.height_in || 0) > Number(shape?.bounds?.width_in || 0)
+      ? { ...shape, kind: 'line', tailEnd: 'triangle' }
+      : shape
+  ));
+  const payload = materializerPayload([sample]);
+  payload.editable_shape_plan.template_layout_grammar.archetype_catalog.unshift({
+    archetype_id: 'sample_status_proof_board',
+    use_when: 'one slide native visual sample',
+    layout_description: 'title, claim, input hub, three status cards, flow connectors, and one proof band only',
+    required_zones: ['title_zone', 'claim_zone', 'status_zone', 'proof_zone'],
+    content_schema: {
+      required_shape_roles: ['title', 'core_sentence', 'input_hub', 'flow_connector', 'content_panel', 'point_text', 'proof_band', 'evidence_item'],
+      required_shape_role_groups: ['title_text', 'core_claim_text', 'input_hub', 'flow_connector', 'content_container', 'audience_body_text', 'structural_visual', 'evidence_or_metric_text'],
+      min_filled_required_zone_share: 1,
+    },
+    prohibited: ['takeaway_zone', 'takeaway_panel'],
+  });
+  payload.native_ppt_sample_layout_profile = nativeSampleProfile();
+  const rejected = runNativePlanValidation(payload);
+  assert.equal(rejected.ok, false);
+  assert.match(JSON.stringify(rejected.failures), /ai_first_native_sample_connector_kind_invalid/);
+});
+
+test('native PPTX one-slide sample accepts compact two-archetype grammar', () => {
+  const sample = createCapacitySafeStatusProofBoardSample();
   const payload = materializerPayload([sample]);
   payload.editable_shape_plan.authoring_mode = 'native_visual_sample_compact';
   payload.editable_shape_plan.template_layout_grammar.archetype_catalog = [
@@ -418,148 +527,14 @@ test('native PPTX one-slide sample accepts compact two-archetype grammar', () =>
     required: true,
     allowed_sample_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
     forbidden_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map'],
+    capacity_rules: statusProofBoardCapacityRules(),
   };
   const accepted = runNativePlanValidation(payload);
   assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
 });
 
 test('native PPTX one-slide sample requires visible input-to-route-to-proof flow', () => {
-  const sample = createAiSlide({
-    slideId: 'S01',
-    layoutFamily: 'cover_signal',
-    title: '三条路线，汇入闭环证据',
-    core: '同一输入先分流到三条路线，再汇入审查与导出证据。',
-    points: [
-      '同一资料包控制输入。',
-      '三条路线各有真实产物。',
-      '截图、审阅、导出齐备。',
-    ],
-    slotCount: 3,
-  });
-  sample.template_layout_binding = {
-    selected_archetype: 'sample_status_proof_board',
-    archetype_instance_id: 'S01-sample-status-proof-board',
-    rhythm_role: 'opening_sample',
-    zone_gap_in_min: 0.32,
-    zone_inset_in_min: 0.15,
-    zones: [
-      { zone_id: 'title_zone', semantic_role: 'title', bounds: { left_in: 0.85, top_in: 0.45, width_in: 14.3, height_in: 1.2 }, intended_content: 'title', min_font_pt: 36, safe_inset_in: 0.15 },
-      { zone_id: 'claim_zone', semantic_role: 'claim', bounds: { left_in: 0.85, top_in: 1.72, width_in: 14.3, height_in: 1.1 }, intended_content: 'claim', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'status_zone', semantic_role: 'status', bounds: { left_in: 0.85, top_in: 3.05, width_in: 14.3, height_in: 2.4 }, intended_content: 'input hub and three status cards', min_font_pt: 18, safe_inset_in: 0.15 },
-      { zone_id: 'proof_zone', semantic_role: 'proof', bounds: { left_in: 0.85, top_in: 6.0, width_in: 14.3, height_in: 1.5 }, intended_content: 'proof band', min_font_pt: 18, safe_inset_in: 0.15 },
-    ],
-  };
-  sample.layout_intent.primary_grid = 'sample_status_proof_board';
-  sample.layout_intent.non_text_visual = 'input hub with flow connectors into three status cards and proof band';
-  sample.native_shapes = sample.native_shapes
-    .filter((shape) => !['takeaway', 'takeaway_panel', 'page_number'].includes(shape.role) && !['signal_connector'].includes(shape.role) && shape.shape_id !== 'S01-evidence-note')
-    .map((shape) => {
-      if (shape.role === 'title') {
-        return { ...shape, layout_zone_id: 'title_zone', bounds: { left_in: 0.95, top_in: 0.58, width_in: 13.5, height_in: 0.96 }, font_size: 36 };
-      }
-      if (shape.role === 'core_sentence') {
-        return { ...shape, layout_zone_id: 'claim_zone', bounds: { left_in: 0.95, top_in: 1.9, width_in: 13.5, height_in: 0.9 }, font_size: 18 };
-      }
-      if (shape.role === 'signal_hub') {
-        return { ...shape, role: 'proof_band', quality_role: 'structural', layout_zone_id: 'proof_zone', bounds: { left_in: 1.05, top_in: 6.2, width_in: 13.95, height_in: 1.06 }, fill: '#0F766E', line: 'none' };
-      }
-      if (shape.role === 'signal_connector') {
-        return { ...shape, role: 'proof_connector', quality_role: 'structural', layout_zone_id: 'proof_zone', bounds: { left_in: 7.75, top_in: 6.06, width_in: 0.04, height_in: 0.3 }, line: '#2563EB' };
-      }
-      if (shape.role === 'signal_panel') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        return {
-          ...shape,
-          role: 'content_panel',
-          layout_zone_id: 'status_zone',
-          bounds: { left_in: [0.95, 5.8, 10.65][index] || shape.bounds.left_in, top_in: 3.18, width_in: 4.4, height_in: 2.08 },
-        };
-      }
-      if (shape.role === 'point_index') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        return {
-          ...shape,
-          layout_zone_id: 'status_zone',
-          bounds: { ...shape.bounds, left_in: ([0.95, 5.8, 10.65][index] || shape.bounds.left_in) + 0.24, top_in: 3.45 },
-        };
-      }
-      if (shape.role === 'point_text') {
-        const index = Number(String(shape.shape_id || '').match(/slot-(\d+)/)?.[1] || 1) - 1;
-        const concisePoints = [
-          '同源输入材料已固定可复核',
-          '三条路线产物均可检查留证',
-          '截图审阅导出证据齐备可查',
-        ];
-        return {
-          ...shape,
-          layout_zone_id: 'status_zone',
-          editable_text: concisePoints[index] || shape.editable_text,
-          bounds: { left_in: ([0.95, 5.8, 10.65][index] || shape.bounds.left_in) + 0.24, top_in: shape.bounds.top_in - 0.04, width_in: 3.92, height_in: 1.1 },
-          font_size: 18,
-          margin: '0.08in',
-        };
-      }
-      if (shape.role === 'evidence_item') {
-        if (shape.shape_id === 'S01-evidence-summary') return null;
-        return { ...shape, role: 'evidence_item', quality_role: 'content', layout_zone_id: 'proof_zone', editable_text: '文件、截图、审阅记录三项齐备。', bounds: { left_in: 1.6, top_in: 6.34, width_in: 12.2, height_in: 0.72 }, font_size: 18 };
-      }
-      return shape;
-    })
-    .filter(Boolean);
-  sample.native_shapes.push(
-    {
-      shape_id: 'S01-input-hub',
-      kind: 'oval',
-      role: 'input_hub',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 7.38, top_in: 3.12, width_in: 0.72, height_in: 0.72 },
-      fill: '#DBEAFE',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-flow-left',
-      kind: 'connector',
-      role: 'flow_connector',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 4.92, top_in: 3.56, width_in: 2.3, height_in: 0.04 },
-      fill: 'none',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-flow-right',
-      kind: 'connector',
-      role: 'merge_connector',
-      quality_role: 'structural',
-      layout_zone_id: 'status_zone',
-      bounds: { left_in: 8.32, top_in: 3.56, width_in: 2.3, height_in: 0.04 },
-      fill: 'none',
-      line: '#2563EB',
-    },
-    {
-      shape_id: 'S01-proof-text',
-      kind: 'text_box',
-      role: 'evidence_item',
-      quality_role: 'content',
-      layout_zone_id: 'proof_zone',
-      editable_text: '文件、截图、审阅记录三项齐备。',
-      bounds: { left_in: 1.6, top_in: 6.34, width_in: 12.2, height_in: 0.72 },
-      font_size: 18,
-    },
-    {
-      shape_id: 'S01-page',
-      kind: 'text_box',
-      role: 'page_number',
-      quality_role: 'auxiliary',
-      editable_text: '01',
-      bounds: { left_in: 14.2, top_in: 8.08, width_in: 0.55, height_in: 0.32 },
-      font_size: 12,
-      color: '#5B6570',
-      fill: 'none',
-      line: 'none',
-    },
-  );
+  const sample = createCapacitySafeStatusProofBoardSample();
   const payload = materializerPayload([sample]);
   payload.editable_shape_plan.template_layout_grammar.archetype_catalog.unshift({
     archetype_id: 'sample_status_proof_board',
@@ -583,11 +558,12 @@ test('native PPTX one-slide sample requires visible input-to-route-to-proof flow
         zone_floor_in: {
           title_zone: 1.15,
           claim_zone: 1.05,
-          status_zone: 2.1,
+          status_zone: 3.45,
           proof_zone: 1.35,
         },
       },
     ],
+    capacity_rules: statusProofBoardCapacityRules(),
   };
   const accepted = runNativePlanValidation(payload);
   assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
@@ -862,11 +838,11 @@ test('native PPTX one-slide sample rejects long wrapped status card text before 
     required: true,
     allowed_sample_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
     forbidden_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map'],
-    capacity_rules: {
+    capacity_rules: statusProofBoardCapacityRules({
       status_card_text_box_height_in_min: 0.96,
       status_card_point_text_max_estimated_lines: 2,
       status_card_point_text_max_cjk_chars: 22,
-    },
+    }),
     archetype_contracts: [
       {
         archetype_id: 'sample_status_proof_board',

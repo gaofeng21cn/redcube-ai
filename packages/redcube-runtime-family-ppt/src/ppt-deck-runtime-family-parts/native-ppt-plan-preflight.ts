@@ -79,7 +79,7 @@ export function createNativePptPlanPreflightParts({
       .map((fix) => {
         const requiredHeight = Number(fix?.required_height_in || 0);
         const requiredFontSize = Number(fix?.required_font_size || 0);
-        const requiredTextCharCount = Number(fix?.required_text_char_count || 0);
+        const requiredTextCharCount = Number(fix?.required_text_char_count || fix?.threshold || 0);
         const requiredGap = Number(fix?.required_gap_in || 0);
         const requiredInset = Number(fix?.required_inset_in || 0);
         const requiredZoneInset = Number(fix?.required_zone_inset_in || 0);
@@ -114,7 +114,7 @@ export function createNativePptPlanPreflightParts({
           required_height_in: Number.isFinite(requiredHeight) && requiredHeight > 0 ? requiredHeight : null,
           required_width_in: Number.isFinite(requiredWidth) && requiredWidth > 0 ? requiredWidth : null,
           required_font_size: Number.isFinite(requiredFontSize) && requiredFontSize > 0 ? requiredFontSize : null,
-          current_text_char_count: Number(fix?.current_text_char_count || 0) || null,
+          current_text_char_count: Number(fix?.current_text_char_count || fix?.text_char_count || 0) || null,
           required_text_char_count: Number.isFinite(requiredTextCharCount) && requiredTextCharCount > 0
             ? requiredTextCharCount
             : null,
@@ -202,7 +202,7 @@ export function createNativePptPlanPreflightParts({
           'If reason is ai_first_page_number_missing, add one small auxiliary page_number shape with quality_role=auxiliary.',
           'For height/width/font/text fixes, meet or exceed required_height_in, required_width_in, required_font_size, and required_text_char_count.',
           'For zone or panel fixes, use zone_bounds/zone_safe_bounds/panel_safe_bounds/required_delta_in and keep the whole shape inside the declared safe area.',
-          'For content-depth fixes, rewrite the exact editable_text into a 12+ meaningful-character audience phrase; input_hub_label is visible content and should read like 同一材料同步进入三路验证, not a tiny label.',
+          'For content-depth fixes, rewrite the exact editable_text into a 12+ meaningful-character audience phrase; input_hub_label is visible content and should read like 同一材料同步进入三条路线验证, not a tiny label.',
           'For connector-thickness fixes, keep both bounds.width_in and bounds.height_in positive and at least 0.03in for every line/connector shape.',
           'For structural-text collisions, reroute connector lanes outside text boxes and keep at least 0.12in clearance from readable text.',
           'For compact sample status board, keep exactly the selected sample archetype contract, three status cards when using sample_status_proof_board, one proof sentence, and no visible boundary-note/takeaway overflow.',
@@ -234,18 +234,18 @@ export function createNativePptPlanPreflightParts({
                   'owner=llm_agent',
                   'motif',
                   'palette.background_or_canvas+ink+accent',
-                  'typography.title_pt_min>=34',
+                  'typography.title_pt_min>=40 for native_visual_sample',
                   'typography.body_pt_min>=18',
                   'grid.edge_margin_in_min>=0.6',
                   'grid.inter_block_gap_in_min>=0.32',
                   'layout_rhythm',
                   'professional_design_brief',
-                  'borrowed_principles',
-                  'qa_gates',
+                  'borrowed_principles string array, not object',
+                  'qa_gates string array, not object',
                 ],
                 canonical_bounds_schema: CANONICAL_BOUNDS_SCHEMA,
                 materializer_inference_allowed: false,
-                instruction: 'Repair only the listed missing structure while preserving the accepted compact sample template grammar and bounds schema.',
+                instruction: 'Repair only listed missing structure. design_spec_lock.borrowed_principles and design_spec_lock.qa_gates must be string arrays, not keyed objects.',
               },
             }
           : {}),
@@ -320,14 +320,14 @@ export function createNativePptPlanPreflightParts({
                   'owner=llm_agent',
                   'motif',
                   'palette.background_or_canvas+ink+accent',
-                  'typography.title_pt_min>=34',
+                  'typography.title_pt_min>=40 for native_visual_sample',
                   'typography.body_pt_min>=18',
                   'grid.edge_margin_in_min>=0.6',
                   'grid.inter_block_gap_in_min>=0.32',
                   'layout_rhythm',
                   'professional_design_brief',
-                  'borrowed_principles',
-                  'qa_gates',
+                  'borrowed_principles string array, not object',
+                  'qa_gates string array, not object',
                 ],
                 per_slide_required_fields: [
                   'slide_id',
@@ -352,6 +352,7 @@ export function createNativePptPlanPreflightParts({
                 'Preserve the complete already accepted structure unless a listed failure explicitly requires changing it: editable_shape_plan.design_spec_lock, editable_shape_plan.deck_layout_rhythm_plan, editable_shape_plan.template_layout_grammar, every slides[].template_layout_binding, every declared zone, every layout_intent, and every native_shapes[].layout_zone_id.',
                 'Do not ask the materializer, Python helper, officecli, or RCA runtime to infer template layout, zones, role groups, rhythm rows, or layout_zone_id values.',
                 'For deck-scope fixes, add the missing top-level contract exactly at editable_shape_plan.<required field>.',
+                'design_spec_lock.borrowed_principles and design_spec_lock.qa_gates must be arrays of strings. Do not return keyed objects for these fields.',
                 'For slide-scope fixes, add or repair that slide template_layout_binding, zones, layout_intent, native_shapes, shape quality roles, and layout_zone_id bindings.',
                 'Return template_layout_binding as a sibling field of native_shapes inside each slide object, not inside native_shapes, layout_intent, notes, or prose.',
                 CANONICAL_BOUNDS_SCHEMA.instruction,
@@ -458,7 +459,7 @@ export function createNativePptPlanPreflightParts({
               'design_spec_lock.owner=llm_agent',
               'design_spec_lock.motif',
               'design_spec_lock.palette.background_or_canvas+ink+accent',
-              'design_spec_lock.typography.title_pt_min>=34',
+              'design_spec_lock.typography.title_pt_min>=40 for native_visual_sample',
               'design_spec_lock.typography.body_pt_min>=18',
               'design_spec_lock.grid.edge_margin_in_min>=0.6',
               'design_spec_lock.grid.inter_block_gap_in_min>=0.32',
@@ -608,10 +609,18 @@ export function createNativePptPlanPreflightParts({
           'ai_first_native_sample_decision_rail_missing',
           'ai_first_native_sample_zone_too_short',
           'ai_first_native_sample_status_slots_not_exact',
+          'ai_first_native_sample_status_card_quality_role_invalid',
           'ai_first_native_sample_status_card_too_small',
           'ai_first_native_sample_status_text_box_too_short',
           'ai_first_native_sample_status_text_wrap_too_deep',
           'ai_first_native_sample_status_text_too_long',
+          'ai_first_native_sample_input_hub_missing', 'ai_first_native_sample_input_hub_too_small',
+          'ai_first_native_sample_input_hub_too_short', 'ai_first_native_sample_input_hub_font_too_small',
+          'ai_first_native_sample_input_hub_not_centered', 'ai_first_native_sample_input_hub_does_not_span_card_centers',
+          'ai_first_native_sample_horizontal_bus_forbidden', 'ai_first_native_sample_connector_count_invalid',
+          'ai_first_native_sample_connector_detached_from_hub', 'ai_first_native_sample_connector_card_alignment_invalid',
+          'ai_first_native_sample_connector_direction_missing', 'ai_first_native_sample_connector_kind_invalid',
+          'ai_first_native_sample_connector_not_vertical_drop',
           'ai_first_native_sample_too_many_proof_text_blocks',
           'ai_first_native_sample_boundary_note_forbidden',
         ].includes(reason)
@@ -647,8 +656,11 @@ export function createNativePptPlanPreflightParts({
             'template_layout_binding.selected_archetype=sample_status_proof_board | sample_decision_proof_split',
             'template_layout_grammar.archetype_catalog includes the selected sample archetype contract',
             'sample_status_proof_board uses only title_zone, claim_zone, status_zone, proof_zone',
-            'sample_status_proof_board includes an input_hub and flow/merge connectors from shared input to route cards to proof band',
+          'sample_status_proof_board includes an input_hub and flow/merge connectors from shared input to route cards to proof band',
+            'sample_status_proof_board input_hub is a dominant centered hub at least 10.4in wide and 0.82in high, spans all three route-card centers, and uses at least 22pt visible label text',
+            'sample_status_proof_board route-card arrows are exactly three straight vertical kind=connector drops, start at the hub bottom, align to each route-card center, land on the card top edge, and carry explicit arrow direction such as tailEnd=triangle or line.end_arrow=true',
             'sample_status_proof_board has exactly three large status cards, each at least 4.0in wide and 1.35in high, with point_text fully inside the card safe area',
+            'sample_status_proof_board content_panel card backgrounds are quality_role=content, while input_hub, connectors, and proof_band are quality_role=structural',
             'sample_status_proof_board has exactly three point_text shapes in status_zone, paired one-to-one with the three content_panel cards; any overall conclusion belongs in proof_zone evidence_item, not a fourth status point_text',
             'sample_status_proof_board card point_text is concise enough for at most two estimated 18pt lines, normally 22 meaningful CJK/Latin chars or fewer, with text box height at least 0.96in',
             'sample_status_proof_board proof_zone has one proof/evidence sentence only',
@@ -660,6 +672,9 @@ export function createNativePptPlanPreflightParts({
             selectedArchetype ? `Preserve or intentionally replace selected_archetype=${selectedArchetype}; if preserving it, satisfy its zone capacity floors before emitting shapes.` : '',
             zoneId && requiredHeight ? `Resize template_layout_binding.zones[${zoneId}].bounds.height_in to at least ${requiredHeight}in and keep related shapes inside that resized zone.` : '',
             'Use sample_status_proof_board for title + claim + input hub + exactly three large equal-height status cards + flow/merge connectors + one proof band containing one compact evidence sentence, or sample_decision_proof_split for title + claim + left decision panel + right proof stack + decision/proof rail + one bottom takeaway band.',
+            'Set the three route content_panel card backgrounds to quality_role=content. Do not mark generic content_panel cards as structural; structural belongs to input_hub, connector arrows, and proof_band.',
+            'The status-board input_hub must be a large centered flow node spanning all three card centers; connector geometry must visibly split from that hub to all three card centers. Do not return a horizontal bus, three isolated short ticks, or a hub that only covers the middle/left route card.',
+            'Use exactly three straight vertical kind=connector card landing arrows so officecli writes real PPT connector shapes; do not use kind=line, diagonal elbows, horizontal bus lines, or wide connector boxes for those arrows.',
             statusSlotInstruction,
             'Status card text must be rewritten as concise labels/short phrases before coordinates; do not force long explanatory sentences into narrow cards.',
             'Do not combine status cards, evidence band, evidence axis, boundary notes, and separate takeaway panel on one page.',
@@ -732,8 +747,9 @@ export function createNativePptPlanPreflightParts({
         rules.push({
           rule_id: 'native_sample_title_fit_rule',
           applies_to_roles: ['title'],
-          repair_instruction: 'For one-slide native samples, either shorten the title to one line, reduce title font to 34-38pt, or use a near full-width title box. Do not keep 44pt in a narrow column.',
-          title_font_size_max_when_wrapping: 38,
+          repair_instruction: 'For one-slide native samples, shorten the title to one line or use a near full-width title box so the title can stay 40-44pt. Do not flatten hierarchy with a 36-38pt title over 20pt body.',
+          title_font_size_min: 40,
+          title_font_size_max_when_wrapping: 44,
           title_width_in_min_for_44pt: 11.8,
           title_height_in_min_when_wrapping: 1.55,
         });
@@ -816,7 +832,20 @@ export function createNativePptPlanPreflightParts({
       || reasons.has('ai_first_native_sample_archetype_not_capacity_safe')
       || reasons.has('ai_first_native_sample_forbidden_general_archetype')
       || reasons.has('ai_first_native_sample_status_board_overloaded_with_takeaway')
+      || reasons.has('ai_first_native_sample_status_card_quality_role_invalid')
       || reasons.has('ai_first_native_sample_evidence_axis_text_collision_risk')
+      || reasons.has('ai_first_native_sample_input_hub_too_small')
+      || reasons.has('ai_first_native_sample_input_hub_too_short')
+      || reasons.has('ai_first_native_sample_input_hub_font_too_small')
+      || reasons.has('ai_first_native_sample_input_hub_not_centered')
+      || reasons.has('ai_first_native_sample_input_hub_does_not_span_card_centers')
+      || reasons.has('ai_first_native_sample_horizontal_bus_forbidden')
+      || reasons.has('ai_first_native_sample_connector_count_invalid')
+      || reasons.has('ai_first_native_sample_connector_detached_from_hub')
+      || reasons.has('ai_first_native_sample_connector_card_alignment_invalid')
+      || reasons.has('ai_first_native_sample_connector_direction_missing')
+      || reasons.has('ai_first_native_sample_connector_kind_invalid')
+      || reasons.has('ai_first_native_sample_connector_not_vertical_drop')
     ) {
       rules.push({
         rule_id: 'native_non_mechanical_visual_skeleton',
@@ -914,7 +943,7 @@ export function createNativePptPlanPreflightParts({
         'If vertical space is tight, enlarge the container, move neighboring objects, shorten the text while preserving meaning, or use fewer lanes/cards; do not keep the old height.',
         'Do not return any text-bearing panel_title, point_text, body, core_sentence, lead, thesis, intro, or takeaway below the validator minimum.',
         'Do not return any content text box below 18pt unless its role is explicitly auxiliary or point_index.',
-        'For ai_first_content_depth_too_low, rewrite that exact shape editable_text into a complete audience-facing phrase or sentence with at least 12 meaningful characters; changing only geometry cannot fix this failure. For input_hub_label, use a compact visible phrase such as 同一材料同步进入三路验证, not 同一材料 or 共同输入.',
+        'For ai_first_content_depth_too_low, rewrite that exact shape editable_text into a complete audience-facing phrase or sentence with at least 12 meaningful characters; changing only geometry cannot fix this failure. For input_hub_label, use a compact visible phrase such as 同一材料同步进入三条路线验证, not 同一材料 or 共同输入.',
         'For ai_first_quality_role_missing_or_invalid, set that exact shape quality_role to the listed required_quality_role. Allowed values are content, structural, decorative, and auxiliary. Do not use primary, secondary, body, title, visual, or any other role-like label as quality_role.',
         'For ai_first_text_box_overlap, move or resize shape_id and/or other_shape_id until their visible text boxes no longer overlap and keep at least required_gap_in clearance.',
         'For ai_first_structural_text_collision, reroute the connector/rail or move the text so structural lines do not pass through readable text; keep at least required_gap_in clearance and preserve the visual flow. For sample_status_proof_board, route connectors in lanes above or between cards instead of through point_text boxes.',
@@ -923,10 +952,14 @@ export function createNativePptPlanPreflightParts({
         'For ai_first_shape_outside_template_layout_zone, use layout_zone_id, zone_bounds, zone_safe_bounds, shape_bounds, required_zone_inset_in, and required_delta_in to move or resize the exact shape so the whole rectangle stays inside the declared zone safe bounds. If the zone itself is too small, redesign or enlarge that zone and keep the same layout_zone_id binding instead of dropping the binding.',
         'For ai_first_visual_structure_missing, add a real editable structural visual object with quality_role=structural, visible fill or line styling, positive materializable bounds, and a structural role such as flow_connector, proof_band, input_hub, evidence_axis, decision_rail, or gate_stack_panel.',
         'For ai_first_structural_role_not_specific, rename or redesign the failed structural shape so its role carries a structural hint. Do not mark a generic content_panel as structural.',
+        'For sample_status_proof_board content_panel card backgrounds, set quality_role=content. Keep structural only for the input_hub, connector arrows, proof_band, rails, and other first-glance visual logic.',
         'Every structural visual object must also carry layout_zone_id bound to a declared semantic zone; rails/connectors/bands without layout_zone_id are incomplete even when the shape is visible.',
         'For ai_first_visual_support_shape_count_too_low, add at least two visible non-text support shapes and make at least one structural. Support shapes must clarify the slide logic; invisible accents, empty cards, and duplicated panels do not count. Bind each support shape to a declared zone.',
         'For ai_first_mechanical_card_template_detected, do not keep the same row of equal content_panel cards. Redesign the composition around a dominant decision/proof area plus structural connector/band/axis, reduce or merge card slots, and update layout_intent.composition_signature and template zones to match. Bind all new structural shapes to layout zones.',
-        'For ai_first_native_sample_* failures, re-plan the one-slide sample using sample_status_proof_board or sample_decision_proof_split. sample_status_proof_board has title, claim, input hub, exactly three large equal-height status cards, exactly three status_zone point_text shapes paired with those cards, flow/merge connectors, and one proof band only; any overall conclusion or cluster summary belongs in the single proof_zone evidence_item or a non-text proof_band, not a fourth status point_text. Each status card must be at least 4.0in wide and 1.35in high, and its point_text must sit fully inside the card safe area. Each status card point_text must be concise enough for at most two estimated 18pt lines, normally 22 meaningful CJK/Latin chars or fewer, with text box height at least 0.96in; rewrite long explanatory sentences as short labels/phrases before placing them. The proof band may contain one compact evidence sentence only; it must not have boundary_note visible text, a separate takeaway zone/panel/text, or a proof axis over proof text. sample_decision_proof_split must include a decision/proof rail.',
+        'For ai_first_native_sample_* failures, re-plan one slide with sample_status_proof_board or sample_decision_proof_split. Status board: title, claim, input hub, exactly 3 large cards, exactly 3 status_zone point_text shapes, connectors, one proof band. Any conclusion belongs in proof_zone evidence_item/proof_band, not a fourth status point_text. Cards >=4.0x1.35in; point_text inside card safe area, box >=0.96in, 12-22 meaningful chars, max two 18pt lines. Proof band has one compact evidence sentence; no boundary_note, separate takeaway, or proof axis over proof text. Decision split must include a rail.',
+        'For status-board point_text content-depth failures, rewrite each route-card phrase to 12-22 meaningful chars; labels like 先确认输入共享, 可审图可导出, or export are invalid.',
+        'For native sample input hub / connector alignment failures, make the input_hub a dominant centered shared-input card at least 10.4in wide and 0.82in high, spanning all route-card centers. Align exactly one straight vertical directional connector to each card center, start it at the hub bottom, and land it on the card top edge. Set tailEnd=triangle/arrow or line.end_arrow=true on route-card connectors.',
+        'For native sample connector kind/drop failures, change the card landing arrows to exactly three kind=connector drops with tailEnd/headEnd or line.end_arrow, keep width about 0.03-0.04in, and make height at least 0.66in; kind=line, horizontal bus lines, diagonal elbows, and short ticks are not enough for route-card arrows.',
         'For ai_first_template_layout_required_role_group_missing, add or reclassify a visible content shape so the selected archetype required role group is actually represented; do not switch archetype just to bypass the missing role group.',
         'For ai_first_route_label_unbalanced_wrap, widen the exact label to required_width_in or shorten/re-role the text so it reads as one balanced line.',
         'For ai_first_text_capacity_exceeded, required_height_in is derived from suggested_height_in plus a conservative buffer; use it as a hard floor, not a target to shave.',

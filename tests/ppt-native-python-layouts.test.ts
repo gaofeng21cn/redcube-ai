@@ -1,6 +1,8 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { join } from 'node:path';
 import {
   createAiSlide,
   materializerPayload,
@@ -221,9 +223,10 @@ test('native PPTX officecli writer maps AI line objects and mid vertical alignme
         },
       };
     }
-    if (shape.role === 'bridge_connector') {
+    if (shape.role === 'bridge_connector_rail') {
       return {
         ...shape,
+        kind: 'connector',
         line: {
           color: '#2563EB',
           width_pt: 2.4,
@@ -241,6 +244,10 @@ test('native PPTX officecli writer maps AI line objects and mid vertical alignme
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.geometry_audit.ok, true);
   assert.equal(slide.native_shapes.some((shape) => shape.line === '#BFDBFE'), true);
+  const unzip = execFileSync('unzip', ['-p', join(result.workspaceRoot, 'native.pptx'), 'ppt/slides/slide1.xml'], {
+    encoding: 'utf-8',
+  });
+  assert.match(unzip, /<p:cxnSp>/);
 });
 
 test('native PPTX quality accepts content panels paired with separate point text and short evidence labels', () => {

@@ -394,6 +394,19 @@ def ai_shape_line_width_pt(shape_spec: dict) -> float:
     return max(numeric, 0.0)
 
 
+def ai_shape_line_end(shape_spec: dict, *, end: str) -> str:
+    line_spec = shape_spec.get('line') if isinstance(shape_spec.get('line'), dict) else {}
+    keys = ['headEnd', 'head_end', 'arrowStart', 'arrow_start'] if end == 'head' else ['tailEnd', 'tail_end', 'arrowEnd', 'arrow_end']
+    raw = next((source.get(key) for source in (shape_spec, line_spec) for key in keys if source.get(key)), None)
+    bool_key = 'begin_arrow' if end == 'head' else 'end_arrow'
+    if (shape_spec.get(bool_key) is True or line_spec.get(bool_key) is True) and not raw:
+        raw = 'triangle'
+    value = safe_text(raw).lower()
+    if value in {'none', 'triangle', 'arrow', 'stealth', 'diamond', 'oval'}:
+        return value
+    return 'none'
+
+
 def officecli_line_prop(shape_spec: dict, line_color: str) -> str:
     if safe_text(line_color).lower() == 'none':
         return 'none'
@@ -770,6 +783,39 @@ def officecli_shape_props(shape_spec: dict, bounds_in: dict, bounds_px: dict) ->
     return props
 
 
+def officecli_command_for_ai_shape(shape_spec: dict, slide_index: int, bounds_in: dict, bounds_px: dict) -> dict:
+    kind = shape_kind(shape_spec)
+    props = officecli_shape_props(shape_spec, bounds_in, bounds_px)
+    if kind != 'connector':
+        return {
+            'command': 'add',
+            'parent': f'/slide[{slide_index}]',
+            'type': 'shape',
+            'props': props,
+        }
+    line_color = ai_shape_line(shape_spec, text=ai_shape_text(shape_spec))
+    connector_props = {
+        'name': safe_text(shape_spec.get('shape_id')),
+        'shape': safe_text(shape_spec.get('connector_shape') or shape_spec.get('connectorShape'), 'straight'),
+        'x': props['x'],
+        'y': props['y'],
+        'width': props['width'],
+        'height': props['height'],
+        'color': line_color if safe_text(line_color).lower() != 'none' else '#2563EB',
+        'lineWidth': f"{ai_shape_line_width_pt(shape_spec):g}pt",
+        'headEnd': ai_shape_line_end(shape_spec, end='head'),
+        'tailEnd': ai_shape_line_end(shape_spec, end='tail'),
+    }
+    if safe_text(shape_spec.get('lineDash') or shape_spec.get('line_dash')):
+        connector_props['lineDash'] = safe_text(shape_spec.get('lineDash') or shape_spec.get('line_dash'))
+    return {
+        'command': 'add',
+        'parent': f'/slide[{slide_index}]',
+        'type': 'connector',
+        'props': connector_props,
+    }
+
+
 def native_shape_manifest_record(shape_spec: dict) -> dict:
     kind = shape_kind(shape_spec)
     role = safe_text(shape_spec.get('role'), 'shape')
@@ -826,7 +872,10 @@ def pptx_geometry_audit(pptx_file: Path) -> dict:
         )
         for slide_index, slide_file in enumerate(slide_files, 1):
             slide = ElementTree.fromstring(package.read(slide_file))
-            for shape in slide.findall('.//p:sp', PPTX_NS):
+            for shape in [
+                *slide.findall('.//p:sp', PPTX_NS),
+                *slide.findall('.//p:cxnSp', PPTX_NS),
+            ]:
                 xfrm = shape.find('.//a:xfrm', PPTX_NS)
                 if xfrm is None:
                     continue
@@ -842,7 +891,7 @@ def pptx_geometry_audit(pptx_file: Path) -> dict:
                 bottom = top + height
                 if left < 0 or top < 0 or right > slide_width_emu or bottom > slide_height_emu:
                     shape_name = ''
-                    non_visual = shape.find('p:nvSpPr/p:cNvPr', PPTX_NS)
+                    non_visual = shape.find('p:nvSpPr/p:cNvPr', PPTX_NS) or shape.find('p:nvCxnSpPr/p:cNvPr', PPTX_NS)
                     if non_visual is not None:
                         shape_name = safe_text(non_visual.attrib.get('name'))
                     text = safe_text(''.join(item.text or '' for item in shape.findall('.//a:t', PPTX_NS)))
@@ -907,12 +956,7 @@ def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, 
         for shape_spec in ai_shapes:
             bounds_in = ai_shape_bounds_in(shape_spec)
             bounds_px = shape_rect_from_ai_bounds(shape_spec)
-            officecli_commands.append({
-                'command': 'add',
-                'parent': f'/slide[{index}]',
-                'type': 'shape',
-                'props': officecli_shape_props(shape_spec, bounds_in, bounds_px),
-            })
+            officecli_commands.append(officecli_command_for_ai_shape(shape_spec, index, bounds_in, bounds_px))
             native_shape = native_shape_manifest_record(shape_spec)
             native_shapes.append(native_shape)
             if native_shape['text']:

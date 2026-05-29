@@ -72,12 +72,12 @@ test('native PPT compact sample output contract carries safe zone blueprints for
   assert.equal(grammar.global_rules.safe_zone_blueprint_must_be_used_before_coordinates, true);
   assert.equal(contract.sample_capacity_contract.safe_zone_blueprints_required_before_coordinates, true);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /sample_status_proof_board/);
-  assert.match(grammar.safe_zone_blueprints.tuple_contract, /title_zone:title:0\.85,0\.45,14\.3,1\.2,0\.15/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /title_zone:title:0\.85,0\.45,14\.3,1\.15,0\.15/);
   assert.match(grammar.safe_zone_blueprints.tuple_contract, /proof_zone:proof/);
-  assert.match(grammar.safe_zone_blueprints.tuple_contract, /title:title_zone:0\.95,0\.58,13\.6,0\.92/);
-  assert.match(grammar.safe_zone_blueprints.tuple_contract, /core_sentence:claim_zone:0\.95,1\.9,13\.6,0\.78/);
-  assert.equal(grammar.safe_zone_blueprint_rule.includes('zone safe bounds'), true);
-  assert.match(grammar.safe_zone_blueprints.tuple_contract, /zone_safe_bounds/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /title:title_zone:0\.95,0\.58,13\.6,0\.9/);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /core_sentence:claim_zone:0\.95,1\.86,13\.6,0\.88/);
+  assert.equal(grammar.safe_zone_blueprint_rule.includes('Copy tuple zones'), true);
+  assert.match(grammar.safe_zone_blueprints.tuple_contract, /kind=connector/);
   assert.deepEqual(
     grammar.native_shape_style_schema.required_text_fields,
     ['editable_text', 'font_size'],
@@ -113,11 +113,22 @@ test('native PPT compact sample output contract exposes capacity budgets from li
     (archetype) => archetype.archetype_id === 'sample_status_proof_board',
   );
   assert.equal(sampleStatus.content_schema.status_zone_height_in_min, 3.45);
+  assert.equal(sampleStatus.content_schema.status_card_quality_role_required, 'content');
   assert.equal(sampleStatus.content_schema.proof_zone_height_in_min, 1.35);
   assert.equal(sampleStatus.content_schema.core_sentence_height_in_min, 0.95);
   assert.equal(sampleStatus.content_schema.evidence_item_height_in_min, 0.84);
+  assert.equal(sampleStatus.content_schema.status_card_point_text_min_cjk_chars, 12);
   assert.equal(sampleStatus.content_schema.input_hub_label_height_in_min, 0.54);
-  assert.equal(sampleStatus.content_schema.input_hub_label_width_in_min, 4.8);
+  assert.equal(sampleStatus.content_schema.input_hub_label_width_in_min, 10.4);
+  assert.equal(sampleStatus.content_schema.input_hub_width_in_min, 10.4);
+  assert.equal(sampleStatus.content_schema.input_hub_height_in_min, 0.82);
+  assert.equal(sampleStatus.content_schema.input_hub_font_pt_min, 22);
+  assert.equal(sampleStatus.content_schema.input_hub_spans_route_card_centers_required, true);
+  assert.equal(sampleStatus.content_schema.connector_vertical_width_in_max, 0.04);
+  assert.equal(sampleStatus.content_schema.connector_vertical_height_in_min, 0.66);
+  assert.equal(sampleStatus.content_schema.connector_hub_gap_in_max, 0.12);
+  assert.equal(sampleStatus.content_schema.horizontal_connector_bus_allowed, false);
+  assert.equal(sampleStatus.content_schema.route_card_connector_kind_required, 'connector');
   assert.equal(sampleStatus.content_schema.input_hub_label_min_cjk_chars, 12);
   assert.equal(sampleStatus.content_schema.input_hub_label_max_cjk_chars, 16);
   assert.equal(sampleStatus.content_schema.input_hub_label_min_cjk_chars_when_content, 12);
@@ -125,6 +136,9 @@ test('native PPT compact sample output contract exposes capacity budgets from li
   assert.equal(sampleStatus.content_schema.connector_text_clearance_in_min, 0.12);
   assert.match(contract.sample_capacity_contract.evidence_text_rule, /compact sentence/);
   assert.match(sampleStatus.layout_description, /proof band/);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('semantic_layout_selection'), true);
+  assert.equal(contract.design_spec_lock.borrowed_principles.includes('per_page_visual_plan'), true);
+  assert.equal(contract.design_spec_lock.qa_gates.includes('layout_variety'), true);
   const profile = nativePptSampleLayoutProfile({
     delivery_request: {
       constraints: {
@@ -133,19 +147,40 @@ test('native PPT compact sample output contract exposes capacity budgets from li
       },
     },
   });
-  assert.equal(profile.capacity_rules.input_hub_label_width_in_min, 4.8);
+  assert.equal(profile.capacity_rules.input_hub_label_width_in_min, 10.4);
+  assert.equal(profile.capacity_rules.input_hub_width_in_min, 10.4);
+  assert.equal(profile.capacity_rules.input_hub_height_in_min, 0.82);
+  assert.equal(profile.capacity_rules.input_hub_font_pt_min, 22);
   assert.equal(profile.capacity_rules.input_hub_label_min_cjk_chars, 12);
   assert.equal(profile.capacity_rules.input_hub_label_max_cjk_chars, 16);
+  assert.deepEqual(profile.capacity_rules.title_font_pt_range, [40, 44]);
+  assert.equal(profile.capacity_rules.status_card_point_text_min_cjk_chars, 12);
   assert.equal(profile.capacity_rules.connector_thickness_in_min, 0.03);
   assert.equal(profile.capacity_rules.connector_text_clearance_in_min, 0.12);
-  assert.match(profile.required_design_decision, /0\.03in/);
+  assert.equal(profile.capacity_rules.status_card_quality_role_required, 'content');
+  assert.equal(profile.capacity_rules.input_hub_card_flow_geometry_required, true);
+  assert.equal(profile.capacity_rules.input_hub_spans_route_card_centers_required, true);
+  assert.equal(profile.capacity_rules.connector_vertical_width_in_max, 0.04);
+  assert.equal(profile.capacity_rules.connector_vertical_height_in_min, 0.66);
+  assert.equal(profile.capacity_rules.connector_hub_gap_in_max, 0.12);
+  assert.equal(profile.capacity_rules.horizontal_connector_bus_allowed, false);
+  assert.equal(profile.capacity_rules.connector_direction_required, true);
+  assert.equal(profile.capacity_rules.route_card_connector_kind_required, 'connector');
+  assert.match(profile.required_design_decision, /0\.04in/);
   assert.match(profile.required_design_decision, /0\.12in/);
-  assert.match(profile.required_design_decision, /同一材料同步进入三路验证/);
-  assert.equal(meaningfulChars('同一材料同步进入三路验证'), 12);
+  assert.match(profile.required_design_decision, /10\.4/);
+  assert.match(profile.required_design_decision, /40-44pt/);
+  assert.match(profile.required_design_decision, />=2\.0x/);
+  assert.match(profile.required_design_decision, /vertical arrow|vertical connector/);
+  assert.match(profile.required_design_decision, /同一材料同步进入三条路线验证/);
+  assert.equal(meaningfulChars('同一材料同步进入三条路线验证'), 14);
   assert.equal(profile.required_design_decision.includes('同一材料进入三路验证'), false);
-  assert.match(profile.safe_zone_blueprints.tuple_contract, /input_hub_label:status_zone:1\.18,3\.28,4\.8,0\.58/);
-  assert.match(profile.safe_zone_blueprints.tuple_contract, /connector_thin>=0\.03/);
-  assert.match(profile.safe_zone_blueprints.tuple_contract, /connector_text_gap>=0\.12/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /input_hub:status_zone:2\.8,3\.08,10\.4,0\.86/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /flow_drop:status_zone:card_center,3\.94,0\.03,0\.74/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /centers=3\.25\|8\.0\|12\.75/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /kind=connector/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /tailEnd=triangle/);
+  assert.match(profile.safe_zone_blueprints.tuple_contract, /no_horizontal_bus/);
 });
 
 test('native PPT compact sample retry context carries exact fixes without full validator payload bloat', () => {
@@ -160,7 +195,7 @@ test('native PPT compact sample retry context carries exact fixes without full v
     validator: {
       ok: false,
       stage: 'ai_first_shape_plan_preflight',
-      failure_count: 2,
+      failure_count: 3,
       slide_count: 1,
       failures: [{
         slide_id: 'S01',
@@ -174,6 +209,13 @@ test('native PPT compact sample retry context carries exact fixes without full v
             required_height_in: 0.54,
             minimum_height_in: 0.54,
             text_repair_instruction: 'raise the exact label height',
+          },
+          {
+            reason: 'ai_first_content_depth_too_low',
+            shape_id: 'S01_POINT_C',
+            role: 'point_text',
+            text_char_count: 10,
+            threshold: 12,
           },
         ],
       }],
@@ -241,6 +283,9 @@ test('native PPT compact sample retry context carries exact fixes without full v
   assert.equal(feedback.validator.full_validator_payload_omitted, true);
   assert.equal(feedback.required_shape_fixes[0].shape_id, 'S01_input_label');
   assert.equal(feedback.required_shape_fixes[0].required_height_in, 0.54);
+  const compactPointTextFailure = feedback.validator.failures[0].failures.find((fix) => fix.shape_id === 'S01_POINT_C');
+  assert.equal(compactPointTextFailure.text_char_count, 10);
+  assert.equal(compactPointTextFailure.required_text_char_count, 12);
   assert.equal(feedback.required_shape_fixes[0].raw_validator_dump, undefined);
   assert.equal(JSON.stringify(feedback).includes('omitted_debug_blob'), false);
   assert.equal(JSON.stringify(feedback).includes('raw_validator_dump'), false);
@@ -284,6 +329,13 @@ test('native PPT compact sample retry output contract stays focused on exact fix
             minimum_height_in: 0.54,
             suggested_height_in: 0.54,
           },
+          {
+            reason: 'ai_first_content_depth_too_low',
+            shape_id: 'S01_POINT_C',
+            role: 'point_text',
+            text_char_count: 10,
+            threshold: 12,
+          },
         ],
       }],
     },
@@ -295,6 +347,13 @@ test('native PPT compact sample retry output contract stays focused on exact fix
       current_height_in: 0.52,
       required_height_in: 0.54,
       minimum_height_in: 0.54,
+    }, {
+      slide_id: 'S01',
+      shape_id: 'S01_POINT_C',
+      reason: 'ai_first_content_depth_too_low',
+      role: 'point_text',
+      current_text_char_count: 10,
+      threshold: 12,
     }],
     required_structural_fixes: [{
       scope: 'slide',
@@ -312,6 +371,11 @@ test('native PPT compact sample retry output contract stays focused on exact fix
   assert.equal(
     outputContract.native_shape_plan_validation_feedback_contract.exact_shape_fixes[0].shape_id,
     'S01_input_label',
+  );
+  assert.equal(
+    outputContract.native_shape_plan_validation_feedback_contract.exact_shape_fixes
+      .some((fix) => fix.shape_id === 'S01_POINT_C' && fix.required_text_char_count === 12),
+    true,
   );
   assert.equal(
     outputContract.native_shape_plan_structural_retry_contract.contract_kind,

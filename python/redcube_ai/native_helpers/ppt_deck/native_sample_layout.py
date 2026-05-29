@@ -82,6 +82,43 @@ def sample_layout_profile_failures(slide_data: dict) -> list[dict]:
     def shape_role(shape: dict) -> str:
         return safe_text(shape.get('role')).lower()
 
+    def rect_right(rect: dict) -> float:
+        return float(rect.get('left_in') or 0.0) + float(rect.get('width_in') or 0.0)
+
+    def rect_bottom(rect: dict) -> float:
+        return float(rect.get('top_in') or 0.0) + float(rect.get('height_in') or 0.0)
+
+    def rect_center_x(rect: dict) -> float:
+        return float(rect.get('left_in') or 0.0) + (float(rect.get('width_in') or 0.0) / 2.0)
+
+    def rect_center_y(rect: dict) -> float:
+        return float(rect.get('top_in') or 0.0) + (float(rect.get('height_in') or 0.0) / 2.0)
+
+    def shape_arrow_end(shape: dict) -> str:
+        line_spec = shape.get('line') if isinstance(shape.get('line'), dict) else {}
+        raw = (
+            shape.get('tailEnd')
+            or shape.get('tail_end')
+            or shape.get('arrowEnd')
+            or shape.get('arrow_end')
+            or line_spec.get('tailEnd')
+            or line_spec.get('tail_end')
+            or line_spec.get('arrowEnd')
+            or line_spec.get('arrow_end')
+        )
+        arrow = safe_text(raw).lower()
+        if arrow in {'arrow', 'triangle', 'stealth', 'diamond', 'oval'}:
+            return arrow
+        if shape.get('end_arrow') is True or line_spec.get('end_arrow') is True:
+            return 'triangle'
+        return ''
+
+    def shape_font_size(shape: dict) -> float:
+        try:
+            return float(shape.get('font_size') or shape.get('size_pt') or shape.get('size') or 0.0)
+        except (TypeError, ValueError):
+            return 0.0
+
     def content_text_shapes_in_zone(zone_id: str) -> list[dict]:
         return [
             shape for shape in shapes
@@ -154,6 +191,18 @@ def sample_layout_profile_failures(slide_data: dict) -> list[dict]:
                 'expected_count': 3,
                 'repair_instruction': 'sample_status_proof_board must use exactly three filled status cards: three content_panel shapes paired with three point_text shapes. Do not create empty, missing, or extra slots.',
             })
+        structural_status_panels = [
+            panel for panel in status_panels
+            if shape_quality_role(panel) != 'content'
+        ]
+        if structural_status_panels:
+            failures.append({
+                'reason': 'ai_first_native_sample_status_card_quality_role_invalid',
+                'selected_archetype': archetype,
+                'shape_ids': [safe_text(panel.get('shape_id'), '<missing-shape-id>') for panel in structural_status_panels],
+                'required_quality_role': 'content',
+                'repair_instruction': 'Set each sample_status_proof_board content_panel card background to quality_role=content. Structural is reserved for the input_hub, connector arrows, and proof_band.',
+            })
         capacity_rules = profile.get('capacity_rules') if isinstance(profile.get('capacity_rules'), dict) else {}
         try:
             point_text_box_height_min = float(capacity_rules.get('status_card_text_box_height_in_min') or 0.96)
@@ -167,6 +216,7 @@ def sample_layout_profile_failures(slide_data: dict) -> list[dict]:
             point_text_max_chars = int(capacity_rules.get('status_card_point_text_max_cjk_chars') or 22)
         except (TypeError, ValueError):
             point_text_max_chars = 22
+        enforce_flow_geometry = capacity_rules.get('input_hub_card_flow_geometry_required') is True
         for panel in status_panels:
             panel_bounds = bounds_in(panel)
             if not panel_bounds:
@@ -243,6 +293,255 @@ def sample_layout_profile_failures(slide_data: dict) -> list[dict]:
                 'selected_archetype': archetype,
                 'repair_instruction': 'Add a visible input_hub and flow/merge connectors that show one shared input feeding the three route cards and converging into the proof band.',
             })
+        if enforce_flow_geometry and len(status_panels) == 3:
+            panel_records = [
+                {
+                    'shape_id': safe_text(panel.get('shape_id'), '<missing-shape-id>'),
+                    'bounds': bounds_in(panel),
+                }
+                for panel in status_panels
+            ]
+            panel_records = [record for record in panel_records if record['bounds']]
+            panel_records.sort(key=lambda record: rect_center_x(record['bounds']))
+            hub_records = [
+                {
+                    'shape_id': safe_text(shape.get('shape_id'), '<missing-shape-id>'),
+                    'bounds': bounds_in(shape),
+                    'text': shape_text(shape),
+                }
+                for shape in shapes
+                if safe_text(shape.get('layout_zone_id')) == 'status_zone'
+                and shape_role(shape) == 'input_hub'
+            ]
+            hub_records = [record for record in hub_records if record['bounds']]
+            hub_record = max(
+                hub_records,
+                key=lambda record: record['bounds'].get('width_in', 0.0) * record['bounds'].get('height_in', 0.0),
+                default=None,
+            )
+            connector_records = [
+                {
+                    'shape_id': safe_text(shape.get('shape_id'), '<missing-shape-id>'),
+                    'role': shape_role(shape),
+                    'kind': shape_kind(shape),
+                    'bounds': bounds_in(shape),
+                    'arrow_end': shape_arrow_end(shape),
+                }
+                for shape in shapes
+                if safe_text(shape.get('layout_zone_id')) == 'status_zone'
+                and shape_kind(shape) in {'line', 'connector'}
+                and any(token in shape_role(shape) for token in ('flow_connector', 'merge_connector', 'connector'))
+            ]
+            connector_records = [record for record in connector_records if record['bounds']]
+            try:
+                hub_width_min = float(capacity_rules.get('input_hub_width_in_min') or 10.4)
+            except (TypeError, ValueError):
+                hub_width_min = 10.4
+            try:
+                hub_height_min = float(capacity_rules.get('input_hub_height_in_min') or 0.0)
+            except (TypeError, ValueError):
+                hub_height_min = 0.0
+            try:
+                hub_font_min = float(capacity_rules.get('input_hub_font_pt_min') or 0.0)
+            except (TypeError, ValueError):
+                hub_font_min = 0.0
+            try:
+                hub_center_tolerance = float(capacity_rules.get('input_hub_center_tolerance_in') or 0.35)
+            except (TypeError, ValueError):
+                hub_center_tolerance = 0.35
+            try:
+                connector_alignment_tolerance = float(capacity_rules.get('connector_card_center_tolerance_in') or 0.22)
+            except (TypeError, ValueError):
+                connector_alignment_tolerance = 0.22
+            try:
+                connector_vertical_width_max = float(capacity_rules.get('connector_vertical_width_in_max') or 0.0)
+            except (TypeError, ValueError):
+                connector_vertical_width_max = 0.0
+            try:
+                connector_vertical_height_min = float(capacity_rules.get('connector_vertical_height_in_min') or 0.0)
+            except (TypeError, ValueError):
+                connector_vertical_height_min = 0.0
+            try:
+                connector_hub_gap_max = float(capacity_rules.get('connector_hub_gap_in_max') or 0.12)
+            except (TypeError, ValueError):
+                connector_hub_gap_max = 0.12
+            horizontal_bus_allowed = capacity_rules.get('horizontal_connector_bus_allowed') is True
+            if not hub_record:
+                failures.append({
+                    'reason': 'ai_first_native_sample_input_hub_missing',
+                    'selected_archetype': archetype,
+                    'repair_instruction': 'Add one wide input_hub shape above the three route cards. It must be a visible hub card owned by the AI plan, not a small dot or implied label.',
+                })
+            elif panel_records:
+                hub_bounds = hub_record['bounds']
+                row_left = min(record['bounds']['left_in'] for record in panel_records)
+                row_right = max(rect_right(record['bounds']) for record in panel_records)
+                row_center = (row_left + row_right) / 2.0
+                if hub_bounds.get('width_in', 0.0) < hub_width_min:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_input_hub_too_small',
+                        'selected_archetype': archetype,
+                        'shape_id': hub_record['shape_id'],
+                        'width_in': round(hub_bounds.get('width_in', 0.0), 4),
+                        'minimum_width_in': round(hub_width_min, 4),
+                        'repair_instruction': 'Make input_hub a broad shared-input card centered over the three route cards. It should visually read as the common source for all routes, not a small label attached to one card.',
+                    })
+                if hub_height_min > 0 and hub_bounds.get('height_in', 0.0) < hub_height_min:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_input_hub_too_short',
+                        'selected_archetype': archetype,
+                        'shape_id': hub_record['shape_id'],
+                        'height_in': round(hub_bounds.get('height_in', 0.0), 4),
+                        'minimum_height_in': round(hub_height_min, 4),
+                        'repair_instruction': 'Make input_hub tall enough to read as a major shared-input node, not a narrow chip. Keep it centered and spanning the route row.',
+                    })
+                hub_font_size = shape_font_size(next(
+                    (shape for shape in shapes if safe_text(shape.get('shape_id')) == hub_record['shape_id']),
+                    {},
+                ))
+                if hub_font_min > 0 and hub_record['text'] and hub_font_size < hub_font_min:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_input_hub_font_too_small',
+                        'selected_archetype': archetype,
+                        'shape_id': hub_record['shape_id'],
+                        'font_size': round(hub_font_size, 2),
+                        'required_font_size': round(hub_font_min, 2),
+                        'repair_instruction': 'Use a readable hub label font so the shared-input node has clear visual priority over connector lines.',
+                    })
+                hub_center_delta = abs(rect_center_x(hub_bounds) - row_center)
+                if hub_center_delta > hub_center_tolerance:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_input_hub_not_centered',
+                        'selected_archetype': archetype,
+                        'shape_id': hub_record['shape_id'],
+                        'hub_center_x_in': round(rect_center_x(hub_bounds), 4),
+                        'route_row_center_x_in': round(row_center, 4),
+                        'maximum_delta_in': round(hub_center_tolerance, 4),
+                        'repair_instruction': 'Center input_hub over the three-card route row before drawing connectors. The shared input must not sit over only the left route card.',
+                    })
+                card_centers = [rect_center_x(record['bounds']) for record in panel_records]
+                card_top = min(record['bounds']['top_in'] for record in panel_records)
+                hub_bottom = rect_bottom(hub_bounds)
+                if capacity_rules.get('input_hub_spans_route_card_centers_required') is True and (
+                    hub_bounds['left_in'] > min(card_centers) - connector_alignment_tolerance
+                    or rect_right(hub_bounds) < max(card_centers) + connector_alignment_tolerance
+                ):
+                    failures.append({
+                        'reason': 'ai_first_native_sample_input_hub_does_not_span_card_centers',
+                        'selected_archetype': archetype,
+                        'shape_id': hub_record['shape_id'],
+                        'hub_left_in': round(hub_bounds['left_in'], 4),
+                        'hub_right_in': round(rect_right(hub_bounds), 4),
+                        'left_card_center_in': round(min(card_centers), 4),
+                        'right_card_center_in': round(max(card_centers), 4),
+                        'repair_instruction': 'Widen input_hub so its visual body spans the left, middle, and right route-card centers. The hub should be the shared source node, not a compact label above the middle card.',
+                    })
+                horizontal_bus = [
+                    record for record in connector_records
+                    if record['bounds']['width_in'] >= max(0.8, record['bounds']['height_in'] * 2.0)
+                    and rect_center_y(record['bounds']) >= hub_bottom - 0.18
+                    and rect_center_y(record['bounds']) <= card_top + 0.18
+                    and record['bounds']['left_in'] <= min(card_centers) + connector_alignment_tolerance
+                    and rect_right(record['bounds']) >= max(card_centers) - connector_alignment_tolerance
+                    and rect_right(record['bounds']) >= hub_bounds['left_in']
+                    and record['bounds']['left_in'] <= rect_right(hub_bounds)
+                ]
+                vertical_connectors = [
+                    record for record in connector_records
+                    if record['bounds']['height_in'] >= max(0.2, record['bounds']['width_in'] * 2.0)
+                ]
+                matched_vertical = []
+                missing_card_ids = []
+                undirected_card_ids = []
+                non_connector_card_ids = []
+                non_vertical_card_ids = []
+                for panel_record, card_center in zip(panel_records, card_centers):
+                    candidates = [
+                        record for record in vertical_connectors
+                        if abs(rect_center_x(record['bounds']) - card_center) <= connector_alignment_tolerance
+                        and rect_bottom(record['bounds']) >= panel_record['bounds']['top_in'] - 0.28
+                        and rect_bottom(record['bounds']) <= panel_record['bounds']['top_in'] + 0.32
+                        and record['bounds']['top_in'] >= hub_bottom - 0.28
+                        and record['bounds']['top_in'] <= panel_record['bounds']['top_in']
+                    ]
+                    if not candidates:
+                        missing_card_ids.append(panel_record['shape_id'])
+                        continue
+                    connector_candidates = [
+                        record for record in candidates
+                        if record['kind'] == 'connector'
+                    ]
+                    matched = (connector_candidates or candidates)[0]
+                    matched_vertical.append(matched)
+                    if matched['kind'] != 'connector':
+                        non_connector_card_ids.append(panel_record['shape_id'])
+                    if not matched['arrow_end']:
+                        undirected_card_ids.append(panel_record['shape_id'])
+                    if (
+                        connector_vertical_width_max > 0
+                        and matched['bounds'].get('width_in', 0.0) > connector_vertical_width_max
+                    ) or (
+                        connector_vertical_height_min > 0
+                        and matched['bounds'].get('height_in', 0.0) < connector_vertical_height_min
+                    ):
+                        non_vertical_card_ids.append(panel_record['shape_id'])
+                    if abs(matched['bounds']['top_in'] - hub_bottom) > connector_hub_gap_max:
+                        failures.append({
+                            'reason': 'ai_first_native_sample_connector_detached_from_hub',
+                            'selected_archetype': archetype,
+                            'shape_id': matched['shape_id'],
+                            'card_shape_id': panel_record['shape_id'],
+                            'connector_top_in': round(matched['bounds']['top_in'], 4),
+                            'hub_bottom_in': round(hub_bottom, 4),
+                            'maximum_gap_in': round(connector_hub_gap_max, 4),
+                            'repair_instruction': 'Start each vertical route-card arrow at the input_hub bottom edge. The arrow should read as dropping directly from the hub, not from a separate bus line or floating tick.',
+                        })
+                if len(set(record['shape_id'] for record in matched_vertical)) != 3:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_connector_count_invalid',
+                        'selected_archetype': archetype,
+                        'vertical_connector_count': len(set(record['shape_id'] for record in matched_vertical)),
+                        'expected_vertical_connector_count': 3,
+                        'repair_instruction': 'Use exactly three vertical route-card connectors: one straight arrow from the hub bottom to each card top center.',
+                    })
+                if horizontal_bus and not horizontal_bus_allowed:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_horizontal_bus_forbidden',
+                        'selected_archetype': archetype,
+                        'shape_ids': [record['shape_id'] for record in horizontal_bus],
+                        'repair_instruction': 'Remove the horizontal connector bus. The wide input_hub itself is the shared source; draw only three vertical arrows from the hub to the card top centers.',
+                    })
+                if missing_card_ids:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_connector_card_alignment_invalid',
+                        'selected_archetype': archetype,
+                        'missing_aligned_card_shape_ids': missing_card_ids,
+                        'maximum_center_delta_in': round(connector_alignment_tolerance, 4),
+                        'repair_instruction': 'Place one vertical arrow/drop connector for each route card, with its center x aligned to that card center and its bottom landing on the top edge of the card.',
+                    })
+                if undirected_card_ids:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_connector_direction_missing',
+                        'selected_archetype': archetype,
+                        'undirected_card_shape_ids': undirected_card_ids,
+                        'repair_instruction': 'Set arrow direction on each route-card connector, for example tailEnd=triangle or line.end_arrow=true, so the flow reads from input hub into the card.',
+                    })
+                if non_connector_card_ids:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_connector_kind_invalid',
+                        'selected_archetype': archetype,
+                        'non_connector_card_shape_ids': non_connector_card_ids,
+                        'repair_instruction': 'Use kind=connector for each route-card arrow. kind=line is not accepted for the card landing arrows because native PPTX export must materialize real connector shapes.',
+                    })
+                if non_vertical_card_ids:
+                    failures.append({
+                        'reason': 'ai_first_native_sample_connector_not_vertical_drop',
+                        'selected_archetype': archetype,
+                        'non_vertical_card_shape_ids': non_vertical_card_ids,
+                        'maximum_width_in': round(connector_vertical_width_max, 4) if connector_vertical_width_max > 0 else None,
+                        'minimum_height_in': round(connector_vertical_height_min, 4) if connector_vertical_height_min > 0 else None,
+                        'repair_instruction': 'Use straight vertical card landing arrows from the hub bottom to each card top center. Do not use slanted elbows, short ticks, or wide diagonal connector boxes for the three drops.',
+                    })
         if 'takeaway_zone' in zone_ids or role_counts.get('takeaway', 0) > 0 or role_counts.get('takeaway_panel', 0) > 0:
             failures.append({
                 'reason': 'ai_first_native_sample_status_board_overloaded_with_takeaway',
