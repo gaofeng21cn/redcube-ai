@@ -300,7 +300,8 @@ test('native PPTX plan preflight and manifest QA reject connector rails crossing
       quality_role: 'structural',
       layout_zone_id: 'signal_zone',
       bounds: { left_in: 1.05, top_in: 6.68, width_in: 6.4, height_in: 0.06 },
-      line: '#2563EB',
+      line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+      tailEnd: 'triangle',
       fill: 'none',
     },
   );
@@ -409,7 +410,8 @@ test('native PPTX system-map QA counts horizontal connectors as route lanes', ()
         role: 'horizontal_route_connector',
         quality_role: 'structural',
         bounds: { left_in: 4.15, top_in: 3.92 + index * 0.52, width_in: 4.75, height_in: 0.04 },
-        line: '#2563EB',
+        line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+        tailEnd: 'triangle',
         fill: 'none',
       })),
       {
@@ -552,7 +554,8 @@ test('native PPTX system-map QA accepts route flow connectors and takeaway bands
         role: 'route_flow_connector',
         quality_role: 'structural',
         bounds: { left_in: 4.15, top_in: 3.92 + index * 0.52, width_in: 4.75, height_in: 0.04 },
-        line: '#2563EB',
+        line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+        tailEnd: 'triangle',
         fill: 'none',
       })),
       {
@@ -703,7 +706,8 @@ test('native PPTX preflight rejects text boxes that bleed out of their visual pa
         role: 'route_flow_connector',
         quality_role: 'structural',
         bounds: { left_in: 4.15, top_in: 3.92 + index * 0.52, width_in: 4.75, height_in: 0.04 },
-        line: '#2563EB',
+        line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+        tailEnd: 'triangle',
         fill: 'none',
       })),
       {

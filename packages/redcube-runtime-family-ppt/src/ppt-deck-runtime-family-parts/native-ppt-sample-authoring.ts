@@ -1,6 +1,6 @@
 type JsonRecord = Record<string, any>;
 
-const SAMPLE_SAFE_ZONE_BLUEPRINTS = 'sample_status_proof_board zones title_zone:title:0.85,0.45,14.3,1.15,0.15|claim_zone:claim:0.85,1.67,14.3,1.05,0.15|status_zone:status:0.85,2.95,14.3,3.55,0.15|proof_zone:proof:0.85,6.65,14.3,1.55,0.15 shapes title:title_zone:0.95,0.58,13.6,0.92|core_sentence:claim_zone:0.95,1.86,13.6,0.88|input_hub:status_zone:2.8,3.08,10.4,0.86|flow_drop:status_zone:card_center,3.94,0.03,0.74|route_card:status_zone:1.1|5.85|10.6,4.68,4.3,1.5|proof_text:proof_zone:1.25,6.88,12.9,1.05 check title>=40 body=18 hub>=10.4x0.82 font>=22 proof_text>=1.05 text=同一材料同步进入三条路线验证 spans centers=3.25|8.0|12.75 exactly3 vertical kind=connector drops no_horizontal_bus tailEnd=triangle gap>=0.12';
+const SAMPLE_SAFE_ZONE_BLUEPRINTS = 'sample_status_proof_board zones title_zone:title:0.85,0.45,14.3,1.15,0.15|claim_zone:claim:0.85,1.67,14.3,1.05,0.15|status_zone:status:0.85,2.95,14.3,3.55,0.15|proof_zone:proof:0.85,6.65,14.3,1.55,0.15 shapes title:title_zone:0.95,0.58,13.6,0.92|core_sentence:claim_zone:0.95,1.86,13.6,0.95|input_hub:status_zone:2.8,3.08,10.4,0.86|flow_drop:status_zone:card_center,3.94,0.03,0.74|route_card:status_zone:1.1|5.85|10.6,4.68,4.3,1.5|point_text:status_zone:1.25|6.0|10.75,4.9,4.0,1.05|proof_text:proof_zone:1.25,6.88,12.9,1.05 check title>=40 body=18 hub>=10.4x0.82 font>=22 point_text>=1.05 proof_text>=1.05 no_route_label text=同一材料同步进入三条路线验证 spans centers=3.25|8.0|12.75 exactly3 vertical kind=connector drops no_horizontal_bus tailEnd=triangle gap>=0.12';
 
 export function nativePptSampleSafeZoneBlueprints(): JsonRecord {
   return { tuple_contract: SAMPLE_SAFE_ZONE_BLUEPRINTS };
@@ -46,6 +46,8 @@ export function nativePptSampleLayoutProfile(contract: JsonRecord): JsonRecord |
       status_card_point_text_min_cjk_chars: 12,
       status_card_point_text_max_cjk_chars: 22,
       status_card_quality_role_required: 'content',
+      status_card_separate_route_label_allowed: false,
+      status_card_single_point_text_required: true,
       input_hub_label_min_cjk_chars: 12,
       input_hub_label_max_cjk_chars: 16,
       input_hub_label_width_in_min: 10.4,
@@ -89,6 +91,8 @@ export function nativePptSampleLayoutProfile(contract: JsonRecord): JsonRecord |
             point_text_min_cjk_chars: 12,
             point_text_max_cjk_chars: 22,
             content_panel_quality_role_required: 'content',
+            separate_route_label_allowed: false,
+            single_point_text_per_card_required: true,
             input_hub_label_min_cjk_chars: 12,
             input_hub_label_max_cjk_chars: 16,
             input_hub_label_width_in_min: 10.4,
@@ -305,30 +309,22 @@ export function createNativePptSampleAuthoringParts({
       source: safeText(profile?.source),
       expected_slide_count: Number(profile?.expected_slide_count || 1),
       capacity_rules: {
-        proof_zone_visible_text_blocks_max: Number(profile?.capacity_rules?.proof_zone_visible_text_blocks_max || 1),
-        min_text_panel_safe_inset_in: Number(profile?.capacity_rules?.min_text_panel_safe_inset_in || 0.15),
         exact_status_card_count: Number(profile?.capacity_rules?.exact_status_card_count || 3),
         status_card_width_in_min: Number(profile?.capacity_rules?.status_card_width_in_min || 4.0),
         status_card_height_in_min: Number(profile?.capacity_rules?.status_card_height_in_min || 1.35),
         status_card_text_box_height_in_min: Number(profile?.capacity_rules?.status_card_text_box_height_in_min || 0.96),
-        status_card_point_text_max_estimated_lines: Number(profile?.capacity_rules?.status_card_point_text_max_estimated_lines || 2),
         status_card_point_text_min_cjk_chars: Number(profile?.capacity_rules?.status_card_point_text_min_cjk_chars || 12),
         status_card_point_text_max_cjk_chars: Number(profile?.capacity_rules?.status_card_point_text_max_cjk_chars || 22),
+        status_card_separate_route_label_allowed: profile?.capacity_rules?.status_card_separate_route_label_allowed === true,
+        status_card_single_point_text_required: profile?.capacity_rules?.status_card_single_point_text_required !== false,
         title_font_pt_min: Number(profile?.capacity_rules?.title_font_pt_range?.[0] || 40),
-        title_font_pt_max: Number(profile?.capacity_rules?.title_font_pt_range?.[1] || 44),
-        status_card_quality_role_required: safeText(profile?.capacity_rules?.status_card_quality_role_required, 'content'),
         input_hub_width_in_min: Number(profile?.capacity_rules?.input_hub_width_in_min || 10.4),
         input_hub_height_in_min: Number(profile?.capacity_rules?.input_hub_height_in_min || 0.82),
         input_hub_font_pt_min: Number(profile?.capacity_rules?.input_hub_font_pt_min || 22),
-        input_hub_spans_route_card_centers_required: profile?.capacity_rules?.input_hub_spans_route_card_centers_required === true,
-        input_hub_card_flow_geometry_required: profile?.capacity_rules?.input_hub_card_flow_geometry_required === true,
-        connector_card_center_tolerance_in: Number(profile?.capacity_rules?.connector_card_center_tolerance_in || 0.22),
         connector_vertical_width_in_max: Number(profile?.capacity_rules?.connector_vertical_width_in_max || 0.04),
         connector_vertical_height_in_min: Number(profile?.capacity_rules?.connector_vertical_height_in_min || 0.66),
         connector_hub_gap_in_max: Number(profile?.capacity_rules?.connector_hub_gap_in_max || 0.12),
         horizontal_connector_bus_allowed: profile?.capacity_rules?.horizontal_connector_bus_allowed === true,
-        connector_direction_required: profile?.capacity_rules?.connector_direction_required === true,
-        route_card_connector_kind_required: safeText(profile?.capacity_rules?.route_card_connector_kind_required, 'connector'),
       },
       safe_zone_blueprints_ref: profile?.safe_zone_blueprints
         ? 'output_contract.editable_shape_plan.template_layout_grammar.safe_zone_blueprints'

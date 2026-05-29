@@ -182,9 +182,9 @@ test('P18 closeout audit line-locks product source JS at zero', () => {
 
 test('P18 closeout audit fails closed when nested JS appears without an explicit migration exception', () => {
   const residueDirectory = 'packages/redcube-runtime';
-  const unexpectedFile = 'src/__closeout-audit-test__/unregistered.js';
+  const unexpectedFile = `src/__closeout-audit-test-${randomUUID()}/unregistered.js`;
   const unexpectedPath = path.join(residueDirectory, unexpectedFile);
-  const caseDirectory = 'tests/__closeout-audit-nested-ts-case__';
+  const caseDirectory = `tests/__closeout-audit-nested-ts-case-${randomUUID()}__`;
 
   mkdirSync(path.dirname(unexpectedPath), { recursive: true });
   mkdirSync(caseDirectory, { recursive: true });
@@ -217,7 +217,7 @@ test('P18 closeout audit fails closed when nested JS appears without an explicit
 });
 
 test('P18 closeout audit fails closed when a new package adds JS without registration', () => {
-  const residueDirectory = 'packages/__closeout-new-js-package__';
+  const residueDirectory = `packages/__closeout-new-js-package-${randomUUID()}__`;
   const unexpectedFile = 'src/unregistered.js';
   const unexpectedPath = path.join(residueDirectory, unexpectedFile);
 
@@ -241,7 +241,7 @@ test('P18 closeout audit fails closed when a new package adds JS without registr
 });
 
 test('P18 closeout audit fails closed when a new JS script appears without registration', () => {
-  const unexpectedPath = 'scripts/__closeout-unregistered-script.mjs';
+  const unexpectedPath = `scripts/__closeout-unregistered-script-${randomUUID()}.mjs`;
 
   writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
 

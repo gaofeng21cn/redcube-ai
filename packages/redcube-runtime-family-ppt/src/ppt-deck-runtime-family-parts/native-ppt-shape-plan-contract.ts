@@ -17,10 +17,12 @@ const SAMPLE_STATUS_PROOF_BOARD = Object.freeze({
     status_card_height_in_min: 1.35,
     status_card_quality_role_required: 'content',
     status_card_text_box_height_in_min: 0.96,
-    status_card_point_text_max_estimated_lines: 2,
-    status_card_point_text_min_cjk_chars: 12,
-    status_card_point_text_max_cjk_chars: 22,
-    status_zone_height_in_min: 3.45,
+	    status_card_point_text_max_estimated_lines: 2,
+	    status_card_point_text_min_cjk_chars: 12,
+	    status_card_point_text_max_cjk_chars: 22,
+	    status_card_separate_route_label_allowed: false,
+	    status_card_single_point_text_required: true,
+	    status_zone_height_in_min: 3.45,
     input_hub_label_min_cjk_chars: 12,
     input_hub_label_max_cjk_chars: 16,
     input_hub_label_min_cjk_chars_when_content: 12,
@@ -82,6 +84,32 @@ const SAMPLE_DECISION_PROOF_SPLIT = Object.freeze({
   ],
 });
 
+const PROFESSIONAL_DESIGN_PACK_CONTRACT = Object.freeze({
+  required: true,
+  creative_owner: 'llm_agent',
+  materializer_can_select_layout: false,
+  layout_archetype_taxonomy: [
+    { archetype_id: 'flow_hub_to_cards_proof_band' },
+    { archetype_id: 'decision_split_with_proof_stack' },
+    { archetype_id: 'system_map_with_gate_stack' },
+    { archetype_id: 'evidence_timeline_rail' },
+    { archetype_id: 'risk_control_matrix' },
+    { archetype_id: 'executive_status_board' },
+  ],
+  capacity_budgets: {
+    body_font_pt_min: 18,
+    card_width_in_min: 4.0,
+    card_height_in_min: 1.35,
+  },
+  connector_semantics: {
+    real_ppt_connector_required: true,
+    horizontal_bus_for_route_cards_allowed: false,
+  },
+  design_reference_discipline: {
+    source_projects: ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills'],
+  },
+});
+
 export function buildNativeSampleShapePlanOutputContract({
   aiFirstEditingContract,
   route,
@@ -116,6 +144,7 @@ export function buildNativeSampleShapePlanOutputContract({
         helper_template_layout_allowed: false,
         officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
       },
+      professional_design_pack_contract: PROFESSIONAL_DESIGN_PACK_CONTRACT,
       structural_contract: {
         contract_kind: 'native_pptx_ai_first_structural_plan_v1',
         required: true,
@@ -158,7 +187,7 @@ export function buildNativeSampleShapePlanOutputContract({
           placeholder_capacity_required: true,
           reference_deck_analysis_required: true,
           action_title_required: true,
-          source_projects: ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx'],
+          source_projects: ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills'],
           rule: 'Zones before coords.',
         },
         canvas_in: { width: 16, height: 9 },
@@ -198,8 +227,8 @@ export function buildNativeSampleShapePlanOutputContract({
       sample_capacity_contract: {
         required: true,
         allowed_selected_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
-          forbidden_selected_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map', 'evidence_timeline', 'risk_control_matrix'],
-          forbidden_catalog_archetypes: ['sample_proof_band', 'partial_component_archetype'],
+        forbidden_selected_archetypes: ['executive_status_board', 'decision_dashboard', 'professional_system_map', 'evidence_timeline', 'risk_control_matrix'],
+        forbidden_catalog_archetypes: ['sample_proof_band', 'partial_component_archetype'],
         evidence_text_rule: 'compact sentence only; refs metadata-only',
         structural_visual_required: true,
         helper_layout_fallback_allowed: false,
@@ -217,7 +246,7 @@ export function buildNativeSampleShapePlanOutputContract({
           accent: '<hex>',
           panel: '<hex>',
         },
-          motif: '<sample motif; no title underline>',
+        motif: '<one sample visual motif used without title underlines>',
         layout_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
         forbidden_motifs: ['decorative_title_underline', 'empty_four_card_template', 'general_deck_archetype_substitution'],
         typography: {
@@ -242,10 +271,17 @@ export function buildNativeSampleShapePlanOutputContract({
           capacity_strategy: 'fit hub/cards/proof before coords',
           forbidden_amateur_patterns: ['generic card grid', 'artifact ledger', 'title underline'],
         },
-        borrowed_principles: ['ppt_master_style_spec_lock', 'template_layout_grammar', 'template_profile', 'semantic_layout_selection', 'reference_deck_analysis', 'per_page_visual_plan', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
-        borrowed_principles_rule: 'string[] only',
+        borrowed_principles: [
+          'ppt_master_style_spec_lock',
+          'template_layout_grammar',
+          'template_profile',
+          'semantic_layout_selection',
+          'reference_deck_analysis',
+          'per_page_visual_plan',
+          'layout_rhythm',
+          'rendered_quality_gate',
+        ],
         qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety', 'true_render_screenshot'],
-        qa_gates_rule: 'string[] only',
       },
       slides: [
         {
@@ -301,6 +337,7 @@ export function buildNativeShapePlanOutputContract({
           helper_template_layout_allowed: false,
           officecli_gate_required: ['save', 'validate', 'view_issues', 'view_text'],
         },
+        professional_design_pack_contract: PROFESSIONAL_DESIGN_PACK_CONTRACT,
         structural_contract: {
           contract_kind: 'native_pptx_ai_first_structural_plan_v1',
           required: true,
@@ -364,7 +401,7 @@ export function buildNativeShapePlanOutputContract({
             placeholder_capacity_required: true,
             reference_deck_analysis_required: true,
             action_title_required: true,
-            source_projects: ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx'],
+            source_projects: ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills'],
             rule: 'Treat templates and reference decks as layout intelligence before coordinates: infer semantic zones, placeholder capacity, spacing rhythm, and action-title hierarchy.',
           },
           canvas_in: { width: 16, height: 9 },

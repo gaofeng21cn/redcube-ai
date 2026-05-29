@@ -646,7 +646,7 @@ test('native PPT AI shape plan records template layout grammar and per-slide zon
     assert.equal(editableShapePlan.template_layout_grammar?.reference_discipline?.reference_deck_analysis_required, true);
     assert.equal(editableShapePlan.template_layout_grammar?.reference_discipline?.action_title_required, true);
     assert.equal(
-      ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx']
+      ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills']
         .every((project) => editableShapePlan.template_layout_grammar.reference_discipline.source_projects.includes(project)),
       true,
     );
@@ -805,7 +805,7 @@ test('native PPT AI shape plan retries missing design spec lock motif before mat
         true,
       );
       const contract = authored.native_ppt_bundle.ai_first_shape_plan_output_contract?.editable_shape_plan || {};
-      assert.equal(contract.design_spec_lock.motif, '<sample motif; no title underline>');
+      assert.equal(contract.design_spec_lock.motif, '<one sample visual motif used without title underlines>');
       assert.equal(contract.design_spec_lock.professional_design_brief.design_register, 'executive proof board');
       const editableShapePlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
       assert.equal(typeof editableShapePlan.design_spec_lock.motif, 'string');

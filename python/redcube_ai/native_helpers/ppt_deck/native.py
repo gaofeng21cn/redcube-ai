@@ -309,6 +309,7 @@ def normalize_slide_data(payload: dict) -> list:
         merged['_template_archetype_contract'] = archetypes_by_id.get(selected_archetype) or {}
         merged['_editable_native_shapes'] = plan_shapes
         merged['_typography_plan'] = typography_plan
+        merged['_deck_layout_rhythm'] = design_spec_lock.get('layout_rhythm') if isinstance(design_spec_lock.get('layout_rhythm'), dict) else {}
         slides.append(merged)
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')

@@ -22,10 +22,14 @@ REQUIRED_REFERENCE_DISCIPLINE_FLAGS = [
 
 REQUIRED_REFERENCE_SOURCE_PROJECTS = {
     'ppt-master',
-    'agent-slides',
     'PPTAgent',
-    'pptx-from-layouts-skill',
     'officecli-pptx',
+    'presenton',
+    'ppt-agent-skills',
+}
+REQUIRED_REFERENCE_SOURCE_PROJECT_KEYS = {
+    safe_text(project).lower()
+    for project in REQUIRED_REFERENCE_SOURCE_PROJECTS
 }
 
 
@@ -78,12 +82,15 @@ def _reference_discipline_failures(grammar: dict) -> list[dict]:
                 'field': field,
                 'actual': reference_discipline.get(field),
             })
-    source_projects = {
-        safe_text(project)
+    source_project_keys = {
+        safe_text(project).lower()
         for project in safe_list(reference_discipline.get('source_projects'))
         if safe_text(project)
     }
-    missing_projects = sorted(REQUIRED_REFERENCE_SOURCE_PROJECTS - source_projects)
+    missing_projects = [
+        project for project in sorted(REQUIRED_REFERENCE_SOURCE_PROJECTS)
+        if safe_text(project).lower() not in source_project_keys
+    ]
     if missing_projects:
         failures.append({
             'reason': 'ai_first_template_layout_reference_source_projects_missing',

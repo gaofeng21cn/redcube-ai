@@ -4,6 +4,7 @@
   "status": "production_hardening_landed",
   "owner": "redcube_ai",
   "deliverable_family": "ppt_deck",
+  "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
   "scope": {
     "goal": "Evaluate direct native PPTX authoring and repair as an opt-in replacement for the current image-first authoring stages when editable PPTX is explicitly requested.",
     "default_mainline_changed": false,
@@ -86,7 +87,19 @@
         "export_pptx"
       ],
       "template_layout_grammar_required": true,
-      "per_slide_layout_binding_required": true
+      "per_slide_layout_binding_required": true,
+      "professional_design_pack_required": true,
+      "professional_design_pack_contract_ref": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+      "required_design_pack_sections": [
+        "layout_archetype_taxonomy",
+        "capacity_budgets",
+        "font_floors",
+        "connector_semantics",
+        "layout_rhythm",
+        "non_text_visual_requirements",
+        "reference_discipline",
+        "professional_style_registry"
+      ]
     },
     "unit_repair_scope": {
       "repair_route": "repair_pptx_native",

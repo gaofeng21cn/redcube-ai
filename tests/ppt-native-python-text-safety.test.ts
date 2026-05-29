@@ -82,7 +82,8 @@ test('native PPTX preflight rejects narrow route labels that force awkward short
       role: 'route_flow_connector',
       quality_role: 'structural',
       bounds: { left_in: 4.15, top_in: 3.08 + index * 0.24, width_in: 4.75, height_in: 0.04 },
-      line: '#2563EB',
+      line: { color: '#2563EB', width_pt: 2, end_arrow: true },
+      tailEnd: 'triangle',
       fill: 'none',
     })),
     {

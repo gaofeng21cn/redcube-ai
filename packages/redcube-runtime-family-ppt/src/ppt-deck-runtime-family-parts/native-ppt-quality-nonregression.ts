@@ -88,6 +88,102 @@ const OFFICECLI_MATERIALIZER_POLICY = Object.freeze({
   default_executor_changed: false,
 });
 
+const PROFESSIONAL_DESIGN_PACK_CONTRACT = Object.freeze({
+  contract_id: 'rca_native_pptx_professional_design_pack_v1',
+  required: true,
+  owner: 'redcube_ai',
+  creative_owner: 'llm_agent',
+  materializer_can_select_layout: false,
+  helper_template_layout_allowed: false,
+  fail_closed_when_missing: true,
+  layout_archetype_taxonomy: [
+    {
+      archetype_id: 'flow_hub_to_cards_proof_band',
+      use_when: 'shared input, route comparison, and proof band need one first-glance causal path',
+      required_visual_logic: 'dominant hub -> exactly scoped route cards -> proof band',
+    },
+    {
+      archetype_id: 'decision_split_with_proof_stack',
+      use_when: 'one recommendation or decision needs supporting proof beside it',
+      required_visual_logic: 'decision rail separates decision area from proof stack',
+    },
+    {
+      archetype_id: 'system_map_with_gate_stack',
+      use_when: 'workflow or route mechanics need visible ownership and gates',
+      required_visual_logic: 'map lanes stay separate from gate cards and labels',
+    },
+    {
+      archetype_id: 'evidence_timeline_rail',
+      use_when: 'sequence, evolution, or route progress needs ordering',
+      required_visual_logic: 'timeline rail never crosses readable labels',
+    },
+    {
+      archetype_id: 'risk_control_matrix',
+      use_when: 'criteria, blockers, controls, or QA requirements need comparison',
+      required_visual_logic: 'filled matrix cells with no empty placeholder slots',
+    },
+    {
+      archetype_id: 'executive_status_board',
+      use_when: 'low-density status proof with a small number of major claims',
+      required_visual_logic: 'large cards subordinate to one proof or takeaway area',
+    },
+  ],
+  capacity_budgets: {
+    title_font_pt_min: 36,
+    native_sample_title_font_pt_min: 40,
+    body_font_pt_min: 18,
+    card_text_max_lines: 2,
+    card_text_min_cjk_chars: 12,
+    card_text_max_cjk_chars: 22,
+    card_width_in_min: 4.0,
+    card_height_in_min: 1.35,
+    text_safe_inset_in_min: 0.15,
+    edge_margin_in_min: 0.6,
+    inter_block_gap_in_min: 0.32,
+  },
+  connector_semantics: {
+    real_ppt_connector_required: true,
+    route_card_connector_kind: 'connector',
+    route_card_connector_direction_required: true,
+    vertical_drop_width_in_max: 0.04,
+    vertical_drop_height_in_min: 0.66,
+    horizontal_bus_for_route_cards_allowed: false,
+    connector_text_clearance_in_min: 0.12,
+  },
+  layout_rhythm: {
+    consecutive_same_archetype_max: 2,
+    consecutive_same_primary_grid_max: 2,
+    distinct_composition_signature_share_min: 0.75,
+    empty_placeholder_slots_allowed: false,
+  },
+  design_reference_discipline: {
+    source_projects: [
+      'ppt-master',
+      'PPTAgent',
+      'officecli-pptx',
+      'presenton',
+      'ppt-agent-skills',
+    ],
+    borrowed_scope: [
+      'spec_lock',
+      'template_profile_registry',
+      'semantic_layout_selection',
+      'placeholder_capacity_budget',
+      'per_page_visual_plan',
+      'rendered_quality_gate',
+    ],
+    runtime_dependency_allowed: false,
+  },
+  required_ai_plan_sections: [
+    'design_spec_lock.professional_design_brief',
+    'deck_layout_rhythm_plan',
+    'template_layout_grammar.reference_discipline',
+    'slides[].layout_intent',
+    'slides[].template_layout_binding',
+    'slides[].native_shapes[].layout_zone_id',
+  ],
+});
+
 function safeText(value: unknown, fallback = ''): string {
   const text = String(value || '').trim();
   return text || fallback;
@@ -165,6 +261,22 @@ export function buildNativePptQualityNonregressionReadModel({
       concrete_layout_variant_repetition_limit: 2,
       helper_can_replace_ai_creative_owner: false,
       fail_closed_when_missing: true,
+    },
+    professional_design_pack_ref: {
+      contract_ref: `${QUALITY_NONREGRESSION_CONTRACT_REF}#/professional_design_pack_contract`,
+      required: PROFESSIONAL_DESIGN_PACK_CONTRACT.required,
+      owner: PROFESSIONAL_DESIGN_PACK_CONTRACT.owner,
+      creative_owner: PROFESSIONAL_DESIGN_PACK_CONTRACT.creative_owner,
+      materializer_can_select_layout: PROFESSIONAL_DESIGN_PACK_CONTRACT.materializer_can_select_layout,
+      helper_template_layout_allowed: PROFESSIONAL_DESIGN_PACK_CONTRACT.helper_template_layout_allowed,
+      required_design_pack_refs: [
+        'layout_archetype_taxonomy',
+        'capacity_budgets',
+        'connector_semantics',
+        'layout_rhythm',
+        'design_reference_discipline',
+      ],
+      fail_closed_when_missing: PROFESSIONAL_DESIGN_PACK_CONTRACT.fail_closed_when_missing,
     },
     visual_sample_claim_boundary: {
       sample_kind: isTestDouble ? 'deterministic_test_double_plumbing_proof' : 'live_codex_executor_native_ppt_sample',

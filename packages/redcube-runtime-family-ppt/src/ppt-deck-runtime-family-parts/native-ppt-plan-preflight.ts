@@ -496,7 +496,7 @@ export function createNativePptPlanPreflightParts({
               'template_layout_grammar.reference_discipline.placeholder_capacity_required=true',
               'template_layout_grammar.reference_discipline.reference_deck_analysis_required=true',
               'template_layout_grammar.reference_discipline.action_title_required=true',
-              'template_layout_grammar.reference_discipline.source_projects includes ppt-master, agent-slides, PPTAgent, pptx-from-layouts-skill, officecli-pptx',
+              'template_layout_grammar.reference_discipline.source_projects includes ppt-master, PPTAgent, officecli-pptx, presenton, ppt-agent-skills',
               'template_layout_grammar.archetype_catalog>=3 or compact sample mode with exactly the two sample archetypes',
               'template_layout_grammar.archetype_catalog[].use_when',
               'template_layout_grammar.archetype_catalog[].layout_description',

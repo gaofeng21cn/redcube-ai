@@ -6,7 +6,8 @@
   "owner": "redcube_ai",
   "handoff_status": "ready_for_opl_meta_agent_and_agent_lab_execution",
   "suite_contract_refs": [
-    "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json"
+    "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+    "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
   ],
   "external_suite_seed": {
     "suite_id": "redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1",
@@ -33,7 +34,9 @@
   },
   "no_forbidden_write_proof_refs": [
     "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only",
-    "no-forbidden-write:rca/goal-workflow/runtime-artifacts-not-repo-source"
+    "no-forbidden-write:rca/goal-workflow/runtime-artifacts-not-repo-source",
+    "no-forbidden-write:rca/ppt-three-route/agent-lab-suite-refs-only",
+    "no-forbidden-write:rca/ppt-three-route/artifact-producing-runtime-tests-not-mutated"
   ],
   "authority_boundary": {
     "refs_only": true,
@@ -44,6 +47,100 @@
     "opl_meta_agent_can_mutate_artifact_body": false,
     "opl_meta_agent_can_authorize_quality_or_export": false,
     "opl_meta_agent_can_write_owner_receipt": false,
-    "rca_owner_receipt_or_typed_blocker_required": true
+    "rca_owner_receipt_or_typed_blocker_required": true,
+    "opl_meta_agent_can_record_ppt_native_terminal_refs": true
+  },
+  "external_suite_seeds": {
+    "goal_workflow": {
+      "suite_id": "redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1",
+      "suite_kind": "agent_lab_external_suite",
+      "required_task_ids": [
+        "agent-lab-task:rca/goal-workflow/minimal-autonomous-visual-delivery"
+      ],
+      "tasks": [
+        {
+          "task_id": "agent-lab-task:rca/goal-workflow/minimal-autonomous-visual-delivery",
+          "gate_id": "minimal_autonomous_visual_delivery_goal_workflow",
+          "owner_route": "redcube_ai",
+          "suite_ref": "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
+          "required_return_shapes": [
+            "domain_receipt",
+            "typed_blocker",
+            "no_regression_evidence"
+          ],
+          "required_command_refs": [
+            "opl agent-lab run --suite contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json --json"
+          ]
+        }
+      ]
+    },
+    "ppt_three_route_native_terminal_refs": {
+      "suite_id": "redcube-ai.ppt-three-route-agent-lab-suite.v1",
+      "suite_kind": "agent_lab_external_suite",
+      "required_task_ids": [
+        "agent-lab-task:rca/ppt-three-route/default-image-first",
+        "agent-lab-task:rca/ppt-three-route/explicit-render-html",
+        "agent-lab-task:rca/ppt-three-route/explicit-author-pptx-native"
+      ],
+      "tasks": [
+        {
+          "task_id": "agent-lab-task:rca/ppt-three-route/explicit-author-pptx-native",
+          "gate_id": "ppt_native_real_route_terminal_refs",
+          "owner_route": "redcube_ai",
+          "suite_ref": "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
+          "route_id": "ppt_deck.native.explicit_author_pptx_native.v1",
+          "primary_route": "author_pptx_native",
+          "terminal_route": "export_pptx",
+          "required_return_shapes": [
+            "domain_receipt",
+            "typed_blocker",
+            "no_regression_evidence"
+          ],
+          "required_terminal_ref_groups": [
+            "editable_pptx",
+            "pdf",
+            "render_screenshots",
+            "shape_manifest",
+            "visual_director_review_receipt",
+            "screenshot_review_receipt",
+            "export_receipt",
+            "artifact_gallery",
+            "agent_lab_run_report"
+          ],
+          "required_report_observations": [
+            "native_pptx_terminal_export_refs_observed",
+            "agent_lab_run_report_ref_observed",
+            "mock_visual_quality_claims_absent"
+          ],
+          "required_command_refs": [
+            "opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json",
+            "node --experimental-strip-types scripts/run-real-route-evolution-probe.ts --live --routes native --iterations 1 --native-sample-slide-count 1 --json"
+          ]
+        }
+      ],
+      "authority_boundary": {
+        "refs_only": true,
+        "read_only": true,
+        "opl_agent_lab_can_run_suite": true,
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_authorize_quality_verdict": false,
+        "can_authorize_export_verdict": false,
+        "can_mutate_domain_artifact": false,
+        "can_write_owner_receipt": false,
+        "opl_agent_lab_can_write_rca_visual_truth": false,
+        "opl_agent_lab_can_write_artifact_blob": false,
+        "opl_agent_lab_can_write_memory_body": false,
+        "opl_agent_lab_can_authorize_quality_verdict": false,
+        "opl_agent_lab_can_authorize_export_verdict": false,
+        "opl_agent_lab_can_mutate_artifact_body": false,
+        "opl_agent_lab_can_write_owner_receipt": false,
+        "opl_agent_lab_score_is_rca_visual_verdict": false,
+        "opl_agent_lab_can_claim_visual_ready": false,
+        "opl_agent_lab_can_claim_exportable": false,
+        "opl_agent_lab_can_claim_production_soak_complete": false,
+        "rca_owner_receipt_or_typed_blocker_required": true
+      }
+    }
   }
 }

@@ -298,6 +298,54 @@ test('real route evolution probe mock native sample honors hard one-slide planni
   assert.equal(exportRun.ok, true);
   assert.equal(exportRun.artifact_refs.some((ref) => ref.endsWith('.pptx')), true);
   assert.equal(exportRun.artifact_refs.some((ref) => ref.endsWith('.pdf')), true);
+
+  assert.equal(lane.terminal_evidence.surface_kind, 'rca_native_pptx_terminal_evidence_refs');
+  assert.equal(lane.terminal_evidence.status, 'refs_collected');
+  assert.deepEqual(lane.terminal_evidence.missing_ref_groups, []);
+  assert.deepEqual(lane.terminal_evidence.route_chain, [
+    'storyline',
+    'detailed_outline',
+    'slide_blueprint',
+    'visual_direction',
+    'author_pptx_native',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+  ]);
+  assert.equal(lane.terminal_evidence.product_entry_domain_route.task_intent, 'run_deliverable_route');
+  assert.equal(lane.terminal_evidence.product_entry_domain_route.hand_written_workflow, false);
+  assert.equal(lane.terminal_evidence.product_entry_domain_route.terminal_route_run_id, exportRun.run_id);
+  for (const group of [
+    'editable_pptx',
+    'pdf',
+    'render_screenshots',
+    'shape_manifest',
+    'visual_director_review_receipt',
+    'screenshot_review_receipt',
+    'export_receipt',
+    'artifact_gallery',
+  ]) {
+    assert.equal(lane.terminal_evidence.ref_groups[group].exists, true, group);
+    assert.equal(
+      lane.terminal_evidence.ref_groups[group].refs.every((ref) => existsSync(ref)),
+      true,
+      group,
+    );
+  }
+  assert.equal(lane.terminal_evidence.ref_groups.agent_lab_run_report.exists, true);
+  assert.equal(lane.terminal_evidence.ref_groups.agent_lab_run_report.planned, true);
+  assert.equal(lane.terminal_evidence.ref_groups.agent_lab_run_report.refs[0], report.report_file);
+  assert.equal(lane.terminal_evidence.review_export_receipt_refs.visual_director_review_status, 'pass');
+  assert.equal(lane.terminal_evidence.review_export_receipt_refs.screenshot_review_status, 'pass');
+  assert.equal(lane.terminal_evidence.review_export_receipt_refs.export_status, 'completed');
+  assert.equal(lane.terminal_evidence.review_export_receipt_refs.export_delivery_state, 'output_ready');
+  assert.equal(lane.terminal_evidence.mock_provider_policy.mock_allowed_for_plumbing_only, true);
+  assert.equal(lane.terminal_evidence.mock_provider_policy.proves_visual_sample_quality, false);
+  assert.equal(lane.terminal_evidence.authority_boundary.agent_lab_records_refs_only, true);
+  assert.equal(lane.terminal_evidence.authority_boundary.agent_lab_can_write_rca_visual_verdict, false);
+  assert.equal(lane.terminal_evidence.authority_boundary.agent_lab_can_write_owner_receipt, false);
+  assert.equal(lane.terminal_evidence.authority_boundary.agent_lab_can_write_artifact_body, false);
+  assert.equal(readJson(report.report_file).lanes[0].terminal_evidence.status, 'refs_collected');
 });
 
 test('real route evolution probe writes numeric evidence into source materials full text', async () => {
