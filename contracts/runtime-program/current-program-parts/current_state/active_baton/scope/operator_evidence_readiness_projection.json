@@ -119,21 +119,25 @@
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
       ],
       "deliverable_family_refs": [
         "ppt_deck",
         "xiaohongshu"
       ],
-      "required_minimum_evidence_ref_count": 4,
+      "required_minimum_evidence_ref_count": 6,
       "repeated_no_regression_claimed_as_soak": false,
       "real_runtime_evidence_refs": [
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+        "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
       ],
-      "real_runtime_evidence_ref_count": 4,
+      "real_runtime_evidence_ref_count": 6,
       "real_runtime_evidence_provenance": [
         {
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
@@ -154,9 +158,19 @@
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
           "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-xhs-window2",
           "sha256": "d476325dfa59bf8f6443a46882630be60001f6b0197f91d71ecf58e3a65d4744"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-native-repeat",
+          "sha256": "59a03cd84db896dd0511d0dce5f9069e82faf00875f94b2698a064f708b232f3"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+          "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat",
+          "sha256": "7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4"
         }
       ],
-      "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs",
+      "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs",
       "evidence_cadence": "cross_route_cross_window_repeated_refs_only"
     },
     "naming_tombstone_follow_through_refs": {
@@ -190,7 +204,9 @@
       "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
       "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
     ],
     "no_regression_refs": [
       "rca-no-regression:visual-stage:transition-hosted-no-regression",
@@ -198,7 +214,9 @@
       "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
       "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2"
+      "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
     ]
   }
 }

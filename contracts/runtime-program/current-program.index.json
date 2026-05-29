@@ -196,7 +196,7 @@
       "json_pointer": "/current_state/active_baton/scope/operator_evidence_readiness_projection",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/operator_evidence_readiness_projection.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 204
+      "line_count": 222
     },
     {
       "json_pointer": "/current_state/active_baton/scope/opl_family_lifecycle_adapter",
@@ -1726,7 +1726,7 @@
       "json_pointer": "/product_release_metadata/public_surfaces",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/public_surfaces.json",
       "role": "current_program_leaf_source",
-      "line_count": 16
+      "line_count": 17
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/consumer",

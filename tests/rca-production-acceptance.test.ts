@@ -14,6 +14,8 @@ const realNoRegressionRefs = [
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
   'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
   'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
+  'rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat',
+  'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
 ];
 
 function readJson(relativePath) {
@@ -324,10 +326,10 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
   }
   assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
-  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 4);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 6);
   assert.equal(
     scaleout.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
-    'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs',
+    'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs',
   );
   assert.deepEqual(
     scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_provenance.map(
@@ -733,7 +735,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
     scaleoutFixture.visual_memory_body_reuse_refs.reuse_ref_scope,
     'visual_pattern_memory_locator_and_content_ref_only',
   );
-  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 4);
+  assert.equal(scaleoutFixture.repeated_no_regression_evidence_refs.minimum_ref_count, 6);
   assertRefArray(
     scaleoutFixture.repeated_no_regression_evidence_refs.evidence_refs,
     'production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_refs',

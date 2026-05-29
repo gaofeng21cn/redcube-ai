@@ -19,6 +19,8 @@ const REAL_NO_REGRESSION_REFS = [
   'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
   'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
   'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
+  'rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat',
+  'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
 ];
 
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
@@ -526,7 +528,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.required_minimum_evidence_ref_count,
-      4,
+      6,
     );
     assert.deepEqual(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.real_runtime_evidence_refs,
@@ -534,7 +536,7 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
-      'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260528-4-refs',
+      'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs',
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_scaleout_refs.repeated_no_regression_evidence_refs.evidence_cadence,
