@@ -15,8 +15,18 @@ State: `current_public_entry`
 Machine boundary: Human-readable public entry. Machine truth remains in contracts, schemas, source, CLI/MCP/API behavior, runtime artifacts, owner receipts, artifact locators, and RCA-owned review/export gates.
 -->
 
-<p align="center"><strong>A Foundry Agent for visual deliverables, released as an OPL-compatible package built on the OPL Framework</strong></p>
+<p align="center"><strong>An AI creation workspace for formal visual deliverables, keeping source material, generation, review, repair, and exported files on one traceable delivery line.</strong></p>
 <p align="center">Slides · Xiaohongshu Notes · Posters</p>
+
+When a task moves from "make a few images" to "produce a visual deliverable I can actually use," the hard part is usually the whole workflow, not one page:
+
+- Source material, notes, screenshots, reference images, and old drafts are scattered. How do they become one coherent deliverable?
+- After many generated versions, which review comments were addressed, and which version should be rerun?
+- Slides, Xiaohongshu notes, and posters need different routes. Can the system choose the right creation path for the deliverable type?
+- During longer generation, review, and export runs, can the user still understand what is happening?
+- At handoff, can exported files, review records, and source material still match each other?
+
+`RedCube AI` is built around those questions. For knowledge-heavy visual work, it keeps source organization, page generation, review repair, progress reporting, and export evidence on the same delivery line so a draft can move toward deliverable files.
 
 <table>
   <tr>
@@ -26,7 +36,7 @@ Machine boundary: Human-readable public entry. Machine truth remains in contract
     </td>
     <td width="33%" valign="top">
       <strong>What It Organizes</strong><br/>
-      Source materials, review comments, reruns, progress updates, and exported files inside one workspace
+      Source materials, review comments, reruns, progress updates, and exported files on one traceable delivery line
     </td>
     <td width="33%" valign="top">
       <strong>How To Start</strong><br/>
@@ -39,7 +49,22 @@ Machine boundary: Human-readable public entry. Machine truth remains in contract
   <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI overview" width="100%" />
 </p>
 
-> `RedCube AI` is the RedCube Foundry Agent: it keeps source material, generation, review, reruns, progress reporting, and exported files on the same delivery line for formal visual work. Its release shape is one `redcube-ai` app skill plus service-safe domain entry, domain_handler/projection, and stage-control projection surfaces.
+## Core Highlights
+
+**Continuous Creation Around The Deliverable**<br/>
+It does not stop at a single generated image. It keeps working around a concrete slide deck, note series, or poster, organizing material, generating pages, routing review feedback, and preparing exports through RCA-owned gates.
+
+**Source To Deliverable In One Workspace**<br/>
+Lecture notes, project summaries, references, screenshots, old drafts, and review comments stay on one delivery line for inspection and reuse; runtime artifacts live in the task workspace, not in the source checkout.
+
+**Traceable Review And Repair**<br/>
+Each review round, rerun, repair target, and export result stays connected, so operators can see why the current version changed.
+
+**Routes Match The Output Type**<br/>
+Slides, Xiaohongshu notes, and knowledge posters use different default routes; editable PPTX and HTML routes are explicit selectable routes.
+
+**Progress Stays Visible During Long Jobs**<br/>
+During generation, checking, reruns, and export, RCA progress and review surfaces expose the current step, remaining issues, and the next review focus.
 
 ## One-Sentence Quick Start
 
@@ -67,7 +92,7 @@ You can start with prompts like:
 
 - Experts provide the source material, audience expectations, and final judgment.
 - The AI operator handles generation, revision, reruns, export, and progress reporting.
-- The workspace keeps sessions, review state, rerun history, and final files together for inspection.
+- The workspace keeps sessions, review state, rerun history, artifact refs, and export outputs together for inspection.
 
 ## Current Boundary
 

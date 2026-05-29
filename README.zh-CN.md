@@ -15,8 +15,18 @@ State: `current_public_entry`
 Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 -->
 
-<p align="center"><strong>面向视觉交付的 Foundry Agent，以 built on OPL Framework 的 OPL-compatible package 形态发布</strong></p>
+<p align="center"><strong>面向正式视觉交付的 AI 创作工作台 —— 把资料、生成、审阅、回修和导出文件放在同一条可追踪的交付线上。</strong></p>
 <p align="center">幻灯片 · 小红书笔记 · 海报</p>
+
+当一项工作从“帮我做几页图”变成“做一套可以正式使用的视觉交付物”时，问题通常不在单张图片，而在完整流程：
+
+- 源材料、讲稿、截图、参考图和旧版草稿分散在多处，怎么收成一套成品？
+- 生成了很多版本后，哪一轮解决了什么审阅意见，哪一轮应该重跑？
+- 幻灯片、小红书笔记和海报的路线不同，能不能按成品类型选择合适的创作方式？
+- 长时间生成、审阅和导出过程中，用户能不能随时看懂当前进度？
+- 最后交付时，导出文件、审阅记录和源材料能不能对得上？
+
+`RedCube AI` 正是围绕这些问题设计的。它面向知识型视觉交付，把源材料整理、页面生成、审阅回修、进度反馈和导出证据放在同一条交付线上，让视觉成品从草稿推进到可以交付的文件。
 
 <table>
   <tr>
@@ -26,7 +36,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
     </td>
     <td width="33%" valign="top">
       <strong>适用问题</strong><br/>
-      资料、草稿、批注、导出结果分散在多处，希望把交付过程收在同一个工作区里
+      资料、草稿、批注、导出结果分散在多处，希望把交付过程收在同一条可追踪交付线上
     </td>
     <td width="33%" valign="top">
       <strong>如何开始</strong><br/>
@@ -39,7 +49,22 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
   <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI 主示意图" width="100%" />
 </p>
 
-> `RedCube AI` 是 RedCube Foundry Agent：它把源材料、生成过程、审阅轮次、进度反馈和导出文件放在同一条交付线上；发布形态统一为单一 `redcube-ai` app skill、service-safe domain entry、domain_action_adapter / projection 和 stage control projection。
+## 核心亮点
+
+**围绕交付物持续创作**<br/>
+它不是只生成一张图，而是围绕幻灯片、系列笔记、海报等明确成品持续组织材料、生成页面、路由审阅反馈，并通过 RCA 自己的 gate 准备导出。
+
+**资料到成品在同一工作区**<br/>
+讲义笔记、项目摘要、参考文献、截图、旧版草稿和审阅意见会被放到同一条交付线上，方便回看和复用；真实运行产物属于任务工作区，不写回源码 checkout。
+
+**审阅和回修可追踪**<br/>
+每轮审阅意见、重跑记录、修改重点和导出结果都保留下来，操作者可以知道当前版本为什么这样改。
+
+**按成品类型选择路线**<br/>
+幻灯片、小红书笔记、知识海报有不同默认路线；可编辑 PPTX、HTML 等路线是显式可选路线。
+
+**长任务进度可见**<br/>
+在生成、检查、重跑和导出过程中，RCA 的进度与审阅 surface 会暴露当前步骤、剩余问题和下一轮处理重点。
 
 ## 一句话快速启动
 
@@ -67,7 +92,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 - 专家提供源材料、受众预期和最终判断。
 - AI 助手负责生成、修订、重跑、导出和进度反馈。
-- 工作区持续保存任务、审阅状态、重跑记录和最终文件，方便检查与回看。
+- 工作区持续保存任务、审阅状态、重跑记录、artifact refs 和导出结果，方便检查与回看。
 
 ## 当前边界
 

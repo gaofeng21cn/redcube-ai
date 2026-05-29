@@ -86,6 +86,70 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 RCA README public-entry rewrite tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-29T22:26:24Z` 的 OPL-series frozen inventory 下处理 RCA `README.md` / `README.zh-CN.md` public-entry dirty lane。该 lane 在快照内已经存在，文件 mtime 为 `2026-05-30T06:19:52+0800`，且本轮复核未发现快照后写入；RCA root 同步 `origin/main` at `37ab1f3335cb89bf9c8eafa2bad3feb4f01c3182`，只保留 README 双语 dirty 内容。其他 RCA worktree `codex/rca-session-progress-first` 在快照内有 dirty source/tests 和 recent writes，未纳入本 tranche。
+
+Frozen inventory summary:
+
+- `one-person-lab`: main ahead `origin/main` 4，`README.md` / `README.zh-CN.md` dirty；多个 OPL worktree 存在 dirty、recent 或 post-snapshot writes，全部保留。
+- `med-autoscience`: main behind `origin/main` 1，README dirty；多条 MAS worktree 和长期 quality/verify 进程存在，全部保留。
+- `med-autogrant`: main synced 但 README dirty；`codex/mag-progress-first-adapter` worktree dirty/recent，保留。
+- `redcube-ai`: main synced，README 双语 dirty；`codex/rca-session-progress-first` worktree dirty/recent，保留；本轮只处理 root README public-entry lane。
+- `opl-meta-agent`: main synced 但 README dirty；`codex/oma-workorder-progress-first` worktree dirty/recent，保留。
+- `one-person-lab-app`: main behind `origin/main` 1，root dirty 且存在 dirty / remote-backed worktree，保留。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、`README.md`、`README.zh-CN.md`。
+- Core current docs: `docs/status.md`、`docs/project.md`、`docs/architecture.md`。
+- Primary references: `docs/references/rca-visual-deliverable-agent-ideal-state.md` and `docs/active/rca-ideal-state-gap-plan.md`。
+- Machine / implementation evidence: `contracts/runtime-program/current-program.json`、`contracts/runtime-program/current-program-parts/**` references for `ppt_deck` / `xiaohongshu` / `poster_onepager`、source/test grep for `author_image_pages`、`render_html`、`author_pptx_native`、`runtimeWatch`、`progress_projection`、`review_state`、`export_bundle` and `export_pptx`。
+- Current docs governance owner: this document.
+
+Fresh semantic result:
+
+- The README rewrite is current as public-entry narrative only: RedCube AI can be described as a formal visual-deliverable AI creation workspace / Foundry Agent that keeps source material, route execution, review/repair, progress and export refs on one traceable delivery line.
+- The README wording was narrowed so it does not imply a mature GUI/WebUI/front office, does not claim production visual-stage long soak, and does not move visual truth、review/export verdict、artifact authority、visual memory body or owner receipt authority to OPL.
+- `ppt_deck` / `xiaohongshu` / `poster_onepager` route claims match current docs/contracts: PPT and Xiaohongshu default to image-first authoring; HTML and native editable PPTX are explicit selectable routes; progress/watch remains refs-only read-model surface; export/readiness stays behind RCA-owned review/export gates.
+- No source/contracts/tests/workflows changed; no module/interface/test/entry was retired in this tranche. No compatibility surface、alias、facade、wrapper or fallback was added.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | `README.md`, `README.zh-CN.md`, `docs/status.md`, `docs/project.md`, `docs/architecture.md`, `docs/active/rca-ideal-state-gap-plan.md`, `docs/references/rca-visual-deliverable-agent-ideal-state.md`, `contracts/runtime-program/current-program.json`, source/contract/test route evidence grep, this governance ledger. | `README.md`, `README.zh-CN.md`, this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none.
+
+Retired modules / interfaces / tests / workflows / entries:
+
+- none.
+
+Retained public-surface reasons:
+
+- `README.md` and `README.zh-CN.md` remain public human entrypoints. They are not machine truth and now explicitly keep current public narrative under the contract/source/runtime owner boundary.
+- Direct RCA public surfaces remain `redcube-ai` app skill, CLI/MCP, service-safe domain entry and generated/hosted refs. The README does not add a new callable public surface.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche did not re-audit all `docs/**/*.md`; it covered README public-entry wording and the current truth surfaces needed to validate that wording.
+- Other OPL series repos remain open under the global goal.
+
+Remaining stale / retire candidates:
+
+- RCA production evidence tail, Temporal controlled visual-stage long soak, generated/default caller thinning, strict source-purity cleanup and compatibility-free retirement remain open in the active plan.
+- RCA `codex/rca-session-progress-first` worktree has dirty source/tests and recent writes; it is retained for a future heartbeat.
+- OPL / MAS / MAG / OMA / App dirty, recent, behind, remote-backed or active-owner lanes remain blockers for destructive cleanup.
+
+Post snapshot activity:
+
+- No README post-snapshot write was observed in this tranche. OPL worktrees showed post-snapshot writes during candidate cleanup evidence collection; those lanes were not cleaned or absorbed and remain next-heartbeat intake.
+
+Next tranche write scope:
+
+- Continue with another frozen-scope stable lane: RCA `codex/rca-session-progress-first` only after owner/truth audit and dirty-lane ownership is clear; otherwise MAG/OMA/RCA README/docs clusters after fresh intake, or OPL/MAS/App lanes only when their dirty/recent/remote-backed blockers clear or are explicitly taken over.
+
 ### 2026-05-30 gflab Developer Mode stale branch deletion retry tranche
 
 本轮在 `RUN_SNAPSHOT_TS=2026-05-29T22:18:46Z` 的 OPL-series frozen inventory 下重试 RCA `gflab/codex/developer-mode-fork-pr-live-closeout-20260528` remote-ref cleanup。RCA root 在快照内已经有 `README.md` / `README.zh-CN.md` dirty public-entry rewrite，且本轮只处理 `gflab` stale remote ref，不吸收、不重写、不 stage RCA README dirty 内容。
