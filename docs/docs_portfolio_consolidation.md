@@ -86,6 +86,49 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 gflab Developer Mode stale branch deletion-blocked tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-29T22:07:26Z` 的 OPL-series frozen inventory 下处理 RCA remote-ref cleanup candidate。RCA main 在快照内 clean/synced at `01acce2`，无 RCA root worktree；快照内存在 `gflab/codex/developer-mode-fork-pr-live-closeout-20260528`，无本地 branch/worktree。该 lane 只覆盖 `gflab` stale remote ref 判断和删除尝试，不扩大到 OPL/MAS/App dirty/recent lanes，不关闭 OPL series 全局 `/goal`。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、`docs/history/README.md`、本 governance ledger、`gflab` / `origin` remote ref state。
+- `gflab/codex/developer-mode-fork-pr-live-closeout-20260528` points to `56ea90fb204e1beef9e144c24e78007373121ebd` / `docs: record Developer Mode fork PR proof boundary`。
+- Current owner main `origin/main` at `01acce23c5ebae87dfe7c26294371d5d469ef3e1` already contains the Developer Mode non-owner fork / PR proof boundary in `docs/history/README.md`.
+- `git cherry -v origin/main gflab/codex/developer-mode-fork-pr-live-closeout-20260528` returned `- 56ea90f...`, so the `gflab` branch patch is equivalent to current owner main.
+- GitHub PR checks: `gflab/redcube-ai` open PR list `[]`; targeted open PR count `0`; all-state targeted query `[]`. Cross-repo target `gaofeng21cn/redcube-ai` open PR count `0`; all-state query returned historical PR `#2` closed.
+- `gflab/main` is at `1803ff417ac63f79aad8ced6fe3003e5e49b8c40`, so this proof line is not patch-equivalent to `gflab/main`; current owner truth for this automation remains `origin/main`.
+
+Fresh semantic result:
+
+- The `gflab/codex/...` remote ref is a stale Developer Mode proof branch relative to the current RCA owner main and has no open PR.
+- The only live semantic payload remains the history boundary already held by `docs/history/README.md`: Developer Mode fork/PR proof only proves GitHub-backed evidence plumbing; it does not declare RCA visual ready、exportable、handoffable、production soak complete、artifact authority、review/export verdict or OPL ownership of RCA visual truth.
+- Deletion was attempted through both configured routes and blocked by transport errors: `git push gflab :codex/developer-mode-fork-pr-live-closeout-20260528` failed with `LibreSSL SSL_connect: SSL_ERROR_SYSCALL`; `gh api -X DELETE repos/gflab/redcube-ai/git/refs/heads/codex/developer-mode-fork-pr-live-closeout-20260528` failed with GitHub API `connection reset by peer`.
+- Post-attempt API verification still returns the `gflab` ref at `56ea90f`, so no deletion is claimed in this tranche.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | `gflab` remote ref state, owner `origin/main` equivalence, `docs/history/README.md` Developer Mode proof boundary, GitHub PR state, deletion command failures, this governance ledger. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. No repo-tracked docs were deleted.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche did not re-audit all `README*` / `docs/**/*.md`; it only covers the stale `gflab` remote ref lifecycle and its already-owned history semantic.
+- Other OPL series repos remain open under the global goal. OPL/MAS/App retain dirty/recent/ahead or remote-backed lanes in the frozen inventory.
+
+Remaining stale / retire candidates:
+
+- `gflab/codex/developer-mode-fork-pr-live-closeout-20260528` remains a stale remote-ref candidate. Next heartbeat should retry deletion after network/API stability, using the same evidence gates and rechecking PR/owner state first.
+- Future RCA prose that upgrades Developer Mode fork/PR proof to visual ready、exportable、handoffable、production soak complete、artifact authority、review/export verdict or OPL-owned visual truth is stale pollution.
+
+Next tranche write scope:
+
+- Prefer another clean semantically decidable lane while the `gflab` delete path is transport-blocked, or retry this remote cleanup once GitHub transport is stable.
+- Continue to avoid OPL/MAS/App dirty/recent/remote-backed lanes unless explicitly taking ownership.
+
 ### 2026-05-30 Developer Mode fork PR stale branch retirement tranche
 
 本轮在 `RUN_SNAPSHOT_TS=2026-05-29T21:46:29Z` 的 OPL-series frozen inventory 下处理 RCA remote-only stale lane。RCA main 在快照内 clean/synced at `d4a0171`，无 RCA 快照窗口写入；快照内存在远端分支 `origin/codex/developer-mode-fork-pr-live-closeout-20260528`，无本地 branch/worktree。该 lane 只覆盖 stale remote branch 判断和清理，不扩大到快照后活动，不关闭 OPL series 全局 `/goal`。
