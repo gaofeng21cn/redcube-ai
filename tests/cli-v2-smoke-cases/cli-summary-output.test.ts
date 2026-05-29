@@ -107,14 +107,6 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
       },
       expectedSurfaceKind: 'review_state',
     },
-    {
-      name: 'review watch',
-      argv: ['review', 'watch', '--workspace-root', '/tmp/ws', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', 'run-summary-1', '--json-summary'],
-      domainActions: {
-        runtimeWatch: async () => minimalLongSurface('runtime_watch'),
-      },
-      expectedSurfaceKind: 'runtime_watch',
-    },
   ];
 
   for (const item of cases) {
@@ -143,14 +135,14 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
 
 test('CLI --quiet emits JSON summary output instead of the full surface', async () => {
   const { printed } = await captureCli(
-    ['review', 'watch', '--workspace-root', '/tmp/ws', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', 'run-summary-1', '--quiet'],
+    ['review', 'get', '--workspace-root', '/tmp/ws', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--quiet'],
     {
-      runtimeWatch: async () => minimalLongSurface('runtime_watch'),
+      getReviewState: async () => minimalLongSurface('review_state'),
     },
   );
 
   assert.equal(printed.ok, true);
-  assert.equal(printed.surface_kind, 'runtime_watch');
+  assert.equal(printed.surface_kind, 'review_state');
   assert.equal(printed.run_id, 'run-summary-1');
   assert.equal(printed.artifact_file, '/tmp/redcube/artifacts/screenshot_review.json');
   assert.equal(printed.full_payload_that_should_not_be_printed, undefined);

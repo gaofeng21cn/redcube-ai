@@ -1,7 +1,7 @@
 {
   "status": "guarded_apply_proof_landed_domain_artifact_mutation_requires_receipt",
   "proof_id": "rca.lifecycle_guarded_apply_proof.v1",
-  "source_manifest_surface": "redcube product manifest#/lifecycle_guarded_apply_proof",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
   "operations": [
     "cleanup",
     "restore",

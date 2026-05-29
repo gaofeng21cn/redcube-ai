@@ -1,7 +1,7 @@
 {
   "status": "controlled_apply_proof_landed_memory_body_external",
   "proof_id": "rca.visual_pattern_memory.controlled_apply_proof.v1",
-  "source_manifest_surface": "redcube product manifest#/controlled_memory_apply_proof",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
   "consumes_visual_pattern_memory_refs": true,
   "projects_writeback_proposal_ref": true,
   "projects_accept_reject_receipt_cases": [
@@ -19,7 +19,7 @@
   "repo_tracks_visual_truth": false,
   "repo_tracks_review_export_verdict": false,
   "repo_tracks_artifact_blobs": false,
-  "runtime_receipt_instances_ref": "redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
+  "runtime_receipt_instances_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
   "projects_runtime_receipt_statuses": [
     "accepted",
     "rejected"

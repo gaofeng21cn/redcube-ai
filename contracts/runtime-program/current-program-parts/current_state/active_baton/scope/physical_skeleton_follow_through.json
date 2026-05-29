@@ -1,6 +1,6 @@
 {
   "status": "low_risk_repo_source_follow_through_landed",
-  "source_manifest_surface": "redcube product manifest#/physical_skeleton_follow_through",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
   "physical_roots": [
     "agent",
     "contracts",

@@ -1,6 +1,6 @@
 type JsonRecord = Record<string, any>;
 
-const SAMPLE_SAFE_ZONE_BLUEPRINTS = 'sample_status_proof_board zones title_zone:title:0.85,0.45,14.3,1.15,0.15|claim_zone:claim:0.85,1.67,14.3,1.05,0.15|status_zone:status:0.85,2.95,14.3,3.55,0.15|proof_zone:proof:0.85,6.65,14.3,1.55,0.15 shapes title:title_zone:0.95,0.58,13.6,0.92|core_sentence:claim_zone:0.95,1.86,13.6,0.88|input_hub:status_zone:2.8,3.08,10.4,0.86|flow_drop:status_zone:card_center,3.94,0.03,0.74|route_card:status_zone:1.1|5.85|10.6,4.68,4.3,1.5|proof_text:proof_zone:1.25,6.98,12.9,0.62 check title>=40 body=18 hub>=10.4x0.82 font>=22 text=同一材料同步进入三条路线验证 spans centers=3.25|8.0|12.75 exactly3 vertical kind=connector drops no_horizontal_bus tailEnd=triangle gap>=0.12';
+const SAMPLE_SAFE_ZONE_BLUEPRINTS = 'sample_status_proof_board zones title_zone:title:0.85,0.45,14.3,1.15,0.15|claim_zone:claim:0.85,1.67,14.3,1.05,0.15|status_zone:status:0.85,2.95,14.3,3.55,0.15|proof_zone:proof:0.85,6.65,14.3,1.55,0.15 shapes title:title_zone:0.95,0.58,13.6,0.92|core_sentence:claim_zone:0.95,1.86,13.6,0.88|input_hub:status_zone:2.8,3.08,10.4,0.86|flow_drop:status_zone:card_center,3.94,0.03,0.74|route_card:status_zone:1.1|5.85|10.6,4.68,4.3,1.5|proof_text:proof_zone:1.25,6.88,12.9,1.05 check title>=40 body=18 hub>=10.4x0.82 font>=22 proof_text>=1.05 text=同一材料同步进入三条路线验证 spans centers=3.25|8.0|12.75 exactly3 vertical kind=connector drops no_horizontal_bus tailEnd=triangle gap>=0.12';
 
 export function nativePptSampleSafeZoneBlueprints(): JsonRecord {
   return { tuple_contract: SAMPLE_SAFE_ZONE_BLUEPRINTS };

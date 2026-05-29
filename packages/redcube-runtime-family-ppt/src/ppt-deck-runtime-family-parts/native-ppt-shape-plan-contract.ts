@@ -177,7 +177,7 @@ export function buildNativeSampleShapePlanOutputContract({
           SAMPLE_STATUS_PROOF_BOARD,
           SAMPLE_DECISION_PROOF_SPLIT,
         ],
-        compact_sample_catalog_rule: 'Catalog only sample_status_proof_board + sample_decision_proof_split; sample_proof_band is a role.',
+        compact_sample_catalog_rule: 'Catalog: two sample archetypes only; sample_proof_band is a role.',
         safe_zone_blueprints: safeZoneBlueprints,
         safe_zone_blueprint_rule: safeZoneBlueprints
           ? 'Copy tuple zones; hub spans card centers; use exactly 3 vertical connector drops.'
@@ -217,7 +217,7 @@ export function buildNativeSampleShapePlanOutputContract({
           accent: '<hex>',
           panel: '<hex>',
         },
-          motif: '<sample motif>',
+          motif: '<sample motif; no title underline>',
         layout_archetypes: ['sample_status_proof_board', 'sample_decision_proof_split'],
         forbidden_motifs: ['decorative_title_underline', 'empty_four_card_template', 'general_deck_archetype_substitution'],
         typography: {
@@ -237,8 +237,8 @@ export function buildNativeSampleShapePlanOutputContract({
         professional_design_brief: {
           design_register: 'executive proof board',
           reference_style_family: 'proof board',
-          first_glance_hierarchy: 'title/claim -> shared input -> three routes -> proof',
-          template_profile_strategy: 'semantic zones with capacity floors',
+          first_glance_hierarchy: 'title/claim -> hub -> 3 routes -> proof',
+          template_profile_strategy: 'semantic zones + capacity floors',
           capacity_strategy: 'fit hub/cards/proof before coords',
           forbidden_amateur_patterns: ['generic card grid', 'artifact ledger', 'title underline'],
         },

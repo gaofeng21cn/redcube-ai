@@ -4,7 +4,7 @@
   "getProductEntrySession",
   "redcube product invoke",
   "redcube domain-handler export",
-  "redcube product session",
+  "opl_generated:product_session",
   "invoke_product_entry",
   "redcube domain-handler dispatch",
   "get_product_entry_session"

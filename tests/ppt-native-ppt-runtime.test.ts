@@ -945,6 +945,7 @@ test('native PPT proof lane records the Python engine contract as the single own
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
     design_spec_lock_required: true,
+    professional_design_brief_required: true,
     reference_design_profile_required: true,
     semantic_layout_selection_required: true,
     placeholder_capacity_required: true,

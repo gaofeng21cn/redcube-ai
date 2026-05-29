@@ -589,13 +589,25 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
         entry_shell_key: 'direct',
         entry_command: 'redcube product invoke',
-        supporting_shell_keys: ['direct', 'session', 'native_ppt_proof', 'image_ppt_proof'],
-        opl_generated_shell_keys: ['status', 'session'],
+        supporting_shell_keys: ['direct', 'native_ppt_proof', 'image_ppt_proof'],
+        opl_generated_shell_keys: ['status', 'start', 'preflight', 'session', 'manifest'],
         domain_handler_keys: ['domain_handler'],
         shell_commands: {
           status: {
             command: 'opl_generated:product_status',
             target_surface_kind: 'product_status',
+            owner: 'one-person-lab',
+            repo_local_command_available: false,
+          },
+          start: {
+            command: 'opl_generated:product_start',
+            target_surface_kind: 'product_entry_start',
+            owner: 'one-person-lab',
+            repo_local_command_available: false,
+          },
+          preflight: {
+            command: 'opl_generated:product_preflight',
+            target_surface_kind: 'product_entry_preflight',
             owner: 'one-person-lab',
             repo_local_command_available: false,
           },
@@ -606,6 +618,12 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
           session: {
             command: 'opl_generated:product_session',
             target_surface_kind: 'product_entry_session',
+            owner: 'one-person-lab',
+            repo_local_command_available: false,
+          },
+          manifest: {
+            command: 'opl_generated:product_entry_manifest',
+            target_surface_kind: 'product_entry_manifest',
             owner: 'one-person-lab',
             repo_local_command_available: false,
           },

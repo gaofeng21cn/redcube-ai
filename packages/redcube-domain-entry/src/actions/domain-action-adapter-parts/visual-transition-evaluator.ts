@@ -50,7 +50,7 @@ export function buildVisualTransitionEvaluatorProjection({ visualTransitionSpec 
     status: 'thin_evaluator_landed_runner_owned_by_opl',
     source_spec_ref: SPEC_REF,
     source_spec_id: visualTransitionSpec?.spec_id || 'rca.visual_transition_spec.v1',
-    source_manifest_surface: 'redcube product manifest#/visual_transition_spec',
+    source_manifest_surface: 'opl_generated:product_entry_manifest#/visual_transition_spec',
     descriptor_model: 'rca_owned_transition_guard_evaluator_refs_only',
     callable_action: 'evaluate_visual_transition',
     expected_inputs: [

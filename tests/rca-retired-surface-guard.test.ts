@@ -107,7 +107,7 @@ function pointerMatchesAllowedSuffix(pointer, suffix) {
   return new RegExp(`${pattern}$`).test(pointer);
 }
 
-test('RCA active source surfaces do not restore compatibility alias claims', () => {
+test('RCA active source surfaces do not restore compatibility alias claims or repo-local product manifest refs', () => {
   for (const contractFile of RETIRED_CONTRACTS) {
     assert.equal(existsSync(path.resolve(contractFile)), false, contractFile);
   }
@@ -127,6 +127,9 @@ test('RCA active source surfaces do not restore compatibility alias claims', () 
       if (pattern.test(text)) {
         violations.push(`${file}: ${pattern}`);
       }
+    }
+    for (const term of ['redcube product manifest#', 'redcube product manifest']) {
+      if (text.includes(term)) violations.push(`${file}: ${term}`);
     }
   }
 
@@ -846,18 +849,31 @@ test('retired managed product-entry contract is tombstoned without compatibility
   assert.equal(retired.active_caller_retained, false);
   assert.equal(replacement.product_entry_session_continuity_id, 'product_entry_session_continuity');
   assert.equal(replacement.callable_surface.api_surface, 'getProductEntrySession');
+  assert.equal(replacement.callable_surface.cli_entry, 'opl_generated:product_session');
+  assert.equal(replacement.callable_surface.repo_local_command_available, false);
+  assert.equal(replacement.callable_surface.repo_local_cli_entry_retired, true);
 });
 
-test('current program active entry surfaces use domain-handler dispatch naming', () => {
+test('current program active entry surfaces use generated product shell naming', () => {
   const currentProgram = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/current-program.json'),
     'utf-8',
   ));
   const entrySurfaces = currentProgram.current_state.active_baton.scope.entry_surfaces;
+  const productEntrySurfaces = currentProgram.product_release_metadata.public_surfaces.product_entry_surfaces;
 
   assert.equal(entrySurfaces.includes('redcube domain-handler dispatch'), true);
   assert.equal(entrySurfaces.includes('redcube domain-handler export'), true);
   assert.equal(entrySurfaces.includes('domain_action_adapter_dispatch'), false);
+  assert.equal(entrySurfaces.includes('redcube product manifest'), false);
+  assert.equal(entrySurfaces.includes('redcube product session'), false);
+  assert.equal(entrySurfaces.includes('opl_generated:product_session'), true);
+  assert.equal(productEntrySurfaces.includes('redcube product status'), false);
+  assert.equal(productEntrySurfaces.includes('redcube product manifest'), false);
+  assert.equal(productEntrySurfaces.includes('redcube product session'), false);
+  assert.equal(productEntrySurfaces.includes('opl_generated:product_status'), true);
+  assert.equal(productEntrySurfaces.includes('opl_generated:product_entry_manifest'), true);
+  assert.equal(productEntrySurfaces.includes('opl_generated:product_session'), true);
 });
 
 test('retired legacy surface ids only appear in tombstone or provenance pointer paths', () => {

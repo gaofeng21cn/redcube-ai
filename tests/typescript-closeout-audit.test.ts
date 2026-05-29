@@ -1,6 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { randomUUID } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
@@ -281,10 +282,19 @@ test('P18 closeout audit fails closed when the registered JS residue budget grow
 
 test('P18 closeout audit emits a machine-readable JSON artifact', () => {
   const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
-  writeAuditFile(audit);
+  const auditFile = path.join(
+    path.dirname(AUDIT_FILE),
+    `P18_TYPESCRIPT_CLOSEOUT_AUDIT.${process.pid}.${randomUUID()}.json`,
+  );
 
-  assert.equal(existsSync(AUDIT_FILE), true);
-  const stored = readJson(AUDIT_FILE);
-  assert.equal(stored.criteria.closeout_ready, true);
-  assert.equal(stored.criteria.quality_gates_green, true);
+  try {
+    writeAuditFile(audit, auditFile);
+
+    assert.equal(existsSync(auditFile), true);
+    const stored = readJson(auditFile);
+    assert.equal(stored.criteria.closeout_ready, true);
+    assert.equal(stored.criteria.quality_gates_green, true);
+  } finally {
+    rmSync(auditFile, { force: true });
+  }
 });

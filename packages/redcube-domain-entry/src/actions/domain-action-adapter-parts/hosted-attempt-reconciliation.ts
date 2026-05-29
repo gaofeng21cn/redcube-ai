@@ -1,7 +1,7 @@
 // @ts-nocheck
 const DEFAULT_TRANSITION_ID = 'review_ready_to_package';
 const BRIDGE_KIND = 'repo_local_opl_provider_attempt_bridge_fixture';
-const CONSUMED_SURFACE = 'redcube product manifest#/visual_transition_spec';
+const CONSUMED_SURFACE = 'opl_generated:product_entry_manifest#/visual_transition_spec';
 const DOMAIN_ID = 'redcube_ai';
 const DOMAIN_TICK_EVENT = 'domain_tick';
 const FORBIDDEN_COMPLETION_CLAIM_FIELDS = new Set([

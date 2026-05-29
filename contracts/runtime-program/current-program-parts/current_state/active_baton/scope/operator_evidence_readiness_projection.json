@@ -1,7 +1,7 @@
 {
   "status": "refs_only_operator_projection_landed",
-  "source_manifest_surface": "redcube product manifest#/operator_evidence_readiness_projection",
-  "source_status_surface": "redcube product status#/operator_evidence_readiness_projection",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+  "source_status_surface": "opl_generated:product_status#/operator_evidence_readiness_projection",
   "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/operator_evidence_readiness_projection",
   "owner": "redcube_ai",
   "consumer": "opl_app_operator",

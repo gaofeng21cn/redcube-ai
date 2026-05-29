@@ -1,9 +1,9 @@
 {
   "status": "refs_only_read_model_landed_runtime_instances_workspace_scoped",
   "projection_id": "rca.workspace_receipt_inventory.v1",
-  "source_manifest_surface": "redcube product manifest#/workspace_receipt_inventory_projection",
-  "source_status_surface": "redcube product status#/workspace_receipt_inventory_projection",
-  "source_session_surface": "redcube product session#/workspace_receipt_inventory_projection",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+  "source_status_surface": "opl_generated:product_status#/workspace_receipt_inventory_projection",
+  "source_session_surface": "opl_generated:product_session#/workspace_receipt_inventory_projection",
   "projection_model": "workspace_runtime_receipt_refs_only_read_model",
   "receipt_root_model": "<workspace-root>/.redcube/runtime/receipts/",
   "owner": "redcube_ai",

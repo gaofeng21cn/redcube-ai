@@ -42,7 +42,7 @@ RCA repo source 只保存 locator、index、schema、receipt ref、restore/reten
 - 实现语言目标是 `TypeScript + Python`：TypeScript 持有 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
 - `ppt_deck` 默认通过 `author_image_pages` 走 image-first 整页 PNG 视觉生成；HTML `render_html/fix_html` 与可编辑原生 PPTX `author_pptx_native/repair_pptx_native` 继续作为显式可选路线。
 - runtime truth 继续以文件 authority 和可重建 artifact index 为主。SQLite 持久层在 RCA 当前阶段 deferred，只有当实测 artifact/session 文件增长或跨交付物查询压力足够明确时，才作为可重建 domain_action_adapter index 评估。
-- `status` 命令键只作为单一 `redcube-ai` app skill 之下的 agent-facing product-entry overview / intake / entry-shell contract 保留，不代表成熟 GUI、WebUI 或最终用户前台壳已落地。
+- `status` 命令键只作为单一 `redcube-ai` app skill 之下的 agent-facing product-entry overview / intake / entry-shell contract 保留，不代表成熟 GUI、WebUI 或最终用户前台壳已落地；repo-local `redcube product` CLI 当前只保留 `invoke`，product status / session / manifest wrapper 由 OPL generated/default caller 持有。
 - `stage_control_projection` 与 `family_action_catalog` 已让 OPL 可发现 RCA stage/action descriptor，但 OPL 只做 discovery / queue / projection / receipt，不持有 visual route、review/export verdict 或 canonical artifact authority。
 
 ## 技术工作集

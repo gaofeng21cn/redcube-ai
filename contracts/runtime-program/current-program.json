@@ -91,15 +91,16 @@
       "product_entry_surfaces": [
         "invokeProductEntry",
         "getProductEntrySession",
-        "redcube product status",
+        "opl_generated:product_status",
         "redcube product invoke",
-        "redcube product session"
+        "opl_generated:product_session",
+        "opl_generated:product_entry_manifest"
       ],
       "domain_handler_surfaces": [
         "redcube domain-handler export",
         "redcube domain-handler dispatch"
       ],
-      "stage_control_projection": "redcube product manifest#/stage_control_projection"
+      "stage_control_projection": "opl_generated:product_entry_manifest#/stage_control_projection"
     },
     "authority_boundary": {
       "rca_owns": [
@@ -7905,7 +7906,7 @@
           "getProductEntrySession",
           "redcube product invoke",
           "redcube domain-handler export",
-          "redcube product session",
+          "opl_generated:product_session",
           "invoke_product_entry",
           "redcube domain-handler dispatch",
           "get_product_entry_session"
@@ -8060,13 +8061,13 @@
           "descriptor_proof_contract_state": "landed",
           "runtime_writeback_state": "pending",
           "controlled_apply_proof_state": "controlled_apply_proof_landed_memory_body_external",
-          "controlled_memory_apply_proof_ref": "redcube product manifest#/controlled_memory_apply_proof"
+          "controlled_memory_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof"
         },
         "controlled_visual_stage_attempt": {
           "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
           "fixture_id": "rca.controlled_visual_stage_attempt.fixture.v1",
           "provider_controlled_proof_id": "rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1",
-          "controlled_memory_apply_proof_ref": "redcube product manifest#/controlled_memory_apply_proof",
+          "controlled_memory_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
           "apply_proof_state": "controlled_apply_proof_landed_memory_body_external",
           "covered_family": "ppt_deck",
           "stage_kinds": [
@@ -8099,7 +8100,7 @@
         "controlled_memory_apply_proof": {
           "status": "controlled_apply_proof_landed_memory_body_external",
           "proof_id": "rca.visual_pattern_memory.controlled_apply_proof.v1",
-          "source_manifest_surface": "redcube product manifest#/controlled_memory_apply_proof",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
           "consumes_visual_pattern_memory_refs": true,
           "projects_writeback_proposal_ref": true,
           "projects_accept_reject_receipt_cases": [
@@ -8117,7 +8118,7 @@
           "repo_tracks_visual_truth": false,
           "repo_tracks_review_export_verdict": false,
           "repo_tracks_artifact_blobs": false,
-          "runtime_receipt_instances_ref": "redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
+          "runtime_receipt_instances_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
           "projects_runtime_receipt_statuses": [
             "accepted",
             "rejected"
@@ -8126,7 +8127,7 @@
         "standard_domain_agent_skeleton_repo_source_layout": {
           "status": "audit_surface_landed",
           "mapping_model": "physical_skeleton_repo_source_layout_with_manifest_projection",
-          "audit_surface": "redcube product manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+          "audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
           "expected_roots": [
             "agent",
             "contracts",
@@ -8144,7 +8145,7 @@
         },
         "runtime_residue_retirement": {
           "status": "active_path_retired",
-          "source_manifest_surface": "redcube product manifest#/runtime_residue_retirement",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/runtime_residue_retirement",
           "retired_default_surfaces": [
             "hermes_first_default_runtime",
             "retired_gateway_protocol_boundary_public_entry",
@@ -8159,7 +8160,7 @@
         "domain_owner_receipt_contract": {
           "status": "contract_landed_runtime_no_regression_evidence_ref_available",
           "contract_id": "rca.domain_owner_receipt.v1",
-          "source_manifest_surface": "redcube product manifest#/domain_owner_receipt_contract",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
           "allowed_return_shapes": [
             "domain_receipt",
             "typed_blocker",
@@ -8207,7 +8208,7 @@
         "lifecycle_guarded_apply_proof": {
           "status": "guarded_apply_proof_landed_domain_artifact_mutation_requires_receipt",
           "proof_id": "rca.lifecycle_guarded_apply_proof.v1",
-          "source_manifest_surface": "redcube product manifest#/lifecycle_guarded_apply_proof",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
           "operations": [
             "cleanup",
             "restore",
@@ -8223,9 +8224,9 @@
         "workspace_receipt_inventory_projection": {
           "status": "refs_only_read_model_landed_runtime_instances_workspace_scoped",
           "projection_id": "rca.workspace_receipt_inventory.v1",
-          "source_manifest_surface": "redcube product manifest#/workspace_receipt_inventory_projection",
-          "source_status_surface": "redcube product status#/workspace_receipt_inventory_projection",
-          "source_session_surface": "redcube product session#/workspace_receipt_inventory_projection",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+          "source_status_surface": "opl_generated:product_status#/workspace_receipt_inventory_projection",
+          "source_session_surface": "opl_generated:product_session#/workspace_receipt_inventory_projection",
           "projection_model": "workspace_runtime_receipt_refs_only_read_model",
           "receipt_root_model": "<workspace-root>/.redcube/runtime/receipts/",
           "owner": "redcube_ai",
@@ -8242,7 +8243,7 @@
         "visual_transition_spec": {
           "status": "contract_landed_thin_evaluator_landed_runner_owned_by_opl",
           "spec_id": "rca.visual_transition_spec.v1",
-          "source_manifest_surface": "redcube product manifest#/visual_transition_spec",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_spec",
           "transition_model": "rca_owned_transition_table_oracle_fixture_refs_only",
           "covered_family_stage_kinds": [
             "source_intake",
@@ -8269,7 +8270,7 @@
         },
         "physical_skeleton_follow_through": {
           "status": "low_risk_repo_source_follow_through_landed",
-          "source_manifest_surface": "redcube product manifest#/physical_skeleton_follow_through",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
           "physical_roots": [
             "agent",
             "contracts",
@@ -8286,7 +8287,7 @@
         },
         "review_helper_baseline_follow_through": {
           "status": "summary_and_geometry_split_landed_baseline_removed",
-          "source_manifest_surface": "redcube product manifest#/review_helper_baseline_follow_through",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
           "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
           "current_line_budget_baseline": null,
           "current_helper_line_budget_state": "within_budget_after_summary_and_geometry_split",
@@ -8517,7 +8518,7 @@
         },
         "opl_stability_read_model_consumption": {
           "status": "refs_only_consumer_projection_landed",
-          "source_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/opl_stability_read_model_consumption",
           "source_domain_handler_surface": "redcube domain-handler export#/mapped_surfaces/opl_stability_read_model_consumption",
           "contract_ref": "opl.family_operator_stability_read_model.v1",
           "owner": "opl",
@@ -8553,8 +8554,8 @@
         },
         "operator_evidence_readiness_projection": {
           "status": "refs_only_operator_projection_landed",
-          "source_manifest_surface": "redcube product manifest#/operator_evidence_readiness_projection",
-          "source_status_surface": "redcube product status#/operator_evidence_readiness_projection",
+          "source_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+          "source_status_surface": "opl_generated:product_status#/operator_evidence_readiness_projection",
           "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/operator_evidence_readiness_projection",
           "owner": "redcube_ai",
           "consumer": "opl_app_operator",
@@ -12518,26 +12519,26 @@
         "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
         "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
         "session_continuity_provenance_brief": "human_doc:program_product_entry_session_continuity",
-        "route_equivalence_manifest_surface": "redcube product manifest#/route_equivalence",
-        "deliverable_facade_manifest_surface": "redcube product manifest#/deliverable_facade",
+        "route_equivalence_manifest_surface": "opl_generated:product_entry_manifest#/route_equivalence",
+        "deliverable_facade_manifest_surface": "opl_generated:product_entry_manifest#/deliverable_facade",
         "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
         "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
-        "visual_pattern_memory_writeback_manifest_surface": "redcube product manifest#/visual_pattern_memory_writeback",
-        "controlled_visual_stage_attempt_manifest_surface": "redcube product manifest#/controlled_visual_stage_attempt",
-        "controlled_consumed_memory_writeback_receipt_proof_surface": "redcube product manifest#/controlled_visual_stage_attempt/writeback_proof_contract",
-        "controlled_memory_apply_proof_manifest_surface": "redcube product manifest#/controlled_memory_apply_proof",
-        "standard_domain_agent_skeleton_layout_audit_surface": "redcube product manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
-        "runtime_residue_retirement_manifest_surface": "redcube product manifest#/runtime_residue_retirement",
-        "controlled_memory_runtime_receipt_instances_surface": "redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
-        "domain_owner_receipt_contract_manifest_surface": "redcube product manifest#/domain_owner_receipt_contract",
-        "lifecycle_guarded_apply_proof_manifest_surface": "redcube product manifest#/lifecycle_guarded_apply_proof",
-        "workspace_receipt_inventory_projection_manifest_surface": "redcube product manifest#/workspace_receipt_inventory_projection",
-        "visual_transition_spec_manifest_surface": "redcube product manifest#/visual_transition_spec",
-        "physical_skeleton_follow_through_manifest_surface": "redcube product manifest#/physical_skeleton_follow_through",
-        "review_helper_baseline_follow_through_manifest_surface": "redcube product manifest#/review_helper_baseline_follow_through",
-        "opl_stability_read_model_consumption_manifest_surface": "redcube product manifest#/opl_stability_read_model_consumption",
-        "operator_evidence_readiness_projection_manifest_surface": "redcube product manifest#/operator_evidence_readiness_projection",
-        "visual_transition_evaluator_manifest_surface": "redcube product manifest#/visual_transition_evaluator"
+        "visual_pattern_memory_writeback_manifest_surface": "opl_generated:product_entry_manifest#/visual_pattern_memory_writeback",
+        "controlled_visual_stage_attempt_manifest_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt",
+        "controlled_consumed_memory_writeback_receipt_proof_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt/writeback_proof_contract",
+        "controlled_memory_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+        "standard_domain_agent_skeleton_layout_audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+        "runtime_residue_retirement_manifest_surface": "opl_generated:product_entry_manifest#/runtime_residue_retirement",
+        "controlled_memory_runtime_receipt_instances_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
+        "domain_owner_receipt_contract_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
+        "lifecycle_guarded_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
+        "workspace_receipt_inventory_projection_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+        "visual_transition_spec_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_spec",
+        "physical_skeleton_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
+        "review_helper_baseline_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
+        "opl_stability_read_model_consumption_manifest_surface": "opl_generated:product_entry_manifest#/opl_stability_read_model_consumption",
+        "operator_evidence_readiness_projection_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+        "visual_transition_evaluator_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_evaluator"
       },
       "closeout": {
         "closeout_id": "rca_one_shot_production_hardening_closeout",

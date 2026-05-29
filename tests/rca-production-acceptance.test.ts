@@ -154,7 +154,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.deepEqual(scaleout.selected_artifact_producing_visual_route, {
     deliverable_family: 'ppt_deck',
     route_id: 'ppt_deck.image_first.artifact_producing.v1',
-    route_ref: 'redcube product manifest#/ppt_deck_visual_route_truth',
+    route_ref: 'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth',
     route_kind: 'image_first_ppt_artifact_route',
     stage_sequence_refs: [
       'author_image_pages',
@@ -232,7 +232,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   ]);
   assert.equal(
     scaleout.owner_payload_item_summary.accepted_payload_paths_ref,
-    'redcube product manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
+    'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
   );
   assert.deepEqual(
     scaleout.owner_payload_item_summary.work_items.map((item) => item.item_id),
@@ -415,7 +415,7 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.deepEqual(handoff.body_free_repeated_no_regression_refs.deliverable_family_refs, ['ppt_deck', 'xiaohongshu']);
   assert.equal(handoff.body_free_repeated_no_regression_refs.repeated_no_regression_claimed_as_soak, false);
 
-  assert.equal(handoff.monitor_freshness_backfill_refs.monitor_surface_ref, 'redcube product manifest#/workspace_receipt_inventory_projection');
+  assert.equal(handoff.monitor_freshness_backfill_refs.monitor_surface_ref, 'opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection');
   assert.equal(handoff.monitor_freshness_backfill_refs.monitor_freshness_payload_body_required, false);
   assert.equal(handoff.monitor_freshness_backfill_refs.production_soak_claimed, false);
 
@@ -436,7 +436,7 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.equal(handoff.stage_expected_receipt_payload_summary.stage_count, 6);
   assert.equal(
     handoff.stage_expected_receipt_payload_summary.accepted_payload_paths_ref,
-    'redcube product manifest#/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
+    'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths',
   );
   assert.deepEqual(handoff.stage_expected_receipt_payload_summary.stage_ids, [
     'source_intake',
@@ -458,7 +458,7 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   );
   assert.equal(
     handoff.stage_expected_receipt_payload_summary.success_ref_models.source_runtime_event_ref,
-    'redcube product manifest#/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
+    'opl_generated:product_entry_manifest#/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
   );
   assert.equal(handoff.stage_expected_receipt_payload_summary.operator_payload_submitted, false);
   assert.equal(handoff.stage_expected_receipt_payload_summary.success_refs_visible_is_completion, false);
@@ -496,7 +496,7 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
   assert.equal(handoff.work_order_ref, 'oma_developer_patch_work_order_5a1b68cacbd4');
   assert.equal(handoff.owner, 'redcube_ai');
   assert.equal(handoff.consumer, 'opl_agent_lab');
-  assert.equal(handoff.projection_ref, 'redcube product manifest#/rca_efficiency_handoff_projection');
+  assert.equal(handoff.projection_ref, 'opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection');
   assert.equal(
     handoff.domain_action_adapter_projection_ref,
     'redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection',
@@ -504,7 +504,7 @@ test('RCA production acceptance exposes Agent Lab efficiency handoff refs withou
   assert.equal(handoff.contract_ref, 'contracts/production_acceptance/rca-efficiency-handoff-projection.json');
   assert.equal(
     handoff.external_work_order_owner_closeout_ref,
-    'redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+    'opl_generated:product_entry_manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
   );
   assert.equal(handoff.external_work_order_owner_closeout_action, 'emit_external_work_order_owner_closeout');
   assertRefArray(handoff.runtime_consumption_refs, 'efficiency_handoff_projection_refs.runtime_consumption_refs');
@@ -583,7 +583,7 @@ test('RCA production acceptance exposes default Temporal-hosted autonomy without
   const readiness = acceptance.temporal_autonomy_readiness;
 
   assert.equal(readiness.surface_kind, 'temporal_autonomy_readiness');
-  assert.equal(readiness.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
+  assert.equal(readiness.readiness_ref, 'opl_generated:product_entry_manifest#/temporal_autonomy_readiness');
   assert.equal(readiness.status, 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending');
   assert.equal(readiness.provider_owner, 'one-person-lab');
   assert.equal(readiness.provider_kind_required_for_production, 'temporal');
@@ -774,7 +774,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
 
   const temporalReadinessFixture = fixture.temporal_autonomy_readiness;
   assert.equal(temporalReadinessFixture.surface_kind, 'temporal_autonomy_readiness_fixture_refs');
-  assert.equal(temporalReadinessFixture.readiness_ref, 'redcube product manifest#/temporal_autonomy_readiness');
+  assert.equal(temporalReadinessFixture.readiness_ref, 'opl_generated:product_entry_manifest#/temporal_autonomy_readiness');
   assert.equal(temporalReadinessFixture.status, 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending');
   assert.equal(temporalReadinessFixture.provider_owner, 'one-person-lab');
   assert.equal(temporalReadinessFixture.provider_kind_required_for_production, 'temporal');

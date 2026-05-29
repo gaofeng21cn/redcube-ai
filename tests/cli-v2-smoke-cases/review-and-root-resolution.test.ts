@@ -240,7 +240,7 @@ async function withMockCodexRuntimeCli(testFn) {
   }
 }
 
-test('CLI review watch returns operator-facing runtime watch surface for a persisted run', async () => {
+test('CLI review watch fails closed because the default watch wrapper is OPL-owned', async () => {
   await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-'));
@@ -277,70 +277,13 @@ test('CLI review watch returns operator-facing runtime watch surface for a persi
     );
     assert.equal(runParsed.ok, true);
 
-    const watched = await execCliAsync(
-      cliPath,
-      [
-        'review',
-        'watch',
-        '--workspace-root', workspaceRoot,
-        '--topic-id', 'topic-a',
-        '--deliverable-id', 'deck-a',
-        '--run-id', runParsed.run.run_id,
-      ],
-      { cwd: path.resolve('.') },
-    );
-    assert.equal(watched.ok, true);
-    assert.equal(watched.surface_kind, 'runtime_watch');
-    assert.equal(watched.run_id, runParsed.run.run_id);
-  });
-});
-
-test('CLI review watch rejects a persisted run when topic locator does not match the run identity', async () => {
-  await withMockCodexRuntimeCli(async () => {
-    const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-review-watch-mismatch-'));
-
-    for (const topicId of ['topic-a', 'topic-b']) {
-      const createOutput = await execCliAsync(
-        cliPath,
-        [
-          'deliverable',
-          'create',
-          '--workspace-root', workspaceRoot,
-          '--overlay', 'ppt_deck',
-          '--profile-id', 'lecture_student',
-          '--topic-id', topicId,
-          '--deliverable-id', 'deck-a',
-          '--title', `deck ${topicId}`,
-          '--goal', `goal ${topicId}`,
-        ],
-        { cwd: path.resolve('.') },
-      );
-      assert.equal(createOutput.ok, true);
-    }
-
-    const runParsed = await execCliAsync(
-      cliPath,
-      [
-        'deliverable',
-        'run',
-        '--workspace-root', workspaceRoot,
-        '--overlay', 'ppt_deck',
-        '--topic-id', 'topic-a',
-        '--deliverable-id', 'deck-a',
-        '--route', 'storyline',
-      ],
-      { cwd: path.resolve('.') },
-    );
-    assert.equal(runParsed.ok, true);
-
     const failure = await execCliExpectFailureAsync(
       cliPath,
       [
         'review',
         'watch',
         '--workspace-root', workspaceRoot,
-        '--topic-id', 'topic-b',
+        '--topic-id', 'topic-a',
         '--deliverable-id', 'deck-a',
         '--run-id', runParsed.run.run_id,
       ],
@@ -349,7 +292,7 @@ test('CLI review watch rejects a persisted run when topic locator does not match
 
     assert.equal(failure.ok, false);
     assert.equal(failure.error_kind, 'cli_usage_error');
-    assert.match(failure.error, /runtimeWatch topicId 与 run\.topic_id 不一致/);
+    assert.match(failure.error, /runtimeWatch default wrapper 由 OPL status\/workbench\/read-model caller 持有/);
   });
 });
 

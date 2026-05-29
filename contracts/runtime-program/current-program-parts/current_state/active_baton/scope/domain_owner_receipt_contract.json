@@ -1,7 +1,7 @@
 {
   "status": "contract_landed_runtime_no_regression_evidence_ref_available",
   "contract_id": "rca.domain_owner_receipt.v1",
-  "source_manifest_surface": "redcube product manifest#/domain_owner_receipt_contract",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
   "allowed_return_shapes": [
     "domain_receipt",
     "typed_blocker",

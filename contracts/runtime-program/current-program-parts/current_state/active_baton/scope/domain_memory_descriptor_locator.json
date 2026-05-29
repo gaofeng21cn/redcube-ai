@@ -29,5 +29,5 @@
   "descriptor_proof_contract_state": "landed",
   "runtime_writeback_state": "pending",
   "controlled_apply_proof_state": "controlled_apply_proof_landed_memory_body_external",
-  "controlled_memory_apply_proof_ref": "redcube product manifest#/controlled_memory_apply_proof"
+  "controlled_memory_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof"
 }

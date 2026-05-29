@@ -100,7 +100,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     assert.deepEqual(domainProjection, {
       bridge_kind: 'repo_local_opl_provider_attempt_bridge_fixture',
-      consumed_surface: 'redcube product manifest#/visual_transition_spec',
+      consumed_surface: 'opl_generated:product_entry_manifest#/visual_transition_spec',
       transition_result_ref: 'family_transition_matrix_result:rca.visual_transition_spec.v1:review_ready_to_package',
       transition_result_status: 'transition_applied',
       transition_result_receipt_refs: ['family-transition-receipt:review-ready-to-package'],
@@ -159,7 +159,7 @@ test('OPL transition hosted attempt bridge reconciles RCA receipt refs only', SE
     });
     assert.deepEqual(noRegressionProjection, {
       bridge_kind: 'repo_local_opl_provider_attempt_bridge_fixture',
-      consumed_surface: 'redcube product manifest#/visual_transition_spec',
+      consumed_surface: 'opl_generated:product_entry_manifest#/visual_transition_spec',
       transition_result_ref: 'family_transition_matrix_result:rca.visual_transition_spec.v1:review_ready_to_package',
       transition_result_status: 'transition_applied',
       transition_result_receipt_refs: ['family-transition-receipt:review-ready-to-package'],

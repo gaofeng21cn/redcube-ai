@@ -45,6 +45,7 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while r
 
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable execute')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), false);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('redcube managed')), false);
   assert.equal(parsed.commonTasks.filter((item) => item.command.includes('deliverable execute')).length, 1);
   assert.deepEqual(parsed.commonFlows.ppt_deck, [
@@ -93,6 +94,7 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
 
   assert.equal(new Set(commands).size, commands.length);
   assert.equal(commands.filter((command) => command.includes('deliverable execute')).length, 1);
+  assert.equal(commands.some((command) => command.includes('review watch')), false);
   assert.equal(commands.some((command) => command.includes('redcube managed')), false);
 
   for (const [actionKey, toolName] of [
@@ -104,11 +106,12 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
     ['runDeliverableRoute', 'run_deliverable_route'],
     ['getReviewState', 'get_review_state'],
     ['getPublicationProjection', 'get_publication_projection'],
-    ['runtimeWatch', 'runtime_watch'],
   ]) {
     assert.equal(typeof cliActions[actionKey], 'function', `cli:${actionKey}`);
     assert.equal(typeof mcpActions[actionKey], 'function', `mcp:${actionKey}`);
   }
+  assert.equal(cliActions.runtimeWatch, undefined);
+  assert.equal(mcpActions.runtimeWatch, undefined);
 
   assert.deepEqual(
     [...toolNames].sort(),
@@ -207,14 +210,20 @@ test('brand-new workspace quickstart converges doctor -> source research -> crea
 
     const review = runCli(['review', 'get', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a']);
     const projection = runCli(['review', 'projection', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a']);
-    const watch = runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', run.run.run_id]);
+    try {
+      runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', run.run.run_id]);
+      assert.fail('review watch CLI wrapper must fail closed');
+    } catch (error) {
+      const failure = JSON.parse(error.stdout);
+      assert.equal(failure.ok, false);
+      assert.equal(failure.error_kind, 'cli_usage_error');
+      assert.match(failure.error, /runtimeWatch default wrapper 由 OPL status\/workbench\/read-model caller 持有/);
+    }
 
     assert.equal(review.source_readiness_summary?.planning_ready, true);
     assert.equal(review.gate_summary?.source_planning_ready, true);
     assert.equal(projection.publication.deliverables['deck-a'].source_readiness_summary.planning_ready, true);
     assert.equal(projection.publication.deliverables['deck-a'].gate_summary.source_planning_ready, true);
-    assert.equal(watch.source_readiness_summary?.planning_ready, true);
-    assert.equal(watch.gate_summary?.source_planning_ready, true);
   });
 });
 

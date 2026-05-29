@@ -1,6 +1,6 @@
 {
   "status": "summary_and_geometry_split_landed_baseline_removed",
-  "source_manifest_surface": "redcube product manifest#/review_helper_baseline_follow_through",
+  "source_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
   "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
   "current_line_budget_baseline": null,
   "current_helper_line_budget_state": "within_budget_after_summary_and_geometry_split",

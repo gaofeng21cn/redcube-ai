@@ -25,6 +25,7 @@ function readGovernanceReviewStateSurface() {
 function readCliSource() {
   return [
     read('apps/redcube-cli/src/cli.ts'),
+    read('apps/redcube-cli/src/cli-parts/dispatch.ts'),
     read('apps/redcube-cli/src/cli-parts/help.ts'),
     read('apps/redcube-cli/src/cli-parts/output.ts'),
   ].join('\n');
@@ -121,7 +122,8 @@ test('harness audit: product/domain surface is stable across success and failure
   assert.equal(cli.includes("recommended_action: 'read_help'"), true);
   assert.equal(cli.includes('review get --workspace-root'), true);
   assert.equal(cli.includes('review projection --workspace-root'), true);
-  assert.equal(cli.includes('review watch --workspace-root'), true);
+  assert.equal(cli.includes('review watch --workspace-root'), false);
+  assert.equal(cli.includes('runtimeWatch default wrapper 由 OPL status/workbench/read-model caller 持有'), true);
   assert.equal(mcp.includes("error_kind: 'domain_tool_error'"), true);
   assert.equal(mcp.includes("recommended_action: 'inspect_tool_request'"), true);
   assert.equal(getDeliverable.includes("surface_kind: 'deliverable_record'"), true);

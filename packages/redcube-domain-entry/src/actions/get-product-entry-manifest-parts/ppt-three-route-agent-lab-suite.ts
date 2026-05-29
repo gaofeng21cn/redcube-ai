@@ -98,8 +98,8 @@ function buildRouteTask({
         expected_status: 'passed',
         observed_status: 'passed',
         source_refs: [
-          'redcube product manifest#/temporal_autonomy_readiness',
-          'redcube product session#/runtime_loop_closure',
+          'opl_generated:product_entry_manifest#/temporal_autonomy_readiness',
+          'opl_generated:product_session#/runtime_loop_closure',
         ],
       },
       {
@@ -135,7 +135,7 @@ function buildRouteTask({
         `rca-typed-blocker:ppt-three-route:${routeName}:domain-owner-closeout-required`,
       ],
       trace_refs: [
-        'redcube product session#/continuation_snapshot/latest_stage_execution_plan_ref',
+        'opl_generated:product_session#/continuation_snapshot/latest_stage_execution_plan_ref',
       ],
       command_refs: [
         'redcube product invoke --task-intent run_opl_stage_execution_plan --lifecycle-policy auto_to_terminal',
@@ -166,9 +166,9 @@ function buildRouteTask({
       },
     },
     manifest_refs: [
-      'redcube product manifest#/ppt_deck_visual_route_truth',
-      'redcube product manifest#/native_ppt_operator_ux/route_selection',
-      'redcube product manifest#/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+      'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth',
+      'opl_generated:product_entry_manifest#/native_ppt_operator_ux/route_selection',
+      'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
     ],
     scorecard: {
       scorecard_ref: `quality-scorecard:rca/ppt-three-route/${routeName}`,
@@ -187,7 +187,7 @@ function buildRouteTask({
         routeContractRef,
         qualityContractRef,
         routePolicyRef,
-        'redcube product manifest#/ppt_deck_visual_route_truth',
+        'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth',
       ],
       review_refs: [
         'agent/quality_gates/review_export_memory.md',
@@ -219,7 +219,7 @@ function buildRouteTask({
       required_refs: [
         routeContractRef,
         qualityContractRef,
-        'redcube product manifest#/ppt_deck_visual_route_truth',
+        'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth',
       ],
       regression_suite_refs: [
         TEST_REF,
@@ -292,7 +292,7 @@ export function buildRcaPptThreeRouteAgentLabSuite() {
       ],
       routeContractRef: 'contracts/runtime-program/ppt-image-first-production-route.json',
       qualityContractRef: 'contracts/runtime-program/ppt-image-first-quality-nonregression.json',
-      routePolicyRef: 'redcube product manifest#/ppt_deck_visual_route_truth/default_visual_route',
+      routePolicyRef: 'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth/default_visual_route',
     }),
     buildRouteTask({
       taskId: 'agent-lab-task:rca/ppt-three-route/explicit-render-html',
@@ -314,7 +314,7 @@ export function buildRcaPptThreeRouteAgentLabSuite() {
       ],
       routeContractRef: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json',
       qualityContractRef: 'contracts/runtime-program/ppt-html-route-quality-nonregression.json',
-      routePolicyRef: 'redcube product manifest#/native_ppt_operator_ux/route_selection/html_routes',
+      routePolicyRef: 'opl_generated:product_entry_manifest#/native_ppt_operator_ux/route_selection/html_routes',
     }),
     buildRouteTask({
       taskId: 'agent-lab-task:rca/ppt-three-route/explicit-author-pptx-native',
@@ -336,7 +336,7 @@ export function buildRcaPptThreeRouteAgentLabSuite() {
       ],
       routeContractRef: 'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json',
       qualityContractRef: 'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json',
-      routePolicyRef: 'redcube product manifest#/native_ppt_operator_ux/route_selection/native_routes',
+      routePolicyRef: 'opl_generated:product_entry_manifest#/native_ppt_operator_ux/route_selection/native_routes',
     }),
   ];
 
@@ -353,7 +353,7 @@ export function buildRcaPptThreeRouteAgentLabSuite() {
     route_family_summary: {
       default_visual_route: 'author_image_pages',
       default_visual_policy: 'image_first',
-      default_route_ref: 'redcube product manifest#/ppt_deck_visual_route_truth/default_visual_route',
+      default_route_ref: 'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth/default_visual_route',
       explicit_routes: [
         'render_html',
         'author_pptx_native',
@@ -395,8 +395,8 @@ export function buildRcaPptThreeRouteAgentLabSuite() {
       'forbidden_authority_flags_all_false',
     ],
     target_runtime_consumption_refs: [
-      'redcube product manifest#/ppt_three_route_agent_lab_suite',
-      'redcube product manifest#/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+      'opl_generated:product_entry_manifest#/ppt_three_route_agent_lab_suite',
+      'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
       'redcube domain-handler export#/mapped_surfaces/ppt_three_route_agent_lab_suite',
       'redcube domain-handler export#/source_manifest_refs/ppt_three_route_agent_lab_suite_ref',
     ],

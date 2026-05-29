@@ -309,7 +309,8 @@ test('CLI product invalid subcommand keeps the OPL-hosted stage runtime handoff 
 
   assert.equal(parsed.ok, false);
   assert.equal(parsed.error_kind, 'cli_usage_error');
-  assert.match(parsed.error, /status\|start\|preflight\|invoke\|session\|manifest/);
+  assert.match(parsed.error, /仅保留 invoke domain handler target/);
+  assert.match(parsed.error, /generated\/default wrapper 由 OPL 持有/);
   assert.equal(parsed.error.includes('federate'), false);
 });
 
@@ -335,7 +336,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commonTasks.length >= 4, true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review get')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review projection')), true);
-  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), false);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('source research')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('deliverable run')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('product invoke')), true);
@@ -350,7 +351,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
   assert.equal(parsed.commandGroups.managed, undefined);
   assert.equal(parsed.commandGroups.product.includes('invoke'), true);
-  assert.equal(parsed.commandGroups.product.includes('session'), true);
+  assert.equal(parsed.commandGroups.product.includes('session'), false);
   assert.equal(parsed.commandGroups.review.includes('projection'), true);
   assert.equal(parsed.whereToReadNext.humanQuickstart, 'human_doc:human_quickstart');
   assert.equal(parsed.whereToReadNext.deliverableExamples, 'human_doc:deliverable_examples');
@@ -411,12 +412,6 @@ test('CLI subcommand --help returns machine-readable command help without execut
       actionRef: 'runDeliverableRoute',
       usageIncludes: '--route <stage>',
     },
-    {
-      args: ['review', 'watch', '--help'],
-      command: 'review watch',
-      actionRef: 'runtimeWatch',
-      usageIncludes: '--run-id <id>',
-    },
   ];
 
   for (const item of cases) {
@@ -432,6 +427,11 @@ test('CLI subcommand --help returns machine-readable command help without execut
     assert.equal(parsed.usage.includes(item.usageIncludes), true);
     assert.deepEqual(parsed.canonical_operator_route, expectedRoute);
   }
+
+  const retiredWatchHelp = execCliExpectFailure(cliPath, ['review', 'watch', '--help']);
+  assert.equal(retiredWatchHelp.ok, false);
+  assert.equal(retiredWatchHelp.error_kind, 'cli_usage_error');
+  assert.match(retiredWatchHelp.error, /runtimeWatch default wrapper 由 OPL status\/workbench\/read-model caller 持有/);
 });
 
 test('CLI profile list exposes registry-driven overlay catalog from isolated install', () => {

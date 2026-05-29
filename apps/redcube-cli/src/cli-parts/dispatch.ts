@@ -177,9 +177,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (options.help === true) {
     const commandHelp = buildCommandHelp(
-      command === 'domain-handler'
-        ? [command, subcommand, rest[1]].filter(Boolean).join(' ')
-        : [command, subcommand].filter(Boolean).join(' '),
+      [command, subcommand].filter(Boolean).join(' '),
     );
     if (commandHelp) {
       return commandHelp;

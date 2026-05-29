@@ -130,8 +130,8 @@ export function buildRcaGoalWorkflowAgentLabSuite() {
             expected_status: 'passed',
             observed_status: 'passed',
             source_refs: [
-              'redcube product manifest#/temporal_autonomy_readiness',
-              'redcube product session#/runtime_loop_closure',
+              'opl_generated:product_entry_manifest#/temporal_autonomy_readiness',
+              'opl_generated:product_session#/runtime_loop_closure',
             ],
           },
           {
@@ -167,7 +167,7 @@ export function buildRcaGoalWorkflowAgentLabSuite() {
             'rca-typed-blocker:goal-workflow:domain-owner-closeout-required',
           ],
           trace_refs: [
-            'redcube product session#/continuation_snapshot/latest_stage_execution_plan_ref',
+            'opl_generated:product_session#/continuation_snapshot/latest_stage_execution_plan_ref',
           ],
           command_refs: [
             'redcube product invoke --task-intent run_opl_stage_execution_plan --lifecycle-policy auto_to_terminal',
@@ -212,8 +212,8 @@ export function buildRcaGoalWorkflowAgentLabSuite() {
             'metric-ref:rca/goal-workflow/no-codex-app-monitor',
           ],
           evidence_refs: [
-            'redcube product manifest#/temporal_autonomy_readiness',
-            'redcube product manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder',
+            'opl_generated:product_entry_manifest#/temporal_autonomy_readiness',
+            'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder',
             'redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite',
           ],
           review_refs: [
@@ -289,8 +289,8 @@ export function buildRcaGoalWorkflowAgentLabSuite() {
       'forbidden_authority_flags_all_false',
     ],
     target_runtime_consumption_refs: [
-      'redcube product manifest#/goal_workflow_agent_lab_suite',
-      'redcube product manifest#/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+      'opl_generated:product_entry_manifest#/goal_workflow_agent_lab_suite',
+      'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
       'redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite',
       'redcube domain-handler export#/source_manifest_refs/goal_workflow_agent_lab_suite_ref',
     ],

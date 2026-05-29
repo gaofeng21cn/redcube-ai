@@ -4,13 +4,14 @@
   "product_entry_surfaces": [
     "invokeProductEntry",
     "getProductEntrySession",
-    "redcube product status",
+    "opl_generated:product_status",
     "redcube product invoke",
-    "redcube product session"
+    "opl_generated:product_session",
+    "opl_generated:product_entry_manifest"
   ],
   "domain_handler_surfaces": [
     "redcube domain-handler export",
     "redcube domain-handler dispatch"
   ],
-  "stage_control_projection": "redcube product manifest#/stage_control_projection"
+  "stage_control_projection": "opl_generated:product_entry_manifest#/stage_control_projection"
 }

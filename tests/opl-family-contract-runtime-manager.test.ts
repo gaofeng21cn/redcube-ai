@@ -63,7 +63,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(memory.descriptor_proof_contract_state, 'landed');
   assert.equal(memory.runtime_writeback_state, 'pending');
   assert.equal(memory.controlled_apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
-  assert.equal(memory.controlled_memory_apply_proof_ref, 'redcube product manifest#/controlled_memory_apply_proof');
+  assert.equal(memory.controlled_memory_apply_proof_ref, 'opl_generated:product_entry_manifest#/controlled_memory_apply_proof');
   assert.equal(memory.memory_content_owner, 'redcube_ai');
   assert.equal(memory.route_truth_owner, 'redcube_ai');
   assert.equal(memory.review_export_verdict_owner, 'redcube_ai');
@@ -81,7 +81,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(attempt.proof_contract_state, 'landed');
   assert.equal(attempt.runtime_writeback_state, 'pending');
   assert.equal(attempt.apply_proof_state, 'controlled_apply_proof_landed_memory_body_external');
-  assert.equal(attempt.controlled_memory_apply_proof_ref, 'redcube product manifest#/controlled_memory_apply_proof');
+  assert.equal(attempt.controlled_memory_apply_proof_ref, 'opl_generated:product_entry_manifest#/controlled_memory_apply_proof');
   assert.deepEqual(attempt.stage_kinds, ['review_and_revision', 'package_and_handoff']);
   assert.equal(attempt.direct_and_opl_share_descriptor_refs, true);
   assert.equal(attempt.direct_and_opl_share_domain_action_adapter_refs, true);
@@ -97,7 +97,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.deepEqual(applyProof.projects_accept_reject_receipt_cases, ['accepted', 'rejected']);
   assert.equal(
     applyProof.runtime_receipt_instances_ref,
-    'redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
+    'opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
   );
   assert.deepEqual(applyProof.projects_runtime_receipt_statuses, ['accepted', 'rejected']);
   assert.equal(applyProof.writes_visual_truth, false);

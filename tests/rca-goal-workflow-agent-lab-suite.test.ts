@@ -95,7 +95,7 @@ function assertGoalWorkflowSuiteShape(suite) {
   assert.equal(suite.not_authorized_claims.includes('visual_ready'), true);
   assert.equal(suite.not_authorized_claims.includes('production_soak_complete'), true);
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube product manifest#/goal_workflow_agent_lab_suite'),
+    suite.target_runtime_consumption_refs.includes('opl_generated:product_entry_manifest#/goal_workflow_agent_lab_suite'),
     true,
   );
   assert.equal(

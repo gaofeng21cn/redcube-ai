@@ -6,8 +6,10 @@
   "callable_surface": {
     "action_ref": "get_product_entry_session",
     "api_surface": "getProductEntrySession",
-    "cli_entry": "redcube product session",
-    "mcp_tool": "get_product_entry_session"
+    "cli_entry": "opl_generated:product_session",
+    "mcp_tool": "get_product_entry_session",
+    "repo_local_command_available": false,
+    "repo_local_cli_entry_retired": true
   },
   "session_continuity_contract": {
     "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",

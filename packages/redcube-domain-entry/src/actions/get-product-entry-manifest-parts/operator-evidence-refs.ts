@@ -25,7 +25,7 @@ const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
     target_surface: 'target_agent_owner_receipt_contract_ref',
     target_repo_refs: [
       'contracts/owner_receipt_contract.json',
-      'redcube product manifest#/domain_owner_receipt_contract',
+      'opl_generated:product_entry_manifest#/domain_owner_receipt_contract',
     ],
     verifies_ref: 'target-owner-receipt-or-typed-blocker:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4',
     refs_only: true,
@@ -38,7 +38,7 @@ const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
     proposed_change_ref: 'target_agent_owner_route_ref:target_agent/owner-receipt-projection',
     target_surface: 'target_agent_owner_route_ref',
     target_repo_refs: [
-      'redcube product manifest#/owner_route',
+      'opl_generated:product_entry_manifest#/owner_route',
       'redcube domain-handler export#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
     ],
     verifies_ref: 'target-runtime-read-model-consumption:redcube_ai/oma_developer_patch_work_order_5a1b68cacbd4/source-patch',
@@ -693,9 +693,9 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       claims_production_soak_complete: false,
     },
     target_agent_owner_surface_refs: {
-      owner_route_ref: 'redcube product manifest#/owner_route',
-      owner_receipt_contract_ref: 'redcube product manifest#/domain_owner_receipt_contract',
-      external_work_order_owner_closeout_ref: 'redcube product manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+      owner_route_ref: 'opl_generated:product_entry_manifest#/owner_route',
+      owner_receipt_contract_ref: 'opl_generated:product_entry_manifest#/domain_owner_receipt_contract',
+      external_work_order_owner_closeout_ref: 'opl_generated:product_entry_manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
       external_work_order_owner_closeout_action: 'emit_external_work_order_owner_closeout',
       production_acceptance_contract_ref: 'contracts/production_acceptance/rca-production-acceptance.json',
       quality_gate_refs: [
@@ -710,8 +710,8 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       refs_only: true,
     },
     target_runtime_consumption_refs: [
-      'redcube product manifest#/rca_efficiency_handoff_projection',
-      'redcube product manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+      'opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection',
+      'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
       'redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection',
       'redcube domain-handler export#/source_manifest_refs/rca_efficiency_handoff_projection_ref',
       'redcube domain-handler export#/mapped_surfaces/external_work_order_owner_closeout',
@@ -728,7 +728,7 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
       ],
       cache_refs: [
         'workspace-runtime-ref:route-summary:<run-id>#/cache_status',
-        'redcube product manifest#/ppt_deck_visual_route_truth/cache_status',
+        'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth/cache_status',
         'workspace-runtime-ref:source-pack-reuse:<run-id>#/cache_status',
         'workspace-runtime-ref:prompt-static-prefix-cache:<run-id>#/cache_status',
         'workspace-runtime-ref:export-preview-cache:<run-id>#/cache_status',
@@ -821,8 +821,8 @@ export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleout
         'workspace-runtime-ref:screenshot_review:<run-id>',
       ],
       visual_memory_authority_refs: [
-        'redcube product manifest#/domain_memory_descriptor_locator/memory_locator',
-        'redcube product manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
+        'opl_generated:product_entry_manifest#/domain_memory_descriptor_locator/memory_locator',
+        'opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances',
       ],
       owner_receipt_refs: [
         ownerReceiptRefs.receipt_ref || 'rca-owner-receipt:visual-stage:<receipt-id>',

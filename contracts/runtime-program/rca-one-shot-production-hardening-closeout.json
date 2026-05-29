@@ -66,8 +66,8 @@
       "evidence_refs": [
         "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
         "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
-        "redcube product manifest#/operator_evidence_readiness_projection",
-        "redcube product manifest#/workspace_receipt_inventory_projection",
+        "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+        "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
         "redcube product domain_action_adapter#/emit_workspace_receipt_proof"
       ],
       "landed_truth": [

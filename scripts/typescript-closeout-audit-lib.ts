@@ -465,7 +465,7 @@ export function buildCloseoutAudit(options = {}) {
   return audit;
 }
 
-export function writeAuditFile(audit) {
-  mkdirSync(path.dirname(AUDIT_FILE), { recursive: true });
-  writeFileSync(AUDIT_FILE, `${JSON.stringify(audit, null, 2)}\n`, 'utf-8');
+export function writeAuditFile(audit, outputFile = AUDIT_FILE) {
+  mkdirSync(path.dirname(outputFile), { recursive: true });
+  writeFileSync(outputFile, `${JSON.stringify(audit, null, 2)}\n`, 'utf-8');
 }

@@ -1,7 +1,7 @@
 {
   "status": "audit_surface_landed",
   "mapping_model": "physical_skeleton_repo_source_layout_with_manifest_projection",
-  "audit_surface": "redcube product manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+  "audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
   "expected_roots": [
     "agent",
     "contracts",

@@ -83,7 +83,7 @@ function assertPptThreeRouteSuiteShape(suite) {
   assert.equal(suite.required_observations.includes('recovery_probes_observed'), true);
   assert.equal(suite.required_observations.includes('forbidden_authority_flags_all_false'), true);
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube product manifest#/ppt_three_route_agent_lab_suite'),
+    suite.target_runtime_consumption_refs.includes('opl_generated:product_entry_manifest#/ppt_three_route_agent_lab_suite'),
     true,
   );
   assert.equal(
