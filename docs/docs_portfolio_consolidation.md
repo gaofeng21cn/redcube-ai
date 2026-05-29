@@ -86,6 +86,70 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 RCA README overview-v2 blocked intake tranche
+
+本轮延续 `RUN_SNAPSHOT_TS=2026-05-29T22:43:09Z`（本地 `2026-05-30T06:43:09+0800`）的 OPL-series frozen inventory，不重新扩大 scope。RCA root 在快照内同步 `origin/main` at `3beee363ed80cf70562e80d4481d42ab3ecc17a2`，且已存在 `README.md` / `README.zh-CN.md` dirty 和未跟踪 `assets/branding/redcube-ai-overview-v2.png`。本轮只审计这组 README overview-v2 lane 是否可吸收；由于 `README.md` 在快照后出现写入，本轮停止吸收动作，只提交本治理 ledger 记录 blocker。
+
+Frozen inventory summary:
+
+- `one-person-lab`: main `6a044bcedf1f`，ahead `origin/main` 5，root `README.md` / `README.zh-CN.md` dirty，未跟踪 `assets/branding/opl-stage-led-delivery-overview-v2.png`；多条 OPL worktree dirty/recent，且 `scripts/verify.sh meta` 进程在跑，保留。
+- `med-autoscience`: main `e41b6b4b3dc1`，behind `origin/main` 1，README / overview-v2 资产 dirty；多条 MAS worktree 和 quality/verify 进程 active，保留。
+- `med-autogrant`: main synced at `ded4d2207ccb`，README / overview-v2 资产 dirty；`codex/mag-progress-first-adapter` worktree dirty/recent，保留。
+- `redcube-ai`: main synced at `3beee363ed80`，root README overview-v2 lane dirty；`codex/rca-session-progress-first` worktree dirty/recent，保留。
+- `opl-meta-agent`: main synced at `a15718a`，README dirty；`codex/oma-workorder-progress-first` worktree dirty/recent，保留。
+- `one-person-lab-app`: main behind `origin/main` 1，root docs/contracts/scripts dirty，未跟踪 `.playwright-mcp/`，并有 dirty / remote-backed worktree，保留。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、当前 `README.md`、`README.zh-CN.md` 和 `assets/branding/redcube-ai-overview-v2.png`。
+- Frozen snapshot files: `/tmp/automation-2-run-snapshot-20260529T224309Z/redcube-ai.inventory.txt`、`redcube-ai.recent-bsd.txt`、`redcube-ai.prs.txt` and `processes.txt`。
+- Current branch / dirty state: `README.md` mtime `2026-05-30T06:47:01+0800`，`README.zh-CN.md` mtime `2026-05-30T06:40:14+0800`，overview-v2 image mtime `2026-05-30T06:39:26+0800`。
+- Visual inspection of `assets/branding/redcube-ai-overview-v2.png`; the bottom caption appears to contain a visible spelling / lettering issue.
+
+Fresh semantic result:
+
+- The README diff only changes public-entry copy and switches the public overview image path to `assets/branding/redcube-ai-overview-v2.png`; it does not change source/contracts/tests/workflows or create a callable public surface.
+- Visual inspection shows the v2 asset renders, but the bottom caption appears to read like `Visual work staus traceable` rather than clean public-entry copy. The asset therefore needs correction, regeneration, or explicit owner acceptance before any future README absorb.
+- The lane is still not safe to absorb in this frozen heartbeat because `README.md` was written at `2026-05-30T06:47:01+0800`, after `RUN_SNAPSHOT_TS=2026-05-29T22:43:09Z`; under the snapshot boundary rule this is `post_snapshot_activity` and cannot expand this tranche's absorb scope.
+- No README/image file was staged, reverted, rewritten, or committed in this tranche. The current dirty README/image lane is retained for the next heartbeat fresh intake.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | RCA README overview-v2 dirty diff, visual overview asset, frozen RCA inventory/recent/PR/process snapshot, and this governance ledger. | this coverage ledger only |
+
+Archived / tombstoned / deleted docs:
+
+- none.
+
+Retired modules / interfaces / tests / workflows / entries:
+
+- none. No source, contract, test, workflow, CLI/MCP entry, alias, facade, wrapper or compatibility surface changed.
+
+Retained public-surface reasons:
+
+- `README.md` and `README.zh-CN.md` remain public human entrypoints and are currently dirty; they are retained because the lane has post-snapshot activity.
+- `assets/branding/redcube-ai-overview-v2.png` remains untracked and retained with the README lane; it is not made public until a future heartbeat rechecks current owner state and stages the README/image set together.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche did not re-audit all `README*` / `docs/**/*.md`; it only covers the overview-v2 README/image lane and blocker judgment.
+- Other OPL series repos remain open under the global goal.
+
+Remaining stale / retire candidates:
+
+- RCA `README.md` / `README.zh-CN.md` / `assets/branding/redcube-ai-overview-v2.png` must be re-intaked in the next heartbeat as current dirty work, with a fresh visual-quality check, owner/conflict check, and corrected or owner-accepted overview asset before absorb.
+- RCA `codex/rca-session-progress-first` remains dirty/recent and includes post-snapshot writes; it is not cleaned or absorbed.
+- OPL / MAS / MAG / OMA / App dirty, recent, behind, remote-backed or active-owner lanes remain blockers for destructive cleanup.
+
+Post snapshot activity:
+
+- RCA `README.md` was written at `2026-05-30T06:47:01+0800`, after the frozen `RUN_SNAPSHOT_TS`; RCA worktree `codex/rca-session-progress-first` also had post-snapshot writes at `2026-05-30T06:47:13+0800` in product-entry currentness files.
+- Other repo README/overview-v2 lanes and active worktree/process activity remain next-heartbeat intake, not this tranche scope.
+
+Next tranche write scope:
+
+- Fresh-intake the current RCA README/image lane if it remains stable, or choose another semantically decidable lane from the frozen six-repo inventory. Continue to avoid dirty/recent/remote-backed/unjudged lanes unless explicitly taking ownership.
+
 ### 2026-05-30 RCA README public-entry rewrite tranche
 
 本轮在 `RUN_SNAPSHOT_TS=2026-05-29T22:26:24Z` 的 OPL-series frozen inventory 下处理 RCA `README.md` / `README.zh-CN.md` public-entry dirty lane。该 lane 在快照内已经存在，文件 mtime 为 `2026-05-30T06:19:52+0800`，且本轮复核未发现快照后写入；RCA root 同步 `origin/main` at `37ab1f3335cb89bf9c8eafa2bad3feb4f01c3182`，只保留 README 双语 dirty 内容。其他 RCA worktree `codex/rca-session-progress-first` 在快照内有 dirty source/tests 和 recent writes，未纳入本 tranche。
