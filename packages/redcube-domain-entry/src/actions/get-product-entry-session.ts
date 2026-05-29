@@ -21,6 +21,10 @@ import {
   buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
+import {
+  buildContinuationSnapshotFromSessionRecord,
+  resolveProductEntryCurrentness,
+} from './product-entry-currentness-resolver.js';
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 import {
   buildNativeProofArtifactInventory,
@@ -64,7 +68,7 @@ export async function getProductEntrySession(request) {
   if (!storedSession) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
-  const session = storedSession;
+  const { session } = resolveProductEntryCurrentness({ session: storedSession, persist: false });
   if (!SUPPORTED_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
     throw new Error('product entry session runtime_owner 漂移');
   }
@@ -82,13 +86,7 @@ export async function getProductEntrySession(request) {
   ]);
   const continuationSnapshot = buildProductEntryContinuationSnapshot({
     latest_run_id: session.latest_run_id || null,
-    extra_payload: {
-      latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
-      stage_execution_plan: session.stage_execution_plan || null,
-      runtime_progress_projection: null,
-      runtime_projection: null,
-      latest_surface_kind: session.latest_surface_kind || null,
-    },
+    extra_payload: buildContinuationSnapshotFromSessionRecord(session),
   });
   const familyOrchestration = buildSessionContinuationFamilyOrchestration({
     continuationSnapshot,

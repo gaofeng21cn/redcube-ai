@@ -5,6 +5,15 @@ Purpose: `active_decision_log`
 State: `current_policy_with_historical_context`
 Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+## 2026-05-30
+
+### 决策：RCA session continuation 采用 OPL Progress-First currentness 与 delta 分账
+
+- RCA product-entry session projection 必须按 OPL family shared contract 输出 `progress_delta_classification`、`deliverable_progress_delta` 和 `platform_repair_delta`；visual-facing alias 只能作为解释层，不能成为 parallel schema。
+- same-session currentness resolver 以 `entry_session_id + deliverable identity + latest attempt/closeout` 裁决当前 envelope。continuation 生成新 session plan 前必须先消费 latest closeout；缺 closeout binding 时返回 RCA typed blocker。
+- route-local repeated block 进入 OPL stall lineage 口径，连续无 deliverable delta 时升级到 mechanism repair / human gate / stop-loss candidate，而 platform/cache/interface repair 不得算作视觉交付推进。
+- 该决策只让 OPL/App/operator 区分 visual deliverable progress 与 platform repair；不授权 OPL/RCA session wrapper 写 visual truth、artifact body、memory body、review/export verdict 或 production-ready claim。
+
 ## 2026-05-20
 
 ### 决策：Visual-facing user stage log 由 RCA closeout 提供，OPL 只做投影

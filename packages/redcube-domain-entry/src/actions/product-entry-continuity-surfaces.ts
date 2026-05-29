@@ -12,6 +12,26 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function deltaPayload(value, domainAlias) {
+  if (isPlainObject(value)) {
+    return {
+      count: Number.isFinite(Number(value.count)) ? Number(value.count) : 0,
+      refs: safeArray(value.refs).filter((ref) => safeText(ref)),
+      domain_alias: safeText(value.domain_alias, domainAlias),
+    };
+  }
+  const count = Number.isFinite(Number(value)) ? Math.max(0, Number(value)) : 0;
+  return {
+    count,
+    refs: [],
+    domain_alias: domainAlias,
+  };
+}
+
 const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'opl_generated:product_session --entry-session-id <entry-session-id>';
 const REDCUBE_LOOP_OWNER = 'redcube_ai';
 const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
@@ -21,18 +41,22 @@ const REVIEW_INTERRUPT_POLICY = 'human_gate_required_before_continuation';
 function buildControlPolicy({ projection, manifestProjection = false }) {
   const needsUserDecision = Boolean(projection?.needs_user_decision);
   const contentStatus = safeText(projection?.content_status);
+  const closeoutBlocked = safeText(projection?.content_status) === 'blocked_pending_closeout'
+    || Boolean(projection?.typed_blocker_ref);
   const completed = contentStatus === 'completed';
-  const gateStatus = needsUserDecision ? 'requested' : 'approved';
+  const gateStatus = needsUserDecision || closeoutBlocked ? 'requested' : 'approved';
   return {
     approval_gate_id: REDCUBE_OPERATOR_REVIEW_GATE_ID,
-    approval_required: needsUserDecision,
+    approval_required: needsUserDecision || closeoutBlocked,
     gate_status: gateStatus,
     default_run_mode: 'auto_to_terminal',
     stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
-    interrupt_policy: needsUserDecision ? REVIEW_INTERRUPT_POLICY : DEFAULT_INTERRUPT_POLICY,
-    recommended_action: needsUserDecision
+    interrupt_policy: needsUserDecision || closeoutBlocked ? REVIEW_INTERRUPT_POLICY : DEFAULT_INTERRUPT_POLICY,
+    recommended_action: closeoutBlocked
+      ? 'consume_route_closeout'
+      : (needsUserDecision
       ? 'resolve_review_gate'
-      : (completed ? 'pick_up_artifacts' : 'continue_autonomous_run'),
+      : (completed ? 'pick_up_artifacts' : 'continue_autonomous_run')),
     continue_action: {
       command: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
       surface_kind: 'product_entry_session',
@@ -103,15 +127,24 @@ export function buildProgressProjectionSurface({ continuationSnapshot }) {
   }
 
   const refs = continuationSnapshot?.runtime_projection?.refs || null;
+  const progressDelta = continuationSnapshot?.progress_delta || {};
+  const deliverableProgressDelta = deltaPayload(progressDelta.deliverable_progress_delta, 'visual_deliverable_delta');
+  const platformRepairDelta = deltaPayload(progressDelta.platform_repair_delta, 'platform_interface_repair_delta');
   return {
     surface_kind: 'progress_projection',
     stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
     projection,
     refs,
+    deliverable_progress_delta: deliverableProgressDelta,
+    platform_repair_delta: platformRepairDelta,
+    progress_delta_classification: safeText(progressDelta.progress_delta_classification, 'unknown'),
+    typed_blocker: continuationSnapshot?.closeout_first_blocker || null,
+    stall_lineage: continuationSnapshot?.stall_lineage || null,
     summary: {
       current_stage: projection.current_stage ?? null,
       content_status: projection.content_status ?? null,
       needs_user_decision: Boolean(projection.needs_user_decision),
+      progress_delta_classification: safeText(progressDelta.progress_delta_classification, 'unknown'),
     },
   };
 }
@@ -203,6 +236,20 @@ export function buildRuntimeLoopClosureSurface({
       artifact_ref_count: artifactRefs.length,
     },
     control_policy: buildControlPolicy({ projection }),
+    typed_blocker: continuationSnapshot?.closeout_first_blocker || null,
+    deliverable_progress_delta: deltaPayload(
+      continuationSnapshot?.progress_delta?.deliverable_progress_delta,
+      'visual_deliverable_delta',
+    ),
+    platform_repair_delta: deltaPayload(
+      continuationSnapshot?.progress_delta?.platform_repair_delta,
+      'platform_interface_repair_delta',
+    ),
+    progress_delta_classification: safeText(
+      continuationSnapshot?.progress_delta?.progress_delta_classification,
+      'unknown',
+    ),
+    stall_lineage: continuationSnapshot?.stall_lineage || null,
     source_linkage: {
       current_source: safeText(source),
       entry_mode: safeText(entryMode) || null,

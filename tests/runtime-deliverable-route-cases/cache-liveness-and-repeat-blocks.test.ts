@@ -360,6 +360,18 @@ test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts wi
         assert.deepEqual(blocked.run.error.target_slide_ids, scenario.targetSlideIds);
         assert.deepEqual(blocked.run.error.blocking_reasons, scenario.blockingReasons);
         assert.equal(blocked.run.error.recommended_action, 'change_input_or_route_to_page_local_fix');
+        assert.equal(blocked.run.stall_lineage.lineage_id, `repeated-block:${scenario.overlay}:render_html:${scenario.deliverableId}`);
+        assert.equal(blocked.run.stall_lineage.repeated_block_count, 2);
+        assert.deepEqual(blocked.run.stall_lineage.repeat_budget, {
+          max_repeats: 2,
+          remaining_repeats: 0,
+          budget_exhausted: true,
+        });
+        assert.equal(blocked.artifact.repeated_block_fail_fast.stall_lineage.lineage_id, blocked.run.stall_lineage.lineage_id);
+        assert.deepEqual(
+          blocked.artifact.repeated_block_fail_fast.repeat_budget,
+          blocked.run.stall_lineage.repeat_budget,
+        );
         assert.doesNotMatch(blocked.run.error.message, /mock forced route failure/);
       }
 
