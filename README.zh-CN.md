@@ -46,7 +46,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 </table>
 
 <p align="center">
-  <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI 主示意图" width="100%" />
+  <img src="assets/branding/redcube-ai-overview-v2.png" alt="RedCube AI 主示意图" width="100%" />
 </p>
 
 ## 核心亮点

@@ -15,10 +15,10 @@ State: `current_public_entry`
 Machine boundary: Human-readable public entry. Machine truth remains in contracts, schemas, source, CLI/MCP/API behavior, runtime artifacts, owner receipts, artifact locators, and RCA-owned review/export gates.
 -->
 
-<p align="center"><strong>An AI creation workspace for formal visual deliverables, keeping source material, generation, review, repair, and exported files on one traceable delivery line.</strong></p>
+<p align="center"><strong>An AI workspace for formal visual deliverables, keeping source material, drafts, review, revisions, and exported files on one traceable delivery line.</strong></p>
 <p align="center">Slides · Xiaohongshu Notes · Posters</p>
 
-When a task moves from "make a few images" to "produce a visual deliverable I can actually use," the hard part is usually the whole workflow, not one page:
+When a task moves from "make a few images" to "produce a visual deliverable I can actually use," the hard part is usually the full workflow, not one page:
 
 - Source material, notes, screenshots, reference images, and old drafts are scattered. How do they become one coherent deliverable?
 - After many generated versions, which review comments were addressed, and which version should be rerun?
@@ -26,7 +26,7 @@ When a task moves from "make a few images" to "produce a visual deliverable I ca
 - During longer generation, review, and export runs, can the user still understand what is happening?
 - At handoff, can exported files, review records, and source material still match each other?
 
-`RedCube AI` is built around those questions. For knowledge-heavy visual work, it keeps source organization, page generation, review repair, progress reporting, and export evidence on the same delivery line so a draft can move toward deliverable files.
+`RedCube AI` is built around those questions. For knowledge-heavy visual work, it keeps source organization, page generation, review, revision, progress reporting, and export evidence on the same delivery line so a draft can move toward deliverable files.
 
 <table>
   <tr>
@@ -46,7 +46,7 @@ When a task moves from "make a few images" to "produce a visual deliverable I ca
 </table>
 
 <p align="center">
-  <img src="assets/branding/redcube-ai-overview.png" alt="RedCube AI overview" width="100%" />
+  <img src="assets/branding/redcube-ai-overview-v2.png" alt="RedCube AI overview" width="100%" />
 </p>
 
 ## Core Highlights
@@ -57,8 +57,8 @@ It does not stop at a single generated image. It keeps working around a concrete
 **Source To Deliverable In One Workspace**<br/>
 Lecture notes, project summaries, references, screenshots, old drafts, and review comments stay on one delivery line for inspection and reuse; runtime artifacts live in the task workspace, not in the source checkout.
 
-**Traceable Review And Repair**<br/>
-Each review round, rerun, repair target, and export result stays connected, so operators can see why the current version changed.
+**Traceable Review And Revision**<br/>
+Each review round, rerun, revision target, and export result stays connected, so operators can see why the current version changed.
 
 **Routes Match The Output Type**<br/>
 Slides, Xiaohongshu notes, and knowledge posters use different default routes; editable PPTX and HTML routes are explicit selectable routes.
