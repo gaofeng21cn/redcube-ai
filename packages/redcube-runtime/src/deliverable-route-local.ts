@@ -378,6 +378,23 @@ function buildRepeatedBlockFailFastArtifact({
   const targetSlideIds = uniqueStrings(priorSignature?.target_slide_ids);
   const blockingReasons = uniqueStrings(priorSignature?.blocking_reasons);
   const blockedChecks = uniqueStrings(priorSignature?.blocked_checks);
+  const repeatBudget = {
+    max_repeats: 2,
+    remaining_repeats: 0,
+    budget_exhausted: true,
+  };
+  const stallLineage = {
+    lineage_id: `repeated-block:${overlay}:${route}:${deliverableId}`,
+    route,
+    overlay,
+    topic_id: topicId,
+    deliverable_id: deliverableId,
+    repeated_block_count: 2,
+    repeat_budget: repeatBudget,
+    target_slide_ids: targetSlideIds,
+    blocking_reasons: blockingReasons,
+    blocked_checks: blockedChecks,
+  };
   return {
     ...priorArtifact,
     status: 'failed',
@@ -401,9 +418,12 @@ function buildRepeatedBlockFailFastArtifact({
         input_hash: routeCacheKey,
         prior_artifact_file: artifactFile,
       },
+      stall_lineage: stallLineage,
+      repeat_budget: repeatBudget,
       recommended_action: 'change_input_or_route_to_page_local_fix',
       quality_gate_policy: 'fail_fast_does_not_turn_blocked_into_pass',
     },
+    stall_lineage: stallLineage,
     route_cache: {
       ...(priorArtifact.route_cache || {}),
       cache_status: 'blocked_fail_fast',
@@ -601,6 +621,7 @@ export async function executeDeliverableRouteLocally({
     error.blocking_reasons = repeatedBlockArtifact.repeated_block_fail_fast.blocking_reasons;
     error.recommended_action = repeatedBlockArtifact.repeated_block_fail_fast.recommended_action;
     error.artifact_file = artifactFile;
+    error.stall_lineage = repeatedBlockArtifact.repeated_block_fail_fast.stall_lineage;
     throw error;
   }
 

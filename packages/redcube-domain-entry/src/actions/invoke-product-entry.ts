@@ -34,6 +34,11 @@ import {
   buildRuntimeLoopClosureSurface,
   buildSessionContinuitySurface,
 } from './product-entry-continuity-surfaces.js';
+import {
+  buildCloseoutBlockedDomainEntrySurface,
+  buildContinuationSnapshotFromSessionRecord,
+  resolveProductEntryCurrentness,
+} from './product-entry-currentness-resolver.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -323,6 +328,11 @@ function buildSessionRecord({
     latest_run_id: continuationSnapshot.latest_run_id,
     latest_stage_execution_plan_ref: continuationSnapshot.latest_stage_execution_plan_ref || null,
     stage_execution_plan: continuationSnapshot.stage_execution_plan || null,
+    runtime_progress_projection: continuationSnapshot.runtime_progress_projection || null,
+    runtime_projection: continuationSnapshot.runtime_projection || null,
+    closeout_first_blocker: continuationSnapshot.closeout_first_blocker || null,
+    progress_delta: continuationSnapshot.progress_delta || null,
+    stall_lineage: continuationSnapshot.stall_lineage || null,
     latest_surface_kind: continuationSnapshot.latest_surface_kind
       || (continuationSnapshot.latest_stage_execution_plan_ref ? 'opl_stage_execution_plan' : null)
       || 'route_run',
@@ -546,7 +556,9 @@ function buildProductEntryResponse({
 export async function invokeProductEntry(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const entrySession = normalizeEntrySessionContract(request);
-  const existingSession = loadProductEntryContinuityRef({ entrySessionId: entrySession.entrySessionId });
+  const storedSession = loadProductEntryContinuityRef({ entrySessionId: entrySession.entrySessionId });
+  const currentness = storedSession ? resolveProductEntryCurrentness({ session: storedSession }) : null;
+  const existingSession = currentness?.session || storedSession;
   const delivery = normalizeDeliveryRequest(request);
   const taskIntent = resolveTaskIntent(request, delivery);
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
@@ -574,7 +586,17 @@ export async function invokeProductEntry(request) {
     deliveryIdentity,
     delivery,
   });
-  const domainEntrySurface = await invokeDomainEntry(buildDomainEntryRequest({
+  const closeoutFirstBlocker = currentness?.closeoutFirstBlocker || existingSession?.closeout_first_blocker || null;
+  const domainEntrySurface = closeoutFirstBlocker
+    ? buildCloseoutBlockedDomainEntrySurface({
+      taskIntent,
+      entryMode,
+      runtimeOwner,
+      workspaceRoot,
+      deliveryIdentity: resolvedIdentity,
+      closeoutFirstBlocker,
+    })
+    : await invokeDomainEntry(buildDomainEntryRequest({
     workspaceRoot,
     taskIntent,
     entryMode,
@@ -583,7 +605,12 @@ export async function invokeProductEntry(request) {
     resolvedIdentity,
   }));
 
-  const continuationSnapshot = buildContinuationSnapshot(domainEntrySurface);
+  const continuationSnapshot = closeoutFirstBlocker
+    ? buildProductEntryContinuationSnapshot({
+      latest_run_id: existingSession.latest_run_id || closeoutFirstBlocker.latest_run_id || null,
+      extra_payload: buildContinuationSnapshotFromSessionRecord(existingSession),
+    })
+    : buildContinuationSnapshot(domainEntrySurface);
   const persisted = saveProductEntryContinuityRef({
     session: buildSessionRecord({
       entrySessionId: entrySession.entrySessionId,

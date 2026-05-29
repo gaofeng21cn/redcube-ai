@@ -153,6 +153,7 @@ function normalizeError(error) {
         : [],
       requires_human_confirmation: error.requiresHumanConfirmation === true,
       requires_external_secret: error.requiresExternalSecret === true,
+      stall_lineage: error.stall_lineage || null,
     };
   }
   return {
@@ -346,6 +347,7 @@ export function failRouteRun({
     runtime_topology: resolveRuntimeTopologyForExecutor(executor || run?.executor),
     executor: executor || run?.executor,
     error: normalizeError(error),
+    stall_lineage: error?.stall_lineage || null,
     telemetry: {
       ...(run?.telemetry || {}),
       ...(telemetry && typeof telemetry === 'object' ? telemetry : {}),

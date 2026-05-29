@@ -515,6 +515,7 @@ function normalizeRouteFailure(error) {
   failure.recommended_action = String(error?.recommended_action || '').trim() || null;
   failure.artifact_file = String(error?.artifact_file || '').trim() || null;
   failure.artifact_refs = Array.isArray(error?.artifact_refs) ? error.artifact_refs : [];
+  failure.stall_lineage = error?.stall_lineage || null;
   failure.requiresHumanConfirmation = error?.requiresHumanConfirmation === true;
   failure.requiresExternalSecret = error?.requiresExternalSecret === true;
   const failureKind = String(failure.failure_kind || failure.code || '').trim();
@@ -570,11 +571,14 @@ function buildFailedRouteResponse({
     error: failedRun.error,
   });
 
+  const includeFailedArtifact = failure.failure_kind === 'repeated_block_without_input_change';
   return {
     ok: false,
     run: failedRun,
     events: readRouteRunEvents(workspaceRoot, failedRun.run_id),
     error: failedRun.error,
+    artifact: includeFailedArtifact ? failedArtifact : null,
+    artifactFile: includeFailedArtifact ? (failure.artifact_file || null) : undefined,
   };
 }
 

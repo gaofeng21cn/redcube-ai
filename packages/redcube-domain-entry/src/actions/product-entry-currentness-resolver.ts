@@ -1,0 +1,325 @@
+// @ts-nocheck
+import path from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+
+import {
+  productEntrySessionFile,
+} from '@redcube/runtime';
+import {
+  resolveWorkspaceContract,
+} from '@redcube/runtime-protocol';
+
+function safeText(value, fallback = '') {
+  const text = String(value || '').trim();
+  return text || fallback;
+}
+
+function safeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function isPlainObject(value) {
+  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function writeJson(file, value) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
+}
+
+function routeRunsDir(workspaceRoot) {
+  return path.join(resolveWorkspaceContract({ workspaceRoot }).runtimeDir, 'runs');
+}
+
+function runTimestamp(run) {
+  return Date.parse(safeText(run?.finished_at || run?.started_at)) || 0;
+}
+
+function loadDeliverableRuns({ workspaceRoot, topicId, deliverableId, deliverableFamily }) {
+  const runsDir = routeRunsDir(workspaceRoot);
+  if (!existsSync(runsDir)) return [];
+  return readdirSync(runsDir)
+    .filter((file) => file.endsWith('.json'))
+    .map((file) => {
+      try {
+        const run = readJson(path.join(runsDir, file));
+        return { ...run, __run_file: path.join(runsDir, file) };
+      } catch {
+        return null;
+      }
+    })
+    .filter((run) => run
+      && safeText(run.topic_id) === safeText(topicId)
+      && safeText(run.deliverable_id || run.target) === safeText(deliverableId)
+      && (!deliverableFamily || safeText(run.overlay) === safeText(deliverableFamily)))
+    .sort((left, right) => runTimestamp(left) - runTimestamp(right));
+}
+
+function latestDeliverableRun(input) {
+  return loadDeliverableRuns(input).at(-1) || null;
+}
+
+function sessionTimestamp(session) {
+  return Date.parse(safeText(session?.updated_at)) || 0;
+}
+
+function runIsNewerThanSession(run, session) {
+  if (!run) return false;
+  if (safeText(run.run_id) && safeText(run.run_id) === safeText(session?.latest_run_id)) return true;
+  const runTime = runTimestamp(run);
+  const storedTime = sessionTimestamp(session);
+  return runTime > storedTime;
+}
+
+function closeoutConsumed(run) {
+  const closeout = run?.closeout || run?.route_closeout || run?.owner_closeout || null;
+  if (!closeout) return true;
+  return closeout.consumed === true || closeout.consumed_at != null || closeout.status === 'consumed';
+}
+
+function slugBlockerKind(value) {
+  return safeText(value, 'route_closeout_unconsumed').replace(/_/g, '-');
+}
+
+function buildCloseoutFirstBlocker({ run }) {
+  const closeout = run?.closeout || {};
+  const blockerKind = safeText(closeout.blocker_kind, 'route_closeout_unconsumed');
+  const closeoutRef = safeText(closeout.closeout_ref || closeout.closeoutRef, `route-run:${run.run_id}`);
+  const nextRequiredOwnerAction = safeText(
+    closeout.next_required_owner_action || run?.error?.recommended_action,
+    'consume_route_closeout_before_new_plan',
+  );
+  return {
+    ok: false,
+    surface_kind: 'typed_blocker',
+    return_shape: 'typed_blocker',
+    blocker_ref: `rca-typed-blocker:${slugBlockerKind(blockerKind)}:${closeoutRef}`,
+    blocker_kind: blockerKind,
+    owner: 'redcube_ai',
+    source_contract: 'rca.product_entry_session_currentness.v1',
+    next_required_owner_action: nextRequiredOwnerAction,
+    route_run_ref: `route-run:${run.run_id}`,
+    closeout_ref: closeoutRef,
+    latest_run_id: safeText(run.run_id) || null,
+    route: safeText(run.route) || null,
+    topic_id: safeText(run.topic_id) || null,
+    deliverable_id: safeText(run.deliverable_id || run.target) || null,
+    visual_ready_claimed: false,
+    exportable_claimed: false,
+    handoffable_claimed: false,
+    writes_visual_truth: false,
+    writes_review_export_verdict: false,
+    writes_canonical_artifact_blob: false,
+  };
+}
+
+function routeRunProgressProjection({ run, closeoutFirstBlocker }) {
+  return {
+    projection_kind: 'route_run_progress_projection',
+    content_status: closeoutFirstBlocker ? 'blocked_pending_closeout' : safeText(run.status, 'unknown'),
+    current_stage: safeText(run.current_stage || run.route) || null,
+    terminal_stage: safeText(run.route) || null,
+    planned_stage_count: 0,
+    needs_user_decision: Boolean(closeoutFirstBlocker),
+    completed_stages: safeText(run.status) === 'completed' ? [safeText(run.current_stage || run.route)] : [],
+    remaining_stages: [],
+    final_artifact_refs: safeArray(run.artifact_refs),
+    route_run_ref: `route-run:${run.run_id}`,
+    closeout_ref: closeoutFirstBlocker?.closeout_ref || null,
+    typed_blocker_ref: closeoutFirstBlocker?.blocker_ref || null,
+  };
+}
+
+function deltaCount(value, defaultCount = 0) {
+  if (Number.isFinite(Number(value)) && !isPlainObject(value)) {
+    return Math.max(0, Number(value));
+  }
+  if (!isPlainObject(value)) {
+    return Math.max(0, defaultCount);
+  }
+  const explicitCount = Number(value.count ?? value.delta_count);
+  if (Number.isFinite(explicitCount) && explicitCount >= 0) {
+    return explicitCount;
+  }
+  if (value.has_deliverable_delta === true || value.has_delta === true) {
+    return 1;
+  }
+  const refs = safeArray(value.refs).filter((ref) => safeText(ref));
+  return refs.length || Math.max(0, defaultCount);
+}
+
+function deltaRefs(value, fallbackRefs = []) {
+  if (isPlainObject(value)) {
+    return safeArray(value.refs).filter((ref) => safeText(ref));
+  }
+  return fallbackRefs.filter((ref) => safeText(ref));
+}
+
+function deltaPayload(value, {
+  defaultCount = 0,
+  fallbackRefs = [],
+  domainAlias,
+}) {
+  const refs = deltaRefs(value, fallbackRefs);
+  return {
+    count: deltaCount(value, defaultCount),
+    refs,
+    domain_alias: isPlainObject(value) && safeText(value.domain_alias)
+      ? safeText(value.domain_alias)
+      : domainAlias,
+  };
+}
+
+function classifyProgressDelta(run) {
+  const delta = run?.progress_delta || {};
+  const deliverableProgressDelta = deltaPayload(delta.deliverable_progress_delta, {
+    defaultCount: safeText(run.status) === 'completed' ? 1 : 0,
+    fallbackRefs: safeArray(run.artifact_refs),
+    domainAlias: 'visual_deliverable_delta',
+  });
+  const platformRepairDelta = deltaPayload(delta.platform_repair_delta, {
+    defaultCount: safeText(run.error?.failure_kind || run.error_kind) ? 1 : 0,
+    fallbackRefs: [
+      safeText(run.error?.failure_kind || run.error_kind),
+      safeText(run.closeout?.closeout_ref || run.route_closeout?.closeout_ref),
+    ].filter(Boolean),
+    domainAlias: 'platform_interface_repair_delta',
+  });
+  const explicitClassification = safeText(delta.progress_delta_classification);
+  const classification = explicitClassification === 'human_gate' || explicitClassification === 'stop_loss'
+    ? explicitClassification
+    : (deliverableProgressDelta.count > 0 && platformRepairDelta.count > 0
+      ? 'mixed'
+      : (deliverableProgressDelta.count > 0
+        ? 'deliverable_progress'
+        : (platformRepairDelta.count > 0 ? 'platform_repair' : 'typed_blocker')));
+  return {
+    deliverable_progress_delta: deliverableProgressDelta,
+    platform_repair_delta: platformRepairDelta,
+    progress_delta_classification: classification,
+  };
+}
+
+export function buildContinuationSnapshotFromSessionRecord(session) {
+  return {
+    latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
+    stage_execution_plan: session.stage_execution_plan || null,
+    runtime_progress_projection: session.runtime_progress_projection || null,
+    runtime_projection: session.runtime_projection || null,
+    latest_surface_kind: session.latest_surface_kind || null,
+    closeout_first_blocker: session.closeout_first_blocker || null,
+    progress_delta: session.progress_delta || null,
+    stall_lineage: session.stall_lineage || null,
+  };
+}
+
+export function resolveProductEntryCurrentness({ session, persist = true }) {
+  const latestRun = latestDeliverableRun({
+    workspaceRoot: session.workspace_root,
+    topicId: session.topic_id,
+    deliverableId: session.deliverable_id,
+    deliverableFamily: session.deliverable_family,
+  });
+
+  if (!runIsNewerThanSession(latestRun, session)) {
+    return {
+      session,
+      latestRun: null,
+      closeoutFirstBlocker: null,
+      updated: false,
+    };
+  }
+
+  const closeoutFirstBlocker = closeoutConsumed(latestRun)
+    ? null
+    : buildCloseoutFirstBlocker({ run: latestRun });
+  const progressDelta = classifyProgressDelta(latestRun);
+  const nextSession = {
+    ...session,
+    latest_run_id: latestRun.run_id || null,
+    latest_stage_execution_plan_ref: closeoutFirstBlocker ? null : (session.latest_stage_execution_plan_ref || null),
+    stage_execution_plan: closeoutFirstBlocker ? null : (session.stage_execution_plan || null),
+    runtime_progress_projection: routeRunProgressProjection({
+      run: latestRun,
+      closeoutFirstBlocker,
+    }),
+    runtime_projection: {
+      surface_kind: 'route_run_currentness_projection',
+      refs: {
+        route_run_ref: `route-run:${latestRun.run_id}`,
+        run_file: latestRun.__run_file || null,
+        closeout_ref: closeoutFirstBlocker?.closeout_ref || null,
+        typed_blocker_ref: closeoutFirstBlocker?.blocker_ref || null,
+      },
+    },
+    latest_surface_kind: closeoutFirstBlocker ? 'typed_blocker' : 'route_run',
+    closeout_first_blocker: closeoutFirstBlocker,
+    progress_delta: progressDelta,
+    stall_lineage: latestRun.stall_lineage || null,
+    updated_at: new Date().toISOString(),
+  };
+  if (persist) {
+    writeJson(productEntrySessionFile(nextSession.entry_session_id), nextSession);
+  }
+  return {
+    session: nextSession,
+    latestRun,
+    closeoutFirstBlocker,
+    updated: true,
+  };
+}
+
+export function buildCloseoutBlockedDomainEntrySurface({
+  taskIntent,
+  entryMode,
+  runtimeOwner,
+  workspaceRoot,
+  deliveryIdentity,
+  closeoutFirstBlocker,
+}) {
+  return {
+    ok: false,
+    surface_kind: 'domain_entry',
+    recommended_action: 'consume_route_closeout',
+    entry_contract_id: 'redcube_service_safe_domain_entry',
+    target_domain_id: 'redcube_ai',
+    task_intent: taskIntent,
+    entry_mode: entryMode,
+    runtime_session_contract: {
+      runtime_owner: runtimeOwner,
+      expected_runtime_owner: runtimeOwner,
+      adapter_surface: '@redcube/codex-cli-client',
+      session_mode: 'entry_session',
+    },
+    return_surface_contract: {
+      requested_surface_kind: 'typed_blocker',
+      expected_surface_kind: 'typed_blocker',
+      actual_surface_kind: 'typed_blocker',
+      durable_truth_surfaces: [
+        'runtimeWatch',
+        'getReviewState',
+        'getPublicationProjection',
+        'auditDeliverable',
+      ],
+    },
+    domain_payload: {
+      deliverable_family: deliveryIdentity.deliverableFamily,
+      topic_id: deliveryIdentity.topicId,
+      deliverable_id: deliveryIdentity.deliverableId,
+      route: null,
+    },
+    workspace_locator: {
+      workspace_root: workspaceRoot,
+    },
+    result_surface: closeoutFirstBlocker,
+    summary: {
+      task_intent: taskIntent,
+      actual_surface_kind: 'typed_blocker',
+      target_handle: closeoutFirstBlocker.latest_run_id || null,
+    },
+  };
+}
