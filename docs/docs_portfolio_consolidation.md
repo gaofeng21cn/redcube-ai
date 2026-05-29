@@ -86,6 +86,51 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 Developer Mode fork PR stale branch retirement tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-29T21:46:29Z` 的 OPL-series frozen inventory 下处理 RCA remote-only stale lane。RCA main 在快照内 clean/synced at `d4a0171`，无 RCA 快照窗口写入；快照内存在远端分支 `origin/codex/developer-mode-fork-pr-live-closeout-20260528`，无本地 branch/worktree。该 lane 只覆盖 stale remote branch 判断和清理，不扩大到快照后活动，不关闭 OPL series 全局 `/goal`。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、`docs/history/README.md` 和本治理 ledger。
+- Remote branch commit `56ea90fb204e1beef9e144c24e78007373121ebd` / `docs: record Developer Mode fork PR proof boundary`。
+- Current main `docs/history/README.md` 已包含等价 Developer Mode non-owner fork / PR proof boundary；该语义只证明 GitHub-backed evidence plumbing，不声明 RCA visual ready、exportable、handoffable、production soak complete 或 OPL 持有 RCA visual truth。
+- `git cherry -v origin/main origin/codex/developer-mode-fork-pr-live-closeout-20260528` 标记该提交为 `- 56ea90f...`，说明 patch-equivalent 已在 main。
+- Fresh GitHub PR check：open PR count `0`；all-state PR query 返回历史 PR `#1` 为 `closed`。
+- Origin remote delete 后 `git ls-remote origin refs/heads/codex/developer-mode-fork-pr-live-closeout-20260528` 无输出。
+- 同名 `gflab/codex/developer-mode-fork-pr-live-closeout-20260528` remote ref 仍存在；本轮对 `gflab` 的 open PR 查询返回 GitHub EOF，未达到 deletion evidence gate，保留给下一次 heartbeat intake。
+
+Fresh semantic result:
+
+- 该 remote-only `codex/` branch 已被当前 main 等价吸收，且没有 open PR 或外部 active owner 继续引用。
+- 分支上的唯一有效语义已由 `docs/history/README.md` 持有；不需要 merge 老分支的大 diff，也不需要恢复历史 branch state。
+- 本轮已删除 `origin` 上的 stale branch `codex/developer-mode-fork-pr-live-closeout-20260528`，并通过 `fetch --prune` 清掉 `origin` remote-tracking 视图。
+- 未退役 RCA 源码模块、接口、测试、workflow 或入口；未新增兼容面、alias、facade、wrapper 或 fallback。
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Origin remote-only branch diff/log/cherry evidence, `docs/history/README.md` Developer Mode proof boundary, GitHub PR state, origin remote ref state, this governance ledger. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. 本轮删除的是 stale remote branch，不删除 repo-tracked docs。
+
+Unreviewed docs:
+
+- `redcube-ai`: 本轮没有重新逐段审计所有 `README*` / `docs/**/*.md`；只覆盖 stale branch 所指向的 history boundary 语义和 remote branch lifecycle。
+- Other OPL series repos remain open under the global goal. OPL/MAS/App have dirty/recent/ahead or remote-backed lanes that remain retained by the frozen inventory rules.
+
+Remaining stale / retire candidates:
+
+- RCA future prose that treats Developer Mode fork/PR proof as RCA visual ready、exportable、handoffable、production soak complete、artifact authority、review/export verdict 或 OPL 持有 RCA visual truth is stale pollution.
+- `gflab/codex/developer-mode-fork-pr-live-closeout-20260528` remains a retained remote-ref candidate until a future heartbeat can verify PR/owner state without network EOF.
+- RCA remaining implementation/evidence tails stay unchanged: Temporal controlled visual-stage long soak, generated/default caller thinning, strict source-purity cleanup, and compatibility-free retirement after no-active-caller proof.
+
+Next tranche write scope:
+
+- Continue OPL series frozen-inventory cleanup with OPL provider-SLO lane, MAS preflight/ahead lane, App dirty release lane, or another clean semantically decidable stale lane.
+- Return to RCA only for newly changed docs/source/contracts/read-model or for owner/evidence lanes that close current RCA production evidence / default-caller / strict-purity / compatibility-free retirement tails.
+
 ### 2026-05-30 no-regression evidence refs absorb tranche
 
 本轮在 `RUN_SNAPSHOT_TS=2026-05-29T20:37:55Z` 的 OPL-series frozen inventory 下处理 RCA clean ahead lane。RCA main 在快照内 clean、ahead `origin/main` 1、无额外 worktree、无快照前 1 小时写入、open PR 为 `[]`；本轮只复核并吸收已提交的 `2f3e9ce chore(rca): scale no-regression evidence refs`，不扩大到快照后活动，不关闭 OPL series 全局 `/goal`。
@@ -102,7 +147,7 @@ Fresh semantic result:
 - RCA production evidence scaleout now records 6 cross-route / cross-window body-free no-regression refs: the 2026-05-27 pair, the 2026-05-28 `ppt_deck` / `xiaohongshu` pair, and the 2026-05-30 native / xiaohongshu repeat pair.
 - The OPL refs-only receipt ref is updated to `opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs` across production acceptance, current-program, operator evidence projection, fixture and tests.
 - The active plan and status correctly keep `repeated_no_regression_claimed_as_soak=false` / `declares_production_soak_complete=false`; the new refs prove continued RCA-owned refs-only evidence projection, not visual ready、exportable、handoffable、domain ready、artifact authority、review/export verdict or production visual-stage long soak.
-- No source or contract surface in this tranche revives managed/gateway/runtime/session/domain_action_adapter compatibility alias or generic runtime ownership.
+- No source or contract surface in this tranche revives managed/gateway/runtime/session/domain_action_adapter retired-public-path wording or generic runtime ownership.
 
 | repo | reviewed docs/sections | edited docs |
 | --- | --- | --- |
