@@ -65,21 +65,65 @@ export async function generateStructuredArtifactViaCodexCli({
     '',
     input,
   ].join('\n');
-  const execution = await runCodexPrompt({
-    contract,
-    prompt,
-    cwd,
-    timeoutMs: resolveGenerationTimeoutMs(timeoutMs, localFileInspection, {
-      family: safeFamily,
-      route: safeRoute,
-    }),
-    spawnSyncImpl,
+  const resolvedTimeoutMs = resolveGenerationTimeoutMs(timeoutMs, localFileInspection, {
+    family: safeFamily,
+    route: safeRoute,
   });
+  const buildFailureRuntime = ({ usage = null, codexRun = null, error = null } = {}) => ({
+    owner: REDCUBE_CODEX_RUNTIME_OWNER,
+    adapter_surface: '@redcube/codex-cli-client',
+    run_id: safeText(codexRun?.run_id),
+    session_id: safeText(codexRun?.session_id || codexRun?.run_id),
+    model_selection: contract.model_selection,
+    reasoning_selection: contract.reasoning_selection,
+    sandbox: contract.sandbox,
+    timeout_ms: resolvedTimeoutMs,
+    terminal_event: safeText(codexRun?.terminal_event),
+    exit_code: codexRun?.exit_code ?? null,
+    failure_kind: 'codex_cli_execution_blocked',
+    error_code: safeText(error?.code || codexRun?.exit_code),
+    error_message: safeText(error?.message || codexRun?.error),
+    ...buildGenerationTelemetry({
+      prompt,
+      promptRelativePath: safePromptRelativePath,
+      context,
+      localFileInspection,
+      usage,
+    }),
+    usage,
+  });
+  const attachFailureRuntime = (error, runtime) => {
+    const failure = error instanceof Error ? error : new Error(safeText(error, 'Codex CLI execution failed'));
+    failure.failure_kind = safeText(failure.failure_kind, 'codex_cli_execution_blocked');
+    failure.codex_cli_runtime = runtime;
+    failure.generationRuntime = runtime;
+    failure.generation_runtime = runtime;
+    return failure;
+  };
+  let execution;
+  try {
+    execution = await runCodexPrompt({
+      contract,
+      prompt,
+      cwd,
+      timeoutMs: resolvedTimeoutMs,
+      spawnSyncImpl,
+    });
+  } catch (error) {
+    throw attachFailureRuntime(error, buildFailureRuntime({ error }));
+  }
 
   if (execution.codexRun.terminal_event !== 'run.completed') {
-    throw new Error(
+    const usage = terminalUsage(execution.codexRun.events);
+    const error = new Error(
       safeText(execution.codexRun.error, `Codex structured generation failed: ${safeFamily}:${safeRoute}`),
     );
+    error.code = safeText(execution.codexRun.exit_code);
+    throw attachFailureRuntime(error, buildFailureRuntime({
+      usage,
+      codexRun: execution.codexRun,
+      error,
+    }));
   }
 
   const data = extractMarkedJson(execution.codexRun.output);
@@ -98,6 +142,7 @@ export async function generateStructuredArtifactViaCodexCli({
       model_selection: execution.contract.model_selection,
       reasoning_selection: execution.contract.reasoning_selection,
       sandbox: execution.contract.sandbox,
+      timeout_ms: resolvedTimeoutMs,
       ...buildGenerationTelemetry({
         prompt,
         promptRelativePath: safePromptRelativePath,

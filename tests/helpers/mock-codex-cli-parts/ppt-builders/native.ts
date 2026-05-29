@@ -2,6 +2,10 @@
 import { createHash } from 'node:crypto';
 
 import { safeArray, safeText } from '../shared.ts';
+import {
+  buildSampleStatusSlide,
+  sampleTemplateLayoutGrammar,
+} from './native-sample.ts';
 
 function pointText(item, fallback) {
   return safeText(item?.text || item, fallback);
@@ -141,6 +145,15 @@ function templateLayoutGrammar() {
     required: true,
     materializer_role: 'execute_selected_archetype_zones_only',
     helper_template_layout_allowed: false,
+    reference_discipline: {
+      template_profile_required: true,
+      semantic_layout_selection_required: true,
+      placeholder_capacity_required: true,
+      reference_deck_analysis_required: true,
+      action_title_required: true,
+      source_projects: ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx'],
+      rule: 'Treat templates and reference decks as layout intelligence before coordinates.',
+    },
     global_rules: {
       edge_margin_in_min: 0.6,
       zone_gap_in_min: 0.32,
@@ -367,7 +380,7 @@ function structuralShapes(layoutFamily, slideId) {
         shape_id: `${slideId}-ai-signal-hub`,
         kind: 'oval',
         role: 'signal_hub',
-        quality_role: 'decorative',
+        quality_role: 'structural',
         layout_zone_id: 'status_zone',
         bounds: { left_in: 14.22, top_in: 2.72, width_in: 0.74, height_in: 0.74 },
         fill: '#B94624',
@@ -377,7 +390,7 @@ function structuralShapes(layoutFamily, slideId) {
         shape_id: `${slideId}-ai-signal-connector`,
         kind: 'line',
         role: 'signal_connector',
-        quality_role: 'decorative',
+        quality_role: 'structural',
         layout_zone_id: 'status_zone',
         bounds: { left_in: 14.58, top_in: 3.48, width_in: 0.06, height_in: 2.12 },
         line: '#B94624',
@@ -389,7 +402,7 @@ function structuralShapes(layoutFamily, slideId) {
       shape_id: `${slideId}-ai-timeline-rail`,
       kind: 'line',
       role: 'timeline_rail',
-      quality_role: 'decorative',
+      quality_role: 'structural',
       layout_zone_id: 'timeline_zone',
       bounds: { left_in: 1.08, top_in: 4.12, width_in: 13.22, height_in: 0.06 },
       line: '#B94624',
@@ -400,7 +413,7 @@ function structuralShapes(layoutFamily, slideId) {
       shape_id: `${slideId}-ai-gate-ladder-spine`,
       kind: 'line',
       role: 'gate_ladder_spine',
-      quality_role: 'decorative',
+      quality_role: 'structural',
       layout_zone_id: 'gate_zone',
       bounds: { left_in: 7.58, top_in: 2.68, width_in: 0.08, height_in: 4.95 },
       line: '#B94624',
@@ -412,7 +425,7 @@ function structuralShapes(layoutFamily, slideId) {
         shape_id: `${slideId}-ai-center-hub`,
         kind: 'oval',
         role: 'center_hub',
-        quality_role: 'decorative',
+        quality_role: 'structural',
         layout_zone_id: 'system_map_zone',
         bounds: { left_in: 7.28, top_in: 4.12, width_in: 1.0, height_in: 1.0 },
         fill: '#B94624',
@@ -422,7 +435,7 @@ function structuralShapes(layoutFamily, slideId) {
         shape_id: `${slideId}-ai-axis-connector-horizontal`,
         kind: 'line',
         role: 'axis_connector',
-        quality_role: 'decorative',
+        quality_role: 'structural',
         layout_zone_id: 'system_map_zone',
         bounds: { left_in: 7.31, top_in: 4.6, width_in: 0.32, height_in: 0.05 },
         line: '#B94624',
@@ -434,7 +447,7 @@ function structuralShapes(layoutFamily, slideId) {
       shape_id: `${slideId}-ai-takeaway-band`,
       kind: 'rect',
       role: 'takeaway_band',
-      quality_role: 'decorative',
+      quality_role: 'structural',
       layout_zone_id: 'decision_zone',
       bounds: { left_in: 0.95, top_in: 4.5, width_in: 13.58, height_in: 0.18 },
       fill: '#B94624',
@@ -445,7 +458,7 @@ function structuralShapes(layoutFamily, slideId) {
     shape_id: `${slideId}-ai-bridge-connector-rail`,
     kind: 'line',
     role: 'bridge_connector_rail',
-    quality_role: 'decorative',
+    quality_role: 'structural',
     layout_zone_id: 'matrix_zone',
     bounds: { left_in: 1.08, top_in: 6.18, width_in: 13.22, height_in: 0.06 },
     line: '#B94624',
@@ -676,11 +689,39 @@ export function buildMockPptNativeShapePlan(meta) {
   const route = safeText(meta?.route);
   const slides = safeArray(meta?.context?.blueprint?.slides);
   const repairFeedback = safeArray(meta?.context?.repair_feedback);
+  const isNativeSample = meta?.context?.native_ppt_sample_layout_profile?.required === true
+    || safeText(meta?.context?.native_ppt_authoring_mode) === 'native_visual_sample_compact';
   const targetSlideIds = new Set(
     safeArray(meta?.context?.unit_repair_scope?.target_slide_ids)
       .map((slideId) => safeText(slideId))
       .filter(Boolean),
   );
+  const authoredSlides = isNativeSample
+    ? slides.slice(0, 1).map((slide, index) => buildSampleStatusSlide(slide, index, stableCompositionSignature))
+    : slides.map((slide, index) => {
+        const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
+        const nativeShapes = nativeShapePlanForSlide(slide, index);
+        return {
+          slide_id: slideId,
+          title: safeText(slide?.title, `Slide ${index + 1}`),
+          layout_family: safeText(slide?.visual_presentation?.layout_family || slide?.layout_family),
+          core_sentence: safeText(slide?.core_sentence),
+          page_core_content: safeArray(slide?.page_core_content),
+          evidence_and_sources: safeArray(slide?.evidence_and_sources),
+          layout_intent: {
+            ...layoutIntentForSlide(slide, index, slidePoints(slide).length),
+            composition_signature: stableCompositionSignature(nativeShapes),
+          },
+          template_layout_binding: templateBindingForSlide(slide, index, slidePoints(slide).length),
+          native_shapes: nativeShapes,
+          redcube_svg_ir_intent: {
+            root_viewbox: '0 0 1152 648',
+            editable_text_required: true,
+            required_intents: ['text:title', 'text:point_text', 'rect:content_panel', 'group:content_point'],
+          },
+          repair_directive: targetSlideIds.has(slideId) ? 'apply screenshot feedback to this editable slide only' : 'preserve passed slide',
+        };
+      });
   return {
     ai_first_editing_contract: {
       contract_id: 'ppt_native_ai_first_editing_contract_v1',
@@ -717,10 +758,10 @@ export function buildMockPptNativeShapePlan(meta) {
       deck_layout_rhythm_plan: {
         owner: 'llm_agent',
         required: true,
-        slides: slides.map((slide, index) => {
+        slides: authoredSlides.map((slide, index) => {
           const layoutFamily = safeText(slide?.visual_presentation?.layout_family || slide?.layout_family, 'multi_zone_compare');
-          const binding = templateBindingForSlide(slide, index, slidePoints(slide).length);
-          const layoutIntent = layoutIntentForSlide(slide, index, slidePoints(slide).length);
+          const binding = isNativeSample ? slide.template_layout_binding : templateBindingForSlide(slide, index, slidePoints(slide).length);
+          const layoutIntent = isNativeSample ? slide.layout_intent : layoutIntentForSlide(slide, index, slidePoints(slide).length);
           return {
             slide_id: safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`),
             rhetorical_role: layoutIntent.rhetorical_role,
@@ -738,14 +779,16 @@ export function buildMockPptNativeShapePlan(meta) {
         design_owner: 'test_double_only',
         motif: 'hardcoded_ci_fixture_not_a_presentation_template',
         visual_motif: 'hardcoded_ci_fixture_not_a_presentation_template',
-        layout_archetypes: [
-          'cover_signal',
-          'multi_zone_compare',
-          'timeline_band',
-          'judgement_ladder',
-          'ring_cross',
-          'summary_peak',
-        ],
+        layout_archetypes: isNativeSample
+          ? ['sample_status_proof_board', 'sample_decision_proof_split', 'sample_proof_band']
+          : [
+              'cover_signal',
+              'multi_zone_compare',
+              'timeline_band',
+              'judgement_ladder',
+              'ring_cross',
+              'summary_peak',
+            ],
         palette: {
           canvas: '#F6F2EA',
           ink: '#171C24',
@@ -758,17 +801,42 @@ export function buildMockPptNativeShapePlan(meta) {
           body_pt_min: 18,
           point_index_pt_min: 16,
         },
+        grid: {
+          edge_margin_in_min: 0.6,
+          inter_block_gap_in_min: 0.32,
+        },
         layout_rhythm: {
           repeated_concrete_composition_limit: 2,
           required_distinct_composition_share: 0.75,
         },
+        professional_design_brief: {
+          design_register: 'executive proof deck',
+          reference_style_family: 'template-profiled multi-zone native PPT board',
+          first_glance_hierarchy: 'audience-facing claim first, then structured proof objects',
+          template_profile_strategy: 'semantic master layouts with explicit zones and placeholder capacity',
+          capacity_strategy: 'shorten copy or reduce slots before coordinates if text cannot fit at font floors',
+          forbidden_amateur_patterns: ['generic equal-card grid', 'decorative title underline', 'overfilled receipt ledger'],
+        },
         borrowed_discipline: {
           from: 'ppt-master',
-          adopted: ['spec_lock', 'template_layout_grammar', 'per_page_visual_plan', 'rendered_quality_gate'],
+          adopted: ['spec_lock', 'template_layout_grammar', 'template_profile', 'semantic_layout_selection', 'reference_deck_analysis', 'per_page_visual_plan', 'rendered_quality_gate'],
           not_adopted: ['ppt_master_product_entry_owner', 'mock_helper_as_visual_template'],
         },
+        borrowed_principles: [
+          'ppt_master_style_spec_lock',
+          'template_layout_grammar',
+          'template_profile',
+          'semantic_layout_selection',
+          'reference_deck_analysis',
+          'per_page_visual_plan',
+          'explicit_grid',
+          'font_floor',
+          'layout_rhythm',
+          'rendered_quality_gate',
+        ],
+        qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety', 'true_render_screenshot'],
       },
-      template_layout_grammar: templateLayoutGrammar(),
+      template_layout_grammar: isNativeSample ? sampleTemplateLayoutGrammar() : templateLayoutGrammar(),
       authoring_ir: {
         kind: 'redcube_svg_ir',
         version: 1,
@@ -777,32 +845,7 @@ export function buildMockPptNativeShapePlan(meta) {
         allowed_svg_tags: ['svg', 'g', 'rect', 'text'],
       },
       consumed_feedback_count: repairFeedback.length,
-      slides: slides.map((slide, index) => {
-        const slideId = safeText(slide?.slide_id, `S${String(index + 1).padStart(2, '0')}`);
-        const nativeShapes = nativeShapePlanForSlide(slide, index);
-        return {
-          slide_id: slideId,
-          title: safeText(slide?.title, `Slide ${index + 1}`),
-          layout_family: safeText(slide?.visual_presentation?.layout_family || slide?.layout_family),
-          core_sentence: safeText(slide?.core_sentence),
-          page_core_content: safeArray(slide?.page_core_content),
-          evidence_and_sources: safeArray(slide?.evidence_and_sources),
-          layout_intent: (() => {
-            return {
-              ...layoutIntentForSlide(slide, index, slidePoints(slide).length),
-              composition_signature: stableCompositionSignature(nativeShapes),
-            };
-          })(),
-          template_layout_binding: templateBindingForSlide(slide, index, slidePoints(slide).length),
-          native_shapes: nativeShapes,
-          redcube_svg_ir_intent: {
-            root_viewbox: '0 0 1152 648',
-            editable_text_required: true,
-            required_intents: ['text:title', 'text:point_text', 'rect:content_panel', 'group:content_point'],
-          },
-          repair_directive: targetSlideIds.has(slideId) ? 'apply screenshot feedback to this editable slide only' : 'preserve passed slide',
-        };
-      }),
+      slides: authoredSlides,
     },
   };
 }

@@ -5,6 +5,7 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import {
   createDeliverable,
@@ -26,6 +27,48 @@ function readJson(file) {
 
 function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function patchDeliverableConstraints({
+  workspaceRoot,
+  topicId = 'topic-a',
+  deliverableId,
+  constraints,
+}) {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const deliverable = readJson(deliverablePaths.deliverableFile);
+  deliverable.contract = {
+    ...(deliverable.contract || {}),
+    delivery_request: {
+      ...(deliverable.contract?.delivery_request || {}),
+      constraints: {
+        ...(deliverable.contract?.delivery_request?.constraints || {}),
+        ...(constraints || {}),
+      },
+    },
+  };
+  deliverable.hydrated_contract = {
+    ...(deliverable.hydrated_contract || {}),
+    delivery_request: {
+      ...(deliverable.hydrated_contract?.delivery_request || {}),
+      constraints: {
+        ...(deliverable.hydrated_contract?.delivery_request?.constraints || {}),
+        ...(constraints || {}),
+      },
+    },
+  };
+  writeJson(deliverablePaths.deliverableFile, deliverable);
+  const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
+  const contractFile = path.join(deliverablePaths.deliverableDir, contractRef);
+  const hydratedContract = readJson(contractFile);
+  hydratedContract.delivery_request = {
+    ...(hydratedContract.delivery_request || {}),
+    constraints: {
+      ...(hydratedContract.delivery_request?.constraints || {}),
+      ...(constraints || {}),
+    },
+  };
+  writeJson(contractFile, hydratedContract);
 }
 
 function flattenNativeVisibleText(nativeArtifact, shapeManifest) {
@@ -124,7 +167,7 @@ function pointIndexTextFailures(shapePlan) {
     .filter((shape) => !shape.editable_text || shape.font_size < 16);
 }
 
-async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native' }) {
+async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native', constraints = undefined }) {
   await createDeliverable({
     workspaceRoot,
     overlay: 'ppt_deck',
@@ -133,6 +176,7 @@ async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-nat
     deliverableId,
     title: 'Native PPT 探索 deck',
     goal: '验证 PPT family 可在 HTML 路线之外直接生成可编辑 PPTX',
+    constraints,
   });
 
   for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
@@ -165,6 +209,7 @@ export {
   fileSha256,
   flattenNativeVisibleText,
   nativeEngineContract,
+  patchDeliverableConstraints,
   pointIndexTextFailures,
   readJson,
   runNativePlanningChain,

@@ -1,4 +1,5 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import {
   auditDeliverable,
@@ -90,6 +91,40 @@ function workspaceReceiptScaleoutRoots(options: JsonMap): string[] {
     .split(',')
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function plainObject(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function parseJsonObjectOption(label: string, value: unknown): Record<string, unknown> {
+  if (!value || value === true) return {};
+  const parsed = JSON.parse(String(value));
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error(`${label} must be a JSON object`);
+  }
+  return parsed as Record<string, unknown>;
+}
+
+function deliveryConstraintsFromOptions(options: JsonMap): Record<string, unknown> | undefined {
+  const constraints = {
+    ...parseJsonObjectOption('--constraints-json', options.constraintsJson),
+    ...(
+      options.constraintsFile && options.constraintsFile !== true
+        ? parseJsonObjectOption('--constraints-file', readFileSync(String(options.constraintsFile), 'utf-8'))
+        : {}
+    ),
+  };
+  const nativeSampleSlideCount = Number(options.nativeSampleSlideCount || 0);
+  if (options.nativeVisualSample === true || nativeSampleSlideCount > 0) {
+    constraints.native_visual_sample = true;
+  }
+  if (nativeSampleSlideCount > 0) {
+    constraints.expected_slide_count = nativeSampleSlideCount;
+    constraints.max_slides = nativeSampleSlideCount;
+  }
+  const normalized = plainObject(constraints);
+  return Object.keys(normalized).length > 0 ? normalized : undefined;
 }
 
 function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap {
@@ -307,6 +342,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'product') {
     if (subcommand === 'invoke') {
+      const constraints = deliveryConstraintsFromOptions(options);
       return domainEntry.invokeProductEntry({
         workspace_locator: {
           workspace_root: resolveWorkspaceRoot(options, cwd),
@@ -329,6 +365,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
           stop_after_stage: options.stopAfterStage || '',
           mode: options.mode || 'draft_new',
           baseline_deliverable_id: options.baselineDeliverableId || '',
+          constraints,
         },
       });
     }
@@ -361,6 +398,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (command === 'native-ppt') {
     if (subcommand === 'proof') {
+      const constraints = deliveryConstraintsFromOptions(options);
       return domainEntry.runNativePptProductEntryProof({
         workspace_root: resolveWorkspaceRoot(options, cwd),
         entry_session_id: options.entrySessionId || '',
@@ -370,6 +408,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
         adapter: options.adapter || '',
         user_intent: options.userIntent || '',
         stop_after_stage: options.stopAfterStage || '',
+        constraints,
       });
     }
 

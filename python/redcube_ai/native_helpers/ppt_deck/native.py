@@ -25,6 +25,7 @@ from redcube_ai.native_helpers.ppt_deck.native_layout_grammar import (
 )
 from redcube_ai.native_helpers.ppt_deck.native_layouts import build_deck, safe_list, safe_text
 from redcube_ai.native_helpers.ppt_deck.native_quality import evaluate_native_slide_quality
+from redcube_ai.native_helpers.ppt_deck.native_sample_layout import sample_layout_profile_failures
 
 
 ENGINE_CAPABILITIES = {
@@ -71,6 +72,23 @@ DEFAULT_ENGINE_CONTRACT_FILE = (
     / 'runtime-program'
     / 'ppt-native-python-engine-contract.json'
 )
+REQUIRED_DESIGN_SPEC_DISCIPLINE = {
+    'ppt_master_style_spec_lock',
+    'template_layout_grammar',
+    'template_profile',
+    'semantic_layout_selection',
+    'reference_deck_analysis',
+    'per_page_visual_plan',
+    'layout_rhythm',
+    'rendered_quality_gate',
+}
+REQUIRED_DESIGN_SPEC_QA_GATES = {
+    'bounds',
+    'font_floor',
+    'text_fit',
+    'structural_visual',
+    'layout_variety',
+}
 
 
 def fail(message: str) -> None:
@@ -86,6 +104,97 @@ def file_sha256(file: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def missing_design_spec_lock_fields(design_spec_lock: dict, minimum_layout_archetypes: int = 3) -> list[str]:
+    palette = design_spec_lock.get('palette') if isinstance(design_spec_lock.get('palette'), dict) else {}
+    typography = design_spec_lock.get('typography') if isinstance(design_spec_lock.get('typography'), dict) else {}
+    grid = design_spec_lock.get('grid') if isinstance(design_spec_lock.get('grid'), dict) else {}
+    layout_rhythm = design_spec_lock.get('layout_rhythm') if isinstance(design_spec_lock.get('layout_rhythm'), dict) else {}
+    professional_design_brief = (
+        design_spec_lock.get('professional_design_brief')
+        if isinstance(design_spec_lock.get('professional_design_brief'), dict)
+        else {}
+    )
+    borrowed_principles = {
+        safe_text(item)
+        for item in safe_list(design_spec_lock.get('borrowed_principles'))
+        if safe_text(item)
+    }
+    qa_gates = {
+        safe_text(item)
+        for item in safe_list(design_spec_lock.get('qa_gates'))
+        if safe_text(item)
+    }
+    missing = []
+    if not safe_text(design_spec_lock.get('spec_id')):
+        missing.append('spec_id')
+    if safe_text(design_spec_lock.get('owner')) != 'llm_agent':
+        missing.append('owner=llm_agent')
+    if not safe_text(design_spec_lock.get('motif')):
+        missing.append('motif')
+    if len(safe_list(design_spec_lock.get('layout_archetypes'))) < minimum_layout_archetypes:
+        missing.append(f'layout_archetypes>={minimum_layout_archetypes}')
+    if (
+        not safe_text(palette.get('background') or palette.get('canvas'))
+        or not safe_text(palette.get('ink'))
+        or not safe_text(palette.get('accent'))
+    ):
+        missing.append('palette.background_or_canvas+ink+accent')
+    try:
+        title_pt_min = float(typography.get('title_pt_min') or typography.get('title_min_pt') or 0)
+    except (TypeError, ValueError):
+        title_pt_min = 0
+    if title_pt_min < 34:
+        missing.append('typography.title_pt_min>=34')
+    try:
+        body_pt_min = float(typography.get('body_pt_min') or typography.get('body_min_pt') or 0)
+    except (TypeError, ValueError):
+        body_pt_min = 0
+    if body_pt_min < 18:
+        missing.append('typography.body_pt_min>=18')
+    try:
+        edge_margin = float(grid.get('edge_margin_in_min') or 0)
+    except (TypeError, ValueError):
+        edge_margin = 0
+    if edge_margin < 0.6:
+        missing.append('grid.edge_margin_in_min>=0.6')
+    try:
+        inter_block_gap = float(grid.get('inter_block_gap_in_min') or 0)
+    except (TypeError, ValueError):
+        inter_block_gap = 0
+    if inter_block_gap < 0.32:
+        missing.append('grid.inter_block_gap_in_min>=0.32')
+    try:
+        repetition_limit = float(layout_rhythm.get('repeated_concrete_composition_limit') or 0)
+    except (TypeError, ValueError):
+        repetition_limit = 0
+    if repetition_limit < 1:
+        missing.append('layout_rhythm.repeated_concrete_composition_limit')
+    try:
+        distinct_share = float(layout_rhythm.get('required_distinct_composition_share') or 0)
+    except (TypeError, ValueError):
+        distinct_share = 0
+    if distinct_share < 0.75:
+        missing.append('layout_rhythm.required_distinct_composition_share>=0.75')
+    for field in [
+        'design_register',
+        'reference_style_family',
+        'first_glance_hierarchy',
+        'template_profile_strategy',
+        'capacity_strategy',
+    ]:
+        if not safe_text(professional_design_brief.get(field)):
+            missing.append(f'professional_design_brief.{field}')
+    if len(safe_list(professional_design_brief.get('forbidden_amateur_patterns'))) == 0:
+        missing.append('professional_design_brief.forbidden_amateur_patterns')
+    for principle in sorted(REQUIRED_DESIGN_SPEC_DISCIPLINE):
+        if principle not in borrowed_principles:
+            missing.append(f'borrowed_principles.{principle}')
+    for gate in sorted(REQUIRED_DESIGN_SPEC_QA_GATES):
+        if gate not in qa_gates:
+            missing.append(f'qa_gates.{gate}')
+    return missing
 
 
 def image_dimensions(file: Path) -> dict:
@@ -132,14 +241,21 @@ def load_engine_contract(contract_file: Path) -> dict:
 
 def normalize_slide_data(payload: dict) -> list:
     plan = payload.get('editable_shape_plan') or {}
+    sample_layout_profile = (
+        payload.get('native_ppt_sample_layout_profile')
+        if isinstance(payload.get('native_ppt_sample_layout_profile'), dict)
+        else {}
+    )
     design_spec_lock = plan.get('design_spec_lock') if isinstance(plan.get('design_spec_lock'), dict) else {}
-    if (
-        not safe_text(design_spec_lock.get('spec_id'))
-        or not safe_text(design_spec_lock.get('owner'))
-        or not safe_text(design_spec_lock.get('motif'))
-        or len(safe_list(design_spec_lock.get('layout_archetypes'))) < 3
-    ):
-        fail('ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires spec_id, owner, motif, and at least three layout_archetypes')
+    minimum_layout_archetypes = 2 if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact' else 3
+    missing_design_spec_lock = missing_design_spec_lock_fields(design_spec_lock, minimum_layout_archetypes)
+    if missing_design_spec_lock:
+        fail(
+            'ai_first_design_spec_lock_missing: editable_shape_plan.design_spec_lock requires '
+            'AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, '
+            'and QA gates before shape coordinates: '
+            + json.dumps(missing_design_spec_lock, ensure_ascii=False, sort_keys=True)
+        )
     grammar_failures = validate_template_layout_grammar(plan)
     if grammar_failures:
         fail(
@@ -163,9 +279,9 @@ def normalize_slide_data(payload: dict) -> list:
         for index, slide in enumerate(blueprint_slides)
         if isinstance(slide, dict)
     }
-    source_slides = plan_slides or blueprint_slides
+    source_slides = plan_slides
     if not source_slides:
-        fail('native PPT authoring requires editable_shape_plan.slides or slide_blueprint.slides')
+        fail('native PPT authoring requires editable_shape_plan.slides; slide_blueprint.slides is context only and cannot substitute for AI-authored native shapes')
     slides = []
     for index, raw_slide in enumerate(source_slides, 1):
         if not isinstance(raw_slide, dict):
@@ -189,6 +305,7 @@ def normalize_slide_data(payload: dict) -> list:
                 f'slide {slide_id} selected_archetype is not in editable_shape_plan.template_layout_grammar.archetype_catalog'
             )
         merged['template_layout_binding'] = template_binding
+        merged['_native_ppt_sample_layout_profile'] = sample_layout_profile
         merged['_template_archetype_contract'] = archetypes_by_id.get(selected_archetype) or {}
         merged['_editable_native_shapes'] = plan_shapes
         merged['_typography_plan'] = typography_plan
@@ -196,6 +313,26 @@ def normalize_slide_data(payload: dict) -> list:
     if not slides:
         fail('native PPT authoring requires at least one valid slide object')
     return slides
+
+
+def normalize_slide_data_failures(payload: dict) -> list[dict]:
+    plan = payload.get('editable_shape_plan') if isinstance(payload.get('editable_shape_plan'), dict) else {}
+    failures = []
+    design_spec_lock = plan.get('design_spec_lock') if isinstance(plan.get('design_spec_lock'), dict) else {}
+    minimum_layout_archetypes = 2 if safe_text(plan.get('authoring_mode')) == 'native_visual_sample_compact' else 3
+    missing_design_spec_lock = missing_design_spec_lock_fields(design_spec_lock, minimum_layout_archetypes)
+    if missing_design_spec_lock:
+        failures.append({
+            'reason': 'ai_first_design_spec_lock_missing',
+            'missing_fields': missing_design_spec_lock,
+        })
+    grammar_failures = validate_template_layout_grammar(plan)
+    if grammar_failures:
+        failures.append({
+            'reason': 'ai_first_template_layout_grammar_missing',
+            'grammar_failures': grammar_failures,
+        })
+    return failures or [{'reason': 'ai_first_shape_plan_normalization_failed'}]
 
 
 def validate_ai_first_shape_plan(input_json: Path, engine_contract_file: Path) -> dict:
@@ -208,13 +345,16 @@ def validate_ai_first_shape_plan(input_json: Path, engine_contract_file: Path) -
             'ok': False,
             'stage': 'normalize_slide_data',
             'exit_code': int(exc.code or 1) if isinstance(exc.code, int) else 1,
-            'failures': [{'reason': 'ai_first_shape_plan_normalization_failed'}],
+            'failures': normalize_slide_data_failures(payload),
         }
     from redcube_ai.native_helpers.ppt_deck.native_layouts import validate_ai_first_design_plan
     failures = []
     for slide in slides:
         slide_id = safe_text(slide.get('slide_id'))
-        slide_failures = validate_ai_first_design_plan(slide)
+        slide_failures = [
+            *sample_layout_profile_failures(slide),
+            *validate_ai_first_design_plan(slide),
+        ]
         if slide_failures:
             failures.append({
                 'slide_id': slide_id,
@@ -631,6 +771,7 @@ def main() -> None:
                 'non_text_visual_specific_ok',
                 'mechanical_card_template_absent',
                 'panel_text_safe_area_ok',
+                'text_card_internal_padding_ok',
                 'short_label_wrap_ok',
                 'composition_signature',
                 'title_underline_absent_ok',

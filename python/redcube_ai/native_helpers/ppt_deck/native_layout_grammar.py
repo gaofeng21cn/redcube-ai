@@ -7,9 +7,43 @@ def safe_list(value):
     return value if isinstance(value, list) else []
 
 
+SAMPLE_TEMPLATE_ARCHETYPES = {
+    'sample_status_proof_board',
+    'sample_decision_proof_split',
+}
+
+REQUIRED_REFERENCE_DISCIPLINE_FLAGS = [
+    'template_profile_required',
+    'semantic_layout_selection_required',
+    'placeholder_capacity_required',
+    'reference_deck_analysis_required',
+    'action_title_required',
+]
+
+REQUIRED_REFERENCE_SOURCE_PROJECTS = {
+    'ppt-master',
+    'agent-slides',
+    'PPTAgent',
+    'pptx-from-layouts-skill',
+    'officecli-pptx',
+}
+
+
+def _compact_sample_catalog_allowed(plan: dict, catalog: list[dict]) -> bool:
+    if safe_text(plan.get('authoring_mode')) != 'native_visual_sample_compact':
+        return False
+    catalog_ids = {
+        safe_text(entry.get('archetype_id'))
+        for entry in catalog
+        if isinstance(entry, dict) and safe_text(entry.get('archetype_id'))
+    }
+    return catalog_ids == SAMPLE_TEMPLATE_ARCHETYPES
+
+
 def validate_template_layout_grammar(plan: dict) -> list[dict]:
     grammar = plan.get('template_layout_grammar') if isinstance(plan.get('template_layout_grammar'), dict) else {}
     catalog = safe_list(grammar.get('archetype_catalog'))
+    minimum_catalog_size = 2 if _compact_sample_catalog_allowed(plan, catalog) else 3
     failures = []
     if safe_text(grammar.get('owner')) != 'llm_agent':
         failures.append({'reason': 'ai_first_template_layout_grammar_owner_invalid'})
@@ -19,13 +53,43 @@ def validate_template_layout_grammar(plan: dict) -> list[dict]:
         failures.append({'reason': 'ai_first_template_layout_materializer_boundary_invalid'})
     if grammar.get('helper_template_layout_allowed') is not False:
         failures.append({'reason': 'ai_first_template_layout_helper_allowed'})
-    if len(catalog) < 3:
+    failures.extend(_reference_discipline_failures(grammar))
+    if len(catalog) < minimum_catalog_size:
         failures.append({
             'reason': 'ai_first_template_layout_archetype_catalog_too_few',
             'actual': len(catalog),
-            'minimum': 3,
+            'minimum': minimum_catalog_size,
         })
     failures.extend(_archetype_catalog_failures(catalog))
+    return failures
+
+
+def _reference_discipline_failures(grammar: dict) -> list[dict]:
+    reference_discipline = (
+        grammar.get('reference_discipline')
+        if isinstance(grammar.get('reference_discipline'), dict)
+        else {}
+    )
+    failures = []
+    for field in REQUIRED_REFERENCE_DISCIPLINE_FLAGS:
+        if reference_discipline.get(field) is not True:
+            failures.append({
+                'reason': 'ai_first_template_layout_reference_discipline_missing',
+                'field': field,
+                'actual': reference_discipline.get(field),
+            })
+    source_projects = {
+        safe_text(project)
+        for project in safe_list(reference_discipline.get('source_projects'))
+        if safe_text(project)
+    }
+    missing_projects = sorted(REQUIRED_REFERENCE_SOURCE_PROJECTS - source_projects)
+    if missing_projects:
+        failures.append({
+            'reason': 'ai_first_template_layout_reference_source_projects_missing',
+            'missing_source_projects': missing_projects,
+            'required_source_projects': sorted(REQUIRED_REFERENCE_SOURCE_PROJECTS),
+        })
     return failures
 
 
@@ -294,7 +358,9 @@ def _shape_binding_failures(shapes: list[dict], zone_ids: set[str], quality_role
     }
     for shape in shapes:
         role = safe_text(shape.get('role'))
-        if quality_role(shape) == 'decorative' or role in {'page_number', 'page_no', 'footer', 'cover_meta', 'meta'}:
+        if quality_role(shape) in {'decorative', 'auxiliary'}:
+            continue
+        if role in {'title', 'core_sentence'}:
             continue
         layout_zone_id = safe_text(shape.get('layout_zone_id'))
         if not layout_zone_id or layout_zone_id not in zone_ids:
@@ -357,11 +423,16 @@ def _shape_zone_fit_failures(shape: dict, zone: dict) -> list[dict]:
     if shape_bounds is None or zone_bounds is None:
         return []
     tolerance = 0.02
+    required_inset = 0.02
+    safe_left = zone_bounds['left_in'] + required_inset
+    safe_top = zone_bounds['top_in'] + required_inset
+    safe_right = zone_bounds['right_in'] - required_inset
+    safe_bottom = zone_bounds['bottom_in'] - required_inset
     if (
-        shape_bounds['left_in'] >= zone_bounds['left_in'] - tolerance
-        and shape_bounds['top_in'] >= zone_bounds['top_in'] - tolerance
-        and shape_bounds['right_in'] <= zone_bounds['right_in'] + tolerance
-        and shape_bounds['bottom_in'] <= zone_bounds['bottom_in'] + tolerance
+        shape_bounds['left_in'] >= safe_left - tolerance
+        and shape_bounds['top_in'] >= safe_top - tolerance
+        and shape_bounds['right_in'] <= safe_right + tolerance
+        and shape_bounds['bottom_in'] <= safe_bottom + tolerance
     ):
         return []
     return [{
@@ -369,17 +440,30 @@ def _shape_zone_fit_failures(shape: dict, zone: dict) -> list[dict]:
         'shape_id': safe_text(shape.get('shape_id'), '<missing-shape-id>'),
         'role': safe_text(shape.get('role')),
         'layout_zone_id': safe_text(shape.get('layout_zone_id')),
+        'required_zone_inset_in': required_inset,
         'zone_bounds': {
             'left_in': round(zone_bounds['left_in'], 4),
             'top_in': round(zone_bounds['top_in'], 4),
             'width_in': round(zone_bounds['width_in'], 4),
             'height_in': round(zone_bounds['height_in'], 4),
         },
+        'zone_safe_bounds': {
+            'left_in': round(safe_left, 4),
+            'top_in': round(safe_top, 4),
+            'right_in': round(safe_right, 4),
+            'bottom_in': round(safe_bottom, 4),
+        },
         'shape_bounds': {
             'left_in': round(shape_bounds['left_in'], 4),
             'top_in': round(shape_bounds['top_in'], 4),
             'width_in': round(shape_bounds['width_in'], 4),
             'height_in': round(shape_bounds['height_in'], 4),
+        },
+        'required_delta_in': {
+            'left': round(max(0.0, safe_left - shape_bounds['left_in']), 4),
+            'top': round(max(0.0, safe_top - shape_bounds['top_in']), 4),
+            'right': round(max(0.0, shape_bounds['right_in'] - safe_right), 4),
+            'bottom': round(max(0.0, shape_bounds['bottom_in'] - safe_bottom), 4),
         },
     }]
 
@@ -450,6 +534,15 @@ def _shape_role_group_satisfied(group_id: str, shapes: list[dict], quality_role)
             return True
         if group_id == 'structural_visual' and kind in {'line', 'connector', 'oval', 'circle'}:
             return True
+        if group_id == 'input_hub' and 'input_hub' in role:
+            if kind in {'oval', 'circle', 'rect', 'rectangle', 'rounded_rect', 'panel'}:
+                return True
+        if group_id == 'flow_connector' and any(token in role for token in ('flow_connector', 'merge_connector', 'connector')):
+            if kind in {'line', 'connector'}:
+                return True
+        if group_id == 'decision_rail' and any(token in role for token in ('decision_rail', 'decision_connector', 'proof_rail')):
+            if kind in {'line', 'connector', 'rect', 'rectangle', 'rounded_rect', 'panel'}:
+                return True
         if group_id == 'content_container' and kind in {'rect', 'rectangle', 'rounded_rect', 'panel'}:
             if quality_role(shape) in {'content', 'structural'}:
                 return True

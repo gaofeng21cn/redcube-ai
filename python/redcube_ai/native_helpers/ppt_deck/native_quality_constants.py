@@ -12,6 +12,8 @@ MIN_NATIVE_TYPOGRAPHY_HIERARCHY_RATIO = 2.0
 MIN_NATIVE_TITLE_CORE_GAP_PX = 8.0
 MIN_AUDIENCE_LABEL_FONT_PT = 16.0
 MIN_NATIVE_TEXT_PANEL_INSET_PX = 10.8
+PANEL_SAFE_AREA_EPSILON_PX = 0.1
+MIN_NATIVE_TEXT_CARD_INTERNAL_PADDING_PX = 10.8
 MIN_GRID_BALANCE_RATIO = 0.56
 MAX_GRID_BALANCE_RATIO = 1.78
 MIN_POINT_TEXT_CONTENT_CHARS = 12
@@ -46,6 +48,7 @@ AUXILIARY_TEXT_ROLES = {
     'page_no',
     'page_number',
     'source_note',
+    'speaker_identity',
 }
 MECHANICAL_CARD_PANEL_ROLES = {
     'compare_panel',
@@ -58,8 +61,12 @@ MECHANICAL_CARD_PANEL_ROLES = {
 }
 SYSTEM_MAP_PANEL_ROLES = {
     'content_panel',
+    'document_map_icon',
     'input_panel',
+    'input_map_panel',
     'source_panel',
+    'source_map_panel',
+    'route_flow_lane',
     'route_lane',
     'route_rail',
     'gate_card',
@@ -68,11 +75,20 @@ SYSTEM_MAP_PANEL_ROLES = {
     'evidence_band',
     'evidence_panel',
 }
+TEXT_PANEL_ROLES = {
+    'content_panel',
+    'input_panel',
+    'input_map_panel',
+    'source_panel',
+    'source_map_panel',
+}
+SYSTEM_MAP_INPUT_PANEL_ROLES = TEXT_PANEL_ROLES | {'content_panel'}
 SYSTEM_MAP_ROUTE_ROLES = {
     'flow_connector',
     'horizontal_route_connector',
     'route_flow_connector',
     'route_gate_connector',
+    'route_flow_lane',
     'route_lane',
     'route_rail',
 }

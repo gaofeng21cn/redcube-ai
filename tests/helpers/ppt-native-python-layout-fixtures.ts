@@ -216,6 +216,19 @@ function qualityPointText(text, index) {
   return `${normalized || `Point ${index + 1}`} carries explicit review evidence`;
 }
 
+function explicitQualityRole(shape) {
+  const existing = String(shape?.quality_role || '').trim();
+  if (existing) return shape;
+  const role = String(shape?.role || '').trim();
+  if (role === 'page_number' || role === 'page_no' || role === 'page') {
+    return { ...shape, quality_role: 'auxiliary' };
+  }
+  if (role === 'title' || role === 'core_sentence' || role === 'point_index' || role === 'point_text') {
+    return { ...shape, quality_role: 'content' };
+  }
+  return { ...shape, quality_role: 'content' };
+}
+
 function slidePoints(slide, count = null) {
   const points = (Array.isArray(slide?.page_core_content) ? slide.page_core_content : [])
     .map((item, index) => pointText(item, `Point ${index + 1} carries complete audience evidence`))
@@ -462,7 +475,7 @@ export function createAiSlide({
 } = {}) {
   const primaryPoints = slidePoints({ page_core_content: points || [] }, slotCount);
   const desiredSlots = slotCount || Math.max(2, Math.min(primaryPoints.length, 4));
-  const actualPanelCount = layoutFamily === 'summary_peak' ? Math.max(1, desiredSlots - 1) : desiredSlots;
+  const actualPanelCount = desiredSlots;
   const shapes = [
     {
       shape_id: `${slideId}-top-band`,
@@ -544,10 +557,8 @@ export function createAiSlide({
     shapes.push(panelMutator ? panelMutator(basePanel, index) : basePanel);
   }
   for (let index = 0; index < desiredSlots; index += 1) {
-    const overflowSummaryText = layoutFamily === 'summary_peak' && index >= actualPanelCount;
-    const base = overflowSummaryText
-      ? { left_in: 1.15, top_in: 6.25, width_in: 12.9, height_in: 0.78 }
-      : slotGeometry(Math.max(actualPanelCount, desiredSlots), Math.min(index, actualPanelCount - 1));
+    const overflowSummaryText = false;
+    const base = slotGeometry(Math.max(actualPanelCount, desiredSlots), Math.min(index, actualPanelCount - 1));
     const pointNumber = index + 1;
     const ladderSlot = layoutFamily === 'judgement_ladder' && !overflowSummaryText;
     shapes.push({
@@ -594,7 +605,7 @@ export function createAiSlide({
     page_core_content: primaryPoints,
     layout_intent: layoutIntentForSlide({ slideId, layoutFamily, slotCount: desiredSlots, shapes }),
     template_layout_binding: templateBindingForSlide(slideId, layoutFamily),
-    native_shapes: shapes.map((shape) => withLayoutZone(shape, layoutFamily)),
+    native_shapes: shapes.map((shape) => withLayoutZone(explicitQualityRole(shape), layoutFamily)),
   };
 }
 
@@ -619,6 +630,46 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
         spec_id: 'native_pptx_test_spec_lock_v1',
         owner: 'llm_agent',
         motif: 'accent rail with structural connector system',
+        palette: {
+          canvas: '#F6F2EA',
+          ink: '#171C24',
+          muted: '#5B6570',
+          accent: '#B94624',
+          panel: '#EFE6D6',
+        },
+        typography: {
+          title_pt_min: 36,
+          body_pt_min: 18,
+          point_index_pt_min: 16,
+        },
+        grid: {
+          edge_margin_in_min: 0.6,
+          inter_block_gap_in_min: 0.32,
+        },
+        layout_rhythm: {
+          repeated_concrete_composition_limit: 2,
+          required_distinct_composition_share: 0.75,
+        },
+        professional_design_brief: {
+          design_register: 'executive proof deck',
+          reference_style_family: 'template-profiled multi-zone board',
+          first_glance_hierarchy: 'action title, core claim, then structured evidence zones',
+          template_profile_strategy: 'semantic master layouts with declared zones and placeholder capacity',
+          capacity_strategy: 'fit text into selected zones at native PPT font floors before coordinates',
+          forbidden_amateur_patterns: ['generic equal-card grid', 'decorative title underline', 'overfilled receipt ledger'],
+        },
+        borrowed_principles: [
+          'ppt_master_style_spec_lock',
+          'template_layout_grammar',
+          'template_profile',
+          'semantic_layout_selection',
+          'reference_deck_analysis',
+          'per_page_visual_plan',
+          'explicit_grid',
+          'font_floor',
+          'layout_rhythm',
+          'rendered_quality_gate',
+        ],
         layout_archetypes: [
           'cover_signal',
           'multi_zone_compare',
@@ -627,7 +678,7 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
           'ring_cross',
           'summary_peak',
         ],
-        qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety'],
+        qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety', 'true_render_screenshot'],
       },
       template_layout_grammar: templateLayoutGrammar(),
       slides: slides.map((slide) => withTemplateLayoutDefaults(slide)),

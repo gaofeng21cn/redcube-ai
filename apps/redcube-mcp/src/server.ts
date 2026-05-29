@@ -278,6 +278,7 @@ export const TOOL_DEFINITIONS = [
         stop_after_stage: z.string().optional().describe('Optional explicit stop-after stage.'),
         mode: z.string().optional().describe('Execution mode such as draft_new.'),
         baseline_deliverable_id: z.string().optional().describe('Optional baseline deliverable id when optimizing existing outputs.'),
+        constraints: PASSTHROUGH_OBJECT.optional().describe('Optional machine-readable delivery constraints such as native_visual_sample.'),
       }).optional().describe('Product-entry delivery request.'),
     },
   },

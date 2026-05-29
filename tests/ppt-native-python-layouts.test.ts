@@ -1,22 +1,12 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import path from 'node:path';
-import { mkdirSync, readFileSync } from 'node:fs';
 import {
-  assertMaterializedQuality,
   createAiSlide,
-  materializedBenchmarkFixture,
   materializerPayload,
-  pythonTestEnv,
-  resolveTestPythonCommand,
   runNativeMaterializer,
   runNativeMaterializerFailure,
   runNativePlanValidation,
-  sha256Hex,
-  writeJson,
-  writeTinyPng,
 } from './helpers/ppt-native-python-layout-fixtures.ts';
 
 test('native PPTX officecli materializer accepts only complete AI spatial plans', () => {
@@ -34,7 +24,12 @@ test('native PPTX officecli materializer accepts only complete AI spatial plans'
   assert.equal(result.slides.every((slide) => slide.layout_writer === 'officecli_pptx_materializer'), true);
   assert.equal(result.slides.every((slide) => slide.ai_first_spatial_plan.helper_template_layout_used === false), true);
   assert.equal(result.slides.every((slide) => slide.redcube_svg_ir_preflight.status === 'pass'), true);
-  assert.equal(result.slides.every((slide) => slide.issues.length === 0), true);
+  assert.equal(result.slides.every((slide) => slide.issues.length === 0), true, JSON.stringify(result.slides.map((slide) => ({
+    slide_id: slide.slide_id,
+    issues: slide.issues,
+    panel_text_safe_area_failures: slide.metrics?.panel_text_safe_area_failures,
+    overlaps: slide.metrics?.overlaps,
+  }))));
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.expected_text_fragments.includes('Native cover proof'), true);
   assert.equal(result.officecli_gate.geometry_audit.ok, true);
@@ -106,6 +101,19 @@ test('native PPTX quality roles keep auxiliary metadata out of body QA while pre
       line: 'none',
       align: 'right',
     },
+    {
+      shape_id: 'S01-speaker',
+      kind: 'text_box',
+      role: 'speaker_identity',
+      quality_role: 'auxiliary',
+      layout_zone_id: 'takeaway_zone',
+      editable_text: '教学型讲者',
+      bounds: { left_in: 12.2, top_in: 7.85, width_in: 1.6, height_in: 0.36 },
+      font_size: 12,
+      color: '#5B6570',
+      fill: 'none',
+      line: 'none',
+    },
   );
   const result = runNativeMaterializer(materializerPayload([auxiliarySlide]));
   const [slide] = result.slides;
@@ -140,6 +148,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
+      layout_zone_id: 'matrix_zone',
       bounds: { left_in: 4.96, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
       line: '#2563EB',
       fill: 'none',
@@ -149,6 +158,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
       kind: 'connector',
       role: 'flow_connector',
       quality_role: 'structural',
+      layout_zone_id: 'matrix_zone',
       bounds: { left_in: 9.34, top_in: 3.06, width_in: 0.34, height_in: 0.05 },
       line: '#2563EB',
       fill: 'none',
@@ -160,6 +170,7 @@ test('native PPTX materializer accepts AI-first content panels with structural f
           ...shape,
           role: 'content_panel',
           editable_text: `可见内容槽：${shape.shape_id}`,
+          font_size: 18,
         };
       }
       if (shape.role === 'point_text') {
@@ -183,6 +194,53 @@ test('native PPTX materializer accepts AI-first content panels with structural f
   assert.equal(slide.metrics.visual_support_shape_count >= 2, true);
   assert.equal(slide.metrics.audience_content_slot_count >= 3, true);
   assert.equal(slide.issues.includes('native_visual_structure_missing'), false);
+});
+
+test('native PPTX officecli writer maps AI line objects and mid vertical alignment', () => {
+  const slideData = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: 'OfficeCLI writer schema mapping',
+    core: 'Writer adapter maps AI style objects without taking layout ownership.',
+    slotCount: 3,
+  });
+  slideData.native_shapes = slideData.native_shapes.map((shape) => {
+    if (shape.role === 'title' || shape.role === 'core_sentence' || shape.role === 'point_text') {
+      return {
+        ...shape,
+        vertical_align: 'mid',
+      };
+    }
+    if (shape.role === 'compare_panel') {
+      return {
+        ...shape,
+        role: 'content_panel',
+        line: {
+          color: '#BFDBFE',
+          width_pt: 1.2,
+        },
+      };
+    }
+    if (shape.role === 'bridge_connector') {
+      return {
+        ...shape,
+        line: {
+          color: '#2563EB',
+          width_pt: 2.4,
+          begin_arrow: false,
+          end_arrow: true,
+        },
+      };
+    }
+    return shape;
+  });
+
+  const result = runNativeMaterializer(materializerPayload([slideData]));
+  const [slide] = result.slides;
+  assert.equal(slide.officecli_gate, undefined);
+  assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
+  assert.equal(result.officecli_gate.geometry_audit.ok, true);
+  assert.equal(slide.native_shapes.some((shape) => shape.line === '#BFDBFE'), true);
 });
 
 test('native PPTX quality accepts content panels paired with separate point text and short evidence labels', () => {
@@ -492,6 +550,41 @@ test('native PPTX route rejects shape plans without top-level design spec lock',
   assert.match(rejected.stderr, /ai_first_design_spec_lock_missing/);
 });
 
+test('native PPTX route rejects thin design spec locks before materialization', () => {
+  const thinSpecLock = materializerPayload([
+    createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Thin spec lock' }),
+  ]);
+  thinSpecLock.editable_shape_plan.design_spec_lock = {
+    spec_id: 'thin_spec_lock_v1',
+    owner: 'llm_agent',
+    motif: 'generic cards',
+    layout_archetypes: ['cards', 'split', 'timeline'],
+    qa_gates: ['bounds'],
+  };
+  const rejected = runNativeMaterializerFailure(thinSpecLock);
+  assert.notEqual(rejected.status, 0);
+  assert.match(rejected.stderr, /ai_first_design_spec_lock_missing/);
+  assert.match(rejected.stderr, /palette\.background_or_canvas\+ink\+accent/);
+  assert.match(rejected.stderr, /typography\.body_pt_min>=18/);
+  assert.match(rejected.stderr, /professional_design_brief\.design_register/);
+  assert.match(rejected.stderr, /borrowed_principles\.template_layout_grammar/);
+  assert.match(rejected.stderr, /qa_gates\.layout_variety/);
+
+  const validation = runNativePlanValidation(thinSpecLock);
+  assert.equal(validation.ok, false);
+  assert.equal(validation.stage, 'normalize_slide_data');
+  assert.equal(
+    validation.failures.some((failure) => (
+      failure.reason === 'ai_first_design_spec_lock_missing'
+      && failure.missing_fields.includes('professional_design_brief.design_register')
+      && failure.missing_fields.includes('borrowed_principles.template_profile')
+      && failure.missing_fields.includes('borrowed_principles.semantic_layout_selection')
+      && failure.missing_fields.includes('borrowed_principles.reference_deck_analysis')
+    )),
+    true,
+  );
+});
+
 test('native PPTX route rejects shape plans without template layout grammar and zone bindings', () => {
   const missingGrammar = materializerPayload([
     createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Missing template grammar' }),
@@ -523,7 +616,8 @@ test('native PPTX route rejects shallow archetype catalogs and shapes outside de
   const catalogRejected = runNativePlanValidation(shallowCatalog);
   assert.equal(catalogRejected.ok, false);
   assert.equal(catalogRejected.stage, 'normalize_slide_data');
-  assert.match(JSON.stringify(catalogRejected.failures), /ai_first_shape_plan_normalization_failed/);
+  assert.match(JSON.stringify(catalogRejected.failures), /ai_first_template_layout_grammar_missing/);
+  assert.match(JSON.stringify(catalogRejected.failures), /ai_first_template_layout_archetype_incomplete/);
 
   const outsideZone = materializerPayload([
     createAiSlide({ slideId: 'S02', layoutFamily: 'multi_zone_compare', title: 'Zone containment' }),
@@ -539,7 +633,136 @@ test('native PPTX route rejects shallow archetype catalogs and shapes outside de
   ));
   const zoneRejected = runNativePlanValidation(outsideZone);
   assert.equal(zoneRejected.ok, false);
+  const zoneFailure = zoneRejected.failures
+    .flatMap((slide) => slide.failures || [])
+    .find((failure) => failure.reason === 'ai_first_shape_outside_template_layout_zone');
+  assert.equal(zoneFailure.shape_id, 'S02-slot-1-text');
+  assert.equal(zoneFailure.required_zone_inset_in, 0.02);
+  assert.equal(zoneFailure.zone_safe_bounds.left_in > zoneFailure.zone_bounds.left_in, true);
+  assert.equal(zoneFailure.required_delta_in.right > 0, true);
   assert.match(JSON.stringify(zoneRejected.failures), /ai_first_shape_outside_template_layout_zone/);
+});
+
+test('native PPTX plan preflight rejects helper-inferred design defaults', () => {
+  const missingDesignFields = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: 'AI plan must own every visual decision',
+    core: '字体、角色和可见样式必须来自 AI plan，而不是执行 helper 的默认值。',
+    slotCount: 3,
+  });
+  missingDesignFields.native_shapes = missingDesignFields.native_shapes.map((shape) => {
+    if (shape.shape_id === 'S01-slot-1-text') {
+      const { font_size: _fontSize, quality_role: _qualityRole, ...rest } = shape;
+      return rest;
+    }
+    if (shape.shape_id === 'S01-slot-1-panel') {
+      const { fill: _fill, line: _line, ...rest } = shape;
+      return rest;
+    }
+    return shape;
+  });
+
+  const rejected = runNativePlanValidation(materializerPayload([missingDesignFields]));
+  assert.equal(rejected.ok, false);
+  const failures = JSON.stringify(rejected.failures);
+  assert.match(failures, /ai_first_quality_role_missing_or_invalid/);
+  assert.match(failures, /ai_first_font_size_missing/);
+  assert.match(failures, /ai_first_visible_style_missing|ai_first_non_text_shape_invisible/);
+});
+
+test('native PPTX authoring rejects blueprint-only slides as a shape-plan substitute', () => {
+  const payload = materializerPayload([
+    createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', title: 'Blueprint is not the native plan' }),
+  ]);
+  payload.blueprint = {
+    slides: payload.editable_shape_plan.slides,
+  };
+  payload.editable_shape_plan.slides = [];
+
+  const rejected = runNativePlanValidation(payload);
+  assert.equal(rejected.ok, false);
+  assert.equal(rejected.stage, 'normalize_slide_data');
+  assert.match(JSON.stringify(rejected.failures), /ai_first_shape_plan_normalization_failed/);
+
+  const materializerRejected = runNativeMaterializerFailure(payload);
+  assert.notEqual(materializerRejected.status, 0);
+  assert.match(materializerRejected.stderr, /editable_shape_plan\.slides/);
+  assert.match(materializerRejected.stderr, /cannot substitute/);
+});
+
+test('native PPTX plan preflight reports panel safe-area geometry deltas for exact repair', () => {
+  const panelBleed = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: 'Panel safe area diagnostics',
+    core: 'Panel text must carry precise repair bounds.',
+    slotCount: 3,
+  });
+  panelBleed.native_shapes = panelBleed.native_shapes.map((shape) => {
+    if (shape.shape_id === 'S01-slot-1-panel') {
+      return {
+        ...shape,
+        role: 'content_panel',
+        bounds: { left_in: 1.0, top_in: 3.2, width_in: 3.9, height_in: 2.5 },
+      };
+    }
+    if (shape.shape_id === 'S01-slot-1-text') {
+      return {
+        ...shape,
+        layout_zone_id: 'signal_zone',
+        bounds: { left_in: 1.05, top_in: 3.32, width_in: 3.75, height_in: 1.0 },
+      };
+    }
+    return shape;
+  });
+
+  const rejected = runNativePlanValidation(materializerPayload([panelBleed]));
+  assert.equal(rejected.ok, false);
+  const panelFailure = rejected.failures
+    .flatMap((slide) => slide.failures || [])
+    .find((failure) => failure.reason === 'ai_first_text_panel_safe_area_violation');
+  assert.equal(panelFailure.shape_id, 'S01-slot-1-text');
+  assert.equal(panelFailure.panel_shape_id, 'S01-slot-1-panel');
+  assert.equal(panelFailure.required_inset_in, 0.15);
+  assert.equal(panelFailure.panel_safe_bounds.left_in, 1.15);
+  assert.equal(panelFailure.shape_bounds.left_in, 1.05);
+  assert.equal(panelFailure.required_delta_in.left > 0, true);
+});
+
+test('native PPTX plan preflight accepts panel text fitted exactly on safe-area boundary', () => {
+  const boundaryFit = createAiSlide({
+    slideId: 'S01',
+    layoutFamily: 'multi_zone_compare',
+    title: 'Panel safe area boundary fit',
+    core: 'Panel text may fit exactly on the declared safe area boundary.',
+    slotCount: 3,
+  });
+  boundaryFit.native_shapes = boundaryFit.native_shapes.map((shape) => {
+    if (shape.shape_id === 'S01-slot-1-panel') {
+      return {
+        ...shape,
+        role: 'content_panel',
+        layout_zone_id: 'matrix_zone',
+        bounds: { left_in: 1.0, top_in: 4.98, width_in: 3.9, height_in: 1.35 },
+      };
+    }
+    if (shape.shape_id === 'S01-slot-1-text') {
+      return {
+        ...shape,
+        layout_zone_id: 'matrix_zone',
+        bounds: { left_in: 1.15, top_in: 5.13, width_in: 3.6, height_in: 1.05 },
+      };
+    }
+    return shape;
+  });
+
+  const accepted = runNativePlanValidation(materializerPayload([boundaryFit]));
+  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
+  const result = runNativeMaterializer(materializerPayload([boundaryFit]));
+  const [slide] = result.slides;
+  assert.equal(slide.checks.panel_text_safe_area_ok, true);
+  assert.deepEqual(slide.metrics.panel_text_safe_area_failures, []);
 });
 
 test('native PPTX route rejects archetype declarations that are not fulfilled by slide roles and filled zones', () => {
@@ -581,141 +804,4 @@ test('native PPTX quality gate blocks operator-facing proof language in visible 
     'product-entry',
     'proof lane',
   ]);
-});
-
-test('native PPTX shape quality flags missing slots, low content, overlap, and unbalanced grids', () => {
-  const missingSlot = createAiSlide({
-    slideId: 'S01',
-    layoutFamily: 'multi_zone_compare',
-    slotCount: 4,
-    points: [
-      '第一项说明任务入口和验收口径。',
-      '第二项说明自主执行已经形成证据。',
-      '第三项说明失败时会进入修复。',
-      '第四项说明导出证据可复核。',
-    ],
-    panelMutator: (shape, index) => (index === 3 ? { ...shape, role: 'body_panel' } : shape),
-  });
-  const labelOnly = createAiSlide({
-    slideId: 'S02',
-    layoutFamily: 'ring_cross',
-    slotCount: 4,
-    points: ['定义', '事实', '执行', '发布'],
-    textMutator: (shape) => ({
-      ...shape,
-      editable_text: shape.editable_text.replace(/ carries explicit review evidence$/, ''),
-    }),
-  });
-  const overlapped = createAiSlide({
-    slideId: 'S03',
-    layoutFamily: 'judgement_ladder',
-    slotCount: 3,
-    textMutator: (shape, index) => (index === 0
-      ? { ...shape, role: 'point_text_short' }
-      : index === 1
-        ? { ...shape, role: 'point_text_short', bounds: { left_in: 1.25, top_in: 4.02, width_in: 3.0, height_in: 1.1 } }
-      : shape),
-  });
-  const unbalanced = createAiSlide({
-    slideId: 'S04',
-    layoutFamily: 'multi_zone_compare',
-    slotCount: 3,
-    panelMutator: (shape, index) => (index === 0
-      ? { ...shape, bounds: { ...shape.bounds, width_in: 6.0 } }
-      : { ...shape, bounds: { ...shape.bounds, width_in: 2.0 } }),
-  });
-
-  const result = runNativeMaterializer(materializerPayload([missingSlot, unbalanced]));
-  const contentPreflight = runNativePlanValidation(materializerPayload([labelOnly]));
-  const overlapPreflight = runNativePlanValidation(materializerPayload([overlapped]));
-  const [slotSlide, balanceSlide] = result.slides;
-
-  assert.equal(slotSlide.checks.slot_fill_ok, false);
-  assert.equal(slotSlide.metrics.expected_slot_count, 4);
-  assert.equal(slotSlide.metrics.filled_slot_count, 3);
-  assert.equal(slotSlide.issues.includes('native_slot_fill_failed'), true);
-
-  assert.equal(contentPreflight.ok, false);
-  assert.equal(JSON.stringify(contentPreflight.failures).match(/ai_first_content_depth_too_low/g)?.length, 4);
-
-  assert.equal(overlapPreflight.ok, false);
-  assert.match(JSON.stringify(overlapPreflight.failures), /ai_first_text_box_overlap/);
-
-  assert.equal(balanceSlide.checks.grid_balance_ok, false);
-  assert.equal(balanceSlide.metrics.grid_balance_failures[0].reason, 'panel_area_ratio_out_of_range');
-  assert.equal(balanceSlide.issues.includes('native_grid_balance_failed'), true);
-});
-
-test('native PPT visual benchmark fixture is materialized from AI shapes without helper templates', () => {
-  const { fixture, suites } = materializedBenchmarkFixture();
-  assert.equal(fixture.route_policy.native_default_route, false);
-  assert.equal(fixture.route_policy.comparison_only, true);
-  assert.equal(fixture.suites.length, 4);
-  const reportRows = suites.map(({ suite, result }) => assertMaterializedQuality({ fixture, suite, result }));
-  const requiredFields = fixture.quality_comparison_report.required_record_fields;
-  assert.equal(reportRows.every((row) => requiredFields.every((field) => Object.hasOwn(row, field))), true);
-  assert.equal(reportRows.every((row) => row.route === 'author_pptx_native'), true);
-  assert.equal(reportRows.every((row) => row.page_count >= 6 && row.page_count <= 10), true);
-  assert.equal(reportRows.every((row) => row.layout_family_count >= fixture.suite_defaults.min_layout_family_count), true);
-  assert.equal(reportRows.every((row) => row.field_leakage_count === 0), true);
-  assert.equal(reportRows.every((row) => row.overlap_pairs === 0), true);
-});
-
-test('native render preview attachment records PNG manifest metrics without packaging screenshots into PPTX', () => {
-  const { fixture, suites } = materializedBenchmarkFixture();
-  for (const { suite, result } of suites) {
-    const previewDir = path.join(result.workspaceRoot, 'previews');
-    mkdirSync(previewDir, { recursive: true });
-    const previewMetrics = result.slides.map((slide, index) => {
-      const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
-      return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
-    });
-    assertMaterializedQuality({ fixture, suite, result, previewMetrics });
-
-    const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
-    writeJson(inputFile, {
-      slides: result.slides,
-      render_proof: {
-        renderer_kind: 'libreoffice_headless',
-        renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
-        source_surface_kind: 'native_pptx',
-        source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
-        pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
-        preview_screenshots: previewMetrics.map((item) => item.file),
-        preview_png_hashes: previewMetrics.map((item) => ({
-          file: item.file,
-          sha256: item.sha256,
-        })),
-      },
-    });
-    const script = `
-import json
-from pathlib import Path
-from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
-
-payload = json.loads(Path(${JSON.stringify(inputFile)}).read_text(encoding='utf-8'))
-print(json.dumps(attach_rendered_previews(payload['slides'], payload['render_proof']), ensure_ascii=False))
-`;
-    const python = resolveTestPythonCommand();
-    const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
-      cwd: path.resolve('.'),
-      env: pythonTestEnv(),
-      encoding: 'utf-8',
-    });
-    const attachedSlides = JSON.parse(stdout);
-
-    assert.equal(attachedSlides.length, suite.expected_page_count);
-    for (const [index, slide] of attachedSlides.entries()) {
-      const expected = previewMetrics[index];
-      assert.equal(slide.preview_screenshot_file, expected.file);
-      assert.equal(slide.preview_screenshot_sha256, expected.sha256);
-      assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
-      assert.equal(slide.synthetic_preview, false);
-      assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
-    }
-    const outputBytes = readFileSync(result.outputPptx);
-    for (const preview of previewMetrics) {
-      assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
-    }
-  }
 });

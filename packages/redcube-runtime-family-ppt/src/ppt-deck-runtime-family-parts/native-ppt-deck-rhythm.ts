@@ -30,7 +30,7 @@ export function requireNativeDeckLayoutRhythmPlan({
       || !safeText(slide?.composition_signature_budget)
       || !safeText(slide?.proof_object));
   if (missingDeckLayoutRhythmPlan) {
-    throw new Error(`Native PPT ${route} requires editable_shape_plan.deck_layout_rhythm_plan with llm_agent owner and one rhythm row per slide before shape coordinates`);
+    throw new Error(`Native PPT ${route} requires editable_shape_plan.deck_layout_rhythm_plan.slides[] with llm_agent owner and one rhythm row per slide before shape coordinates; do not use per_slide`);
   }
   return deckLayoutRhythmPlan;
 }

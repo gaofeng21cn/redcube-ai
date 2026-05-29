@@ -48,6 +48,7 @@ export interface DomainEntryRequest extends Record<string, unknown> {
     stop_after_stage?: string;
     mode?: string;
     baseline_deliverable_id?: string;
+    constraints?: Record<string, unknown>;
   };
 }
 
@@ -90,6 +91,7 @@ export interface ProductEntryRequest extends Record<string, unknown> {
     stop_after_stage?: string;
     mode?: string;
     baseline_deliverable_id?: string;
+    constraints?: Record<string, unknown>;
   };
 }
 

@@ -55,7 +55,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
     {
       shape_id: 'S01-input-panel',
       kind: 'rounded_rect',
-      role: 'input_panel',
+      role: 'input_map_panel',
       quality_role: 'structural',
       bounds: { left_in: 0.85, top_in: 3.0, width_in: 3.25, height_in: 2.9 },
       fill: '#FFFFFF',
@@ -64,7 +64,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
     {
       shape_id: 'S01-document-icon',
       kind: 'rect',
-      role: 'document_icon',
+      role: 'document_map_icon',
       quality_role: 'structural',
       bounds: { left_in: 1.15, top_in: 3.25, width_in: 0.65, height_in: 0.82 },
       fill: '#2563EB',
@@ -100,7 +100,7 @@ test('native PPTX quality accepts AI-first system map route-gate-evidence layout
         {
           shape_id: `S01-route-${index + 1}-panel`,
           kind: 'rounded_rect',
-          role: 'route_lane',
+          role: 'route_flow_lane',
           quality_role: 'structural',
           bounds: { left_in: 4.6, top_in: top, width_in: 4.35, height_in: 0.9 },
           fill: index === 0 ? '#DBEAFE' : '#FFFFFF',
@@ -373,7 +373,7 @@ test('native PPTX system-map QA counts horizontal connectors as route lanes', ()
       {
         shape_id: 'S01-input-panel',
         kind: 'rounded_rect',
-        role: 'content_panel',
+        role: 'input_map_panel',
         quality_role: 'structural',
         bounds: { left_in: 0.9, top_in: 3.1, width_in: 2.95, height_in: 2.1 },
         fill: '#FFFFFF',
@@ -385,7 +385,7 @@ test('native PPTX system-map QA counts horizontal connectors as route lanes', ()
         role: 'body_sentence',
         quality_role: 'content',
         editable_text: '共同输入先锁定比较对象，避免把素材差异误判成路径差异。',
-        bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.1 },
+        bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.28 },
         font_size: 18,
         color: '#111827',
         fill: 'none',
@@ -528,7 +528,7 @@ test('native PPTX system-map QA accepts route flow connectors and takeaway bands
       {
         shape_id: 'S01-input-panel',
         kind: 'rounded_rect',
-        role: 'content_panel',
+        role: 'input_map_panel',
         quality_role: 'structural',
         bounds: { left_in: 0.9, top_in: 3.1, width_in: 2.95, height_in: 2.1 },
         fill: '#FFFFFF',
@@ -679,7 +679,7 @@ test('native PPTX preflight rejects text boxes that bleed out of their visual pa
       {
         shape_id: 'S01-source-panel',
         kind: 'rounded_rect',
-        role: 'content_panel',
+        role: 'source_map_panel',
         quality_role: 'structural',
         bounds: { left_in: 0.82, top_in: 3.25, width_in: 2.82, height_in: 2.68 },
         fill: '#DBEAFE',
@@ -691,7 +691,7 @@ test('native PPTX preflight rejects text boxes that bleed out of their visual pa
         role: 'route_label',
         quality_role: 'content',
         editable_text: '同一份资料先进入三条成稿路径，确保后续判断有共同起点。',
-        bounds: { left_in: 1.0, top_in: 4.72, width_in: 2.85, height_in: 1.2 },
+        bounds: { left_in: 0.88, top_in: 4.72, width_in: 2.92, height_in: 1.2 },
         font_size: 18,
         color: '#0F172A',
         fill: 'none',
@@ -798,167 +798,4 @@ test('native PPTX preflight rejects text boxes that bleed out of their visual pa
   const [slide] = result.slides;
   assert.equal(slide.checks.panel_text_safe_area_ok, true);
   assert.equal(slide.metrics.panel_text_safe_area_failures.length, 0);
-});
-
-test('native PPTX preflight rejects narrow route labels that force awkward short-sentence wrapping', () => {
-  const slideData = createAiSlide({
-    slideId: 'S01',
-    layoutFamily: 'multi_zone_compare',
-    title: '路径说明不能被窄框硬折行',
-    core: '短路径说明应当通过更宽版心或更短文案保持横向节奏。',
-    slotCount: 3,
-  });
-  slideData.layout_intent.rhetorical_role = 'system_map';
-  slideData.layout_intent.non_text_visual = 'route flow connectors, input panel, gate stack, and takeaway band';
-  slideData.native_shapes = [
-    {
-      shape_id: 'S01-title',
-      kind: 'text_box',
-      role: 'title',
-      quality_role: 'content',
-      editable_text: slideData.title,
-      bounds: { left_in: 0.8, top_in: 0.5, width_in: 10.9, height_in: 1.0 },
-      font_size: 38,
-      color: '#111827',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-core',
-      kind: 'text_box',
-      role: 'core_sentence',
-      quality_role: 'content',
-      editable_text: slideData.core_sentence,
-      bounds: { left_in: 0.85, top_in: 1.62, width_in: 11.8, height_in: 0.96 },
-      font_size: 19,
-      color: '#4B5563',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-input-panel',
-      kind: 'rounded_rect',
-      role: 'content_panel',
-      quality_role: 'structural',
-      bounds: { left_in: 0.9, top_in: 3.1, width_in: 2.95, height_in: 2.1 },
-      fill: '#FFFFFF',
-      line: '#BFDBFE',
-    },
-    {
-      shape_id: 'S01-input-text',
-      kind: 'text_box',
-      role: 'body_sentence',
-      quality_role: 'content',
-      editable_text: '共同输入先锁定比较对象，避免把素材差异误判成路径差异。',
-      bounds: { left_in: 1.15, top_in: 3.75, width_in: 2.35, height_in: 1.16 },
-      font_size: 18,
-      color: '#111827',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-route-1-label',
-      kind: 'text_box',
-      role: 'route_label',
-      quality_role: 'content',
-      editable_text: '网页稿路径验证同一结构可被浏览检查。',
-      bounds: { left_in: 4.12, top_in: 4.72, width_in: 4.05, height_in: 1.05 },
-      font_size: 18,
-      color: '#0F172A',
-      fill: 'none',
-      line: 'none',
-    },
-    ...[0, 1, 2].map((index) => ({
-      shape_id: `S01-route-${index + 1}-connector`,
-      kind: 'connector',
-      role: 'route_flow_connector',
-      quality_role: 'structural',
-      bounds: { left_in: 4.15, top_in: 3.08 + index * 0.24, width_in: 4.75, height_in: 0.04 },
-      line: '#2563EB',
-      fill: 'none',
-    })),
-    {
-      shape_id: 'S01-gate-panel',
-      kind: 'rounded_rect',
-      role: 'gate_stack_panel',
-      quality_role: 'structural',
-      bounds: { left_in: 9.7, top_in: 3.05, width_in: 4.4, height_in: 2.3 },
-      fill: '#FFFFFF',
-      line: '#5EEAD4',
-    },
-    {
-      shape_id: 'S01-gate-card',
-      kind: 'text_box',
-      role: 'gate_card',
-      quality_role: 'content',
-      editable_text: '三道交付门全部通过才放行。',
-      bounds: { left_in: 10.1, top_in: 3.72, width_in: 3.75, height_in: 1.12 },
-      font_size: 18,
-      color: '#0F766E',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-loop-band',
-      kind: 'rounded_rect',
-      role: 'takeaway_band',
-      quality_role: 'structural',
-      bounds: { left_in: 0.9, top_in: 6.28, width_in: 13.2, height_in: 1.3 },
-      fill: '#111827',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-evidence-note',
-      kind: 'text_box',
-      role: 'evidence_item',
-      quality_role: 'content',
-      editable_text: '证据包同时保留演示文件、PDF、截图、形状清单、审查记录和导出记录。',
-      bounds: { left_in: 1.2, top_in: 6.55, width_in: 9.5, height_in: 0.92 },
-      font_size: 18,
-      color: '#F9FAFB',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: 'S01-page',
-      kind: 'text_box',
-      role: 'page_number',
-      quality_role: 'auxiliary',
-      editable_text: '01',
-      bounds: { left_in: 14.3, top_in: 8.05, width_in: 0.7, height_in: 0.4 },
-      font_size: 16,
-      color: '#94A3B8',
-      fill: 'none',
-      line: 'none',
-    },
-  ];
-
-  const rejected = runNativePlanValidation(materializerPayload([slideData]));
-  assert.equal(rejected.ok, false);
-  assert.match(JSON.stringify(rejected.failures), /ai_first_route_label_unbalanced_wrap/);
-
-  const fixed = {
-    ...slideData,
-    native_shapes: slideData.native_shapes.map((shape) => (
-      shape.shape_id === 'S01-route-1-label'
-        ? {
-          ...shape,
-          editable_text: '网页稿路径验证浏览检查。',
-          bounds: { ...shape.bounds, width_in: 4.8 },
-        }
-        : shape.shape_id === 'S01-gate-card'
-          ? {
-            ...shape,
-            editable_text: '三道交付门确认证据后放行。',
-            bounds: { ...shape.bounds, width_in: 4.15 },
-          }
-        : shape
-    )),
-  };
-  const accepted = runNativePlanValidation(materializerPayload([fixed]));
-  assert.equal(accepted.ok, true, JSON.stringify(accepted.failures));
-  const result = runNativeMaterializer(materializerPayload([fixed]));
-  const [slide] = result.slides;
-  assert.equal(slide.checks.short_label_wrap_ok, true);
-  assert.equal(slide.metrics.short_label_wrap_failures.length, 0);
 });

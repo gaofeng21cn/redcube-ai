@@ -384,6 +384,8 @@ test('CLI product invoke and domain-handler dispatch keep RCA as handler target 
         '先给我主线故事',
         '--stop-after-stage',
         'storyline',
+        '--native-sample-slide-count',
+        '1',
       ],
       {
         cwd: installRoot,
@@ -403,6 +405,14 @@ test('CLI product invoke and domain-handler dispatch keep RCA as handler target 
     assert.equal(directParsed.summary.latest_handle, directParsed.summary.target_handle);
     assert.equal(directParsed.summary.approval_required, directParsed.runtime_loop_closure.control_policy.approval_required);
     assert.equal(directParsed.summary.gate_status, directParsed.runtime_loop_closure.control_policy.gate_status);
+    const hydratedContract = JSON.parse(
+      readFileSync(
+        path.join(workspaceRoot, 'topics/topic-a/deliverables/deck-a/contracts/hydrated-deliverable.json'),
+        'utf-8',
+      ),
+    );
+    assert.equal(hydratedContract.delivery_request.constraints.native_visual_sample, true);
+    assert.equal(hydratedContract.delivery_request.constraints.expected_slide_count, 1);
 
     const domainHandlerTaskFile = path.join(runtimeStateRoot, 'opl-hosted-domain-handler-task.json');
     writeFileSync(
@@ -484,6 +494,8 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
     'topic-a',
     '--deliverable-id',
     'deck-a',
+    '--native-sample-slide-count',
+    '1',
   ], {
     domainActions: {
       runNativePptProductEntryProof: async (request) => ({
@@ -501,6 +513,8 @@ test('CLI native-ppt proof proxies the controlled product-entry helper surface',
   assert.equal(proof.request.topic_id, 'topic-a');
   assert.equal(proof.request.deliverable_id, 'deck-a');
   assert.equal(proof.request.route, 'author_pptx_native');
+  assert.equal(proof.request.constraints.native_visual_sample, true);
+  assert.equal(proof.request.constraints.expected_slide_count, 1);
 });
 
 test('CLI domain-handler export and dispatch proxy guarded RCA-owned actions without legacy product alias', async () => {

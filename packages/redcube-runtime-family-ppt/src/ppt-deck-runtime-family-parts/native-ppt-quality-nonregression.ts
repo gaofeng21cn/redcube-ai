@@ -15,6 +15,17 @@ const REQUIRED_NATIVE_VISUAL_SAMPLE_CHECKS = Object.freeze([
 
 const QUALITY_NONREGRESSION_CONTRACT_REF = 'contracts/runtime-program/ppt-native-pptx-quality-nonregression.json';
 
+const ADOPTED_NATIVE_PPT_DESIGN_DISCIPLINES = Object.freeze([
+  'spec_lock',
+  'template_layout_grammar',
+  'template_profile',
+  'semantic_layout_selection',
+  'reference_deck_analysis',
+  'per_page_visual_plan',
+  'svg_qa_before_export',
+  'rendered_quality_gate',
+]);
+
 const REQUIRED_NATIVE_QUALITY_METRIC_REFS = Object.freeze([
   'shape_manifest#/slides/*/metrics/bounds',
   'shape_manifest#/slides/*/metrics/text_char_count',
@@ -139,13 +150,17 @@ export function buildNativePptQualityNonregressionReadModel({
       creative_owner: 'llm_agent',
       python_helper_role: 'execute_validate_export_only',
       design_spec_lock_required: true,
+      reference_design_profile_required: true,
       template_layout_grammar_required: true,
+      semantic_layout_selection_required: true,
+      placeholder_capacity_required: true,
       per_slide_layout_binding_required: true,
       materializer_executes_selected_archetype_zones_only: true,
       per_page_visual_plan_required: true,
-      ppt_master_style_discipline_adopted: ['spec_lock', 'template_layout_grammar', 'per_page_visual_plan', 'svg_qa_before_export', 'rendered_quality_gate'],
+      ppt_master_style_discipline_adopted: [...ADOPTED_NATIVE_PPT_DESIGN_DISCIPLINES],
       layout_intent_required: true,
       composition_signature_required: true,
+      action_title_required: true,
       title_underline_motif_allowed: false,
       concrete_layout_variant_repetition_limit: 2,
       helper_can_replace_ai_creative_owner: false,

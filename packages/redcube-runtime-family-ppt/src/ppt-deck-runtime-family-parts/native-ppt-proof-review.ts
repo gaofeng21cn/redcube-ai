@@ -211,6 +211,7 @@ export function createNativePptProofReviewParts({
           non_text_visual_specific_ok: booleanCheck(manifestSlide, 'non_text_visual_specific_ok', missingQuality),
           mechanical_card_template_absent: booleanCheck(manifestSlide, 'mechanical_card_template_absent', missingQuality),
           panel_text_safe_area_ok: booleanCheck(manifestSlide, 'panel_text_safe_area_ok', missingQuality),
+          text_card_internal_padding_ok: booleanCheck(manifestSlide, 'text_card_internal_padding_ok', missingQuality),
           short_label_wrap_ok: booleanCheck(manifestSlide, 'short_label_wrap_ok', missingQuality),
         },
         metrics: {
@@ -264,6 +265,8 @@ export function createNativePptProofReviewParts({
           mechanical_card_template_detected: manifestSlide?.metrics?.mechanical_card_template_detected === true,
           panel_text_safe_area_ok: manifestSlide?.metrics?.panel_text_safe_area_ok === true,
           panel_text_safe_area_failures: safeArray(manifestSlide?.metrics?.panel_text_safe_area_failures),
+          text_card_internal_padding_ok: manifestSlide?.metrics?.text_card_internal_padding_ok === true,
+          text_card_internal_padding_failures: safeArray(manifestSlide?.metrics?.text_card_internal_padding_failures),
           short_label_wrap_ok: manifestSlide?.metrics?.short_label_wrap_ok === true,
           short_label_wrap_failures: safeArray(manifestSlide?.metrics?.short_label_wrap_failures),
           structural_visual_count: finiteNumberOrNull(manifestSlide?.metrics?.structural_visual_count),

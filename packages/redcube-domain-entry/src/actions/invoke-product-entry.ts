@@ -1,11 +1,17 @@
 // @ts-nocheck
-import { existsSync } from 'node:fs';
+import path from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   buildDeliveryIdentitySurface,
   buildEntrySessionSurface,
   buildProductEntryContinuationSnapshot,
 } from 'opl-framework-shared/product-entry-companions';
+import {
+  buildGovernanceSurfaceContract,
+  hydrateDeliverableContract,
+} from '@redcube/overlay-core';
+import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
   getPublicationProjection,
   getReviewState,
@@ -34,10 +40,46 @@ const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const SUPPORTED_TASK_INTENTS = new Set(['run_opl_stage_execution_plan', 'run_deliverable_route']);
+const overlayRegistry = getDefaultOverlayRegistry();
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
+}
+
+function isPlainObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value);
+}
+
+function mergeJsonObject(base = {}, override = {}) {
+  const merged = { ...(isPlainObject(base) ? base : {}) };
+  for (const [key, value] of Object.entries(isPlainObject(override) ? override : {})) {
+    if (isPlainObject(value) && isPlainObject(merged[key])) {
+      merged[key] = mergeJsonObject(merged[key], value);
+      continue;
+    }
+    merged[key] = value;
+  }
+  return merged;
+}
+
+function stableJson(value) {
+  if (Array.isArray(value)) {
+    return `[${value.map((item) => stableJson(item)).join(',')}]`;
+  }
+  if (isPlainObject(value)) {
+    return `{${Object.keys(value).sort().map((key) => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
+  }
+  return JSON.stringify(value);
+}
+
+function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function writeJson(file, value) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }
 
 function requireField(name, value) {
@@ -173,6 +215,73 @@ function stageIdsFromDeliverableRecord(deliverableRecord) {
   return stages.map((stage) => safeText(stage?.stage_id)).filter(Boolean);
 }
 
+function requestedConstraints(delivery) {
+  return isPlainObject(delivery?.constraints) ? delivery.constraints : {};
+}
+
+function constraintsHaveValues(delivery) {
+  return Object.keys(requestedConstraints(delivery)).length > 0;
+}
+
+function surfaceBundleFiles({ overlayDefinition, deliverablePaths, contract }) {
+  const surfaceFiles = [];
+  for (const artifact of overlayDefinition.buildSurfaceBundle({ contract })) {
+    const targetFile = path.join(deliverablePaths.deliverableDir, artifact.relativePath);
+    writeJson(targetFile, artifact.content);
+    surfaceFiles.push(targetFile);
+  }
+  return surfaceFiles;
+}
+
+function rehydrateDeliverableContractWithConstraints({
+  workspaceRoot,
+  deliverableFamily,
+  topicId,
+  deliverableId,
+  delivery,
+}) {
+  if (!constraintsHaveValues(delivery)) return null;
+
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const deliverable = readJson(deliverablePaths.deliverableFile);
+  const contractRef = safeText(deliverable.hydrated_contract_ref, 'contracts/hydrated-deliverable.json');
+  const contractFile = path.join(deliverablePaths.deliverableDir, contractRef);
+  const existingContract = readJson(contractFile);
+  const currentConstraints = isPlainObject(existingContract?.delivery_request?.constraints)
+    ? existingContract.delivery_request.constraints
+    : {};
+  const mergedConstraints = mergeJsonObject(currentConstraints, requestedConstraints(delivery));
+  if (stableJson(currentConstraints) === stableJson(mergedConstraints)) {
+    return null;
+  }
+
+  const overlayDefinition = overlayRegistry.getOverlay(deliverableFamily);
+  if (typeof overlayDefinition.buildSurfaceBundle !== 'function') {
+    throw new Error(`Overlay ${deliverableFamily} cannot hydrate deliverable surfaces`);
+  }
+  const hydratedContract = hydrateDeliverableContract(overlayRegistry, {
+    overlay: deliverableFamily,
+    profileId: safeText(deliverable.profile_id || existingContract.profile_id),
+    topicId,
+    deliverableId,
+    title: safeText(deliverable.title || existingContract.title),
+    goal: safeText(deliverable.goal || existingContract.goal),
+    constraints: mergedConstraints,
+  });
+  const surfaceFiles = surfaceBundleFiles({
+    overlayDefinition,
+    deliverablePaths,
+    contract: hydratedContract,
+  });
+
+  return {
+    hydratedContract,
+    governance_surface: buildGovernanceSurfaceContract(hydratedContract),
+    surfaceFiles,
+    mergedConstraints,
+  };
+}
+
 function assertRequestedStagesAllowed({ deliverableRecord, delivery }) {
   const allowedStages = stageIdsFromDeliverableRecord(deliverableRecord);
   if (allowedStages.length === 0) return;
@@ -300,6 +409,16 @@ async function ensureDeliverableForProductEntry({
     });
     createdDeliverable = true;
   }
+
+  const rehydrated = !createdDeliverable
+    ? rehydrateDeliverableContractWithConstraints({
+      workspaceRoot,
+      deliverableFamily,
+      topicId,
+      deliverableId,
+      delivery,
+    })
+    : null;
 
   const deliverableRecord = await getDeliverable({
     workspaceRoot,

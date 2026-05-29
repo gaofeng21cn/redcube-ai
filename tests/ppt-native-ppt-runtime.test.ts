@@ -41,12 +41,26 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       editable_shape_plan_required: true,
       editable_shape_manifest_required: true,
       design_spec_lock_required: true,
+      reference_design_profile_required: true,
       template_layout_grammar_required: true,
+      semantic_layout_selection_required: true,
+      placeholder_capacity_required: true,
       per_slide_layout_binding_required: true,
       shape_quality_role_required: true,
       layout_intent_required: true,
       composition_signature_required: true,
+      action_title_required: true,
       structural_visual_required: true,
+      adopted_design_disciplines: [
+        'spec_lock',
+        'template_layout_grammar',
+        'template_profile',
+        'semantic_layout_selection',
+        'reference_deck_analysis',
+        'per_page_visual_plan',
+        'svg_qa_before_export',
+        'rendered_quality_gate',
+      ],
       title_underline_motif_allowed: false,
       concrete_layout_variant_repetition_limit: 2,
       python_helper_role: 'execute_validate_export_only',
@@ -196,10 +210,12 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(nativeMechanicalSlide.checks.non_text_visual_specific_ok, true);
     assert.equal(nativeMechanicalSlide.checks.mechanical_card_template_absent, true);
     assert.equal(nativeMechanicalSlide.checks.panel_text_safe_area_ok, true);
+    assert.equal(nativeMechanicalSlide.checks.text_card_internal_padding_ok, true);
     assert.equal(nativeMechanicalSlide.checks.short_label_wrap_ok, true);
     assert.equal(nativeMechanicalSlide.metrics.structural_visual_count >= 1, true);
     assert.equal(nativeMechanicalSlide.metrics.mechanical_card_template_absent, true);
     assert.equal(nativeMechanicalSlide.metrics.panel_text_safe_area_ok, true);
+    assert.equal(nativeMechanicalSlide.metrics.text_card_internal_padding_ok, true);
     assert.equal(nativeMechanicalSlide.metrics.short_label_wrap_ok, true);
     assert.equal(Array.isArray(nativeMechanicalSlide.metrics.operator_language_fragments), true);
     assert.equal(nativeMechanicalSlide.metrics.title_safe_zone_clearance_ok, true);
@@ -921,21 +937,33 @@ test('native PPT proof lane records the Python engine contract as the single own
     creative_owner: 'llm_agent',
     helper_role: 'execute_validate_export_only',
     template_substitution_allowed: false,
+    helper_visual_default_inference_allowed: false,
+    explicit_shape_quality_role_required: true,
+    explicit_text_font_size_required: true,
+    explicit_non_text_visible_style_required: true,
+    blueprint_slide_substitution_allowed: false,
     editable_shape_plan_required: true,
     editable_shape_manifest_required: true,
     design_spec_lock_required: true,
+    reference_design_profile_required: true,
+    semantic_layout_selection_required: true,
+    placeholder_capacity_required: true,
     template_layout_grammar_required: true,
     per_slide_layout_binding_required: true,
     per_page_visual_plan_required: true,
     ppt_master_style_discipline_adopted: [
       'spec_lock',
       'template_layout_grammar',
+      'template_profile',
+      'semantic_layout_selection',
+      'reference_deck_analysis',
       'per_page_visual_plan',
       'svg_qa_before_export',
       'rendered_quality_gate',
     ],
     layout_intent_required: true,
     composition_signature_required: true,
+    action_title_required: true,
     title_underline_motif_allowed: false,
     concrete_layout_variant_repetition_limit: 2,
   });

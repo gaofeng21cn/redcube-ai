@@ -3,6 +3,49 @@ import { nativeDeckLayoutRhythmFailures, requireNativeDeckLayoutRhythmPlan } fro
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
 
+const NATIVE_PPT_SAMPLE_ARCHETYPES = new Set([
+  'sample_status_proof_board',
+  'sample_decision_proof_split',
+]);
+
+const REQUIRED_TEMPLATE_REFERENCE_DISCIPLINE_FLAGS = [
+  'template_profile_required',
+  'semantic_layout_selection_required',
+  'placeholder_capacity_required',
+  'reference_deck_analysis_required',
+  'action_title_required',
+];
+
+const REQUIRED_TEMPLATE_REFERENCE_SOURCE_PROJECTS = [
+  'ppt-master',
+  'agent-slides',
+  'PPTAgent',
+  'pptx-from-layouts-skill',
+  'officecli-pptx',
+];
+
+const REQUIRED_DESIGN_SPEC_DISCIPLINE = [
+  'ppt_master_style_spec_lock',
+  'template_layout_grammar',
+  'template_profile',
+  'semantic_layout_selection',
+  'reference_deck_analysis',
+  'per_page_visual_plan',
+  'layout_rhythm',
+  'rendered_quality_gate',
+];
+
+const REQUIRED_DESIGN_SPEC_QA_GATES = [
+  'bounds',
+  'font_floor',
+  'text_fit',
+  'structural_visual',
+  'layout_variety',
+];
+
+const CANONICAL_BOUNDS_KEYS = ['left_in', 'top_in', 'width_in', 'height_in'];
+const FORBIDDEN_BOUNDS_KEYS = ['x', 'y', 'w', 'h', 'left', 'top', 'right', 'bottom', 'width', 'height'];
+
 interface NativePptShapePlanNormalizeDeps {
   safeArray(value: unknown): JsonRecord[];
   safeText(value: unknown, fallback?: string): string;
@@ -12,6 +55,50 @@ export function createNativePptShapePlanNormalizeParts({
   safeArray,
   safeText,
 }: NativePptShapePlanNormalizeDeps) {
+  function missingDesignSpecLockFields(designSpecLock: JsonRecord, minimumLayoutArchetypes = 3): string[] {
+    const missing: string[] = [];
+    const palette = designSpecLock?.palette && typeof designSpecLock.palette === 'object' ? designSpecLock.palette : {};
+    const typography = designSpecLock?.typography && typeof designSpecLock.typography === 'object'
+      ? designSpecLock.typography
+      : {};
+    const grid = designSpecLock?.grid && typeof designSpecLock.grid === 'object' ? designSpecLock.grid : {};
+    const layoutRhythm = designSpecLock?.layout_rhythm && typeof designSpecLock.layout_rhythm === 'object'
+      ? designSpecLock.layout_rhythm
+      : {};
+    const borrowedPrinciples = safeArray(designSpecLock?.borrowed_principles).map((item) => safeText(item)).filter(Boolean);
+    const qaGates = safeArray(designSpecLock?.qa_gates).map((item) => safeText(item)).filter(Boolean);
+    if (!safeText(designSpecLock?.spec_id)) missing.push('spec_id');
+    if (safeText(designSpecLock?.owner) !== 'llm_agent') missing.push('owner=llm_agent');
+    if (!safeText(designSpecLock?.motif)) missing.push('motif');
+    if (!Array.isArray(designSpecLock?.layout_archetypes) || designSpecLock.layout_archetypes.length < minimumLayoutArchetypes) {
+      missing.push(`layout_archetypes>=${minimumLayoutArchetypes}`);
+    }
+    if (!safeText(palette?.background || palette?.canvas) || !safeText(palette?.ink) || !safeText(palette?.accent)) {
+      missing.push('palette.background_or_canvas+ink+accent');
+    }
+    if (Number(typography?.title_pt_min || typography?.title_min_pt || 0) < 34) {
+      missing.push('typography.title_pt_min>=34');
+    }
+    if (Number(typography?.body_pt_min || typography?.body_min_pt || 0) < 18) {
+      missing.push('typography.body_pt_min>=18');
+    }
+    if (Number(grid?.edge_margin_in_min || 0) < 0.6) missing.push('grid.edge_margin_in_min>=0.6');
+    if (Number(grid?.inter_block_gap_in_min || 0) < 0.32) missing.push('grid.inter_block_gap_in_min>=0.32');
+    if (Number(layoutRhythm?.repeated_concrete_composition_limit || 0) < 1) {
+      missing.push('layout_rhythm.repeated_concrete_composition_limit');
+    }
+    if (Number(layoutRhythm?.required_distinct_composition_share || 0) < 0.75) {
+      missing.push('layout_rhythm.required_distinct_composition_share>=0.75');
+    }
+    for (const principle of REQUIRED_DESIGN_SPEC_DISCIPLINE) {
+      if (!borrowedPrinciples.includes(principle)) missing.push(`borrowed_principles.${principle}`);
+    }
+    for (const gate of REQUIRED_DESIGN_SPEC_QA_GATES) {
+      if (!qaGates.includes(gate)) missing.push(`qa_gates.${gate}`);
+    }
+    return missing;
+  }
+
   function structuralFeedbackFromPlanError({
     route,
     error,
@@ -26,16 +113,156 @@ export function createNativePptShapePlanNormalizeParts({
     previousValidationFeedback?: JsonRecord | null;
   }): JsonRecord | null {
     const message = error instanceof Error ? error.message : String(error);
-    if (/requires editable_shape_plan\.template_layout_grammar/i.test(message)) {
+    const designSpecLockMarker = 'requires editable_shape_plan.design_spec_lock with AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, and QA gates before shape coordinates: ';
+    const designSpecLockMarkerIndex = message.indexOf(designSpecLockMarker);
+    if (designSpecLockMarkerIndex >= 0) {
+      let missingDesignSpecFields: string[] = [];
+      try {
+        missingDesignSpecFields = safeArray(JSON.parse(message.slice(designSpecLockMarkerIndex + designSpecLockMarker.length)))
+          .map((field) => safeText(field))
+          .filter(Boolean);
+      } catch {
+        missingDesignSpecFields = [];
+      }
+      const missingFields = missingDesignSpecFields.map((field) => `editable_shape_plan.design_spec_lock.${field}`);
       return {
         repair_request: [
-          `Regenerate editable_shape_plan for ${route} and add the missing top-level template_layout_grammar before materialization.`,
-          'The grammar must be AI-authored and must include owner=llm_agent, required=true, materializer_role=execute_selected_archetype_zones_only, helper_template_layout_allowed=false, archetype_catalog, and per-slide template_layout_binding.',
+          `Regenerate editable_shape_plan for ${route} and repair the AI-authored design_spec_lock before materialization.`,
+          'The lock must be complete at editable_shape_plan.design_spec_lock, owned by llm_agent, and include a concrete motif plus palette, typography, grid, layout_rhythm, borrowed_principles, and qa_gates.',
+          'Do not ask the Python helper, officecli, materializer, or RCA runtime to infer or fill any design-system field.',
+        ].join(' '),
+        previous_attempt: attemptIndex,
+        required_shape_fixes: safeArray(previousValidationFeedback?.required_shape_fixes),
+        global_shape_class_fixes: safeArray(previousValidationFeedback?.global_shape_class_fixes),
+        passed_structure_preservation_contract: previousValidationFeedback?.passed_structure_preservation_contract || null,
+        required_structural_fixes: [{
+          scope: 'deck',
+          slide_id: '',
+          reason: 'native_shape_plan_design_spec_lock_missing_fields',
+          missing_fields: missingFields.length > 0
+            ? missingFields
+            : ['editable_shape_plan.design_spec_lock'],
+          required_fields: [
+            'design_spec_lock.spec_id',
+            'design_spec_lock.owner=llm_agent',
+            'design_spec_lock.motif',
+            'design_spec_lock.palette.background_or_canvas+ink+accent',
+            'design_spec_lock.typography.title_pt_min>=34',
+            'design_spec_lock.typography.body_pt_min>=18',
+            'design_spec_lock.grid.edge_margin_in_min>=0.6',
+            'design_spec_lock.grid.inter_block_gap_in_min>=0.32',
+            'design_spec_lock.layout_rhythm.repeated_concrete_composition_limit',
+            'design_spec_lock.layout_rhythm.required_distinct_composition_share>=0.75',
+            'design_spec_lock.borrowed_principles',
+            'design_spec_lock.qa_gates',
+          ],
+          repair_instruction: missingDesignSpecFields.length > 0
+            ? `Add or repair these AI-authored design_spec_lock fields: ${missingDesignSpecFields.join(', ')}. The motif must be a concrete visual system motif and cannot be a title underline.`
+            : 'Add a complete AI-authored design_spec_lock before shape coordinates. The motif must be a concrete visual system motif and cannot be a title underline.',
+        }],
+        validator: {
+          ok: false,
+          reason: 'native_shape_plan_design_spec_lock_missing_fields',
+          failures: [{ scope: 'deck', message, missing_fields: missingFields }],
+        },
+        attempt_artifact_refs: [...attemptArtifactRefs],
+      };
+    }
+    const compactSampleCatalogMarker = 'compact sample grammar must contain exactly the two complete sample archetype contracts, not partial component archetypes: ';
+    const compactSampleCatalogMarkerIndex = message.indexOf(compactSampleCatalogMarker);
+    if (compactSampleCatalogMarkerIndex >= 0) {
+      let catalogFailure: JsonRecord = {};
+      try {
+        const parsed = JSON.parse(message.slice(compactSampleCatalogMarkerIndex + compactSampleCatalogMarker.length));
+        catalogFailure = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed as JsonRecord : {};
+      } catch {
+        catalogFailure = {};
+      }
+      const requiredArchetypeIds = safeArray(catalogFailure?.required_archetype_ids)
+        .map((archetypeId) => safeText(archetypeId))
+        .filter(Boolean);
+      const canonicalRequiredArchetypeIds = requiredArchetypeIds.length > 0
+        ? requiredArchetypeIds
+        : [...NATIVE_PPT_SAMPLE_ARCHETYPES];
+      const actualArchetypeIds = safeArray(catalogFailure?.actual_archetype_ids)
+        .map((archetypeId) => safeText(archetypeId))
+        .filter(Boolean);
+      const invalidCatalogArchetypeIds = actualArchetypeIds
+        .filter((archetypeId) => !NATIVE_PPT_SAMPLE_ARCHETYPES.has(archetypeId));
+      const forbiddenExamples = safeArray(catalogFailure?.forbidden_examples)
+        .map((example) => safeText(example))
+        .filter(Boolean);
+      const forbiddenCatalogArchetypes = invalidCatalogArchetypeIds.length > 0
+        ? invalidCatalogArchetypeIds
+        : (forbiddenExamples.length > 0 ? forbiddenExamples : ['sample_proof_band', 'partial_component_archetype']);
+      return {
+        repair_request: [
+          `Regenerate editable_shape_plan for ${route} and repair the compact native sample template_layout_grammar catalog before materialization.`,
+          'Preserve the AI-authored grammar and slide binding, but make the compact sample catalog exact.',
+          'template_layout_grammar.archetype_catalog must contain exactly the complete sample_status_proof_board and sample_decision_proof_split contracts.',
+          'Remove sample_proof_band and any other partial component archetype from archetype_catalog; proof_band is a native_shapes[].role inside the selected complete archetype, not a catalog archetype.',
+          'Continue using safe_zone_blueprints.tuple_contract before coordinates, preserve slides[].template_layout_binding, and keep native_shapes[].layout_zone_id bound to declared zones.',
+        ].join(' '),
+        previous_attempt: attemptIndex,
+        required_shape_fixes: safeArray(previousValidationFeedback?.required_shape_fixes),
+        global_shape_class_fixes: safeArray(previousValidationFeedback?.global_shape_class_fixes),
+        passed_structure_preservation_contract: previousValidationFeedback?.passed_structure_preservation_contract || null,
+        required_structural_fixes: [{
+          scope: 'deck',
+          slide_id: '',
+          reason: 'native_shape_plan_compact_sample_catalog_contains_component_archetype',
+          missing_fields: [],
+          required_fields: [
+            `template_layout_grammar.archetype_catalog exactly [${canonicalRequiredArchetypeIds.join(', ')}]`,
+            'remove sample_proof_band from template_layout_grammar.archetype_catalog',
+            'proof_band is native_shapes[].role inside the selected complete sample archetype',
+            'slides[].template_layout_binding.selected_archetype in [sample_status_proof_board, sample_decision_proof_split]',
+            'native_shapes[].layout_zone_id bound to selected archetype zones',
+            'template_layout_grammar.safe_zone_blueprints.tuple_contract used before shape coordinates',
+          ],
+          actual_archetype_ids: actualArchetypeIds,
+          required_archetype_ids: canonicalRequiredArchetypeIds,
+          forbidden_catalog_archetypes: forbiddenCatalogArchetypes,
+          repair_instruction: `Repair the existing compact sample grammar in place. archetype_catalog must contain exactly ${canonicalRequiredArchetypeIds.join(' and ')} complete contracts; remove ${forbiddenCatalogArchetypes.join(', ')} from archetype_catalog. Keep proof_band as a native_shapes[].role inside the selected archetype zones, preserve template_layout_binding and layout_zone_id, and keep using safe_zone_blueprints.tuple_contract before shape coordinates.`,
+        }],
+        validator: {
+          ok: false,
+          reason: 'native_shape_plan_compact_sample_catalog_contains_component_archetype',
+          failures: [{
+            scope: 'deck',
+            message,
+            actual_archetype_ids: actualArchetypeIds,
+            required_archetype_ids: canonicalRequiredArchetypeIds,
+            forbidden_catalog_archetypes: forbiddenCatalogArchetypes,
+          }],
+        },
+        attempt_artifact_refs: [...attemptArtifactRefs],
+      };
+    }
+    if (/requires editable_shape_plan\.template_layout_grammar/i.test(message)) {
+      let grammarFailures: JsonRecord[] = [];
+      const grammarFailureMarker = 'execute-selected-zones materializer boundary: ';
+      const grammarFailureMarkerIndex = message.indexOf(grammarFailureMarker);
+      if (grammarFailureMarkerIndex >= 0) {
+        try {
+          grammarFailures = safeArray(JSON.parse(message.slice(grammarFailureMarkerIndex + grammarFailureMarker.length)));
+        } catch {
+          grammarFailures = [];
+        }
+      }
+      const grammarFailureReasons = grammarFailures.map((failure) => safeText(failure?.reason)).filter(Boolean);
+      return {
+        repair_request: [
+          `Regenerate editable_shape_plan for ${route} and repair the top-level template_layout_grammar before materialization.`,
+          'Preserve any existing AI-authored grammar fields that are already valid, but complete the failed fields before returning the plan.',
+          'The grammar must be AI-authored and must include owner=llm_agent, required=true, materializer_role=execute_selected_archetype_zones_only, helper_template_layout_allowed=false, complete archetype_catalog, and per-slide template_layout_binding.',
+          'For compact native samples, keep both sample_status_proof_board and sample_decision_proof_split in archetype_catalog even when the slide selects only one archetype.',
           'Do not ask the Python helper, officecli, or materializer to infer layout templates.',
         ].join(' '),
         previous_attempt: attemptIndex,
         required_shape_fixes: safeArray(previousValidationFeedback?.required_shape_fixes),
         global_shape_class_fixes: safeArray(previousValidationFeedback?.global_shape_class_fixes),
+        passed_structure_preservation_contract: previousValidationFeedback?.passed_structure_preservation_contract || null,
         required_structural_fixes: [{
           scope: 'deck',
           slide_id: '',
@@ -47,14 +274,18 @@ export function createNativePptShapePlanNormalizeParts({
             'template_layout_grammar.materializer_role',
             'template_layout_grammar.helper_template_layout_allowed',
             'template_layout_grammar.archetype_catalog[]',
+            'template_layout_grammar.archetype_catalog includes sample_status_proof_board and sample_decision_proof_split for compact samples',
             'slides[].template_layout_binding',
           ],
-          repair_instruction: 'Add a complete AI-authored template layout grammar and matching per-slide template_layout_binding. Every non-decorative audience-facing shape must receive a layout_zone_id bound to a declared slide zone.',
+          grammar_failures: grammarFailures,
+          repair_instruction: grammarFailureReasons.includes('template_layout_grammar.archetype_catalog_count')
+            ? 'Repair the existing AI-authored template_layout_grammar instead of dropping it. For compact native samples, archetype_catalog must include complete contracts for both sample_status_proof_board and sample_decision_proof_split, even if the current slide selected only one. Preserve per-slide template_layout_binding and native_shapes[].layout_zone_id values while completing the catalog.'
+            : 'Add or repair a complete AI-authored template layout grammar and matching per-slide template_layout_binding. Every non-decorative/non-auxiliary shape must receive a layout_zone_id bound to a declared slide zone.',
         }],
         validator: {
           ok: false,
           reason: 'native_shape_plan_template_layout_grammar_missing',
-          failures: [{ scope: 'deck', message }],
+          failures: [{ scope: 'deck', message, grammar_failures: grammarFailures }],
         },
         attempt_artifact_refs: [...attemptArtifactRefs],
       };
@@ -79,6 +310,7 @@ export function createNativePptShapePlanNormalizeParts({
           ...safeArray(slide?.invalid_shapes)
             .flatMap((shape) => [
               ...(shape?.missing_bounds === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].bounds`] : []),
+              ...(shape?.bounds_schema_error === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].bounds_schema_error`] : []),
               ...(shape?.missing_kind === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].kind`] : []),
               ...(shape?.missing_text === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].editable_text`] : []),
               ...(shape?.missing_quality_role === true ? [`native_shapes[${safeText(shape?.shape_id, '?')}].quality_role`] : []),
@@ -102,6 +334,7 @@ export function createNativePptShapePlanNormalizeParts({
           missing_fields: missingFields,
           invalid_template_binding_fields: invalidBindingFields,
           invalid_template_zones: invalidZones,
+          invalid_shapes: safeArray(slide?.invalid_shapes),
           required_fields: [
             'template_layout_binding.selected_archetype',
             'template_layout_binding.archetype_instance_id',
@@ -110,11 +343,19 @@ export function createNativePptShapePlanNormalizeParts({
             'template_layout_binding.zone_inset_in_min>=0.15',
             'template_layout_binding.zones[]',
             'template_layout_binding.zones[].safe_inset_in>=0.15',
+            'template_layout_binding.zones[].bounds.left_in',
+            'template_layout_binding.zones[].bounds.top_in',
+            'template_layout_binding.zones[].bounds.width_in',
+            'template_layout_binding.zones[].bounds.height_in',
+            'native_shapes[].bounds.left_in',
+            'native_shapes[].bounds.top_in',
+            'native_shapes[].bounds.width_in',
+            'native_shapes[].bounds.height_in',
             'native_shapes[].layout_zone_id',
           ],
           repair_instruction: invalidBinding
-            ? 'Repair the existing AI-authored template_layout_binding instead of treating it as absent. Preserve the slide-level binding, selected archetype, declared zones, and shape layout_zone_id values while fixing invalid binding fields and zone constraints such as safe_inset_in >= 0.15.'
-            : 'Return a complete AI-authored slide plan. Add template_layout_binding with declared semantic zones, bind every non-decorative audience-facing shape to a zone on the same slide, and keep all shape bounds inside the declared zone. Do not ask the Python helper or officecli to infer this.',
+            ? 'Repair the existing AI-authored template_layout_binding instead of treating it as absent. Preserve the slide-level binding, selected archetype, declared zones, and shape layout_zone_id values while fixing invalid binding fields and zone constraints such as safe_inset_in >= 0.15. All zone bounds and shape bounds must use canonical keys left_in/top_in/width_in/height_in only; do not use x/y/w/h, left/top/right/bottom, or width/height aliases.'
+            : 'Return a complete AI-authored slide plan. Add template_layout_binding with declared semantic zones, bind every non-decorative/non-auxiliary shape to a zone on the same slide, and keep all zone-bound shape bounds inside the declared zone. Structural rails, connectors, proof bands, panels, and audience content cannot float outside the selected template. All zone bounds and shape bounds must use canonical keys left_in/top_in/width_in/height_in only; do not use x/y/w/h, left/top/right/bottom, or width/height aliases. Do not ask the Python helper or officecli to infer this.',
         };
       })
       .filter(Boolean);
@@ -128,6 +369,7 @@ export function createNativePptShapePlanNormalizeParts({
       previous_attempt: attemptIndex,
       required_shape_fixes: safeArray(previousValidationFeedback?.required_shape_fixes),
       global_shape_class_fixes: safeArray(previousValidationFeedback?.global_shape_class_fixes),
+      passed_structure_preservation_contract: previousValidationFeedback?.passed_structure_preservation_contract || null,
       required_structural_fixes: requiredStructuralFixes,
       validator: {
         ok: false,
@@ -144,29 +386,75 @@ export function createNativePptShapePlanNormalizeParts({
     if (slides.length === 0) {
       throw new Error(`Native PPT ${route} requires an AI-authored editable_shape_plan.slides array`);
     }
+    const planAuthoringMode = safeText(plan?.authoring_mode);
+    const sampleCompactPlan = planAuthoringMode === 'native_visual_sample_compact';
     const designSpecLock = plan?.design_spec_lock && typeof plan.design_spec_lock === 'object'
       ? plan.design_spec_lock
       : {};
-    const missingDesignSpecLock = !safeText(designSpecLock?.spec_id)
-      || !safeText(designSpecLock?.owner)
-      || !safeText(designSpecLock?.motif)
-      || !Array.isArray(designSpecLock?.layout_archetypes)
-      || designSpecLock.layout_archetypes.length < 3;
-    if (missingDesignSpecLock) {
-      throw new Error(`Native PPT ${route} requires editable_shape_plan.design_spec_lock with spec_id, owner, motif, and layout_archetypes`);
+    const missingDesignSpecLock = missingDesignSpecLockFields(
+      designSpecLock,
+      sampleCompactPlan ? NATIVE_PPT_SAMPLE_ARCHETYPES.size : 3,
+    );
+    if (missingDesignSpecLock.length > 0) {
+      throw new Error(`Native PPT ${route} requires editable_shape_plan.design_spec_lock with AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, and QA gates before shape coordinates: ${JSON.stringify(missingDesignSpecLock)}`);
     }
     const deckLayoutRhythmPlan = requireNativeDeckLayoutRhythmPlan({ plan, route, slides, safeArray, safeText });
     const templateLayoutGrammar = plan?.template_layout_grammar && typeof plan.template_layout_grammar === 'object'
       ? plan.template_layout_grammar
       : {};
+    const templateReferenceDisciplineFailures = templateReferenceDisciplineFailuresFor(templateLayoutGrammar);
     const archetypeCatalog = safeArray(templateLayoutGrammar?.archetype_catalog);
+    const archetypeCatalogIds = archetypeCatalog.map((entry) => safeText(entry?.archetype_id)).filter(Boolean);
+    const sampleOnlyArchetypeCatalog = archetypeCatalogIds.length >= NATIVE_PPT_SAMPLE_ARCHETYPES.size
+      && archetypeCatalogIds.every((archetypeId) => NATIVE_PPT_SAMPLE_ARCHETYPES.has(archetypeId))
+      && [...NATIVE_PPT_SAMPLE_ARCHETYPES].every((archetypeId) => archetypeCatalogIds.includes(archetypeId));
+    const sampleSelectedArchetypeSlides = slides.length === 1
+      && slides.every((slide) => NATIVE_PPT_SAMPLE_ARCHETYPES.has(safeText(slide?.template_layout_binding?.selected_archetype)));
+    const sampleCompactAuthoring = sampleCompactPlan
+      || (sampleOnlyArchetypeCatalog && sampleSelectedArchetypeSlides);
+    const minimumArchetypeCount = sampleCompactAuthoring && sampleOnlyArchetypeCatalog
+      ? NATIVE_PPT_SAMPLE_ARCHETYPES.size
+      : 3;
     const missingTemplateLayoutGrammar = safeText(templateLayoutGrammar?.owner) !== 'llm_agent'
       || templateLayoutGrammar?.required !== true
       || safeText(templateLayoutGrammar?.materializer_role) !== 'execute_selected_archetype_zones_only'
       || templateLayoutGrammar?.helper_template_layout_allowed !== false
-      || archetypeCatalog.length < 3;
+      || templateReferenceDisciplineFailures.length > 0
+      || archetypeCatalog.length < minimumArchetypeCount;
     if (missingTemplateLayoutGrammar) {
-      throw new Error(`Native PPT ${route} requires editable_shape_plan.template_layout_grammar with llm_agent owner, archetype catalog, and execute-selected-zones materializer boundary`);
+      const grammarFailures = [
+        ...(safeText(templateLayoutGrammar?.owner) !== 'llm_agent'
+          ? [{ reason: 'template_layout_grammar.owner', actual: safeText(templateLayoutGrammar?.owner) }]
+          : []),
+        ...(templateLayoutGrammar?.required !== true
+          ? [{ reason: 'template_layout_grammar.required', actual: templateLayoutGrammar?.required ?? null }]
+          : []),
+        ...(safeText(templateLayoutGrammar?.materializer_role) !== 'execute_selected_archetype_zones_only'
+          ? [{ reason: 'template_layout_grammar.materializer_role', actual: safeText(templateLayoutGrammar?.materializer_role) }]
+          : []),
+        ...(templateLayoutGrammar?.helper_template_layout_allowed !== false
+          ? [{ reason: 'template_layout_grammar.helper_template_layout_allowed', actual: templateLayoutGrammar?.helper_template_layout_allowed ?? null }]
+          : []),
+        ...templateReferenceDisciplineFailures,
+        ...(archetypeCatalog.length < minimumArchetypeCount
+          ? [{
+              reason: 'template_layout_grammar.archetype_catalog_count',
+              actual: archetypeCatalog.length,
+              minimum: minimumArchetypeCount,
+              required_archetype_ids: sampleCompactAuthoring
+                ? [...NATIVE_PPT_SAMPLE_ARCHETYPES]
+                : 'at_least_three_professional_archetypes',
+            }]
+          : []),
+      ];
+      throw new Error(`Native PPT ${route} requires editable_shape_plan.template_layout_grammar with llm_agent owner, archetype catalog, and execute-selected-zones materializer boundary: ${JSON.stringify(grammarFailures)}`);
+    }
+    if (sampleCompactAuthoring && !sampleOnlyArchetypeCatalog) {
+      throw new Error(`Native PPT ${route} compact sample grammar must contain exactly the two complete sample archetype contracts, not partial component archetypes: ${JSON.stringify({
+        actual_archetype_ids: archetypeCatalogIds,
+        required_archetype_ids: [...NATIVE_PPT_SAMPLE_ARCHETYPES],
+        forbidden_examples: ['sample_proof_band', 'partial_component_archetype'],
+      })}`);
     }
     const allowedArchetypes = new Set(archetypeCatalog.map((entry) => safeText(entry?.archetype_id)).filter(Boolean));
     const incompleteArchetypes = archetypeCatalog
@@ -215,6 +503,32 @@ export function createNativePptShapePlanNormalizeParts({
       deck_layout_rhythm_plan: deckLayoutRhythmPlan,
       slides,
     };
+  }
+
+  function templateReferenceDisciplineFailuresFor(templateLayoutGrammar: JsonRecord): JsonRecord[] {
+    const referenceDiscipline = templateLayoutGrammar?.reference_discipline
+      && typeof templateLayoutGrammar.reference_discipline === 'object'
+      ? templateLayoutGrammar.reference_discipline
+      : {};
+    const sourceProjects = safeArray(referenceDiscipline?.source_projects)
+      .map((project) => safeText(project))
+      .filter(Boolean);
+    const failures: JsonRecord[] = REQUIRED_TEMPLATE_REFERENCE_DISCIPLINE_FLAGS
+      .filter((field) => referenceDiscipline?.[field] !== true)
+      .map((field) => ({
+        reason: `template_layout_grammar.reference_discipline.${field}`,
+        actual: referenceDiscipline?.[field] ?? null,
+      }));
+    const missingSourceProjects = REQUIRED_TEMPLATE_REFERENCE_SOURCE_PROJECTS
+      .filter((project) => !sourceProjects.includes(project));
+    if (missingSourceProjects.length > 0) {
+      failures.push({
+        reason: 'template_layout_grammar.reference_discipline.source_projects',
+        missing_source_projects: missingSourceProjects,
+        required_source_projects: REQUIRED_TEMPLATE_REFERENCE_SOURCE_PROJECTS,
+      });
+    }
+    return failures;
   }
 
   function invalidSlideShapePlan({
@@ -283,13 +597,18 @@ export function createNativePptShapePlanNormalizeParts({
 
   function invalidTemplateZone(zone: JsonRecord): JsonRecord | null {
     const bounds = zone?.bounds && typeof zone.bounds === 'object' ? zone.bounds : {};
+    const boundsKeys = Object.keys(bounds);
+    const forbiddenBoundsKeys = boundsKeys.filter((key) => FORBIDDEN_BOUNDS_KEYS.includes(key));
+    const missingCanonicalBoundsKeys = CANONICAL_BOUNDS_KEYS
+      .filter((key) => !Number.isFinite(Number(bounds?.[key])));
     const invalidFields = [
       ...(!safeText(zone?.zone_id) ? ['zone_id'] : []),
       ...(!safeText(zone?.semantic_role) ? ['semantic_role'] : []),
       ...(!safeText(zone?.intended_content) ? ['intended_content'] : []),
-      ...(!['left_in', 'top_in', 'width_in', 'height_in'].every((key) => Number.isFinite(Number(bounds?.[key])))
+      ...(missingCanonicalBoundsKeys.length > 0
         ? ['bounds']
         : []),
+      ...(forbiddenBoundsKeys.length > 0 ? ['bounds_schema_error'] : []),
       ...(Number(bounds?.width_in || 0) <= 0 ? ['bounds.width_in'] : []),
       ...(Number(bounds?.height_in || 0) <= 0 ? ['bounds.height_in'] : []),
       ...(Number(zone?.safe_inset_in || 0) < 0.15 ? ['safe_inset_in'] : []),
@@ -308,6 +627,14 @@ export function createNativePptShapePlanNormalizeParts({
         'bounds.height_in>0',
         'safe_inset_in>=0.15',
       ],
+      bounds_contract: {
+        canonical_keys: CANONICAL_BOUNDS_KEYS,
+        forbidden_alias_keys: FORBIDDEN_BOUNDS_KEYS,
+        instruction: 'Replace any alias bounds object with { left_in, top_in, width_in, height_in }. Do not use x/y/w/h, left/top/right/bottom, or width/height.',
+      },
+      actual_bounds_keys: boundsKeys,
+      missing_canonical_bounds_keys: missingCanonicalBoundsKeys,
+      forbidden_bounds_keys: forbiddenBoundsKeys,
     };
   }
 
@@ -321,8 +648,11 @@ export function createNativePptShapePlanNormalizeParts({
     zoneIds: Set<string>;
   }): JsonRecord | null {
     const bounds = shape?.bounds && typeof shape.bounds === 'object' ? shape.bounds : {};
-    const hasBounds = ['left_in', 'top_in', 'width_in', 'height_in']
-      .every((key) => Number.isFinite(Number(bounds?.[key])));
+    const boundsKeys = Object.keys(bounds);
+    const forbiddenBoundsKeys = boundsKeys.filter((key) => FORBIDDEN_BOUNDS_KEYS.includes(key));
+    const missingCanonicalBoundsKeys = CANONICAL_BOUNDS_KEYS
+      .filter((key) => !Number.isFinite(Number(bounds?.[key])));
+    const hasBounds = missingCanonicalBoundsKeys.length === 0 && forbiddenBoundsKeys.length === 0;
     const kind = safeText(shape?.kind || shape?.type);
     const role = safeText(shape?.role);
     const qualityRole = safeText(shape?.quality_role);
@@ -332,8 +662,7 @@ export function createNativePptShapePlanNormalizeParts({
       || ['title', 'core_sentence', 'point_text', 'body', 'content', 'point_index'].includes(role);
     const missingText = textShape && !text;
     const missingQualityRole = !qualityRole;
-    const needsLayoutZone = !['decorative'].includes(qualityRole)
-      && !['page_number', 'page_no', 'footer', 'cover_meta', 'meta'].includes(role);
+    const needsLayoutZone = !['decorative', 'auxiliary'].includes(qualityRole);
     const missingLayoutZone = needsLayoutZone && !zoneIds.has(layoutZoneId);
     if (!hasBounds || !kind || missingText || missingQualityRole || missingLayoutZone) {
       return {
@@ -343,6 +672,15 @@ export function createNativePptShapePlanNormalizeParts({
         missing_text: missingText,
         missing_quality_role: missingQualityRole,
         missing_layout_zone: missingLayoutZone,
+        bounds_schema_error: forbiddenBoundsKeys.length > 0,
+        actual_bounds_keys: boundsKeys,
+        missing_canonical_bounds_keys: missingCanonicalBoundsKeys,
+        forbidden_bounds_keys: forbiddenBoundsKeys,
+        bounds_contract: {
+          canonical_keys: CANONICAL_BOUNDS_KEYS,
+          forbidden_alias_keys: FORBIDDEN_BOUNDS_KEYS,
+          instruction: 'native_shapes[].bounds must be exactly { left_in, top_in, width_in, height_in }. Do not use x/y/w/h, left/top/right/bottom, or width/height aliases.',
+        },
       };
     }
     return null;

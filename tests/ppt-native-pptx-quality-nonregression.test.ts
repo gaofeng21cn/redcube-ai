@@ -120,6 +120,7 @@ function assertQualityContractShape(contract) {
     'non_text_visual_specific_ok',
     'mechanical_card_template_absent',
     'panel_text_safe_area_ok',
+    'text_card_internal_padding_ok',
     'short_label_wrap_ok',
     'composition_signature',
     'title_underline_absent_ok',
@@ -145,10 +146,17 @@ function assertQualityContractShape(contract) {
   assert.deepEqual(contract.editable_shape_plan_contract.ppt_master_style_discipline_adopted, [
     'spec_lock',
     'template_layout_grammar',
+    'template_profile',
+    'semantic_layout_selection',
+    'reference_deck_analysis',
     'per_page_visual_plan',
     'svg_qa_before_export',
     'rendered_quality_gate',
   ]);
+  assert.equal(contract.editable_shape_plan_contract.reference_design_profile_required, true);
+  assert.equal(contract.editable_shape_plan_contract.semantic_layout_selection_required, true);
+  assert.equal(contract.editable_shape_plan_contract.placeholder_capacity_required, true);
+  assert.equal(contract.editable_shape_plan_contract.action_title_required, true);
   assert.equal(contract.editable_shape_plan_contract.layout_intent_required, true);
   assert.equal(contract.editable_shape_plan_contract.composition_signature_required, true);
   assert.equal(contract.editable_shape_plan_contract.title_underline_motif_allowed, false);
@@ -304,10 +312,15 @@ test('native PPTX authoring artifact exposes Agent Lab quality non-regression re
       assert.equal(readModel.editable_shape_plan_ref.per_slide_layout_binding_required, true);
       assert.equal(readModel.editable_shape_plan_ref.materializer_executes_selected_archetype_zones_only, true);
       assert.equal(readModel.editable_shape_plan_ref.per_page_visual_plan_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.reference_design_profile_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.semantic_layout_selection_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.placeholder_capacity_required, true);
       assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('spec_lock'), true);
       assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('template_layout_grammar'), true);
+      assert.equal(readModel.editable_shape_plan_ref.ppt_master_style_discipline_adopted.includes('reference_deck_analysis'), true);
       assert.equal(readModel.editable_shape_plan_ref.layout_intent_required, true);
       assert.equal(readModel.editable_shape_plan_ref.composition_signature_required, true);
+      assert.equal(readModel.editable_shape_plan_ref.action_title_required, true);
       assert.equal(readModel.editable_shape_plan_ref.title_underline_motif_allowed, false);
       assert.equal(readModel.editable_shape_plan_ref.concrete_layout_variant_repetition_limit, 2);
       assert.equal(readModel.visual_sample_claim_boundary.sample_kind, 'deterministic_test_double_plumbing_proof');

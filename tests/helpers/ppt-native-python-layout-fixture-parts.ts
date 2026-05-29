@@ -1,7 +1,7 @@
 // @ts-nocheck
 
 export function archetypeSupportShapes(layoutFamily, slideId) {
-  const supportQualityRole = 'structural';
+  const supportQualityRole = 'content';
   const supportText = {
     evidence: '证据链可复核。',
     takeaway: '自主链路已经闭合且证据可复核。',
@@ -166,7 +166,7 @@ export function archetypeSupportShapes(layoutFamily, slideId) {
       quality_role: supportQualityRole,
       layout_zone_id: 'signal_zone',
       editable_text: supportText.metric,
-      bounds: { left_in: 0.95, top_in: 7.55, width_in: 6.0, height_in: 0.86 },
+      bounds: { left_in: 0.95, top_in: 7.5, width_in: 6.0, height_in: 0.86 },
       font_size: 18,
       color: '#5B6570',
       fill: 'none',
@@ -179,7 +179,7 @@ export function archetypeSupportShapes(layoutFamily, slideId) {
       quality_role: supportQualityRole,
       layout_zone_id: 'takeaway_zone',
       editable_text: supportText.takeaway,
-      bounds: { left_in: 7.35, top_in: 7.55, width_in: 6.8, height_in: 0.86 },
+      bounds: { left_in: 7.35, top_in: 7.5, width_in: 6.8, height_in: 0.86 },
       font_size: 18,
       color: '#171C24',
       fill: 'none',
@@ -260,6 +260,15 @@ export function templateLayoutGrammar() {
     required: true,
     materializer_role: 'execute_selected_archetype_zones_only',
     helper_template_layout_allowed: false,
+    reference_discipline: {
+      template_profile_required: true,
+      semantic_layout_selection_required: true,
+      placeholder_capacity_required: true,
+      reference_deck_analysis_required: true,
+      action_title_required: true,
+      source_projects: ['ppt-master', 'agent-slides', 'PPTAgent', 'pptx-from-layouts-skill', 'officecli-pptx'],
+      rule: 'Treat templates and reference decks as layout intelligence before coordinates.',
+    },
     archetype_catalog: [
       {
         archetype_id: 'professional_system_map',
@@ -282,7 +291,7 @@ export function templateLayoutGrammar() {
         required_zones: ['title_zone', 'claim_zone', 'status_zone', 'evidence_zone', 'takeaway_zone'],
         content_schema: {
           required_shape_roles: ['title', 'core_sentence', 'content_panel', 'point_text', 'evidence_item', 'takeaway'],
-          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'audience_body_text', 'takeaway_text'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'audience_body_text', 'evidence_or_metric_text', 'takeaway_text'],
           min_filled_required_zone_share: 0.8,
           max_audience_text_shapes: 12,
           min_card_width_in: 3.3,
@@ -325,7 +334,7 @@ export function templateLayoutGrammar() {
         required_zones: ['title_zone', 'claim_zone', 'decision_zone', 'proof_zone', 'takeaway_zone'],
         content_schema: {
           required_shape_roles: ['title', 'core_sentence', 'content_panel', 'point_text', 'metric', 'takeaway'],
-          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'evidence_or_metric_text', 'takeaway_text'],
+          required_shape_role_groups: ['title_text', 'core_claim_text', 'content_container', 'audience_body_text', 'evidence_or_metric_text', 'takeaway_text'],
           min_filled_required_zone_share: 0.8,
           first_glance_hierarchy_required: true,
           min_body_font_pt: 18,

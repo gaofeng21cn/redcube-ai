@@ -111,6 +111,8 @@ export function buildCreativeRunOutput(meta) {
       const rawPrompt = safeText(meta?.__raw_prompt);
       if (!rawPrompt.includes('ai_first_text_panel_safe_area_violation')
         || !rawPrompt.includes('panel_shape_id')
+        || !rawPrompt.includes('panel_safe_bounds')
+        || !rawPrompt.includes('required_delta_in')
         || !rawPrompt.includes('required_inset_in')
         || !rawPrompt.includes('0.15in inset')) {
         throw new Error('mock expected native preflight retry output contract with panel_shape_id and required_inset_in');
@@ -126,10 +128,56 @@ export function buildCreativeRunOutput(meta) {
       }
       return output;
     }
+    if (mutateKind === 'drop_layout_binding_after_page_number_feedback') {
+      const validationFeedback = meta?.context?.native_shape_plan_validation_feedback;
+      const hasValidationFeedback = Boolean(validationFeedback?.validator);
+      const failures = validationFeedback?.validator?.failures
+        ?.flatMap((slide) => slide?.failures || []) || [];
+      const hasPageNumberFeedback = failures.some((failure) => failure?.reason === 'ai_first_page_number_missing');
+      if (!hasValidationFeedback) {
+        for (const slide of output?.editable_shape_plan?.slides || []) {
+          slide.native_shapes = (slide.native_shapes || [])
+            .filter((shape) => !['page_number', 'page_no', 'page'].includes(shape?.role));
+        }
+        return output;
+      }
+      const rawPrompt = safeText(meta?.__raw_prompt);
+      if (!rawPrompt.includes('passed_structure_preservation_contract')
+        || !rawPrompt.includes('template_layout_binding')
+        || !rawPrompt.includes('deck_layout_rhythm_plan')
+        || (!rawPrompt.includes('page_number_missing') && !rawPrompt.includes('page_number'))) {
+        throw new Error('mock expected native retry contract to preserve passed layout structure while fixing page number');
+      }
+      if (hasPageNumberFeedback) {
+        for (const slide of output?.editable_shape_plan?.slides || []) {
+          delete slide.template_layout_binding;
+          for (const shape of slide?.native_shapes || []) {
+            delete shape.layout_zone_id;
+          }
+        }
+      }
+      return output;
+    }
     if (mutateKind === 'repair_missing_design_spec_lock') {
       if (route === 'repair_pptx_native') {
         delete output?.editable_shape_plan?.design_spec_lock;
       }
+      return output;
+    }
+    if (mutateKind === 'drop_design_spec_lock_motif_once') {
+      const hasStructuralFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.required_structural_fixes);
+      if (hasStructuralFeedback) {
+        const rawPrompt = safeText(meta?.__raw_prompt);
+        if (!rawPrompt.includes('native_shape_plan_structural_retry_contract')
+          || !rawPrompt.includes('native_shape_plan_design_spec_lock_missing_fields')
+          || !rawPrompt.includes('editable_shape_plan.design_spec_lock.motif')
+          || !rawPrompt.includes('required_design_spec_lock_fields')
+          || !rawPrompt.includes('materializer_inference_allowed')) {
+          throw new Error('mock expected native structural retry contract with design_spec_lock.motif fix');
+        }
+        return output;
+      }
+      delete output?.editable_shape_plan?.design_spec_lock?.motif;
       return output;
     }
     if (mutateKind === 'remove_template_layout_grammar') {
@@ -170,6 +218,76 @@ export function buildCreativeRunOutput(meta) {
         if (firstZone) {
           firstZone.safe_inset_in = 0.05;
         }
+      }
+      return output;
+    }
+    if (mutateKind === 'always_alias_template_and_shape_bounds') {
+      const aliasBounds = (bounds) => ({
+        x: Number(bounds?.left_in || 0),
+        y: Number(bounds?.top_in || 0),
+        w: Number(bounds?.width_in || 0),
+        h: Number(bounds?.height_in || 0),
+      });
+      for (const slide of output?.editable_shape_plan?.slides || []) {
+        const firstZone = slide?.template_layout_binding?.zones?.[0];
+        if (firstZone?.bounds) {
+          firstZone.bounds = aliasBounds(firstZone.bounds);
+        }
+        const firstShape = (slide?.native_shapes || []).find((shape) => shape?.bounds);
+        if (firstShape?.bounds) {
+          firstShape.bounds = aliasBounds(firstShape.bounds);
+        }
+      }
+      return output;
+    }
+    if (mutateKind === 'drop_speaker_layout_zone') {
+      const firstSlide = output?.editable_shape_plan?.slides?.[0];
+      if (firstSlide) {
+        firstSlide.native_shapes = [
+          ...(firstSlide.native_shapes || []),
+          {
+            shape_id: `${safeText(firstSlide.slide_id, 'S01')}-speaker`,
+            kind: 'text_box',
+            role: 'speaker_identity',
+            quality_role: 'auxiliary',
+            editable_text: '教学型讲者',
+            bounds: { left_in: 12.6, top_in: 0.72, width_in: 1.4, height_in: 0.64 },
+            font_size: 18,
+            color: '#5B6570',
+            fill: 'none',
+            line: 'none',
+          },
+        ];
+      }
+      return output;
+    }
+    if (mutateKind === 'always_drop_content_layout_zone') {
+      for (const slide of output?.editable_shape_plan?.slides || []) {
+        const contentShape = (slide?.native_shapes || [])
+          .find((shape) => shape?.quality_role === 'content' && !['page_number', 'page_no', 'page'].includes(shape?.role));
+        if (contentShape) {
+          delete contentShape.layout_zone_id;
+        }
+      }
+      return output;
+    }
+    if (mutateKind === 'drop_structural_shape_layout_zone_once') {
+      const hasStructuralFeedback = Boolean(meta?.context?.native_shape_plan_validation_feedback?.required_structural_fixes);
+      if (hasStructuralFeedback) {
+        const rawPrompt = safeText(meta?.__raw_prompt);
+        if (!rawPrompt.includes('structural_shape_binding_required')
+          || !rawPrompt.includes('rails, connectors, proof bands')
+          || !rawPrompt.includes('layout_zone_id')) {
+          throw new Error('mock expected native structural retry contract to require zone binding for structural shapes');
+        }
+        return output;
+      }
+      const structuralShape = output?.editable_shape_plan?.slides
+        ?.flatMap((slide) => slide?.native_shapes || [])
+        ?.find((shape) => shape?.quality_role === 'structural');
+      if (structuralShape) {
+        structuralShape.shape_id = 'S01-bridge-connector';
+        delete structuralShape.layout_zone_id;
       }
       return output;
     }

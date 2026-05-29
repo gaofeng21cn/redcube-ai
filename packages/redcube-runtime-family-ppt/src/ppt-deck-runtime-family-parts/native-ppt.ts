@@ -6,9 +6,24 @@ import { buildNativePptQualityNonregressionReadModel } from './native-ppt-qualit
 import { createNativePptPlanIntegrityParts } from './native-ppt-plan-integrity.js';
 import { createNativePptPlanPreflightParts } from './native-ppt-plan-preflight.js';
 import { createNativePptProofReviewParts } from './native-ppt-proof-review.js';
-import { buildNativeShapePlanOutputContract } from './native-ppt-shape-plan-contract.js';
+import {
+  createNativePptSampleAuthoringParts,
+  nativePptSampleLayoutProfile,
+} from './native-ppt-sample-authoring.js';
+import {
+  buildNativeSampleShapePlanOutputContract,
+  buildNativeShapePlanOutputContract,
+} from './native-ppt-shape-plan-contract.js';
 import { createNativePptShapePlanNormalizeParts } from './native-ppt-shape-plan-normalize.js';
 import { createNativePptRepairEvidenceParts } from './native-ppt-repair-evidence.js';
+import {
+  createNativePptCodexInvocationBlockerParts,
+  type NativeShapePlanInvocationFailure,
+} from './native-ppt-codex-invocation-blocker.js';
+import {
+  AI_FIRST_EDITING_CONTRACT,
+  OFFICECLI_MATERIALIZER_POLICY,
+} from './native-ppt-authoring-policies.js';
 import {
   NATIVE_PPT_AGGREGATED_CHECK_KEYS,
   REQUIRED_ENGINE_CAPABILITIES,
@@ -27,6 +42,7 @@ interface NativePlanAttempt {
   editableShapePlan: JsonRecord;
   generationRuntime: JsonRecord;
   modelContract: JsonRecord | null;
+  shapePlanOutputContract: JsonRecord | null;
   validationFeedback: JsonRecord | null;
   attemptIndex: number;
   executorRetryCount: number;
@@ -100,51 +116,24 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     normalizeEditableShapePlan,
     structuralFeedbackFromPlanError,
   } = createNativePptShapePlanNormalizeParts({ safeArray, safeText });
+  const {
+    isCodexInvocationFailure,
+    writeCodexInvocationBlocker,
+  } = createNativePptCodexInvocationBlockerParts({
+    PROMPT_PACK,
+    safeArray,
+    safeText,
+    writeJson,
+  });
+  const {
+    compactNativeSampleContext,
+  } = createNativePptSampleAuthoringParts({
+    aiFirstEditingContract: AI_FIRST_EDITING_CONTRACT,
+    safeArray,
+    safeText,
+  });
 
   let cachedNativeEngineContract: JsonRecord | null = null;
-  const AI_FIRST_EDITING_CONTRACT = Object.freeze({
-    contract_id: 'ppt_native_ai_first_editing_contract_v1',
-    creative_owner: 'llm_agent',
-    editable_shape_plan_required: true,
-    editable_shape_manifest_required: true,
-    design_spec_lock_required: true,
-    template_layout_grammar_required: true,
-    per_slide_layout_binding_required: true,
-    shape_quality_role_required: true,
-    layout_intent_required: true,
-    composition_signature_required: true,
-    structural_visual_required: true,
-    title_underline_motif_allowed: false,
-    concrete_layout_variant_repetition_limit: 2,
-    python_helper_role: 'execute_validate_export_only',
-    template_substitution_allowed: false,
-    preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
-  });
-  const OFFICECLI_MATERIALIZER_POLICY = Object.freeze({
-    policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
-    adoption_status: 'qa_materializer_discipline_only',
-    rca_main_workflow_owner: 'redcube_stage_review_export',
-    skill_authoring_loop_adopted: false,
-    materializer_role: 'default_editable_pptx_materializer_and_qa_gate',
-    current_pptx_writer: 'officecli_pptx_materializer',
-    officecli_writer_adapter_default_enabled: true,
-    required_gate_refs: [
-      'officecli_save_before_close',
-      'officecli_validate',
-      'officecli_view_issues',
-      'officecli_view_text',
-    ],
-    save_before_close_required: true,
-    validate_required: true,
-    view_issues_required: true,
-    view_text_required: true,
-    true_render_proof_required_after_officecli_gate: true,
-    true_render_proof_substitute_allowed: false,
-    deterministic_cjk_font_family: 'Noto Sans CJK SC',
-    default_visual_route_changed: false,
-    default_executor_changed: false,
-  });
-
   function expectedNativeEngineContract(): JsonRecord {
     if (cachedNativeEngineContract) return cachedNativeEngineContract;
     if (!existsSync(NATIVE_PPT_ENGINE_CONTRACT)) {
@@ -281,6 +270,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       shapeManifestFile: path.join(nativeDir, `${basename}-shape-manifest.json`),
       repairLogFile: path.join(nativeDir, `${basename}-repair-log.json`),
       planValidationFile: path.join(nativeDir, `${basename}-plan-validation-input.json`),
+      codexInvocationBlockerFile: path.join(nativeDir, `${basename}-codex-invocation-blocker.json`),
       previewDir: ensureDir(path.join(reportDir, `${basename}-screenshots`)),
     };
   }
@@ -308,6 +298,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       route,
       ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
       unit_repair_scope: unitRepairScope,
+      native_ppt_sample_layout_profile: nativePptSampleLayoutProfile(contract),
       contract: {
         overlay: contract.overlay,
         profile_id: contract.profile_id,
@@ -400,6 +391,14 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     });
   }
 
+  function nativeSampleShapePlanOutputContract(route: NativePptRoute, sampleProfile: JsonRecord | null) {
+    return buildNativeSampleShapePlanOutputContract({
+      aiFirstEditingContract: AI_FIRST_EDITING_CONTRACT,
+      route,
+      sampleProfile,
+    });
+  }
+
   async function generateEditableShapePlan({
     route,
     contract,
@@ -411,6 +410,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     adapter,
     validationFeedback = null,
     attemptIndex = 1,
+    codexInvocationBlockerFile = '',
   }: {
     route: NativePptRoute;
     contract: JsonRecord;
@@ -422,6 +422,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     adapter: string;
     validationFeedback?: JsonRecord | null;
     attemptIndex?: number;
+    codexInvocationBlockerFile?: string;
   }) {
     if (typeof generateStructuredArtifact !== 'function') {
       throw new Error('Native PPT proof lane requires generateStructuredArtifact for AI-first shape planning');
@@ -429,9 +430,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     const currentNativeArtifact = route === 'repair_pptx_native'
       ? (readCurrentNativePptArtifact(contract, deliverablePaths) || readAuthorNativePptArtifact(contract, deliverablePaths))
       : null;
+    const sampleProfile = nativePptSampleLayoutProfile(contract);
+    const useCompactSampleAuthoring = route === 'author_pptx_native' && sampleProfile?.required === true;
+    const baseAuthoringContext = typeof buildAuthoringContext === 'function' ? buildAuthoringContext(contract) : {};
     const baseContext = {
-      ...(typeof buildAuthoringContext === 'function' ? buildAuthoringContext(contract) : {}),
+      ...baseAuthoringContext,
       ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
+      native_ppt_sample_layout_profile: sampleProfile,
       unit_repair_scope: unitRepairScope,
       blueprint: blueprintArtifact?.slide_blueprint || {},
       visual_direction: visualArtifact?.visual_direction || {},
@@ -450,13 +455,36 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     let lastExecutorError: unknown = null;
     for (let executorRetryIndex = 0; executorRetryIndex <= maxExecutorRetries; executorRetryIndex += 1) {
       try {
+        const baseShapePlanOutputContract = useCompactSampleAuthoring
+          ? nativeSampleShapePlanOutputContract(route, sampleProfile)
+          : nativeShapePlanOutputContract(route);
+        const shapePlanOutputContract = validationFeedback
+          ? nativePlanPreflightParts.nativeShapePlanOutputContractForAttempt(
+              route,
+              validationFeedback,
+              baseShapePlanOutputContract,
+            )
+          : baseShapePlanOutputContract;
         const { data, generationRuntime } = await generateStructuredArtifact({
           adapter,
           family: 'ppt_deck',
           route,
-          promptRelativePath: PROMPT_PACK?.[route],
+          promptRelativePath: useCompactSampleAuthoring
+            ? 'prompts/ppt_deck/author_pptx_native_sample.md'
+            : PROMPT_PACK?.[route],
           context: {
-            ...baseContext,
+            ...(useCompactSampleAuthoring
+              ? compactNativeSampleContext({
+                  contract,
+                  baseAuthoringContext,
+                  blueprintArtifact,
+                  visualArtifact,
+                  unitRepairScope,
+                  repairFeedback,
+                  validationFeedback,
+                  attemptIndex,
+                })
+              : baseContext),
             native_shape_plan_executor_retry: executorRetryIndex > 0
               ? {
                   retry_index: executorRetryIndex,
@@ -465,7 +493,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
                 }
               : null,
           },
-          outputContract: nativePlanPreflightParts.nativeShapePlanOutputContractForAttempt(route, validationFeedback),
+          outputContract: shapePlanOutputContract,
           cwd: deliverablePaths.deliverableDir,
         });
         const normalizedInput = route === 'repair_pptx_native'
@@ -485,14 +513,39 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           generationRuntime: {
             ...generationRuntime,
             native_shape_plan_executor_retry_count: executorRetryIndex,
+            native_ppt_compact_sample_invocation: useCompactSampleAuthoring,
           },
           modelContract: data?.ai_first_editing_contract || null,
+          shapePlanOutputContract,
           executorRetryCount: executorRetryIndex,
         };
       } catch (error) {
         lastExecutorError = error;
         const message = error instanceof Error ? error.message : String(error);
         if (!/structured generation returned invalid JSON/i.test(message)) {
+          if (codexInvocationBlockerFile && isCodexInvocationFailure(error)) {
+            const diagnosticFile = writeCodexInvocationBlocker({
+              file: codexInvocationBlockerFile,
+              route,
+              contract,
+              deliverablePaths,
+              blueprintArtifact,
+              visualArtifact,
+              repairFeedback,
+              unitRepairScope,
+              validationFeedback,
+              attemptIndex,
+              adapter,
+              error,
+            });
+            const failure = error as NativeShapePlanInvocationFailure;
+            failure.failure_kind = safeText(failure.failure_kind, 'codex_cli_execution_blocked');
+            failure.artifact_file = diagnosticFile;
+            failure.artifact_refs = Array.from(new Set([
+              diagnosticFile,
+              ...safeArray(failure.artifact_refs).map((ref) => safeText(ref)).filter(Boolean),
+            ]));
+          }
           throw error;
         }
       }
@@ -511,6 +564,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     adapter,
     validationInputFile,
     editableShapePlanFile,
+    codexInvocationBlockerFile,
   }: {
     route: NativePptRoute;
     contract: JsonRecord;
@@ -522,8 +576,9 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     adapter: string;
     validationInputFile: string;
     editableShapePlanFile: string;
+    codexInvocationBlockerFile: string;
   }): Promise<NativePlanAttempt> {
-    const maxAttempts = Math.max(1, Number(process.env.REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS || 3));
+    const maxAttempts = Math.max(1, Number(process.env.REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS || 4));
     let validationFeedback: JsonRecord | null = null;
     let lastAttempt: NativePlanAttempt | null = null;
     const attemptArtifactRefs: string[] = [];
@@ -541,6 +596,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           adapter,
           validationFeedback,
           attemptIndex,
+          codexInvocationBlockerFile,
         });
       } catch (error) {
         const candidate = (error as Error & { nativeShapePlanCandidate?: JsonRecord })?.nativeShapePlanCandidate;
@@ -556,9 +612,15 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           attemptArtifactRefs,
           previousValidationFeedback: validationFeedback,
         });
-        if (!structuralFeedback || attemptIndex >= maxAttempts) {
-          if (error instanceof Error && attemptArtifactRefs.length > 0) {
-            (error as Error & { artifact_refs?: string[] }).artifact_refs = [...attemptArtifactRefs];
+        if (!structuralFeedback) {
+          if (error instanceof Error) {
+            const existingRefs = safeArray((error as NativeShapePlanInvocationFailure).artifact_refs)
+              .map((ref) => safeText(ref))
+              .filter(Boolean);
+            const refs = Array.from(new Set([...attemptArtifactRefs, ...existingRefs]));
+            if (refs.length > 0) {
+              (error as NativeShapePlanInvocationFailure).artifact_refs = refs;
+            }
           }
           throw error;
         }
@@ -566,6 +628,19 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         writeJson(attemptValidationFile, structuralFeedback);
         attemptArtifactRefs.push(attemptValidationFile);
         validationFeedback = structuralFeedback;
+        if (attemptIndex >= maxAttempts) {
+          lastAttempt = {
+            editableShapePlan: {},
+            generationRuntime: {},
+            modelContract: null,
+            shapePlanOutputContract: null,
+            validationFeedback,
+            attemptIndex,
+            executorRetryCount: 0,
+            attemptArtifactRefs: [...attemptArtifactRefs],
+          };
+          continue;
+        }
         continue;
       }
       const candidate = route === 'repair_pptx_native'
@@ -610,6 +685,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         validation,
         attemptIndex,
         attemptArtifactRefs,
+        previousValidationFeedback: validationFeedback,
       });
     }
     const error = new Error(`Native PPT ${route} AI-first editable_shape_plan did not pass preflight after ${maxAttempts} attempt(s): ${JSON.stringify(lastAttempt?.validationFeedback || validationFeedback)}`);
@@ -669,11 +745,13 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       adapter,
       validationInputFile: paths.planValidationFile,
       editableShapePlanFile: paths.editableShapePlanFile,
+      codexInvocationBlockerFile: paths.codexInvocationBlockerFile,
     });
     const {
       editableShapePlan,
       generationRuntime,
       modelContract,
+      shapePlanOutputContract,
       validationFeedback,
       attemptIndex,
       attemptArtifactRefs,
@@ -793,6 +871,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
         redcube_svg_ir: payload.redcube_svg_ir || shapeManifest.redcube_svg_ir || null,
         ai_first_editing_contract: AI_FIRST_EDITING_CONTRACT,
         ai_first_shape_plan_contract: modelContract || AI_FIRST_EDITING_CONTRACT,
+        ai_first_shape_plan_output_contract: shapePlanOutputContract || null,
         ai_first_shape_plan_preflight: {
           attempts: attemptIndex,
           validator: validationFeedback,

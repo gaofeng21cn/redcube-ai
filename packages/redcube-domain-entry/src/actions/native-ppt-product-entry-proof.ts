@@ -24,12 +24,29 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+function plainObject(value) {
+  return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+}
+
 function routeFromRequest(request) {
   const route = safeText(request?.route, 'author_pptx_native');
   if (!NATIVE_PPT_ROUTES.includes(route)) {
     throw new Error(`native PPT proof route 仅支持 ${NATIVE_PPT_ROUTES.join('|')}`);
   }
   return route;
+}
+
+function constraintsFromRequest(request) {
+  const constraints = { ...plainObject(request?.constraints) };
+  const nativeSampleSlideCount = Number(request?.native_sample_slide_count || request?.nativeSampleSlideCount || 0);
+  if (request?.native_visual_sample === true || request?.nativeVisualSample === true || nativeSampleSlideCount > 0) {
+    constraints.native_visual_sample = true;
+  }
+  if (nativeSampleSlideCount > 0) {
+    constraints.expected_slide_count = nativeSampleSlideCount;
+    constraints.max_slides = nativeSampleSlideCount;
+  }
+  return Object.keys(constraints).length > 0 ? constraints : undefined;
 }
 
 function nativeArtifactRefs(routeResult, sessionSurface) {
@@ -103,6 +120,7 @@ export async function runNativePptProductEntryProof(request) {
   const deliverableId = requireField('deliverable_id', request?.deliverable_id || request?.deliverableId);
   const entrySessionId = requireField('entry_session_id', request?.entry_session_id || request?.entrySessionId);
   const route = routeFromRequest(request);
+  const constraints = constraintsFromRequest(request);
 
   const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
   const nativeRoute = manifest?.native_ppt_operator_ux?.route_selection || {};
@@ -130,6 +148,7 @@ export async function runNativePptProductEntryProof(request) {
       adapter: safeText(request?.adapter),
       user_intent: safeText(request?.user_intent || request?.userIntent),
       stop_after_stage: safeText(request?.stop_after_stage || request?.stopAfterStage),
+      constraints,
     },
   });
   const routeResult = productEntry?.domain_entry_surface?.result_surface || {};

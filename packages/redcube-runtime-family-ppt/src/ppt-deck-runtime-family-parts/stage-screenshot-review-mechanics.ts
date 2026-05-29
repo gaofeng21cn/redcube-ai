@@ -300,6 +300,7 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
         non_text_visual_specific_ok: aiFirstMechanicalCheckValue(slideReviews, 'non_text_visual_specific_ok'),
         mechanical_card_template_absent: aiFirstMechanicalCheckValue(slideReviews, 'mechanical_card_template_absent'),
         panel_text_safe_area_ok: aiFirstMechanicalCheckValue(slideReviews, 'panel_text_safe_area_ok'),
+        text_card_internal_padding_ok: aiFirstMechanicalCheckValue(slideReviews, 'text_card_internal_padding_ok'),
         short_label_wrap_ok: aiFirstMechanicalCheckValue(slideReviews, 'short_label_wrap_ok'),
       } : {}),
       ...deriveProfileChecks(contract, blueprintArtifact, storylineArtifact),

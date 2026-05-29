@@ -53,6 +53,30 @@ export function nativePlanPanelSafeAreaFailures({
         panel_shape_id: safeText(panel?.shape_id, '<missing-panel-id>'),
         role: safeText(textShape?.role),
         required_inset_in: 0.15,
+        panel_bounds: {
+          left_in: Number(panelBounds.left_in.toFixed(4)),
+          top_in: Number(panelBounds.top_in.toFixed(4)),
+          width_in: Number(panelBounds.width_in.toFixed(4)),
+          height_in: Number(panelBounds.height_in.toFixed(4)),
+        },
+        panel_safe_bounds: {
+          left_in: Number(safeLeft.toFixed(4)),
+          top_in: Number(safeTop.toFixed(4)),
+          right_in: Number(safeRight.toFixed(4)),
+          bottom_in: Number(safeBottom.toFixed(4)),
+        },
+        shape_bounds: {
+          left_in: Number(textBounds.left_in.toFixed(4)),
+          top_in: Number(textBounds.top_in.toFixed(4)),
+          width_in: Number(textBounds.width_in.toFixed(4)),
+          height_in: Number(textBounds.height_in.toFixed(4)),
+        },
+        required_delta_in: {
+          left: Number(Math.max(0, safeLeft - textBounds.left_in).toFixed(4)),
+          top: Number(Math.max(0, safeTop - textBounds.top_in).toFixed(4)),
+          right: Number(Math.max(0, textRight - safeRight).toFixed(4)),
+          bottom: Number(Math.max(0, textBottom - safeBottom).toFixed(4)),
+        },
         geometry_repair_instruction: 'Keep the text box fully inside its containing visual panel with the required inset on all sides; shrink the text box, enlarge the panel, or move the text.',
       });
     }

@@ -253,6 +253,7 @@ function buildRouteCacheKey({
     prompt_pack: contract?.prompt_pack || null,
     review_surface: contract?.review_surface || null,
     delivery_contract: contract?.delivery_contract || null,
+    delivery_request_constraints: contract?.delivery_request?.constraints || null,
     route_user_intent: safeText(userIntent),
     required_artifacts: routeRequiresArtifacts(contract, route),
     mode,

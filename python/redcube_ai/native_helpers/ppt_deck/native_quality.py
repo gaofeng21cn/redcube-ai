@@ -6,6 +6,10 @@ from redcube_ai.native_helpers.ppt_deck.native_layouts import safe_text
 
 
 from redcube_ai.native_helpers.ppt_deck.native_quality_constants import *  # noqa: F403
+from redcube_ai.native_helpers.ppt_deck.native_quality_text_safety import (
+    panel_text_safe_area_failures,
+    text_card_internal_padding_failures,
+)
 
 
 def clamp(value: float, lower: float, upper: float) -> float:
@@ -103,52 +107,6 @@ def text_shape_estimated_lines(shape: dict) -> int:
     if not text:
         return 0
     return max(1, math.ceil(weighted_text_width_px(text, font_size) / max(width - (2 * MIN_NATIVE_TEXT_PANEL_INSET_PX), 1.0)))
-
-
-def panel_text_safe_area_failures(native_shapes: list[dict]) -> list[dict]:
-    panels = [
-        shape for shape in native_shapes
-        if safe_text(shape.get('role')) in {'content_panel', 'input_panel', 'source_panel'}
-        and shape.get('kind') in {'rect', 'rounded_rect'}
-    ]
-    text_shapes = [
-        shape for shape in native_shapes
-        if shape.get('quality_role') == 'content'
-        and shape.get('kind') == 'text_box'
-        and safe_text(shape.get('text'))
-    ]
-    failures = []
-    for panel in panels:
-        panel_rect = panel.get('bounds') or {}
-        safe_left = float(panel_rect.get('left') or 0.0) + MIN_NATIVE_TEXT_PANEL_INSET_PX
-        safe_top = float(panel_rect.get('top') or 0.0) + MIN_NATIVE_TEXT_PANEL_INSET_PX
-        safe_right = float(panel_rect.get('right') or 0.0) - MIN_NATIVE_TEXT_PANEL_INSET_PX
-        safe_bottom = float(panel_rect.get('bottom') or 0.0) - MIN_NATIVE_TEXT_PANEL_INSET_PX
-        for text_shape in text_shapes:
-            text_rect = text_shape.get('bounds') or {}
-            center_x = float(text_rect.get('left') or 0.0) + (float(text_rect.get('width') or 0.0) / 2.0)
-            center_y = float(text_rect.get('top') or 0.0) + (float(text_rect.get('height') or 0.0) / 2.0)
-            if not (
-                float(panel_rect.get('left') or 0.0) <= center_x <= float(panel_rect.get('right') or 0.0)
-                and float(panel_rect.get('top') or 0.0) <= center_y <= float(panel_rect.get('bottom') or 0.0)
-            ):
-                continue
-            text_right = float(text_rect.get('right') or 0.0)
-            text_bottom = float(text_rect.get('bottom') or 0.0)
-            if (
-                float(text_rect.get('left') or 0.0) >= safe_left
-                and float(text_rect.get('top') or 0.0) >= safe_top
-                and text_right <= safe_right
-                and text_bottom <= safe_bottom
-            ):
-                continue
-            failures.append({
-                'shape_id': text_shape.get('shape_id'),
-                'panel_shape_id': panel.get('shape_id'),
-                'role': text_shape.get('role'),
-                'required_inset_px': MIN_NATIVE_TEXT_PANEL_INSET_PX,
-            })
-    return failures
 
 
 def short_label_wrap_failures(native_shapes: list[dict]) -> list[dict]:
@@ -470,14 +428,15 @@ def slot_fill_audit(native_shapes: list[dict], primary_points: int) -> dict:
         )
     else:
         text_count = panel_count
-    if variant == 'summary_peak':
-        expected_slots = max(1, min(max(primary_points - 1, 1), 3))
-    elif variant.startswith('content_'):
+    if variant.startswith('content_'):
         expected_slots = min(max(1, primary_points), max(panel_count, 1))
     elif variant == 'structured_compare':
         expected_slots = min(max(1, primary_points), max(panel_count, 1))
     else:
-        expected_slots = max(1, min(primary_points, 4))
+        if variant == 'summary_peak':
+            expected_slots = min(max(1, primary_points), max(panel_count, 1))
+        else:
+            expected_slots = max(1, min(primary_points, 4))
     filled_slots = min(panel_count, text_count)
     failures = []
     if panel_count != expected_slots:
@@ -545,7 +504,7 @@ def grid_balance_audit(native_shapes: list[dict]) -> dict:
         route_lane_count = len(shapes_with_any_role(native_shapes, SYSTEM_MAP_ROUTE_ROLES))
         gate_card_count = len(shapes_with_any_role(native_shapes, {'gate_card', 'gate_ladder_panel', 'gate_stack_panel'}))
         evidence_band_count = len(shapes_with_any_role(native_shapes, {'evidence_band', 'evidence_panel', 'takeaway_band'}))
-        input_panel_count = len(shapes_with_any_role(native_shapes, {'input_panel', 'source_panel', 'content_panel'}))
+        input_panel_count = len(shapes_with_any_role(native_shapes, SYSTEM_MAP_INPUT_PANEL_ROLES))
         failures = []
         if route_lane_count < 2:
             failures.append({
@@ -849,6 +808,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
     title_core_failures = title_core_overlap_failures(content_shapes)
     structural_text_collisions = structural_text_collision_failures(native_shapes)
     panel_safe_area_failures = panel_text_safe_area_failures(native_shapes)
+    card_padding_failures = text_card_internal_padding_failures(native_shapes)
     label_wrap_failures = short_label_wrap_failures(native_shapes)
     slot_audit = slot_fill_audit(native_shapes, primary_points)
     label_failures = audience_label_readability_failures(content_shapes)
@@ -924,6 +884,7 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         'non_text_visual_specific_ok': structural_visual_count >= 1,
         'mechanical_card_template_absent': not mechanical_card_template_detected,
         'panel_text_safe_area_ok': len(panel_safe_area_failures) == 0,
+        'text_card_internal_padding_ok': len(card_padding_failures) == 0,
         'short_label_wrap_ok': len(label_wrap_failures) == 0,
     }
     issues = []
@@ -979,6 +940,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
         issues.append('native_mechanical_card_template_detected')
     if not checks['panel_text_safe_area_ok']:
         issues.append('panel_text_safe_area_violation')
+    if not checks['text_card_internal_padding_ok']:
+        issues.append('text_card_internal_padding_too_small')
     if not checks['short_label_wrap_ok']:
         issues.append('short_label_unbalanced_wrap')
     return {
@@ -1061,6 +1024,8 @@ def evaluate_native_slide_quality(native_shapes: list, primary_points: int) -> d
             'mechanical_card_template_absent': checks['mechanical_card_template_absent'],
             'panel_text_safe_area_ok': checks['panel_text_safe_area_ok'],
             'panel_text_safe_area_failures': panel_safe_area_failures,
+            'text_card_internal_padding_ok': checks['text_card_internal_padding_ok'],
+            'text_card_internal_padding_failures': card_padding_failures,
             'short_label_wrap_ok': checks['short_label_wrap_ok'],
             'short_label_wrap_failures': label_wrap_failures,
         },

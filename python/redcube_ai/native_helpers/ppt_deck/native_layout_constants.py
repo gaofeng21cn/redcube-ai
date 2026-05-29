@@ -69,6 +69,7 @@ AUXILIARY_TEXT_ROLES = {
     'page_no',
     'page_number',
     'source_note',
+    'speaker_identity',
 }
 LAYOUT_INTENT_REQUIRED_FIELDS = [
     'rhetorical_role',
@@ -115,6 +116,13 @@ MECHANICAL_CARD_PANEL_ROLES = {
     'takeaway_panel',
     'structured_note_panel',
 }
+TEXT_PANEL_ROLES = {
+    'content_panel',
+    'input_panel',
+    'input_map_panel',
+    'source_panel',
+    'source_map_panel',
+}
 AI_FIRST_MIN_SHAPES = 7
 AI_FIRST_MIN_CONTENT_SHAPES = 4
 AI_FIRST_MIN_VISUAL_SUPPORT_SHAPES = 2
@@ -124,6 +132,8 @@ POINT_INDEX_FLOOR_PT = 16.0
 OFFICECLI_DEFAULT_TEXT_MARGIN_IN = 0.02
 CONTENT_TEXT_DEFAULT_MARGIN_IN = 0.10
 MIN_TEXT_PANEL_INSET_IN = 0.15
+PANEL_SAFE_AREA_EPSILON_IN = 0.001
+MIN_TEXT_CARD_INTERNAL_PADDING_IN = 0.15
 MIN_SHORT_ROUTE_LABEL_WIDTH_IN = 4.20
 SHORT_ROUTE_LABEL_MAX_NORMALIZED_CHARS = 22
 MIN_CONNECTOR_THICKNESS_IN = 0.03
