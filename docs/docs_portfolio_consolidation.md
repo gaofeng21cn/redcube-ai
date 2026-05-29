@@ -86,6 +86,47 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 no-regression evidence refs absorb tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-29T20:37:55Z` 的 OPL-series frozen inventory 下处理 RCA clean ahead lane。RCA main 在快照内 clean、ahead `origin/main` 1、无额外 worktree、无快照前 1 小时写入、open PR 为 `[]`；本轮只复核并吸收已提交的 `2f3e9ce chore(rca): scale no-regression evidence refs`，不扩大到快照后活动，不关闭 OPL series 全局 `/goal`。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、核心五件套、`docs/active/rca-ideal-state-gap-plan.md`、`docs/status.md`、`docs/references/rca-visual-deliverable-agent-ideal-state.md` 和本文件。
+- Machine / source / tests touched by the ahead commit: `contracts/production_acceptance/rca-production-acceptance.json`、`contracts/runtime-program/current-program.json`、`contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/opl-family-contract-adoption.json`、`contracts/product_entry/operator_evidence_readiness_projection.json`、`contracts/fixtures/rca-evidence-receipt-fixture.json`、`packages/redcube-product-entry/src/get-product-entry-manifest-parts/operator-evidence-refs.ts`、`tests/evidence-scaleout-surfaces.test.ts`、`tests/rca-production-acceptance.test.ts`。
+- OPL Doc Governance doctor output from this run: `finding_count=0`, active truth `pass`.
+- Fresh PR check for the six OPL-series repos returned open PR `[]`.
+
+Fresh semantic result:
+
+- RCA production evidence scaleout now records 6 cross-route / cross-window body-free no-regression refs: the 2026-05-27 pair, the 2026-05-28 `ppt_deck` / `xiaohongshu` pair, and the 2026-05-30 native / xiaohongshu repeat pair.
+- The OPL refs-only receipt ref is updated to `opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs` across production acceptance, current-program, operator evidence projection, fixture and tests.
+- The active plan and status correctly keep `repeated_no_regression_claimed_as_soak=false` / `declares_production_soak_complete=false`; the new refs prove continued RCA-owned refs-only evidence projection, not visual ready、exportable、handoffable、domain ready、artifact authority、review/export verdict or production visual-stage long soak.
+- No source or contract surface in this tranche revives managed/gateway/runtime/session/domain_action_adapter compatibility alias or generic runtime ownership.
+
+| repo | reviewed docs/sections | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Ahead commit diff over production acceptance/current-program/operator evidence/source/tests; active plan/status sections that fold back the 6-ref no-regression evidence; this governance ledger. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. This tranche absorbs and records a current evidence-scaleout commit; no doc path lost its durable role.
+
+Unreviewed docs:
+
+- `redcube-ai`: no root/docs exact-path coverage gap reopened by this commit; future source/contract/doc changes can still reopen specific sections.
+- Other OPL series repos remain open under the global goal. OPL and MAS have ahead/dirty/recent lanes; App remains dirty and has a remote-backed dirty worktree.
+
+Remaining stale / retire candidates:
+
+- Future RCA docs or contracts that treat 6 no-regression refs, OPL refs-only ledger verification, provider/conformance output or zero PR state as production visual-stage long soak, visual ready, exportable, handoffable, domain ready, artifact authority or review/export verdict are stale pollution.
+- RCA implementation/evidence tails remain: Temporal controlled visual-stage long soak, generated/default caller thinning, strict source-purity cleanup, and compatibility-free retirement after no-active-caller proof.
+
+Next tranche write scope:
+
+- Continue OPL series frozen-inventory cleanup with OPL/MAS/RCA/App lanes according to dirty/recent/ahead safety. Prefer safe clean lanes or focused document clusters; do not delete dirty/recent worktrees or remote-backed App lanes.
+- Return to RCA only for newly changed docs/source/contracts/read-model or for owner/evidence lanes that close the remaining Temporal long-soak, default-caller thinning, strict-purity or compatibility-free retirement tails.
+
 ### 2026-05-29 active stale-wording and retirement-gate tranche
 
 本轮覆盖 RCA active truth / stale wording 复核，不改变 RCA active plan 的完成判断。目标是确认 active docs 里出现的 `managed`、`gateway`、`runtime`、`session`、`domain_action_adapter`、Hermes 和 compatibility 词汇仍被限定为 semantic-id、refs-only adapter、domain handler target、package/protocol boundary、retired guard 或 provenance，不把旧 public path / wrapper / facade / alias 写回 active owner。
