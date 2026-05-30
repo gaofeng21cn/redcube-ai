@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "RedCube AI",
     "shortDescription": "Visual deliverable domain app for Codex.",
-    "longDescription": "Adds a thin Codex plugin entry for RedCube AI while preserving the existing CLI, gateway contracts, and same-session deliverable loop surfaces.",
+    "longDescription": "Adds a thin Codex plugin entry for RedCube AI while routing generated status/session/manifest wrappers through OPL and preserving RCA direct product invoke plus domain-handler export/dispatch targets.",
     "developerName": "Gao Feng",
     "category": "Creative",
     "capabilities": [
@@ -30,8 +30,8 @@
     "composerIcon": "./assets/icon.png",
     "logo": "./assets/icon.png",
     "defaultPrompt": [
-      "Open the RedCube AI status for this workspace.",
-      "Inspect the current RedCube product-entry manifest.",
+      "Read the RedCube AI domain-handler export for this workspace.",
+      "Inspect the current OPL generated product-entry refs for RedCube AI.",
       "Continue the active RedCube deliverable loop in the same entry session."
     ],
     "brandColor": "#C65D2E"

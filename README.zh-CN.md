@@ -136,7 +136,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 当前已验证的公开入口面是单一 `redcube-ai` 应用技能、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与仓库跟踪合同，就构成了稳定可调用面。OPL/Temporal 托管调度是任务启动后的默认运行口径，本地默认具体 stage executor 仍是 `Codex CLI`，非默认 executor / proof adapter 继续只在显式选择时出现。
 - RedCube 可以通过 Codex 应用技能直接调用，也可以作为外部领域智能体被 OPL 托管调用。两条路径必须回到同一套 RedCube 持有的 route、review、artifact 和 export surface。
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
-- 如果外部智能体或 OPL 需要直接读取仓库跟踪的技能面，使用单一 `redcube-ai` 应用技能，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI 命令；`status` / `invoke` / `session` 继续作为这个技能下面的机器可读命令合同。`redcube product status` 是当前 product overview 命令，语义是产品入口概览 / 材料接收壳，不代表成熟的人用 GUI 或 WebUI；OPL 托管路径仍然只是内部集成面。
+- 如果外部智能体或 OPL 需要直接读取仓库跟踪的技能面，使用单一 `redcube-ai` 应用技能，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI 命令；`redcube product invoke` 是 repo-local direct product target，`domain-handler export|dispatch` 是当前 RCA active handler target；product-entry status / session / manifest wrapper 由 OPL generated/default caller 持有，不是 repo-local `redcube product` 默认命令。product-entry status surface 仍是 agent-facing overview / intake shell，不代表成熟的人用 GUI 或 WebUI；OPL 托管路径仍然只是内部集成面。
 - 测试 lane 真相放在 `scripts/test-registry.ts`，当前验证矩阵以 [当前状态](./docs/status.md) 为准。`smoke` 是最小本地入口，`fast` 是核心回归快线，hosted CI 等价于 `npm run test:ci`，`historical` 只在显式要求时运行。
 - `docs/active/` 用来读当前 baton，`docs/references/` 用来读当前支撑参考，`docs/history/` 用来读已吸收里程碑、proof 记录、tombstone 和 provenance；Agent 不需要先从零散实现文件里反推当前执行真相。
 
