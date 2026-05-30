@@ -314,6 +314,7 @@ function buildContracts() {
     domain_descriptor: buildDomainDescriptor(),
     pack_compiler_input: buildPackCompilerInput(visualPackCompilerHandoff),
     generated_surface_handoff: buildGeneratedSurfaceHandoff(),
+    foundry_agent_series: buildFoundryAgentSeriesContract(stageControlPlane),
     action_catalog: withActionCatalogGuards(actionCatalog),
     stage_control_plane: stageControlPlane,
     memory_descriptor: buildMemoryDescriptor(skeleton),
@@ -322,6 +323,70 @@ function buildContracts() {
     functional_privatization_audit: buildFunctionalAudit(functionalAudit),
     private_functional_surface_policy: buildPrivateFunctionalSurfacePolicy(),
     physical_source_morphology_policy: buildPhysicalSourceMorphologyPolicy(),
+  };
+}
+
+function buildFoundryAgentSeriesContract(stageControlPlane) {
+  return {
+    surface_kind: 'opl_foundry_agent_series_contract',
+    version: 'foundry-agent-series.v1',
+    owner: 'one-person-lab',
+    product_layer: 'foundry_agent',
+    product_model: 'OPL Framework -> One Person Lab App -> Foundry Agents',
+    standard_agent_requirement:
+      'foundry_agents_share_identity_stage_authority_progress_currentness_closeout_and_app_projection_packets',
+    domain_id: 'redcube',
+    foundry_agent_id: 'redcube',
+    domain_label: 'Presentation Foundry',
+    domain_aliases: [DOMAIN_ID, 'redcube-ai', 'rca'],
+    authority_owner: stageControlPlane.owner,
+    stage_control_plane_ref: 'contracts/stage_control_plane.json',
+    stage_control_plane_target_domain_id: stageControlPlane.target_domain_id,
+    app_projection_ref: 'contracts/generated_surface_handoff.json#/product_entry',
+    required_identity_fields: [
+      'domain_id',
+      'foundry_agent_id',
+      'product_layer',
+      'domain_label',
+      'authority_owner',
+      'stage_control_plane_ref',
+    ],
+    required_stage_packets: [
+      'user_stage_log_contract',
+      'progress_delta_policy',
+      'typed_blocker_lineage_policy',
+      'effective_current_context',
+      'owner_receipt_or_typed_blocker_closeout',
+    ],
+    shared_progress_projection_fields: [
+      'progress_delta_classification',
+      'deliverable_progress_delta',
+      'platform_repair_delta',
+      'next_forced_delta',
+    ],
+    domain_progress_aliases: {
+      deliverable: ['visual_deliverable_progress', 'deliverable_progress_delta'],
+      platform: ['platform_repair_delta'],
+    },
+    domain_adapter_policy: {
+      domain_specific_aliases_only: true,
+      no_parallel_progress_schema: true,
+      no_parallel_blocker_lineage_schema: true,
+      no_domain_runtime_fork: true,
+    },
+    app_projection_policy: {
+      app_consumes_shared_progress_projection_only: true,
+      app_can_read_domain_body: false,
+      app_can_write_domain_truth: false,
+      app_can_claim_quality_or_export: false,
+      display_policy: 'classification_only_no_domain_artifact_body',
+    },
+    authority_boundary: {
+      opl_owns_series_contract: true,
+      domain_owns_truth_quality_artifact_memory_and_receipts: true,
+      app_owns_display_and_user_action_shell: true,
+      generated_surface_can_claim_domain_ready: false,
+    },
   };
 }
 

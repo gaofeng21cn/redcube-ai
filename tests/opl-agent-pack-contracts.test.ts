@@ -218,6 +218,7 @@ function buildCanonicalPack() {
 test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   const canonical = buildCanonicalPack();
 
+  const foundrySeries = readJson('contracts/foundry_agent_series.json');
   assert.deepEqual(readJson('contracts/action_catalog.json'), canonical.actionCatalog);
   assert.deepEqual(readJson('contracts/stage_control_plane.json'), canonical.stageControlPlane);
   assert.deepEqual(readJson('contracts/memory_descriptor.json'), canonical.memoryDescriptor);
@@ -229,6 +230,14 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     readJson('contracts/physical_source_morphology_policy.json'),
     canonical.physicalSourceMorphologyPolicy,
   );
+  assert.equal(foundrySeries.surface_kind, 'opl_foundry_agent_series_contract');
+  assert.equal(foundrySeries.version, 'foundry-agent-series.v1');
+  assert.equal(foundrySeries.product_layer, 'foundry_agent');
+  assert.equal(foundrySeries.domain_id, 'redcube');
+  assert.equal(foundrySeries.stage_control_plane_target_domain_id, 'redcube_ai');
+  assert.equal(foundrySeries.domain_adapter_policy.no_parallel_progress_schema, true);
+  assert.equal(foundrySeries.app_projection_policy.app_consumes_shared_progress_projection_only, true);
+  assert.equal(foundrySeries.app_projection_policy.app_can_read_domain_body, false);
 });
 
 test('RCA physical source morphology policy classifies active source tails without generic ownership', () => {
@@ -442,6 +451,51 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
     assert.equal(stage.stage_contract.monitor_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.dashboard_metric_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.metric_refs.length >= 4, true, stage.stage_id);
+    assert.equal(
+      stage.stage_contract.progress_delta_policy.surface_kind,
+      'opl_stage_progress_delta_policy',
+      stage.stage_id,
+    );
+    assert.deepEqual(
+      stage.stage_contract.progress_delta_policy.required_fields,
+      [
+        'progress_delta_classification',
+        'deliverable_progress_delta',
+        'platform_repair_delta',
+        'next_forced_delta',
+      ],
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.progress_delta_policy.platform_only_is_not_deliverable_progress,
+      true,
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.typed_blocker_lineage_policy.surface_kind,
+      'family-stall-lineage.v1',
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('blocker_family'),
+      true,
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('repeat_count'),
+      true,
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('next_forced_delta'),
+      true,
+      stage.stage_id,
+    );
+    assert.equal(
+      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('escalation_owner'),
+      true,
+      stage.stage_id,
+    );
     assert.equal(
       stage.stage_contract.metric_refs.some((metricRef) => metricRef.role === 'expected_success_ref'),
       true,
