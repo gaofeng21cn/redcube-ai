@@ -86,6 +86,153 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 RCA generated wrapper boundary revalidation tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-30T07:05:34Z` 的 OPL-series
+frozen inventory 下处理 RCA clean/synced lane。RCA root
+`HEAD == origin/main == 0f70c2836edf40fb870443bdefbd565349a1f59b`，
+staged 0、dirty 0、recent-to-snapshot 0、post-snapshot 0，tracked human
+docs 92，all README 25，open PR 为 `[]`；`ls-remote` 两次遇到 LibreSSL
+transport failure，故本轮不做任何 remote mutation，只把 main 上最新
+`docs: refresh RCA generated wrapper boundary` 的 live truth 折回本文档组合
+治理台账。
+
+Six-repo frozen inventory summary:
+
+- `one-person-lab`: main clean/synced at
+  `1706dfbed946105924b2edde0263f79967514f7a`；snapshot 1 小时内写入
+  `docs/active/current-state-vs-ideal-gap.md` 与 `docs/status.md`，remote-only
+  `origin/fix/opl-temporal-worker-stale-repair-20260528` 继续缺少 positive
+  automation ownership / no external refs 证明。
+- `med-autoscience`: main synced but dirty in 10 tracked files plus untracked
+  `src/med_autoscience/controllers/study_progress_parts/current_owner_handoff_projection.py`；
+  dirty old worktree `fix/github-ci-20260530-mas-preflight` 保留，且
+  `tests/study_progress_cases/ai_repair_lifecycle_projection.py` 是
+  post-snapshot write。
+- `med-autogrant`: main clean/synced at
+  `c81f1f77b79b715a30f7b0f1553df89b50d8bfb5`；snapshot 1 小时内写入
+  `.agents/plugins/marketplace.json` 与
+  `tests/product_entry_cases/test_progress_cockpit.py`；remote
+  `origin/feature/ai-narration-contracts` 继续按 external/superseded retained。
+- `redcube-ai`: selected clean/synced lane at
+  `0f70c2836edf40fb870443bdefbd565349a1f59b`；local remote refs still include
+  historical `gflab/main` mirror refs, not touched.
+- `opl-meta-agent`: main clean/synced at
+  `3f717c683e2940552364a6c75b2a40555aad496a`，无 recent/post-snapshot writes。
+- `one-person-lab-app`: main synced but dirty only in untracked `.playwright-mcp/`；
+  dirty remote-backed worktree
+  `codex/full-first-run-stable-gate-20260525` 保留。
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、root `README.md`、`docs/status.md`、
+  `docs/active/rca-ideal-state-gap-plan.md`、
+  `docs/references/rca-visual-deliverable-agent-ideal-state.md` and this
+  governance ledger.
+- Latest commit reviewed: `0f70c283 docs: refresh RCA generated wrapper boundary`,
+  touching `README.zh-CN.md`、`docs/status.md` and
+  `plugins/rca/.codex-plugin/plugin.json`.
+- Machine/read-model evidence:
+  `/Users/gaofeng/workspace/one-person-lab/bin/opl agents conformance --repo-dir /Users/gaofeng/workspace/redcube-ai --json`
+  returned `status=passed`, `summary.blocked_count=0`, and
+  `summary.production_evidence_tail_count=1`;
+  `opl stages readiness --domain rca --json` returned `status=launch_warning`,
+  `summary.hard_blocker_count=0`, `summary.warning_count=4`, and all warnings are
+  `expected_receipt_ref_missing` for `human_gate:redcube_operator_review_gate`
+  replay evidence in `communication_strategy`、`visual_direction`、
+  `artifact_creation` and `review_and_revision`;
+  `opl generated-agent-interfaces` output returned `status=ready`,
+  `generated_surface_owner=one-person-lab`, and
+  `domain_repo_can_own_generated_surface=false`.
+- OPL Doc Governance doctor returned `finding_count=0`,
+  `active_truth_health.status=pass`, `markdown_doc_count=90`.
+- `contracts/action_catalog.json` keeps generated status/start/preflight/session/
+  manifest shell commands under `opl_generated:*`, keeps `redcube product invoke`
+  as the repo-local direct product target, and keeps
+  `redcube domain-handler export|dispatch` as product domain handler target
+  surfaces. The catalog boundary names OPL / One Person Lab as generated
+  interface, generic session/workbench, default generic dispatch and default
+  supervision owner.
+- `plugins/rca/.codex-plugin/plugin.json` now describes the plugin shell as
+  routing generated status/session/manifest wrappers through OPL while preserving
+  RCA direct product invoke plus domain-handler export/dispatch targets.
+
+Fresh semantic result:
+
+- RCA's generated wrapper boundary is current: OPL owns generated
+  CLI/MCP/Skill/product-entry/status/session/domain_action_adapter/workbench
+  wrappers; RCA retains visual-domain handler targets, authority refs, direct
+  `redcube product invoke`, and `domain-handler export|dispatch`.
+- The latest README/status/plugin wording matches the action catalog, generated
+  interface bundle and active gap plan. No active truth body rewrite was needed
+  beyond this ledger foldback.
+- Conformance pass and generated interface readiness do not close production
+  visual-stage long soak, visual ready, exportable, handoffable, domain ready,
+  default-caller cutover, or physical source-purity tail. Stage readiness remains
+  `launch_warning` because four replay evidence refs for
+  `human_gate:redcube_operator_review_gate` are still missing.
+- No source/interface/test/workflow/entry retirement proof is complete in this
+  tranche. The retained repo-local wrappers/adapters still need
+  no-active-caller proof, OPL generated/default caller parity, owner receipt /
+  typed blocker roundtrip, no-forbidden-write proof and tombstone/provenance
+  foldback before deletion.
+
+| repo | reviewed docs / surfaces | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Root README, current status, active gap plan, ideal-state reference, latest generated-wrapper commit, action catalog, plugin manifest, OPL conformance/readiness/generated-interface read models, doctor output and this ledger. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. This tranche did not move, tombstone, archive or delete a doc path.
+
+Retired modules / interfaces / tests / workflows / entries:
+
+- none. This tranche did not retire source, contract, test, workflow, CLI/MCP
+  entry, alias, facade, wrapper or compatibility surface.
+
+Retained public-surface reasons:
+
+- `redcube-ai` app skill, CLI/MCP, `redcube product invoke`,
+  `redcube domain-handler export|dispatch`, family action catalog, product-entry
+  manifest and generated interface refs remain current package / direct-entry /
+  domain-handler target surfaces.
+- Repo-local product/session/status/domain_action_adapter helper code and
+  projections remain only as refs-only adapter, domain handler target, fixture,
+  diagnostic or migration input until OPL generated/default caller parity and
+  no-active-caller deletion evidence exist.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche does not re-audit all 92 `README*` /
+  `docs/**/*.md` paths section by section. It covers the latest generated-wrapper
+  boundary refresh and the live surfaces needed to validate that refresh.
+- Other OPL-series repos remain open under the global goal.
+
+Remaining stale / retire candidates:
+
+- RCA production evidence tail, Temporal controlled visual-stage long soak,
+  production-like repeated family route no-regression, generated/default caller
+  cutover, repo-local wrapper/adapter thinning, strict source-purity tail, and
+  compatibility-free retirement after no-active-caller proof.
+- Any future wording that treats OPL generated wrapper readiness, conformance
+  pass, stage readiness launch warning, provider scheduling, replay evidence,
+  refs-only receipt, domain-dispatch receipt or cleanup proof as RCA visual
+  ready, exportable, handoffable, domain ready or production ready is stale
+  pollution.
+
+Post snapshot activity:
+
+- No unrelated RCA post-snapshot activity was observed before this selected
+  ledger edit. This ledger write is the in-scope tranche foldback and does not
+  expand scope to other repos or blocked lanes.
+
+Next tranche write scope:
+
+- Continue OPL-series fresh intake. Reopen RCA only if the action catalog,
+  generated interface bundle, plugin manifest, direct/domain-handler target
+  command surface, active gap plan, OPL conformance/readiness output, or
+  no-active-caller proof changes.
+
 ### 2026-05-30 RCA Foundry Agent series stage-pack foldback tranche
 
 本轮在 `RUN_SNAPSHOT_TS=2026-05-30T02:58:19Z` 的
