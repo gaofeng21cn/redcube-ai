@@ -86,6 +86,128 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger
 
+### 2026-05-30 RCA Foundry Agent series stage-pack foldback tranche
+
+本轮在 `RUN_SNAPSHOT_TS=2026-05-30T02:58:19Z` 的
+OPL-series frozen inventory 下处理 RCA clean/synced lane。RCA root
+`HEAD == origin/main == eac8388fcdc87145ec904078653aa5aa9ccbfc5a`，
+无 dirty 文件、无额外 worktree、recent-to-snapshot 为 0、post-snapshot 为
+0，open PR 为 `[]`；因此本轮只把已在 main 的
+`feat(rca): align stage pack with foundry series` source/contract/test/docs
+事实折回本文档组合治理台账，不接管其他 repo 的 dirty、recent、process
+或 remote-backed lane，也不关闭 OPL series 全局 `/goal`。
+
+Six-repo frozen inventory summary:
+
+- `one-person-lab`: main clean/synced at `7064c5cdbbbdffbdaba03633cf984f178327a791`，无 recent/post-snapshot 写入；remote-only
+  `origin/fix/opl-temporal-worker-stale-repair-20260528` 仍因 ownership 未证实而保留。
+- `med-autoscience`: main synced but dirty in
+  `docs/status.md` and `docs/active/mas-ideal-state-gap-plan.md`，recent-to-snapshot
+  8；`codex/protect-mas-foundry-series` 与 dirty old preflight worktree 仍保留。
+- `med-autogrant`: main clean/synced at `fced91c12e26a07a114ac97e72471008cb97f816`，
+  recent-to-snapshot 1 (`.agents/plugins/marketplace.json` mtime from verification)，remote
+  `feature/ai-narration-contracts` 已在上一轮判定为 semantically superseded 但 retained external。
+- `redcube-ai`: clean/synced at `eac8388fcdc87145ec904078653aa5aa9ccbfc5a`，
+  selected for this foldback.
+- `opl-meta-agent`: clean/synced at `3f717c683e2940552364a6c75b2a40555aad496a`，
+  no recent/post-snapshot writes; remains covered unless inventory/truth changes.
+- `one-person-lab-app`: synced but dirty only in untracked `.playwright-mcp/`; dirty
+  remote-backed `codex/full-first-run-stable-gate-20260525` worktree remains retained.
+
+Live truth inputs:
+
+- RCA `AGENTS.md`、`TASTE.md`、root `README.md` / `README.zh-CN.md`、
+  `docs/README.md`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、
+  `docs/invariants.md`、`docs/decisions.md`、
+  `docs/active/rca-ideal-state-gap-plan.md`、
+  `docs/references/rca-visual-deliverable-agent-ideal-state.md` and this ledger.
+- Latest commit reviewed: `eac8388f feat(rca): align stage pack with foundry series`,
+  touching `contracts/foundry_agent_series.json`,
+  `contracts/stage_control_plane.json`, `docs/status.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`,
+  `packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts`,
+  `scripts/sync-opl-agent-contracts.ts`, and
+  `tests/opl-agent-pack-contracts.test.ts`.
+- Machine/read-model evidence:
+  `/Users/gaofeng/workspace/one-person-lab/bin/opl agents conformance --repo-dir /Users/gaofeng/workspace/redcube-ai --json`
+  returned `status=passed` with 6 admitted stages, no blockers, and production evidence
+  tail reported separately; `opl stages readiness --domain rca --json` returned
+  `status=launch_warning`, `hard_blocker_count=0`, and 4 replay-evidence warnings for
+  missing `human_gate:redcube_operator_review_gate` refs in replay evidence.
+- OPL Doc Governance doctor returned `finding_count=0`,
+  `active_truth_health.status=pass`, `markdown_doc_count=90`.
+
+Fresh semantic result:
+
+- `contracts/foundry_agent_series.json` now declares RCA as an
+  `opl_foundry_agent_series_contract` in `product_layer=foundry_agent` with
+  `domain_id=redcube` and `stage_control_plane_target_domain_id=redcube_ai`.
+- `contracts/stage_control_plane.json` and
+  `packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts`
+  expose the 6 visual stages with OPL standard `user_stage_log_contract`,
+  Progress-First `progress_delta_policy`, runtime event refs and strict authority
+  boundaries. OPL can schedule/project stage attempts, but cannot write RCA visual
+  truth, review/export verdict, artifact body, memory body, domain-ready verdict,
+  visual-ready verdict, exportable verdict or production-ready claim.
+- `tests/opl-agent-pack-contracts.test.ts` fixes the current no-resurrection guard:
+  foundry-series contract shape, App projection boundary, no parallel progress schema,
+  stage-control contract parity, progress-delta policy, runtime event refs, minimal
+  visual authority taxonomy and default-caller deletion evidence remain tested.
+- Current `README*`、`docs/status.md`、`docs/architecture.md`、`docs/decisions.md`
+  and active gap plan already carry the same Foundry Agent / OPL-compatible package
+  boundary, so no active truth body rewrite was needed in this tranche.
+
+| repo | reviewed docs / surfaces | edited docs |
+| --- | --- | --- |
+| `redcube-ai` | Root README pair, core docs, active gap plan, ideal-state reference, latest foundry-series commit, foundry-series contract, stage control plane, domain-entry stage-control source, OPL conformance/readiness read models, doctor output and focused tests. | this coverage ledger |
+
+Archived / tombstoned / deleted docs:
+
+- none. This tranche did not move, tombstone, archive or delete a doc path.
+
+Retired modules / interfaces / tests / workflows / entries:
+
+- none. This tranche did not retire source, contract, test, workflow, CLI/MCP entry,
+  alias, facade, wrapper or compatibility surface.
+
+Retained public-surface reasons:
+
+- `README.md` / `README.zh-CN.md` remain public human entrypoints and are not machine truth.
+- `redcube-ai` app skill, CLI/MCP, service-safe domain entry, product-entry/domain-handler
+  refs, `contracts/foundry_agent_series.json` and `contracts/stage_control_plane.json`
+  remain retained because they are current Foundry Agent package / generated-surface /
+  domain-handler target inputs while OPL default caller cutover and physical deletion
+  evidence tails remain open.
+
+Unreviewed docs:
+
+- `redcube-ai`: this tranche does not re-audit all 92 `README*` / `docs/**/*.md`
+  paths section by section. It covers the latest foundry-series stage-pack foldback
+  and the core docs / machine refs needed to validate that foldback.
+- Other OPL-series repos remain open under the global goal.
+
+Remaining stale / retire candidates:
+
+- RCA active wrapper / adapter thinning, OPL default-caller cutover, physical source
+  morphology tail, replay evidence warnings, and production/visual-ready/export-ready
+  authority evidence remain governed by `docs/active/rca-ideal-state-gap-plan.md`.
+- Any future wording that turns conformance pass, stage readiness launch warning,
+  OPL provider scheduling, Progress-First projection, Foundry Agent package identity
+  or App projection metadata into RCA visual-ready, exportable, handoffable,
+  domain-ready or production-ready claims is stale pollution.
+
+Post snapshot activity:
+
+- none observed in RCA for this tranche. MAS dirty docs and active MAS/App/Yang
+  processes remain next-heartbeat intake signals outside this RCA scope.
+
+Next tranche write scope:
+
+- Continue OPL-series fresh intake. RCA should only reopen this foldback if
+  `contracts/foundry_agent_series.json`, `contracts/stage_control_plane.json`,
+  the domain-entry stage-control source, OPL conformance/readiness read models or
+  the active truth wording changes.
+
 ### 2026-05-30 RCA README overview-v2 blocked intake tranche
 
 本轮延续 `RUN_SNAPSHOT_TS=2026-05-29T22:43:09Z`（本地 `2026-05-30T06:43:09+0800`）的 OPL-series frozen inventory，不重新扩大 scope。RCA root 在快照内同步 `origin/main` at `3beee363ed80cf70562e80d4481d42ab3ecc17a2`，且已存在 `README.md` / `README.zh-CN.md` dirty 和未跟踪 `assets/branding/redcube-ai-overview-v2.png`。本轮只审计这组 README overview-v2 lane 是否可吸收；由于 `README.md` 在快照后出现写入，本轮停止吸收动作，只提交本治理 ledger 记录 blocker。
