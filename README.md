@@ -128,6 +128,7 @@ You can start with prompts like:
 <details>
   <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
 
+- No. Cloning this repo does not auto-install OPL Framework or the hosted runtime. To make RedCube usable, first make the current `one-person-lab` checkout or release bundle available, then use the single `redcube-ai` app skill and the repo-local `redcube product invoke` target or the CLI-backed command shown below.
 - Read the [Docs Guide](./docs/README.md) first. It explains the direct RedCube route, the OPL-hosted integration path, the stable capability surface, and the current technical baseline.
 - Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
 - Treat the public package as `RedCube AI Foundry Agent`: an OPL-compatible package built on the OPL Framework that publishes one app skill, one service-safe domain entry, product domain_handler/projection refs, and stage-control projection metadata while keeping domain truth inside RCA.

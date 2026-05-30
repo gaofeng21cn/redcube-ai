@@ -129,6 +129,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 <details>
   <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
 
+- 不会自动安装。单独 clone 这个仓不会把 OPL Framework 或托管运行时一起装好。要把 RedCube 用到能用，先准备好当前的 `one-person-lab` checkout 或 release bundle，然后再用单一 `redcube-ai` 应用技能和仓内的 `redcube product invoke` 入口，或下面的 CLI 命令。
 - 先读 [文档索引](./docs/README.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
 - 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product domain_action_adapter / projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
