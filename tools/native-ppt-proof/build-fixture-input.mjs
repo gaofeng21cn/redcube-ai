@@ -17,6 +17,20 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+function contentCharCount(text) {
+  return [...safeText(text)]
+    .filter((char) => !/\s/.test(char) && !['，', '。', '、', ',', '.', ':', '：', ';', '；'].includes(char))
+    .length;
+}
+
+function qualityPointText(text, index) {
+  const normalized = safeText(text, `Point ${index + 1}`);
+  if (contentCharCount(normalized) >= 12) {
+    return normalized;
+  }
+  return `${normalized} carries explicit review evidence`;
+}
+
 function slidePoints(slide, slotCount = null) {
   const values = [];
   for (const item of Array.isArray(slide.page_core_content) ? slide.page_core_content : []) {
@@ -30,7 +44,9 @@ function slidePoints(slide, slotCount = null) {
   while (values.length < (slotCount ?? 4)) {
     values.push(`Evidence point ${values.length + 1} remains editable in native PPT.`);
   }
-  return values.slice(0, Math.max(slotCount ?? values.length, 1));
+  return values
+    .slice(0, Math.max(slotCount ?? values.length, 1))
+    .map((text, index) => qualityPointText(text, index));
 }
 
 function slotGeometry(total, index) {
@@ -106,13 +122,34 @@ function layoutVisualIntent(layoutFamily) {
 }
 
 function structuralShapes(layoutFamily, slideId) {
+  if (layoutFamily === 'cover_signal') {
+    return [
+      {
+        shape_id: `${slideId}-ai-signal-hub`,
+        kind: 'oval',
+        role: 'signal_hub',
+        quality_role: 'decorative',
+        bounds: { left_in: 14.26, top_in: 2.7, width_in: 0.72, height_in: 0.72 },
+        fill: '#B94624',
+        line: 'none',
+      },
+      {
+        shape_id: `${slideId}-ai-signal-connector`,
+        kind: 'line',
+        role: 'signal_connector',
+        quality_role: 'decorative',
+        bounds: { left_in: 14.6, top_in: 3.44, width_in: 0.06, height_in: 2.05 },
+        line: '#B94624',
+      },
+    ];
+  }
   if (layoutFamily === 'timeline_band') {
     return [{
       shape_id: `${slideId}-ai-timeline-rail`,
       kind: 'line',
       role: 'timeline_rail',
       quality_role: 'decorative',
-      bounds: { left_in: 1.15, top_in: 4.55, width_in: 13.1, height_in: 0.06 },
+      bounds: { left_in: 1.1, top_in: 2.98, width_in: 13.3, height_in: 0.06 },
       line: '#B94624',
     }];
   }
@@ -142,7 +179,7 @@ function structuralShapes(layoutFamily, slideId) {
         kind: 'line',
         role: 'axis_connector',
         quality_role: 'decorative',
-        bounds: { left_in: 3.0, top_in: 4.58, width_in: 9.5, height_in: 0.05 },
+        bounds: { left_in: 7.31, top_in: 4.58, width_in: 0.32, height_in: 0.05 },
         line: '#B94624',
       },
     ];
@@ -163,9 +200,200 @@ function structuralShapes(layoutFamily, slideId) {
     kind: 'line',
     role: 'bridge_connector_rail',
     quality_role: 'decorative',
-    bounds: { left_in: 1.1, top_in: 6.18, width_in: 13.15, height_in: 0.06 },
+    bounds: { left_in: 1.1, top_in: 7.78, width_in: 13.15, height_in: 0.06 },
     line: '#B94624',
   }];
+}
+
+function templateLayoutGrammar() {
+  const catalog = [
+    ['cover_signal', 'hero signal board with explicit claim and evidence field'],
+    ['multi_zone_compare', 'comparison board with separated editable evidence zones'],
+    ['timeline_band', 'timeline band with milestone evidence outside the rail'],
+    ['judgement_ladder', 'decision ladder with structured step evidence'],
+    ['ring_cross', 'hub and axis synthesis map with bounded evidence'],
+    ['summary_peak', 'closing synthesis board with proof and takeaway field'],
+  ].map(([archetypeId, layoutDescription]) => ({
+    archetype_id: archetypeId,
+    use_when: `Use for ${archetypeId.replace(/_/g, ' ')} fixture slides when the AI plan chooses this composition.`,
+    layout_description: layoutDescription,
+    required_zones: ['title_zone', 'claim_zone', 'body_zone'],
+    content_schema: {
+      required_shape_roles: ['title', 'core_sentence', 'point_text'],
+      required_shape_role_groups: [
+        'title_text',
+        'core_claim_text',
+        'content_container',
+        'audience_body_text',
+        'structural_visual',
+      ],
+      min_filled_required_zone_share: 1,
+      max_audience_text_shapes: 12,
+      min_body_font_pt: 18,
+    },
+    prohibited: [
+      'helper-selected template fallback',
+      'shape coordinates without a semantic zone',
+      'structural rails crossing readable text',
+    ],
+  }));
+  return {
+    grammar_id: 'native_ppt_proof_template_layout_grammar_v1',
+    owner: 'llm_agent',
+    required: true,
+    materializer_role: 'execute_selected_archetype_zones_only',
+    helper_template_layout_allowed: false,
+    reference_discipline: {
+      template_profile_required: true,
+      semantic_layout_selection_required: true,
+      placeholder_capacity_required: true,
+      reference_deck_analysis_required: true,
+      action_title_required: true,
+      source_projects: ['ppt-master', 'PPTAgent', 'officecli-pptx', 'presenton', 'ppt-agent-skills'],
+      rule: 'Fixture coordinates are valid only after explicit template-profile and semantic-zone selection.',
+    },
+    archetype_catalog: catalog,
+  };
+}
+
+function designSpecLock() {
+  return {
+    spec_id: 'native_ppt_proof_ai_first_design_lock_v1',
+    owner: 'llm_agent',
+    motif: 'warm accent rail with bounded evidence zones',
+    layout_archetypes: [
+      'cover_signal',
+      'multi_zone_compare',
+      'timeline_band',
+      'judgement_ladder',
+      'ring_cross',
+      'summary_peak',
+    ],
+    palette: {
+      canvas: '#F6F2EA',
+      ink: '#171C24',
+      muted: '#5B6570',
+      accent: '#B94624',
+      panel: '#EFE6D6',
+    },
+    typography: {
+      title_pt_min: 36,
+      body_pt_min: 18,
+      point_index_pt_min: 16,
+    },
+    grid: {
+      edge_margin_in_min: 0.6,
+      inter_block_gap_in_min: 0.32,
+    },
+    layout_rhythm: {
+      repeated_concrete_composition_limit: 2,
+      required_distinct_composition_share: 0.75,
+    },
+    professional_design_brief: {
+      design_register: 'native PPT proof fixture design system',
+      reference_style_family: 'editorial business proof deck with explicit template zones',
+      first_glance_hierarchy: 'action title, core claim, then bounded evidence shapes',
+      template_profile_strategy: 'select a named archetype before assigning coordinates',
+      capacity_strategy: 'bind every content shape to a semantic zone with 18pt body floor',
+      forbidden_amateur_patterns: [
+        'generic equal-card grid without structural intent',
+        'decorative title underline as the only motif',
+        'unbounded text placed directly on rails',
+      ],
+    },
+    borrowed_principles: [
+      'ppt_master_style_spec_lock',
+      'template_layout_grammar',
+      'template_profile',
+      'semantic_layout_selection',
+      'reference_deck_analysis',
+      'per_page_visual_plan',
+      'layout_rhythm',
+      'rendered_quality_gate',
+    ],
+    qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'layout_variety'],
+  };
+}
+
+function templateLayoutBindingForSlide(slideId, layoutFamily) {
+  return {
+    selected_archetype: layoutFamily,
+    archetype_instance_id: `${slideId}-${layoutFamily}`,
+    rhythm_role: layoutFamily === 'summary_peak' ? 'close' : layoutFamily,
+    zone_gap_in_min: 0.32,
+    zone_inset_in_min: 0.15,
+    zones: [
+      {
+        zone_id: 'title_zone',
+        semantic_role: 'action_title',
+        intended_content: 'slide title and visual opening accent',
+        bounds: { left_in: 0.65, top_in: 0.4, width_in: 13.4, height_in: 1.35 },
+        min_font_pt: 36,
+        safe_inset_in: 0.15,
+      },
+      {
+        zone_id: 'claim_zone',
+        semantic_role: 'core_claim',
+        intended_content: 'one sentence claim directly below the title',
+        bounds: { left_in: 0.75, top_in: 1.55, width_in: 13.3, height_in: 1.35 },
+        min_font_pt: 18,
+        safe_inset_in: 0.15,
+      },
+      {
+        zone_id: 'body_zone',
+        semantic_role: 'bounded_evidence',
+        intended_content: 'editable panels, point indexes, and body evidence text',
+        bounds: { left_in: 0.7, top_in: 2.55, width_in: 14.35, height_in: 5.25 },
+        min_font_pt: 18,
+        safe_inset_in: 0.15,
+      },
+    ],
+  };
+}
+
+function deckLayoutRhythmPlan(slides) {
+  return {
+    owner: 'llm_agent',
+    required: true,
+    slides: slides.map((slide, index) => ({
+      slide_id: slide.slide_id,
+      rhetorical_role: slide.layout_intent.rhetorical_role,
+      selected_archetype: slide.template_layout_binding.selected_archetype,
+      rhythm_role: slide.template_layout_binding.rhythm_role,
+      primary_grid: slide.layout_intent.primary_grid,
+      composition_signature_budget: slide.layout_intent.composition_signature,
+      proof_object: slide.layout_intent.non_text_visual,
+      sequence_index: index + 1,
+    })),
+  };
+}
+
+function explicitQualityRole(shape) {
+  const role = safeText(shape.role);
+  if (shape.quality_role) {
+    return shape;
+  }
+  if (role === 'page_number' || role === 'page_no' || role === 'footer' || role === 'cover_meta') {
+    return { ...shape, quality_role: 'auxiliary' };
+  }
+  if (role === 'title' || role === 'core_sentence' || role === 'point_index' || role === 'point_text') {
+    return { ...shape, quality_role: 'content' };
+  }
+  return shape;
+}
+
+function withLayoutZone(shape) {
+  const role = safeText(shape.role);
+  if (shape.layout_zone_id || shape.quality_role === 'decorative' || shape.quality_role === 'auxiliary') {
+    return shape;
+  }
+  if (role === 'title') {
+    return { ...shape, layout_zone_id: 'title_zone' };
+  }
+  if (role === 'core_sentence') {
+    return { ...shape, layout_zone_id: 'claim_zone' };
+  }
+  return { ...shape, layout_zone_id: 'body_zone' };
 }
 
 function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
@@ -230,7 +458,7 @@ function buildAiSlide(slide) {
   );
   const points = slidePoints(slide);
   const desiredSlots = Math.min(4, Math.max(3, points.length));
-  const actualPanelCount = layoutFamily === 'summary_peak' ? Math.max(1, desiredSlots - 1) : desiredSlots;
+  const actualPanelCount = desiredSlots;
   const shapes = [
     {
       shape_id: `${slideId}-top-band`,
@@ -245,6 +473,8 @@ function buildAiSlide(slide) {
       shape_id: `${slideId}-title`,
       kind: 'text_box',
       role: 'title',
+      quality_role: 'content',
+      layout_zone_id: 'title_zone',
       editable_text: title,
       bounds: { left_in: 0.9, top_in: 0.54, width_in: 12.7, height_in: layoutFamily === 'cover_signal' ? 1.12 : 1.02 },
       font_size: layoutFamily === 'cover_signal' ? 56 : 44,
@@ -257,8 +487,10 @@ function buildAiSlide(slide) {
       shape_id: `${slideId}-core`,
       kind: 'text_box',
       role: 'core_sentence',
+      quality_role: 'content',
+      layout_zone_id: 'claim_zone',
       editable_text: core,
-      bounds: { left_in: 0.95, top_in: 1.78, width_in: 12.3, height_in: 0.62 },
+      bounds: { left_in: 0.95, top_in: 1.78, width_in: 12.3, height_in: 0.98 },
       font_size: 20,
       color: '#5B6570',
       fill: 'none',
@@ -286,6 +518,7 @@ function buildAiSlide(slide) {
       shape_id: `${slideId}-page`,
       kind: 'text_box',
       role: 'page_number',
+      quality_role: 'auxiliary',
       editable_text: slideId.replace(/^[A-Z]+/, '').padStart(2, '0'),
       bounds: { left_in: 14.05, top_in: 7.95, width_in: 0.9, height_in: 0.44 },
       font_size: 18,
@@ -317,6 +550,8 @@ function buildAiSlide(slide) {
       shape_id: `${slideId}-slot-${pointNumber}-index`,
       kind: 'text_box',
       role: 'point_index',
+      quality_role: 'content',
+      layout_zone_id: 'body_zone',
       editable_text: String(pointNumber).padStart(2, '0'),
       bounds: {
         left_in: base.left_in + 0.24,
@@ -334,12 +569,14 @@ function buildAiSlide(slide) {
       shape_id: `${slideId}-slot-${pointNumber}-text`,
       kind: 'text_box',
       role: 'point_text',
+      quality_role: 'content',
+      layout_zone_id: 'body_zone',
       editable_text: points[index] || `Point ${pointNumber} carries complete audience evidence.`,
       bounds: {
         left_in: base.left_in + (overflowSummaryText ? 1.05 : 0.28),
         top_in: base.top_in + (overflowSummaryText ? 0.02 : 0.82),
         width_in: base.width_in - (overflowSummaryText ? 1.4 : 0.56),
-        height_in: overflowSummaryText ? 0.62 : 1.24,
+        height_in: overflowSummaryText ? 0.92 : 1.44,
       },
       font_size: 18,
       color: '#171C24',
@@ -354,7 +591,8 @@ function buildAiSlide(slide) {
     core_sentence: core,
     page_core_content: points,
     layout_intent: layoutIntentForSlide({ slideId, layoutFamily, slotCount: desiredSlots, shapes }),
-    native_shapes: shapes,
+    template_layout_binding: templateLayoutBindingForSlide(slideId, layoutFamily),
+    native_shapes: shapes.map((shape) => withLayoutZone(explicitQualityRole(shape))),
   };
 }
 
@@ -364,6 +602,7 @@ const suite = (fixture.suites || []).find((item) => item.suite_id === requestedS
 if (!suite?.editable_shape_plan?.slides) {
   throw new Error(`Fixture suite ${requestedSuiteId} does not include editable_shape_plan.slides`);
 }
+const slides = suite.editable_shape_plan.slides.map(buildAiSlide);
 const payload = {
   fixture_id: fixture.fixture_id,
   suite_id: suite.suite_id,
@@ -371,7 +610,10 @@ const payload = {
   editable_shape_plan: {
     contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
     route: suite.editable_shape_plan.route || 'author_pptx_native',
-    slides: suite.editable_shape_plan.slides.map(buildAiSlide),
+    design_spec_lock: designSpecLock(),
+    template_layout_grammar: templateLayoutGrammar(),
+    deck_layout_rhythm_plan: deckLayoutRhythmPlan(slides),
+    slides,
   },
 };
 
