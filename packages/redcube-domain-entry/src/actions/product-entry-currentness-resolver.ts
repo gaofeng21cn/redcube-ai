@@ -85,6 +85,13 @@ function slugBlockerKind(value) {
   return safeText(value, 'route_closeout_unconsumed').replace(/_/g, '-');
 }
 
+function blockerRecommendedAction(blocker) {
+  return safeText(blocker?.recommended_action || blocker?.next_required_owner_action)
+    || (safeText(blocker?.blocker_kind) === 'missing_provider_attempt_ledger'
+      ? 'resolve_provider_attempt_ledger'
+      : 'consume_route_closeout');
+}
+
 function buildCloseoutFirstBlocker({ run }) {
   const closeout = run?.closeout || {};
   const blockerKind = safeText(closeout.blocker_kind, 'route_closeout_unconsumed');
@@ -117,10 +124,115 @@ function buildCloseoutFirstBlocker({ run }) {
   };
 }
 
+function providerAttemptIndexSource(run) {
+  if (isPlainObject(run?.cross_provider_attempt_index)) return run.cross_provider_attempt_index;
+  if (isPlainObject(run?.provider_attempt_index)) return run.provider_attempt_index;
+  if (isPlainObject(run?.opl_provider_attempt_index)) return run.opl_provider_attempt_index;
+  return {};
+}
+
+function buildProviderCurrentness({ run, session }) {
+  const index = providerAttemptIndexSource(run);
+  const localSessionRef = safeText(
+    index.local_session_ref || index.product_entry_session_ref,
+    `product-entry-session:${session.entry_session_id}`,
+  );
+  const localRouteRunRef = safeText(index.local_route_run_ref || index.route_run_ref, `route-run:${run.run_id}`);
+  const providerAttemptRef = safeText(
+    index.provider_attempt_ref
+      || index.opl_provider_attempt_ref
+      || run.provider_attempt_ref
+      || run.opl_provider_attempt_ref,
+  );
+  const providerAttemptLedgerRef = safeText(
+    index.provider_attempt_ledger_ref
+      || index.opl_provider_attempt_ledger_ref
+      || run.provider_attempt_ledger_ref
+      || run.opl_provider_attempt_ledger_ref,
+  );
+  const canClaimCurrent = Boolean(providerAttemptRef && providerAttemptLedgerRef);
+  return {
+    surface_kind: 'cross_provider_attempt_currentness',
+    version: 'cross-provider-attempt-currentness.v1',
+    owner: 'redcube_ai',
+    provider_attempt_owner: safeText(index.provider_attempt_owner, 'one-person-lab'),
+    local_session_ref: localSessionRef,
+    local_route_run_ref: localRouteRunRef,
+    provider_attempt_ref: providerAttemptRef || null,
+    provider_attempt_ledger_ref: providerAttemptLedgerRef || null,
+    currentness_status: canClaimCurrent
+      ? 'current_with_provider_attempt_ledger'
+      : 'blocked_missing_provider_attempt_ledger',
+    can_claim_current: canClaimCurrent,
+    local_session_ref_is_not_provider_attempt_ref: true,
+    rca_does_not_own_provider_attempt_ledger: true,
+    missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+  };
+}
+
+function buildProviderAttemptLedgerBlocker({ run, providerCurrentness }) {
+  const routeRunRef = providerCurrentness.local_route_run_ref || `route-run:${run.run_id}`;
+  return {
+    ok: false,
+    surface_kind: 'typed_blocker',
+    return_shape: 'typed_blocker',
+    blocker_ref: `rca-typed-blocker:missing-provider-attempt-ledger:${routeRunRef}`,
+    blocker_kind: 'missing_provider_attempt_ledger',
+    owner: 'redcube_ai',
+    source_contract: 'rca.product_entry_session_currentness.v1',
+    next_required_owner_action: 'resolve_provider_attempt_ledger',
+    recommended_action: 'resolve_provider_attempt_ledger',
+    local_session_ref: providerCurrentness.local_session_ref,
+    local_route_run_ref: routeRunRef,
+    provider_attempt_ref: null,
+    provider_attempt_ledger_ref: null,
+    latest_run_id: safeText(run.run_id) || null,
+    route: safeText(run.route) || null,
+    topic_id: safeText(run.topic_id) || null,
+    deliverable_id: safeText(run.deliverable_id || run.target) || null,
+    visual_ready_claimed: false,
+    exportable_claimed: false,
+    handoffable_claimed: false,
+    writes_visual_truth: false,
+    writes_review_export_verdict: false,
+    writes_canonical_artifact_blob: false,
+  };
+}
+
+function buildRuntimeCurrentnessProjection({
+  run,
+  currentnessBlocker,
+  providerCurrentness,
+}) {
+  return {
+    surface_kind: 'cross_provider_attempt_currentness_projection',
+    refs: {
+      route_run_ref: `route-run:${run.run_id}`,
+      run_file: run.__run_file || null,
+      closeout_ref: currentnessBlocker?.closeout_ref || null,
+      typed_blocker_ref: currentnessBlocker?.blocker_ref || null,
+      local_session_ref: providerCurrentness.local_session_ref,
+      local_route_run_ref: providerCurrentness.local_route_run_ref,
+      provider_attempt_ref: providerCurrentness.provider_attempt_ref,
+      provider_attempt_ledger_ref: providerCurrentness.provider_attempt_ledger_ref,
+    },
+    provider_currentness: providerCurrentness,
+  };
+}
+
+function routeRunContentStatus(run, blocker) {
+  if (!blocker) return safeText(run.status, 'unknown');
+  if (safeText(blocker.blocker_kind) === 'missing_provider_attempt_ledger') {
+    return 'blocked_missing_provider_attempt_ledger';
+  }
+  return 'blocked_pending_closeout';
+}
+
 function routeRunProgressProjection({ run, closeoutFirstBlocker }) {
+  const contentStatus = routeRunContentStatus(run, closeoutFirstBlocker);
   return {
     projection_kind: 'route_run_progress_projection',
-    content_status: closeoutFirstBlocker ? 'blocked_pending_closeout' : safeText(run.status, 'unknown'),
+    content_status: contentStatus,
     current_stage: safeText(run.current_stage || run.route) || null,
     terminal_stage: safeText(run.route) || null,
     planned_stage_count: 0,
@@ -237,27 +349,34 @@ export function resolveProductEntryCurrentness({ session, persist = true }) {
   const closeoutFirstBlocker = closeoutConsumed(latestRun)
     ? null
     : buildCloseoutFirstBlocker({ run: latestRun });
+  const providerCurrentness = buildProviderCurrentness({
+    run: latestRun,
+    session,
+  });
+  const providerAttemptLedgerBlocker = closeoutFirstBlocker || providerCurrentness.can_claim_current
+    ? null
+    : buildProviderAttemptLedgerBlocker({
+      run: latestRun,
+      providerCurrentness,
+    });
+  const currentnessBlocker = closeoutFirstBlocker || providerAttemptLedgerBlocker;
   const progressDelta = classifyProgressDelta(latestRun);
   const nextSession = {
     ...session,
     latest_run_id: latestRun.run_id || null,
-    latest_stage_execution_plan_ref: closeoutFirstBlocker ? null : (session.latest_stage_execution_plan_ref || null),
-    stage_execution_plan: closeoutFirstBlocker ? null : (session.stage_execution_plan || null),
+    latest_stage_execution_plan_ref: currentnessBlocker ? null : (session.latest_stage_execution_plan_ref || null),
+    stage_execution_plan: currentnessBlocker ? null : (session.stage_execution_plan || null),
     runtime_progress_projection: routeRunProgressProjection({
       run: latestRun,
-      closeoutFirstBlocker,
+      closeoutFirstBlocker: currentnessBlocker,
     }),
-    runtime_projection: {
-      surface_kind: 'route_run_currentness_projection',
-      refs: {
-        route_run_ref: `route-run:${latestRun.run_id}`,
-        run_file: latestRun.__run_file || null,
-        closeout_ref: closeoutFirstBlocker?.closeout_ref || null,
-        typed_blocker_ref: closeoutFirstBlocker?.blocker_ref || null,
-      },
-    },
-    latest_surface_kind: closeoutFirstBlocker ? 'typed_blocker' : 'route_run',
-    closeout_first_blocker: closeoutFirstBlocker,
+    runtime_projection: buildRuntimeCurrentnessProjection({
+      run: latestRun,
+      currentnessBlocker,
+      providerCurrentness,
+    }),
+    latest_surface_kind: currentnessBlocker ? 'typed_blocker' : 'route_run',
+    closeout_first_blocker: currentnessBlocker,
     progress_delta: progressDelta,
     stall_lineage: latestRun.stall_lineage || null,
     updated_at: new Date().toISOString(),
@@ -268,7 +387,7 @@ export function resolveProductEntryCurrentness({ session, persist = true }) {
   return {
     session: nextSession,
     latestRun,
-    closeoutFirstBlocker,
+    closeoutFirstBlocker: currentnessBlocker,
     updated: true,
   };
 }
@@ -284,7 +403,7 @@ export function buildCloseoutBlockedDomainEntrySurface({
   return {
     ok: false,
     surface_kind: 'domain_entry',
-    recommended_action: 'consume_route_closeout',
+    recommended_action: blockerRecommendedAction(closeoutFirstBlocker),
     entry_contract_id: 'redcube_service_safe_domain_entry',
     target_domain_id: 'redcube_ai',
     task_intent: taskIntent,

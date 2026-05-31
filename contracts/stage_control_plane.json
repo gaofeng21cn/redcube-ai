@@ -402,6 +402,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/source_intake"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/source_intake",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/source_intake",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.source_intake.source_truth_frozen"
         ],
@@ -899,6 +914,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/communication_strategy"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/communication_strategy",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/communication_strategy",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.communication_strategy.accepted"
         ],
@@ -1375,6 +1405,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/visual_direction"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/visual_direction",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/visual_direction",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.visual_direction.accepted"
         ],
@@ -1866,6 +1911,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/artifact_creation"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/artifact_creation",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/artifact_creation",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.artifact_creation.candidate_rendered"
         ],
@@ -2388,6 +2448,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/review_and_revision"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/review_and_revision",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/review_and_revision",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.review_and_revision.gate_recorded"
         ],
@@ -2910,6 +2985,21 @@
         "attempt_ledger_refs": [
           "attempt-ledger:opl/redcube_ai/package_and_handoff"
         ],
+        "cross_provider_attempt_index": {
+          "surface_kind": "cross_provider_attempt_index",
+          "version": "cross-provider-attempt-index.v1",
+          "owner": "one-person-lab",
+          "provider_attempt_owner": "one-person-lab",
+          "domain_adapter_owner": "redcube_ai",
+          "local_session_ref": "/session_continuity/package_and_handoff",
+          "provider_attempt_ledger_ref": "attempt-ledger:opl/redcube_ai/package_and_handoff",
+          "provider_attempt_ref_required": true,
+          "provider_attempt_ledger_ref_required": true,
+          "missing_provider_ledger_policy": "fail_closed_typed_blocker_projection",
+          "local_session_ref_is_not_provider_attempt_ref": true,
+          "rca_does_not_own_provider_attempt_ledger": true,
+          "can_claim_current_without_provider_ledger": false
+        },
         "recorded_runtime_event_refs": [
           "runtime_event:rca.package_and_handoff.export_handoff_recorded"
         ],

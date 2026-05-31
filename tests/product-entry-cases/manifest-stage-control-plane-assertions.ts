@@ -173,6 +173,22 @@ export function assertManifestActionAndStageControlPlane({
     assert.deepEqual(stage.stage_contract.owner_receipt_refs, [`owner_receipt:${stage.stage_id}`]);
     assert.equal(stage.stage_contract.append_only_event_log_refs.length, 1);
     assert.equal(stage.stage_contract.attempt_ledger_refs.length, 1);
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.surface_kind, 'cross_provider_attempt_index');
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.provider_attempt_owner, 'one-person-lab');
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.domain_adapter_owner, 'redcube_ai');
+    assert.equal(
+      stage.stage_contract.cross_provider_attempt_index.provider_attempt_ledger_ref,
+      `attempt-ledger:opl/redcube_ai/${stage.stage_id}`,
+    );
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.provider_attempt_ref_required, true);
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.provider_attempt_ledger_ref_required, true);
+    assert.equal(
+      stage.stage_contract.cross_provider_attempt_index.missing_provider_ledger_policy,
+      'fail_closed_typed_blocker_projection',
+    );
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.local_session_ref_is_not_provider_attempt_ref, true);
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.rca_does_not_own_provider_attempt_ledger, true);
+    assert.equal(stage.stage_contract.cross_provider_attempt_index.can_claim_current_without_provider_ledger, false);
     assert.equal(
       stage.stage_contract.closeout_receipt_refs.includes(`owner_receipt:${stage.stage_id}`),
       true,

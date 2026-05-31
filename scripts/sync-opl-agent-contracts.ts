@@ -18,6 +18,14 @@ import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from './run-test-group-
 const CONTRACTS_DIR = path.resolve('contracts');
 const DOMAIN_ID = 'redcube_ai';
 const GENERATED_SURFACE_OWNER = 'one-person-lab';
+const SHARED_POLICY_RELEASE = {
+  policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
+  policy_bundle_fingerprint: 'sha256:5d77102e99e6e49acd88714cd94dcafe0969b8f2a5529928d753002ac3d4619d',
+  fingerprint_algorithm: 'sha256:stable-json',
+  domain_contract_policy_release_pin_required: true,
+  domain_adapter_must_not_copy_policy_body_as_authority: true,
+  consumer_alignment_check: 'foundry:policy-release',
+};
 
 const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_scheduler_owner',
@@ -357,6 +365,7 @@ function buildFoundryAgentSeriesContract(stageControlPlane) {
       consumer_alignment_check: 'family:shared-release',
       domain_contract_version_pin_does_not_authorize_domain_truth: true,
     },
+    shared_policy_release: SHARED_POLICY_RELEASE,
     domain_id: 'redcube',
     foundry_agent_id: 'redcube',
     domain_label: 'Presentation Foundry',

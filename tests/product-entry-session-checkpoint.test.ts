@@ -239,7 +239,10 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
     });
     assert.equal(session.progress_projection.progress_delta_classification, 'platform_repair');
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
-    assert.equal(session.runtime_loop_closure.control_policy.recommended_action, 'consume_route_closeout');
+    assert.equal(
+      session.runtime_loop_closure.control_policy.recommended_action,
+      'consume_route_closeout_before_new_plan',
+    );
     assert.deepEqual(session.runtime_loop_closure.stall_lineage.repeat_budget, {
       max_repeats: 2,
       remaining_repeats: 0,
@@ -272,6 +275,206 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
     assert.equal(sessionRecord.latest_run_id, runId);
     assert.equal(sessionRecord.latest_surface_kind, 'typed_blocker');
     assert.equal(existsSync(routeRunFile), true);
+  });
+});
+
+test('getProductEntrySession fails closed when a newer route run lacks OPL provider attempt ledger evidence', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const first = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-provider-currentness',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-provider-currentness',
+        profile_id: 'lecture_student',
+        title: 'Product entry provider currentness proof',
+        goal: '验证 currentness 必须区分本地 session ref 与 OPL provider attempt ledger ref',
+        user_intent: '先做到故事主线',
+        stop_after_stage: 'storyline',
+      },
+    });
+
+    const runId = 'run-provider-currentness-local-only';
+    const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
+    const firstSessionRecord = readJson(first.entry_session.session_file);
+    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
+    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+    writeJson(routeRunFile, {
+      run_id: runId,
+      route: 'storyline',
+      scope: 'deliverable',
+      target: 'deck-provider-currentness',
+      overlay: 'ppt_deck',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-provider-currentness',
+      status: 'completed',
+      started_at: new Date(firstSessionUpdatedAt + 1000).toISOString(),
+      finished_at: new Date(firstSessionUpdatedAt + 2000).toISOString(),
+      current_stage: 'storyline',
+      stage_results: [{ stage: 'storyline', status: 'completed' }],
+      artifact_refs: ['artifact:local-only-storyline'],
+      closeout: {
+        closeout_ref: 'rca-closeout:deck-provider-currentness/storyline',
+        consumed: true,
+        owner: 'redcube_ai',
+        route: 'storyline',
+      },
+      progress_delta: {
+        deliverable_progress_delta: {
+          count: 1,
+          refs: ['artifact:local-only-storyline'],
+          domain_alias: 'visual_deliverable_delta',
+        },
+        platform_repair_delta: {
+          count: 0,
+          refs: [],
+          domain_alias: 'platform_interface_repair_delta',
+        },
+        progress_delta_classification: 'deliverable_progress',
+      },
+    });
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-provider-currentness',
+    });
+
+    assert.equal(session.continuation_snapshot.latest_run_id, runId);
+    assert.equal(session.continuation_snapshot.latest_surface_kind, 'typed_blocker');
+    assert.equal(session.continuation_snapshot.runtime_projection.surface_kind, 'cross_provider_attempt_currentness_projection');
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
+      'blocked_missing_provider_attempt_ledger',
+    );
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.local_session_ref,
+      'product-entry-session:session-provider-currentness',
+    );
+    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ref, null);
+    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ledger_ref, null);
+    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, false);
+    assert.equal(session.continuation_snapshot.closeout_first_blocker.surface_kind, 'typed_blocker');
+    assert.equal(
+      session.continuation_snapshot.closeout_first_blocker.blocker_kind,
+      'missing_provider_attempt_ledger',
+    );
+    assert.equal(
+      session.continuation_snapshot.closeout_first_blocker.blocker_ref,
+      `rca-typed-blocker:missing-provider-attempt-ledger:route-run:${runId}`,
+    );
+    assert.equal(session.progress_projection.summary.content_status, 'blocked_missing_provider_attempt_ledger');
+    assert.equal(session.progress_projection.typed_blocker.blocker_kind, 'missing_provider_attempt_ledger');
+    assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
+    assert.equal(session.runtime_loop_closure.control_policy.recommended_action, 'resolve_provider_attempt_ledger');
+  });
+});
+
+test('getProductEntrySession records provider attempt ledger refs when a newer route run carries cross-provider index evidence', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const first = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-provider-currentness-ready',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-provider-currentness-ready',
+        profile_id: 'lecture_student',
+        title: 'Product entry provider currentness ready proof',
+        goal: '验证 provider attempt ledger evidence 能随 currentness 投影',
+        user_intent: '先做到故事主线',
+        stop_after_stage: 'storyline',
+      },
+    });
+
+    const runId = 'run-provider-currentness-indexed';
+    const providerAttemptRef = 'opl-provider-attempt:redcube_ai/storyline/attempt-001';
+    const providerAttemptLedgerRef = 'attempt-ledger:opl/redcube_ai/storyline';
+    const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
+    const firstSessionRecord = readJson(first.entry_session.session_file);
+    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
+    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+    writeJson(routeRunFile, {
+      run_id: runId,
+      route: 'storyline',
+      scope: 'deliverable',
+      target: 'deck-provider-currentness-ready',
+      overlay: 'ppt_deck',
+      topic_id: 'topic-a',
+      deliverable_id: 'deck-provider-currentness-ready',
+      status: 'completed',
+      started_at: new Date(firstSessionUpdatedAt + 1000).toISOString(),
+      finished_at: new Date(firstSessionUpdatedAt + 2000).toISOString(),
+      current_stage: 'storyline',
+      stage_results: [{ stage: 'storyline', status: 'completed' }],
+      artifact_refs: ['artifact:indexed-storyline'],
+      closeout: {
+        closeout_ref: 'rca-closeout:deck-provider-currentness-ready/storyline',
+        consumed: true,
+        owner: 'redcube_ai',
+        route: 'storyline',
+      },
+      cross_provider_attempt_index: {
+        surface_kind: 'cross_provider_attempt_index',
+        local_session_ref: 'product-entry-session:session-provider-currentness-ready',
+        local_route_run_ref: `route-run:${runId}`,
+        provider_attempt_ref: providerAttemptRef,
+        provider_attempt_ledger_ref: providerAttemptLedgerRef,
+        provider_attempt_owner: 'one-person-lab',
+      },
+      progress_delta: {
+        deliverable_progress_delta: {
+          count: 1,
+          refs: ['artifact:indexed-storyline'],
+          domain_alias: 'visual_deliverable_delta',
+        },
+        platform_repair_delta: {
+          count: 0,
+          refs: [],
+          domain_alias: 'platform_interface_repair_delta',
+        },
+        progress_delta_classification: 'deliverable_progress',
+      },
+    });
+
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-provider-currentness-ready',
+    });
+
+    assert.equal(session.continuation_snapshot.latest_run_id, runId);
+    assert.equal(session.continuation_snapshot.latest_surface_kind, 'route_run');
+    assert.equal(session.continuation_snapshot.closeout_first_blocker, null);
+    assert.equal(session.continuation_snapshot.runtime_projection.surface_kind, 'cross_provider_attempt_currentness_projection');
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
+      'current_with_provider_attempt_ledger',
+    );
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.local_session_ref,
+      'product-entry-session:session-provider-currentness-ready',
+    );
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ref,
+      providerAttemptRef,
+    );
+    assert.equal(
+      session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ledger_ref,
+      providerAttemptLedgerRef,
+    );
+    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, true);
+    assert.equal(session.progress_projection.summary.content_status, 'completed');
+    assert.equal(session.runtime_loop_closure.control_policy.approval_required, false);
   });
 });
 

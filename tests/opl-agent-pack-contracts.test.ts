@@ -257,6 +257,14 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     consumer_alignment_check: 'family:shared-release',
     domain_contract_version_pin_does_not_authorize_domain_truth: true,
   });
+  assert.deepEqual(foundrySeries.shared_policy_release, {
+    policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
+    policy_bundle_fingerprint: 'sha256:5d77102e99e6e49acd88714cd94dcafe0969b8f2a5529928d753002ac3d4619d',
+    fingerprint_algorithm: 'sha256:stable-json',
+    domain_contract_policy_release_pin_required: true,
+    domain_adapter_must_not_copy_policy_body_as_authority: true,
+    consumer_alignment_check: 'foundry:policy-release',
+  });
   assert.deepEqual(foundrySeries.identity_hygiene_policy.canonical_identities, {
     series_domain_id: foundrySeries.domain_id,
     foundry_agent_id: foundrySeries.foundry_agent_id,
@@ -591,6 +599,21 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
     assert.deepEqual(stage.stage_contract.owner_receipt_refs, [`owner_receipt:${stage.stage_id}`]);
     assert.equal(stage.stage_contract.append_only_event_log_refs.length, 1, stage.stage_id);
     assert.equal(stage.stage_contract.attempt_ledger_refs.length, 1, stage.stage_id);
+    assert.deepEqual(stage.stage_contract.cross_provider_attempt_index, {
+      surface_kind: 'cross_provider_attempt_index',
+      version: 'cross-provider-attempt-index.v1',
+      owner: 'one-person-lab',
+      provider_attempt_owner: 'one-person-lab',
+      domain_adapter_owner: 'redcube_ai',
+      local_session_ref: `/session_continuity/${stage.stage_id}`,
+      provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/${stage.stage_id}`,
+      provider_attempt_ref_required: true,
+      provider_attempt_ledger_ref_required: true,
+      missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+      local_session_ref_is_not_provider_attempt_ref: true,
+      rca_does_not_own_provider_attempt_ledger: true,
+      can_claim_current_without_provider_ledger: false,
+    }, stage.stage_id);
     assert.equal(
       stage.stage_contract.closeout_receipt_refs.includes(`owner_receipt:${stage.stage_id}`),
       true,

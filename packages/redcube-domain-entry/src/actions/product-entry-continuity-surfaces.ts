@@ -38,11 +38,17 @@ const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
 const DEFAULT_INTERRUPT_POLICY = 'continue_autonomously_until_runtime_gate';
 const REVIEW_INTERRUPT_POLICY = 'human_gate_required_before_continuation';
 
-function buildControlPolicy({ projection, manifestProjection = false }) {
+function buildControlPolicy({ projection, typedBlocker = null, manifestProjection = false }) {
   const needsUserDecision = Boolean(projection?.needs_user_decision);
   const contentStatus = safeText(projection?.content_status);
   const closeoutBlocked = safeText(projection?.content_status) === 'blocked_pending_closeout'
     || Boolean(projection?.typed_blocker_ref);
+  const typedBlockerAction = safeText(
+    typedBlocker?.recommended_action
+      || typedBlocker?.next_required_owner_action
+      || projection?.typed_blocker?.recommended_action
+      || projection?.typed_blocker?.next_required_owner_action,
+  );
   const completed = contentStatus === 'completed';
   const gateStatus = needsUserDecision || closeoutBlocked ? 'requested' : 'approved';
   return {
@@ -53,7 +59,7 @@ function buildControlPolicy({ projection, manifestProjection = false }) {
     stop_policy: 'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
     interrupt_policy: needsUserDecision || closeoutBlocked ? REVIEW_INTERRUPT_POLICY : DEFAULT_INTERRUPT_POLICY,
     recommended_action: closeoutBlocked
-      ? 'consume_route_closeout'
+      ? (typedBlockerAction || 'consume_route_closeout')
       : (needsUserDecision
       ? 'resolve_review_gate'
       : (completed ? 'pick_up_artifacts' : 'continue_autonomous_run')),
@@ -235,7 +241,10 @@ export function buildRuntimeLoopClosureSurface({
       artifact_refs: artifactRefs,
       artifact_ref_count: artifactRefs.length,
     },
-    control_policy: buildControlPolicy({ projection }),
+    control_policy: buildControlPolicy({
+      projection,
+      typedBlocker: continuationSnapshot?.closeout_first_blocker || null,
+    }),
     typed_blocker: continuationSnapshot?.closeout_first_blocker || null,
     deliverable_progress_delta: deltaPayload(
       continuationSnapshot?.progress_delta?.deliverable_progress_delta,
