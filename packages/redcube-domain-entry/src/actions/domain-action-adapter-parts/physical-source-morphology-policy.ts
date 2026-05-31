@@ -437,6 +437,7 @@ export function buildPhysicalSourceMorphologyPolicy() {
         retired_field_ids: [
           'managed_runtime_compatibility_alias',
         ],
+        retired_field_ids_as_json_keys_allowed: false,
         policy_declaration_pointer_suffixes: [
           '/legacy_name_policy/retired_compatibility_payload_field_policy/retired_field_ids/*',
         ],
