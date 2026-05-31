@@ -300,6 +300,18 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.success_boundary.production_soak_complete_claimed,
       false,
     );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.temporal_controlled_visual_stage_long_soak_evidence_inventory.surface_kind,
+      'temporal_controlled_visual_stage_long_soak_evidence_inventory',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.temporal_controlled_visual_stage_long_soak_evidence_inventory.evidence_count,
+      0,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.temporal_controlled_visual_stage_long_soak_evidence_inventory.declares_production_soak_complete,
+      false,
+    );
     assert.deepEqual(
       manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items.map(
         (item) => item.item_id,

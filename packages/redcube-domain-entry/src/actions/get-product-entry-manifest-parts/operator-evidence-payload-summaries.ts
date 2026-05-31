@@ -50,6 +50,15 @@ const RCA_STAGE_EXPECTED_RECEIPT_STAGE_IDS = Object.freeze([
   'package_and_handoff',
 ]);
 
+const RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF = 'human_gate:redcube_operator_review_gate';
+
+const RCA_STAGE_REPLAY_HUMAN_GATE_STAGE_IDS = Object.freeze([
+  'communication_strategy',
+  'visual_direction',
+  'artifact_creation',
+  'review_and_revision',
+]);
+
 const RCA_STAGE_EXPECTED_RECEIPT_RUNTIME_EVENT_REFS = Object.freeze({
   source_intake: Object.freeze(['runtime_event:rca.source_intake.source_truth_frozen']),
   communication_strategy: Object.freeze(['runtime_event:rca.communication_strategy.accepted']),
@@ -91,6 +100,19 @@ function ownerPayloadTemplate(keys) {
   return Object.fromEntries(keys.map((key) => [key, []]));
 }
 
+function stageReplayHumanGateTypedBlockerRef(stageId) {
+  return `rca-typed-blocker:stage-replay-human-gate:${stageId}:redcube_operator_review_gate/operator-review-receipt-pending`;
+}
+
+function stageReplayHumanGateTargetIdentity(stageId) {
+  return {
+    domain_id: 'redcube_ai',
+    stage_id: stageId,
+    missing_ref: RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF,
+    target_key: `redcube_ai/${stageId}/${RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF}`,
+  };
+}
+
 function refsByPrefix(refs, prefixes) {
   return uniqueRefs(refs.filter((ref) => prefixes.some((prefix) => ref.startsWith(prefix))));
 }
@@ -123,6 +145,8 @@ function successRefsForOwnerPayloadItem({
       domain_owner_receipt_refs: domainOwnerReceiptRefs,
       no_regression_evidence_refs: [],
       owner_chain_refs: refsByPrefix(ownerChainRefs, [
+        'rca-long-soak:visual-stage:',
+        'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:',
         'workspace-runtime-ref:review-export:',
         'workspace-runtime-ref:temporal-stage-attempt:',
         'workspace-runtime-ref:retry-dead-letter:',
@@ -271,5 +295,85 @@ export function buildStageExpectedReceiptPayloadSummary({
       ...ownerPayloadClaimBoundary(),
       authority_boundary: ownerPayloadAuthorityBoundary(),
     })),
+  };
+}
+
+export function buildStageReplayHumanGateBlockerSummary() {
+  const requiredOperatorPayloadRefs = [
+    'receipt_refs',
+    'typed_blocker_refs',
+  ];
+  const stages = RCA_STAGE_REPLAY_HUMAN_GATE_STAGE_IDS.map((stageId, index) => {
+    const typedBlockerRef = stageReplayHumanGateTypedBlockerRef(stageId);
+    return {
+      stage_id: stageId,
+      sequence: index + 1,
+      missing_ref: RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF,
+      missing_ref_kind: 'human_gate_ref',
+      status: 'blocked_by_domain_owned_typed_blocker_ref',
+      target_identity: stageReplayHumanGateTargetIdentity(stageId),
+      current_payload_template: ownerPayloadTemplate(requiredOperatorPayloadRefs),
+      typed_blocker_path_payload: {
+        typed_blocker_refs: [typedBlockerRef],
+      },
+      success_refs_path_payload: {
+        receipt_refs: [],
+        required_receipt_ref: RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF,
+      },
+      source_ref: `/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary/stages/${index}/typed_blocker_path_payload/typed_blocker_refs/0`,
+      record_command_ref_model:
+        'opl runtime stage-replay-missing-receipt record --target-identity <target_identity_json> --payload <typed_blocker_path_payload_json>',
+      verify_command_ref_model:
+        'opl runtime stage-replay-missing-receipt verify --receipt-ref <ledger_receipt_ref>',
+      operator_payload_submitted: false,
+      success_claimed: false,
+      human_gate_approval_claimed: false,
+      closes_replay_receipt_ref: false,
+      ...ownerPayloadClaimBoundary(),
+      authority_boundary: {
+        ...ownerPayloadAuthorityBoundary(),
+        can_requery_human: false,
+        can_write_owner_receipt: false,
+        can_close_replay_receipt_ref: false,
+      },
+    };
+  });
+  return {
+    surface_kind: 'rca_stage_replay_human_gate_blocker_summary',
+    owner: 'redcube_ai',
+    consumer: 'one_person_lab',
+    status: 'domain_owned_typed_blocker_refs_ready',
+    payload_kind: 'stage_replay_missing_receipt_typed_blocker_refs',
+    payload_path_policy: 'success_receipt_ref_or_domain_owned_typed_blocker_ref',
+    payload_body_allowed: false,
+    empty_payload_template_is_success_evidence: false,
+    missing_ref: RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF,
+    missing_ref_kind: 'human_gate_ref',
+    stage_count: stages.length,
+    stage_ids: stages.map((stage) => stage.stage_id),
+    typed_blocker_refs: stages.flatMap((stage) => stage.typed_blocker_path_payload.typed_blocker_refs),
+    accepted_payload_paths: {
+      success_refs_path: {
+        required_receipt_ref: RCA_STAGE_REPLAY_HUMAN_GATE_MISSING_REF,
+        typed_blocker_refs_must_be_absent: true,
+        closes_replay_receipt_ref: true,
+        readiness_claim_allowed: false,
+      },
+      typed_blocker_path: {
+        required_typed_blocker_refs: ['typed_blocker_refs'],
+        success_claimed: false,
+        closes_replay_receipt_ref: false,
+        readiness_claim_allowed: false,
+      },
+    },
+    stages,
+    source_ref_root:
+      '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary',
+    authority_boundary: {
+      ...ownerPayloadAuthorityBoundary(),
+      can_requery_human: false,
+      can_write_owner_receipt: false,
+      can_close_replay_receipt_ref: false,
+    },
   };
 }

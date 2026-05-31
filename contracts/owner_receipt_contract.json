@@ -99,12 +99,28 @@
       "owner": "redcube_ai"
     },
     {
+      "return_shape": "controlled_visual_stage_long_soak_evidence",
+      "evidence_ref": "rca-long-soak:visual-stage:<soak-id>",
+      "runtime_locator_ref": "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>",
+      "generator_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
+      "temporal_stage_attempt_ref": "workspace-runtime-ref:temporal-stage-attempt:<run-id>",
+      "retry_dead_letter_ref": "workspace-runtime-ref:retry-dead-letter:<run-id>",
+      "requery_resume_ref": "workspace-runtime-ref:requery-resume:<run-id>",
+      "provider_residency_ref": "opl-provider-residency:temporal:<proof-id>",
+      "stage_execution_ai_task_ref": "opl-stage-ai-task:execution:<task-id>",
+      "stage_quality_ai_task_ref": "opl-stage-ai-task:quality:<task-id>",
+      "domain_owner_receipt_ref": "rca-owner-receipt:visual-stage:<receipt-id>",
+      "review_export_ref": "workspace-runtime-ref:review-export:<run-id>",
+      "forbidden_write_proof_ref": "/controlled_memory_apply_proof/forbidden_write_audit",
+      "owner": "redcube_ai"
+    },
+    {
       "return_shape": "typed_blocker",
       "blocker_ref": "rca-typed-blocker:controlled-soak:<blocker-id>",
       "blocker_kind": "domain_owner_receipt_required",
-      "source_contract": "opl_temporal_controlled_visual_stage_attempt_apply_contract",
+      "source_contract": "rca.temporal_controlled_visual_stage_long_soak.v1",
       "owner": "redcube_ai",
-      "next_required_owner_action": "run_rca_owned_visual_stage_attempt_or_emit_no_regression_evidence"
+      "next_required_owner_action": "run_temporal_controlled_visual_stage_long_soak_or_emit_rca_refs_only_evidence"
     },
     {
       "return_shape": "no_regression_evidence",

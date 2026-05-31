@@ -116,6 +116,7 @@ export function buildTemporalAutonomyReadinessProjection({
         rca_surface_ref: '/product_entry_shell/domain_handler',
         required_domain_action_adapter_actions: [
           'emit_no_regression_evidence',
+          'emit_temporal_controlled_visual_stage_long_soak_evidence',
           'emit_domain_owner_receipt',
           'emit_workspace_receipt_proof',
         ],
@@ -180,8 +181,8 @@ export function buildTemporalAutonomyReadinessProjection({
       },
       {
         owner: DOMAIN_ID,
-        action_ref: 'opl_generated:domain_action_adapter dispatch:emit_domain_owner_receipt',
-        purpose: 'return RCA-owned owner receipt or typed blocker for the hosted attempt',
+        action_ref: 'opl_generated:domain_action_adapter dispatch:emit_temporal_controlled_visual_stage_long_soak_evidence',
+        purpose: 'return RCA-owned refs-only long-soak evidence or typed blocker for the hosted attempt',
       },
     ],
     projection_inputs: {

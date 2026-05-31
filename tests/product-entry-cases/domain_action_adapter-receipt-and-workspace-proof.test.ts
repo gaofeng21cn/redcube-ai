@@ -4,6 +4,156 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { SERIAL_ENV_TEST, assert, getProductEntryManifest, exportDomainActionAdapter, dispatchDomainActionAdapter, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
 
+test('domain-handler emits Temporal controlled visual-stage long-soak evidence refs-only', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const result = await dispatchDomainActionAdapter({
+      task: {
+        action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
+        workspace_root: workspaceRoot,
+        soak_id: 'unit-temporal-long-soak',
+        temporal_stage_attempt_ref: 'workspace-runtime-ref:temporal-stage-attempt:unit-run',
+        retry_dead_letter_ref: 'workspace-runtime-ref:retry-dead-letter:unit-run',
+        requery_resume_ref: 'workspace-runtime-ref:requery-resume:unit-run',
+        provider_residency_ref: 'opl-provider-residency:temporal:unit-proof',
+        stage_execution_ai_task_ref: 'opl-stage-ai-task:execution:unit-run',
+        stage_quality_ai_task_ref: 'opl-stage-ai-task:quality:unit-run',
+        domain_owner_receipt_ref: 'rca-owner-receipt:visual-stage:unit-run',
+        review_export_ref: 'workspace-runtime-ref:review-export:unit-run',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        no_regression_evidence_refs: ['rca-no-regression:visual-stage:unit-run'],
+        monitor_freshness_refs: ['/workspace_receipt_inventory_projection/stage_monitor_freshness/artifact_creation'],
+      },
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.action, 'emit_temporal_controlled_visual_stage_long_soak_evidence');
+    assert.equal(result.result_surface.surface_kind, 'temporal_controlled_visual_stage_long_soak_evidence');
+    assert.equal(result.result_surface.return_shape, 'controlled_visual_stage_long_soak_evidence');
+    assert.equal(result.result_surface.evidence_ref, 'rca-long-soak:visual-stage:unit-temporal-long-soak');
+    assert.equal(
+      result.result_surface.runtime_locator_ref,
+      'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:unit-temporal-long-soak',
+    );
+    assert.equal(result.result_surface.coverage.required_refs_present, true);
+    assert.equal(result.result_surface.coverage.independent_ai_stage_refs_present, true);
+    assert.equal(result.result_surface.independent_ai_stage_boundary.same_context_self_review_allowed, false);
+    assert.equal(result.result_surface.coverage.production_visual_stage_long_soak_complete, false);
+    assert.equal(result.result_surface.coverage.visual_truth_written, false);
+    assert.equal(result.result_surface.coverage.artifact_body_written, false);
+    assert.equal(result.result_surface.coverage.memory_content_body_written, false);
+    assert.equal(result.result_surface.coverage.review_export_verdict_written, false);
+    assert.equal(result.result_surface.authority_boundary.opl_can_claim_visual_stage_soak_complete, false);
+    assert.equal(result.result_surface.repository_boundary.repo_tracks_live_long_soak_instances, false);
+
+    const evidenceFile = readJson(result.result_surface.evidence_file);
+    assert.equal(evidenceFile.evidence_ref, result.result_surface.evidence_ref);
+    assert.equal(evidenceFile.required_refs.temporal_stage_attempt_ref, 'workspace-runtime-ref:temporal-stage-attempt:unit-run');
+    assert.deepEqual(evidenceFile.optional_refs.no_regression_evidence_refs, ['rca-no-regression:visual-stage:unit-run']);
+    assert.equal(evidenceFile.coverage.production_visual_stage_long_soak_complete, false);
+
+    const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
+    const inventory = manifest.temporal_controlled_visual_stage_long_soak_evidence_inventory;
+    assert.equal(inventory.status, 'runtime_long_soak_evidence_refs_visible_not_production_soak');
+    assert.equal(inventory.evidence_count, 1);
+    assert.equal(inventory.latest_evidence_ref, 'rca-long-soak:visual-stage:unit-temporal-long-soak');
+    assert.equal(inventory.coverage.long_soak_evidence_refs_visible, true);
+    assert.equal(inventory.declares_production_soak_complete, false);
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.long_soak_evidence_ref_count,
+      1,
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.latest_long_soak_evidence_ref,
+      'rca-long-soak:visual-stage:unit-temporal-long-soak',
+    );
+    assert.equal(
+      manifest.operator_evidence_readiness_projection.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.production_visual_stage_long_soak_complete,
+      false,
+    );
+
+    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.long_soak_evidence_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.latest_long_soak_evidence_ref,
+      'rca-long-soak:visual-stage:unit-temporal-long-soak',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder
+        .success_boundary.production_soak_complete_claimed,
+      false,
+    );
+  });
+});
+
+test('domain-handler long-soak evidence fails closed for missing refs and body payloads', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const missing = await dispatchDomainActionAdapter({
+      task: {
+        action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
+        workspace_root: workspaceRoot,
+        soak_id: 'missing-long-soak-refs',
+        temporal_stage_attempt_ref: 'workspace-runtime-ref:temporal-stage-attempt:missing',
+      },
+    });
+    assert.equal(missing.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(
+      missing.result_surface.blocker_kind,
+      'temporal_controlled_visual_stage_long_soak_missing_required_refs',
+    );
+    assert.equal(missing.result_surface.owner, 'redcube_ai');
+    assert.equal(missing.result_surface.visual_ready_claimed, false);
+    assert.equal(
+      existsSync(`${workspaceRoot}/.redcube/runtime/evidence/temporal-controlled-visual-stage-long-soak/missing-long-soak-refs.json`),
+      false,
+    );
+
+    const forbidden = await dispatchDomainActionAdapter({
+      task: {
+        action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
+        workspace_root: workspaceRoot,
+        soak_id: 'forbidden-long-soak-body',
+        temporal_stage_attempt_ref: 'workspace-runtime-ref:temporal-stage-attempt:forbidden',
+        retry_dead_letter_ref: 'workspace-runtime-ref:retry-dead-letter:forbidden',
+        requery_resume_ref: 'workspace-runtime-ref:requery-resume:forbidden',
+        provider_residency_ref: 'opl-provider-residency:temporal:forbidden',
+        stage_execution_ai_task_ref: 'opl-stage-ai-task:execution:forbidden',
+        stage_quality_ai_task_ref: 'opl-stage-ai-task:quality:forbidden',
+        domain_owner_receipt_ref: 'rca-owner-receipt:visual-stage:forbidden',
+        review_export_ref: 'workspace-runtime-ref:review-export:forbidden',
+        forbidden_write_proof_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
+        artifact_refs: [
+          {
+            artifact_ref: 'workspace-runtime-ref:artifact:forbidden',
+            artifact_body: 'forbidden artifact body',
+          },
+        ],
+        visual_memory_body: 'forbidden memory body',
+      },
+    });
+    assert.equal(forbidden.result_surface.surface_kind, 'typed_blocker');
+    assert.equal(
+      forbidden.result_surface.blocker_kind,
+      'temporal_controlled_visual_stage_long_soak_forbidden_payload_fields',
+    );
+    assert.deepEqual(forbidden.result_surface.forbidden_payload_fields, [
+      'artifact_refs[0].artifact_body',
+      'visual_memory_body',
+    ]);
+    assert.equal(forbidden.result_surface.payload_body_allowed, false);
+  });
+});
+
 test('domain-handler receipt actions emit refs-only workspace proof without promoting visual readiness', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();

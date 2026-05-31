@@ -57,6 +57,7 @@ import {
 import { buildProductEntryManifestShellProjections } from './get-product-entry-manifest-parts/shell-projections.js';
 import { normalizeWorkspaceRoot, readCurrentProgramContract, safeText } from './get-product-entry-manifest-parts/utils.js';
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
+import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
 import { buildProductEntryManifestEntrySurfaces } from './get-product-entry-manifest-parts/entry-surfaces.js';
 
@@ -134,6 +135,7 @@ export async function getProductEntryManifest(request) {
     workspaceRoot,
     workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
   });
+  const temporalLongSoakEvidenceInventory = buildTemporalLongSoakEvidenceInventory({ workspaceRoot });
   const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
@@ -307,6 +309,7 @@ export async function getProductEntryManifest(request) {
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
@@ -413,6 +416,7 @@ export async function getProductEntryManifest(request) {
     visualTransitionEvaluator,
     visualPatternMemoryWriteback,
     workspaceReceiptInventoryProjection,
+    temporalLongSoakEvidenceInventory,
     temporalAutonomyReadiness,
   });
 		}

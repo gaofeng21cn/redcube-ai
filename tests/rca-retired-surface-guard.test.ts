@@ -72,6 +72,12 @@ function sourceRefCoversFile(sourceRef, file) {
 
 function assertRepoRefResolves(sourceRef, label) {
   const [sourcePath, anchor] = String(sourceRef).split('#');
+  assert.equal(
+    sourcePath !== '' && sourcePath === normalizePath(sourcePath) && !path.isAbsolute(sourcePath)
+      && !sourcePath.startsWith('../') && !sourcePath.includes('/../') && !/^[a-z][a-z0-9+.-]*:/i.test(sourcePath),
+    true,
+    `${label}: ${sourceRef}`,
+  );
   const fullPath = path.resolve(sourcePath);
   assert.equal(existsSync(fullPath), true, `${label}: ${sourceRef}`);
   if (!anchor) return;
@@ -499,16 +505,14 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
   assert.deepEqual(policy.source_ref_integrity_gate, {
     policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
-    applies_to: [
-      'active_surface_classifications[*].source_refs',
-      'active_surface_classifications[*].machine_boundary_refs',
-    ],
-    accepted_ref_shapes: [
-      'repo_path',
-      'repo_directory',
-      'repo_path_anchor',
-    ],
+    applies_to: ['active_surface_classifications[*].source_refs', 'active_surface_classifications[*].machine_boundary_refs'],
+    accepted_ref_shapes: ['repo_path', 'repo_directory', 'repo_path_anchor'],
     anchor_separator: '#',
+    repo_local_refs_only: true,
+    absolute_path_allowed: false,
+    parent_directory_traversal_allowed: false,
+    uri_ref_allowed: false,
+    machine_boundary_refs_require_anchor: true,
     stale_source_ref_reopens_gap: true,
     missing_source_ref_allowed: false,
     missing_machine_boundary_anchor_allowed: false,
@@ -742,6 +746,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       assertRepoRefResolves(sourceRef, `${entry.surface_id}.source_refs`);
     }
     for (const sourceRef of entry.machine_boundary_refs ?? []) {
+      assert.equal(String(sourceRef).includes('#'), true, `${entry.surface_id}.machine_boundary_refs`);
       assertRepoRefResolves(sourceRef, `${entry.surface_id}.machine_boundary_refs`);
     }
   }

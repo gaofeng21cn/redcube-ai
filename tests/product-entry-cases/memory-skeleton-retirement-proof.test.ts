@@ -66,13 +66,18 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
     assert.equal(controlledSoak.deferred_blocker.blocker_kind, 'domain_owner_receipt_required');
     assert.equal(
       controlledSoak.deferred_blocker.source_contract,
-      'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+      'rca.temporal_controlled_visual_stage_long_soak.v1',
     );
     assert.deepEqual(controlledSoak.deferred_blocker.required_return_shapes, [
+      'controlled_visual_stage_long_soak_evidence',
       'domain_owner_receipt_ref',
       'typed_blocker',
       'no_regression_evidence_ref',
     ]);
+    assert.equal(
+      controlledSoak.deferred_blocker.generator_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
     assert.equal(controlledSoak.no_regression_surface_refs.includes('/controlled_visual_stage_attempt'), true);
     assert.equal(controlledSoak.no_regression_surface_refs.includes('/controlled_memory_apply_proof'), true);
     assert.equal(controlledSoak.authority_boundary.can_hold_visual_truth, false);
@@ -112,10 +117,24 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
     const noRegressionCase = ownerReceipt.receipt_cases.find((receipt) => receipt.return_shape === 'no_regression_evidence');
     assert.equal(noRegressionCase.generator_action, 'emit_no_regression_evidence');
     assert.equal(noRegressionCase.runtime_locator_ref, 'workspace-runtime-ref:no-regression-evidence:<evidence-id>');
+    const longSoakCase = ownerReceipt.receipt_cases.find((receipt) => (
+      receipt.return_shape === 'controlled_visual_stage_long_soak_evidence'
+    ));
+    assert.equal(longSoakCase.generator_action, 'emit_temporal_controlled_visual_stage_long_soak_evidence');
+    assert.equal(longSoakCase.evidence_ref, 'rca-long-soak:visual-stage:<soak-id>');
+    assert.equal(
+      longSoakCase.runtime_locator_ref,
+      'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>',
+    );
     assert.equal(ownerReceipt.repository_boundary.repo_tracks_runtime_evidence_instances, false);
     assert.deepEqual(
       ownerReceipt.receipt_cases.map((receipt) => receipt.return_shape),
-      ['domain_receipt', 'typed_blocker', 'no_regression_evidence'],
+      [
+        'domain_receipt',
+        'controlled_visual_stage_long_soak_evidence',
+        'typed_blocker',
+        'no_regression_evidence',
+      ],
     );
 
     const lifecycleApply = manifest.lifecycle_guarded_apply_proof;

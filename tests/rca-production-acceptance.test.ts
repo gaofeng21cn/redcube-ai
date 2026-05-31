@@ -3,51 +3,16 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '..');
-const acceptancePath = 'contracts/production_acceptance/rca-production-acceptance.json';
-const evidenceFixturePath = 'contracts/production_acceptance/rca-evidence-receipt-fixture.json';
-const realNoRegressionRefs = [
-  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a',
-  'rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b',
-  'rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2',
-  'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
-  'rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat',
-  'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
-];
-
-function readJson(relativePath) {
-  return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
-}
-
-function collectKeys(value, prefix = '') {
-  if (Array.isArray(value)) {
-    return value.flatMap((entry, index) => collectKeys(entry, `${prefix}[${index}]`));
-  }
-  if (!value || typeof value !== 'object') return [];
-
-  return Object.entries(value).flatMap(([key, entry]) => {
-    const current = prefix ? `${prefix}.${key}` : key;
-    return [current, ...collectKeys(entry, current)];
-  });
-}
-
-function assertRefString(value, label) {
-  assert.equal(typeof value, 'string', label);
-  assert.notEqual(value.trim(), '', label);
-  assert.equal(value.startsWith('/'), false, `${label} must be a portable ref, not an absolute path`);
-  assert.equal(value.includes('\n'), false, label);
-}
-
-function assertRefArray(values, label) {
-  assert.equal(Array.isArray(values), true, label);
-  assert.equal(values.length > 0, true, label);
-  for (const [index, value] of values.entries()) {
-    assertRefString(value, `${label}[${index}]`);
-  }
-}
+import {
+  acceptancePath,
+  assertRefArray,
+  assertRefString,
+  collectKeys,
+  evidenceFixturePath,
+  readJson,
+  realNoRegressionRefs,
+  repoRoot,
+} from './rca-production-acceptance-shared.ts';
 
 test('RCA production acceptance surface exists and records domain-owned scope', () => {
   assert.equal(fs.existsSync(path.join(repoRoot, acceptancePath)), true);
@@ -260,6 +225,22 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
       typed_blocker_refs: ['rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'],
     },
   );
+  const temporalLongSoakSummary = scaleout.owner_payload_item_summary.work_items[2];
+  assert.deepEqual(
+    temporalLongSoakSummary.expected_output_refs,
+    [
+      'rca-long-soak:visual-stage:<soak-id>',
+      'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>',
+    ],
+  );
+  assert.equal(
+    temporalLongSoakSummary.temporal_readiness_refs.long_soak_evidence_action,
+    'emit_temporal_controlled_visual_stage_long_soak_evidence',
+  );
+  assert.equal(
+    temporalLongSoakSummary.temporal_readiness_refs.production_visual_stage_long_soak_complete,
+    false,
+  );
   assert.equal(
     scaleout.owner_payload_item_summary.work_items.every((item) => (
       item.operator_payload_submitted === false
@@ -326,7 +307,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
     assert.equal(scaleout.repeated_no_regression_evidence_refs.evidence_refs.includes(evidenceRef), true);
   }
   assert.deepEqual(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_refs, realNoRegressionRefs);
-  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 6);
+  assert.equal(scaleout.repeated_no_regression_evidence_refs.real_runtime_evidence_ref_count, 7);
   assert.equal(
     scaleout.repeated_no_regression_evidence_refs.opl_external_evidence_receipt_ref,
     'opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs',
@@ -469,6 +450,37 @@ test('RCA production acceptance exposes body-free OPL expected receipt and monit
   assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.can_write_domain_truth, false);
   assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.can_create_owner_receipt, false);
   assert.equal(handoff.stage_expected_receipt_payload_summary.authority_boundary.refs_only, true);
+
+  const replayBlocker = handoff.stage_replay_human_gate_blocker_summary;
+  assert.equal(replayBlocker.surface_kind, 'rca_stage_replay_human_gate_blocker_summary');
+  assert.equal(replayBlocker.status, 'domain_owned_typed_blocker_refs_ready');
+  assert.equal(replayBlocker.missing_ref, 'human_gate:redcube_operator_review_gate');
+  assert.equal(replayBlocker.payload_body_allowed, false);
+  assert.equal(replayBlocker.empty_payload_template_is_success_evidence, false);
+  assert.deepEqual(replayBlocker.stage_ids, ['communication_strategy', 'visual_direction', 'artifact_creation', 'review_and_revision']);
+  assert.equal(replayBlocker.stage_count, replayBlocker.stage_ids.length);
+  assert.equal(replayBlocker.typed_blocker_refs.length, replayBlocker.stage_ids.length);
+  assert.deepEqual([replayBlocker.accepted_payload_paths.typed_blocker_path.success_claimed, replayBlocker.accepted_payload_paths.typed_blocker_path.closes_replay_receipt_ref, replayBlocker.accepted_payload_paths.success_refs_path.closes_replay_receipt_ref], [false, false, true]);
+  for (const [index, stage] of replayBlocker.stages.entries()) {
+    assert.equal(stage.stage_id, replayBlocker.stage_ids[index]);
+    assert.equal(stage.missing_ref, 'human_gate:redcube_operator_review_gate');
+    assert.equal(stage.status, 'blocked_by_domain_owned_typed_blocker_ref');
+    assert.equal(stage.target_identity.domain_id, 'redcube_ai');
+    assert.equal(stage.target_identity.stage_id, stage.stage_id);
+    assert.equal(stage.target_identity.missing_ref, 'human_gate:redcube_operator_review_gate');
+    assert.deepEqual(stage.current_payload_template, { receipt_refs: [], typed_blocker_refs: [] });
+    assertRefArray(stage.typed_blocker_path_payload.typed_blocker_refs, `stage_replay_human_gate_blocker_summary.stages.${stage.stage_id}.typed_blocker_refs`);
+    assert.equal(stage.success_refs_path_payload.required_receipt_ref, 'human_gate:redcube_operator_review_gate');
+    assert.equal(stage.operator_payload_submitted, false);
+    assert.equal(stage.success_claimed, false);
+    assert.equal(stage.human_gate_approval_claimed, false);
+    assert.equal(stage.closes_replay_receipt_ref, false);
+    assert.equal(stage.domain_readiness_claimed, false);
+    assert.equal(stage.production_soak_complete_claimed, false);
+    assert.equal(stage.authority_boundary.can_requery_human, false);
+    assert.equal(stage.authority_boundary.can_close_replay_receipt_ref, false);
+    assert.equal(stage.authority_boundary.refs_only, true);
+  }
 
   assert.equal(handoff.opl_payload_policy.payload_kind, 'stage_production_evidence_receipt_record_body_free_refs');
   assert.equal(handoff.opl_payload_policy.payload_body_required, false);
@@ -819,6 +831,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   assert.equal(soak.provider_restart_requery_retry_dead_letter_proven, false);
   assert.equal(soak.typed_blocker.owner, 'redcube_ai');
   assert.equal(soak.typed_blocker.blocker_kind, 'controlled_visual_soak_runtime_evidence_pending');
+  assert.equal(soak.typed_blocker.source_contract, 'rca.temporal_controlled_visual_stage_long_soak.v1');
   assertRefString(soak.typed_blocker.blocker_ref, 'controlled_visual_soak_closeout.typed_blocker.blocker_ref');
   assertRefArray(
     soak.typed_blocker.next_verification_command_refs,
@@ -898,6 +911,20 @@ test('RCA production evidence tail workorder keeps evidence-after-contract refs 
     'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
     'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
   ]);
+  const temporalLongSoakWorkItem = workorder.work_items[2];
+  assert.equal(temporalLongSoakWorkItem.item_id, 'temporal_controlled_visual_stage_long_soak');
+  assert.equal(temporalLongSoakWorkItem.temporal_readiness_refs.long_soak_evidence_action, 'emit_temporal_controlled_visual_stage_long_soak_evidence');
+  assert.deepEqual(
+    temporalLongSoakWorkItem.expected_output_refs.slice(0, 2),
+    [
+      'rca-long-soak:visual-stage:<soak-id>',
+      'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>',
+    ],
+  );
+  assert.equal(
+    temporalLongSoakWorkItem.temporal_readiness_refs.production_visual_stage_long_soak_complete,
+    false,
+  );
   for (const item of workorder.work_items) {
     assertRefArray(item.required_input_refs, `production_evidence_tail_workorder.${item.item_id}.required_input_refs`);
     assertRefArray(item.expected_output_refs, `production_evidence_tail_workorder.${item.item_id}.expected_output_refs`);

@@ -21,6 +21,7 @@ const REAL_NO_REGRESSION_REFS = [
   'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
   'rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat',
   'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
+  'rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat',
 ];
 
 test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL_ENV_TEST, async () => {
@@ -299,6 +300,31 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       ),
       true,
     );
+    const replayHumanGateBlocker =
+      domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff
+        .stage_replay_human_gate_blocker_summary;
+    assert.equal(replayHumanGateBlocker.surface_kind, 'rca_stage_replay_human_gate_blocker_summary');
+    assert.equal(replayHumanGateBlocker.status, 'domain_owned_typed_blocker_refs_ready');
+    assert.equal(replayHumanGateBlocker.missing_ref, 'human_gate:redcube_operator_review_gate');
+    assert.deepEqual(replayHumanGateBlocker.stage_ids, [
+      'communication_strategy',
+      'visual_direction',
+      'artifact_creation',
+      'review_and_revision',
+    ]);
+    assert.equal(replayHumanGateBlocker.stage_count, 4);
+    assert.equal(replayHumanGateBlocker.payload_body_allowed, false);
+    assert.equal(replayHumanGateBlocker.accepted_payload_paths.typed_blocker_path.success_claimed, false);
+    assert.equal(replayHumanGateBlocker.accepted_payload_paths.typed_blocker_path.closes_replay_receipt_ref, false);
+    assert.equal(replayHumanGateBlocker.stages.every(
+      (stage) => stage.missing_ref === 'human_gate:redcube_operator_review_gate'
+        && stage.status === 'blocked_by_domain_owned_typed_blocker_ref'
+        && stage.target_identity.domain_id === 'redcube_ai'
+        && stage.typed_blocker_path_payload.typed_blocker_refs.length === 1
+        && stage.human_gate_approval_claimed === false
+        && stage.closes_replay_receipt_ref === false
+        && stage.authority_boundary.can_requery_human === false,
+    ), true);
     assert.equal(
       domain_action_adapter.mapped_surfaces.opl_expected_receipt_monitor_freshness_handoff.authority_boundary.opl_can_record_expected_receipt_refs,
       true,
@@ -338,6 +364,29 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     );
     assert.equal(
       domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder.success_boundary.production_soak_complete_claimed,
+      false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.long_soak_evidence_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.long_soak_evidence_ref_count,
+      0,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.production_visual_stage_long_soak_complete,
+      false,
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.long_soak_evidence_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.production_visual_stage_long_soak_complete_claimed,
       false,
     );
     assert.equal(
@@ -589,6 +638,27 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
       manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.production_tail_typed_blocker_refs.blocks_stage_expected_receipt_or_monitor_refs,
       false,
     );
+    assert.deepEqual(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff
+        .stage_replay_human_gate_blocker_summary.stage_ids,
+      [
+        'communication_strategy',
+        'visual_direction',
+        'artifact_creation',
+        'review_and_revision',
+      ],
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff
+        .stage_replay_human_gate_blocker_summary.stages.every(
+          (stage) => stage.typed_blocker_path_payload.typed_blocker_refs[0].startsWith(
+            'rca-typed-blocker:stage-replay-human-gate:',
+          )
+            && stage.human_gate_approval_claimed === false
+            && stage.closes_replay_receipt_ref === false,
+        ),
+      true,
+    );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.opl_expected_receipt_monitor_freshness_handoff.opl_payload_policy.payload_body_allowed,
       false,
@@ -611,6 +681,16 @@ test('product-entry evidence scaleout refs stay RCA-owned and refs-only', SERIAL
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items[2].temporal_readiness_refs.production_visual_stage_long_soak_complete,
       false,
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder
+        .work_items[2].temporal_readiness_refs.long_soak_evidence_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
+    assert.equal(
+      manifestWithReceipts.operator_evidence_readiness_projection
+        .temporal_controlled_visual_stage_long_soak_evidence_inventory.evidence_count,
+      0,
     );
     assert.equal(
       manifestWithReceipts.operator_evidence_readiness_projection.production_evidence_tail_workorder.work_items.every(

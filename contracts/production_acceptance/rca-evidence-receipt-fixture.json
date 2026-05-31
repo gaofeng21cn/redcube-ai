@@ -142,7 +142,8 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
       "real_runtime_evidence_refs": [
         "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
@@ -150,9 +151,10 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
-      "real_runtime_evidence_ref_count": 6,
+      "real_runtime_evidence_ref_count": 7,
       "real_runtime_evidence_provenance": [
         {
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
@@ -183,6 +185,11 @@
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
           "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat",
           "sha256": "7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat",
+          "workspace_ref": "user-runtime-state:redcube-ai/rca-native-live-20260531-tranche1/workspace",
+          "sha256": "7f05bc52871961dff4fbce1acee32b276ccbc51f376a8fa6e31caa845ccd38cc"
         }
       ],
       "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs",
@@ -213,7 +220,8 @@
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
       "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+      "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
     ],
     "no_regression_refs": [
       "rca-no-regression:visual-stage:transition-hosted-no-regression",
@@ -223,7 +231,8 @@
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
       "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+      "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
     ]
   },
   "opl_expected_receipt_monitor_freshness_handoff": {
@@ -264,7 +273,8 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
       "evidence_cadence": "cross_route_cross_window_repeated_refs_only",
       "repeated_no_regression_claimed_as_soak": false
@@ -311,8 +321,8 @@
       "blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
       "blocker_kind": "controlled_visual_soak_runtime_evidence_pending",
       "owner": "redcube_ai",
-      "source_contract": "opl_temporal_controlled_visual_stage_attempt_apply_contract",
-      "next_required_owner_action": "run_temporal_controlled_visual_stage_long_soak_or_return_rca_no_regression_evidence",
+      "source_contract": "rca.temporal_controlled_visual_stage_long_soak.v1",
+      "next_required_owner_action": "run_temporal_controlled_visual_stage_long_soak_or_emit_rca_refs_only_evidence",
       "next_verification_command_refs": [
         "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
         "command:npm run test:fast"

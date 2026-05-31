@@ -11,6 +11,8 @@ import {
   resolveOwnerRepoRoot,
 } from 'opl-framework-shared/family-shared-release';
 
+export const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
+
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'integration',
   'integration:remaining',

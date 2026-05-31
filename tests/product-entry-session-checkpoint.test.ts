@@ -152,6 +152,11 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
     const runId = 'run-closeout-first-latest';
     const closeoutRef = 'rca-closeout:deck-closeout-first/visual-director-block';
     const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
+    const firstSessionRecord = readJson(first.entry_session.session_file);
+    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
+    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+    const routeStartedAt = new Date(firstSessionUpdatedAt + 1000).toISOString();
+    const routeFinishedAt = new Date(firstSessionUpdatedAt + 2000).toISOString();
     writeJson(routeRunFile, {
       run_id: runId,
       route: 'visual_director_review',
@@ -161,8 +166,8 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
       topic_id: 'topic-a',
       deliverable_id: 'deck-closeout-first',
       status: 'quality_blocked',
-      started_at: '2026-05-30T10:00:00.000Z',
-      finished_at: '2026-05-30T10:01:00.000Z',
+      started_at: routeStartedAt,
+      finished_at: routeFinishedAt,
       current_stage: 'visual_director_review',
       stage_results: [{ stage: 'visual_director_review', status: 'quality_blocked' }],
       artifact_refs: [],

@@ -179,6 +179,11 @@ const TRANSIENT_TEST_FIXTURE_DIRS = new Set([
   '__closeout-audit-nested-ts-case__',
 ]);
 
+function isTransientTestFixtureDir(entry) {
+  return TRANSIENT_TEST_FIXTURE_DIRS.has(entry)
+    || /^__closeout-audit-nested-ts-case-[0-9a-f-]+__$/.test(entry);
+}
+
 function toRepoPath(file) {
   return file.split(path.sep).join('/');
 }
@@ -187,8 +192,17 @@ function collectTestFiles(dir = TESTS_DIR) {
   return readdirSync(dir)
     .flatMap((entry) => {
       const file = path.join(dir, entry);
-      if (statSync(file).isDirectory()) {
-        if (dir === TESTS_DIR && TRANSIENT_TEST_FIXTURE_DIRS.has(entry)) {
+      let stat;
+      try {
+        stat = statSync(file);
+      } catch (error) {
+        if (error?.code === 'ENOENT') {
+          return [];
+        }
+        throw error;
+      }
+      if (stat.isDirectory()) {
+        if (dir === TESTS_DIR && isTransientTestFixtureDir(entry)) {
           return [];
         }
         return collectTestFiles(file);

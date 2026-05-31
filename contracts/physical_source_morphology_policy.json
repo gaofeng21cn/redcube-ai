@@ -569,6 +569,11 @@
       "repo_path_anchor"
     ],
     "anchor_separator": "#",
+    "repo_local_refs_only": true,
+    "absolute_path_allowed": false,
+    "parent_directory_traversal_allowed": false,
+    "uri_ref_allowed": false,
+    "machine_boundary_refs_require_anchor": true,
     "stale_source_ref_reopens_gap": true,
     "missing_source_ref_allowed": false,
     "missing_machine_boundary_anchor_allowed": false,

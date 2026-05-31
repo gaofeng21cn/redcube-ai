@@ -3,6 +3,7 @@
 import {
   buildOwnerPayloadItemSummaries,
   buildStageExpectedReceiptPayloadSummary,
+  buildStageReplayHumanGateBlockerSummary,
 } from './operator-evidence-payload-summaries.js';
 
 const RCA_EFFICIENCY_WORK_ORDER_ID = 'oma_developer_patch_work_order_5a1b68cacbd4';
@@ -106,6 +107,7 @@ const RCA_REAL_NO_REGRESSION_EVIDENCE_REFS = Object.freeze([
   'rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2',
   'rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat',
   'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
+  'rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat',
 ]);
 
 const RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE = 'cross_route_cross_window_repeated_refs_only';
@@ -142,6 +144,11 @@ const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE = Object.freeze([
     evidence_ref: 'rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat',
     workspace_ref: 'user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat',
     sha256: '7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4',
+  }),
+  Object.freeze({
+    evidence_ref: 'rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat',
+    workspace_ref: 'user-runtime-state:redcube-ai/rca-native-live-20260531-tranche1/workspace',
+    sha256: '7f05bc52871961dff4fbce1acee32b276ccbc51f376a8fa6e31caa845ccd38cc',
   }),
 ]);
 
@@ -351,6 +358,7 @@ export function buildProductionEvidenceTailWorkOrder({
   productionEvidenceScaleoutRefs,
   oplExpectedReceiptMonitorFreshnessHandoff,
   workspaceReceiptInventoryProjection,
+  temporalLongSoakEvidenceInventory,
   temporalAutonomyReadiness,
 } = {}) {
   const typedBlockerRefs = productionEvidenceScaleoutRefs?.typed_blocker_refs || [
@@ -361,6 +369,7 @@ export function buildProductionEvidenceTailWorkOrder({
     production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
     opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
     temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
+    temporal_long_soak_evidence_inventory_ref: '/temporal_controlled_visual_stage_long_soak_evidence_inventory',
     workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
     remaining_evidence_gate_blockers_contract_ref: 'contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers',
   };
@@ -483,6 +492,8 @@ export function buildProductionEvidenceTailWorkOrder({
           `${sourceProjectionRefs.production_evidence_scaleout_refs_ref}/review_export_verdict_refs`,
         ],
         expected_output_refs: [
+          'rca-long-soak:visual-stage:<soak-id>',
+          'workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>',
           'workspace-runtime-ref:temporal-stage-attempt:<run-id>',
           'workspace-runtime-ref:retry-dead-letter:<run-id>',
           'workspace-runtime-ref:requery-resume:<run-id>',
@@ -497,6 +508,14 @@ export function buildProductionEvidenceTailWorkOrder({
           provider_kind_required_for_production: temporalAutonomyReadiness?.provider_kind_required_for_production || 'temporal',
           default_opl_temporal_hosted_autonomy_enabled: (
             temporalAutonomyReadiness?.default_opl_temporal_hosted_autonomy_enabled === true
+          ),
+          long_soak_evidence_action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
+          long_soak_evidence_inventory_ref: '/temporal_controlled_visual_stage_long_soak_evidence_inventory',
+          long_soak_evidence_ref_count: temporalLongSoakEvidenceInventory?.evidence_count || 0,
+          latest_long_soak_evidence_ref: temporalLongSoakEvidenceInventory?.latest_evidence_ref || null,
+          latest_long_soak_runtime_locator_ref: temporalLongSoakEvidenceInventory?.latest_runtime_locator_ref || null,
+          long_soak_evidence_refs_visible: (
+            temporalLongSoakEvidenceInventory?.coverage?.long_soak_evidence_refs_visible === true
           ),
           production_visual_stage_long_soak_complete: false,
         },
@@ -646,6 +665,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       productionEvidenceScaleoutRefs,
       workspaceReceiptInventoryProjection,
     }),
+    stage_replay_human_gate_blocker_summary: buildStageReplayHumanGateBlockerSummary(),
     opl_payload_policy: {
       payload_kind: 'stage_production_evidence_receipt_record_body_free_refs',
       payload_body_required: false,

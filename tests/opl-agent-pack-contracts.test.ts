@@ -16,6 +16,7 @@ import {
   buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
 } from '../packages/redcube-domain-entry/dist/index.js';
+import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from '../scripts/run-test-group-lib.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -235,6 +236,86 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.equal(foundrySeries.product_layer, 'foundry_agent');
   assert.equal(foundrySeries.domain_id, 'redcube');
   assert.equal(foundrySeries.stage_control_plane_target_domain_id, 'redcube_ai');
+  assert.deepEqual(foundrySeries.contract_version_policy, {
+    current_version: 'foundry-agent-series.v1',
+    domain_contract_ref: 'contracts/foundry_agent_series.json',
+    exact_version_pin_required: true,
+    compatible_version_range: ['foundry-agent-series.v1'],
+    breaking_change_requires_new_version: true,
+    domain_descriptor_must_reference_domain_contract: true,
+  });
+  assert.deepEqual(foundrySeries.shared_release_pin_strategy, {
+    owner_release_contract_ref: REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH,
+    owner_commit_pin_required: true,
+    domain_dependency_pin_required: true,
+    supported_pin_sources: [
+      'pyproject.toml',
+      'uv.lock',
+      'package.json',
+      'package-lock.json',
+    ],
+    consumer_alignment_check: 'family:shared-release',
+    domain_contract_version_pin_does_not_authorize_domain_truth: true,
+  });
+  assert.deepEqual(foundrySeries.identity_hygiene_policy.canonical_identities, {
+    series_domain_id: foundrySeries.domain_id,
+    foundry_agent_id: foundrySeries.foundry_agent_id,
+    domain_authority_owner_id: foundrySeries.authority_owner,
+    stage_control_plane_target_domain_id: foundrySeries.stage_control_plane_target_domain_id,
+    public_package_or_skill_id: 'redcube-ai',
+    shorthand_alias: 'rca',
+    domain_aliases: foundrySeries.domain_aliases,
+  });
+  assert.deepEqual(
+    Object.fromEntries(
+      foundrySeries.identity_hygiene_policy.identity_role_bindings.map((entry) => [entry.identity, entry]),
+    ),
+    {
+      redcube: {
+        identity: 'redcube',
+        role: 'foundry_series_identity',
+        authority_source: false,
+        public_package_or_skill_id: false,
+        generated_surface_owner: false,
+      },
+      redcube_ai: {
+        identity: 'redcube_ai',
+        role: 'domain_authority_owner_and_stage_control_target',
+        authority_source: true,
+        public_package_or_skill_id: false,
+        generated_surface_owner: false,
+      },
+      'redcube-ai': {
+        identity: 'redcube-ai',
+        role: 'public_package_and_skill_identity',
+        authority_source: false,
+        public_package_or_skill_id: true,
+        generated_surface_owner: false,
+      },
+      rca: {
+        identity: 'rca',
+        role: 'shorthand_alias',
+        authority_source: false,
+        public_package_or_skill_id: false,
+        generated_surface_owner: false,
+      },
+    },
+  );
+  assert.deepEqual(foundrySeries.identity_hygiene_policy.alias_authority_policy, {
+    domain_aliases_do_not_define_authority: true,
+    authority_owner_must_equal: foundrySeries.authority_owner,
+    stage_control_plane_target_must_equal: foundrySeries.stage_control_plane_target_domain_id,
+    public_package_or_skill_must_equal: 'redcube-ai',
+    shorthand_alias_must_equal: 'rca',
+  });
+  assert.deepEqual(foundrySeries.identity_hygiene_policy.readiness_claim_boundary, {
+    identity_hygiene_contract_only: true,
+    can_claim_visual_ready: false,
+    can_claim_exportable: false,
+    can_claim_handoffable: false,
+    can_claim_domain_ready: false,
+    can_claim_production_ready: false,
+  });
   assert.equal(foundrySeries.domain_adapter_policy.no_parallel_progress_schema, true);
   assert.equal(foundrySeries.app_projection_policy.app_consumes_shared_progress_projection_only, true);
   assert.equal(foundrySeries.app_projection_policy.app_can_read_domain_body, false);

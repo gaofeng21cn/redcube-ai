@@ -320,12 +320,14 @@ export function buildControlledSoakNoRegressionAttempt() {
     deferred_blocker: {
       blocker_kind: 'domain_owner_receipt_required',
       blocker_id: 'rca_controlled_soak_domain_receipt_required',
-      source_contract: 'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+      source_contract: 'rca.temporal_controlled_visual_stage_long_soak.v1',
       required_return_shapes: [
+        'controlled_visual_stage_long_soak_evidence',
         'domain_owner_receipt_ref',
         'typed_blocker',
         'no_regression_evidence_ref',
       ],
+      generator_action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
       required_owner: DOMAIN_ID,
       domain_owner: DOMAIN_ID,
     },

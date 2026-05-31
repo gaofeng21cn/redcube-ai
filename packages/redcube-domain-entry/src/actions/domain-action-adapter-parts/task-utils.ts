@@ -14,6 +14,8 @@ export const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
   'canonical_artifact_blob',
   'artifact_blob',
   'artifact_body',
+  'visual_memory_body',
+  'memory_body',
   'memory_content_body',
   'generic_runtime_state',
   'managed_runtime_compatibility_alias',

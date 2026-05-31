@@ -159,7 +159,8 @@
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
       "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+      "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
     ],
     "domain_receipt_refs": [
       "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
@@ -173,7 +174,8 @@
       "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
       "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
       "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+      "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+      "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
     ],
     "required_return_shapes": [
       "domain_owner_receipt_ref",
@@ -330,7 +332,9 @@
             ],
             "no_regression_evidence_refs": [],
             "owner_chain_refs": [
-              "workspace-runtime-ref:review-export:transition-run"
+              "workspace-runtime-ref:review-export:transition-run",
+              "rca-long-soak:visual-stage:<soak-id>",
+              "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
             ]
           },
           "typed_blocker_path_payload": {
@@ -348,7 +352,23 @@
           "production_readiness_claimed": false,
           "visual_readiness_claimed": false,
           "export_readiness_claimed": false,
-          "production_soak_complete_claimed": false
+          "production_soak_complete_claimed": false,
+          "required_input_refs": [
+            "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory"
+          ],
+          "expected_output_refs": [
+            "rca-long-soak:visual-stage:<soak-id>",
+            "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
+          ],
+          "temporal_readiness_refs": {
+            "long_soak_evidence_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
+            "long_soak_evidence_inventory_ref": "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory",
+            "long_soak_evidence_ref_count": 0,
+            "latest_long_soak_evidence_ref": null,
+            "latest_long_soak_runtime_locator_ref": null,
+            "long_soak_evidence_refs_visible": false,
+            "production_visual_stage_long_soak_complete": false
+          }
         },
         {
           "item_id": "cross_family_repeated_no_regression",
@@ -372,7 +392,8 @@
               "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
               "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
               "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-              "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+              "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+              "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
             ],
             "owner_chain_refs": [
               "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection"
@@ -459,7 +480,8 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
       "deliverable_family_refs": [
         "ppt_deck",
@@ -474,9 +496,10 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
-      "real_runtime_evidence_ref_count": 6,
+      "real_runtime_evidence_ref_count": 7,
       "real_runtime_evidence_provenance": [
         {
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
@@ -507,6 +530,11 @@
           "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
           "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat",
           "sha256": "7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4"
+        },
+        {
+          "evidence_ref": "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat",
+          "workspace_ref": "user-runtime-state:redcube-ai/rca-native-live-20260531-tranche1/workspace",
+          "sha256": "7f05bc52871961dff4fbce1acee32b276ccbc51f376a8fa6e31caa845ccd38cc"
         }
       ],
       "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs"
@@ -596,7 +624,8 @@
         "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
         "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
         "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat"
+        "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+        "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
       ],
       "deliverable_family_refs": [
         "ppt_deck",
@@ -692,6 +721,244 @@
         "can_generate_typed_blocker": false,
         "can_authorize_quality_or_export": false,
         "refs_only": true
+      }
+    },
+    "stage_replay_human_gate_blocker_summary": {
+      "surface_kind": "rca_stage_replay_human_gate_blocker_summary",
+      "owner": "redcube_ai",
+      "consumer": "one_person_lab",
+      "status": "domain_owned_typed_blocker_refs_ready",
+      "payload_kind": "stage_replay_missing_receipt_typed_blocker_refs",
+      "payload_path_policy": "success_receipt_ref_or_domain_owned_typed_blocker_ref",
+      "payload_body_allowed": false,
+      "empty_payload_template_is_success_evidence": false,
+      "missing_ref": "human_gate:redcube_operator_review_gate",
+      "missing_ref_kind": "human_gate_ref",
+      "stage_count": 4,
+      "stage_ids": [
+        "communication_strategy",
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision"
+      ],
+      "typed_blocker_refs": [
+        "rca-typed-blocker:stage-replay-human-gate:communication_strategy:redcube_operator_review_gate/operator-review-receipt-pending",
+        "rca-typed-blocker:stage-replay-human-gate:visual_direction:redcube_operator_review_gate/operator-review-receipt-pending",
+        "rca-typed-blocker:stage-replay-human-gate:artifact_creation:redcube_operator_review_gate/operator-review-receipt-pending",
+        "rca-typed-blocker:stage-replay-human-gate:review_and_revision:redcube_operator_review_gate/operator-review-receipt-pending"
+      ],
+      "accepted_payload_paths": {
+        "success_refs_path": {
+          "required_receipt_ref": "human_gate:redcube_operator_review_gate",
+          "typed_blocker_refs_must_be_absent": true,
+          "closes_replay_receipt_ref": true,
+          "readiness_claim_allowed": false
+        },
+        "typed_blocker_path": {
+          "required_typed_blocker_refs": [
+            "typed_blocker_refs"
+          ],
+          "success_claimed": false,
+          "closes_replay_receipt_ref": false,
+          "readiness_claim_allowed": false
+        }
+      },
+      "stages": [
+        {
+          "stage_id": "communication_strategy",
+          "sequence": 1,
+          "missing_ref": "human_gate:redcube_operator_review_gate",
+          "missing_ref_kind": "human_gate_ref",
+          "status": "blocked_by_domain_owned_typed_blocker_ref",
+          "target_identity": {
+            "domain_id": "redcube_ai",
+            "stage_id": "communication_strategy",
+            "missing_ref": "human_gate:redcube_operator_review_gate",
+            "target_key": "redcube_ai/communication_strategy/human_gate:redcube_operator_review_gate"
+          },
+          "current_payload_template": {
+            "receipt_refs": [],
+            "typed_blocker_refs": []
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:stage-replay-human-gate:communication_strategy:redcube_operator_review_gate/operator-review-receipt-pending"
+            ]
+          },
+          "success_refs_path_payload": {
+            "receipt_refs": [],
+            "required_receipt_ref": "human_gate:redcube_operator_review_gate"
+          },
+          "source_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary/stages/0/typed_blocker_path_payload/typed_blocker_refs/0",
+          "operator_payload_submitted": false,
+          "success_claimed": false,
+          "human_gate_approval_claimed": false,
+          "closes_replay_receipt_ref": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false,
+          "authority_boundary": {
+            "can_write_domain_truth": false,
+            "can_write_owner_receipt": false,
+            "can_create_owner_receipt": false,
+            "can_generate_typed_blocker": false,
+            "can_authorize_quality_or_export": false,
+            "refs_only": true,
+            "can_requery_human": false,
+            "can_close_replay_receipt_ref": false
+          }
+        },
+        {
+          "stage_id": "visual_direction",
+          "sequence": 2,
+          "missing_ref": "human_gate:redcube_operator_review_gate",
+          "missing_ref_kind": "human_gate_ref",
+          "status": "blocked_by_domain_owned_typed_blocker_ref",
+          "target_identity": {
+            "domain_id": "redcube_ai",
+            "stage_id": "visual_direction",
+            "missing_ref": "human_gate:redcube_operator_review_gate",
+            "target_key": "redcube_ai/visual_direction/human_gate:redcube_operator_review_gate"
+          },
+          "current_payload_template": {
+            "receipt_refs": [],
+            "typed_blocker_refs": []
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:stage-replay-human-gate:visual_direction:redcube_operator_review_gate/operator-review-receipt-pending"
+            ]
+          },
+          "success_refs_path_payload": {
+            "receipt_refs": [],
+            "required_receipt_ref": "human_gate:redcube_operator_review_gate"
+          },
+          "source_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary/stages/1/typed_blocker_path_payload/typed_blocker_refs/0",
+          "operator_payload_submitted": false,
+          "success_claimed": false,
+          "human_gate_approval_claimed": false,
+          "closes_replay_receipt_ref": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false,
+          "authority_boundary": {
+            "can_write_domain_truth": false,
+            "can_write_owner_receipt": false,
+            "can_create_owner_receipt": false,
+            "can_generate_typed_blocker": false,
+            "can_authorize_quality_or_export": false,
+            "refs_only": true,
+            "can_requery_human": false,
+            "can_close_replay_receipt_ref": false
+          }
+        },
+        {
+          "stage_id": "artifact_creation",
+          "sequence": 3,
+          "missing_ref": "human_gate:redcube_operator_review_gate",
+          "missing_ref_kind": "human_gate_ref",
+          "status": "blocked_by_domain_owned_typed_blocker_ref",
+          "target_identity": {
+            "domain_id": "redcube_ai",
+            "stage_id": "artifact_creation",
+            "missing_ref": "human_gate:redcube_operator_review_gate",
+            "target_key": "redcube_ai/artifact_creation/human_gate:redcube_operator_review_gate"
+          },
+          "current_payload_template": {
+            "receipt_refs": [],
+            "typed_blocker_refs": []
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:stage-replay-human-gate:artifact_creation:redcube_operator_review_gate/operator-review-receipt-pending"
+            ]
+          },
+          "success_refs_path_payload": {
+            "receipt_refs": [],
+            "required_receipt_ref": "human_gate:redcube_operator_review_gate"
+          },
+          "source_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary/stages/2/typed_blocker_path_payload/typed_blocker_refs/0",
+          "operator_payload_submitted": false,
+          "success_claimed": false,
+          "human_gate_approval_claimed": false,
+          "closes_replay_receipt_ref": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false,
+          "authority_boundary": {
+            "can_write_domain_truth": false,
+            "can_write_owner_receipt": false,
+            "can_create_owner_receipt": false,
+            "can_generate_typed_blocker": false,
+            "can_authorize_quality_or_export": false,
+            "refs_only": true,
+            "can_requery_human": false,
+            "can_close_replay_receipt_ref": false
+          }
+        },
+        {
+          "stage_id": "review_and_revision",
+          "sequence": 4,
+          "missing_ref": "human_gate:redcube_operator_review_gate",
+          "missing_ref_kind": "human_gate_ref",
+          "status": "blocked_by_domain_owned_typed_blocker_ref",
+          "target_identity": {
+            "domain_id": "redcube_ai",
+            "stage_id": "review_and_revision",
+            "missing_ref": "human_gate:redcube_operator_review_gate",
+            "target_key": "redcube_ai/review_and_revision/human_gate:redcube_operator_review_gate"
+          },
+          "current_payload_template": {
+            "receipt_refs": [],
+            "typed_blocker_refs": []
+          },
+          "typed_blocker_path_payload": {
+            "typed_blocker_refs": [
+              "rca-typed-blocker:stage-replay-human-gate:review_and_revision:redcube_operator_review_gate/operator-review-receipt-pending"
+            ]
+          },
+          "success_refs_path_payload": {
+            "receipt_refs": [],
+            "required_receipt_ref": "human_gate:redcube_operator_review_gate"
+          },
+          "source_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary/stages/3/typed_blocker_path_payload/typed_blocker_refs/0",
+          "operator_payload_submitted": false,
+          "success_claimed": false,
+          "human_gate_approval_claimed": false,
+          "closes_replay_receipt_ref": false,
+          "domain_readiness_claimed": false,
+          "production_readiness_claimed": false,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false,
+          "production_soak_complete_claimed": false,
+          "authority_boundary": {
+            "can_write_domain_truth": false,
+            "can_write_owner_receipt": false,
+            "can_create_owner_receipt": false,
+            "can_generate_typed_blocker": false,
+            "can_authorize_quality_or_export": false,
+            "refs_only": true,
+            "can_requery_human": false,
+            "can_close_replay_receipt_ref": false
+          }
+        }
+      ],
+      "source_ref_root": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/stage_replay_human_gate_blocker_summary",
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_owner_receipt": false,
+        "can_create_owner_receipt": false,
+        "can_generate_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "refs_only": true,
+        "can_requery_human": false,
+        "can_close_replay_receipt_ref": false
       }
     },
     "opl_payload_policy": {
@@ -812,7 +1079,10 @@
     "production_soak_complete": false,
     "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
     "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
-    "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak"
+    "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak",
+    "evidence_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
+    "evidence_ref_model": "rca-long-soak:visual-stage:<soak-id>",
+    "runtime_locator_ref_model": "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
   },
   "temporal_autonomy_readiness": {
     "surface_kind": "temporal_autonomy_readiness",
@@ -963,9 +1233,12 @@
           "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
           "opl_generated:product_entry_manifest#/controlled_soak_no_regression_attempt",
           "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff/monitor_freshness_backfill_refs",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/review_export_verdict_refs"
+          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/review_export_verdict_refs",
+          "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory"
         ],
         "expected_output_refs": [
+          "rca-long-soak:visual-stage:<soak-id>",
+          "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>",
           "workspace-runtime-ref:temporal-stage-attempt:<run-id>",
           "workspace-runtime-ref:retry-dead-letter:<run-id>",
           "workspace-runtime-ref:requery-resume:<run-id>",
@@ -981,7 +1254,24 @@
         "export_readiness_claimed": false,
         "handoff_readiness_claimed": false,
         "domain_readiness_claimed": false,
-        "production_soak_complete_claimed": false
+        "production_soak_complete_claimed": false,
+        "temporal_readiness_refs": {
+          "long_soak_evidence_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
+          "long_soak_evidence_inventory_ref": "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory",
+          "long_soak_evidence_ref_count": 0,
+          "latest_long_soak_evidence_ref": null,
+          "latest_long_soak_runtime_locator_ref": null,
+          "long_soak_evidence_refs_visible": false,
+          "production_visual_stage_long_soak_complete": false
+        },
+        "success_refs_path_payload": {
+          "domain_owner_receipt_refs": [],
+          "no_regression_evidence_refs": [],
+          "owner_chain_refs": [
+            "rca-long-soak:visual-stage:<soak-id>",
+            "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
+          ]
+        }
       },
       {
         "item_id": "cross_family_repeated_no_regression",

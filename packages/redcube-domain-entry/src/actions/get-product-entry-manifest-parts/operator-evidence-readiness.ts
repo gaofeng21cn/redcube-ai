@@ -17,6 +17,7 @@ export function buildOperatorEvidenceReadinessProjection({
   standardDomainAgentSkeleton,
   visualTransitionEvaluator,
   workspaceReceiptInventoryProjection,
+  temporalLongSoakEvidenceInventory,
   temporalAutonomyReadiness,
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
@@ -33,6 +34,7 @@ export function buildOperatorEvidenceReadinessProjection({
     productionEvidenceScaleoutRefs,
     oplExpectedReceiptMonitorFreshnessHandoff,
     workspaceReceiptInventoryProjection,
+    temporalLongSoakEvidenceInventory,
     temporalAutonomyReadiness,
   });
   const rcaEfficiencyHandoffProjection = buildRcaEfficiencyHandoffProjection({
@@ -87,6 +89,13 @@ export function buildOperatorEvidenceReadinessProjection({
         ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
         status: productionEvidenceTailWorkOrder.status,
         workorder_id: productionEvidenceTailWorkOrder.workorder_id,
+      },
+      {
+        source_id: 'temporal_controlled_visual_stage_long_soak_evidence_inventory',
+        ref: '/temporal_controlled_visual_stage_long_soak_evidence_inventory',
+        status: temporalLongSoakEvidenceInventory?.status || 'unknown',
+        evidence_count: temporalLongSoakEvidenceInventory?.evidence_count || 0,
+        source_action: temporalLongSoakEvidenceInventory?.source_action || 'emit_temporal_controlled_visual_stage_long_soak_evidence',
       },
       {
         source_id: 'goal_workflow_agent_lab_suite',
@@ -183,6 +192,7 @@ export function buildOperatorEvidenceReadinessProjection({
     production_evidence_scaleout_refs: productionEvidenceScaleoutRefs,
     opl_expected_receipt_monitor_freshness_handoff: oplExpectedReceiptMonitorFreshnessHandoff,
     production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
+    temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
     goal_workflow_agent_lab_suite: goalWorkflowAgentLabSuite,
     ppt_three_route_agent_lab_suite: pptThreeRouteAgentLabSuite,
@@ -207,7 +217,8 @@ export function buildOperatorEvidenceReadinessProjection({
         owner: 'opl_provider_then_redcube_ai_receipt',
         status: 'pending_production_soak',
         required_evidence: 'A real OPL-hosted controlled visual-stage run repeatedly consumes RCA domain_action_adapter refs and receives RCA domain receipt, typed blocker, or no-regression evidence refs without writing RCA visual truth.',
-        current_best_ref: '/controlled_soak_no_regression_attempt',
+        current_best_ref: temporalLongSoakEvidenceInventory?.latest_evidence_ref || '/controlled_soak_no_regression_attempt',
+        observed_long_soak_evidence_ref_count: temporalLongSoakEvidenceInventory?.evidence_count || 0,
         workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
       },
       {

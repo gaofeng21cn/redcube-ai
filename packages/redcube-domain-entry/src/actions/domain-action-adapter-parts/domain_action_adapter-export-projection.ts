@@ -368,7 +368,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         source_contract: (
           manifest.controlled_soak_no_regression_attempt
             ?.deferred_blocker
-            ?.source_contract || 'opl_temporal_controlled_visual_stage_attempt_apply_contract'
+            ?.source_contract || 'rca.temporal_controlled_visual_stage_long_soak.v1'
         ),
         required_return_shapes: manifest.controlled_soak_no_regression_attempt
           ?.deferred_blocker
@@ -378,8 +378,11 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
             'no_regression_evidence_ref',
         ],
         evidence_action: 'emit_no_regression_evidence',
+        long_soak_evidence_action: 'emit_temporal_controlled_visual_stage_long_soak_evidence',
         evidence_surface_kind: 'no_regression_evidence',
-        writable_by_domain_action_adapter: false,
+        long_soak_evidence_surface_kind: 'temporal_controlled_visual_stage_long_soak_evidence',
+        writable_by_domain_action_adapter: true,
+        production_visual_stage_long_soak_complete_claimed: false,
       },
       temporal_autonomy_readiness: {
         ref: '/temporal_autonomy_readiness',

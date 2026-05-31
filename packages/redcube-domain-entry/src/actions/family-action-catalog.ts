@@ -354,7 +354,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     action({
       actionId: 'dispatch_domain_handler',
       title: 'Dispatch RedCube product domain handler guarded action',
-      summary: '调度 RCA-owned guarded domain handler actions：no-regression evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA handler 默认派发面暴露。',
+      summary: '调度 RCA-owned guarded domain handler actions：no-regression evidence、Temporal controlled visual-stage long-soak evidence、domain owner receipt、visual memory writeback、workspace lifecycle receipt、visual transition evaluation、workspace receipt proof、notification receipt；runtime watch、generic supervise/continuation 入口归 OPL status/workbench/runtime read model 与 runner/session shell，不在 RCA handler 默认派发面暴露。',
       effect: 'mutating',
       command: DOMAIN_HANDLER_DISPATCH_COMMAND,
       surfaceKind: 'product_domain_handler_dispatch',

@@ -672,13 +672,18 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     assert.equal(domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.state, 'deferred_typed_blocker');
     assert.equal(
       domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.source_contract,
-      'opl_temporal_controlled_visual_stage_attempt_apply_contract',
+      'rca.temporal_controlled_visual_stage_long_soak.v1',
     );
     assert.deepEqual(domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.required_return_shapes, [
+      'controlled_visual_stage_long_soak_evidence',
       'domain_owner_receipt_ref',
       'typed_blocker',
       'no_regression_evidence_ref',
     ]);
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.controlled_soak_no_regression_attempt.long_soak_evidence_action,
+      'emit_temporal_controlled_visual_stage_long_soak_evidence',
+    );
     assert.equal(domain_action_adapter.mapped_surfaces.owner_receipt_contract.ref, '/domain_owner_receipt_contract');
     assert.equal(domain_action_adapter.mapped_surfaces.owner_receipt_contract.owner, 'redcube_ai');
     assert.deepEqual(domain_action_adapter.mapped_surfaces.owner_receipt_contract.allowed_return_shapes, [
