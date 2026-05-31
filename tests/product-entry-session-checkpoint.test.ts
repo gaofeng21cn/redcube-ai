@@ -32,6 +32,75 @@ function writeJson(file, value) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
 }
 
+function buildProviderCurrentnessRun({
+  first,
+  runId,
+  deliverableId,
+  providerAttemptRef = undefined,
+  providerAttemptLedgerRef = undefined,
+  localSessionRef = undefined,
+}) {
+  const firstSessionRecord = readJson(first.entry_session.session_file);
+  const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
+  assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+  const crossProviderAttemptIndex = {
+    surface_kind: 'cross_provider_attempt_index',
+    local_session_ref: localSessionRef ?? `product-entry-session:${first.entry_session.entry_session_id}`,
+    local_route_run_ref: `route-run:${runId}`,
+    provider_attempt_owner: 'one-person-lab',
+  };
+  if (providerAttemptRef !== undefined) {
+    crossProviderAttemptIndex.provider_attempt_ref = providerAttemptRef;
+  }
+  if (providerAttemptLedgerRef !== undefined) {
+    crossProviderAttemptIndex.provider_attempt_ledger_ref = providerAttemptLedgerRef;
+  }
+  return {
+    run_id: runId,
+    route: 'storyline',
+    scope: 'deliverable',
+    target: deliverableId,
+    overlay: 'ppt_deck',
+    topic_id: 'topic-a',
+    deliverable_id: deliverableId,
+    status: 'completed',
+    started_at: new Date(firstSessionUpdatedAt + 1000).toISOString(),
+    finished_at: new Date(firstSessionUpdatedAt + 2000).toISOString(),
+    current_stage: 'storyline',
+    stage_results: [{ stage: 'storyline', status: 'completed' }],
+    artifact_refs: [`artifact:${runId}`],
+    closeout: {
+      closeout_ref: `rca-closeout:${deliverableId}/storyline`,
+      consumed: true,
+      owner: 'redcube_ai',
+      route: 'storyline',
+    },
+    cross_provider_attempt_index: crossProviderAttemptIndex,
+    progress_delta: {
+      deliverable_progress_delta: {
+        count: 1,
+        refs: [`artifact:${runId}`],
+        domain_alias: 'visual_deliverable_delta',
+      },
+      platform_repair_delta: {
+        count: 0,
+        refs: [],
+        domain_alias: 'platform_interface_repair_delta',
+      },
+      progress_delta_classification: 'deliverable_progress',
+    },
+  };
+}
+
+function assertNextForcedDelta(value, expected) {
+  assert.equal(value.surface_kind, 'next_forced_delta');
+  assert.equal(value.domain_alias, expected.domain_alias);
+  assert.equal(value.delta_kind, expected.delta_kind);
+  assert.equal(value.required_output_kind, expected.required_output_kind);
+  assert.equal(value.owner, expected.owner);
+  assert.equal(value.next_required_owner_action, expected.next_required_owner_action);
+}
+
 async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
@@ -237,8 +306,22 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
       refs: ['route_closeout_unconsumed'],
       domain_alias: 'platform_interface_repair_delta',
     });
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
+      domain_alias: 'operator_typed_blocker_delta',
+      delta_kind: 'operator_typed_blocker',
+      required_output_kind: 'typed_blocker_resolution',
+      owner: 'redcube_ai',
+      next_required_owner_action: 'consume_route_closeout_before_new_plan',
+    });
     assert.equal(session.progress_projection.progress_delta_classification, 'platform_repair');
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
+      domain_alias: 'operator_typed_blocker_delta',
+      delta_kind: 'operator_typed_blocker',
+      required_output_kind: 'typed_blocker_resolution',
+      owner: 'redcube_ai',
+      next_required_owner_action: 'consume_route_closeout_before_new_plan',
+    });
     assert.equal(
       session.runtime_loop_closure.control_policy.recommended_action,
       'consume_route_closeout_before_new_plan',
@@ -370,9 +453,114 @@ test('getProductEntrySession fails closed when a newer route run lacks OPL provi
     );
     assert.equal(session.progress_projection.summary.content_status, 'blocked_missing_provider_attempt_ledger');
     assert.equal(session.progress_projection.typed_blocker.blocker_kind, 'missing_provider_attempt_ledger');
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
+      domain_alias: 'provider_ledger_closeout_binding_delta',
+      delta_kind: 'provider_ledger_closeout_binding',
+      required_output_kind: 'provider_attempt_ledger_binding',
+      owner: 'one-person-lab',
+      next_required_owner_action: 'resolve_provider_attempt_ledger',
+    });
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
+      domain_alias: 'provider_ledger_closeout_binding_delta',
+      delta_kind: 'provider_ledger_closeout_binding',
+      required_output_kind: 'provider_attempt_ledger_binding',
+      owner: 'one-person-lab',
+      next_required_owner_action: 'resolve_provider_attempt_ledger',
+    });
     assert.equal(session.runtime_loop_closure.control_policy.recommended_action, 'resolve_provider_attempt_ledger');
   });
+});
+
+test('getProductEntrySession fails closed when provider attempt binding is partial or local-session-masqueraded', SERIAL_ENV_TEST, async () => {
+  const cases = [
+    {
+      entrySessionId: 'session-provider-ref-without-ledger',
+      deliverableId: 'deck-provider-ref-without-ledger',
+      runId: 'run-provider-ref-without-ledger',
+      providerAttemptRef: 'opl-provider-attempt:redcube_ai/storyline/attempt-001',
+      providerAttemptLedgerRef: undefined,
+    },
+    {
+      entrySessionId: 'session-ledger-without-provider-ref',
+      deliverableId: 'deck-ledger-without-provider-ref',
+      runId: 'run-ledger-without-provider-ref',
+      providerAttemptRef: undefined,
+      providerAttemptLedgerRef: 'attempt-ledger:opl/redcube_ai/storyline',
+    },
+    {
+      entrySessionId: 'session-local-ref-masquerades-provider',
+      deliverableId: 'deck-local-ref-masquerades-provider',
+      runId: 'run-local-ref-masquerades-provider',
+      providerAttemptRef: 'product-entry-session:session-local-ref-masquerades-provider',
+      providerAttemptLedgerRef: 'attempt-ledger:opl/redcube_ai/storyline',
+    },
+  ];
+
+  for (const currentnessCase of cases) {
+    await withMockCodexRuntimeState(async () => {
+      const workspaceRoot = await prepareProductEntryWorkspace();
+      const first = await invokeProductEntry({
+        workspace_locator: {
+          workspace_root: workspaceRoot,
+        },
+        entry_session_contract: {
+          entry_session_id: currentnessCase.entrySessionId,
+        },
+        delivery_request: {
+          deliverable_family: 'ppt_deck',
+          topic_id: 'topic-a',
+          deliverable_id: currentnessCase.deliverableId,
+          profile_id: 'lecture_student',
+          title: 'Product entry provider binding fail-closed proof',
+          goal: '验证 provider attempt 与 ledger binding 不完整时不能 claim current',
+          user_intent: '先做到故事主线',
+          stop_after_stage: 'storyline',
+        },
+      });
+
+      writeJson(
+        path.join(workspaceRoot, 'runtime', 'runs', `${currentnessCase.runId}.json`),
+        buildProviderCurrentnessRun({
+          first,
+          runId: currentnessCase.runId,
+          deliverableId: currentnessCase.deliverableId,
+          providerAttemptRef: currentnessCase.providerAttemptRef,
+          providerAttemptLedgerRef: currentnessCase.providerAttemptLedgerRef,
+        }),
+      );
+
+      const session = await getProductEntrySession({
+        entry_session_id: currentnessCase.entrySessionId,
+      });
+
+      assert.equal(session.continuation_snapshot.latest_run_id, currentnessCase.runId);
+      assert.equal(session.continuation_snapshot.latest_surface_kind, 'typed_blocker');
+      assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, false);
+      assert.equal(
+        session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
+        'blocked_missing_provider_attempt_ledger',
+      );
+      assert.equal(
+        session.continuation_snapshot.closeout_first_blocker.blocker_kind,
+        'missing_provider_attempt_ledger',
+      );
+      assertNextForcedDelta(session.progress_projection.next_forced_delta, {
+        domain_alias: 'provider_ledger_closeout_binding_delta',
+        delta_kind: 'provider_ledger_closeout_binding',
+        required_output_kind: 'provider_attempt_ledger_binding',
+        owner: 'one-person-lab',
+        next_required_owner_action: 'resolve_provider_attempt_ledger',
+      });
+      assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
+        domain_alias: 'provider_ledger_closeout_binding_delta',
+        delta_kind: 'provider_ledger_closeout_binding',
+        required_output_kind: 'provider_attempt_ledger_binding',
+        owner: 'one-person-lab',
+        next_required_owner_action: 'resolve_provider_attempt_ledger',
+      });
+    });
+  }
 });
 
 test('getProductEntrySession records provider attempt ledger refs when a newer route run carries cross-provider index evidence', SERIAL_ENV_TEST, async () => {
@@ -473,8 +661,22 @@ test('getProductEntrySession records provider attempt ledger refs when a newer r
       providerAttemptLedgerRef,
     );
     assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, true);
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
+      domain_alias: 'visual_deliverable_delta',
+      delta_kind: 'visual_deliverable_delta',
+      required_output_kind: 'visual_deliverable_delta',
+      owner: 'redcube_ai',
+      next_required_owner_action: 'pick_up_artifacts',
+    });
     assert.equal(session.progress_projection.summary.content_status, 'completed');
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, false);
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
+      domain_alias: 'visual_deliverable_delta',
+      delta_kind: 'visual_deliverable_delta',
+      required_output_kind: 'visual_deliverable_delta',
+      owner: 'redcube_ai',
+      next_required_owner_action: 'pick_up_artifacts',
+    });
   });
 });
 

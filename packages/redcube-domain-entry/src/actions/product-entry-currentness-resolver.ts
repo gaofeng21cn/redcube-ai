@@ -92,6 +92,73 @@ function blockerRecommendedAction(blocker) {
       : 'consume_route_closeout');
 }
 
+function buildVisualDeliverableNextForcedDelta({ run, progressDelta }) {
+  return {
+    surface_kind: 'next_forced_delta',
+    domain_alias: 'visual_deliverable_delta',
+    delta_kind: 'visual_deliverable_delta',
+    required_output_kind: 'visual_deliverable_delta',
+    owner: 'redcube_ai',
+    next_required_owner_action: safeText(run?.status) === 'completed'
+      ? 'pick_up_artifacts'
+      : 'continue_autonomous_run',
+    refs: safeArray(progressDelta?.deliverable_progress_delta?.refs).filter((ref) => safeText(ref)),
+    route_run_ref: run?.run_id ? `route-run:${run.run_id}` : null,
+    writes_visual_truth: false,
+    writes_review_export_verdict: false,
+    writes_canonical_artifact_blob: false,
+  };
+}
+
+function buildOperatorTypedBlockerNextForcedDelta({ blocker, run }) {
+  return {
+    surface_kind: 'next_forced_delta',
+    domain_alias: 'operator_typed_blocker_delta',
+    delta_kind: 'operator_typed_blocker',
+    required_output_kind: 'typed_blocker_resolution',
+    owner: 'redcube_ai',
+    next_required_owner_action: blockerRecommendedAction(blocker),
+    refs: [
+      safeText(blocker?.blocker_ref),
+      safeText(blocker?.closeout_ref),
+      run?.run_id ? `route-run:${run.run_id}` : '',
+    ].filter(Boolean),
+    typed_blocker_ref: safeText(blocker?.blocker_ref) || null,
+    closeout_ref: safeText(blocker?.closeout_ref) || null,
+    route_run_ref: run?.run_id ? `route-run:${run.run_id}` : null,
+    visual_ready_claimed: false,
+    exportable_claimed: false,
+    handoffable_claimed: false,
+  };
+}
+
+function buildProviderLedgerNextForcedDelta({ blocker, providerCurrentness, run }) {
+  return {
+    surface_kind: 'next_forced_delta',
+    domain_alias: 'provider_ledger_closeout_binding_delta',
+    delta_kind: 'provider_ledger_closeout_binding',
+    required_output_kind: 'provider_attempt_ledger_binding',
+    owner: 'one-person-lab',
+    next_required_owner_action: 'resolve_provider_attempt_ledger',
+    refs: [
+      safeText(providerCurrentness?.provider_attempt_ref),
+      safeText(providerCurrentness?.provider_attempt_ledger_ref),
+      safeText(providerCurrentness?.local_session_ref),
+      safeText(providerCurrentness?.local_route_run_ref),
+      safeText(blocker?.blocker_ref),
+      run?.run_id ? `route-run:${run.run_id}` : '',
+    ].filter(Boolean),
+    local_session_ref: providerCurrentness?.local_session_ref || null,
+    local_route_run_ref: providerCurrentness?.local_route_run_ref || (run?.run_id ? `route-run:${run.run_id}` : null),
+    provider_attempt_ref: providerCurrentness?.provider_attempt_ref || null,
+    provider_attempt_ledger_ref: providerCurrentness?.provider_attempt_ledger_ref || null,
+    typed_blocker_ref: blocker?.blocker_ref || null,
+    visual_ready_claimed: false,
+    exportable_claimed: false,
+    handoffable_claimed: false,
+  };
+}
+
 function buildCloseoutFirstBlocker({ run }) {
   const closeout = run?.closeout || {};
   const blockerKind = safeText(closeout.blocker_kind, 'route_closeout_unconsumed');
@@ -150,7 +217,18 @@ function buildProviderCurrentness({ run, session }) {
       || run.provider_attempt_ledger_ref
       || run.opl_provider_attempt_ledger_ref,
   );
-  const canClaimCurrent = Boolean(providerAttemptRef && providerAttemptLedgerRef);
+  const providerAttemptRefIsValid = Boolean(
+    providerAttemptRef
+      && providerAttemptRef !== localSessionRef
+      && !providerAttemptRef.startsWith('product-entry-session:'),
+  );
+  const providerAttemptLedgerRefIsValid = Boolean(
+    providerAttemptLedgerRef
+      && providerAttemptLedgerRef !== localSessionRef
+      && providerAttemptLedgerRef !== providerAttemptRef
+      && !providerAttemptLedgerRef.startsWith('product-entry-session:'),
+  );
+  const canClaimCurrent = providerAttemptRefIsValid && providerAttemptLedgerRefIsValid;
   return {
     surface_kind: 'cross_provider_attempt_currentness',
     version: 'cross-provider-attempt-currentness.v1',
@@ -158,13 +236,23 @@ function buildProviderCurrentness({ run, session }) {
     provider_attempt_owner: safeText(index.provider_attempt_owner, 'one-person-lab'),
     local_session_ref: localSessionRef,
     local_route_run_ref: localRouteRunRef,
-    provider_attempt_ref: providerAttemptRef || null,
-    provider_attempt_ledger_ref: providerAttemptLedgerRef || null,
+    provider_attempt_ref: providerAttemptRefIsValid ? providerAttemptRef : null,
+    provider_attempt_ledger_ref: providerAttemptLedgerRefIsValid ? providerAttemptLedgerRef : null,
+    rejected_provider_attempt_ref: providerAttemptRef && !providerAttemptRefIsValid
+      ? providerAttemptRef
+      : null,
+    rejected_provider_attempt_ledger_ref: providerAttemptLedgerRef && !providerAttemptLedgerRefIsValid
+      ? providerAttemptLedgerRef
+      : null,
     currentness_status: canClaimCurrent
       ? 'current_with_provider_attempt_ledger'
       : 'blocked_missing_provider_attempt_ledger',
     can_claim_current: canClaimCurrent,
-    local_session_ref_is_not_provider_attempt_ref: true,
+    provider_attempt_ref_required: true,
+    provider_attempt_ledger_ref_required: true,
+    provider_attempt_ref_is_valid: providerAttemptRefIsValid,
+    provider_attempt_ledger_ref_is_valid: providerAttemptLedgerRefIsValid,
+    local_session_ref_is_not_provider_attempt_ref: !providerAttemptRef || providerAttemptRef !== localSessionRef,
     rca_does_not_own_provider_attempt_ledger: true,
     missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
   };
@@ -184,12 +272,21 @@ function buildProviderAttemptLedgerBlocker({ run, providerCurrentness }) {
     recommended_action: 'resolve_provider_attempt_ledger',
     local_session_ref: providerCurrentness.local_session_ref,
     local_route_run_ref: routeRunRef,
-    provider_attempt_ref: null,
-    provider_attempt_ledger_ref: null,
+    provider_attempt_ref: providerCurrentness.provider_attempt_ref || null,
+    provider_attempt_ledger_ref: providerCurrentness.provider_attempt_ledger_ref || null,
+    rejected_provider_attempt_ref: providerCurrentness.rejected_provider_attempt_ref || null,
+    rejected_provider_attempt_ledger_ref: providerCurrentness.rejected_provider_attempt_ledger_ref || null,
     latest_run_id: safeText(run.run_id) || null,
     route: safeText(run.route) || null,
     topic_id: safeText(run.topic_id) || null,
     deliverable_id: safeText(run.deliverable_id || run.target) || null,
+    next_forced_delta: buildProviderLedgerNextForcedDelta({
+      blocker: {
+        blocker_ref: `rca-typed-blocker:missing-provider-attempt-ledger:${routeRunRef}`,
+      },
+      providerCurrentness,
+      run,
+    }),
     visual_ready_claimed: false,
     exportable_claimed: false,
     handoffable_claimed: false,
@@ -243,6 +340,7 @@ function routeRunProgressProjection({ run, closeoutFirstBlocker }) {
     route_run_ref: `route-run:${run.run_id}`,
     closeout_ref: closeoutFirstBlocker?.closeout_ref || null,
     typed_blocker_ref: closeoutFirstBlocker?.blocker_ref || null,
+    next_forced_delta: closeoutFirstBlocker?.next_forced_delta || null,
   };
 }
 
@@ -316,6 +414,36 @@ function classifyProgressDelta(run) {
   };
 }
 
+function attachNextForcedDelta({
+  run,
+  progressDelta,
+  currentnessBlocker,
+  providerCurrentness,
+}) {
+  const nextForcedDelta = safeText(currentnessBlocker?.blocker_kind) === 'missing_provider_attempt_ledger'
+    ? buildProviderLedgerNextForcedDelta({
+      blocker: currentnessBlocker,
+      providerCurrentness,
+      run,
+    })
+    : (currentnessBlocker
+      ? buildOperatorTypedBlockerNextForcedDelta({
+        blocker: currentnessBlocker,
+        run,
+      })
+      : buildVisualDeliverableNextForcedDelta({
+        run,
+        progressDelta,
+      }));
+  if (currentnessBlocker && !currentnessBlocker.next_forced_delta) {
+    currentnessBlocker.next_forced_delta = nextForcedDelta;
+  }
+  return {
+    ...progressDelta,
+    next_forced_delta: nextForcedDelta,
+  };
+}
+
 export function buildContinuationSnapshotFromSessionRecord(session) {
   return {
     latest_stage_execution_plan_ref: session.latest_stage_execution_plan_ref || null,
@@ -360,7 +488,12 @@ export function resolveProductEntryCurrentness({ session, persist = true }) {
       providerCurrentness,
     });
   const currentnessBlocker = closeoutFirstBlocker || providerAttemptLedgerBlocker;
-  const progressDelta = classifyProgressDelta(latestRun);
+  const progressDelta = attachNextForcedDelta({
+    run: latestRun,
+    progressDelta: classifyProgressDelta(latestRun),
+    currentnessBlocker,
+    providerCurrentness,
+  });
   const nextSession = {
     ...session,
     latest_run_id: latestRun.run_id || null,
