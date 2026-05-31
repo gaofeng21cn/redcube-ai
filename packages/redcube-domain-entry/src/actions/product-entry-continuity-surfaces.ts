@@ -32,6 +32,46 @@ function deltaPayload(value, domainAlias) {
   };
 }
 
+function nextForcedDeltaPayload(progressDelta, projection) {
+  if (isPlainObject(progressDelta?.next_forced_delta)) {
+    return progressDelta.next_forced_delta;
+  }
+  const contentStatus = safeText(projection?.content_status);
+  if (contentStatus === 'blocked_missing_provider_attempt_ledger') {
+    return {
+      surface_kind: 'next_forced_delta',
+      domain_alias: 'provider_ledger_closeout_binding_delta',
+      delta_kind: 'provider_ledger_closeout_binding',
+      required_output_kind: 'provider_attempt_ledger_binding',
+      owner: 'one-person-lab',
+      next_required_owner_action: 'resolve_provider_attempt_ledger',
+      refs: [],
+    };
+  }
+  if (safeText(projection?.typed_blocker_ref) || contentStatus === 'blocked_pending_closeout') {
+    return {
+      surface_kind: 'next_forced_delta',
+      domain_alias: 'operator_typed_blocker_delta',
+      delta_kind: 'operator_typed_blocker',
+      required_output_kind: 'typed_blocker_resolution',
+      owner: REDCUBE_LOOP_OWNER,
+      next_required_owner_action: 'consume_route_closeout',
+      refs: safeText(projection?.typed_blocker_ref) ? [safeText(projection.typed_blocker_ref)] : [],
+    };
+  }
+  return {
+    surface_kind: 'next_forced_delta',
+    domain_alias: 'visual_deliverable_delta',
+    delta_kind: 'visual_deliverable_delta',
+    required_output_kind: 'visual_deliverable_delta',
+    owner: REDCUBE_LOOP_OWNER,
+    next_required_owner_action: contentStatus === 'completed'
+      ? 'pick_up_artifacts'
+      : 'continue_autonomous_run',
+    refs: [],
+  };
+}
+
 const PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE = 'opl_generated:product_session --entry-session-id <entry-session-id>';
 const REDCUBE_LOOP_OWNER = 'redcube_ai';
 const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
@@ -136,6 +176,7 @@ export function buildProgressProjectionSurface({ continuationSnapshot }) {
   const progressDelta = continuationSnapshot?.progress_delta || {};
   const deliverableProgressDelta = deltaPayload(progressDelta.deliverable_progress_delta, 'visual_deliverable_delta');
   const platformRepairDelta = deltaPayload(progressDelta.platform_repair_delta, 'platform_interface_repair_delta');
+  const nextForcedDelta = nextForcedDeltaPayload(progressDelta, projection);
   return {
     surface_kind: 'progress_projection',
     stage_execution_plan_ref: continuationSnapshot?.latest_stage_execution_plan_ref || null,
@@ -143,6 +184,7 @@ export function buildProgressProjectionSurface({ continuationSnapshot }) {
     refs,
     deliverable_progress_delta: deliverableProgressDelta,
     platform_repair_delta: platformRepairDelta,
+    next_forced_delta: nextForcedDelta,
     progress_delta_classification: safeText(progressDelta.progress_delta_classification, 'unknown'),
     typed_blocker: continuationSnapshot?.closeout_first_blocker || null,
     stall_lineage: continuationSnapshot?.stall_lineage || null,
@@ -206,6 +248,7 @@ export function buildRuntimeLoopClosureSurface({
   const artifactRefs = Array.isArray(projection?.final_artifact_refs)
     ? projection.final_artifact_refs
     : [];
+  const nextForcedDelta = nextForcedDeltaPayload(continuationSnapshot?.progress_delta || {}, projection);
   return {
     surface_kind: 'runtime_loop_closure',
     loop_owner: buildLoopOwner(runtimeOwner),
@@ -254,6 +297,7 @@ export function buildRuntimeLoopClosureSurface({
       continuationSnapshot?.progress_delta?.platform_repair_delta,
       'platform_interface_repair_delta',
     ),
+    next_forced_delta: nextForcedDelta,
     progress_delta_classification: safeText(
       continuationSnapshot?.progress_delta?.progress_delta_classification,
       'unknown',
