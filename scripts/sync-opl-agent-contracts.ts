@@ -27,6 +27,94 @@ const SHARED_POLICY_RELEASE = {
   consumer_alignment_check: 'foundry:policy-release',
 };
 
+const SERIES_DESIGN_PROFILE = {
+  surface_kind: 'opl_foundry_agent_series_design_profile',
+  version: 'foundry-agent-series-design-profile.v1',
+  profile_id: 'opl_foundry_agent_series_design_profile.v1',
+  profile_summary:
+    'All Foundry Agents share the same OPL domain-pack to stage-led execution to gate/receipt to handoff lifecycle; domain inputs, outputs, aliases, and authority functions vary by agent.',
+  shared_lifecycle_pipeline: [
+    'domain_material_intake',
+    'domain_pack_interpretation',
+    'stage_led_agent_execution',
+    'independent_quality_gate_or_owner_review',
+    'owner_receipt_or_typed_blocker_closeout',
+    'artifact_or_deliverable_handoff',
+    'opl_refs_only_projection_and_recovery',
+  ],
+  domain_io_profile: {
+    input_slot: 'domain_materials_or_task_request',
+    output_slot: 'domain_deliverable_or_owner_handoff',
+    input_is_domain_specific: true,
+    output_is_domain_specific: true,
+    shared_runtime_interpretation:
+      'OPL treats input/output as opaque domain refs and projects identity, stage, progress, closeout, evidence, and recovery metadata only.',
+  },
+  stage_pack_sections: [
+    'prompts',
+    'stages',
+    'skills',
+    'knowledge',
+    'quality_gates',
+  ],
+  shared_closeout_contract: {
+    success_shape: 'domain_owner_receipt_ref',
+    blocked_shape: 'domain_owned_typed_blocker_ref',
+    route_back_shape: 'route_back_or_human_gate_ref',
+    provider_completion_is_closeout: false,
+  },
+  authority_invariants: {
+    opl_can_infer_domain_output: false,
+    opl_can_read_domain_body: false,
+    opl_can_write_domain_truth: false,
+    opl_can_authorize_quality_or_export: false,
+    domain_owns_input_truth_and_output_authority: true,
+  },
+};
+
+const DOMAIN_SPECIFIC_PROFILE = {
+  profile_id: 'rca_domain_specific_series_profile.v1',
+  series_membership: 'opl_foundry_agent_series',
+  peer_agent_ids: ['mas', 'mag', 'oma'],
+  shared_lifecycle_owner: 'one-person-lab',
+  shared_lifecycle_contract:
+    'OPL generated descriptors, refs, projection, provider-backed runtime, stage attempts, queue, wakeup, retry, human gate, receipt ledger, App/workbench shell',
+  shared_lifecycle_policy:
+    'rca_uses_the_same_opl_agent_lifecycle_as_mas_mag_oma_without_forking_runtime',
+  domain_specialization: {
+    input_profile: 'visual_materials_sources_brand_assets_images_documents_and_delivery_brief',
+    output_profile: 'visual_deliverables_ppt_pdf_png_export_bundle_and_handoff_refs',
+    stage_pack_role: 'declarative_visual_pack',
+    default_visual_routes: ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
+  },
+  rca_domain_authority: {
+    visual_truth_owner: DOMAIN_ID,
+    route_truth_owner: DOMAIN_ID,
+    review_export_verdict_owner: DOMAIN_ID,
+    artifact_authority_owner: DOMAIN_ID,
+    visual_memory_accept_reject_owner: DOMAIN_ID,
+    owner_receipt_owner: DOMAIN_ID,
+  },
+  opl_boundary: {
+    generated_descriptors_owner: GENERATED_SURFACE_OWNER,
+    refs_projection_owner: GENERATED_SURFACE_OWNER,
+    runtime_provider_owner: GENERATED_SURFACE_OWNER,
+    app_workbench_shell_owner: GENERATED_SURFACE_OWNER,
+    can_write_visual_truth: false,
+    can_authorize_review_export_verdict: false,
+    can_mutate_canonical_artifacts: false,
+    can_accept_or_reject_visual_memory: false,
+    can_issue_rca_owner_receipt: false,
+  },
+  conformance_policy: {
+    descriptor_resolved: true,
+    no_runtime_fork_required: true,
+    domain_contract_must_remain_refs_only_for_opl: true,
+    provider_completion_is_not_visual_ready: true,
+    structural_conformance_is_not_domain_ready: true,
+  },
+};
+
 const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generic_scheduler_owner',
   'generic_daemon_owner',
@@ -140,6 +228,9 @@ function buildDomainDescriptor() {
     owner: DOMAIN_ID,
     generated_surface_owner: GENERATED_SURFACE_OWNER,
     domain_repo_can_own_generated_surface: false,
+    foundry_agent_series_contract_ref: 'contracts/foundry_agent_series.json',
+    series_design_profile: SERIES_DESIGN_PROFILE,
+    domain_specific_profile: DOMAIN_SPECIFIC_PROFILE,
     standard_contract_refs: {
       action_catalog: 'contracts/action_catalog.json',
       stage_control_plane: 'contracts/stage_control_plane.json',
@@ -374,6 +465,8 @@ function buildFoundryAgentSeriesContract(stageControlPlane) {
     stage_control_plane_ref: 'contracts/stage_control_plane.json',
     stage_control_plane_target_domain_id: stageControlPlane.target_domain_id,
     app_projection_ref: 'contracts/generated_surface_handoff.json#/product_entry',
+    series_design_profile: SERIES_DESIGN_PROFILE,
+    domain_specific_profile: DOMAIN_SPECIFIC_PROFILE,
     identity_hygiene_policy: {
       policy_id: 'rca.identity_hygiene.v1',
       canonical_identities: {

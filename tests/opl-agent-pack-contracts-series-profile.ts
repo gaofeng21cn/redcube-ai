@@ -1,0 +1,87 @@
+export const expectedSeriesDesignProfile = {
+  surface_kind: 'opl_foundry_agent_series_design_profile',
+  version: 'foundry-agent-series-design-profile.v1',
+  profile_id: 'opl_foundry_agent_series_design_profile.v1',
+  profile_summary:
+    'All Foundry Agents share the same OPL domain-pack to stage-led execution to gate/receipt to handoff lifecycle; domain inputs, outputs, aliases, and authority functions vary by agent.',
+  shared_lifecycle_pipeline: [
+    'domain_material_intake',
+    'domain_pack_interpretation',
+    'stage_led_agent_execution',
+    'independent_quality_gate_or_owner_review',
+    'owner_receipt_or_typed_blocker_closeout',
+    'artifact_or_deliverable_handoff',
+    'opl_refs_only_projection_and_recovery',
+  ],
+  domain_io_profile: {
+    input_slot: 'domain_materials_or_task_request',
+    output_slot: 'domain_deliverable_or_owner_handoff',
+    input_is_domain_specific: true,
+    output_is_domain_specific: true,
+    shared_runtime_interpretation:
+      'OPL treats input/output as opaque domain refs and projects identity, stage, progress, closeout, evidence, and recovery metadata only.',
+  },
+  stage_pack_sections: [
+    'prompts',
+    'stages',
+    'skills',
+    'knowledge',
+    'quality_gates',
+  ],
+  shared_closeout_contract: {
+    success_shape: 'domain_owner_receipt_ref',
+    blocked_shape: 'domain_owned_typed_blocker_ref',
+    route_back_shape: 'route_back_or_human_gate_ref',
+    provider_completion_is_closeout: false,
+  },
+  authority_invariants: {
+    opl_can_infer_domain_output: false,
+    opl_can_read_domain_body: false,
+    opl_can_write_domain_truth: false,
+    opl_can_authorize_quality_or_export: false,
+    domain_owns_input_truth_and_output_authority: true,
+  },
+};
+
+export const expectedDomainSpecificProfile = {
+  profile_id: 'rca_domain_specific_series_profile.v1',
+  series_membership: 'opl_foundry_agent_series',
+  peer_agent_ids: ['mas', 'mag', 'oma'],
+  shared_lifecycle_owner: 'one-person-lab',
+  shared_lifecycle_contract:
+    'OPL generated descriptors, refs, projection, provider-backed runtime, stage attempts, queue, wakeup, retry, human gate, receipt ledger, App/workbench shell',
+  shared_lifecycle_policy:
+    'rca_uses_the_same_opl_agent_lifecycle_as_mas_mag_oma_without_forking_runtime',
+  domain_specialization: {
+    input_profile: 'visual_materials_sources_brand_assets_images_documents_and_delivery_brief',
+    output_profile: 'visual_deliverables_ppt_pdf_png_export_bundle_and_handoff_refs',
+    stage_pack_role: 'declarative_visual_pack',
+    default_visual_routes: ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
+  },
+  rca_domain_authority: {
+    visual_truth_owner: 'redcube_ai',
+    route_truth_owner: 'redcube_ai',
+    review_export_verdict_owner: 'redcube_ai',
+    artifact_authority_owner: 'redcube_ai',
+    visual_memory_accept_reject_owner: 'redcube_ai',
+    owner_receipt_owner: 'redcube_ai',
+  },
+  opl_boundary: {
+    generated_descriptors_owner: 'one-person-lab',
+    refs_projection_owner: 'one-person-lab',
+    runtime_provider_owner: 'one-person-lab',
+    app_workbench_shell_owner: 'one-person-lab',
+    can_write_visual_truth: false,
+    can_authorize_review_export_verdict: false,
+    can_mutate_canonical_artifacts: false,
+    can_accept_or_reject_visual_memory: false,
+    can_issue_rca_owner_receipt: false,
+  },
+  conformance_policy: {
+    descriptor_resolved: true,
+    no_runtime_fork_required: true,
+    domain_contract_must_remain_refs_only_for_opl: true,
+    provider_completion_is_not_visual_ready: true,
+    structural_conformance_is_not_domain_ready: true,
+  },
+};

@@ -16,6 +16,10 @@ import {
   buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
 } from '../packages/redcube-domain-entry/dist/index.js';
+import {
+  expectedDomainSpecificProfile,
+  expectedSeriesDesignProfile,
+} from './opl-agent-pack-contracts-series-profile.ts';
 import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from '../scripts/run-test-group-lib.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -220,6 +224,7 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   const canonical = buildCanonicalPack();
 
   const foundrySeries = readJson('contracts/foundry_agent_series.json');
+  const domainDescriptor = readJson('contracts/domain_descriptor.json');
   assert.deepEqual(readJson('contracts/action_catalog.json'), canonical.actionCatalog);
   assert.deepEqual(readJson('contracts/stage_control_plane.json'), canonical.stageControlPlane);
   assert.deepEqual(readJson('contracts/memory_descriptor.json'), canonical.memoryDescriptor);
@@ -236,6 +241,37 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.equal(foundrySeries.product_layer, 'foundry_agent');
   assert.equal(foundrySeries.domain_id, 'redcube');
   assert.equal(foundrySeries.stage_control_plane_target_domain_id, 'redcube_ai');
+  assert.equal(domainDescriptor.foundry_agent_series_contract_ref, 'contracts/foundry_agent_series.json');
+  assert.deepEqual(foundrySeries.series_design_profile, expectedSeriesDesignProfile);
+  assert.deepEqual(domainDescriptor.series_design_profile, foundrySeries.series_design_profile);
+  assert.deepEqual(foundrySeries.domain_specific_profile, expectedDomainSpecificProfile);
+  assert.deepEqual(domainDescriptor.domain_specific_profile, foundrySeries.domain_specific_profile);
+  assert.deepEqual(foundrySeries.domain_specific_profile.peer_agent_ids, ['mas', 'mag', 'oma']);
+  assert.equal(
+    foundrySeries.domain_specific_profile.shared_lifecycle_policy,
+    'rca_uses_the_same_opl_agent_lifecycle_as_mas_mag_oma_without_forking_runtime',
+  );
+  assert.equal(
+    foundrySeries.domain_specific_profile.domain_specialization.input_profile,
+    'visual_materials_sources_brand_assets_images_documents_and_delivery_brief',
+  );
+  assert.equal(
+    foundrySeries.domain_specific_profile.domain_specialization.output_profile,
+    'visual_deliverables_ppt_pdf_png_export_bundle_and_handoff_refs',
+  );
+  assert.equal(foundrySeries.domain_specific_profile.rca_domain_authority.visual_truth_owner, 'redcube_ai');
+  assert.equal(foundrySeries.domain_specific_profile.rca_domain_authority.review_export_verdict_owner, 'redcube_ai');
+  assert.equal(foundrySeries.domain_specific_profile.rca_domain_authority.artifact_authority_owner, 'redcube_ai');
+  assert.equal(foundrySeries.domain_specific_profile.rca_domain_authority.visual_memory_accept_reject_owner, 'redcube_ai');
+  assert.equal(foundrySeries.domain_specific_profile.rca_domain_authority.owner_receipt_owner, 'redcube_ai');
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.generated_descriptors_owner, 'one-person-lab');
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.can_write_visual_truth, false);
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.can_authorize_review_export_verdict, false);
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.can_mutate_canonical_artifacts, false);
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.can_accept_or_reject_visual_memory, false);
+  assert.equal(foundrySeries.domain_specific_profile.opl_boundary.can_issue_rca_owner_receipt, false);
+  assert.equal(foundrySeries.domain_specific_profile.conformance_policy.descriptor_resolved, true);
+  assert.equal(foundrySeries.domain_specific_profile.conformance_policy.no_runtime_fork_required, true);
   assert.deepEqual(foundrySeries.contract_version_policy, {
     current_version: 'foundry-agent-series.v1',
     domain_contract_ref: 'contracts/foundry_agent_series.json',
