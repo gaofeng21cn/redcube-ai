@@ -15,6 +15,56 @@
     "visual_native_helper_implementation",
     "ai_first_review_export_ref_materializer"
   ],
+  "purpose_first_owner_delta_policy": {
+    "default_operator_question": "which_owner_must_produce_which_delta_or_typed_blocker",
+    "accepted_next_delta_kinds": [
+      "artifact_producing_owner_receipt",
+      "visual_review_export_receipt",
+      "visual_memory_accept_reject_receipt",
+      "workspace_receipt_scaleout_receipt",
+      "production_like_no_regression_ref",
+      "temporal_controlled_visual_stage_long_soak_ref",
+      "human_review_receipt",
+      "domain_owned_typed_blocker"
+    ],
+    "refs_only_accounting_is_progress": false,
+    "provider_completion_is_visual_progress": false,
+    "session_currentness_is_visual_progress": false,
+    "workbench_projection_is_visual_progress": false
+  },
+  "domain_thinning_exit_gate": {
+    "candidate_surface_classes": [
+      "generic_cli_mcp_product_wrapper",
+      "generic_session_store_owner",
+      "generic_status_workbench_owner",
+      "generic_domain_action_adapter_owner",
+      "generic_operator_workbench_owner",
+      "generic_observability_runtime",
+      "generic_queue_or_attempt_ledger",
+      "generic_review_repair_transport_owner"
+    ],
+    "required_before_delete_or_thin": [
+      "opl_default_caller_parity",
+      "no_active_caller",
+      "rca_owner_receipt_or_typed_blocker_roundtrip",
+      "no_forbidden_write_proof",
+      "retired_alias_no_resurrection_proof",
+      "tombstone_or_provenance_pointer"
+    ],
+    "allowed_before_gate": [
+      "refs_only_adapter",
+      "domain_handler_target",
+      "migration_input",
+      "negative_input_guard"
+    ],
+    "forbidden_after_gate": [
+      "compatibility_alias",
+      "facade",
+      "default_dispatch",
+      "old_public_path_test",
+      "success_payload_compatibility_field"
+    ]
+  },
   "forbidden_generic_owner_roles": [
     "generic_scheduler_owner",
     "generic_daemon_owner",
