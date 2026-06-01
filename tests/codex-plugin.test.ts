@@ -2,7 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
+import os from 'node:os';
+import { spawnSync } from 'node:child_process';
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
@@ -11,10 +13,12 @@ const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
 const pluginIconSourcePath = path.join(pluginRoot, 'assets', 'icon.svg');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
+const pluginMarketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const manifest = readJson(pluginManifestPath);
+  const marketplace = readJson(pluginMarketplacePath);
   const skillText = readFileSync(pluginSkillPath, 'utf-8');
   const metadataText = readFileSync(pluginSkillUiMetadataPath, 'utf-8');
 
@@ -26,6 +30,11 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.interface.composerIcon, './assets/icon.png');
   assert.equal(manifest.interface.logo, './assets/icon.png');
   assert.match(manifest.description, /Codex plugin/i);
+  assert.equal(marketplace.name, 'rca-local');
+  assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
+  assert.equal(marketplace.plugins[0].name, 'rca');
+  assert.equal(marketplace.plugins[0].source.path, './plugins/rca');
+  assert.equal(marketplace.plugins[0].category, 'Creative');
   assert.equal(existsSync(pluginIconPath), true);
   assert.equal(existsSync(pluginIconSourcePath), true);
   const iconSource = readFileSync(pluginIconSourcePath, 'utf-8');
@@ -47,7 +56,58 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /author_image_pages` 是默认视觉实现路线/i);
 });
 
-test('codex plugin repo-local installer and marketplace surfaces stay retired', () => {
-  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
-  assert.equal(existsSync(path.join(repoRoot, '.agents', 'plugins', 'marketplace.json')), false);
+test('codex plugin repo-local installer writes marketplace metadata without a bare skill mirror', () => {
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-codex-plugin-installer-'));
+  const fixturePluginRoot = path.join(fixtureRoot, 'plugins', 'rca');
+  const fixtureHome = path.join(fixtureRoot, 'home');
+  const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.ts');
+
+  try {
+    cpSync(pluginRoot, fixturePluginRoot, { recursive: true });
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        installerPath,
+        '--repo-root',
+        fixtureRoot,
+        '--home',
+        fixtureHome,
+        '--skip-tools',
+      ],
+      {
+        cwd: repoRoot,
+        encoding: 'utf8',
+      },
+    );
+
+    assert.equal(result.status, 0, result.stderr);
+    const output = JSON.parse(result.stdout);
+    assert.equal(output.repo_root, fixtureRoot);
+    assert.equal(output.home, fixtureHome);
+    assert.equal(output.plugin_root, fixturePluginRoot);
+    assert.equal(output.skill_root, path.join(fixturePluginRoot, 'skills', 'rca'));
+    assert.equal(output.marketplace_path, path.join(fixtureRoot, '.agents', 'plugins', 'marketplace.json'));
+
+    const marketplace = readJson(output.marketplace_path);
+    assert.equal(marketplace.name, 'rca-local');
+    assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
+    assert.deepEqual(marketplace.plugins, [
+      {
+        name: 'rca',
+        source: {
+          source: 'local',
+          path: './plugins/rca',
+        },
+        policy: {
+          installation: 'AVAILABLE',
+          authentication: 'ON_INSTALL',
+        },
+        category: 'Creative',
+      },
+    ]);
+    assert.equal(existsSync(path.join(fixtureHome, '.codex', 'skills', 'rca', 'SKILL.md')), false);
+  } finally {
+    rmSync(fixtureRoot, { recursive: true, force: true });
+  }
 });
