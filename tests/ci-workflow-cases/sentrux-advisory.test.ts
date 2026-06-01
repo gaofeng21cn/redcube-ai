@@ -21,7 +21,7 @@ test('Sentrux advisory publishes OPL quality details without changing the defaul
     workflow,
     /json-limit:\s*['"]50['"]/
   );
-  assert.match(workflow, /uses:\s*actions\/upload-artifact@v6\b/);
+  assert.match(workflow, /uses:\s*actions\/upload-artifact@v7\b/);
   assert.match(workflow, /name:\s*opl-quality-details\b/);
   assert.match(workflow, /path:\s*artifacts\/opl-quality-details\/quality-details\.json\b/);
 
