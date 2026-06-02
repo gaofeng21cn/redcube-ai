@@ -43,12 +43,15 @@
     "agent/quality_gates/visual_authority_boundaries.md",
     "agent/quality_gates/source_and_truth.md",
     "agent/quality_gates/communication_and_direction.md",
+    "agent/quality_gates/visual_pack_discipline.md",
+    "agent/quality_gates/package_distribution.md",
     "agent/quality_gates/artifact_authority.md",
     "agent/quality_gates/review_export_memory.md",
     "agent/knowledge/visual_truth_boundaries.md",
     "agent/knowledge/communication_visual_direction.md",
     "agent/knowledge/artifact_and_export_authority.md",
     "agent/knowledge/review_export_memory.md",
+    "agent/knowledge/markdown_route_policy.md",
     "agent/knowledge/owner_receipt_policy.md"
   ],
   "minimal_authority_surface_ids": [
@@ -479,6 +482,143 @@
   ],
   "repo_local_handlers_are_generated_surface_owners": false,
   "domain_repo_can_own_generated_surface": false,
+  "visual_pack_discipline_contract": {
+    "owner": "redcube_ai",
+    "policy_ref": "agent/quality_gates/visual_pack_discipline.md",
+    "required_before_artifact_creation": true,
+    "required_contract_fields": [
+      "deliverable_family",
+      "route",
+      "audience",
+      "output_format",
+      "canvas_or_aspect_ratio",
+      "visual_direction_refs",
+      "brand_profile_precedence_refs",
+      "material_status_refs",
+      "source_material_pass_refs",
+      "layout_density_refs",
+      "sparse_page_evidence_refs",
+      "render_acceptance_refs",
+      "review_gate_refs",
+      "export_target"
+    ],
+    "brand_profile_precedence": {
+      "precedence_order": [
+        "explicit_delivery_request_brand_material",
+        "rca_visual_direction_judgment",
+        "workspace_profile_defaults",
+        "user_profile_defaults",
+        "built_in_route_defaults"
+      ],
+      "approved_task_material_overrides_memory_or_defaults": true,
+      "generated_or_inferred_profile_can_override_approved_material": false,
+      "defaults_fill_missing_fields_only": true,
+      "required_refs": [
+        "brand_profile_precedence_refs",
+        "approved_brand_material_refs",
+        "visual_direction_refs",
+        "profile_default_refs",
+        "typed_blocker_refs"
+      ]
+    },
+    "source_material_pass_transparency": {
+      "required_item_statuses": [
+        "approved",
+        "provided_unverified",
+        "missing",
+        "out_of_scope"
+      ],
+      "pass_level_evidence_required": true,
+      "per_material_item_required_fields": [
+        "material_id",
+        "material_kind",
+        "status",
+        "pass_ref",
+        "source_ref",
+        "verified",
+        "carried_forward",
+        "gap_ref",
+        "typed_blocker_ref"
+      ],
+      "missing_or_unverified_required_material_yields": [
+        "source_gap_refs",
+        "material_gap_refs",
+        "typed_blocker"
+      ],
+      "opl_generated_surface_may_summarize_refs_only": true
+    },
+    "layout_density_sparse_page_evidence": {
+      "density_contract_required_before_layout": true,
+      "required_fields": [
+        "target_density_band",
+        "page_or_frame_inventory_refs",
+        "minimum_occupancy_evidence_refs",
+        "sparse_page_acceptance_reason_refs",
+        "merge_split_decision_refs",
+        "blocked_page_refs",
+        "screenshot_review_refs",
+        "export_gate_refs"
+      ],
+      "sparse_page_can_pass_without_rca_rationale": false,
+      "provider_completion_can_accept_sparse_page": false,
+      "schema_completeness_can_accept_sparse_page": false,
+      "allowed_sparse_page_outcomes": [
+        "accepted_with_rca_owned_rationale_refs",
+        "repair_target_refs",
+        "merge_or_split_decision_refs",
+        "typed_blocker"
+      ]
+    },
+    "material_status_required": true,
+    "render_acceptance_required": true,
+    "mechanical_checks_can_issue_visual_verdict": false,
+    "provider_completion_can_issue_visual_verdict": false,
+    "allowed_machine_outputs": [
+      "typed_blocker",
+      "repair_target_refs",
+      "preserved_page_refs",
+      "no_regression_refs",
+      "helper_proof_refs"
+    ],
+    "forbidden_machine_outputs": [
+      "visual_ready_verdict",
+      "exportable_verdict",
+      "handoffable_verdict",
+      "publication_ready_verdict",
+      "artifact_body_write_without_owner_receipt"
+    ]
+  },
+  "markdown_marp_route_policy": {
+    "owner": "redcube_ai",
+    "policy_ref": "agent/knowledge/markdown_route_policy.md",
+    "route_family": "markdown_marp",
+    "route_default": false,
+    "explicit_selection_required": true,
+    "refs_only": true,
+    "allowed_route_use": [
+      "operator_explicit_markdown_or_marp_request",
+      "source_to_slide_text_structuring_refs",
+      "intermediate_outline_or_script_packaging_refs"
+    ],
+    "default_visual_route_ref": "author_image_pages",
+    "external_runtime_authority_allowed": false,
+    "provider_completion_can_issue_visual_verdict": false
+  },
+  "package_distribution_gate": {
+    "owner": "redcube_ai",
+    "policy_ref": "agent/quality_gates/package_distribution.md",
+    "gate_id": "rca.package_distribution_consistency.v1",
+    "refs_only": true,
+    "required_consistency_checks": [
+      "source_to_package_required_domain_pack_paths_match",
+      "plugin_skill_refs_resolve_to_repo_tracked_pack_paths",
+      "package_manifest_does_not_add_runtime_authority",
+      "packaging_does_not_change_route_default"
+    ],
+    "package_can_omit_required_domain_pack_refs": false,
+    "packaging_can_change_route_default": false,
+    "external_runtime_authority_allowed": false
+  },
   "source_refs": {
     "canonical_semantic_pack": "agent/",
     "action_catalog": "packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata",

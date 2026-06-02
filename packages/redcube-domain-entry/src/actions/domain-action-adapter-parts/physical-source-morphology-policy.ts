@@ -88,6 +88,11 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'quality_gate_refs',
       'knowledge_refs',
     ],
+    legacy_name_allowance: legacyNameAllowance({
+      legacy_terms: ['runtime', 'session', 'domain_action_adapter'],
+      allowed_as: ['machine_contract_ref', 'refs_only_read_model', 'contract_safe_semantic_id', 'locator_protocol_boundary'],
+      rationale: 'agent pack Markdown may point at OPL generated runtime/session/domain_action_adapter refs and locator contracts; it cannot create RCA-owned generated wrappers or generic runtime/session shells.',
+    }),
   },
   {
     surface_id: 'runtime_program_machine_contracts',

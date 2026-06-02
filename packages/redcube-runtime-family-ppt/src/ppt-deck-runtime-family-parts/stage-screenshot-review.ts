@@ -23,6 +23,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
     attachCommon,
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
+    buildRenderReviewMachineGate,
     chunkArray,
     collectSlidesNeedingTargetedRevision,
     compareFailuresAndDensity,
@@ -516,6 +517,21 @@ export function createPptDeckScreenshotReviewParts(deps) {
         device_scale_factor: Number(reviewPayload.device_scale_factor || 2),
         screenshot_dimensions: reviewPayload.screenshot_dimensions || null,
       },
+      render_review_machine_gate: buildRenderReviewMachineGate({
+        sourceSurfaceKind: nativeReviewInput ? 'native_pptx'
+          : imagePagesReviewInput ? 'image_pages' : 'html',
+        renderedPageRefs: nativeReviewInput ? safeArray(renderArtifact?.native_ppt_bundle?.preview_screenshots) : [],
+        imagePngRefs: imagePagesReviewInput
+          ? slideReviews.map((slide) => safeText(slide?.screenshot_file)).filter(Boolean)
+          : [],
+        pageManifestRef: captureManifest.manifest_file,
+        materialGapRefs: safeArray(reviewPayload?.material_gap_refs),
+        brandGapRefs: safeArray(reviewPayload?.brand_gap_refs),
+        typedBlockerRefs: safeArray(reviewPayload?.typed_blocker_refs),
+        slideReviews,
+        failedChecks,
+        rerunFromStage,
+      }),
       slide_reviews: slideReviews,
       ai_review: {
         review_model: 'screenshot_director_first_visual_judgement',

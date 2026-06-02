@@ -11,6 +11,8 @@ Machine boundary: 人读 delivery 索引。机器真相继续归 runtime-family 
 
 Delivery support docs 和示例只提供 route / proof / export 读法。最终 visual ready、exportable、handoffable、artifact authority 与 review/export verdict 仍必须来自 RCA-owned review/export gates、workspace artifacts、artifact manifests、review/export receipts 和 owner receipts。
 
+交付前的可执行读法必须同时具备 material / brand status、brand precedence refs、source/material pass refs、density/sparse-page evidence、route/template contract、rendered evidence、review/export refs 和 owner refs。Markdown/Marp 只在显式请求时作为 refs-only route material，package distribution 只检查 source-to-package consistency。机械 QA、schema check、render probe、screenshot helper、Markdown/Marp completion 或 package install success 只能产出 evidence refs、typed blocker refs、repair target refs 或 export input refs；不能产出 visual ready、exportable、handoffable 或 artifact authority verdict。
+
 ## 当前角色
 
 Delivery docs 解释当前 deliverable families、default routes、proof environments 和 examples。描述旧 rendering paths 的 route notes 必须标明 explicit optional route、route-level repair/recovery 或 historical support，避免被读成当前默认 route 或 hidden fallback chain。

@@ -92,3 +92,12 @@
 - 项目级 `.runtime-program/` 已退役，不再作为仓库本地控制面。
 - 本地 session、prompt、log、report 与 hook 状态统一迁入用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
 - 任何机器私有 overlay 也只允许放在用户级 runtime-state 根目录下，不进入 repo-tracked 主线。
+
+<!-- OPL_FLOW_MANAGED_START -->
+OPL Flow managed surface: repo_agent_instructions
+Plugin: opl-flow
+Plugin version: 0.1.0
+Profile pointer: contracts/opl-native-profile.json
+本块只声明 OPL Flow 工作流 profile 指针；repo-specific 规则、项目事实、contracts、source、tests 和 runtime 输出继续归本仓既有 owner。
+请只通过 OPL Flow repo_profile sync 更新本块；本块外内容由目标 repo 自己维护。
+<!-- OPL_FLOW_MANAGED_END -->

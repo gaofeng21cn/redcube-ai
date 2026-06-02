@@ -16,6 +16,45 @@ const PNG_16_9 = Buffer.from(
 const safeArray = (value) => Array.isArray(value) ? value : [];
 const safeText = (value, fallback = '') => value == null || value === '' ? fallback : String(value);
 
+function buildTestRenderReviewMachineGate(input = {}) {
+  const slideReviews = safeArray(input?.slideReviews);
+  const failedChecks = safeArray(input?.failedChecks).map((check) => safeText(check)).filter(Boolean);
+  const blockedPageRefs = slideReviews
+    .filter((slide) => safeText(slide?.status) === 'block' || safeArray(slide?.issues).length > 0)
+    .map((slide) => safeText(slide?.slide_id))
+    .filter(Boolean);
+  return {
+    gate_id: 'rca_render_review_machine_gate.v1',
+    surface_kind: 'render_review_machine_gate_policy',
+    owner: 'redcube_ai',
+    source_surface_kind: safeText(input?.sourceSurfaceKind, 'rendered_visual_surface'),
+    evidence_refs: {
+      rendered_page_refs: safeArray(input?.renderedPageRefs).map((ref) => safeText(ref)).filter(Boolean),
+      image_png_refs: safeArray(input?.imagePngRefs).map((ref) => safeText(ref)).filter(Boolean),
+      page_manifest_ref: safeText(input?.pageManifestRef) || null,
+      material_gap_refs: safeArray(input?.materialGapRefs).map((ref) => safeText(ref)).filter(Boolean),
+      brand_gap_refs: safeArray(input?.brandGapRefs).map((ref) => safeText(ref)).filter(Boolean),
+      typed_blocker_refs: safeArray(input?.typedBlockerRefs).map((ref) => safeText(ref)).filter(Boolean),
+    },
+    machine_check_output: {
+      failed_checks: failedChecks,
+      blocked_page_refs: blockedPageRefs,
+      repair_target: failedChecks.length > 0 || blockedPageRefs.length > 0
+        ? {
+            rerun_from_stage: safeText(input?.rerunFromStage) || null,
+            target_slide_ids: blockedPageRefs,
+          }
+        : null,
+    },
+    output_boundary: {
+      grants_visual_ready: false,
+      grants_exportable: false,
+      grants_handoffable: false,
+      writes_rca_visual_truth: false,
+    },
+  };
+}
+
 function writeJson(file, value) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
@@ -114,6 +153,7 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
     buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, status: aiReview?.judgement === 'block' ? 'block' : slide.status, ai_review: aiReview }),
     buildAuthoringContext: () => ({}),
     buildDeckHtml: () => '<html></html>',
+    buildRenderReviewMachineGate: buildTestRenderReviewMachineGate,
     chunkArray: (items) => [items],
     collectSlidesNeedingTargetedRevision: (slides) => slides.filter((slide) => slide.status === 'block'),
     compareFailuresAndDensity: () => ({ verdict: 'not_degraded' }),

@@ -77,6 +77,10 @@ Machine boundary: 人读本地配置指南。机器真相继续归 ignored local
 
 这里可以继续扩展你自己的作者字段，但不要把真实内容写回公开仓库。
 
+## 生效边界
+
+私有 profile 只填补当前交付请求没有声明的作者、品牌、署名和风格默认值。优先级固定为：显式交付请求与已批准素材、RCA visual direction 判断、workspace `.redcube/` profile、用户级 profile、内置 route 默认值。私有 profile 不能覆盖当前任务中已批准的 logo、产品图、UI 截图、品牌色、字体、source truth 或交付约束，也不能产生 source-ready、visual-ready、exportable、handoffable、review-pass、owner receipt 或 artifact mutation verdict。缺少关键品牌/素材时，应记录 source/material gap refs 或 typed blocker，而不是用 profile 推断值静默替代。
+
 ## 本机覆盖：config/local
 
 如果某台机器需要临时覆盖配置，可以在仓库里的 `config/local/` 放私有文件，例如：

@@ -715,6 +715,17 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       manifest.product_entry_shell.domain_handler.forbidden_writes,
       domain_action_adapterGuardedActionMetadata.forbiddenWrites,
     );
+    const { visual_pack_discipline: visualPackDiscipline, markdown_marp_route_policy: markdownMarpRoutePolicy, package_distribution_gate: packageDistributionGate, render_review_gate_contract: renderReviewGateContract } = manifest.visual_pack_compiler_handoff;
+    assert.deepEqual(
+      [visualPackDiscipline.surface_kind, visualPackDiscipline.discipline_id, visualPackDiscipline.refs_only, visualPackDiscipline.quality_gate_refs.includes('agent/quality_gates/visual_pack_discipline.md'), visualPackDiscipline.authority_boundary.provider_completion_is_visual_ready],
+      ['visual_pack_discipline_refs', 'rca.executable_visual_pack_discipline.v1', true, true, false],
+    );
+    assert.deepEqual([markdownMarpRoutePolicy.surface_kind, markdownMarpRoutePolicy.route_default, markdownMarpRoutePolicy.refs_only, markdownMarpRoutePolicy.policy_ref, markdownMarpRoutePolicy.authority_boundary.external_runtime_authority_allowed], ['markdown_marp_optional_route_policy_refs', false, true, 'agent/knowledge/markdown_route_policy.md', false]);
+    assert.deepEqual([packageDistributionGate.surface_kind, packageDistributionGate.gate_id, packageDistributionGate.refs_only, packageDistributionGate.policy_ref, packageDistributionGate.required_consistency_checks.includes('source_to_package_required_domain_pack_paths_match')], ['package_distribution_consistency_gate_refs', 'rca.package_distribution_consistency.v1', true, 'agent/quality_gates/package_distribution.md', true]);
+    assert.deepEqual(
+      [renderReviewGateContract.surface_kind, renderReviewGateContract.contract_id, renderReviewGateContract.refs_only, renderReviewGateContract.required_stage_refs.includes('export_pptx'), renderReviewGateContract.authority_boundary.opl_can_declare_visual_ready],
+      ['render_review_gate_contract_refs', 'rca.render_review_gate_contract.v1', true, true, false],
+    );
     assert.match(manifest.product_entry_shell.status.purpose, /product-entry overview/i);
     assert.equal(
       manifest.product_entry_shell.status.canonical_entry_semantics,

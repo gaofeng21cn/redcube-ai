@@ -139,6 +139,26 @@ const FORBIDDEN_GENERIC_OWNER_ROLES = [
   'generated_surface_owner_in_domain_repo',
 ];
 
+const OWNER_DELTA_NEXT_DELTA_KINDS = [
+  'artifact_producing_owner_receipt',
+  'visual_review_export_receipt',
+  'visual_memory_accept_reject_receipt',
+  'workspace_receipt_scaleout_receipt',
+  'production_like_no_regression_ref',
+  'temporal_controlled_visual_stage_long_soak_ref',
+  'human_review_receipt',
+  'domain_owned_typed_blocker',
+];
+
+const REPO_LOCAL_OWNER_DELTA_SURFACE_IDS = [
+  'repo_local_wrapper',
+  'product_entry_session',
+  'runtime_watch',
+  'operator_projection',
+  'domain_action_adapter_compatibility',
+  'neutral_route_run_record_adapter',
+];
+
 const OPL_CANONICAL_GENERATED_SURFACES = [
   'cli',
   'mcp',
@@ -184,12 +204,15 @@ const REQUIRED_DOMAIN_PACK_PATHS = [
   'agent/quality_gates/visual_authority_boundaries.md',
   'agent/quality_gates/source_and_truth.md',
   'agent/quality_gates/communication_and_direction.md',
+  'agent/quality_gates/visual_pack_discipline.md',
+  'agent/quality_gates/package_distribution.md',
   'agent/quality_gates/artifact_authority.md',
   'agent/quality_gates/review_export_memory.md',
   'agent/knowledge/visual_truth_boundaries.md',
   'agent/knowledge/communication_visual_direction.md',
   'agent/knowledge/artifact_and_export_authority.md',
   'agent/knowledge/review_export_memory.md',
+  'agent/knowledge/markdown_route_policy.md',
   'agent/knowledge/owner_receipt_policy.md',
 ];
 
@@ -272,7 +295,7 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
       'prompts/xiaohongshu/',
     ],
     legacy_detail_asset_policy: 'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
-    required_domain_pack_paths: REQUIRED_DOMAIN_PACK_PATHS,
+    required_domain_pack_paths: visualPackCompilerHandoff.declarative_visual_pack_input.required_domain_pack_paths,
     minimal_authority_surface_ids: authorityContract.allowed_authority_surface_ids,
     minimal_authority_surface_taxonomy: authorityContract.authority_surface_taxonomy,
     minimal_authority_surface_contracts: authorityContract.authority_surface_contracts,
@@ -281,6 +304,9 @@ function buildPackCompilerInput(visualPackCompilerHandoff) {
     repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
     repo_local_handlers_are_generated_surface_owners: false,
     domain_repo_can_own_generated_surface: false,
+    visual_pack_discipline_contract: visualPackCompilerHandoff.declarative_visual_pack_input.visual_pack_discipline_contract,
+    markdown_marp_route_policy: visualPackCompilerHandoff.declarative_visual_pack_input.markdown_marp_route_policy,
+    package_distribution_gate: visualPackCompilerHandoff.declarative_visual_pack_input.package_distribution_gate,
     source_refs: {
       canonical_semantic_pack: 'agent/',
       action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
@@ -397,6 +423,73 @@ function buildPrivateFunctionalSurfacePolicy() {
       'visual_native_helper_implementation',
       'ai_first_review_export_ref_materializer',
     ],
+    purpose_first_owner_delta_policy: {
+      default_operator_question: 'which_owner_must_produce_which_delta_or_typed_blocker',
+      accepted_next_delta_kinds: OWNER_DELTA_NEXT_DELTA_KINDS,
+      refs_only_accounting_is_progress: false,
+      provider_completion_is_visual_progress: false,
+      session_currentness_is_visual_progress: false,
+      workbench_projection_is_visual_progress: false,
+    },
+    repo_local_owner_delta_surface_policy: {
+      default_surface_role: 'refs_only_owner_delta_adapter_until_exit_gate',
+      scoped_surface_ids: REPO_LOCAL_OWNER_DELTA_SURFACE_IDS,
+      allowed_roles_before_exit_gate: [
+        'refs_only_adapter',
+        'domain_handler_target',
+        'native_helper_target',
+        'migration_input',
+        'negative_input_guard',
+      ],
+      required_next_delta_kinds: OWNER_DELTA_NEXT_DELTA_KINDS,
+      disallowed_progress_claims: [
+        'mock_sample_ref_accounting',
+        'sample_ref_accounting',
+        'refs_only_accounting',
+        'provider_completion',
+        'session_currentness',
+        'workbench_projection',
+        'structural_contract_pass',
+      ],
+      production_ready_claim_allowed: false,
+      visual_ready_claim_allowed: false,
+      artifact_ready_claim_allowed: false,
+      mock_sample_ref_accounting_is_production_ready: false,
+      sample_ref_accounting_is_production_ready: false,
+    },
+    domain_thinning_exit_gate: {
+      candidate_surface_classes: [
+        'generic_cli_mcp_product_wrapper',
+        'generic_session_store_owner',
+        'generic_status_workbench_owner',
+        'generic_domain_action_adapter_owner',
+        'generic_operator_workbench_owner',
+        'generic_observability_runtime',
+        'generic_queue_or_attempt_ledger',
+        'generic_review_repair_transport_owner',
+      ],
+      required_before_delete_or_thin: [
+        'opl_default_caller_parity',
+        'no_active_caller',
+        'rca_owner_receipt_or_typed_blocker_roundtrip',
+        'no_forbidden_write_proof',
+        'retired_alias_no_resurrection_proof',
+        'tombstone_or_provenance_pointer',
+      ],
+      allowed_before_gate: [
+        'refs_only_adapter',
+        'domain_handler_target',
+        'migration_input',
+        'negative_input_guard',
+      ],
+      forbidden_after_gate: [
+        'compatibility_alias',
+        'facade',
+        'default_dispatch',
+        'old_public_path_test',
+        'success_payload_compatibility_field',
+      ],
+    },
     forbidden_generic_owner_roles: FORBIDDEN_GENERIC_OWNER_ROLES,
   };
 }

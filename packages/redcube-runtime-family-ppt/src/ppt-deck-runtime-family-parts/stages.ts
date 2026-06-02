@@ -27,6 +27,7 @@ export function createPptDeckStageParts(deps) {
     attachCommon,
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
+    buildRenderReviewMachineGate,
     buildDeckHtml,
     chunkArray,
     collectSlidesNeedingTargetedRevision,

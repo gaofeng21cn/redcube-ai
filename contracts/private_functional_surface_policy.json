@@ -32,6 +32,48 @@
     "session_currentness_is_visual_progress": false,
     "workbench_projection_is_visual_progress": false
   },
+  "repo_local_owner_delta_surface_policy": {
+    "default_surface_role": "refs_only_owner_delta_adapter_until_exit_gate",
+    "scoped_surface_ids": [
+      "repo_local_wrapper",
+      "product_entry_session",
+      "runtime_watch",
+      "operator_projection",
+      "domain_action_adapter_compatibility",
+      "neutral_route_run_record_adapter"
+    ],
+    "allowed_roles_before_exit_gate": [
+      "refs_only_adapter",
+      "domain_handler_target",
+      "native_helper_target",
+      "migration_input",
+      "negative_input_guard"
+    ],
+    "required_next_delta_kinds": [
+      "artifact_producing_owner_receipt",
+      "visual_review_export_receipt",
+      "visual_memory_accept_reject_receipt",
+      "workspace_receipt_scaleout_receipt",
+      "production_like_no_regression_ref",
+      "temporal_controlled_visual_stage_long_soak_ref",
+      "human_review_receipt",
+      "domain_owned_typed_blocker"
+    ],
+    "disallowed_progress_claims": [
+      "mock_sample_ref_accounting",
+      "sample_ref_accounting",
+      "refs_only_accounting",
+      "provider_completion",
+      "session_currentness",
+      "workbench_projection",
+      "structural_contract_pass"
+    ],
+    "production_ready_claim_allowed": false,
+    "visual_ready_claim_allowed": false,
+    "artifact_ready_claim_allowed": false,
+    "mock_sample_ref_accounting_is_production_ready": false,
+    "sample_ref_accounting_is_production_ready": false
+  },
   "domain_thinning_exit_gate": {
     "candidate_surface_classes": [
       "generic_cli_mcp_product_wrapper",

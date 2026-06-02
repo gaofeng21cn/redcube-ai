@@ -50,6 +50,30 @@
         "quality_gate_refs",
         "knowledge_refs"
       ],
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "runtime",
+          "session",
+          "domain_action_adapter"
+        ],
+        "allowed_as": [
+          "machine_contract_ref",
+          "refs_only_read_model",
+          "contract_safe_semantic_id",
+          "locator_protocol_boundary"
+        ],
+        "rationale": "agent pack Markdown may point at OPL generated runtime/session/domain_action_adapter refs and locator contracts; it cannot create RCA-owned generated wrappers or generic runtime/session shells.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,

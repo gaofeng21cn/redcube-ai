@@ -5,6 +5,7 @@ import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 const ACTIVE_ROOTS = [
+  'agent',
   'apps',
   'packages',
   'contracts',
@@ -15,6 +16,7 @@ const ACTIVE_ROOTS = [
   'python',
 ];
 const TEXT_EXTENSIONS = new Set([
+  '.md',
   '.json',
   '.ts',
   '.tsx',
@@ -582,6 +584,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
 
   const requiredClassifications = {
+    agent_declarative_visual_pack: 'declarative_visual_pack',
     runtime_program_machine_contracts: 'machine_contract',
     mcp_product_entry_domain_entry: 'service_safe_domain_entry',
     redcube_domain_entry_package_protocol_boundary: 'package_protocol_boundary',
@@ -603,6 +606,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   }
 
   const legacyAllowanceExpectations = {
+    agent_declarative_visual_pack: { terms: ['runtime', 'session', 'domain_action_adapter'], allowedAs: ['machine_contract_ref', 'refs_only_read_model', 'contract_safe_semantic_id', 'locator_protocol_boundary'] },
     runtime_program_machine_contracts: {
       terms: ['runtime'],
       allowedAs: ['machine_contract_ref', 'contract_safe_semantic_id'],
@@ -642,6 +646,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     }
   }
 
+  assert.deepEqual(byId.agent_declarative_visual_pack.source_refs, ['agent/']);
   assert.equal(
     byId.product_entry_continuity_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',

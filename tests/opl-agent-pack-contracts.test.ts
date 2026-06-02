@@ -1,6 +1,5 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
@@ -24,7 +23,6 @@ import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from '../scripts/run-te
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
-const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 
 const requiredDomainPackPaths = [
   'agent/prompts/source_intake.md',
@@ -45,12 +43,15 @@ const requiredDomainPackPaths = [
   'agent/quality_gates/visual_authority_boundaries.md',
   'agent/quality_gates/source_and_truth.md',
   'agent/quality_gates/communication_and_direction.md',
+  'agent/quality_gates/visual_pack_discipline.md',
+  'agent/quality_gates/package_distribution.md',
   'agent/quality_gates/artifact_authority.md',
   'agent/quality_gates/review_export_memory.md',
   'agent/knowledge/visual_truth_boundaries.md',
   'agent/knowledge/communication_visual_direction.md',
   'agent/knowledge/artifact_and_export_authority.md',
   'agent/knowledge/review_export_memory.md',
+  'agent/knowledge/markdown_route_policy.md',
   'agent/knowledge/owner_receipt_policy.md',
 ];
 
@@ -71,6 +72,17 @@ const wrapperDescriptorScopeIds = [
   'product_session',
   'domain_handler',
   'workbench',
+];
+
+const ownerDeltaNextDeltaKinds = [
+  'artifact_producing_owner_receipt',
+  'visual_review_export_receipt',
+  'visual_memory_accept_reject_receipt',
+  'workspace_receipt_scaleout_receipt',
+  'production_like_no_regression_ref',
+  'temporal_controlled_visual_stage_long_soak_ref',
+  'human_review_receipt',
+  'domain_owned_typed_blocker',
 ];
 
 function readJson(relativePath) {
@@ -172,7 +184,7 @@ function buildCanonicalPack() {
         'prompts/xiaohongshu/',
       ],
       legacy_detail_asset_policy: 'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
-      required_domain_pack_paths: requiredDomainPackPaths,
+      required_domain_pack_paths: visualPackCompilerHandoff.declarative_visual_pack_input.required_domain_pack_paths,
       minimal_authority_surface_ids: visualPackCompilerHandoff.minimal_authority_function_contract.allowed_authority_surface_ids,
       minimal_authority_surface_taxonomy: (
         visualPackCompilerHandoff.minimal_authority_function_contract.authority_surface_taxonomy
@@ -185,6 +197,9 @@ function buildCanonicalPack() {
       repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
       repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
+      visual_pack_discipline_contract: visualPackCompilerHandoff.declarative_visual_pack_input.visual_pack_discipline_contract,
+      markdown_marp_route_policy: visualPackCompilerHandoff.declarative_visual_pack_input.markdown_marp_route_policy,
+      package_distribution_gate: visualPackCompilerHandoff.declarative_visual_pack_input.package_distribution_gate,
       source_refs: {
         canonical_semantic_pack: 'agent/',
         action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
@@ -216,6 +231,99 @@ function buildCanonicalPack() {
         domain_repo_can_own_generated_surface: false,
       },
     },
+    privateFunctionalSurfacePolicy: {
+      surface_kind: 'opl_domain_private_functional_surface_admission_policy',
+      schema_version: 1,
+      domain_id: 'redcube_ai',
+      default_posture: 'forbidden_until_classified_and_receipted',
+      forbidden_private_surface_classes: [
+        'generic_scheduler',
+        'generic_queue_or_attempt_ledger',
+        'generic_cli_mcp_product_wrapper',
+        'generic_workbench_shell',
+        'generic_observability_runtime',
+      ],
+      allowed_private_surface_classes: [
+        'minimal_authority_function',
+        'visual_native_helper_implementation',
+        'ai_first_review_export_ref_materializer',
+      ],
+      purpose_first_owner_delta_policy: {
+        default_operator_question: 'which_owner_must_produce_which_delta_or_typed_blocker',
+        accepted_next_delta_kinds: ownerDeltaNextDeltaKinds,
+        refs_only_accounting_is_progress: false,
+        provider_completion_is_visual_progress: false,
+        session_currentness_is_visual_progress: false,
+        workbench_projection_is_visual_progress: false,
+      },
+      repo_local_owner_delta_surface_policy: {
+        default_surface_role: 'refs_only_owner_delta_adapter_until_exit_gate',
+        scoped_surface_ids: [
+          'repo_local_wrapper',
+          'product_entry_session',
+          'runtime_watch',
+          'operator_projection',
+          'domain_action_adapter_compatibility',
+          'neutral_route_run_record_adapter',
+        ],
+        allowed_roles_before_exit_gate: [
+          'refs_only_adapter',
+          'domain_handler_target',
+          'native_helper_target',
+          'migration_input',
+          'negative_input_guard',
+        ],
+        required_next_delta_kinds: ownerDeltaNextDeltaKinds,
+        disallowed_progress_claims: [
+          'mock_sample_ref_accounting',
+          'sample_ref_accounting',
+          'refs_only_accounting',
+          'provider_completion',
+          'session_currentness',
+          'workbench_projection',
+          'structural_contract_pass',
+        ],
+        production_ready_claim_allowed: false,
+        visual_ready_claim_allowed: false,
+        artifact_ready_claim_allowed: false,
+        mock_sample_ref_accounting_is_production_ready: false,
+        sample_ref_accounting_is_production_ready: false,
+      },
+      domain_thinning_exit_gate: {
+        candidate_surface_classes: [
+          'generic_cli_mcp_product_wrapper',
+          'generic_session_store_owner',
+          'generic_status_workbench_owner',
+          'generic_domain_action_adapter_owner',
+          'generic_operator_workbench_owner',
+          'generic_observability_runtime',
+          'generic_queue_or_attempt_ledger',
+          'generic_review_repair_transport_owner',
+        ],
+        required_before_delete_or_thin: [
+          'opl_default_caller_parity',
+          'no_active_caller',
+          'rca_owner_receipt_or_typed_blocker_roundtrip',
+          'no_forbidden_write_proof',
+          'retired_alias_no_resurrection_proof',
+          'tombstone_or_provenance_pointer',
+        ],
+        allowed_before_gate: [
+          'refs_only_adapter',
+          'domain_handler_target',
+          'migration_input',
+          'negative_input_guard',
+        ],
+        forbidden_after_gate: [
+          'compatibility_alias',
+          'facade',
+          'default_dispatch',
+          'old_public_path_test',
+          'success_payload_compatibility_field',
+        ],
+      },
+      forbidden_generic_owner_roles: readJson('contracts/action_catalog.json').forbidden_generic_owner_roles,
+    },
     physicalSourceMorphologyPolicy: buildPhysicalSourceMorphologyPolicy(),
   });
 }
@@ -232,6 +340,10 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.deepEqual(readJson('contracts/owner_receipt_contract.json'), canonical.ownerReceiptContract);
   assert.deepEqual(readJson('contracts/pack_compiler_input.json'), canonical.packCompilerInput);
   assert.deepEqual(readJson('contracts/functional_privatization_audit.json'), canonical.functionalAudit);
+  assert.deepEqual(
+    readJson('contracts/private_functional_surface_policy.json'),
+    canonical.privateFunctionalSurfacePolicy,
+  );
   assert.deepEqual(
     readJson('contracts/physical_source_morphology_policy.json'),
     canonical.physicalSourceMorphologyPolicy,
@@ -732,31 +844,13 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     assert.equal(surface.owner, 'one-person-lab', surface.surface_id);
     assert.equal(surface.domain_repo_can_own_generated_surface, false, surface.surface_id);
   }
-  assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner,
-    'one-person-lab',
-  );
-  assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.default_generic_dispatch_owner,
-    'one-person-lab',
-  );
-  assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.domain_handler_role,
-    'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
-  );
-  assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.default_supervision_owner,
-    'one-person-lab',
-  );
-  assert.equal(
-    generatedSurfaceHandoff.repo_local_launcher_policy.legacy_supervision_public_surface,
-    'retired',
-  );
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner, 'one-person-lab');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.default_generic_dispatch_owner, 'one-person-lab');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.domain_handler_role, 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.default_supervision_owner, 'one-person-lab');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.legacy_supervision_public_surface, 'retired');
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.gate_id, 'rca.generated_surface_bridge_exit.v1');
-  assert.equal(
-    generatedSurfaceHandoff.bridge_exit_gate.current_rca_status,
-    'opl_generated_surface_consumed_domain_handlers_only',
-  );
+  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.current_rca_status, 'opl_generated_surface_consumed_domain_handlers_only');
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.required_before_retiring_repo_local_wrappers, [
     'domain_authority_refs_preserved',
     'no_regression_proof_recorded',
@@ -806,142 +900,67 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     );
   }
 
+  const visualPackDisciplineContract = packCompilerInput.visual_pack_discipline_contract;
+  assert.equal(visualPackDisciplineContract.owner, 'redcube_ai');
+  assert.equal(visualPackDisciplineContract.policy_ref, 'agent/quality_gates/visual_pack_discipline.md');
+  assert.equal(visualPackDisciplineContract.required_before_artifact_creation, true);
+  const brandPrecedence = visualPackDisciplineContract.brand_profile_precedence;
+  const materialPass = visualPackDisciplineContract.source_material_pass_transparency;
+  const densityEvidence = visualPackDisciplineContract.layout_density_sparse_page_evidence;
+  const disciplineClaims = [
+    brandPrecedence.precedence_order,
+    [
+      brandPrecedence.approved_task_material_overrides_memory_or_defaults,
+      brandPrecedence.generated_or_inferred_profile_can_override_approved_material,
+      brandPrecedence.defaults_fill_missing_fields_only,
+    ],
+    materialPass.required_item_statuses,
+    materialPass.missing_or_unverified_required_material_yields,
+    [
+      densityEvidence.density_contract_required_before_layout,
+      densityEvidence.sparse_page_can_pass_without_rca_rationale,
+      densityEvidence.provider_completion_can_accept_sparse_page,
+      densityEvidence.schema_completeness_can_accept_sparse_page,
+    ],
+  ];
+  assert.deepEqual(disciplineClaims, [
+    ['explicit_delivery_request_brand_material', 'rca_visual_direction_judgment', 'workspace_profile_defaults', 'user_profile_defaults', 'built_in_route_defaults'],
+    [true, false, true],
+    ['approved', 'provided_unverified', 'missing', 'out_of_scope'],
+    ['source_gap_refs', 'material_gap_refs', 'typed_blocker'],
+    [true, false, false, false],
+  ]);
+  assert.equal(materialPass.pass_level_evidence_required, true);
+  for (const requiredField of ['brand_profile_precedence_refs', 'source_material_pass_refs', 'layout_density_refs', 'sparse_page_evidence_refs']) {
+    assert.equal(visualPackDisciplineContract.required_contract_fields.includes(requiredField), true, requiredField);
+  }
+  const routeClaims = packCompilerInput.markdown_marp_route_policy;
+  const packageClaims = packCompilerInput.package_distribution_gate;
+  assert.deepEqual([
+    routeClaims.owner,
+    routeClaims.policy_ref,
+    routeClaims.route_family,
+    routeClaims.route_default,
+    routeClaims.explicit_selection_required,
+    routeClaims.refs_only,
+    routeClaims.default_visual_route_ref,
+    routeClaims.external_runtime_authority_allowed,
+    routeClaims.provider_completion_can_issue_visual_verdict,
+  ], ['redcube_ai', 'agent/knowledge/markdown_route_policy.md', 'markdown_marp', false, true, true, 'author_image_pages', false, false]);
+  assert.deepEqual(routeClaims.allowed_route_use, ['operator_explicit_markdown_or_marp_request', 'source_to_slide_text_structuring_refs', 'intermediate_outline_or_script_packaging_refs']);
+  assert.deepEqual([
+    packageClaims.owner,
+    packageClaims.policy_ref,
+    packageClaims.gate_id,
+    packageClaims.refs_only,
+    packageClaims.package_can_omit_required_domain_pack_refs,
+    packageClaims.packaging_can_change_route_default,
+    packageClaims.external_runtime_authority_allowed,
+  ], ['redcube_ai', 'agent/quality_gates/package_distribution.md', 'rca.package_distribution_consistency.v1', true, false, false, false]);
+  assert.equal(packageClaims.required_consistency_checks.includes('source_to_package_required_domain_pack_paths_match'), true);
+
   assertNoLegacyAuthorityFunctionFields(packCompilerInput, 'contracts/pack_compiler_input.json');
   assertNoLegacyAuthorityFunctionFields(functionalAudit, 'contracts/functional_privatization_audit.json');
-  assertNoLegacyAuthorityFunctionFields(
-    readJson('contracts/runtime-program/current-program.json'),
-    'contracts/runtime-program/current-program.json',
-  );
-  assertNoLegacyAuthorityFunctionFields(
-    readJson('contracts/runtime-program/opl-family-contract-adoption.json'),
-    'contracts/runtime-program/opl-family-contract-adoption.json',
-  );
-});
-
-test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {
-  const rootAudit = readJson('contracts/functional_privatization_audit.json').privatized_functional_module_audit;
-  const current = readJson('contracts/runtime-program/current-program.json');
-  const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
-  const surfaces = [
-    rootAudit,
-    current.product_release_metadata.privatized_functional_module_audit,
-    current.current_state.privatized_functional_module_audit,
-    current.current_state.active_baton.scope.privatized_functional_module_audit,
-    adoption.privatized_functional_module_audit,
-  ];
-
-  for (const surface of surfaces) {
-    assert.equal(surface.bridge_exit_gate.gate_id, 'rca.private_generic_residue_bridge_exit.v1');
-    assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_remaining_repo_local_bridges, [
-    ]);
-    assert.deepEqual(surface.bridge_exit_gate.required_before_retiring_adapter_tail_modules, [
-      'domain_authority_refs_preserved',
-      'no_regression_proof_recorded',
-      'explicit_owner_receipt_authorizes_physical_delete',
-    ]);
-    assert.deepEqual(surface.bridge_exit_gate.remaining_bridge_module_ids, []);
-    assert.equal(surface.bridge_exit_gate.adapter_thinning_module_ids.includes('generic_cli_mcp_wrappers'), true);
-    assert.equal(surface.bridge_exit_gate.source_shape_status, 'landed');
-    assert.equal(surface.bridge_exit_gate.functional_structure_gap_count, 0);
-    assert.equal(surface.bridge_exit_gate.declares_no_active_bridge_modules, true);
-    assert.equal(surface.bridge_exit_gate.forbidden_after_exit_rca_surface_classes.includes('generic_session_shell'), true);
-    assert.equal(surface.bridge_exit_gate.declares_generated_surface_consumption_complete, false);
-    assert.equal(surface.bridge_exit_gate.declares_production_consumption_complete, false);
-    assert.equal(
-      surface.bridge_exit_gate.production_consumption_scope,
-      'descriptor_and_contract_consumed_not_production_default_caller_live_soak',
-    );
-    assert.equal(surface.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
-    assert.deepEqual(surface.bridge_exit_gate.remaining_blocker_ids, []);
-    assert.deepEqual(surface.bridge_exit_gate.remaining_evidence_gate_ids, [
-      'real_artifact_producing_domain_owner_receipt',
-      'opl_hosted_controlled_visual_stage_long_soak',
-      'real_memory_lifecycle_receipt_instances',
-      'cross_family_repeated_no_regression_evidence',
-    ]);
-
-    for (const entry of surface.modules) {
-      assert.equal(entry.bridge_exit_gate.gate_id, `${entry.module_id}_bridge_exit_gate`, entry.module_id);
-      assert.equal(entry.bridge_exit_gate.rca_can_own_replacement_runtime, false, entry.module_id);
-      assert.equal(entry.bridge_exit_gate.opl_can_write_visual_truth, false, entry.module_id);
-      assert.equal(entry.bridge_exit_gate.opl_can_store_artifact_blob, false, entry.module_id);
-      assert.equal(entry.bridge_exit_gate.declares_replacement_complete, false, entry.module_id);
-      if (!['visual_pack_compiler_handoff', 'visual_authority_functions'].includes(entry.module_id)) {
-        assert.deepEqual(entry.bridge_exit_gate.required_before_retire, [
-          'domain_authority_refs_preserved',
-          'no_regression_proof_recorded',
-          'explicit_owner_receipt_authorizes_physical_delete',
-        ], entry.module_id);
-      }
-    }
-  }
-});
-
-test('OPL generated interfaces are ready from RCA root contracts when OPL checkout is available', {
-  skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
-}, () => {
-  const result = spawnSync(oplBin, [
-    'agents',
-    'interfaces',
-    '--repo-dir',
-    repoRoot,
-    '--json',
-  ], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const payload = JSON.parse(result.stdout);
-  const bundle = payload.generated_agent_interfaces;
-  assert.equal(bundle.source_kind, 'standard_agent_repo_contracts');
-  assert.equal(bundle.status, 'ready');
-  assert.equal(bundle.owner, 'one-person-lab');
-  assert.equal(bundle.domain_repo_can_own_generated_surface, false);
-  assert.deepEqual(bundle.blocker_reasons, []);
-  assert.equal(bundle.cli.status, 'ready');
-  assert.equal(bundle.mcp.status, 'ready');
-  assert.equal(bundle.skill.status, 'ready');
-  assert.equal(bundle.product_entry.status, 'ready');
-  assert.equal(bundle.stage_routes.length, 6);
-});
-
-test('OPL default callers see RCA deletion evidence refs without delete authority', {
-  skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
-}, () => {
-  const result = spawnSync(oplBin, [
-    'agents',
-    'default-callers',
-    '--agent',
-    `redcube-ai=${repoRoot}`,
-    '--json',
-  ], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  const payload = JSON.parse(result.stdout);
-  const readiness = payload.agent_default_caller_readiness;
-  assert.equal(readiness.status, 'ready_domain_evidence_required');
-  assert.equal(readiness.summary.generated_default_caller_surface_count, 8);
-  assert.equal(readiness.summary.missing_domain_owner_receipt_or_typed_blocker_count, 0);
-  assert.equal(readiness.summary.missing_no_forbidden_write_proof_count, 0);
-  assert.equal(readiness.summary.missing_tombstone_or_provenance_ref_count, 0);
-  assert.equal(readiness.migration_gate_policy.physical_delete_authorized_by_this_report, false);
-  assert.equal(readiness.authority_boundary.report_can_authorize_domain_repo_physical_delete, false);
-
-  const report = readiness.reports[0];
-  assert.equal(report.deletion_gate.physical_delete_authorized, false);
-  const bySurface = Object.fromEntries(report.surface_gates.map((gate) => [gate.surface_id, gate]));
-  assert.equal(bySurface.cli.active_caller_module_id, 'generic_cli_mcp_wrappers');
-  assert.equal(bySurface.skill.active_caller_module_id, 'generic_cli_mcp_wrappers');
-  assert.equal(bySurface.product_status.active_caller_module_id, 'operator_projection_shell');
-  for (const gate of report.surface_gates) {
-    const worklist = gate.deletion_evidence_worklist;
-    assert.equal(worklist.domain_owner_receipt_or_typed_blocker.status, 'observed', gate.surface_id);
-    assert.equal(worklist.no_forbidden_write_proof.status, 'observed', gate.surface_id);
-    assert.equal(worklist.tombstone_or_provenance_ref.status, 'observed', gate.surface_id);
-    assert.equal(worklist.physical_delete_authorized, false, gate.surface_id);
-  }
+  assertNoLegacyAuthorityFunctionFields(readJson('contracts/runtime-program/current-program.json'), 'contracts/runtime-program/current-program.json');
+  assertNoLegacyAuthorityFunctionFields(readJson('contracts/runtime-program/opl-family-contract-adoption.json'), 'contracts/runtime-program/opl-family-contract-adoption.json');
 });

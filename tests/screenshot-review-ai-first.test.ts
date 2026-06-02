@@ -37,6 +37,36 @@ const FAMILY_FILES = [
   },
 ];
 
+const SCREENSHOT_REVIEW_EVIDENCE_POLICY = Object.freeze({
+  required_render_evidence_refs: Object.freeze([
+    'rendered_page_refs',
+    'page_manifest_ref',
+    'non_empty_page_evidence_ref',
+    'page_count_or_aspect_ratio_ref',
+    'duplicate_or_hash_signal_ref',
+    'crop_or_overflow_risk_ref',
+    'field_leakage_signal_ref',
+    'text_readability_signal_ref',
+    'material_status_ref',
+  ]),
+  allowed_mechanical_outputs: Object.freeze([
+    'typed_blocker',
+    'repair_target_refs',
+    'preserved_page_refs',
+    'evidence_refs',
+    'inventory_refs',
+    'no_regression_refs',
+  ]),
+  forbidden_mechanical_outputs: Object.freeze([
+    'visual_ready_verdict',
+    'exportable_verdict',
+    'handoffable_verdict',
+    'publication_ready_verdict',
+    'review_pass_verdict',
+    'source_ready_verdict',
+  ]),
+});
+
 const POSTER_HELPERS = createPosterOnepagerReviewHelpers({
   safeText: (value, fallback = '') => {
     const text = String(value || '').trim();
@@ -52,6 +82,31 @@ const POSTER_HELPERS = createPosterOnepagerReviewHelpers({
     'visual_density_out_of_range',
     'block_content_overflow_detected',
   ]),
+});
+
+test('screenshot_review evidence policy keeps render QA refs-only and non-verdict', () => {
+  assert.deepEqual(SCREENSHOT_REVIEW_EVIDENCE_POLICY.required_render_evidence_refs, [
+    'rendered_page_refs',
+    'page_manifest_ref',
+    'non_empty_page_evidence_ref',
+    'page_count_or_aspect_ratio_ref',
+    'duplicate_or_hash_signal_ref',
+    'crop_or_overflow_risk_ref',
+    'field_leakage_signal_ref',
+    'text_readability_signal_ref',
+    'material_status_ref',
+  ]);
+  assert.equal(SCREENSHOT_REVIEW_EVIDENCE_POLICY.allowed_mechanical_outputs.includes('typed_blocker'), true);
+  assert.equal(SCREENSHOT_REVIEW_EVIDENCE_POLICY.allowed_mechanical_outputs.includes('repair_target_refs'), true);
+  assert.equal(SCREENSHOT_REVIEW_EVIDENCE_POLICY.allowed_mechanical_outputs.includes('preserved_page_refs'), true);
+  assert.equal(SCREENSHOT_REVIEW_EVIDENCE_POLICY.allowed_mechanical_outputs.includes('no_regression_refs'), true);
+  for (const forbidden of SCREENSHOT_REVIEW_EVIDENCE_POLICY.forbidden_mechanical_outputs) {
+    assert.equal(
+      SCREENSHOT_REVIEW_EVIDENCE_POLICY.allowed_mechanical_outputs.includes(forbidden),
+      false,
+      forbidden,
+    );
+  }
 });
 
 function extractFunction(source, name) {

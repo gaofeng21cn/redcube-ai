@@ -615,6 +615,74 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.authority_boundary.opl_can_authorize_review_export_verdict,
       false,
     );
+    const visualPackDiscipline = domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.visual_pack_discipline;
+    assert.equal(visualPackDiscipline.surface_kind, 'visual_pack_discipline_refs');
+    assert.equal(visualPackDiscipline.owner, 'redcube_ai');
+    assert.equal(visualPackDiscipline.consumer, 'opl_pack_compiler');
+    assert.equal(visualPackDiscipline.read_only, true);
+    assert.equal(visualPackDiscipline.refs_only, true);
+    assert.equal(
+      visualPackDiscipline.quality_gate_refs.includes('agent/quality_gates/screenshot_review.md'),
+      true,
+    );
+    assert.equal(
+      visualPackDiscipline.quality_gate_refs.includes('agent/quality_gates/visual_pack_discipline.md'),
+      true,
+    );
+    assert.equal(visualPackDiscipline.authority_boundary.opl_can_write_rca_visual_truth, false);
+    assert.equal(visualPackDiscipline.authority_boundary.opl_can_authorize_review_export_verdict, false);
+    assert.equal(visualPackDiscipline.authority_boundary.provider_completion_is_visual_ready, false);
+    assert.equal(
+      visualPackDiscipline.forbidden_outputs.includes('artifact_body'),
+      true,
+    );
+    const markdownMarpRoutePolicy = domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.markdown_marp_route_policy;
+    assert.equal(markdownMarpRoutePolicy.surface_kind, 'markdown_marp_optional_route_policy_refs');
+    assert.equal(markdownMarpRoutePolicy.owner, 'redcube_ai');
+    assert.equal(markdownMarpRoutePolicy.consumer, 'opl_pack_compiler');
+    assert.equal(markdownMarpRoutePolicy.read_only, true);
+    assert.equal(markdownMarpRoutePolicy.refs_only, true);
+    assert.equal(markdownMarpRoutePolicy.route_default, false);
+    assert.equal(markdownMarpRoutePolicy.explicit_selection_required, true);
+    assert.equal(markdownMarpRoutePolicy.policy_ref, 'agent/knowledge/markdown_route_policy.md');
+    assert.equal(markdownMarpRoutePolicy.authority_boundary.external_runtime_authority_allowed, false);
+    assert.equal(markdownMarpRoutePolicy.authority_boundary.provider_completion_is_visual_ready, false);
+    assert.equal(
+      markdownMarpRoutePolicy.forbidden_outputs.includes('default_route_replacement'),
+      true,
+    );
+    const packageDistributionGate = domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.package_distribution_gate;
+    assert.equal(packageDistributionGate.surface_kind, 'package_distribution_consistency_gate_refs');
+    assert.equal(packageDistributionGate.owner, 'redcube_ai');
+    assert.equal(packageDistributionGate.consumer, 'opl_pack_compiler');
+    assert.equal(packageDistributionGate.read_only, true);
+    assert.equal(packageDistributionGate.refs_only, true);
+    assert.equal(packageDistributionGate.policy_ref, 'agent/quality_gates/package_distribution.md');
+    assert.equal(
+      packageDistributionGate.required_consistency_checks.includes('source_to_package_required_domain_pack_paths_match'),
+      true,
+    );
+    assert.equal(packageDistributionGate.authority_boundary.package_can_omit_required_domain_pack_refs, false);
+    assert.equal(packageDistributionGate.authority_boundary.packaging_can_change_route_default, false);
+    const renderReviewGateContract = domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.render_review_gate_contract;
+    assert.equal(renderReviewGateContract.surface_kind, 'render_review_gate_contract_refs');
+    assert.equal(renderReviewGateContract.owner, 'redcube_ai');
+    assert.equal(renderReviewGateContract.consumer, 'opl_generated_surface');
+    assert.equal(renderReviewGateContract.read_only, true);
+    assert.equal(renderReviewGateContract.refs_only, true);
+    assert.deepEqual(renderReviewGateContract.review_gate_refs, [
+      'agent/quality_gates/review_export_memory.md',
+      '/review_state',
+      '/publication_projection',
+    ]);
+    assert.equal(renderReviewGateContract.authority_boundary.redcube_ai_owns_review_export_verdict, true);
+    assert.equal(renderReviewGateContract.authority_boundary.opl_can_authorize_review_export_verdict, false);
+    assert.equal(renderReviewGateContract.authority_boundary.opl_can_declare_visual_ready, false);
+    assert.equal(renderReviewGateContract.authority_boundary.provider_completion_is_visual_ready, false);
+    assert.equal(
+      renderReviewGateContract.forbidden_outputs.includes('review_export_verdict_body'),
+      true,
+    );
     assert.deepEqual(
       domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.minimal_authority_function_contract.allowed_authority_surface_ids,
       [
