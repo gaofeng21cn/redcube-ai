@@ -13,7 +13,7 @@
         "source",
         "owner",
         "hosted_adapter_reference",
-        "adapter_runtime_owner",
+        "selected_executor_backend",
         "domain_truth_owner",
         "review_export_gate_owner",
         "activation",
@@ -31,7 +31,7 @@
         "hosted_adapter_reference": {
           "const": "opl_hosted:hermes_agent_loop"
         },
-        "adapter_runtime_owner": {
+        "selected_executor_backend": {
           "const": "hermes_agent"
         },
         "domain_truth_owner": {

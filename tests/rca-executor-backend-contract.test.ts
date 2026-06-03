@@ -72,7 +72,7 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
     'source',
     'owner',
     'hosted_adapter_reference',
-    'adapter_runtime_owner',
+    'selected_executor_backend',
     'domain_truth_owner',
     'review_export_gate_owner',
     'activation',
@@ -82,7 +82,7 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
   ]);
   assert.equal(receipt.properties.owner.const, 'opl_runtime_manager');
   assert.equal(receipt.properties.hosted_adapter_reference.const, 'opl_hosted:hermes_agent_loop');
-  assert.equal(receipt.properties.adapter_runtime_owner.const, 'hermes_agent');
+  assert.equal(receipt.properties.selected_executor_backend.const, 'hermes_agent');
   assert.equal(receipt.properties.domain_truth_owner.const, 'redcube_ai_visual_deliverable_runtime');
   assert.equal(receipt.properties.review_export_gate_owner.const, 'redcube_ai');
   assert.equal(receipt.properties.activation.const, 'explicit_opt_in_only');

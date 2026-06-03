@@ -93,7 +93,7 @@ export function buildOplExecutorAdapterReceipt({
     owner: OPL_RUNTIME_MANAGER_RUNTIME_OWNER,
     hosted_adapter_reference: hostedAdapterReference,
     adapter,
-    adapter_runtime_owner: adapter,
+    selected_executor_backend: adapter,
     runtime_surface: runtimeSurface,
     domain_truth_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
     review_export_gate_owner: RCA_REVIEW_EXPORT_GATE_OWNER,

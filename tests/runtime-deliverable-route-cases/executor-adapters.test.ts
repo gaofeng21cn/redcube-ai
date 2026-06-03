@@ -188,7 +188,7 @@ test('runDeliverableRoute supports explicit hermes_agent adapter without changin
     assert.equal(result.run.executor.hermes_agent_loop_runtime?.owner, 'opl_runtime_manager');
     assert.equal(result.run.executor.hermes_agent_loop_runtime?.source, 'opl_executor_adapter_receipt');
     assert.equal(result.run.executor.hermes_agent_loop_runtime?.hosted_adapter_reference, 'opl_hosted:hermes_agent_loop');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(result.run.executor.hermes_agent_loop_runtime?.selected_executor_backend, 'hermes_agent');
     assert.equal(
       result.run.executor.hermes_agent_loop_runtime?.domain_truth_owner,
       'redcube_ai_visual_deliverable_runtime',
@@ -230,7 +230,7 @@ test('runDeliverableRoute supports explicit hermes_agent adapter without changin
       artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
       'opl_hosted:hermes_agent_loop',
     );
-    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
     assert.equal(
       artifact.creative_execution?.generation_runtime?.creative_owner,
       'redcube_ai_visual_deliverable_runtime',
@@ -307,7 +307,7 @@ test('runDeliverableRoute supports explicit hermes_agent adapter for xiaohongshu
       artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
       'opl_hosted:hermes_agent_loop',
     );
-    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
     assert.equal(
       artifact.creative_execution?.generation_runtime?.creative_owner,
       'redcube_ai_visual_deliverable_runtime',
@@ -361,7 +361,7 @@ test('runDeliverableRoute supports explicit hermes_agent adapter for poster stor
       artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
       'opl_hosted:hermes_agent_loop',
     );
-    assert.equal(artifact.creative_execution?.generation_runtime?.adapter_runtime_owner, 'hermes_agent');
+    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
     assert.equal(
       artifact.creative_execution?.generation_runtime?.creative_owner,
       'redcube_ai_visual_deliverable_runtime',
