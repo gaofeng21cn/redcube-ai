@@ -69,6 +69,60 @@ const wrapperDescriptorScopeIds = [
   'workbench',
 ];
 
+const sharedFoundryPolicyRelease = {
+  policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
+  policy_bundle_fingerprint: 'sha256:5d77102e99e6e49acd88714cd94dcafe0969b8f2a5529928d753002ac3d4619d',
+  fingerprint_algorithm: 'sha256:stable-json',
+  domain_contract_policy_release_pin_required: true,
+  domain_adapter_must_not_copy_policy_body_as_authority: true,
+  consumer_alignment_check: 'foundry:policy-release',
+};
+
+const sharedFoundrySeriesDesignProfile = {
+  surface_kind: 'opl_foundry_agent_series_design_profile',
+  version: 'foundry-agent-series-design-profile.v1',
+  profile_id: 'opl_foundry_agent_series_design_profile.v1',
+  profile_summary:
+    'All Foundry Agents share the same OPL domain-pack to stage-led execution to gate/receipt to handoff lifecycle; domain inputs, outputs, aliases, and authority functions vary by agent.',
+  shared_lifecycle_pipeline: [
+    'domain_material_intake',
+    'domain_pack_interpretation',
+    'stage_led_agent_execution',
+    'independent_quality_gate_or_owner_review',
+    'owner_receipt_or_typed_blocker_closeout',
+    'artifact_or_deliverable_handoff',
+    'opl_refs_only_projection_and_recovery',
+  ],
+  domain_io_profile: {
+    input_slot: 'domain_materials_or_task_request',
+    output_slot: 'domain_deliverable_or_owner_handoff',
+    input_is_domain_specific: true,
+    output_is_domain_specific: true,
+    shared_runtime_interpretation:
+      'OPL treats input/output as opaque domain refs and projects identity, stage, progress, closeout, evidence, and recovery metadata only.',
+  },
+  stage_pack_sections: [
+    'prompts',
+    'stages',
+    'skills',
+    'knowledge',
+    'quality_gates',
+  ],
+  shared_closeout_contract: {
+    success_shape: 'domain_owner_receipt_ref',
+    blocked_shape: 'domain_owned_typed_blocker_ref',
+    route_back_shape: 'route_back_or_human_gate_ref',
+    provider_completion_is_closeout: false,
+  },
+  authority_invariants: {
+    opl_can_infer_domain_output: false,
+    opl_can_read_domain_body: false,
+    opl_can_write_domain_truth: false,
+    opl_can_authorize_quality_or_export: false,
+    domain_owns_input_truth_and_output_authority: true,
+  },
+};
+
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
@@ -257,6 +311,8 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     consumer_alignment_check: 'family:shared-release',
     domain_contract_version_pin_does_not_authorize_domain_truth: true,
   });
+  assert.deepEqual(foundrySeries.shared_policy_release, sharedFoundryPolicyRelease);
+  assert.deepEqual(foundrySeries.series_design_profile, sharedFoundrySeriesDesignProfile);
   assert.deepEqual(foundrySeries.identity_hygiene_policy.canonical_identities, {
     series_domain_id: foundrySeries.domain_id,
     foundry_agent_id: foundrySeries.foundry_agent_id,
