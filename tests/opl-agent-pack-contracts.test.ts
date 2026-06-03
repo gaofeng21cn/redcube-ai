@@ -85,6 +85,15 @@ const ownerDeltaNextDeltaKinds = [
   'domain_owned_typed_blocker',
 ];
 
+const sharedFoundryPolicyRelease = {
+  policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
+  policy_bundle_fingerprint: 'sha256:5d77102e99e6e49acd88714cd94dcafe0969b8f2a5529928d753002ac3d4619d',
+  fingerprint_algorithm: 'sha256:stable-json',
+  domain_contract_policy_release_pin_required: true,
+  domain_adapter_must_not_copy_policy_body_as_authority: true,
+  consumer_alignment_check: 'foundry:policy-release',
+};
+
 function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
@@ -405,14 +414,7 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     consumer_alignment_check: 'family:shared-release',
     domain_contract_version_pin_does_not_authorize_domain_truth: true,
   });
-  assert.deepEqual(foundrySeries.shared_policy_release, {
-    policy_release_contract_ref: 'contracts/opl-framework/foundry-agent-series-policy-release.json',
-    policy_bundle_fingerprint: 'sha256:5d77102e99e6e49acd88714cd94dcafe0969b8f2a5529928d753002ac3d4619d',
-    fingerprint_algorithm: 'sha256:stable-json',
-    domain_contract_policy_release_pin_required: true,
-    domain_adapter_must_not_copy_policy_body_as_authority: true,
-    consumer_alignment_check: 'foundry:policy-release',
-  });
+  assert.deepEqual(foundrySeries.shared_policy_release, sharedFoundryPolicyRelease);
   assert.deepEqual(foundrySeries.identity_hygiene_policy.canonical_identities, {
     series_domain_id: foundrySeries.domain_id,
     foundry_agent_id: foundrySeries.foundry_agent_id,
