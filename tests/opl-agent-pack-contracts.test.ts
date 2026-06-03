@@ -475,6 +475,36 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     can_claim_production_ready: false,
   });
   assert.equal(foundrySeries.domain_adapter_policy.no_parallel_progress_schema, true);
+  const thinning = foundrySeries.purpose_first_adapter_thinning_policy;
+  assert.deepEqual(thinning.default_retained_surface_roles, [
+    'refs_only_adapter',
+    'domain_handler_target',
+    'minimal_authority_function',
+    'migration_input',
+    'history_or_tombstone_provenance',
+  ]);
+  assert.equal(
+    thinning.default_operator_delta_shape,
+    'visual_deliverable_progress_delta_or_rca_owned_typed_blocker',
+  );
+  assert.deepEqual(thinning.physical_delete_required_gates, [
+    'replacement_parity',
+    'no_active_caller',
+    'owner_receipt_or_typed_blocker',
+    'no_forbidden_write',
+    'tombstone_or_provenance',
+  ]);
+  assert.equal(
+    thinning.evidence_tail_boundary.missing_visual_review_or_export_gate_returns,
+    'rca_owned_typed_blocker',
+  );
+  assert.equal(thinning.evidence_tail_boundary.descriptor_ready_is_visual_ready, false);
+  assert.equal(
+    thinning.legacy_alias_guard.managed_gateway_session_domain_action_adapter_terms_are_authority_sources,
+    false,
+  );
+  assert.equal(thinning.legacy_alias_guard.may_be_active_public_surface, false);
+  assert.equal(thinning.legacy_alias_guard.may_be_generic_owner_surface, false);
   assert.equal(foundrySeries.app_projection_policy.app_consumes_shared_progress_projection_only, true);
   assert.equal(foundrySeries.app_projection_policy.app_can_read_domain_body, false);
 });
