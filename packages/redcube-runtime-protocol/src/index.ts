@@ -12,6 +12,15 @@ import {
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY as WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY_JS,
 } from './workspace.js';
 import {
+  canonicalStageForRoute as canonicalStageForRouteJs,
+  stageFolderArtifactPath as stageFolderArtifactPathJs,
+  readStageFolderArtifact as readStageFolderArtifactJs,
+  stageFolderAttemptPaths as stageFolderAttemptPathsJs,
+  stageFolderOutputPath as stageFolderOutputPathJs,
+  stageOrderForCanonicalStage as stageOrderForCanonicalStageJs,
+  writeStageFolderArtifact as writeStageFolderArtifactJs,
+} from './stage-folder-contract.js';
+import {
   buildSourcePackFanoutArtifact as buildSourcePackFanoutArtifactJs,
   buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
   getSourceArtifactPaths as getSourceArtifactPathsJs,
@@ -97,6 +106,34 @@ export function getTopicPaths(workspaceRoot: string, topicId: string): TopicPath
 
 export function getDeliverablePaths(workspaceRoot: string, topicId: string, deliverableId: string): DeliverablePaths {
   return getDeliverablePathsJs(workspaceRoot, topicId, deliverableId) as DeliverablePaths;
+}
+
+export function canonicalStageForRoute(stageId: string): string {
+  return canonicalStageForRouteJs(stageId) as string;
+}
+
+export function stageOrderForCanonicalStage(stageId: string): number {
+  return stageOrderForCanonicalStageJs(stageId) as number;
+}
+
+export function stageFolderAttemptPaths(input: Record<string, unknown>): Record<string, string> {
+  return stageFolderAttemptPathsJs(input) as Record<string, string>;
+}
+
+export function stageFolderArtifactPath(input: Record<string, unknown>): string {
+  return stageFolderArtifactPathJs(input) as string;
+}
+
+export function stageFolderOutputPath(input: Record<string, unknown>): string {
+  return stageFolderOutputPathJs(input) as string;
+}
+
+export function writeStageFolderArtifact(input: Record<string, unknown>): Record<string, unknown> {
+  return writeStageFolderArtifactJs(input) as Record<string, unknown>;
+}
+
+export function readStageFolderArtifact(input: Record<string, unknown>): Record<string, unknown> | null {
+  return readStageFolderArtifactJs(input) as Record<string, unknown> | null;
 }
 
 export function getNotePaths(workspaceRoot: string, topicId: string, noteId: string): NotePaths {

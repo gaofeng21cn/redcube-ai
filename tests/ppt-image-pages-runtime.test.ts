@@ -6,7 +6,12 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildDeckRecord, hydratePptDeckContract } from '@redcube/overlay-ppt';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
 
 function readJson(file) {
@@ -50,6 +55,29 @@ function stageArtifactFile(paths, contract, stageId) {
   return path.join(paths.artifactsDir, stage?.output_artifact || `${stageId}.json`);
 }
 
+function writeStageArtifact(paths, contract, stageId, artifact, status = 'success') {
+  const stage = [
+    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ].find((item) => item.stage_id === stageId);
+  const artifactFile = stageArtifactFile(paths, contract, stageId);
+  writeJson(artifactFile, artifact);
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  writeStageFolderArtifact({
+    deliverablePaths: paths,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: `seed-${stageId}`,
+    artifactFile,
+    outputName: stage?.output_artifact || `${stageId}.json`,
+    status,
+    ownerReceiptRefs: status === 'success' ? [`rca-owner-receipt:test-seed:${stageId}`] : [],
+    typedBlockerRefs: status === 'blocked' ? [`rca-typed-blocker:test-seed:${stageId}`] : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || artifact?.issues || [],
+  });
+}
+
 function seedWorkspace() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-image-pages-'));
   const topicId = 'topic-a';
@@ -71,7 +99,7 @@ function seedWorkspace() {
   const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   writeJson(paths.deliverableFile, { ...record, hydrated_contract_ref: 'contracts/hydrated-deliverable.json' });
   writeJson(path.join(paths.deliverableDir, 'contracts/hydrated-deliverable.json'), contract);
-  writeJson(stageArtifactFile(paths, contract, 'slide_blueprint'), {
+  writeStageArtifact(paths, contract, 'slide_blueprint', {
     route: 'slide_blueprint',
     slide_blueprint: {
       slides: [
@@ -90,7 +118,7 @@ function seedWorkspace() {
       ],
     },
   });
-  writeJson(stageArtifactFile(paths, contract, 'visual_direction'), {
+  writeStageArtifact(paths, contract, 'visual_direction', {
     route: 'visual_direction',
     visual_direction: {
       palette: ['ink', 'red', 'white'],
@@ -161,8 +189,8 @@ test('ppt repair_image_pages regenerates only blocked screenshot-review pages', 
     route: 'author_image_pages',
     contract,
   });
-  writeJson(stageArtifactFile(paths, contract, 'author_image_pages'), authored);
-  writeJson(stageArtifactFile(paths, contract, 'screenshot_review'), {
+  writeStageArtifact(paths, contract, 'author_image_pages', authored);
+  writeStageArtifact(paths, contract, 'screenshot_review', {
     route: 'screenshot_review',
     status: 'block',
     blocked_slide_ids: ['S02'],
@@ -196,7 +224,7 @@ test('ppt repair_image_pages regenerates only blocked screenshot-review pages', 
         },
       },
     ],
-  });
+  }, 'blocked');
 
   const repaired = await runPptDeckRoute({
     workspaceRoot,
@@ -233,8 +261,8 @@ test('ppt repair_image_pages targets reviewed pages when deck-level image review
     route: 'author_image_pages',
     contract,
   });
-  writeJson(stageArtifactFile(paths, contract, 'author_image_pages'), authored);
-  writeJson(stageArtifactFile(paths, contract, 'screenshot_review'), {
+  writeStageArtifact(paths, contract, 'author_image_pages', authored);
+  writeStageArtifact(paths, contract, 'screenshot_review', {
     route: 'screenshot_review',
     status: 'block',
     checks: {
@@ -269,7 +297,7 @@ test('ppt repair_image_pages targets reviewed pages when deck-level image review
         ai_review: { judgement: 'pass', visual_findings: ['ok'], recommended_fix: 'none' },
       },
     ],
-  });
+  }, 'blocked');
 
   const repaired = await runPptDeckRoute({
     workspaceRoot,

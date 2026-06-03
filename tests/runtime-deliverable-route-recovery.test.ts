@@ -11,6 +11,12 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.ts';
 import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
+import {
   buildMockCreativeOutput,
   startMockCodexCli,
   withEnv,
@@ -27,6 +33,29 @@ const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-hermes-agent-loop-bridge.ts', import.meta.url)),
 ]);
+
+function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function routeArtifactFile(result) {
+  const file = result?.artifactFile || result?.artifact_file || result?.error?.artifact_file || result?.run?.error?.artifact_file;
+  assert.equal(typeof file, 'string');
+  assert.notEqual(file.trim(), '');
+  return file;
+}
+
+function readStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
+  return loaded.artifact;
+}
 
 async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
@@ -102,6 +131,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
       goal: '验证 direct route recovery',
     });
 
+    const routeResults = new Map();
     for (const route of [
       'storyline',
       'detailed_outline',
@@ -119,26 +149,10 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
         route,
       });
       assert.equal(result.ok, true, route);
+      routeResults.set(route, result);
     }
 
-    const renderBundleFile = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-      'render_bundle.json',
-    );
-    const fixBundleFile = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-      'fix_bundle.json',
-    );
+    const renderBundleFile = routeArtifactFile(routeResults.get('render_html'));
     await new Promise((resolve) => setTimeout(resolve, 30));
     const touchedAt = new Date();
     utimesSync(renderBundleFile, touchedAt, touchedAt);
@@ -170,7 +184,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
       assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
       assert.equal(result.execution_proof?.escalation_status, 'escalated_still_requires_fix_html');
       assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
-      const fixArtifact = JSON.parse(readFileSync(fixBundleFile, 'utf-8'));
+      const fixArtifact = readJson(routeArtifactFile(result));
       assert.deepEqual(fixArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
     } finally {
       restoreVariants();
@@ -508,15 +522,7 @@ test('runDeliverableRoute auto-repairs ppt image pages after visual director rev
       );
       assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
 
-      const repairArtifact = JSON.parse(readFileSync(path.join(
-        workspaceRoot,
-        'topics',
-        'topic-a',
-        'deliverables',
-        'deck-a',
-        'artifacts',
-        'image_pages_repair_bundle.json',
-      ), 'utf-8'));
+      const repairArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'repair_image_pages');
       assert.equal(repairArtifact.repair_image_pages?.source_review_stage, 'visual_director_review');
       assert.deepEqual(repairArtifact.repair_image_pages?.blocked_slide_ids, ['S01']);
     } finally {
@@ -593,15 +599,7 @@ test('runDeliverableRoute can repair native PPT directly from visual director pr
       assert.equal(result.artifact?.export_bundle?.delivery_state?.current, 'output_ready');
       assert.equal(result.artifact?.export_bundle?.source_visual_route, 'repair_pptx_native');
 
-      const repairArtifact = JSON.parse(readFileSync(path.join(
-        workspaceRoot,
-        'topics',
-        'topic-a',
-        'deliverables',
-        'deck-native',
-        'artifacts',
-        'native_ppt_repair_bundle.json',
-      ), 'utf-8'));
+      const repairArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-native', 'repair_pptx_native');
       assert.equal(repairArtifact.native_ppt_repair_log?.consumed_review_stage, 'screenshot_review');
       assert.equal(repairArtifact.native_ppt_bundle?.source_visual_route, 'repair_pptx_native');
     } finally {
@@ -754,15 +752,7 @@ test('runDeliverableRoute escalates repeated ppt fix_html review blocks through 
         [true, true],
       );
 
-      const reviewArtifact = JSON.parse(readFileSync(path.join(
-        workspaceRoot,
-        'topics',
-        'topic-a',
-        'deliverables',
-        'deck-a',
-        'artifacts',
-        'quality_gate.json',
-      ), 'utf-8'));
+      const reviewArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'screenshot_review');
       assert.equal(reviewArtifact.execution_proof.escalation_status, 'escalated_still_requires_fix_html');
     } finally {
       restoreVariants();

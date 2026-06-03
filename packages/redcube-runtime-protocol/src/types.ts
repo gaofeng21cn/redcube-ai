@@ -98,6 +98,8 @@ export interface TopicPaths {
 }
 
 export interface DeliverablePaths {
+  programId: string;
+  topicId: string;
   deliverableId: string;
   deliverableDir: string;
   deliverableFile: string;

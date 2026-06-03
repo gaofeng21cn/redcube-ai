@@ -12,6 +12,7 @@ import type {
 
 import {
   readJsonRecord,
+  routeResultArtifactFile,
   safeText,
 } from './shared.js';
 
@@ -70,6 +71,7 @@ export function buildRouteRunDomainEntryResponse({
     dependency_route_runs: dependencyRouteRuns,
     continuation_route_runs: continuationRouteRuns,
     ...(executionProof ? { execution_proof: executionProof } : {}),
+    artifactFile: routeResultArtifactFile(result) || undefined,
     artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),
   };

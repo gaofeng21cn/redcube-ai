@@ -19,7 +19,11 @@ import { readCodexCliContract } from '@redcube/codex-cli-client';
 import { resolveExecutorRouting } from '@redcube/redcube-config';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { runCandidateRaceRoute } from './candidate-racing.js';
-import { executeDeliverableRouteLocally, validateDeliverableRouteInput } from './deliverable-route-local.js';
+import {
+  executeDeliverableRouteLocally,
+  refreshStageFolderRouteArtifact,
+  validateDeliverableRouteInput,
+} from './deliverable-route-local.js';
 import { resolveExecutorAdapter } from './executors.js';
 
 function requireSafeSegment(name, value) {
@@ -564,7 +568,17 @@ function buildRoutePromptTelemetry(routeResult = {}) {
   };
 }
 
-function materializeRouteResult({ raced, executor }) {
+function materializeRouteResult({
+  raced,
+  executor,
+  workspaceRoot,
+  overlay,
+  topicId,
+  deliverableId,
+  safeRoute,
+  runId,
+  crossProviderAttemptIndex,
+}) {
   const routeResult = raced.artifact;
   routeResult.artifact = {
     ...(routeResult.artifact || {}),
@@ -581,6 +595,24 @@ function materializeRouteResult({ raced, executor }) {
     ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
   ]));
   patchArtifactExecutionModel(routeResult.artifact_file, executor);
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const patchedArtifact = JSON.parse(readFileSync(routeResult.artifact_file, 'utf-8'));
+  const stageFolderRefs = refreshStageFolderRouteArtifact({
+    deliverablePaths,
+    overlay,
+    topicId,
+    deliverableId,
+    route: safeRoute,
+    attemptId: runId,
+    artifactFile: routeResult.artifact_file,
+    artifact: patchedArtifact,
+    oplRouteAttemptIndex: crossProviderAttemptIndex,
+  });
+  routeResult.artifact = patchedArtifact;
+  routeResult.artifact_refs = Array.from(new Set([
+    ...(Array.isArray(routeResult.artifact_refs) ? routeResult.artifact_refs : []),
+    ...(Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : []),
+  ]));
   return routeResult;
 }
 
@@ -598,6 +630,7 @@ async function executeRouteCandidateRace({
   candidateCount,
   executor,
   crossProviderAttemptIndex,
+  runId,
 }) {
   const routeCandidateCount = candidateCountForRoute({ route: safeRoute, candidateCount });
   const raced = await runCandidateRaceRoute({
@@ -619,10 +652,21 @@ async function executeRouteCandidateRace({
       mode,
       baselineDeliverableId,
       oplRouteAttemptIndex: crossProviderAttemptIndex,
+      runId,
     }),
     scoreCandidate: (candidate) => Number(candidate?.artifact?.visual_direction?.rhythm_curve?.length || 1),
   });
-  return materializeRouteResult({ raced, executor });
+  return materializeRouteResult({
+    raced,
+    executor,
+    workspaceRoot,
+    overlay,
+    topicId,
+    deliverableId,
+    safeRoute,
+    runId,
+    crossProviderAttemptIndex,
+  });
 }
 
 function buildCompletedRouteResponse({
@@ -825,6 +869,7 @@ export async function runDeliverableRoute(request) {
       candidateCount,
       executor,
       crossProviderAttemptIndex: normalizedRouteAttempt.index,
+      runId: run.run_id,
     });
     return buildCompletedRouteResponse({
       workspaceRoot,

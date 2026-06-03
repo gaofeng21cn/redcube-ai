@@ -2,7 +2,12 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
-import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary,
+  readStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
 import { buildGovernanceSurface } from './governance-surface.js';
 
@@ -52,14 +57,22 @@ function loadReviewArtifact(request, contract) {
     request.topicId,
     request.deliverableId,
   );
-  const reviewFile = path.join(
-    deliverablePaths.artifactsDir,
-    String(contract?.review_surface?.artifact_file || 'quality_gate.json').trim(),
-  );
-  if (!existsSync(reviewFile)) {
-    return null;
-  }
-  return JSON.parse(readFileSync(reviewFile, 'utf-8'));
+  const reviewArtifactName = String(contract?.review_surface?.artifact_file || 'quality_gate.json').trim();
+  const stages = [
+    ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract?.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ];
+  const reviewStage = stages.find((stage) => String(stage?.output_artifact || '').trim() === reviewArtifactName)
+    || stages.find((stage) => String(stage?.stage_id || '').trim() === 'screenshot_review');
+  const reviewStageId = String(reviewStage?.stage_id || 'screenshot_review').trim();
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: reviewStageId,
+    canonicalStageId: canonicalStageForRoute(reviewStageId),
+  });
+  return loaded?.status === 'success' || loaded?.status === 'blocked'
+    ? loaded.artifact
+    : null;
 }
 
 function toMissingIssue(check) {

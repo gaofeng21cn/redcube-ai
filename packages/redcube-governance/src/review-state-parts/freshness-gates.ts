@@ -1,6 +1,11 @@
 // @ts-nocheck
 import path from 'node:path';
 import { existsSync, statSync } from 'node:fs';
+import {
+  canonicalStageForRoute,
+  stageFolderArtifactPath,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 import {
   normalizeList,
@@ -13,7 +18,18 @@ export function stageArtifactPath(contract, deliverablePaths, stageId) {
     ? contract.stage_sequence.stages.find((item) => item?.stage_id === stageId)
     : null;
   const artifactName = safeText(stage?.output_artifact, `${stageId}.json`);
-  return path.join(deliverablePaths.artifactsDir, artifactName);
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  return stageFolderArtifactPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: safeText(deliverablePaths.programId),
+    topicId: safeText(deliverablePaths.topicId),
+    deliverableId: deliverablePaths.deliverableId,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    outputName: artifactName,
+  });
 }
 
 export function stageSequence(contract) {

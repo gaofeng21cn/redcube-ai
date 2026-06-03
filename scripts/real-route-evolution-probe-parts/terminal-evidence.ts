@@ -1,6 +1,12 @@
 // @ts-nocheck
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -22,6 +28,17 @@ function readJsonIfExists(file) {
   } catch {
     return null;
   }
+}
+
+function readStageArtifact({ workspaceRoot, topicId, deliverableId, routeStageId }) {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  return loaded?.status === 'success' ? loaded : null;
 }
 
 function artifactRefsFrom(...values) {
@@ -50,22 +67,18 @@ export function collectNativeTerminalEvidence({
   reportFile,
   providerMode,
 }) {
-  const deliverableRoot = path.join(
-    workspaceRoot,
-    topicId ? 'topics' : '',
-    topicId || '',
-    topicId ? 'deliverables' : '',
-    deliverableId,
-  );
-  const artifactsDir = path.join(deliverableRoot, 'artifacts');
-  const nativeArtifactFile = path.join(artifactsDir, 'native_ppt_bundle.json');
-  const directorReviewFile = path.join(artifactsDir, 'director_review.json');
-  const screenshotReviewFile = path.join(artifactsDir, 'quality_gate.json');
-  const exportReceiptFile = path.join(artifactsDir, 'publish_bundle.json');
-  const nativeArtifact = readJsonIfExists(nativeArtifactFile);
-  const directorReview = readJsonIfExists(directorReviewFile);
-  const screenshotReview = readJsonIfExists(screenshotReviewFile);
-  const exportReceipt = readJsonIfExists(exportReceiptFile);
+  const nativeArtifactStage = readStageArtifact({ workspaceRoot, topicId, deliverableId, routeStageId: 'author_pptx_native' });
+  const directorReviewStage = readStageArtifact({ workspaceRoot, topicId, deliverableId, routeStageId: 'visual_director_review' });
+  const screenshotReviewStage = readStageArtifact({ workspaceRoot, topicId, deliverableId, routeStageId: 'screenshot_review' });
+  const exportReceiptStage = readStageArtifact({ workspaceRoot, topicId, deliverableId, routeStageId: 'export_pptx' });
+  const nativeArtifactFile = nativeArtifactStage?.output_file || '';
+  const directorReviewFile = directorReviewStage?.output_file || '';
+  const screenshotReviewFile = screenshotReviewStage?.output_file || '';
+  const exportReceiptFile = exportReceiptStage?.output_file || '';
+  const nativeArtifact = nativeArtifactStage?.artifact || readJsonIfExists(nativeArtifactFile);
+  const directorReview = directorReviewStage?.artifact || readJsonIfExists(directorReviewFile);
+  const screenshotReview = screenshotReviewStage?.artifact || readJsonIfExists(screenshotReviewFile);
+  const exportReceipt = exportReceiptStage?.artifact || readJsonIfExists(exportReceiptFile);
   const nativeBundle = nativeArtifact?.native_ppt_bundle || {};
   const exportBundle = exportReceipt?.export_bundle || {};
   const reviewScreenshots = safeArray(screenshotReview?.slide_reviews)

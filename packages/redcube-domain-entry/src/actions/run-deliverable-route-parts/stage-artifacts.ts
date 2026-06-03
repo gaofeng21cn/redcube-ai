@@ -1,7 +1,13 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageFolderArtifactPath,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 import type { JsonObject } from '@redcube/overlay-core';
 import type { RunDeliverableRouteRequest } from '../../types.js';
@@ -98,15 +104,34 @@ export function stageArtifactFileForRequest(request: RunDeliverableRouteRequest,
   const stage = stages.find((item) => safeText((item as { stage_id?: unknown })?.stage_id) === stageId) as {
     output_artifact?: unknown;
   } | undefined;
-  return path.join(
-    deliverablePaths.artifactsDir,
-    safeText(stage?.output_artifact) || `${stageId}.json`,
-  );
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  return stageFolderArtifactPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: deliverablePaths.programId,
+    topicId: request.topicId,
+    deliverableId: request.deliverableId,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    outputName: safeText(stage?.output_artifact) || `${stageId}.json`,
+  });
 }
 
 export function readStageArtifactForRequest(request: RunDeliverableRouteRequest, stageId: string): JsonObject | null {
-  const artifactFile = stageArtifactFileForRequest(request, stageId);
-  return existsSync(artifactFile) ? readJsonRecord(artifactFile) : null;
+  const deliverablePaths = getDeliverablePaths(
+    request.workspaceRoot,
+    request.topicId,
+    request.deliverableId,
+  );
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: stageId,
+    canonicalStageId: canonicalStageForRoute(stageId),
+  });
+  return loaded?.status === 'success' || loaded?.status === 'blocked'
+    ? loaded.artifact as JsonObject
+    : null;
 }
 
 export function nextLinearStageId(contract: JsonObject, currentRoute: string): string | null {

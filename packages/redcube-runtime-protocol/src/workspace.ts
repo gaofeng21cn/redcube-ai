@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import type { SpawnSyncReturns } from 'node:child_process';
@@ -72,6 +73,12 @@ function requireSegment(name: string, value: unknown, options: SegmentOptions = 
   }
 
   return text;
+}
+
+function programIdForWorkspaceRoot(workspaceRoot: string): string {
+  const root = path.resolve(requireSegment('workspaceRoot', workspaceRoot));
+  const hash = createHash('sha256').update(root).digest('hex').slice(0, 16);
+  return `workspace-${hash}`;
 }
 
 export function resolveWorkspaceContract({ workspaceRoot }: { workspaceRoot: string }): WorkspaceContract {
@@ -186,6 +193,8 @@ export function getDeliverablePaths(
   });
   const deliverableDir = path.join(topicPaths.deliverablesDir, deliverable);
   return {
+    programId: programIdForWorkspaceRoot(workspaceRoot),
+    topicId: topicPaths.topicId,
     deliverableId: deliverable,
     deliverableDir,
     deliverableFile: path.join(deliverableDir, 'deliverable.json'),

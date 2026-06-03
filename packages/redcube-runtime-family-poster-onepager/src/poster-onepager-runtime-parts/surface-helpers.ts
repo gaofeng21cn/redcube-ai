@@ -2,7 +2,13 @@
 import path from 'node:path';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  readStageFolderArtifact,
+  runRedCubePythonHelper,
+  stageFolderArtifactPath,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 export function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -74,15 +80,29 @@ export function readJson(file) {
 
 export function stageArtifactPath(contract, deliverablePaths, stageId) {
   const stage = safeArray(contract?.stage_sequence?.stages).find((item) => item?.stage_id === stageId);
-  return path.join(
-    deliverablePaths.artifactsDir,
-    safeText(stage?.output_artifact, `${stageId}.json`),
-  );
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  return stageFolderArtifactPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: safeText(deliverablePaths.programId),
+    topicId: safeText(deliverablePaths.topicId),
+    deliverableId: deliverablePaths.deliverableId,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    outputName: safeText(stage?.output_artifact, `${stageId}.json`),
+  });
 }
 
 export function readStageArtifact(contract, deliverablePaths, stageId) {
-  const file = stageArtifactPath(contract, deliverablePaths, stageId);
-  return existsSync(file) ? readJson(file) : null;
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: stageId,
+    canonicalStageId: canonicalStageForRoute(stageId),
+  });
+  return loaded?.status === 'success' || loaded?.status === 'blocked'
+    ? loaded.artifact
+    : null;
 }
 
 export function normalizeInlineText(value, maxLength = 220) {

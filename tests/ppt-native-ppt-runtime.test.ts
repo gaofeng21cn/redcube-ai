@@ -13,9 +13,11 @@ import {
   nativeEngineContract,
   pointIndexTextFailures,
   readJson,
+  readRouteStageArtifact,
   runNativePlanningChain,
   textCapacityFailures,
   withMockNativePptRuntime,
+  writeRouteStageArtifact,
   writeJson,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
 import { runDeliverableRoute } from './product-domain-action-test-api.ts';
@@ -184,6 +186,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(authored.native_ppt_bundle?.officecli_materializer_policy?.current_pptx_writer, 'officecli_pptx_materializer');
 
     let screenshotReviewArtifact = null;
+    let exportResult = null;
     for (const route of ['visual_director_review', 'screenshot_review', 'export_pptx']) {
       const result = await runDeliverableRoute({
         workspaceRoot,
@@ -195,6 +198,9 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
       assert.equal(result.ok, true, route);
       if (route === 'screenshot_review') {
         screenshotReviewArtifact = readJson(result.artifactFile);
+      }
+      if (route === 'export_pptx') {
+        exportResult = result;
       }
     }
     const nativeMechanicalSlide = screenshotReviewArtifact.mechanical_review.slide_reviews[0];
@@ -223,16 +229,7 @@ test('native PPT lane authors editable PPTX and still passes review/export gates
     assert.equal(Array.isArray(nativeMechanicalSlide.metrics.operator_language_fragments), true);
     assert.equal(nativeMechanicalSlide.metrics.title_safe_zone_clearance_ok, true);
 
-    const exportArtifactFile = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-native',
-      'artifacts',
-      'publish_bundle.json',
-    );
-    const exported = readJson(exportArtifactFile);
+    const exported = readJson(exportResult.artifactFile);
     assert.equal(exported.export_bundle?.source_visual_route, 'author_pptx_native');
     assert.equal(exported.export_bundle?.source_pptx, authored.native_ppt_bundle.pptx_file);
     assert.equal(exported.export_bundle?.native_ppt_shape_manifest, authored.native_ppt_bundle.shape_manifest_file);
@@ -474,15 +471,7 @@ test('native PPT screenshot review blocks missing render proof and missing scree
       route: 'screenshot_review',
     });
     assert.equal(screenshotResult.ok, false);
-    const screenshotReview = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-missing-proof',
-      'artifacts',
-      'quality_gate.json',
-    ));
+    const screenshotReview = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-missing-proof', 'screenshot_review');
     assert.equal(screenshotReview.status, 'block');
     assert.equal(screenshotReview.checks.overflow_free, false);
     assert.equal(screenshotReview.checks.block_content_fit_ok, false);
@@ -565,15 +554,7 @@ test('native PPT screenshot review blocks from shape-manifest quality metrics in
       route: 'screenshot_review',
     });
     assert.equal(screenshotResult.ok, false);
-    const screenshotReview = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-quality',
-      'artifacts',
-      'quality_gate.json',
-    ));
+    const screenshotReview = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-quality', 'screenshot_review');
     assert.equal(screenshotReview.status, 'block');
     assert.equal(screenshotReview.checks.edge_clearance_ok, false);
     assert.equal(screenshotReview.checks.block_content_fit_ok, false);
@@ -679,15 +660,7 @@ test('native PPT visual director preflight blocks incomplete slots, unreadable l
       route: 'visual_director_review',
     });
     assert.equal(directorResult.ok, false);
-    const directorArtifact = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-layout-gates',
-      'artifacts',
-      'director_review.json',
-    ));
+    const directorArtifact = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-layout-gates', 'visual_director_review');
     assert.equal(directorArtifact.status, 'block');
     assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
     assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
@@ -758,15 +731,7 @@ test('native PPT visual director review blocks repeated native layout variants b
       route: 'visual_director_review',
     });
     assert.equal(directorResult.ok, false);
-    const directorArtifact = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-layout-repetition',
-      'artifacts',
-      'director_review.json',
-    ));
+    const directorArtifact = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-layout-repetition', 'visual_director_review');
     assert.equal(directorArtifact.status, 'block');
     assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
     assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
@@ -834,15 +799,7 @@ test('native PPT visual director review blocks repeated composition signatures e
       route: 'visual_director_review',
     });
     assert.equal(directorResult.ok, false);
-    const directorArtifact = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-composition-repetition',
-      'artifacts',
-      'director_review.json',
-    ));
+    const directorArtifact = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-composition-repetition', 'visual_director_review');
     assert.equal(directorArtifact.status, 'block');
     assert.equal(directorArtifact.visual_director_review.anti_template_ok, false);
     assert.equal(directorArtifact.review_state_patch.rerun_from_stage, 'repair_pptx_native');
@@ -869,9 +826,7 @@ test('native PPT visual director review can clear prior full-deck block after ta
     });
     assert.equal(authorResult.ok, true);
 
-    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', deliverableId);
-    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
-    writeJson(directorReviewFile, {
+    writeRouteStageArtifact(workspaceRoot, 'topic-a', deliverableId, 'visual_director_review', {
       route: 'visual_director_review',
       status: 'block',
       visual_director_review: {

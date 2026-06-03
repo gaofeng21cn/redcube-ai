@@ -8,6 +8,12 @@ import {
   statSync,
   writeFileSync,
 } from 'node:fs';
+import {
+  canonicalStageForRoute,
+  readStageFolderArtifact,
+  stageFolderArtifactPath,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 export const MIN_REVIEW_QA_BLOCKS = 2;
 export const MIN_REVIEW_PRIMARY_POINTS = 1;
@@ -567,12 +573,29 @@ export function stageArtifactPath(contract, deliverablePaths, stageId) {
     ...safeArray(contract?.stage_sequence?.stages),
     ...safeArray(contract?.stage_sequence?.alternate_stages),
   ].find((item) => item?.stage_id === stageId);
-  return path.join(deliverablePaths.artifactsDir, safeText(stage?.output_artifact, `${stageId}.json`));
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  return stageFolderArtifactPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: safeText(deliverablePaths.programId),
+    topicId: safeText(deliverablePaths.topicId),
+    deliverableId: deliverablePaths.deliverableId,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    outputName: safeText(stage?.output_artifact, `${stageId}.json`),
+  });
 }
 
 export function readStageArtifact(contract, deliverablePaths, stageId) {
-  const file = stageArtifactPath(contract, deliverablePaths, stageId);
-  return existsSync(file) ? readJson(file) : null;
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: stageId,
+    canonicalStageId: canonicalStageForRoute(stageId),
+  });
+  return loaded?.status === 'success' || loaded?.status === 'blocked'
+    ? loaded.artifact
+    : null;
 }
 
 export function safeFileMtimeMs(file) {

@@ -5,7 +5,13 @@ import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 
 import {
   createDeliverable,
@@ -27,6 +33,45 @@ function readJson(file) {
 
 function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function readRouteStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
+  return loaded.artifact;
+}
+
+function writeRouteStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId, artifact) {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const artifactFile = path.join(deliverablePaths.artifactsDir, `${routeStageId}.manual-test-artifact.json`);
+  writeJson(artifactFile, artifact);
+  writeStageFolderArtifact({
+    deliverablePaths,
+    programId: deliverablePaths.programId,
+    topicId,
+    deliverableId,
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: `manual-${routeStageId}`,
+    artifactFile,
+    outputName: `${routeStageId}.json`,
+    ownerReceiptRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? []
+      : [`rca-owner-receipt:test:${routeStageId}:${deliverableId}`],
+    typedBlockerRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? [`rca-typed-blocker:test:${routeStageId}:${deliverableId}`]
+      : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || [],
+  });
+  return artifactFile;
 }
 
 function patchDeliverableConstraints({
@@ -212,8 +257,10 @@ export {
   patchDeliverableConstraints,
   pointIndexTextFailures,
   readJson,
+  readRouteStageArtifact,
   runNativePlanningChain,
   textCapacityFailures,
   withMockNativePptRuntime,
+  writeRouteStageArtifact,
   writeJson,
 };

@@ -65,6 +65,7 @@ export function createPptDeckStageParts(deps) {
     resolvePromptPackAsset,
     safeArray,
     safeFileMtimeMs,
+    stageArtifactMtimeMs,
     safeText,
     screenshotReviewSlideBatchOutputContract,
     screenshotReviewSummaryOutputContract,
@@ -178,20 +179,20 @@ export function createPptDeckStageParts(deps) {
       }
     }
     const currentHtmlStage = currentHtmlStageId(contract, deliverablePaths);
-    const currentHtmlMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, currentHtmlStage));
+    const currentHtmlMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, currentHtmlStage);
     const currentVisualStage = currentVisualStageId(contract, deliverablePaths);
     const currentVisualMtimeMs = visualArtifactMtimeMs(contract, deliverablePaths);
     if (route === PAGE_FIX_ROUTE) {
-      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       if (screenshotReviewMtimeMs < currentHtmlMtimeMs) {
         throw new Error('Route fix_html requires screenshot_review based on the current HTML; rerun screenshot_review first');
       }
     }
     if (route === 'repair_pptx_native') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-      const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
-      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
-      const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_pptx_native'));
+      const directorReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'visual_director_review');
+      const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
+      const authorMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'author_pptx_native');
       const hasFreshScreenshotRepairRequest = screenshotReviewMtimeMs >= authorMtimeMs
         && reviewArtifactRequestsRoute(readStageArtifact(contract, deliverablePaths, 'screenshot_review'), 'repair_pptx_native');
       const hasFreshDirectorRepairRequest = directorReviewMtimeMs >= authorMtimeMs
@@ -202,11 +203,11 @@ export function createPptDeckStageParts(deps) {
     }
     if (route === 'repair_image_pages') {
       const directorReviewArtifact = readStageArtifact(contract, deliverablePaths, 'visual_director_review');
-      const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
-      const repairMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'repair_image_pages'));
-      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const directorReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'visual_director_review');
+      const repairMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'repair_image_pages');
+      const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       const screenshotReviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
-      const authorMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'author_image_pages'));
+      const authorMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'author_image_pages');
       const currentImageMtimeMs = Math.max(authorMtimeMs, repairMtimeMs);
       const hasFreshScreenshotRepairRequest = screenshotReviewMtimeMs >= currentImageMtimeMs
         && reviewArtifactRequestsRoute(screenshotReviewArtifact, 'repair_image_pages');
@@ -227,7 +228,7 @@ export function createPptDeckStageParts(deps) {
       if (!directorReviewArtifact || (directorReviewArtifact.status !== 'pass' && !screenshotFeedbackOnlyRoute)) {
         throw new Error('Route screenshot_review requires visual_director_review to pass before audit');
       }
-      const directorReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'visual_director_review'));
+      const directorReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'visual_director_review');
       if (directorReviewMtimeMs < currentVisualMtimeMs) {
         throw new Error('Route screenshot_review requires visual_director_review to be rerun after the latest visual changes');
       }
@@ -237,7 +238,7 @@ export function createPptDeckStageParts(deps) {
       if (!reviewArtifact || reviewArtifact.status !== 'pass') {
         throw new Error('Route export_pptx requires screenshot_review to pass before export');
       }
-      const screenshotReviewMtimeMs = safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
+      const screenshotReviewMtimeMs = stageArtifactMtimeMs(contract, deliverablePaths, 'screenshot_review');
       if (screenshotReviewMtimeMs < currentVisualMtimeMs) {
         throw new Error('Route export_pptx requires screenshot_review to be rerun after the latest visual changes');
       }

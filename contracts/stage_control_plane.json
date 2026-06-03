@@ -34,19 +34,25 @@
       "ref_kind": "json_pointer",
       "ref": "/artifact_inventory",
       "role": "artifact_authority_projection"
+    },
+    {
+      "ref_kind": "contract",
+      "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+      "role": "stage_folder_physical_artifact_truth"
     }
   ],
   "freshness": {
     "status": "current",
     "checked_at": "manifest_build",
-    "source_ref_count": 6,
+    "source_ref_count": 7,
     "stale_if_missing": [
       "/family_action_catalog",
       "/deliverable_facade/family_route_policy",
       "/progress_projection",
       "/review_state",
       "/publication_projection",
-      "/artifact_inventory"
+      "/artifact_inventory",
+      "contracts/artifact_locator_contract.json#/primary_artifact_truth"
     ]
   },
   "stage_action_parity": {
@@ -72,6 +78,32 @@
     "default_ppt_route_changed": false,
     "repo_local_stage_runner_retired": true,
     "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
+  },
+  "stage_artifact_runtime": {
+    "surface_kind": "opl_stage_folder_contract_consumption",
+    "contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+    "physical_source_of_truth": "$OPL_STATE_DIR/runtime-state/domains/redcube_ai/deliverables/<program_id>/<topic_id>/<deliverable_id>/stages/<nn-stage>/attempts/<attempt_id>/",
+    "canonical_stages": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation",
+      "review_and_revision",
+      "package_and_handoff"
+    ],
+    "completion_rule": "required outputs plus valid manifest plus RCA owner receipt",
+    "blocked_rule": "RCA typed blocker plus evidence",
+    "orphan_rule": "output files without valid manifest/receipt/evidence are not completed stages",
+    "derived_projection_policy": "status, stage_progress_log, gallery, and handoff are derived from Stage Folder contents; they are not first truth",
+    "authority_boundary": {
+      "owner": "redcube_ai",
+      "opl_role": "stage_folder_contract_provider_index_rebuild_status_explain",
+      "opl_can_issue_owner_receipt": false,
+      "opl_can_write_visual_truth": false,
+      "opl_can_write_review_export_verdict": false,
+      "opl_can_write_domain_artifact_body": false,
+      "rca_owns_artifact_authority": true
+    }
   },
   "stages": [
     {

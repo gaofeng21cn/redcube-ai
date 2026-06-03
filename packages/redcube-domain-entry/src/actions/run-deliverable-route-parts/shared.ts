@@ -84,9 +84,10 @@ export function routeResultErrorMessage(result: RuntimeRouteResult): string {
 }
 
 export function routeResultArtifactFile(result: RuntimeRouteResult): string | null {
+  const snakeCaseArtifactFile = (result as { artifact_file?: unknown }).artifact_file;
   const error = result.error as { artifact_file?: unknown } | undefined;
   const run = result.run as { error?: { artifact_file?: unknown } } | undefined;
-  return safeText(result.artifactFile || error?.artifact_file || run?.error?.artifact_file) || null;
+  return safeText(result.artifactFile || snakeCaseArtifactFile || error?.artifact_file || run?.error?.artifact_file) || null;
 }
 
 export function summarizeDependencyRoute(route: string, result: RuntimeRouteResult): DependencyRouteRun {

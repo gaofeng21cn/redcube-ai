@@ -4,6 +4,13 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 
 import {
   createDeliverable,
@@ -24,6 +31,45 @@ function readJson(file) {
 
 function writeJson(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+function readRouteStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
+  return loaded.artifact;
+}
+
+function writeRouteStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId, artifact) {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const artifactFile = path.join(deliverablePaths.artifactsDir, `${routeStageId}.manual-test-artifact.json`);
+  writeJson(artifactFile, artifact);
+  writeStageFolderArtifact({
+    deliverablePaths,
+    programId: deliverablePaths.programId,
+    topicId,
+    deliverableId,
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: `manual-${routeStageId}`,
+    artifactFile,
+    outputName: `${routeStageId}.json`,
+    ownerReceiptRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? []
+      : [`rca-owner-receipt:test:${routeStageId}:${deliverableId}`],
+    typedBlockerRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? [`rca-typed-blocker:test:${routeStageId}:${deliverableId}`]
+      : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || [],
+  });
+  return artifactFile;
 }
 
 async function runNativePlanningChain({ workspaceRoot, deliverableId = 'deck-native' }) {
@@ -86,9 +132,7 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
       assert.equal(result.ok, true, route);
     }
 
-    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-repair');
-    const screenshotReviewFile = path.join(deliverableDir, 'artifacts', 'quality_gate.json');
-    const priorReview = readJson(screenshotReviewFile);
+    const priorReview = readRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-repair', 'screenshot_review');
     const blockedReview = {
       ...priorReview,
       status: 'block',
@@ -134,7 +178,7 @@ test('native PPT repair consumes screenshot feedback and targets blocked slides'
         },
       },
     };
-    writeJson(screenshotReviewFile, blockedReview);
+    writeRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-repair', 'screenshot_review', blockedReview);
 
     const repairResult = await runDeliverableRoute({
       workspaceRoot,
@@ -236,9 +280,7 @@ test('native PPT repair can consume visual director native preflight feedback be
     });
     assert.equal(authorResult.ok, true);
 
-    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-director-repair');
-    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
-    writeJson(directorReviewFile, {
+    writeRouteStageArtifact(workspaceRoot, 'topic-a', 'deck-director-repair', 'visual_director_review', {
       route: 'visual_director_review',
       status: 'block',
       visual_director_review: {
@@ -301,9 +343,7 @@ test('native PPT repair inherits prior AI design spec lock when targeted repair 
     const authoredPlan = readJson(authored.native_ppt_bundle.editable_shape_plan_file);
     assert.equal(authoredPlan.design_spec_lock?.owner, 'llm_agent');
 
-    const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', deliverableId);
-    const directorReviewFile = path.join(deliverableDir, 'artifacts', 'director_review.json');
-    writeJson(directorReviewFile, {
+    writeRouteStageArtifact(workspaceRoot, 'topic-a', deliverableId, 'visual_director_review', {
       route: 'visual_director_review',
       status: 'block',
       visual_director_review: {

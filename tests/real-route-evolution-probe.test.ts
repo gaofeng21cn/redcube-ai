@@ -6,6 +6,13 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+  canonicalStageForRoute,
+} from '@redcube/runtime-protocol';
+
+import {
   collectNativeRouteAttemptEvidenceForTest,
   materializeRouteTimeoutBlockerArtifactForTest,
   runRealRouteEvolutionProbe,
@@ -20,6 +27,19 @@ function readJson(file) {
 function writeJson(file, value) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
+}
+
+function readStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  assert.equal(loaded?.status, 'success', routeStageId);
+  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
+  return loaded.artifact;
 }
 
 function tempDir(prefix) {
@@ -269,16 +289,24 @@ test('real route evolution probe mock native sample honors hard one-slide planni
   const lane = report.lanes.find((item) => item.lane === 'native');
   assert.equal(lane.status, 'completed');
 
-  const deliverableRoot = path.join(
+  const outline = readStageArtifact(
     workspaceRoot,
-    'topics',
     'topic-real-route-evolution',
-    'deliverables',
     'deck-native',
+    'detailed_outline',
   );
-  const outline = readJson(path.join(deliverableRoot, 'artifacts', 'detailed_outline.json'));
-  const blueprint = readJson(path.join(deliverableRoot, 'artifacts', 'slide_blueprint.json'));
-  const nativeBundle = readJson(path.join(deliverableRoot, 'artifacts', 'native_ppt_bundle.json'));
+  const blueprint = readStageArtifact(
+    workspaceRoot,
+    'topic-real-route-evolution',
+    'deck-native',
+    'slide_blueprint',
+  );
+  const nativeBundle = readStageArtifact(
+    workspaceRoot,
+    'topic-real-route-evolution',
+    'deck-native',
+    'author_pptx_native',
+  );
 
   assert.equal(outline.detailed_outline.slides.length, 1);
   assert.equal(blueprint.slide_blueprint.slides.length, 1);

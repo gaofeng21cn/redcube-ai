@@ -5,6 +5,16 @@ Purpose: `active_decision_log`
 State: `current_policy_with_historical_context`
 Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+## 2026-06-03
+
+### 决策：RCA artifact completion 改由 OPL Stage Folder 物理合同推导
+
+- RCA route handler 写入 OPL Stage Folder Contract：`$OPL_STATE_DIR/runtime-state/domains/redcube_ai/deliverables/<program_id>/<topic_id>/<deliverable_id>/stages/<nn-stage>/attempts/<attempt_id>/`。每个 attempt 必须有 `attempt.json`、`manifest.json`、`outputs/`、`evidence/`、`receipts/` 和 current/latest pointer。
+- `success` 只能由 required outputs、valid manifest、RCA owner receipt refs 和 receipt file 共同成立；`blocked` 只能由 RCA typed blocker refs 和 evidence file 成立。只有 output 文件、没有 manifest/receipt/evidence 的 attempt 是 orphan，不完成 stage。
+- RCA 从 workspace root 派生 `program_id`，再与 `topic_id`、`deliverable_id` 构成 Stage Folder identity，避免不同 workspace 中同名 topic/deliverable 在共享 OPL runtime-state 下碰撞。
+- OPL 负责 Stage Folder locator、index、rebuild、status/explain、orphan/broken/stale projection、gallery/handoff shell 和 App/operator read-model；旧 status/read-model、`stage_progress_log`、gallery 和 handoff 都是从物理 Stage Folder 重建的派生投影。
+- RCA 继续持有 visual truth、review/export verdict、artifact authority、typed blocker 和 owner receipt。OPL 不能签发 RCA owner receipt，不能写 visual truth，不能写 review/export verdict，不能把 provider completion 或物理 folder 存在升级成 visual-ready、exportable、handoffable 或 production-ready claim。
+
 ## 2026-05-30
 
 ### 决策：RCA session continuation 采用 OPL Progress-First currentness 与 delta 分账

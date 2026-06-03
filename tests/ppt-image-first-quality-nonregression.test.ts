@@ -6,7 +6,12 @@ import path from 'node:path';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildDeckRecord, hydratePptDeckContract } from '@redcube/overlay-ppt';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
 
 const CONTRACT_PATH = 'contracts/runtime-program/ppt-image-first-quality-nonregression.json';
@@ -74,6 +79,29 @@ function stageArtifactFile(paths, contract, stageId) {
   return path.join(paths.artifactsDir, stage?.output_artifact || `${stageId}.json`);
 }
 
+function writeStageArtifact(paths, contract, stageId, artifact, status = 'success') {
+  const stage = [
+    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ].find((item) => item.stage_id === stageId);
+  const artifactFile = stageArtifactFile(paths, contract, stageId);
+  writeJson(artifactFile, artifact);
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  writeStageFolderArtifact({
+    deliverablePaths: paths,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: `seed-${stageId}`,
+    artifactFile,
+    outputName: stage?.output_artifact || `${stageId}.json`,
+    status,
+    ownerReceiptRefs: status === 'success' ? [`rca-owner-receipt:test-seed:${stageId}`] : [],
+    typedBlockerRefs: status === 'blocked' ? [`rca-typed-blocker:test-seed:${stageId}`] : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || artifact?.issues || [],
+  });
+}
+
 function seedWorkspace() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-image-quality-'));
   const topicId = 'topic-quality';
@@ -95,7 +123,7 @@ function seedWorkspace() {
   const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   writeJson(paths.deliverableFile, { ...record, hydrated_contract_ref: 'contracts/hydrated-deliverable.json' });
   writeJson(path.join(paths.deliverableDir, 'contracts/hydrated-deliverable.json'), contract);
-  writeJson(stageArtifactFile(paths, contract, 'slide_blueprint'), {
+  writeStageArtifact(paths, contract, 'slide_blueprint', {
     route: 'slide_blueprint',
     slide_blueprint: {
       slides: [
@@ -114,7 +142,7 @@ function seedWorkspace() {
       ],
     },
   });
-  writeJson(stageArtifactFile(paths, contract, 'visual_direction'), {
+  writeStageArtifact(paths, contract, 'visual_direction', {
     route: 'visual_direction',
     visual_direction: {
       palette: ['ink', 'red', 'white'],
@@ -234,7 +262,7 @@ test('ppt image-first runtime emits refs-only quality non-regression read models
     route: 'author_image_pages',
     contract,
   });
-  writeJson(stageArtifactFile(paths, contract, 'author_image_pages'), authored);
+  writeStageArtifact(paths, contract, 'author_image_pages', authored);
 
   assert.equal(authored.quality_non_regression_read_model.contract_ref, CONTRACT_PATH);
   assert.equal(authored.quality_non_regression_read_model.refs_only, true);
@@ -245,7 +273,7 @@ test('ppt image-first runtime emits refs-only quality non-regression read models
   assert.deepEqual(authored.quality_non_regression_read_model.repair_scope.freshly_rendered_slide_ids, ['S01', 'S02']);
   assert.equal(authored.quality_non_regression_read_model.export_pptx_policy.editable_shapes_claim_allowed, false);
 
-  writeJson(stageArtifactFile(paths, contract, 'screenshot_review'), {
+  writeStageArtifact(paths, contract, 'screenshot_review', {
     route: 'screenshot_review',
     status: 'block',
     blocked_slide_ids: ['S02'],
@@ -279,7 +307,7 @@ test('ppt image-first runtime emits refs-only quality non-regression read models
         },
       },
     ],
-  });
+  }, 'blocked');
 
   const repaired = await runPptDeckRoute({
     workspaceRoot,

@@ -1,7 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 
-import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getSourceArtifactPaths,
+  readStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -16,13 +19,6 @@ function safeArray(value: unknown): unknown[] {
 
 function readJson(file: string): JsonRecord {
   return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function readJsonIfExists(file: string): JsonRecord | null {
-  if (!existsSync(file)) {
-    return null;
-  }
-  return readJson(file);
 }
 
 export function loadSharedSourceTruth(workspaceRoot: string, topicId: string): JsonRecord | null {
@@ -75,22 +71,6 @@ function isOperatorContextMaterial(material: unknown): boolean {
   return safeText(item?.source_role) === 'operator_context'
     || kind === 'brief'
     || kind === 'keywords';
-}
-
-function routeStageDefinitions(contract: JsonRecord): JsonRecord[] {
-  return [
-    ...safeArray((contract.stage_sequence as JsonRecord | undefined)?.stages),
-    ...safeArray((contract.stage_sequence as JsonRecord | undefined)?.alternate_stages),
-  ] as JsonRecord[];
-}
-
-function stageArtifactPath(contract: JsonRecord, deliverablePaths: JsonRecord, stageId: string): string {
-  const stage = routeStageDefinitions(contract)
-    .find((item) => safeText(item.stage_id) === safeText(stageId));
-  return path.join(
-    safeText(deliverablePaths.artifactsDir),
-    safeText(stage?.output_artifact, `${stageId}.json`),
-  );
 }
 
 function sourceMaterialsFullText(contract: JsonRecord): JsonRecord[] {
@@ -189,7 +169,14 @@ function extractSourceSlidePlanSuggestionsFromMaterials(materials: JsonRecord[])
 }
 
 function manuscriptEvidenceTableForAudit(contract: JsonRecord, deliverablePaths: JsonRecord): unknown[] {
-  const storyline = readJsonIfExists(stageArtifactPath(contract, deliverablePaths, 'storyline'));
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: 'storyline',
+    canonicalStageId: canonicalStageForRoute('storyline'),
+  });
+  const storyline = loaded?.status === 'success' || loaded?.status === 'blocked'
+    ? loaded.artifact as JsonRecord
+    : null;
   const storylineBody = storyline?.storyline as JsonRecord | undefined;
   return safeArray(storylineBody?.manuscript_evidence_table);
 }

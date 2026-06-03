@@ -2,7 +2,15 @@
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
-import { getDeliverablePaths } from '@redcube/runtime-protocol';
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageFolderArtifactPath,
+  stageFolderOutputPath,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 import { persistReviewStatePatch } from '@redcube/governance';
 import { CODEX_DEFAULT_ADAPTER } from '@redcube/runtime-protocol';
 import { hydrateDeliverableContract } from '@redcube/overlay-core';
@@ -47,6 +55,10 @@ function routeStageDefinitions(contract) {
     ...(Array.isArray(contract?.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
     ...(Array.isArray(contract?.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
   ];
+}
+
+function canonicalStageIdForRoute(route) {
+  return canonicalStageForRoute(route);
 }
 
 function writeDeliverableSurfaceBundle({ deliverablePaths, hydratedContract, overlay }) {
@@ -188,7 +200,26 @@ function routeRequiresArtifacts(contract, route) {
 
 function stageArtifactFile(deliverablePaths, contract, stageId) {
   const stage = routeStageDefinitions(contract).find((item) => item?.stage_id === stageId);
-  return path.join(deliverablePaths.artifactsDir, String(stage?.output_artifact || `${stageId}.json`).trim());
+  const canonicalStageId = canonicalStageIdForRoute(stageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: stageId,
+    canonicalStageId,
+  });
+  if (loaded?.output_file && ['success', 'blocked'].includes(loaded.status)) {
+    return loaded.output_file;
+  }
+  return stageFolderArtifactPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: deliverablePaths.programId,
+    topicId: deliverablePaths.topicId,
+    deliverableId: deliverablePaths.deliverableId,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    outputName: String(stage?.output_artifact || `${stageId}.json`).trim(),
+  });
 }
 
 function pptDraftViewFiles(deliverablePaths, deliverableId) {
@@ -371,6 +402,106 @@ function readCachedRouteArtifact({ artifactFile, routeCacheKey, requiredArtifact
   });
 }
 
+function readCachedStageFolderRouteArtifact({
+  deliverablePaths,
+  route,
+  routeCacheKey,
+  requiredArtifactFiles,
+}) {
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: route,
+    canonicalStageId: canonicalStageIdForRoute(route),
+  });
+  if (loaded?.status !== 'success' || !loaded?.artifact) return null;
+  const artifactFile = loaded.output_file;
+  const cached = cacheHitArtifact({
+    artifactFile,
+    artifact: loaded.artifact,
+    routeCacheKey,
+    requiredArtifactFiles,
+  });
+  return cached ? {
+    artifact: cached,
+    artifact_file: loaded.output_file,
+    artifact_refs: [loaded.output_file, loaded.manifest_file].filter(Boolean),
+  } : null;
+}
+
+function ownerReceiptRefsForRoute({ overlay, route, deliverableId, artifact, oplRouteAttemptIndex }) {
+  if (artifact?.status === 'block' || artifact?.status === 'failed') return [];
+  return uniqueStrings([
+    ...safeArray(artifact?.owner_receipt_refs),
+    ...safeArray(artifact?.receipt_refs),
+    `rca-owner-receipt:stage-artifact:redcube_ai:${overlay}:${route}:${deliverableId}`,
+  ]);
+}
+
+function typedBlockerRefsForRoute({ overlay, route, deliverableId, artifact }) {
+  if (artifact?.status !== 'block' && artifact?.status !== 'failed') return [];
+  return uniqueStrings([
+    ...safeArray(artifact?.typed_blocker_refs),
+    ...safeArray(artifact?.blocker_refs),
+    safeText(artifact?.blocker_ref),
+    `rca-typed-blocker:stage-artifact:redcube_ai:${overlay}:${route}:${deliverableId}`,
+  ]);
+}
+
+function reviewExportRefsForRoute(artifact) {
+  return uniqueStrings([
+    ...safeArray(artifact?.review_export_refs),
+    ...safeArray(artifact?.review_refs),
+    ...safeArray(artifact?.export_refs),
+    safeText(artifact?.review_state_patch?.review_ref),
+    safeText(artifact?.publish_bundle?.export_ref),
+    safeText(artifact?.export_bundle?.export_ref),
+  ]);
+}
+
+export function refreshStageFolderRouteArtifact({
+  deliverablePaths,
+  overlay,
+  topicId,
+  deliverableId,
+  route,
+  attemptId,
+  artifactFile,
+  artifact,
+  oplRouteAttemptIndex = null,
+}) {
+  const canonicalStageId = canonicalStageIdForRoute(route);
+  return writeStageFolderArtifact({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: deliverablePaths.programId,
+    topicId,
+    deliverableId,
+    routeStageId: route,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId,
+    artifactFile,
+    outputName: path.basename(artifactFile),
+    requiredOutputs: [path.basename(artifactFile)],
+    ownerReceiptRefs: ownerReceiptRefsForRoute({
+      overlay,
+      route,
+      deliverableId,
+      artifact,
+      oplRouteAttemptIndex,
+    }),
+    typedBlockerRefs: typedBlockerRefsForRoute({
+      overlay,
+      route,
+      deliverableId,
+      artifact,
+    }),
+    blockingReasons: safeArray(artifact?.blocking_reasons),
+    artifactRefs: safeArray(artifact?.artifact_refs),
+    reviewExportRefs: reviewExportRefsForRoute(artifact),
+  });
+}
+
 function attachRouteCache(artifact, routeCacheKey) {
   const artifactWithBlockingSignature = attachBlockingSignature(artifact);
   return {
@@ -542,6 +673,7 @@ export async function executeDeliverableRouteLocally({
   mode = 'draft_new',
   baselineDeliverableId = '',
   oplRouteAttemptIndex = null,
+  runId = null,
 }) {
   assertOplRouteAttemptBoundary(oplRouteAttemptIndex);
   const { safeRoute } = validateDeliverableRouteInput({
@@ -573,10 +705,23 @@ export async function executeDeliverableRouteLocally({
   const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
-  const artifactFile = path.join(
-    deliverablePaths.artifactsDir,
-    String(stageContract.output_artifact || `${safeRoute}.json`).trim(),
-  );
+  const attemptId = safeText(runId)
+    || safeText(oplRouteAttemptIndex?.stage_attempt_ref || oplRouteAttemptIndex?.stageAttemptRef)
+    || safeText(oplRouteAttemptIndex?.attempt_receipt_ref || oplRouteAttemptIndex?.attemptReceiptRef)
+    || `attempt-${safeRoute}`;
+  const canonicalStageId = canonicalStageIdForRoute(safeRoute);
+  const artifactFile = stageFolderOutputPath({
+    deliverablePaths,
+    domainId: 'redcube_ai',
+    programId: deliverablePaths.programId,
+    topicId,
+    deliverableId,
+    routeStageId: safeRoute,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId,
+    outputName: String(stageContract.output_artifact || `${safeRoute}.json`).trim(),
+  });
   const requiredArtifactFiles = routeCacheDependencyFiles({
     overlay,
     route: safeRoute,
@@ -601,7 +746,13 @@ export async function executeDeliverableRouteLocally({
     requiredArtifactFiles,
   });
 
-  const cachedArtifact = readCachedRouteArtifact({
+  const cachedStageArtifact = readCachedStageFolderRouteArtifact({
+    deliverablePaths,
+    route: safeRoute,
+    routeCacheKey,
+    requiredArtifactFiles,
+  });
+  const cachedArtifact = cachedStageArtifact?.artifact || readCachedRouteArtifact({
     artifactFile,
     routeCacheKey,
     requiredArtifactFiles,
@@ -614,9 +765,10 @@ export async function executeDeliverableRouteLocally({
       topic_id: topicId,
       deliverable_id: deliverableId,
       artifact: cachedArtifact,
-      artifact_file: artifactFile,
+      artifact_file: cachedStageArtifact?.artifact_file || artifactFile,
       artifact_refs: Array.from(new Set([
-        artifactFile,
+        cachedStageArtifact?.artifact_file || artifactFile,
+        ...(Array.isArray(cachedStageArtifact?.artifact_refs) ? cachedStageArtifact.artifact_refs : []),
         ...(Array.isArray(cachedArtifact?.artifact_refs) ? cachedArtifact.artifact_refs : []),
       ])),
       cache_status: 'hit',
@@ -640,7 +792,19 @@ export async function executeDeliverableRouteLocally({
     deliverableId,
   });
   if (repeatedBlockArtifact) {
+    mkdirSync(path.dirname(artifactFile), { recursive: true });
     writeFileSync(artifactFile, JSON.stringify(repeatedBlockArtifact, null, 2), 'utf-8');
+    const stageFolderRefs = refreshStageFolderRouteArtifact({
+      deliverablePaths,
+      overlay,
+      topicId,
+      deliverableId,
+      route: safeRoute,
+      attemptId,
+      artifactFile,
+      artifact: repeatedBlockArtifact,
+      oplRouteAttemptIndex,
+    });
     const error = new Error(`Route ${safeRoute} fail-fast: repeated block without input change`);
     error.code = 'repeated_block_without_input_change';
     error.failure_kind = 'repeated_block_without_input_change';
@@ -648,6 +812,7 @@ export async function executeDeliverableRouteLocally({
     error.blocking_reasons = repeatedBlockArtifact.repeated_block_fail_fast.blocking_reasons;
     error.recommended_action = repeatedBlockArtifact.repeated_block_fail_fast.recommended_action;
     error.artifact_file = artifactFile;
+    error.artifact_refs = Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : [];
     error.stall_lineage = repeatedBlockArtifact.repeated_block_fail_fast.stall_lineage;
     throw error;
   }
@@ -668,8 +833,19 @@ export async function executeDeliverableRouteLocally({
     executorRouting,
   }), routeCacheKey);
 
-  mkdirSync(deliverablePaths.artifactsDir, { recursive: true });
+  mkdirSync(path.dirname(artifactFile), { recursive: true });
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
+  const stageFolderRefs = refreshStageFolderRouteArtifact({
+    deliverablePaths,
+    overlay,
+    topicId,
+    deliverableId,
+    route: safeRoute,
+    attemptId,
+    artifactFile,
+    artifact,
+    oplRouteAttemptIndex,
+  });
 
   if (artifact?.review_state_patch) {
     persistReviewStatePatch({
@@ -725,6 +901,7 @@ export async function executeDeliverableRouteLocally({
     cache_status: 'miss',
     artifact_refs: Array.from(new Set([
       artifactFile,
+      ...(Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : []),
       ...(Array.isArray(artifact?.artifact_refs) ? artifact.artifact_refs : []),
     ])),
     executor: {

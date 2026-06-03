@@ -6,6 +6,12 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
+import {
   applyReviewMutation,
   createDeliverable,
   intakeSource,
@@ -31,6 +37,33 @@ function stageArtifactFile(created, stageId) {
   ];
   const stage = stages.find((item) => item.stage_id === stageId);
   return path.join(path.dirname(created.deliverableFile), 'artifacts', stage?.output_artifact || `${stageId}.json`);
+}
+
+function writeStageArtifact({ workspaceRoot, topicId, deliverableId, stageId, artifact, status = 'success' }) {
+  const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const contractFile = path.join(paths.deliverableDir, 'contracts', 'hydrated-deliverable.json');
+  const contract = readJson(contractFile);
+  const stages = [
+    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ];
+  const stage = stages.find((item) => item.stage_id === stageId);
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  const legacyFile = stageArtifactFile({ deliverableFile: paths.deliverableFile }, stageId);
+  writeJson(legacyFile, artifact);
+  writeStageFolderArtifact({
+    deliverablePaths: paths,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: `seed-${stageId}`,
+    artifactFile: legacyFile,
+    outputName: stage?.output_artifact || `${stageId}.json`,
+    status,
+    ownerReceiptRefs: status === 'success' ? [`rca-owner-receipt:test-seed:${stageId}`] : [],
+    typedBlockerRefs: status === 'blocked' ? [`rca-typed-blocker:test-seed:${stageId}`] : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || artifact?.issues || [],
+  });
 }
 
 function xhsRouteArtifact(results, route) {
@@ -171,7 +204,13 @@ test('xiaohongshu author_image_pages writes mocked full-page image assets and re
     }
 
     const blockedSlide = authored.image_page_manifest.slides[1] || authored.image_page_manifest.slides[0];
-    writeJson(stageArtifactFile(created, 'screenshot_review'), {
+    writeStageArtifact({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      stageId: 'screenshot_review',
+      status: 'blocked',
+      artifact: {
       route: 'screenshot_review',
       status: 'block',
       blocked_slide_ids: [blockedSlide.slide_id],
@@ -188,6 +227,7 @@ test('xiaohongshu author_image_pages writes mocked full-page image assets and re
           recommended_fix: slide.slide_id === blockedSlide.slide_id ? 'redraw this XHS page only' : 'none',
         },
       })),
+      },
     });
 
     const repairedResult = await runDeliverableRoute({

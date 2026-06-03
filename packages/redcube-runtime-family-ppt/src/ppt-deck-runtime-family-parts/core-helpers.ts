@@ -1,6 +1,12 @@
 // @ts-nocheck
 import path from 'node:path';
 import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import {
+  canonicalStageForRoute,
+  readStageFolderArtifact,
+  stageFolderArtifactPath,
+  stageOrderForCanonicalStage,
+} from '@redcube/runtime-protocol';
 
 export function createPptDeckCoreHelpers({
   REPO_ROOT,
@@ -143,15 +149,41 @@ export function createPptDeckCoreHelpers({
 
   function stageArtifactPath(contract, deliverablePaths, stageId) {
     const stage = routeStageDefinitions(contract).find((item) => item?.stage_id === stageId);
-    return path.join(
-      deliverablePaths.artifactsDir,
-      safeText(stage?.output_artifact) || `${stageId}.json`,
-    );
+    const canonicalStageId = canonicalStageForRoute(stageId);
+    const loaded = readStageFolderArtifact({
+      deliverablePaths,
+      routeStageId: stageId,
+      canonicalStageId,
+    });
+    if (loaded?.output_file && ['success', 'blocked'].includes(loaded.status)) {
+      return loaded.output_file;
+    }
+    return stageFolderArtifactPath({
+      deliverablePaths,
+      domainId: 'redcube_ai',
+      programId: safeText(deliverablePaths.programId),
+      topicId: safeText(deliverablePaths.topicId),
+      deliverableId: deliverablePaths.deliverableId,
+      routeStageId: stageId,
+      canonicalStageId,
+      stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+      outputName: safeText(stage?.output_artifact) || `${stageId}.json`,
+    });
   }
 
   function readStageArtifact(contract, deliverablePaths, stageId) {
-    const file = stageArtifactPath(contract, deliverablePaths, stageId);
-    return existsSync(file) ? readJson(file) : null;
+    const loaded = readStageFolderArtifact({
+      deliverablePaths,
+      routeStageId: stageId,
+      canonicalStageId: canonicalStageForRoute(stageId),
+    });
+    return loaded?.status === 'success' || loaded?.status === 'blocked'
+      ? loaded.artifact
+      : null;
+  }
+
+  function stageArtifactMtimeMs(contract, deliverablePaths, stageId) {
+    return safeFileMtimeMs(stageArtifactPath(contract, deliverablePaths, stageId));
   }
 
   function currentHtmlStageId(contract, deliverablePaths) {
@@ -378,6 +410,7 @@ export function createPptDeckCoreHelpers({
     writeText,
     readJson,
     safeFileMtimeMs,
+    stageArtifactMtimeMs,
     formatTimestamp,
     stageArtifactPath,
     readStageArtifact,

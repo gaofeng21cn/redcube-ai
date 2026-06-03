@@ -13,7 +13,7 @@ import {
   safeReadJson,
   writeState,
 } from './state-io.js';
-import { buildQualitySummary } from './freshness-gates.js';
+import { buildQualitySummary, stageArtifactPath } from './freshness-gates.js';
 
 export function deriveArtifactGovernanceState({ previous, patch, contract }) {
   const approvalRequired = Boolean(contract?.delivery_contract?.human_gate?.required);
@@ -308,11 +308,7 @@ export function applyReviewMutation({
     }
     const latestArtifactFile = String(current?.latest_review_artifact || '').trim();
     const latestArtifact = latestArtifactFile ? safeReadJson(latestArtifactFile) : null;
-    const screenshotStage = Array.isArray(contract?.stage_sequence?.stages)
-      ? contract.stage_sequence.stages.find((stage) => stage?.stage_id === 'screenshot_review')
-      : null;
-    const screenshotArtifactName = String(screenshotStage?.output_artifact || 'screenshot_review.json').trim();
-    const screenshotReviewArtifact = safeReadJson(path.join(deliverablePaths.artifactsDir, screenshotArtifactName));
+    const screenshotReviewArtifact = safeReadJson(stageArtifactPath(contract, deliverablePaths, 'screenshot_review'));
     const relativeQuality = latestArtifact?.baseline_review?.relative_quality
       || screenshotReviewArtifact?.baseline_review?.relative_quality
       || null;

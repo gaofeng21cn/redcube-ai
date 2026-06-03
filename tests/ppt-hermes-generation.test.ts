@@ -27,6 +27,13 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+function routeArtifactFile(result) {
+  const file = result?.artifactFile || result?.artifact_file || result?.error?.artifact_file || result?.run?.error?.artifact_file;
+  assert.equal(typeof file, 'string');
+  assert.notEqual(file.trim(), '');
+  return file;
+}
+
 async function withMockCodexRuntime(testFn) {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
@@ -126,15 +133,7 @@ test('ppt manuscript sync blocks abstract outlines without visible paper evidenc
       route: 'storyline',
     });
     assert.equal(storylineResult.ok, true);
-    const storylineArtifact = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-      'storyline.json',
-    ));
+    const storylineArtifact = readJson(routeArtifactFile(storylineResult));
     assert.equal(storylineArtifact.storyline.manuscript_evidence_table.length, 3);
     assert.match(
       storylineArtifact.storyline.manuscript_evidence_table[0].key_numeric_results.join('\n'),
@@ -207,15 +206,7 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
       route: 'detailed_outline',
     });
     assert.equal(outlineResult.ok, true);
-    const outlineArtifact = readJson(path.join(
-      workspaceRoot,
-      'topics',
-      'topic-plan',
-      'deliverables',
-      'deck-plan',
-      'artifacts',
-      'detailed_outline.json',
-    ));
+    const outlineArtifact = readJson(routeArtifactFile(outlineResult));
     assert.notEqual(outlineArtifact.detailed_outline.slides.length, 21);
     assert.equal(outlineArtifact.detailed_outline.slides.length <= 30, true);
   });
@@ -375,6 +366,7 @@ test('ppt screenshot review escalates speaker fit failures back to slide_bluepri
       goal: '面向医学人工智能小同行正式讲课，讲清系统设计、推进路径与模块复用。',
     });
 
+    const routeResults = new Map();
     for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'render_html']) {
       const result = await runDeliverableRoute({
         workspaceRoot,
@@ -384,9 +376,10 @@ test('ppt screenshot review escalates speaker fit failures back to slide_bluepri
         route,
       });
       assert.equal(result.ok, true, route);
+      routeResults.set(route, result);
     }
 
-    const renderArtifact = readJson(path.join(path.dirname(created.deliverableFile), 'artifacts', 'render_bundle.json'));
+    const renderArtifact = readJson(routeArtifactFile(routeResults.get('render_html')));
     const htmlFile = renderArtifact.html_bundle?.html_file;
     const originalHtml = readFileSync(htmlFile, 'utf-8');
     writeFileSync(
@@ -414,7 +407,7 @@ test('ppt screenshot review escalates speaker fit failures back to slide_bluepri
     assert.equal(screenshotReviewResult.ok, false);
     assert.match(screenshotReviewResult.run?.error?.message || '', /Route screenshot_review blocked/);
 
-    const reviewArtifact = readJson(path.join(path.dirname(created.deliverableFile), 'artifacts', 'quality_gate.json'));
+    const reviewArtifact = readJson(routeArtifactFile(screenshotReviewResult));
     assert.equal(reviewArtifact.status, 'block');
     assert.equal(reviewArtifact.checks?.speaker_fit_ok, false);
     assert.equal(reviewArtifact.review_state_patch?.rerun_from_stage, 'slide_blueprint');

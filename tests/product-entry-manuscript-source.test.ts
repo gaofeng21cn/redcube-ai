@@ -28,6 +28,13 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+function routeArtifactFile(result) {
+  const file = result?.artifactFile || result?.artifact_file || result?.error?.artifact_file || result?.run?.error?.artifact_file;
+  assert.equal(typeof file, 'string');
+  assert.notEqual(file.trim(), '');
+  return file;
+}
+
 async function withMockCodexRuntimeState(testFn) {
   const upstream = await startMockCodexCli();
   const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-product-entry-state-'));
@@ -141,16 +148,8 @@ test('product-entry returns OPL plan while diagnostic route-level ppt deck prese
     assert.equal(storylineRoute.ok, true);
     assert.equal(outlineRoute.ok, true);
 
-    const artifactDir = path.join(
-      workspaceRoot,
-      'topics',
-      'nfpitnet-topic',
-      'deliverables',
-      'nfpitnet-deck',
-      'artifacts',
-    );
-    const storyline = readJson(path.join(artifactDir, 'storyline.json'));
-    const outline = readJson(path.join(artifactDir, 'detailed_outline.json'));
+    const storyline = readJson(routeArtifactFile(storylineRoute));
+    const outline = readJson(routeArtifactFile(outlineRoute));
     assert.equal(storyline.storyline.manuscript_evidence_table.length, 3);
     assert.match(
       storyline.storyline.manuscript_evidence_table[0].key_numeric_results.join('\n'),
