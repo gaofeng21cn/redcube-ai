@@ -105,10 +105,10 @@ function main(): void {
     ],
   });
 
-  if (!args.skipTools) {
-    process.stderr.write('RedCube AI CLI tools are provided by the repo-local npm launcher; refreshed Codex plugin metadata only.\n');
-  } else {
+  if (args.skipTools) {
     process.stderr.write('refreshed RedCube AI repo-local Codex plugin metadata (skip-tools)\n');
+  } else {
+    process.stderr.write('RedCube AI CLI tools are provided by the repo-local npm launcher; refreshed Codex plugin metadata only.\n');
   }
 
   process.stdout.write(`${JSON.stringify({
