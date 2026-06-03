@@ -42,7 +42,7 @@
   },
   "persistence_policy": {
     "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
-    "sqlite_status": "deferred_for_rca",
+    "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
     "sqlite_adoption_gate": [
       "measured artifact or session file-count growth",
       "cross-deliverable query pressure",
@@ -50,20 +50,25 @@
       "JSON retention ledger maintenance cost"
     ],
     "if_adopted_scope": [
-      "session index",
-      "deliverable index",
-      "route run index",
-      "artifact path and hash index",
-      "review and export bundle projection",
-      "retention ledger projection"
+      "session locator/hash/provenance index",
+      "deliverable locator/hash/provenance index",
+      "route run locator/hash/provenance index",
+      "artifact locator/hash/provenance index",
+      "review and export refs-only projection",
+      "retention ledger refs-only projection"
     ],
     "must_not_own": [
       "visual-domain truth",
       "canonical artifact truth",
       "review/export judgment",
-      "PNG/PPTX/PDF blob storage"
+      "PNG/PPTX/PDF blob storage",
+      "owner receipt body",
+      "visual memory body"
     ],
-    "source_reference": "MAS/MDS runtime lifecycle SQLite domain_action_adapter pattern"
+    "source_reference": "OPL State Index Kernel / SQLite sidecar refs-only pattern",
+    "sqlite_owner_if_adopted": "one-person-lab",
+    "sqlite_sidecar_is_domain_runtime": false,
+    "sqlite_adoption_contract_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption"
   },
   "north_star": [
     "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",

@@ -17,6 +17,7 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
+import { refreshStageFolderRouteArtifact } from '../packages/redcube-runtime/dist/deliverable-route-local.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -102,6 +103,236 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
     assert.equal(loaded?.artifact.route, 'author_image_pages');
     assert.equal(loaded?.status, 'success');
     assert.equal(loaded?.manifest.program_id, paths.programId);
+  });
+});
+
+test('RCA stage folder manifest exposes canonical output roles, stage receipts, and helper refs', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-role-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const artifactFile = path.join(paths.artifactsDir, 'render-output-v2.json');
+    const helperFile = path.join(paths.artifactsDir, 'shape-manifest.json');
+    mkdirSync(path.dirname(artifactFile), { recursive: true });
+    writeFileSync(artifactFile, JSON.stringify({ route: 'author_pptx_native', status: 'ok' }), 'utf-8');
+    writeFileSync(helperFile, JSON.stringify({ surface_kind: 'native_shape_manifest' }), 'utf-8');
+
+    const written = writeStageFolderArtifact({
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'author_pptx_native',
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
+      attemptId: 'attempt-role',
+      artifactFile,
+      outputName: 'render-output-v2.json',
+      outputRole: 'render_manifest',
+      requiredOutputRoles: ['render_manifest'],
+      ownerReceiptRefs: ['rca-owner-receipt:render-manifest'],
+      helperOutputRefs: [{
+        role: 'native_shape_manifest',
+        file: helperFile,
+        sha256: '0'.repeat(64),
+        evidence_ref: 'native_ppt_bundle.shape_manifest_file',
+        review_receipt_ref: 'rca-owner-receipt:screenshot-review',
+      }],
+    });
+
+    const manifest = readJson(written.manifest_file);
+    assert.equal(manifest.stage_output_role_interface.surface_kind, 'rca_stage_output_role_interface');
+    assert.equal(manifest.stage_output_role_interface.file_name_is_interface, false);
+    assert.equal(manifest.stage_output_role_interface.role_manifest_receipt_is_interface, true);
+    assert.deepEqual(manifest.stage_output_role_interface.required_roles, ['render_manifest']);
+    assert.deepEqual(manifest.required_outputs, ['render-output-v2.json']);
+    assert.deepEqual(manifest.required_output_roles, ['render_manifest']);
+    assert.deepEqual(manifest.present_output_roles, ['render_manifest']);
+    assert.equal(Array.isArray(manifest.output_refs), true);
+    assert.equal(manifest.output_refs.some((entry) => entry === 'render-output-v2.json'), false);
+    const renderRef = manifest.output_refs.find((entry) => entry.role === 'render_manifest');
+    assert.equal(renderRef.output_ref, 'outputs/render-output-v2.json');
+    assert.equal(renderRef.manifest_ref, 'manifest.json');
+    assert.equal(renderRef.receipt_ref, 'receipts/domain-owner-receipt.json');
+    assert.equal(typeof renderRef.sha256, 'string');
+    assert.equal(renderRef.sha256.length, 64);
+    assert.equal(manifest.stage_receipts[0].receipt_kind, 'domain_owner_receipt');
+    assert.equal(manifest.stage_receipts[0].receipt_ref, 'rca-owner-receipt:render-manifest');
+    assert.deepEqual(manifest.stage_receipts[0].output_roles, ['render_manifest']);
+    assert.equal(manifest.helper_output_refs[0].role, 'native_shape_manifest');
+    assert.equal(manifest.helper_output_refs[0].evidence_ref, 'native_ppt_bundle.shape_manifest_file');
+    assert.equal(manifest.helper_output_refs[0].review_receipt_ref, 'rca-owner-receipt:screenshot-review');
+
+    const loaded = readStageFolderArtifact({
+      deliverablePaths: paths,
+      routeStageId: 'author_pptx_native',
+      canonicalStageId: 'artifact_creation',
+      outputRole: 'render_manifest',
+    });
+    assert.equal(loaded?.status, 'success');
+    assert.equal(path.basename(loaded?.output_file), 'render-output-v2.json');
+    assert.equal(loaded?.artifact.route, 'author_pptx_native');
+  });
+});
+
+test('RCA blocked stage folder attempts expose typed blocker stage receipts', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-blocked-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const artifactFile = path.join(paths.artifactsDir, 'screenshot_review.json');
+    mkdirSync(path.dirname(artifactFile), { recursive: true });
+    writeFileSync(artifactFile, JSON.stringify({ route: 'screenshot_review', status: 'block' }), 'utf-8');
+
+    const written = writeStageFolderArtifact({
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'screenshot_review',
+      canonicalStageId: 'review_and_revision',
+      stageOrder: 5,
+      attemptId: 'attempt-blocked',
+      artifactFile,
+      outputRole: 'review_verdict',
+      typedBlockerRefs: ['rca-typed-blocker:screenshot-review'],
+      blockingReasons: ['review_blocked'],
+    });
+
+    const manifest = readJson(written.manifest_file);
+    assert.equal(manifest.status, 'blocked');
+    assert.deepEqual(manifest.required_output_roles, ['review_verdict']);
+    assert.deepEqual(manifest.owner_receipt_refs, []);
+    assert.deepEqual(manifest.typed_blocker_refs, ['rca-typed-blocker:screenshot-review']);
+    assert.equal(manifest.stage_receipts[0].receipt_kind, 'domain_typed_blocker');
+    assert.equal(manifest.stage_receipts[0].typed_blocker_ref, 'rca-typed-blocker:screenshot-review');
+    assert.equal(manifest.stage_receipts[0].evidence_file, 'evidence/typed-blocker-ref.json');
+    assert.equal(readJson(written.blocker_evidence_file).blocking_reasons[0], 'review_blocked');
+
+    const loaded = readStageFolderArtifact({
+      deliverablePaths: paths,
+      routeStageId: 'screenshot_review',
+      canonicalStageId: 'review_and_revision',
+    });
+    assert.equal(loaded?.status, 'blocked');
+    assert.equal(loaded?.artifact.status, 'block');
+  });
+});
+
+test('RCA review, repair, and export routes map to receipt-backed stage output roles', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-roles-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const cases = [
+      ['visual_director_review', 'review_and_revision', 'review_verdict'],
+      ['screenshot_review', 'review_and_revision', 'review_verdict'],
+      ['repair_image_pages', 'artifact_creation', 'render_manifest'],
+      ['export_pptx', 'package_and_handoff', 'export_bundle'],
+    ];
+
+    for (const [routeStageId, canonicalStageId, outputRole] of cases) {
+      const artifactFile = path.join(paths.artifactsDir, `${routeStageId}-role.json`);
+      mkdirSync(path.dirname(artifactFile), { recursive: true });
+      writeFileSync(artifactFile, JSON.stringify({ route: routeStageId, status: 'ok' }), 'utf-8');
+      const written = writeStageFolderArtifact({
+        deliverablePaths: paths,
+        programId: paths.programId,
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        routeStageId,
+        canonicalStageId,
+        stageOrder: routeStageId === 'export_pptx' ? 6 : routeStageId === 'repair_image_pages' ? 4 : 5,
+        attemptId: `attempt-${routeStageId}`,
+        artifactFile,
+        ownerReceiptRefs: [`rca-owner-receipt:${routeStageId}`],
+      });
+      const manifest = readJson(written.manifest_file);
+      assert.equal(manifest.present_output_roles.includes(outputRole), true);
+      assert.equal(manifest.stage_receipts[0].receipt_ref, `rca-owner-receipt:${routeStageId}`);
+      assert.equal(manifest.stage_receipts[0].output_roles.includes(outputRole), true);
+      if (routeStageId === 'export_pptx') {
+        assert.equal(manifest.present_output_roles.includes('handoff_manifest'), true);
+      }
+    }
+  });
+});
+
+test('RCA route closeout records native helper, export, gallery, and handoff refs in Stage Manifest', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const exportDir = path.join(paths.artifactsDir, 'export');
+    mkdirSync(exportDir, { recursive: true });
+    const files = {
+      artifact: path.join(exportDir, 'export_pptx.json'),
+      pptx: path.join(exportDir, 'deck.pptx'),
+      pdf: path.join(exportDir, 'deck.pdf'),
+      notes: path.join(exportDir, 'notes.md'),
+      handoff: path.join(exportDir, 'handoff-manifest.json'),
+      gallery: path.join(exportDir, 'gallery-index.json'),
+      capture: path.join(exportDir, 'capture-manifest.json'),
+      shapeManifest: path.join(exportDir, 'shape-manifest.json'),
+    };
+    for (const [key, file] of Object.entries(files)) {
+      writeFileSync(file, key === 'pptx' || key === 'pdf' ? key : JSON.stringify({ key }), 'utf-8');
+    }
+    const artifact = {
+      route: 'export_pptx',
+      status: 'completed',
+      native_ppt_bundle: {
+        shape_manifest_file: files.shapeManifest,
+      },
+      export_bundle: {
+        pptx_file: files.pptx,
+        pdf_file: files.pdf,
+        presenter_notes_file: files.notes,
+        final_delivery: { manifest_file: files.handoff },
+        artifact_gallery: { index_file: files.gallery },
+        review_capture: { export_manifest_file: files.capture },
+      },
+      review_capture: {
+        export_manifest_file: files.capture,
+      },
+    };
+    writeFileSync(files.artifact, JSON.stringify(artifact, null, 2), 'utf-8');
+
+    const written = refreshStageFolderRouteArtifact({
+      deliverablePaths: paths,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+      attemptId: 'attempt-export',
+      artifactFile: files.artifact,
+      artifact,
+    });
+
+    const manifest = readJson(written.manifest_file);
+    assert.deepEqual(manifest.present_output_roles, ['export_bundle', 'handoff_manifest']);
+    assert.equal(manifest.stage_receipts[0].receipt_ref, 'rca-owner-receipt:stage-artifact:redcube_ai:ppt_deck:export_pptx:deck-a');
+    const helperRoles = manifest.helper_output_refs.map((ref) => ref.role).sort();
+    for (const role of [
+      'artifact_gallery_ref_index',
+      'export_capture_manifest',
+      'export_pdf',
+      'export_pptx',
+      'export_presenter_notes',
+      'handoff_manifest',
+      'native_shape_manifest',
+    ]) {
+      assert.equal(helperRoles.includes(role), true);
+    }
+    const handoffRef = manifest.helper_output_refs.find((ref) => ref.role === 'handoff_manifest');
+    assert.equal(handoffRef.sha256.length, 64);
+    assert.equal(handoffRef.output_ref.includes('handoff-manifest.json'), true);
+    for (const helperRef of manifest.helper_output_refs) {
+      assert.equal(typeof helperRef.output_ref, 'string');
+      assert.equal(typeof helperRef.sha256, 'string');
+      assert.equal(helperRef.sha256.length, 64);
+      assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'body'), false);
+      assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'content'), false);
+      assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'blob'), false);
+      assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'visual_truth'), false);
+      assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'review_export_judgment'), false);
+    }
   });
 });
 

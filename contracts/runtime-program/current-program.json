@@ -6946,6 +6946,80 @@
         "domain_can_claim_generic_runtime_owner": false,
         "domain_repo_can_own_generated_surface": false
       }
+    },
+    "stage_artifact_kernel_adoption": {
+      "surface_kind": "opl_stage_artifact_kernel_adoption_projection",
+      "ref": "/stage_artifact_kernel_adoption",
+      "contract_ref": "contracts/stage_artifact_kernel_adoption.json",
+      "owner": "redcube_ai",
+      "consumer": "opl_framework",
+      "status": "root_conformance_entrypoint_landed",
+      "projection_mode": "machine_readable_conformance_entrypoint",
+      "stage_artifact_runtime_ref": "contracts/stage_control_plane.json#/stage_artifact_runtime",
+      "stage_output_role_interface_ref": "contracts/stage_artifact_kernel_adoption.json#/stage_output_role_interface",
+      "review_repair_export_receipts_ref": "contracts/stage_artifact_kernel_adoption.json#/review_repair_export_receipts",
+      "native_helper_manifest_ref": "contracts/stage_artifact_kernel_adoption.json#/native_helper_manifest",
+      "artifact_gallery_handoff_shell_ref": "contracts/stage_artifact_kernel_adoption.json#/artifact_gallery_handoff_shell",
+      "visual_ready_claimed": false,
+      "exportable_claimed": false,
+      "handoffable_claimed": false,
+      "domain_ready_claimed": false,
+      "production_ready_claimed": false,
+      "authority_boundary": {
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_export_verdict": true,
+        "rca_owns_artifact_authority": true,
+        "rca_owns_owner_receipt": true,
+        "opl_can_index_refs": true,
+        "opl_can_rebuild_projection": true,
+        "opl_can_provide_gallery_handoff_shell": true,
+        "opl_can_write_visual_truth": false,
+        "opl_can_authorize_quality_or_export": false,
+        "opl_can_issue_rca_owner_receipt": false
+      },
+      "opl_state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+      "opl_state_index_kernel_adoption": {
+        "ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+        "owner": "one-person-lab",
+        "consumer": "redcube_ai",
+        "adoption_status": "deferred_until_measured_trigger",
+        "sqlite_enabled_now": false,
+        "index_backend": "sqlite_sidecar_index",
+        "refs_only": true,
+        "rebuildable": true,
+        "sidecar_is_domain_runtime": false,
+        "allowed_index_entities": [
+          "session",
+          "deliverable",
+          "route",
+          "artifact",
+          "review",
+          "export"
+        ],
+        "allowed_payload_classes": [
+          "locator",
+          "hash",
+          "provenance",
+          "manifest_ref",
+          "receipt_ref",
+          "route_ref",
+          "lineage_ref"
+        ],
+        "forbidden_storage": [
+          "PNG body",
+          "PPTX body",
+          "PDF body",
+          "visual artifact blob",
+          "canonical artifact truth",
+          "visual-domain truth",
+          "review/export judgment",
+          "owner receipt body",
+          "visual memory body"
+        ],
+        "sqlite_can_be_truth_source": false,
+        "sqlite_can_store_visual_artifact_body": false,
+        "sqlite_can_store_review_export_judgment": false
+      }
     }
   },
   "longrun_goal": {
@@ -6992,7 +7066,7 @@
     },
     "persistence_policy": {
       "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
-      "sqlite_status": "deferred_for_rca",
+      "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
       "sqlite_adoption_gate": [
         "measured artifact or session file-count growth",
         "cross-deliverable query pressure",
@@ -7000,20 +7074,25 @@
         "JSON retention ledger maintenance cost"
       ],
       "if_adopted_scope": [
-        "session index",
-        "deliverable index",
-        "route run index",
-        "artifact path and hash index",
-        "review and export bundle projection",
-        "retention ledger projection"
+        "session locator/hash/provenance index",
+        "deliverable locator/hash/provenance index",
+        "route run locator/hash/provenance index",
+        "artifact locator/hash/provenance index",
+        "review and export refs-only projection",
+        "retention ledger refs-only projection"
       ],
       "must_not_own": [
         "visual-domain truth",
         "canonical artifact truth",
         "review/export judgment",
-        "PNG/PPTX/PDF blob storage"
+        "PNG/PPTX/PDF blob storage",
+        "owner receipt body",
+        "visual memory body"
       ],
-      "source_reference": "MAS/MDS runtime lifecycle SQLite domain_action_adapter pattern"
+      "source_reference": "OPL State Index Kernel / SQLite sidecar refs-only pattern",
+      "sqlite_owner_if_adopted": "one-person-lab",
+      "sqlite_sidecar_is_domain_runtime": false,
+      "sqlite_adoption_contract_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption"
     },
     "north_star": [
       "keep CLI as the default formal entry while retaining MCP as the supported protocol layer",
@@ -7250,11 +7329,18 @@
         "domain_memory_descriptor_locator projection"
       ],
       "future_domain_action_adapter_constraints": [
+        "must be OPL-owned State Index Kernel sidecar if adopted",
         "must be rebuildable",
+        "must store refs, hashes, locators, and provenance only",
         "must not store PNG/PPTX/PDF blobs",
         "must not replace visual-domain truth or review/export judgment",
+        "must not store owner receipt body or visual memory body",
         "must not be Git-tracked"
-      ]
+      ],
+      "sqlite_adoption_contract_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+      "sqlite_owner_if_adopted": "one-person-lab",
+      "sqlite_index_backend_if_adopted": "sqlite_sidecar_index",
+      "sqlite_sidecar_is_domain_runtime": false
     },
     "exploration_lanes": {
       "ppt_image_first_production_route": {
@@ -8002,9 +8088,22 @@
             "owner-route discovery",
             "adoption surface"
           ],
-          "sqlite_status": "deferred_for_rca",
+          "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
           "domain_truth_owner": "redcube_ai",
-          "opl_role": "projection_consumer_only"
+          "opl_role": "projection_consumer_only",
+          "state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+          "state_index_kernel_adoption": {
+            "owner": "one-person-lab",
+            "consumer": "redcube_ai",
+            "sqlite_enabled_now": false,
+            "index_backend": "sqlite_sidecar_index",
+            "refs_only": true,
+            "rebuildable": true,
+            "sidecar_is_domain_runtime": false,
+            "sqlite_can_be_truth_source": false,
+            "sqlite_can_store_visual_artifact_body": false,
+            "sqlite_can_store_review_export_judgment": false
+          }
         },
         "opl_family_stage_control_projection": {
           "status": "repo_tracked_projection_contract",
@@ -12537,7 +12636,81 @@
           }
         },
         "repo_local_stage_runner_active_caller": false,
-        "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
+        "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
+        "stage_artifact_kernel_adoption": {
+          "surface_kind": "opl_stage_artifact_kernel_adoption_projection",
+          "ref": "/stage_artifact_kernel_adoption",
+          "contract_ref": "contracts/stage_artifact_kernel_adoption.json",
+          "owner": "redcube_ai",
+          "consumer": "opl_framework",
+          "status": "root_conformance_entrypoint_landed",
+          "projection_mode": "machine_readable_conformance_entrypoint",
+          "stage_artifact_runtime_ref": "contracts/stage_control_plane.json#/stage_artifact_runtime",
+          "stage_output_role_interface_ref": "contracts/stage_artifact_kernel_adoption.json#/stage_output_role_interface",
+          "review_repair_export_receipts_ref": "contracts/stage_artifact_kernel_adoption.json#/review_repair_export_receipts",
+          "native_helper_manifest_ref": "contracts/stage_artifact_kernel_adoption.json#/native_helper_manifest",
+          "artifact_gallery_handoff_shell_ref": "contracts/stage_artifact_kernel_adoption.json#/artifact_gallery_handoff_shell",
+          "visual_ready_claimed": false,
+          "exportable_claimed": false,
+          "handoffable_claimed": false,
+          "domain_ready_claimed": false,
+          "production_ready_claimed": false,
+          "authority_boundary": {
+            "rca_owns_visual_truth": true,
+            "rca_owns_review_export_verdict": true,
+            "rca_owns_artifact_authority": true,
+            "rca_owns_owner_receipt": true,
+            "opl_can_index_refs": true,
+            "opl_can_rebuild_projection": true,
+            "opl_can_provide_gallery_handoff_shell": true,
+            "opl_can_write_visual_truth": false,
+            "opl_can_authorize_quality_or_export": false,
+            "opl_can_issue_rca_owner_receipt": false
+          },
+          "opl_state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+          "opl_state_index_kernel_adoption": {
+            "ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+            "owner": "one-person-lab",
+            "consumer": "redcube_ai",
+            "adoption_status": "deferred_until_measured_trigger",
+            "sqlite_enabled_now": false,
+            "index_backend": "sqlite_sidecar_index",
+            "refs_only": true,
+            "rebuildable": true,
+            "sidecar_is_domain_runtime": false,
+            "allowed_index_entities": [
+              "session",
+              "deliverable",
+              "route",
+              "artifact",
+              "review",
+              "export"
+            ],
+            "allowed_payload_classes": [
+              "locator",
+              "hash",
+              "provenance",
+              "manifest_ref",
+              "receipt_ref",
+              "route_ref",
+              "lineage_ref"
+            ],
+            "forbidden_storage": [
+              "PNG body",
+              "PPTX body",
+              "PDF body",
+              "visual artifact blob",
+              "canonical artifact truth",
+              "visual-domain truth",
+              "review/export judgment",
+              "owner receipt body",
+              "visual memory body"
+            ],
+            "sqlite_can_be_truth_source": false,
+            "sqlite_can_store_visual_artifact_body": false,
+            "sqlite_can_store_review_export_judgment": false
+          }
+        }
       },
       "artifacts": {
         "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
@@ -16644,6 +16817,80 @@
             "opl_can_authorize": false
           }
         }
+      }
+    },
+    "stage_artifact_kernel_adoption": {
+      "surface_kind": "opl_stage_artifact_kernel_adoption_projection",
+      "ref": "/stage_artifact_kernel_adoption",
+      "contract_ref": "contracts/stage_artifact_kernel_adoption.json",
+      "owner": "redcube_ai",
+      "consumer": "opl_framework",
+      "status": "root_conformance_entrypoint_landed",
+      "projection_mode": "machine_readable_conformance_entrypoint",
+      "stage_artifact_runtime_ref": "contracts/stage_control_plane.json#/stage_artifact_runtime",
+      "stage_output_role_interface_ref": "contracts/stage_artifact_kernel_adoption.json#/stage_output_role_interface",
+      "review_repair_export_receipts_ref": "contracts/stage_artifact_kernel_adoption.json#/review_repair_export_receipts",
+      "native_helper_manifest_ref": "contracts/stage_artifact_kernel_adoption.json#/native_helper_manifest",
+      "artifact_gallery_handoff_shell_ref": "contracts/stage_artifact_kernel_adoption.json#/artifact_gallery_handoff_shell",
+      "visual_ready_claimed": false,
+      "exportable_claimed": false,
+      "handoffable_claimed": false,
+      "domain_ready_claimed": false,
+      "production_ready_claimed": false,
+      "authority_boundary": {
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_export_verdict": true,
+        "rca_owns_artifact_authority": true,
+        "rca_owns_owner_receipt": true,
+        "opl_can_index_refs": true,
+        "opl_can_rebuild_projection": true,
+        "opl_can_provide_gallery_handoff_shell": true,
+        "opl_can_write_visual_truth": false,
+        "opl_can_authorize_quality_or_export": false,
+        "opl_can_issue_rca_owner_receipt": false
+      },
+      "opl_state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+      "opl_state_index_kernel_adoption": {
+        "ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+        "owner": "one-person-lab",
+        "consumer": "redcube_ai",
+        "adoption_status": "deferred_until_measured_trigger",
+        "sqlite_enabled_now": false,
+        "index_backend": "sqlite_sidecar_index",
+        "refs_only": true,
+        "rebuildable": true,
+        "sidecar_is_domain_runtime": false,
+        "allowed_index_entities": [
+          "session",
+          "deliverable",
+          "route",
+          "artifact",
+          "review",
+          "export"
+        ],
+        "allowed_payload_classes": [
+          "locator",
+          "hash",
+          "provenance",
+          "manifest_ref",
+          "receipt_ref",
+          "route_ref",
+          "lineage_ref"
+        ],
+        "forbidden_storage": [
+          "PNG body",
+          "PPTX body",
+          "PDF body",
+          "visual artifact blob",
+          "canonical artifact truth",
+          "visual-domain truth",
+          "review/export judgment",
+          "owner receipt body",
+          "visual memory body"
+        ],
+        "sqlite_can_be_truth_source": false,
+        "sqlite_can_store_visual_artifact_body": false,
+        "sqlite_can_store_review_export_judgment": false
       }
     }
   },

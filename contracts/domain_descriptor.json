@@ -104,6 +104,8 @@
   "standard_contract_refs": {
     "action_catalog": "contracts/action_catalog.json",
     "stage_control_plane": "contracts/stage_control_plane.json",
+    "stage_artifact_kernel_adoption": "contracts/stage_artifact_kernel_adoption.json",
+    "opl_state_index_kernel_adoption": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
     "pack_compiler_input": "contracts/pack_compiler_input.json",
     "agent_lab_handoff": "contracts/agent_lab_handoff.json",
     "generated_surface_handoff": "contracts/generated_surface_handoff.json",

@@ -13,6 +13,8 @@ import {
 } from './workspace.js';
 import {
   canonicalStageForRoute as canonicalStageForRouteJs,
+  RCA_STAGE_OUTPUT_CANONICAL_ROLES as RCA_STAGE_OUTPUT_CANONICAL_ROLES_JS,
+  RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS as RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS_JS,
   stageFolderArtifactPath as stageFolderArtifactPathJs,
   readStageFolderArtifact as readStageFolderArtifactJs,
   stageFolderAttemptPaths as stageFolderAttemptPathsJs,
@@ -111,6 +113,10 @@ export function getDeliverablePaths(workspaceRoot: string, topicId: string, deli
 export function canonicalStageForRoute(stageId: string): string {
   return canonicalStageForRouteJs(stageId) as string;
 }
+
+export const RCA_STAGE_OUTPUT_CANONICAL_ROLES = RCA_STAGE_OUTPUT_CANONICAL_ROLES_JS as readonly string[];
+
+export const RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS_JS as Record<string, readonly string[]>;
 
 export function stageOrderForCanonicalStage(stageId: string): number {
   return stageOrderForCanonicalStageJs(stageId) as number;

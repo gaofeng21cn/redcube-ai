@@ -14,7 +14,20 @@
     "owner-route discovery",
     "adoption surface"
   ],
-  "sqlite_status": "deferred_for_rca",
+  "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
   "domain_truth_owner": "redcube_ai",
-  "opl_role": "projection_consumer_only"
+  "opl_role": "projection_consumer_only",
+  "state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+  "state_index_kernel_adoption": {
+    "owner": "one-person-lab",
+    "consumer": "redcube_ai",
+    "sqlite_enabled_now": false,
+    "index_backend": "sqlite_sidecar_index",
+    "refs_only": true,
+    "rebuildable": true,
+    "sidecar_is_domain_runtime": false,
+    "sqlite_can_be_truth_source": false,
+    "sqlite_can_store_visual_artifact_body": false,
+    "sqlite_can_store_review_export_judgment": false
+  }
 }

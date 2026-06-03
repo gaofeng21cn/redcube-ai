@@ -25,6 +25,85 @@ function uniqueStrings(value) {
   return [...new Set(safeArray(value).map((entry) => safeText(entry)).filter(Boolean))];
 }
 
+export const RCA_STAGE_OUTPUT_CANONICAL_ROLES = Object.freeze([
+  'source_truth_pack',
+  'material_inventory',
+  'strategy_brief',
+  'visual_direction',
+  'render_manifest',
+  'review_verdict',
+  'export_bundle',
+  'handoff_manifest',
+]);
+
+export const RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS = Object.freeze({
+  source_intake: ['source_truth_pack', 'material_inventory'],
+  communication_strategy: ['strategy_brief'],
+  visual_direction: ['visual_direction'],
+  artifact_creation: ['render_manifest'],
+  review_and_revision: ['review_verdict'],
+  package_and_handoff: ['export_bundle', 'handoff_manifest'],
+});
+
+function canonicalRole(value) {
+  const text = safeText(value);
+  return RCA_STAGE_OUTPUT_CANONICAL_ROLES.includes(text) ? text : '';
+}
+
+function inferStageOutputRoles(input = {}) {
+  const route = safeText(input.routeStageId || input.route_stage_id || input.canonicalStageId || input.canonical_stage_id);
+  const explicit = uniqueStrings([
+    input.outputRole || input.output_role,
+    ...safeArray(input.outputRoles || input.output_roles),
+  ]).map((role) => canonicalRole(role)).filter(Boolean);
+  if (explicit.length > 0) return explicit;
+  if (['source_readiness'].includes(route)) return ['source_truth_pack'];
+  if (['research'].includes(route)) return ['material_inventory'];
+  if (['storyline', 'detailed_outline', 'single_note_plan', 'communication_strategy'].includes(route)) {
+    return ['strategy_brief'];
+  }
+  if (['slide_blueprint', 'poster_blueprint', 'visual_direction'].includes(route)) return ['visual_direction'];
+  if ([
+    'render_html',
+    'fix_html',
+    'author_image_pages',
+    'repair_image_pages',
+    'author_pptx_native',
+    'repair_pptx_native',
+  ].includes(route)) return ['render_manifest'];
+  if (['visual_director_review', 'screenshot_review'].includes(route)) return ['review_verdict'];
+  if (['publish_copy', 'export_bundle'].includes(route)) return ['export_bundle', 'handoff_manifest'];
+  if (['export_pptx'].includes(route)) return ['export_bundle', 'handoff_manifest'];
+  return [];
+}
+
+function requiredOutputNames(input, outputName, outputRoles) {
+  const requested = uniqueStrings(input.requiredOutputs);
+  const roleSet = new Set(outputRoles);
+  const names = requested.filter((entry) => !roleSet.has(entry));
+  return names.length > 0 ? names : [outputName];
+}
+
+function normalizeHelperOutputRefs(input, attemptDir) {
+  return safeArray(input.helperOutputRefs || input.helper_output_refs).map((entry) => {
+    const record = entry && typeof entry === 'object' && !Array.isArray(entry) ? entry : {};
+    const file = safeText(record.file || record.path || record.ref);
+    const role = safeText(record.role);
+    return {
+      role,
+      ref: file,
+      output_ref: file && path.isAbsolute(file)
+        ? path.relative(attemptDir, file).split(path.sep).join('/')
+        : file,
+      sha256: safeText(record.sha256),
+      bytes: Number.isFinite(Number(record.bytes)) ? Number(record.bytes) : null,
+      evidence_ref: safeText(record.evidence_ref || record.evidenceRef) || null,
+      review_receipt_ref: safeText(record.review_receipt_ref || record.reviewReceiptRef) || null,
+      review_receipt_refs: uniqueStrings(record.review_receipt_refs || record.reviewReceiptRefs),
+    };
+  }).filter((entry) => entry.role && entry.ref);
+}
+
 function safeSegment(value, fallback) {
   const text = safeText(value, fallback);
   if (!text || text.includes('/') || text.includes('\\') || text.includes('..')) {
@@ -384,12 +463,47 @@ export function writeStageFolderArtifact(input) {
   if (existsSync(input.artifactFile) && path.resolve(input.artifactFile) !== path.resolve(outputFile)) {
     writeFileSync(outputFile, readFileSync(input.artifactFile));
   }
-  const requiredOutputs = uniqueStrings(input.requiredOutputs?.length ? input.requiredOutputs : [outputName]);
+  const outputRoles = inferStageOutputRoles(input);
+  const requiredOutputRoles = uniqueStrings(input.requiredOutputRoles || input.required_output_roles)
+    .map((role) => canonicalRole(role)).filter(Boolean);
+  const effectiveRequiredOutputRoles = requiredOutputRoles.length > 0 ? requiredOutputRoles : outputRoles;
+  const requiredOutputs = requiredOutputNames(input, outputName, outputRoles);
   const ownerReceiptRefs = ownerReceiptRefsFor(input, status, attemptId, canonicalStageId);
   const typedBlockerRefs = typedBlockerRefsFor(input, status, attemptId, canonicalStageId);
   const outputRef = path.relative(paths.attempt_dir, outputFile);
   const outputHash = fileHashRecord(paths.outputs_dir, outputFile, 'output');
   const outputHashes = outputHash ? [outputHash] : [];
+  const receiptRef = ownerReceiptRefs.length > 0 ? 'receipts/domain-owner-receipt.json' : null;
+  const blockerRef = typedBlockerRefs.length > 0 ? 'evidence/typed-blocker-ref.json' : null;
+  const outputRoleRefs = outputRoles.map((role) => ({
+    role,
+    output_ref: outputRef,
+    output_file: outputFile,
+    manifest_ref: 'manifest.json',
+    receipt_ref: receiptRef,
+    typed_blocker_ref: blockerRef,
+    sha256: outputHash?.sha256 || null,
+    bytes: outputHash?.bytes || null,
+  }));
+  const helperOutputRefs = normalizeHelperOutputRefs(input, paths.attempt_dir);
+  const stageReceipts = [
+    ...ownerReceiptRefs.map((receiptRefValue) => ({
+      receipt_kind: 'domain_owner_receipt',
+      receipt_ref: receiptRefValue,
+      receipt_file: receiptRef,
+      output_roles: outputRoles,
+      route_stage_id: safeText(input.routeStageId),
+      owner: 'redcube_ai',
+    })),
+    ...typedBlockerRefs.map((blockerRefValue) => ({
+      receipt_kind: 'domain_typed_blocker',
+      typed_blocker_ref: blockerRefValue,
+      evidence_file: blockerRef,
+      output_roles: outputRoles,
+      route_stage_id: safeText(input.routeStageId),
+      owner: 'redcube_ai',
+    })),
+  ];
   writeJson(paths.attempt_file, {
     surface_kind: 'opl_stage_artifact_attempt',
     attempt_id: attemptId,
@@ -444,15 +558,30 @@ export function writeStageFolderArtifact(input) {
     artifact_file: input.artifactFile,
     output_file: outputFile,
     required_outputs: requiredOutputs,
+    required_output_roles: effectiveRequiredOutputRoles,
     present_outputs: listRelativeFilesRecursive(paths.outputs_dir),
-    output_refs: uniqueStrings([outputRef, outputFile, ...(input.artifactRefs ?? [])]),
+    present_output_roles: outputRoleRefs.map((entry) => entry.role),
+    output_refs: outputRoleRefs,
+    stage_output_role_interface: {
+      surface_kind: 'rca_stage_output_role_interface',
+      version: 'rca-stage-output-role-interface.v1',
+      canonical_roles: RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+      required_roles: effectiveRequiredOutputRoles,
+      present_roles: outputRoleRefs.map((entry) => entry.role),
+      file_name_is_interface: false,
+      role_manifest_receipt_is_interface: true,
+      output_roles: outputRoleRefs,
+    },
+    helper_output_refs: helperOutputRefs,
     output_hashes: outputHashes,
     evidence_hashes: hashFiles(paths.evidence_dir, 'evidence'),
     receipt_hashes: hashFiles(paths.receipts_dir, 'receipt'),
     owner_receipt_refs: ownerReceiptRefs,
     typed_blocker_refs: typedBlockerRefs,
     decision_receipt_refs: [],
+    stage_receipts: stageReceipts,
     review_export_refs: uniqueStrings(input.reviewExportRefs),
+    artifact_refs: uniqueStrings(input.artifactRefs ?? []),
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
   writeJson(paths.manifest_file, manifest);

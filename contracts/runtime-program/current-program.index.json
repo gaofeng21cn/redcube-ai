@@ -202,7 +202,7 @@
       "json_pointer": "/current_state/active_baton/scope/opl_family_lifecycle_adapter",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/opl_family_lifecycle_adapter.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 20
+      "line_count": 33
     },
     {
       "json_pointer": "/current_state/active_baton/scope/opl_family_stage_control_projection",
@@ -527,6 +527,12 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/runtime_substrate_owner.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 1
+    },
+    {
+      "json_pointer": "/current_state/active_baton/scope/stage_artifact_kernel_adoption",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/stage_artifact_kernel_adoption.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 74
     },
     {
       "json_pointer": "/current_state/active_baton/scope/standard_domain_agent_skeleton_repo_source_layout",
@@ -994,13 +1000,19 @@
       "json_pointer": "/current_state/runtime_persistence_strategy",
       "ref": "contracts/runtime-program/current-program-parts/current_state/runtime_persistence_strategy.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 22
+      "line_count": 29
     },
     {
       "json_pointer": "/current_state/runtime_substrate_owner",
       "ref": "contracts/runtime-program/current-program-parts/current_state/runtime_substrate_owner.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 1
+    },
+    {
+      "json_pointer": "/current_state/stage_artifact_kernel_adoption",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/stage_artifact_kernel_adoption.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 74
     },
     {
       "json_pointer": "/current_state/stop_conditions",
@@ -1144,7 +1156,7 @@
       "json_pointer": "/longrun_goal",
       "ref": "contracts/runtime-program/current-program-parts/longrun_goal.json",
       "role": "current_program_leaf_source",
-      "line_count": 113
+      "line_count": 118
     },
     {
       "json_pointer": "/product_release_metadata/authority_boundary",
@@ -1727,6 +1739,12 @@
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/public_surfaces.json",
       "role": "current_program_leaf_source",
       "line_count": 17
+    },
+    {
+      "json_pointer": "/product_release_metadata/stage_artifact_kernel_adoption",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/stage_artifact_kernel_adoption.json",
+      "role": "current_program_leaf_source",
+      "line_count": 74
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/consumer",

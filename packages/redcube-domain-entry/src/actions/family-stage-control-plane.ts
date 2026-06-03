@@ -1,4 +1,8 @@
 // @ts-nocheck
+import {
+  RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+  RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
+} from '@redcube/runtime-protocol';
 
 const STAGES = [
   {
@@ -231,6 +235,11 @@ const PLANE_SOURCE_REFS = [
   { ref_kind: 'json_pointer', ref: '/review_state', role: 'review_truth_projection' },
   { ref_kind: 'json_pointer', ref: '/publication_projection', role: 'publication_projection' },
   { ref_kind: 'json_pointer', ref: '/artifact_inventory', role: 'artifact_authority_projection' },
+  {
+    ref_kind: 'contract',
+    ref: 'contracts/artifact_locator_contract.json#/primary_artifact_truth',
+    role: 'stage_folder_physical_artifact_truth',
+  },
 ];
 
 const CANONICAL_STAGE_PROMPT_REFS = {
@@ -436,6 +445,7 @@ function buildReplayEvidenceRefs(stage) {
 }
 
 function stageDescriptor(stage, actionIds) {
+  const expectedOutputRoles = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[stage.stage_id] || [];
   const sourceRefs = [
     ...PLANE_SOURCE_REFS,
     { ref_kind: 'route_stage_refs', ref: stage.domain_stage_refs, role: 'domain_stage_projection' },
@@ -495,6 +505,18 @@ function stageDescriptor(stage, actionIds) {
     stage_contract: {
       requires: stage.requires || [],
       ensures: stage.ensures || [],
+      stage_output_role_interface: {
+        surface_kind: 'rca_stage_output_role_interface_contract',
+        version: 'stage-output-role-interface.v1',
+        owner: 'redcube_ai',
+        stage_id: stage.stage_id,
+        required_roles: expectedOutputRoles,
+        accepted_roles: RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+        interface_rule: 'role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface',
+        manifest_ref: 'manifest.json',
+        receipt_ref_policy: 'owner_receipt_or_typed_blocker_ref_required_by_terminal_status',
+      },
+      expected_output_roles: expectedOutputRoles,
       runtime_event_refs: stage.runtime_event_refs || [],
       ...buildCohortLoopRefs(stage),
       ...buildReplayEvidenceRefs(stage),
@@ -564,6 +586,51 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
       status: missingActionRefs.length === 0 ? 'aligned' : 'missing_action_refs',
       family_action_catalog_ref: '/family_action_catalog',
       missing_action_refs: missingActionRefs,
+    },
+    stage_output_role_interface: {
+      surface_kind: 'rca_stage_output_role_interface_contract',
+      version: 'stage-output-role-interface.v1',
+      owner: 'redcube_ai',
+      canonical_roles: RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+      interface_rule: 'stage_outputs_are_addressed_by_role_manifest_and_receipt_refs_not_filename',
+      stage_role_expectations: RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
+      role_ref_shape: {
+        role: '<canonical_role>',
+        output_ref: 'outputs/<mutable-file-name>',
+        manifest_ref: 'manifest.json',
+        receipt_ref: 'receipts/domain-owner-receipt.json or null when blocked',
+        typed_blocker_ref: 'evidence/typed-blocker-ref.json or null when successful',
+      },
+      filename_policy: 'output file names may vary and must not be used as the machine interface',
+    },
+    stage_artifact_runtime: {
+      surface_kind: 'opl_stage_folder_contract_consumption',
+      contract_ref: 'contracts/artifact_locator_contract.json#/primary_artifact_truth',
+      physical_source_of_truth: '$OPL_STATE_DIR/runtime-state/domains/redcube_ai/deliverables/<program_id>/<topic_id>/<deliverable_id>/stages/<nn-stage>/attempts/<attempt_id>/',
+      canonical_stages: [
+        'source_intake',
+        'communication_strategy',
+        'visual_direction',
+        'artifact_creation',
+        'review_and_revision',
+        'package_and_handoff',
+      ],
+      canonical_output_roles: RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+      stage_role_expectations: RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
+      interface_rule: 'role_plus_manifest_plus_receipt_ref_is_machine_interface_filename_is_mutable',
+      completion_rule: 'required output roles plus valid manifest plus RCA owner receipt',
+      blocked_rule: 'RCA typed blocker plus evidence',
+      orphan_rule: 'output files without valid role manifest/receipt/evidence are not completed stages',
+      derived_projection_policy: 'status, stage_progress_log, gallery, and handoff are derived from Stage Folder contents; they are not first truth',
+      authority_boundary: {
+        owner: 'redcube_ai',
+        opl_role: 'stage_folder_contract_provider_index_rebuild_status_explain',
+        opl_can_issue_owner_receipt: false,
+        opl_can_write_visual_truth: false,
+        opl_can_write_review_export_verdict: false,
+        opl_can_write_domain_artifact_body: false,
+        rca_owns_artifact_authority: true,
+      },
     },
     authority_boundary: {
       domain_truth_owner: 'redcube_ai',

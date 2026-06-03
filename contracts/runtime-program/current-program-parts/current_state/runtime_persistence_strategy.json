@@ -14,9 +14,16 @@
     "domain_memory_descriptor_locator projection"
   ],
   "future_domain_action_adapter_constraints": [
+    "must be OPL-owned State Index Kernel sidecar if adopted",
     "must be rebuildable",
+    "must store refs, hashes, locators, and provenance only",
     "must not store PNG/PPTX/PDF blobs",
     "must not replace visual-domain truth or review/export judgment",
+    "must not store owner receipt body or visual memory body",
     "must not be Git-tracked"
-  ]
+  ],
+  "sqlite_adoption_contract_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+  "sqlite_owner_if_adopted": "one-person-lab",
+  "sqlite_index_backend_if_adopted": "sqlite_sidecar_index",
+  "sqlite_sidecar_is_domain_runtime": false
 }

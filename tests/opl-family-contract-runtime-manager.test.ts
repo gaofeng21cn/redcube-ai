@@ -33,7 +33,23 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('domain_memory_descriptor_locator projection'));
   assert.equal(adapter.status, 'repo_tracked_projection_contract');
   assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
-  assert.equal(adapter.sqlite_status, 'deferred_for_rca');
+  assert.equal(adapter.sqlite_status, 'deferred_for_rca_opl_state_index_kernel_sidecar');
+  assert.equal(
+    adapter.state_index_kernel_adoption_ref,
+    'contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption',
+  );
+  assert.deepEqual(adapter.state_index_kernel_adoption, {
+    owner: 'one-person-lab',
+    consumer: 'redcube_ai',
+    sqlite_enabled_now: false,
+    index_backend: 'sqlite_sidecar_index',
+    refs_only: true,
+    rebuildable: true,
+    sidecar_is_domain_runtime: false,
+    sqlite_can_be_truth_source: false,
+    sqlite_can_store_visual_artifact_body: false,
+    sqlite_can_store_review_export_judgment: false,
+  });
   assert.deepEqual(adapter.exposes, [
     'family persistence',
     'lifecycle projection',

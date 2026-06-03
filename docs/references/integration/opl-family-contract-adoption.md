@@ -43,7 +43,7 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。`runtimeWatch` 继续是 direct review/progress read model，`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；OPL 的 runtime 查询目标是 status/workbench runtime read-model，而不是 RCA repo-local default wrapper。
 
-该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite domain_action_adapter 保持 `deferred_for_rca`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估。
+该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite 只作为 OPL State Index Kernel / refs-only sidecar index 保持 `deferred_for_rca_opl_state_index_kernel_sidecar`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估；它不存 PNG/PPTX/PDF body，也不持有 visual truth、canonical artifact truth 或 review/export verdict。
 
 ## Stage Control Projection
 
