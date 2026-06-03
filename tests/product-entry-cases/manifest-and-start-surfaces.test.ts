@@ -437,7 +437,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_evaluator_ref, '/visual_transition_evaluator');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_memory_descriptor_locator_ref, '/domain_memory_descriptor_locator');
     assert.equal(manifest.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
-    assert.equal(manifest.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+    assert.equal(manifest.artifact_locator_contract.locator_model, 'opl_stage_folder_contract_refs_only');
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.workspace_root, workspaceRoot);
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.runtime_state_root, runtimeStateRoot);
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_continuity_root, manifest.runtime.session_continuity_root);

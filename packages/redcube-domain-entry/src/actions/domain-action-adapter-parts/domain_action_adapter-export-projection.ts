@@ -285,7 +285,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       artifact_locator_contract: {
         ref: '/artifact_locator_contract',
         owner: DOMAIN_ID,
-        locator_model: manifest.artifact_locator_contract?.locator_model || 'workspace_runtime_artifact_root_refs_only',
+        locator_model: manifest.artifact_locator_contract?.locator_model || 'opl_stage_folder_contract_refs_only',
         writable_by_domain_action_adapter: false,
         lifecycle_transport_owner: 'opl',
         rca_retained_authority: ['artifact_authority'],

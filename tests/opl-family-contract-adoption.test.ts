@@ -990,7 +990,7 @@ test('RCA artifact locator and domain_action_adapter receipts expose refs withou
   const skeleton = payload.standard_domain_agent_skeleton;
 
   assert.equal(skeleton.artifact_locator_contract.contract_id, 'rca.workspace_runtime_artifact_locator.v1');
-  assert.equal(skeleton.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+  assert.equal(skeleton.artifact_locator_contract.locator_model, 'opl_stage_folder_contract_refs_only');
   assert.equal(skeleton.artifact_locator_contract.repo_tracks_visual_or_export_artifact_blobs, false);
   for (const forbidden of [
     'store_png_pptx_pdf_blob',

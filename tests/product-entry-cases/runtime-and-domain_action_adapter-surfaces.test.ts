@@ -172,7 +172,7 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_ref, '/standard_domain_agent_skeleton/repo_source_boundary/audit_surface');
     assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_status, 'pass');
     assert.equal(domain_action_adapter.mapped_surfaces.artifact_locator_contract.ref, '/artifact_locator_contract');
-    assert.equal(domain_action_adapter.mapped_surfaces.artifact_locator_contract.locator_model, 'workspace_runtime_artifact_root_refs_only');
+    assert.equal(domain_action_adapter.mapped_surfaces.artifact_locator_contract.locator_model, 'opl_stage_folder_contract_refs_only');
     assert.equal(domain_action_adapter.mapped_surfaces.artifact_locator_contract.lifecycle_transport_owner, 'opl');
     assert.equal(domain_action_adapter.mapped_surfaces.receipt_refs.ref, '/domain_action_adapter_receipt_refs');
     assert.equal(domain_action_adapter.mapped_surfaces.receipt_refs.forbidden_receipt_fields.includes('export_verdict'), true);
