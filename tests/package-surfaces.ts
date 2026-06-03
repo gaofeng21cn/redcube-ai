@@ -81,6 +81,7 @@ export {
   structuredCallViaHermesAgentApi,
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from '@redcube/runtime-protocol';
+export { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';
 export {
   persistReviewStatePatch,
 } from '@redcube/governance';

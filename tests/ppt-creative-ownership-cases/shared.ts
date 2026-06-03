@@ -18,8 +18,8 @@ import {
 
 import {
   createDeliverable,
-  runDeliverableRoute,
 } from '@redcube/domain-entry';
+import { runDeliverableRoute } from '../helpers/route-attempt-test-api.ts';
 import {
   getPublicationProjection,
 } from '@redcube/governance';

@@ -123,29 +123,166 @@ function buildExecutorDescriptor(executor, runtimeDescriptor) {
   };
 }
 
-function buildRouteRunProviderAttemptIndex({ runId, safeRoute, executor }) {
-  const safeRunId = String(runId || '').trim();
-  const routeRunRef = safeRunId ? `route-run:${safeRunId}` : '';
+function safeIndexText(index, ...keys) {
+  for (const key of keys) {
+    const text = String(index?.[key] || '').trim();
+    if (text) return text;
+  }
+  return '';
+}
+
+function buildMissingOplRouteAttemptBlocker({ safeRoute, overlay, topicId, deliverableId, runId, reasons }) {
+  const blockerRef = `rca-typed-blocker:route-execution-owner:${overlay}:${safeRoute}:${deliverableId}:opl-stage-attempt-required`;
   return {
-    surface_kind: 'cross_provider_attempt_index',
-    version: 'cross-provider-attempt-index.v1',
-    owner: 'one-person-lab',
-    provider_attempt_owner: 'one-person-lab',
-    domain_adapter_owner: 'redcube_ai',
-    ...(routeRunRef ? {
-      local_session_ref: routeRunRef,
-      local_route_run_ref: routeRunRef,
-      provider_attempt_ref: `opl-provider-attempt:redcube_ai/${safeRoute}/${safeRunId}`,
-    } : {}),
-    provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/${safeRoute}`,
-    provider_attempt_ref_required: true,
-    provider_attempt_ledger_ref_required: true,
-    missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
-    local_session_ref_is_not_provider_attempt_ref: true,
-    rca_does_not_own_provider_attempt_ledger: true,
-    can_claim_current_without_provider_ledger: false,
-    executor_adapter: String(executor?.adapter || '').trim() || null,
-    executor_backend: String(executor?.backend || executor?.executor_backend || '').trim() || null,
+    ok: false,
+    surface_kind: 'typed_blocker',
+    return_shape: 'typed_blocker',
+    blocker_ref: blockerRef,
+    blocker_kind: 'missing_opl_stage_attempt',
+    owner: 'redcube_ai',
+    route: safeRoute,
+    overlay,
+    topic_id: topicId,
+    deliverable_id: deliverableId,
+    run: {
+      run_id: String(runId || '').trim() || null,
+      route: safeRoute,
+      overlay,
+      topic_id: topicId,
+      deliverable_id: deliverableId,
+      status: 'typed_blocker',
+      current_stage: safeRoute,
+      error_kind: 'typed_blocker',
+      error: {
+        code: 'missing_opl_stage_attempt',
+        message: 'RCA route execution requires an OPL-owned stage attempt packet; repo-local route runner cannot be the default execution owner.',
+        failure_kind: 'typed_blocker',
+        blocking_reasons: reasons,
+        recommended_action: 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker',
+      },
+      cross_provider_attempt_index: null,
+      route_execution_owner_boundary: {
+        owner: 'opl',
+        rca_role: 'visual_route_handler_and_artifact_authority',
+        default_execution_owner: 'opl_stage_attempt_or_typed_blocker',
+        repo_local_route_runner_default_allowed: false,
+      },
+    },
+    events: [],
+    error: {
+      code: 'missing_opl_stage_attempt',
+      message: 'RCA route execution requires an OPL-owned stage attempt packet; repo-local route runner cannot be the default execution owner.',
+      failure_kind: 'typed_blocker',
+      blocking_reasons: reasons,
+      recommended_action: 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker',
+      blocker_ref: blockerRef,
+      blocker_kind: 'missing_opl_stage_attempt',
+    },
+    typed_blocker: {
+      surface_kind: 'typed_blocker',
+      return_shape: 'typed_blocker',
+      blocker_ref: blockerRef,
+      blocker_kind: 'missing_opl_stage_attempt',
+      owner: 'redcube_ai',
+      next_required_owner_action: 'opl_stage_attempt_or_domain_owned_typed_blocker',
+      missing_refs: reasons,
+      forbidden_default_owner: 'redcube_ai_repo_local_route_runner',
+    },
+    artifact: null,
+    artifactFile: undefined,
+    cache_status: 'miss',
+  };
+}
+
+function normalizeOplRouteAttemptIndex({ crossProviderAttemptIndex, safeRoute, overlay, topicId, deliverableId, runId }) {
+  const index = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object' && !Array.isArray(crossProviderAttemptIndex)
+    ? crossProviderAttemptIndex
+    : null;
+  const missing = [];
+  if (!index) {
+    missing.push('cross_provider_attempt_index');
+    return {
+      ok: false,
+      blocker: buildMissingOplRouteAttemptBlocker({
+        safeRoute,
+        overlay,
+        topicId,
+        deliverableId,
+        runId,
+        reasons: missing,
+      }),
+    };
+  }
+
+  const providerAttemptOwner = safeIndexText(index, 'provider_attempt_owner', 'providerAttemptOwner');
+  const owner = safeIndexText(index, 'owner');
+  const providerAttemptRef = safeIndexText(index, 'provider_attempt_ref', 'providerAttemptRef', 'opl_provider_attempt_ref', 'oplProviderAttemptRef');
+  const providerAttemptLedgerRef = safeIndexText(index, 'provider_attempt_ledger_ref', 'providerAttemptLedgerRef', 'opl_provider_attempt_ledger_ref', 'oplProviderAttemptLedgerRef');
+  const stageAttemptRef = safeIndexText(index, 'stage_attempt_ref', 'stageAttemptRef', 'opl_stage_attempt_ref', 'oplStageAttemptRef');
+  const attemptLeaseRef = safeIndexText(index, 'attempt_lease_ref', 'attemptLeaseRef', 'lease_ref', 'leaseRef', 'provider_attempt_lease_ref', 'providerAttemptLeaseRef');
+  const attemptReceiptRef = safeIndexText(index, 'attempt_receipt_ref', 'attemptReceiptRef', 'closeout_receipt_ref', 'closeoutReceiptRef');
+  const localSessionRef = safeIndexText(index, 'local_session_ref', 'localSessionRef');
+
+  if (providerAttemptOwner !== 'one-person-lab' && owner !== 'one-person-lab') missing.push('provider_attempt_owner');
+  if (!providerAttemptRef) missing.push('provider_attempt_ref');
+  if (!providerAttemptLedgerRef) missing.push('provider_attempt_ledger_ref');
+  if (!stageAttemptRef && !attemptLeaseRef && !attemptReceiptRef) {
+    missing.push('opl_stage_attempt_or_lease_or_receipt_ref');
+  }
+  if (providerAttemptRef && (
+    providerAttemptRef === localSessionRef
+    || providerAttemptRef.startsWith('route-run:')
+    || providerAttemptRef.startsWith('product-entry-session:')
+  )) {
+    missing.push('valid_provider_attempt_ref');
+  }
+  if (providerAttemptLedgerRef && (
+    providerAttemptLedgerRef === localSessionRef
+    || providerAttemptLedgerRef === providerAttemptRef
+    || providerAttemptLedgerRef.startsWith('route-run:')
+    || providerAttemptLedgerRef.startsWith('product-entry-session:')
+  )) {
+    missing.push('valid_provider_attempt_ledger_ref');
+  }
+
+  if (missing.length > 0) {
+    return {
+      ok: false,
+      blocker: buildMissingOplRouteAttemptBlocker({
+        safeRoute,
+        overlay,
+        topicId,
+        deliverableId,
+        runId,
+        reasons: Array.from(new Set(missing)).sort(),
+      }),
+    };
+  }
+
+  return {
+    ok: true,
+    index: {
+      ...index,
+      surface_kind: 'cross_provider_attempt_index',
+      version: safeIndexText(index, 'version') || 'cross-provider-attempt-index.v1',
+      owner: 'one-person-lab',
+      provider_attempt_owner: 'one-person-lab',
+      domain_adapter_owner: 'redcube_ai',
+      provider_attempt_ref: providerAttemptRef,
+      provider_attempt_ledger_ref: providerAttemptLedgerRef,
+      ...(stageAttemptRef ? { stage_attempt_ref: stageAttemptRef } : {}),
+      ...(attemptLeaseRef ? { attempt_lease_ref: attemptLeaseRef } : {}),
+      ...(attemptReceiptRef ? { attempt_receipt_ref: attemptReceiptRef } : {}),
+      provider_attempt_ref_required: true,
+      provider_attempt_ledger_ref_required: true,
+      missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+      local_session_ref_is_not_provider_attempt_ref: true,
+      rca_does_not_own_provider_attempt_ledger: true,
+      can_claim_current_without_provider_ledger: false,
+      repo_local_route_runner_default_allowed: false,
+      execution_owner: 'opl_stage_attempt',
+      rca_execution_role: 'visual_route_handler_and_artifact_authority',
+    },
   };
 }
 
@@ -162,7 +299,7 @@ function parseRouteRequest(request) {
     mode = 'draft_new',
     baselineDeliverableId = '',
     candidateCount = 1,
-    crossProviderAttemptIndex = null,
+    crossProviderAttemptIndex = request.cross_provider_attempt_index || null,
   } = request;
   const safeRoute = requireSafeSegment('route', route);
   validateDeliverableRouteInput({
@@ -460,6 +597,7 @@ async function executeRouteCandidateRace({
   baselineDeliverableId,
   candidateCount,
   executor,
+  crossProviderAttemptIndex,
 }) {
   const routeCandidateCount = candidateCountForRoute({ route: safeRoute, candidateCount });
   const raced = await runCandidateRaceRoute({
@@ -480,6 +618,7 @@ async function executeRouteCandidateRace({
       userIntent,
       mode,
       baselineDeliverableId,
+      oplRouteAttemptIndex: crossProviderAttemptIndex,
     }),
     scoreCandidate: (candidate) => Number(candidate?.artifact?.visual_direction?.rhythm_curve?.length || 1),
   });
@@ -638,11 +777,18 @@ export async function runDeliverableRoute(request) {
   });
   const effectiveCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
     ? crossProviderAttemptIndex
-    : buildRouteRunProviderAttemptIndex({
-        runId: String(runId || '').trim() || null,
-        safeRoute,
-        executor,
-      });
+    : null;
+  const normalizedRouteAttempt = normalizeOplRouteAttemptIndex({
+    crossProviderAttemptIndex: effectiveCrossProviderAttemptIndex,
+    safeRoute,
+    overlay,
+    topicId,
+    deliverableId,
+    runId,
+  });
+  if (normalizedRouteAttempt.ok !== true) {
+    return normalizedRouteAttempt.blocker;
+  }
 
   const run = startRouteRun({
     workspaceRoot,
@@ -654,7 +800,7 @@ export async function runDeliverableRoute(request) {
     deliverableId,
     baselineDeliverableId,
     executor,
-    crossProviderAttemptIndex: effectiveCrossProviderAttemptIndex,
+    crossProviderAttemptIndex: normalizedRouteAttempt.index,
   });
 
   appendRouteRunEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
@@ -678,6 +824,7 @@ export async function runDeliverableRoute(request) {
       baselineDeliverableId,
       candidateCount,
       executor,
+      crossProviderAttemptIndex: normalizedRouteAttempt.index,
     });
     return buildCompletedRouteResponse({
       workspaceRoot,
@@ -687,7 +834,7 @@ export async function runDeliverableRoute(request) {
       deliverableId,
       routeResult,
       executor,
-      crossProviderAttemptIndex: effectiveCrossProviderAttemptIndex,
+      crossProviderAttemptIndex: normalizedRouteAttempt.index,
     });
   } catch (error) {
     return buildFailedRouteResponse({

@@ -15,6 +15,8 @@ Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL
 
 OPL Framework 持有通用 stage attempt、provider-backed runtime、typed queue、wakeup、retry/dead-letter、human gate、receipt ledger、operator projection、workspace/source locator、artifact gallery/handoff shell、review/repair transport、generated wrapper 和 App/workbench shell。RCA 当前口径已收敛为 OPL generated/hosted wrapper/session/workbench/generic shell consumer；RCA 只保留 domain handler target、direct entry、refs-only adapter、minimal visual authority function 和 native helper implementation。旧 repo-local managed runtime 物理实现已删除，active source/package/test surface 不再保留内部 managed runtime fixture。
 
+当前 `runDeliverableRoute` / route-local helper 只能作为 RCA visual route handler 和 artifact authority target 运行。默认执行必须携带 OPL-owned `cross_provider_attempt_index`，同时包含 `provider_attempt_owner=one-person-lab`、provider attempt ref、provider attempt ledger ref，以及 stage attempt / lease / receipt ref；缺失时返回 RCA typed blocker `missing_opl_stage_attempt`，且不创建 repo-local run/event state。`allowLocalDiagnosticRecord` 只允许 explicit refs-only diagnostic test 使用，不能作为默认执行 owner。
+
 RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.md` 是 stage-level canonical prompt policy；`agent/stages/`、`agent/skills/`、`agent/quality_gates/` 与 `agent/knowledge/` 持有 Declarative Visual Pack 的 repo-source 语义。`prompts/ppt_deck/` 与 `prompts/xiaohongshu/` 继续作为 detailed implementation prompt assets，由 `agent/prompts/*.md` 定位；`contracts/stage_control_plane.json` 的 `prompt_refs` 只指向 `agent/prompts/*.md`。
 
 `Codex CLI` 是当前第一公民 executor。`Hermes-Agent` 只在显式 hosted/proof backend 或技术参考层出现，不承诺行为或输出质量与 Codex CLI 等价。

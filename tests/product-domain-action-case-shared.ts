@@ -34,9 +34,9 @@ import {
   invokeProductEntry,
   prepareSourceAugmentationResult,
   researchSource,
-  runDeliverableRoute,
   writeSourceAugmentationResult,
 } from '@redcube/domain-entry';
+import { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,

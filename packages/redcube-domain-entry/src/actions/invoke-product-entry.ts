@@ -139,6 +139,7 @@ function normalizeDeliveryRequest(request) {
     mode: safeText(delivery?.mode),
     baselineDeliverableId: safeText(delivery?.baseline_deliverable_id || delivery?.baselineDeliverableId),
     taskIntent: safeText(delivery?.task_intent || delivery?.taskIntent),
+    crossProviderAttemptIndex: delivery?.cross_provider_attempt_index || delivery?.crossProviderAttemptIndex || null,
     constraints: delivery?.constraints && typeof delivery.constraints === 'object' && !Array.isArray(delivery.constraints)
       ? delivery.constraints
       : {},
@@ -493,7 +494,8 @@ function buildDomainEntryRequest({
       lifecycle_policy: delivery.lifecyclePolicy || undefined,
       mode: delivery.mode || undefined,
       baseline_deliverable_id: delivery.baselineDeliverableId || undefined,
-      cross_provider_attempt_index: entrySession.providerAttemptRef || entrySession.providerAttemptLedgerRef
+      cross_provider_attempt_index: delivery.crossProviderAttemptIndex
+        || (entrySession.providerAttemptRef || entrySession.providerAttemptLedgerRef
         ? {
             surface_kind: 'cross_provider_attempt_index',
             local_session_ref: `product-entry-session:${entrySession.entrySessionId}`,
@@ -501,7 +503,7 @@ function buildDomainEntryRequest({
             provider_attempt_ref: entrySession.providerAttemptRef || undefined,
             provider_attempt_ledger_ref: entrySession.providerAttemptLedgerRef || undefined,
           }
-        : undefined,
+        : undefined),
     },
   };
 }

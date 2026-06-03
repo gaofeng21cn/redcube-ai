@@ -40,12 +40,20 @@ export function buildRouteRunDomainEntryResponse({
   const hydratedContract = readJsonRecord(path.join(deliverablePaths.deliverableDir, contractRef));
   const run = result.run as { current_stage?: unknown; run_id?: unknown; status?: unknown } | undefined;
   const qualityBlocked = result.ok !== true && safeText(run?.status) === 'quality_blocked';
+  const typedBlocker = result.ok !== true && (
+    safeText((result as { surface_kind?: unknown }).surface_kind) === 'typed_blocker'
+    || safeText((result as { return_shape?: unknown }).return_shape) === 'typed_blocker'
+    || safeText(run?.status) === 'typed_blocker'
+  );
 
   return {
     ...result,
-    surface_kind: 'route_run',
-    recommended_action: result.ok ? 'continue' : (qualityBlocked ? 'run_recommended_repair' : 'inspect_run_failure'),
-    error_kind: result.ok ? null : (qualityBlocked ? 'quality_blocked' : 'route_failure'),
+    surface_kind: typedBlocker ? 'typed_blocker' : 'route_run',
+    ...(typedBlocker ? { return_shape: 'typed_blocker' } : {}),
+    recommended_action: result.ok
+      ? 'continue'
+      : (typedBlocker ? 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker' : (qualityBlocked ? 'run_recommended_repair' : 'inspect_run_failure')),
+    error_kind: result.ok ? null : (typedBlocker ? 'typed_blocker' : (qualityBlocked ? 'quality_blocked' : 'route_failure')),
     summary: {
       route: request.route,
       run_id: result.run?.run_id || null,

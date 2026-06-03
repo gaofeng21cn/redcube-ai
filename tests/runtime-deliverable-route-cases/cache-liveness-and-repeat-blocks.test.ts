@@ -223,6 +223,7 @@ test('getRun and runtimeWatch expire stale persisted running route runs with an 
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
+    allowLocalDiagnosticRecord: true,
   });
   const runFile = path.join(workspaceRoot, 'runtime', 'runs', `${run.run_id}.json`);
   const staleRun = JSON.parse(readFileSync(runFile, 'utf-8'));

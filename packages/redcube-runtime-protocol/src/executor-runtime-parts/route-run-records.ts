@@ -236,6 +236,31 @@ function requireRuntimeTopologyResolver(deps) {
   return resolver;
 }
 
+function normalizeCrossProviderAttemptIndex(index, routeRunRef) {
+  if (!index || typeof index !== 'object' || Array.isArray(index)) {
+    return null;
+  }
+  return {
+    ...index,
+    local_session_ref: String(index.local_session_ref || routeRunRef).trim() || routeRunRef,
+    local_route_run_ref: String(index.local_route_run_ref || routeRunRef).trim() || routeRunRef,
+  };
+}
+
+function hasOplRouteAttemptEvidence(index) {
+  if (!index || typeof index !== 'object' || Array.isArray(index)) return false;
+  const owner = String(index.provider_attempt_owner || index.providerAttemptOwner || index.owner || '').trim();
+  const providerAttemptRef = String(index.provider_attempt_ref || index.providerAttemptRef || '').trim();
+  const providerAttemptLedgerRef = String(index.provider_attempt_ledger_ref || index.providerAttemptLedgerRef || '').trim();
+  const stageAttemptRef = String(index.stage_attempt_ref || index.stageAttemptRef || index.opl_stage_attempt_ref || index.oplStageAttemptRef || '').trim();
+  const attemptLeaseRef = String(index.attempt_lease_ref || index.attemptLeaseRef || index.lease_ref || index.leaseRef || '').trim();
+  const attemptReceiptRef = String(index.attempt_receipt_ref || index.attemptReceiptRef || index.closeout_receipt_ref || index.closeoutReceiptRef || '').trim();
+  return owner === 'one-person-lab'
+    && providerAttemptRef
+    && providerAttemptLedgerRef
+    && (stageAttemptRef || attemptLeaseRef || attemptReceiptRef);
+}
+
 export function startRouteRun({
   workspaceRoot,
   runId = null,
@@ -248,19 +273,18 @@ export function startRouteRun({
   baselineDeliverableId = '',
   executor,
   crossProviderAttemptIndex = null,
+  allowLocalDiagnosticRecord = false,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
   const resolvedRunId = String(runId || '').trim() || `run-${randomUUID()}`;
   const resolvedRouteRunRef = `route-run:${resolvedRunId}`;
-  const normalizedCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
-    ? {
-        ...crossProviderAttemptIndex,
-        local_session_ref: String(crossProviderAttemptIndex.local_session_ref || resolvedRouteRunRef).trim() || resolvedRouteRunRef,
-        local_route_run_ref: String(crossProviderAttemptIndex.local_route_run_ref || resolvedRouteRunRef).trim() || resolvedRouteRunRef,
-        provider_attempt_ref: String(crossProviderAttemptIndex.provider_attempt_ref || '').trim()
-          || `opl-provider-attempt:redcube_ai/${route}/${resolvedRunId}`,
-      }
-    : null;
+  const normalizedCrossProviderAttemptIndex = normalizeCrossProviderAttemptIndex(
+    crossProviderAttemptIndex,
+    resolvedRouteRunRef,
+  );
+  if (!hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex) && allowLocalDiagnosticRecord !== true) {
+    throw new Error('startRouteRun requires OPL-owned stage attempt evidence; set allowLocalDiagnosticRecord only for explicit refs-only diagnostics');
+  }
   const priorRuns = findPriorRuns({
     workspaceRoot,
     route,
@@ -337,11 +361,9 @@ export function completeRouteRun({
               || run?.cross_provider_attempt_index?.local_route_run_ref
               || `route-run:${runId}`,
             provider_attempt_ref: crossProviderAttemptIndex.provider_attempt_ref
-              || run?.cross_provider_attempt_index?.provider_attempt_ref
-              || `opl-provider-attempt:redcube_ai/${currentStage}/${runId}`,
+              || run?.cross_provider_attempt_index?.provider_attempt_ref,
             provider_attempt_ledger_ref: crossProviderAttemptIndex.provider_attempt_ledger_ref
-              || run?.cross_provider_attempt_index?.provider_attempt_ledger_ref
-              || `attempt-ledger:opl/redcube_ai/${currentStage}`,
+              || run?.cross_provider_attempt_index?.provider_attempt_ledger_ref,
           },
         }
       : {}),

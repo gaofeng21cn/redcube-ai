@@ -7,8 +7,8 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync
 
 import {
   createDeliverable,
-  runDeliverableRoute,
 } from '@redcube/domain-entry';
+import { runDeliverableRoute } from '../../helpers/route-attempt-test-api.ts';
 import {
   startMockCodexCli,
   withEnv,

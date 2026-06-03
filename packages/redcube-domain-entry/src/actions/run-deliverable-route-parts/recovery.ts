@@ -35,23 +35,40 @@ const REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK = new Set([
 ]);
 const MAX_REPAIR_CONTINUATION_CYCLES = 3;
 
-function buildRouteRunProviderAttemptIndex(route: string, existingIndex: unknown): JsonObject {
+function buildRouteRunProviderAttemptIndex(existingIndex: unknown): JsonObject | null {
   const index = existingIndex && typeof existingIndex === 'object' && !Array.isArray(existingIndex)
     ? existingIndex as JsonObject
-    : {};
+    : null;
+  if (!index) return null;
   return {
     ...index,
     surface_kind: 'cross_provider_attempt_index',
     version: 'cross-provider-attempt-index.v1',
-    owner: 'one-person-lab',
-    provider_attempt_owner: 'one-person-lab',
+    owner: safeText(index.owner) || safeText(index.runtime_owner),
+    provider_attempt_owner: safeText(index.provider_attempt_owner) || safeText(index.providerAttemptOwner),
     domain_adapter_owner: 'redcube_ai',
     provider_attempt_ref: safeText(index.provider_attempt_ref)
       || safeText(index.opl_provider_attempt_ref)
-      || `opl-provider-attempt:redcube_ai/${route}`,
+      || safeText(index.providerAttemptRef)
+      || safeText(index.oplProviderAttemptRef),
     provider_attempt_ledger_ref: safeText(index.provider_attempt_ledger_ref)
       || safeText(index.opl_provider_attempt_ledger_ref)
-      || `attempt-ledger:opl/redcube_ai/${route}`,
+      || safeText(index.providerAttemptLedgerRef)
+      || safeText(index.oplProviderAttemptLedgerRef),
+    stage_attempt_ref: safeText(index.stage_attempt_ref)
+      || safeText(index.opl_stage_attempt_ref)
+      || safeText(index.stageAttemptRef)
+      || safeText(index.oplStageAttemptRef),
+    attempt_lease_ref: safeText(index.attempt_lease_ref)
+      || safeText(index.lease_ref)
+      || safeText(index.provider_attempt_lease_ref)
+      || safeText(index.attemptLeaseRef)
+      || safeText(index.leaseRef)
+      || safeText(index.providerAttemptLeaseRef),
+    attempt_receipt_ref: safeText(index.attempt_receipt_ref)
+      || safeText(index.closeout_receipt_ref)
+      || safeText(index.attemptReceiptRef)
+      || safeText(index.closeoutReceiptRef),
     provider_attempt_ref_required: true,
     provider_attempt_ledger_ref_required: true,
     missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
@@ -70,7 +87,7 @@ function routeRequestForProviderAttempt(
     ...request,
     ...overrides,
     route,
-    crossProviderAttemptIndex: buildRouteRunProviderAttemptIndex(route, request.crossProviderAttemptIndex),
+    crossProviderAttemptIndex: buildRouteRunProviderAttemptIndex(request.crossProviderAttemptIndex) || undefined,
   };
 }
 

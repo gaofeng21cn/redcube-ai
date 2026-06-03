@@ -45,7 +45,9 @@ export type FixHtmlExecutionProof = {
   attempts: FixHtmlEscalationAttempt[];
 };
 
-export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summary'> & {
+export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summary' | 'surface_kind'> & {
+  surface_kind: 'route_run' | 'typed_blocker';
+  return_shape?: 'typed_blocker';
   run: RuntimeRunRouteResponse['run'];
   artifact?: unknown;
   dependency_route_runs?: DependencyRouteRun[];

@@ -10,6 +10,7 @@ import {
   getProductEntrySession,
   invokeProductEntry,
 } from './product-domain-action-test-api.ts';
+import { buildOplRouteAttemptIndexForTest } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   startMockCodexCli,
@@ -713,6 +714,12 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale l
       delivery_request: {
         route: 'storyline',
         user_intent: '直接重跑故事主线',
+        cross_provider_attempt_index: buildOplRouteAttemptIndexForTest({
+          route: 'storyline',
+          runId: 'session-route-checkpoint/storyline',
+          topicId: 'topic-a',
+          deliverableId: 'deck-route-checkpoint',
+        }),
       },
     });
 

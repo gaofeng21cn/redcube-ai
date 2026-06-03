@@ -134,6 +134,31 @@ function safeText(value) {
   return text;
 }
 
+function assertOplRouteAttemptBoundary(oplRouteAttemptIndex) {
+  const index = oplRouteAttemptIndex && typeof oplRouteAttemptIndex === 'object' && !Array.isArray(oplRouteAttemptIndex)
+    ? oplRouteAttemptIndex
+    : null;
+  const providerAttemptRef = safeText(index?.provider_attempt_ref || index?.providerAttemptRef);
+  const providerAttemptLedgerRef = safeText(index?.provider_attempt_ledger_ref || index?.providerAttemptLedgerRef);
+  const stageAttemptRef = safeText(index?.stage_attempt_ref || index?.stageAttemptRef || index?.opl_stage_attempt_ref || index?.oplStageAttemptRef);
+  const attemptLeaseRef = safeText(index?.attempt_lease_ref || index?.attemptLeaseRef || index?.lease_ref || index?.leaseRef);
+  const attemptReceiptRef = safeText(index?.attempt_receipt_ref || index?.attemptReceiptRef || index?.closeout_receipt_ref || index?.closeoutReceiptRef);
+  if (
+    safeText(index?.provider_attempt_owner || index?.providerAttemptOwner || index?.owner) === 'one-person-lab'
+    && providerAttemptRef
+    && providerAttemptLedgerRef
+    && (stageAttemptRef || attemptLeaseRef || attemptReceiptRef)
+  ) {
+    return;
+  }
+  const error = new Error('RCA local deliverable route helper requires OPL-owned stage attempt, lease, or receipt evidence');
+  error.code = 'missing_opl_stage_attempt';
+  error.failure_kind = 'typed_blocker';
+  error.blocking_reasons = ['opl_stage_attempt_or_lease_or_receipt_ref'];
+  error.recommended_action = 'submit_route_to_opl_stage_attempt_or_record_domain_owned_typed_blocker';
+  throw error;
+}
+
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
@@ -516,7 +541,9 @@ export async function executeDeliverableRouteLocally({
   executorRouting = null,
   mode = 'draft_new',
   baselineDeliverableId = '',
+  oplRouteAttemptIndex = null,
 }) {
+  assertOplRouteAttemptBoundary(oplRouteAttemptIndex);
   const { safeRoute } = validateDeliverableRouteInput({
     workspaceRoot,
     overlay,

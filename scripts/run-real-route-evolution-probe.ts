@@ -62,6 +62,42 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function buildOplRouteAttemptIndex({
+  lane,
+  route,
+  iteration,
+  topicId,
+  deliverableId,
+  entrySessionId,
+}) {
+  const routeId = safeText(route, 'unknown_route');
+  const runId = [
+    safeText(lane, 'lane'),
+    String(iteration || 0),
+    safeText(topicId, 'topic'),
+    safeText(deliverableId, 'deliverable'),
+    routeId,
+    safeText(entrySessionId, randomUUID()),
+  ].join('/');
+  return {
+    surface_kind: 'cross_provider_attempt_index',
+    version: 'cross-provider-attempt-index.v1',
+    owner: 'one-person-lab',
+    provider_attempt_owner: 'one-person-lab',
+    domain_adapter_owner: 'redcube_ai',
+    provider_attempt_ref: `opl-provider-attempt:real-route-probe/redcube_ai/${runId}`,
+    provider_attempt_ledger_ref: `attempt-ledger:opl/real-route-probe/redcube_ai/${runId}`,
+    stage_attempt_ref: `opl-stage-attempt:real-route-probe/redcube_ai/${runId}`,
+    attempt_lease_ref: `opl-attempt-lease:real-route-probe/redcube_ai/${runId}`,
+    provider_attempt_ref_required: true,
+    provider_attempt_ledger_ref_required: true,
+    missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+    local_session_ref_is_not_provider_attempt_ref: true,
+    rca_does_not_own_provider_attempt_ledger: true,
+    can_claim_current_without_provider_ledger: false,
+  };
+}
+
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
@@ -596,6 +632,14 @@ async function runProductRoute({
       adapter: adapter || undefined,
       user_intent: scopedUserIntent || undefined,
       task_intent: 'run_deliverable_route',
+      cross_provider_attempt_index: buildOplRouteAttemptIndex({
+        lane,
+        route,
+        iteration,
+        topicId,
+        deliverableId,
+        entrySessionId,
+      }),
       constraints: nativeSampleSlideCount > 0
         ? {
             expected_slide_count: nativeSampleSlideCount,

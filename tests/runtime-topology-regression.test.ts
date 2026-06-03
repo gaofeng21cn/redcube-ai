@@ -114,6 +114,7 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
+    allowLocalDiagnosticRecord: true,
   });
 
   const completed = completeRouteRun({
@@ -146,6 +147,7 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
+    allowLocalDiagnosticRecord: true,
   });
 
   const failed = failRouteRun({
@@ -177,6 +179,7 @@ test('failed route runs retain diagnostic artifact refs from typed errors', () =
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
+    allowLocalDiagnosticRecord: true,
   });
   const error = new Error('native structural blocker');
   error.artifact_refs = [
