@@ -144,7 +144,7 @@ test('ppt_deck ships dedicated prompt pack instead of xiaohongshu prompt semanti
   }
 });
 
-test('ppt_deck render_html blocks until slide_blueprint and visual_direction exist', async () => {
+test('ppt_deck render_html auto-recovers missing planning dependencies before rendering', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
 
@@ -166,8 +166,23 @@ test('ppt_deck render_html blocks until slide_blueprint and visual_direction exi
       route: 'render_html',
     });
 
-    assert.equal(result.ok, false);
-    assert.match(result.run.error.message, /render_html.*slide_blueprint.*visual_direction/i);
+    assert.equal(result.ok, true);
+    assert.equal(result.summary.requested_route, 'render_html');
+    assert.equal(result.summary.executed_route, 'render_html');
+    assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
+      'storyline',
+      'detailed_outline',
+      'slide_blueprint',
+      'visual_direction',
+    ]);
+    assert.deepEqual(
+      result.dependency_route_runs.map((entry) => entry.route),
+      ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
+    );
+    assert.equal(existsSync(result.artifactFile), true);
+    const artifact = readJson(result.artifactFile);
+    assert.equal(artifact.route, 'render_html');
+    assert.equal(existsSync(artifact.html_bundle.html_file), true);
   });
 });
 

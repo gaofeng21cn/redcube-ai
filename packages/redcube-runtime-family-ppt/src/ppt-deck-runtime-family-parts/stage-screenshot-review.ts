@@ -4,6 +4,7 @@ import path from 'node:path';
 import {
   collectIncrementalScreenshotReviewTargetSlideIds,
 } from './incremental-review-scope.js';
+import { createPptRenderReviewMachineGateBuilder } from './render-review-machine-gate.js';
 import { materializePptScreenshotReviewCapture } from './screenshot-capture.js';
 import { createPptDeckScreenshotReviewMechanicsParts } from './stage-screenshot-review-mechanics.js';
 import { createPptDeckScreenshotPreflightParts } from './stage-screenshot-preflight.js';
@@ -23,7 +24,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
     attachCommon,
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
-    buildRenderReviewMachineGate,
+    buildRenderReviewMachineGate: providedBuildRenderReviewMachineGate,
     chunkArray,
     collectSlidesNeedingTargetedRevision,
     compareFailuresAndDensity,
@@ -59,6 +60,9 @@ export function createPptDeckScreenshotReviewParts(deps) {
     summarizeRelativeQuality,
     writeText,
   } = deps;
+  const buildRenderReviewMachineGate = typeof providedBuildRenderReviewMachineGate === 'function'
+    ? providedBuildRenderReviewMachineGate
+    : createPptRenderReviewMachineGateBuilder({ safeArray, safeText });
   const {
     buildPageLocalVisualDirectionContext,
     filterSlideScopedArray,

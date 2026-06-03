@@ -123,6 +123,32 @@ function buildExecutorDescriptor(executor, runtimeDescriptor) {
   };
 }
 
+function buildRouteRunProviderAttemptIndex({ runId, safeRoute, executor }) {
+  const safeRunId = String(runId || '').trim();
+  const routeRunRef = safeRunId ? `route-run:${safeRunId}` : '';
+  return {
+    surface_kind: 'cross_provider_attempt_index',
+    version: 'cross-provider-attempt-index.v1',
+    owner: 'one-person-lab',
+    provider_attempt_owner: 'one-person-lab',
+    domain_adapter_owner: 'redcube_ai',
+    ...(routeRunRef ? {
+      local_session_ref: routeRunRef,
+      local_route_run_ref: routeRunRef,
+      provider_attempt_ref: `opl-provider-attempt:redcube_ai/${safeRoute}/${safeRunId}`,
+    } : {}),
+    provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/${safeRoute}`,
+    provider_attempt_ref_required: true,
+    provider_attempt_ledger_ref_required: true,
+    missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+    local_session_ref_is_not_provider_attempt_ref: true,
+    rca_does_not_own_provider_attempt_ledger: true,
+    can_claim_current_without_provider_ledger: false,
+    executor_adapter: String(executor?.adapter || '').trim() || null,
+    executor_backend: String(executor?.backend || executor?.executor_backend || '').trim() || null,
+  };
+}
+
 function parseRouteRequest(request) {
   const {
     workspaceRoot,
@@ -136,6 +162,7 @@ function parseRouteRequest(request) {
     mode = 'draft_new',
     baselineDeliverableId = '',
     candidateCount = 1,
+    crossProviderAttemptIndex = null,
   } = request;
   const safeRoute = requireSafeSegment('route', route);
   validateDeliverableRouteInput({
@@ -156,6 +183,7 @@ function parseRouteRequest(request) {
     mode,
     baselineDeliverableId,
     candidateCount,
+    crossProviderAttemptIndex,
     safeRoute,
   };
 }
@@ -466,6 +494,7 @@ function buildCompletedRouteResponse({
   deliverableId,
   routeResult,
   executor,
+  crossProviderAttemptIndex = null,
 }) {
   const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
   const completedRun = completeRouteRun({
@@ -481,6 +510,7 @@ function buildCompletedRouteResponse({
     telemetry: buildRoutePromptTelemetry(routeResult),
     status: routeRunStatus,
     errorKind: routeRunStatus === 'quality_blocked' ? 'quality_blocked' : null,
+    crossProviderAttemptIndex,
   });
 
   appendRouteRunEvent(workspaceRoot, completedRun.run_id, {
@@ -594,6 +624,7 @@ export async function runDeliverableRoute(request) {
   mode = 'draft_new',
   baselineDeliverableId = '',
   candidateCount = 1,
+  crossProviderAttemptIndex = null,
     safeRoute,
   } = routeRequest;
   const { executorRouting, selectedExecutor, executor } = resolveRouteExecutor({
@@ -605,6 +636,13 @@ export async function runDeliverableRoute(request) {
     request,
     adapter,
   });
+  const effectiveCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
+    ? crossProviderAttemptIndex
+    : buildRouteRunProviderAttemptIndex({
+        runId: String(runId || '').trim() || null,
+        safeRoute,
+        executor,
+      });
 
   const run = startRouteRun({
     workspaceRoot,
@@ -616,6 +654,7 @@ export async function runDeliverableRoute(request) {
     deliverableId,
     baselineDeliverableId,
     executor,
+    crossProviderAttemptIndex: effectiveCrossProviderAttemptIndex,
   });
 
   appendRouteRunEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
@@ -648,6 +687,7 @@ export async function runDeliverableRoute(request) {
       deliverableId,
       routeResult,
       executor,
+      crossProviderAttemptIndex: effectiveCrossProviderAttemptIndex,
     });
   } catch (error) {
     return buildFailedRouteResponse({

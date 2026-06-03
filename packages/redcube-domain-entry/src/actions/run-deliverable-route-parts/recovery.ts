@@ -35,6 +35,45 @@ const REVISION_ROUTES_REQUIRING_SCREENSHOT_FEEDBACK = new Set([
 ]);
 const MAX_REPAIR_CONTINUATION_CYCLES = 3;
 
+function buildRouteRunProviderAttemptIndex(route: string, existingIndex: unknown): JsonObject {
+  const index = existingIndex && typeof existingIndex === 'object' && !Array.isArray(existingIndex)
+    ? existingIndex as JsonObject
+    : {};
+  return {
+    ...index,
+    surface_kind: 'cross_provider_attempt_index',
+    version: 'cross-provider-attempt-index.v1',
+    owner: 'one-person-lab',
+    provider_attempt_owner: 'one-person-lab',
+    domain_adapter_owner: 'redcube_ai',
+    provider_attempt_ref: safeText(index.provider_attempt_ref)
+      || safeText(index.opl_provider_attempt_ref)
+      || `opl-provider-attempt:redcube_ai/${route}`,
+    provider_attempt_ledger_ref: safeText(index.provider_attempt_ledger_ref)
+      || safeText(index.opl_provider_attempt_ledger_ref)
+      || `attempt-ledger:opl/redcube_ai/${route}`,
+    provider_attempt_ref_required: true,
+    provider_attempt_ledger_ref_required: true,
+    missing_provider_ledger_policy: 'fail_closed_typed_blocker_projection',
+    local_session_ref_is_not_provider_attempt_ref: true,
+    rca_does_not_own_provider_attempt_ledger: true,
+    can_claim_current_without_provider_ledger: false,
+  };
+}
+
+function routeRequestForProviderAttempt(
+  request: RunDeliverableRouteRequest,
+  route: string,
+  overrides: Partial<RunDeliverableRouteRequest> = {},
+): RunDeliverableRouteRequest {
+  return {
+    ...request,
+    ...overrides,
+    route,
+    crossProviderAttemptIndex: buildRouteRunProviderAttemptIndex(route, request.crossProviderAttemptIndex),
+  };
+}
+
 function canRevisitContinuationEdgeAfterRepair({
   currentRoute,
   nextRoute,
@@ -82,8 +121,9 @@ function canContinueNativePptRepairCycle({
 
 function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result: RuntimeRouteResult): string[] {
   const route = request.route;
+  const overlay = safeText(request.overlay);
   const message = routeResultErrorMessage(result);
-  if (VISUAL_AUTHOR_ALTERNATE_ROUTES.has(route) && /requires completed stage artifacts:/i.test(message)) {
+  if (overlay === 'ppt_deck' && VISUAL_AUTHOR_ALTERNATE_ROUTES.has(route) && /requires completed stage artifacts:/i.test(message)) {
     const requestedMissing = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
       .filter((stageId) => new RegExp(`\\b${stageId}\\b`).test(message));
     if (requestedMissing.length > 0) {
@@ -180,7 +220,9 @@ function dependencyRouteCanContinue({
 }
 
 export async function runHostedRoute(request: RunDeliverableRouteRequest): Promise<RuntimeRouteResult> {
-  return await runHostedDeliverableRoute(request) as RuntimeRouteResult;
+  return await runHostedDeliverableRoute(
+    routeRequestForProviderAttempt(request, request.route),
+  ) as RuntimeRouteResult;
 }
 
 export async function runWithRecoverableDependencies(request: RunDeliverableRouteRequest): Promise<{
@@ -298,11 +340,10 @@ export async function continueToStopAfterStage({
     }
     visited.add(edgeKey);
 
-    currentResult = await runHostedRoute({
-      ...request,
+    currentResult = await runHostedRoute(routeRequestForProviderAttempt(request, nextRoute, {
       route: nextRoute,
       stopAfterStage: undefined,
-    });
+    }));
     currentRoute = nextRoute;
     continuationRouteRuns.push(summarizeDependencyRoute(nextRoute, currentResult));
   }

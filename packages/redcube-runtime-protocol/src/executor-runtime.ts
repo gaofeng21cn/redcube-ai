@@ -379,6 +379,7 @@ export function startRouteRun({
   deliverableId = null,
   baselineDeliverableId = '',
   executor,
+  crossProviderAttemptIndex = null,
 }) {
   return startRouteRunFromRouteRunRecords({
     workspaceRoot,
@@ -391,6 +392,7 @@ export function startRouteRun({
     deliverableId,
     baselineDeliverableId,
     executor,
+    crossProviderAttemptIndex,
   }, { resolveRuntimeTopologyForExecutor });
 }
 
@@ -404,6 +406,7 @@ export function completeRouteRun({
   telemetry = {},
   status = 'completed',
   errorKind = null,
+  crossProviderAttemptIndex = null,
 }) {
   return completeRouteRunFromRouteRunRecords({
     workspaceRoot,
@@ -415,6 +418,7 @@ export function completeRouteRun({
     telemetry,
     status,
     errorKind,
+    crossProviderAttemptIndex,
   }, { resolveRuntimeTopologyForExecutor });
 }
 

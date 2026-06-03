@@ -35,7 +35,7 @@ const WORKSPACE_AGENTS_TEMPLATE = `# RedCube AI 交付工作区约束
 
 ## 默认入口
 
-- 当前工作区的视觉交付任务必须从 RedCube AI / RCA direct product-entry handler target 开始：\`redcube product invoke\`；overview/status/session shell 由 OPL generated caller 提供。
+- 当前工作区的视觉交付任务必须从 RedCube AI / RCA product-entry direct handler target 开始：\`redcube product invoke\`；overview/status/session shell 由 OPL generated caller 提供。
 - PPT deck 默认路线是 \`storyline -> detailed_outline -> slide_blueprint -> visual_direction -> author_image_pages -> visual_director_review -> screenshot_review -> export_pptx\`。
 - Image-first 是默认视觉实现路线；HTML/native routes 只能在 manifest/status/session surface 明确显示可选且 operator 显式选择时使用。
 - \`style_reference_dir\` 通过 \`delivery_request.style_reference_dir\` 输入，provider diagnostics 的 blocked_reason 以 product-entry surface 为准。

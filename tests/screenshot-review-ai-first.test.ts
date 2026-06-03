@@ -121,7 +121,7 @@ function extractFunction(source, name) {
     throw new Error(`Missing function ${name}`);
   }
   const rest = source.slice(start + 1);
-  const nextMatch = rest.match(/\n\s*(?:export\s+)?function\s+\w+/);
+  const nextMatch = rest.match(/\n\s*(?:(?:export\s+)?function\s+\w+|const\s+buildRenderReviewMachineGate\b)/);
   const next = nextMatch ? start + 1 + nextMatch.index : -1;
   return source.slice(start, next === -1 ? undefined : next);
 }

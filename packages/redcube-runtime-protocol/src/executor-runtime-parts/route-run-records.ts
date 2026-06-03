@@ -247,9 +247,20 @@ export function startRouteRun({
   deliverableId = null,
   baselineDeliverableId = '',
   executor,
+  crossProviderAttemptIndex = null,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
   const resolvedRunId = String(runId || '').trim() || `run-${randomUUID()}`;
+  const resolvedRouteRunRef = `route-run:${resolvedRunId}`;
+  const normalizedCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
+    ? {
+        ...crossProviderAttemptIndex,
+        local_session_ref: String(crossProviderAttemptIndex.local_session_ref || resolvedRouteRunRef).trim() || resolvedRouteRunRef,
+        local_route_run_ref: String(crossProviderAttemptIndex.local_route_run_ref || resolvedRouteRunRef).trim() || resolvedRouteRunRef,
+        provider_attempt_ref: String(crossProviderAttemptIndex.provider_attempt_ref || '').trim()
+          || `opl-provider-attempt:redcube_ai/${route}/${resolvedRunId}`,
+      }
+    : null;
   const priorRuns = findPriorRuns({
     workspaceRoot,
     route,
@@ -275,6 +286,9 @@ export function startRouteRun({
     current_stage: route,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor),
     executor,
+    ...(normalizedCrossProviderAttemptIndex ? {
+      cross_provider_attempt_index: normalizedCrossProviderAttemptIndex,
+    } : {}),
   };
   run.telemetry = buildRunTelemetry(run, executor, 'running', null);
 
@@ -292,6 +306,7 @@ export function completeRouteRun({
   telemetry = {},
   status = 'completed',
   errorKind = null,
+  crossProviderAttemptIndex = null,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
   const { run } = loadRouteRunRaw({ workspaceRoot, runId });
@@ -310,6 +325,26 @@ export function completeRouteRun({
       ...(run?.telemetry || {}),
       ...(telemetry && typeof telemetry === 'object' ? telemetry : {}),
     },
+    ...(crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object' && !Array.isArray(crossProviderAttemptIndex)
+      ? {
+          cross_provider_attempt_index: {
+            ...(run?.cross_provider_attempt_index || {}),
+            ...crossProviderAttemptIndex,
+            local_session_ref: crossProviderAttemptIndex.local_session_ref
+              || run?.cross_provider_attempt_index?.local_session_ref
+              || `route-run:${runId}`,
+            local_route_run_ref: crossProviderAttemptIndex.local_route_run_ref
+              || run?.cross_provider_attempt_index?.local_route_run_ref
+              || `route-run:${runId}`,
+            provider_attempt_ref: crossProviderAttemptIndex.provider_attempt_ref
+              || run?.cross_provider_attempt_index?.provider_attempt_ref
+              || `opl-provider-attempt:redcube_ai/${currentStage}/${runId}`,
+            provider_attempt_ledger_ref: crossProviderAttemptIndex.provider_attempt_ledger_ref
+              || run?.cross_provider_attempt_index?.provider_attempt_ledger_ref
+              || `attempt-ledger:opl/redcube_ai/${currentStage}`,
+          },
+        }
+      : {}),
   };
   completedRun.telemetry = buildRunTelemetry(
     completedRun,

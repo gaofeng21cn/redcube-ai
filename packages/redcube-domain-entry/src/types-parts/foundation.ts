@@ -167,6 +167,8 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
   opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   stopAfterStage?: string;
+  crossProviderAttemptIndex?: Record<string, unknown>;
+  cross_provider_attempt_index?: Record<string, unknown>;
 }
 
 // Telemetry summaries

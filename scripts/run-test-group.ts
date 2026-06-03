@@ -1,7 +1,6 @@
 // @ts-nocheck
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync } from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
@@ -44,7 +43,12 @@ function pathIsInsideRepo(value) {
 const repoTempRoot =
   process.env.OPL_REPO_TEMP_ROOT && !pathIsInsideRepo(process.env.OPL_REPO_TEMP_ROOT)
     ? process.env.OPL_REPO_TEMP_ROOT
-    : mkdtempSync(path.join(os.tmpdir(), 'redcube-repo-temp-'));
+    : mkdtempSync(path.join(
+        process.env.OPL_SHORT_TMPDIR && !pathIsInsideRepo(process.env.OPL_SHORT_TMPDIR)
+          ? process.env.OPL_SHORT_TMPDIR
+          : '/tmp',
+        'redcube-repo-temp-',
+      ));
 const pythonCacheRoot = path.join(repoTempRoot, 'python-test-cache');
 mkdirSync(path.join(repoTempRoot, 'tmp'), { recursive: true });
 mkdirSync(pythonCacheRoot, { recursive: true });

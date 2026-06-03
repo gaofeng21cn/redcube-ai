@@ -109,6 +109,14 @@ function normalizeEntrySessionContract(request) {
       'entry_session_contract.entry_session_id',
       contract?.entry_session_id || contract?.entrySessionId || request?.entrySessionId,
     ),
+    providerAttemptRef: safeText(
+      contract?.provider_attempt_ref || contract?.providerAttemptRef || request?.providerAttemptRef,
+    ),
+    providerAttemptLedgerRef: safeText(
+      contract?.provider_attempt_ledger_ref
+        || contract?.providerAttemptLedgerRef
+        || request?.providerAttemptLedgerRef,
+    ),
   };
 }
 
@@ -452,6 +460,7 @@ async function ensureDeliverableForProductEntry({
 
 function buildDomainEntryRequest({
   workspaceRoot,
+  entrySession,
   taskIntent,
   entryMode,
   runtimeOwner,
@@ -484,6 +493,15 @@ function buildDomainEntryRequest({
       lifecycle_policy: delivery.lifecyclePolicy || undefined,
       mode: delivery.mode || undefined,
       baseline_deliverable_id: delivery.baselineDeliverableId || undefined,
+      cross_provider_attempt_index: entrySession.providerAttemptRef || entrySession.providerAttemptLedgerRef
+        ? {
+            surface_kind: 'cross_provider_attempt_index',
+            local_session_ref: `product-entry-session:${entrySession.entrySessionId}`,
+            provider_attempt_owner: 'one-person-lab',
+            provider_attempt_ref: entrySession.providerAttemptRef || undefined,
+            provider_attempt_ledger_ref: entrySession.providerAttemptLedgerRef || undefined,
+          }
+        : undefined,
     },
   };
 }
@@ -598,6 +616,7 @@ export async function invokeProductEntry(request) {
     })
     : await invokeDomainEntry(buildDomainEntryRequest({
     workspaceRoot,
+    entrySession,
     taskIntent,
     entryMode,
     runtimeOwner,

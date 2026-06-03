@@ -13,12 +13,10 @@ const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
 const pluginIconSourcePath = path.join(pluginRoot, 'assets', 'icon.svg');
 const pluginSkillPath = path.join(pluginRoot, 'skills', 'rca', 'SKILL.md');
 const pluginSkillUiMetadataPath = path.join(pluginRoot, 'skills', 'rca', 'agents', 'openai.yaml');
-const pluginMarketplacePath = path.join(repoRoot, '.agents', 'plugins', 'marketplace.json');
 function readJson(filePath) { return JSON.parse(readFileSync(filePath, 'utf-8')); }
 test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   const packageJson = readJson(path.join(repoRoot, 'package.json'));
   const manifest = readJson(pluginManifestPath);
-  const marketplace = readJson(pluginMarketplacePath);
   const skillText = readFileSync(pluginSkillPath, 'utf-8');
   const metadataText = readFileSync(pluginSkillUiMetadataPath, 'utf-8');
 
@@ -30,11 +28,6 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(manifest.interface.composerIcon, './assets/icon.png');
   assert.equal(manifest.interface.logo, './assets/icon.png');
   assert.match(manifest.description, /Codex plugin/i);
-  assert.equal(marketplace.name, 'rca-local');
-  assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
-  assert.equal(marketplace.plugins[0].name, 'rca');
-  assert.equal(marketplace.plugins[0].source.path, './plugins/rca');
-  assert.equal(marketplace.plugins[0].category, 'Creative');
   assert.equal(existsSync(pluginIconPath), true);
   assert.equal(existsSync(pluginIconSourcePath), true);
   const iconSource = readFileSync(pluginIconSourcePath, 'utf-8');

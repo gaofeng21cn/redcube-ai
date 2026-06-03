@@ -76,6 +76,8 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
     },
     entry_session_contract: {
       entry_session_id: entrySessionId,
+      provider_attempt_ref: `opl-provider-attempt:${entrySessionId}:${route}`,
+      provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/native-ppt-live-proof:${entrySessionId}`,
     },
     task_intent: 'run_deliverable_route',
     delivery_request: {

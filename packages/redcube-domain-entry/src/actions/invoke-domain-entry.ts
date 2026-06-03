@@ -57,6 +57,7 @@ function normalizeDomainPayload(request) {
     stopAfterStage: safeText(payload?.stop_after_stage || payload?.stopAfterStage),
     mode: safeText(payload?.mode),
     baselineDeliverableId: safeText(payload?.baseline_deliverable_id || payload?.baselineDeliverableId),
+    crossProviderAttemptIndex: payload?.cross_provider_attempt_index || payload?.crossProviderAttemptIndex || null,
   };
 }
 
@@ -143,6 +144,7 @@ export async function invokeDomainEntry(request) {
       adapter: domainPayload.adapter || undefined,
       userIntent: domainPayload.userIntent || undefined,
       stopAfterStage: domainPayload.stopAfterStage || undefined,
+      crossProviderAttemptIndex: domainPayload.crossProviderAttemptIndex || undefined,
     });
   } else {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);

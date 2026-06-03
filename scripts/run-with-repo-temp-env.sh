@@ -10,7 +10,7 @@ cleanup_temp_root=0
 if [ -n "${OPL_REPO_TEMP_ROOT:-}" ]; then
   repo_temp_root="${OPL_REPO_TEMP_ROOT}"
 else
-  repo_temp_root="$(mktemp -d "${TMPDIR:-/tmp}/redcube-repo-temp.XXXXXX")"
+  repo_temp_root="$(mktemp -d "${OPL_SHORT_TMPDIR:-/tmp}/redcube-repo-temp.XXXXXX")"
   cleanup_temp_root=1
 fi
 

@@ -330,6 +330,7 @@ export interface RuntimeStartRunRequest {
   deliverableId?: string | null;
   baselineDeliverableId?: string;
   executor: Record<string, unknown>;
+  crossProviderAttemptIndex?: Record<string, unknown> | null;
 }
 
 export interface RuntimeCompleteRunRequest {
