@@ -57,19 +57,19 @@ RCA repo source 只保存 locator、index、schema、receipt ref、restore/reten
 
 ## 生命周期分层
 
-| 分层 | 职责 | 入口 |
-| --- | --- | --- |
-| 当前真相 | 当前产品角色、活跃边界、执行模型、硬约束和持久决策 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md) |
-| 机器真相 | runtime-program contracts、schema、source、generated artifacts 和 callable surfaces | [合同说明](../contracts/README.md) |
-| Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) |
-| Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) |
-| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) |
-| Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) |
-| Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) |
-| Active | 当前执行、当前计划、当前差距与当前完成门槛 | [Active](./active/README.md) |
-| Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) |
-| References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) |
-| History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.md) |
+| 分层 | 职责 | 当前文件 / 入口 | 生命周期边界 |
+| --- | --- | --- | --- |
+| 当前真相 | 当前产品角色、活跃边界、执行模型、硬约束和持久决策 | [项目概览](./project.md)、[当前状态](./status.md)、[架构](./architecture.md)、[硬约束](./invariants.md)、[关键决策](./decisions.md) | 只写 current truth / policy；dated proof 和旧路线不回流。 |
+| 机器真相 | runtime-program contracts、schema、source、generated artifacts 和 callable surfaces | [合同说明](../contracts/README.md) | 机器接口只在 contracts/source/tests/runtime artifacts；docs prose 不是 API。 |
+| Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) | 不定义 runtime truth 或 GUI/WebUI 已落地状态。 |
+| Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) | 不承载 Phase 2、Hermes proof 或 gateway/harness 历史叙事。 |
+| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) | Route/proof support 不能替代 RCA-owned review/export verdict。 |
+| Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) | `planning_ready` 不授权 visual/export/domain/production ready。 |
+| Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) | 长期规则才进入；一次性过程证据进 history/process。 |
+| Active | 当前执行、当前计划、当前差距与当前完成门槛 | [Active](./active/README.md) | 当前唯一 completion plan 是 `rca-ideal-state-gap-plan.md`；长清单和 proof 流水不进 active。 |
+| Specs | 当前仍有效的技术规格索引 | [Specs](./specs/README.md) | 当前保持薄索引；规格真相优先在 contracts/schema/source/owner docs。 |
+| References | 不持有 active baton 或公开身份的支持性技术参考 | [References](./references/README.md) | 支撑 current contract / target-state；不承担 active plan。 |
+| History | 已归档 provenance、tombstone 与历史计划 | [History](./history/README.md) | 历史标题里的“当前/下一步/Backlog”只按归档时点读取。 |
 
 这张表是层级：先读当前真相和机器真相；product/runtime/delivery/source/policies 解释当前工作；`docs/active` 记录仍在推进的 active plan；references 与 history 分别保留支撑上下文和历史 provenance。
 RCA 采用 OPL-family canonical docs taxonomy：
@@ -89,6 +89,28 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。
 - `README*` 与 `docs/**` 是人读面。Runtime contract、测试、脚本和 dashboard 可以暴露 `human_doc:*` 语义指针帮助读者定位上下文，但不能把 repo 文档路径钉成稳定机读 API。
 - 仓库目录治理现在通过 `scripts/repo-hygiene.sh` 在 `scripts/verify.sh` 各 lane 和 grouped test 执行前运行。`scripts/run-test-group.ts` 同时给 Python native helper 子进程注入仓外 cache 环境。tracked 主线不得包含 `dist/`、`build/`、`out/`、`__pycache__`、`*.egg-info`、`.DS_Store`、项目级 `.codex/`、`.omx/`、`.runtime-program/`、`runtime-state/`、`.agent-contract-baseline.json` 或 `.agents/` 这类生成物 / 本地状态；RCA Codex plugin scaffold 保留在 `plugins/rca/`，不再通过 repo-local installer 或 tracked `.agents/plugins/marketplace.json` 注册。
+
+## 文档角色清单
+
+本清单覆盖当前 repo-tracked `README*` 与 `docs/**/*.md` 的生命周期角色；完整枚举过程记录见 [2026-06-03 docs lifecycle cleanup closeout](./history/process/2026-06-03-rca-docs-lifecycle-cleanup-closeout.md)。
+
+| 路径组 | 当前职责 | 不承担 |
+| --- | --- | --- |
+| `README.md`、`README.zh-CN.md` | public repository entry；先说明 RCA visual-deliverable 身份，再说明 OPL-compatible package / hosted integration 边界。 | 不作为机器接口，不声明 GUI/WebUI 已落地，不把 OPL 写成 visual truth owner。 |
+| `agent/README.md` | Declarative Visual Pack repo-source 入口。 | 不承接 docs lifecycle governance。 |
+| `runtime/README.md` | runtime source package 入口。 | 不承接人读 runtime topology owner；读 `docs/runtime/`。 |
+| `contracts/README.md` | machine contract index 的人读说明。 | 不替代 JSON contracts / schema / tests。 |
+| `docs/README.md` | docs entry index 与生命周期导航。 | 不保存 dated coverage ledger。 |
+| `docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` | 核心五件套，持有当前角色、状态、架构、硬约束和仍有效决策。 | 不保存 run/probe 流水、旧 active checklist 或 history proof。 |
+| `docs/active/` | 当前 gap plan 与私有实现迁移台账。 | 不新增第二 active checklist，不保存已完成 closeout 流水。 |
+| `docs/product/` | Human/operator quickstart、profile、publish 协作。 | 不定义 runtime truth、GUI/WebUI readiness 或 generic runtime。 |
+| `docs/runtime/` | Runtime topology、executor/backend、service-safe entry、watch/projection 说明。 | 不恢复 Hermes-first、gateway/harness 或 repo-local managed runtime owner。 |
+| `docs/delivery/` | Deliverable route/proof/export/examples support。 | 不替代 visual ready/exportable/handoffable verdict。 |
+| `docs/source/` | Source readiness / augmentation / deep research trigger support。 | 不授权 artifact authority 或 review/export verdict。 |
+| `docs/policies/` | 稳定规则。 | 不保存一次性执行证据或 dated tranches。 |
+| `docs/public/`、`docs/specs/` | 薄索引；未来有真实 public/spec 需求时再扩写。 | 不吸收旧 program/capabilities/reference 正文。 |
+| `docs/references/` | Target-state、integration、product-entry、memory locator、executor routing、governance 等 support references。 | 不承担 current truth 或 active baton。 |
+| `docs/history/` | Hermes、Phase 2、plans、process、positioning、runtime、tombstone provenance。 | 不作为当前 runtime/product/source/delivery truth。 |
 
 ## 参考层
 
