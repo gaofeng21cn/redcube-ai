@@ -9,6 +9,21 @@
   "stage_control_plane_ref": "contracts/stage_control_plane.json",
   "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+  "conformance_validator": {
+    "surface_kind": "rca_stage_artifact_kernel_adoption_conformance_validator",
+    "validator_ref": "tests/opl-family-contract-adoption.test.ts",
+    "test_name": "RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint",
+    "validates": [
+      "root_contract_discoverability",
+      "stage_folder_manifest_receipt_current_pointer_unit",
+      "stage_output_role_interface",
+      "review_repair_export_receipts",
+      "native_helper_manifest",
+      "artifact_gallery_handoff_shell",
+      "current_program_pointer_visibility",
+      "false_domain_readiness_and_false_visual_export_authority_claims"
+    ]
+  },
   "stage_folder_unit": [
     "Stage Folder",
     "Manifest",
@@ -33,6 +48,36 @@
     "lineage_ref",
     "retention_ref"
   ],
+  "conformance_gate": {
+    "surface_kind": "opl_stage_artifact_runtime_conformance",
+    "strict_units": [
+      "Stage Folder",
+      "Manifest",
+      "Receipt",
+      "content_hashes",
+      "latest_pointer",
+      "current_pointer",
+      "lineage_events",
+      "role_manifest",
+      "stage_receipts",
+      "helper_output_refs"
+    ],
+    "fails_on": [
+      "missing_deliverable_json",
+      "missing_stage_json",
+      "missing_required_attempt_entry",
+      "missing_latest_pointer",
+      "latest_pointer_missing_attempt",
+      "missing_current_pointer",
+      "missing_manifest_hash_entry",
+      "manifest_content_hash_mismatch",
+      "missing_required_output_role",
+      "missing_owner_receipt_or_typed_blocker_ref",
+      "attempt_broken",
+      "attempt_orphan"
+    ],
+    "domain_readiness_claim": false
+  },
   "kernel_refs": {
     "physical_stage_folder_source_of_truth": true,
     "derived_index_rebuildable": true,

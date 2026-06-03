@@ -235,6 +235,10 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
 
   const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
   assert.equal(director.status, 'pass');
+  assert.deepEqual(director.owner_receipt_refs, [
+    'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-image',
+  ]);
+  assert.deepEqual(director.typed_blocker_refs, []);
   assert.equal(director.visual_director_review.deterministic_preflight.findings.length, 0);
   fixture.artifacts.set('visual_director_review', director);
 
@@ -246,6 +250,10 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
     mode: 'draft_new',
   });
   assert.equal(screenshot.status, 'pass');
+  assert.deepEqual(screenshot.owner_receipt_refs, [
+    'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
+  ]);
+  assert.deepEqual(screenshot.typed_blocker_refs, []);
   assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
   assert.equal(screenshot.mechanical_review.python_helper_invocation, null);
   assert.equal(screenshot.mechanical_review.metrics.source_surface_kind, 'image_pages');
@@ -259,6 +267,12 @@ test('ppt image-first route reviews PNG pages and exports non-editable full-page
     deliverableId: 'deck-image',
     contract: fixture.contract,
   });
+  assert.deepEqual(exported.owner_receipt_refs, [
+    'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-image',
+  ]);
+  assert.deepEqual(exported.typed_blocker_refs, []);
+  assert.equal(exported.export_bundle.review_receipt_refs.includes(screenshot.owner_receipt_refs[0]), true);
+  assert.equal(exported.review_export_refs.includes(exported.export_bundle.export_ref), true);
   assert.equal(exported.export_bundle.source_visual_route, 'author_image_pages');
   assert.equal(exported.export_bundle.editable, false);
   assert.equal(exported.export_bundle.page_count_match, true);
@@ -287,6 +301,11 @@ test('ppt image-first screenshot review fails closed when PNG manifest refs are 
     mode: 'draft_new',
   });
   assert.equal(screenshot.status, 'block');
+  assert.deepEqual(screenshot.owner_receipt_refs, []);
+  assert.deepEqual(screenshot.typed_blocker_refs, [
+    'rca-typed-blocker:review-export:ppt_deck:screenshot_review:deck-image',
+  ]);
+  assert.equal(screenshot.typed_blocker.blocker_kind, 'missing_required_artifact');
   assert.equal(screenshot.review_state_patch.rerun_from_stage, 'repair_image_pages');
   assert.equal(screenshot.checks.block_content_fit_ok, false);
   assert.equal(screenshot.slide_reviews[0].issues.includes('image_page_manifest_missing'), true);

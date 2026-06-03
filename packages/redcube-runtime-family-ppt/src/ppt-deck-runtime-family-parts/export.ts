@@ -7,6 +7,7 @@ import {
 } from '@redcube/runtime-protocol';
 
 import { createPptDeckExportImagePageHelpers } from './export-image-pages-helpers.js';
+import { buildReviewExportCloseout } from './review-export-closeout.js';
 
 type JsonRecord = Record<string, any>;
 
@@ -436,8 +437,35 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       updated_at: new Date().toISOString(),
     };
     writeJson(artifactGalleryIndexFile, artifactGalleryIndex);
+    const artifactRefs = [
+      sourcePptx,
+      sourcePdf,
+      shapeManifestFile,
+      repairLogFile,
+      ...previewPngFiles,
+      pptxFile,
+      pdfFile,
+      notesFile,
+      finalDelivery.pptx_file,
+      finalDelivery.pdf_file,
+      finalDelivery.manifest_file,
+      finalDelivery.readme_file,
+      artifactGalleryIndexFile,
+    ].filter(Boolean);
+    const closeout = buildReviewExportCloseout({
+      family: 'ppt_deck',
+      route: 'export_pptx',
+      deliverableId: safeText(contract?.deliverable_id),
+      status: 'completed',
+      reviewExportRefs: [
+        ...safeArray(reviewArtifact?.review_export_refs),
+        ...safeArray(reviewArtifact?.owner_receipt_refs),
+      ],
+      artifactRefs,
+    });
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
+      ...closeout,
       status: 'completed',
       review_state_patch: {
         current_status: 'completed',
@@ -452,6 +480,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
       },
       export_bundle: {
+        export_ref: closeout.review_export_refs[0],
+        review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
         source_visual_route: safeText(renderArtifact.route),
         source_pptx: sourcePptx,
         source_html: null,
@@ -500,21 +530,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           command: ['--source-pptx', sourcePptx, '--output-pptx', pptxFile],
         },
       },
-      artifact_refs: [
-        sourcePptx,
-        sourcePdf,
-        shapeManifestFile,
-        repairLogFile,
-        ...previewPngFiles,
-        pptxFile,
-        pdfFile,
-        notesFile,
-        finalDelivery.pptx_file,
-        finalDelivery.pdf_file,
-        finalDelivery.manifest_file,
-        finalDelivery.readme_file,
-        artifactGalleryIndexFile,
-      ].filter(Boolean),
+      artifact_refs: artifactRefs,
     };
   }
 
@@ -589,8 +605,34 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           finalDelivery,
         })
       : null;
+    const artifactRefs = [
+      stableViewHtmlFile,
+      imageGallery?.index_file,
+      ...safeArray(imageGallery?.artifacts?.source?.png_files),
+      ...safeArray(imageGallery?.artifacts?.source?.prompt_manifest_files),
+      ...safeArray(imageGallery?.artifacts?.source?.style_manifest_files),
+      pptxPath,
+      pdfPath,
+      notesFile,
+      finalDelivery.pptx_file,
+      finalDelivery.pdf_file,
+      finalDelivery.manifest_file,
+      finalDelivery.readme_file,
+    ].filter(Boolean);
+    const closeout = buildReviewExportCloseout({
+      family: 'ppt_deck',
+      route: 'export_pptx',
+      deliverableId,
+      status: 'completed',
+      reviewExportRefs: [
+        ...safeArray(reviewArtifact?.review_export_refs),
+        ...safeArray(reviewArtifact?.owner_receipt_refs),
+      ],
+      artifactRefs,
+    });
     return {
       ...attachCommon('export_pptx', contract, null, adapter),
+      ...closeout,
       status: 'completed',
       review_state_patch: {
         current_status: 'completed',
@@ -605,6 +647,8 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
         },
       },
       export_bundle: {
+        export_ref: closeout.review_export_refs[0],
+        review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
         source_visual_route: imagePagesExportInput ? safeText(renderArtifact?.route) : undefined,
         editable: imagePagesExportInput ? false : undefined,
         source_html: stableViewHtmlFile,
@@ -640,20 +684,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           command: conversionCommand,
         },
       },
-      artifact_refs: [
-        stableViewHtmlFile,
-        imageGallery?.index_file,
-        ...safeArray(imageGallery?.artifacts?.source?.png_files),
-        ...safeArray(imageGallery?.artifacts?.source?.prompt_manifest_files),
-        ...safeArray(imageGallery?.artifacts?.source?.style_manifest_files),
-        pptxPath,
-        pdfPath,
-        notesFile,
-        finalDelivery.pptx_file,
-        finalDelivery.pdf_file,
-        finalDelivery.manifest_file,
-        finalDelivery.readme_file,
-      ].filter(Boolean),
+      artifact_refs: artifactRefs,
     };
   }
 

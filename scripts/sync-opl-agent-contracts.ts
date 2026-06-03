@@ -263,6 +263,7 @@ function buildDomainDescriptor() {
       functional_privatization_audit: 'contracts/functional_privatization_audit.json',
       physical_source_morphology_policy: 'contracts/physical_source_morphology_policy.json',
       stage_artifact_kernel_adoption: 'contracts/stage_artifact_kernel_adoption.json',
+      opl_state_index_kernel_adoption: 'contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption',
     },
     authority_boundary: {
       redcube_ai_owns_visual_truth: true,

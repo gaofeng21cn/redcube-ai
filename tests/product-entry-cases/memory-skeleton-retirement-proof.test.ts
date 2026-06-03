@@ -131,11 +131,24 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, physical sk
       ownerReceipt.receipt_cases.map((receipt) => receipt.return_shape),
       [
         'domain_receipt',
+        'domain_receipt',
+        'typed_blocker',
         'controlled_visual_stage_long_soak_evidence',
         'typed_blocker',
         'no_regression_evidence',
       ],
     );
+    const reviewExportReceiptCase = ownerReceipt.receipt_cases.find((receipt) => (
+      receipt.receipt_ref === 'rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>'
+    ));
+    assert.equal(
+      reviewExportReceiptCase.stage_receipt_policy,
+      'route_artifact_must_carry_owner_receipt_refs_or_typed_blocker_refs_before_stage_folder_current',
+    );
+    const reviewExportBlockerCase = ownerReceipt.receipt_cases.find((receipt) => (
+      receipt.blocker_ref === 'rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>'
+    ));
+    assert.equal(reviewExportBlockerCase.next_required_owner_action, 'repair_or_rerun_required_route_stage');
 
     const lifecycleApply = manifest.lifecycle_guarded_apply_proof;
     assert.equal(lifecycleApply.surface_kind, 'lifecycle_guarded_apply_proof');

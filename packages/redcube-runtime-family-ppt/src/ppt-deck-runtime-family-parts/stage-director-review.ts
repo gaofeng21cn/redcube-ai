@@ -4,6 +4,10 @@ import path from 'node:path';
 import {
   collectIncrementalDirectorReviewTargetSlideIds,
 } from './incremental-review-scope.js';
+import {
+  buildReviewExportCloseout,
+  reviewExportBlockerKind,
+} from './review-export-closeout.js';
 import { createPptDeckDirectorReviewPreflightParts } from './stage-director-review-preflight.js';
 import { createPptDeckStageReviewScopeParts } from './stage-review-scope.js';
 
@@ -206,8 +210,28 @@ export function createPptDeckDirectorReviewParts(deps) {
     const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
     const reviewOwner = primarySurface(generationRuntime, adapter);
     writeDirectorReviewReport(reviewFile, reviewOwner, decision);
+    const artifactRefs = [reviewFile];
+    const closeout = buildReviewExportCloseout({
+      family: 'ppt_deck',
+      route: 'visual_director_review',
+      deliverableId: deliverablePaths.deliverableId || contract?.deliverable_id,
+      status,
+      blockerKind: reviewExportBlockerKind({
+        route: 'visual_director_review',
+        failedChecks: status === 'pass' ? [] : ['visual_director_review_blocked'],
+      }),
+      blockingReasons: status === 'pass'
+        ? []
+        : [
+            ...safeArray(decision.weakPages).map((slideId) => `weak_page:${safeText(slideId)}`),
+            safeText(decision.reviewSummary, 'visual_director_review_blocked'),
+          ],
+      nextRequiredOwnerAction: status === 'pass' ? null : rerunFromStage,
+      artifactRefs,
+    });
     return {
       ...attachCommon('visual_director_review', contract, generationRuntime, adapter),
+      ...closeout,
       review_execution: {
         ...creativeExecution('visual_director_review', generationRuntime, adapter),
         overlay: 'visual_director_review',
@@ -247,7 +271,7 @@ export function createPptDeckDirectorReviewParts(deps) {
           }),
         },
       },
-      artifact_refs: [reviewFile],
+      artifact_refs: artifactRefs,
       review_state_patch: buildDirectorReviewStatePatch(
         status,
         decision,

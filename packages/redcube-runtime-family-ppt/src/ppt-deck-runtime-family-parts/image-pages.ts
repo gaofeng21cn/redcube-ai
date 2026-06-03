@@ -11,6 +11,8 @@ import {
 } from 'node:fs';
 import { generateImageViaCodexNativeImagegen } from '@redcube/codex-cli-client';
 
+import { buildReviewExportCloseout } from './review-export-closeout.js';
+
 type JsonRecord = Record<string, any>;
 type ImagePageRoute = 'author_image_pages' | 'repair_image_pages';
 
@@ -842,8 +844,33 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
         opl_agent_lab_can_lower_export_pptx: false,
       },
     };
+    const artifactRefs = [
+      paths.manifestFile,
+      paths.promptManifestFile,
+      paths.styleManifestFile,
+      paths.metadataFile,
+      ...bundlePages.map((slide) => safeText(slide?.png_file)).filter(Boolean),
+      ...promptEntries.map((entry) => safeText(entry?.prompt_file)).filter(Boolean),
+      ...promptEntries.map((entry) => safeText(entry?.prompt_manifest_file)).filter(Boolean),
+      ...promptEntries.map((entry) => safeText(entry?.style_manifest_file)).filter(Boolean),
+    ];
+    const closeout = route === 'repair_image_pages'
+      ? buildReviewExportCloseout({
+          family: 'ppt_deck',
+          route,
+          deliverableId,
+          status: 'completed',
+          reviewExportRefs: [
+            ...safeArray(reviewArtifact?.review_export_refs),
+            ...safeArray(reviewArtifact?.typed_blocker_refs),
+            ...safeArray(reviewArtifact?.owner_receipt_refs),
+          ],
+          artifactRefs,
+        })
+      : {};
     return {
       ...attachCommon(route, contract, null, adapter),
+      ...closeout,
       status: 'completed',
       creative_execution: {
         ...creativeExecution(route, null, adapter),
@@ -882,16 +909,7 @@ export function createPptDeckImagePageStageParts(deps: ImagePageDeps) {
           adapter,
         }),
       },
-      artifact_refs: [
-        paths.manifestFile,
-        paths.promptManifestFile,
-        paths.styleManifestFile,
-        paths.metadataFile,
-        ...bundlePages.map((slide) => safeText(slide?.png_file)).filter(Boolean),
-        ...promptEntries.map((entry) => safeText(entry?.prompt_file)).filter(Boolean),
-        ...promptEntries.map((entry) => safeText(entry?.prompt_manifest_file)).filter(Boolean),
-        ...promptEntries.map((entry) => safeText(entry?.style_manifest_file)).filter(Boolean),
-      ],
+      artifact_refs: artifactRefs,
       review_state_patch: {
         current_status: 'draft',
         ready_for_export: false,

@@ -5,6 +5,10 @@ import {
   collectIncrementalScreenshotReviewTargetSlideIds,
 } from './incremental-review-scope.js';
 import { createPptRenderReviewMachineGateBuilder } from './render-review-machine-gate.js';
+import {
+  buildReviewExportCloseout,
+  reviewExportBlockerKind,
+} from './review-export-closeout.js';
 import { materializePptScreenshotReviewCapture } from './screenshot-capture.js';
 import { createPptDeckScreenshotReviewMechanicsParts } from './stage-screenshot-review-mechanics.js';
 import { createPptDeckScreenshotPreflightParts } from './stage-screenshot-preflight.js';
@@ -484,8 +488,29 @@ export function createPptDeckScreenshotReviewParts(deps) {
       ? null
       : imagePagesReviewInput ? 'repair_image_pages'
         : nativeReviewInput ? 'repair_pptx_native' : deriveScreenshotReviewRerunStage(contract, failedChecks, slideReviews);
+    const artifactRefs = [
+      reviewMarkdown,
+      reviewCapture.reviewMarkdownFile,
+      captureManifest.manifest_file,
+      ...slideReviews.map((slide) => slide.screenshot_file),
+    ].filter(Boolean);
+    const closeout = buildReviewExportCloseout({
+      family: 'ppt_deck',
+      route: 'screenshot_review',
+      deliverableId,
+      status,
+      blockerKind: reviewExportBlockerKind({
+        route: 'screenshot_review',
+        failedChecks,
+        slideReviews,
+      }),
+      blockingReasons: failedChecks,
+      nextRequiredOwnerAction: rerunFromStage,
+      artifactRefs,
+    });
     const artifact = {
       ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
+      ...closeout,
       review_execution: {
         ...creativeExecution('screenshot_review', generationRuntime, adapter),
         overlay: 'screenshot_review',
@@ -584,12 +609,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
       },
       report_markdown: reviewMarkdown,
       metrics: reviewPayload.metrics,
-      artifact_refs: [
-        reviewMarkdown,
-        reviewCapture.reviewMarkdownFile,
-        captureManifest.manifest_file,
-        ...slideReviews.map((slide) => slide.screenshot_file),
-      ].filter(Boolean),
+      artifact_refs: artifactRefs,
       review_state_patch: {
         current_status: status === 'pass' ? 'export_ready' : 'blocked_for_revision',
         ready_for_export: status === 'pass',

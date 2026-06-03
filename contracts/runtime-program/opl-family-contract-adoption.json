@@ -728,7 +728,7 @@
     },
     "artifact_locator_contract": {
       "contract_id": "rca.workspace_runtime_artifact_locator.v1",
-      "locator_model": "workspace_runtime_artifact_root_refs_only",
+      "locator_model": "opl_stage_folder_contract_refs_only",
       "repo_tracks_visual_or_export_artifact_blobs": false,
       "opl_forbidden": [
         "store_png_pptx_pdf_blob",

@@ -61,6 +61,111 @@
     "family_action_catalog_ref": "/family_action_catalog",
     "missing_action_refs": []
   },
+  "stage_output_role_interface": {
+    "surface_kind": "rca_stage_output_role_interface_contract",
+    "version": "stage-output-role-interface.v1",
+    "owner": "redcube_ai",
+    "canonical_roles": [
+      "source_truth_pack",
+      "material_inventory",
+      "strategy_brief",
+      "visual_direction",
+      "render_manifest",
+      "review_verdict",
+      "export_bundle",
+      "handoff_manifest"
+    ],
+    "interface_rule": "stage_outputs_are_addressed_by_role_manifest_and_receipt_refs_not_filename",
+    "stage_role_expectations": {
+      "source_intake": [
+        "source_truth_pack",
+        "material_inventory"
+      ],
+      "communication_strategy": [
+        "strategy_brief"
+      ],
+      "visual_direction": [
+        "visual_direction"
+      ],
+      "artifact_creation": [
+        "render_manifest"
+      ],
+      "review_and_revision": [
+        "review_verdict"
+      ],
+      "package_and_handoff": [
+        "export_bundle",
+        "handoff_manifest"
+      ]
+    },
+    "role_ref_shape": {
+      "role": "<canonical_role>",
+      "output_ref": "outputs/<mutable-file-name>",
+      "manifest_ref": "manifest.json",
+      "receipt_ref": "receipts/domain-owner-receipt.json or null when blocked",
+      "typed_blocker_ref": "evidence/typed-blocker-ref.json or null when successful"
+    },
+    "filename_policy": "output file names may vary and must not be used as the machine interface"
+  },
+  "stage_artifact_runtime": {
+    "surface_kind": "opl_stage_folder_contract_consumption",
+    "contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+    "physical_source_of_truth": "$OPL_STATE_DIR/runtime-state/domains/redcube_ai/deliverables/<program_id>/<topic_id>/<deliverable_id>/stages/<nn-stage>/attempts/<attempt_id>/",
+    "canonical_stages": [
+      "source_intake",
+      "communication_strategy",
+      "visual_direction",
+      "artifact_creation",
+      "review_and_revision",
+      "package_and_handoff"
+    ],
+    "canonical_output_roles": [
+      "source_truth_pack",
+      "material_inventory",
+      "strategy_brief",
+      "visual_direction",
+      "render_manifest",
+      "review_verdict",
+      "export_bundle",
+      "handoff_manifest"
+    ],
+    "stage_role_expectations": {
+      "source_intake": [
+        "source_truth_pack",
+        "material_inventory"
+      ],
+      "communication_strategy": [
+        "strategy_brief"
+      ],
+      "visual_direction": [
+        "visual_direction"
+      ],
+      "artifact_creation": [
+        "render_manifest"
+      ],
+      "review_and_revision": [
+        "review_verdict"
+      ],
+      "package_and_handoff": [
+        "export_bundle",
+        "handoff_manifest"
+      ]
+    },
+    "interface_rule": "role_plus_manifest_plus_receipt_ref_is_machine_interface_filename_is_mutable",
+    "completion_rule": "required output roles plus valid manifest plus RCA owner receipt",
+    "blocked_rule": "RCA typed blocker plus evidence",
+    "orphan_rule": "output files without valid role manifest/receipt/evidence are not completed stages",
+    "derived_projection_policy": "status, stage_progress_log, gallery, and handoff are derived from Stage Folder contents; they are not first truth",
+    "authority_boundary": {
+      "owner": "redcube_ai",
+      "opl_role": "stage_folder_contract_provider_index_rebuild_status_explain",
+      "opl_can_issue_owner_receipt": false,
+      "opl_can_write_visual_truth": false,
+      "opl_can_write_review_export_verdict": false,
+      "opl_can_write_domain_artifact_body": false,
+      "rca_owns_artifact_authority": true
+    }
+  },
   "authority_boundary": {
     "domain_truth_owner": "redcube_ai",
     "opl_role": "projection_consumer_only",
@@ -78,32 +183,6 @@
     "default_ppt_route_changed": false,
     "repo_local_stage_runner_retired": true,
     "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
-  },
-  "stage_artifact_runtime": {
-    "surface_kind": "opl_stage_folder_contract_consumption",
-    "contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
-    "physical_source_of_truth": "$OPL_STATE_DIR/runtime-state/domains/redcube_ai/deliverables/<program_id>/<topic_id>/<deliverable_id>/stages/<nn-stage>/attempts/<attempt_id>/",
-    "canonical_stages": [
-      "source_intake",
-      "communication_strategy",
-      "visual_direction",
-      "artifact_creation",
-      "review_and_revision",
-      "package_and_handoff"
-    ],
-    "completion_rule": "required outputs plus valid manifest plus RCA owner receipt",
-    "blocked_rule": "RCA typed blocker plus evidence",
-    "orphan_rule": "output files without valid manifest/receipt/evidence are not completed stages",
-    "derived_projection_policy": "status, stage_progress_log, gallery, and handoff are derived from Stage Folder contents; they are not first truth",
-    "authority_boundary": {
-      "owner": "redcube_ai",
-      "opl_role": "stage_folder_contract_provider_index_rebuild_status_explain",
-      "opl_can_issue_owner_receipt": false,
-      "opl_can_write_visual_truth": false,
-      "opl_can_write_review_export_verdict": false,
-      "opl_can_write_domain_artifact_body": false,
-      "rca_owns_artifact_authority": true
-    }
   },
   "stages": [
     {
@@ -179,6 +258,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "source_readiness",
@@ -191,7 +275,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 7,
+        "source_ref_count": 8,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -199,6 +283,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "source_readiness",
             "research",
@@ -316,6 +401,33 @@
         ],
         "ensures": [
           "source_truth_frozen"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "source_intake",
+          "required_roles": [
+            "source_truth_pack",
+            "material_inventory"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "source_truth_pack",
+          "material_inventory"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.source_intake.source_truth_frozen"
@@ -685,6 +797,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "storyline",
@@ -699,7 +816,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 7,
+        "source_ref_count": 8,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -707,6 +824,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "storyline",
             "detailed_outline",
@@ -826,6 +944,31 @@
         ],
         "ensures": [
           "communication_strategy_accepted"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "communication_strategy",
+          "required_roles": [
+            "strategy_brief"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "strategy_brief"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.communication_strategy.accepted"
@@ -1188,6 +1331,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "visual_direction"
@@ -1198,7 +1346,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 7,
+        "source_ref_count": 8,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -1206,6 +1354,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "visual_direction"
           ]
@@ -1321,6 +1470,31 @@
         ],
         "ensures": [
           "visual_direction_accepted"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "visual_direction",
+          "required_roles": [
+            "visual_direction"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "visual_direction"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.visual_direction.accepted"
@@ -1681,6 +1855,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "author_image_pages",
@@ -1693,7 +1872,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 7,
+        "source_ref_count": 8,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -1701,6 +1880,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "author_image_pages",
             "render_html",
@@ -1824,6 +2004,31 @@
         ],
         "ensures": [
           "artifact_candidate_rendered"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "artifact_creation",
+          "required_roles": [
+            "render_manifest"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "render_manifest"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.artifact_creation.candidate_rendered"
@@ -2203,6 +2408,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "visual_director_review",
@@ -2227,7 +2437,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 9,
+        "source_ref_count": 10,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -2235,6 +2445,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "visual_director_review",
             "screenshot_review",
@@ -2360,6 +2571,31 @@
         ],
         "ensures": [
           "visual_review_gate_receipt_recorded"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "review_and_revision",
+          "required_roles": [
+            "review_verdict"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "review_verdict"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.review_and_revision.gate_recorded"
@@ -2738,6 +2974,11 @@
           "role": "artifact_authority_projection"
         },
         {
+          "ref_kind": "contract",
+          "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
+          "role": "stage_folder_physical_artifact_truth"
+        },
+        {
           "ref_kind": "route_stage_refs",
           "ref": [
             "export_pptx",
@@ -2761,7 +3002,7 @@
       "freshness": {
         "status": "current",
         "checked_at": "manifest_build",
-        "source_ref_count": 9,
+        "source_ref_count": 10,
         "stale_if_missing": [
           "/family_action_catalog",
           "/deliverable_facade/family_route_policy",
@@ -2769,6 +3010,7 @@
           "/review_state",
           "/publication_projection",
           "/artifact_inventory",
+          "contracts/artifact_locator_contract.json#/primary_artifact_truth",
           [
             "export_pptx",
             "publish_copy",
@@ -2897,6 +3139,33 @@
         ],
         "ensures": [
           "export_handoff_receipt_recorded"
+        ],
+        "stage_output_role_interface": {
+          "surface_kind": "rca_stage_output_role_interface_contract",
+          "version": "stage-output-role-interface.v1",
+          "owner": "redcube_ai",
+          "stage_id": "package_and_handoff",
+          "required_roles": [
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "accepted_roles": [
+            "source_truth_pack",
+            "material_inventory",
+            "strategy_brief",
+            "visual_direction",
+            "render_manifest",
+            "review_verdict",
+            "export_bundle",
+            "handoff_manifest"
+          ],
+          "interface_rule": "role_manifest_receipt_ref_is_machine_interface_filename_is_not_interface",
+          "manifest_ref": "manifest.json",
+          "receipt_ref_policy": "owner_receipt_or_typed_blocker_ref_required_by_terminal_status"
+        },
+        "expected_output_roles": [
+          "export_bundle",
+          "handoff_manifest"
         ],
         "runtime_event_refs": [
           "runtime_event:rca.package_and_handoff.export_handoff_recorded"
