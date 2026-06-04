@@ -390,6 +390,8 @@ export {
   buildPrivatizedFunctionalModuleAuditProjection,
   OPL_GENERATED_INTERFACE_CONSUMPTION,
   buildVisualPackCompilerHandoffProjection,
+  RCA_COGNITIVE_KERNEL_ADOPTION,
+  RCA_GOLDEN_PATH_PROFILE,
 } from './actions/guarded-domain-actions.js';
 
 export {

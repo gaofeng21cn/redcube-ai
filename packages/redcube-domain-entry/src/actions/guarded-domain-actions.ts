@@ -758,4 +758,8 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
   };
 }
 
-export { buildVisualPackCompilerHandoffProjection };
+export {
+  buildVisualPackCompilerHandoffProjection,
+  RCA_COGNITIVE_KERNEL_ADOPTION,
+  RCA_GOLDEN_PATH_PROFILE,
+} from './domain-action-adapter-parts/visual-pack-compiler-handoff.js';

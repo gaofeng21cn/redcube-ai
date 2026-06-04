@@ -1,0 +1,45 @@
+{
+  "surface_kind": "opl_foundry_agent_golden_path_profile",
+  "version": "golden-path-profile.v1",
+  "owner": "redcube-ai",
+  "domain_id": "redcube_ai",
+  "state": "advisory_current_contract",
+  "profile_role": "visual_foundry_agent_golden_path_profile",
+  "purpose": "RedCube AI golden path for OPL-hosted Foundry Agent execution under current_owner_delta and stage-internal cognitive-kernel boundaries.",
+  "machine_boundary": "This profile describes the intended happy path and stop-loss contract. It does not declare domain ready, App release ready, or production ready.",
+  "default_executor": "codex_cli",
+  "default_outer_loop": "current_owner_delta",
+  "stage_attempt_strategy": "cognitive_kernel_stage_internal",
+  "domain_affordance_catalog_ref": "agent/tools/domain_affordances.md",
+  "cognitive_kernel_adoption_ref": "contracts/cognitive_kernel_adoption.json",
+  "stage_control_plane_ref": "contracts/stage_control_plane.json",
+  "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
+  "golden_path_steps": [
+    "hydrate_current_owner_delta",
+    "run_stage_attempt_with_declared_prompt_skill_tool_knowledge_refs",
+    "generate_candidate_pool_or_artifact_delta_inside_domain_workspace",
+    "ground_review_in_source_refs_and_tool_evidence",
+    "select_or_revise_candidate_with_lineage",
+    "record_owner_receipt_typed_blocker_human_gate_or_route_back_ref",
+    "project_refs_only_status_to_opl_and_app"
+  ],
+  "required_closeout_refs": [
+    "stage_artifact_unit_ref",
+    "owner_receipt_ref_or_typed_blocker_ref",
+    "independent_gate_receipt_ref_or_route_back_ref",
+    "current_owner_delta_ref"
+  ],
+  "stop_loss_policy": {
+    "missing_domain_truth": "return_typed_blocker_ref",
+    "missing_credential_or_human_authority": "return_human_gate_ref",
+    "failed_independent_gate": "return_route_back_ref_or_typed_blocker_ref",
+    "forbidden_write_requested": "return_typed_blocker_ref"
+  },
+  "forbidden_claims": [
+    "descriptor_ready_means_domain_ready",
+    "provider_completion_means_quality_ready",
+    "generated_surface_ready_means_export_ready",
+    "same_attempt_self_review_closes_quality_gate",
+    "tool_catalog_prescribes_executor_sequence"
+  ]
+}

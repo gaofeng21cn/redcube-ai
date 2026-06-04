@@ -226,6 +226,61 @@ test('RCA stage control plane requires visual-facing user stage log semantics', 
   }
 });
 
+test('RCA stage control plane declares cognitive-kernel strategy sections for each visual stage', () => {
+  const plane = stageControlPlane();
+
+  for (const stage of plane.stages) {
+    assert.equal(stage.selected_executor.executor_kind, 'codex_cli', stage.stage_id);
+    assert.equal(stage.selected_executor.default_executor, true, stage.stage_id);
+    assert.ok(stage.prompt_refs.length > 0, stage.stage_id);
+    assert.ok(stage.skill_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_refs.length > 0, stage.stage_id);
+    assert.ok(stage.knowledge_refs.length > 0, stage.stage_id);
+    assert.ok(stage.quality_gate_refs.length > 0, stage.stage_id);
+    assert.ok(stage.strategy_refs.length > 0, stage.stage_id);
+
+    assert.equal(
+      stage.tool_affordance_boundary.catalog_role,
+      'available_affordance_catalog_not_workflow_script',
+      stage.stage_id,
+    );
+    assert.equal(stage.tool_affordance_boundary.executor_autonomy.executor_can_choose_tools, true, stage.stage_id);
+    assert.equal(stage.tool_affordance_boundary.executor_autonomy.executor_can_choose_order_and_parallelism, true, stage.stage_id);
+    assert.equal(stage.tool_affordance_boundary.executor_autonomy.tool_catalog_can_prescribe_tool_sequence, false, stage.stage_id);
+    assert.equal(stage.tool_affordance_boundary.executor_autonomy.tool_catalog_can_define_cognitive_strategy, false, stage.stage_id);
+    assert.equal(stage.tool_affordance_boundary.executor_autonomy.tool_catalog_can_authorize_forbidden_write, false, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.capability_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.permission_scope_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.credential_boundary_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.write_scope_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.side_effect_risk_refs.length > 0, stage.stage_id);
+    assert.ok(stage.tool_affordance_boundary.forbidden_authority_refs.length > 0, stage.stage_id);
+
+    assert.equal(stage.candidate_pool_policy.candidate_pool_is_stage_internal_artifact, true, stage.stage_id);
+    assert.equal(stage.candidate_pool_policy.user_visible_flow_changed, false, stage.stage_id);
+    assert.equal(stage.candidate_pool_policy.route_can_complete_stage, false, stage.stage_id);
+    assert.ok(stage.candidate_pool_policy.allowed_candidate_kinds.length > 0, stage.stage_id);
+
+    assert.equal(stage.independent_gate_policy.execution_review_separation_required, true, stage.stage_id);
+    assert.equal(stage.independent_gate_policy.same_attempt_self_review_can_close_quality_gate, false, stage.stage_id);
+    assert.equal(stage.independent_gate_policy.provider_completion_can_close_quality_gate, false, stage.stage_id);
+    assert.ok(stage.independent_gate_policy.gate_ref.startsWith('agent/quality_gates/'), stage.stage_id);
+
+    assert.equal(stage.handoff_policy.owner_receipt_or_typed_blocker_required, true, stage.stage_id);
+    assert.equal(stage.handoff_policy.handoff_refs_only, true, stage.stage_id);
+    assert.equal(stage.stage_contract.cognitive_kernel_contract_ref, 'contracts/opl-framework/cognitive-computation-kernel.json', stage.stage_id);
+  }
+
+  const artifactCreation = plane.stages.find((stage) => stage.stage_id === 'artifact_creation');
+  assert.ok(artifactCreation.strategy_refs.includes('image_first_candidate_generation'));
+  assert.ok(artifactCreation.tool_refs.some((tool) => tool.ref === 'tool:codex-native-imagegen'));
+  assert.equal(artifactCreation.independent_gate_policy.next_quality_gate_stage_ref, 'review_and_revision');
+
+  const review = plane.stages.find((stage) => stage.stage_id === 'review_and_revision');
+  assert.ok(review.strategy_refs.includes('grounded_visual_review'));
+  assert.equal(review.independent_gate_policy.gate_ref, 'agent/quality_gates/review_export_memory.md');
+});
+
 test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint', () => {
   const adoption = stageArtifactKernelAdoption();
   const plane = stageControlPlane();

@@ -306,6 +306,177 @@ export const RCA_PACKAGE_DISTRIBUTION_GATE = Object.freeze({
   external_runtime_authority_allowed: false,
 });
 
+export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
+  'prompt_refs',
+  'skill_refs',
+  'tool_refs',
+  'tool_affordance_boundary',
+  'knowledge_refs',
+  'quality_gate_refs',
+  'strategy_refs',
+  'candidate_pool_policy',
+  'independent_gate_policy',
+  'handoff_policy',
+]);
+
+export const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
+  ref: 'agent/tools/domain_affordances.md',
+  ref_kind: 'repo_path',
+  role: 'domain_tool_affordance_catalog',
+  catalog_role: 'available_affordance_catalog_not_workflow_script',
+});
+
+export const RCA_COGNITIVE_TOOL_AFFORDANCE_BOUNDARY = Object.freeze({
+  catalog_role: 'available_affordance_catalog_not_workflow_script',
+  capability_refs: [
+    { ref: 'source_context_and_visual_brief_reading', ref_kind: 'policy_ref', role: 'capability_boundary' },
+    { ref: 'visual_direction_and_candidate_generation_support', ref_kind: 'policy_ref', role: 'capability_boundary' },
+    { ref: 'native_ppt_render_screenshot_and_export_helpers', ref_kind: 'policy_ref', role: 'capability_boundary' },
+    { ref: 'visual_review_repair_and_artifact_lineage_support', ref_kind: 'policy_ref', role: 'capability_boundary' },
+  ],
+  permission_scope_refs: [
+    { ref: 'repo_context_read', ref_kind: 'policy_ref', role: 'permission_scope_boundary' },
+    { ref: 'declared_domain_workspace_read', ref_kind: 'policy_ref', role: 'permission_scope_boundary' },
+    { ref: 'bounded_domain_artifact_write_when_owner_authorized', ref_kind: 'policy_ref', role: 'permission_scope_boundary' },
+    { ref: 'receipt_or_typed_blocker_return', ref_kind: 'policy_ref', role: 'permission_scope_boundary' },
+  ],
+  credential_boundary_refs: [
+    { ref: 'no_secret_material_in_stage_pack', ref_kind: 'policy_ref', role: 'credential_boundary_boundary' },
+    { ref: 'executor_must_request_human_gate_for_missing_credentials', ref_kind: 'policy_ref', role: 'credential_boundary_boundary' },
+  ],
+  write_scope_refs: [
+    { ref: 'visual_workspace_refs_only', ref_kind: 'policy_ref', role: 'write_scope_boundary' },
+    { ref: 'deliverable_artifact_mutation_only_with_rca_artifact_authority_receipt', ref_kind: 'policy_ref', role: 'write_scope_boundary' },
+  ],
+  side_effect_risk_refs: [
+    { ref: 'external_network_or_portal_side_effect_requires_explicit_stage_permission', ref_kind: 'policy_ref', role: 'side_effect_risk_boundary' },
+    { ref: 'artifact_or_package_mutation_requires_domain_owner_receipt', ref_kind: 'policy_ref', role: 'side_effect_risk_boundary' },
+  ],
+  forbidden_authority_refs: [
+    { ref: 'visual_truth_write_by_opl', ref_kind: 'policy_ref', role: 'forbidden_authority_boundary' },
+    { ref: 'review_verdict_without_rca_owner_receipt', ref_kind: 'policy_ref', role: 'forbidden_authority_boundary' },
+    { ref: 'export_verdict_without_rca_owner_receipt', ref_kind: 'policy_ref', role: 'forbidden_authority_boundary' },
+    { ref: 'artifact_body_write_without_artifact_authority_receipt', ref_kind: 'policy_ref', role: 'forbidden_authority_boundary' },
+    { ref: 'visual_memory_body_write_by_opl', ref_kind: 'policy_ref', role: 'forbidden_authority_boundary' },
+  ],
+  executor_autonomy: {
+    executor_can_choose_tools: true,
+    executor_can_skip_tools: true,
+    executor_can_substitute_tools_within_boundary: true,
+    executor_can_choose_order_and_parallelism: true,
+    executor_can_request_missing_context_or_human_gate: true,
+    tool_catalog_can_prescribe_tool_sequence: false,
+    tool_catalog_can_define_cognitive_strategy: false,
+    tool_catalog_can_override_stage_goal: false,
+    tool_catalog_can_authorize_forbidden_write: false,
+  },
+  policy:
+    'redcube_ai tool refs declare available affordances and safety boundaries only; they do not prescribe executor order, stage strategy, stage goal, or forbidden writes.',
+});
+
+export const RCA_COGNITIVE_KERNEL_ADOPTION = Object.freeze({
+  surface_kind: 'opl_cognitive_kernel_adoption',
+  version: 'cognitive-kernel-adoption.v1',
+  owner: 'redcube-ai',
+  domain_id: 'redcube_ai',
+  state: 'advisory_current_contract',
+  purpose:
+    'RedCube AI declares repo-owned stage-internal cognitive-kernel refs, tool affordances, and independent gate boundaries for OPL-hosted Foundry Agent execution.',
+  machine_boundary:
+    'This contract is advisory/current adoption metadata. Domain truth, artifact bodies, quality verdicts, owner receipts, typed blockers, human gates, and export authority remain domain-owned; OPL owns transport, attempts, refs, receipts projection, and generated/hosted surfaces only.',
+  framework_contract_ref: 'one-person-lab/contracts/opl-framework/cognitive-computation-kernel.json',
+  pack_compiler_input_ref: 'contracts/pack_compiler_input.json',
+  stage_control_plane_ref: 'contracts/stage_control_plane.json',
+  golden_path_profile_ref: 'contracts/golden_path_profile.json',
+  domain_affordance_catalog_ref: 'agent/tools/domain_affordances.md',
+  stage_pack_required_sections: [...RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS],
+  tool_affordance_boundary: { ...RCA_COGNITIVE_TOOL_AFFORDANCE_BOUNDARY },
+  authority_boundary: {
+    domain_repo_declares_strategy_not_generic_runtime: true,
+    domain_repo_can_claim_generated_surface_owner: false,
+    opl_can_write_domain_truth: false,
+    opl_can_read_domain_body: false,
+    opl_can_create_owner_receipt: false,
+    opl_can_create_typed_blocker: false,
+    opl_can_claim_domain_ready: false,
+    opl_can_claim_artifact_ready: false,
+    strategy_refs_completeness_is_launch_hard_gate: false,
+    independent_gate_receipt_required_for_quality_progression: true,
+    same_attempt_self_review_can_close_quality_gate: false,
+  },
+  adoption_policy: {
+    advisory_not_launch_hard_gate: true,
+    tool_catalog_is_not_workflow_script: true,
+    route_is_not_stage_strategy: true,
+    stage_attempt_is_required_for_execution: true,
+    candidate_pool_is_stage_internal_artifact: true,
+    meta_review_updates_are_proposals_until_owner_acceptance: true,
+  },
+  stage_strategy_refs: [
+    'visual_brief_goal_and_constraints',
+    'image_first_candidate_generation',
+    'screenshot_grounded_reflection',
+    'visual_candidate_comparative_selection',
+    'export_independent_quality_gate',
+  ],
+  stage_artifact_refs: [
+    'source_readiness_manifest_ref',
+    'communication_strategy_ref',
+    'visual_direction_ref',
+    'visual_artifact_candidate_ref',
+    'review_revision_packet_ref',
+    'package_handoff_ref',
+  ],
+});
+
+export const RCA_GOLDEN_PATH_PROFILE = Object.freeze({
+  surface_kind: 'opl_foundry_agent_golden_path_profile',
+  version: 'golden-path-profile.v1',
+  owner: 'redcube-ai',
+  domain_id: 'redcube_ai',
+  state: 'advisory_current_contract',
+  profile_role: 'visual_foundry_agent_golden_path_profile',
+  purpose:
+    'RedCube AI golden path for OPL-hosted Foundry Agent execution under current_owner_delta and stage-internal cognitive-kernel boundaries.',
+  machine_boundary:
+    'This profile describes the intended happy path and stop-loss contract. It does not declare domain ready, App release ready, or production ready.',
+  default_executor: 'codex_cli',
+  default_outer_loop: 'current_owner_delta',
+  stage_attempt_strategy: 'cognitive_kernel_stage_internal',
+  domain_affordance_catalog_ref: 'agent/tools/domain_affordances.md',
+  cognitive_kernel_adoption_ref: 'contracts/cognitive_kernel_adoption.json',
+  stage_control_plane_ref: 'contracts/stage_control_plane.json',
+  pack_compiler_input_ref: 'contracts/pack_compiler_input.json',
+  golden_path_steps: [
+    'hydrate_current_owner_delta',
+    'run_stage_attempt_with_declared_prompt_skill_tool_knowledge_refs',
+    'generate_candidate_pool_or_artifact_delta_inside_domain_workspace',
+    'ground_review_in_source_refs_and_tool_evidence',
+    'select_or_revise_candidate_with_lineage',
+    'record_owner_receipt_typed_blocker_human_gate_or_route_back_ref',
+    'project_refs_only_status_to_opl_and_app',
+  ],
+  required_closeout_refs: [
+    'stage_artifact_unit_ref',
+    'owner_receipt_ref_or_typed_blocker_ref',
+    'independent_gate_receipt_ref_or_route_back_ref',
+    'current_owner_delta_ref',
+  ],
+  stop_loss_policy: {
+    missing_domain_truth: 'return_typed_blocker_ref',
+    missing_credential_or_human_authority: 'return_human_gate_ref',
+    failed_independent_gate: 'return_route_back_ref_or_typed_blocker_ref',
+    forbidden_write_requested: 'return_typed_blocker_ref',
+  },
+  forbidden_claims: [
+    'descriptor_ready_means_domain_ready',
+    'provider_completion_means_quality_ready',
+    'generated_surface_ready_means_export_ready',
+    'same_attempt_self_review_closes_quality_gate',
+    'tool_catalog_prescribes_executor_sequence',
+  ],
+});
+
 export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([
   'agent/prompts/source_intake.md',
   'agent/prompts/communication_strategy.md',
@@ -335,6 +506,7 @@ export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([
   'agent/knowledge/review_export_memory.md',
   'agent/knowledge/markdown_route_policy.md',
   'agent/knowledge/owner_receipt_policy.md',
+  'agent/tools/domain_affordances.md',
 ]);
 
 export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
@@ -379,6 +551,33 @@ export const OPL_GENERATED_SURFACE_EXIT_GATE = Object.freeze({
     'real_memory_lifecycle_receipt_instances',
     'cross_family_repeated_no_regression_evidence',
   ],
+});
+
+export const RCA_COGNITIVE_STAGE_PACK_CONTRACT = Object.freeze({
+  owner: 'redcube_ai',
+  consumer: 'opl_pack_compiler',
+  contract_ref: 'contracts/opl-framework/cognitive-computation-kernel.json',
+  stage_control_plane_ref: 'contracts/stage_control_plane.json',
+  cognitive_kernel_adoption_ref: 'contracts/cognitive_kernel_adoption.json',
+  golden_path_profile_ref: 'contracts/golden_path_profile.json',
+  domain_affordance_catalog_ref: { ...RCA_DOMAIN_TOOL_AFFORDANCE_REF },
+  refs_only: true,
+  user_visible_flow_changed: false,
+  launch_hard_gate: false,
+  required_stage_sections: [...RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS],
+  stage_strategy_owner: 'selected_codex_executor_with_rca_owned_gates',
+  tool_affordance_policy: 'available_affordance_catalog_not_workflow_script',
+  tool_affordance_boundary: { ...RCA_COGNITIVE_TOOL_AFFORDANCE_BOUNDARY },
+  candidate_pool_policy: 'stage_internal_refs_with_lineage_no_user_flow_expansion',
+  independent_gate_policy: 'execution_and_review_attempts_must_be_separable_for_quality_progression',
+  authority_boundary: {
+    opl_can_write_visual_truth: false,
+    opl_can_write_artifact_body: false,
+    opl_can_authorize_review_export_verdict: false,
+    opl_can_sign_owner_receipt: false,
+    provider_completion_is_visual_ready: false,
+    same_attempt_self_review_can_close_quality_gate: false,
+  },
 });
 
 export function buildVisualPackCompilerHandoffProjection() {
@@ -575,6 +774,9 @@ export function buildVisualPackCompilerHandoffProjection() {
         { source_id: 'visual_pack_discipline_policy', ref: RCA_VISUAL_PACK_DISCIPLINE_CONTRACT.policy_ref },
         { source_id: 'markdown_marp_route_policy', ref: RCA_MARKDOWN_MARP_ROUTE_POLICY.policy_ref },
         { source_id: 'package_distribution_policy', ref: RCA_PACKAGE_DISTRIBUTION_GATE.policy_ref },
+        { source_id: 'cognitive_kernel_adoption', ref: 'contracts/cognitive_kernel_adoption.json' },
+        { source_id: 'golden_path_profile', ref: 'contracts/golden_path_profile.json' },
+        { source_id: 'domain_tool_affordance_catalog', ref: 'agent/tools/domain_affordances.md' },
       ],
       required_input_families: [
         'domain_descriptor',
@@ -588,6 +790,9 @@ export function buildVisualPackCompilerHandoffProjection() {
         'receipt_schema',
         'authority_function_manifest',
         'oracle_fixtures',
+        'tool_affordance_catalog',
+        'cognitive_kernel_adoption_contract',
+        'golden_path_profile',
       ],
       required_domain_pack_paths: [...RCA_REQUIRED_DOMAIN_PACK_PATHS],
       authority_function_manifest: {
@@ -617,6 +822,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         repo_tracks_live_receipt_instances: false,
       },
       visual_pack_discipline_contract: { ...RCA_VISUAL_PACK_DISCIPLINE_CONTRACT },
+      cognitive_stage_pack_contract: { ...RCA_COGNITIVE_STAGE_PACK_CONTRACT },
       markdown_marp_route_policy: { ...RCA_MARKDOWN_MARP_ROUTE_POLICY },
       package_distribution_gate: { ...RCA_PACKAGE_DISTRIBUTION_GATE },
     },

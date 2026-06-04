@@ -324,6 +324,125 @@ const CANONICAL_STAGE_QUALITY_GATE_REFS = {
   ],
 };
 
+const COGNITIVE_KERNEL_CONTRACT_REF = 'contracts/opl-framework/cognitive-computation-kernel.json';
+const COGNITIVE_KERNEL_ADOPTION_REF = 'contracts/cognitive_kernel_adoption.json';
+const GOLDEN_PATH_PROFILE_REF = 'contracts/golden_path_profile.json';
+const DOMAIN_TOOL_AFFORDANCE_CATALOG_REF = {
+  ref_kind: 'repo_path',
+  ref: 'agent/tools/domain_affordances.md',
+  role: 'stage_tool_affordance_catalog',
+  catalog_role: 'available_affordance_catalog_not_workflow_script',
+};
+
+const COGNITIVE_KERNEL_REQUIRED_SECTIONS = [
+  'prompt_refs',
+  'skill_refs',
+  'tool_refs',
+  'tool_affordance_boundary',
+  'knowledge_refs',
+  'quality_gate_refs',
+  'strategy_refs',
+  'candidate_pool_policy',
+  'independent_gate_policy',
+  'handoff_policy',
+];
+
+const COGNITIVE_STAGE_STRATEGY_REFS = {
+  source_intake: [
+    'goal_and_constraints',
+    'source_scope_freeze',
+    'material_gap_detection',
+  ],
+  communication_strategy: [
+    'candidate_storyline_generation',
+    'grounded_source_reflection',
+    'comparative_narrative_selection',
+  ],
+  visual_direction: [
+    'candidate_visual_direction_generation',
+    'brand_grounded_reflection',
+    'comparative_visual_selection',
+  ],
+  artifact_creation: [
+    'image_first_candidate_generation',
+    'tool_grounded_render_reflection',
+    'artifact_lineage_evolution',
+  ],
+  review_and_revision: [
+    'grounded_visual_review',
+    'repair_target_selection',
+    'revision_lineage_review',
+  ],
+  package_and_handoff: [
+    'export_candidate_verification',
+    'handoff_manifest_review',
+    'artifact_lineage_closeout',
+  ],
+};
+
+const COGNITIVE_STAGE_CANDIDATE_KINDS = {
+  source_intake: [
+    'source_truth_pack_candidate',
+    'material_inventory_candidate',
+    'source_gap_typed_blocker_candidate',
+  ],
+  communication_strategy: [
+    'storyline_variant',
+    'strategy_brief_candidate',
+    'information_density_plan',
+  ],
+  visual_direction: [
+    'visual_direction_variant',
+    'brand_precedence_rationale',
+    'layout_density_direction',
+  ],
+  artifact_creation: [
+    'image_first_page_candidate',
+    'html_or_native_route_candidate_when_explicit',
+    'render_manifest_candidate',
+  ],
+  review_and_revision: [
+    'visual_review_verdict_candidate',
+    'repair_target_candidate',
+    'revision_lineage_candidate',
+  ],
+  package_and_handoff: [
+    'export_bundle_candidate',
+    'handoff_manifest_candidate',
+    'resume_handle_candidate',
+  ],
+};
+
+const COGNITIVE_STAGE_TOOL_REFS = {
+  source_intake: [
+    { ref_kind: 'tool_ref', ref: 'tool:repo-source-reader', role: 'source_context_reading' },
+    { ref_kind: 'tool_ref', ref: 'tool:stage-folder-manifest-writer', role: 'source_manifest_refs' },
+  ],
+  communication_strategy: [
+    { ref_kind: 'tool_ref', ref: 'tool:repo-source-reader', role: 'source_context_reading' },
+    { ref_kind: 'tool_ref', ref: 'tool:strategy-brief-writer', role: 'strategy_ref_materialization' },
+  ],
+  visual_direction: [
+    { ref_kind: 'tool_ref', ref: 'tool:brand-asset-reader', role: 'brand_and_material_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:visual-direction-writer', role: 'visual_direction_ref_materialization' },
+  ],
+  artifact_creation: [
+    { ref_kind: 'tool_ref', ref: 'tool:codex-native-imagegen', role: 'image_first_page_generation' },
+    { ref_kind: 'tool_ref', ref: 'tool:render-screenshot-inspection', role: 'render_evidence_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:stage-folder-manifest-writer', role: 'artifact_manifest_and_receipt_refs' },
+  ],
+  review_and_revision: [
+    { ref_kind: 'tool_ref', ref: 'tool:render-screenshot-inspection', role: 'visual_review_evidence_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:repair-target-writer', role: 'repair_target_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:visual-memory-receipt-writer', role: 'memory_receipt_refs' },
+  ],
+  package_and_handoff: [
+    { ref_kind: 'tool_ref', ref: 'tool:export-pptx-helper', role: 'export_bundle_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:artifact-locator-reader', role: 'artifact_locator_refs' },
+    { ref_kind: 'tool_ref', ref: 'tool:handoff-manifest-writer', role: 'handoff_manifest_refs' },
+  ],
+};
+
 function repoPathRefs(refs, role) {
   return refs.map((ref) => ({
     ref_kind: 'repo_path',
@@ -348,6 +467,111 @@ function buildActionParity(stage, actionIds) {
     family_action_catalog_ref: '/family_action_catalog',
     allowed_action_refs: stage.allowed_action_refs,
     missing_action_refs,
+  };
+}
+
+function buildToolAffordanceBoundary(stage, toolRefs) {
+  return {
+    surface_kind: 'opl_tool_affordance_boundary',
+    version: 'tool-affordance-boundary.v1',
+    contract_ref: COGNITIVE_KERNEL_CONTRACT_REF,
+    catalog_role: 'available_affordance_catalog_not_workflow_script',
+    tool_refs: toolRefs,
+    capability_refs: toolRefs.map((toolRef) => ({
+      ref_kind: 'capability_ref',
+      ref: toolRef.ref,
+      role: toolRef.role,
+    })),
+    permission_scope_refs: [
+      { ref_kind: 'permission_scope_ref', ref: 'permission:read-repo-source', role: 'read_declared_pack_refs' },
+      { ref_kind: 'permission_scope_ref', ref: 'permission:write-stage-folder-attempt', role: 'write_refs_and_manifests' },
+    ],
+    credential_boundary_refs: [
+      { ref_kind: 'credential_boundary_ref', ref: 'credential:codex-native-executor', role: 'executor_managed_credentials' },
+      { ref_kind: 'credential_boundary_ref', ref: 'credential:no-domain-secret-copy', role: 'no_repo_secret_or_token_materialization' },
+    ],
+    write_scope_refs: [
+      {
+        ref_kind: 'write_scope_ref',
+        ref: `stage-folder:redcube_ai/${stage.stage_id}/attempts/<attempt_id>`,
+        role: 'stage_attempt_refs_only_write_scope',
+      },
+      { ref_kind: 'write_scope_ref', ref: 'workspace-runtime-artifacts', role: 'artifact_refs_not_repo_source' },
+    ],
+    side_effect_risk_refs: [
+      { ref_kind: 'side_effect_risk_ref', ref: 'risk:runtime-artifact-write', role: 'bounded_workspace_artifact_write' },
+      { ref_kind: 'side_effect_risk_ref', ref: 'risk:external-export-helper', role: 'export_helper_side_effects_must_emit_refs' },
+    ],
+    forbidden_authority_refs: [
+      { ref_kind: 'forbidden_authority_ref', ref: 'forbidden:visual-truth-write', role: 'rca_visual_truth_owner_only' },
+      { ref_kind: 'forbidden_authority_ref', ref: 'forbidden:review-export-verdict', role: 'rca_review_export_gate_only' },
+      { ref_kind: 'forbidden_authority_ref', ref: 'forbidden:owner-receipt-signing-by-opl', role: 'rca_owner_receipt_only' },
+      { ref_kind: 'forbidden_authority_ref', ref: 'forbidden:artifact-body-in-opl-ledger', role: 'refs_hashes_and_locator_only' },
+    ],
+    executor_autonomy: {
+      executor_can_choose_tools: true,
+      executor_can_skip_tools: true,
+      executor_can_substitute_tools_within_boundary: true,
+      executor_can_choose_order_and_parallelism: true,
+      executor_can_request_missing_context_or_human_gate: true,
+      tool_catalog_can_prescribe_tool_sequence: false,
+      tool_catalog_can_define_cognitive_strategy: false,
+      tool_catalog_can_override_stage_goal: false,
+      tool_catalog_can_authorize_forbidden_write: false,
+    },
+  };
+}
+
+function buildCandidatePoolPolicy(stage) {
+  return {
+    surface_kind: 'rca_cognitive_candidate_pool_policy',
+    version: 'cognitive-candidate-pool-policy.v1',
+    contract_ref: COGNITIVE_KERNEL_CONTRACT_REF,
+    stage_id: stage.stage_id,
+    candidate_pool_is_stage_internal_artifact: true,
+    user_visible_flow_changed: false,
+    route_can_complete_stage: false,
+    candidate_refs_are_body_free: true,
+    candidate_lineage_required: true,
+    allowed_candidate_kinds: COGNITIVE_STAGE_CANDIDATE_KINDS[stage.stage_id] || [],
+    selected_candidate_ref_required_for_success: true,
+    selected_candidate_ref_can_claim_quality_verdict: false,
+    completion_requires_owner_receipt_or_typed_blocker: true,
+  };
+}
+
+function buildIndependentGatePolicy(stage, qualityGateRefs) {
+  return {
+    surface_kind: 'rca_independent_quality_gate_policy',
+    version: 'independent-quality-gate-policy.v1',
+    contract_ref: COGNITIVE_KERNEL_CONTRACT_REF,
+    stage_id: stage.stage_id,
+    gate_owner: 'redcube_ai',
+    gate_ref: qualityGateRefs[0]?.ref,
+    next_quality_gate_stage_ref: stage.stage_id === 'artifact_creation' ? 'review_and_revision' : null,
+    execution_review_separation_required: true,
+    same_attempt_self_review_can_close_quality_gate: false,
+    provider_completion_can_close_quality_gate: false,
+    owner_receipt_or_typed_blocker_required: true,
+    human_gate_allowed: true,
+    route_back_allowed: true,
+  };
+}
+
+function buildHandoffPolicy(stage) {
+  return {
+    surface_kind: 'rca_cognitive_stage_handoff_policy',
+    version: 'cognitive-stage-handoff-policy.v1',
+    contract_ref: COGNITIVE_KERNEL_CONTRACT_REF,
+    stage_id: stage.stage_id,
+    next_owner: 'one-person-lab',
+    next_stage_refs: stage.next_stage_refs || [],
+    provides: stage.ensures || [],
+    owner_receipt_or_typed_blocker_required: true,
+    handoff_refs_only: true,
+    artifact_body_handoff_forbidden: true,
+    resume_surface_ref: '/session_continuity',
+    artifact_surface_ref: '/artifact_inventory',
   };
 }
 
@@ -446,6 +670,33 @@ function buildReplayEvidenceRefs(stage) {
 
 function stageDescriptor(stage, actionIds) {
   const expectedOutputRoles = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[stage.stage_id] || [];
+  const skillRefs = [
+    ...repoPathRefs(CANONICAL_STAGE_SKILL_REFS[stage.stage_id], 'canonical_stage_skill_policy'),
+    { ref_kind: 'skill_id', ref: 'redcube-ai', role: 'domain_skill' },
+    { ref_kind: 'skill_id', ref: 'imagegen', role: 'visual_generation' },
+    { ref_kind: 'skill_id', ref: 'presentations', role: 'presentation_output' },
+  ];
+  const promptRefs = [
+    {
+      ref_kind: 'repo_path',
+      ref: CANONICAL_STAGE_PROMPT_REFS[stage.stage_id],
+      role: 'canonical_stage_prompt_policy',
+    },
+  ];
+  const knowledgeRefs = repoPathRefs(
+    CANONICAL_STAGE_KNOWLEDGE_REFS[stage.stage_id],
+    'canonical_stage_knowledge_policy',
+  );
+  const qualityGateRefs = CANONICAL_STAGE_QUALITY_GATE_REFS[stage.stage_id].map((gate) => ({
+    ref_kind: 'repo_path',
+    ref: gate.ref,
+    role: gate.role,
+  }));
+  const toolRefs = [
+    DOMAIN_TOOL_AFFORDANCE_CATALOG_REF,
+    ...(COGNITIVE_STAGE_TOOL_REFS[stage.stage_id] || []),
+  ];
+  const strategyRefs = COGNITIVE_STAGE_STRATEGY_REFS[stage.stage_id] || [];
   const sourceRefs = [
     ...PLANE_SOURCE_REFS,
     { ref_kind: 'route_stage_refs', ref: stage.domain_stage_refs, role: 'domain_stage_projection' },
@@ -458,6 +709,18 @@ function stageDescriptor(stage, actionIds) {
   return {
     ...stage,
     owner: 'redcube_ai',
+    selected_executor: {
+      executor_kind: 'codex_cli',
+      default_executor: true,
+      executor_binding_ref: 'default_codex_cli',
+      binding_policy: 'default_first_class_executor_for_ai_first_stage_execution',
+      required_capabilities: [
+        'repo_context_reading',
+        'domain_skill_invocation',
+        'receipt_or_typed_blocker_return',
+        'no_forbidden_write_guard',
+      ],
+    },
     summary: `${stage.title} projected from RCA-owned route stages for OPL family discovery.`,
     source_refs: sourceRefs,
     freshness: buildFreshness(sourceRefs),
@@ -467,33 +730,23 @@ function stageDescriptor(stage, actionIds) {
       { ref_kind: 'json_pointer', ref: '/progress_projection', role: 'progress_read_model' },
       { ref_kind: 'json_pointer', ref: '/session_continuity', role: 'resume_context' },
     ],
-    skills: [
-      ...repoPathRefs(CANONICAL_STAGE_SKILL_REFS[stage.stage_id], 'canonical_stage_skill_policy'),
-      { ref_kind: 'skill_id', ref: 'redcube-ai', role: 'domain_skill' },
-      { ref_kind: 'skill_id', ref: 'imagegen', role: 'visual_generation' },
-      { ref_kind: 'skill_id', ref: 'presentations', role: 'presentation_output' },
-    ],
-    prompt_refs: [
-      {
-        ref_kind: 'repo_path',
-        ref: CANONICAL_STAGE_PROMPT_REFS[stage.stage_id],
-        role: 'canonical_stage_prompt_policy',
-      },
-    ],
+    skills: skillRefs,
+    skill_refs: skillRefs,
+    prompt_refs: promptRefs,
     legacy_prompt_asset_refs: [
       { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_detailed_prompt_assets' },
       { ref_kind: 'repo_path', ref: 'prompts/xiaohongshu', role: 'xiaohongshu_detailed_prompt_assets' },
     ],
-    knowledge_refs: repoPathRefs(
-      CANONICAL_STAGE_KNOWLEDGE_REFS[stage.stage_id],
-      'canonical_stage_knowledge_policy',
-    ),
+    knowledge_refs: knowledgeRefs,
+    tool_refs: toolRefs,
+    quality_gate_refs: qualityGateRefs,
+    strategy_refs: strategyRefs,
+    tool_affordance_boundary: buildToolAffordanceBoundary(stage, toolRefs),
+    candidate_pool_policy: buildCandidatePoolPolicy(stage),
+    independent_gate_policy: buildIndependentGatePolicy(stage, qualityGateRefs),
+    handoff_policy: buildHandoffPolicy(stage),
     visual_pattern_memory_refs: stage.visual_pattern_memory_refs || [],
-    evaluation: CANONICAL_STAGE_QUALITY_GATE_REFS[stage.stage_id].map((gate) => ({
-      ref_kind: 'repo_path',
-      ref: gate.ref,
-      role: gate.role,
-    })),
+    evaluation: qualityGateRefs,
     handoff: {
       next_owner: 'one-person-lab',
       next_stage_refs: stage.next_stage_refs || [],
@@ -503,6 +756,15 @@ function stageDescriptor(stage, actionIds) {
       stage_execution_plan_ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
     },
     stage_contract: {
+      cognitive_kernel_contract_ref: COGNITIVE_KERNEL_CONTRACT_REF,
+      cognitive_kernel_adoption_ref: COGNITIVE_KERNEL_ADOPTION_REF,
+      golden_path_profile_ref: GOLDEN_PATH_PROFILE_REF,
+      cognitive_kernel_required_sections: COGNITIVE_KERNEL_REQUIRED_SECTIONS,
+      strategy_refs: strategyRefs,
+      tool_affordance_boundary_ref: `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
+      candidate_pool_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/candidate_pool_policy`,
+      independent_gate_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/independent_gate_policy`,
+      handoff_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/handoff_policy`,
       requires: stage.requires || [],
       ensures: stage.ensures || [],
       stage_output_role_interface: {
@@ -587,6 +849,9 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
       family_action_catalog_ref: '/family_action_catalog',
       missing_action_refs: missingActionRefs,
     },
+    cognitive_kernel_adoption_ref: COGNITIVE_KERNEL_ADOPTION_REF,
+    golden_path_profile_ref: GOLDEN_PATH_PROFILE_REF,
+    stage_pack_required_sections: COGNITIVE_KERNEL_REQUIRED_SECTIONS,
     stage_output_role_interface: {
       surface_kind: 'rca_stage_output_role_interface_contract',
       version: 'stage-output-role-interface.v1',

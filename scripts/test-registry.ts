@@ -24,6 +24,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/overlay-registry.test.ts',
     'tests/opl-agent-pack-contracts-bridge-and-opl.test.ts',
     'tests/opl-agent-pack-contracts.test.ts',
+    'tests/opl-cognitive-kernel-adoption.test.ts',
     'tests/opl-family-contract-adoption.test.ts',
     'tests/opl-family-contract-runtime-manager.test.ts',
     'tests/opl-family-contract-adoption-source-shape.test.ts',

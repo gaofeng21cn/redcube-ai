@@ -1,0 +1,106 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import test from 'node:test';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+const requiredStagePackSections = [
+  'prompt_refs',
+  'skill_refs',
+  'tool_refs',
+  'tool_affordance_boundary',
+  'knowledge_refs',
+  'quality_gate_refs',
+  'strategy_refs',
+  'candidate_pool_policy',
+  'independent_gate_policy',
+  'handoff_policy',
+];
+
+function readJson(relativePath: string): any {
+  return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
+}
+
+function refs(entries: any[]): Set<string> {
+  return new Set(entries.map((entry) => entry.ref));
+}
+
+test('RCA pack declares advisory cognitive-kernel contracts', () => {
+  const pack = readJson('contracts/pack_compiler_input.json');
+  const adoption = readJson('contracts/cognitive_kernel_adoption.json');
+  const golden = readJson('contracts/golden_path_profile.json');
+
+  assert.deepEqual(pack.stage_pack_required_sections, requiredStagePackSections);
+  assert.equal(pack.cognitive_kernel_adoption_ref, 'contracts/cognitive_kernel_adoption.json');
+  assert.equal(pack.golden_path_profile_ref, 'contracts/golden_path_profile.json');
+  assert.ok(pack.declarative_domain_pack.includes('tool_affordance_catalog'));
+  assert.ok(pack.required_domain_pack_paths.includes('agent/tools/domain_affordances.md'));
+  assert.equal(fs.existsSync(path.join(repoRoot, 'agent/tools/domain_affordances.md')), true);
+
+  assert.deepEqual(pack.tool_refs, [
+    {
+      ref: 'agent/tools/domain_affordances.md',
+      ref_kind: 'repo_path',
+      role: 'domain_tool_affordance_catalog',
+      catalog_role: 'available_affordance_catalog_not_workflow_script',
+    },
+  ]);
+
+  const packBoundary = pack.cognitive_stage_pack_contract.tool_affordance_boundary;
+  assert.equal(packBoundary.catalog_role, 'available_affordance_catalog_not_workflow_script');
+  assert.equal(packBoundary.executor_autonomy.executor_can_choose_order_and_parallelism, true);
+  assert.equal(packBoundary.executor_autonomy.tool_catalog_can_prescribe_tool_sequence, false);
+  assert.equal(refs(packBoundary.forbidden_authority_refs).has('review_verdict_without_rca_owner_receipt'), true);
+
+  assert.equal(adoption.state, 'advisory_current_contract');
+  assert.equal(adoption.domain_id, 'redcube_ai');
+  assert.deepEqual(adoption.stage_pack_required_sections, requiredStagePackSections);
+  assert.equal(adoption.adoption_policy.advisory_not_launch_hard_gate, true);
+  assert.equal(adoption.authority_boundary.opl_can_claim_domain_ready, false);
+  assert.equal(adoption.authority_boundary.same_attempt_self_review_can_close_quality_gate, false);
+
+  assert.equal(golden.default_outer_loop, 'current_owner_delta');
+  assert.equal(golden.stage_attempt_strategy, 'cognitive_kernel_stage_internal');
+  assert.ok(golden.required_closeout_refs.includes('owner_receipt_ref_or_typed_blocker_ref'));
+  assert.ok(golden.forbidden_claims.includes('tool_catalog_prescribes_executor_sequence'));
+});
+
+test('RCA stage control plane declares tool boundaries and independent gates', () => {
+  const plane = readJson('contracts/stage_control_plane.json');
+  const adoption = readJson('contracts/cognitive_kernel_adoption.json');
+  const adoptionBoundary = adoption.tool_affordance_boundary;
+
+  assert.equal(plane.cognitive_kernel_adoption_ref, 'contracts/cognitive_kernel_adoption.json');
+  assert.equal(plane.golden_path_profile_ref, 'contracts/golden_path_profile.json');
+  assert.deepEqual(plane.stage_pack_required_sections, requiredStagePackSections);
+
+  for (const stage of plane.stages) {
+    assert.equal(stage.tool_refs[0].ref, 'agent/tools/domain_affordances.md');
+    assert.equal(stage.tool_refs[0].catalog_role, 'available_affordance_catalog_not_workflow_script');
+
+    assert.equal(
+      stage.stage_contract.tool_affordance_boundary_ref,
+      `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
+    );
+    assert.equal(stage.tool_affordance_boundary.catalog_role, 'available_affordance_catalog_not_workflow_script');
+    assert.equal(refs(adoptionBoundary.capability_refs).has('source_context_and_visual_brief_reading'), true);
+    assert.equal(adoptionBoundary.executor_autonomy.executor_can_choose_tools, true);
+    assert.equal(adoptionBoundary.executor_autonomy.tool_catalog_can_define_cognitive_strategy, false);
+    assert.equal(adoptionBoundary.executor_autonomy.tool_catalog_can_authorize_forbidden_write, false);
+
+    assert.equal(stage.candidate_pool_policy.candidate_pool_is_stage_internal_artifact, true);
+    assert.equal(stage.candidate_pool_policy.completion_requires_owner_receipt_or_typed_blocker, true);
+    assert.ok(stage.strategy_refs.length > 0);
+    assert.equal(stage.handoff_policy.owner_receipt_or_typed_blocker_required, true);
+    assert.equal(stage.handoff_policy.handoff_refs_only, true);
+
+    const declaredGateRefs = new Set(stage.evaluation.map((entry: any) => entry.ref));
+    assert.equal(declaredGateRefs.has(stage.independent_gate_policy.gate_ref), true);
+    assert.equal(stage.independent_gate_policy.gate_owner, 'redcube_ai');
+    assert.equal(stage.independent_gate_policy.execution_review_separation_required, true);
+    assert.equal(stage.independent_gate_policy.same_attempt_self_review_can_close_quality_gate, false);
+    assert.equal(stage.independent_gate_policy.provider_completion_can_close_quality_gate, false);
+  }
+});

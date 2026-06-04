@@ -52,7 +52,7 @@ const requiredDomainPackPaths = [
   'agent/knowledge/artifact_and_export_authority.md',
   'agent/knowledge/review_export_memory.md',
   'agent/knowledge/markdown_route_policy.md',
-  'agent/knowledge/owner_receipt_policy.md',
+  'agent/knowledge/owner_receipt_policy.md', 'agent/tools/domain_affordances.md',
 ];
 
 const oplCanonicalGeneratedSurfaceIds = [
@@ -206,7 +206,9 @@ function buildCanonicalPack() {
       repo_local_handler_targets: OPL_GENERATED_INTERFACE_CONSUMPTION.repo_local_handler_targets,
       repo_local_handlers_are_generated_surface_owners: false,
       domain_repo_can_own_generated_surface: false,
+      ...{ stage_pack_required_sections: visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.required_stage_sections, cognitive_kernel_adoption_ref: 'contracts/cognitive_kernel_adoption.json', golden_path_profile_ref: 'contracts/golden_path_profile.json', tool_refs: [visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.domain_affordance_catalog_ref], tool_affordance_boundary: visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract.tool_affordance_boundary },
       visual_pack_discipline_contract: visualPackCompilerHandoff.declarative_visual_pack_input.visual_pack_discipline_contract,
+      cognitive_stage_pack_contract: visualPackCompilerHandoff.declarative_visual_pack_input.cognitive_stage_pack_contract,
       markdown_marp_route_policy: visualPackCompilerHandoff.declarative_visual_pack_input.markdown_marp_route_policy,
       package_distribution_gate: visualPackCompilerHandoff.declarative_visual_pack_input.package_distribution_gate,
       source_refs: {
