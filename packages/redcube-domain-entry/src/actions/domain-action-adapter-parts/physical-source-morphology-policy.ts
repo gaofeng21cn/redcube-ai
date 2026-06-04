@@ -315,9 +315,9 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'native_helper_receipt_refs',
     ],
     legacy_name_allowance: legacyNameAllowance({
-      legacy_terms: ['runtime'],
-      allowed_as: ['minimal_visual_authority_function', 'visual_native_helper_path'],
-      rationale: 'runtime package paths are implementation homes for visual authority/native helpers, not generic runtime ownership.',
+      legacy_terms: ['runtime', 'session'],
+      allowed_as: ['minimal_visual_authority_function', 'visual_native_helper_path', 'locator_protocol_boundary'],
+      rationale: 'runtime package paths are implementation homes for visual authority/native helpers; session wording is limited to locator/provenance refs such as product-entry-session IDs, not generic session runtime ownership.',
     }),
   },
   {
