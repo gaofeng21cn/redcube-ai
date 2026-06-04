@@ -4,6 +4,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
+import { buildVisualPackCompilerHandoffProjection } from '../packages/redcube-domain-entry/dist/index.js';
+
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 const requiredStagePackSections = [
@@ -65,6 +67,39 @@ test('RCA pack declares advisory cognitive-kernel contracts', () => {
   assert.equal(golden.stage_attempt_strategy, 'cognitive_kernel_stage_internal');
   assert.ok(golden.required_closeout_refs.includes('owner_receipt_ref_or_typed_blocker_ref'));
   assert.ok(golden.forbidden_claims.includes('tool_catalog_prescribes_executor_sequence'));
+});
+
+test('RCA visual pack compiler handoff exposes cognitive-kernel refs-only inputs', () => {
+  const input = buildVisualPackCompilerHandoffProjection().declarative_visual_pack_input;
+  const contract = input.cognitive_stage_pack_contract;
+
+  assert.deepEqual(contract.required_stage_sections, requiredStagePackSections);
+  assert.equal(contract.refs_only, true);
+  assert.equal(contract.user_visible_flow_changed, false);
+  assert.equal(contract.launch_hard_gate, false);
+  assert.deepEqual(contract.domain_affordance_catalog_ref, {
+    ref: 'agent/tools/domain_affordances.md',
+    ref_kind: 'repo_path',
+    role: 'domain_tool_affordance_catalog',
+    catalog_role: 'available_affordance_catalog_not_workflow_script',
+  });
+  assert.equal(contract.authority_boundary.opl_can_write_visual_truth, false);
+  assert.equal(contract.authority_boundary.opl_can_authorize_review_export_verdict, false);
+  assert.equal(contract.authority_boundary.same_attempt_self_review_can_close_quality_gate, false);
+
+  assert.ok(input.required_input_families.includes('tool_affordance_catalog'));
+  assert.ok(input.required_input_families.includes('cognitive_kernel_adoption_contract'));
+  assert.ok(input.required_input_families.includes('golden_path_profile'));
+  assert.ok(input.required_domain_pack_paths.includes('agent/tools/domain_affordances.md'));
+  assert.deepEqual(input.source_refs.filter((entry: any) => (
+    entry.source_id === 'cognitive_kernel_adoption'
+    || entry.source_id === 'golden_path_profile'
+    || entry.source_id === 'domain_tool_affordance_catalog'
+  )), [
+    { source_id: 'cognitive_kernel_adoption', ref: 'contracts/cognitive_kernel_adoption.json' },
+    { source_id: 'golden_path_profile', ref: 'contracts/golden_path_profile.json' },
+    { source_id: 'domain_tool_affordance_catalog', ref: 'agent/tools/domain_affordances.md' },
+  ]);
 });
 
 test('RCA stage control plane declares tool boundaries and independent gates', () => {
