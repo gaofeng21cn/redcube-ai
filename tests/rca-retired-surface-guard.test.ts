@@ -628,8 +628,8 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       allowedAs: ['refs_only_read_model', 'negative_test_guard'],
     },
     visual_authority_functions: {
-      terms: ['runtime'],
-      allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path'],
+      terms: ['runtime', 'session'],
+      allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path', 'locator_protocol_boundary'],
     },
     retired_product_entry_contract_tombstone_refs: {
       terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
