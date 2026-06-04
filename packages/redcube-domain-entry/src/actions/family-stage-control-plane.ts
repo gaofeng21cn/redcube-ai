@@ -711,7 +711,7 @@ function stageDescriptor(stage, actionIds) {
     owner: 'redcube_ai',
     selected_executor: {
       executor_kind: 'codex_cli',
-      default_executor: true,
+      default_executor: stage.stage_id === 'source_intake',
       executor_binding_ref: 'default_codex_cli',
       binding_policy: 'default_first_class_executor_for_ai_first_stage_execution',
       required_capabilities: [

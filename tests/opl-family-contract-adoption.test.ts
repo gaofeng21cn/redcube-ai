@@ -228,10 +228,14 @@ test('RCA stage control plane requires visual-facing user stage log semantics', 
 
 test('RCA stage control plane declares cognitive-kernel strategy sections for each visual stage', () => {
   const plane = stageControlPlane();
+  const defaultStageIds = plane.stages
+    .filter((stage) => stage.selected_executor.default_executor === true)
+    .map((stage) => stage.stage_id);
+  assert.deepEqual(defaultStageIds, ['source_intake']);
 
   for (const stage of plane.stages) {
     assert.equal(stage.selected_executor.executor_kind, 'codex_cli', stage.stage_id);
-    assert.equal(stage.selected_executor.default_executor, true, stage.stage_id);
+    assert.equal(stage.selected_executor.default_executor, stage.stage_id === 'source_intake', stage.stage_id);
     assert.ok(stage.prompt_refs.length > 0, stage.stage_id);
     assert.ok(stage.skill_refs.length > 0, stage.stage_id);
     assert.ok(stage.tool_refs.length > 0, stage.stage_id);
