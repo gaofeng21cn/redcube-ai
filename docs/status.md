@@ -9,6 +9,8 @@ Machine boundary: 人读状态面。机器真相继续归 contracts、schema、s
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
+Codex Developer Mode source pointer: 仓库根层 `.codex-plugin/plugin.json` 是 `rca-local` 指向 live developer checkout 时的 Codex plugin manifest 入口；它只把 Codex source root 固定到当前 `redcube-ai` repo，并通过 `./plugins/rca/skills/` 和 `./plugins/rca/assets/` 引用现有 RCA app skill scaffold。`plugins/rca/.codex-plugin/plugin.json` 继续作为 packaged/scaffold plugin payload 保留；`.agents/plugins/marketplace.json` 仍由 `scripts/install-codex-plugin.ts` 生成，不进入 tracked repo source。该入口只解决 Codex plugin metadata/source channel 路径，不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
+
 ## 当前角色
 
 `RedCube AI` 是视觉交付 domain agent，也是 OPL-compatible Foundry Agent package。Direct route 仍是 `redcube-ai` app skill / CLI / MCP / Product Entry / service-safe domain entry；OPL-hosted route 可以发现、托管、唤醒和投影 RCA，但必须回到同一套 RCA-owned visual truth、communication strategy、visual direction、review/export verdict、artifact authority、visual memory accept/reject、owner receipt 和 typed blocker。

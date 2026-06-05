@@ -73,9 +73,13 @@ function main(): void {
   const args = parseArgs(process.argv.slice(2));
   const pluginRoot = path.join(args.repoRoot, 'plugins', 'rca');
   const skillRoot = path.join(pluginRoot, 'skills', 'rca');
+  const devSourceManifestPath = path.join(args.repoRoot, '.codex-plugin', 'plugin.json');
   const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
   const skillEntryPath = path.join(skillRoot, 'SKILL.md');
 
+  if (!fs.existsSync(devSourceManifestPath)) {
+    fail(`missing repository-root Codex plugin manifest: ${devSourceManifestPath}`);
+  }
   if (!fs.existsSync(pluginManifestPath)) {
     fail(`missing Codex plugin manifest: ${pluginManifestPath}`);
   }
@@ -94,7 +98,7 @@ function main(): void {
         name: 'rca',
         source: {
           source: 'local',
-          path: './plugins/rca',
+          path: '.',
         },
         policy: {
           installation: 'AVAILABLE',
@@ -114,6 +118,8 @@ function main(): void {
   process.stdout.write(`${JSON.stringify({
     repo_root: args.repoRoot,
     home: args.home,
+    dev_source_root: args.repoRoot,
+    dev_source_manifest: devSourceManifestPath,
     plugin_root: pluginRoot,
     skill_root: skillRoot,
     marketplace_path: marketplacePath,

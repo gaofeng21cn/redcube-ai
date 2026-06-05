@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
+const devSourceManifestPath = path.join(repoRoot, '.codex-plugin', 'plugin.json');
 const pluginRoot = path.join(repoRoot, 'plugins', 'rca');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
 const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
@@ -49,6 +50,21 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.match(skillText, /author_image_pages` 是默认视觉实现路线/i);
 });
 
+test('codex plugin dev source manifest is available at repository root', () => {
+  const packageJson = readJson(path.join(repoRoot, 'package.json'));
+  const manifest = readJson(devSourceManifestPath);
+
+  assert.equal(manifest.name, 'rca');
+  assert.equal(manifest.version, packageJson.version);
+  assert.equal(manifest.skills, './plugins/rca/skills/');
+  assert.equal(manifest.interface.displayName, 'RedCube AI');
+  assert.equal(manifest.interface.category, 'Creative');
+  assert.equal(manifest.interface.composerIcon, './plugins/rca/assets/icon.png');
+  assert.equal(manifest.interface.logo, './plugins/rca/assets/icon.png');
+  assert.equal(existsSync(path.join(repoRoot, manifest.skills, 'rca', 'SKILL.md')), true);
+  assert.equal(existsSync(path.join(repoRoot, manifest.interface.logo)), true);
+});
+
 test('codex plugin repo-local installer writes marketplace metadata without a bare skill mirror', () => {
   const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-codex-plugin-installer-'));
   const fixturePluginRoot = path.join(fixtureRoot, 'plugins', 'rca');
@@ -57,6 +73,7 @@ test('codex plugin repo-local installer writes marketplace metadata without a ba
 
   try {
     cpSync(pluginRoot, fixturePluginRoot, { recursive: true });
+    cpSync(path.join(repoRoot, '.codex-plugin'), path.join(fixtureRoot, '.codex-plugin'), { recursive: true });
     const result = spawnSync(
       process.execPath,
       [
@@ -78,6 +95,8 @@ test('codex plugin repo-local installer writes marketplace metadata without a ba
     const output = JSON.parse(result.stdout);
     assert.equal(output.repo_root, fixtureRoot);
     assert.equal(output.home, fixtureHome);
+    assert.equal(output.dev_source_root, fixtureRoot);
+    assert.equal(output.dev_source_manifest, path.join(fixtureRoot, '.codex-plugin', 'plugin.json'));
     assert.equal(output.plugin_root, fixturePluginRoot);
     assert.equal(output.skill_root, path.join(fixturePluginRoot, 'skills', 'rca'));
     assert.equal(output.marketplace_path, path.join(fixtureRoot, '.agents', 'plugins', 'marketplace.json'));
@@ -90,7 +109,7 @@ test('codex plugin repo-local installer writes marketplace metadata without a ba
         name: 'rca',
         source: {
           source: 'local',
-          path: './plugins/rca',
+          path: '.',
         },
         policy: {
           installation: 'AVAILABLE',

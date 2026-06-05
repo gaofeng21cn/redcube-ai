@@ -1,0 +1,39 @@
+{
+  "name": "rca",
+  "version": "0.1.0",
+  "description": "Codex plugin shell for the RedCube AI visual deliverable domain app.",
+  "author": {
+    "name": "Gao Feng",
+    "url": "https://github.com/gaofeng21cn"
+  },
+  "homepage": "https://github.com/gaofeng21cn/redcube-ai",
+  "repository": "https://github.com/gaofeng21cn/redcube-ai",
+  "license": "UNLICENSED",
+  "keywords": [
+    "redcube",
+    "codex",
+    "visual-deliverables",
+    "developer-source"
+  ],
+  "skills": "./plugins/rca/skills/",
+  "interface": {
+    "displayName": "RedCube AI",
+    "shortDescription": "Visual deliverable domain app for Codex.",
+    "longDescription": "Provides the repository-root Codex plugin entry used when OPL Developer Mode points rca-local at the live RedCube AI checkout; the canonical RCA skill content remains under plugins/rca/skills.",
+    "developerName": "Gao Feng",
+    "category": "Creative",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/gaofeng21cn/redcube-ai",
+    "composerIcon": "./plugins/rca/assets/icon.png",
+    "logo": "./plugins/rca/assets/icon.png",
+    "defaultPrompt": [
+      "Read the RedCube AI domain-handler export for this workspace.",
+      "Inspect the current OPL generated product-entry refs for RedCube AI.",
+      "Continue the active RedCube deliverable loop in the same entry session."
+    ],
+    "brandColor": "#C65D2E"
+  }
+}
