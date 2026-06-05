@@ -31,7 +31,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | `docs/public/` | public narrative index | 当前较薄；除非未来有真正公开材料，否则保持薄索引。 |
 | `docs/product/` | quickstart、profile、public publish、product/operator handoff | 真实承载。 |
 | `docs/runtime/` | runtime topology、executor/backend、service-safe entry、watch/projection | 真实承载但较薄，核心是 runtime architecture。 |
-| `docs/delivery/` | deliverable family、route、proof、export、manual validation | 真实承载。 |
+| `docs/delivery/` | deliverable family、route、proof、export、manual validation | 真实承载；不保存 route evolution probe 过程流水。 |
 | `docs/source/` | source readiness、augmentation、deep research trigger/gate | 真实承载。 |
 | `docs/policies/` | AI-first、visual memory、runtime operating model、deliverable contract model 等稳定规则 | 真实承载。 |
 | `docs/specs/` | 当前仍有效的技术规格索引 | 当前较薄；不扩成杂物层。 |
@@ -50,6 +50,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 - [文档索引](./README.md) 现在持有 repo-tracked `README*` 与 `docs/**/*.md` 的路径组级 lifecycle role。该清单只做导航和归位，不替代核心五件套、contracts/source/tests 或 runtime evidence。
 - `docs/references/opl-managed-runtime-three-layer-contract.md` 已迁入 `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
 - `docs/references/product-entry/` 承接已落地的 `redcube_product_entry_mvp`、`product_entry_session_continuity` 与 `opl_framework_hosted_product_entry` support brief；它们解释 contract surface，不承担 active plan。旧 `managed_product_entry_hardening` 只保留在 history tombstone。
+- `docs/delivery/real-route-evolution-probe.md` 已迁入 `docs/history/process/real-route-evolution-probe.md`。它保存 probe 命令、输出形状、历史样片根和效率读法；当前 delivery owner 只保留 family / route / proof / export support，不承担 dated probe ledger。
 - `docs/references/integration/lightweight-product-entry-and-opl-handoff.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/integration/opl-family-contract-adoption.md`、`docs/references/rca_executor_routing_config.md` 仍是 support reference；它们解释 direct / hosted 边界、memory locator、family contract adoption 和 opt-in executor routing，不承担 active plan。
 - `docs/references/direct_delivery_longrun_target_state.md`、`docs/references/source_readiness_deep_research_longrun_target_state.md` 与 `docs/source/deep_research_auto_first_product_contract.md` 已归入 `docs/history/plans/`，分别保存 2026-04-09 direct-delivery future freeze、2026-04-09 source-plane future freeze 和 2026-04-08 Deep Research / auto-first 产品语义 provenance。当前 delivery/source truth 回到 owner docs、active gap plan 和 machine-readable contracts。
 - `docs/references/positioning/domain-harness-os-positioning.md` 已迁入 `docs/history/positioning/domain-harness-os-positioning.md`；该语义 ID 只作为 historical positioning / internal boundary vocabulary 保留。
@@ -80,6 +81,7 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 - product-entry support brief 只解释已落地 contract surface、direct/hosted 边界或 session-continuity provenance；不得继续追加 active follow-up board。
 - source/delivery future target freeze 与 dated product-semantics long list 只保存在 history/provenance；当前 active/reference 层不再保留这类长清单正文。
+- real-route evolution probe、native sample root、效率读数、probe 输出字段和 route/run transcript 只保存在 history/process、runtime/evidence ledger 或提交历史；delivery 当前层只保留当前 route/proof/export 边界。
 - Phase 2、Hermes proof、creative-stage audit、gateway/frontdoor/federation/source-pack-federation、old workbench 或 managed runtime 记录只进入 history/provenance/tombstone。
 - `managed`、`session`、`gateway`、`domain_action_adapter`、`runtime` 等历史词如果仍出现在 active docs，必须同时说明它是 semantic-id、refs-only adapter、domain handler target、retired guard 或 provenance，不得表达 RCA-owned generic runtime。
 - 长表只保留当前 owner、当前状态、证据门和下一步；dated proof、命令输出、旧分支名和 absorbed tranche 进入 `docs/history/**`。
@@ -92,6 +94,6 @@ Dated coverage entries that previously lived in this active governance document 
 
 This file now keeps only current lifecycle rules, directory roles, content placement rules, direct-retirement posture, long-list governance, and stale-word no-resurrection policy. Do not append future six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs here. New dated coverage belongs under `docs/history/process/` or another precise `docs/history/**` owner; durable conclusions must be folded back into the core five docs, active gap plan, owner docs, contracts, source, or tests.
 
-Current active owner remains [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md). Product-entry support is indexed by `docs/product/` and `docs/references/product-entry/`; historical Hermes / Phase 2 / managed runtime records stay under [历史文档](./history/README.md).
+Current active owner remains [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md). Product-entry support is indexed by `docs/product/` and `docs/references/product-entry/`; historical Hermes / Phase 2 / managed runtime / route probe records stay under [历史文档](./history/README.md).
 
 Latest full docs lifecycle cleanup closeout: [2026-06-03 RCA docs lifecycle cleanup closeout](./history/process/2026-06-03-rca-docs-lifecycle-cleanup-closeout.md). It records the README/docs inventory, role classification, stale-word scan scope and docs-only verification for this cleanup; the durable lifecycle rules are folded back into this file and [文档索引](./README.md).

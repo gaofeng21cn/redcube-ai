@@ -28,6 +28,8 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 `RedCube AI` 正是围绕这些问题设计的。它面向知识型视觉交付，把源材料整理、页面生成、审阅回修、进度反馈和导出证据放在同一条交付线上，让视觉成品从草稿推进到可以交付的文件。
 
+它不会把视觉交付简化成“生成一张图”。一个成品往往需要多个视觉方向、版式比较、素材补齐、审阅回修和最终导出检查。RedCube AI 把这些创作判断和交付证据放在同一条线上，让每一轮修改都能说清楚为什么改、改到了哪里。
+
 <table>
   <tr>
     <td width="33%" valign="top">
@@ -52,7 +54,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 核心亮点
 
 **围绕交付物持续创作**<br/>
-它不是只生成一张图，而是围绕幻灯片、系列笔记、海报等明确成品持续组织材料、生成页面、路由审阅反馈，并通过 RCA 自己的 gate 准备导出。
+它不是只生成一张图，而是围绕幻灯片、系列笔记、海报等明确成品持续组织材料、生成页面、吸收审阅反馈，并准备最终导出。
 
 **资料到成品在同一工作区**<br/>
 讲义笔记、项目摘要、参考文献、截图、旧版草稿和审阅意见会被放到同一条交付线上，方便回看和复用；真实运行产物属于任务工作区，不写回源码 checkout。
@@ -65,6 +67,9 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 **长任务进度可见**<br/>
 在生成、检查、重跑和导出过程中，RCA 的进度与审阅 surface 会暴露当前步骤、剩余问题和下一轮处理重点。
+
+**保留视觉探索和比较空间**<br/>
+正式视觉交付常常需要比较多个方向、发现反复失败点、生成变体并做导出检查。RedCube AI 不把创作锁成单一路线，而是让候选、审阅、回修和交付能连续发生。
 
 ## 一句话快速启动
 
@@ -97,12 +102,9 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 当前边界
 
 - `RedCube AI` 是独立的视觉交付 Foundry Agent。它对外第一身份是视觉交付：接收材料、分阶段完成视觉创作、审阅、回修、导出和文件交付。
-- 公开发布形态：`RedCube AI Foundry Agent`，一个 built on OPL Framework 的 OPL-compatible package。这个 package 由单一 `redcube-ai` app skill、service-safe domain entry（`invokeDomainEntry`）、product domain_action_adapter / projection surface 和只读 stage control projection 组成。
-- 对外第一入口是单一 `redcube-ai` 应用技能；`status` / `invoke` / `session` 继续作为这个技能下面的机器可读命令合同。其中 `status` 指面向智能体的产品入口概览、材料接收和入口壳，不代表已经落地 GUI、WebUI 或最终用户前台。
-- 它对外稳定暴露的可调用面是本地 CLI、MCP / 产品入口命令、`invokeDomainEntry`、本地脚本与仓库跟踪合同，方便 `Codex` 或其他操作者直接调用。
+- 对外第一入口是单一 `redcube-ai` 应用技能；`Codex`、`OPL` 和其他通用智能体可以通过这个入口访问稳定能力面。
+- 它可以作为 One Person Lab 里的汇报工坊使用，也可以由 Codex 或其他 Agent 直接调用稳定能力入口。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。
-- RedCube 的 public executor backend contract 只认 `codex_cli` 与 `hermes_agent`；`execution_shape` 另行声明为 `structured_call` 或 `agent_loop`。
-- 实现语言目标是 `TypeScript + Python`：TypeScript 管 product/runtime contract 与 service boundary，Python 在 RedCube route/gate 下承担 native PPT/Office helper 与文档/PPT 修复循环。
 - 内容界定、受众适配和最终采用由专家把关。
 - 外部发布、上传和最终对外交付由人工监督完成。
 
@@ -114,6 +116,8 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - Agent executor 是最小具体执行单位；当前第一公民 stage executor 是 `Codex CLI`，其他 executor / proof adapter 必须显式选择。
 - Hermes-Agent 等其他 executor 是 opt-in adapter。RedCube 对这些 adapter 只承诺接入、生命周期、回执和审计面成立，不默认承诺行为或输出质量与 Codex CLI 等价。
 - 直达路径和 OPL 托管路径都必须收敛到同一个下游 RedCube 领域智能体入口（`invokeDomainEntry` service-safe surface）。
+- RCA stage pack 给 executor 提供目标、上下文、authority boundary、skill、knowledge refs、tool affordance 和 visual quality gate；route 只管理 owner、恢复和证据边界，不预先规定视觉创作策略。
+- RCA 工具目录是 affordance catalog，不是 workflow script。RCA 只声明视觉工具、native helper、渲染、修复和导出能力的边界；executor 可以在 stage attempt 内自主选择、组合、跳过、替代或追问。
 - RedCube 持有视觉交付阶段包、提示词、技能、审阅门、视觉领域真相、标准产物和导出权威。OPL 可以提供排队、唤醒、交接、回执、重试 / 死信和投影支撑，但不会成为视觉领域大脑或产物所有者。
 
 </details>

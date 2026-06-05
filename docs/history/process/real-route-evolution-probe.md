@@ -1,13 +1,15 @@
 # RCA Real Route Evolution Probe
 
 Owner: `RedCube AI`
-Purpose: `real_route_evolution_probe_support`
-State: `active_support`
-Machine boundary: 人读运行说明。机器真相继续归 product-entry invoke 行为、workspace/runtime artifacts、route artifacts、review/export gates、typed blockers 和 probe JSON 输出。
+Purpose: `real_route_evolution_probe_provenance`
+State: `history_process`
+Machine boundary: 人读 probe provenance。机器真相继续归 probe script、contracts、product-entry invoke 行为、workspace/runtime artifacts、route artifacts、review/export gates、typed blockers 和 probe JSON 输出。
 
-## Status
+## Lifecycle Readout
 
-`scripts/run-real-route-evolution-probe.ts` 是 RCA 当前 repo-native 的真实 route 演进 probe。它创建真实 workspace，补齐 source readiness，然后通过 `invokeProductEntry` 的 `task_intent=run_deliverable_route` 顺序执行 deliverable route。
+本文从 `docs/delivery/` 归入 process history。它保留 real-route evolution probe 的命令、输出形状、历史样片根和效率读法，供追溯 probe / dated evidence 时使用；它不再承担当前 delivery lifecycle owner。
+
+当前 delivery truth 回到 `docs/delivery/README.md`、route support docs、contracts、runtime-family source、workspace artifacts、review/export gates 和 owner receipts。`scripts/run-real-route-evolution-probe.ts` 仍是 repo-native machine probe；是否可执行、输出字段和测试覆盖以脚本、contracts 和 tests 为准。
 
 它验证的是“RCA 能真实运行、真实产出 artifact、真实复跑命中 cache、真实返回 typed blocker”。它不替代 `visual_director_review`、`screenshot_review`、`export_pptx`，也不把 OPL Agent Lab score 写成 RCA visual quality verdict。
 
@@ -86,7 +88,7 @@ opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-ag
 
 该命令读取 suite contract、route refs、gate refs 和 forbidden-authority flags。它不生产视觉质量结论，不替代 workspace artifact，也不声明 native PPTX production soak complete。
 
-2026-05-29 native live 样片的物理 evidence root 是：
+2026-05-29 native live 样片的物理 evidence root 是历史 provenance：
 
 ```text
 /Users/gaofeng/workspace/projects/redcube-ai/runtime-state/native-ai-first-live-20260529-v5/

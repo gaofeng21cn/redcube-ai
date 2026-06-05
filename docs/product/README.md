@@ -11,7 +11,7 @@ Machine boundary: 人读 product 索引。机器真相继续归 contracts、sche
 
 ## 当前角色
 
-Product docs 位于仓库首页之下、runtime/delivery 细节之上，解释当前 human/operator 如何进入 RedCube AI。历史 publishing 或 setup notes 只有在仍支撑当前 product surface 时才留在这里；完成或被替代的计划在链接复核后进入 history。
+Product docs 位于仓库首页之下、runtime/delivery 细节之上，解释当前 human/operator 如何进入 RedCube AI。当前 product surface 是 direct product entry、human quickstart、profile 与 publishing 协作；已被 OPL generated/default shell、domain pack 或 stage-artifact kernel 替代的 product-entry wrapper、managed/session 旧面、GUI/WebUI readiness 叙事和 compatibility alias 只进入 `../references/product-entry/`、`../history/**` 或 tombstone，不作为 active product 兼容面。历史 publishing 或 setup notes 只有在仍支撑当前 product surface 时才留在这里；完成或被替代的计划在链接复核后进入 history。
 
 当前 product-facing 材料：
 

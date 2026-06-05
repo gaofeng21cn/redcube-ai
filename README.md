@@ -28,6 +28,8 @@ When a task moves from "make a few images" to "produce a visual deliverable I ca
 
 `RedCube AI` is built around those questions. For knowledge-heavy visual work, it keeps source organization, page generation, review, revision, progress reporting, and export evidence on the same delivery line so a draft can move toward deliverable files.
 
+It does not reduce visual delivery to "generate one image." A usable deliverable often needs several visual directions, layout comparison, missing-material handling, review and repair, and final export checks. RedCube AI keeps those creative decisions and delivery evidence on one line so every revision can explain why it changed and where it landed.
+
 <table>
   <tr>
     <td width="33%" valign="top">
@@ -52,7 +54,7 @@ When a task moves from "make a few images" to "produce a visual deliverable I ca
 ## Core Highlights
 
 **Continuous Creation Around The Deliverable**<br/>
-It does not stop at a single generated image. It keeps working around a concrete slide deck, note series, or poster, organizing material, generating pages, routing review feedback, and preparing exports through RCA-owned gates.
+It does not stop at a single generated image. It keeps working around a concrete slide deck, note series, or poster, organizing material, generating pages, absorbing review feedback, and preparing final exports.
 
 **Source To Deliverable In One Workspace**<br/>
 Lecture notes, project summaries, references, screenshots, old drafts, and review comments stay on one delivery line for inspection and reuse; runtime artifacts live in the task workspace, not in the source checkout.
@@ -65,6 +67,9 @@ Slides, Xiaohongshu notes, and knowledge posters use different default routes; e
 
 **Progress Stays Visible During Long Jobs**<br/>
 During generation, checking, reruns, and export, RCA progress and review surfaces expose the current step, remaining issues, and the next review focus.
+
+**Room For Visual Exploration And Comparison**<br/>
+Formal visual delivery often needs multiple directions, repeated-failure diagnosis, variants, and export checks. RedCube AI does not lock creation into one path; candidates, review, repair, and handoff can continue together.
 
 ## One-Sentence Quick Start
 
@@ -97,11 +102,9 @@ You can start with prompts like:
 ## Current Boundary
 
 - `RedCube AI` is an independent visual-deliverable Foundry Agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.
-- Public release form: `RedCube AI Foundry Agent`, an OPL-compatible package built on the OPL Framework. The package shape is the single `redcube-ai` app skill, the service-safe domain entry (`invokeDomainEntry`), product domain_handler/projection surfaces, and the read-only stage control projection.
-- The first public surface is the single `redcube-ai` app skill. Product-entry overview / status / session / manifest remain machine-readable surfaces for OPL generated/default callers; the repo-local `redcube product` CLI keeps only `invoke` as the direct domain target. In that contract, `status` means the agent-facing product-entry overview / intake / entry shell, not a landed GUI, WebUI, or end-user front office.
-- The repo-root OPL standard pack is the generated-interface source for OPL. OPL compiles that pack into generated CLI / MCP / Skill / product-entry / tool descriptors. The local CLI, MCP/product-entry commands, `invokeDomainEntry`, local scripts, and repo-tracked contracts are strict migration inputs, visual-domain handler targets, or authority functions until OPL generated/default callers take over; they are not permanent RCA-owned generic wrappers.
-- RedCube's public executor backend contract is `codex_cli` or `hermes_agent`; `execution_shape` is declared separately as `structured_call` or `agent_loop`.
-- The implementation target is `TypeScript + Python`: TypeScript for product/runtime contracts and service boundaries, Python via the repo-owned `redcube_ai` helper package for native PPT/Office helpers and document/PPT repair loops under RedCube routes and gates.
+- The first public surface is the single `redcube-ai` app skill; `Codex`, `OPL`, and other general agents can reach stable capabilities through that skill.
+- It can be used as the Presentation Foundry inside One Person Lab, and it can also be called directly by Codex or another agent through stable capability entries.
+- RedCube owns material intake, visual generation, review loops, export, and file handoff.
 - Content framing, audience fit, and final acceptance stay with experts.
 - External publishing and upload steps stay under human supervision.
 
@@ -113,6 +116,8 @@ You can start with prompts like:
 - An Agent executor is the minimum concrete execution unit. `Codex CLI` is the current first-class stage executor; other executor or proof adapters must be selected explicitly.
 - Hermes-Agent and similar executors are opt-in adapters. RedCube only promises connection, lifecycle, receipts, and auditability for those adapters; it does not assume behavior or output quality matches Codex CLI.
 - Both direct and OPL-hosted paths converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
+- An RCA stage pack gives the executor a goal, context, authority boundary, skills, knowledge refs, tool affordances, and visual quality gate. The route manages owner, recovery, and evidence boundaries; it does not pre-script visual creation strategy.
+- RCA's tool catalog is an affordance catalog, not a workflow script. RCA declares boundaries for visual tools, native helpers, rendering, repair, and export capabilities; the executor may choose, combine, skip, replace, or ask about them inside the stage attempt.
 - RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, canonical artifacts, and export authority. OPL may provide queue, wakeup, handoff, receipts, retry/dead-letter handling, and projection support, but it does not become the visual-domain brain or artifact owner.
 
 </details>

@@ -63,7 +63,7 @@ RCA repo source 只保存 locator、index、schema、receipt ref、restore/reten
 | 机器真相 | runtime-program contracts、schema、source、generated artifacts 和 callable surfaces | [合同说明](../contracts/README.md) | 机器接口只在 contracts/source/tests/runtime artifacts；docs prose 不是 API。 |
 | Product | 人类 / operator 入口、product handoff、profile 与发布协作 | [Product docs](./product/README.md) | 不定义 runtime truth 或 GUI/WebUI 已落地状态。 |
 | Runtime | runtime topology、executor/backend 边界、service-safe entry、watch/projection 语义 | [Runtime docs](./runtime/README.md) | 不承载 Phase 2、Hermes proof 或 gateway/harness 历史叙事。 |
-| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) | Route/proof support 不能替代 RCA-owned review/export verdict。 |
+| Delivery | deliverable family、route、proof、export 与示例材料 | [Delivery docs](./delivery/README.md) | Route/proof support 不能替代 RCA-owned review/export verdict；probe/run 流水进入 history/process。 |
 | Source | source readiness、augmentation、deep research trigger/gate 与 source truth 消费 | [Source docs](./source/README.md) | `planning_ready` 不授权 visual/export/domain/production ready。 |
 | Policies | 稳定治理与运行规则 | [Policies](./policies/README.md) | 长期规则才进入；一次性过程证据进 history/process。 |
 | Active | 当前执行、当前计划、当前差距与当前完成门槛 | [Active](./active/README.md) | 当前唯一 completion plan 是 `rca-ideal-state-gap-plan.md`；长清单和 proof 流水不进 active。 |
@@ -105,7 +105,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 | `docs/active/` | 当前 gap plan 与私有实现迁移台账。 | 不新增第二 active checklist，不保存已完成 closeout 流水。 |
 | `docs/product/` | Human/operator quickstart、profile、publish 协作。 | 不定义 runtime truth、GUI/WebUI readiness 或 generic runtime。 |
 | `docs/runtime/` | Runtime topology、executor/backend、service-safe entry、watch/projection 说明。 | 不恢复 Hermes-first、gateway/harness 或 repo-local managed runtime owner。 |
-| `docs/delivery/` | Deliverable route/proof/export/examples support。 | 不替代 visual ready/exportable/handoffable verdict。 |
+| `docs/delivery/` | Deliverable route/proof/export/examples support。 | 不替代 visual ready/exportable/handoffable verdict；不保存 dated probe commands、sample roots 或 run transcripts。 |
 | `docs/source/` | Source readiness / augmentation / deep research trigger support。 | 不授权 artifact authority 或 review/export verdict。 |
 | `docs/policies/` | 稳定规则。 | 不保存一次性执行证据或 dated tranches。 |
 | `docs/public/`、`docs/specs/` | 薄索引；未来有真实 public/spec 需求时再扩写。 | 不吸收旧 program/capabilities/reference 正文。 |
@@ -130,6 +130,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。
 - [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
 - [Direct-delivery longrun target state](./history/plans/2026-04-09-direct-delivery-longrun-target-state.md)：历史 future-facing 设计目标 freeze，已退出 active/reference 支撑面
+- [Real-route evolution probe](./history/process/real-route-evolution-probe.md)：历史 process/provenance，保存 probe 命令、输出形状、历史样片根和效率读法；当前 delivery truth 回到 delivery owner docs、contracts 和 RCA-owned gates
 - [Source readiness deep research longrun target state](./history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md)：历史 source-plane future target freeze，当前 source truth 回到 source owner docs 和 contracts
 - [Historical OPL managed runtime three-layer contract](./history/runtime/opl-managed-runtime-three-layer-contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
 
