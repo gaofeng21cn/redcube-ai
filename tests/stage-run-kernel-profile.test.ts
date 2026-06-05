@@ -68,6 +68,9 @@ test('StageRun Kernel profile keeps RCA visual authority separate from OPL runti
   const profile = readJson('contracts/stage_run_kernel_profile.json');
   const oplRefs = profile.opl_contract_refs;
   const canary = profile.visual_stage_run_canary;
+  const overclaimBoundary = profile.overclaim_boundary;
+  const residueGuard = profile.legacy_runtime_residue_guard;
+  const operatorSummary = profile.controlled_canary_operator_summary;
 
   assert.equal(profile.surface_kind, 'opl_stage_run_kernel_profile');
   assert.equal(profile.domain_id, 'redcube-ai');
@@ -118,6 +121,29 @@ test('StageRun Kernel profile keeps RCA visual authority separate from OPL runti
   assert.equal(profile.authority_boundary.opl_can_create_typed_blocker, false);
   assert.equal(profile.authority_boundary.opl_can_authorize_quality_or_export, false);
 
+  assert.equal(overclaimBoundary.boundary_id, 'rca_stage_run_overclaim_boundary.v1');
+  assert.equal(overclaimBoundary.controlled_canary_evidence_scope, 'controlled_fixture_not_live_domain_progress');
+  assert.deepEqual(overclaimBoundary.claims_allowed, [
+    'controlled_fixture_trace_shape_present',
+    'refs_only_stage_run_assets_followable',
+    'owner_receipt_or_typed_blocker_closeout_shape_present',
+    'legacy_runtime_residue_guard_declared',
+  ]);
+  assert.deepEqual(overclaimBoundary.claims_forbidden, [
+    'live_domain_progress',
+    'visual_ready',
+    'exportable',
+    'handoffable',
+    'domain_ready',
+    'production_ready',
+    'production_visual_stage_long_soak_complete',
+  ]);
+  assert.equal(overclaimBoundary.provider_completion_counts_as_claim, false);
+  assert.equal(overclaimBoundary.render_success_counts_as_claim, false);
+  assert.equal(overclaimBoundary.conformance_pass_counts_as_claim, false);
+  assert.equal(overclaimBoundary.operator_summary_can_upgrade_claims, false);
+  assert.equal(overclaimBoundary.docs_or_readme_can_upgrade_claims, false);
+
   assert.equal(canary.canary_id, 'rca_visual_stage_run_canary.v1');
   assert.equal(canary.controlled_evidence_ref, 'contracts/stage_run_canary_evidence.json');
   assert.deepEqual(canary.ordered_domain_events, [
@@ -142,6 +168,37 @@ test('StageRun Kernel profile keeps RCA visual authority separate from OPL runti
   assert.equal(canary.tool_and_render_boundary.tool_refs_are_affordances, true);
   assert.equal(canary.tool_and_render_boundary.render_refs_are_affordances, true);
   assert.equal(canary.tool_and_render_boundary.hardcoded_workflow_from_tool_catalog_allowed, false);
+
+  assert.equal(residueGuard.guard_id, 'rca_stage_run_legacy_runtime_residue_guard.v1');
+  assert.equal(residueGuard.state, 'active_guard');
+  assert.deepEqual(residueGuard.guard_scope, [
+    'repo_local_sidecar_owner',
+    'repo_local_session_supervision_owner',
+    'repo_local_runner_owner',
+    'repo_local_session_store_owner',
+    'repo_local_status_shell_owner',
+    'repo_local_workbench_wrapper_owner',
+  ]);
+  assert.equal(residueGuard.default_runtime_owner, 'one-person-lab');
+  assert.equal(residueGuard.repo_local_stage_run_runtime_owner_allowed, false);
+  assert.equal(residueGuard.repo_local_session_store_owner_allowed, false);
+  assert.equal(residueGuard.repo_local_status_workbench_owner_allowed, false);
+  assert.equal(residueGuard.artifact_gallery_owner_allowed, false);
+  assert.equal(residueGuard.review_repair_transport_owner_allowed, false);
+
+  assert.equal(operatorSummary.summary_ref, 'operator-summary-ref:controlled-canary:rca:visual_direction:attempt-001');
+  assert.equal(operatorSummary.summary_subject_ref, canary.controlled_evidence_ref);
+  assert.equal(operatorSummary.summary_scope, 'stage_run_asset_refs_and_closeout_shape_only');
+  assert.deepEqual(operatorSummary.must_say, [
+    'controlled_fixture_not_live_domain_progress',
+    'owner_receipt_or_typed_blocker_closeout_required',
+    'tool_and_render_refs_are_affordance_or_evidence_refs',
+    'legacy_runtime_residue_is_not_active_runtime_owner',
+  ]);
+  assert.deepEqual(operatorSummary.must_not_say, overclaimBoundary.claims_forbidden);
+  assert.equal(operatorSummary.operator_can_follow_assets, true);
+  assert.equal(operatorSummary.operator_can_infer_live_progress, false);
+  assert.equal(operatorSummary.operator_can_upgrade_claims, false);
 });
 
 test('controlled visual StageRun canary evidence locks refs-only closeout shape', () => {
@@ -167,6 +224,36 @@ test('controlled visual StageRun canary evidence locks refs-only closeout shape'
   for (const key of expectedRoleArtifactRefKeys) {
     assertNonEmptyString(evidence.role_artifact_refs[key], `role_artifact_refs.${key}`);
   }
+
+  assert.equal(evidence.asset_follow_audit.audit_id, 'rca_visual_stage_run_canary_asset_follow_audit.v1');
+  assert.equal(
+    evidence.asset_follow_audit.operator_summary_ref,
+    'operator-summary-ref:controlled-canary:rca:visual_direction:attempt-001',
+  );
+  assert.equal(evidence.asset_follow_audit.summary_scope, 'stage_run_asset_refs_and_closeout_shape_only');
+  assert.deepEqual(evidence.asset_follow_audit.required_followable_refs, [
+    'stage_run_ref',
+    'stage_manifest_ref',
+    'current_pointer_ref',
+    'candidate_pool_ref',
+    'reflection_review_ref',
+    'ranking_selection_ref',
+    'revision_lineage_ref',
+    'meta_review_ref',
+    'independent_gate_ref',
+    'owner_receipt_or_typed_blocker_ref',
+  ]);
+  assert.equal(evidence.asset_follow_audit.asset_body_included, false);
+  assert.equal(evidence.asset_follow_audit.artifact_body_included, false);
+  assert.equal(evidence.asset_follow_audit.visual_truth_body_included, false);
+  assert.equal(evidence.asset_follow_audit.review_verdict_body_included, false);
+  assert.equal(evidence.asset_follow_audit.export_verdict_body_included, false);
+  assert.equal(evidence.asset_follow_audit.owner_receipt_body_included, false);
+  assert.equal(evidence.asset_follow_audit.typed_blocker_body_included, false);
+  assert.equal(evidence.asset_follow_audit.operator_can_follow_asset_refs, true);
+  assert.equal(evidence.asset_follow_audit.operator_summary_can_claim_live_progress, false);
+  assert.equal(evidence.asset_follow_audit.operator_summary_can_claim_visual_ready, false);
+  assert.equal(evidence.asset_follow_audit.operator_summary_can_claim_exportable, false);
 
   assert.equal(
     evidence.strategy_trace.candidate_generation.refs.includes(evidence.role_artifact_refs.candidate_pool_ref),
@@ -217,5 +304,23 @@ test('controlled visual StageRun canary evidence locks refs-only closeout shape'
   assert.equal(evidence.tool_and_render_boundary.render_refs_are_evidence_refs, true);
   assert.equal(evidence.tool_and_render_boundary.render_refs_can_authorize_visual_quality, false);
   assert.equal(evidence.tool_and_render_boundary.export_gate_ref_can_authorize_export, false);
+  assert.deepEqual(evidence.overclaim_boundary.claims_allowed, [
+    'controlled_fixture_trace_shape_present',
+    'refs_only_asset_follow_audit_present',
+    'owner_receipt_or_typed_blocker_closeout_shape_present',
+  ]);
+  assert.deepEqual(evidence.overclaim_boundary.claims_forbidden, [
+    'live_domain_progress',
+    'visual_ready',
+    'exportable',
+    'handoffable',
+    'domain_ready',
+    'production_ready',
+    'production_visual_stage_long_soak_complete',
+  ]);
+  assert.equal(evidence.overclaim_boundary.provider_completion_counts_as_claim, false);
+  assert.equal(evidence.overclaim_boundary.render_success_counts_as_claim, false);
+  assert.equal(evidence.overclaim_boundary.conformance_pass_counts_as_claim, false);
+  assert.equal(evidence.overclaim_boundary.operator_summary_can_upgrade_claims, false);
   assertNoForbiddenBodyFields(evidence);
 });

@@ -60,6 +60,34 @@
     "meta_review_ref": "role-artifact-ref:controlled-canary:visual_direction:meta_review",
     "independent_gate_ref": "role-artifact-ref:controlled-canary:visual_direction:independent_gate"
   },
+  "asset_follow_audit": {
+    "audit_id": "rca_visual_stage_run_canary_asset_follow_audit.v1",
+    "operator_summary_ref": "operator-summary-ref:controlled-canary:rca:visual_direction:attempt-001",
+    "summary_scope": "stage_run_asset_refs_and_closeout_shape_only",
+    "required_followable_refs": [
+      "stage_run_ref",
+      "stage_manifest_ref",
+      "current_pointer_ref",
+      "candidate_pool_ref",
+      "reflection_review_ref",
+      "ranking_selection_ref",
+      "revision_lineage_ref",
+      "meta_review_ref",
+      "independent_gate_ref",
+      "owner_receipt_or_typed_blocker_ref"
+    ],
+    "asset_body_included": false,
+    "artifact_body_included": false,
+    "visual_truth_body_included": false,
+    "review_verdict_body_included": false,
+    "export_verdict_body_included": false,
+    "owner_receipt_body_included": false,
+    "typed_blocker_body_included": false,
+    "operator_can_follow_asset_refs": true,
+    "operator_summary_can_claim_live_progress": false,
+    "operator_summary_can_claim_visual_ready": false,
+    "operator_summary_can_claim_exportable": false
+  },
   "closeout": {
     "terminal_outcome": "owner_receipt",
     "owner_receipt_ref": "rca-owner-receipt-ref:controlled-canary:visual_direction:attempt-001",
@@ -85,5 +113,25 @@
     "opl_can_sign_owner_receipt": false,
     "opl_can_create_typed_blocker": false,
     "opl_can_authorize_quality_or_export": false
+  },
+  "overclaim_boundary": {
+    "claims_allowed": [
+      "controlled_fixture_trace_shape_present",
+      "refs_only_asset_follow_audit_present",
+      "owner_receipt_or_typed_blocker_closeout_shape_present"
+    ],
+    "claims_forbidden": [
+      "live_domain_progress",
+      "visual_ready",
+      "exportable",
+      "handoffable",
+      "domain_ready",
+      "production_ready",
+      "production_visual_stage_long_soak_complete"
+    ],
+    "provider_completion_counts_as_claim": false,
+    "render_success_counts_as_claim": false,
+    "conformance_pass_counts_as_claim": false,
+    "operator_summary_can_upgrade_claims": false
   }
 }

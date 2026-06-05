@@ -119,7 +119,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 直达路径和 OPL 托管路径都必须收敛到同一个下游 RedCube 领域智能体入口（`invokeDomainEntry` service-safe surface）。
 - RCA stage pack 给 executor 提供目标、上下文、authority boundary、skill、knowledge refs、tool affordance 和 visual quality gate；route 只管理 owner、恢复和证据边界，不预先规定视觉创作策略。
 - RCA 工具目录是 affordance catalog，不是 workflow script。RCA 只声明视觉工具、native helper、渲染、修复和导出能力的边界；executor 可以在 stage attempt 内自主选择、组合、跳过、替代或追问。
-- visual StageRun canary 由 controlled fixture 固定：视觉方向候选 -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt 或 typed blocker。渲染和工具 refs 只支撑本次 attempt，不变成硬编码 workflow 或 live-progress claim。
+- visual StageRun canary 由 controlled fixture 固定：视觉方向候选 -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt 或 typed blocker。它的 operator summary 只跟随 stage、manifest、current pointer、role artifact 和 closeout refs。渲染和工具 refs 只支撑本次 attempt，legacy runtime residue 也被 guard 防止重新成为 active runtime owner；这些 surface 都不能升级成硬编码 workflow、visual readiness verdict、export claim、production claim 或 live-progress claim。
 - RedCube 持有视觉交付阶段包、提示词、技能、审阅门、视觉领域真相、标准产物和导出权威。OPL 可以提供排队、唤醒、交接、回执、重试 / 死信和投影支撑，但不会成为视觉领域大脑或产物所有者。
 
 </details>

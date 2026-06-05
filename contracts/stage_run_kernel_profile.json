@@ -88,6 +88,30 @@
     "provider_completion_counts_as_domain_accepted": false,
     "read_model_can_be_truth_source": false
   },
+  "overclaim_boundary": {
+    "boundary_id": "rca_stage_run_overclaim_boundary.v1",
+    "controlled_canary_evidence_scope": "controlled_fixture_not_live_domain_progress",
+    "claims_allowed": [
+      "controlled_fixture_trace_shape_present",
+      "refs_only_stage_run_assets_followable",
+      "owner_receipt_or_typed_blocker_closeout_shape_present",
+      "legacy_runtime_residue_guard_declared"
+    ],
+    "claims_forbidden": [
+      "live_domain_progress",
+      "visual_ready",
+      "exportable",
+      "handoffable",
+      "domain_ready",
+      "production_ready",
+      "production_visual_stage_long_soak_complete"
+    ],
+    "provider_completion_counts_as_claim": false,
+    "render_success_counts_as_claim": false,
+    "conformance_pass_counts_as_claim": false,
+    "operator_summary_can_upgrade_claims": false,
+    "docs_or_readme_can_upgrade_claims": false
+  },
   "domain_authority_retained": [
     "visual_truth",
     "layout_review_verdict",
@@ -122,6 +146,57 @@
     ],
     "replacement_owner": "one-person-lab",
     "replacement_surface": "opl_hosted_runtime_projection_and_generated_wrappers"
+  },
+  "legacy_runtime_residue_guard": {
+    "guard_id": "rca_stage_run_legacy_runtime_residue_guard.v1",
+    "state": "active_guard",
+    "source_policy_ref": "contracts/stage_run_kernel_profile.json#/retired_generic_surface_policy",
+    "guard_scope": [
+      "repo_local_sidecar_owner",
+      "repo_local_session_supervision_owner",
+      "repo_local_runner_owner",
+      "repo_local_session_store_owner",
+      "repo_local_status_shell_owner",
+      "repo_local_workbench_wrapper_owner"
+    ],
+    "allowed_residual_roles_ref": "contracts/stage_run_kernel_profile.json#/retired_generic_surface_policy/allowed_residual_roles",
+    "forbidden_active_roles_ref": "contracts/stage_run_kernel_profile.json#/retired_generic_surface_policy/forbidden_resurrection",
+    "default_runtime_owner": "one-person-lab",
+    "repo_local_stage_run_runtime_owner_allowed": false,
+    "repo_local_session_store_owner_allowed": false,
+    "repo_local_status_workbench_owner_allowed": false,
+    "artifact_gallery_owner_allowed": false,
+    "review_repair_transport_owner_allowed": false,
+    "pass_condition": "all_legacy_runtime_residue_is_explicitly_classified_and_cannot_be_default_runtime_owner"
+  },
+  "controlled_canary_operator_summary": {
+    "summary_ref": "operator-summary-ref:controlled-canary:rca:visual_direction:attempt-001",
+    "summary_subject_ref": "contracts/stage_run_canary_evidence.json",
+    "summary_scope": "stage_run_asset_refs_and_closeout_shape_only",
+    "default_operator_readout": "controlled_canary_fixture_only",
+    "must_say": [
+      "controlled_fixture_not_live_domain_progress",
+      "owner_receipt_or_typed_blocker_closeout_required",
+      "tool_and_render_refs_are_affordance_or_evidence_refs",
+      "legacy_runtime_residue_is_not_active_runtime_owner"
+    ],
+    "must_not_say": [
+      "live_domain_progress",
+      "visual_ready",
+      "exportable",
+      "handoffable",
+      "domain_ready",
+      "production_ready",
+      "production_visual_stage_long_soak_complete"
+    ],
+    "required_drilldown_refs": [
+      "contracts/stage_run_kernel_profile.json#/visual_stage_run_canary",
+      "contracts/stage_run_canary_evidence.json#/asset_follow_audit",
+      "contracts/stage_run_canary_evidence.json#/closeout"
+    ],
+    "operator_can_follow_assets": true,
+    "operator_can_infer_live_progress": false,
+    "operator_can_upgrade_claims": false
   },
   "visual_stage_run_canary": {
     "canary_id": "rca_visual_stage_run_canary.v1",
