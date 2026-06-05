@@ -85,6 +85,7 @@ You can start with prompts like:
 - Keeping multi-round review, reruns, and export checks tied to the same workspace.
 - Showing human-readable progress while longer-running jobs continue in the background.
 - Delivering exported files that stay connected to their source material and review history; editable PPTX is an explicit route when requested.
+- Comparing visual directions, finding repeated failure patterns, generating variants, absorbing review, and completing export checks inside the same delivery stage.
 
 ## Current Delivery Focus
 
@@ -96,7 +97,7 @@ You can start with prompts like:
 ## How It Works
 
 - Experts provide the source material, audience expectations, and final judgment.
-- The AI operator handles generation, revision, reruns, export, and progress reporting.
+- The AI operator handles direction exploration, generation, revision, reruns, export, and progress reporting.
 - The workspace keeps sessions, review state, rerun history, artifact refs, and export outputs together for inspection.
 
 ## Current Boundary
@@ -118,6 +119,7 @@ You can start with prompts like:
 - Both direct and OPL-hosted paths converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
 - An RCA stage pack gives the executor a goal, context, authority boundary, skills, knowledge refs, tool affordances, and visual quality gate. The route manages owner, recovery, and evidence boundaries; it does not pre-script visual creation strategy.
 - RCA's tool catalog is an affordance catalog, not a workflow script. RCA declares boundaries for visual tools, native helpers, rendering, repair, and export capabilities; the executor may choose, combine, skip, replace, or ask about them inside the stage attempt.
+- The visual StageRun canary is backed by a controlled fixture: visual direction candidates -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt or typed blocker. Render/tool refs support that attempt; they do not become a hardcoded workflow or live-progress claim.
 - RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, canonical artifacts, and export authority. OPL may provide queue, wakeup, handoff, receipts, retry/dead-letter handling, and projection support, but it does not become the visual-domain brain or artifact owner.
 
 </details>

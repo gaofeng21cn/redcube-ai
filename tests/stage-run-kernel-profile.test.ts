@@ -1,0 +1,221 @@
+// @ts-nocheck
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import test from 'node:test';
+
+const repoRoot = path.resolve(import.meta.dirname, '..');
+
+function readJson(relativePath) {
+  return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
+}
+
+const requiredStrategyTraceKeys = [
+  'candidate_generation',
+  'grounded_reflection',
+  'comparative_selection',
+  'evolution_and_revision',
+  'meta_review_learning',
+  'independent_quality_gate',
+];
+
+const expectedRoleArtifactRefKeys = [
+  'candidate_pool_ref',
+  'reflection_review_ref',
+  'ranking_selection_ref',
+  'revision_lineage_ref',
+  'meta_review_ref',
+  'independent_gate_ref',
+];
+
+function assertNonEmptyString(value, label) {
+  assert.equal(typeof value, 'string', label);
+  assert.notEqual(value.trim(), '', label);
+}
+
+function assertRefs(value, label) {
+  assert.equal(Array.isArray(value), true, label);
+  assert.equal(value.length > 0, true, label);
+  for (const [index, ref] of value.entries()) {
+    assertNonEmptyString(ref, `${label}[${index}]`);
+  }
+}
+
+function assertNoForbiddenBodyFields(value, label = 'evidence') {
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => assertNoForbiddenBodyFields(entry, `${label}[${index}]`));
+    return;
+  }
+  if (!value || typeof value !== 'object') return;
+
+  const forbiddenBodyFieldNames = new Set([
+    'artifact_body',
+    'artifact_blob',
+    'visual_truth_body',
+    'review_verdict_body',
+    'export_verdict_body',
+    'owner_receipt_body',
+    'typed_blocker_body',
+    'memory_body',
+  ]);
+  for (const key of Object.keys(value)) {
+    assert.equal(forbiddenBodyFieldNames.has(key), false, `${label}.${key}`);
+    assertNoForbiddenBodyFields(value[key], `${label}.${key}`);
+  }
+}
+
+test('StageRun Kernel profile keeps RCA visual authority separate from OPL runtime refs', () => {
+  const profile = readJson('contracts/stage_run_kernel_profile.json');
+  const oplRefs = profile.opl_contract_refs;
+  const canary = profile.visual_stage_run_canary;
+
+  assert.equal(profile.surface_kind, 'opl_stage_run_kernel_profile');
+  assert.equal(profile.domain_id, 'redcube-ai');
+  assert.equal(profile.kernel_role, 'minimal_state_shell_not_domain_controller_system');
+  assert.deepEqual(profile.stage_native_unit, [
+    'stage_folder',
+    'stage_manifest',
+    'role_artifacts',
+    'owner_receipt_or_typed_blocker',
+  ]);
+  assert.deepEqual(profile.required_object_models, [
+    'StageRun',
+    'RoleArtifactRef',
+    'OwnerReceipt',
+    'TypedBlocker',
+    'ReadModel',
+  ]);
+
+  assert.equal(profile.stage_run_state_machine.provider_completion_counts_as_domain_accepted, false);
+  assert.equal(profile.stage_run_state_machine.file_presence_counts_as_stage_complete, false);
+  assert.equal(profile.stage_run_state_machine.latest_json_counts_as_domain_accepted, false);
+  assert.equal(profile.stage_run_state_machine.read_model_counts_as_transition_authority, false);
+
+  assert.equal(oplRefs.owner, 'one-person-lab');
+  assert.equal(oplRefs.domain_repo_role, 'consumer_profile_ref_only');
+  assert.equal(oplRefs.repo_local_file_required, false);
+  assert.equal(oplRefs.local_resolution_policy, 'do_not_copy_opl_framework_contracts_into_domain_repo');
+  assert.deepEqual(oplRefs.refs, [
+    'contracts/opl-framework/stage-run-kernel-contract.json',
+    'contracts/opl-framework/stage-manifest.schema.json',
+    'contracts/opl-framework/role-artifact-ref.schema.json',
+    'contracts/opl-framework/stage-owner-receipt.schema.json',
+    'contracts/opl-framework/stage-typed-blocker.schema.json',
+  ]);
+
+  assert.deepEqual(profile.domain_authority_retained, [
+    'visual_truth',
+    'layout_review_verdict',
+    'export_verdict',
+    'artifact_mutation_authority',
+    'visual_memory_accept_reject',
+    'owner_receipt',
+    'typed_blocker',
+  ]);
+  assert.equal(profile.authority_boundary.opl_can_write_domain_truth, false);
+  assert.equal(profile.authority_boundary.opl_can_mutate_artifact_body, false);
+  assert.equal(profile.authority_boundary.opl_can_sign_domain_owner_receipt, false);
+  assert.equal(profile.authority_boundary.opl_can_create_typed_blocker, false);
+  assert.equal(profile.authority_boundary.opl_can_authorize_quality_or_export, false);
+
+  assert.equal(canary.canary_id, 'rca_visual_stage_run_canary.v1');
+  assert.equal(canary.controlled_evidence_ref, 'contracts/stage_run_canary_evidence.json');
+  assert.deepEqual(canary.ordered_domain_events, [
+    'visual_direction_candidates',
+    'grounded_reflection',
+    'comparative_selection',
+    'evolution_and_revision',
+    'meta_review_learning',
+    'independent_quality_gate',
+    'owner_receipt_or_typed_blocker_closeout',
+  ]);
+  assert.deepEqual(canary.required_role_artifacts, expectedRoleArtifactRefKeys);
+  assert.deepEqual(canary.closure_policy.success_requires, [
+    'rca_owner_receipt_ref',
+    'independent_quality_gate_ref',
+    'export_gate_ref',
+  ]);
+  assert.equal(canary.closure_policy.provider_completion_counts_as_success, false);
+  assert.equal(canary.closure_policy.render_success_counts_as_visual_verdict, false);
+  assert.equal(canary.closure_policy.wrapper_currentness_counts_as_stage_progress, false);
+  assert.equal(canary.closure_policy.conformance_pass_counts_as_closeout, false);
+  assert.equal(canary.tool_and_render_boundary.tool_refs_are_affordances, true);
+  assert.equal(canary.tool_and_render_boundary.render_refs_are_affordances, true);
+  assert.equal(canary.tool_and_render_boundary.hardcoded_workflow_from_tool_catalog_allowed, false);
+});
+
+test('controlled visual StageRun canary evidence locks refs-only closeout shape', () => {
+  const profile = readJson('contracts/stage_run_kernel_profile.json');
+  const evidence = readJson(profile.visual_stage_run_canary.controlled_evidence_ref);
+
+  assert.equal(evidence.surface_kind, 'opl_stage_run_controlled_canary_evidence');
+  assert.equal(evidence.version, 'stage-run-controlled-canary.v1');
+  assert.equal(evidence.domain_id, 'redcube-ai');
+  assert.equal(evidence.canary_id, profile.visual_stage_run_canary.canary_id);
+  assert.equal(evidence.stage_id, 'visual_direction');
+  assert.equal(evidence.evidence_scope, 'controlled_fixture_not_live_domain_progress');
+  assertNonEmptyString(evidence.stage_run_ref, 'stage_run_ref');
+  assertNonEmptyString(evidence.stage_manifest_ref, 'stage_manifest_ref');
+  assertNonEmptyString(evidence.current_pointer_ref, 'current_pointer_ref');
+
+  assert.deepEqual(Object.keys(evidence.strategy_trace), requiredStrategyTraceKeys);
+  for (const key of requiredStrategyTraceKeys) {
+    assertRefs(evidence.strategy_trace[key].refs, `strategy_trace.${key}.refs`);
+  }
+
+  assert.deepEqual(Object.keys(evidence.role_artifact_refs), expectedRoleArtifactRefKeys);
+  for (const key of expectedRoleArtifactRefKeys) {
+    assertNonEmptyString(evidence.role_artifact_refs[key], `role_artifact_refs.${key}`);
+  }
+
+  assert.equal(
+    evidence.strategy_trace.candidate_generation.refs.includes(evidence.role_artifact_refs.candidate_pool_ref),
+    true,
+  );
+  assert.equal(
+    evidence.strategy_trace.grounded_reflection.refs.includes(evidence.role_artifact_refs.reflection_review_ref),
+    true,
+  );
+  assert.equal(
+    evidence.strategy_trace.comparative_selection.refs.includes(evidence.role_artifact_refs.ranking_selection_ref),
+    true,
+  );
+  assert.equal(
+    evidence.strategy_trace.evolution_and_revision.refs.includes(evidence.role_artifact_refs.revision_lineage_ref),
+    true,
+  );
+  assert.equal(
+    evidence.strategy_trace.meta_review_learning.refs.includes(evidence.role_artifact_refs.meta_review_ref),
+    true,
+  );
+  assert.equal(
+    evidence.strategy_trace.independent_quality_gate.refs.includes(evidence.role_artifact_refs.independent_gate_ref),
+    true,
+  );
+
+  assert.equal(['owner_receipt', 'typed_blocker'].includes(evidence.closeout.terminal_outcome), true);
+  assert.equal(
+    Boolean(evidence.closeout.owner_receipt_ref || evidence.closeout.typed_blocker_ref),
+    true,
+  );
+  assert.equal(evidence.closeout.same_attempt_self_review, false);
+
+  assert.deepEqual(evidence.authority_boundary, {
+    refs_only: true,
+    controlled_canary_claims_live_domain_progress: false,
+    provider_completion_counts_as_closeout: false,
+    file_presence_counts_as_closeout: false,
+    read_model_counts_as_closeout: false,
+    conformance_pass_counts_as_closeout: false,
+    opl_can_write_domain_truth: false,
+    opl_can_mutate_artifact_body: false,
+    opl_can_sign_owner_receipt: false,
+    opl_can_create_typed_blocker: false,
+    opl_can_authorize_quality_or_export: false,
+  });
+  assert.equal(evidence.tool_and_render_boundary.tool_refs_are_affordance_refs, true);
+  assert.equal(evidence.tool_and_render_boundary.render_refs_are_evidence_refs, true);
+  assert.equal(evidence.tool_and_render_boundary.render_refs_can_authorize_visual_quality, false);
+  assert.equal(evidence.tool_and_render_boundary.export_gate_ref_can_authorize_export, false);
+  assertNoForbiddenBodyFields(evidence);
+});

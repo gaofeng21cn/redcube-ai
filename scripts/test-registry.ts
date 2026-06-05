@@ -61,6 +61,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/source-augmentation-contract.test.ts',
     'tests/source-augmentation-provider.test.ts',
     'tests/stage-folder-contract.test.ts',
+    'tests/stage-run-kernel-profile.test.ts',
     'tests/test-workspace-lifecycle.test.ts',
     'tests/typescript-baseline.test.ts',
     'tests/typescript-closeout-audit.test.ts',
@@ -194,6 +195,7 @@ const FAST_FILES = Object.freeze([
   'tests/rca-ppt-three-route-agent-lab-suite.test.ts',
   'tests/source-augmentation-provider.test.ts',
   'tests/stage-folder-contract.test.ts',
+  'tests/stage-run-kernel-profile.test.ts',
 ]);
 
 const smokeFileSet = new Set(SMOKE_FILES);

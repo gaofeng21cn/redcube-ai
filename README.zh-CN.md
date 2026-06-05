@@ -85,6 +85,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 在同一个工作区里持续跟踪多轮审阅、重跑和导出检查。
 - 在长时间运行过程中查看人话进度，了解当前步骤和下一轮审阅重点。
 - 让导出文件、审阅结果和源材料保持清晰对应关系；可编辑 PPTX 是用户明确要求时启用的专门路线。
+- 在同一交付阶段里比较多个视觉方向、发现反复失败点、生成变体、吸收审阅意见并完成导出检查。
 
 ## 当前交付重点
 
@@ -96,7 +97,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 工作方式
 
 - 专家提供源材料、受众预期和最终判断。
-- AI 助手负责生成、修订、重跑、导出和进度反馈。
+- AI 助手负责方向探索、生成、修订、重跑、导出和进度反馈。
 - 工作区持续保存任务、审阅状态、重跑记录、artifact refs 和导出结果，方便检查与回看。
 
 ## 当前边界
@@ -118,6 +119,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 直达路径和 OPL 托管路径都必须收敛到同一个下游 RedCube 领域智能体入口（`invokeDomainEntry` service-safe surface）。
 - RCA stage pack 给 executor 提供目标、上下文、authority boundary、skill、knowledge refs、tool affordance 和 visual quality gate；route 只管理 owner、恢复和证据边界，不预先规定视觉创作策略。
 - RCA 工具目录是 affordance catalog，不是 workflow script。RCA 只声明视觉工具、native helper、渲染、修复和导出能力的边界；executor 可以在 stage attempt 内自主选择、组合、跳过、替代或追问。
+- visual StageRun canary 由 controlled fixture 固定：视觉方向候选 -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt 或 typed blocker。渲染和工具 refs 只支撑本次 attempt，不变成硬编码 workflow 或 live-progress claim。
 - RedCube 持有视觉交付阶段包、提示词、技能、审阅门、视觉领域真相、标准产物和导出权威。OPL 可以提供排队、唤醒、交接、回执、重试 / 死信和投影支撑，但不会成为视觉领域大脑或产物所有者。
 
 </details>

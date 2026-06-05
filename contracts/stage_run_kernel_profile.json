@@ -1,0 +1,187 @@
+{
+  "surface_kind": "opl_stage_run_kernel_profile",
+  "version": "stage-run-kernel-profile.v1",
+  "domain_id": "redcube-ai",
+  "owner": "redcube_ai",
+  "state": "active_contract",
+  "purpose": "Machine-readable StageRun Kernel profile for Stage Native visual-deliverable execution: stage folder, stage_manifest, role artifacts, and RCA owner receipt or typed blocker.",
+  "machine_boundary": "This profile defines a minimal StageRun state shell and authority boundary. It does not declare visual closure, review/export readiness, domain readiness, quality readiness, artifact readiness, package freshness, or production readiness.",
+  "kernel_contract_ref": "contracts/opl-framework/stage-run-kernel-contract.json",
+  "stage_manifest_schema_ref": "contracts/opl-framework/stage-manifest.schema.json",
+  "role_artifact_ref_schema_ref": "contracts/opl-framework/role-artifact-ref.schema.json",
+  "owner_receipt_schema_ref": "contracts/opl-framework/stage-owner-receipt.schema.json",
+  "typed_blocker_schema_ref": "contracts/opl-framework/stage-typed-blocker.schema.json",
+  "stage_artifact_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json",
+  "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+  "opl_contract_refs": {
+    "owner": "one-person-lab",
+    "domain_repo_role": "consumer_profile_ref_only",
+    "repo_local_file_required": false,
+    "local_resolution_policy": "do_not_copy_opl_framework_contracts_into_domain_repo",
+    "refs": [
+      "contracts/opl-framework/stage-run-kernel-contract.json",
+      "contracts/opl-framework/stage-manifest.schema.json",
+      "contracts/opl-framework/role-artifact-ref.schema.json",
+      "contracts/opl-framework/stage-owner-receipt.schema.json",
+      "contracts/opl-framework/stage-typed-blocker.schema.json"
+    ]
+  },
+  "kernel_role": "minimal_state_shell_not_domain_controller_system",
+  "stage_native_unit": [
+    "stage_folder",
+    "stage_manifest",
+    "role_artifacts",
+    "owner_receipt_or_typed_blocker"
+  ],
+  "required_object_models": [
+    "StageRun",
+    "RoleArtifactRef",
+    "OwnerReceipt",
+    "TypedBlocker",
+    "ReadModel"
+  ],
+  "stage_run_state_machine": {
+    "provider_completion_counts_as_domain_accepted": false,
+    "file_presence_counts_as_stage_complete": false,
+    "latest_json_counts_as_domain_accepted": false,
+    "read_model_counts_as_transition_authority": false
+  },
+  "launch_admission_policy": {
+    "hard_blockers": [
+      "identity",
+      "owner",
+      "scope",
+      "selected_executor",
+      "authority_boundary",
+      "required_role_artifacts",
+      "receipt_or_blocker_shape",
+      "forbidden_write",
+      "replay_audit_lineage"
+    ],
+    "advisory_refs": [
+      "prompt_refs",
+      "skill_refs",
+      "tool_affordance_refs",
+      "knowledge_refs",
+      "rubric_refs",
+      "evaluation_refs"
+    ],
+    "advisory_refs_can_block_launch": false
+  },
+  "default_read_surface": {
+    "root": "stage_run_current_owner_delta",
+    "raw_worklist_default": false,
+    "readiness_default": false,
+    "replay_packet_default": false
+  },
+  "transition_authority": {
+    "terminal_transition_authority": "owner_receipt_or_typed_blocker",
+    "provider_completion_counts_as_transition": false,
+    "file_presence_counts_as_transition": false
+  },
+  "authority_boundary": {
+    "opl_can_write_domain_truth": false,
+    "opl_can_mutate_artifact_body": false,
+    "opl_can_sign_domain_owner_receipt": false,
+    "opl_can_create_typed_blocker": false,
+    "opl_can_authorize_quality_or_export": false,
+    "provider_completion_counts_as_domain_accepted": false,
+    "read_model_can_be_truth_source": false
+  },
+  "domain_authority_retained": [
+    "visual_truth",
+    "layout_review_verdict",
+    "export_verdict",
+    "artifact_mutation_authority",
+    "visual_memory_accept_reject",
+    "owner_receipt",
+    "typed_blocker"
+  ],
+  "retired_generic_surface_policy": {
+    "repo_local_sidecar_owner": "retired_migration_input",
+    "repo_local_session_supervision_owner": "retired_migration_input",
+    "repo_local_runner_owner": "retired_migration_input",
+    "repo_local_session_store_owner": "retired_migration_input",
+    "repo_local_status_shell_owner": "retired_migration_input",
+    "repo_local_workbench_wrapper_owner": "retired_migration_input",
+    "allowed_residual_roles": [
+      "refs_only_adapter",
+      "diagnostic",
+      "provenance",
+      "domain_handler_target",
+      "native_helper_implementation"
+    ],
+    "forbidden_resurrection": [
+      "generic_runtime_owner",
+      "generic_projection_owner",
+      "generic_session_store_owner",
+      "generic_status_workbench_owner",
+      "generic_runner_owner",
+      "artifact_gallery_owner",
+      "review_repair_transport_owner"
+    ],
+    "replacement_owner": "one-person-lab",
+    "replacement_surface": "opl_hosted_runtime_projection_and_generated_wrappers"
+  },
+  "visual_stage_run_canary": {
+    "canary_id": "rca_visual_stage_run_canary.v1",
+    "purpose": "Prove that an RCA visual StageRun can move from candidate visual directions to RCA-owned review/export closure without making render tools or wrappers the workflow owner.",
+    "controlled_evidence_ref": "contracts/stage_run_canary_evidence.json",
+    "ordered_domain_events": [
+      "visual_direction_candidates",
+      "grounded_reflection",
+      "comparative_selection",
+      "evolution_and_revision",
+      "meta_review_learning",
+      "independent_quality_gate",
+      "owner_receipt_or_typed_blocker_closeout"
+    ],
+    "required_role_artifacts": [
+      "candidate_pool_ref",
+      "reflection_review_ref",
+      "ranking_selection_ref",
+      "revision_lineage_ref",
+      "meta_review_ref",
+      "independent_gate_ref"
+    ],
+    "closure_policy": {
+      "success_requires": [
+        "rca_owner_receipt_ref",
+        "independent_quality_gate_ref",
+        "export_gate_ref"
+      ],
+      "blocked_requires": [
+        "rca_typed_blocker_ref",
+        "blocking_evidence_ref"
+      ],
+      "provider_completion_counts_as_success": false,
+      "render_success_counts_as_visual_verdict": false,
+      "wrapper_currentness_counts_as_stage_progress": false,
+      "conformance_pass_counts_as_closeout": false
+    },
+    "tool_and_render_boundary": {
+      "tool_refs_are_affordances": true,
+      "render_refs_are_affordances": true,
+      "hardcoded_workflow_from_tool_catalog_allowed": false,
+      "required_affordance_ref_kinds": [
+        "tool_affordance_refs",
+        "render_evidence_refs",
+        "skill_refs",
+        "quality_gate_refs"
+      ]
+    }
+  },
+  "projection_boundary": {
+    "read_models_are_rebuildable": true,
+    "allowed_projection_inputs": [
+      "StageRun_event_log",
+      "stage_manifest_ref",
+      "role_artifact_refs",
+      "owner_receipt_refs",
+      "typed_blocker_refs",
+      "current_owner_delta_ref"
+    ],
+    "projection_can_write_truth": false,
+    "projection_can_authorize_next_stage": false
+  }
+}

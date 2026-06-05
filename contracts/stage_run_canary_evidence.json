@@ -1,0 +1,89 @@
+{
+  "surface_kind": "opl_stage_run_controlled_canary_evidence",
+  "version": "stage-run-controlled-canary.v1",
+  "domain_id": "redcube-ai",
+  "canary_id": "rca_visual_stage_run_canary.v1",
+  "stage_id": "visual_direction",
+  "evidence_scope": "controlled_fixture_not_live_domain_progress",
+  "stage_run_ref": "stage-run:controlled-canary:rca:visual_direction:attempt-001",
+  "stage_manifest_ref": "stage-manifest:controlled-canary:rca:visual_direction:attempt-001",
+  "current_pointer_ref": "stage-current-pointer:controlled-canary:rca:visual_direction:attempt-001",
+  "strategy_trace": {
+    "candidate_generation": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:candidate_pool",
+        "tool-affordance-ref:agent/tools/domain_affordances.md",
+        "render-evidence-ref:controlled-canary:visual_direction:candidate-contact-sheet"
+      ]
+    },
+    "grounded_reflection": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:reflection_review",
+        "knowledge-ref:agent/knowledge/communication_visual_direction.md",
+        "quality-gate-ref:agent/quality_gates/communication_and_direction.md"
+      ]
+    },
+    "comparative_selection": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:ranking_selection",
+        "rubric-ref:agent/quality_gates/visual_pack_discipline.md",
+        "render-evidence-ref:controlled-canary:visual_direction:ranked-direction-grid"
+      ]
+    },
+    "evolution_and_revision": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:revision_lineage",
+        "render-evidence-ref:controlled-canary:visual_direction:revision-delta-preview",
+        "tool-affordance-ref:agent/tools/domain_affordances.md"
+      ]
+    },
+    "meta_review_learning": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:meta_review",
+        "knowledge-ref:agent/knowledge/review_export_memory.md",
+        "quality-gate-ref:agent/quality_gates/review_export_memory.md"
+      ]
+    },
+    "independent_quality_gate": {
+      "refs": [
+        "role-artifact-ref:controlled-canary:visual_direction:independent_gate",
+        "quality-gate-ref:agent/quality_gates/visual_authority_boundaries.md",
+        "export-gate-ref:controlled-canary:body-free-export-readiness-gate"
+      ]
+    }
+  },
+  "role_artifact_refs": {
+    "candidate_pool_ref": "role-artifact-ref:controlled-canary:visual_direction:candidate_pool",
+    "reflection_review_ref": "role-artifact-ref:controlled-canary:visual_direction:reflection_review",
+    "ranking_selection_ref": "role-artifact-ref:controlled-canary:visual_direction:ranking_selection",
+    "revision_lineage_ref": "role-artifact-ref:controlled-canary:visual_direction:revision_lineage",
+    "meta_review_ref": "role-artifact-ref:controlled-canary:visual_direction:meta_review",
+    "independent_gate_ref": "role-artifact-ref:controlled-canary:visual_direction:independent_gate"
+  },
+  "closeout": {
+    "terminal_outcome": "owner_receipt",
+    "owner_receipt_ref": "rca-owner-receipt-ref:controlled-canary:visual_direction:attempt-001",
+    "typed_blocker_ref": null,
+    "same_attempt_self_review": false,
+    "closeout_boundary": "controlled_fixture_ref_only_not_visual_quality_or_export_verdict"
+  },
+  "tool_and_render_boundary": {
+    "tool_refs_are_affordance_refs": true,
+    "render_refs_are_evidence_refs": true,
+    "render_refs_can_authorize_visual_quality": false,
+    "export_gate_ref_can_authorize_export": false
+  },
+  "authority_boundary": {
+    "refs_only": true,
+    "controlled_canary_claims_live_domain_progress": false,
+    "provider_completion_counts_as_closeout": false,
+    "file_presence_counts_as_closeout": false,
+    "read_model_counts_as_closeout": false,
+    "conformance_pass_counts_as_closeout": false,
+    "opl_can_write_domain_truth": false,
+    "opl_can_mutate_artifact_body": false,
+    "opl_can_sign_owner_receipt": false,
+    "opl_can_create_typed_blocker": false,
+    "opl_can_authorize_quality_or_export": false
+  }
+}
