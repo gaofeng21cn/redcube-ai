@@ -9,7 +9,7 @@ Machine boundary: 人读状态面。机器真相继续归 contracts、schema、s
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
-Codex Developer Mode source pointer: 仓库根层 `.codex-plugin/plugin.json` 是 `rca-local` 指向 live developer checkout 时的 Codex plugin manifest 入口；它只把 Codex source root 固定到当前 `redcube-ai` repo，并通过 `./plugins/rca/skills/` 和 `./plugins/rca/assets/` 引用现有 RCA app skill scaffold。`plugins/rca/.codex-plugin/plugin.json` 继续作为 packaged/scaffold plugin payload 保留；`.agents/plugins/marketplace.json` 仍由 `scripts/install-codex-plugin.ts` 生成，不进入 tracked repo source。该入口只解决 Codex plugin metadata/source channel 路径，不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
+Codex Developer Mode source pointer: 仓库根层 `.codex-plugin/plugin.json` 是 `rca-local` 指向 live developer checkout 时的 Codex plugin manifest 入口；它只把 Codex source root 固定到当前 `redcube-ai` repo，并通过 `./plugins/rca/skills/` 和 `./plugins/rca/assets/` 引用现有 RCA app skill scaffold。`plugins/rca/.codex-plugin/plugin.json` 继续作为 packaged/scaffold plugin payload 保留；repo-local `.agents/plugins/marketplace.json` 是已退役副产物，`scripts/install-codex-plugin.ts` 只校验 source 并清理旧副产物。Codex marketplace registration 由 OPL-owned wrapper 写入 `OPL_STATE_DIR/codex-plugin-marketplaces/rca-local`。该入口只解决 Codex plugin metadata/source channel 路径，不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
 
 ## 当前角色
 

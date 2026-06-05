@@ -65,7 +65,7 @@ test('codex plugin dev source manifest is available at repository root', () => {
   assert.equal(existsSync(path.join(repoRoot, manifest.interface.logo)), true);
 });
 
-test('codex plugin repo-local installer writes marketplace metadata without a bare skill mirror', () => {
+test('codex plugin repo-local installer validates tracked source without marketplace write', () => {
   const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-codex-plugin-installer-'));
   const fixturePluginRoot = path.join(fixtureRoot, 'plugins', 'rca');
   const fixtureHome = path.join(fixtureRoot, 'home');
@@ -100,24 +100,9 @@ test('codex plugin repo-local installer writes marketplace metadata without a ba
     assert.equal(output.plugin_root, fixturePluginRoot);
     assert.equal(output.skill_root, path.join(fixturePluginRoot, 'skills', 'rca'));
     assert.equal(output.marketplace_path, path.join(fixtureRoot, '.agents', 'plugins', 'marketplace.json'));
-
-    const marketplace = readJson(output.marketplace_path);
-    assert.equal(marketplace.name, 'rca-local');
-    assert.equal(marketplace.interface.displayName, 'RedCube AI Local');
-    assert.deepEqual(marketplace.plugins, [
-      {
-        name: 'rca',
-        source: {
-          source: 'local',
-          path: '.',
-        },
-        policy: {
-          installation: 'AVAILABLE',
-          authentication: 'ON_INSTALL',
-        },
-        category: 'Creative',
-      },
-    ]);
+    assert.equal(output.repo_local_marketplace_written, 'false');
+    assert.equal(output.codex_marketplace_owner, 'opl_owned_wrapper');
+    assert.equal(existsSync(output.marketplace_path), false);
     assert.equal(existsSync(path.join(fixtureHome, '.codex', 'skills', 'rca', 'SKILL.md')), false);
   } finally {
     rmSync(fixtureRoot, { recursive: true, force: true });

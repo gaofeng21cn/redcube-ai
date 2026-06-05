@@ -64,11 +64,6 @@ function parseArgs(argv: string[]): ParsedArgs {
   };
 }
 
-function writeJson(filePath: string, value: unknown): void {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
-}
-
 function main(): void {
   const args = parseArgs(process.argv.slice(2));
   const pluginRoot = path.join(args.repoRoot, 'plugins', 'rca');
@@ -88,31 +83,20 @@ function main(): void {
   }
 
   const marketplacePath = path.join(args.repoRoot, '.agents', 'plugins', 'marketplace.json');
-  writeJson(marketplacePath, {
-    name: 'rca-local',
-    interface: {
-      displayName: 'RedCube AI Local',
-    },
-    plugins: [
-      {
-        name: 'rca',
-        source: {
-          source: 'local',
-          path: '.',
-        },
-        policy: {
-          installation: 'AVAILABLE',
-          authentication: 'ON_INSTALL',
-        },
-        category: 'Creative',
-      },
-    ],
-  });
+  let repoLocalMarketplaceRemoved = false;
+  if (fs.existsSync(marketplacePath)) {
+    const stat = fs.lstatSync(marketplacePath);
+    if (stat.isDirectory()) {
+      fail(`refusing to remove marketplace directory: ${marketplacePath}`);
+    }
+    fs.unlinkSync(marketplacePath);
+    repoLocalMarketplaceRemoved = true;
+  }
 
   if (args.skipTools) {
-    process.stderr.write('refreshed RedCube AI repo-local Codex plugin metadata (skip-tools)\n');
+    process.stderr.write('checked RedCube AI tracked Codex plugin source and retired repo-local marketplace metadata (skip-tools)\n');
   } else {
-    process.stderr.write('RedCube AI CLI tools are provided by the repo-local npm launcher; refreshed Codex plugin metadata only.\n');
+    process.stderr.write('RedCube AI CLI tools are provided by the repo-local npm launcher; Codex marketplace registration is owned by the OPL wrapper.\n');
   }
 
   process.stdout.write(`${JSON.stringify({
@@ -123,6 +107,9 @@ function main(): void {
     plugin_root: pluginRoot,
     skill_root: skillRoot,
     marketplace_path: marketplacePath,
+    repo_local_marketplace_written: 'false',
+    repo_local_marketplace_removed: repoLocalMarketplaceRemoved ? 'true' : 'false',
+    codex_marketplace_owner: 'opl_owned_wrapper',
   }, null, 2)}\n`);
 }
 
