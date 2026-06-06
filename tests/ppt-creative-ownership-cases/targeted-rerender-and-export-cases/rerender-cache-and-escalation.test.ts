@@ -10,11 +10,13 @@ import {
   PPT_ROUTES_TO_SCREENSHOT_REVIEW,
   readFileSync,
   readJson,
+  readRouteStageArtifact,
   runDeliverableRoute,
   test,
   withEnv,
   withMockCodexRuntime,
   writeFileSync,
+  writeRouteStageArtifact,
 } from './shared.ts';
 
 test('ppt fix_html only regenerates blocked slides and preserves previously passed slides', async () => {
@@ -27,23 +29,15 @@ test('ppt fix_html only regenerates blocked slides and preserves previously pass
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'visual_director_review', {
       status: 'block',
       visual_director_review: {
         weak_pages: ['S06'],
         review_summary: 'S06 需要继续压缩风险支路。',
         rewrite_action: 'revise_render_html',
       },
-    }, null, 2), 'utf-8');
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    });
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       status: 'block',
       checks: {
         ai_review_passed: false,
@@ -64,7 +58,7 @@ test('ppt fix_html only regenerates blocked slides and preserves previously pass
         weak_pages: ['S06'],
         review_summary: '当前只需回到 render_html 修 S06。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_mechanical_feedback',
@@ -173,16 +167,8 @@ test('ppt visual review route cache invalidates after fix_html updates current H
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
     await new Promise((resolve) => setTimeout(resolve, 25));
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       status: 'block',
       checks: {
         ai_review_passed: false,
@@ -205,7 +191,7 @@ test('ppt visual review route cache invalidates after fix_html updates current H
         weak_pages: ['S06'],
         review_summary: '当前只需回到 fix_html 修 S06。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_mechanical_feedback',
@@ -257,14 +243,6 @@ test('ppt fix_html escalates when the same slide is blocked again after a prior 
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
     const blockedGate = {
       status: 'block',
       checks: {
@@ -290,7 +268,7 @@ test('ppt fix_html escalates when the same slide is blocked again after a prior 
       },
     };
     await new Promise((resolve) => setTimeout(resolve, 25));
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify(blockedGate, null, 2), 'utf-8');
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', blockedGate);
 
     const firstRestoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_mechanical_feedback',
@@ -310,13 +288,13 @@ test('ppt fix_html escalates when the same slide is blocked again after a prior 
     }
 
     await new Promise((resolve) => setTimeout(resolve, 25));
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       ...blockedGate,
       ai_review: {
         weak_pages: ['S06'],
         review_summary: 'S06 在上一轮 fix_html 后仍然阻塞。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const secondRestoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,require_mechanical_feedback,require_repeat_block_escalation',
@@ -378,23 +356,15 @@ test('ppt fix_html targets slides blocked only by mechanical screenshot checks',
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'visual_director_review', {
       status: 'pass',
       visual_director_review: {
         weak_pages: [],
         review_summary: '导演层通过，本轮只剩机械层的遮挡与密度问题。',
         rewrite_action: 'none',
       },
-    }, null, 2), 'utf-8');
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    });
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       status: 'block',
       checks: {
         ai_review_passed: true,
@@ -428,7 +398,7 @@ test('ppt fix_html targets slides blocked only by mechanical screenshot checks',
         weak_pages: [],
         review_summary: '当前只需要对机械失败页做定点返修。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
@@ -462,23 +432,15 @@ test('ppt fix_html ignores AI-passed mechanical false positives when another sli
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'visual_director_review', {
       status: 'pass',
       visual_director_review: {
         weak_pages: [],
         review_summary: '导演层通过，本轮只剩一个真实阻断页。',
         rewrite_action: 'none',
       },
-    }, null, 2), 'utf-8');
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    });
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       status: 'block',
       checks: {
         ai_review_passed: false,
@@ -513,7 +475,7 @@ test('ppt fix_html ignores AI-passed mechanical false positives when another sli
         weak_pages: [],
         review_summary: '当前只有 S05 阻断；S06 是 AI 通过的机械提示页，不应进入重画目标。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
@@ -547,23 +509,15 @@ test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak page
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    writeFileSync(path.join(artifactsDir, 'director_review.json'), JSON.stringify({
+    writeRouteStageArtifact(workspaceRoot, 'visual_director_review', {
       status: 'pass',
       visual_director_review: {
         weak_pages: ['S08'],
         review_summary: 'S08 还是本批最弱的通过页，但不挡导出。',
         rewrite_action: 'revise_render_html',
       },
-    }, null, 2), 'utf-8');
-    writeFileSync(path.join(artifactsDir, 'quality_gate.json'), JSON.stringify({
+    });
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       status: 'block',
       checks: {
         ai_review_passed: false,
@@ -584,7 +538,7 @@ test('ppt fix_html prioritizes screenshot-blocked slides over advisory weak page
         weak_pages: ['S05'],
         review_summary: '当前只有 S05 挡导出，S08 只是弱通过页。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
@@ -618,16 +572,7 @@ test('ppt screenshot_review incrementally reviews only freshly fixed slides and 
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    const priorQualityGateFile = path.join(artifactsDir, 'quality_gate.json');
-    const priorQualityGate = readJson(priorQualityGateFile);
+    const priorQualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
     const priorS01Screenshot = priorQualityGate.slide_reviews.find((slide) => slide.slide_id === 'S01')?.screenshot_file;
     const blockedQualityGate = {
       ...priorQualityGate,
@@ -658,7 +603,7 @@ test('ppt screenshot_review incrementally reviews only freshly fixed slides and 
         review_summary: '当前只有 S05 需要 fix_html 后复核。',
       },
     };
-    writeFileSync(priorQualityGateFile, JSON.stringify(blockedQualityGate, null, 2), 'utf-8');
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', blockedQualityGate);
 
     const restoreRenderVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',

@@ -40,6 +40,24 @@ function targetedHtmlRevisionSlideIds(renderArtifact: JsonRecord | null | undefi
   ]);
 }
 
+function hasCurrentScreenshotReviewMechanicalShape(priorReviewArtifact: JsonRecord | null | undefined): boolean {
+  const slideReviews = safeArray(priorReviewArtifact?.slide_reviews);
+  if (slideReviews.length === 0) return false;
+  if (typeof priorReviewArtifact?.checks?.page_number_consistency_ok !== 'boolean') return false;
+  return slideReviews.every((rawSlide) => {
+    const slide = rawSlide as JsonRecord;
+    const checks = slide.checks as JsonRecord | undefined;
+    const metrics = slide.metrics as JsonRecord | undefined;
+    const pageNumberAudit = metrics?.page_number_audit;
+    return (
+      typeof checks?.page_number_consistency_ok === 'boolean'
+      && pageNumberAudit !== null
+      && typeof pageNumberAudit === 'object'
+      && !Array.isArray(pageNumberAudit)
+    );
+  });
+}
+
 export function collectIncrementalDirectorReviewTargetSlideIds({
   renderArtifact,
   priorReviewArtifact,
@@ -58,12 +76,11 @@ export function collectIncrementalScreenshotReviewTargetSlideIds({
   priorReviewArtifact,
   pageFixRoute,
 }: IncrementalScreenshotReviewTargetInput): string[] {
+  if (!hasCurrentScreenshotReviewMechanicalShape(priorReviewArtifact)) return [];
   if (safeText(renderArtifact?.route) === 'repair_pptx_native') {
-    if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
     return nativePptRepairTargetSlideIds(renderArtifact);
   }
   if (safeText(renderArtifact?.route) !== safeText(pageFixRoute)) return [];
   if (safeText(renderArtifact?.render_execution?.mode) !== 'targeted_revision_only') return [];
-  if (safeArray(priorReviewArtifact?.slide_reviews).length === 0) return [];
   return targetedHtmlRevisionSlideIds(renderArtifact);
 }

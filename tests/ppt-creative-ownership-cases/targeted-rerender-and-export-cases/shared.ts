@@ -3,8 +3,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
+import {
+  canonicalStageForRoute,
+  getDeliverablePaths,
+  readStageFolderArtifact,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from '@redcube/runtime-protocol';
 import {
   createDeliverable,
 } from '@redcube/domain-entry';
@@ -16,6 +23,123 @@ import {
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function writeJson(file, data) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+}
+
+let stageFixtureWriteCounter = 0;
+
+function nextStageFixtureAttemptId(routeStageId, label) {
+  stageFixtureWriteCounter += 1;
+  return [
+    Date.now(),
+    String(stageFixtureWriteCounter).padStart(6, '0'),
+    label,
+    routeStageId,
+  ].join('-');
+}
+
+function relocatePreparedArtifact(value, fromWorkspaceRoot, toWorkspaceRoot) {
+  if (typeof value === 'string') {
+    return value.includes(fromWorkspaceRoot)
+      ? value.split(fromWorkspaceRoot).join(toWorkspaceRoot)
+      : value;
+  }
+  if (Array.isArray(value)) {
+    return value.map((item) => relocatePreparedArtifact(item, fromWorkspaceRoot, toWorkspaceRoot));
+  }
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        relocatePreparedArtifact(item, fromWorkspaceRoot, toWorkspaceRoot),
+      ]),
+    );
+  }
+  return value;
+}
+
+function relocateWorkspaceJsonSidecars(rootDir, fromWorkspaceRoot, toWorkspaceRoot) {
+  for (const entry of readdirSync(rootDir, { withFileTypes: true })) {
+    const file = path.join(rootDir, entry.name);
+    if (entry.isDirectory()) {
+      relocateWorkspaceJsonSidecars(file, fromWorkspaceRoot, toWorkspaceRoot);
+      continue;
+    }
+    if (!entry.isFile() || !entry.name.endsWith('.json')) continue;
+    const content = readFileSync(file, 'utf-8');
+    if (!content.includes(fromWorkspaceRoot)) continue;
+    writeFileSync(file, content.split(fromWorkspaceRoot).join(toWorkspaceRoot), 'utf-8');
+  }
+}
+
+function writeLatestCapturePointer(workspaceRoot, topicId, deliverableId, artifact) {
+  if (!artifact?.review_capture) return;
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const captureId = String(artifact.review_capture.capture_id || '').trim();
+  const reviewMarkdownFile = String(artifact.review_capture.review_markdown_file || '').trim();
+  if (!captureId || !reviewMarkdownFile) return;
+  writeJson(path.join(deliverablePaths.reportsDir, 'screenshots', 'latest-capture.json'), {
+    capture_id: captureId,
+    review_markdown_file: reviewMarkdownFile,
+    slide_count: Array.isArray(artifact.slide_reviews) ? artifact.slide_reviews.length : 0,
+  });
+}
+
+function readRouteStageArtifact(workspaceRoot, routeStageId, topicId = 'topic-a', deliverableId = 'deck-a') {
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const loaded = readStageFolderArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+  });
+  assert.equal(Boolean(loaded?.artifact), true, routeStageId);
+  return loaded.artifact;
+}
+
+function writeRouteStageArtifact(
+  workspaceRoot,
+  routeStageId,
+  artifact,
+  topicId = 'topic-a',
+  deliverableId = 'deck-a',
+  label = 'manual',
+) {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const canonicalStageId = canonicalStageForRoute(routeStageId);
+  const artifactFile = path.join(
+    deliverablePaths.deliverableDir,
+    'stage-test-inputs',
+    `${routeStageId}.${label}-artifact.json`,
+  );
+  writeJson(artifactFile, artifact);
+  const written = writeStageFolderArtifact({
+    deliverablePaths,
+    programId: deliverablePaths.programId,
+    topicId,
+    deliverableId,
+    routeStageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId: nextStageFixtureAttemptId(routeStageId, label),
+    artifactFile,
+    outputName: `${routeStageId}.json`,
+    ownerReceiptRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? []
+      : [`rca-owner-receipt:test:${routeStageId}:${deliverableId}`],
+    typedBlockerRefs: artifact?.status === 'block' || artifact?.status === 'failed'
+      ? [`rca-typed-blocker:test:${routeStageId}:${deliverableId}`]
+      : [],
+    blockingReasons: artifact?.blocking_reasons || artifact?.review_state_patch?.blocking_reasons || [],
+  });
+  if (routeStageId === 'screenshot_review') {
+    writeLatestCapturePointer(workspaceRoot, topicId, deliverableId, artifact);
+  }
+  return written.output_file;
 }
 
 const DEFAULT_PPT_CREATIVE_METADATA = {
@@ -90,7 +214,7 @@ async function getPreparedPptWorkspaceSnapshot({
         workspaceRoot,
         routeArtifacts: routeResults.map(({ route, result }) => ({
           route,
-          artifactRelativePath: path.relative(workspaceRoot, result.artifactFile),
+          artifact: readJson(result.artifactFile),
         })),
       };
     })());
@@ -120,15 +244,27 @@ async function clonePreparedPptWorkspace({
     'workspace',
   );
   cpSync(prepared.workspaceRoot, workspaceRoot, { recursive: true });
+  relocateWorkspaceJsonSidecars(workspaceRoot, prepared.workspaceRoot, workspaceRoot);
   return {
     workspaceRoot,
-    routeResults: prepared.routeArtifacts.map(({ route, artifactRelativePath }) => ({
-      route,
-      result: {
-        ok: true,
-        artifactFile: path.join(workspaceRoot, artifactRelativePath),
-      },
-    })),
+    routeResults: prepared.routeArtifacts.map(({ route, artifact }) => {
+      const relocatedArtifact = relocatePreparedArtifact(artifact, prepared.workspaceRoot, workspaceRoot);
+      return {
+        route,
+        result: {
+          ok: true,
+          artifact: relocatedArtifact,
+          artifactFile: writeRouteStageArtifact(
+            workspaceRoot,
+            route,
+            relocatedArtifact,
+            topicId || DEFAULT_PPT_CREATIVE_METADATA.topicId,
+            deliverableId || DEFAULT_PPT_CREATIVE_METADATA.deliverableId,
+            'prepared-clone',
+          ),
+        },
+      };
+    }),
   };
 }
 
@@ -169,9 +305,12 @@ export {
   path,
   readFileSync,
   readJson,
+  readRouteStageArtifact,
   runDeliverableRoute,
   test,
   withEnv,
   withMockCodexRuntime,
   writeFileSync,
+  writeJson,
+  writeRouteStageArtifact,
 };

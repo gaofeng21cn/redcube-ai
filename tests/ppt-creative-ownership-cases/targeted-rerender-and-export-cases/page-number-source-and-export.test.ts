@@ -1,44 +1,33 @@
 // @ts-nocheck
 import {
-  PPT_ROUTES_TO_RENDER_HTML,
   PPT_ROUTES_TO_SCREENSHOT_REVIEW,
   assert,
   clonePreparedPptWorkspace,
   createDeliverable,
   existsSync,
-  getPptDeliverableSurfacePaths,
-  mkdirSync,
   mkdtempSync,
   os,
   path,
   readJson,
+  readRouteStageArtifact,
   runDeliverableRoute,
   test,
   withEnv,
   withMockCodexRuntime,
-  writeFileSync,
+  writeRouteStageArtifact,
 } from './shared.ts';
 
-test('ppt screenshot_review backfills page number consistency for legacy incremental prior reviews', async () => {
+test('ppt screenshot_review rejects stale prior mechanical shape before incremental reuse', async () => {
   await withMockCodexRuntime(async () => {
     const { workspaceRoot, routeResults } = await clonePreparedPptWorkspace({
-      clonePrefix: 'redcube-ppt-incremental-legacy-page-number-review-',
+      clonePrefix: 'redcube-ppt-stale-prior-page-number-review-',
       routes: PPT_ROUTES_TO_SCREENSHOT_REVIEW,
     });
     for (const { route, result } of routeResults) {
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    const priorQualityGateFile = path.join(artifactsDir, 'quality_gate.json');
-    const priorQualityGate = readJson(priorQualityGateFile);
+    const priorQualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
     const blockedQualityGate = {
       ...priorQualityGate,
       status: 'block',
@@ -48,7 +37,7 @@ test('ppt screenshot_review backfills page number consistency for legacy increme
         block_content_fit_ok: false,
       },
       slide_reviews: priorQualityGate.slide_reviews.map((slide) => {
-        const legacySlide = {
+        const staleSlide = {
           ...slide,
           checks: {
             ...slide.checks,
@@ -57,11 +46,11 @@ test('ppt screenshot_review backfills page number consistency for legacy increme
             ...slide.metrics,
           },
         };
-        delete legacySlide.checks.page_number_consistency_ok;
-        delete legacySlide.metrics.page_number_audit;
-        if (slide.slide_id !== 'S05') return legacySlide;
+        delete staleSlide.checks.page_number_consistency_ok;
+        delete staleSlide.metrics.page_number_audit;
+        if (slide.slide_id !== 'S05') return staleSlide;
         return {
-          ...legacySlide,
+          ...staleSlide,
           status: 'block',
           issues: ['ai_visual_risk'],
           mechanical_issues: ['block_content_overflow_detected'],
@@ -79,7 +68,7 @@ test('ppt screenshot_review backfills page number consistency for legacy increme
       },
     };
     delete blockedQualityGate.checks.page_number_consistency_ok;
-    writeFileSync(priorQualityGateFile, JSON.stringify(blockedQualityGate, null, 2), 'utf-8');
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', blockedQualityGate);
 
     const restoreRenderVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
@@ -94,41 +83,18 @@ test('ppt screenshot_review backfills page number consistency for legacy increme
       });
       assert.equal(fixResult.ok, true);
       assert.deepEqual(fixResult.artifact?.render_execution?.freshly_rendered_slide_ids, ['S05']);
-    } finally {
-      restoreRenderVariant();
-    }
-
-    const directorReview = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'visual_director_review',
-    });
-    assert.equal(directorReview.ok, true);
-
-    const restoreScreenshotVariant = withEnv({
-      REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'require_page_local_review,require_source_html',
-      REDCUBE_MOCK_PPT_SCREENSHOT_EXPECTED_SLIDE_IDS: 'S05',
-    });
-    try {
-      const reviewed = await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route: 'screenshot_review',
-      });
-      assert.equal(reviewed.ok, true);
-      assert.equal(reviewed.artifact?.review_execution?.review_scope, 'incremental_page_review');
-      assert.deepEqual(reviewed.artifact?.review_execution?.reviewed_slide_ids, ['S05']);
-      assert.equal(reviewed.artifact?.checks?.page_number_consistency_ok, true);
+      const reviewed = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
+      assert.equal(reviewed.review_execution?.review_scope, 'full_deck_review');
+      assert.equal(reviewed.review_execution?.reviewed_slide_ids.includes('S01'), true);
+      assert.equal(reviewed.review_execution?.reviewed_slide_ids.includes('S05'), true);
+      assert.deepEqual(reviewed.review_execution?.reused_slide_ids, []);
+      assert.equal(reviewed.checks?.page_number_consistency_ok, true);
       assert.equal(
-        reviewed.artifact?.slide_reviews.every((slide) => slide.checks?.page_number_consistency_ok === true),
+        reviewed.slide_reviews.every((slide) => slide.checks?.page_number_consistency_ok === true),
         true,
       );
     } finally {
-      restoreScreenshotVariant();
+      restoreRenderVariant();
     }
   });
 });
@@ -143,17 +109,8 @@ test('ppt visual_director_review incrementally reviews only freshly fixed slides
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    const priorQualityGateFile = path.join(artifactsDir, 'quality_gate.json');
-    const priorQualityGate = readJson(priorQualityGateFile);
-    writeFileSync(priorQualityGateFile, JSON.stringify({
+    const priorQualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', {
       ...priorQualityGate,
       status: 'block',
       checks: {
@@ -181,7 +138,7 @@ test('ppt visual_director_review incrementally reviews only freshly fixed slides
         weak_pages: ['S05'],
         review_summary: '当前只有 S05 需要 fix_html 后复核。',
       },
-    }, null, 2), 'utf-8');
+    });
 
     const restoreRenderVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender',
@@ -233,16 +190,7 @@ test('ppt screenshot_review recalculates page number consistency after increment
       assert.equal(result.ok, true, route);
     }
 
-    const artifactsDir = path.join(
-      workspaceRoot,
-      'topics',
-      'topic-a',
-      'deliverables',
-      'deck-a',
-      'artifacts',
-    );
-    const priorQualityGateFile = path.join(artifactsDir, 'quality_gate.json');
-    const priorQualityGate = readJson(priorQualityGateFile);
+    const priorQualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
     const blockedQualityGate = {
       ...priorQualityGate,
       status: 'block',
@@ -272,7 +220,7 @@ test('ppt screenshot_review recalculates page number consistency after increment
         review_summary: '当前只有 S05 需要 fix_html 后复核。',
       },
     };
-    writeFileSync(priorQualityGateFile, JSON.stringify(blockedQualityGate, null, 2), 'utf-8');
+    writeRouteStageArtifact(workspaceRoot, 'screenshot_review', blockedQualityGate);
 
     const restoreRenderVariant = withEnv({
       REDCUBE_MOCK_PPT_RENDER_VARIANT: 'require_targeted_revision_rerender,drift_page_number_s05',
@@ -314,7 +262,7 @@ test('ppt screenshot_review recalculates page number consistency after increment
         route: 'screenshot_review',
       });
       assert.equal(reviewed.ok, false);
-      const qualityGate = readJson(priorQualityGateFile);
+      const qualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
       assert.equal(qualityGate.review_execution?.review_scope, 'incremental_page_review');
       assert.deepEqual(qualityGate.review_execution?.reviewed_slide_ids, ['S05']);
       assert.equal(qualityGate.checks?.page_number_consistency_ok, false);
@@ -375,7 +323,7 @@ test('ppt screenshot_review pass refreshes latest-capture pointer and export_ppt
     }
 
     const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a');
-    const qualityGate = readJson(path.join(deliverableDir, 'artifacts', 'quality_gate.json'));
+    const qualityGate = readRouteStageArtifact(workspaceRoot, 'screenshot_review');
     const latestCaptureFile = path.join(deliverableDir, 'reports', 'screenshots', 'latest-capture.json');
     const stableHtmlFile = path.join(deliverableDir, 'views', 'deck-a.html');
 
@@ -395,7 +343,6 @@ test('ppt screenshot_review pass refreshes latest-capture pointer and export_ppt
     });
     assert.equal(exportResult.ok, true);
 
-    const exportArtifact = readJson(path.join(deliverableDir, 'artifacts', 'publish_bundle.json'));
-    assert.equal(exportArtifact.export_bundle.source_html, stableHtmlFile);
+    assert.equal(exportResult.artifact?.export_bundle.source_html, stableHtmlFile);
   });
 });
