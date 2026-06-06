@@ -729,12 +729,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.deepEqual(
       surface.fresh_large_private_surface_scan.large_surface_readout.map((entry) => entry.classification),
       [
-        'visual_domain_profile_authority',
+        'contract_conformance_test_surface',
         'native_helper_implementation',
-        'native_helper_implementation',
-        'visual_artifact_creation_route',
-        'review_export_helper_authority',
-        'native_helper_implementation',
+        'native_helper_quality_metrics',
       ],
     );
     assert.deepEqual(surface.rca_visual_authority_allowlist, [

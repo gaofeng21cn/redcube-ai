@@ -7,36 +7,34 @@ fi
 
 lane="${1:-smoke}"
 
-node --experimental-strip-types scripts/line-budget.ts
+case "$lane" in
+  line-budget-strict|structure-strict)
+    npm run --silent line-budget:strict
+    ;;
+  *)
+    npm run --silent line-budget
+    ;;
+esac
+
 scripts/repo-hygiene.sh --fix
 scripts/repo-hygiene.sh
 
 case "$lane" in
   smoke)
-    npm run test:line-budget
     npm run test:smoke
     ;;
   fast)
-    npm run test:line-budget
     npm run test:fast
     ;;
   ci)
-    npm run test:line-budget
     npm run test:ci
     ;;
-  line-budget)
-    npm run test:line-budget
-    ;;
-  line-budget-strict)
-    npm run test:line-budget:strict
-    npm run line-budget:strict
+  line-budget|line-budget-strict)
     ;;
   structure)
-    npm run test:line-budget
     scripts/run-structural-quality-gate.sh
     ;;
   structure-strict)
-    npm run test:line-budget:strict
     OPL_LINE_BUDGET_STRICT=1 scripts/run-structural-quality-gate.sh --strict
     ;;
   meta)

@@ -25,7 +25,18 @@ test('RCA privatized functional audit source shape is landed across runtime cont
   ];
 
   for (const surface of surfaces) {
-    assert.equal(surface.fresh_large_private_surface_scan.scan_date, '2026-05-25');
+    const scan = surface.fresh_large_private_surface_scan;
+
+    assert.equal(scan.scan_date, '2026-06-06');
+    assert.equal(scan.authoritative_gate_entrypoint, 'scripts/line-budget.ts');
+    assert.deepEqual(scan.retired_duplicate_gate_entrypoints, ['scripts/check-line-budget.ts']);
+    assert.equal(scan.current_clean_truth.authoritative_line_budget_gate_count, 1);
+    assert.equal(scan.current_clean_truth.duplicate_check_line_budget_retired, true);
+    assert.deepEqual(scan.current_clean_truth.reviewed_baseline_ratchet, {
+      'python/redcube_ai/native_helpers/ppt_deck/native_layouts.py': 1082,
+      'python/redcube_ai/native_helpers/ppt_deck/native_quality.py': 1032,
+      'tests/opl-family-contract-adoption.test.ts': 1116,
+    });
     assert.equal(surface.bridge_exit_gate.source_shape_status, 'landed');
     assert.equal(surface.bridge_exit_gate.functional_structure_gap_count, 0);
     assert.deepEqual(surface.bridge_exit_gate.remaining_bridge_module_ids, []);

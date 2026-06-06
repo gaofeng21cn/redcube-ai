@@ -155,7 +155,7 @@ function buildCanonicalPack() {
     productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
-  const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
+  const functionalAudit = { ...buildPrivatizedFunctionalModuleAuditProjection(), fresh_large_private_surface_scan: readJson('contracts/functional_privatization_audit.json').fresh_large_private_surface_scan };
   const generatedSurfaceIds = [
     ...oplCanonicalGeneratedSurfaceIds,
     ...wrapperDescriptorScopeIds,

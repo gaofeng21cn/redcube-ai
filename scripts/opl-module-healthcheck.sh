@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-npm run test:line-budget
+npm run --silent line-budget
 npm run --silent build
 
 NODE_NO_WARNINGS=1 node --experimental-strip-types --test \

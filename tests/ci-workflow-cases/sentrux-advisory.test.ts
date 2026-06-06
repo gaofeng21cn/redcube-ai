@@ -26,11 +26,28 @@ test('Sentrux advisory publishes OPL quality details without changing the defaul
   assert.match(workflow, /path:\s*artifacts\/opl-quality-details\/quality-details\.json\b/);
 
   const verify = readRepoFile('scripts/verify.sh');
-  assert.match(verify, /smoke\)\n\s+npm run test:line-budget\n\s+npm run test:smoke/);
-  assert.match(verify, /fast\)\n\s+npm run test:line-budget\n\s+npm run test:fast/);
-  assert.match(verify, /ci\)\n\s+npm run test:line-budget\n\s+npm run test:ci/);
-  assert.match(verify, /structure\)\n\s+npm run test:line-budget\n\s+scripts\/run-structural-quality-gate\.sh/);
-  assert.match(verify, /structure-strict\)\n\s+npm run test:line-budget:strict\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
+  const verifyLines = verify.split('\n').map((line) => line.trim());
+  const preflightCaseStart = verifyLines.indexOf('case "$lane" in');
+  assert.notEqual(preflightCaseStart, -1);
+  assert.deepEqual(verifyLines.slice(preflightCaseStart, preflightCaseStart + 9), [
+    'case "$lane" in',
+    'line-budget-strict|structure-strict)',
+    'npm run --silent line-budget:strict',
+    ';;',
+    '*)',
+    'npm run --silent line-budget',
+    ';;',
+    'esac',
+    '',
+  ]);
+  assert.ok(preflightCaseStart < verifyLines.indexOf('scripts/repo-hygiene.sh --fix'));
+  assert.match(verify, /smoke\)\n\s+npm run test:smoke/);
+  assert.match(verify, /fast\)\n\s+npm run test:fast/);
+  assert.match(verify, /ci\)\n\s+npm run test:ci/);
+  assert.match(verify, /line-budget\|line-budget-strict\)\n\s+;;/);
+  assert.match(verify, /structure\)\n\s+scripts\/run-structural-quality-gate\.sh/);
+  assert.match(verify, /structure-strict\)\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
+  assert.doesNotMatch(verify, /test:line-budget/);
   assert.doesNotMatch(verify, /quality details|sentrux-advisory|opl-quality-details/);
 
   const structuralGate = readRepoFile('scripts/run-structural-quality-gate.sh');

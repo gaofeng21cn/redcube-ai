@@ -78,24 +78,33 @@ test('package scripts expose advisory default and explicit strict line budget en
 
   assert.equal(packageJson.scripts['line-budget'], 'node --experimental-strip-types scripts/line-budget.ts');
   assert.equal(packageJson.scripts['line-budget:strict'], 'node --experimental-strip-types scripts/line-budget.ts --strict');
-  assert.equal(packageJson.scripts['test:line-budget'], 'node --experimental-strip-types scripts/check-line-budget.ts');
-  assert.equal(packageJson.scripts['test:line-budget:strict'], 'node --experimental-strip-types scripts/check-line-budget.ts --strict');
+  assert.equal(packageJson.scripts['test:line-budget'], 'npm run --silent line-budget');
+  assert.equal(packageJson.scripts['test:line-budget:strict'], 'npm run --silent line-budget:strict');
   assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
 });
 
-test('verify runs advisory line budget before lane dispatch and keeps explicit strict lanes', () => {
-  const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
+test('retired check-line-budget script does not remain as a second gate implementation', () => {
+  assert.equal(fs.existsSync(path.join(repoRoot, 'scripts/check-line-budget.ts')), false);
+});
 
-  assert.match(verifyScript, /node --experimental-strip-types scripts\/line-budget\.ts/);
-  assert.ok(verifyScript.indexOf('node --experimental-strip-types scripts/line-budget.ts') < verifyScript.indexOf('case "$lane" in'));
-  assert.match(verifyScript, /line-budget-strict\)\n\s+npm run test:line-budget:strict\n\s+npm run line-budget:strict/);
-  assert.match(verifyScript, /structure-strict\)\n\s+npm run test:line-budget:strict\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
+test('verify runs exactly one line budget gate before lane dispatch and keeps explicit strict lanes', () => {
+  const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
+  const verifyLines = verifyScript.split('\n').map((line) => line.trim());
+
+  assert.equal(verifyLines.filter((line) => line === 'npm run --silent line-budget').length, 1);
+  assert.equal(verifyLines.filter((line) => line === 'npm run --silent line-budget:strict').length, 1);
+  assert.ok(
+    verifyScript.indexOf('npm run --silent line-budget') < verifyScript.indexOf('scripts/repo-hygiene.sh --fix'),
+  );
+  assert.match(verifyScript, /line-budget\|line-budget-strict\)\n\s+;;/);
+  assert.match(verifyScript, /structure-strict\)\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
+  assert.doesNotMatch(verifyScript, /test:line-budget/);
 });
 
 test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy fast lane', () => {
   const healthcheck = fs.readFileSync(path.join(repoRoot, 'scripts/opl-module-healthcheck.sh'), 'utf8');
 
-  assert.match(healthcheck, /npm run test:line-budget/);
+  assert.match(healthcheck, /npm run --silent line-budget/);
   assert.match(healthcheck, /npm run --silent build/);
   assert.match(healthcheck, /tests\/product-entry\.test\.ts/);
   assert.match(healthcheck, /tests\/product-entry-runtime-manager-registration\.test\.ts/);
