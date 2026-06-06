@@ -286,7 +286,7 @@ OPL-hosted path 应提供：
 2. 定义 stage sequence、route policy、prompt refs、skill refs 和 knowledge refs。
 3. 实现或复用 TypeScript orchestration 与 Python native helper。
 4. 把 artifact locator、review state、export bundle、receipt schema、visual policies 和 authority function manifest 接到 product-entry manifest / OPL pack compiler 输入。
-5. 跑 direct product-entry proof、OPL-hosted handoff proof、review/export proof、no-forbidden-write proof、transition fixture proof 和 line-budget / test lane。
+5. 跑 direct product-entry proof、OPL-hosted handoff proof、review/export proof、no-forbidden-write proof、transition fixture proof 和 line-budget / test lane；line budget 默认 advisory，daily / strict maintenance 才使用 explicit strict lane 作为 hard enforcement。
 6. 让用户通过 direct skill 或 OPL-hosted path 进入同一 deliverable loop。
 
 维护者不应重复实现：

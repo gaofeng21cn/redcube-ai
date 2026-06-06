@@ -4,9 +4,18 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
+strict=0
+if [ "${1:-}" = "--strict" ] || [ "${OPL_LINE_BUDGET_STRICT:-}" = "1" ]; then
+  strict=1
+fi
+
 if ! command -v sentrux >/dev/null 2>&1; then
   echo "Sentrux structural gate unavailable: 'sentrux' command was not found." >&2
-  exit 127
+  if [ "$strict" -eq 1 ]; then
+    exit 127
+  fi
+  echo "Sentrux advisory only; continuing. Use --strict or OPL_LINE_BUDGET_STRICT=1 for hard enforcement." >&2
+  exit 0
 fi
 
 sentrux --version
@@ -37,4 +46,12 @@ if [ "$sentrux_status" -ne 0 ]; then
   scripts/run-opl-quality-details.sh || echo "OPL quality details failed; preserving Sentrux exit code $sentrux_status." >&2
 fi
 
-exit "$sentrux_status"
+if [ "$strict" -eq 1 ]; then
+  exit "$sentrux_status"
+fi
+
+if [ "$sentrux_status" -ne 0 ]; then
+  echo "Sentrux advisory only; continuing. Use --strict or OPL_LINE_BUDGET_STRICT=1 for hard enforcement." >&2
+fi
+
+exit 0

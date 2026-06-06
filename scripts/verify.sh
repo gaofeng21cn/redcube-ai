@@ -27,9 +27,17 @@ case "$lane" in
   line-budget)
     npm run test:line-budget
     ;;
+  line-budget-strict)
+    npm run test:line-budget:strict
+    npm run line-budget:strict
+    ;;
   structure)
     npm run test:line-budget
     scripts/run-structural-quality-gate.sh
+    ;;
+  structure-strict)
+    npm run test:line-budget:strict
+    OPL_LINE_BUDGET_STRICT=1 scripts/run-structural-quality-gate.sh --strict
     ;;
   meta)
     npm run test:meta
@@ -60,7 +68,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|ci|line-budget|structure|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining|full-with-historical]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|ci|line-budget|line-budget-strict|structure|structure-strict|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining|full-with-historical]" >&2
     exit 1
     ;;
 esac

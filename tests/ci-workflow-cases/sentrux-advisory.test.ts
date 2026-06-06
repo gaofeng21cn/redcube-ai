@@ -30,13 +30,18 @@ test('Sentrux advisory publishes OPL quality details without changing the defaul
   assert.match(verify, /fast\)\n\s+npm run test:line-budget\n\s+npm run test:fast/);
   assert.match(verify, /ci\)\n\s+npm run test:line-budget\n\s+npm run test:ci/);
   assert.match(verify, /structure\)\n\s+npm run test:line-budget\n\s+scripts\/run-structural-quality-gate\.sh/);
+  assert.match(verify, /structure-strict\)\n\s+npm run test:line-budget:strict\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
   assert.doesNotMatch(verify, /quality details|sentrux-advisory|opl-quality-details/);
 
   const structuralGate = readRepoFile('scripts/run-structural-quality-gate.sh');
+  assert.match(structuralGate, /strict=0/);
+  assert.match(structuralGate, /OPL_LINE_BUDGET_STRICT/);
   assert.match(structuralGate, /\bsentrux gate \./);
   assert.match(structuralGate, /\bsentrux check \./);
   assert.match(structuralGate, /scripts\/run-opl-quality-details\.sh/);
   assert.match(structuralGate, /exit "\$sentrux_status"/);
+  assert.match(structuralGate, /Sentrux advisory only; continuing/);
+  assert.match(structuralGate, /exit 0/);
 
   const qualityDetails = readRepoFile('scripts/run-opl-quality-details.sh');
   assert.match(qualityDetails, /compare_ref="\$\{OPL_QUALITY_DETAILS_COMPARE_REF:-origin\/main\}"/);

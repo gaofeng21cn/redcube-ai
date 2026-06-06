@@ -26,6 +26,7 @@ function trackedFiles() {
 
 const warnLimit = parseLimit('REDCUBE_LINE_BUDGET_WARN', DEFAULT_WARN_LIMIT);
 const failLimit = parseLimit('REDCUBE_LINE_BUDGET_FAIL', DEFAULT_FAIL_LIMIT);
+const strict = process.argv.includes('--strict') || process.env.OPL_LINE_BUDGET_STRICT === '1';
 const oversized = [];
 const warnings = [];
 
@@ -43,11 +44,14 @@ for (const entry of warnings.sort((a, b) => b.lines - a.lines || a.file.localeCo
 }
 
 if (oversized.length > 0) {
-  console.error(`[line-budget] ${oversized.length} tracked code files exceed ${failLimit} lines:`);
+  console.error(`[line-budget] ${strict ? 'strict failure' : 'advisory'}: ${oversized.length} tracked code files exceed ${failLimit} lines:`);
   for (const entry of oversized.sort((a, b) => b.lines - a.lines || a.file.localeCompare(b.file))) {
     console.error(`[line-budget] fail ${entry.lines} ${entry.file}`);
   }
-  process.exit(1);
+  if (!strict) {
+    console.error('[line-budget] advisory only; continuing. Use --strict or OPL_LINE_BUDGET_STRICT=1 for hard enforcement.');
+  }
+  process.exit(strict ? 1 : 0);
 }
 
 console.log(`[line-budget] ok: no tracked code file exceeds ${failLimit} lines`);

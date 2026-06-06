@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { BASELINE_ENTRIES, DEFAULT_LIMIT, countLines, evaluateLineBudget } from '../scripts/line-budget.ts';
+import { BASELINE_ENTRIES, DEFAULT_LIMIT, countLines, evaluateLineBudget, isStrictLineBudgetMode, lineBudgetExitCode } from '../scripts/line-budget.ts';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 
@@ -18,7 +18,7 @@ test('line budget list mode reports without blocking unresolved cleanup lanes', 
   assert.equal(result.stderr, '');
 });
 
-test('line budget check fails closed for new oversize, baseline growth, and stale baselines', () => {
+test('line budget check reports new oversize, baseline growth, and stale baselines', () => {
   const files = new Map(Object.entries({
     'src/grown.ts': makeLines(DEFAULT_LIMIT + 4),
     'src/new.ts': makeLines(DEFAULT_LIMIT + 1),
@@ -50,6 +50,16 @@ test('line budget check fails closed for new oversize, baseline growth, and stal
   assert.match(result.failures.join('\n'), /src\/deleted\.ts: stale line-budget baseline entry; remove it after deleting or renaming the file/);
 });
 
+test('line budget exits advisory by default and strict only when explicit', () => {
+  assert.equal(isStrictLineBudgetMode({ argv: ['node', 'scripts/line-budget.ts'], env: {} }), false);
+  assert.equal(isStrictLineBudgetMode({ argv: ['node', 'scripts/line-budget.ts', '--strict'], env: {} }), true);
+  assert.equal(isStrictLineBudgetMode({ argv: ['node', 'scripts/line-budget.ts'], env: { OPL_LINE_BUDGET_STRICT: '1' } }), true);
+
+  assert.equal(lineBudgetExitCode({ failures: ['src/new.ts: oversize'], strict: false }), 0);
+  assert.equal(lineBudgetExitCode({ failures: ['src/new.ts: oversize'], strict: true }), 1);
+  assert.equal(lineBudgetExitCode({ failures: [], strict: true }), 0);
+});
+
 test('default baseline does not retain files already within the line budget', () => {
   for (const relativePath of Object.keys(BASELINE_ENTRIES)) {
     const absolutePath = path.join(repoRoot, relativePath);
@@ -63,18 +73,23 @@ test('default baseline does not retain files already within the line budget', ()
   }
 });
 
-test('test:meta runs the line budget guard before meta tests', () => {
+test('package scripts expose advisory default and explicit strict line budget entries', () => {
   const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
 
   assert.equal(packageJson.scripts['line-budget'], 'node --experimental-strip-types scripts/line-budget.ts');
+  assert.equal(packageJson.scripts['line-budget:strict'], 'node --experimental-strip-types scripts/line-budget.ts --strict');
+  assert.equal(packageJson.scripts['test:line-budget'], 'node --experimental-strip-types scripts/check-line-budget.ts');
+  assert.equal(packageJson.scripts['test:line-budget:strict'], 'node --experimental-strip-types scripts/check-line-budget.ts --strict');
   assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
 });
 
-test('verify runs the line budget guard before lane dispatch', () => {
+test('verify runs advisory line budget before lane dispatch and keeps explicit strict lanes', () => {
   const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
 
   assert.match(verifyScript, /node --experimental-strip-types scripts\/line-budget\.ts/);
   assert.ok(verifyScript.indexOf('node --experimental-strip-types scripts/line-budget.ts') < verifyScript.indexOf('case "$lane" in'));
+  assert.match(verifyScript, /line-budget-strict\)\n\s+npm run test:line-budget:strict\n\s+npm run line-budget:strict/);
+  assert.match(verifyScript, /structure-strict\)\n\s+npm run test:line-budget:strict\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
 });
 
 test('OPL module healthcheck stays on product-entry smoke instead of proof-heavy fast lane', () => {

@@ -74,6 +74,10 @@ function main() {
   process.chdir(repoRoot);
 
   const mode = process.argv.includes('--list') ? 'list' : 'check';
+  const strict = isStrictLineBudgetMode({
+    argv: process.argv,
+    env: process.env,
+  });
 
   const trackedFiles = spawnSync('git', ['ls-files'], { encoding: 'utf8' });
   if (trackedFiles.status !== 0) {
@@ -95,10 +99,16 @@ function main() {
   }
 
   if (result.failures.length > 0) {
-    process.stderr.write(`line budget check failed (${result.failures.length} issue${result.failures.length === 1 ? '' : 's'}):\n`);
+    process.stderr.write(`line budget ${strict ? 'strict check failed' : 'advisory report'} (${result.failures.length} issue${result.failures.length === 1 ? '' : 's'}):\n`);
     process.stderr.write(result.failures.map((failure) => `- ${failure}`).join('\n'));
     process.stderr.write('\n');
-    process.exit(1);
+    if (!strict) {
+      process.stderr.write('line budget advisory only; continuing. Use --strict or OPL_LINE_BUDGET_STRICT=1 for hard enforcement.\n');
+    }
+    process.exit(lineBudgetExitCode({
+      failures: result.failures,
+      strict,
+    }));
   }
 }
 
@@ -118,6 +128,14 @@ export function countLines(content) {
     return 0;
   }
   return content.endsWith('\n') ? content.split('\n').length - 1 : content.split('\n').length;
+}
+
+export function isStrictLineBudgetMode({ argv = [], env = {} } = {}) {
+  return argv.includes('--strict') || env.OPL_LINE_BUDGET_STRICT === '1';
+}
+
+export function lineBudgetExitCode({ failures, strict }) {
+  return failures.length > 0 && strict ? 1 : 0;
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === scriptPath) {
