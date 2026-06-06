@@ -138,7 +138,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 - 不会自动安装。单独 clone 这个仓不会把 OPL Framework 或托管运行时一起装好。要把 RedCube 用到能用，先准备好当前的 `one-person-lab` checkout 或 release bundle，然后再用单一 `redcube-ai` 应用技能和仓内的 `redcube product invoke` 入口，或下面的 CLI 命令。
 - 先读 [文档索引](./docs/README.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
 - 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
-- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product domain_action_adapter / projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
+- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product domain_handler/projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
 - 当前已验证的公开入口面是单一 `redcube-ai` 应用技能、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与仓库跟踪合同，就构成了稳定可调用面。OPL/Temporal 托管调度是任务启动后的默认运行口径，本地默认具体 stage executor 仍是 `Codex CLI`，非默认 executor / proof adapter 继续只在显式选择时出现。
 - RedCube 可以通过 Codex 应用技能直接调用，也可以作为外部领域智能体被 OPL 托管调用。两条路径必须回到同一套 RedCube 持有的 route、review、artifact 和 export surface。
 - Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
