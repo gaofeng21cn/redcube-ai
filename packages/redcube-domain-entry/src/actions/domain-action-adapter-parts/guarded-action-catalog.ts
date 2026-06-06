@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
+export const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'emit_no_regression_evidence',
     effect: 'guarded_runtime_evidence_write',
@@ -114,14 +114,14 @@ export const SIDECAR_GUARDED_ACTIONS = Object.freeze([
   },
 ]);
 
-export const SIDECAR_FORBIDDEN_WRITES = Object.freeze([
+export const DOMAIN_ACTION_ADAPTER_FORBIDDEN_WRITES = Object.freeze([
   'visual_truth',
   'review_verdict',
   'publication_gate',
   'canonical_artifacts',
 ]);
 
-export const SIDECAR_BLOCKED_ACTIONS = Object.freeze([
+export const DOMAIN_ACTION_ADAPTER_BLOCKED_ACTIONS = Object.freeze([
   'write_visual_truth',
   'write_canonical_artifacts',
   'write_review_verdict',
@@ -131,11 +131,11 @@ export const SIDECAR_BLOCKED_ACTIONS = Object.freeze([
 ]);
 
 export function listDomainActionAdapterGuardedActions() {
-  return SIDECAR_GUARDED_ACTIONS.map((entry) => ({ ...entry }));
+  return DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS.map((entry) => ({ ...entry }));
 }
 
 export function listDomainActionAdapterGuardedActionIds() {
-  return SIDECAR_GUARDED_ACTIONS.map((entry) => entry.action);
+  return DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS.map((entry) => entry.action);
 }
 
 export function domainActionAdapterGuardedActionSet() {
@@ -143,9 +143,9 @@ export function domainActionAdapterGuardedActionSet() {
 }
 
 export function listDomainActionAdapterForbiddenWrites() {
-  return [...SIDECAR_FORBIDDEN_WRITES];
+  return [...DOMAIN_ACTION_ADAPTER_FORBIDDEN_WRITES];
 }
 
 export function listDomainActionAdapterBlockedActions() {
-  return [...SIDECAR_BLOCKED_ACTIONS];
+  return [...DOMAIN_ACTION_ADAPTER_BLOCKED_ACTIONS];
 }
