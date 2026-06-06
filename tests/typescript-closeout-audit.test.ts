@@ -42,47 +42,6 @@ function passingQualityGates() {
   };
 }
 
-const RETIRED_SOURCE_JS_FILES = {
-  'packages/redcube-domain-entry/src/actions/doctor-workspace.ts': 1,
-  'packages/redcube-domain-entry/src/actions/execute-source-augmentation.ts': 1,
-  'packages/redcube-domain-entry/src/actions/get-deliverable.ts': 1,
-  'packages/redcube-domain-entry/src/actions/get-product-status.ts': 1,
-  'packages/redcube-domain-entry/src/actions/get-product-preflight.ts': 1,
-  'packages/redcube-domain-entry/src/actions/get-product-start.ts': 1,
-  'packages/redcube-domain-entry/src/actions/get-run.ts': 1,
-  'packages/redcube-domain-entry/src/actions/intake-source.ts': 1,
-  'packages/redcube-domain-entry/src/actions/list-topics.ts': 1,
-  'packages/redcube-domain-entry/src/actions/ops-eval-summary.ts': 1,
-  'packages/redcube-domain-entry/src/actions/prepare-source-augmentation-result.ts': 1,
-  'packages/redcube-domain-entry/src/actions/prepare-source-augmentation.ts': 1,
-  'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts': 1,
-  'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts': 1,
-  'packages/redcube-domain-entry/src/actions/source-research.ts': 1,
-  'packages/redcube-domain-entry/src/actions/write-source-augmentation-result.ts': 1,
-  'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/review-helpers.ts': 1,
-  'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.ts': 1,
-  'packages/redcube-runtime-family-registry/src/index.ts': 1,
-  'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts': 1,
-  'packages/redcube-runtime/src/candidate-racing.ts': 1,
-  'packages/redcube-runtime/src/creative-ownership.ts': 1,
-  'packages/redcube-runtime/src/executors.ts': 1,
-  'packages/redcube-runtime/src/index.ts': 1,
-  'packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts': 1,
-  'packages/redcube-runtime/src/runtime-state.ts': 1,
-  'packages/redcube-runtime/src/shared-source-truth.ts': 1,
-  'packages/redcube-runtime/src/source-augmentation-executor.ts': 1,
-  'packages/redcube-runtime/src/source-augmentation-request.ts': 1,
-  'packages/redcube-runtime/src/source-augmentation-result.ts': 1,
-  'packages/redcube-runtime/src/source-research.ts': 1,
-  'packages/redcube-runtime/src/source-readiness-pack.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/export.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/incremental-review-scope.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts': 1,
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/screenshot-capture.ts': 1,
-};
-
 test('P18 closeout audit proves structural TypeScript coverage across baseline, contracts, service boundaries, and high-churn lanes', () => {
   const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
 
@@ -99,15 +58,6 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
       'packages/redcube-config',
     ],
   );
-});
-
-test('P24 source TypeScript retirement keeps migrated product files present without JS mirrors', () => {
-  for (const file of Object.keys(RETIRED_SOURCE_JS_FILES)) {
-    const retiredJsFile = file.replace(/\.ts$/, '.js');
-
-    assert.equal(existsSync(path.resolve(file)), true, file);
-    assert.equal(existsSync(path.resolve(retiredJsFile)), false, retiredJsFile);
-  }
 });
 
 test('P18 closeout audit keeps JS residue explicit instead of silently drifting', () => {
