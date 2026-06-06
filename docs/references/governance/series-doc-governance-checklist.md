@@ -8,7 +8,7 @@ Machine boundary: 人读治理清单。机器真相继续归各 repo 的 contrac
 ## 目标
 
 本清单用于把 `RedCube AI` 放进 OPL family 六仓统一文档管理口径里做巡检：`One Person Lab`、`One Person Lab App`、`Med Auto Science`、`Med Auto Grant`、`RedCube AI`、`OPL Meta Agent`。
-它服务跨仓 docs intake、回归与持续对齐，不替代核心五件套、`docs/active/**`、`docs/policies/**`、typed boundary audit 或 machine-readable contracts。
+它服务跨仓 docs intake、回归与持续对齐，不替代 [RCA 文档组合治理](../../docs_portfolio_consolidation.md)、核心五件套、`docs/active/**`、`docs/policies/**`、typed boundary audit 或 machine-readable contracts。
 
 ## 一、默认入口
 

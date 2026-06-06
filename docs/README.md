@@ -83,7 +83,8 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 
 ## 维护者治理入口
 
-- 维护者验证与文档治理统一留在 `docs/references/governance/series-doc-governance-checklist.md`。
+- 文档生命周期治理规则统一留在 [RCA 文档组合治理](./docs_portfolio_consolidation.md)。
+- `docs/references/governance/series-doc-governance-checklist.md` 只作为 OPL series 跨仓巡检支撑清单，不替代本文档索引、文档组合治理、核心五件套、active plan 或 machine contracts。
 - 不再服务当前 program baton 的历史与 provenance 审计放入 `docs/history/`；仍解释当前运行方式的材料留在 `docs/references/`。
 - 被 `human_doc:*` 语义 ID 引用的读者上下文保持语义稳定，物理文档按生命周期分层：当前计划在 `docs/active/`，support brief 在 `docs/references/`，absorbed / proof / historical positioning 材料在 `docs/history/`。
 - RCA 文档按内容生命周期维护。同一个文件可以只有部分内容仍属当前事实；当前事实合入 owner doc，active baton 留在 `docs/active/`，支撑说明进入 references，已完成或被替代的计划文本在链接审计后进入 history。

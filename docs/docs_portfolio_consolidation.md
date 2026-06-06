@@ -48,6 +48,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 
 - `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
 - [文档索引](./README.md) 现在持有 repo-tracked `README*` 与 `docs/**/*.md` 的路径组级 lifecycle role。该清单只做导航和归位，不替代核心五件套、contracts/source/tests 或 runtime evidence。
+- [系列项目文档治理清单](./references/governance/series-doc-governance-checklist.md) 只作为 OPL series 跨仓巡检支撑清单，不持有 RCA 文档生命周期治理规则、active completion plan 或 current truth。
 - `docs/references/opl-managed-runtime-three-layer-contract.md` 已迁入 `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
 - `docs/references/product-entry/` 承接已落地的 `redcube_product_entry_mvp`、`product_entry_session_continuity` 与 `opl_framework_hosted_product_entry` support brief；它们解释 contract surface，不承担 active plan。旧 `managed_product_entry_hardening` 只保留在 history tombstone。
 - `docs/delivery/real-route-evolution-probe.md` 已迁入 `docs/history/process/real-route-evolution-probe.md`。它保存 probe 命令、输出形状、历史样片根和效率读法；当前 delivery owner 只保留 family / route / proof / export support，不承担 dated probe ledger。
