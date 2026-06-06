@@ -27,22 +27,7 @@ Mock provider、mock Codex helper 和 deterministic fixture 只用于 route plum
 
 样片和证据实例必须落在真实 workspace / runtime artifact root，例如 `/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/` 或具体交付 workspace 下的 runtime-state / artifacts / reports / publish 目录；开发 checkout 只保存 contract、locator、index、schema、refs-only proof 和文档，不保存 PPTX/PDF/PNG 样片或运行证据实例。
 
-当前 native sample proof 只能关闭 native sample materialization / review / export proof lane、hub / connector regression 和 mock hard-count regression。它不声明 production visual-stage long soak、production readiness、domain ready、handoffable、visual ready 或全局完成。
-
-当前 live native sample evidence root：
-
-```text
-/Users/gaofeng/workspace/projects/redcube-ai/runtime-state/native-ai-first-live-20260529-v5/
-```
-
-关键 refs：
-
-- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pptx`
-- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native.pdf`
-- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/artifacts/native_ppt/deck-native-author_pptx_native-shape-manifest.json`
-- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/reports/native_ppt/deck-native-author_pptx_native-screenshots/slide-1.png`
-- `workspace/topics/topic-real-route-evolution/deliverables/deck-native/publish/artifact_gallery/index.json`
-- `agentlab-output/rca-ppt-three-route-agent-lab-suite.json`
+当前 native sample proof 只能关闭 native sample materialization / review / export proof lane、hub / connector regression 和 mock hard-count regression。它不声明 production visual-stage long soak、production readiness、domain ready、handoffable、visual ready 或全局完成。具体 dated evidence root、workspace refs、artifact refs 和 run/proof transcript 已折回 [RCA dated production evidence foldback](../history/process/2026-06-03-rca-dated-production-evidence-foldback.md) 与 [real-route evolution probe](../history/process/real-route-evolution-probe.md)；本文只保留当前 native route / proof environment 边界。
 
 AgentLab refs-only suite：
 
