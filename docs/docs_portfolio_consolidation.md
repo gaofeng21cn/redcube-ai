@@ -86,7 +86,7 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 - `managed`、`session`、`gateway`、`domain_action_adapter`、`runtime` 等历史词如果仍出现在 active docs，必须同时说明它是 semantic-id、refs-only adapter、domain handler target、retired guard 或 provenance，不得表达 RCA-owned generic runtime。
 - 长表只保留当前 owner、当前状态、证据门和下一步；dated proof、命令输出、旧分支名和 absorbed tranche 进入 `docs/history/**`。
 - 若历史文档中的规则仍 current，先抽取到核心五件套、active gap plan、policy/runtime/delivery/source owner、contract 或 source surface；不在历史文件中继续追加新状态。
-- Active plan 不保存下一轮 Agent prompt 模板。需要给未来执行者的 scope、验证命令、审计枚举和 closeout evidence 进入 `docs/history/process/**`；长期仍有效的部分折回本文、核心五件套、owner docs 或 machine contracts。
+- Active plan 不保存可直接复制的长 Agent prompt 模板或过程流水；它可以保存结构化下一轮 baton 字段，例如 write scope、non-goals、live truth inputs、required actions、verification commands、completion gate 和 foldback target。dated closeout、proof transcript、审计枚举和一次性 closeout evidence 进入 `docs/history/process/**`；长期仍有效的部分折回本文、核心五件套、owner docs 或 machine contracts。
 
 ## Coverage Ledger Foldback
 
