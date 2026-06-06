@@ -8,10 +8,7 @@ const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 
 export const DEFAULT_LIMIT = 1000;
-export const BASELINE_ENTRIES = {
-  'python/redcube_ai/native_helpers/ppt_deck/native_layouts.py': 1082,
-  'tests/opl-family-contract-adoption.test.ts': 1116,
-};
+export const BASELINE_ENTRIES = {};
 const CODE_EXTENSIONS = new Set(['.js', '.jsx', '.mjs', '.cjs', '.ts', '.tsx', '.mts', '.cts', '.py', '.sh', '.bash', '.zsh', '.rs', '.go']);
 const IGNORED_PARTS = new Set(['node_modules', 'dist', 'build', 'coverage', '.venv', '__pycache__']);
 const IGNORED_SUFFIXES = ['.min.js'];

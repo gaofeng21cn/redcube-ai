@@ -680,7 +680,7 @@
       "fresh_large_private_surface_scan": {
         "surface_kind": "rca_large_private_platform_surface_scan",
         "scan_date": "2026-06-06",
-        "scope": "tracked_repo_code_files_counted_by_canonical_scripts_line_budget_ts",
+        "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
         "line_count_thresholds": {
           "primary_attention_lines": 800,
           "preferred_source_limit_lines": 1000,
@@ -710,55 +710,18 @@
           "no_tracked_code_file_exceeds_1500_lines": true,
           "authoritative_line_budget_gate_count": 1,
           "duplicate_check_line_budget_retired": true,
-          "line_budget_baseline_only_tracks": [
-            "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-            "tests/opl-family-contract-adoption.test.ts"
-          ],
-          "reviewed_baseline_ratchet": {
-            "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py": 1082,
-            "tests/opl-family-contract-adoption.test.ts": 1116
-          },
+          "line_budget_baseline_only_tracks": [],
+          "reviewed_baseline_ratchet": {},
           "strict_gate_currently_passes": true,
           "no_obvious_safe_large_generic_control_plane_split_found": true,
           "functional_structure_gap_reopened": false
         },
-        "large_surface_readout": [
-          {
-            "path": "tests/opl-family-contract-adoption.test.ts",
-            "observed_lines": 1116,
-            "classification": "contract_conformance_test_surface",
-            "retained_authority": [
-              "opl_family_contract_adoption_conformance",
-              "stage_artifact_kernel_adoption_conformance"
-            ],
-            "migration_action": "retain as reviewed baseline while additional independent conformance slices move to focused test files"
-          },
-          {
-            "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-            "observed_lines": 1082,
-            "classification": "native_helper_implementation",
-            "retained_authority": [
-              "ppt_layout_materialization_helper",
-              "native_layout_shape_planning"
-            ],
-            "migration_action": "retain as domain native helper implementation; split only along natural layout materialization boundaries with native proof coverage"
-          },
-          {
-            "path": "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
-            "observed_lines": 1032,
-            "classification": "native_helper_quality_metrics",
-            "retained_authority": [
-              "ppt_native_quality_metrics",
-              "shape_manifest_quality_projection"
-            ],
-            "migration_action": "retain as reviewed baseline after ratchet to current count; future growth must split focused quality metric helpers first"
-          }
-        ],
+        "large_surface_readout": [],
         "high_risk_surfaces_not_migrated": [
-          "native PPT/Office helper implementation",
-          "native layout materialization helper body",
-          "native quality metric computation",
           "visual route truth and family profile policy",
+          "image-first artifact creation body",
+          "native PPT/Office helper implementation",
+          "screenshot/layout review helper behavior",
           "review/export verdict and blocked-item materialization"
         ],
         "generic_surfaces_for_opl_or_shared_runtime": [
@@ -4432,7 +4395,7 @@
         "fresh_large_private_surface_scan": {
           "surface_kind": "rca_large_private_platform_surface_scan",
           "scan_date": "2026-06-06",
-          "scope": "tracked_repo_code_files_counted_by_canonical_scripts_line_budget_ts",
+          "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
           "line_count_thresholds": {
             "primary_attention_lines": 800,
             "preferred_source_limit_lines": 1000,
@@ -4462,55 +4425,18 @@
             "no_tracked_code_file_exceeds_1500_lines": true,
             "authoritative_line_budget_gate_count": 1,
             "duplicate_check_line_budget_retired": true,
-            "line_budget_baseline_only_tracks": [
-              "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-              "tests/opl-family-contract-adoption.test.ts"
-            ],
-            "reviewed_baseline_ratchet": {
-              "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py": 1082,
-              "tests/opl-family-contract-adoption.test.ts": 1116
-            },
+            "line_budget_baseline_only_tracks": [],
+            "reviewed_baseline_ratchet": {},
             "strict_gate_currently_passes": true,
             "no_obvious_safe_large_generic_control_plane_split_found": true,
             "functional_structure_gap_reopened": false
           },
-          "large_surface_readout": [
-            {
-              "path": "tests/opl-family-contract-adoption.test.ts",
-              "observed_lines": 1116,
-              "classification": "contract_conformance_test_surface",
-              "retained_authority": [
-                "opl_family_contract_adoption_conformance",
-                "stage_artifact_kernel_adoption_conformance"
-              ],
-              "migration_action": "retain as reviewed baseline while additional independent conformance slices move to focused test files"
-            },
-            {
-              "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-              "observed_lines": 1082,
-              "classification": "native_helper_implementation",
-              "retained_authority": [
-                "ppt_layout_materialization_helper",
-                "native_layout_shape_planning"
-              ],
-              "migration_action": "retain as domain native helper implementation; split only along natural layout materialization boundaries with native proof coverage"
-            },
-            {
-              "path": "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
-              "observed_lines": 1032,
-              "classification": "native_helper_quality_metrics",
-              "retained_authority": [
-                "ppt_native_quality_metrics",
-                "shape_manifest_quality_projection"
-              ],
-              "migration_action": "retain as reviewed baseline after ratchet to current count; future growth must split focused quality metric helpers first"
-            }
-          ],
+          "large_surface_readout": [],
           "high_risk_surfaces_not_migrated": [
-            "native PPT/Office helper implementation",
-            "native layout materialization helper body",
-            "native quality metric computation",
             "visual route truth and family profile policy",
+            "image-first artifact creation body",
+            "native PPT/Office helper implementation",
+            "screenshot/layout review helper behavior",
             "review/export verdict and blocked-item materialization"
           ],
           "generic_surfaces_for_opl_or_shared_runtime": [
@@ -9089,7 +9015,7 @@
           "fresh_large_private_surface_scan": {
             "surface_kind": "rca_large_private_platform_surface_scan",
             "scan_date": "2026-06-06",
-            "scope": "tracked_repo_code_files_counted_by_canonical_scripts_line_budget_ts",
+            "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
             "line_count_thresholds": {
               "primary_attention_lines": 800,
               "preferred_source_limit_lines": 1000,
@@ -9119,55 +9045,18 @@
               "no_tracked_code_file_exceeds_1500_lines": true,
               "authoritative_line_budget_gate_count": 1,
               "duplicate_check_line_budget_retired": true,
-              "line_budget_baseline_only_tracks": [
-                "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-                "tests/opl-family-contract-adoption.test.ts"
-              ],
-              "reviewed_baseline_ratchet": {
-                "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py": 1082,
-                "tests/opl-family-contract-adoption.test.ts": 1116
-              },
+              "line_budget_baseline_only_tracks": [],
+              "reviewed_baseline_ratchet": {},
               "strict_gate_currently_passes": true,
               "no_obvious_safe_large_generic_control_plane_split_found": true,
               "functional_structure_gap_reopened": false
             },
-            "large_surface_readout": [
-              {
-                "path": "tests/opl-family-contract-adoption.test.ts",
-                "observed_lines": 1116,
-                "classification": "contract_conformance_test_surface",
-                "retained_authority": [
-                  "opl_family_contract_adoption_conformance",
-                  "stage_artifact_kernel_adoption_conformance"
-                ],
-                "migration_action": "retain as reviewed baseline while additional independent conformance slices move to focused test files"
-              },
-              {
-                "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-                "observed_lines": 1082,
-                "classification": "native_helper_implementation",
-                "retained_authority": [
-                  "ppt_layout_materialization_helper",
-                  "native_layout_shape_planning"
-                ],
-                "migration_action": "retain as domain native helper implementation; split only along natural layout materialization boundaries with native proof coverage"
-              },
-              {
-                "path": "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
-                "observed_lines": 1032,
-                "classification": "native_helper_quality_metrics",
-                "retained_authority": [
-                  "ppt_native_quality_metrics",
-                  "shape_manifest_quality_projection"
-                ],
-                "migration_action": "retain as reviewed baseline after ratchet to current count; future growth must split focused quality metric helpers first"
-              }
-            ],
+            "large_surface_readout": [],
             "high_risk_surfaces_not_migrated": [
-              "native PPT/Office helper implementation",
-              "native layout materialization helper body",
-              "native quality metric computation",
               "visual route truth and family profile policy",
+              "image-first artifact creation body",
+              "native PPT/Office helper implementation",
+              "screenshot/layout review helper behavior",
               "review/export verdict and blocked-item materialization"
             ],
             "generic_surfaces_for_opl_or_shared_runtime": [
@@ -13267,7 +13156,7 @@
       "fresh_large_private_surface_scan": {
         "surface_kind": "rca_large_private_platform_surface_scan",
         "scan_date": "2026-06-06",
-        "scope": "tracked_repo_code_files_counted_by_canonical_scripts_line_budget_ts",
+        "scope": "tracked_ts_js_python_cli_status_runtime_watch_workbench_product_entry_projection_locator_storage_attempt_ledger_state_machine_files",
         "line_count_thresholds": {
           "primary_attention_lines": 800,
           "preferred_source_limit_lines": 1000,
@@ -13297,55 +13186,18 @@
           "no_tracked_code_file_exceeds_1500_lines": true,
           "authoritative_line_budget_gate_count": 1,
           "duplicate_check_line_budget_retired": true,
-          "line_budget_baseline_only_tracks": [
-            "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-            "tests/opl-family-contract-adoption.test.ts"
-          ],
-          "reviewed_baseline_ratchet": {
-            "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py": 1082,
-            "tests/opl-family-contract-adoption.test.ts": 1116
-          },
+          "line_budget_baseline_only_tracks": [],
+          "reviewed_baseline_ratchet": {},
           "strict_gate_currently_passes": true,
           "no_obvious_safe_large_generic_control_plane_split_found": true,
           "functional_structure_gap_reopened": false
         },
-        "large_surface_readout": [
-          {
-            "path": "tests/opl-family-contract-adoption.test.ts",
-            "observed_lines": 1116,
-            "classification": "contract_conformance_test_surface",
-            "retained_authority": [
-              "opl_family_contract_adoption_conformance",
-              "stage_artifact_kernel_adoption_conformance"
-            ],
-            "migration_action": "retain as reviewed baseline while additional independent conformance slices move to focused test files"
-          },
-          {
-            "path": "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-            "observed_lines": 1082,
-            "classification": "native_helper_implementation",
-            "retained_authority": [
-              "ppt_layout_materialization_helper",
-              "native_layout_shape_planning"
-            ],
-            "migration_action": "retain as domain native helper implementation; split only along natural layout materialization boundaries with native proof coverage"
-          },
-          {
-            "path": "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
-            "observed_lines": 1032,
-            "classification": "native_helper_quality_metrics",
-            "retained_authority": [
-              "ppt_native_quality_metrics",
-              "shape_manifest_quality_projection"
-            ],
-            "migration_action": "retain as reviewed baseline after ratchet to current count; future growth must split focused quality metric helpers first"
-          }
-        ],
+        "large_surface_readout": [],
         "high_risk_surfaces_not_migrated": [
-          "native PPT/Office helper implementation",
-          "native layout materialization helper body",
-          "native quality metric computation",
           "visual route truth and family profile policy",
+          "image-first artifact creation body",
+          "native PPT/Office helper implementation",
+          "screenshot/layout review helper behavior",
           "review/export verdict and blocked-item materialization"
         ],
         "generic_surfaces_for_opl_or_shared_runtime": [

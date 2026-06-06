@@ -32,10 +32,7 @@ test('RCA privatized functional audit source shape is landed across runtime cont
     assert.deepEqual(scan.retired_duplicate_gate_entrypoints, ['scripts/check-line-budget.ts']);
     assert.equal(scan.current_clean_truth.authoritative_line_budget_gate_count, 1);
     assert.equal(scan.current_clean_truth.duplicate_check_line_budget_retired, true);
-    assert.deepEqual(scan.current_clean_truth.reviewed_baseline_ratchet, {
-      'python/redcube_ai/native_helpers/ppt_deck/native_layouts.py': 1082,
-      'tests/opl-family-contract-adoption.test.ts': 1116,
-    });
+    assert.deepEqual(scan.current_clean_truth.reviewed_baseline_ratchet, {});
     assert.equal(surface.bridge_exit_gate.source_shape_status, 'landed');
     assert.equal(surface.bridge_exit_gate.functional_structure_gap_count, 0);
     assert.deepEqual(surface.bridge_exit_gate.remaining_bridge_module_ids, []);
