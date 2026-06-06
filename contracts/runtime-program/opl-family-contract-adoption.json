@@ -1756,12 +1756,10 @@
         "duplicate_check_line_budget_retired": true,
         "line_budget_baseline_only_tracks": [
           "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py",
-          "python/redcube_ai/native_helpers/ppt_deck/native_quality.py",
           "tests/opl-family-contract-adoption.test.ts"
         ],
         "reviewed_baseline_ratchet": {
           "python/redcube_ai/native_helpers/ppt_deck/native_layouts.py": 1082,
-          "python/redcube_ai/native_helpers/ppt_deck/native_quality.py": 1032,
           "tests/opl-family-contract-adoption.test.ts": 1116
         },
         "strict_gate_currently_passes": true,
