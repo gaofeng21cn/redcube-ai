@@ -7,6 +7,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuDeliveryParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/delivery.js';
+import { pptExportHelperFixture, pptReviewHelperFixture, testPythonCommandEnv } from './helpers/python-native-helper-fixtures.ts';
 
 const safeArray = (value) => Array.isArray(value) ? value : [];
 const safeText = (value, fallback = '') => value == null || value === '' ? fallback : String(value);
@@ -38,24 +39,11 @@ function makePptExportParts() {
 
   const stableHtmlFile = path.join(viewsDir, 'deck-a.html');
   const screenshotFile = path.join(screenshotsDir, 'slide-01.png');
-  const exportScript = path.join(workspaceRoot, 'export-helper.py');
   const callCountFile = path.join(workspaceRoot, 'export-count.txt');
   writeFileSync(stableHtmlFile, '<html><body><section data-slide-id="S01">stable reviewed html</section></body></html>');
   writeFileSync(screenshotFile, 'png');
-  writeFileSync(exportScript, [
-    'import json',
-    'import os',
-    'import sys',
-    `count_file = ${JSON.stringify(callCountFile)}`,
-    "count = int(open(count_file, encoding='utf-8').read()) if os.path.exists(count_file) else 0",
-    "open(count_file, 'w', encoding='utf-8').write(str(count + 1))",
-    "pptx = sys.argv[sys.argv.index('--output-pptx') + 1]",
-    "pdf = sys.argv[sys.argv.index('--output-pdf') + 1]",
-    "open(pptx, 'w', encoding='utf-8').write('pptx')",
-    "open(pdf, 'w', encoding='utf-8').write('pdf')",
-    "print(json.dumps({'status': 'completed', 'page_count': 1, 'pptx_file': pptx, 'pdf_file': pdf, 'metrics': {'page_count': 1, 'preview_pages': 1}}))",
-    '',
-  ].join('\n'));
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
 
   const contract = { title: 'PPT cache', layout_rules: { max_primary_points_per_slide: 5 } };
   const deliverablePaths = { deliverableDir, reportsDir, deliverableId };
@@ -76,8 +64,8 @@ function makePptExportParts() {
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { export_pptx: 'export_pptx.md' },
-    PYTHON_EXPORT: exportScript,
-    PYTHON_REVIEW: '/tmp/review.py',
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 1,
     RENDER_REFERENCE_SLIDE_WINDOW: 1,
     SCREENSHOT_REVIEW_BATCH_SIZE: 1,
@@ -146,18 +134,35 @@ function makePptExportParts() {
 }
 
 test('ppt export_pptx reuses deterministic preview metrics when reviewed stable HTML is unchanged', () => {
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  const previousCallCountFile = process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
   const { workspaceRoot, contract, stageParts, callCountFile, artifacts } = makePptExportParts();
-  const first = stageParts.buildExportArtifact({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a', contract });
-  artifacts.set('export_pptx', first);
-  const second = stageParts.buildExportArtifact({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a', contract });
+  process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = callCountFile;
+  try {
+    const first = stageParts.buildExportArtifact({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a', contract });
+    artifacts.set('export_pptx', first);
+    const second = stageParts.buildExportArtifact({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a', contract });
 
-  assert.equal(readCount(callCountFile), 1);
-  assert.equal(first.export_bundle.preview_cache.cache_status, 'miss');
-  assert.equal(second.export_bundle.preview_cache.cache_status, 'hit');
-  assert.equal(second.export_bundle.preview_cache.hash, first.export_bundle.preview_cache.hash);
-  assert.equal(second.export_bundle.page_count_match, true);
-  assert.equal(second.review_state_patch.latest_review_stage, 'export_pptx');
-  assert.ok(second.export_bundle.pptx_file.endsWith('deck-a.pptx'));
+    assert.equal(readCount(callCountFile), 1);
+    assert.equal(first.export_bundle.preview_cache.cache_status, 'miss');
+    assert.equal(second.export_bundle.preview_cache.cache_status, 'hit');
+    assert.equal(second.export_bundle.preview_cache.hash, first.export_bundle.preview_cache.hash);
+    assert.equal(second.export_bundle.page_count_match, true);
+    assert.equal(second.review_state_patch.latest_review_stage, 'export_pptx');
+    assert.ok(second.export_bundle.pptx_file.endsWith('deck-a.pptx'));
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+    if (previousCallCountFile === undefined) {
+      delete process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+    } else {
+      process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = previousCallCountFile;
+    }
+  }
 });
 
 function makeXhsDeliveryParts() {

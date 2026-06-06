@@ -10,6 +10,7 @@ import { materializeScreenshotCaptureStore } from './package-surfaces.ts';
 import { materializePptScreenshotReviewCapture } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/screenshot-capture.js';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/review.js';
+import { pptExportHelperFixture, pptReviewHelperFixture, testPythonCommandEnv } from './helpers/python-native-helper-fixtures.ts';
 
 const safeArray = (value) => Array.isArray(value) ? value : [];
 const safeText = (value, fallback = '') => value == null || value === '' ? fallback : String(value);
@@ -130,12 +131,12 @@ function makePptStageParts() {
   mkdirSync(screenshotsDir, { recursive: true });
   const htmlFile = path.join(workspaceRoot, 'deck.html');
   const screenshotFile = path.join(screenshotsDir, 'slide-01.png');
-  const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
   const callCountFile = path.join(workspaceRoot, 'python-count.txt');
   const slideHtml = '<section data-slide-root="true" data-slide-id="S01" data-qa-block="root" data-primary-point="true" data-title="第一页" data-layout-family="hero" data-speaker-seconds="30" data-recipe-id="hero_metric" data-template-id="none" data-peak-page="true" data-director-role="anchor"><div data-qa-block="body">same html</div></section>';
   writeFileSync(htmlFile, `<html><body>${slideHtml}</body></html>`);
   writeFileSync(screenshotFile, 'png');
-  writeFileSync(reviewScript, `import { existsSync, readFileSync, writeFileSync } from 'node:fs';\nconst countFile = ${JSON.stringify(callCountFile)};\nconst count = existsSync(countFile) ? Number(readFileSync(countFile, 'utf-8')) : 0;\nwriteFileSync(countFile, String(count + 1));\nconsole.log(JSON.stringify({ slide_reviews: [{ slide_id: 'S01', title: '第一页', layout_family: 'hero', screenshot_file: ${JSON.stringify(screenshotFile)}, checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true }, issues: [], metrics: { occupied_ratio: 0.5 } }], checks: { overflow_free: true }, metrics: { page_count: 1 }, baseline: {} }));\n`);
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
   const contract = { title: 'PPT cache', layout_rules: { max_primary_points_per_slide: 5 } };
   const artifacts = new Map();
@@ -146,8 +147,8 @@ function makePptStageParts() {
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
-    PYTHON_EXPORT: '/tmp/export.py',
-    PYTHON_REVIEW: reviewScript,
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 2,
     RENDER_REFERENCE_SLIDE_WINDOW: 2,
     SCREENSHOT_REVIEW_BATCH_SIZE: 2,
@@ -254,7 +255,9 @@ function legacyPptScreenshotMechanicsV1Hash({ htmlFile, slideHtml }) {
 test('ppt screenshot_review reuses mechanical cache for identical HTML while still running AI visual gate', async () => {
   const fixture = makePptStageParts();
   const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
-  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  const previousCallCountFile = process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
+  process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = path.join(fixture.workspaceRoot, 'python-count.txt');
   let first;
   let second;
   try {
@@ -280,6 +283,11 @@ test('ppt screenshot_review reuses mechanical cache for identical HTML while sti
       delete process.env.REDCUBE_PYTHON_COMMAND;
     } else {
       process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+    if (previousCallCountFile === undefined) {
+      delete process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+    } else {
+      process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = previousCallCountFile;
     }
   }
 
@@ -314,7 +322,9 @@ test('ppt screenshot_review rejects legacy v1 mechanical cache after review rule
     },
   });
   const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
-  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  const previousCallCountFile = process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
+  process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = path.join(fixture.workspaceRoot, 'python-count.txt');
   let reviewed;
   try {
     reviewed = await fixture.stageParts.buildScreenshotReviewArtifact({
@@ -330,6 +340,11 @@ test('ppt screenshot_review rejects legacy v1 mechanical cache after review rule
       delete process.env.REDCUBE_PYTHON_COMMAND;
     } else {
       process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+    if (previousCallCountFile === undefined) {
+      delete process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
+    } else {
+      process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = previousCallCountFile;
     }
   }
 
@@ -353,8 +368,8 @@ function makeIncrementalPptScreenshotFixture() {
   const s01Html = '<section data-slide-root="true" data-slide-id="S01" data-qa-block="root" data-primary-point="true" data-title="第一页" data-layout-family="body" data-speaker-seconds="30" data-recipe-id="body_metric" data-template-id="none" data-peak-page="false" data-director-role="body"><div data-qa-block="body">stable html</div></section>';
   const s02Html = '<section data-slide-root="true" data-slide-id="S02" data-qa-block="root" data-primary-point="true" data-title="第二页" data-layout-family="body" data-speaker-seconds="30" data-recipe-id="body_metric" data-template-id="none" data-peak-page="false" data-director-role="body"><div data-qa-block="body">fresh html</div></section>';
   writeFileSync(htmlFile, `<html><body>${s01Html}${s02Html}</body></html>`);
-  const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
-  writeFileSync(reviewScript, `console.log(JSON.stringify({ slide_reviews: [{ slide_id: 'S02', title: '第二页', layout_family: 'body', screenshot_file: ${JSON.stringify(s02Screenshot)}, checks: { overflow_free: true, occlusion_free: true, visual_density_ok: true, speaker_fit_ok: true, edge_clearance_ok: true, block_content_fit_ok: true, title_typography_ok: true, page_number_consistency_ok: true }, issues: [], metrics: { occupied_ratio: 0.5, title_font_size: 34 } }], checks: { overflow_free: true }, metrics: { page_count: 2 }, baseline: {} }));\n`);
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
   const priorReviewArtifact = {
     status: 'pass',
@@ -400,8 +415,8 @@ function makeIncrementalPptScreenshotFixture() {
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
-    PYTHON_EXPORT: '/tmp/export.py',
-    PYTHON_REVIEW: reviewScript,
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 2,
     RENDER_REFERENCE_SLIDE_WINDOW: 2,
     SCREENSHOT_REVIEW_BATCH_SIZE: 2,
@@ -517,7 +532,7 @@ function makeIncrementalPptScreenshotFixture() {
 test('ppt incremental screenshot_review summarizes only changed slides and records child-call telemetry', async () => {
   const fixture = makeIncrementalPptScreenshotFixture();
   const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
-  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
   let artifact;
   try {
     artifact = await fixture.stageParts.buildScreenshotReviewArtifact({
@@ -567,7 +582,6 @@ function makePptScreenshotBatchingFixture() {
   }));
   for (const slide of slides) writeFileSync(slide.screenshot_file, 'png');
   writeFileSync(htmlFile, `<html><body>${slides.map((slide) => slide.content).join('')}</body></html>`);
-  const reviewScript = path.join(workspaceRoot, 'review-helper.mjs');
   const mechanicalSlideReviews = slides.map((slide) => ({
     slide_id: slide.slide_id,
     title: slide.title,
@@ -577,7 +591,8 @@ function makePptScreenshotBatchingFixture() {
     issues: [],
     metrics: { occupied_ratio: 0.5, title_font_size: 34 },
   }));
-  writeFileSync(reviewScript, `console.log(JSON.stringify({ slide_reviews: ${JSON.stringify(mechanicalSlideReviews)}, checks: { overflow_free: true }, metrics: { page_count: 3 }, baseline: {} }));\n`);
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'deck-a' };
   const contexts = [];
   const stageParts = createPptDeckStageParts({
@@ -586,8 +601,8 @@ function makePptScreenshotBatchingFixture() {
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
-    PYTHON_EXPORT: '/tmp/export.py',
-    PYTHON_REVIEW: reviewScript,
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 2,
     RENDER_REFERENCE_SLIDE_WINDOW: 2,
     SCREENSHOT_REVIEW_BATCH_SIZE: 2,
@@ -701,7 +716,7 @@ function makePptScreenshotBatchingFixture() {
 test('ppt screenshot_review batches page-local AI calls while preserving child-call telemetry', async () => {
   const fixture = makePptScreenshotBatchingFixture();
   const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
-  process.env.REDCUBE_PYTHON_COMMAND = process.execPath;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
   let artifact;
   try {
     artifact = await fixture.stageParts.buildScreenshotReviewArtifact({
@@ -746,13 +761,14 @@ function makeXhsReviewParts() {
   const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'note-a' };
   const contract = { title: 'XHS cache', layout_rules: { max_primary_points_per_slide: 4 } };
   const artifacts = new Map();
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   let pythonCalls = 0;
   let aiCalls = 0;
   const reviewParts = createXiaohongshuReviewParts({
     CANVAS: { width: 390, height: 844 },
     CODEX_DEFAULT_ADAPTER: 'test-adapter',
     CREATIVE_MATERIALIZED_FROM: 'test',
-    PYTHON_REVIEW: '/tmp/review.py',
+    PYTHON_REVIEW: reviewHelper,
     attachCommon: (stage) => ({ stage }),
     aiFirstMechanicalCheckValue: (slides, check) => slides.every((slide) => slide.checks?.[check] !== false),
     buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, ai_review: aiReview }),

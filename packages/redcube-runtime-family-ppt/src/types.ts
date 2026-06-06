@@ -515,7 +515,7 @@ export interface PptExportBundleArtifact extends PptRuntimeArtifactBase {
     real_conversion_invocation: {
       tool: string;
       helper_id: string;
-      package_module: string | null;
+      package_module: string;
       command: string[];
     };
   };

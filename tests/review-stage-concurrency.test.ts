@@ -6,6 +6,7 @@ import path from 'node:path';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/review.js';
+import { pptExportHelperFixture, pptReviewHelperFixture, testPythonCommandEnv } from './helpers/python-native-helper-fixtures.ts';
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,6 +24,7 @@ function makeXhsReviewParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     reportsDir,
     deliverableId: 'xhs-a',
   };
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const contract = {
     title: '并发审阅测试',
     layout_rules: { max_primary_points_per_slide: 4 },
@@ -31,7 +33,7 @@ function makeXhsReviewParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     CANVAS: { width: 390, height: 844 },
     CODEX_DEFAULT_ADAPTER: 'test-adapter',
     CREATIVE_MATERIALIZED_FROM: 'test',
-    PYTHON_REVIEW: '/tmp/review.py',
+    PYTHON_REVIEW: reviewHelper,
     attachCommon: (stage) => ({ stage }),
     aiFirstMechanicalCheckValue: (slides, check) => slides.every((slide) => slide.checks?.[check] !== false),
     buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, ai_review: aiReview }),
@@ -177,43 +179,12 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
   const reportsDir = path.join(workspaceRoot, 'reports');
   mkdirSync(reportsDir, { recursive: true });
   const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const reviewScript = path.join(workspaceRoot, 'review-helper.py');
   const screenshotFile = path.join(reportsDir, 'screenshots', 'capture-a', 'slide-01.png');
   writeFileSync(htmlFile, '<html><body>ok</body></html>');
   mkdirSync(path.dirname(screenshotFile), { recursive: true });
   writeFileSync(screenshotFile, 'png');
-  writeFileSync(reviewScript, [
-    'import json',
-    'payload = {',
-    "  'slide_reviews': [{",
-    "    'slide_id': 'S01',",
-    "    'title': '第一页',",
-    "    'layout_family': 'hero',",
-    `    'screenshot_file': ${JSON.stringify(screenshotFile)},`,
-    "    'checks': {",
-    "      'overflow_free': True,",
-    "      'occlusion_free': True,",
-    "      'visual_density_ok': True,",
-    "      'speaker_fit_ok': True,",
-    "      'edge_clearance_ok': True,",
-    "      'block_content_fit_ok': True,",
-    "      'title_typography_ok': True,",
-    '    },',
-    "    'issues': [],",
-    "    'metrics': {'occupied_ratio': 0.5},",
-    '  }],',
-    "  'checks': {},",
-    "  'metrics': {},",
-    "  'baseline': {",
-    "    'current_failed_slides': 0,",
-    "    'baseline_failed_slides': 0,",
-    "    'current_average_density': 0.5,",
-    "    'baseline_average_density': 0.5,",
-    '  },',
-    '}',
-    'print(json.dumps(payload, ensure_ascii=False))',
-    '',
-  ].join('\n'));
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const deliverablePaths = {
     deliverableDir: workspaceRoot,
     reportsDir,
@@ -229,8 +200,8 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { screenshot_review: 'screenshot-review.md' },
-    PYTHON_EXPORT: '/tmp/export.py',
-    PYTHON_REVIEW: reviewScript,
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 2,
     RENDER_REFERENCE_SLIDE_WINDOW: 2,
     SCREENSHOT_REVIEW_BATCH_SIZE: 2,
@@ -369,16 +340,27 @@ function makePptStageParts({ baselineDelayMs = 80, aiDelayMs = 80, events }) {
 test('ppt screenshot_review runs AI visual review and baseline comparison concurrently', async () => {
   const events = [];
   const { stageParts, workspaceRoot, contract } = makePptStageParts({ events });
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
 
-  const artifact = await stageParts.buildScreenshotReviewArtifact({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    contract,
-    mode: 'optimize_existing',
-    baselineDeliverableId: 'baseline-a',
-    adapter: 'test-adapter',
-  });
+  let artifact;
+  try {
+    artifact = await stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract,
+      mode: 'optimize_existing',
+      baselineDeliverableId: 'baseline-a',
+      adapter: 'test-adapter',
+    });
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
 
   assert.equal(artifact.status, 'pass');
   assert.equal(artifact.baseline_review.relative_quality.verdict, 'not_degraded');

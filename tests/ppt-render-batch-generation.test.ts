@@ -6,6 +6,7 @@ import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
+import { pptExportHelperFixture, pptReviewHelperFixture } from './helpers/python-native-helper-fixtures.ts';
 
 function makeSlide(slideNo) {
   const slideId = `S${String(slideNo).padStart(2, '0')}`;
@@ -35,6 +36,8 @@ function makePptRenderParts({ stageCalls }) {
   mkdirSync(reportsDir, { recursive: true });
   const deliverablePaths = { deliverableDir, reportsDir, deliverableId: 'deck-a' };
   const slides = Array.from({ length: 6 }, (_, index) => makeSlide(index + 1));
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
   const contract = {
     title: '批量生成测试',
     profile_id: 'lecture_peer',
@@ -56,8 +59,8 @@ function makePptRenderParts({ stageCalls }) {
     CREATIVE_MATERIALIZED_FROM: 'codex_cli_json_output',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { render_html: 'render-html.md', screenshot_review: 'screenshot-review.md' },
-    PYTHON_EXPORT: '/tmp/export.py',
-    PYTHON_REVIEW: '/tmp/review.py',
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 2,
     RENDER_REFERENCE_SLIDE_WINDOW: 2,
     SCREENSHOT_REVIEW_BATCH_SIZE: 2,

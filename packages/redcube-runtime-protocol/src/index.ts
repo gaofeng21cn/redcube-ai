@@ -216,20 +216,20 @@ export function resolvePythonNativeHelper(
 }
 
 export function resolvePythonHelperInvocation(
-  helper: RedCubePythonNativeHelper | string,
+  helper: RedCubePythonNativeHelper,
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperInvocation {
   return resolvePythonHelperInvocationTs(helper, options);
 }
 
 export function pythonHelperReference(
-  helper: RedCubePythonNativeHelper | string,
-): RedCubePythonHelperReference | null {
+  helper: RedCubePythonNativeHelper,
+): RedCubePythonHelperReference {
   return pythonHelperReferenceTs(helper);
 }
 
 export function runRedCubePythonHelper(
-  helper: RedCubePythonNativeHelper | string,
+  helper: RedCubePythonNativeHelper,
   args: string[],
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperRunResult {

@@ -24,7 +24,7 @@ export interface ResolveRedCubePythonNativeHelperOptions {
 
 export interface RedCubePythonHelperInvocation {
   helperId: string;
-  packageModule: string | null;
+  packageModule: string;
   argv: string[];
   env: Record<string, string | undefined>;
   label: string;
@@ -32,7 +32,7 @@ export interface RedCubePythonHelperInvocation {
 
 export interface RedCubePythonHelperReference {
   helper_id: string;
-  package_module: string | null;
+  package_module: string;
 }
 
 export interface RunRedCubePythonHelperOptions {
@@ -47,7 +47,7 @@ export interface RunRedCubePythonHelperOptions {
 export interface RedCubePythonHelperRunResult {
   command: string;
   helper_id: string;
-  package_module: string | null;
+  package_module: string;
   argv: string[];
   payload: unknown;
 }

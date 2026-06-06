@@ -59,58 +59,41 @@ export function resolvePythonNativeHelper(
 }
 
 export function resolvePythonHelperInvocation(
-  helper: RedCubePythonNativeHelper | string,
+  helper: RedCubePythonNativeHelper,
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperInvocation {
   const fileExists = options.fileExists || existsSync;
   const env = options.env || process.env;
-  if (helper && typeof helper === 'object' && helper.packageModule) {
-    const pythonRoot = safeText(helper.pythonRoot);
-    if (!pythonRoot || !fileExists(pythonRoot)) {
-      throw new Error(`Missing RedCube Python package root for helper ${helper.helperId || helper.packageModule}: ${pythonRoot}`);
-    }
-    return {
-      helperId: helper.helperId || helper.packageModule,
-      packageModule: helper.packageModule,
-      argv: ['-m', helper.packageModule],
-      env: buildPythonHelperEnv(pythonRoot, env),
-      label: helper.packageModule,
-    };
+  if (!helper || typeof helper !== 'object' || !helper.packageModule) {
+    throw new Error('Python helper must be resolved from the native helper catalog before invocation');
   }
-
-  const script = safeText(helper);
-  if (!script || !fileExists(script)) {
-    throw new Error(`${options.missingMessagePrefix || 'Missing python helper'}: ${script}`);
+  const pythonRoot = safeText(helper.pythonRoot);
+  if (!pythonRoot || !fileExists(pythonRoot)) {
+    throw new Error(`Missing RedCube Python package root for helper ${helper.helperId || helper.packageModule}: ${pythonRoot}`);
   }
   return {
-    helperId: path.basename(script),
-    packageModule: null,
-    argv: [script],
-    env,
-    label: script,
+    helperId: helper.helperId || helper.packageModule,
+    packageModule: helper.packageModule,
+    argv: ['-m', helper.packageModule],
+    env: buildPythonHelperEnv(pythonRoot, env),
+    label: helper.packageModule,
   };
 }
 
 export function pythonHelperReference(
-  helper: RedCubePythonNativeHelper | string,
-): RedCubePythonHelperReference | null {
-  if (helper && typeof helper === 'object' && helper.packageModule) {
-    return {
-      helper_id: helper.helperId || helper.packageModule,
-      package_module: helper.packageModule,
-    };
+  helper: RedCubePythonNativeHelper,
+): RedCubePythonHelperReference {
+  if (!helper || typeof helper !== 'object' || !helper.packageModule) {
+    throw new Error('Python helper reference must come from the native helper catalog');
   }
-  const script = safeText(helper);
-  return script
-    ? {
-        helper_id: path.basename(script),
-        package_module: null,
-      }
-    : null;
+  return {
+    helper_id: helper.helperId || helper.packageModule,
+    package_module: helper.packageModule,
+  };
 }
 
 export function runRedCubePythonHelper(
-  helper: RedCubePythonNativeHelper | string,
+  helper: RedCubePythonNativeHelper,
   args: string[],
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperRunResult {

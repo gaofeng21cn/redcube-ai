@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
-import { runRedCubePythonHelper } from '@redcube/runtime-protocol';
+import { runRedCubePythonHelper, type RedCubePythonNativeHelper } from '@redcube/runtime-protocol';
 import { createPptDeckVisualArtifactParts } from './visual-artifacts.js';
 import { buildNativePptQualityNonregressionReadModel } from './native-ppt-quality-nonregression.js';
 import { createNativePptPlanIntegrityParts } from './native-ppt-plan-integrity.js';
@@ -53,7 +53,7 @@ interface NativePptDeps {
   CODEX_DEFAULT_ADAPTER: string;
   CREATIVE_MATERIALIZED_FROM: string;
   NATIVE_PPT_ENGINE_CONTRACT: string;
-  PYTHON_NATIVE: string;
+  PYTHON_NATIVE: RedCubePythonNativeHelper;
   PROMPT_PACK?: Record<string, string>;
   attachCommon(route: string, contract: JsonRecord, generationRuntime: JsonRecord | null, adapter: string): JsonRecord;
   buildAuthoringContext?(contract: JsonRecord): JsonRecord;
@@ -143,7 +143,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     return cachedNativeEngineContract;
   }
 
-  function runPython(helper: string, args: string[]): JsonRecord {
+  function runPython(helper: RedCubePythonNativeHelper, args: string[]): JsonRecord {
     return runRedCubePythonHelper(helper, args, {
       fileExists: existsSync,
       missingMessagePrefix: 'Missing ppt_deck python helper',

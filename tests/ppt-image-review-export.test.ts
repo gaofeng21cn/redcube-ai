@@ -7,6 +7,12 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 
 
 import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
 import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core-profile-presets.js';
+import {
+  pptExportHelperFixture,
+  pptNativeHelperFixture,
+  pptReviewHelperFixture,
+  testPythonCommandEnv,
+} from './helpers/python-native-helper-fixtures.ts';
 
 const PNG_16_9 = Buffer.from(
   'iVBORw0KGgoAAAANSUhEUgAABIAAAAKIAQAAAAAyaZf6AAAADElEQVR42u3BMQEAAADCoPVPbQo/oAAAAAAA4G0CxwAAATXs5kEAAAAASUVORK5CYII=',
@@ -77,7 +83,6 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
   const pngFile = path.join(imageDir, 'slide-01.png');
   const promptManifestFile = path.join(imageDir, 'prompt-manifest.json');
   const styleManifestFile = path.join(imageDir, 'style-manifest.json');
-  const exportScript = path.join(workspaceRoot, 'export-helper.py');
   writeFileSync(pngFile, Buffer.concat([PNG_16_9, Buffer.alloc(2000, 1)]));
   if (!missingManifest) {
     writeJson(promptManifestFile, {
@@ -90,18 +95,9 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
       ...styleManifestPatch,
     });
   }
-  writeFileSync(exportScript, [
-    'import json',
-    'import os',
-    'import sys',
-    "pptx = sys.argv[sys.argv.index('--output-pptx') + 1]",
-    "pdf = sys.argv[sys.argv.index('--output-pdf') + 1]",
-    'os.makedirs(os.path.dirname(pptx), exist_ok=True)',
-    "open(pptx, 'w', encoding='utf-8').write('full-page-image-pptx')",
-    "open(pdf, 'w', encoding='utf-8').write('full-page-image-pdf')",
-    "print(json.dumps({'page_count': 1, 'pptx_file': pptx, 'pdf_file': pdf}))",
-    '',
-  ].join('\n'));
+  const exportHelper = pptExportHelperFixture(workspaceRoot);
+  const nativeHelper = pptNativeHelperFixture(workspaceRoot);
+  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
 
   const contract = {
     title: 'Image first deck',
@@ -141,9 +137,9 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
     CREATIVE_MATERIALIZED_FROM: 'test',
     PAGE_FIX_ROUTE: 'fix_html',
     PROMPT_PACK: { visual_director_review: 'director.md', screenshot_review: 'screenshot.md', export_pptx: 'export.md' },
-    PYTHON_EXPORT: exportScript,
-    PYTHON_NATIVE: '/tmp/native.py',
-    PYTHON_REVIEW: '/tmp/review.py',
+    PYTHON_EXPORT: exportHelper,
+    PYTHON_NATIVE: nativeHelper,
+    PYTHON_REVIEW: reviewHelper,
     RENDER_HTML_BATCH_SIZE: 1,
     RENDER_REFERENCE_SLIDE_WINDOW: 1,
     SCREENSHOT_REVIEW_BATCH_SIZE: 1,
@@ -231,61 +227,70 @@ function makeFixture({ missingManifest = false, promptManifestPatch = {}, styleM
 }
 
 test('ppt image-first route reviews PNG pages and exports non-editable full-page image PPTX', async () => {
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
   const fixture = makeFixture();
+  try {
+    const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
+    assert.equal(director.status, 'pass');
+    assert.deepEqual(director.owner_receipt_refs, [
+      'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-image',
+    ]);
+    assert.deepEqual(director.typed_blocker_refs, []);
+    assert.equal(director.visual_director_review.deterministic_preflight.findings.length, 0);
+    fixture.artifacts.set('visual_director_review', director);
 
-  const director = await fixture.stageParts.buildDirectorReview(fixture.contract, fixture.deliverablePaths, 'test-adapter');
-  assert.equal(director.status, 'pass');
-  assert.deepEqual(director.owner_receipt_refs, [
-    'rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-image',
-  ]);
-  assert.deepEqual(director.typed_blocker_refs, []);
-  assert.equal(director.visual_director_review.deterministic_preflight.findings.length, 0);
-  fixture.artifacts.set('visual_director_review', director);
+    const screenshot = await fixture.stageParts.buildScreenshotReviewArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-image',
+      contract: fixture.contract,
+      mode: 'draft_new',
+    });
+    assert.equal(screenshot.status, 'pass');
+    assert.deepEqual(screenshot.owner_receipt_refs, [
+      'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
+    ]);
+    assert.deepEqual(screenshot.typed_blocker_refs, []);
+    assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
+    assert.equal(screenshot.mechanical_review.python_helper_invocation, null);
+    assert.equal(screenshot.mechanical_review.metrics.source_surface_kind, 'image_pages');
+    assert.equal(screenshot.slide_reviews[0].metrics.image_width, 1152);
+    assert.equal(screenshot.slide_reviews[0].metrics.image_height, 648);
+    fixture.artifacts.set('screenshot_review', screenshot);
 
-  const screenshot = await fixture.stageParts.buildScreenshotReviewArtifact({
-    workspaceRoot: fixture.workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-image',
-    contract: fixture.contract,
-    mode: 'draft_new',
-  });
-  assert.equal(screenshot.status, 'pass');
-  assert.deepEqual(screenshot.owner_receipt_refs, [
-    'rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-image',
-  ]);
-  assert.deepEqual(screenshot.typed_blocker_refs, []);
-  assert.equal(screenshot.review_capture.source_visual_route, 'author_image_pages');
-  assert.equal(screenshot.mechanical_review.python_helper_invocation, null);
-  assert.equal(screenshot.mechanical_review.metrics.source_surface_kind, 'image_pages');
-  assert.equal(screenshot.slide_reviews[0].metrics.image_width, 1152);
-  assert.equal(screenshot.slide_reviews[0].metrics.image_height, 648);
-  fixture.artifacts.set('screenshot_review', screenshot);
-
-  const exported = fixture.stageParts.buildExportArtifact({
-    workspaceRoot: fixture.workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-image',
-    contract: fixture.contract,
-  });
-  assert.deepEqual(exported.owner_receipt_refs, [
-    'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-image',
-  ]);
-  assert.deepEqual(exported.typed_blocker_refs, []);
-  assert.equal(exported.export_bundle.review_receipt_refs.includes(screenshot.owner_receipt_refs[0]), true);
-  assert.equal(exported.review_export_refs.includes(exported.export_bundle.export_ref), true);
-  assert.equal(exported.export_bundle.source_visual_route, 'author_image_pages');
-  assert.equal(exported.export_bundle.editable, false);
-  assert.equal(exported.export_bundle.page_count_match, true);
-  assert.equal(exported.export_bundle.source_html, '');
-  assert.equal(existsSync(exported.export_bundle.pptx_file), true);
-  assert.equal(existsSync(exported.export_bundle.pdf_file), true);
-  assert.equal(exported.export_bundle.artifact_gallery.editable, false);
-  const gallery = readJson(exported.export_bundle.artifact_gallery.index_file);
-  assert.equal(gallery.source_visual_route, 'author_image_pages');
-  assert.equal(gallery.editable, false);
-  assert.deepEqual(gallery.artifacts.source.png_files, [fixture.pngFile]);
-  assert.deepEqual(gallery.artifacts.source.prompt_manifest_files, [fixture.promptManifestFile]);
-  assert.deepEqual(gallery.artifacts.source.style_manifest_files, [fixture.styleManifestFile]);
+    const exported = fixture.stageParts.buildExportArtifact({
+      workspaceRoot: fixture.workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-image',
+      contract: fixture.contract,
+    });
+    assert.deepEqual(exported.owner_receipt_refs, [
+      'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-image',
+    ]);
+    assert.deepEqual(exported.typed_blocker_refs, []);
+    assert.equal(exported.export_bundle.review_receipt_refs.includes(screenshot.owner_receipt_refs[0]), true);
+    assert.equal(exported.review_export_refs.includes(exported.export_bundle.export_ref), true);
+    assert.equal(exported.export_bundle.source_visual_route, 'author_image_pages');
+    assert.equal(exported.export_bundle.editable, false);
+    assert.equal(exported.export_bundle.page_count_match, true);
+    assert.equal(exported.export_bundle.source_html, '');
+    assert.equal(existsSync(exported.export_bundle.pptx_file), true);
+    assert.equal(existsSync(exported.export_bundle.pdf_file), true);
+    assert.equal(exported.export_bundle.artifact_gallery.editable, false);
+    const gallery = readJson(exported.export_bundle.artifact_gallery.index_file);
+    assert.equal(gallery.source_visual_route, 'author_image_pages');
+    assert.equal(gallery.editable, false);
+    assert.deepEqual(gallery.artifacts.source.png_files, [fixture.pngFile]);
+    assert.deepEqual(gallery.artifacts.source.prompt_manifest_files, [fixture.promptManifestFile]);
+    assert.deepEqual(gallery.artifacts.source.style_manifest_files, [fixture.styleManifestFile]);
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
+    }
+  }
 });
 
 test('ppt image-first screenshot review fails closed when PNG manifest refs are missing', async () => {

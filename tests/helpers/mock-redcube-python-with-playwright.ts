@@ -114,17 +114,31 @@ function writeBinary(file, value) {
   writeFileSync(file, value);
 }
 
+function incrementMockCallCount() {
+  const callCountFile = String(process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE || '').trim();
+  if (!callCountFile) return;
+  let count = 0;
+  try {
+    count = Number(readFileSync(callCountFile, 'utf-8')) || 0;
+  } catch {
+    count = 0;
+  }
+  writeText(callCountFile, String(count + 1));
+}
+
 function extractSlidesFromHtml(htmlFile) {
   const html = readText(htmlFile);
-  const matches = [...html.matchAll(/data-slide-id="([^"]+)"[^>]*data-title="([^"]*)"[^>]*data-speaker-seconds="([^"]*)"[^>]*data-layout-family="([^"]*)"/g)];
-  if (matches.length === 0) {
+  const slideRoots = [...html.matchAll(/<[a-z][^>]*data-slide-root=(["'])true\1[^>]*data-slide-id=(["'])[^"']+\2[^>]*>/gi)]
+    .map((match) => match[0]);
+  if (slideRoots.length === 0) {
     return [{ slide_id: 'S01', title: 'Slide 1', speaker_seconds: 60, layout_family: 'default' }];
   }
-  return matches.map((match, index) => ({
-    slide_id: match[1] || `S${String(index + 1).padStart(2, '0')}`,
-    title: match[2] || `Slide ${index + 1}`,
-    speaker_seconds: Number(match[3] || 60),
-    layout_family: match[4] || 'default',
+  const attr = (tag, name) => tag.match(new RegExp(`${name}="([^"]*)"`))?.[1] || '';
+  return slideRoots.map((tag, index) => ({
+    slide_id: attr(tag, 'data-slide-id') || `S${String(index + 1).padStart(2, '0')}`,
+    title: attr(tag, 'data-title') || `Slide ${index + 1}`,
+    speaker_seconds: Number(attr(tag, 'data-speaker-seconds') || 60),
+    layout_family: attr(tag, 'data-layout-family') || 'default',
   }));
 }
 
@@ -931,6 +945,7 @@ function buildNativePlanValidationPayload(args) {
 }
 
 function main() {
+  incrementMockCallCount();
   const invocation = normalizeHelperInvocation(process.argv.slice(2));
   const basename = path.basename(invocation.helper);
   const args = parseArgs(invocation.args);

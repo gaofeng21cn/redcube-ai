@@ -4,6 +4,7 @@ import { copyFileSync, existsSync, readFileSync } from 'node:fs';
 import {
   pythonHelperReference,
   runRedCubePythonHelper,
+  type RedCubePythonNativeHelper,
 } from '@redcube/runtime-protocol';
 
 import { createPptDeckExportImagePageHelpers } from './export-image-pages-helpers.js';
@@ -14,8 +15,8 @@ type JsonRecord = Record<string, any>;
 export interface PptDeckExportStageDeps {
   CANVAS: { width: number; height: number };
   CODEX_DEFAULT_ADAPTER: string;
-  PYTHON_EXPORT: string;
-  PYTHON_NATIVE: string;
+  PYTHON_EXPORT: RedCubePythonNativeHelper;
+  PYTHON_NATIVE: RedCubePythonNativeHelper;
   SCREENSHOT_MECHANICAL_REVIEW_RULESET_ID?: string;
   attachCommon(route: string, contract: JsonRecord, generationRuntime: JsonRecord | null, adapter: string): JsonRecord;
   ensureDir(dir: string): string;
@@ -89,7 +90,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
 
   const fileExists = mainExistsSync || existsSync;
 
-  function runPython(helper: string, args: string[]): JsonRecord {
+  function runPython(helper: RedCubePythonNativeHelper, args: string[]): JsonRecord {
     return runRedCubePythonHelper(helper, args, {
       fileExists,
       missingMessagePrefix: 'Missing ppt_deck python helper',
