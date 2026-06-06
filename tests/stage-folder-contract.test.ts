@@ -23,6 +23,32 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
+function writeJson(file, data) {
+  mkdirSync(path.dirname(file), { recursive: true });
+  writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`, 'utf-8');
+}
+
+function writeStageFolderOutputFixture(input, artifact) {
+  const outputName = input.outputName || `${input.routeStageId}.json`;
+  const artifactFile = stageFolderOutputPath({
+    ...input,
+    outputName,
+  });
+  writeJson(artifactFile, artifact);
+  return writeStageFolderArtifact({
+    ...input,
+    artifactFile,
+    outputName,
+  });
+}
+
+function stageFolderAttemptOutputFile(input, outputName) {
+  return stageFolderOutputPath({
+    ...input,
+    outputName,
+  });
+}
+
 function withTempOplState(fn) {
   const previous = process.env.OPL_STATE_DIR;
   const root = mkdtempSync(path.join(os.tmpdir(), 'redcube-opl-stage-state-'));
@@ -52,11 +78,8 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
   withTempOplState((stateRoot) => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const artifactFile = path.join(paths.artifactsDir, 'author_image_pages.json');
-    mkdirSync(path.dirname(artifactFile), { recursive: true });
-    writeFileSync(artifactFile, JSON.stringify({ route: 'author_image_pages', status: 'ok' }), 'utf-8');
 
-    const written = writeStageFolderArtifact({
+    const written = writeStageFolderOutputFixture({
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -65,11 +88,10 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
       canonicalStageId: 'artifact_creation',
       stageOrder: 4,
       attemptId: 'attempt-1',
-      artifactFile,
       requiredOutputs: ['author_image_pages.json'],
       ownerReceiptRefs: ['rca-owner-receipt:visual-stage:deck-a'],
       artifactRefs: ['workspace-runtime-ref:author_image_pages.json'],
-    });
+    }, { route: 'author_image_pages', status: 'ok' });
 
     assert.equal(written.root.startsWith(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai')), true);
     assert.equal(existsSync(written.manifest_file), true);
@@ -110,13 +132,7 @@ test('RCA stage folder manifest exposes canonical output roles, stage receipts, 
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-role-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const artifactFile = path.join(paths.artifactsDir, 'render-output-v2.json');
-    const helperFile = path.join(paths.artifactsDir, 'shape-manifest.json');
-    mkdirSync(path.dirname(artifactFile), { recursive: true });
-    writeFileSync(artifactFile, JSON.stringify({ route: 'author_pptx_native', status: 'ok' }), 'utf-8');
-    writeFileSync(helperFile, JSON.stringify({ surface_kind: 'native_shape_manifest' }), 'utf-8');
-
-    const written = writeStageFolderArtifact({
+    const base = {
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -125,9 +141,14 @@ test('RCA stage folder manifest exposes canonical output roles, stage receipts, 
       canonicalStageId: 'artifact_creation',
       stageOrder: 4,
       attemptId: 'attempt-role',
-      artifactFile,
       outputName: 'render-output-v2.json',
       outputRole: 'render_manifest',
+    };
+    const helperFile = stageFolderAttemptOutputFile(base, 'helper/shape-manifest.json');
+    writeJson(helperFile, { surface_kind: 'native_shape_manifest' });
+
+    const written = writeStageFolderOutputFixture({
+      ...base,
       requiredOutputRoles: ['render_manifest'],
       ownerReceiptRefs: ['rca-owner-receipt:render-manifest'],
       helperOutputRefs: [{
@@ -137,7 +158,7 @@ test('RCA stage folder manifest exposes canonical output roles, stage receipts, 
         evidence_ref: 'native_ppt_bundle.shape_manifest_file',
         review_receipt_ref: 'rca-owner-receipt:screenshot-review',
       }],
-    });
+    }, { route: 'author_pptx_native', status: 'ok' });
 
     const manifest = readJson(written.manifest_file);
     assert.equal(manifest.stage_output_role_interface.surface_kind, 'rca_stage_output_role_interface');
@@ -178,11 +199,8 @@ test('RCA blocked stage folder attempts expose typed blocker stage receipts', ()
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-blocked-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const artifactFile = path.join(paths.artifactsDir, 'screenshot_review.json');
-    mkdirSync(path.dirname(artifactFile), { recursive: true });
-    writeFileSync(artifactFile, JSON.stringify({ route: 'screenshot_review', status: 'block' }), 'utf-8');
 
-    const written = writeStageFolderArtifact({
+    const written = writeStageFolderOutputFixture({
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -191,11 +209,10 @@ test('RCA blocked stage folder attempts expose typed blocker stage receipts', ()
       canonicalStageId: 'review_and_revision',
       stageOrder: 5,
       attemptId: 'attempt-blocked',
-      artifactFile,
       outputRole: 'review_verdict',
       typedBlockerRefs: ['rca-typed-blocker:screenshot-review'],
       blockingReasons: ['review_blocked'],
-    });
+    }, { route: 'screenshot_review', status: 'block' });
 
     const manifest = readJson(written.manifest_file);
     assert.equal(manifest.status, 'blocked');
@@ -229,10 +246,7 @@ test('RCA review, repair, and export routes map to receipt-backed stage output r
     ];
 
     for (const [routeStageId, canonicalStageId, outputRole] of cases) {
-      const artifactFile = path.join(paths.artifactsDir, `${routeStageId}-role.json`);
-      mkdirSync(path.dirname(artifactFile), { recursive: true });
-      writeFileSync(artifactFile, JSON.stringify({ route: routeStageId, status: 'ok' }), 'utf-8');
-      const written = writeStageFolderArtifact({
+      const written = writeStageFolderOutputFixture({
         deliverablePaths: paths,
         programId: paths.programId,
         topicId: 'topic-a',
@@ -241,9 +255,9 @@ test('RCA review, repair, and export routes map to receipt-backed stage output r
         canonicalStageId,
         stageOrder: routeStageId === 'export_pptx' ? 6 : routeStageId === 'repair_image_pages' ? 4 : 5,
         attemptId: `attempt-${routeStageId}`,
-        artifactFile,
+        outputName: `${routeStageId}-role.json`,
         ownerReceiptRefs: [`rca-owner-receipt:${routeStageId}`],
-      });
+      }, { route: routeStageId, status: 'ok' });
       const manifest = readJson(written.manifest_file);
       assert.equal(manifest.present_output_roles.includes(outputRole), true);
       assert.equal(manifest.stage_receipts[0].receipt_ref, `rca-owner-receipt:${routeStageId}`);
@@ -259,20 +273,29 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const exportDir = path.join(paths.artifactsDir, 'export');
-    mkdirSync(exportDir, { recursive: true });
+    const exportBase = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'export_pptx',
+      canonicalStageId: 'package_and_handoff',
+      stageOrder: 6,
+      attemptId: 'attempt-export',
+    };
     const files = {
-      artifact: path.join(exportDir, 'export_pptx.json'),
-      pptx: path.join(exportDir, 'deck.pptx'),
-      pdf: path.join(exportDir, 'deck.pdf'),
-      notes: path.join(exportDir, 'notes.md'),
-      handoff: path.join(exportDir, 'handoff-manifest.json'),
-      gallery: path.join(exportDir, 'gallery-index.json'),
-      capture: path.join(exportDir, 'capture-manifest.json'),
-      shapeManifest: path.join(exportDir, 'shape-manifest.json'),
+      artifact: stageFolderAttemptOutputFile(exportBase, 'export_pptx.json'),
+      pptx: stageFolderAttemptOutputFile(exportBase, 'deck.pptx'),
+      pdf: stageFolderAttemptOutputFile(exportBase, 'deck.pdf'),
+      notes: stageFolderAttemptOutputFile(exportBase, 'notes.md'),
+      handoff: stageFolderAttemptOutputFile(exportBase, 'handoff-manifest.json'),
+      gallery: stageFolderAttemptOutputFile(exportBase, 'gallery-index.json'),
+      capture: stageFolderAttemptOutputFile(exportBase, 'capture-manifest.json'),
+      shapeManifest: stageFolderAttemptOutputFile(exportBase, 'shape-manifest.json'),
     };
     for (const [key, file] of Object.entries(files)) {
-      writeFileSync(file, key === 'pptx' || key === 'pdf' ? key : JSON.stringify({ key }), 'utf-8');
+      mkdirSync(path.dirname(file), { recursive: true });
+      writeFileSync(file, key === 'pptx' || key === 'pdf' ? key : `${JSON.stringify({ key }, null, 2)}\n`, 'utf-8');
     }
     const artifact = {
       route: 'export_pptx',
@@ -292,7 +315,7 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
         export_manifest_file: files.capture,
       },
     };
-    writeFileSync(files.artifact, JSON.stringify(artifact, null, 2), 'utf-8');
+    writeJson(files.artifact, artifact);
 
     const written = refreshStageFolderRouteArtifact({
       deliverablePaths: paths,
@@ -418,13 +441,8 @@ test('RCA stage folder artifact read is route-aware inside one canonical Stage',
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-routes-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const authorArtifact = path.join(paths.artifactsDir, 'author.json');
-    const repairArtifact = path.join(paths.artifactsDir, 'repair.json');
-    mkdirSync(paths.artifactsDir, { recursive: true });
-    writeFileSync(authorArtifact, JSON.stringify({ route: 'author_image_pages' }), 'utf-8');
-    writeFileSync(repairArtifact, JSON.stringify({ route: 'repair_image_pages' }), 'utf-8');
 
-    writeStageFolderArtifact({
+    writeStageFolderOutputFixture({
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -433,11 +451,10 @@ test('RCA stage folder artifact read is route-aware inside one canonical Stage',
       canonicalStageId: 'artifact_creation',
       stageOrder: 4,
       attemptId: 'attempt-author',
-      artifactFile: authorArtifact,
       outputName: 'image_pages_bundle.json',
       ownerReceiptRefs: ['rca-owner-receipt:author'],
-    });
-    writeStageFolderArtifact({
+    }, { route: 'author_image_pages' });
+    writeStageFolderOutputFixture({
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -446,10 +463,9 @@ test('RCA stage folder artifact read is route-aware inside one canonical Stage',
       canonicalStageId: 'artifact_creation',
       stageOrder: 4,
       attemptId: 'attempt-repair',
-      artifactFile: repairArtifact,
       outputName: 'image_pages_repair_bundle.json',
       ownerReceiptRefs: ['rca-owner-receipt:repair'],
-    });
+    }, { route: 'repair_image_pages' });
 
     assert.equal(
       readStageFolderArtifact({
@@ -483,14 +499,8 @@ test('RCA stage folder artifact read does not substitute another route in the sa
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-substitution-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
-    const directorArtifact = path.join(paths.artifactsDir, 'visual-director-review.json');
-    mkdirSync(paths.artifactsDir, { recursive: true });
-    writeFileSync(directorArtifact, JSON.stringify({
-      route: 'visual_director_review',
-      status: 'block',
-    }), 'utf-8');
 
-    writeStageFolderArtifact({
+    writeStageFolderOutputFixture({
       deliverablePaths: paths,
       programId: paths.programId,
       topicId: 'topic-a',
@@ -499,9 +509,11 @@ test('RCA stage folder artifact read does not substitute another route in the sa
       canonicalStageId: 'review_and_revision',
       stageOrder: 5,
       attemptId: 'attempt-director-block',
-      artifactFile: directorArtifact,
       outputName: 'visual_director_review.json',
       typedBlockerRefs: ['rca-typed-blocker:visual-director-review'],
+    }, {
+      route: 'visual_director_review',
+      status: 'block',
     });
 
     assert.equal(

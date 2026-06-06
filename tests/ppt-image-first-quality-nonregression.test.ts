@@ -10,6 +10,7 @@ import {
   canonicalStageForRoute,
   getDeliverablePaths,
   stageOrderForCanonicalStage,
+  stageFolderOutputPath,
   writeStageFolderArtifact,
 } from '@redcube/runtime-protocol';
 import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
@@ -71,30 +72,44 @@ function injectImagePageRoutes(contract) {
   return contract;
 }
 
-function stageArtifactFile(paths, contract, stageId) {
-  const stage = [
+function stageContractEntry(contract, stageId) {
+  return [
     ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
     ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
   ].find((item) => item.stage_id === stageId);
-  return path.join(paths.artifactsDir, stage?.output_artifact || `${stageId}.json`);
+}
+
+function stageOutputName(contract, stageId) {
+  const stage = stageContractEntry(contract, stageId);
+  return stage?.output_artifact || `${stageId}.json`;
+}
+
+function stageFolderFixtureOutputFile(paths, contract, stageId, attemptId = `seed-${stageId}`) {
+  const canonicalStageId = canonicalStageForRoute(stageId);
+  return stageFolderOutputPath({
+    deliverablePaths: paths,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
+    attemptId,
+    outputName: stageOutputName(contract, stageId),
+  });
 }
 
 function writeStageArtifact(paths, contract, stageId, artifact, status = 'success') {
-  const stage = [
-    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
-    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
-  ].find((item) => item.stage_id === stageId);
-  const artifactFile = stageArtifactFile(paths, contract, stageId);
-  writeJson(artifactFile, artifact);
   const canonicalStageId = canonicalStageForRoute(stageId);
+  const attemptId = `seed-${stageId}`;
+  const outputName = stageOutputName(contract, stageId);
+  const artifactFile = stageFolderFixtureOutputFile(paths, contract, stageId, attemptId);
+  writeJson(artifactFile, artifact);
   writeStageFolderArtifact({
     deliverablePaths: paths,
     routeStageId: stageId,
     canonicalStageId,
     stageOrder: stageOrderForCanonicalStage(canonicalStageId),
-    attemptId: `seed-${stageId}`,
+    attemptId,
     artifactFile,
-    outputName: stage?.output_artifact || `${stageId}.json`,
+    outputName,
     status,
     ownerReceiptRefs: status === 'success' ? [`rca-owner-receipt:test-seed:${stageId}`] : [],
     typedBlockerRefs: status === 'blocked' ? [`rca-typed-blocker:test-seed:${stageId}`] : [],

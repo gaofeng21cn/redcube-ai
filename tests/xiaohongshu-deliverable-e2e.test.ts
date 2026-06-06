@@ -9,6 +9,7 @@ import {
   canonicalStageForRoute,
   getDeliverablePaths,
   stageOrderForCanonicalStage,
+  stageFolderOutputPath,
   writeStageFolderArtifact,
 } from '@redcube/runtime-protocol';
 import {
@@ -25,40 +26,44 @@ function readJson(file) {
 }
 
 function writeJson(file, data) {
+  mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-function stageArtifactFile(created, stageId) {
-  const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
-  const contract = readJson(contractFile);
-  const stages = [
-    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
-    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
-  ];
-  const stage = stages.find((item) => item.stage_id === stageId);
-  return path.join(path.dirname(created.deliverableFile), 'artifacts', stage?.output_artifact || `${stageId}.json`);
-}
-
-function writeStageArtifact({ workspaceRoot, topicId, deliverableId, stageId, artifact, status = 'success' }) {
-  const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+function stageContractEntry(paths, stageId) {
   const contractFile = path.join(paths.deliverableDir, 'contracts', 'hydrated-deliverable.json');
   const contract = readJson(contractFile);
   const stages = [
     ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
     ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
   ];
-  const stage = stages.find((item) => item.stage_id === stageId);
+  return stages.find((item) => item.stage_id === stageId);
+}
+
+function writeStageArtifact({ workspaceRoot, topicId, deliverableId, stageId, artifact, status = 'success' }) {
+  const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const canonicalStageId = canonicalStageForRoute(stageId);
-  const legacyFile = stageArtifactFile({ deliverableFile: paths.deliverableFile }, stageId);
-  writeJson(legacyFile, artifact);
+  const stageOrder = stageOrderForCanonicalStage(canonicalStageId);
+  const attemptId = `seed-${stageId}`;
+  const stage = stageContractEntry(paths, stageId);
+  const outputName = stage?.output_artifact || `${stageId}.json`;
+  const artifactFile = stageFolderOutputPath({
+    deliverablePaths: paths,
+    routeStageId: stageId,
+    canonicalStageId,
+    stageOrder,
+    attemptId,
+    outputName,
+  });
+  writeJson(artifactFile, artifact);
   writeStageFolderArtifact({
     deliverablePaths: paths,
     routeStageId: stageId,
     canonicalStageId,
-    stageOrder: stageOrderForCanonicalStage(canonicalStageId),
-    attemptId: `seed-${stageId}`,
-    artifactFile: legacyFile,
-    outputName: stage?.output_artifact || `${stageId}.json`,
+    stageOrder,
+    attemptId,
+    artifactFile,
+    outputName,
     status,
     ownerReceiptRefs: status === 'success' ? [`rca-owner-receipt:test-seed:${stageId}`] : [],
     typedBlockerRefs: status === 'blocked' ? [`rca-typed-blocker:test-seed:${stageId}`] : [],
