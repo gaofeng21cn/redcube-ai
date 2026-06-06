@@ -30,7 +30,6 @@ import {
 import * as z from 'zod/v4';
 
 type DomainActionMap = Record<string, ((args: Record<string, unknown>) => Promise<unknown>) | ((args?: unknown) => Promise<unknown>)>;
-type ToolName = keyof typeof TOOL_ROUTE_DEFINITIONS;
 type ToolArgs = Record<string, unknown>;
 
 export const DEFAULT_DOMAIN_ACTIONS = {
@@ -83,7 +82,7 @@ const OPTIONAL_OVERLAY_ID = z.string().optional().describe('Overlay id.');
 const STRING_ARRAY_OR_CSV = z.union([z.string(), z.array(z.string())]);
 const PASSTHROUGH_OBJECT = z.object({}).passthrough();
 
-const TOOL_ROUTE_DEFINITIONS = {
+const LOCAL_PROTOCOL_ROUTE_DEFINITIONS = {
   redcube_workspace: {
     selector: 'action',
     routes: {
@@ -123,31 +122,32 @@ const TOOL_ROUTE_DEFINITIONS = {
       apply_review_mutation: 'applyReviewMutation',
     },
   },
-  redcube_product_entry: {
-    selector: 'action',
-    routes: {
-    },
-  },
 };
 
 const ACTION_METADATA = buildRedCubeActionMetadata();
 const MCP_TOOL_METADATA = new Map(ACTION_METADATA.mcp_tools.map((tool) => [tool.name, tool]));
 const MCP_ROUTE_METADATA = Object.fromEntries(
   Object.entries(ACTION_METADATA.mcp_route_definitions).map(([name, definition]) => {
-    const base = TOOL_ROUTE_DEFINITIONS[name as ToolName];
-    const catalogRoutes = definition.routes || {};
-    const routes = Object.keys(catalogRoutes).length > 0
-      ? catalogRoutes
-      : base?.routes || {};
     return [
       name,
       {
-        selector: definition.selector || base?.selector,
-        routes,
+        selector: definition.selector,
+        routes: definition.routes || {},
       },
     ];
   }),
 );
+
+function routeDefinitionFor(name: string) {
+  const catalogDefinition = MCP_ROUTE_METADATA[name];
+  if (catalogDefinition && Object.keys(catalogDefinition.routes).length > 0) {
+    return catalogDefinition;
+  }
+  if (name === 'redcube_product_entry') {
+    return catalogDefinition;
+  }
+  return LOCAL_PROTOCOL_ROUTE_DEFINITIONS[name as keyof typeof LOCAL_PROTOCOL_ROUTE_DEFINITIONS] ?? catalogDefinition;
+}
 
 function getMcpToolProjection(name: string) {
   return MCP_TOOL_METADATA.get(name)?.action_catalog_projection;
@@ -377,7 +377,7 @@ export async function callDomainTool(name: string, args: ToolArgs, deps: Partial
     throw new Error(`Unknown tool: ${name}`);
   }
 
-  const routeDefinition = MCP_ROUTE_METADATA[name as ToolName] || TOOL_ROUTE_DEFINITIONS[name as ToolName];
+  const routeDefinition = routeDefinitionFor(name);
   if (!routeDefinition) {
     throw new Error(`Tool routing not configured: ${name}`);
   }

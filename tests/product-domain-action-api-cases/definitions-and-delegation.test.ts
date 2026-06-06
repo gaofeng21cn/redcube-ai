@@ -11,6 +11,7 @@ import {
   mkdtempSync,
   os,
   path,
+  readFileSync,
   runDeliverableRoute,
   StdioClientTransport,
   test,
@@ -118,6 +119,18 @@ test('MCP catalog definitions are projected from the RedCube family action catal
     productEntryTool?.action_catalog_projection,
     metadata.mcp_tools.find((tool) => tool.name === 'redcube_product_entry')?.action_catalog_projection,
   );
+});
+
+test('MCP routing retires product-entry local fallback routes', () => {
+  const source = readFileSync(
+    fileURLToPath(new URL('../../apps/redcube-mcp/src/server.ts', import.meta.url)),
+    'utf-8',
+  );
+
+  assert.equal(source.includes('TOOL_ROUTE_DEFINITIONS'), false);
+  assert.equal(source.includes('const LOCAL_PROTOCOL_ROUTE_DEFINITIONS'), true);
+  assert.equal(source.includes('redcube_product_entry: {\n    selector:'), false);
+  assert.equal(source.includes("if (name === 'redcube_product_entry')"), true);
 });
 
 test('MCP product-entry routes are limited to the canonical family action catalog', async () => {
