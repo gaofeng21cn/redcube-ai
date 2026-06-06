@@ -54,7 +54,7 @@ User / Agent
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 `domain-handler export|dispatch` refs-only target 和 service-safe domain entry；OPL-generated `domain_action_adapter` wrapper 只是框架侧 descriptor / dispatch shell。provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。
 
-`temporal_autonomy_readiness` 是当前判断 RCA 是否默认由 OPL/Temporal 托管自治运行的机器读面。它声明 RCA 侧已提供 stage descriptor、queue/wakeup handoff、progress re-query、runtimeWatch、owner receipt、workspace receipt proof 与 no-regression refs，因此 `can_be_opl_temporal_hosted=true`、`default_opl_temporal_hosted_autonomy_enabled=true`、`long_time_autonomy_claimed=true`；同时它也把 provider production residency、worker restart/resume/re-query、retry/dead-letter 和真实 visual-stage long soak 留给 OPL/Temporal 证明，并保持 `production_visual_stage_long_soak_complete=false`。
+`temporal_autonomy_readiness` 是当前判断 RCA 是否默认由 OPL/Temporal 托管自治运行的机器读面；具体字段归 `contracts/production_acceptance/rca-production-acceptance.json` 和 product-entry manifest。本文只保留读法：RCA 已能作为 OPL/Temporal hosted consumer 暴露 stage descriptor、handoff、watch/projection 与 owner refs；真实 provider residency、restart/resume/re-query、retry/dead-letter 和 production visual-stage long soak 仍是 open evidence tail。
 
 因此本文的 `runtime` 只指 RCA domain-agent runtime boundary，不表示 RCA 仓维护 generic scheduler、generic queue、generic attempt ledger、generic state-machine runner、generic memory locator、generic observability 或通用 App/workbench runtime。
 
@@ -91,22 +91,16 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 
 `runtimeWatch` 是读模型和治理投影，不是第二套 runtime truth。它必须围绕同一组 `workspaceRoot`、`topic_id`、`deliverable_id`、`run_id` 与 artifact refs 读取状态，并与 `getReviewState`、`getPublicationProjection`、`auditDeliverable` 对齐。
 
-OPL 侧通过 generated `domain_action_adapter` descriptor 进入 RCA `domain-handler export|dispatch` target 读取和派发受控动作：
+OPL 侧通过 generated `domain_action_adapter` descriptor 进入 RCA `domain-handler export|dispatch` target。机器 action set 由 action catalog、product-entry manifest、domain handler source 和 contracts 持有；本文不保存逐 action 清单。
 
-- `domain-handler export` 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。
-- `domain-handler dispatch` 只允许 `emit_no_regression_evidence`、`emit_domain_owner_receipt`、`apply_visual_memory_writeback`、`apply_visual_workspace_lifecycle`、`evaluate_visual_transition`、`emit_workspace_receipt_proof`、`notification_receipt` 这类 RCA-owned guarded actions。`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；`runtimeWatch` 继续作为 direct review/progress read model，domain_action_adapter 查询归 OPL status/workbench runtime read-model target。
-- 旧 managed supervision action 与 `product_entry_continuation` 已从 default generic domain_action_adapter dispatch 物理删除/收薄；旧 managed run lookup action / 旧 managed supervision action 已从 public CLI/MCP/gateway surface 退役。generic supervision / continuation 归 OPL runner/session shell。RCA 保留 direct product-entry/session API 和内部 visual authority surfaces；旧 repo-local supervision/runtime 不再作为 active fixture 保留，只在 history/provenance 语境追溯。
-- `emit_no_regression_evidence` 只生成 RCA-owned runtime evidence ref，落在 workspace `.redcube/runtime/evidence/no-regression/`；它证明 descriptor/runtime refs、physical skeleton anchor、legacy active-path retirement 和 no-forbidden-write 边界未回退，不写 visual artifact blob，也不声明 provider-hosted visual long soak 完成。
+| Surface | 当前 runtime 读法 |
+| --- | --- |
+| `domain-handler export` | 暴露 product-entry registration、session continuity、artifact inventory、runtime health、review/publication projection refs。 |
+| `domain-handler dispatch` | 只接受 RCA-owned guarded actions，并只返回 receipt、typed blocker、no-regression、memory/lifecycle 或 workspace evidence refs。 |
+| `runtimeWatch` | direct review/progress read model；`runtime_watch` 不再是 generated `domain_action_adapter` default dispatch action。 |
+| retired managed / continuation actions | 只作为 tombstone、negative guard 或 history/provenance 读取；generic supervision / continuation 归 OPL runner/session shell。 |
 
-DomainActionAdapter 不写 visual truth、canonical artifacts、review verdict 或 publication gate。任何需要生成、修复、审阅或导出视觉交付物的动作都必须回到 RCA-owned route 与 gate。
-
-当前 runtime apply surface 包括：
-
-- `emit_domain_owner_receipt`：写 RCA-owned domain receipt、typed blocker 或 no-regression evidence ref，用于真实 artifact-producing attempt 的 owner closeout。
-- `apply_visual_memory_writeback`：写 RCA-owned memory proposal / accepted-rejected receipt refs，并由 RCA 持有 visual lesson body、accept/reject authority 和 route caveat 判断。
-- `apply_visual_workspace_lifecycle`：写 RCA-owned cleanup / restore / retention mutation receipt 或 typed blocker，用于真实 visual workspace 生命周期操作。
-
-这些 surface 只写 workspace/runtime refs，不写 repo source tree，不把 RCA visual truth、review/export verdict、memory body、canonical artifacts 或 artifact mutation authority 移给 OPL。OPL hosted integration 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。
+DomainActionAdapter 不写 visual truth、canonical artifacts、memory body、review verdict 或 publication gate。任何生成、修复、审阅、导出或 memory accept/reject 都必须回到 RCA-owned route、authority function、review/export gate、owner receipt 或 typed blocker。OPL hosted integration 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。
 
 ## Family Lifecycle
 

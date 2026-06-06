@@ -118,22 +118,16 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 
 ## 当前正式能力面
 
-- `source intake` 已通过 `CLI` / `MCP` 成为 `Source Readiness` 的正式 baseline surface
-- canonical quartet 固定为 `source-index.json`、`extracted-materials.json`、`source-audit.json`、`source-brief.json`
-- canonical readiness / augmentation surfaces 现已固定包括 `source-readiness-pack.json`、`source-augmentation-request.json`、`source-augmentation-result.json`、`source-augmentation-report.json` 与 `source-research-report.json`
-- `source-readiness deep research trigger + gate convergence` 已在当前主线上吸收：`Deep Research` 现在必须作为 shared `Source Readiness` augmentation 把 Step 1 推到 `planning_ready`，而不能把 `source_audit = pass` 误写成已放行
-- `workspace / operator quickstart convergence` 已在当前主线上吸收：brand-new / thin workspace 现在围绕 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run` 这条 canonical operator route 暴露 repo-verified quickstart surface，同时保持 `workspace doctor` 只做诊断、真正 bootstrap 由 `source intake` / `source research` 落盘
-- `operator surface consistency hardening` 已在当前主线上吸收：`workspace doctor` 对 brand-new workspace 只暴露 `source intake` / `source research` bootstrap guidance；command-scoped CLI help 现在必须 machine-readable 且 `--help` 不执行真正命令；`CLI review watch` 与 `MCP runtime_watch` 围绕同一 `workspace/topic/deliverable/run` locator 收口到 `runtimeWatch`
-- `runtime watch locator integrity hardening` 已在当前主线上吸收：deliverable-scope run record 现在必须持久化 `topic_id` / `deliverable_id`；`runtimeWatch` 在 persisted / preloaded run 两条入口上都必须验证 quartet locator；`CLI review watch` 与 `MCP runtime_watch` 在 mismatch 时共享同一 fail-closed 行为
-- 历史 `Hermes stable family closure truth` 冻结件只保留为本地迁移 provenance；当前 repo-verified 基线是 RCA 通过 direct product entry、service-safe domain entry、runtime-family route、review/export gate 与 OPL stage-plan refs 形成同一份 Codex-default execution truth，并由 `Codex CLI` 承担默认 concrete executor 角色
-- `ppt_deck` 与 `xiaohongshu` 当前在同一 substrate 上消费 `shared_source_truth`，guarded `poster_onepager` 则共享同一 `source_truth_contract` 与 `source_truth_consumption` summary
-- authoritative fail-closed source gate 继续留在 auditDeliverable / runtimeWatch，而 family artifact 需输出统一的 source_truth_consumption summary
-- `review / export / gate / audit hardening` 与 `family source-truth consumption convergence` 已在当前主线上吸收为前置 provenance
-- `publication-state.json` 现在必须围绕 hydrated `delivery_contract` 与 canonical `review_state` 输出 topic 级 projection；`xiaohongshu` 保持 explicit human publication gate，`ppt_deck` / `poster_onepager` 保持 direct-delivery semantics
-- `direct-delivery operator handoff hardening` 已在当前主线上吸收：direct-delivery family 现在必须暴露 machine-readable `operator_handoff`，同时保持 `delivery_state` ownership 与 gate semantics 的边界清晰
-- `direct-delivery lifecycle stage convergence` 已在当前主线上吸收：direct-delivery family 现在必须暴露 machine-readable `lifecycle_stage_contract` 与 `lifecycle_stage_summary`，同时保持 `Story Architecture` / `Visual Authorship` / `Delivery Packaging` 的当前命名不被改写
-- 更深层 source-plane 扩展仍属于同一主线上的后续增强，不应被误写成当前已完成的 repo truth
-- 当前 repo-tracked phase 标签仍可保留为 program pointer，但它不等于长线目标本身
+本节只保存当前 runtime policy，不追加 absorbed tranche 清单。旧 workspace/operator quickstart、operator surface、runtimeWatch locator、direct-delivery handoff、source convergence、Hermes closure 等过程证据按 provenance 读取，位置在 `docs/history/phase-2/`、`docs/history/hermes/` 或 `docs/history/process/`。
+
+| Capability area | 当前政策 |
+| --- | --- |
+| Source readiness | `CLI` / `MCP` / product-entry 只暴露 source intake、readiness、augmentation、research trigger 和 fail-closed source gate；source truth 与 augmentation truth 归 source owner docs、contracts、canonical artifacts 和 tests。 |
+| Visual route lifecycle | `ppt_deck` 与 `xiaohongshu` 默认 image-first；`poster_onepager` 是 guarded knowledge poster；HTML 和 native editable PPTX 是显式可选路线。 |
+| Review / watch / projection | `auditDeliverable`、`runtimeWatch`、`getReviewState` 和 `getPublicationProjection` 围绕同一 `workspace/topic/deliverable/run` 与 hydrated delivery contract 收口，不能生成平行 review truth。 |
+| Product/runtime handoff | direct product entry、service-safe domain entry、OPL stage-plan refs 和 Codex-default concrete executor 构成当前 repo-verified baseline；OPL/Temporal 持有通用 runtime 与 attempt ledger，RCA 持有 visual-domain authority。 |
+| Delivery / publication | `publication-state.json`、delivery contract、review state、operator handoff 和 lifecycle stage summary 只做 handoff / projection / gate 解释；RCA review/export verdict 和 artifact authority 仍由 owner receipt、typed blocker 和 workspace artifacts 证明。 |
+| Evidence tail | 真实 long-soak、production-like repeated route no-regression、memory/lifecycle receipt scaleout 和 generated/default caller thinning 继续由 active gap plan 与 production acceptance contracts 管理。 |
 
 ## 真相源原则
 
