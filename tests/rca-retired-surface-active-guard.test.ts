@@ -39,6 +39,33 @@ test('RCA active source surfaces do not restore compatibility alias claims or re
   assert.deepEqual(violations, []);
 });
 
+test('hosted attempt reconciliation fixture helpers stay out of production domain-entry source', () => {
+  assert.equal(
+    existsSync(path.resolve('packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/hosted-attempt-reconciliation.ts')),
+    false,
+  );
+  assert.equal(existsSync(path.resolve('tests/helpers/hosted-attempt-reconciliation.ts')), true);
+
+  const violations = [];
+  const retiredProductionPatterns = [
+    /\bbuildHostedAttemptBridgeFixture\b/,
+    /\breconcileHostedAttemptReceipt\b/,
+    /\bassertReceiptOnlyHostedAttemptProjection\b/,
+    /\bisReceiptOnlyHostedAttemptProjection\b/,
+    /hosted-attempt-reconciliation/,
+  ];
+  for (const file of listTextFiles('packages/redcube-domain-entry/src')) {
+    const text = readFileSync(file, 'utf-8');
+    for (const pattern of retiredProductionPatterns) {
+      if (pattern.test(text)) {
+        violations.push(`${file}: ${pattern}`);
+      }
+    }
+  }
+
+  assert.deepEqual(violations, []);
+});
+
 test('RCA consumes OPL family scheduler replacement without owning generic scheduling surfaces', () => {
   const currentProgram = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/current-program.json'),

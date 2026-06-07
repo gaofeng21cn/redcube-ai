@@ -39,6 +39,11 @@ import {
 import { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
+  assertReceiptOnlyHostedAttemptProjection as assertReceiptOnlyHostedAttemptProjectionImpl,
+  buildHostedAttemptBridgeFixture as buildHostedAttemptBridgeFixtureImpl,
+  reconcileHostedAttemptReceipt as reconcileHostedAttemptReceiptImpl,
+} from './helpers/hosted-attempt-reconciliation.ts';
+import {
   startMockCodexCli,
   withEnv,
 } from './helpers/mock-codex-cli.ts';
@@ -100,18 +105,15 @@ async function getDomainActionAdapterGuardedActionMetadata() {
 }
 
 async function buildHostedAttemptBridgeFixture(request) {
-  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
-  return module.buildHostedAttemptBridgeFixture(request);
+  return buildHostedAttemptBridgeFixtureImpl(request);
 }
 
 async function reconcileHostedAttemptReceipt(request) {
-  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
-  return module.reconcileHostedAttemptReceipt(request);
+  return reconcileHostedAttemptReceiptImpl(request);
 }
 
 async function assertReceiptOnlyHostedAttemptProjection(projection) {
-  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
-  return module.assertReceiptOnlyHostedAttemptProjection(projection);
+  return assertReceiptOnlyHostedAttemptProjectionImpl(projection);
 }
 
 async function withMockCodexRuntimeState(testFn) {

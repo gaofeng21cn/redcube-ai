@@ -4,12 +4,6 @@ import { domainActionAdapterGuardedActionSet } from './domain-action-adapter-par
 import { dispatchDomainActionAdapter as dispatchDomainActionAdapterImpl } from './domain-action-adapter-parts/dispatch-orchestration.js';
 import { buildDomainActionAdapterProjection, DOMAIN_ID, DOMAIN_ACTION_ADAPTER_ID } from './domain-action-adapter-parts/domain_action_adapter-export-projection.js';
 import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
-export {
-  assertReceiptOnlyHostedAttemptProjection,
-  buildHostedAttemptBridgeFixture,
-  isReceiptOnlyHostedAttemptProjection,
-  reconcileHostedAttemptReceipt,
-} from './domain-action-adapter-parts/hosted-attempt-reconciliation.js';
 
 const GUARDED_ACTIONS = domainActionAdapterGuardedActionSet();
 
