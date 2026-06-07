@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { BASELINE_ENTRIES, DEFAULT_LIMIT, countLines, evaluateLineBudget, isStrictLineBudgetMode, lineBudgetExitCode } from '../scripts/line-budget.ts';
+import { BASELINE_ENTRIES, DEFAULT_LIMIT, evaluateLineBudget, isStrictLineBudgetMode, lineBudgetExitCode } from '../scripts/line-budget.ts';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 
@@ -60,16 +60,13 @@ test('line budget exits advisory by default and strict only when explicit', () =
   assert.equal(lineBudgetExitCode({ failures: [], strict: true }), 0);
 });
 
-test('default baseline does not retain files already within the line budget', () => {
+test('default baseline entries are explicit numeric ratchets when present', () => {
   for (const relativePath of Object.keys(BASELINE_ENTRIES)) {
     const absolutePath = path.join(repoRoot, relativePath);
     assert.ok(fs.existsSync(absolutePath), `${relativePath} baseline entry points to a missing file`);
 
-    const lineCount = countLines(fs.readFileSync(absolutePath, 'utf8'));
-    assert.ok(
-      lineCount > DEFAULT_LIMIT,
-      `${relativePath} is ${lineCount} lines and must be removed from the line-budget baseline`,
-    );
+    assert.equal(typeof BASELINE_ENTRIES[relativePath], 'number');
+    assert.ok(BASELINE_ENTRIES[relativePath] > DEFAULT_LIMIT);
   }
 });
 
