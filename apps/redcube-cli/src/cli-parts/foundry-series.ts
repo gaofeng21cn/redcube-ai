@@ -21,8 +21,8 @@ const OPL_FOUNDRY_CONTRACT_REF = 'contracts/opl-framework/foundry-agent-series-c
 const OPL_POLICY_RELEASE_REF = 'contracts/opl-framework/foundry-agent-series-policy-release.json';
 const SERIES_ID = 'opl_foundry_agent_series.v1';
 const SERIES_LABEL = 'OPL Foundry Agent';
-const DIRECT_FRONTDOOR = 'redcube';
-const CANONICAL_OPL_FRONTDOOR = 'opl agents foundry';
+const DIRECT_COMMAND_SURFACE = 'redcube';
+const CANONICAL_OPL_COMMAND_SURFACE = 'opl agents foundry';
 const RCA_ALIAS = 'deck';
 
 const SERIES_SPINE = [
@@ -163,11 +163,11 @@ function baseSurface(operation: FoundrySeriesOperation, contract: JsonMap, comma
       series_id: SERIES_ID,
       series_label: SERIES_LABEL,
       product_model: readString(contract.product_model, 'OPL Framework -> One Person Lab App -> Foundry Agents'),
-      direct_frontdoor: DIRECT_FRONTDOOR,
+      direct_command_surface: DIRECT_COMMAND_SURFACE,
       foundry_namespace: 'redcube foundry',
-      canonical_opl_frontdoor: CANONICAL_OPL_FRONTDOOR,
+      canonical_opl_command_surface: CANONICAL_OPL_COMMAND_SURFACE,
       operations: [...FOUNDRY_SERIES_OPERATIONS],
-      ordinary_frontdoor_spine: SERIES_SPINE.map((entry) => ({ ...entry })),
+      ordinary_command_spine: SERIES_SPINE.map((entry) => ({ ...entry })),
       refs: {
         rca_domain_contract_ref: RCA_FOUNDRY_CONTRACT_REF,
         opl_series_contract_ref: OPL_FOUNDRY_CONTRACT_REF,

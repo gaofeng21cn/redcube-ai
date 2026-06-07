@@ -436,15 +436,15 @@ test('CLI exposes OPL Foundry Agent series first-layer grammar and work/deck ali
     assert.equal(parsed.operation, item.operation, item.command);
     assert.equal(parsed.command, item.command, item.command);
     assert.equal(parsed.foundry_agent_series.series_label, 'OPL Foundry Agent', item.command);
-    assert.equal(parsed.foundry_agent_series.direct_frontdoor, 'redcube', item.command);
-    assert.equal(parsed.foundry_agent_series.canonical_opl_frontdoor, 'opl agents foundry', item.command);
+    assert.equal(parsed.foundry_agent_series.direct_command_surface, 'redcube', item.command);
+    assert.equal(parsed.foundry_agent_series.canonical_opl_command_surface, 'opl agents foundry', item.command);
     assert.deepEqual(
       parsed.foundry_agent_series.operations,
       ['status', 'inspect', 'interfaces', 'validate', 'doctor', 'peers'],
       item.command,
     );
     assert.deepEqual(
-      parsed.foundry_agent_series.ordinary_frontdoor_spine.map((entry) => entry.object),
+      parsed.foundry_agent_series.ordinary_command_spine.map((entry) => entry.object),
       ['workspace', 'work', 'stage', 'run', 'vault', 'handoff', 'connect'],
       item.command,
     );

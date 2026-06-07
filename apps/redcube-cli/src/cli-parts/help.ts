@@ -55,7 +55,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     .find((entry) => entry.command === command);
   const catalog = {
     foundry: {
-      summary: '读取 RCA 的 OPL Foundry Agent series frontdoor，总览 status/inspect/interfaces/validate/doctor/peers。',
+      summary: '读取 RCA 的 OPL Foundry Agent series 命令面，总览 status/inspect/interfaces/validate/doctor/peers。',
       usage: 'redcube foundry <status|inspect|interfaces|validate|doctor|peers>',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'authority_boundary'],
