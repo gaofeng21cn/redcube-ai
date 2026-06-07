@@ -22,13 +22,15 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 ## 核心入口
 
-自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。这个 launcher 只用于命中 RCA domain handler / direct domain entry；不要把它写成 CLI/MCP/Skill/product/status/session/workbench metadata owner，也不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
+自动调用时使用 repo-local launcher：`npm run --prefix <redcube-ai-repo> redcube -- ...`。这个 launcher 的第一层公共语法暴露 OPL Foundry Agent series 读面：`status`、`inspect`、`interfaces`、`validate`、`doctor`、`peers`，也可用 `foundry <operation>`、`work <operation>` 或 RCA deck-oriented alias `deck <operation>`。这些命令只用于读取 series identity、spine、接口与边界，不是 visual truth、generic session shell、workbench metadata 或 product status/session wrapper owner；不要用 shell PATH lookup 或用户 PATH 上的裸 `redcube` 判断当前模块可用性。
 
+- `npm run --prefix <redcube-ai-repo> redcube -- status`
+- `npm run --prefix <redcube-ai-repo> redcube -- deck inspect`
 - `npm run --prefix <redcube-ai-repo> redcube -- product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`
 - `npm run --prefix <redcube-ai-repo> redcube -- domain-handler export --workspace-root <dir> --format json`
 - `npm run --prefix <redcube-ai-repo> redcube -- domain-handler dispatch --task <task.json> --format json`
 
-`domain-handler export` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、direct diagnostic entry 和 visual authority functions。
+`domain-handler export` 暴露 RCA-owned `family_action_catalog` 和 OPL 可消费的 generated-interface handoff；CLI help、Foundry series grammar、MCP descriptors/routes、skill command contracts、product-entry action metadata、status/session/workbench metadata 的 generated descriptor owner 是 `OPL`，RCA 只提供 action/stage metadata、domain handler targets、series-readable direct diagnostic entry 和 visual authority functions。
 
 `opl_generated:product_status` / `opl_generated:product_session` 是 OPL generated wrapper refs，不是 RCA repo-local 默认命令。需要在 RCA worktree 里直接命中当前 active handler target 时，使用 `redcube product invoke` 或 `redcube domain-handler export|dispatch`。
 

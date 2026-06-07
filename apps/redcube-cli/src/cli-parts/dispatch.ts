@@ -24,6 +24,10 @@ import {
   runDeliverableRoute,
 } from '@redcube/domain-entry';
 
+import {
+  buildFoundrySeriesSurface,
+  isFoundrySeriesOperation,
+} from './foundry-series.js';
 import { buildCommandHelp, buildHelp } from './help.js';
 import { buildCliJsonSummary } from './json-summary.js';
 import { parseArgs, resolveWorkspaceRoot } from './options.js';
@@ -166,6 +170,7 @@ function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap
 export async function executeCli(argv: string[], deps: CliDependenciesMap = {}): Promise<JsonMap> {
   const [command, ...rest] = argv;
   const subcommand = rest[0];
+  const positionalSubcommand = subcommand && !subcommand.startsWith('--') ? subcommand : '';
   const options = parseArgs(rest);
   const domainEntry = getCliDomainActions(deps.domainActions || {});
   const cwd = deps.cwd || process.cwd;
@@ -177,11 +182,39 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
   if (options.help === true) {
     const commandHelp = buildCommandHelp(
-      [command, subcommand].filter(Boolean).join(' '),
+      [command, positionalSubcommand].filter(Boolean).join(' '),
     );
     if (commandHelp) {
       return commandHelp;
     }
+  }
+
+  if (command === 'foundry') {
+    const operation = positionalSubcommand || 'status';
+    if (!isFoundrySeriesOperation(operation)) {
+      throw new Error('foundry 命令仅支持 status|inspect|interfaces|validate|doctor|peers');
+    }
+
+    return buildFoundrySeriesSurface(operation, `redcube foundry ${operation}`.trim(), {
+      namespace: 'foundry',
+    });
+  }
+
+  if (isFoundrySeriesOperation(command)) {
+    return buildFoundrySeriesSurface(command, `redcube ${command}`);
+  }
+
+  if (command === 'work' || command === 'deck') {
+    const operation = positionalSubcommand || 'inspect';
+    if (!isFoundrySeriesOperation(operation)) {
+      throw new Error(`${command} 命令仅支持 status|inspect|interfaces|validate|doctor|peers`);
+    }
+
+    return buildFoundrySeriesSurface(operation, `redcube ${command} ${operation}`.trim(), {
+      object: 'work',
+      alias: command,
+      alias_maps_to: command === 'deck' ? 'work' : undefined,
+    });
   }
 
   if (command === 'workspace') {

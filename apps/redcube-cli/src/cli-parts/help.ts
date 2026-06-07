@@ -1,5 +1,6 @@
 import type { DomainActionMap, JsonMap } from './types.js';
 import { buildRedCubeActionMetadata } from '@redcube/domain-entry';
+import { FOUNDRY_SERIES_OPERATIONS } from './foundry-series.js';
 
 function buildCommonFlows(overlayCatalog: { overlays: JsonMap[] }): JsonMap {
   return Object.fromEntries(
@@ -53,6 +54,108 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     .filter((entry): entry is JsonMap => Boolean(entry))
     .find((entry) => entry.command === command);
   const catalog = {
+    foundry: {
+      summary: '读取 RCA 的 OPL Foundry Agent series frontdoor，总览 status/inspect/interfaces/validate/doctor/peers。',
+      usage: 'redcube foundry <status|inspect|interfaces|validate|doctor|peers>',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'authority_boundary'],
+    },
+    'foundry status': {
+      summary: '读取 RCA Foundry Agent series 状态。',
+      usage: 'redcube foundry status',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'identity', 'authority_boundary'],
+    },
+    'foundry inspect': {
+      summary: '检查 RCA 作为 Presentation Foundry agent 的 series identity、spine 与 deck alias。',
+      usage: 'redcube foundry inspect',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'rca_series_aliases'],
+    },
+    'foundry interfaces': {
+      summary: '列出 CLI / skill / MCP / app_action 派生面及 owner 边界。',
+      usage: 'redcube foundry interfaces',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'authority_boundary'],
+    },
+    'foundry validate': {
+      summary: '校验 RCA CLI Foundry series grammar 与本地合同引用。',
+      usage: 'redcube foundry validate',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'checks'],
+    },
+    'foundry doctor': {
+      summary: '诊断 RCA CLI Foundry series grammar、合同链接与 work/deck alias。',
+      usage: 'redcube foundry doctor',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'checks'],
+    },
+    'foundry peers': {
+      summary: '列出共享 OPL Foundry Agent series grammar 的 peer agents。',
+      usage: 'redcube foundry peers',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['peers'],
+    },
+    status: {
+      summary: '读取 RCA Foundry Agent series 状态。',
+      usage: 'redcube status',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'identity', 'authority_boundary'],
+    },
+    inspect: {
+      summary: '检查 RCA 作为 Presentation Foundry agent 的 series identity、spine 与 deck alias。',
+      usage: 'redcube inspect',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'rca_series_aliases'],
+    },
+    interfaces: {
+      summary: '列出 CLI / skill / MCP / app_action 派生面及 owner 边界。',
+      usage: 'redcube interfaces',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'authority_boundary'],
+    },
+    validate: {
+      summary: '校验 RCA CLI Foundry series grammar 与本地合同引用。',
+      usage: 'redcube validate',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'checks'],
+    },
+    doctor: {
+      summary: '诊断 RCA CLI Foundry series grammar、合同链接与 work/deck alias。',
+      usage: 'redcube doctor',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['foundry_agent_series', 'checks'],
+    },
+    peers: {
+      summary: '列出共享 OPL Foundry Agent series grammar 的 peer agents。',
+      usage: 'redcube peers',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['peers'],
+    },
+    work: {
+      summary: '以 Foundry series 的 work object 读取 RCA visual deliverable project unit。',
+      usage: 'redcube work [status|inspect|interfaces|validate|doctor|peers]',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['scope', 'rca_series_aliases'],
+    },
+    deck: {
+      summary: 'RCA deck-oriented alias；等价映射到 Foundry series 的 work object。',
+      usage: 'redcube deck [status|inspect|interfaces|validate|doctor|peers]',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['scope', 'rca_series_aliases'],
+    },
+    'work inspect': {
+      summary: '以 work object 检查 RCA visual deliverable project unit。',
+      usage: 'redcube work inspect',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['scope', 'rca_series_aliases'],
+    },
+    'deck inspect': {
+      summary: '用 deck alias 检查 RCA visual deliverable project unit。',
+      usage: 'redcube deck inspect',
+      action_ref: 'buildFoundrySeriesSurface',
+      boundary_fields: ['scope', 'rca_series_aliases'],
+    },
     'workspace doctor': {
       summary: '诊断 workspace 合同与 canonical 目录，并把 brand-new workspace 引向 Source Readiness bootstrap writers。',
       usage: 'redcube workspace doctor --workspace-root <dir>',
@@ -173,6 +276,14 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
     availableOverlays: overlayCatalog.overlays,
     commonTasks: [
       {
+        task: '读取 RCA OPL Foundry Agent series 状态',
+        command: 'redcube status',
+      },
+      {
+        task: '检查 RCA work/deck alias 与 series spine',
+        command: 'redcube deck inspect',
+      },
+      {
         task: '检查工作区是否可用',
         command: 'redcube workspace doctor --workspace-root <dir>',
       },
@@ -240,6 +351,10 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
     commonFlows: buildCommonFlows(overlayCatalog),
     operatorQuickstart: buildOperatorQuickstart(),
     commandGroups: {
+      foundry: [...FOUNDRY_SERIES_OPERATIONS],
+      series: [...FOUNDRY_SERIES_OPERATIONS],
+      work: [...FOUNDRY_SERIES_OPERATIONS],
+      deck: [...FOUNDRY_SERIES_OPERATIONS],
       workspace: ['doctor'],
       topics: ['list'],
       source: ['intake', 'research', 'augment', 'prepare-augmentation-result', 'write-augmentation-result', 'execute-augmentation'],

@@ -334,6 +334,8 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
+  assert.equal(parsed.commonTasks.some((item) => item.command === 'redcube status'), true);
+  assert.equal(parsed.commonTasks.some((item) => item.command === 'redcube deck inspect'), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review get')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review projection')), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review watch')), false);
@@ -349,6 +351,9 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   ]);
   assert.equal(parsed.commandGroups.source.includes('research'), true);
   assert.equal(parsed.commandGroups.deliverable.includes('create'), true);
+  assert.deepEqual(parsed.commandGroups.foundry, ['status', 'inspect', 'interfaces', 'validate', 'doctor', 'peers']);
+  assert.deepEqual(parsed.commandGroups.work, ['status', 'inspect', 'interfaces', 'validate', 'doctor', 'peers']);
+  assert.deepEqual(parsed.commandGroups.deck, ['status', 'inspect', 'interfaces', 'validate', 'doctor', 'peers']);
   assert.equal(parsed.commandGroups.managed, undefined);
   assert.equal(parsed.commandGroups.product.includes('invoke'), true);
   assert.equal(parsed.commandGroups.product.includes('session'), false);
@@ -365,6 +370,115 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   assert.match(parsed.usage.reviewMutate, /promote_baseline/);
 });
 
+test('CLI exposes OPL Foundry Agent series first-layer grammar and work/deck alias', () => {
+  const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
+  const cases = [
+    {
+      args: ['status'],
+      operation: 'status',
+      command: 'redcube status',
+      surfaceKind: 'rca_foundry_agent_status',
+    },
+    {
+      args: ['foundry', 'status'],
+      operation: 'status',
+      command: 'redcube foundry status',
+      surfaceKind: 'rca_foundry_agent_status',
+    },
+    {
+      args: ['interfaces'],
+      operation: 'interfaces',
+      command: 'redcube interfaces',
+      surfaceKind: 'rca_foundry_agent_interfaces',
+    },
+    {
+      args: ['validate'],
+      operation: 'validate',
+      command: 'redcube validate',
+      surfaceKind: 'rca_foundry_agent_validate',
+    },
+    {
+      args: ['doctor'],
+      operation: 'doctor',
+      command: 'redcube doctor',
+      surfaceKind: 'rca_foundry_agent_doctor',
+    },
+    {
+      args: ['peers'],
+      operation: 'peers',
+      command: 'redcube peers',
+      surfaceKind: 'rca_foundry_agent_peers',
+    },
+    {
+      args: ['work'],
+      operation: 'inspect',
+      command: 'redcube work inspect',
+      surfaceKind: 'rca_foundry_agent_inspect',
+      scopeAlias: 'work',
+    },
+    {
+      args: ['deck', 'inspect'],
+      operation: 'inspect',
+      command: 'redcube deck inspect',
+      surfaceKind: 'rca_foundry_agent_inspect',
+      scopeAlias: 'deck',
+    },
+  ];
+
+  for (const item of cases) {
+    const output = execFileSync('node', [cliPath, ...item.args], {
+      encoding: 'utf-8',
+      cwd: path.resolve('.'),
+    });
+    const parsed = JSON.parse(output);
+    assert.equal(parsed.ok, true, item.command);
+    assert.equal(parsed.surface_kind, item.surfaceKind, item.command);
+    assert.equal(parsed.operation, item.operation, item.command);
+    assert.equal(parsed.command, item.command, item.command);
+    assert.equal(parsed.foundry_agent_series.series_label, 'OPL Foundry Agent', item.command);
+    assert.equal(parsed.foundry_agent_series.direct_frontdoor, 'redcube', item.command);
+    assert.equal(parsed.foundry_agent_series.canonical_opl_frontdoor, 'opl agents foundry', item.command);
+    assert.deepEqual(
+      parsed.foundry_agent_series.operations,
+      ['status', 'inspect', 'interfaces', 'validate', 'doctor', 'peers'],
+      item.command,
+    );
+    assert.deepEqual(
+      parsed.foundry_agent_series.ordinary_frontdoor_spine.map((entry) => entry.object),
+      ['workspace', 'work', 'stage', 'run', 'vault', 'handoff', 'connect'],
+      item.command,
+    );
+    assert.equal(parsed.identity.domain_id, 'redcube', item.command);
+    assert.equal(parsed.identity.authority_owner, 'redcube_ai', item.command);
+    assert.equal(parsed.rca_series_aliases.deck_alias_maps_to, 'work', item.command);
+    assert.equal(parsed.authority_boundary.generated_surface_can_write_domain_truth, false, item.command);
+    assert.equal(parsed.authority_boundary.generated_surface_can_create_owner_receipt, false, item.command);
+    if (item.scopeAlias) {
+      assert.equal(parsed.scope.object, 'work', item.command);
+      assert.equal(parsed.scope.alias, item.scopeAlias, item.command);
+    }
+  }
+});
+
+test('CLI Foundry series grammar works from isolated install', () => {
+  const { cliPath, installRoot } = createIsolatedCliInstall();
+
+  const output = execFileSync(
+    'node',
+    [cliPath, 'deck', 'doctor'],
+    { encoding: 'utf-8', cwd: installRoot },
+  );
+
+  const parsed = JSON.parse(output);
+  assert.equal(parsed.ok, true);
+  assert.equal(parsed.surface_kind, 'rca_foundry_agent_doctor');
+  assert.equal(parsed.command, 'redcube deck doctor');
+  assert.equal(parsed.scope.object, 'work');
+  assert.equal(parsed.scope.alias, 'deck');
+  assert.equal(parsed.foundry_agent_series.refs.rca_domain_contract_ref, 'contracts/foundry_agent_series.json');
+  assert.equal(parsed.checks.some((entry) => entry.check_id === 'cli:work-deck-alias' && entry.status === 'pass'), true);
+});
+
 
 test('CLI subcommand --help returns machine-readable command help without executing the route', () => {
   const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
@@ -376,6 +490,24 @@ test('CLI subcommand --help returns machine-readable command help without execut
     'deliverable run',
   ];
   const cases = [
+    {
+      args: ['status', '--help'],
+      command: 'status',
+      actionRef: 'buildFoundrySeriesSurface',
+      usageIncludes: 'redcube status',
+    },
+    {
+      args: ['foundry', 'interfaces', '--help'],
+      command: 'foundry interfaces',
+      actionRef: 'buildFoundrySeriesSurface',
+      usageIncludes: 'redcube foundry interfaces',
+    },
+    {
+      args: ['deck', 'inspect', '--help'],
+      command: 'deck inspect',
+      actionRef: 'buildFoundrySeriesSurface',
+      usageIncludes: 'redcube deck inspect',
+    },
     {
       args: ['workspace', 'doctor', '--help'],
       command: 'workspace doctor',
@@ -425,7 +557,11 @@ test('CLI subcommand --help returns machine-readable command help without execut
     assert.equal(parsed.command, item.command);
     assert.equal(parsed.action_ref, item.actionRef);
     assert.equal(parsed.usage.includes(item.usageIncludes), true);
-    assert.deepEqual(parsed.canonical_operator_route, expectedRoute);
+    if (item.actionRef === 'buildFoundrySeriesSurface') {
+      assert.equal(parsed.boundary_fields.includes('foundry_agent_series') || parsed.boundary_fields.includes('scope'), true);
+    } else {
+      assert.deepEqual(parsed.canonical_operator_route, expectedRoute);
+    }
   }
 
   const retiredWatchHelp = execCliExpectFailure(cliPath, ['review', 'watch', '--help']);
