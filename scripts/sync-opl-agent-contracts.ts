@@ -74,6 +74,124 @@ const SERIES_DESIGN_PROFILE = {
   },
 };
 
+const WORKSPACE_TOPOLOGY_PROFILE = {
+  surface_kind: 'opl_workspace_topology_profile',
+  version: 'workspace-topology-profile.v1',
+  profile_id: 'opl.workspace_topology_profile.v1',
+  topology_model: [
+    'workspace_group',
+    'project_unit',
+    'stage_artifact_unit',
+    'owner_receipt_or_typed_blocker',
+  ],
+  workspace_modes: [
+    'one_off',
+    'series',
+    'portfolio',
+  ],
+  default_project_stage_outputs_root: 'artifacts/stage_outputs',
+  default_profiles: {
+    one_off: {
+      workspace_mode: 'one_off',
+      project_collection_path: 'deliverables',
+      series_capable_skeleton: true,
+      shared_resource_roots: [
+        'shared/sources',
+        'shared/memory',
+        'shared/style_system',
+      ],
+      project_stage_outputs_root: 'artifacts/stage_outputs',
+    },
+    rca_series: {
+      workspace_mode: 'series',
+      project_collection_path: 'deliverables',
+      shared_resource_roots: [
+        'shared/sources',
+        'shared/brand',
+        'shared/visual_memory',
+        'shared/style_system',
+        'shared/material_inventory',
+      ],
+      project_stage_outputs_root: 'artifacts/stage_outputs',
+    },
+    mas_portfolio: {
+      workspace_mode: 'portfolio',
+      project_collection_path: 'studies',
+      shared_resource_roots: [
+        'data',
+        'literature',
+        'memory',
+        'shared/sources',
+      ],
+      project_stage_outputs_root: 'artifacts/stage_outputs',
+    },
+  },
+  domain_profile_defaults: {
+    mas: 'mas_portfolio',
+    mag: 'one_off',
+    rca: 'rca_series',
+    oma: 'one_off',
+  },
+  default_user_inspection_surface: {
+    ordinary_user_default_surface: 'workspace_local_project_stage_outputs',
+    project_stage_outputs_pattern: '<project-root>/artifacts/stage_outputs/<stage-id>/',
+    runtime_state_is_default_user_surface: false,
+    product_views_are_stage_outputs: false,
+  },
+  runtime_state_boundary: {
+    role: 'provider_backing_provenance_restore_audit',
+    runtime_state_can_be_canonical_project_root: false,
+    runtime_state_can_close_stage: false,
+    runtime_state_can_replace_owner_receipt_or_typed_blocker: false,
+  },
+  authority_boundary: {
+    opl_can_define_topology_contract: true,
+    opl_can_project_workspace_refs: true,
+    opl_can_write_domain_truth: false,
+    opl_can_mutate_artifact_body: false,
+    opl_can_create_owner_receipt: false,
+    opl_can_create_typed_blocker: false,
+    runtime_state_counts_as_user_default_surface: false,
+  },
+  workspace_initialization_policy: {
+    default_workspace_mode: 'one_off',
+    one_off_still_uses_project_collection_path: 'deliverables',
+    infer_series_when_user_requests_multiple_related_deliverables: true,
+    infer_portfolio_when_user_requests_shared_research_workspace_with_multiple_studies: true,
+    upgrading_one_off_to_series_must_not_move_existing_project_roots: true,
+    explicit_workspace_mode_declaration_preferred: true,
+  },
+  example_project_layouts: {
+    one_off: {
+      project_collection_path: 'deliverables',
+      project_root_pattern: 'deliverables/<project-id>',
+      project_stage_outputs_pattern: 'deliverables/<project-id>/artifacts/stage_outputs/<stage-id>/',
+    },
+    rca_series: {
+      shared_roots: [
+        'shared/sources',
+        'shared/brand',
+        'shared/visual_memory',
+        'shared/style_system',
+        'shared/material_inventory',
+      ],
+      project_collection_path: 'deliverables',
+      project_root_pattern: 'deliverables/<deck-id>',
+      project_stage_outputs_pattern: 'deliverables/<deck-id>/artifacts/stage_outputs/<stage-id>/',
+    },
+    mas_portfolio: {
+      shared_roots: [
+        'data',
+        'literature',
+        'memory',
+      ],
+      project_collection_path: 'studies',
+      project_root_pattern: 'studies/<study-id>',
+      project_stage_outputs_pattern: 'studies/<study-id>/artifacts/stage_outputs/<stage-id>/',
+    },
+  },
+};
+
 const DOMAIN_SPECIFIC_PROFILE = {
   profile_id: 'rca_domain_specific_series_profile.v1',
   series_membership: 'opl_foundry_agent_series',
@@ -258,6 +376,7 @@ function buildDomainDescriptor() {
     series_design_profile: SERIES_DESIGN_PROFILE,
     domain_specific_profile: DOMAIN_SPECIFIC_PROFILE,
     standard_contract_refs: {
+      domain_manifest_registration: 'contracts/opl_domain_manifest_registration.json',
       action_catalog: 'contracts/action_catalog.json',
       stage_control_plane: 'contracts/stage_control_plane.json',
       pack_compiler_input: 'contracts/pack_compiler_input.json',
@@ -281,6 +400,111 @@ function buildDomainDescriptor() {
       opl_can_mutate_artifacts: false,
       provider_completion_is_domain_ready: false,
     },
+  };
+}
+
+function buildOplDomainManifestRegistration() {
+  return {
+    surface_kind: 'opl_domain_manifest_registration',
+    schema_version: 1,
+    domain_id: DOMAIN_ID,
+    project_id: 'redcube',
+    agent_id: 'rca',
+    owner: DOMAIN_ID,
+    registry_owner: GENERATED_SURFACE_OWNER,
+    registration_status: 'repo_contract_ready_rebind_required_for_live_opl_registry',
+    role: 'domain_registration_metadata_refs_only',
+    domain_manifest: {
+      domain_label: 'RedCube AI',
+      agent_role: 'visual_deliverable_foundry_agent',
+      delivery_domain: 'formal_visual_deliverables',
+      canonical_semantic_pack_root: 'agent/',
+      canonical_semantic_pack_role: 'repo_source_declarative_visual_pack',
+      domain_descriptor_ref: 'contracts/domain_descriptor.json',
+      stage_control_plane_ref: 'contracts/stage_control_plane.json',
+      action_catalog_ref: 'contracts/action_catalog.json',
+      pack_compiler_input_ref: 'contracts/pack_compiler_input.json',
+      generated_surface_handoff_ref: 'contracts/generated_surface_handoff.json',
+      functional_privatization_audit_ref: 'contracts/functional_privatization_audit.json',
+      domain_memory_descriptor_ref: 'contracts/memory_descriptor.json',
+      artifact_locator_contract_ref: 'contracts/artifact_locator_contract.json',
+      owner_receipt_contract_ref: 'contracts/owner_receipt_contract.json',
+      manifest_builder_export: '@redcube/domain-entry#getProductEntryManifest',
+      manifest_builder_source_ref: 'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+    },
+    workspace_binding_manifest_command: {
+      surface_kind: 'opl_workspace_binding_manifest_command_contract',
+      project_id: 'redcube',
+      workspace_locator_surface_kind: 'redcube_workspace',
+      expected_binding_command:
+        'opl workspace bind --project redcube --path <redcube-ai-repo> [--workspace-root <workspace-root>]',
+      expected_derived_manifest_command_template:
+        'node -e <redcube_generated_product_entry_manifest_materializer>',
+      expected_derived_status_command_template:
+        'node -e <redcube_generated_product_status_materializer>',
+      expected_module_path: 'packages/redcube-domain-entry/dist/index.js',
+      expected_export: 'getProductEntryManifest',
+      status_export: 'getProductStatus',
+      requires_build_artifact: true,
+      requires_opl_workspace_binding_registry_entry: true,
+      repo_contract_alone_updates_live_binding: false,
+      blocked_if_manifest_command_null: true,
+      pack_compiler_blocker_when_null: 'domain_manifest_not_resolved',
+    },
+    workspace_generated_artifact_policy: {
+      surface_kind: 'rca_workspace_generated_artifact_policy',
+      owner: DOMAIN_ID,
+      repo_source_tracking_allowed: false,
+      ignored_repo_root_paths: [
+        'workspace.yaml',
+        'workspace_*.json',
+        'shared/',
+      ],
+      generated_by: [
+        'OPL workspace initializer',
+        'OPL workspace topology/materialized resource manifest writer',
+      ],
+      lifecycle: 'workspace_runtime_state_not_repo_source',
+      durable_contract_owner: 'contracts/opl_domain_manifest_registration.json',
+      no_forbidden_write_policy:
+        'workspace topology outputs may exist beside a local workspace root but must not be tracked in the RCA source checkout',
+    },
+    consumed_by: [
+      'OPL workspace bind',
+      'OPL domain manifest resolver',
+      'OPL agents pack-compiler',
+      'OPL generated interface bundle',
+    ],
+    provided_outputs: [
+      'domain_registration_ref',
+      'domain_descriptor_ref',
+      'stage_control_plane_ref',
+      'action_catalog_ref',
+      'pack_compiler_input_ref',
+      'generated_surface_handoff_ref',
+      'functional_privatization_audit_ref',
+      'workspace_binding_manifest_command_contract',
+      'workspace_generated_artifact_policy',
+    ],
+    authority_boundary: {
+      refs_only: true,
+      domain_repo_can_own_generated_surface: false,
+      domain_repo_can_own_generic_runtime: false,
+      can_write_visual_truth: false,
+      can_write_visual_memory_body: false,
+      can_mutate_canonical_artifact_body: false,
+      can_authorize_review_export_verdict: false,
+      can_issue_rca_owner_receipt: false,
+      provider_completion_is_domain_ready: false,
+      descriptor_ready_is_visual_ready: false,
+    },
+    forbidden_claims: [
+      'repo_contract_alone_repaired_live_opl_workspace_registry',
+      'descriptor_ready_is_visual_ready',
+      'opl_can_write_rca_visual_truth',
+      'workspace_yaml_is_repo_source',
+      'shared_resource_manifests_are_repo_source',
+    ],
   };
 }
 
@@ -518,6 +742,7 @@ function buildContracts() {
 
   return {
     domain_descriptor: buildDomainDescriptor(),
+    opl_domain_manifest_registration: buildOplDomainManifestRegistration(),
     pack_compiler_input: buildPackCompilerInput(visualPackCompilerHandoff),
     cognitive_kernel_adoption: RCA_COGNITIVE_KERNEL_ADOPTION,
     golden_path_profile: RCA_GOLDEN_PATH_PROFILE,
@@ -574,6 +799,7 @@ function buildFoundryAgentSeriesContract(stageControlPlane) {
     stage_control_plane_target_domain_id: stageControlPlane.target_domain_id,
     app_projection_ref: 'contracts/generated_surface_handoff.json#/product_entry',
     series_design_profile: SERIES_DESIGN_PROFILE,
+    workspace_topology_profile: WORKSPACE_TOPOLOGY_PROFILE,
     domain_specific_profile: DOMAIN_SPECIFIC_PROFILE,
     identity_hygiene_policy: {
       policy_id: 'rca.identity_hygiene.v1',

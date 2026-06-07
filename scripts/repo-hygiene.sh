@@ -37,6 +37,9 @@ tracked="$(
     ':(glob)**/.omx/**' \
     ':(glob)**/.runtime-program/**' \
     ':(glob)**/runtime-state/**' \
+    workspace.yaml \
+    'workspace_*.json' \
+    'shared/**' \
     .agent-contract-baseline.json
 )"
 
@@ -59,6 +62,9 @@ unignored_generated="$(
     ':(glob)**/.omx/**' \
     ':(glob)**/.runtime-program/**' \
     ':(glob)**/runtime-state/**' \
+    workspace.yaml \
+    'workspace_*.json' \
+    'shared/**' \
     .agent-contract-baseline.json
 )"
 

@@ -31,6 +31,8 @@ RCA 的 repo-source layout 按标准 domain agent 职责读取：`agent/` 持有
 
 RCA repo source 只保存 locator、index、schema、receipt ref、restore/retention policy 和 no-forbidden-write 证据。visual truth、review/export verdict、artifact authority、visual memory body accept/reject 与 owner receipt 仍归 RCA owner chain；OPL 只上收通用 workspace/file lifecycle primitive、scheduler/runner/session/workbench shell 和 projection。
 
+当 RCA repo checkout 被临时用作 OPL workspace root 时，`workspace.yaml`、`workspace_*.json` 与 `shared/` 下的 `opl_resource_manifest.json` 属于 OPL workspace topology / materialized resource manifest 生成物，必须保持 ignored，不进入 repo source。RCA 持久的 pack compiler descriptor 输入是 `contracts/opl_domain_manifest_registration.json` 与 `contracts/domain_descriptor.json#/standard_contract_refs/domain_manifest_registration`；live OPL `agents pack-compiler` 还要求当前 OPL workspace binding 已通过 `opl workspace bind --project redcube --path <redcube-ai-repo>` 派生 `getProductEntryManifest` manifest command。
+
 ## 当前基线
 
 - `RedCube AI` 持有视觉领域真相、`invokeDomainEntry`、direct repo-verified 的 product-entry service surface，以及由单一 `redcube-ai` 应用技能、`CLI`、`MCP`、本地脚本与仓库跟踪合同组成的稳定可调用面。

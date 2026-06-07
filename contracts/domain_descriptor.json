@@ -102,6 +102,7 @@
     }
   },
   "standard_contract_refs": {
+    "domain_manifest_registration": "contracts/opl_domain_manifest_registration.json",
     "action_catalog": "contracts/action_catalog.json",
     "stage_control_plane": "contracts/stage_control_plane.json",
     "pack_compiler_input": "contracts/pack_compiler_input.json",

@@ -7,6 +7,11 @@ RTK.md
 .worktrees/
 .codegraph/
 
+# OPL workspace topology/materialized resource manifests when this checkout is used as a workspace root.
+/workspace.yaml
+/workspace_*.json
+/shared/
+
 # 运行产物
 .redcube_pi/
 projects/

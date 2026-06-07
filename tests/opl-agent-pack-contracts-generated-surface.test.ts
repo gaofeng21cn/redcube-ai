@@ -1,11 +1,14 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import test from 'node:test';
 
 import {
   assertNoLegacyAuthorityFunctionFields,
   oplCanonicalGeneratedSurfaceIds,
   readJson,
+  repoRoot,
 } from './helpers/opl-agent-pack-contracts.ts';
 
 test('RCA root generated surface handoff names OPL as owner for skill, product status, and session metadata', () => {
@@ -151,4 +154,75 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   assertNoLegacyAuthorityFunctionFields(functionalAudit, 'contracts/functional_privatization_audit.json');
   assertNoLegacyAuthorityFunctionFields(readJson('contracts/runtime-program/current-program.json'), 'contracts/runtime-program/current-program.json');
   assertNoLegacyAuthorityFunctionFields(readJson('contracts/runtime-program/opl-family-contract-adoption.json'), 'contracts/runtime-program/opl-family-contract-adoption.json');
+});
+
+test('RCA OPL manifest registration pins pack compiler descriptor input and keeps workspace topology generated output untracked', () => {
+  const domainDescriptor = readJson('contracts/domain_descriptor.json');
+  const registration = readJson('contracts/opl_domain_manifest_registration.json');
+  const gitignore = fs.readFileSync(path.join(repoRoot, '.gitignore'), 'utf8');
+  const repoHygiene = fs.readFileSync(path.join(repoRoot, 'scripts/repo-hygiene.sh'), 'utf8');
+
+  assert.equal(
+    domainDescriptor.standard_contract_refs.domain_manifest_registration,
+    'contracts/opl_domain_manifest_registration.json',
+  );
+  assert.equal(registration.surface_kind, 'opl_domain_manifest_registration');
+  assert.equal(registration.domain_id, 'redcube_ai');
+  assert.equal(registration.project_id, 'redcube');
+  assert.equal(registration.agent_id, 'rca');
+  assert.equal(registration.domain_manifest.manifest_builder_export, '@redcube/domain-entry#getProductEntryManifest');
+  assert.equal(
+    registration.domain_manifest.manifest_builder_source_ref,
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+  );
+  assert.equal(
+    registration.workspace_binding_manifest_command.expected_export,
+    'getProductEntryManifest',
+  );
+  assert.equal(
+    registration.workspace_binding_manifest_command.requires_opl_workspace_binding_registry_entry,
+    true,
+  );
+  assert.equal(
+    registration.workspace_binding_manifest_command.repo_contract_alone_updates_live_binding,
+    false,
+  );
+  assert.equal(
+    registration.workspace_binding_manifest_command.blocked_if_manifest_command_null,
+    true,
+  );
+  assert.equal(
+    registration.workspace_binding_manifest_command.pack_compiler_blocker_when_null,
+    'domain_manifest_not_resolved',
+  );
+
+  assert.equal(registration.workspace_generated_artifact_policy.repo_source_tracking_allowed, false);
+  assert.deepEqual(registration.workspace_generated_artifact_policy.ignored_repo_root_paths, [
+    'workspace.yaml',
+    'workspace_*.json',
+    'shared/',
+  ]);
+  for (const ignoredPath of ['/workspace.yaml', '/workspace_*.json', '/shared/']) {
+    assert.equal(gitignore.includes(ignoredPath), true, ignoredPath);
+  }
+  for (const hygienePattern of ['workspace.yaml', 'workspace_*.json', 'shared/**']) {
+    assert.equal(repoHygiene.includes(hygienePattern), true, hygienePattern);
+  }
+
+  assert.deepEqual(registration.authority_boundary, {
+    refs_only: true,
+    domain_repo_can_own_generated_surface: false,
+    domain_repo_can_own_generic_runtime: false,
+    can_write_visual_truth: false,
+    can_write_visual_memory_body: false,
+    can_mutate_canonical_artifact_body: false,
+    can_authorize_review_export_verdict: false,
+    can_issue_rca_owner_receipt: false,
+    provider_completion_is_domain_ready: false,
+    descriptor_ready_is_visual_ready: false,
+  });
+  assert.equal(
+    registration.forbidden_claims.includes('repo_contract_alone_repaired_live_opl_workspace_registry'),
+    true,
+  );
 });

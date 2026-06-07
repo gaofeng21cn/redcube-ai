@@ -259,8 +259,10 @@ export const RCA_COGNITIVE_KERNEL_ADOPTION = Object.freeze({
 });
 
 export const RCA_GOLDEN_PATH_PROFILE = Object.freeze({
-  surface_kind: 'opl_foundry_agent_golden_path_profile',
-  version: 'golden-path-profile.v1',
+  surface_kind: 'opl_golden_path_profile',
+  schema_version: 'golden-path-profile.v1',
+  profile_id: 'redcube-ai.golden-path',
+  domain: 'redcube_ai',
   owner: 'redcube-ai',
   domain_id: 'redcube_ai',
   state: 'advisory_current_contract',
@@ -304,6 +306,27 @@ export const RCA_GOLDEN_PATH_PROFILE = Object.freeze({
     'same_attempt_self_review_closes_quality_gate',
     'tool_catalog_prescribes_executor_sequence',
   ],
+  ordinary_path: {
+    path_id: 'redcube-ai_ordinary_default',
+    path_role: 'ordinary_default',
+    stage_refs: [
+      'source_intake',
+    ],
+  },
+  explicit_variants: [],
+  default_surface_policy: {
+    ordinary_route_count: 1,
+    variants_hidden_by_default: true,
+    raw_evidence_hidden_by_default: true,
+  },
+  authority_boundary: {
+    ordinary_path_count_must_be_one: true,
+    variant_can_be_default_without_explicit_selection: false,
+    opl_can_write_domain_truth: false,
+    opl_can_authorize_domain_ready: false,
+    opl_can_authorize_quality_verdict: false,
+    opl_can_mutate_artifact_body: false,
+  },
 });
 
 export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([

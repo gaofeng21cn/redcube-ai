@@ -1,0 +1,98 @@
+{
+  "surface_kind": "opl_domain_manifest_registration",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "project_id": "redcube",
+  "agent_id": "rca",
+  "owner": "redcube_ai",
+  "registry_owner": "one-person-lab",
+  "registration_status": "repo_contract_ready_rebind_required_for_live_opl_registry",
+  "role": "domain_registration_metadata_refs_only",
+  "domain_manifest": {
+    "domain_label": "RedCube AI",
+    "agent_role": "visual_deliverable_foundry_agent",
+    "delivery_domain": "formal_visual_deliverables",
+    "canonical_semantic_pack_root": "agent/",
+    "canonical_semantic_pack_role": "repo_source_declarative_visual_pack",
+    "domain_descriptor_ref": "contracts/domain_descriptor.json",
+    "stage_control_plane_ref": "contracts/stage_control_plane.json",
+    "action_catalog_ref": "contracts/action_catalog.json",
+    "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
+    "generated_surface_handoff_ref": "contracts/generated_surface_handoff.json",
+    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json",
+    "domain_memory_descriptor_ref": "contracts/memory_descriptor.json",
+    "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json",
+    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+    "manifest_builder_export": "@redcube/domain-entry#getProductEntryManifest",
+    "manifest_builder_source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts"
+  },
+  "workspace_binding_manifest_command": {
+    "surface_kind": "opl_workspace_binding_manifest_command_contract",
+    "project_id": "redcube",
+    "workspace_locator_surface_kind": "redcube_workspace",
+    "expected_binding_command": "opl workspace bind --project redcube --path <redcube-ai-repo> [--workspace-root <workspace-root>]",
+    "expected_derived_manifest_command_template": "node -e <redcube_generated_product_entry_manifest_materializer>",
+    "expected_derived_status_command_template": "node -e <redcube_generated_product_status_materializer>",
+    "expected_module_path": "packages/redcube-domain-entry/dist/index.js",
+    "expected_export": "getProductEntryManifest",
+    "status_export": "getProductStatus",
+    "requires_build_artifact": true,
+    "requires_opl_workspace_binding_registry_entry": true,
+    "repo_contract_alone_updates_live_binding": false,
+    "blocked_if_manifest_command_null": true,
+    "pack_compiler_blocker_when_null": "domain_manifest_not_resolved"
+  },
+  "workspace_generated_artifact_policy": {
+    "surface_kind": "rca_workspace_generated_artifact_policy",
+    "owner": "redcube_ai",
+    "repo_source_tracking_allowed": false,
+    "ignored_repo_root_paths": [
+      "workspace.yaml",
+      "workspace_*.json",
+      "shared/"
+    ],
+    "generated_by": [
+      "OPL workspace initializer",
+      "OPL workspace topology/materialized resource manifest writer"
+    ],
+    "lifecycle": "workspace_runtime_state_not_repo_source",
+    "durable_contract_owner": "contracts/opl_domain_manifest_registration.json",
+    "no_forbidden_write_policy": "workspace topology outputs may exist beside a local workspace root but must not be tracked in the RCA source checkout"
+  },
+  "consumed_by": [
+    "OPL workspace bind",
+    "OPL domain manifest resolver",
+    "OPL agents pack-compiler",
+    "OPL generated interface bundle"
+  ],
+  "provided_outputs": [
+    "domain_registration_ref",
+    "domain_descriptor_ref",
+    "stage_control_plane_ref",
+    "action_catalog_ref",
+    "pack_compiler_input_ref",
+    "generated_surface_handoff_ref",
+    "functional_privatization_audit_ref",
+    "workspace_binding_manifest_command_contract",
+    "workspace_generated_artifact_policy"
+  ],
+  "authority_boundary": {
+    "refs_only": true,
+    "domain_repo_can_own_generated_surface": false,
+    "domain_repo_can_own_generic_runtime": false,
+    "can_write_visual_truth": false,
+    "can_write_visual_memory_body": false,
+    "can_mutate_canonical_artifact_body": false,
+    "can_authorize_review_export_verdict": false,
+    "can_issue_rca_owner_receipt": false,
+    "provider_completion_is_domain_ready": false,
+    "descriptor_ready_is_visual_ready": false
+  },
+  "forbidden_claims": [
+    "repo_contract_alone_repaired_live_opl_workspace_registry",
+    "descriptor_ready_is_visual_ready",
+    "opl_can_write_rca_visual_truth",
+    "workspace_yaml_is_repo_source",
+    "shared_resource_manifests_are_repo_source"
+  ]
+}

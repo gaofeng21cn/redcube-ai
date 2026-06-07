@@ -63,8 +63,22 @@ test('RCA pack declares advisory cognitive-kernel contracts', () => {
   assert.equal(adoption.authority_boundary.opl_can_claim_domain_ready, false);
   assert.equal(adoption.authority_boundary.same_attempt_self_review_can_close_quality_gate, false);
 
+  assert.equal(golden.surface_kind, 'opl_golden_path_profile');
+  assert.equal(golden.schema_version, 'golden-path-profile.v1');
+  assert.equal(golden.profile_id, 'redcube-ai.golden-path');
+  assert.equal(golden.domain, 'redcube_ai');
   assert.equal(golden.default_outer_loop, 'current_owner_delta');
   assert.equal(golden.stage_attempt_strategy, 'cognitive_kernel_stage_internal');
+  assert.deepEqual(golden.ordinary_path, {
+    path_id: 'redcube-ai_ordinary_default',
+    path_role: 'ordinary_default',
+    stage_refs: [
+      'source_intake',
+    ],
+  });
+  assert.deepEqual(golden.explicit_variants, []);
+  assert.equal(golden.default_surface_policy.ordinary_route_count, 1);
+  assert.equal(golden.authority_boundary.variant_can_be_default_without_explicit_selection, false);
   assert.ok(golden.required_closeout_refs.includes('owner_receipt_ref_or_typed_blocker_ref'));
   assert.ok(golden.forbidden_claims.includes('tool_catalog_prescribes_executor_sequence'));
 });
