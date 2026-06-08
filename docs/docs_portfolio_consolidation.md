@@ -91,10 +91,10 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger Foldback
 
-Dated coverage entries that previously lived in this active governance document are archived in [RCA docs portfolio coverage ledger archive](./history/process/2026-06-02-rca-docs-portfolio-coverage-ledger-archive.md).
+Dated coverage entries, docs lifecycle inventories, SSOT closeouts and retirement proof/read-model foldbacks that previously lived as per-tranche process files are compressed under [RCA process history](./history/process/README.md), with durable no-resurrection rules in [RCA retired surface provenance](./history/process/retired-surface-provenance.md).
 
 This file now keeps only current lifecycle rules, directory roles, content placement rules, direct-retirement posture, long-list governance, and stale-word no-resurrection policy. Do not append future six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs here. New dated coverage belongs under `docs/history/process/` or another precise `docs/history/**` owner; durable conclusions must be folded back into the core five docs, active gap plan, owner docs, contracts, source, or tests.
 
 Current active owner remains [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md). Product-entry support is indexed by `docs/product/` and `docs/references/product-entry/`; historical Hermes / Phase 2 / managed runtime / route probe records stay under [历史文档](./history/README.md).
 
-Latest full docs lifecycle cleanup closeout: [2026-06-03 RCA docs lifecycle cleanup closeout](./history/process/2026-06-03-rca-docs-lifecycle-cleanup-closeout.md). It records the README/docs inventory, role classification, stale-word scan scope and docs-only verification for this cleanup; the durable lifecycle rules are folded back into this file and [文档索引](./README.md).
+Latest process-history compression snapshot is indexed by [RCA process history](./history/process/README.md). It records the retained dated evidence files, compressed closeout groups, coverage snapshot and next write scope; the durable lifecycle rules are folded back into this file and [文档索引](./README.md).
