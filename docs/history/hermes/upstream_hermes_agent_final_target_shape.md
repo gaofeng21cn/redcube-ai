@@ -9,80 +9,59 @@ Machine boundary: 人读历史 target brief。当前机器真相继续归 contra
 
 生命周期说明：本文件仍作为 contract-linked target/provenance brief 保留，但当前解释口径已被 2026-05-10 provider-backed OPL runtime target 更新。OPL 是可外部依赖的 stage-led、以 Agent executor 为最小执行单位 运行框架；Hermes 只保留 legacy/optional provider 或显式 proof lane；RedCube 的第一公开身份仍是视觉交付领域智能体。
 
-## 一句话结论
+## 历史 target 摘要
 
-`RedCube AI` 的最终目标，不是继续打磨 repo-local runtime，也不是把自己写成整个 `OPL`。
-对外第一身份是独立 visual-deliverable domain agent，`gateway / harness` 只作为内部边界语言。
-这条主线已经冻结的理想型是：
+这份 brief 的 contract-linked 价值是保存当时的目标拆分，而不是继续定义当前 App、runtime 或 executor backlog。
 
-`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+| 历史主题 | 2026-04-12 target 读法 | 当前 owner |
+| --- | --- | --- |
+| Direct product entry | `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces` | RCA product-entry manifest、domain handler target、source/tests、core docs。 |
+| OPL-hosted route | `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces` | OPL / Temporal provider 和 OPL generated/hosted shells 持有通用 runtime/workbench/session wrapper；RCA 持有 visual-domain truth 与 owner receipts。 |
+| Hermes role | 当时作为 upstream proof / optional provider / migration target 读取。 | 只作为显式 optional / proof backend、executor adapter 评估、diagnostic 或历史参考；不是默认 runtime owner。 |
+| Default executor | 保持 concrete executor owner 不被 runtime cutover 改写。 | `Codex CLI` 是当前第一公民 concrete executor。 |
 
-放到 `OPL` 顶层语义里，同一目标形态应收口为：
+## 当前读法
 
-`User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
+当前 SSOT 不在本文。读者应回到：
 
-## 最终目标到底是什么
+- `docs/active/rca-ideal-state-gap-plan.md`
+- `docs/project.md`
+- `docs/status.md`
+- `docs/architecture.md`
+- `contracts/runtime-program/current-program.json`
+- product-entry manifest、domain handler source、runtime-program leaf parts、focused tests、owner receipts 和 typed blockers
 
-最终目标是把 `RedCube AI` 收敛成一个 `OPL` 可调用、也可独立直达的 visual-domain 产品 / 服务节点。
-它应当：
+这些 owner 才能说明：
 
-- 让 `OPL Runtime Manager` 作为 OPL 侧 thin product-managed adapter/projection layer，管理 configured family runtime provider 的 profile/provisioning、task registration hydration、runtime status projection、doctor/repair/resume、native helper catalog 与高频状态索引；Temporal 是 production online runtime 的必需 substrate，Hermes 只保留 legacy/optional provider 或显式 proof lane
-- 让 `RedCube AI` 继续承担 `gateway -> family -> profile -> pack` authority 与 visual-domain truth
-- 让 direct `RedCube Product Entry` 与 `OPL Runtime Manager` handoff 收敛到同一个 service-safe domain entry contract
-- 让 `Codex CLI` 继续作为 executor adapter 背后的默认 concrete executor，不改写 default executor owner
+- RCA 当前第一公开身份仍是 visual-deliverable domain agent。
+- OPL-hosted route 和 direct route 都必须进入同一个 RCA service-safe domain entry / domain handler target。
+- Temporal 是 production online runtime 的必需 substrate 目标；Hermes-Agent 不是 RCA 当前 production substrate。
+- Mature end-user App / workbench / hosted shell 差距属于当前 App / OPL / RCA active owner 的交界，不从本历史 brief 派生 backlog。
 
-最终目标不是让 `RedCube AI` 变成整个 `OPL`，也不是把 repo-local `Hermes` 命名重新包装成“长期 runtime owner”。
+## 历史 proof 读法
 
-## 边界怎么分
+| 历史事实 | 当前限制 |
+| --- | --- |
+| external `Hermes-Agent` live/proof substrate 有历史 closeout / blocker / activation package。 | 只能证明当时 proof lane 曾推进；不能声明当前 runtime ownership、OPL hosted readiness 或 production readiness。 |
+| `redcube_service_safe_domain_entry` 曾作为 machine-readable domain adapter 冻结。 | 当前 service-safe entry 的权威回到 runtime-program contracts、product-entry manifest、domain handler source 和 tests。 |
+| CLI / MCP 和 direct route 曾被用于验证历史目标。 | 当前 public entry、formal entry 和 fail-closed behavior 以 core docs、CLI/MCP source、contracts 和 tests 为准。 |
+| visual-domain truth 在历史 cutover 中没有迁出 RCA。 | 当前仍由 RCA 持有 visual truth、artifact authority、review/export verdict、visual memory accept/reject、owner receipt 和 typed blocker。 |
 
-`OPL Runtime Manager` 长线负责：
+## 不作为当前 gap
 
-- product-managed adapter/projection layer
-- configured family runtime provider 的 registration / status / doctor / repair / resume 投影
-- native helper catalog 与高频状态索引
+本文不再保存 active gap 清单。以下历史表达不得被复制成当前待办：
 
-configured family runtime provider 可承担：
+- mature `RedCube Product Entry` 前台壳。
+- managed web runtime 产品化壳。
+- upstream run-surface terminal-event blocker。
+- Hermes-first runtime substrate cutover。
 
-- runtime substrate / orchestration
-- run session、interrupt / resume、watch、recovery
-- future product-entry shell 背后的 runtime session continuity
+若这些主题仍有当前工作价值，必须先由 `docs/active/rca-ideal-state-gap-plan.md`、App / OPL owner docs、runtime-program contracts、source/tests 或 owner receipt / typed blocker 重新承接。
 
-`RedCube AI` 长线继续负责：
+## No-Resurrection Boundary
 
-- visual domain gateway
-- family / profile / pack authority
-- `program_id`、`topic_id`、`deliverable_id`、`run_id`
-- `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection`
-- canonical artifacts、review / projection、delivery contract 与 export truth
-
-因此，future `RedCube Product Entry` 的价值，不是替代上游 runtime，而是把用户入口稳定接到同一个 service-safe domain entry 上。
-
-## 当前已经落地的部分
-
-- external `Hermes-Agent` live/proof substrate 已有历史可验证 closeout 记录；当前 OPL-hosted 入口通过 `OPL Runtime Manager` 作为薄 adapter/projection layer 消费 configured family runtime provider，不把 repo-local wrapper 或 Hermes-first proof 写成当前 substrate ownership proof
-- `redcube_service_safe_domain_entry` 已冻结为 machine-readable domain adapter
-- `CLI` / `MCP` 仍是 repo-verified public entry
-- repo-verified direct route 与 `OPL Runtime Manager` hosted integration 已对齐为同一 downstream domain-agent entry
-- visual-domain truth 仍由 `RedCube AI` 收口，没有被 runtime cutover 冲散
-
-## 当前还没有落地的部分
-
-- repo-verified 的 `RedCube Product Entry` service surface 已落地，但成熟的最终用户产品入口前台壳仍未落地
-- repo-verified 的 `OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube` hosted integration 已能进入同一个 downstream product entry，但仍不是成熟的 end-user 托管前台路线，也不等于生产级 Temporal stage execution 已完成
-- 当前 landed 的是 service surface、CLI/MCP wrapper 与 session continuity，不是独立 UI 或 managed web runtime shell
-
-## 当前真实 gap
-
-当前已经不是旧的 upstream run-surface terminal-event blocker 在卡这条线了。
-在 `2026-04-12` 的当前验证宿主上，live upstream preflight 已能通过，`xiaohongshu` 的 baseline / optimize_existing 链路也已 fresh 穿过 `screenshot_review` 与 `publish_copy`。
-因此当前真正还没落地的，不是旧 terminal-event proof blocker，也不再是 repo-verified product-entry service surface，而是：
-
-- mature 的最终用户 `RedCube Product Entry` 前台壳
-- managed web runtime 上的产品化壳
-
-## 明确不做的事
-
-- 不把 `RedCube AI` 写成整个 `OPL`
-- 不把 repo-local `Hermes` 命名重新包装成“已接入上游”
-- 不先做聊天 UI、自然语言壳或平台故事
-- 不先开新 family、academic poster 或 controller expansion
+- 不把 `RedCube AI` 写成整个 `OPL`。
+- 不把 repo-local `Hermes` 命名重新包装成已接入 upstream `Hermes-Agent`。
+- 不把 Hermes proof lane 恢复为默认 runtime owner、production substrate、generic session/workbench owner、App shell owner 或 production readiness proof。
+- 不把历史 `gateway / harness / Product Entry / OPL Runtime Manager` wording 当作当前机器接口；当前机器接口以 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和 typed blockers 为准。
+- 不新增 compatibility alias、facade、wrapper 或测试来保护旧 Hermes-first / gateway-first / repo-local runtime path。

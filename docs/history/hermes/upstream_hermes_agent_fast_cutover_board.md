@@ -9,108 +9,60 @@ Machine boundary: 人读历史 board。当前机器真相继续归 contracts、s
 
 生命周期说明：本文件是 contract-linked 的历史 cutover board / proof provenance。2026-05-10 之后的当前运行口径以 provider-backed OPL runtime target、Temporal production substrate target、默认 `Codex CLI` 最小执行单元、以及 RCA-owned visual-domain truth 为准；本文不再作为 RedCube 对外第一身份或 Hermes-first 默认 runtime owner 说明。
 
-## 文档目的
+## 历史 SSOT
 
-这份文档只回答一个问题：
+本文件只保留 `2026-04-12` upstream Hermes-Agent fast-cutover 主题的历史读法：
 
-- 在不继续深磨 repo-local runtime 的前提下，`RedCube AI` 如何以**最快且诚实**的方式切到理想形态。
+- 为什么当时要停止继续深磨 repo-local managed runtime。
+- 当时如何区分 upstream runtime proof 与 RCA visual-domain truth。
+- 哪些 contract-linked proof / blocker / closeout 仍需要这个人读上下文。
 
-这里的“理想形态”不是：
+当前执行、差距、owner-delta 和下一轮 baton 不从本文读取。当前 owner 是：
 
-- 把仓内现有 `Hermes` 命名继续包装成“已经接入上游”
-- 先做聊天 UI 或顶层自然语言壳
-- 先开新 family、先补 academic poster、先扩 platform 故事
+- `docs/active/rca-ideal-state-gap-plan.md`
+- `docs/project.md`
+- `docs/status.md`
+- `docs/architecture.md`
+- `contracts/runtime-program/current-program.json`
+- source/tests、runtime artifacts、owner receipts 和 typed blockers
 
-这里的“理想形态”是：
-
-- 上游 `Hermes-Agent` 真正拥有 session / run / watch / memory / scheduling / recovery 这层 runtime substrate
-- `RedCube AI` 继续只拥有 visual domain truth：
-  - `source truth`
-  - `family / profile / pack`
-  - `audit / review / export / projection`
-  - visual-domain gate semantics
-
-配套冻结件：
+配套历史冻结件：
 
 - final target brief：`docs/history/hermes/upstream_hermes_agent_final_target_shape.md`
 - final target contract：`contracts/runtime-program/upstream-hermes-agent-final-target-shape.json`
 
-## 一句话目标
+## 当时的 cutover 假设
 
-把当前 `repo-local managed runtime baseline + Codex local operator host`，切成：
+| 历史维度 | 2026-04-12 读法 | 当前读法 |
+| --- | --- | --- |
+| Runtime substrate | 通过真实 upstream `Hermes-Agent` proof 替代 repo-local managed runtime 主责。 | Production online runtime substrate 回到 OPL / Temporal provider 目标；Hermes-Agent 只作为显式 optional / proof backend 或 executor adapter 评估。 |
+| RCA 边界 | RCA 保持 `source truth`、family/profile/pack、audit/review/export/projection 和 visual-domain gates。 | RCA 继续持有 visual truth、route truth、review/export verdict、artifact authority、visual memory accept/reject、owner receipt 和 typed blocker。 |
+| Product / hosted entry | 形成可被未来 OPL Runtime Manager 调用的 service-safe domain entry。 | Direct route 和 OPL-hosted route 都回到 RCA service-safe domain entry；OPL/generated shells 持有通用 runtime/workbench/session wrapper。 |
+| Default executor | 当时关注 upstream Hermes runtime proof。 | `Codex CLI` 是当前第一公民 concrete executor；其他 executor 必须显式 adapter 接入。 |
 
-`real upstream Hermes-Agent runtime substrate + RedCube visual-domain gateway`
+## 历史阶段摘要
 
-并保留当前 `ppt_deck / xiaohongshu / guarded poster_onepager` 的 domain contract 不漂移。
+| Phase | 当时目标 | 当前保留价值 |
+| --- | --- | --- |
+| F1 | 给出真实 upstream Hermes connection / adapter / client / endpoint proof。 | 作为 `upstream_hermes_agent_activation_package.md` 和 live-verification blocker / closeout 的历史入口。 |
+| F2 | 把 run creation、watch、resume/interrupt、scheduling/recovery/session linkage 从 repo-local runtime 主责迁出。 | 作为旧 managed runtime owner 退役语境；不授权恢复 Hermes-first runtime owner。 |
+| F3 | 收口 service-safe domain entry / adapter，并保持 CLI/MCP 可验证。 | 作为 RCA service-safe domain entry provenance；当前 owner 回到 product-entry manifest、domain handler target、contracts 和 source/tests。 |
+| F4 | 对 `ppt_deck`、`xiaohongshu` 和 guarded `poster_onepager` 做端到端 proof。 | 只解释 live verification closeout / blocker 的历史范围；不能升级成当前 visual ready、exportable、handoffable、domain ready 或 production ready。 |
 
-## 成功条件
+## 历史排除范围
 
-只有同时满足下面几项，才可把这条线写成完成：
+这条历史线当时明确排除 new family onboarding、academic poster 新 contract、Web 前台壳、自然语言聊天壳和通用 agent 平台化。当前仍按 active owner 读取这些主题；本文不能重新开启任何一项 backlog。
 
-1. 仓库能给出真实的上游 `Hermes-Agent` 依赖与连接证据。
-2. `runManagedDeliverable / getManagedRun / superviseManagedRun` 不再由 repo-local runtime 自己主责。
-3. `program_id / topic_id / deliverable_id / run_id`、`auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 继续保持 canonical truth surface。
-4. 形成可被未来 `OPL Runtime Manager` 托管路径调用的 service-safe domain entry / adapter surface。
+## 退役提示词
 
-## 明确排除范围
+原 board 曾保存一段可复制的长线 Codex prompt。该 prompt 已退役：它只证明当时存在 fast-cutover 执行意图，不再是当前 Agent prompt、runbook、执行顺序、delete authority 或 readiness proof。
 
-本线不做：
+后续 agent 如果需要推进 Hermes / executor / runtime 相关工作，必须重新从当前核心 docs、runtime-program contracts、active gap plan、source/tests、owner receipts 和 typed blockers 建立 live truth；不得从本文继续下一棒。
 
-- 新 family onboarding
-- academic poster 新 contract
-- 先做 Web 前端
-- 先做自然语言聊天壳
-- 先做通用 agent 平台化
+## No-Resurrection Boundary
 
-## 固定阶段顺序
-
-### F1. 真正的上游 Hermes 连接证据
-
-先把“已连接上游 `Hermes-Agent`”做成可验证事实：
-
-- profile / runtime root / session substrate
-- 真实 adapter / client / gateway endpoint
-- repo 内不再只停留在命名或 mock wiring
-
-### F2. Runtime substrate owner 切换
-
-在不改写 visual domain contract 的前提下，把 runtime 主责切到上游 `Hermes-Agent`：
-
-- run creation
-- run watch
-- resume / interrupt
-- scheduling / recovery
-- session linkage
-
-### F3. Domain entry adapter 收口
-
-形成一个明确的、可被顶层 `OPL Runtime Manager` 调用的 domain entry adapter：
-
-- 继续保留 `CLI` / `MCP`
-- 同时补齐 service-safe adapter / entry contract
-- 这一步不是聊天 UI，而是把 domain gateway 变成真正可被产品入口调用的服务面
-
-### F4. 端到端验证与 absorb
-
-至少在下面这些路径上做 fresh proof：
-
-- `ppt_deck`
-- `xiaohongshu`
-- guarded `poster_onepager`
-
-并证明：
-
-- run surface 在上游 `Hermes-Agent`
-- domain truth 仍在 RedCube
-- public docs / current-program / tests / contracts 一致
-
-## 默认验证
-
-- `scripts/verify.sh meta`
-- `scripts/verify.sh integration`
-- `scripts/verify.sh e2e`
-- 额外补一组真实 `Hermes-Agent` substrate proof
-
-## 长线 Codex 提示词
-
-> 你现在负责 `RedCube AI` 的 `upstream Hermes-Agent fast cutover` 主线。先完整读取并遵守以下文档：`AGENTS.md`、`README.md`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`contracts/runtime-program/current-program.json`、`docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md`。目标不是继续打磨 repo-local runtime，也不是先做 UI；目标是在不改写 RedCube visual domain boundary 的前提下，以最快速度把 runtime substrate 责任切到真实上游 `Hermes-Agent`，并形成可被未来 `OPL Runtime Manager` 调用的 service-safe domain entry surface。你必须按 board 的顺序自行推进：先冻结真实上游连接证据，再迁移 runtime owner，再收口 domain entry adapter，再做端到端验证。你可以自己写 activation package、tests、contracts、docs，并在每个 honest tranche 完成后直接 absorb 到 `main`、提交、push、继续下一棒；不要因为“已完成一个小 tranche”就停车。只有遇到真实硬 blocker 才允许停下，例如：需要外部安装/凭证/网络服务、需要用户做不可替代决策、或继续前进会造成 truth drift。禁止做的事：把 repo-local `Hermes` 命名包装成已接入上游、先开新 family、先补 academic poster、先做聊天 UI、先讲平台故事。每次推进都必须同步更新 docs / contracts / tests，并用 fresh verification 证明当前说法成立。
+- 不把 repo-local `Hermes` 命名包装成已接入 upstream `Hermes-Agent`。
+- 不把 upstream Hermes proof lane 写成当前默认 runtime owner、production substrate、generic session/workbench owner 或 OPL provider readiness。
+- 不把历史 `runManagedDeliverable / getManagedRun / superviseManagedRun` wording 恢复为 public API、compatibility alias、facade、wrapper 或测试断言。
+- 不把历史 proof lane 写成 RCA visual ready、exportable、handoffable、domain ready、human approval、production ready 或 production visual-stage long-soak complete。
+- 若要删除或收薄相关活跃源码/测试/入口，必须重新满足 no-active-caller、replacement parity、RCA owner receipt / typed blocker roundtrip、no-forbidden-write proof 和 tombstone/provenance pointer。

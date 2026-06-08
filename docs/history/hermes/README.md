@@ -32,7 +32,7 @@ Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/ru
 | `hermes_runtime_substrate_canonical_closure.md` | repo-local Hermes-backed canonical closure proof | 只保存当时 Hermes-backed route/runtime topology closure；当前 default executor 和 provider boundary 以 status、architecture 和 runtime-program 为准。 |
 | `hermes_stable_family_closure_truth.md` | stable family migration closure proof | 只记录 stable family runtime output closure；不声明 new family onboarding、managed web runtime 完成或 production readiness。 |
 | `upstream_hermes_agent_activation_package.md` | upstream API connection proof package | 只证明历史 F1 upstream API / run-event surface 曾可验证；当前不是默认 runtime owner 或 production substrate 证明。 |
-| `upstream_hermes_agent_fast_cutover_board.md` | historical upstream cutover board | 只保存 2026-04-12 fast cutover 顺序和约束；当前不作为活跃 backlog 或 Hermes-first target plan 执行。 |
+| `upstream_hermes_agent_fast_cutover_board.md` | historical upstream cutover board | 只保存 2026-04-12 fast cutover 的历史假设、阶段摘要和 no-resurrection boundary；当前不作为活跃 backlog、prompt 或 Hermes-first target plan 执行。 |
 | `upstream_hermes_agent_final_target_shape.md` | historical target-shape brief | 只保留旧 target-shape provenance；当前目标已更新为 OPL stage-led runtime / Temporal production substrate / RCA domain authority split。 |
 | `upstream_hermes_agent_live_verification_blocker.md` | historical live verification blocker | 只证明 blocker 曾真实发生；当前 stop boundary 以 closeout brief、status 和 active gap plan 读取。 |
 | `upstream_hermes_agent_live_verification_closeout.md` | historical live verification closeout | 只证明历史 Hermes-hosted proof lane 的 live run surface closeout；不升级 mature product entry、OPL hosted end-user shell 或 production readiness。 |

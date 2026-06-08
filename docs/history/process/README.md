@@ -43,6 +43,65 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA Hermes history/provenance body compression tranche:
+
+- Theme / SSOT: `docs/history/hermes/**` repo-local Hermes migration,
+  upstream Hermes proof, fast-cutover, final-target-shape, blocker, closeout
+  and service-safe entry provenance. Current runtime owner boundary, executor
+  posture, RCA visual-domain authority, active gaps, owner-delta and next baton
+  remain in `docs/active/rca-ideal-state-gap-plan.md`, core docs,
+  `contracts/runtime-program/current-program.json`, runtime-program leaf parts,
+  source/tests, runtime artifacts, owner receipts and typed blockers. Historical
+  Hermes indexing remains `docs/history/hermes/README.md`.
+- Reviewed: `AGENTS.md`, `TASTE.md`, `docs/history/hermes/README.md`,
+  every `docs/history/hermes/*.md` body,
+  `docs/history/hermes/hermes_managed_family_closure_truth.md`,
+  `docs/history/hermes/hermes_runtime_capability_extraction_map.md`,
+  `docs/history/hermes/hermes_runtime_substrate_activation_package.md`,
+  `docs/history/hermes/hermes_runtime_substrate_canonical_closure.md`,
+  `docs/history/hermes/hermes_stable_family_closure_truth.md`,
+  `docs/history/hermes/upstream_hermes_agent_activation_package.md`,
+  `docs/history/hermes/upstream_hermes_agent_fast_cutover_board.md`,
+  `docs/history/hermes/upstream_hermes_agent_final_target_shape.md`,
+  `docs/history/hermes/upstream_hermes_agent_live_verification_blocker.md`,
+  `docs/history/hermes/upstream_hermes_agent_live_verification_closeout.md`,
+  `docs/history/hermes/upstream_hermes_agent_service_safe_domain_entry.md`,
+  `docs/project.md`, `docs/status.md`, `docs/architecture.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`, this process index,
+  `docs/history/process/retired-surface-provenance.md`, runtime-program
+  contracts that reference the two `human_doc:*` ids, focused Hermes adapter /
+  backend refs in source/tests, and stale prompt scans over Hermes history docs.
+- Edited: this file, `docs/history/hermes/README.md`,
+  `docs/history/process/retired-surface-provenance.md`, and every
+  non-index `docs/history/hermes/*.md` body.
+- Coverage result: Hermes history bodies no longer preserve copy-paste long
+  prompts, active success conditions, runnable phase order, current gap lists,
+  upstream/runtime-owner claims, Product Entry / managed web runtime shell
+  backlog items or default verification commands as current guidance. They keep
+  historical reader context, proof/blocker provenance, historical command
+  records and no-resurrection boundaries, while pointing current execution back
+  to active owners and machine surfaces.
+- Retired / guarded: no Hermes history file, contract, source module, test,
+  workflow or command was physically deleted because runtime-program contracts
+  and historical blocker/closeout records still reference these human-doc
+  contexts. The retired surface is active-looking Hermes-first board prose:
+  long prompts, "current gap" lists, success conditions, runnable cutover order
+  and default verification commands may not be reused as Agent prompt,
+  implementation checklist, runtime owner proof, App/product-shell backlog,
+  delete authority or readiness evidence.
+- Remaining RCA unreviewed scope under the parent OPL series goal:
+  `docs/history/plans/**`, `docs/history/runtime/**`, remaining Phase 2 bodies,
+  tombstone body audits, active private-inventory details, generated/default
+  caller thinning evidence tails, and future source/contract/test retirement
+  lanes that need fresh no-active-caller plus owner receipt / typed blocker
+  proof. Active Hermes proof/backend code and tests remain governed by current
+  source/contracts and were not retirement candidates in this docs-only tranche.
+- Next write scope: continue with another precise history/provenance body theme
+  after fresh intake, likely plans archive bodies, runtime history bodies,
+  tombstones, remaining Phase 2 bodies or a clean sibling repo lane. Do not use
+  this tranche as proof that every RCA `docs/**/*.md` paragraph has been
+  line-reviewed.
+
 2026-06-08 RCA Phase 2 history-board body compression tranche:
 
 - Theme / SSOT: `docs/history/phase-2/**` historical continuation boards and
