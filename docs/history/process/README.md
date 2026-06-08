@@ -43,6 +43,56 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA Phase 2 history-board body compression tranche:
+
+- Theme / SSOT: `docs/history/phase-2/**` historical continuation boards and
+  architecture-boundary briefs. Current completion, gap, owner-delta and next
+  baton truth remains `docs/active/rca-ideal-state-gap-plan.md`; docs
+  lifecycle and long-list governance remains
+  `docs/docs_portfolio_consolidation.md`; historical Phase 2 indexing remains
+  `docs/history/phase-2/README.md`; machine truth remains runtime-program
+  contracts, source/tests, CLI/MCP/API behavior, runtime artifacts, owner
+  receipts and typed blockers.
+- Reviewed: `AGENTS.md`, `TASTE.md`, root `README.md`, `docs/README.md`,
+  `docs/project.md`, `docs/status.md`, `docs/architecture.md`,
+  `docs/invariants.md`, `docs/decisions.md`,
+  `docs/docs_portfolio_consolidation.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`,
+  `docs/history/README.md`, `docs/history/phase-2/README.md`, this process
+  index, `docs/history/process/retired-surface-provenance.md`,
+  `docs/history/phase-2/phase_2_family_parity_autopilot_continuation_board.md`,
+  `docs/history/phase-2/phase_2_architecture_boundary_governance.md`,
+  `docs/history/phase-2/phase_2_family_parity_governance_surface_convergence.md`,
+  `contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json`,
+  runtime-program / docs refs for the two target briefs, and stale-word scans
+  over history boards / backlogs / continuation wording.
+- Edited: this file,
+  `docs/history/process/retired-surface-provenance.md`,
+  `docs/history/phase-2/phase_2_family_parity_autopilot_continuation_board.md`,
+  and `docs/history/phase-2/phase_2_architecture_boundary_governance.md`.
+- Coverage result: the family-parity continuation board no longer reads as a
+  runnable current board with recommended operator steps. It is now a historical
+  SSOT map that points current execution back to the active gap plan and machine
+  surfaces. The architecture-boundary brief no longer preserves lane/backlog
+  sections as current work; it keeps historical goals, landed results, owner
+  pointers and no-resurrection boundaries.
+- Retired / guarded: no contract, source module, test, workflow or history file
+  was deleted because `human_doc:*` / runtime-program provenance still needs
+  the historical reader contexts. The retired shape is active-runbook wording
+  inside history bodies: "recommended use", "current backlog", live lane lists
+  and old owner taxonomies may not be reused as current Agent prompt,
+  implementation checklist, delete authority or readiness proof.
+- Remaining RCA unreviewed scope under the parent OPL series goal: other
+  individual `docs/history/phase-2/**`, `docs/history/hermes/**`,
+  `docs/history/plans/**`, `docs/history/runtime/**` and tombstone body audits;
+  active private-inventory details; generated/default caller thinning evidence
+  tails; and future source/contract/test retirement lanes that need fresh
+  no-active-caller plus owner receipt / typed blocker proof.
+- Next write scope: continue with one precise history/provenance body theme
+  after fresh intake, likely another Phase 2 body with active-looking
+  "next tranche" or Hermes fast-cutover prose. Do not use this tranche as proof
+  that every RCA `docs/**/*.md` paragraph has been line-reviewed.
+
 2026-06-08 RCA references body-governance tranche:
 
 - Theme / SSOT: `docs/references/**` support-reference body governance. Current

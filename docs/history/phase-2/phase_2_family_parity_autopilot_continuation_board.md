@@ -7,54 +7,39 @@ Machine boundary: 人读历史 continuation board。当前机器真相继续归 
 
 生命周期说明：本文是 contract-linked continuation board / absorbed tranche context，不是当前新的 public mainline。当前 RCA 第一身份仍是 visual-deliverable domain agent；OPL 只作为 stage-led、以 Agent executor 为最小执行单位 托管框架和 family-level runtime/projection 支撑出现。
 
-## 文档目的
+## 历史 SSOT
 
-这份 board 不是新的 public mainline，而是把 `runtime watch locator integrity hardening` 之后的 same-mainline 长线继续冻结出来，让当前 Codex operator line 不会在完成当前 tranche 后因为 `next_tranche_candidate = null` 就立刻停车。
+本文只保留 2026-04-11 左右的 Phase 2 continuation board 读者上下文。机器化历史快照在 `contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json`；当前完成口径、功能/结构差距、证据缺口和下一轮 owner-delta baton 回到 `docs/active/rca-ideal-state-gap-plan.md`、核心五件套、runtime-program contracts、source/tests、owner receipts 和 typed blockers。
 
-它只服务当前已经稳定的 family：
+这个历史 board 当时服务的 stable family 是：
 
 - `ppt_deck`
 - `xiaohongshu`
 - `poster_onepager`
 
-并且只服务当前已经 repo-verified 的 formal entry：
+当时限定的 formal entry 是：
 
 - `CLI`
 - `MCP`
 
-## 当前预冻结的 tranche 顺序
+这些名词不表示今天存在新的 Phase 2 active backlog，也不授权从 history 继续自动执行旧 board。
 
-1. `phase_2_family_parity_governance_surface_convergence`
-   - 先把 stable families 的 shared governance surface 收紧到同一 contract
-   - 保持 `ppt_deck` direct-delivery、`poster_onepager` guarded knowledge-poster、`xiaohongshu` human_publication 的边界不漂移
-2. `phase_2_autonomous_stop_reason_convergence`
-   - 再把当前 Auto-only runtime 的 stop / continue / retry 语义压成一套 machine-readable language
-3. `phase_2_autopilot_closeout_evidence_convergence`
-   - 最后把当前 stable families 的 closeout evidence path 收紧成一条 auditable autopilot closeout path
+## 历史冻结内容
 
-## 这条板子解决什么问题
+| 历史项 | 当时目的 | 当前读法 |
+| --- | --- | --- |
+| Parent tranche: `phase_2_runtime_watch_locator_integrity_hardening` | 在 locator fail-closed hardening 后冻结同一主线下一棒。 | 只按 history provenance 读取；当前 runtimeWatch / locator truth 回到 contracts、source/tests、runtime owner docs 和 active gap plan。 |
+| `phase_2_family_parity_governance_surface_convergence` | 把 stable families 的 shared governance surface 收紧到同一 contract，并保持 family-specific delivery boundary。 | 已作为历史 absorbed tranche 读取；不作为今天的 active implementation checklist。 |
+| `phase_2_autonomous_stop_reason_convergence` | 将当时 Auto-only runtime 的 stop / continue / retry 语义压成 machine-readable language。 | 不在本文继续追踪；若仍相关，必须进入当前 active owner、contract/source/test 或 typed blocker。 |
+| `phase_2_autopilot_closeout_evidence_convergence` | 将 stable families 的 closeout evidence path 收紧为 auditable closeout path。 | 不在本文继续追踪；当前 closeout / evidence 读法以 production acceptance、owner receipt、runtime evidence 和 active gap plan 为准。 |
 
-当前仓库已经有：
+## 历史问题压缩
 
-- source readiness
-- review / export / gate / audit
-- direct-delivery handoff
-- lifecycle stage
-- deep research trigger
-- workspace / operator quickstart
-- operator surface consistency
-- runtime watch locator integrity
+该 board 当时解决的是：前序 source readiness、review/export/gate、direct-delivery handoff、lifecycle stage、deep research trigger、workspace/operator quickstart、operator surface consistency 和 runtimeWatch locator integrity 都已经形成 absorbed tranche，但还没有被压成一条 same-mainline continuation board。
 
-但这些 absorbed tranche 还没有继续冻结成一条更长的 same-mainline continuation board。
+当前读法只保留这条历史事实。今天的推进顺序不从本文推导，必须回到当前 active plan 的 `production_evidence_tail`、`runtime_evidence_scaleout`、`generated_default_caller_thinning`、`naming_contract_hygiene` 和 `compatibility_free_retirement`。
 
-结果就是：
-
-- 当前 operator line 做完当前 absorbed tranche 的 follow-up 后，容易因为“没有已冻结下一棒”而 honest stop
-- 但 repo 长线目标其实还没有完成
-
-这块 board 的作用，就是把“family parity / autopilot continuity”收紧成一条仍然诚实、仍然在同一主线内、且不需要另开新产品线的 follow-on board。
-
-## Hard Boundaries
+## 历史 Hard Boundaries
 
 - 不扩 `controller`
 - 不新增 family / overlay
@@ -63,11 +48,15 @@ Machine boundary: 人读历史 continuation board。当前机器真相继续归 
 - 不推进 managed web runtime
 - 不把 current repo 改写成同仓双模或 OPL runtime owner
 
-## 推荐用法
+这些 boundary 已折回当前核心五件套、docs portfolio、active gap plan、runtime-program contracts 和 retired-surface provenance。它们不能被读成“继续跑这个 board”的操作指令。
 
-当前 Codex operator line 在当前 absorbed tranche 之后，如果仍要继续：
+## No-Resurrection 读法
 
-1. 先读这块 board
-2. 先跑 `phase_2_family_parity_governance_surface_convergence`
-3. 完成并 absorbed 后，再沿 board 继续下一条
-4. 只有在 board 也走完、或者下一步必然要求新 formal entry / 新 family / 新产品语义时，才 honest stop
+禁止把本文恢复成：
+
+- 当前 active backlog 或下一轮 Agent prompt。
+- 新的 public mainline、formal-entry 扩张计划或 OPL-owned runtime owner 证明。
+- visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak 证据。
+- 恢复旧 `gateway`、`managed runtime`、`domain_action_adapter` compatibility path、old workbench 或 fallback/alias/facade 的理由。
+
+若其中任何历史目标需要重新推进，必须先在当前 active owner、machine contract、source/test surface、runtime evidence、owner receipt 或 typed blocker 中重新开题；不能从本文直接续跑。
