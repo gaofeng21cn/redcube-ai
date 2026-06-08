@@ -17,23 +17,21 @@ Machine boundary: 人读历史 closeout brief。当前机器真相继续归 cont
 ## 历史 closeout proof
 
 1. live preflight 已通过标准 launcher 重放：
-   - 命令：`npm run test:e2e`
-   - launcher：`scripts/run-test-group.ts -> hermes gateway run -q --replace`
+   - launcher：standard `run-test-group` Hermes gateway launcher
    - Python helper：`REDCUBE_PYTHON_COMMAND=/opt/homebrew/opt/python@3.14/bin/python3.14`
    - 结果：`/v1/health`、`/v1/models`、`/v1/runs`、`/v1/runs/{run_id}/events` preflight 通过，并拿到 terminal `run.completed`
 2. `ppt_deck` 与 `xiaohongshu` live e2e 已 fresh 全绿：
-   - 命令：`npm run test:e2e`
    - `ppt_deck` 证明面：`screenshot_review`、`export_pptx`、`optimize_existing relative review`、shared source-truth proof
    - `xiaohongshu` 证明面：`publish_copy`、`export_bundle`、`optimize_existing relative review`、shared source-truth proof
    - 结果：`16/16 pass`
 3. guarded `poster_onepager` 已补齐 fresh upstream proof：
-   - 命令：`node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'`
    - 证明面：guarded knowledge-poster managed execution、shared source-truth consumption、shared runtime route/review/export
    - 结果：`32/32 pass`
 4. 同一主线的 shared runtime contract lane 仍然是绿的：
-   - 命令：`npm run test:fast`
    - 结果：closeout 当次记录为 `64/64 pass`
    - 备注：若后续 fast lane 吸收新的 active-baton capability tests，计数以 fresh verification 输出为准，不改写这次 F4 closeout 的 completed 结论
+
+具体命令只按当时 closeout provenance 和提交历史读取，不在本文继续保留为当前可执行验证清单。
 
 ## 对历史 blocker 的处理
 

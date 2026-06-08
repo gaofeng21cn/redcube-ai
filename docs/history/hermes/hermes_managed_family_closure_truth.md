@@ -46,11 +46,6 @@ Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、s
 
 ## 历史 verification record
 
-- `node --test tests/managed-deliverable-execution.test.ts`
-- `node --test tests/hermes-managed-family-closure-truth.test.ts`
-- `node --test tests/hermes-stable-family-closure-truth.test.ts`
-- `node --test tests/runtime-deliverable-route.test.ts`
-- `npm run typecheck`
-- `npm run test:full`
+当时 verification 覆盖 managed deliverable execution、Hermes managed/stable family closure truth、runtime deliverable route、typecheck 和 full-suite 口径。具体命令与当时测试文件名只按提交历史 / runtime-program provenance 读取，不在本文继续保留为可执行清单。
 
-这些命令只记录当时 closeout 口径，不是当前默认验证入口或 current readiness proof。
+当前默认验证入口、current readiness proof、runtime owner 和 production evidence tail 回到 `scripts/verify.sh`、`scripts/run-test-group.ts`、active gap plan、runtime-program contracts、source/tests、owner receipts 和 typed blockers。

@@ -44,6 +44,7 @@ Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/ru
 
 - `Hermes-backed`、`upstream Hermes`、`managed runtime`、`runManagedDeliverable`、`getManagedRun`、`superviseManagedRun` 表示历史 proof lane 或 retired migration surface。
 - `current`、`next`、`activation`、`cutover`、`target` 等词若出现在历史正文中，只表示原始 tranche 当时语境。
+- 历史正文中的 verification command、test file、launcher、pass-count 或 live proof transcript 只按原始 closeout / blocker provenance 和提交历史读取；当前可执行验证入口回到 `scripts/verify.sh`、`scripts/run-test-group.ts`、source/tests、contracts、owner receipts 和 typed blockers。
 - 任何把这些历史 proof lane 写回 active public entry、default runtime owner、generated/default caller、generic session/workbench/runtime shell、production readiness、visual ready、exportable、handoffable、domain ready 或 production ready 的改动，都是 stale pollution。
 
 若历史 brief 中仍有 current rule，需要先抽取到核心五件套、`docs/active/rca-ideal-state-gap-plan.md`、runtime/delivery/source/policy owner docs、machine-readable contracts 或 source/test surface；不要在本目录继续追加活跃计划。
