@@ -370,22 +370,12 @@ export function stageFolderArtifactPath(input) {
   );
 }
 
-function ownerReceiptRefsFor(input, status, attemptId, canonicalStageId) {
-  const refs = uniqueStrings(input.ownerReceiptRefs || input.owner_receipt_refs);
-  if (refs.length > 0 || status !== 'success') return refs;
-  const locator = stageArtifactLocator(input);
-  return [
-    `rca-owner-receipt:stage-artifact:${locator.domainId}:${canonicalStageId}:${locator.deliverableId}:${attemptId}`,
-  ];
+function ownerReceiptRefsFor(input) {
+  return uniqueStrings(input.ownerReceiptRefs || input.owner_receipt_refs);
 }
 
-function typedBlockerRefsFor(input, status, attemptId, canonicalStageId) {
-  const refs = uniqueStrings(input.typedBlockerRefs || input.typed_blocker_refs);
-  if (refs.length > 0 || status !== 'blocked') return refs;
-  const locator = stageArtifactLocator(input);
-  return [
-    `rca-typed-blocker:stage-artifact:${locator.domainId}:${canonicalStageId}:${locator.deliverableId}:${attemptId}`,
-  ];
+function typedBlockerRefsFor(input) {
+  return uniqueStrings(input.typedBlockerRefs || input.typed_blocker_refs);
 }
 
 function closeoutStatus(input) {
@@ -410,6 +400,19 @@ function refsFromWritten(paths) {
     paths.stage_current_file,
     paths.output_file,
   ].filter(Boolean);
+}
+
+function assertExplicitTerminalCloseoutRefs({ status, ownerReceiptRefs, typedBlockerRefs, canonicalStageId, attemptId }) {
+  if (status === 'success' && ownerReceiptRefs.length === 0) {
+    throw new Error(
+      `RCA Stage Folder success closeout requires explicit ownerReceiptRefs for ${canonicalStageId}/${attemptId}`,
+    );
+  }
+  if (status === 'blocked' && typedBlockerRefs.length === 0) {
+    throw new Error(
+      `RCA Stage Folder blocked closeout requires explicit typedBlockerRefs for ${canonicalStageId}/${attemptId}`,
+    );
+  }
 }
 
 function writeStageFolderDescriptors({ paths, locator, canonicalStageId, stageOrder }) {
@@ -444,6 +447,15 @@ export function writeStageFolderArtifact(input) {
   const attemptId = safeSegmentFromText(input.attemptId, 'attempt');
   const stageOrder = input.stageOrder ?? stageOrderForCanonicalStage(canonicalStageId);
   const status = closeoutStatus(input);
+  const ownerReceiptRefs = ownerReceiptRefsFor(input);
+  const typedBlockerRefs = typedBlockerRefsFor(input);
+  assertExplicitTerminalCloseoutRefs({
+    status,
+    ownerReceiptRefs,
+    typedBlockerRefs,
+    canonicalStageId,
+    attemptId,
+  });
   const paths = stageFolderAttemptPaths({
     ...input,
     deliverablePaths: input.deliverablePaths,
@@ -468,8 +480,6 @@ export function writeStageFolderArtifact(input) {
     .map((role) => canonicalRole(role)).filter(Boolean);
   const effectiveRequiredOutputRoles = requiredOutputRoles.length > 0 ? requiredOutputRoles : outputRoles;
   const requiredOutputs = requiredOutputNames(input, outputName, outputRoles);
-  const ownerReceiptRefs = ownerReceiptRefsFor(input, status, attemptId, canonicalStageId);
-  const typedBlockerRefs = typedBlockerRefsFor(input, status, attemptId, canonicalStageId);
   const outputRef = path.relative(paths.attempt_dir, outputFile);
   const outputHash = fileHashRecord(paths.outputs_dir, outputFile, 'output');
   const outputHashes = outputHash ? [outputHash] : [];

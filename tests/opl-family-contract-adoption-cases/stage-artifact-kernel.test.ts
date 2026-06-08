@@ -60,6 +60,16 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
     'repair_image_pages',
     'export_pptx',
   ]);
+  assert.equal(
+    adoption.stage_folder_writer_closeout_authority.closeout_ref_signer,
+    'redcube_ai_domain_family_runtime',
+  );
+  assert.equal(adoption.stage_folder_writer_closeout_authority.domain_family_runtime_may_issue_owner_receipt_refs, true);
+  assert.equal(adoption.stage_folder_writer_closeout_authority.domain_family_runtime_may_issue_typed_blocker_refs, true);
+  assert.equal(adoption.stage_folder_writer_closeout_authority.writer_may_synthesize_owner_receipt_refs, false);
+  assert.equal(adoption.stage_folder_writer_closeout_authority.writer_may_synthesize_typed_blocker_refs, false);
+  assert.equal(adoption.stage_folder_writer_closeout_authority.route_helper_may_synthesize_owner_receipt_refs, false);
+  assert.equal(adoption.stage_folder_writer_closeout_authority.route_helper_may_synthesize_typed_blocker_refs, false);
   assert.equal(adoption.native_helper_manifest.required, true);
   assert.equal(adoption.native_helper_manifest.failure_shape, 'typed_blocker');
   assert.equal(adoption.artifact_gallery_handoff_shell.owner, 'one-person-lab');

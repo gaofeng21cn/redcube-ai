@@ -453,6 +453,8 @@ export interface XhsRuntimeRouteEnvelope<TRoute extends XhsRuntimeRoute> {
   contract: XhsRuntimeContract;
   stage_contract: XhsRuntimeStageContract | null;
   execution_model: XhsRuntimeExecutionModel;
+  owner_receipt_refs?: string[];
+  typed_blocker_refs?: string[];
 }
 
 export type XhsRuntimeRouteOutput<

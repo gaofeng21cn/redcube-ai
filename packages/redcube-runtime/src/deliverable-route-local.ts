@@ -423,22 +423,20 @@ function readCachedStageFolderRouteArtifact({
   } : null;
 }
 
-function ownerReceiptRefsForRoute({ overlay, route, deliverableId, artifact, oplRouteAttemptIndex }) {
+function ownerReceiptRefsForRoute({ artifact }) {
   if (artifact?.status === 'block' || artifact?.status === 'failed') return [];
   return uniqueStrings([
     ...safeArray(artifact?.owner_receipt_refs),
     ...safeArray(artifact?.receipt_refs),
-    `rca-owner-receipt:stage-artifact:redcube_ai:${overlay}:${route}:${deliverableId}`,
   ]);
 }
 
-function typedBlockerRefsForRoute({ overlay, route, deliverableId, artifact }) {
+function typedBlockerRefsForRoute({ artifact }) {
   if (artifact?.status !== 'block' && artifact?.status !== 'failed') return [];
   return uniqueStrings([
     ...safeArray(artifact?.typed_blocker_refs),
     ...safeArray(artifact?.blocker_refs),
     safeText(artifact?.blocker_ref),
-    `rca-typed-blocker:stage-artifact:redcube_ai:${overlay}:${route}:${deliverableId}`,
   ]);
 }
 
@@ -451,6 +449,28 @@ function reviewExportRefsForRoute(artifact) {
     safeText(artifact?.publish_bundle?.export_ref),
     safeText(artifact?.export_bundle?.export_ref),
   ]);
+}
+
+export function attachRouteArtifactCloseoutRefs({ artifact }) {
+  if (artifact?.status === 'block' || artifact?.status === 'failed') {
+    return {
+      ...artifact,
+      owner_receipt_refs: [],
+      typed_blocker_refs: uniqueStrings([
+        ...safeArray(artifact?.typed_blocker_refs),
+        ...safeArray(artifact?.blocker_refs),
+        safeText(artifact?.blocker_ref),
+      ]),
+    };
+  }
+  return {
+    ...artifact,
+    owner_receipt_refs: uniqueStrings([
+      ...safeArray(artifact?.owner_receipt_refs),
+      ...safeArray(artifact?.receipt_refs),
+    ]),
+    typed_blocker_refs: [],
+  };
 }
 
 export function refreshStageFolderRouteArtifact({
@@ -478,19 +498,8 @@ export function refreshStageFolderRouteArtifact({
     artifactFile,
     outputName: path.basename(artifactFile),
     requiredOutputs: [path.basename(artifactFile)],
-    ownerReceiptRefs: ownerReceiptRefsForRoute({
-      overlay,
-      route,
-      deliverableId,
-      artifact,
-      oplRouteAttemptIndex,
-    }),
-    typedBlockerRefs: typedBlockerRefsForRoute({
-      overlay,
-      route,
-      deliverableId,
-      artifact,
-    }),
+    ownerReceiptRefs: ownerReceiptRefsForRoute({ artifact }),
+    typedBlockerRefs: typedBlockerRefsForRoute({ artifact }),
     blockingReasons: safeArray(artifact?.blocking_reasons),
     artifactRefs: safeArray(artifact?.artifact_refs),
     reviewExportRefs: reviewExportRefsForRoute(artifact),
@@ -788,8 +797,14 @@ export async function executeDeliverableRouteLocally({
     deliverableId,
   });
   if (repeatedBlockArtifact) {
+    const closeoutArtifact = attachRouteArtifactCloseoutRefs({
+      overlay,
+      route: safeRoute,
+      deliverableId,
+      artifact: repeatedBlockArtifact,
+    });
     mkdirSync(path.dirname(artifactFile), { recursive: true });
-    writeFileSync(artifactFile, JSON.stringify(repeatedBlockArtifact, null, 2), 'utf-8');
+    writeFileSync(artifactFile, JSON.stringify(closeoutArtifact, null, 2), 'utf-8');
     const stageFolderRefs = refreshStageFolderRouteArtifact({
       deliverablePaths,
       overlay,
@@ -798,22 +813,22 @@ export async function executeDeliverableRouteLocally({
       route: safeRoute,
       attemptId,
       artifactFile,
-      artifact: repeatedBlockArtifact,
+      artifact: closeoutArtifact,
       oplRouteAttemptIndex,
     });
     const error = new Error(`Route ${safeRoute} fail-fast: repeated block without input change`);
     error.code = 'repeated_block_without_input_change';
     error.failure_kind = 'repeated_block_without_input_change';
-    error.target_slide_ids = repeatedBlockArtifact.repeated_block_fail_fast.target_slide_ids;
-    error.blocking_reasons = repeatedBlockArtifact.repeated_block_fail_fast.blocking_reasons;
-    error.recommended_action = repeatedBlockArtifact.repeated_block_fail_fast.recommended_action;
+    error.target_slide_ids = closeoutArtifact.repeated_block_fail_fast.target_slide_ids;
+    error.blocking_reasons = closeoutArtifact.repeated_block_fail_fast.blocking_reasons;
+    error.recommended_action = closeoutArtifact.repeated_block_fail_fast.recommended_action;
     error.artifact_file = artifactFile;
     error.artifact_refs = Array.isArray(stageFolderRefs?.artifact_refs) ? stageFolderRefs.artifact_refs : [];
-    error.stall_lineage = repeatedBlockArtifact.repeated_block_fail_fast.stall_lineage;
+    error.stall_lineage = closeoutArtifact.repeated_block_fail_fast.stall_lineage;
     throw error;
   }
 
-  const artifact = attachRouteCache(await executor.runRoute({
+  const routeArtifact = attachRouteCache(await executor.runRoute({
     workspaceRoot,
     overlay,
     route: safeRoute,
@@ -828,6 +843,12 @@ export async function executeDeliverableRouteLocally({
     hermesProfile,
     executorRouting,
   }), routeCacheKey);
+  const artifact = attachRouteArtifactCloseoutRefs({
+    overlay,
+    route: safeRoute,
+    deliverableId,
+    artifact: routeArtifact,
+  });
 
   mkdirSync(path.dirname(artifactFile), { recursive: true });
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');

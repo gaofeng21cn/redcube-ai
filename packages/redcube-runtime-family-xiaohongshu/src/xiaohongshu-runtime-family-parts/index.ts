@@ -65,6 +65,46 @@ const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 
+function uniqueStrings(value) {
+  return [...new Set(shared.safeArray(value).map((entry) => shared.safeText(entry)).filter(Boolean))];
+}
+
+function refSegment(value, fallback) {
+  return shared.safeText(value, fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
+}
+
+function isBlockedCloseoutStatus(status) {
+  return ['block', 'blocked', 'failed'].includes(shared.safeText(status).toLowerCase());
+}
+
+function routeCloseoutRefs({ route, deliverableId, payload }) {
+  const safeRoute = refSegment(route, 'route');
+  const safeDeliverableId = refSegment(deliverableId, 'deliverable');
+  if (isBlockedCloseoutStatus(payload?.status)) {
+    const explicitBlockerRefs = uniqueStrings([
+      ...shared.safeArray(payload?.typed_blocker_refs),
+      ...shared.safeArray(payload?.blocker_refs),
+      shared.safeText(payload?.blocker_ref),
+    ]);
+    return {
+      owner_receipt_refs: [],
+      typed_blocker_refs: explicitBlockerRefs.length > 0
+        ? explicitBlockerRefs
+        : [`rca-typed-blocker:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
+    };
+  }
+  const explicitOwnerRefs = uniqueStrings([
+    ...shared.safeArray(payload?.owner_receipt_refs),
+    ...shared.safeArray(payload?.receipt_refs),
+  ]);
+  return {
+    owner_receipt_refs: explicitOwnerRefs.length > 0
+      ? explicitOwnerRefs
+      : [`rca-owner-receipt:visual-stage:xiaohongshu:${safeRoute}:${safeDeliverableId}`],
+    typed_blocker_refs: [],
+  };
+}
+
 function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
   return adapter === HERMES_AGENT_ADAPTER
     ? HERMES_AGENT_LOOP_EXECUTION_MODEL
@@ -430,6 +470,7 @@ export async function runXiaohongshuRoute({
         throw new Error(`Unsupported xiaohongshu route: ${route}`);
     }
   })();
+  const closeoutRefs = routeCloseoutRefs({ route, deliverableId, payload });
   return {
     overlay: contract.overlay,
     route,
@@ -438,6 +479,7 @@ export async function runXiaohongshuRoute({
     contract,
     stage_contract: stageContract,
     ...payload,
+    ...closeoutRefs,
     ...(sourceTruthConsumptionRole
       ? {
           source_truth_consumption: buildSourceTruthConsumptionSummary(contract.shared_source_truth, {

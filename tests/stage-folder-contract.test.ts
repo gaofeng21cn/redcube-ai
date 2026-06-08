@@ -128,6 +128,74 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
   });
 });
 
+test('RCA stage folder success closeout fails closed without explicit owner receipt refs', () => {
+  withTempOplState((stateRoot) => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-owner-ref-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const base = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'author_image_pages',
+      canonicalStageId: 'artifact_creation',
+      stageOrder: 4,
+      attemptId: 'attempt-missing-owner-ref',
+      outputName: 'author_image_pages.json',
+      status: 'success',
+    };
+    const artifactFile = stageFolderOutputPath(base);
+    writeJson(artifactFile, { route: 'author_image_pages', status: 'ok' });
+    const pointers = stageFolderAttemptPaths(base);
+
+    assert.throws(
+      () => writeStageFolderArtifact({
+        ...base,
+        artifactFile,
+      }),
+      /requires explicit ownerReceiptRefs/,
+    );
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
+    assert.equal(existsSync(pointers.latest_pointer), false);
+    assert.equal(existsSync(pointers.stage_current_file), false);
+  });
+});
+
+test('RCA stage folder blocked closeout fails closed without explicit typed blocker refs', () => {
+  withTempOplState((stateRoot) => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-blocker-ref-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const base = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'screenshot_review',
+      canonicalStageId: 'review_and_revision',
+      stageOrder: 5,
+      attemptId: 'attempt-missing-blocker-ref',
+      outputName: 'screenshot_review.json',
+      status: 'blocked',
+    };
+    const artifactFile = stageFolderOutputPath(base);
+    writeJson(artifactFile, { route: 'screenshot_review', status: 'block' });
+    const pointers = stageFolderAttemptPaths(base);
+
+    assert.throws(
+      () => writeStageFolderArtifact({
+        ...base,
+        artifactFile,
+      }),
+      /requires explicit typedBlockerRefs/,
+    );
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
+    assert.equal(existsSync(pointers.latest_pointer), false);
+    assert.equal(existsSync(pointers.stage_current_file), false);
+  });
+});
+
 test('RCA stage folder manifest exposes canonical output roles, stage receipts, and helper refs', () => {
   withTempOplState(() => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-role-'));
@@ -300,6 +368,7 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
     const artifact = {
       route: 'export_pptx',
       status: 'completed',
+      owner_receipt_refs: ['rca-owner-receipt:export-pptx-ready'],
       native_ppt_bundle: {
         shape_manifest_file: files.shapeManifest,
       },
@@ -330,7 +399,7 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
 
     const manifest = readJson(written.manifest_file);
     assert.deepEqual(manifest.present_output_roles, ['export_bundle', 'handoff_manifest']);
-    assert.equal(manifest.stage_receipts[0].receipt_ref, 'rca-owner-receipt:stage-artifact:redcube_ai:ppt_deck:export_pptx:deck-a');
+    assert.equal(manifest.stage_receipts[0].receipt_ref, 'rca-owner-receipt:export-pptx-ready');
     const helperRoles = manifest.helper_output_refs.map((ref) => ref.role).sort();
     for (const role of [
       'artifact_gallery_ref_index',
@@ -356,6 +425,50 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
       assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'visual_truth'), false);
       assert.equal(Object.prototype.hasOwnProperty.call(helperRef, 'review_export_judgment'), false);
     }
+  });
+});
+
+test('RCA route stage folder helper fails closed without explicit owner receipt refs', () => {
+  withTempOplState((stateRoot) => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-missing-ref-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const base = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'export_pptx',
+      canonicalStageId: 'package_and_handoff',
+      stageOrder: 6,
+      attemptId: 'attempt-export-missing-ref',
+      outputName: 'export_pptx.json',
+    };
+    const artifactFile = stageFolderAttemptOutputFile(base, 'export_pptx.json');
+    const artifact = {
+      route: 'export_pptx',
+      status: 'completed',
+      export_bundle: {},
+    };
+    writeJson(artifactFile, artifact);
+    const pointers = stageFolderAttemptPaths(base);
+
+    assert.throws(
+      () => refreshStageFolderRouteArtifact({
+        deliverablePaths: paths,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'export_pptx',
+        attemptId: 'attempt-export-missing-ref',
+        artifactFile,
+        artifact,
+      }),
+      /requires explicit ownerReceiptRefs/,
+    );
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
+    assert.equal(existsSync(pointers.latest_pointer), false);
+    assert.equal(existsSync(pointers.stage_current_file), false);
   });
 });
 
@@ -569,6 +682,13 @@ test('RCA route execution writes manifest-backed Stage Folder attempt and curren
       });
       assert.equal(loaded?.status, 'success');
       assert.equal(loaded?.artifact?.route, 'research');
+      assert.deepEqual(loaded?.manifest?.owner_receipt_refs, [
+        'rca-owner-receipt:visual-stage:xiaohongshu:research:note-a',
+      ]);
+      assert.equal(
+        loaded?.manifest?.owner_receipt_refs.some((ref) => ref.startsWith('rca-owner-receipt:stage-artifact:')),
+        false,
+      );
       assert.equal(loaded?.manifest?.stage_id, 'source_intake');
       assert.equal(loaded?.manifest?.attempt_id, 'route-run-1');
       assert.equal(existsSync(loaded?.manifest_file), true);

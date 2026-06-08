@@ -123,6 +123,21 @@
     "stage_manifest_field": "stage_receipts",
     "completion_interpretation_owner": "redcube_ai"
   },
+  "stage_folder_writer_closeout_authority": {
+    "closeout_ref_signer": "redcube_ai_domain_family_runtime",
+    "domain_family_runtime_may_issue_owner_receipt_refs": true,
+    "domain_family_runtime_may_issue_typed_blocker_refs": true,
+    "writer_role": "consume_explicit_owner_receipt_or_typed_blocker_refs",
+    "status_success_requires_non_empty_owner_receipt_refs": true,
+    "status_blocked_requires_non_empty_typed_blocker_refs": true,
+    "writer_may_synthesize_owner_receipt_refs": false,
+    "writer_may_synthesize_typed_blocker_refs": false,
+    "route_helper_may_synthesize_owner_receipt_refs": false,
+    "route_helper_may_synthesize_typed_blocker_refs": false,
+    "missing_terminal_refs_policy": "fail_closed_without_current_or_latest_pointer",
+    "route_run_completed_or_current_stage_is_terminal_acceptance": false,
+    "current_owner_delta_writer_is_terminal_acceptance": false
+  },
   "native_helper_manifest": {
     "required": true,
     "manifest_field": "helper_output_refs",

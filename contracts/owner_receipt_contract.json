@@ -180,6 +180,15 @@
     "opl_can_accept_or_reject_memory_writeback": false,
     "opl_can_mutate_domain_artifacts": false
   },
+  "stage_folder_writer_policy": {
+    "stage_folder_writer_can_issue_owner_receipt": false,
+    "stage_folder_writer_can_issue_typed_blocker": false,
+    "success_closeout_input": "explicit_non_empty_owner_receipt_refs",
+    "blocked_closeout_input": "explicit_non_empty_typed_blocker_refs",
+    "missing_refs_result": "fail_closed_no_current_or_latest_pointer",
+    "route_run_completed_current_stage_is_owner_receipt": false,
+    "current_owner_delta_is_owner_receipt": false
+  },
   "repository_boundary": {
     "repo_tracks_contract_and_fixture_refs": true,
     "repo_tracks_live_receipt_instances": false,
