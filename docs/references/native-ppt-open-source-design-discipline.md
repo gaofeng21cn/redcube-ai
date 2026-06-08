@@ -2,7 +2,7 @@
 
 Owner: `RedCube AI`
 Purpose: `native_ppt_open_source_design_discipline_reference`
-State: `reference_draft`
+State: `active_support`
 Machine boundary: 人读参考文档。本文不定义 RCA 机器接口、route 合同、测试断言或完成状态；机器真相仍以 `contracts/runtime-program/*`、runtime-family source、native helper 输出、shape manifest、render proof、review/export receipts 为准。
 
 ## 结论

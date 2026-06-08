@@ -43,6 +43,57 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA references body-governance tranche:
+
+- Theme / SSOT: `docs/references/**` support-reference body governance. Current
+  SSOT for RCA completion, gaps, owner delta and evidence tail remains
+  `docs/active/rca-ideal-state-gap-plan.md`; docs lifecycle and reference
+  placement remains `docs/docs_portfolio_consolidation.md`; navigation and
+  reference grouping remains `docs/references/README.md`; machine truth remains
+  contracts, product-entry manifest, source, CLI/MCP/API behavior, focused
+  tests, runtime artifacts, owner receipts and RCA-owned review/export gates.
+- Reviewed: `AGENTS.md`, `TASTE.md`, `docs/docs_portfolio_consolidation.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`, this process index,
+  `docs/history/process/retired-surface-provenance.md`,
+  `docs/references/README.md`, `docs/references/product-entry/README.md`,
+  `docs/references/product-entry/redcube_product_entry_mvp.md`,
+  `docs/references/product-entry/product_entry_session_continuity.md`,
+  `docs/references/product-entry/opl_framework_hosted_product_entry.md`,
+  `docs/references/integration/lightweight-product-entry-and-opl-handoff.md`,
+  `docs/references/integration/opl-family-contract-adoption.md`,
+  `docs/references/domain_memory_descriptor_locator.md`,
+  `docs/references/rca_executor_routing_config.md`,
+  `docs/references/governance/series-doc-governance-checklist.md`,
+  `docs/references/native-ppt-open-source-design-discipline.md`, and
+  `docs/references/rca-visual-deliverable-agent-ideal-state.md`.
+- Edited: this file and `docs/references/native-ppt-open-source-design-discipline.md`.
+- Coverage result: every current reference doc has owner / purpose / state /
+  machine-boundary metadata and a support-reference role. Product-entry,
+  integration, domain-memory, executor-routing, native-PPT and north-star
+  references point back to active/core owners or machine surfaces and do not
+  claim GUI/WebUI maturity, visual ready, exportable, handoffable, domain ready,
+  production ready, production visual-stage long soak, artifact authority,
+  review/export verdict, or generic runtime ownership. `native-ppt-open-source-
+  design-discipline.md` was promoted from `reference_draft` to `active_support`
+  because it is already indexed as the active native editable PPTX discipline
+  support reference and does not define a machine interface.
+- Retired / guarded: no reference file, contract, source module, test, workflow
+  or command was retired in this tranche. Guarded stale surfaces are old
+  Gateway/frontdoor/federation/Hermes-first/local-runtime/workbench/product
+  frontdesk/compatibility narratives, repo-local product wrapper ownership,
+  hidden fallback chains, and proof-artifact-over-readiness claims; current
+  references keep them only as provenance, opt-in proof lane, refs-only adapter,
+  explicit fail-closed/fallback-with-proof policy, or no-resurrection boundary.
+- Remaining RCA unreviewed scope under the parent OPL series goal: individual
+  `docs/history/**` bodies beyond process-history retained records, tombstone
+  body audits, active private-inventory details, generated/default caller
+  thinning evidence tails, and any future source/contract/test retirement lane
+  that needs fresh no-active-caller and owner receipt / typed blocker proof.
+- Next write scope: continue with a concrete SSOT theme after fresh intake,
+  likely individual history/tombstone bodies or active private-inventory detail
+  governance. Do not use this references review as proof that every RCA
+  `docs/**/*.md` paragraph has been line-reviewed.
+
 2026-06-08 RCA public-doc support lifecycle tranche:
 
 - Theme / SSOT: public narrative entry and public support docs. Current public
