@@ -3,38 +3,32 @@
 Owner: `RedCube AI`
 Purpose: `historical_ppt_html_quality_closeout_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 closeout brief。当前机器真相继续归 contracts、runtime-family source、workspace artifacts、artifact manifests、review/export receipts 和 canonical artifacts。
+Machine boundary: 人读历史 closeout brief。当前机器真相继续归 contracts、runtime-family source、workspace artifacts、artifact manifests、review/export receipts、canonical artifacts 和 delivery owner docs。
 
 状态锚点：`2026-05-01`
 
-## 结论
+## Lifecycle
 
-当前 RCA `ppt_deck` 历史 HTML 质量闭环不需要回到历史 OPL-series PPT 重跑来证明。这个 closeout 记录的是 2026-05-01 当时的 HTML 默认路线质量债收口；当前默认视觉路线已经切到 image-first `author_image_pages`。
+本文只保存当时 HTML 默认路线质量债收口的历史 provenance。它不再是当前 PPT route checklist、HTML quality gate、proof transcript、branch state 或执行计划。
 
-这次 closeout 的判断对象是当时 HTML authoring lane 的代码、合同和测试约束：`render_html -> visual_director_review -> screenshot_review -> fix_html -> screenshot_review -> export_pptx` 是否已经具备预期的质量闭环。
+当前 `ppt_deck` 默认视觉路线是 image-first，由 `docs/delivery/image-first-ppt-production-route.md`、`contracts/runtime-program/ppt-image-first-production-route.json`、runtime-family source/tests、workspace artifacts 和 RCA review/export gates 持有。HTML 与 native editable PPTX 都是显式可选路线。
 
-结论是：历史视觉质量债务已被后续 HTML lane 的 review / repair hardening 覆盖，状态记为 `resolved_by_later_work`。HTML 现在保留为生产可选二线；`ppt_deck` 当前默认视觉路线由 `contracts/runtime-program/ppt-image-first-production-route.json` 冻结。
+## Historical Fact
 
-## 证据
+当时的判断对象是 HTML authoring lane：
 
-- `screenshot_review` 已把 page-level 视觉问题路由回 `fix_html`。
-- speaker-fit 这类结构性问题仍回到 `slide_blueprint`，不被塞进页面级补丁。
-- `fix_html` 已支持定点页面回修，保留已通过页面。
-- 回修后的 visual review / screenshot review 会基于新鲜页面重新判断，不复用 stale review。
-- `export_pptx` 使用稳定通过审查的 HTML，而不是未审查 draft。
-- slide review 与 page-local repair 的并行能力只提升吞吐，不改变 quality gate。
+`render_html -> visual_director_review -> screenshot_review -> fix_html -> screenshot_review -> export_pptx`
 
-## 边界
+历史结论是：HTML lane 的 review / repair / export hardening 后续覆盖了当时的历史视觉质量债，记录状态读为 `resolved_by_later_work`。这只说明 2026-05-01 HTML debt closeout 已归档，不声明今天的 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete。
 
-native PPT proof lane 仍是二线：它用于用户明确要求可编辑 / 原生 PPTX / DrawingML 时的生产可选路线。
+## Historical Boundary
 
-它不参与这次历史 HTML closeout，也不是 HTML lane 视觉问题的兜底修复手段。
+- `screenshot_review` 曾把 page-level 视觉问题路由回 `fix_html`。
+- speaker-fit 等结构性问题回到 `slide_blueprint`，不塞进页面级补丁。
+- `fix_html` 支持定点页面回修，并要求复审读取新鲜页面。
+- `export_pptx` 只能使用稳定通过审查的 HTML。
+- native PPTX 路线不参与这个历史 HTML closeout，也不是 HTML lane 的兜底修复手段。
 
-## Plan Closeout
+## No-Resurrection Rule
 
-- `planned`：核查当前 `ppt_deck` HTML 主线质量闭环是否仍有历史视觉质量债缺口。
-- `done`：确认 review、rerun target、定点回修、复审、export 与并行边界已由当前代码和测试覆盖。
-- `deferred`：无。
-- `skipped`：不重跑历史 OPL-series PPT；不手工修历史 PPT；不把 native PPT proof lane 接成 HTML fallback；不在这个历史 HTML closeout 内重跑当前 image-first proof；不新增历史样本分类工程。
-- `verification`：见 `contracts/runtime-program/ppt-mainline-quality-closeout.json`。
-- `commit-push state`：完成 fresh verification 后提交并推送。
+不要把本文恢复成当前 HTML route 操作手册、质量门、proof lane、执行计划或 readiness evidence。需要推进 HTML 路线时，回到 current route contracts、delivery owner docs、runtime-family source/tests、workspace artifacts、review/export receipts、owner receipts 和 typed blockers。

@@ -43,6 +43,68 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA Phase 2 high-risk and convergence brief compression tranche:
+
+- Theme / SSOT: active-looking `docs/history/phase-2/**` manual-test,
+  source-activation, source/review/delivery convergence, HTML closeout and
+  native editable PPTX proof briefs. Current completion, gaps, owner-delta and
+  next baton remain `docs/active/rca-ideal-state-gap-plan.md`; current default
+  PPT route support remains `docs/delivery/image-first-ppt-production-route.md`
+  plus route contracts; current native editable PPTX support remains
+  `docs/delivery/native-ppt-proof-environment.md`, native contracts, helper
+  catalog and proof runner source; current source truth remains `docs/source/`,
+  workspace canonical artifacts, runtime-family contracts/source/tests, owner
+  receipts and typed blockers; current review/export/delivery authority
+  remains RCA review/export gates, delivery docs, artifact locators and
+  runtime-program contracts.
+- Reviewed: `AGENTS.md`, `TASTE.md`, OPL Doc skill,
+  `docs/history/phase-2/README.md`,
+  `docs/history/phase-2/stable_deliverable_manual_test_brief.md`,
+  `docs/history/phase-2/phase_2_source_intake_activation_package_freeze.md`,
+  `docs/history/phase-2/phase_2_source_intake_shared_source_truth_baseline.md`,
+  `docs/history/phase-2/phase_2_review_export_gate_audit_hardening.md`,
+  `docs/history/phase-2/phase_2_family_source_truth_consumption_convergence.md`,
+  `docs/history/phase-2/phase_2_publication_projection_delivery_contract_convergence.md`,
+  `docs/history/phase-2/ppt_mainline_quality_closeout.md`,
+  `docs/history/phase-2/phase_2_ppt_native_authoring_proof_lane.md`,
+  `docs/delivery/README.md`,
+  `docs/delivery/image-first-ppt-production-route.md`,
+  `docs/delivery/native-ppt-proof-environment.md`,
+  `docs/source/README.md`,
+  `docs/source/source_augmentation_executor_contract.md`,
+  `docs/status.md`, `docs/architecture.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`, this process index,
+  `docs/history/process/retired-surface-provenance.md`, focused
+  runtime-program contract refs and stale scans over Phase 2 active-looking
+  checklist / runbook / next-tranche / closeout wording.
+- Edited: `docs/history/phase-2/README.md`, the eight target Phase 2 bodies,
+  this process index and
+  `docs/history/process/retired-surface-provenance.md`.
+- Coverage result: the target Phase 2 bodies no longer preserve CLI sequences,
+  operator flows, activation gates, artifact schema tables, manual QA rubrics,
+  source/review/delivery contract tables as current owners, next-tranche boards,
+  proof runner handbooks, V2 closeout ledgers, branch/worktree closeout wording
+  or backlog schemas as current guidance. They now keep historical fact,
+  current owner maps and no-resurrection rules.
+- Retired / guarded: no source module, contract, test, workflow or history file
+  was physically deleted because runtime-program contracts and `human_doc:*`
+  provenance still need these reader contexts. The retired surface is the
+  active-looking runbook/checklist/proof-ledger/projection-board prose inside
+  history bodies; it may not be reused as current Agent prompt, route guide,
+  source activation plan, source/review/delivery contract owner, manual QA
+  gate, native proof handbook, CI checklist, readiness evidence or
+  compatibility path.
+- Remaining RCA unreviewed scope under the parent OPL series goal: other
+  individual `docs/history/phase-2/**` bodies not covered by accepted tranches,
+  active private-inventory details, generated/default caller thinning evidence
+  tails, and future source/contract/test retirement lanes that need fresh
+  no-active-caller plus owner receipt / typed blocker proof.
+- Next write scope: continue with one precise Phase 2 body theme after fresh
+  intake, likely remaining direct-delivery / operator / runtimeWatch /
+  workspace quickstart convergence briefs with active-looking current-status
+  wording. Do not use this tranche as proof that every RCA `docs/**/*.md`
+  paragraph has been line-reviewed.
+
 2026-06-08 RCA tombstone body governance tranche:
 
 - Theme / SSOT: `docs/history/tombstones/**` retired route / managed product

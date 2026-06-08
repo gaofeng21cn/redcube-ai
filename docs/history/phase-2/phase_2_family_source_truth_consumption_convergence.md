@@ -3,98 +3,35 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_source_truth_consumption_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、typed blockers 和当前 owner docs。
 
 日期锚点：`2026-04-08`
 
-生命周期说明：本文是已吸收的 Phase 2 source-plane hardening brief，保留为 contract-linked provenance。当前 source truth consumption 以 canonical workspace artifacts、`docs/source/`、runtime-family contracts 与 runtime-program contracts 为准。
+## Lifecycle
 
-这份文档记录的是同一主线上的下一条 hardening tranche：
+本文只保存 family source-truth consumption convergence 的历史 provenance。它不再是当前 source truth consumption contract、family route guide、poster boundary rule owner、handoff board 或 implementation checklist。
 
-- `family source-truth consumption convergence`
+当前 source consumption truth 回到 `docs/source/`、canonical workspace artifacts、runtime-family contracts/source/tests、runtime-program contracts、owner receipts 和 typed blockers。
 
-它不是：
+## Historical Fact
 
-- `RedCube AI` 的全部长期目标
-- `controller` 已经成为正式入口的证明
-- academic poster contract 已经正式打开
+这条 absorbed tranche 当时收紧了三类边界：
 
-## 当前结论
+- `ppt_deck`、`xiaohongshu`、`poster_onepager` 共享同一 canonical `shared_source_truth`。
+- family-specific artifacts 可以保留自己的业务字段，但需要以统一 summary 形状表达 source truth consumption。
+- `poster_onepager` 只按 guarded `knowledge_poster` surface 读取，不打开 academic poster contract。
 
-- `ppt_deck`、`xiaohongshu`、`poster_onepager` 继续共享同一 canonical `shared_source_truth`
-- authoritative fail-closed gate 仍在 `auditDeliverable` / `runtimeWatch`，权威 gate 仍是 `topics/<topic>/canonical/source-audit.json`
-- family-specific stages 允许保留各自产物结构，但需要输出同一形状的 `source_truth_consumption`
-- `poster_onepager` 仍只代表 guarded `knowledge_poster` surface，不打开 academic poster contract
-- formal entry 仍只有 `MCP / CLI`
+历史 reader context 中的 key terms 包括 `source_truth_contract`、`source_truth_consumption`、`auditDeliverable`、`runtimeWatch`、`getReviewState` 和 `getPublicationProjection`。这些名字的当前行为与机器 truth 继续归 contracts/source/tests、runtime artifacts、owner receipts 和 RCA review/export gates。
 
-## 这条 tranche 实际收紧了什么
+## Current Owner Read
 
-### 1. Shared source_truth_contract
+| Theme | Current owner |
+| --- | --- |
+| source readiness / consumption support | `docs/source/README.md`, source contracts, runtime-family source/tests |
+| review/export and delivery owner boundary | `docs/delivery/`, RCA review/export gates, artifact locator contracts |
+| current RCA completion and gaps | `docs/active/rca-ideal-state-gap-plan.md` |
+| historical machine provenance | `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json` |
 
-每个 hydrated deliverable contract 都应显式暴露：
+## No-Resurrection Rule
 
-- `source_truth_contract`
-
-它至少冻结：
-
-- authoritative surface = `shared_source_truth`
-- authoritative gate = `topics/<topic>/canonical/source-audit.json`
-- canonical quartet = `source_index` / `extracted_materials` / `source_audit` / `source_brief`
-- route-to-consumption-role mapping
-
-### 2. Shared source_truth_consumption summary
-
-family artifact 允许保留自己的业务字段，但对 shared source truth 的消费必须收口成同一组 summary 字段：
-
-- `authoritative_source_kind`
-- `consumption_role`
-- `input_mode`
-- `confidence`
-- `material_count`
-- `material_ids`
-- `source_labels`
-- `source_audit_status`
-- `source_audit_blocking_reasons`
-
-### 3. Guarded poster boundary stays honest
-
-`poster_onepager` 在本 tranche 内只允许：
-
-- `knowledge_poster`
-
-它不允许被改写成：
-
-- `paper_poster`
-- `conference_poster`
-- academic poster contract 已激活
-
-### 4. Export / governance alignment stays hydrated
-
-family-specific export surface 仍按 hydrated contract 区分：
-
-- `ppt_deck`：`export_pptx`
-- `xiaohongshu`：`export_bundle`
-- `poster_onepager`：`export_bundle`
-
-但 shared governance truth 仍必须围绕：
-
-- `auditDeliverable`
-- `runtimeWatch`
-- `getReviewState`
-- `getPublicationProjection`
-
-## 最小 closeout evidence
-
-- `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json`
-- `tests/phase-2-family-source-truth-consumption-convergence.test.ts`
-- `tests/family-source-truth-consumption.test.ts`
-- `tests/profile-contract-hydration.test.ts`
-
-## 下一候选 tranche
-
-- `phase_2_publication_projection_delivery_contract_convergence`
-
-它的意义是：
-
-- 继续收紧 publication projection / delivery contract / governance surface 的同主线一致性
-- 不是把当前 absorbed tranche 误写成全部终点
+不要把本文恢复成当前 source contract table、family route checklist、poster activation rule、next-tranche board、test lane 或 readiness evidence。需要推进 source consumption 时，回到 current source/delivery owner docs、contracts/source/tests、workspace artifacts、owner receipts 和 typed blockers。

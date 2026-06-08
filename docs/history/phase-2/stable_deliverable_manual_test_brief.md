@@ -3,197 +3,53 @@
 Owner: `RedCube AI`
 Purpose: `historical_stable_deliverable_manual_test_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 manual-test brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 owner docs。
+Machine boundary: 人读历史 manual-test brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts、RCA review/export gates 和当前 owner docs。
 
-> 历史手工测试简报，冻结于 `2026-04-07`。它保留当时的 `stable deliverable` hardening 手测方案。当前默认入口、运行链路与验证口径以 `docs/status.md`、`docs/architecture.md`、`docs/README.md` 和 `contracts/runtime-program/current-program.json` 为准；当前 `ppt_deck` 默认 image-first 路线由 `contracts/runtime-program/ppt-image-first-production-route.json` 接管。
+日期锚点：`2026-04-07`
 
-当前 baton 名称：`stable deliverable manual-test-driven hardening`
+## Lifecycle
 
-## 历史状态
+本文只保存 `stable deliverable manual-test-driven hardening` 的历史手测 provenance。它不再是当前 manual QA checklist、CLI recipe、route execution guide、delivery readiness gate、hardening backlog schema owner 或下一轮 Agent prompt。
 
-- baton id：`stable_deliverable_manual_test_driven_hardening`
-- 当前状态：`closeout_completed`
-- 当前 review：`passed`
-- 激活状态：这条下一棒已由 `Codex App` 显式激活
-- 前置条件：`P0 review-closeout` 已通过，且 durable closeout 已 durably committed
-- 2026-04-07 首轮正式手工测试结果：`ppt_deck = pass`、`xiaohongshu = pass`、hardening backlog = `manual_test_completed_no_findings`
-- 范围只限：`ppt_deck`、`xiaohongshu`
-- 明确不做：不打开 `Phase 2 / source intake + shared source truth`、不扩 `controller`、不新增 family / overlay、不推进 poster academic contract、不扩大 OPL-hosted runtime integration
+当前读法回到这些 owner：
 
-## 基线预检
+| Theme | Current owner |
+| --- | --- |
+| RCA 当前完成口径、open gaps、下一轮 baton | `docs/active/rca-ideal-state-gap-plan.md` |
+| 当前默认入口与运行链路 | `docs/status.md`, `docs/architecture.md`, `contracts/runtime-program/current-program.json` |
+| 当前 delivery / route / proof 支撑 | `docs/delivery/README.md`, `docs/delivery/image-first-ppt-production-route.md`, route contracts, runtime-family source/tests |
+| 当前 production evidence tail | `contracts/production_acceptance/rca-production-acceptance.json`, runtime evidence, owner receipts, typed blockers |
+| 历史 machine provenance | `contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json`, `contracts/runtime-program/stable-deliverable-hardening-backlog.json` |
 
-先证明当前基线仍然是 tracked-only / clean-clone 可复现：
+## Historical Fact
 
-1. `git diff --check`
-2. `npm run test:full`
-3. `npm run typecheck`
-4. `node --test tests/runtime-alignment-p0.test.ts tests/poster-production-hardening-freeze.test.ts tests/p21-operations-and-evaluation-os.test.ts`
-5. 在 clean-clone / tracked-only 条件下，至少重放第 4 步
+本 brief 冻结时的 baton id 是 `stable_deliverable_manual_test_driven_hardening`。当时的 scope 只覆盖 `ppt_deck` 和 `xiaohongshu` 两个 stable deliverable family；它记录了首轮正式手测结论、手测关注面、发现写回约束，以及不扩到 Phase 2 source intake、controller、新 family、poster academic contract 或 OPL-hosted runtime integration 的边界。
 
-若第 4 或第 5 步失败，本轮不进入 manual test，先回到 P0 closeout truth surface 修复。
+当时记录的历史结果是：
 
-## 手工测试对象 A：`ppt_deck`
+- `ppt_deck` 手测通过。
+- `xiaohongshu` 手测通过。
+- hardening backlog 读为 `manual_test_completed_no_findings`。
+- baton closeout 后被后续 Phase 2 source-intake activation / baseline 记录消费。
 
-### 输入
+这些事实只说明当时的 stable-deliverable hardening 已 close out。它们不能升级为今天的 visual ready、exportable、handoffable、domain ready、production ready、production visual-stage long soak complete、当前 route quality verdict 或当前 operator 手测通过证明。
 
-- `overlay`：`ppt_deck`
-- `profile_id`：`lecture_student`
-- `topic_id`：`manual-ppt-thyroid-basics`
-- `deliverable_id`：`lecture-01`
-- `title`：`Thyroid Basics`
-- `goal`：`Explain thyroid fundamentals to undergraduate students`
-- 最小材料包：
-  - 课程提纲：定义、功能、常见检查、诊疗边界
-  - 讲义笔记：`TSH / T3 / T4`、甲减 / 甲亢症状、就诊路径
-  - 必保留边界：不能替代临床诊断；示例仅用于教学
-- 参考面：`human_doc:deliverable_examples#ppt`（人读路径当前为 `docs/delivery/deliverable_examples.md#示例一：给学生讲课的-PPT`）
+## Historical Content Compression
 
-### 建议 CLI 序列
+旧正文包含两套完整手工测试输入、历史 CLI 序列、阶段顺序、预期产物、失败采样方式、验收判断和 backlog 字段清单。那些内容已经压缩为历史 provenance，不在本文继续保留为可执行 runbook：
 
-```bash
-npm run redcube -- deliverable create \
-  --workspace-root /ABS/PATH/TO/WORKSPACE \
-  --overlay ppt_deck \
-  --profile-id lecture_student \
-  --topic-id manual-ppt-thyroid-basics \
-  --deliverable-id lecture-01 \
-  --title "Thyroid Basics" \
-  --goal "Explain thyroid fundamentals to undergraduate students"
-```
+- `ppt_deck` 当前默认路线是 image-first；HTML 和 native editable PPTX 是显式可选路线。当前路线、proof、review/export 与 artifact authority 回到 delivery owner docs、route contracts、runtime-family source/tests、workspace artifacts 和 review/export receipts。
+- `xiaohongshu` 当前 route truth、publish/export gate、artifact authority 和 source boundary 回到 runtime-family source/tests、contracts、workspace artifacts 和 RCA-owned review/export gates。
+- 手测发现写回不再由本文维护 schema。历史 backlog contract 只保留当时 hardening 记录；当前 evidence / typed blocker / owner receipt 写回以 production acceptance、runtime evidence、owner receipts 和 active gap plan 为准。
 
-随后依次运行：
+## No-Resurrection Rule
 
-- `storyline`
-- `detailed_outline`
-- `slide_blueprint`
-- `visual_direction`
-- `render_html`
-- `visual_director_review`
-- `screenshot_review`
-- `export_pptx`
+不要把本文中的历史手测材料恢复成：
 
-### 预期产物
+- 当前 CLI 操作指南或 route execution checklist。
+- 当前 delivery / source / production evidence gate。
+- 当前 backlog schema、test command list、manual QA rubric 或 Agent prompt。
+- 证明 visual ready、exportable、handoffable、domain ready、production ready 或 long-soak complete 的证据。
+- 允许绕过 current route contracts、Stage Folder artifacts、RCA review/export gates、owner receipts 或 typed blockers 的兼容面。
 
-- hydrated deliverable contract
-- storyline / detailed outline / slide blueprint / visual direction artifacts
-- rendered html artifact
-- visual director review report
-- screenshot review report
-- ppt export bundle，或显式 hard block
-
-### 失败采样方式
-
-- 缺失任何阶段 artifact：记为 `artifact gap`
-- 章节节奏、页间叙事、讲授边界漂移：记为 `structure drift`
-- `visual_director_review` 指出峰值页、层级、记忆点失真：记为 `visual direction miss`
-- `screenshot_review` 暴露远视可读性、密度、对齐问题：记为 `screenshot regression`
-- `export_pptx` 既未产出真实交付，也未显式 hard block：记为 `export contract failure`
-
-### 通过标准
-
-- 全部 route 顺序可执行，且 review surfaces 可回读
-- `render_html` 与 `screenshot_review` 不出现阻断性失败
-- 导出阶段产出真实 bundle，或给出显式 hard block
-- 最终 deck 保持讲授节奏、结构层级与 visual direction 一致
-
-### 不通过标准
-
-- 缺失关键 artifact / review 报告 / 导出结果
-- review surfaces 明确给出阻断结论
-- 通过结论只能依赖 machine-local ignored state 才成立
-
-## 手工测试对象 B：`xiaohongshu`
-
-### 输入
-
-- `overlay`：`xiaohongshu`
-- `profile_id`：`standard_note`
-- `topic_id`：`manual-xhs-thyroid-clinic`
-- `deliverable_id`：`note-01`
-- `title`：`甲状腺门诊小红书科普`
-- `goal`：`为门诊患者生成可发布的科普图文`
-- 最小材料包：
-  - 门诊常见问题列表：症状、检查、何时复诊
-  - 专业边界说明：不能替代医生面诊；避免夸大疗效
-  - 平台风格要求：首页钩子、分屏节奏、结尾行动建议
-- 参考面：`human_doc:deliverable_examples#xiaohongshu`（人读路径当前为 `docs/delivery/deliverable_examples.md#示例二：知识传播型小红书图文`）
-
-### 建议 CLI 序列
-
-```bash
-npm run redcube -- deliverable create \
-  --workspace-root /ABS/PATH/TO/WORKSPACE \
-  --overlay xiaohongshu \
-  --profile-id standard_note \
-  --topic-id manual-xhs-thyroid-clinic \
-  --deliverable-id note-01 \
-  --title "甲状腺门诊小红书科普" \
-  --goal "为门诊患者生成可发布的科普图文"
-```
-
-随后依次运行：
-
-- `research`
-- `storyline`
-- `single_note_plan`
-- `visual_direction`
-- `render_html`
-- `visual_director_review`
-- `screenshot_review`
-- `publish_copy`
-- `export_bundle`
-
-### 预期产物
-
-- research / storyline / single note plan / visual direction artifacts
-- rendered html artifact
-- visual director review report
-- screenshot review report
-- publish copy artifact
-- html / caption / png export bundle，或显式 hard block
-
-### 失败采样方式
-
-- `research` / `storyline` 无法保持专业边界：记为 `content boundary miss`
-- `visual_director_review` 指出首页钩子、节奏、记忆点失真：记为 `visual hook miss`
-- `screenshot_review` 暴露密度、排版、scan path 问题：记为 `screenshot regression`
-- `publish_copy` 未给出可发布文案或质量 gate 失败：记为 `publish surface failure`
-- `export_bundle` 未产出 html / caption / png 或 `delivery_state` 不明确：记为 `export contract failure`
-
-### 通过标准
-
-- 全部 route 顺序可执行，且 review surfaces 可回读
-- 发布文案、视觉审阅与截图审阅结论相互一致
-- 导出阶段产出 html / caption / png bundle，或给出显式 hard block
-- 最终图文既保留专业边界，也保持可读与传播节奏
-
-### 不通过标准
-
-- 缺失关键 artifact / review 报告 / publish copy / export bundle
-- review surfaces 明确给出阻断结论
-- 通过结论只能依赖 machine-local ignored state 才成立
-
-## 发现问题后的回写规则
-
-所有手工测试暴露的问题，都必须先进入：
-
-- `contracts/runtime-program/stable-deliverable-hardening-backlog.json`
-
-每条 backlog 至少写明：
-
-- `id`
-- `overlay`
-- `surface`
-- `symptom`
-- `severity`
-- `evidence`
-- `repro_steps`
-- `next_action`
-
-禁止把这些发现直接外扩到：
-
-- `Phase 2 / source intake + shared source truth`
-- `controller` 扩展
-- 新 family / overlay
-- poster academic contract
-- OPL-hosted runtime integration
+如果需要重新打开 stable deliverable 手测，应在当前 delivery owner docs、contracts/source/tests、workspace runtime evidence、owner receipt 或 typed blocker surface 中建立新的 owner-delta，并把本文只作为历史 reader context 读取。
