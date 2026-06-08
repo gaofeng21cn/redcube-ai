@@ -16,9 +16,10 @@ Machine boundary: 人读 tombstone。机器真相继续归 `contracts/runtime-pr
 
 - active contract：`contracts/runtime-program/product-entry-session-continuity.json`
 - active support doc：`docs/references/product-entry/product_entry_session_continuity.md`
-- callable surface：`getProductEntrySession` / `redcube product session` / `get_product_entry_session`
+- API / MCP surface：`getProductEntrySession` / `get_product_entry_session`
+- CLI surface：OPL generated/default product session shell target；repo-local `redcube product session` 已退役，repo-local `redcube product` 只保留 `invoke`
 - provenance human doc id：`human_doc:retired_managed_product_entry_contract_tombstone`
 
 退役读法：
 
-旧 `managed` 命名只允许作为 provenance、semantic-id 或 tombstone 出现。它不得恢复为 active caller、public action key、default runtime owner、domain_action_adapter template、compatibility alias、facade 或 wrapper。RCA 继续持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject authority 和 owner receipt；OPL 持有 generic stage runtime / attempt ledger / queue / wakeup shell。
+旧 `managed` 命名只允许作为 provenance、semantic-id 或 tombstone 出现。它不得恢复为 active caller、public action key、default runtime owner、repo-local product session command、domain_action_adapter template、compatibility alias、facade 或 wrapper。RCA 继续持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject authority 和 owner receipt；OPL 持有 generated product session shell、generic stage runtime、attempt ledger、queue 和 wakeup shell。

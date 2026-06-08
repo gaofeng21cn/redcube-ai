@@ -23,7 +23,7 @@ Machine boundary: 人读 tombstone。当前机器真相继续归 contracts、sou
 - OPL 是 stage-led、以 Agent executor 为最小执行单位的完整智能体运行框架，可通过内部托管路径调用 RedCube；它不持有 RedCube visual truth。
 - Codex CLI 是未显式选择 hosted/proof backend 时的默认最小具体执行单元。
 - `gateway` / `harness` 只作为仓内边界层、执行层或历史语境词汇保留。
-- Hermes 只作为 legacy/optional provider、显式 hosted/proof backend 或历史 proof lane 出现。
+- Hermes / Hermes-Agent 只作为上游外部 runtime 项目、显式 hosted/proof backend、非默认 executor adapter、diagnostic 或历史 proof lane 出现。
 
 ## Contract-linked exception
 
@@ -46,4 +46,4 @@ Machine boundary: 人读 tombstone。当前机器真相继续归 contracts、sou
 
 ## Physical follow-through note
 
-2026-05-13 follow-through 后，默认 active path 只读作 direct product entry、service-safe domain entry、product domain_action_adapter、stage descriptor 与 OPL-hosted handoff parity。旧 Hermes/Gateway/local-manager 文件名若仍在 `docs/history/` 或 `docs/references/` 出现，原因只能是 `human_doc:*` 合同引用、proof provenance 或 tombstone 可检索性；无合同引用的旧 active-path 物理入口不得重新进入 active code/tests/package surface。
+2026-05-13 follow-through 后，默认 active path 只读作 direct product entry、service-safe domain entry、RCA `domain-handler export|dispatch` target、OPL-generated `domain_action_adapter` descriptor refs、stage descriptor 与 OPL-hosted handoff parity。旧 Hermes/Gateway/local-manager 文件名若仍在 `docs/history/` 或 `docs/references/` 出现，原因只能是 `human_doc:*` 合同引用、proof provenance 或 tombstone 可检索性；无合同引用的旧 active-path 物理入口不得重新进入 active code/tests/package surface。

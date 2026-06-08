@@ -28,6 +28,8 @@ Machine boundary: 人读 tombstone 索引。机器真相继续归 contracts、sc
 - `retired-route-narratives-2026-05-11.md`：gateway-first、frontdoor-first、federation-first、harness-first、OPL-first、OPL bridge、Hermes-first 与 open-ended Phase 2 public-direction wording。
 - `retired-managed-product-entry-contract-2026-05-20.md`：legacy managed product-entry contract naming；active contract 是 product-entry session continuity。
 
+2026-06-08 tombstone body governance 已覆盖本目录两个正文：旧 route narrative tombstone 只指向 RCA `domain-handler export|dispatch` target 与 OPL-generated descriptor refs；managed product-entry tombstone 不再把 repo-local `redcube product session` 写成 callable surface。
+
 No-resurrection boundary:
 
 - tombstone 只保留可检索性和迁移解释，不允许旧词恢复为 active caller、public action key、default runtime owner、generated/default caller、domain_action_adapter template、compatibility alias、facade、wrapper 或 compatibility-only test。

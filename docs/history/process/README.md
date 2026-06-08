@@ -43,6 +43,49 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA tombstone body governance tranche:
+
+- Theme / SSOT: `docs/history/tombstones/**` retired route / managed product
+  entry wording. Current product-entry session continuity truth remains
+  `contracts/runtime-program/product-entry-session-continuity.json`,
+  `docs/references/product-entry/product_entry_session_continuity.md`,
+  product-entry manifest, source/tests, CLI/MCP/API behavior and owner
+  receipts. Current route identity, runtime owner split and generated/default
+  caller posture remain in core docs, `docs/active/rca-ideal-state-gap-plan.md`,
+  `docs/history/tombstones/README.md`, runtime-program contracts and source.
+- Reviewed: `AGENTS.md`, `TASTE.md`, `docs/history/tombstones/README.md`,
+  `docs/history/tombstones/retired-route-narratives-2026-05-11.md`,
+  `docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md`,
+  `docs/history/README.md`, this process index,
+  `docs/history/process/retired-surface-provenance.md`,
+  `docs/status.md`, `docs/architecture.md`,
+  `docs/references/product-entry/product_entry_session_continuity.md`,
+  `contracts/runtime-program/product-entry-session-continuity.json`,
+  CLI dispatch fail-closed source and stale scans over tombstone wording.
+- Edited: this file, `docs/history/tombstones/README.md`,
+  both non-index tombstone bodies, and
+  `docs/history/process/retired-surface-provenance.md`.
+- Coverage result: tombstone bodies no longer write repo-local
+  `redcube product session` as callable surface or `product domain_action_adapter`
+  as active path wording. They point current execution back to RCA
+  `domain-handler export|dispatch`, OPL-generated descriptor refs, product-entry
+  session continuity contract/support doc and machine surfaces.
+- Retired / guarded: no source module, contract, test, workflow or tombstone
+  file was physically deleted. The guarded retired surface is active-looking
+  tombstone prose that could be misread as repo-local product-session command,
+  direct product entry, domain_action_adapter template, default runtime owner,
+  public identity, active wrapper, compatibility alias, facade, delete authority
+  or readiness evidence.
+- Remaining RCA unreviewed scope under the parent OPL series goal:
+  remaining individual `docs/history/phase-2/**` bodies beyond prior tranches,
+  active private-inventory details, generated/default caller thinning evidence
+  tails, and future source/contract/test retirement lanes that need fresh
+  no-active-caller plus owner receipt / typed blocker proof.
+- Next write scope: continue with another precise history/provenance body theme
+  after fresh intake, likely remaining Phase 2 bodies or active
+  private-inventory detail governance. Do not use this tranche as proof that
+  every RCA `docs/**/*.md` paragraph has been line-reviewed.
+
 2026-06-08 RCA plans-history body compression tranche:
 
 - Theme / SSOT: `docs/history/plans/**` historical plans and future target
