@@ -3,120 +3,41 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_workspace_operator_quickstart_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts 和当前 product/runtime owner docs。
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、workspace artifacts、owner receipts、typed blockers 和当前 product/runtime owner docs。
 
 日期锚点：`2026-04-10`
 
-生命周期说明：本文是已吸收的 workspace/operator quickstart hardening brief，保留为 contract-linked provenance。当前 quickstart truth 以 `docs/product/human_quickstart.md`、CLI help、runtime-program contracts 与 workspace artifacts 为准。
+## Lifecycle
 
-这份文档记录同一 `redcube-runtime-program` 主线closeout 已完成并吸收到当前 mainline 的 current tranche：
+本文只保存 workspace/operator quickstart convergence 的历史 provenance。它不再是当前 quickstart guide、workspace bootstrap contract、CLI route sequence owner、minimal verification list、closeout evidence ledger 或 parking rule。
 
-- `workspace operator quickstart convergence`
+现行 quickstart truth 回到 `docs/product/human_quickstart.md`、CLI help、runtime-program contracts、workspace artifacts、source/tests、owner receipts 和 typed blockers。
 
-它证明的是：
+## Historical Fact
 
-- `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run`
-  现在已经收紧为一条 repo-verified operator quickstart surface；
-- brand-new / thin workspace 的 canonical bootstrap 行为，已经在当前 hard boundary 内被明确并验证；
-- 这仍然是同一条主线上的 hardening，不是新 program，也不是 `controller` / academic poster / managed web runtime 的推进。
-
-它不是：
-
-- `controller` 已成为 repo-verified public formal entry 的声明；
-- `paper_poster / conference_poster` academic poster contract 已开启的声明；
-- `xiaohongshu` 已被改写成 direct-delivery 的声明；
-- `managed web runtime` 或 `OPL-hosted runtime integration` 已开始迁移的声明。
-
-## 当前冻结结论
-
-- `workspace doctor` 继续保持**诊断**表面：在 brand-new workspace 上返回 `run_source_intake`，并显式暴露 canonical topics / runs 目录。
-- `source intake` 与 `source research` 继续是当前 quickstart 的**bootstrap writer**：由它们写入 `redcube.workspace.json`、`topics/<topic>/topic.json` 与 topic 级 canonical source surfaces。
-- `source research` 继续是 Step 1 的 one-shot orchestration surface：它总是先执行 `source intake`，再决定是停在 canonical result staging，还是继续 augmentation execution。
-- `deliverable create`、`deliverable audit`、`deliverable run` 现在与上述 bootstrap / readiness / governance 语义形成同一条 repo-verified operator route。
-- `planning_ready` 继续保持 `Source Readiness` 的 machine-readable release gate；`auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 继续围绕同一 deliverable/topic 边界收口。
-- `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 继续共享同一 source substrate；其中 `xiaohongshu` 仍保持 explicit `human_publication`。
-
-## In scope
-
-### 1. Workspace bootstrap hardening
-
-- brand-new workspace 上，`workspace doctor` 明确返回 `run_source_intake`；
-- brand-new / thin workspace 上，`source intake` 与 `source research` 明确写出：
-  - `redcube.workspace.json`
-  - `topics/<topic>/topic.json`
-  - `topics/<topic>/canonical/source-index.json`
-  - `topics/<topic>/canonical/extracted-materials.json`
-  - `topics/<topic>/canonical/source-audit.json`
-  - `topics/<topic>/canonical/source-brief.json`
-  - `topics/<topic>/canonical/source-readiness-pack.json`
-  - `topics/<topic>/canonical/source-augmentation-request.json`
-- `deliverable create` 继续在同一 workspace / topic 下补齐 deliverable 合同与 surface files。
-
-### 2. Operator quickstart surface
-
-- canonical operator route 冻结为：
+这条 absorbed tranche 当时证明过以下 quickstart surface 被收紧为 repo-verified operator path：
 
 `workspace doctor -> source intake / source research -> deliverable create -> deliverable audit -> deliverable run`
 
-- `source research` 继续保持 Step 1 的 one-shot formal entry；
-- `deliverable audit` 继续 fail-closed 在 `source_readiness_summary` / `gate_summary` 上，而不是伪装成“source_audit = pass 就可放行”；
-- `deliverable run` 继续是 hydrated contract 之后的 routed execution surface。
+历史语境中的关键事实：
 
-### 3. Docs / help / behavior alignment
+- brand-new / thin workspace 的 bootstrap 由 Source Readiness surface 承担。
+- `workspace doctor` 是诊断入口，不是 workspace init 产品入口。
+- `source research` 作为 Step 1 orchestration surface，先执行 `source intake`，再按 readiness 判断是否继续 augmentation。
+- `planning_ready` 是 Source Readiness 的 machine-readable release gate。
+- `ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 共享 source substrate，同时保留各自 ontology。
 
-- `README*`、`docs/README*`、`docs/product/human_quickstart.md` 与 CLI help 现在对同一 quickstart surface 说的是同一套话；
-- 对新目录的推荐口径继续保持：先 `workspace doctor` 做诊断，再由 `source intake` 或 `source research` 执行正式 bootstrap；
-- 不引入新的 `workspace init` 产品表面，也不靠 hidden fallback chain 偷写 contract truth。
+这些事实只说明 2026-04-10 quickstart hardening 已吸收。它们不能打开 controller、academic poster、new family、managed web runtime、OPL-hosted runtime expansion，也不能替代 current product/runtime owner docs 或 CLI/MCP behavior。
 
-## Hard Boundaries
+## Current Owner Read
 
-这条线不得越过：
+| Theme | Current owner |
+| --- | --- |
+| human quickstart | `docs/product/human_quickstart.md` |
+| workspace/source bootstrap | source contracts, source/runtime-family source/tests, workspace artifacts |
+| runtime and operator projection | `docs/runtime/`, runtimeWatch contracts/source/tests |
+| historical machine provenance | `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json` |
 
-- `controller expansion`
-- 把 `controller` 写成 repo-verified public formal entry
-- `paper_poster / conference_poster` academic poster contract advancement
-- new family / overlay expansion
-- `xiaohongshu` 改写成 direct-delivery
-- `Deep Research` 改写成 `MedDeepScientist Scout + Idea`
-- `managed web runtime migration`
-- `OPL-hosted runtime integration` 扩面
-- hidden fallback chains as main behavior
-- prompt patch replacing contract hydration
+## No-Resurrection Rule
 
-## Minimal verification surface
-
-- truth freeze：
-  - `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json`
-  - `tests/phase-2-workspace-operator-quickstart-convergence.test.ts`
-- quickstart behavior：
-  - `tests/workspace-operator-quickstart.test.ts`
-  - `tests/source-intake.test.ts`
-  - `tests/source-research.test.ts`
-- `tests/cli-v2-smoke.test.ts`
-- `tests/deliverable-review-loop.test.ts`
-- `tests/direct-delivery-operator-handoff.test.ts`
-- `tests/phase-2-behavior-convergence.test.ts`
-
-## Closeout evidence
-
-本轮 absorbed 之后，必须诚实留下：
-
-- brand-new / thin workspace 的 canonical bootstrap 行为已被 repo-tracked tests 覆盖；
-- `workspace doctor`、`source intake / source research`、`deliverable create / audit / run` 已构成同一条 quickstart surface；
-- `planning_ready` gate 与 governance semantics 未漂移；
-- `xiaohongshu` 仍保持 `human_publication`，没有被改写成 direct-delivery。
-
-本轮不得宣称：
-
-- `controller` 已打开；
-- academic poster contract 已打开；
-- new family / overlay 已打开；
-- `managed web runtime` 已进入当前 repo truth。
-
-## 停车结论
-
-当前 tranche 的 honest closeout 结论是：
-
-- `WORKSPACE_OPERATOR_QUICKSTART_CLOSED_AND_ABSORBED`
-
-下一棒仍需在同一主线 hard boundary 内重新证明新的 honest freeze；若做不到，就继续保持 `none / not yet frozen`。
+不要把本文恢复成当前 quickstart checklist、workspace bootstrap handbook、CLI command sequence owner、verification surface list、closeout evidence ledger、parking conclusion 或 Agent prompt。需要推进 quickstart 时，回到 current product/runtime/source owner docs、contracts/source/tests、CLI/MCP behavior、workspace artifacts、owner receipts 和 typed blockers。

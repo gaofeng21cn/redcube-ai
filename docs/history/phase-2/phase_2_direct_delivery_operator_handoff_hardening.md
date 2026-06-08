@@ -3,108 +3,36 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_operator_handoff_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、typed blockers 和当前 owner docs。
 
 日期锚点：`2026-04-08`
 
-生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 operator handoff truth 以 RCA product/runtime surfaces、`docs/status.md`、`docs/delivery/` 与 runtime-program contracts 为准。
+## Lifecycle
 
-这份文档记录的是同一主线上的下一条 hardening tranche：
+本文只保存 direct-delivery operator handoff hardening 的历史 provenance。它不再是当前 operator handoff contract owner、delivery state schema、governance surface checklist、test lane、same-mainline continuation rule 或 readiness evidence。
 
-- `direct-delivery operator handoff hardening`
+现行 operator handoff truth 回到 RCA product/runtime surfaces、`docs/delivery/`、`docs/status.md`、runtime-program contracts、runtime artifacts、review/export receipts、owner receipts 和 typed blockers。
 
-它不是：
+## Historical Fact
 
-- `controller` 已经成为正式入口的证明
-- academic poster contract 已经正式打开
-- `RedCube AI` 的全部长期目标
+这条 absorbed tranche 当时收紧了 direct-delivery `operator_handoff` 语义：
 
-## 冻结结论
+- handoff owner surface 读 required export artifact 的 `delivery_state`。
+- handoff readiness 由 `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 等同一 deliverable/topic governance path 共同决定。
+- direct-delivery families 保留 reopen / closeout mutation 语义。
+- `xiaohongshu` 继续保留 explicit human publication，对照 direct-delivery families。
 
-- `ppt_deck` 与 guarded `poster_onepager` 必须在 hydrated `delivery_contract` 中显式冻结 `operator_handoff` 机器可读语义
-- `operator_handoff` 必须说明：谁拥有 `delivery_state`、哪一组 gate surfaces 决定 handoff 是否真的 ready、direct-delivery 允许哪些 reopen / closeout mutation surfaces
-- `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 必须对同一个 deliverable/topic 输出同一份 `operator_handoff` 语义，而不是各自再推一套 handoff 结论
-- `xiaohongshu` 继续保留 `human_publication` 语义，只作为对照面，不得被误写成 direct-delivery
-- formal entry 仍只有 `MCP / CLI`
+这些事实只说明当时 operator handoff hardening 已吸收。它们不能声明今天的 handoff ready、exportable、visual ready、domain ready、production ready、human approval 或 production visual-stage long soak complete。
 
-## 当前结论
+## Current Owner Read
 
-- 这条 tranche 已完成 closeout，并吸收到当前 mainline
-- direct-delivery `operator_handoff` 现在已在 `auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection` 上保持同一 deliverable/topic 语义
-- 下一棒如果还要继续，必须先证明新的 same-mainline tranche 能在当前 hard boundary 内被诚实冻结
+| Theme | Current owner |
+| --- | --- |
+| operator handoff / delivery support | `docs/delivery/`, runtime-program contracts, workspace artifacts |
+| review/publication projection | `getReviewState`, `getPublicationProjection`, runtime-family source/tests |
+| RCA completion and evidence tail | `docs/active/rca-ideal-state-gap-plan.md`, production acceptance contracts |
+| historical machine provenance | `contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json` |
 
-## 这条 tranche 实际收紧了什么
+## No-Resurrection Rule
 
-### 1. Shared direct-delivery operator_handoff contract
-
-direct-delivery families 的 hydrated `delivery_contract` 需要显式暴露：
-
-- `operator_handoff.owner_surface`
-- `operator_handoff.handoff_ready_state`
-- `operator_handoff.gate_surfaces`
-- `operator_handoff.reopen_mutation_surface`
-- `operator_handoff.closeout_mutation_surface`
-
-当前冻结口径：
-
-- `owner_surface = required_export_artifact.delivery_state`
-- `handoff_ready_state = output_ready`
-- `gate_surfaces = auditDeliverable / runtimeWatch / getReviewState / getPublicationProjection`
-- `reopen_mutation_surface = request_changes`
-- `closeout_mutation_surface = promote_baseline`
-
-### 2. delivery_state ownership and gate semantics stay separate but aligned
-
-这条 tranche 不把 `delivery_state` 偷换成 topic projection 或 review mutation 自身。
-
-相反，它要求同时保留两层真相：
-
-- `delivery_state` 继续由 required export artifact 持有
-- handoff gate 是否真的 ready，继续由同一 deliverable/topic canonical governance path 决定
-
-因此 direct-delivery deliverable 即使已经 `output_ready`，只要 source readiness 或 review gate 仍未诚实通过，`operator_handoff.gate_status` 也必须继续反映 `blocked`。
-
-### 3. One shared operator-facing summary across the four governance surfaces
-
-以下四个 surface 必须暴露同一份 `operator_handoff` 结论：
-
-- `auditDeliverable`
-- `runtimeWatch`
-- `getReviewState`
-- `getPublicationProjection`
-
-至少要对齐：
-
-- `gate_status`
-- `blocking_reasons`
-- `delivery_state_owner`
-- `required_export_route`
-- `required_export_bundle_id`
-- `canonical_export_artifact`
-- `delivery_state_current`
-- `delivery_state_next`
-- `reopen_mutation_surface`
-- `closeout_mutation_surface`
-
-### 4. Human publication stays explicit and separate
-
-- `ppt_deck`：direct delivery
-- `poster_onepager`：direct delivery，但仍保持 guarded knowledge-poster 边界
-- `xiaohongshu`：explicit human publication
-
-这表示当前 tranche 是在 direct-delivery family 上继续收紧 operator handoff，
-不是把 human publication 与 direct delivery 混成一套模糊 closeout 叙事。
-
-## 最小验证面
-
-- `contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json`
-- `tests/phase-2-direct-delivery-operator-handoff-hardening.test.ts`
-- `tests/direct-delivery-operator-handoff.test.ts`
-- `tests/profile-contract-hydration.test.ts`
-- `tests/review-platform.test.ts`
-- `tests/deliverable-review-loop.test.ts`
-
-## 吸收后继续判断
-
-- 如果同一主线还能在当前 hard boundary 内诚实冻结下一条 tranche，就继续自动推进
-- 如果再往前会开始编故事、重写 formal entry、扩 family / academic poster / controller，就必须停车
+不要把本文恢复成当前 operator handoff schema owner、delivery-state readiness guide、governance surface checklist、test command list、same-mainline continuation board 或 Agent prompt。需要推进 handoff 时，回到 current delivery/runtime owner docs、contracts/source/tests、workspace artifacts、review/export receipts、owner receipts 和 typed blockers。

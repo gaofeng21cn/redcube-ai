@@ -43,6 +43,59 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA Phase 2 residual operator/runtime brief compression tranche:
+
+- Theme / SSOT: residual active-looking `docs/history/phase-2/**`
+  operator, runtimeWatch, quickstart, direct-delivery lifecycle/handoff,
+  Source Readiness trigger/gate and family-parity governance briefs. Current
+  quickstart truth remains `docs/product/human_quickstart.md`, CLI help,
+  contracts, source/tests and workspace artifacts; runtimeWatch / locator truth
+  remains `docs/runtime/`, runtime-program contracts, CLI/MCP behavior,
+  runtime-family source/tests, runtime artifacts, owner receipts and typed
+  blockers; delivery / handoff / lifecycle truth remains `docs/delivery/`,
+  route contracts, RCA review/export gates and artifact locator contracts;
+  current completion, gaps and next baton remain
+  `docs/active/rca-ideal-state-gap-plan.md`.
+- Reviewed: `AGENTS.md`, `TASTE.md`, OPL Doc skill,
+  `docs/history/phase-2/README.md`,
+  `docs/history/phase-2/phase_2_operator_surface_consistency_hardening.md`,
+  `docs/history/phase-2/phase_2_workspace_operator_quickstart_convergence.md`,
+  `docs/history/phase-2/phase_2_direct_delivery_lifecycle_stage_convergence.md`,
+  `docs/history/phase-2/phase_2_direct_delivery_operator_handoff_hardening.md`,
+  `docs/history/phase-2/phase_2_source_readiness_deep_research_trigger_gate_convergence.md`,
+  `docs/history/phase-2/phase_2_family_parity_governance_surface_convergence.md`,
+  `docs/history/phase-2/phase_2_runtime_watch_locator_integrity_hardening.md`,
+  `docs/product/human_quickstart.md`, `docs/runtime/README.md`,
+  `docs/runtime/runtime_architecture.md`, this process index and
+  `docs/history/process/retired-surface-provenance.md`.
+- Edited: `docs/history/phase-2/README.md`, the seven target residual Phase 2
+  bodies, this process index and
+  `docs/history/process/retired-surface-provenance.md`.
+- Coverage result: the target residual bodies no longer preserve current-status
+  headings, workspace bootstrap guides, locator mismatch specs, direct-delivery
+  lifecycle/hand-off schema tables, Source Readiness trigger checklists,
+  family parity continuation boards, verification surface lists, absorption
+  gates or parking conclusions as current guidance. They now keep historical
+  fact, current owner maps and no-resurrection rules.
+- Retired / guarded: no source module, contract, test, workflow or history file
+  was physically deleted because runtime-program contracts and `human_doc:*`
+  provenance still need these reader contexts. The retired surface is the
+  active-looking residual process prose inside history bodies; it may not be
+  reused as current quickstart guide, runtimeWatch spec, CLI/MCP behavior spec,
+  delivery schema owner, operator handoff board, verification lane, Agent
+  prompt, readiness evidence or compatibility path.
+- Remaining RCA unreviewed scope under the parent OPL series goal: remaining
+  compact `docs/history/phase-2/phase_2_architecture_boundary_governance.md`,
+  `docs/history/phase-2/phase_2_family_parity_autopilot_continuation_board.md`,
+  active private-inventory details, generated/default caller thinning evidence
+  tails, and future source/contract/test retirement lanes that need fresh
+  no-active-caller plus owner receipt / typed blocker proof.
+- Next write scope: finish the last two compact Phase 2 board/architecture
+  bodies only if fresh scan shows active-plan pollution, otherwise move to
+  active private-inventory detail governance or a clean sibling repo lane. Do
+  not use this tranche as proof that every RCA `docs/**/*.md` paragraph has
+  been line-reviewed.
+
 2026-06-08 RCA Phase 2 high-risk and convergence brief compression tranche:
 
 - Theme / SSOT: active-looking `docs/history/phase-2/**` manual-test,

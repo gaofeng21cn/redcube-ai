@@ -3,73 +3,34 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_runtime_watch_locator_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、typed blockers 和当前 owner docs。
 
-生命周期说明：本文是已吸收的 Phase 2 runtime-watch hardening brief，保留为 contract-linked provenance。当前 runtimeWatch / locator truth 以 machine-readable contracts、CLI/MCP surface 和 runtime artifacts 为准。
+## Lifecycle
 
-## 当前状态
+本文只保存 runtimeWatch locator integrity hardening 的历史 provenance。它不再是当前 run record contract owner、runtimeWatch locator rule spec、CLI/MCP mismatch behavior checklist、follow-on board 或 absorption gate。
 
-本 tranche closeout 已完成并吸收到当前 mainline。当前仓库正式口径是：deliverable-scope run record 必须持久化 `topic_id` / `deliverable_id`，而 `runtimeWatch`、`CLI review watch`、`MCP runtime_watch` 在 quartet locator 与 run identity 不一致时必须 fail-closed。
-同一主线的 prefrozen follow-on board 也已经冻结：`phase_2_family_parity_autopilot_continuation_board` 现在明确把下一棒固定为 `phase_2_family_parity_governance_surface_convergence`，因此当前 Codex operator line 不需要在这一 tranche closeout 之后回到 “next tranche 未冻结” 的停车结论。
+现行 runtimeWatch / locator truth 回到 `docs/runtime/`、machine-readable contracts、CLI/MCP behavior、runtime-family source/tests、runtime artifacts、owner receipts 和 typed blockers。
 
-## 冻结目的
+## Historical Fact
 
-这条 same-mainline slice 不再讨论 operator surface 是否统一，而是继续收紧已经吸收的 operator route，把 `workspace/topic/deliverable/run` quartet locator 从“口头约定”推进到可 machine-verify 的 run-boundary truth：
+这条 absorbed tranche 当时收紧了 quartet locator 与 run identity 的一致性：
 
-- deliverable-scope run record 之前还没有把 `topic_id` / `deliverable_id` 作为 durable identity 一起落盘
-- `runtimeWatch` 在提供 `workspaceRoot/topicId/deliverableId/runId` 时，之前仍可能把错误 deliverable/topic 的 run 与当前 governance surface 混拼在一起
-- `CLI review watch` 与 `MCP runtime_watch` 之前还缺少 locator mismatch 的 fail-closed 行为
+- deliverable-scope run record 持久化 `topic_id` 与 `deliverable_id`。
+- `runtimeWatch` 在 persisted run 与 explicit in-process run 两条入口上执行同一 locator integrity rule。
+- 只给 workspace/topic/deliverable 而不带 run identity 时，仍允许 deliverable-level review watch。
+- CLI `review watch` 与 MCP `runtime_watch` 在 locator mismatch 时共享 fail-closed behavior。
 
-## 吸收结论
+这些事实只说明当时 runtimeWatch locator hardening 已吸收。它不能恢复为 current follow-on board、generated `domain_action_adapter` default dispatch、runtime owner proof、visual ready、exportable、handoffable、domain ready 或 production ready evidence。
 
-- `runDeliverableRoute -> startRun -> createRunRecord` 现在会把 `topic_id` / `deliverable_id` 写入 deliverable-scope run record
-- `runtimeWatch` 在 persisted run 与 preloaded run 两条入口上都执行同一 quartet locator integrity rule
-- `runtimeWatch` 仍然保留 deliverable-level review watch 入口：只给 `workspaceRoot/topicId/deliverableId`、不带 `runId` / `run` 时，不要求 run identity 字段
-- `redcube review watch` 与 `runtime_watch` 继续通过同一个 `runtimeWatch` gateway truth 收口，并且在 locator mismatch 时返回同一类 fail-closed 错误
-- `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 继续围绕同一 governance summaries 对齐，不把 locator integrity 修成一条平行 surface
+## Current Owner Read
 
-## In scope
+| Theme | Current owner |
+| --- | --- |
+| runtimeWatch / locator support | `docs/runtime/`, runtime-program contracts, CLI/MCP behavior, source/tests |
+| operator quickstart | `docs/product/human_quickstart.md` |
+| RCA completion and open gaps | `docs/active/rca-ideal-state-gap-plan.md` |
+| historical machine provenance | `contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json` |
 
-### 1. Run record durable identity hardening
+## No-Resurrection Rule
 
-- deliverable-scope run envelope 必须持久化 `topic_id`
-- deliverable-scope run envelope 必须持久化 `deliverable_id`
-- `getRun` / persisted run store 继续暴露同一 canonical run record，而不是额外发明 watch-only locator shadow
-
-### 2. runtimeWatch quartet locator integrity
-
-- `runtimeWatch` 在 `workspaceRoot/topicId/deliverableId/runId` 同时提供时，必须验证 resolved run 的 `topic_id` / `deliverable_id`
-- `runtimeWatch` 在 `run` 作为显式 in-process 输入时，也必须 obey 同一 locator integrity rule
-- `runtimeWatch` 在没有 `runId` / `run` 时，仍然必须允许 deliverable-level review watch，而不是错误要求 run identity
-- 缺失或不匹配时，必须 hard fail，而不是 silent fallback
-
-### 3. CLI / MCP fail-closed convergence
-
-- `CLI review watch` 与 `MCP runtime_watch` 继续围绕同一 quartet locator 暴露 operator-facing watch surface
-- locator mismatch 时，两条 formal entry 都必须通过 shared gateway truth 返回 fail-closed 错误
-
-## Hard Boundaries
-
-- 不扩展 `controller`
-- 不新增 family / overlay
-- 不把 `xiaohongshu` 改写成 direct-delivery
-- 不推进 academic poster
-- 不推进 managed web runtime / OPL-hosted runtime integration
-
-## 预期验证面
-
-- `tests/runtime-protocol-workspace.test.ts`
-- `tests/runtime-deliverable-route.test.ts`
-- `tests/deliverable-review-loop.test.ts`
-- `tests/cli-v2-smoke.test.ts`
-- `tests/product-domain-action-api.test.ts`
-- `tests/phase-2-behavior-convergence.test.ts`
-- `tests/source-readiness-deep-research-gate.test.ts`
-- `tests/direct-delivery-operator-handoff.test.ts`
-
-## 吸收门槛
-
-- deliverable-scope run record 稳定持久化 `topic_id` / `deliverable_id`
-- `runtimeWatch` 在 quartet locator mismatch 时 fail-closed
-- `CLI review watch` 与 `MCP runtime_watch` 共享同一 mismatch 行为
-- governance summaries 没有因为 locator integrity hardening 出现漂移
+不要把本文恢复成当前 run record schema, locator mismatch checklist, CLI/MCP behavior spec, follow-on board, verification list 或 Agent prompt。需要推进 runtimeWatch / locator integrity 时，回到 current runtime owner docs、contracts/source/tests、CLI/MCP behavior、runtime artifacts、owner receipts 和 typed blockers。

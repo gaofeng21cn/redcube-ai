@@ -3,44 +3,17 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_family_parity_governance_provenance`
 State: `historical_provenance`
-Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
+Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、typed blockers 和当前 owner docs。
 
-生命周期说明：本文是已吸收的 Phase 2 hardening tranche brief，保留为 contract-linked provenance。当前 family parity 真相以 runtime-program contracts、RCA-owned route/review/export surfaces 和核心五件套为准。
+## Lifecycle
 
-## 当前状态
+本文只保存 family parity governance surface convergence 的历史 provenance。它不再是当前 family parity contract owner、shared governance checklist、Auto-only continuation board、verification surface list 或 runtime owner transition record。
 
-这条 same-mainline activation package 已在后续 Hermes 主线迁移前完成实现并吸收到主线 provenance。
-它在 machine-readable truth 中固定为 `closeout_completed`。
+现行 family parity truth 回到 runtime-program contracts、runtime-family source/tests、RCA-owned route/review/export surfaces、core docs、owner receipts 和 typed blockers。
 
-它是 `phase_2_family_parity_autopilot_continuation_board` 的 same-mainline 第一条 tranche，用来接在当前 absorbed 的 `runtime watch locator integrity hardening` 之后。
+## Historical Fact
 
-## 冻结目的
-
-当前 stable families 已经共享：
-
-- `auditDeliverable`
-- `runtimeWatch`
-- `getReviewState`
-- `getPublicationProjection`
-- `source_readiness_summary`
-- `gate_summary`
-- `operator_handoff`
-- `lifecycle_stage_summary`
-
-但它们还没有被明确冻结为：
-
-- 一条 stable family parity governance contract
-- 一条可继续支撑 Auto-only 长跑的 family-level continuation tranche
-
-这条 activation package 要解决的是：
-
-1. 让 `ppt_deck`、`xiaohongshu`、`poster_onepager` 在 shared governance surface 上继续对齐
-2. 让 family 差异继续保留在 family boundary，而不是泄漏成 governance surface 漂移
-3. 让当前 Codex operator line 后续能在不发明新 family、不扩大 formal entry 的情况下继续推进同一主线
-
-## In scope
-
-### 1. Shared governance surface parity
+这条 same-mainline tranche 曾在后续 Hermes 主线迁移前完成并吸收。它当时收紧了 stable family 之间的 shared governance surface parity：
 
 - `deliverable create`
 - `deliverable audit`
@@ -51,47 +24,19 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 - `getReviewState`
 - `getPublicationProjection`
 
-这些 surface 需要围绕 stable families 保持同一治理轴，而不是 family 各说各话。
+历史语境中，`ppt_deck`、`xiaohongshu` 与 guarded `poster_onepager` 继续围绕 `source_readiness_summary`、`gate_summary`、`operator_handoff` 与 `lifecycle_stage_summary` 对齐，同时保留各自 family ontology。
 
-### 2. Required summaries stay explicit
+这条历史记录不能恢复为当前 Auto-only board、family-level continuation prompt、Hermes runtime owner proof、visual ready、exportable、handoffable、domain ready 或 production ready evidence。
 
-当前 stable families 继续围绕同一组 shared governance summaries：
+## Current Owner Read
 
-- `source_readiness_summary`
-- `gate_summary`
-- `operator_handoff`
-- `lifecycle_stage_summary`
+| Theme | Current owner |
+| --- | --- |
+| family parity and route governance | runtime-program contracts, runtime-family source/tests, RCA route/review/export surfaces |
+| runtime owner boundary | `docs/runtime/`, `docs/architecture.md`, OPL/Temporal owner docs |
+| RCA completion and evidence tail | `docs/active/rca-ideal-state-gap-plan.md` |
+| historical machine provenance | `contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json` |
 
-缺失这些 summary 时，应优先 fail-closed，而不是 silent downgrade。
+## No-Resurrection Rule
 
-### 3. Family boundary stays explicit
-
-- `ppt_deck` 仍是 direct-delivery capable family
-- `poster_onepager` 仍是 guarded knowledge-poster surface
-- `xiaohongshu` 仍是 `human_publication`
-
-family parity 只收紧 shared governance surface，不会抹平 family ontology。
-
-## Hard Boundaries
-
-- 不扩 `controller`
-- 不新增 family / overlay
-- 不把 `xiaohongshu` 改写成 direct-delivery
-- 不推进 academic poster
-- 不推进 managed web runtime / OPL-hosted runtime integration
-
-## 预期验证面
-
-- `tests/phase-2-family-parity-governance-surface-convergence.test.ts`
-- `tests/deliverable-review-loop.test.ts`
-- `tests/runtime-deliverable-route.test.ts`
-- `tests/phase-2-behavior-convergence.test.ts`
-- `tests/product-domain-action-api.test.ts`
-- `tests/cli-v2-smoke.test.ts`
-- `tests/ppt-deliverable-e2e.test.ts`
-- `tests/xiaohongshu-deliverable-e2e.test.ts`
-
-## 完成后真实去向
-
-这条 tranche absorbed 后，没有继续沿 phase-2 board 打开下一条 follow-on tranche。
-真实的下一棒转入了新的 `Hermes runtime substrate activation package`，因为产品 runtime owner 已从旧 host-agent 形态迁往 Hermes-backed substrate。
+不要把本文恢复成当前 family parity checklist、Auto-only continuation board、verification list、runtime owner migration proof 或 Agent prompt。需要推进 family parity 时，回到 current contracts/source/tests、runtime artifacts、review/export gates、owner receipts 和 typed blockers。
