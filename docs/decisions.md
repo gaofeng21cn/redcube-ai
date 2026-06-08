@@ -5,6 +5,16 @@ Purpose: `active_decision_log`
 State: `current_policy_with_historical_context`
 Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+## 2026-06-08
+
+### 决策：RCA owner-chain live progress evidence lane 只冻结 refs-only owner chain
+
+- `contracts/owner_chain_live_progress_evidence.json` 是 RCA-owned machine-readable owner-chain evidence lane，供 OPL-hosted visual-stage / review / export path 读取可接受的 `domain_receipt`、`typed_blocker` 和 `no_regression_evidence` ref shapes。
+- 该 surface 复用 `owner_receipt_contract`、review/export closeout builder、domain handler owner receipt / no-regression / external work-order closeout action 和 workspace receipt proof，不新增 generic wrapper、runtime owner 或 workspace writer。
+- 该 lane 只证明 owner-chain evidence shape 与 false-authority flags 可被机器验证；它不生成视觉/PPT artifact，不调用图片 API，不写 workspace，不携带 visual truth、artifact body、memory body、review/export verdict body 或 receipt body。
+- OPL 可以存储 owner-chain refs、typed blocker refs 和 no-regression refs；OPL 不能签发 RCA owner receipt、创建 RCA typed blocker、写 RCA visual truth、授权 review/export、或把 provider completion / conformance / controlled canary 升级为 live visual readiness。
+- 该决策不声明 visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long soak complete；真实 live route attempt、review/export receipt instance 和 Temporal controlled visual-stage long soak 仍按 production evidence tail 管理。
+
 ## 2026-06-03
 
 ### 决策：RCA Codex Developer Mode source 使用仓库根层 manifest

@@ -324,3 +324,83 @@ test('controlled visual StageRun canary evidence locks refs-only closeout shape'
   assert.equal(evidence.overclaim_boundary.operator_summary_can_upgrade_claims, false);
   assertNoForbiddenBodyFields(evidence);
 });
+
+test('RCA owner-chain live progress evidence exposes accepted refs without readiness overclaim', () => {
+  const profile = readJson('contracts/stage_run_kernel_profile.json');
+  const evidence = readJson('contracts/owner_chain_live_progress_evidence.json');
+
+  assert.equal(profile.owner_chain_live_progress_evidence_ref, 'contracts/owner_chain_live_progress_evidence.json');
+  assert.equal(evidence.surface_kind, 'rca_owner_chain_live_progress_evidence');
+  assert.equal(evidence.version, 'owner-chain-live-progress-evidence.v1');
+  assert.equal(evidence.domain_id, 'redcube-ai');
+  assert.equal(evidence.owner, 'redcube_ai');
+  assert.equal(evidence.evidence_scope, 'live_owner_chain_progress_refs_only');
+  assert.equal(evidence.controlled_fixture_ref, profile.visual_stage_run_canary.controlled_evidence_ref);
+  assert.equal(evidence.controlled_fixture_is_live_progress, false);
+  assert.equal(evidence.repository_boundary.repo_tracks_live_artifacts, false);
+  assert.equal(evidence.repository_boundary.repo_tracks_live_receipt_instances, false);
+  assert.equal(evidence.repository_boundary.repo_tracks_evidence_ref_shapes, true);
+
+  assert.deepEqual(evidence.owner_chain_stages.map((stage) => stage.stage_id), [
+    'visual_direction',
+    'visual_director_review',
+    'screenshot_review',
+    'export_pptx',
+    'no_regression_closeout',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.required_ref_groups, [
+    'domain_owner_receipt_refs',
+    'typed_blocker_refs',
+    'review_export_receipt_refs',
+    'no_regression_evidence_refs',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.domain_owner_receipt_refs, [
+    'rca-owner-receipt:visual-stage:<receipt-id>',
+    'rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.typed_blocker_refs, [
+    'rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>',
+    'rca-typed-blocker:controlled-soak:<blocker-id>',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.review_export_receipt_refs, [
+    'rca-review-export:<family>:visual_director_review:<deliverable-id>',
+    'rca-review-export:<family>:screenshot_review:<deliverable-id>',
+    'rca-review-export:<family>:export_pptx:<deliverable-id>',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.no_regression_evidence_refs, [
+    'rca-no-regression:visual-stage:<evidence-id>',
+    'rca-no-regression:external-work-order:<work-order-id>',
+  ]);
+
+  assert.deepEqual(evidence.accepted_return_shapes, [
+    'domain_receipt',
+    'typed_blocker',
+    'no_regression_evidence',
+  ]);
+  assert.equal(evidence.progress_readout.current_status, 'owner_chain_ref_shapes_ready_live_artifact_generation_not_run');
+  assert.equal(evidence.progress_readout.live_progress_claimed, true);
+  assert.equal(evidence.progress_readout.visual_ready_claimed, false);
+  assert.equal(evidence.progress_readout.production_ready_claimed, false);
+
+  assert.deepEqual(evidence.false_authority_flags, {
+    declares_visual_ready: false,
+    declares_exportable: false,
+    declares_handoffable: false,
+    declares_domain_ready: false,
+    declares_production_ready: false,
+    declares_production_visual_stage_long_soak_complete: false,
+    provider_completion_counts_as_visual_progress: false,
+    conformance_pass_counts_as_live_progress: false,
+    controlled_canary_counts_as_live_progress: false,
+    writes_visual_truth: false,
+    writes_artifact_body: false,
+    writes_memory_body: false,
+    writes_review_export_verdict_body: false,
+  });
+  assert.equal(evidence.opl_hosted_path_boundary.opl_can_store_owner_chain_refs, true);
+  assert.equal(evidence.opl_hosted_path_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(evidence.opl_hosted_path_boundary.opl_can_issue_rca_owner_receipt, false);
+  assert.equal(evidence.opl_hosted_path_boundary.opl_can_authorize_review_export, false);
+  assert.equal(evidence.opl_hosted_path_boundary.opl_can_claim_visual_or_production_ready, false);
+  assertNoForbiddenBodyFields(evidence);
+});
