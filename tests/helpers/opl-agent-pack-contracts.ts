@@ -174,7 +174,10 @@ export function buildCanonicalPack() {
       opl_projection_policy: 'locator_and_receipt_refs_only',
     },
     artifactLocatorContract: skeleton.artifact_locator_contract,
-    ownerReceiptContract: skeleton.domain_owner_receipt_contract,
+    ownerReceiptContract: {
+      ...skeleton.domain_owner_receipt_contract,
+      stage_folder_writer_policy: readJson('contracts/owner_receipt_contract.json').stage_folder_writer_policy,
+    },
     packCompilerInput: {
       surface_kind: 'opl_domain_pack_compiler_input',
       schema_version: 1,
