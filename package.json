@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "redcube": "node apps/redcube-cli/dist/cli.js",
+    "rca": "node apps/redcube-cli/dist/cli.js",
     "mcp": "node apps/redcube-mcp/dist/server.js",
     "test": "npm run test:fast",
     "test:smoke": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts smoke",

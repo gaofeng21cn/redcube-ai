@@ -101,6 +101,14 @@ function plainObject(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {};
 }
 
+function resolveOutputFormat(options: JsonMap): JsonMap {
+  const requestedFormat = options.json === true ? 'json' : options.format;
+  return {
+    output_format: requestedFormat || 'json',
+    json_alias: options.json === true ? '--json' : undefined,
+  };
+}
+
 function parseJsonObjectOption(label: string, value: unknown): Record<string, unknown> {
   if (!value || value === true) return {};
   const parsed = JSON.parse(String(value));
@@ -197,11 +205,12 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
 
     return buildFoundrySeriesSurface(operation, `redcube foundry ${operation}`.trim(), {
       namespace: 'foundry',
+      ...resolveOutputFormat(options),
     });
   }
 
   if (isFoundrySeriesOperation(command)) {
-    return buildFoundrySeriesSurface(command, `redcube ${command}`);
+    return buildFoundrySeriesSurface(command, `redcube ${command}`, resolveOutputFormat(options));
   }
 
   if (command === 'work' || command === 'deck') {
@@ -214,6 +223,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       object: 'work',
       alias: command,
       alias_maps_to: command === 'deck' ? 'work' : undefined,
+      ...resolveOutputFormat(options),
     });
   }
 

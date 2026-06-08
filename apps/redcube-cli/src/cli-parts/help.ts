@@ -56,43 +56,43 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
   const catalog = {
     foundry: {
       summary: '读取 RCA 的 OPL Foundry Agent series 命令面，总览 status/inspect/interfaces/validate/doctor/peers。',
-      usage: 'redcube foundry <status|inspect|interfaces|validate|doctor|peers>',
+      usage: 'redcube foundry <status|inspect|interfaces|validate|doctor|peers> [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'authority_boundary'],
     },
     'foundry status': {
       summary: '读取 RCA Foundry Agent series 状态。',
-      usage: 'redcube foundry status',
+      usage: 'redcube foundry status [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'identity', 'authority_boundary'],
     },
     'foundry inspect': {
       summary: '检查 RCA 作为 Presentation Foundry agent 的 series identity、spine 与 deck alias。',
-      usage: 'redcube foundry inspect',
+      usage: 'redcube foundry inspect [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'rca_series_aliases'],
     },
     'foundry interfaces': {
       summary: '列出 CLI / skill / MCP / app_action 派生面及 owner 边界。',
-      usage: 'redcube foundry interfaces',
+      usage: 'redcube foundry interfaces [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'authority_boundary'],
     },
     'foundry validate': {
       summary: '校验 RCA CLI Foundry series grammar 与本地合同引用。',
-      usage: 'redcube foundry validate',
+      usage: 'redcube foundry validate [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'checks'],
     },
     'foundry doctor': {
       summary: '诊断 RCA CLI Foundry series grammar、合同链接与 work/deck alias。',
-      usage: 'redcube foundry doctor',
+      usage: 'redcube foundry doctor [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['foundry_agent_series', 'checks'],
     },
     'foundry peers': {
       summary: '列出共享 OPL Foundry Agent series grammar 的 peer agents。',
-      usage: 'redcube foundry peers',
+      usage: 'redcube foundry peers [--json|--format json]',
       action_ref: 'buildFoundrySeriesSurface',
       boundary_fields: ['peers'],
     },
@@ -276,6 +276,10 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
     availableOverlays: overlayCatalog.overlays,
     commonTasks: [
       {
+        task: '用 RCA npm alias 读取 Foundry Agent series 状态',
+        command: 'npm run rca -- foundry status --json',
+      },
+      {
         task: '读取 RCA OPL Foundry Agent series 状态',
         command: 'redcube status',
       },
@@ -377,6 +381,7 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       privateProfileSetup: 'human_doc:private_profile_setup',
     },
     usage: {
+      rcaNpmAlias: 'npm run rca -- foundry status --json',
       workspaceDoctor: 'redcube workspace doctor --workspace-root <dir>',
       topicsList: 'redcube topics list --workspace-root <dir>',
       sourceIntake: 'redcube source intake --workspace-root <dir> --topic-id <id> [--title <text>] [--brief <text>] [--keywords a,b] [--source-files /abs/a.pdf,/abs/b.md] [--operator-files /abs/rules.md,/abs/template.md]',

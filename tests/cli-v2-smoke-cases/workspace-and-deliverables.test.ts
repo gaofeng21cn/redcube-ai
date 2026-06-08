@@ -334,6 +334,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
   );
   assert.equal(Array.isArray(parsed.commonTasks), true);
   assert.equal(parsed.commonTasks.length >= 4, true);
+  assert.equal(parsed.commonTasks.some((item) => item.command === 'npm run rca -- foundry status --json'), true);
   assert.equal(parsed.commonTasks.some((item) => item.command === 'redcube status'), true);
   assert.equal(parsed.commonTasks.some((item) => item.command === 'redcube deck inspect'), true);
   assert.equal(parsed.commonTasks.some((item) => item.command.includes('review get')), true);
@@ -366,6 +367,7 @@ test('CLI help exposes task-oriented onboarding surface', () => {
     true,
   );
   assert.equal(typeof parsed.usage.deliverableCreate, 'string');
+  assert.equal(parsed.usage.rcaNpmAlias, 'npm run rca -- foundry status --json');
   assert.equal(typeof parsed.usage.sourceResearch, 'string');
   assert.match(parsed.usage.reviewMutate, /promote_baseline/);
 });
@@ -437,6 +439,7 @@ test('CLI exposes OPL Foundry Agent series first-layer grammar and work/deck ali
     assert.equal(parsed.command, item.command, item.command);
     assert.equal(parsed.foundry_agent_series.series_label, 'OPL Foundry Agent', item.command);
     assert.equal(parsed.foundry_agent_series.direct_command_surface, 'redcube', item.command);
+    assert.equal(parsed.foundry_agent_series.repo_native_script_alias, 'rca', item.command);
     assert.equal(parsed.foundry_agent_series.canonical_opl_command_surface, 'opl agents foundry', item.command);
     assert.deepEqual(
       parsed.foundry_agent_series.operations,
@@ -450,6 +453,8 @@ test('CLI exposes OPL Foundry Agent series first-layer grammar and work/deck ali
     );
     assert.equal(parsed.identity.domain_id, 'redcube', item.command);
     assert.equal(parsed.identity.authority_owner, 'redcube_ai', item.command);
+    assert.equal(parsed.rca_series_aliases.npm_script_alias, 'npm run rca --', item.command);
+    assert.equal(parsed.rca_series_aliases.npm_script_alias_maps_to, 'npm run redcube --', item.command);
     assert.equal(parsed.rca_series_aliases.deck_alias_maps_to, 'work', item.command);
     assert.equal(parsed.authority_boundary.generated_surface_can_write_domain_truth, false, item.command);
     assert.equal(parsed.authority_boundary.generated_surface_can_create_owner_receipt, false, item.command);
@@ -458,6 +463,50 @@ test('CLI exposes OPL Foundry Agent series first-layer grammar and work/deck ali
       assert.equal(parsed.scope.alias, item.scopeAlias, item.command);
     }
   }
+});
+
+test('CLI Foundry commands accept --json as --format json alias', () => {
+  const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
+
+  for (const operation of ['status', 'interfaces', 'validate', 'doctor', 'inspect', 'peers']) {
+    const output = execFileSync('node', [cliPath, 'foundry', operation, '--json'], {
+      encoding: 'utf-8',
+      cwd: path.resolve('.'),
+    });
+    const parsed = JSON.parse(output);
+
+    assert.equal(parsed.ok, true, operation);
+    assert.equal(parsed.operation, operation, operation);
+    assert.equal(parsed.scope.namespace, 'foundry', operation);
+    assert.equal(parsed.scope.output_format, 'json', operation);
+    assert.equal(parsed.scope.json_alias, '--json', operation);
+  }
+
+  const redcubeValidate = JSON.parse(execFileSync('node', [cliPath, 'validate', '--json'], {
+    encoding: 'utf-8',
+    cwd: path.resolve('.'),
+  }));
+  assert.equal(redcubeValidate.scope.output_format, 'json');
+  assert.equal(redcubeValidate.scope.json_alias, '--json');
+});
+
+test('RCA npm script aliases the existing RedCube CLI', () => {
+  const help = JSON.parse(execFileSync('npm', ['run', '--silent', 'rca', '--', '--help'], {
+    encoding: 'utf-8',
+    cwd: path.resolve('.'),
+  }));
+  assert.equal(help.ok, true);
+  assert.equal(help.usage.rcaNpmAlias, 'npm run rca -- foundry status --json');
+
+  const status = JSON.parse(execFileSync('npm', ['run', '--silent', 'rca', '--', 'foundry', 'status', '--json'], {
+    encoding: 'utf-8',
+    cwd: path.resolve('.'),
+  }));
+  assert.equal(status.ok, true);
+  assert.equal(status.command, 'redcube foundry status');
+  assert.equal(status.scope.output_format, 'json');
+  assert.equal(status.foundry_agent_series.direct_command_surface, 'redcube');
+  assert.equal(status.foundry_agent_series.repo_native_script_alias, 'rca');
 });
 
 test('CLI Foundry series grammar works from isolated install', () => {

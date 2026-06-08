@@ -22,6 +22,7 @@ const OPL_POLICY_RELEASE_REF = 'contracts/opl-framework/foundry-agent-series-pol
 const SERIES_ID = 'opl_foundry_agent_series.v1';
 const SERIES_LABEL = 'OPL Foundry Agent';
 const DIRECT_COMMAND_SURFACE = 'redcube';
+const REPO_NATIVE_SCRIPT_ALIAS = 'rca';
 const CANONICAL_OPL_COMMAND_SURFACE = 'opl agents foundry';
 const RCA_ALIAS = 'deck';
 
@@ -164,6 +165,7 @@ function baseSurface(operation: FoundrySeriesOperation, contract: JsonMap, comma
       series_label: SERIES_LABEL,
       product_model: readString(contract.product_model, 'OPL Framework -> One Person Lab App -> Foundry Agents'),
       direct_command_surface: DIRECT_COMMAND_SURFACE,
+      repo_native_script_alias: REPO_NATIVE_SCRIPT_ALIAS,
       foundry_namespace: 'redcube foundry',
       canonical_opl_command_surface: CANONICAL_OPL_COMMAND_SURFACE,
       operations: [...FOUNDRY_SERIES_OPERATIONS],
@@ -185,6 +187,8 @@ function baseSurface(operation: FoundrySeriesOperation, contract: JsonMap, comma
       identity_hygiene_policy_id: readString(identityPolicy.policy_id, 'rca.identity_hygiene.v1'),
     },
     rca_series_aliases: {
+      npm_script_alias: `npm run ${REPO_NATIVE_SCRIPT_ALIAS} --`,
+      npm_script_alias_maps_to: `npm run ${DIRECT_COMMAND_SURFACE} --`,
       work_alias: 'redcube work',
       deck_alias: 'redcube deck',
       deck_alias_maps_to: 'work',
