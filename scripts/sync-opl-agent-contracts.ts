@@ -93,7 +93,7 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
   default_profiles: {
     one_off: {
       workspace_mode: 'one_off',
-      project_collection_path: 'deliverables',
+      project_collection_path: 'projects',
       series_capable_skeleton: true,
       shared_resource_roots: [
         'shared/sources',
@@ -104,7 +104,7 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
     },
     rca_series: {
       workspace_mode: 'series',
-      project_collection_path: 'deliverables',
+      project_collection_path: 'projects',
       shared_resource_roots: [
         'shared/sources',
         'shared/brand',
@@ -116,7 +116,7 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
     },
     mas_portfolio: {
       workspace_mode: 'portfolio',
-      project_collection_path: 'studies',
+      project_collection_path: 'projects',
       shared_resource_roots: [
         'data',
         'literature',
@@ -155,17 +155,24 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
   },
   workspace_initialization_policy: {
     default_workspace_mode: 'one_off',
-    one_off_still_uses_project_collection_path: 'deliverables',
     infer_series_when_user_requests_multiple_related_deliverables: true,
     infer_portfolio_when_user_requests_shared_research_workspace_with_multiple_studies: true,
     upgrading_one_off_to_series_must_not_move_existing_project_roots: true,
     explicit_workspace_mode_declaration_preferred: true,
+    default_project_collection_path: 'projects',
+    legacy_project_collection_aliases: [
+      'deliverables',
+      'studies',
+    ],
   },
   example_project_layouts: {
     one_off: {
-      project_collection_path: 'deliverables',
-      project_root_pattern: 'deliverables/<project-id>',
-      project_stage_outputs_pattern: 'deliverables/<project-id>/artifacts/stage_outputs/<stage-id>/',
+      project_collection_path: 'projects',
+      project_root_pattern: 'projects/<project-id>',
+      project_stage_outputs_pattern: 'projects/<project-id>/artifacts/stage_outputs/<stage-id>/',
+      legacy_project_collection_aliases: [
+        'deliverables',
+      ],
     },
     rca_series: {
       shared_roots: [
@@ -175,9 +182,12 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
         'shared/style_system',
         'shared/material_inventory',
       ],
-      project_collection_path: 'deliverables',
-      project_root_pattern: 'deliverables/<deck-id>',
-      project_stage_outputs_pattern: 'deliverables/<deck-id>/artifacts/stage_outputs/<stage-id>/',
+      project_collection_path: 'projects',
+      project_root_pattern: 'projects/<deck-id>',
+      project_stage_outputs_pattern: 'projects/<deck-id>/artifacts/stage_outputs/<stage-id>/',
+      legacy_project_collection_aliases: [
+        'deliverables',
+      ],
     },
     mas_portfolio: {
       shared_roots: [
@@ -185,9 +195,12 @@ const WORKSPACE_TOPOLOGY_PROFILE = {
         'literature',
         'memory',
       ],
-      project_collection_path: 'studies',
-      project_root_pattern: 'studies/<study-id>',
-      project_stage_outputs_pattern: 'studies/<study-id>/artifacts/stage_outputs/<stage-id>/',
+      project_collection_path: 'projects',
+      project_root_pattern: 'projects/<study-id>',
+      project_stage_outputs_pattern: 'projects/<study-id>/artifacts/stage_outputs/<stage-id>/',
+      legacy_project_collection_aliases: [
+        'studies',
+      ],
     },
   },
 };

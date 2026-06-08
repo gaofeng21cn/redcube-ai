@@ -45,7 +45,11 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
   assert.equal(foundrySeries.workspace_topology_profile.profile_id, 'opl.workspace_topology_profile.v1');
   assert.equal(foundrySeries.workspace_topology_profile.default_project_stage_outputs_root, 'artifacts/stage_outputs');
   assert.equal(foundrySeries.workspace_topology_profile.default_profiles.rca_series.workspace_mode, 'series');
-  assert.equal(foundrySeries.workspace_topology_profile.default_profiles.rca_series.project_collection_path, 'deliverables');
+  assert.equal(foundrySeries.workspace_topology_profile.default_profiles.rca_series.project_collection_path, 'projects');
+  assert.deepEqual(
+    foundrySeries.workspace_topology_profile.workspace_initialization_policy.legacy_project_collection_aliases,
+    ['deliverables', 'studies'],
+  );
   assert.equal(
     foundrySeries.workspace_topology_profile.authority_boundary.runtime_state_counts_as_user_default_surface,
     false,
