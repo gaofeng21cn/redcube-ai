@@ -43,6 +43,53 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA plans-history body compression tranche:
+
+- Theme / SSOT: `docs/history/plans/**` historical plans and future target
+  freezes. Current source truth remains `docs/source/`,
+  `docs/source/source_augmentation_executor_contract.md`, workspace canonical
+  artifacts, runtime-family contracts/source/tests and owner receipts. Current
+  delivery / review / export truth remains `docs/delivery/`, contracts,
+  source/tests, review/export receipts and artifact locators. Current
+  completion, owner-delta, gaps and next baton remain
+  `docs/active/rca-ideal-state-gap-plan.md`; current public narrative remains
+  root README files and `docs/public/README.md`; current docs lifecycle rules
+  remain `docs/docs_portfolio_consolidation.md`.
+- Reviewed: `AGENTS.md`, `TASTE.md`, OPL Doc skill,
+  `docs/history/plans/README.md`, every non-index
+  `docs/history/plans/*.md` body, this process index,
+  `docs/history/process/retired-surface-provenance.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`, `docs/source/README.md`,
+  `docs/source/source_augmentation_executor_contract.md`,
+  `docs/delivery/README.md`, and stale scans over plans-history checklist,
+  prompt, branch-state, public-doc wording-test, gateway/federation and
+  Hermes-owner wording.
+- Edited: `docs/history/plans/README.md`, this file,
+  `docs/history/process/retired-surface-provenance.md`, and all non-index
+  `docs/history/plans/*.md` files.
+- Coverage result: `docs/history/plans/**` no longer preserves runnable
+  implementation checklists, code snippets, TDD recipes, public docs wording
+  tests, branch/commit/push closeouts, long future-stage specs, active gap
+  counts, Hermes-first owner maps or Agent handoff prompts as current guidance.
+  Each body now keeps historical intent, current owner pointers, retired
+  active-looking surfaces and a no-resurrection rule.
+- Retired / guarded: no source module, contract, test, workflow or history file
+  was physically deleted because this was a docs-history tranche. The retired
+  surfaces are active-looking plans-history bodies and old wording-test /
+  checklist / branch-state shapes; they may not be reused as current source or
+  delivery contracts, Agent prompts, route-owner proof, delete authority or
+  readiness evidence.
+- Remaining RCA unreviewed scope under the parent OPL series goal:
+  remaining individual `docs/history/phase-2/**` bodies beyond prior tranches,
+  tombstone body audits, active private-inventory details,
+  generated/default caller thinning evidence tails, and future source/contract
+  / test retirement lanes that need fresh no-active-caller plus owner receipt /
+  typed blocker proof.
+- Next write scope: continue with another precise history/provenance body theme
+  after fresh intake, likely tombstones, remaining Phase 2 bodies or active
+  private-inventory detail governance. Do not use this tranche as proof that
+  every RCA `docs/**/*.md` paragraph has been line-reviewed.
+
 2026-06-08 RCA runtime / positioning history body compression tranche:
 
 - Theme / SSOT: `docs/history/runtime/**` and

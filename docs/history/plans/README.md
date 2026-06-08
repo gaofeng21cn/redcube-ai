@@ -7,6 +7,8 @@ Machine boundary: 人读历史计划索引。机器真相继续归 contracts、s
 
 本目录只保留用于追溯、但不再服务当前 active baton 的历史计划。计划中的文件路径、测试名、旧 public docs wording、federated route、source-pack-federation 或 capabilities 口径只按当时设计语境阅读；当前 source / delivery / runtime truth 回到核心五件套、`docs/source/`、`docs/delivery/`、`docs/runtime/`、`docs/active/rca-ideal-state-gap-plan.md` 和 runtime-program contracts。
 
+2026-06-08 已完成本目录正文压缩：所有非索引计划文件都只保留 historical intent、current SSOT pointer、retired active-looking surfaces 和 no-resurrection boundary。原来的长 checklists、代码片段、测试命令、branch/commit/push 状态、public-doc wording tests、future implementation steps 和 Agent handoff prompts 不再作为当前工作入口。
+
 ## 当前文件读法
 
 | 文件 | 历史角色 | 当前读法 |
@@ -23,6 +25,7 @@ Machine boundary: 人读历史计划索引。机器真相继续归 contracts、s
 ## 退役词与 no-resurrection 规则
 
 - 本目录正文中的 `当前状态`、`下一步`、`Backlog`、`planned`、`done`、`deferred` 等标题只按文件日期和原 tranche 语境读取。
+- 本目录不得保存可直接复制的旧实现清单、TDD 代码片段、commit 指令、branch closeout、push 状态、测试命令流水或 Agent handoff prompt。
 - `gateway`、`frontdoor`、`federation`、`source-pack-federation`、`capabilities`、`managed web runtime`、`upstream Hermes`、`Hermes owner`、`managed` 和 `domain_action_adapter` 等词只保留为 historical wording、semantic id、proof lane、tombstone 或 refs-only adapter 语境。
 - 当前 RCA 默认 runtime owner、visual truth、review/export verdict、artifact authority、memory accept/reject authority、domain ready 和 production ready 不从本目录正文推导。
 - 如果某条历史规则仍需要长期生效，先抽取到核心五件套、`docs/source/`、`docs/delivery/`、`docs/runtime/`、`docs/policies/`、active gap plan、machine-readable contract 或 source/test surface；不要继续在本目录追加新的当前状态。
