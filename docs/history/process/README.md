@@ -43,6 +43,46 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA public-doc support lifecycle tranche:
+
+- Theme / SSOT: public narrative entry and public support docs. Current public
+  narrative owners are root `README.md`, `README.zh-CN.md`, and
+  `docs/public/README.md`; current technical, status, readiness, runtime,
+  artifact-authority and review/export truth remains in the core five docs,
+  `docs/active/rca-ideal-state-gap-plan.md`,
+  `docs/docs_portfolio_consolidation.md`, contracts, source, focused tests,
+  CLI/MCP/API behavior, runtime artifacts, owner receipts and RCA-owned
+  review/export gates.
+- Reviewed: `AGENTS.md`, `TASTE.md`, root `README.md`,
+  root `README.zh-CN.md`, `docs/public/README.md`, `docs/README.md`,
+  `docs/project.md`, `docs/status.md`, `docs/invariants.md`,
+  `docs/active/rca-ideal-state-gap-plan.md`,
+  `docs/docs_portfolio_consolidation.md`, this process index, and stale-word
+  scans over root README/public/status/active/doc-portfolio/process surfaces.
+- Edited: this file only.
+- Coverage result: the public docs already keep one role: public repository
+  entry plus thin public narrative index. They preserve RedCube AI as a
+  visual-deliverable Foundry Agent and keep OPL as hosted integration context,
+  while avoiding GUI/WebUI maturity, visual ready, exportable, handoffable,
+  domain ready, production ready, artifact-authority or runtime-readiness
+  claims. No public doc needs to become a parallel current truth owner.
+- Retired / guarded: no file, command, contract, source module, test, workflow
+  or public doc was retired in this tranche. The guarded stale surfaces are old
+  Gateway/frontdoor/federation/Hermes-first/source-pack federation, old
+  workbench, capabilities and compatibility narratives; they remain excluded
+  from public docs unless reintroduced as history/provenance with current owner
+  pointers.
+- Remaining RCA unreviewed scope under the parent OPL series goal: references
+  body governance, historical Hermes / Phase 2 bodies, tombstones, active
+  private inventory details, generated/default caller thinning evidence tails,
+  and full paragraph-level governance for support/history docs not covered by
+  accepted SSOT tranches.
+- Next write scope: continue with a concrete SSOT theme after fresh intake,
+  likely reference-doc body governance, individual history bodies, active
+  private inventory details or a clean sibling repo lane. Do not use this
+  public-doc review as proof that every RCA `docs/**/*.md` paragraph has been
+  line-reviewed.
+
 2026-06-08 RCA product/runtime/delivery/source/policies thin-support lifecycle tranche:
 
 - Theme / SSOT: product, runtime, delivery, source, policy and specs support
