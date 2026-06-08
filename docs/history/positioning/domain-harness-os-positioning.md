@@ -9,7 +9,7 @@ Machine boundary: 本文是人读历史定位参考。机器真相继续归 cont
 
 当前公开第一身份是独立 visual-deliverable domain agent 与单一 `redcube-ai` app skill。本文的 `Domain Gateway` / `Domain Harness OS` 词汇只能按历史内部边界层与执行层语言理解，不能读成当前 public identity、generic framework/runtime owner、frontdoor、federation 或 workbench truth。
 
-## 1. 项目在统一基座中的位置
+## 1. 历史统一基座定位
 
 `RedCube AI` 在历史统一基座口径中的角色曾被描述为：
 
@@ -23,11 +23,11 @@ Machine boundary: 本文是人读历史定位参考。机器真相继续归 cont
 - 通过同一套 RCA-owned `domain-agent entry -> family -> profile -> pack -> execution / deliverable truth` 控制链运行
 - 通过 family-specific contract 区分交付物，不通过平行系统分叉主线
 
-理想型上，`RedCube AI` 应收敛成一个 `OPL` 可调用的 visual-domain 产品 / 服务节点，而不是把视觉 domain 重新吸回 family-level federation 本体：
+这份历史定位当时把 `RedCube AI` 收敛方向描述为一个 `OPL` 可调用的 visual-domain 产品 / 服务节点，而不是把视觉 domain 重新吸回 family-level federation 本体：
 
 `User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces`
 
-## 2. 统一约束（跨 family）
+## 2. 历史统一约束（跨 family）
 
 跨 `ppt_deck`、`xiaohongshu`、`poster_onepager` 的统一约束包括：
 
@@ -36,7 +36,7 @@ Machine boundary: 本文是人读历史定位参考。机器真相继续归 cont
 3. 运行真相源是 canonical artifact，而不是 prompt 历史
 4. 质量规则进入 contract / gate / policy，不依赖 prompt 补救
 
-## 3. Domain-Specific Contract 边界
+## 3. 历史 Domain-Specific Contract 边界
 
 本项目的 domain-specific contract 负责定义：
 
@@ -67,18 +67,18 @@ RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、prod
 - `supported_protocol_layer`：`MCP`
 - `internal_controller_surface`：`controller`
 
-补充说明：
+历史补充说明：
 
-- `CLI` 与 `MCP` 当前都已 repo-verified，但 `CLI` 是默认 formal entry
-- `controller` 目前不是 repo-verified independent public entry
+- `CLI` 与 `MCP` 在当前 owner docs 中仍是 repo-verified entry；本文只保留历史定位语境
+- `controller` 在这份历史定位中不是 repo-verified independent public entry
 - `gateway` 只作为历史包名或内部聚合层词汇读取；公开 action / tool 命名必须使用 product/domain action 体系
-- 当前仓库主线按 `Auto-only` 理解；未来 `Human-in-the-loop` 产品应作为 upper-layer product、OPL App 或 product shell 读取 projection/receipt refs，不持有 visual truth、review/export verdict 或 artifact rewrite authority
+- 历史仓库主线按 `Auto-only` 理解；`Human-in-the-loop` 产品如果仍有当前价值，必须由 upper-layer product、OPL App 或 product shell owner docs 重新承接，并只读取 projection/receipt refs，不持有 visual truth、review/export verdict 或 artifact rewrite authority
 
 约束说明：
 
-- `Agent-first` 由默认 `Codex CLI host-agent runtime` 与显式 `hermes_agent` proof lane 共同成立
-- explicit proof lane 可以使用 `hermes_agent`，但不改变默认 concrete executor 和 OPL production provider 口径
-- Domain contract 决定控制面，prompt 仅作为辅助信息
+- `Agent-first` 历史表达现在回到当前 executor/backend split：`Codex CLI` 是第一公民 concrete executor，`hermes_agent` 只是显式 proof / optional backend。
+- explicit proof lane 可以使用 `hermes_agent`，但不改变默认 concrete executor 和 OPL production provider 口径。
+- Domain contract 决定控制面，prompt 仅作为辅助信息。
 
 ## 4.1 被当前 owner docs supersede 的能力边界
 
@@ -89,25 +89,25 @@ RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、prod
 - `Phase 2 activation package freeze` 已完成并作为已吸收的前置冻结件保留
 - `docs/history/hermes/*` 相关 activation package 已转为历史本地迁移工件；它们不再代表“上游 `Hermes-Agent` 已接管 runtime”
 - `review / export / gate / audit` hardening、`family source-truth consumption convergence`、`publication projection / delivery contract convergence`、`direct-delivery operator handoff hardening`、`direct-delivery lifecycle stage convergence`、`source-readiness deep research trigger + gate convergence`、`workspace / operator quickstart convergence` 与 `operator surface consistency hardening` 都已吸收为同一主线 provenance
-- 当前 active tranche 应按 `repo-verified product entry + OPL stage-led hosted integration + managed product-entry hardening` 理解：OPL 托管路径通过 thin product-managed adapter/projection layer 挂到 configured family runtime provider，默认 concrete executor 仍是本地 Codex CLI host-agent runtime；product-entry service surface 与 session continuity 已 landed，而 mature end-user product shell 仍未落地；stable family runtime output、`xiaohongshu` human-publication closure 与 guarded `poster_onepager` 仍在同一 RedCube visual-domain truth 上收口
+- 历史 active tranche 曾按 `repo-verified product entry + OPL stage-led hosted integration + managed product-entry hardening` 理解；当前 product-entry、hosted integration、session continuity、mature end-user product shell 和 production evidence tail 的读法回到 active gap plan、product/runtime docs、contracts、source/tests、owner receipts 和 typed blockers。
 - authoritative source gate 继续留在 `auditDeliverable / runtimeWatch`；`operator_handoff` 与 `lifecycle_stage_summary` 继续沿同一 canonical governance path 暴露，而更深层 source-plane 扩展仍属于同一主线上的持续增强
 - 这里的 phase / baseline 标签只作为当前 program pointer，不等于 `RedCube AI` 的长期 north star
 
-## 5. 未来产品壳与托管形态
+## 5. 历史产品壳与托管形态边界
 
-未来若出现面向人的 product shell、OPL App 面板或托管产品壳，前提是：
+本文只保留当时对面向人的 product shell、OPL App 面板或托管产品壳的边界判断。若这些主题仍要推进，必须由当前 App / OPL / RCA active owner 和 machine surfaces 重新开题。当时的前提是：
 
 - 保持同一 RCA-owned domain entry、route truth、review/export gate 和 artifact authority
 - 只读取 projection、artifact refs、review state、attention item 和 receipt refs
 - framework-level 动作回到 OPL provider；domain-level 动作回到 RCA product entry / domain_action_adapter / direct skill
 
-迁移后不改变的内容：
+当时约束中不改变的内容：
 
 - `RedCube AI` 仍是独立 visual-deliverable domain agent
 - `RedCube AI` 仍不是 `OPL` 本体、generic framework 或 workbench runtime
 - visual ready、exportable、handoffable 只能由 RCA-owned gate 给出
 
-## 6. 避免的错误表述
+## 6. No-Resurrection Boundary
 
 - 保持 `codex_cli` 默认主线与 `hermes_agent` 显式 proof lane 的双层执行结构
 - 不把部署形态变化写成本体变化
@@ -115,3 +115,4 @@ RCA 只维护 visual-deliverable domain package 薄程序面：descriptor、prod
 - 不把 prompt patch 当作 contract hydration 的替代
 - 不把 `gateway`、`frontdoor`、`federation`、repo-local Hermes、local runtime 或旧 workbench 写成 active truth
 - 不为退役模块、接口、CLI alias、测试入口或文档入口保留兼容面；迁移 active caller 后直接退役
+- 不把本文作为 current support reference、runtime owner map、Product Entry backlog、OPL App backlog、implementation checklist、visual readiness proof 或 production readiness proof。

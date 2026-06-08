@@ -43,6 +43,50 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-08 RCA runtime / positioning history body compression tranche:
+
+- Theme / SSOT: `docs/history/runtime/**` and
+  `docs/history/positioning/**` owner-boundary / historical positioning
+  provenance. Current runtime owner, executor/backend split, product-entry /
+  hosted integration posture, RCA visual-domain authority, active gaps and next
+  baton remain in core docs, `docs/runtime/`, `docs/active/rca-ideal-state-gap-plan.md`,
+  runtime-program contracts, source/tests, runtime artifacts, owner receipts and
+  typed blockers. History indexes remain `docs/history/README.md` and
+  `docs/history/positioning/README.md`.
+- Reviewed: `AGENTS.md`, `TASTE.md`, `docs/docs_portfolio_consolidation.md`,
+  `docs/history/README.md`, `docs/history/positioning/README.md`,
+  `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`,
+  `docs/history/positioning/domain-harness-os-positioning.md`,
+  `docs/runtime/README.md`, `docs/runtime/runtime_architecture.md`,
+  core docs, `docs/active/rca-ideal-state-gap-plan.md`,
+  runtime-program / source / test refs for `human_doc:*` ids, this process
+  index, and stale wording scans over runtime / positioning history bodies.
+- Edited: this file,
+  `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`, and
+  `docs/history/positioning/domain-harness-os-positioning.md`.
+- Coverage result: runtime / positioning history bodies no longer keep shared
+  framework next steps, current active tranche wording, future product-shell
+  backlog, current support-reference language or implementation-checklist
+  semantics as active guidance. They preserve historical owner-boundary /
+  positioning context and point current work back to active owners and machine
+  surfaces.
+- Retired / guarded: no history file, contract, source module, test, workflow
+  or command was physically deleted because `human_doc:*` refs still need these
+  reader contexts. The retired surface is active-looking historical positioning
+  prose: shared-code extraction backlogs, runtime owner maps, Product Entry /
+  App shell backlog wording, gateway / Domain Harness OS / managed runtime
+  positioning and proof-lane language may not be reused as current Agent prompt,
+  public identity, runtime owner proof, delete authority or readiness evidence.
+- Remaining RCA unreviewed scope under the parent OPL series goal:
+  `docs/history/plans/**`, remaining Phase 2 bodies, tombstone body audits,
+  active private-inventory details, generated/default caller thinning evidence
+  tails, and future source/contract/test retirement lanes that need fresh
+  no-active-caller plus owner receipt / typed blocker proof.
+- Next write scope: continue with another precise history/provenance body theme
+  after fresh intake, likely plans archive bodies, tombstones, remaining Phase 2
+  bodies or a clean sibling repo lane. Do not use this tranche as proof that
+  every RCA `docs/**/*.md` paragraph has been line-reviewed.
+
 2026-06-08 RCA Hermes history/provenance body compression tranche:
 
 - Theme / SSOT: `docs/history/hermes/**` repo-local Hermes migration,
