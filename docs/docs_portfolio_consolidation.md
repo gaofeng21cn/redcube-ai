@@ -91,9 +91,18 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 ## Coverage Ledger Foldback
 
-Dated coverage entries, docs lifecycle inventories, SSOT closeouts and retirement proof/read-model foldbacks that previously lived as per-tranche process files are compressed under [RCA process history](./history/process/README.md), with durable no-resurrection rules in [RCA retired surface provenance](./history/process/retired-surface-provenance.md).
+Dated coverage entries, docs lifecycle inventories, SSOT closeouts and retirement proof/read-model foldbacks are compressed under [RCA process history](./history/process/README.md), with durable no-resurrection rules in [RCA retired surface provenance](./history/process/retired-surface-provenance.md).
 
-This file now keeps only current lifecycle rules, directory roles, content placement rules, direct-retirement posture, long-list governance, and stale-word no-resurrection policy. Do not append future six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs here. New dated coverage belongs under `docs/history/process/` or another precise `docs/history/**` owner; durable conclusions must be folded back into the core five docs, active gap plan, owner docs, contracts, source, or tests.
+The process history index is now topic-level only. It records retained records, compressed provenance groups, a coverage snapshot, remaining unreviewed scope and next write scope; it must not grow back into six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs.
+
+Future foldback uses this routing:
+
+| Future evidence | Owner |
+| --- | --- |
+| Durable RCA current truth, gap, owner-delta or no-ready boundary | Core five docs, active gap plan, owner docs, contracts, source or tests |
+| Production evidence proof, route probe details, run/probe ids, screenshots, no-regression refs | Runtime/evidence ledger, retained process record, precise history/provenance owner, or git history |
+| Docs lifecycle tranche closeout | `docs/history/process/README.md` as a compressed theme row, not a dated proof ledger |
+| Retired command/helper/fallback/test/workflow no-resurrection | `retired-surface-provenance.md` plus machine guard/source/test owner |
 
 Current active owner remains [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md). Product-entry support is indexed by `docs/product/` and `docs/references/product-entry/`; historical Hermes / Phase 2 / managed runtime / route probe records stay under [历史文档](./history/README.md).
 
