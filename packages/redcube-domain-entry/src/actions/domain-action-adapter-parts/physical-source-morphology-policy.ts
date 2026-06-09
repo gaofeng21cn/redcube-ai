@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-export const RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES = Object.freeze([
+const RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES = Object.freeze([
   'declarative_visual_pack',
   'machine_contract',
   'package_protocol_boundary',
@@ -13,7 +13,7 @@ export const RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES = Object.freeze([
   'tombstone_or_provenance',
 ]);
 
-export const RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES = Object.freeze([
+const RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES = Object.freeze([
   'generic_scheduler_owner',
   'generic_runner_owner',
   'generic_attempt_ledger_owner',
@@ -37,7 +37,7 @@ const FORBIDDEN_GENERIC_OWNER_FLAGS = Object.freeze({
   rca_owns_generic_domain_entry_runtime: false,
 });
 
-export const RCA_LEGACY_NAME_ALLOWANCE_ROLES = Object.freeze([
+const RCA_LEGACY_NAME_ALLOWANCE_ROLES = Object.freeze([
   'machine_contract_ref',
   'package_protocol_boundary',
   'service_safe_domain_entry',
