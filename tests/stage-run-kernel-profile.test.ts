@@ -377,8 +377,15 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'typed_blocker',
     'no_regression_evidence',
   ]);
-  assert.equal(evidence.progress_readout.current_status, 'owner_chain_ref_shapes_ready_live_artifact_generation_not_run');
+  assert.equal(
+    evidence.progress_readout.current_status,
+    'mock_safe_visual_owner_chain_canary_recorded_live_provider_evidence_open',
+  );
   assert.equal(evidence.progress_readout.live_progress_claimed, true);
+  assert.equal(evidence.progress_readout.artifact_generation_run, true);
+  assert.equal(evidence.progress_readout.mock_safe_artifact_generation_run, true);
+  assert.equal(evidence.progress_readout.image_api_called, false);
+  assert.equal(evidence.progress_readout.repo_tracks_workspace_artifacts, false);
   assert.equal(evidence.progress_readout.visual_ready_claimed, false);
   assert.equal(evidence.progress_readout.production_ready_claimed, false);
 
@@ -392,6 +399,7 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     provider_completion_counts_as_visual_progress: false,
     conformance_pass_counts_as_live_progress: false,
     controlled_canary_counts_as_live_progress: false,
+    mock_safe_canary_counts_as_production_progress: false,
     writes_visual_truth: false,
     writes_artifact_body: false,
     writes_memory_body: false,
