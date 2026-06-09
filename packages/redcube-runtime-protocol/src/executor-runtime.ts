@@ -380,6 +380,7 @@ export function startRouteRun({
   baselineDeliverableId = '',
   executor,
   crossProviderAttemptIndex = null,
+  allowLocalDiagnosticRecord = false,
 }) {
   return startRouteRunFromRouteRunRecords({
     workspaceRoot,
@@ -393,6 +394,7 @@ export function startRouteRun({
     baselineDeliverableId,
     executor,
     crossProviderAttemptIndex,
+    allowLocalDiagnosticRecord,
   }, { resolveRuntimeTopologyForExecutor });
 }
 
