@@ -3,8 +3,8 @@
 Owner: `RedCube AI`
 Purpose: `opl_private_implementation_migration_inventory`
 State: `active_inventory`
-Machine boundary: 本文是人读迁移治理台账。机器真相继续归 contracts、runtime-program leaf contracts、CLI/MCP/API 行为、product-entry manifest、RCA domain handler projection、OPL-generated `domain_action_adapter` descriptor refs、workspace/runtime receipt、artifact locator、review/export gate 和 RCA owner receipt。
-Date: `2026-05-23`
+Machine boundary: 本文是人读迁移治理台账。机器真相继续归 `contracts/private_functional_surface_policy.json`、`contracts/physical_source_morphology_policy.json`、runtime-program leaf contracts、CLI/MCP/API 行为、product-entry manifest、RCA domain handler projection、OPL-generated `domain_action_adapter` descriptor refs、workspace/runtime receipt、artifact locator、review/export gate 和 RCA owner receipt。
+Date: `2026-06-09`
 
 ## 当前 clean truth
 
@@ -22,6 +22,8 @@ Executor runtime protocol 当前只保留 route-level executor policy、topology
 
 本台账只维护当前 active surface 的分类、保留 authority、可上收 generic 子域和退役门。dated scan、line-count 变化、拆分过程、proof 命令和 closeout receipt 进入 contracts 或 `docs/history/**`，不在本文继续追加流水。
 
+本轮 currentness refresh 以 `contracts/physical_source_morphology_policy.json#/active_surface_classifications` 和 `contracts/private_functional_surface_policy.json#/repo_local_owner_delta_surface_policy` 为 per-surface SSOT。下方 path-level checkpoints 只作维护者定位和 focused verification 指针；若 path rows 与 surface-id contract 冲突，先更新 contract/source/tests 或重新生成 runtime-program leaf，再折回本文。
+
 ## Classification
 
 | class | 含义 |
@@ -31,6 +33,25 @@ Executor runtime protocol 当前只保留 route-level executor policy、topology
 | `strict_delete_after_cutover` | 仍有 active caller 的 repo-local generic wrapper / adapter / compatibility path；当前可运行不构成完成态，必须在 OPL cutover 后删除或降到纯 domain handler target。 |
 | `already_thin_adapter` | 已收薄为 refs-only adapter/projection/provenance，仍因 direct route、domain handler 或测试暂留。 |
 | `source_split_landed_default_caller_tail` | Source split 已 landed；仍等待 OPL generated/default caller 或 proof parity 进一步收薄 repo-local refs adapter。 |
+
+## Surface-ID SSOT Map
+
+该表直接折回 current physical source morphology policy，不按历史文件名、旧 grouping 或 line count 决定 owner。`refs_only_read_model` 和 `service_safe_domain_entry` 表示 RCA 暂留 repo-local adapter，但它们不能升级为 generic runtime/session/workbench owner；`minimal_visual_authority_function` 表示 RCA authority retained；`tombstone_or_provenance` 表示只读 history / negative guard。
+
+| Surface id | Contract classification | Current RCA role | Current read / next gate |
+| --- | --- | --- | --- |
+| `agent_declarative_visual_pack` | `declarative_visual_pack` | `declarative_visual_pack` | Agent pack 只声明 stage prompt / skill / quality gate / knowledge refs；不能创建 RCA-owned generated wrapper、generic runtime 或 session shell。 |
+| `runtime_program_machine_contracts` | `machine_contract` | `contract_truth_and_leaf_program_projection` | Runtime-program leaf 是 machine contract / semantic id / tombstone ref，不是 RCA runtime implementation。 |
+| `mcp_product_entry_domain_entry` | `service_safe_domain_entry` | `direct_protocol_adapter_domain_handler_target_not_generated_wrapper_owner` | MCP/product/domain entry 是 service-safe domain adapter；只返回 metadata refs、typed blocker 和 owner receipt refs。 |
+| `redcube_cli_domain_entry_adapter` | `service_safe_domain_entry` | `direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner` | CLI 是 direct domain entry adapter；不得恢复 generic CLI wrapper owner、compat alias 或 public gateway identity。 |
+| `redcube_domain_entry_package_protocol_boundary` | `package_protocol_boundary` | `package_protocol_boundary_for_domain_action_protocol_not_public_framework_identity` | Package exports 只定义 typed protocol boundary；不成为 public framework identity 或 generic owner。 |
+| `product_entry_continuity_refs_adapter` | `refs_only_read_model` | `entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell` | Product-entry session 只输出 entry-session / deliverable locator / operator navigation refs；等待 generated session shell default caller parity。 |
+| `workspace_run_envelope_helpers` | `refs_only_read_model` | `workspace_and_run_locator_envelope_refs_only_adapter_not_attempt_ledger` | Workspace/run envelope 只提供 locator、receipt refs 和 typed blocker；OPL 持有 attempt ledger。 |
+| `runtime_watch_projection` | `refs_only_read_model` | `run_review_existing_run_locator_refs_only_projection_not_supervisor` | `runtimeWatch` 是 direct review/progress read model，仍从 `domain_action_adapter` default dispatch 退役。 |
+| `domain_action_adapter_guarded_actions` | `domain_handler_target` | `guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner` | `domain_action_adapter` 只能作为 guarded domain action target / refs-only adapter descriptor；不能成为 RCA-owned generic adapter owner。 |
+| `operator_evidence_stability_projection` | `refs_only_read_model` | `operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench` | Operator evidence/stability 只做 body-free refs projection；不能声明 visual ready、exportable、handoffable 或 production ready。 |
+| `visual_authority_functions` | `minimal_visual_authority_function` | `visual_authority_and_native_helper_implementation` | RCA 保留 source readiness、communication/visual direction、review/export、artifact mutation、memory accept/reject、owner receipt 和 native helper authority。 |
+| `retired_product_entry_contract_tombstone_refs` | `tombstone_or_provenance` | `contract_safe_semantic_id_or_tombstone_provenance_only` | Retired managed/product-entry ids 只作 tombstone/provenance；不得恢复 callable surface、compat alias、delete authority 或 readiness proof。 |
 
 ## Active Inventory
 
