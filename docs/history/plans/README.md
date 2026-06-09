@@ -9,18 +9,19 @@ Machine boundary: 人读历史计划索引。机器真相继续归 contracts、s
 
 2026-06-08 已完成本目录正文压缩：所有非索引计划文件都只保留 historical intent、current SSOT pointer、retired active-looking surfaces 和 no-resurrection boundary。原来的长 checklists、代码片段、测试命令、branch/commit/push 状态、public-doc wording tests、future implementation steps 和 Agent handoff prompts 不再作为当前工作入口。
 
-## 当前文件读法
+## 当前计划组读法
 
-| 文件 | 历史角色 | 当前读法 |
+本目录按历史计划主题组读取，不再维护逐文件 active-read table。子文件保留原计划正文、旧测试命令、历史 closeout、当时的 owner 假设和迁移 provenance；当前 source、delivery、runtime、production evidence、standard-agent completion 和 docs lifecycle truth 回到上方 owner docs、active gap plan、contracts、source/tests 与 runtime evidence。
+
+| 历史主题 | Provenance refs | 当前读法 |
 | --- | --- | --- |
-| `2026-04-08-deep-research-source-readiness-pack-phase-1.md` | 历史 Deep Research / Source Readiness Pack Phase 1 计划。 | 已被后续 source readiness、source augmentation、deep research trigger/gate 与 workspace quickstart hardening 吸收，不再作为当前 implementation checklist；其中旧 public-doc wording test 和 gateway result 只按 provenance 读取。 |
-| `2026-04-08-deep-research-auto-first-product-contract.md` | 历史 Deep Research / 5 步 auto-first 产品语义 freeze。 | 当前 source 执行合同回到 `docs/source/source_augmentation_executor_contract.md`、workspace canonical artifacts、runtime-family contracts 与 runtime-program contracts。 |
-| `2026-04-09-direct-delivery-longrun-target-state.md` | 历史 direct-delivery longrun target freeze。 | 当前 delivery truth 回到 `docs/delivery/`、核心五件套和 contracts；其中 managed web runtime、controller expansion、new family 等排除项不能反向读成当前 gap 已打开。 |
-| `2026-04-09-source-readiness-deep-research-longrun-target-state.md` | 历史 source-plane longrun target freeze。 | 当前 source truth 回到 `docs/source/`、核心五件套和 contracts；`Deep Research` 仍只是 source readiness 内的增强模式，不接管 Storyline / Plan owner。 |
-| `2026-05-20-doc-lifecycle-governance-audit.md` | docs 生命周期治理审计记录。 | 保留 2026-05-20 文档归位依据；当前 docs coverage 与剩余 gap 以 `docs/docs_portfolio_consolidation.md`、active gap plan 和 OPL family ledger 为准。 |
-| `creative-stage-ai-first-audit-2026-04-13.md` | 历史 AI-first 创作阶段审计。 | 其中 upstream Hermes owner wording 只保留为当时 proof/provenance，不再作为当前 executor owner、默认 route、default runtime owner 或 active support reference。 |
-| `rca-production-acceptance-readiness-closeout-2026-05-20.md` | production acceptance/readiness closeout provenance。 | 记录 AI-first / executor-first 验收读法、expected merged refs-only evidence result 和 production scaleout remainder；结构 conformance / readiness observable 不授权 visual ready、exportable、handoffable、domain ready 或 production ready。 |
-| `rca-standard-agent-doc-process-history-2026-05.md` | RCA standard OPL Agent 对齐过程归档。 | 过程摘要只解释 2026-05 source-shape / generated surface / refs-only adapter 收敛；当前功能/结构差距和证据差距回到 active gap plan 与 live contracts。 |
+| Deep Research / Source Readiness plan lineage | `2026-04-08-deep-research-source-readiness-pack-phase-1.md`、`2026-04-08-deep-research-auto-first-product-contract.md`、`2026-04-09-source-readiness-deep-research-longrun-target-state.md` | 只保留 source readiness、source augmentation、Deep Research trigger/gate 与 auto-first 产品语义的历史设计来源；当前 source truth 回到 `docs/source/`、workspace canonical artifacts、runtime-family contracts 和 runtime-program contracts。旧 public-doc wording tests、gateway result、Storyline / Plan owner 假设不作为当前 checklist。 |
+| Direct delivery / delivery longrun target freeze | `2026-04-09-direct-delivery-longrun-target-state.md` | 只保留 direct-delivery future freeze 与边界排除项；当前 delivery truth 回到 `docs/delivery/`、核心五件套、runtime-program contracts、artifact locator、review/export gates 和 active gap plan。历史 managed web runtime、controller expansion 或 new family 排除项不能反向读成当前 gap 已打开。 |
+| Docs lifecycle governance audit | `2026-05-20-doc-lifecycle-governance-audit.md` | 只保留 2026-05-20 文档归位依据；当前 docs coverage、remaining gap、one-document-one-role 与 direct-retirement posture 以 `docs/docs_portfolio_consolidation.md`、`docs/README.md`、active gap plan、process history 和 OPL family ledger 为准。 |
+| Creative-stage AI-first / Hermes owner audit | `creative-stage-ai-first-audit-2026-04-13.md` | 只保留 AI-first 创作阶段审计和 upstream Hermes owner wording 的历史 provenance；当前 executor owner、default route、runtime owner、stage pack discipline 和 AI-first gate 回到 `agent/`、核心五件套、active gap plan、contracts 和 current route tests。 |
+| Production acceptance / standard OPL Agent closeout | `rca-production-acceptance-readiness-closeout-2026-05-20.md`、`rca-standard-agent-doc-process-history-2026-05.md` | 只解释 2026-05 production acceptance/readiness、source-shape、generated surface、refs-only adapter 与 standard-agent 收敛过程；当前功能/结构差距、生产证据差距、generated/default caller thinning 和 compatibility-free retirement 回到 active gap plan、production acceptance contracts、private inventory、source/tests 和 live read-model。 |
+
+如果子文件里仍有 implementation checklist、TDD snippet、branch/push closeout、test transcript、future prompt 或 "next" board，全部按原计划时点和 provenance 读取；当前可执行 baton 只从 `docs/active/rca-ideal-state-gap-plan.md` 及其 live-truth inputs 派生。
 
 ## 退役词与 no-resurrection 规则
 
