@@ -43,6 +43,15 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 
 ## Coverage Snapshot
 
+2026-06-09 RCA adapter-thinning active-plan SSOT tranche:
+
+- Theme / SSOT: generated/default caller thinning, compatibility-free retirement and RCA repo-local adapter path-level current roles. The active gap plan remains the owner for current completion/gap/order/baton, while path-level active caller, current role, OPL replacement domain and retirement gate detail belongs to `docs/active/opl-private-implementation-migration-inventory.md` plus `contracts/private_functional_surface_policy.json`, `contracts/physical_source_morphology_policy.json`, source/tests and runtime evidence.
+- Peer docs: `docs/active/rca-ideal-state-gap-plan.md` = active-plan owner and thinned; `docs/active/opl-private-implementation-migration-inventory.md` = `more_specific_detail` and retained as the SSOT for path-level classifications; `docs/status.md`, `docs/architecture.md`, `docs/invariants.md` and `docs/docs_portfolio_consolidation.md` = support current truth / lifecycle boundary; this process index = `history_or_provenance`.
+- Section classification: active-plan `结构卫生尾项` surface table = `covered_by_ssot` / `more_specific_detail` duplicate and replaced by three open-tail rows; `不能直接删除的 explicit remainder` = retained active-plan boundary because it records current physical-delete blockers; owner-delta order = retained active-plan baton; no conflicts with SSOT found.
+- Retired / preserved surface decision: no source, contract, test, workflow, package or CLI surface was retired in this tranche. The candidate repo-local adapters still have active callers or explicit provenance/test consumers, so deletion remains gated by replacement parity, no-active-caller, owner receipt / typed blocker roundtrip, no-forbidden-write and tombstone/provenance evidence.
+- Verification boundary: docs-only lane. Run `git diff --check`, conflict-marker scan over README/docs, focused stale scan over active plan / private inventory / status / docs lifecycle, and OPL Doc doctor before commit. Source or contract edits must run repo-native focused tests.
+- Remaining RCA scope: actual generated/default caller cutover, repo-local adapter deletion after cutover, Temporal long-soak evidence, production-like no-regression, and further history/provenance body coverage remain open under the active plan.
+
 2026-06-08 RCA Hermes history command-list compression tranche:
 
 - Theme / SSOT: `docs/history/hermes/**` verification command lists, launcher
