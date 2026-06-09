@@ -115,7 +115,27 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
     assert.equal(manifest.receipt_hashes[0].path, 'domain-owner-receipt.json');
     assert.equal(manifest.receipt_hashes[0].role, 'receipt');
     assert.deepEqual(manifest.evidence_hashes, []);
+    assert.equal(
+      manifest.authority_boundary.stage_folder_current_pointer_role,
+      'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
+    );
+    assert.equal(
+      manifest.authority_boundary.stage_folder_terminal_status_role,
+      'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
+    );
+    assert.equal(manifest.authority_boundary.stage_transition_authority_required_for_opl_stage_run_current, true);
+    assert.equal(manifest.authority_boundary.can_write_opl_stage_run_current_pointer, false);
+    assert.equal(manifest.authority_boundary.can_write_opl_stage_run_terminal_state, false);
+    assert.equal(manifest.authority_boundary.can_publish_current_owner_delta, false);
     assert.equal(manifest.authority_boundary.opl_can_issue_owner_receipt, false);
+    const currentPointer = readJson(written.current_file);
+    assert.equal(
+      currentPointer.authority_boundary.stage_folder_current_pointer_role,
+      'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
+    );
+    assert.equal(currentPointer.authority_boundary.can_write_opl_stage_run_current_pointer, false);
+    assert.equal(currentPointer.authority_boundary.can_write_opl_stage_run_terminal_state, false);
+    assert.equal(currentPointer.authority_boundary.can_publish_current_owner_delta, false);
 
     const loaded = readStageFolderArtifact({
       deliverablePaths: paths,

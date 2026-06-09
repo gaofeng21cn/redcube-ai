@@ -251,6 +251,12 @@ function resolveStageDir(stageRoot, canonicalStageId) {
 export const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
   owner: 'redcube_ai',
   opl_role: 'stage_folder_locator_and_index_consumer',
+  stage_folder_current_pointer_role: 'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
+  stage_folder_terminal_status_role: 'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
+  stage_transition_authority_required_for_opl_stage_run_current: true,
+  can_write_opl_stage_run_current_pointer: false,
+  can_write_opl_stage_run_terminal_state: false,
+  can_publish_current_owner_delta: false,
   opl_can_issue_owner_receipt: false,
   opl_can_write_visual_truth: false,
   opl_can_write_review_export_verdict: false,
