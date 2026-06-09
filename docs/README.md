@@ -95,7 +95,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 
 ## 文档角色清单
 
-本清单覆盖当前 repo-tracked `README*` 与 `docs/**/*.md` 的生命周期角色；过程记录和压缩 coverage snapshot 见 [RCA process history](./history/process/README.md)。
+本清单覆盖当前 repo-tracked `README*` 与 `docs/**/*.md` 的生命周期角色；过程记录和压缩 coverage summary 见 [RCA process history](./history/process/README.md)。
 
 | 路径组 | 当前职责 | 不承担 |
 | --- | --- | --- |

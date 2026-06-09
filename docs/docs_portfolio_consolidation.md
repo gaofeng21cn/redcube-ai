@@ -93,7 +93,7 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 Dated coverage entries, docs lifecycle inventories, SSOT closeouts and retirement proof/read-model foldbacks are compressed under [RCA process history](./history/process/README.md), with durable no-resurrection rules in [RCA retired surface provenance](./history/process/retired-surface-provenance.md).
 
-The process history index is now topic-level only. It records retained records, compressed provenance groups, a coverage snapshot, remaining unreviewed scope and next write scope; it must not grow back into six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs.
+The process history index is now topic-level only. It records retained records, compressed provenance groups, a coverage summary, remaining reopened scope and next write scope; it must not grow back into six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs.
 
 Future foldback uses this routing:
 
@@ -106,4 +106,4 @@ Future foldback uses this routing:
 
 Current active owner remains [RCA 理想目标态差距与完善计划](./active/rca-ideal-state-gap-plan.md). Product-entry support is indexed by `docs/product/` and `docs/references/product-entry/`; historical Hermes / Phase 2 / managed runtime / route probe records stay under [历史文档](./history/README.md).
 
-Latest process-history compression snapshot is indexed by [RCA process history](./history/process/README.md). It records the retained dated evidence files, compressed closeout groups, coverage snapshot and next write scope; the durable lifecycle rules are folded back into this file and [文档索引](./README.md).
+Latest process-history coverage summary is indexed by [RCA process history](./history/process/README.md). It records the retained dated evidence files, compressed closeout groups, remaining reopened scope and next write scope; the durable lifecycle rules are folded back into this file and [文档索引](./README.md).
