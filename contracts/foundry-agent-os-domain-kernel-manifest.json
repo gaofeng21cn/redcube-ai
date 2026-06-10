@@ -1,0 +1,136 @@
+{
+  "surface_kind": "foundry_agent_os_domain_kernel_manifest",
+  "version": "foundry-agent-os-domain-kernel-manifest.v1",
+  "domain_id": "redcube_ai",
+  "domain_agent_id": "rca",
+  "owner": "RedCube AI",
+  "state": "active_contract",
+  "role": "w4_domain_kernel_manifest",
+  "source_of_truth_refs": [
+    "docs/active/foundry-agent-os-target-delta.md",
+    "contracts/foundry_agent_series.json",
+    "contracts/private_functional_surface_policy.json",
+    "contracts/physical_source_morphology_policy.json",
+    "contracts/functional_privatization_audit.json"
+  ],
+  "default_read_root": {
+    "surface": "current_owner_delta",
+    "ordinary_operator_root": true,
+    "raw_worklist_role": "drilldown_only",
+    "provider_completion_role": "transport_evidence_only",
+    "artifact_inventory_role": "audit_only",
+    "gallery_projection_role": "drilldown_only",
+    "projection_can_be_owner_answer": false
+  },
+  "domain_authority_kernel": {
+    "retained_surfaces": [
+      "visual_truth",
+      "source_readiness_verdict",
+      "communication_strategy",
+      "visual_direction_decision",
+      "layout_review_export_verdict",
+      "repair_target_selection",
+      "artifact_mutation_authorization",
+      "artifact_export_authority",
+      "artifact_locator_ownership",
+      "visual_memory_accept_reject_or_blocker",
+      "owner_receipt_signer",
+      "typed_blocker_materializer",
+      "visual_native_helper_authority"
+    ],
+    "retained_surface_owner": "redcube_ai",
+    "owner_receipt_signer": "redcube_ai_authority_kernel",
+    "typed_blocker_signer": "redcube_ai_authority_kernel",
+    "quality_export_publication_review_verdict_signers": [
+      "layout_review_export_verdict",
+      "repair_target_selection",
+      "artifact_export_authority",
+      "source_readiness_verdict"
+    ],
+    "accepted_answer_shapes": [
+      "rca_owner_receipt_ref",
+      "rca_typed_blocker_ref",
+      "review_verdict_ref",
+      "export_verdict_ref",
+      "artifact_mutation_authority_ref",
+      "visual_memory_receipt_ref",
+      "human_review_gate_ref",
+      "no_regression_evidence_ref"
+    ]
+  },
+  "opl_upcollect_surfaces": [
+    "generic_runtime",
+    "stage_run_kernel",
+    "queue_and_attempt_ledger",
+    "retry_dead_letter_resume",
+    "workspace_source_intake_shell",
+    "artifact_gallery_handoff_shell",
+    "review_repair_transport",
+    "native_helper_envelope",
+    "generated_cli_mcp_app_status_workbench_surfaces",
+    "operator_projection_shell",
+    "console_current_owner_delta_projection",
+    "refs_only_vault_lineage",
+    "capability_registry_abi"
+  ],
+  "forbidden_authority_flags": {
+    "opl": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "vault": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "console": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "runway": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "pack": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "capability_registry": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    },
+    "gallery_handoff_shell": {
+      "can_write_domain_truth": false,
+      "can_sign_owner_receipt": false,
+      "can_create_domain_typed_blocker": false,
+      "can_authorize_quality_export_publication_or_review_verdict": false
+    }
+  },
+  "non_claims": {
+    "domain_ready": false,
+    "visual_ready": false,
+    "exportable": false,
+    "handoffable": false,
+    "production_visual_stage_long_soak_complete": false,
+    "production_ready": false,
+    "app_release_ready": false,
+    "physical_delete_authorized": false
+  },
+  "verification": {
+    "focused_tests": [
+      "tests/rca-foundry-agent-os-domain-kernel-manifest.test.ts"
+    ],
+    "docs_ref": "docs/active/foundry-agent-os-target-delta.md"
+  }
+}
