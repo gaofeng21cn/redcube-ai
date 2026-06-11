@@ -64,6 +64,16 @@ function assertNoForbiddenBodyFields(value, label = 'evidence') {
   }
 }
 
+function assertLiveProgressBlockedEntry(liveProgress, entryId, blockerRef) {
+  const entry = liveProgress.progress_entries.find((candidate) => candidate.entry_id === entryId);
+  assert.ok(entry, entryId);
+  assert.equal(entry.status, 'blocked_by_domain_owned_typed_blocker', entryId);
+  assert.equal(entry.refs.typed_blocker_refs.includes(blockerRef), true, `${entryId}.${blockerRef}`);
+  assert.equal(entry.ready_claim_allowed, false, entryId);
+  assert.equal(entry.required_success_ref_shapes.length > 0, true, `${entryId}.required_success_ref_shapes`);
+  assert.equal(entry.next_verification_command_refs.length > 0, true, `${entryId}.next_verification_command_refs`);
+}
+
 test('StageRun Kernel profile keeps RCA visual authority separate from OPL runtime refs', () => {
   const profile = readJson('contracts/stage_run_kernel_profile.json');
   const oplRefs = profile.opl_contract_refs;
@@ -349,11 +359,13 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'screenshot_review',
     'export_pptx',
     'no_regression_closeout',
+    'memory_lifecycle_closeout',
   ]);
   assert.deepEqual(evidence.accepted_ref_shapes.required_ref_groups, [
     'domain_owner_receipt_refs',
     'typed_blocker_refs',
     'review_export_receipt_refs',
+    'memory_lifecycle_receipt_refs',
     'no_regression_evidence_refs',
   ]);
   assert.equal(liveProgress.surface_kind, 'domain_live_stage_run_progress_evidence');
@@ -367,18 +379,44 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'typed_blocker_refs',
     'human_gate_refs',
     'quality_or_export_receipt_refs',
+    'memory_lifecycle_refs',
     'no_regression_refs',
     'long_soak_refs',
   ]);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:no-regression:cross-family-production-scaleout-pending'), true);
   assert.equal(liveProgress.refs.human_gate_refs.includes('human_gate:redcube_operator_review_gate'), true);
   assert.equal(liveProgress.refs.quality_or_export_receipt_refs.includes('rca-review-export:ppt_deck:export_pptx:deck-owner-chain'), true);
+  assert.equal(
+    liveProgress.refs.memory_lifecycle_refs.includes('rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention'),
+    true,
+  );
+  assert.equal(
+    liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat'),
+    true,
+  );
   assert.equal(liveProgress.refs.long_soak_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
-  assert.equal(liveProgress.progress_entries.some((entry) => (
-    entry.entry_id === 'human_ready_export_handoff'
-    && entry.status === 'blocked_by_domain_owned_typed_blocker'
-    && entry.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending')
-  )), true);
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'human_ready_export_handoff',
+    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'temporal_controlled_visual_stage_long_soak',
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'memory_lifecycle_receipt_scaleout',
+    'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'cross_family_repeated_no_regression',
+    'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+  );
   assert.equal(liveProgress.authority_boundary.opl_can_issue_rca_owner_receipt, false);
   assert.equal(liveProgress.authority_boundary.opl_can_sign_owner_receipt, false);
   assert.equal(liveProgress.authority_boundary.opl_can_create_rca_typed_blocker, false);
@@ -401,11 +439,19 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
   assert.deepEqual(evidence.accepted_ref_shapes.typed_blocker_refs, [
     'rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>',
     'rca-typed-blocker:controlled-soak:<blocker-id>',
+    'rca-typed-blocker:memory-lifecycle:<blocker-id>',
+    'rca-typed-blocker:no-regression:<blocker-id>',
   ]);
   assert.deepEqual(evidence.accepted_ref_shapes.review_export_receipt_refs, [
     'rca-review-export:<family>:visual_director_review:<deliverable-id>',
     'rca-review-export:<family>:screenshot_review:<deliverable-id>',
     'rca-review-export:<family>:export_pptx:<deliverable-id>',
+  ]);
+  assert.deepEqual(evidence.accepted_ref_shapes.memory_lifecycle_receipt_refs, [
+    'rca-memory-receipt:visual-pattern:<receipt-id>',
+    'rca-lifecycle-receipt:cleanup:<receipt-id>',
+    'rca-lifecycle-receipt:restore:<receipt-id>',
+    'rca-lifecycle-receipt:retention:<receipt-id>',
   ]);
   assert.deepEqual(evidence.accepted_ref_shapes.no_regression_evidence_refs, [
     'rca-no-regression:visual-stage:<evidence-id>',

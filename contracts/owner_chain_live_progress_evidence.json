@@ -134,6 +134,16 @@
       "accepted_blocker_ref_shape": "rca-typed-blocker:external-work-order-owner-closeout:<blocker-id>",
       "required_return_shape": "no_regression_evidence_or_typed_blocker",
       "artifact_body_required": false
+    },
+    {
+      "stage_id": "memory_lifecycle_closeout",
+      "domain_role": "refs_only_visual_memory_lifecycle_receipt_or_typed_blocker_closeout",
+      "accepted_success_ref_shape": "rca-memory-receipt:visual-pattern:<receipt-id>",
+      "accepted_lifecycle_success_ref_shape": "rca-lifecycle-receipt:<lifecycle-action>:<receipt-id>",
+      "accepted_blocker_ref_shape": "rca-typed-blocker:memory-lifecycle:<blocker-id>",
+      "required_return_shape": "memory_lifecycle_refs_or_typed_blocker",
+      "artifact_body_required": false,
+      "memory_body_required": false
     }
   ],
   "accepted_ref_shapes": {
@@ -141,6 +151,7 @@
       "domain_owner_receipt_refs",
       "typed_blocker_refs",
       "review_export_receipt_refs",
+      "memory_lifecycle_receipt_refs",
       "no_regression_evidence_refs"
     ],
     "domain_owner_receipt_refs": [
@@ -149,12 +160,20 @@
     ],
     "typed_blocker_refs": [
       "rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>",
-      "rca-typed-blocker:controlled-soak:<blocker-id>"
+      "rca-typed-blocker:controlled-soak:<blocker-id>",
+      "rca-typed-blocker:memory-lifecycle:<blocker-id>",
+      "rca-typed-blocker:no-regression:<blocker-id>"
     ],
     "review_export_receipt_refs": [
       "rca-review-export:<family>:visual_director_review:<deliverable-id>",
       "rca-review-export:<family>:screenshot_review:<deliverable-id>",
       "rca-review-export:<family>:export_pptx:<deliverable-id>"
+    ],
+    "memory_lifecycle_receipt_refs": [
+      "rca-memory-receipt:visual-pattern:<receipt-id>",
+      "rca-lifecycle-receipt:cleanup:<receipt-id>",
+      "rca-lifecycle-receipt:restore:<receipt-id>",
+      "rca-lifecycle-receipt:retention:<receipt-id>"
     ],
     "no_regression_evidence_refs": [
       "rca-no-regression:visual-stage:<evidence-id>",
@@ -212,7 +231,9 @@
   "remaining_evidence_gates": {
     "real_visual_artifact_generation": "mock_safe_canary_recorded_live_provider_not_run",
     "real_review_export_receipt_instance": "mock_safe_canary_recorded_live_provider_not_run",
+    "real_memory_lifecycle_receipt_instances": "blocked_by_domain_owned_typed_blocker",
     "temporal_controlled_visual_stage_long_soak": "open",
+    "cross_family_repeated_no_regression_evidence": "blocked_by_domain_owned_typed_blocker",
     "production_visual_ready": "not_claimed",
     "exportable": "not_claimed",
     "handoffable": "not_claimed",

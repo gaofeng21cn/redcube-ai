@@ -9,7 +9,7 @@
   "status": "owner_typed_blocker_recorded_not_ready_claim",
   "state": "active_contract",
   "purpose": "OPL-standard RCA live visual stage progress evidence and typed-blocker surface for StageRun consumers.",
-  "machine_boundary": "This surface is the RCA-owned OPL consumption contract for body-free live stage progress refs. It records owner receipt refs, typed blocker refs, human gate refs, quality/export receipt refs, no-regression refs, long-soak refs, doc refs, and next verification refs. It does not contain visual truth, artifact bodies, review/export verdict bodies, memory bodies, owner receipt bodies, typed blocker bodies, or production-ready claims.",
+  "machine_boundary": "This surface is the RCA-owned OPL consumption contract for body-free live stage progress refs. It records owner receipt refs, typed blocker refs, human gate refs, quality/export receipt refs, memory/lifecycle refs, no-regression refs, long-soak refs, doc refs, and next verification refs. It does not contain visual truth, artifact bodies, review/export verdict bodies, memory bodies, owner receipt bodies, typed blocker bodies, or production-ready claims.",
   "evidence_scope": "live_visual_stage_progress_refs_or_domain_owned_typed_blocker",
   "source_contract_refs": {
     "stage_run_kernel_profile_ref": "contracts/stage_run_kernel_profile.json",
@@ -44,6 +44,13 @@
       "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
       "rca-review-export:ppt_deck:export_pptx:deck-owner-chain",
       "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
+    ],
+    "memory_lifecycle_refs": [
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+      "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+      "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+      "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
     ],
     "no_regression_refs": [
       "rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression",
@@ -82,6 +89,7 @@
         ],
         "typed_blocker_refs": [],
         "human_gate_refs": [],
+        "memory_lifecycle_refs": [],
         "no_regression_refs": [],
         "long_soak_refs": []
       },
@@ -107,6 +115,7 @@
         "human_gate_refs": [
           "human_gate:redcube_operator_review_gate"
         ],
+        "memory_lifecycle_refs": [],
         "no_regression_refs": [],
         "long_soak_refs": []
       },
@@ -132,6 +141,7 @@
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
         ],
         "human_gate_refs": [],
+        "memory_lifecycle_refs": [],
         "no_regression_refs": [],
         "long_soak_refs": [
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
@@ -143,6 +153,81 @@
       ],
       "next_verification_command_refs": [
         "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/temporal-autonomy-readiness.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+      ],
+      "ready_claim_allowed": false
+    },
+    {
+      "entry_id": "memory_lifecycle_receipt_scaleout",
+      "status": "blocked_by_domain_owned_typed_blocker",
+      "evidence_kind": "real_visual_memory_lifecycle_receipt_instances",
+      "refs": {
+        "owner_receipt_refs": [
+          "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
+        ],
+        "quality_or_export_receipt_refs": [
+          "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
+        ],
+        "typed_blocker_refs": [
+          "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending"
+        ],
+        "human_gate_refs": [],
+        "memory_lifecycle_refs": [
+          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+          "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+          "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+          "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+          "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+        ],
+        "no_regression_refs": [],
+        "long_soak_refs": []
+      },
+      "required_success_ref_shapes": [
+        "rca-memory-receipt:visual-pattern:<accepted-receipt-id>",
+        "rca-memory-receipt:visual-pattern:<rejected-receipt-id>",
+        "rca-lifecycle-receipt:cleanup:<receipt-id>",
+        "rca-lifecycle-receipt:restore:<receipt-id>",
+        "rca-lifecycle-receipt:retention:<receipt-id>"
+      ],
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+      ],
+      "ready_claim_allowed": false
+    },
+    {
+      "entry_id": "cross_family_repeated_no_regression",
+      "status": "blocked_by_domain_owned_typed_blocker",
+      "evidence_kind": "production_like_cross_family_repeated_no_regression",
+      "refs": {
+        "owner_receipt_refs": [
+          "rca-owner-receipt:visual-stage:production-evidence-tail-ppt-image-first-domain-owner"
+        ],
+        "quality_or_export_receipt_refs": [
+          "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first"
+        ],
+        "typed_blocker_refs": [
+          "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+        ],
+        "human_gate_refs": [],
+        "memory_lifecycle_refs": [],
+        "no_regression_refs": [
+          "rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+        ],
+        "long_soak_refs": []
+      },
+      "required_success_ref_shapes": [
+        "rca-no-regression:visual-stage:ppt_deck:<run-id>",
+        "rca-no-regression:visual-stage:xiaohongshu:<run-id>",
+        "workspace-runtime-ref:no-regression:<run-id>"
+      ],
+      "next_verification_command_refs": [
+        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
       ],
       "ready_claim_allowed": false
     }

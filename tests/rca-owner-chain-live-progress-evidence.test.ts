@@ -54,6 +54,24 @@ function assertRefPrefix(value, prefix, label) {
   assert.equal(value.startsWith(prefix), true, `${label}: ${value}`);
 }
 
+function assertLiveProgressBlockedEntry(liveProgress, entryId, blockerRef, options = {}) {
+  const entry = liveProgress.progress_entries.find((candidate) => candidate.entry_id === entryId);
+  assert.ok(entry, entryId);
+  assert.equal(entry.status, 'blocked_by_domain_owned_typed_blocker', entryId);
+  assert.equal(entry.refs.typed_blocker_refs.includes(blockerRef), true, `${entryId}.${blockerRef}`);
+  assert.equal(entry.ready_claim_allowed, false, entryId);
+  assert.equal(entry.required_success_ref_shapes.length > 0, true, `${entryId}.required_success_ref_shapes`);
+  assert.equal(entry.next_verification_command_refs.length > 0, true, `${entryId}.next_verification_command_refs`);
+  assert.deepEqual(entry.refs.human_gate_refs, options.humanGateRefs || []);
+  assert.deepEqual(entry.refs.long_soak_refs, options.longSoakRefs || []);
+  if (options.memoryLifecycleRefs) {
+    assert.deepEqual(entry.refs.memory_lifecycle_refs, options.memoryLifecycleRefs);
+  }
+  if (options.noRegressionRefs) {
+    assert.deepEqual(entry.refs.no_regression_refs, options.noRegressionRefs);
+  }
+}
+
 async function runImageFirstOwnerChainCanary(workspaceRoot) {
   await createDeliverable({
     workspaceRoot,
@@ -169,7 +187,9 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
 
   assert.equal(evidence.remaining_evidence_gates.real_visual_artifact_generation, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.real_review_export_receipt_instance, 'mock_safe_canary_recorded_live_provider_not_run');
+  assert.equal(evidence.remaining_evidence_gates.real_memory_lifecycle_receipt_instances, 'blocked_by_domain_owned_typed_blocker');
   assert.equal(evidence.remaining_evidence_gates.temporal_controlled_visual_stage_long_soak, 'open');
+  assert.equal(evidence.remaining_evidence_gates.cross_family_repeated_no_regression_evidence, 'blocked_by_domain_owned_typed_blocker');
   assert.equal(liveProgress.surface_kind, 'domain_live_stage_run_progress_evidence');
   assert.equal(liveProgress.rca_surface_kind, 'rca_live_stage_run_progress_evidence');
   assert.equal(liveProgress.schema_ref, 'contracts/opl-framework/domain-live-stage-run-progress-evidence.schema.json');
@@ -180,7 +200,51 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression'), true);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:no-regression:cross-family-production-scaleout-pending'), true);
   assert.equal(liveProgress.refs.human_gate_refs.includes('human_gate:redcube_operator_review_gate'), true);
+  assert.deepEqual(liveProgress.refs.memory_lifecycle_refs, [
+    'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted',
+    'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected',
+    'rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup',
+    'rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore',
+    'rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention',
+  ]);
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'human_ready_export_handoff',
+    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
+    { humanGateRefs: ['human_gate:redcube_operator_review_gate'] },
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'temporal_controlled_visual_stage_long_soak',
+    'rca-typed-blocker:controlled-soak:temporal-long-soak-pending',
+    { longSoakRefs: ['rca-typed-blocker:controlled-soak:temporal-long-soak-pending'] },
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'memory_lifecycle_receipt_scaleout',
+    'rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending',
+    { memoryLifecycleRefs: liveProgress.refs.memory_lifecycle_refs },
+  );
+  assertLiveProgressBlockedEntry(
+    liveProgress,
+    'cross_family_repeated_no_regression',
+    'rca-typed-blocker:no-regression:cross-family-production-scaleout-pending',
+    { noRegressionRefs: liveProgress.refs.no_regression_refs },
+  );
+  assert.deepEqual(
+    liveProgress.progress_entries
+      .filter((entry) => entry.status === 'blocked_by_domain_owned_typed_blocker')
+      .map((entry) => entry.entry_id),
+    [
+      'human_ready_export_handoff',
+      'temporal_controlled_visual_stage_long_soak',
+      'memory_lifecycle_receipt_scaleout',
+      'cross_family_repeated_no_regression',
+    ],
+  );
   assert.equal(
     liveProgress.progress_entries.every((entry) => entry.ready_claim_allowed === false),
     true,
