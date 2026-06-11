@@ -93,6 +93,7 @@ async function runImageFirstOwnerChainCanary(workspaceRoot) {
 
 test('RCA owner-chain evidence contract records mock-safe visual canary refs without readiness overclaim', () => {
   const evidence = readRepoJson('contracts/owner_chain_live_progress_evidence.json');
+  const liveProgress = readRepoJson('contracts/live_stage_run_progress_evidence.json');
 
   assert.equal(evidence.progress_readout.current_status, 'mock_safe_visual_owner_chain_canary_recorded_live_provider_evidence_open');
   assert.equal(evidence.progress_readout.live_progress_claim_kind, 'mock_safe_artifact_producing_owner_chain_canary_plus_refs_only_owner_actions');
@@ -169,6 +170,21 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(evidence.remaining_evidence_gates.real_visual_artifact_generation, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.real_review_export_receipt_instance, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.temporal_controlled_visual_stage_long_soak, 'open');
+  assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, 'contracts/owner_chain_live_progress_evidence.json');
+  assert.equal(liveProgress.refs.owner_receipt_refs.includes(evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref), true);
+  assert.equal(liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
+  assert.equal(liveProgress.refs.human_gate_refs.includes('human_gate:redcube_operator_review_gate'), true);
+  assert.equal(
+    liveProgress.progress_entries.every((entry) => entry.ready_claim_allowed === false),
+    true,
+  );
+  assert.equal(liveProgress.authority_boundary.declares_visual_ready, false);
+  assert.equal(liveProgress.authority_boundary.declares_exportable, false);
+  assert.equal(liveProgress.authority_boundary.declares_handoffable, false);
+  assert.equal(liveProgress.authority_boundary.declares_production_visual_stage_long_soak_complete, false);
+  assertNoReadyClaims(liveProgress);
   assertNoReadyClaims(evidence);
 });
 

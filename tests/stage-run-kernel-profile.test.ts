@@ -328,8 +328,10 @@ test('controlled visual StageRun canary evidence locks refs-only closeout shape'
 test('RCA owner-chain live progress evidence exposes accepted refs without readiness overclaim', () => {
   const profile = readJson('contracts/stage_run_kernel_profile.json');
   const evidence = readJson('contracts/owner_chain_live_progress_evidence.json');
+  const liveProgress = readJson('contracts/live_stage_run_progress_evidence.json');
 
   assert.equal(profile.owner_chain_live_progress_evidence_ref, 'contracts/owner_chain_live_progress_evidence.json');
+  assert.equal(profile.live_stage_run_progress_evidence_ref, 'contracts/live_stage_run_progress_evidence.json');
   assert.equal(evidence.surface_kind, 'rca_owner_chain_live_progress_evidence');
   assert.equal(evidence.version, 'owner-chain-live-progress-evidence.v1');
   assert.equal(evidence.domain_id, 'redcube-ai');
@@ -354,6 +356,34 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'review_export_receipt_refs',
     'no_regression_evidence_refs',
   ]);
+  assert.equal(liveProgress.surface_kind, 'rca_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.version, 'live-stage-run-progress-evidence.v1');
+  assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, profile.owner_chain_live_progress_evidence_ref);
+  assert.deepEqual(Object.keys(liveProgress.refs), [
+    'owner_receipt_refs',
+    'typed_blocker_refs',
+    'human_gate_refs',
+    'quality_or_export_receipt_refs',
+    'no_regression_refs',
+    'long_soak_refs',
+  ]);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
+  assert.equal(liveProgress.refs.human_gate_refs.includes('human_gate:redcube_operator_review_gate'), true);
+  assert.equal(liveProgress.refs.quality_or_export_receipt_refs.includes('rca-review-export:ppt_deck:export_pptx:deck-owner-chain'), true);
+  assert.equal(liveProgress.refs.long_soak_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
+  assert.equal(liveProgress.progress_entries.some((entry) => (
+    entry.entry_id === 'human_ready_export_handoff'
+    && entry.status === 'blocked_by_domain_owned_typed_blocker'
+    && entry.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending')
+  )), true);
+  assert.equal(liveProgress.authority_boundary.opl_can_issue_rca_owner_receipt, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_create_rca_typed_blocker, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_authorize_review_export, false);
+  assert.equal(liveProgress.authority_boundary.declares_visual_ready, false);
+  assert.equal(liveProgress.authority_boundary.declares_exportable, false);
+  assert.equal(liveProgress.authority_boundary.declares_handoffable, false);
+  assert.equal(liveProgress.authority_boundary.declares_production_visual_stage_long_soak_complete, false);
+  assertNoForbiddenBodyFields(liveProgress);
   assert.deepEqual(evidence.accepted_ref_shapes.domain_owner_receipt_refs, [
     'rca-owner-receipt:visual-stage:<receipt-id>',
     'rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>',
