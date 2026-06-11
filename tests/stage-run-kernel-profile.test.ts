@@ -356,7 +356,10 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'review_export_receipt_refs',
     'no_regression_evidence_refs',
   ]);
-  assert.equal(liveProgress.surface_kind, 'rca_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.surface_kind, 'domain_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.rca_surface_kind, 'rca_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.schema_ref, 'contracts/opl-framework/domain-live-stage-run-progress-evidence.schema.json');
+  assert.equal(liveProgress.status, 'owner_typed_blocker_recorded_not_ready_claim');
   assert.equal(liveProgress.version, 'live-stage-run-progress-evidence.v1');
   assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, profile.owner_chain_live_progress_evidence_ref);
   assert.deepEqual(Object.keys(liveProgress.refs), [
@@ -377,8 +380,15 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     && entry.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending')
   )), true);
   assert.equal(liveProgress.authority_boundary.opl_can_issue_rca_owner_receipt, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_sign_owner_receipt, false);
   assert.equal(liveProgress.authority_boundary.opl_can_create_rca_typed_blocker, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_create_typed_blocker, false);
   assert.equal(liveProgress.authority_boundary.opl_can_authorize_review_export, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_authorize_quality_or_export, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_claim_domain_ready, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_claim_production_ready, false);
+  assert.equal(liveProgress.authority_boundary.provider_completion_counts_as_domain_ready, false);
+  assert.equal(liveProgress.authority_boundary.structural_conformance_counts_as_live_progress, false);
   assert.equal(liveProgress.authority_boundary.declares_visual_ready, false);
   assert.equal(liveProgress.authority_boundary.declares_exportable, false);
   assert.equal(liveProgress.authority_boundary.declares_handoffable, false);

@@ -170,6 +170,11 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(evidence.remaining_evidence_gates.real_visual_artifact_generation, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.real_review_export_receipt_instance, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.temporal_controlled_visual_stage_long_soak, 'open');
+  assert.equal(liveProgress.surface_kind, 'domain_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.rca_surface_kind, 'rca_live_stage_run_progress_evidence');
+  assert.equal(liveProgress.schema_ref, 'contracts/opl-framework/domain-live-stage-run-progress-evidence.schema.json');
+  assert.equal(liveProgress.schema_version, 1);
+  assert.equal(liveProgress.status, 'owner_typed_blocker_recorded_not_ready_claim');
   assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, 'contracts/owner_chain_live_progress_evidence.json');
   assert.equal(liveProgress.refs.owner_receipt_refs.includes(evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref), true);
   assert.equal(liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression'), true);
@@ -184,6 +189,14 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(liveProgress.authority_boundary.declares_exportable, false);
   assert.equal(liveProgress.authority_boundary.declares_handoffable, false);
   assert.equal(liveProgress.authority_boundary.declares_production_visual_stage_long_soak_complete, false);
+  assert.equal(liveProgress.authority_boundary.refs_only, true);
+  assert.equal(liveProgress.authority_boundary.opl_can_sign_owner_receipt, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_create_typed_blocker, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_authorize_quality_or_export, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_claim_domain_ready, false);
+  assert.equal(liveProgress.authority_boundary.opl_can_claim_production_ready, false);
+  assert.equal(liveProgress.authority_boundary.provider_completion_counts_as_domain_ready, false);
+  assert.equal(liveProgress.authority_boundary.structural_conformance_counts_as_live_progress, false);
   assertNoReadyClaims(liveProgress);
   assertNoReadyClaims(evidence);
 });
