@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `opl_private_implementation_migration_inventory`
 State: `active_inventory`
 Machine boundary: 本文是人读迁移治理台账。机器真相继续归 `contracts/private_functional_surface_policy.json`、`contracts/physical_source_morphology_policy.json`、runtime-program leaf contracts、CLI/MCP/API 行为、product-entry manifest、RCA domain handler projection、OPL-generated `domain_action_adapter` descriptor refs、workspace/runtime receipt、artifact locator、review/export gate 和 RCA owner receipt。
-Date: `2026-06-09`
+Last reviewed: `2026-06-12`
 
 ## 当前 clean truth
 

@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Date: `2026-06-03`
+Last reviewed: `2026-06-12`
 
 Dated native proof、workspace path、attempt id、screenshot path、no-regression ref 流水和 proof 命令摘要不再追加到本文；这些过程证据进入 `docs/history/process/` 或 runtime/evidence ledger。本文只保留 current readout、open gates、owner delta 和完成顺序。
 
