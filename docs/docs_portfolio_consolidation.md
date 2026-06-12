@@ -44,20 +44,16 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 
 `capabilities` 不作为 RCA docs active 目录复活。Capability truth 优先归 contracts、runtime manifest、CLI/MCP surface、delivery/source/runtime owner docs 或 domain action catalog。
 
-当前 docs 生命周期复核结论：
+当前 docs 生命周期复核只保留当前归位，不在本文保存逐项迁移清单。详细迁移 provenance、退役路径和历史 closeout 读 [RCA process history](./history/process/README.md) 与 [RCA retired surface provenance](./history/process/retired-surface-provenance.md)。
 
-- `docs/public/` 和 `docs/specs/` 继续保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。
-- [文档索引](./README.md) 现在持有 repo-tracked `README*` 与 `docs/**/*.md` 的路径组级 lifecycle role。该清单只做导航和归位，不替代核心五件套、contracts/source/tests 或 runtime evidence。
-- [系列项目文档治理清单](./references/governance/series-doc-governance-checklist.md) 只作为 OPL series 跨仓巡检支撑清单，不持有 RCA 文档生命周期治理规则、active completion plan 或 current truth。
-- `docs/references/opl-managed-runtime-three-layer-contract.md` 已迁入 `docs/history/runtime/opl-managed-runtime-three-layer-contract.md`，因为它只保留历史 owner-boundary 讨论，不再承担 current support reference。
-- `docs/references/product-entry/` 承接已落地的 `redcube_product_entry_mvp`、`product_entry_session_continuity` 与 `opl_framework_hosted_product_entry` support brief；它们解释 contract surface，不承担 active plan。旧 `managed_product_entry_hardening` 只保留在 history tombstone。
-- `docs/delivery/real-route-evolution-probe.md` 已迁入 `docs/history/process/real-route-evolution-probe.md`。它只保留 route probe 的压缩 provenance 和 current owner map；probe 命令、输出字段、cache / typed blocker 行为和回归覆盖回到 script、contracts 与 tests。当前 delivery owner 只保留 family / route / proof / export support，不承担 dated probe ledger。
-- `docs/references/product-entry/` 三个 contract-linked brief 是 direct product entry、OPL-hosted product entry 与 session continuity 的 support SSOT；`docs/references/integration/opl-family-contract-adoption.md`、`docs/references/domain_memory_descriptor_locator.md`、`docs/references/rca_executor_routing_config.md` 分别解释 family contract adoption、memory locator 和 opt-in executor routing，不承担 active plan。旧 `docs/references/integration/lightweight-product-entry-and-opl-handoff.md` 已作为重复 handoff overview 退役，不保留路径兼容入口。
-- `docs/references/direct_delivery_longrun_target_state.md`、`docs/references/source_readiness_deep_research_longrun_target_state.md` 与 `docs/source/deep_research_auto_first_product_contract.md` 已归入 `docs/history/plans/`，分别保存 2026-04-09 direct-delivery future freeze、2026-04-09 source-plane future freeze 和 2026-04-08 Deep Research / auto-first 产品语义 provenance。当前 delivery/source truth 回到 owner docs、active gap plan 和 machine-readable contracts。
-- `docs/references/positioning/domain-harness-os-positioning.md` 已迁入 `docs/history/positioning/domain-harness-os-positioning.md`；该语义 ID 只作为 historical positioning / internal boundary vocabulary 保留。
-- 旧 `docs/references/creative-stage-ai-first-audit-2026-04-13.md` 已迁入 `docs/history/plans/creative-stage-ai-first-audit-2026-04-13.md`；其中 upstream Hermes 创作 owner 表述只按 2026-04-13 历史 audit 读取，当前 executor / owner truth 回到核心五件套、AI-first policy、ideal-state reference 和 active gap plan。
-- `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/` 和 `docs/history/tombstones/` 只保留 provenance / tombstone；其中的旧 Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。
-- 没有恢复 `docs/capabilities/`；新增 capability-like 内容应先进入 contracts、manifest、domain action catalog 或对应 owner doc。
+| Semantic theme | Current owner / disposition |
+| --- | --- |
+| Public/spec thin indexes | `docs/public/` 和 `docs/specs/` 只保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。 |
+| Human-doc inventory | [文档索引](./README.md) 持有 repo-tracked `README*` 与 `docs/**/*.md` 的路径组级 lifecycle role；它只导航，不替代核心五件套、contracts/source/tests 或 runtime evidence。 |
+| Product-entry / OPL handoff support | `docs/references/product-entry/` 三个 contract-linked brief、`docs/references/integration/opl-family-contract-adoption.md`、memory locator 与 opt-in executor routing refs 是 support SSOT；重复 handoff overview、managed product-entry hardening 和 path compatibility 只保留在 history/tombstone。 |
+| Runtime / delivery / source historical freezes | 旧 OPL managed runtime 三层讨论、route evolution probe、direct-delivery/source future freeze、Deep Research auto-first product semantics 和 creative-stage audit 只作为 history/provenance 读取；当前 truth 回到 owner docs、active gap plan、machine-readable contracts、source 和 tests。 |
+| Old route vocabulary | `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/`、`docs/history/positioning/` 和 `docs/history/tombstones/` 只保留 provenance/tombstone；Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。 |
+| Capability-like material | 不恢复 `docs/capabilities/`；新增 capability-like 内容先进入 contracts、manifest、domain action catalog 或对应 owner doc。 |
 
 ## 内容级整合规则
 
