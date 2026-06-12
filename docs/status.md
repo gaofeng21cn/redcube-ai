@@ -94,6 +94,13 @@ Hermes-Agent / executor runtime protocol 仍只读为显式 opt-in proof backend
 | Repeated no-regression | RCA-owned body-free refs 已有历史证据；当前只证明 RCA owner surface 能跨 route/window 向 OPL 投影 no-regression refs，不声明 repeated route soak、visual ready、exportable 或 production ready。 | `docs/history/process/2026-06-03-rca-dated-production-evidence-foldback.md`、production acceptance |
 | Temporal controlled visual-stage long soak | RCA refs-only intake / inventory / operator projection 已落地；真实 provider restart/re-query/retry/dead-letter、OPL/Temporal residency、独立 stage execution / quality AI task receipts 和 owner-chain closeout evidence 仍未产出。 | production acceptance、long-soak source contract、runtime evidence |
 
+`contracts/owner_chain_live_progress_evidence.json#/domain_owner_chain_scaleout`
+是 RCA 给 OPL `domain_owner_chain_scaleout` gate 的当前 refs-only
+backfill：它聚合 RCA-owned owner receipt、review/export receipt、typed
+blocker 与 no-regression refs。该 ref 只说明 owner-chain evidence lane 可被
+OPL 消费，不声明 visual ready、exportable、handoffable、domain ready、
+production ready 或 production visual-stage long-soak complete。
+
 RCA 当前已有 refs-only evidence accounting 面让 OPL/App/operator 读取缺口状态与下一步执行顺序：operator evidence readiness projection、workspace receipt inventory projection、domain handler projection、production acceptance surface、typed blocker refs、Temporal long-soak evidence inventory 和 `production_evidence_tail_workorder`。这些 surfaces 的 payload template、success refs path、typed blocker path、accepted return shape 和 forbidden payload policy 归机器合同；status 不复制字段级 payload 表。真实 Temporal long-soak 与 production-like repeated family route no-regression 仍保持 open evidence tail。OPL conformance、readiness clean/observable、hosted/provider completion、replay evidence、cleanup proof、stage evidence receipt、domain-dispatch receipt、payload item success refs visible 或 workorder item completion 都不能升级为 RCA visual/export/domain ready。
 
 Product-entry session currentness 与 runtime loop projection 现在都暴露 OPL shared `next_forced_delta`。当 continuation 缺 closeout consumption 时，下一强制产出是 RCA operator typed blocker resolution；当 newer route run 缺 provider attempt ledger binding 时，下一强制产出是 OPL-owned provider ledger closeout binding；当 visual route 已有有效 provider attempt / ledger refs 且完成时，下一强制产出回到 RCA visual deliverable artifact pickup。Provider currentness 必须同时拥有有效 provider attempt ref 与 provider attempt ledger ref，且两者不能等于或伪装成本地 `product-entry-session:*` ref；半缺失或本地 session ref masquerade 均 fail closed 为 typed blocker。该 hardening 只改变 RCA session/read-model currentness，不写 visual truth、artifact body、memory body、review/export verdict 或 production-ready claim。

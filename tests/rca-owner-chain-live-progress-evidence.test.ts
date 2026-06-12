@@ -265,6 +265,67 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assertNoReadyClaims(evidence);
 });
 
+test('RCA domain-owner-chain scaleout exposes OPL backfill refs without ready claims', () => {
+  const evidence = readRepoJson('contracts/owner_chain_live_progress_evidence.json');
+  const scaleout = evidence.domain_owner_chain_scaleout;
+
+  assert.equal(scaleout.surface_kind, 'rca_domain_owner_chain_scaleout_evidence_lane');
+  assert.equal(scaleout.gate_id, 'domain_owner_chain_scaleout');
+  assert.equal(scaleout.owner, 'redcube_ai');
+  assert.equal(scaleout.status, 'domain_owned_refs_recorded_live_provider_evidence_open');
+  assert.equal(scaleout.opl_consumption_status, 'owner_chain_refs_available_with_open_real_provider_tail');
+  assert.equal(scaleout.ready_claim_authorized, false);
+  assert.equal(scaleout.visual_ready_claimed, false);
+  assert.equal(scaleout.exportable_claimed, false);
+  assert.equal(scaleout.domain_ready_claimed, false);
+  assert.equal(scaleout.production_ready_claimed, false);
+  assert.deepEqual(scaleout.accepted_ref_shapes, [
+    'owner_receipt_ref',
+    'review_export_receipt_ref',
+    'typed_blocker_ref',
+    'memory_lifecycle_receipt_ref',
+    'no_regression_ref',
+  ]);
+
+  assert.deepEqual(scaleout.opl_backfill_refs.owner_receipt_refs, [
+    ...evidence.live_visual_owner_chain_canary.observed_owner_receipt_refs,
+    evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref,
+  ]);
+  assert.deepEqual(
+    scaleout.opl_backfill_refs.review_export_receipt_refs,
+    evidence.live_visual_owner_chain_canary.observed_review_export_receipt_refs,
+  );
+  assert.deepEqual(scaleout.opl_backfill_refs.typed_blocker_refs, [
+    evidence.rca_owned_owner_action_canary.observed_typed_blocker_ref,
+  ]);
+  assert.deepEqual(scaleout.opl_backfill_refs.no_regression_refs, [
+    evidence.rca_owned_owner_action_canary.observed_no_regression_evidence_ref,
+  ]);
+  assert.deepEqual(scaleout.observed_ref_counts, {
+    owner_receipt_ref_count: 4,
+    review_export_receipt_ref_count: 3,
+    typed_blocker_ref_count: 1,
+    memory_lifecycle_receipt_ref_count: 0,
+    no_regression_ref_count: 1,
+  });
+  assert.deepEqual(scaleout.blocked_gate_categories, [
+    'real_visual_artifact_generation',
+    'real_review_export_receipt_instance',
+    'real_memory_lifecycle_receipt_instances',
+    'temporal_controlled_visual_stage_long_soak',
+    'cross_family_repeated_no_regression_evidence',
+  ]);
+  assert.equal(scaleout.authority_boundary.refs_only, true);
+  assert.equal(scaleout.authority_boundary.rca_owns_owner_chain_refs, true);
+  assert.equal(scaleout.authority_boundary.opl_can_consume_refs, true);
+  assert.equal(scaleout.authority_boundary.opl_can_write_rca_visual_truth, false);
+  assert.equal(scaleout.authority_boundary.opl_can_issue_rca_owner_receipt, false);
+  assert.equal(scaleout.authority_boundary.opl_can_create_rca_typed_blocker, false);
+  assert.equal(scaleout.authority_boundary.opl_can_authorize_review_export, false);
+  assert.equal(scaleout.authority_boundary.opl_can_claim_visual_or_production_ready, false);
+  assertNoReadyClaims(scaleout);
+});
+
 test('RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs', SERIAL_ENV_TEST, async () => {
   const restoreEnv = withEnv({
     REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,

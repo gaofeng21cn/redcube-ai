@@ -185,6 +185,70 @@
     "typed_blocker",
     "no_regression_evidence"
   ],
+  "domain_owner_chain_scaleout": {
+    "surface_kind": "rca_domain_owner_chain_scaleout_evidence_lane",
+    "gate_id": "domain_owner_chain_scaleout",
+    "owner": "redcube_ai",
+    "status": "domain_owned_refs_recorded_live_provider_evidence_open",
+    "opl_consumption_status": "owner_chain_refs_available_with_open_real_provider_tail",
+    "ready_claim_authorized": false,
+    "visual_ready_claimed": false,
+    "exportable_claimed": false,
+    "domain_ready_claimed": false,
+    "production_ready_claimed": false,
+    "evidence_ref": "contracts/owner_chain_live_progress_evidence.json#/domain_owner_chain_scaleout",
+    "accepted_ref_shapes": [
+      "owner_receipt_ref",
+      "review_export_receipt_ref",
+      "typed_blocker_ref",
+      "memory_lifecycle_receipt_ref",
+      "no_regression_ref"
+    ],
+    "opl_backfill_refs": {
+      "owner_receipt_refs": [
+        "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
+        "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
+        "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain",
+        "rca-owner-receipt:visual-stage:owner-chain-canary-domain-owner"
+      ],
+      "review_export_receipt_refs": [
+        "rca-review-export:ppt_deck:visual_director_review:deck-owner-chain",
+        "rca-review-export:ppt_deck:screenshot_review:deck-owner-chain",
+        "rca-review-export:ppt_deck:export_pptx:deck-owner-chain"
+      ],
+      "typed_blocker_refs": [
+        "rca-typed-blocker:workspace_receipt_proof_missing_required_refs:owner-chain-canary-blocker"
+      ],
+      "memory_lifecycle_receipt_refs": [],
+      "no_regression_refs": [
+        "rca-no-regression:visual-stage:owner-chain-canary-no-regression"
+      ]
+    },
+    "observed_ref_counts": {
+      "owner_receipt_ref_count": 4,
+      "review_export_receipt_ref_count": 3,
+      "typed_blocker_ref_count": 1,
+      "memory_lifecycle_receipt_ref_count": 0,
+      "no_regression_ref_count": 1
+    },
+    "blocked_gate_categories": [
+      "real_visual_artifact_generation",
+      "real_review_export_receipt_instance",
+      "real_memory_lifecycle_receipt_instances",
+      "temporal_controlled_visual_stage_long_soak",
+      "cross_family_repeated_no_regression_evidence"
+    ],
+    "authority_boundary": {
+      "refs_only": true,
+      "rca_owns_owner_chain_refs": true,
+      "opl_can_consume_refs": true,
+      "opl_can_write_rca_visual_truth": false,
+      "opl_can_issue_rca_owner_receipt": false,
+      "opl_can_create_rca_typed_blocker": false,
+      "opl_can_authorize_review_export": false,
+      "opl_can_claim_visual_or_production_ready": false
+    }
+  },
   "opl_hosted_path_boundary": {
     "entry_path": "opl_hosted_product_entry_to_redcube_service_safe_domain_entry",
     "opl_can_store_owner_chain_refs": true,
