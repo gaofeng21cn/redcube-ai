@@ -116,32 +116,45 @@ Product-entry session currentness 与 runtime loop projection 现在都暴露 OP
 
 PPT 三技术路线 AgentLab 测试遵守同一边界：refs-only 测试证明 image-first、HTML 与 native PPTX 路线的合同、runtime read-model、gate refs 和 forbidden-authority flags 可被标准 AgentLab 读取；mock proof 只证明轻量 fixture、mock image provider、mock Codex test double 或 native helper plumbing 能产出预期文件链路，不能展示成视觉样片或路线质量证明。真实样片必须通过显式 Codex-native imagegen task、live integrated sample 或 native PPT proof lane 生成，并继续经过 RCA product-entry、visual director review、screenshot review 与 export gate。当前 native PPTX live proof 的 dated details 已归入 history/process；这些样片和 mock proof仍不能升级成 production visual-stage long soak、domain ready、handoffable、全局 App release closeout 或 artifact authority 迁移。
 
-OPL expected receipt / monitor freshness handoff 的 forbidden payload policy 已与 RCA production acceptance 对齐：`visual truth body`、review/export verdict body、artifact blob/body、memory body、generic runtime state 和 retired managed runtime alias negative-guard field 都只能作为阻断项读取。该 handoff 只承载 body-free receipt / monitor refs；`stage_expected_receipt_payload_summary` 为 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision` 和 `package_and_handoff` 提供逐 stage 的 expected receipt / monitor freshness refs 模板与 typed blocker path，且逐 stage `runtime_event_refs` 从 `family_stage_control_plane.stages[*].stage_contract.runtime_event_refs` 派生，避免与 stage contract 真实事件 refs 分叉。这些模板不写入 stage body、不生成 receipt，也不关闭 owner-chain 或 production readiness。Production evidence tail 的 typed blocker refs 只通过 `production_tail_typed_blocker_refs` 链接到 `production_evidence_tail_workorder`，不作为 stage expected receipt / monitor freshness 成功 payload，也不阻断这些 refs 被记录为 observed。`contracts/physical_source_morphology_policy.json` 现在用 `retired_compatibility_payload_field_policy` 约束旧 `managed_runtime_compatibility_alias` 字段只能作为 forbidden payload / forbidden receipt negative-guard 字段值或 policy 自身声明值出现，且不能作为 JSON key 复活；它不是 active public alias、public action key、domain_action_adapter template、success payload field、production readiness claim 或 runtime owner。
+OPL expected receipt / monitor freshness handoff 的 forbidden payload policy 已与 RCA production acceptance 对齐：`visual truth body`、review/export verdict body、artifact blob/body、memory body、generic runtime state 和 retired managed runtime alias negative-guard field 都只能作为阻断项读取。该 handoff 只承载 body-free receipt / monitor refs；`stage_expected_receipt_payload_summary` 为 `source_intake`、`communication_strategy`、`visual_direction`、`artifact_creation`、`review_and_revision` 和 `package_and_handoff` 提供逐 stage 的 expected receipt / monitor freshness refs 模板与 typed blocker path，且逐 stage `runtime_event_refs` 从 `family_stage_control_plane.stages[*].stage_contract.runtime_event_refs` 派生，避免与 stage contract 真实事件 refs 分叉。这些模板不写入 stage body、不生成 receipt，也不关闭 owner-chain 或 production readiness。Production evidence tail 的 typed blocker refs 只通过 `production_tail_typed_blocker_refs` 链接到 `production_evidence_tail_workorder`，不作为 stage expected receipt / monitor freshness 成功 payload，也不阻断这些 refs 被记录为 observed。Retired payload-field detail 归 `contracts/physical_source_morphology_policy.json` 和 focused guard tests；status 不把字段级 policy 写成 active public alias、success payload、readiness claim 或 runtime owner。
 
-当前 naming / contract hygiene tail：
+当前 naming / contract hygiene tail 只按 SSOT 摘要读取，不在 status
+继续保存字段级 guard 清单。当前 owner 是
+`docs/active/rca-ideal-state-gap-plan.md#结构卫生尾项`、
+`docs/active/opl-private-implementation-migration-inventory.md`、
+`contracts/physical_source_morphology_policy.json`、
+`contracts/functional_privatization_audit.json`、runtime-program leaf
+contracts 和 focused guard tests。`managed`、`gateway`、`runtime`、
+`session`、`domain_action_adapter`、`bridge` 和 Hermes gateway 命令值只能在
+semantic-id、tombstone/provenance、negative guard、refs-only adapter、domain
+handler target、package/protocol boundary 或 upstream launch provenance 中出现；
+它们不能恢复成 public identity、callable alias、compatibility surface、generic
+runtime owner、success payload 或 production readiness claim。
 
-- `contracts/runtime-program/managed-product-entry-hardening.json` 是 tombstone-only / semantic-id provenance surface，仍被 current-program、session-continuity 和 provenance tests 消费。
-- `product_entry_continuation`、`get_managed_run`、retired managed supervision 与 `domain_action_adapter_dispatch.runtime_watch` 字符串只作为 retired legacy surface id、tombstone/provenance ref 或 negative dispatch input 存在。
-- `contracts/physical_source_morphology_policy.json` 现在用 `retired_legacy_surface_id_pointer_policy` 约束 retired legacy surface id 只能出现在聚合合同与 current-program leaf snapshot 的 `physical_deletion_guard.retired_legacy_surface_ids` 或 `retired_no_resurrection_guards.retired_legacy_surface_id` 位置；这些位置只表达 tombstone/provenance，不是 active callable path、retired-alias resurrection 或 production readiness claim。
-- `managed_runtime_compatibility_alias` 现在有独立 `retired_compatibility_payload_field_policy` 与 focused guard 扫描 `contracts/**/*.json`；允许位置仅限 `forbidden_payload_fields`、`forbidden_receipt_fields` 和 policy 声明的字段值，且 `retired_field_ids_as_json_keys_allowed=false`，不能回到 active payload template、success payload 或任何 object key。
-- `contracts/physical_source_morphology_policy.json` 现在有 `source_ref_integrity_gate`：`active_surface_classifications[*].source_refs` 与 `machine_boundary_refs` 必须解析到真实 repo-local path、directory 或 `#anchor`；绝对路径、`..` 父目录穿越、URI / URL ref 和无 anchor 的 machine boundary ref 都会重新打开 source hygiene gap。Focused guard 还会扫描 active code source 与 `agent/` declarative pack Markdown 中的 legacy terms，要求它们被对应 surface 的 `legacy_name_allowance` 覆盖。该 gate 只证明分类清单没有悬空路径、没有未分类 active code / pack legacy wording，不声明 source purity、visual ready 或 production evidence complete。
-- `session_store_root` / `required_session_store_root` 的 active reader-facing 字段已迁到 `session_continuity_root` / `required_session_continuity_root`；旧 `session store` 词只可留在 forbidden generic-owner role、retired semantic id、tombstone/provenance 或人读解释语境。
-- active `formal_entry.internal_surface` 口径已迁为 `domain_entry_protocol_boundary`；`@redcube/domain-entry` 包名只作为 machine-guarded package/protocol boundary 或 provenance 语境读取，不代表 gateway public identity 或 generic gateway runtime owner。
-- active runtime topology 协议字段已迁为 `domain_entry_protocol_role=visual_deliverable_domain_entry_protocol_boundary`；旧 `gateway_role` / `visual_deliverable_domain_gateway` 不再作为 active protocol 字段或值保留。
-- active product-entry manifest 的 `formal_entry.retired_internal_surface_ids` 已从裸 `gateway` 降为 `retired_gateway_protocol_boundary_public_entry`；这是 tombstone semantic id，不是 public entry、callable alias 或 compatibility surface。
-- active MCP server initialization identity 已收口为 `redcube-ai`；这只清理 reader-facing `gateway` 命名泄漏，不改变 `@redcube/domain-entry` package/protocol boundary，也不由 MCP identity 本身声明新的 production visual-stage long soak、artifact-producing owner receipt 或 visual ready/exportable/handoffable。
-- active product-entry status / manifest / CLI help 的 operator-facing OPL-hosted handoff 口径已收敛为 `framework-side handoff contract`；`bridge contract` 只允许继续作为 contracts/provenance/history 中的 bridge-exit 语境，不作为当前入口说明。
-- upstream Hermes 历史合同保留 `REDCUBE_HERMES_GATEWAY_COMMAND` 和 `hermes gateway run` 作为历史命令值 provenance；读者可见字段名已收口为 upstream launch semantics，active architecture executor chain 也已改为 service-safe domain entry 语义；guard tests 阻断新的 `*_gateway_command*` object key 或 `gateway -> ...` active route chain。
+Reader-facing active fields 已收敛到当前口径：session continuity、domain-entry
+protocol boundary、service-safe domain entry、`redcube-ai` package / skill
+identity 和 framework-side handoff contract。具体允许字段、retired legacy
+surface id pointer、compatibility payload field policy、source-ref integrity
+gate、legacy-name allowance、active source scan 和 no-resurrection guard 均归
+machine contracts 与 tests；status 只保留 current read。该 hygiene tail 证明
+命名和源码形态边界受 guard 约束，不声明 source purity、visual ready、
+exportable、handoffable、domain ready、production ready 或 production evidence
+complete。
 
 ## 当前物理源码形态收口与尾项
 
-- MCP / CLI / product-entry / domain_action_adapter / status / session wrapper 的 repo-local surface 只按 service-safe domain entry、domain handler target、operator help projection、refs-only adapter 或 migration input 分类，不是 generated CLI wrapper owner、generic workbench owner、generic session runtime owner 或 generic gateway runtime owner。OPL generated/hosted shell 是 default caller 目标；RCA 只保留 service-safe domain entry、domain handler target、receipt、typed blocker 与 visual authority refs。Default caller parity 成立后，repo-local wrapper / facade / alias / compatibility path 直接删除或只留 history/provenance。
-- `product-entry-continuity-ref-adapter` 只允许是 refs-only snapshot/ref adapter；active manifest / artifact locator / behavior contract 已使用 `session_continuity_root` 命名承认它是 continuity root，不是 generic session store owner；`product_entry_continuity_refs_adapter` 仅保留为当前机器合同 semantic id，剩余动作是随着 OPL generic session shell 默认化继续收薄 RCA refs adapter。
-- workspace/run helpers、runtimeWatch、operator evidence、stability projection 和 domain handler guarded actions 只允许输出 refs、receipt、typed blocker、no-regression evidence 或 visual action metadata；OPL generic boundary projection 当前集中在 `domain-action-adapter-parts/opl-generic-boundaries.ts`，domain handler export projection 当前集中在 `domain-action-adapter-parts/domain_action_adapter-export-projection.ts` 作为内部 migration/provenance implementation refs，operator evidence accounting 当前集中在 `get-product-entry-manifest-parts/operator-evidence-refs.ts` 与 `operator-evidence-readiness.ts`。这些都是 refs-only consumer projection / migration input，不是 RCA-owned platform runtime。`WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY`、`RUN_LOCATOR_ENVELOPE_BOUNDARY`、`RUNTIME_WATCH_BOUNDARY` 是审计这些路径的当前 contract anchors，不得扩展成 generic attempt ledger、supervisor、review/repair transport 或 workbench。
-- `visual_authority_functions` 的 source refs 已从 broad `packages/redcube-runtime/src/` 收窄到实际 visual authority / source truth / executor routing files、Python native helper package 和 native-helper catalog；`product-entry-continuity-ref-adapter` 归 `product_entry_continuity_refs_adapter`，不再被 visual authority 分类隐式覆盖。
-- Large-surface scan 结论记录在 `privatized_functional_module_audit.fresh_large_private_surface_scan`：tracked code file 没有超过 `1500` 行；超过默认 `1000` 行预算的文件应进入 explicit reviewed line-budget baseline 并被锁定不能继续增长。`scripts/line-budget.ts` 是唯一 authoritative line-budget gate；`npm run line-budget`、`npm run test:line-budget` 和 `scripts/verify.sh line-budget` 都只委托该入口。Line budget 默认只作 advisory 报告，不阻断 ordinary development；硬 enforcement 属于显式 strict / daily structure maintenance，通过 `scripts/verify.sh line-budget-strict`、`scripts/verify.sh structure-strict`、`npm run line-budget:strict` 或 `OPL_LINE_BUDGET_STRICT=1` 触发。候选文件的保留理由、OPL 应接管的 generic shell 和迁移门以 machine-readable inventory 为准；status 不保存 scan 明细。
-- `runtime`、`gateway`、`domain_action_adapter`、`managed`、`session` 等历史词继续出现时，必须有 `legacy_name_allowance` 机器解释，且只能落在 provenance、retired guard、domain adapter、refs-only read-model、package/protocol boundary、machine contract ref、semantic id、visual authority/native helper path 或 locator protocol boundary；新增 active caller 不增加兼容别名。
-- 只保护旧 managed/gateway/runtime/session path 的测试应删除或改写为 current contract、no-resurrection、fail-closed negative input、owner receipt、typed blocker 或 tombstone semantics；不维护旧 public path 兼容。
+RCA repo-local product / session / `domain_action_adapter` / `runtimeWatch` /
+operator projection / route-run record surfaces 只按 service-safe domain entry、
+domain handler target、operator help projection、refs-only adapter、native helper
+implementation 或 migration input 分类；OPL generated/hosted shell 是 default
+caller 目标。Path-level active caller、source split、large-surface scan、line
+budget posture、legacy-name allowance 和 per-surface cutover gate 的 SSOT 是
+私有实现迁移台账、`contracts/private_functional_surface_policy.json`、
+`contracts/physical_source_morphology_policy.json`、source/tests 和 runtime
+evidence。Default caller parity、no-active-caller、RCA owner receipt / typed
+blocker roundtrip、no-forbidden-write proof 与 tombstone/provenance pointer
+同时成立后，repo-local wrapper、facade、alias、compatibility path 和只保护旧
+public path 的测试直接删除或 tombstone，不新增兼容面。
 
 ## 当前保留的 visual authority surfaces
 
