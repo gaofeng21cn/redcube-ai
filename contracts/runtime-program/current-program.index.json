@@ -244,7 +244,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/bridge_exit_gate",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/bridge_exit_gate.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 59
+      "line_count": 121
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/classification_values",
@@ -298,13 +298,13 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/0",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0000.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/1",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0001.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/10",
@@ -322,49 +322,49 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/2",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0002.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/3",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0003.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/4",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0004.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 128
+      "line_count": 225
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/5",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0005.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/6",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0006.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0007.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 138
+      "line_count": 233
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0008.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 145
+      "line_count": 242
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/modules/9",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/modules/0009.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/must_not_retire",
@@ -400,7 +400,7 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 27
+      "line_count": 123
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/projection_mode",
@@ -754,7 +754,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/bridge_exit_gate",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/bridge_exit_gate.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 59
+      "line_count": 121
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/classification_values",
@@ -808,13 +808,13 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/0",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0000.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/1",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0001.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/10",
@@ -832,49 +832,49 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/2",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0002.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/3",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0003.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/4",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0004.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 128
+      "line_count": 225
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/5",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0005.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/6",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0006.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0007.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 138
+      "line_count": 233
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0008.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 145
+      "line_count": 242
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/modules/9",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/modules/0009.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/must_not_retire",
@@ -910,7 +910,7 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 27
+      "line_count": 123
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/projection_mode",
@@ -1165,10 +1165,40 @@
       "line_count": 19
     },
     {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/audit_scope",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/audit_scope.json",
+      "role": "current_program_leaf_source",
+      "line_count": 14
+    },
+    {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/authority_boundary",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/authority_boundary.json",
       "role": "current_program_leaf_source",
       "line_count": 7
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/bridge_exit_gate",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/bridge_exit_gate.json",
+      "role": "current_program_leaf_source",
+      "line_count": 121
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/classification_values",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/classification_values.json",
+      "role": "current_program_leaf_source",
+      "line_count": 7
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/consumer",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/consumer.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/contract_ref",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/contract_ref.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/domain_id",
@@ -1177,16 +1207,142 @@
       "line_count": 1
     },
     {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/forbidden_generic_owner_flags",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/forbidden_generic_owner_flags.json",
+      "role": "current_program_leaf_source",
+      "line_count": 10
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/fresh_large_private_surface_scan",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/fresh_large_private_surface_scan.json",
+      "role": "current_program_leaf_source",
+      "line_count": 71
+    },
+    {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/functional_structure_gap_closure",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/functional_structure_gap_closure.json",
       "role": "current_program_leaf_source",
       "line_count": 46
     },
     {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/generated_interface_consumption.json",
+      "role": "current_program_leaf_source",
+      "line_count": 108
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption_ref",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/generated_interface_consumption_ref.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/0",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0000.json",
+      "role": "current_program_leaf_source",
+      "line_count": 228
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/1",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0001.json",
+      "role": "current_program_leaf_source",
+      "line_count": 224
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/10",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0010.json",
+      "role": "current_program_leaf_source",
+      "line_count": 97
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/11",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0011.json",
+      "role": "current_program_leaf_source",
+      "line_count": 505
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/2",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0002.json",
+      "role": "current_program_leaf_source",
+      "line_count": 223
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/3",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0003.json",
+      "role": "current_program_leaf_source",
+      "line_count": 224
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/4",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0004.json",
+      "role": "current_program_leaf_source",
+      "line_count": 225
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/5",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0005.json",
+      "role": "current_program_leaf_source",
+      "line_count": 223
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/6",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0006.json",
+      "role": "current_program_leaf_source",
+      "line_count": 228
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/7",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0007.json",
+      "role": "current_program_leaf_source",
+      "line_count": 233
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/8",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0008.json",
+      "role": "current_program_leaf_source",
+      "line_count": 242
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/modules/9",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/modules/0009.json",
+      "role": "current_program_leaf_source",
+      "line_count": 224
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/must_not_retire",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/must_not_retire.json",
+      "role": "current_program_leaf_source",
+      "line_count": 7
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/non_adapter_classification_values",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/non_adapter_classification_values.json",
+      "role": "current_program_leaf_source",
+      "line_count": 3
+    },
+    {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
       "line_count": 108
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_owned_generic_primitives",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/opl_owned_generic_primitives.json",
+      "role": "current_program_leaf_source",
+      "line_count": 33
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/owner",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/owner.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/physical_deletion_guard",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/physical_deletion_guard.json",
+      "role": "current_program_leaf_source",
+      "line_count": 123
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/audit_scope",
@@ -1204,7 +1360,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/bridge_exit_gate",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/bridge_exit_gate.json",
       "role": "current_program_leaf_source",
-      "line_count": 59
+      "line_count": 121
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/classification_values",
@@ -1258,13 +1414,13 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0000.json",
       "role": "current_program_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/1",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0001.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/10",
@@ -1282,49 +1438,49 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/2",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0002.json",
       "role": "current_program_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/3",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0003.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/4",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0004.json",
       "role": "current_program_leaf_source",
-      "line_count": 128
+      "line_count": 225
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/5",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0005.json",
       "role": "current_program_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/6",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0006.json",
       "role": "current_program_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0007.json",
       "role": "current_program_leaf_source",
-      "line_count": 138
+      "line_count": 233
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0008.json",
       "role": "current_program_leaf_source",
-      "line_count": 145
+      "line_count": 242
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/9",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules/0009.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/must_not_retire",
@@ -1360,7 +1516,7 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "current_program_leaf_source",
-      "line_count": 27
+      "line_count": 123
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/projection_mode",
@@ -1429,8 +1585,68 @@
       "line_count": 1
     },
     {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/projection_mode",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/projection_mode.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/protected_rca_surfaces",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/protected_rca_surfaces.json",
+      "role": "current_program_leaf_source",
+      "line_count": 10
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/rca_retained_authority",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/rca_retained_authority.json",
+      "role": "current_program_leaf_source",
+      "line_count": 10
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/rca_visual_authority_allowlist",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/rca_visual_authority_allowlist.json",
+      "role": "current_program_leaf_source",
+      "line_count": 9
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/read_only",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/read_only.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/ref",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/ref.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/refs_only",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/refs_only.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/replacement_expectation_mode",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/replacement_expectation_mode.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/retired_no_resurrection_guards",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/retired_no_resurrection_guards.json",
+      "role": "current_program_leaf_source",
+      "line_count": 62
+    },
+    {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/schema_version",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/schema_version.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/status",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/status.json",
       "role": "current_program_leaf_source",
       "line_count": 1
     },
@@ -1443,6 +1659,12 @@
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/target_domain_id",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/target_domain_id.json",
+      "role": "current_program_leaf_source",
+      "line_count": 1
+    },
+    {
+      "json_pointer": "/product_release_metadata/functional_privatization_audit/visual_pack_compiler_handoff_ref",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/visual_pack_compiler_handoff_ref.json",
       "role": "current_program_leaf_source",
       "line_count": 1
     },
@@ -1504,7 +1726,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/bridge_exit_gate",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/bridge_exit_gate.json",
       "role": "current_program_leaf_source",
-      "line_count": 59
+      "line_count": 121
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/classification_values",
@@ -1558,13 +1780,13 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/0",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0000.json",
       "role": "current_program_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/1",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0001.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/10",
@@ -1582,49 +1804,49 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/2",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0002.json",
       "role": "current_program_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/3",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0003.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/4",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0004.json",
       "role": "current_program_leaf_source",
-      "line_count": 128
+      "line_count": 225
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/5",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0005.json",
       "role": "current_program_leaf_source",
-      "line_count": 126
+      "line_count": 223
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/6",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0006.json",
       "role": "current_program_leaf_source",
-      "line_count": 131
+      "line_count": 228
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/7",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0007.json",
       "role": "current_program_leaf_source",
-      "line_count": 138
+      "line_count": 233
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/8",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0008.json",
       "role": "current_program_leaf_source",
-      "line_count": 145
+      "line_count": 242
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/modules/9",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/modules/0009.json",
       "role": "current_program_leaf_source",
-      "line_count": 127
+      "line_count": 224
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/must_not_retire",
@@ -1660,7 +1882,7 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/physical_deletion_guard",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/physical_deletion_guard.json",
       "role": "current_program_leaf_source",
-      "line_count": 27
+      "line_count": 123
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/projection_mode",

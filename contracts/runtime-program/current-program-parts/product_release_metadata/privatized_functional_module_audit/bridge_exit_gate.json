@@ -55,5 +55,67 @@
     "opl_hosted_controlled_visual_stage_long_soak",
     "real_memory_lifecycle_receipt_instances",
     "cross_family_repeated_no_regression_evidence"
-  ]
+  ],
+  "owner_evidence_lane": {
+    "surface_kind": "rca_private_platform_retirement_owner_evidence_lane",
+    "lane_id": "rca.private_platform_retirement.all-retained-private-platform-residue.owner_evidence.v1",
+    "owner": "redcube_ai",
+    "consumer": "opl",
+    "state": "active_contract",
+    "evidence_scope": "owner_native_refs_only_no_physical_delete_authorization",
+    "decision": "retained_private_platform_residue_classified_by_owner_refs",
+    "physical_delete_authorization_ref": null,
+    "physical_delete_authorization_refs": [],
+    "keep_as_authority_adapter_ref": null,
+    "keep_as_authority_adapter_refs": [
+      "rca-keep-authority-adapter:private-platform-retirement:product-entry-continuity-refs-adapter",
+      "rca-keep-authority-adapter:private-platform-retirement:workspace-source-intake",
+      "rca-keep-authority-adapter:private-platform-retirement:memory-writeback-receipt-transport",
+      "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle",
+      "rca-keep-authority-adapter:private-platform-retirement:review-repair-transport",
+      "rca-keep-authority-adapter:private-platform-retirement:native-helper-envelope",
+      "rca-keep-authority-adapter:private-platform-retirement:operator-projection-shell",
+      "rca-keep-authority-adapter:private-platform-retirement:generic-cli-mcp-wrappers",
+      "rca-keep-authority-adapter:private-platform-retirement:codex-executor-adapter",
+      "rca-keep-authority-adapter:private-platform-retirement:observability-stability-read-model"
+    ],
+    "typed_blocker_ref": null,
+    "typed_blocker_refs": [
+      "rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:workspace-source-intake:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:memory-writeback-receipt-transport:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:review-repair-transport:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:native-helper-envelope:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:operator-projection-shell:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:generic-cli-mcp-wrappers:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:codex-executor-adapter:physical-delete-requires-explicit-owner-receipt",
+      "rca-typed-blocker:private-platform-retirement:observability-stability-read-model:physical-delete-requires-explicit-owner-receipt"
+    ],
+    "memory_artifact_lifecycle_receipt_ref": "contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs",
+    "memory_artifact_lifecycle_receipt_refs": [
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+      "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+      "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+      "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+      "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+    ],
+    "source_contract_refs": {
+      "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+      "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
+      "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
+    },
+    "authority_boundary": {
+      "owner_can_authorize_physical_delete": true,
+      "physical_delete_authorized_now": false,
+      "opl_projection_can_authorize_physical_delete": false,
+      "open_count_zero_can_authorize_physical_delete": false,
+      "opl_can_store_refs": true,
+      "opl_can_write_visual_truth": false,
+      "opl_can_write_artifact_body": false,
+      "opl_can_write_memory_body": false,
+      "opl_can_issue_rca_owner_receipt": false,
+      "opl_can_create_rca_typed_blocker": false
+    }
+  }
 }

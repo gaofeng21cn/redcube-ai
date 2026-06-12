@@ -73,6 +73,7 @@
     "opl_can_issue_owner_receipt": false,
     "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
     "typed_blocker_refs": [
+      "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
       "typed-blocker:rca/default-caller-deletion/artifact_export_lifecycle/physical-delete-requires-explicit-owner-receipt"
     ],
     "no_forbidden_write_refs": [
@@ -82,7 +83,55 @@
       "no-forbidden-write:rca/default-caller-deletion/artifact_export_lifecycle/refs-only-boundary"
     ],
     "domain_repo_physical_delete_authorized": false,
-    "physical_delete_authorized_by_refs": false
+    "physical_delete_authorized_by_refs": false,
+    "physical_delete_authorization_ref": null,
+    "keep_as_authority_adapter_ref": "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle",
+    "typed_blocker_ref": "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
+    "memory_artifact_lifecycle_receipt_ref": "contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs",
+    "owner_evidence_lane": {
+      "surface_kind": "rca_private_platform_retirement_owner_evidence_lane",
+      "lane_id": "rca.private_platform_retirement.artifact-export-lifecycle.owner_evidence.v1",
+      "owner": "redcube_ai",
+      "consumer": "opl",
+      "state": "active_contract",
+      "evidence_scope": "owner_native_refs_only_no_physical_delete_authorization",
+      "decision": "keep_as_authority_adapter_or_blocked_pending_explicit_owner_delete_receipt",
+      "physical_delete_authorization_ref": null,
+      "physical_delete_authorization_refs": [],
+      "keep_as_authority_adapter_ref": "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle",
+      "keep_as_authority_adapter_refs": [
+        "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle"
+      ],
+      "typed_blocker_ref": "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
+      "typed_blocker_refs": [
+        "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt"
+      ],
+      "memory_artifact_lifecycle_receipt_ref": "contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs",
+      "memory_artifact_lifecycle_receipt_refs": [
+        "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+        "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+        "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+        "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+        "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+      ],
+      "source_contract_refs": {
+        "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+        "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
+        "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
+      },
+      "authority_boundary": {
+        "owner_can_authorize_physical_delete": true,
+        "physical_delete_authorized_now": false,
+        "opl_projection_can_authorize_physical_delete": false,
+        "open_count_zero_can_authorize_physical_delete": false,
+        "opl_can_store_refs": true,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_artifact_body": false,
+        "opl_can_write_memory_body": false,
+        "opl_can_issue_rca_owner_receipt": false,
+        "opl_can_create_rca_typed_blocker": false
+      }
+    }
   },
   "current_surface_refs": [
     "/artifact_locator_contract"
@@ -109,7 +158,55 @@
     "required_before_delete": [
       "domain_authority_refs_preserved",
       "no_regression_proof_recorded"
-    ]
+    ],
+    "physical_delete_authorization_ref": null,
+    "keep_as_authority_adapter_ref": "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle",
+    "typed_blocker_ref": "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
+    "memory_artifact_lifecycle_receipt_ref": "contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs",
+    "owner_evidence_lane": {
+      "surface_kind": "rca_private_platform_retirement_owner_evidence_lane",
+      "lane_id": "rca.private_platform_retirement.artifact-export-lifecycle.owner_evidence.v1",
+      "owner": "redcube_ai",
+      "consumer": "opl",
+      "state": "active_contract",
+      "evidence_scope": "owner_native_refs_only_no_physical_delete_authorization",
+      "decision": "keep_as_authority_adapter_or_blocked_pending_explicit_owner_delete_receipt",
+      "physical_delete_authorization_ref": null,
+      "physical_delete_authorization_refs": [],
+      "keep_as_authority_adapter_ref": "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle",
+      "keep_as_authority_adapter_refs": [
+        "rca-keep-authority-adapter:private-platform-retirement:artifact-export-lifecycle"
+      ],
+      "typed_blocker_ref": "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt",
+      "typed_blocker_refs": [
+        "rca-typed-blocker:private-platform-retirement:artifact-export-lifecycle:physical-delete-requires-explicit-owner-receipt"
+      ],
+      "memory_artifact_lifecycle_receipt_ref": "contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs",
+      "memory_artifact_lifecycle_receipt_refs": [
+        "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
+        "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected",
+        "rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup",
+        "rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore",
+        "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
+      ],
+      "source_contract_refs": {
+        "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+        "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
+        "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
+      },
+      "authority_boundary": {
+        "owner_can_authorize_physical_delete": true,
+        "physical_delete_authorized_now": false,
+        "opl_projection_can_authorize_physical_delete": false,
+        "open_count_zero_can_authorize_physical_delete": false,
+        "opl_can_store_refs": true,
+        "opl_can_write_visual_truth": false,
+        "opl_can_write_artifact_body": false,
+        "opl_can_write_memory_body": false,
+        "opl_can_issue_rca_owner_receipt": false,
+        "opl_can_create_rca_typed_blocker": false
+      }
+    }
   },
   "rca_retains": [
     "canonical_artifact_authority",

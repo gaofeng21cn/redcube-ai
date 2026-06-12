@@ -2,7 +2,9 @@
 
 import {
   FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS,
+  RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS,
   RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
+  buildPrivatePlatformRetirementOwnerEvidenceLane,
   buildBridgeExitGate,
   buildFunctionalModulePhysicalDeletionGuard,
   buildPrivateGenericResidueBridgeExitGate,
@@ -606,6 +608,15 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       deletion_status: 'legacy_runtime_physical_cleanup_closed',
       remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
       required_before_remaining_physical_delete: [],
+      physical_delete_authorization_ref: null,
+      physical_delete_authorization_refs: [],
+      keep_as_authority_adapter_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) =>
+        `rca-keep-authority-adapter:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}`),
+      typed_blocker_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) =>
+        `rca-typed-blocker:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`),
+      memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
+      memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
+      owner_evidence_lane: buildPrivatePlatformRetirementOwnerEvidenceLane(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     },
     fresh_large_private_surface_scan: RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN,
     bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),

@@ -32,6 +32,13 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     codex_executor_adapter: 'opl_agent_executor_adapter',
     observability_stability_read_model: 'opl_stability_read_model_and_observability_export',
   };
+  const expectedMemoryArtifactLifecycleReceiptRefs = [
+    'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted',
+    'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected',
+    'rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup',
+    'rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore',
+    'rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention',
+  ];
 
   for (const surface of surfaces) {
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
@@ -49,6 +56,51 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     assert.equal(
       surface.physical_deletion_guard.surface_id_policy,
       'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
+    );
+    assert.equal(surface.physical_deletion_guard.physical_delete_authorization_ref, null);
+    assert.deepEqual(surface.physical_deletion_guard.physical_delete_authorization_refs, []);
+    assert.equal(
+      surface.physical_deletion_guard.keep_as_authority_adapter_refs.length,
+      surface.modules.length - 2,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.typed_blocker_refs.length,
+      surface.modules.length - 2,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.typed_blocker_refs.every((ref) =>
+        ref.startsWith('rca-typed-blocker:private-platform-retirement:')
+        && ref.endsWith(':physical-delete-requires-explicit-owner-receipt')),
+      true,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.memory_artifact_lifecycle_receipt_ref,
+      'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
+    );
+    assert.deepEqual(
+      surface.physical_deletion_guard.memory_artifact_lifecycle_receipt_refs,
+      expectedMemoryArtifactLifecycleReceiptRefs,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.owner_evidence_lane.surface_kind,
+      'rca_private_platform_retirement_owner_evidence_lane',
+    );
+    assert.equal(
+      surface.physical_deletion_guard.owner_evidence_lane.evidence_scope,
+      'owner_native_refs_only_no_physical_delete_authorization',
+    );
+    assert.deepEqual(surface.physical_deletion_guard.owner_evidence_lane.physical_delete_authorization_refs, []);
+    assert.deepEqual(
+      surface.physical_deletion_guard.owner_evidence_lane.memory_artifact_lifecycle_receipt_refs,
+      expectedMemoryArtifactLifecycleReceiptRefs,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.owner_evidence_lane.authority_boundary.opl_projection_can_authorize_physical_delete,
+      false,
+    );
+    assert.equal(
+      surface.physical_deletion_guard.owner_evidence_lane.authority_boundary.open_count_zero_can_authorize_physical_delete,
+      false,
     );
     assert.equal(surface.physical_deletion_guard.retired_legacy_surface_ids.length, 8);
     assert.equal(
@@ -156,6 +208,48 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
         ], entry.module_id);
+        assert.equal(entry.physical_deletion_guard.physical_delete_authorization_ref, null, entry.module_id);
+        assert.equal(
+          entry.physical_deletion_guard.keep_as_authority_adapter_ref,
+          `rca-keep-authority-adapter:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}`,
+          entry.module_id,
+        );
+        assert.equal(
+          entry.physical_deletion_guard.typed_blocker_ref,
+          `rca-typed-blocker:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`,
+          entry.module_id,
+        );
+        assert.equal(
+          entry.physical_deletion_guard.memory_artifact_lifecycle_receipt_ref,
+          'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
+          entry.module_id,
+        );
+        assert.deepEqual(
+          entry.physical_deletion_guard.owner_evidence_lane.memory_artifact_lifecycle_receipt_refs,
+          expectedMemoryArtifactLifecycleReceiptRefs,
+          entry.module_id,
+        );
+        assert.equal(entry.bridge_exit_gate.physical_delete_authorization_ref, null, entry.module_id);
+        assert.equal(
+          entry.bridge_exit_gate.keep_as_authority_adapter_ref,
+          entry.physical_deletion_guard.keep_as_authority_adapter_ref,
+          entry.module_id,
+        );
+        assert.equal(
+          entry.bridge_exit_gate.typed_blocker_ref,
+          entry.physical_deletion_guard.typed_blocker_ref,
+          entry.module_id,
+        );
+        assert.equal(
+          entry.bridge_exit_gate.owner_evidence_lane.authority_boundary.opl_projection_can_authorize_physical_delete,
+          false,
+          entry.module_id,
+        );
+        assert.equal(
+          entry.bridge_exit_gate.owner_evidence_lane.authority_boundary.open_count_zero_can_authorize_physical_delete,
+          false,
+          entry.module_id,
+        );
       }
       assert.equal(entry.declares_production_soak_complete, false, entry.module_id);
     }

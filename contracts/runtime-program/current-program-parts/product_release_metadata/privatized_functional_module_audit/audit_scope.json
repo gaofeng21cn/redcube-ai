@@ -8,7 +8,7 @@
   "native helper envelope",
   "operator projection shell",
   "generic CLI/MCP wrappers",
-  "generated CLI/MCP/product-entry/domain_action_adapter descriptor/status/session/workbench wrappers with RCA domain-handler targets",
+  "generated CLI/MCP/product-entry/domain_handler descriptor/status/session/workbench wrappers with RCA domain-handler targets",
   "Codex executor adapter",
   "observability/stability read model"
 ]
