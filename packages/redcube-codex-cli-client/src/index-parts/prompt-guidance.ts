@@ -13,7 +13,7 @@ import {
 } from './constants.js';
 import { compactStringArray, safeText } from './shared.js';
 
-export function readPromptGuidance(relativePath) {
+function readPromptGuidance(relativePath) {
   const absolutePath = path.join(REPO_ROOT, relativePath);
   if (!existsSync(absolutePath)) {
     throw new Error(`Missing prompt pack asset: ${relativePath}`);
@@ -47,7 +47,7 @@ export function extractMarkedJson(text) {
   }
 }
 
-export function normalizeLocalFileInspection(value) {
+function normalizeLocalFileInspection(value) {
   return (Array.isArray(value) ? value : [])
     .map((entry) => ({
       label: safeText(entry?.label, 'local-file'),
@@ -65,7 +65,7 @@ export function buildPromptFiles(promptRelativePath, localFileInspection = []) {
   ]);
 }
 
-export function buildLocalFileInspectionSection(localFileInspection = []) {
+function buildLocalFileInspectionSection(localFileInspection = []) {
   const entries = normalizeLocalFileInspection(localFileInspection);
   if (entries.length === 0) {
     return '';

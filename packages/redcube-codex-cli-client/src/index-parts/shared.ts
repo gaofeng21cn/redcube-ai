@@ -16,7 +16,7 @@ export function optionalText(value) {
   return text || null;
 }
 
-export async function readJsonResponse(response) {
+async function readJsonResponse(response) {
   const text = await response.text();
   if (!text.trim()) {
     return {};

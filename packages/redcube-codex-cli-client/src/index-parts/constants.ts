@@ -8,7 +8,7 @@ export const REDCUBE_CREATIVE_GENERATION_META_END = 'REDCUBE_CREATIVE_GENERATION
 export const REDCUBE_STAGE_JSON_BEGIN = 'REDCUBE_STAGE_JSON_BEGIN';
 export const REDCUBE_STAGE_JSON_END = 'REDCUBE_STAGE_JSON_END';
 
-export const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
 export const DEFAULT_CODEX_COMMAND = Object.freeze(['codex']);
 export const DEFAULT_CODEX_SANDBOX = 'workspace-write';
