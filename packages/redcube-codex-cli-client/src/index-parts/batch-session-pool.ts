@@ -5,7 +5,7 @@ import { REDCUBE_CODEX_RUNTIME_OWNER } from './constants.js';
 import { readCodexCliContract } from './command-process.js';
 import { safeText } from './shared.js';
 
-export function normalizeSessionPoolDescriptor(sessionPool = {}) {
+function normalizeSessionPoolDescriptor(sessionPool = {}) {
   const descriptorId = safeText(sessionPool?.descriptor_id, `codex_batch_${randomUUID()}`);
   const reuseStrategy = safeText(sessionPool?.reuse_strategy, 'same_session_if_supported');
   return {
@@ -18,14 +18,14 @@ export function normalizeSessionPoolDescriptor(sessionPool = {}) {
   };
 }
 
-export function stageIdForBatchStage(stage, index) {
+function stageIdForBatchStage(stage, index) {
   if (typeof stage === 'function') {
     return safeText(stage.stage_id, `stage_${index + 1}`);
   }
   return safeText(stage?.stage_id, `stage_${index + 1}`);
 }
 
-export function normalizeBatchStages(stages) {
+function normalizeBatchStages(stages) {
   if (!Array.isArray(stages) || stages.length === 0) {
     throw new Error('stages 必须是非空数组');
   }

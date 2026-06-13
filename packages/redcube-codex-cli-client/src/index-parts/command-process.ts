@@ -89,7 +89,7 @@ function reapTimedOutCodexExecutors(parentPid) {
   }
 }
 
-export function parseCodexCommand(value, env = process.env) {
+function parseCodexCommand(value, env = process.env) {
   const raw = String(value || '').trim();
   if (!raw) {
     const canonicalCommand = path.join(optionalText(env.HOME) || os.homedir(), 'bin', 'codex-canonical');
@@ -110,7 +110,7 @@ export function parseCodexCommand(value, env = process.env) {
   return [raw];
 }
 
-export function buildBlockedResult({
+function buildBlockedResult({
   contract,
   steps,
   errorKind,
@@ -145,7 +145,7 @@ export function readCodexCliContract(env = process.env) {
   };
 }
 
-export function buildCodexExecArgs({ contract, cwd, lastMessageFile }) {
+function buildCodexExecArgs({ contract, cwd, lastMessageFile }) {
   const args = [
     'exec',
     '--json',
