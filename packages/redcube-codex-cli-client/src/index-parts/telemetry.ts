@@ -9,11 +9,11 @@ export function terminalUsage(events = []) {
   return terminalEvent?.usage || null;
 }
 
-export function byteLength(text) {
+function byteLength(text) {
   return Buffer.byteLength(String(text || ''), 'utf-8');
 }
 
-export function usageNumber(usage, ...keys) {
+function usageNumber(usage, ...keys) {
   for (const key of keys) {
     const value = usage?.[key];
     if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -21,7 +21,7 @@ export function usageNumber(usage, ...keys) {
   return null;
 }
 
-export function mergeSlideScope(left = {}, right = {}) {
+function mergeSlideScope(left = {}, right = {}) {
   return {
     slide_ids: compactStringArray([...(left.slide_ids || []), ...(right.slide_ids || [])]),
     target_slide_ids: compactStringArray([...(left.target_slide_ids || []), ...(right.target_slide_ids || [])]),
@@ -30,7 +30,7 @@ export function mergeSlideScope(left = {}, right = {}) {
   };
 }
 
-export function collectSlideScope(value, scope = {
+function collectSlideScope(value, scope = {
   slide_ids: [],
   target_slide_ids: [],
   reviewed_slide_ids: [],

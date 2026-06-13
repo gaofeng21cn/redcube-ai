@@ -21,7 +21,7 @@ function ensureTempDir() {
   return dir;
 }
 
-export function killCodexChildProcessTree(child) {
+function killCodexChildProcessTree(child) {
   if (!child) return;
   const pid = Number(child.pid || 0);
   if (process.platform !== 'win32' && pid > 0) {
@@ -171,7 +171,7 @@ function buildCodexExecArgs({ contract, cwd, lastMessageFile }) {
   return args;
 }
 
-export function parseCodexEvents(stdout) {
+function parseCodexEvents(stdout) {
   return String(stdout || '')
     .split('\n')
     .map((line) => line.trim())
@@ -186,7 +186,7 @@ export function parseCodexEvents(stdout) {
     .filter(Boolean);
 }
 
-export function buildCodexRunMetadata({ runId, result, lastMessageFile }) {
+function buildCodexRunMetadata({ runId, result, lastMessageFile }) {
   return {
     run_id: runId,
     session_id: runId,
