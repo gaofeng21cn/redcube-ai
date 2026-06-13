@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "entry": [
+    "scripts/install-codex-plugin.ts",
+    "scripts/materialize-rca-workspace-receipt-scaleout-evidence.ts",
+    "scripts/p19-creative-ownership-audit-lib.ts",
+    "scripts/real-route-evolution-probe-parts/terminal-evidence.ts",
+    "scripts/real-route-evolution-probe-parts/timeout-blocker.ts",
+    "scripts/run-real-route-evolution-probe.ts",
+    "tools/native-ppt-proof/build-fixture-input.mjs"
+  ]
+}
