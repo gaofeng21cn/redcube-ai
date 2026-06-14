@@ -112,15 +112,11 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 <details>
   <summary><strong>技术层 OPL / executor 边界</strong></summary>
 
-- `OPL` 是 stage-led 的完整智能体运行框架，可以把 RedCube 作为外部领域智能体托管；这条路径是内部集成 / 托管运行路径，不是 RedCube 的对外第一身份。
-- OPL/Temporal 托管运行是标准默认口径：任务启动后由 OPL/Temporal 负责持久在线调度、唤醒、retry/dead-letter 与 resume；RCA 不内置 daemon、scheduler 或 attempt loop。
-- Agent executor 是最小具体执行单位；当前第一公民 stage executor 是 `Codex CLI`，其他 executor / proof adapter 必须显式选择。
-- Hermes-Agent 等其他 executor 是 opt-in adapter。RedCube 对这些 adapter 只承诺接入、生命周期、回执和审计面成立，不默认承诺行为或输出质量与 Codex CLI 等价。
-- 直达路径和 OPL 托管路径都必须收敛到同一个下游 RedCube 领域智能体入口（`invokeDomainEntry` service-safe surface）。
-- RCA stage pack 给 executor 提供目标、上下文、authority boundary、skill、knowledge refs、tool affordance 和 visual quality gate；route 只管理 owner、恢复和证据边界，不预先规定视觉创作策略。
-- RCA 工具目录是 affordance catalog，不是 workflow script。RCA 只声明视觉工具、native helper、渲染、修复和导出能力的边界；executor 可以在 stage attempt 内自主选择、组合、跳过、替代或追问。
-- visual StageRun canary 由 controlled fixture 固定：视觉方向候选 -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt 或 typed blocker。它的 operator summary 只跟随 stage、manifest、current pointer、role artifact 和 closeout refs。渲染和工具 refs 只支撑本次 attempt，legacy runtime residue 也被 guard 防止重新成为 active runtime owner；这些 surface 都不能升级成硬编码 workflow、visual readiness verdict、export claim、production claim 或 live-progress claim。
-- RedCube 持有视觉交付阶段包、提示词、技能、审阅门、视觉领域真相、标准产物和导出权威。OPL 可以提供排队、唤醒、交接、回执、重试 / 死信和投影支撑，但不会成为视觉领域大脑或产物所有者。
+- `OPL` 可以把 RedCube 作为外部领域智能体托管；这条 hosted path 是内部集成面，不是 RedCube 的对外第一身份。
+- 任务启动后，OPL/Temporal 可以负责持久在线调度、唤醒、retry/dead-letter 与 resume；RCA 不内置 daemon、scheduler 或 attempt loop。
+- `Codex CLI` 是当前第一公民 executor；Hermes-Agent、Claude Code 等其他 executor 是显式 opt-in adapter，必须产出可审计回执。
+- RedCube 保留视觉交付权威：视觉领域真相、review/export gates、标准产物、文件交接和 owner receipts。
+- 完整入口 taxonomy、service-safe domain entry、generated-wrapper 边界、合同 refs、canary evidence 和 no-readiness 规则由 [文档索引](./docs/README.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 和 [合同说明](./contracts/README.md) 维护。
 
 </details>
 
@@ -135,16 +131,12 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 <details>
   <summary><strong>如果你准备把这个仓直接交给 Codex 或其他 Agent，先看这里</strong></summary>
 
-- 不会自动安装。单独 clone 这个仓不会把 OPL Framework 或托管运行时一起装好。要把 RedCube 用到能用，先准备好当前的 `one-person-lab` checkout 或 release bundle，然后再用单一 `redcube-ai` 应用技能和仓内的 `redcube product invoke` 入口，或下面的 CLI 命令。
-- 先读 [文档索引](./docs/README.md)。这里已经说明 RedCube 直达路径、OPL 托管集成路径、稳定能力面，以及当前技术基线。
-- 然后读 [合同说明](./contracts/README.md)，再读 [项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)，再决定是否调整入口 wording 或集成表述。
-- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 built on OPL Framework 的 OPL-compatible package；它发布一个 app skill、一个 service-safe domain entry、product domain_handler/projection refs 和 stage-control projection metadata，同时把 domain truth 留在 RCA。
-- 当前已验证的公开入口面是单一 `redcube-ai` 应用技能、`CLI` 和 `MCP`，`controller` 继续只是内部控制面；再加上 `invokeDomainEntry`、`invokeProductEntry`、本地脚本与仓库跟踪合同，就构成了稳定可调用面。OPL/Temporal 托管调度是任务启动后的默认运行口径，本地默认具体 stage executor 仍是 `Codex CLI`，非默认 executor / proof adapter 继续只在显式选择时出现。
-- RedCube 可以通过 Codex 应用技能直接调用，也可以作为外部领域智能体被 OPL 托管调用。两条路径必须回到同一套 RedCube 持有的 route、review、artifact 和 export surface。
-- Agent 应把实现面理解为 TypeScript orchestration 加 Python native helpers。仓内已跟踪 JavaScript 已退役；新的产品、测试或脚本 JavaScript 会被 closeout audit 阻断。
-- 如果外部智能体或 OPL 需要直接读取仓库跟踪的技能面，使用单一 `redcube-ai` 应用技能，并通过 `npm run --prefix <redcube-ai-repo> redcube -- ...` 启动 CLI 命令；`redcube product invoke` 是 repo-local direct product target，`domain-handler export|dispatch` 是当前 RCA active handler target；product-entry status / session / manifest wrapper 由 OPL generated/default caller 持有，不是 repo-local `redcube product` 默认命令。product-entry status surface 仍是 agent-facing overview / intake shell，不代表成熟的人用 GUI 或 WebUI；OPL 托管路径仍然只是内部集成面。
-- 测试 lane 真相放在 `scripts/test-registry.ts`，当前验证矩阵以 [当前状态](./docs/status.md) 为准。`smoke` 是最小本地入口，`fast` 是核心回归快线，hosted CI 等价于 `npm run test:ci`，`historical` 只在显式要求时运行。
-- `docs/active/` 用来读当前 baton，`docs/references/` 用来读当前支撑参考，`docs/history/` 用来读已吸收里程碑、proof 记录、tombstone 和 provenance；Agent 不需要先从零散实现文件里反推当前执行真相。
+- 单独 clone 这个仓不会安装 OPL Framework 或托管运行时。需要 hosted execution 时，先准备当前 `one-person-lab` checkout 或 release bundle。
+- 先读 [文档索引](./docs/README.md)，再读 [合同说明](./contracts/README.md)、[项目概览](./docs/project.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md) 和 [关键决策](./docs/decisions.md)。
+- 把公开 package 读作 `RedCube AI Foundry Agent`：一个 app skill 和一个 service-safe domain entry，加上 OPL-generated wrapper/projection refs，视觉领域真相继续留在 RCA。
+- RedCube direct path 与 OPL-hosted path 必须回到同一套 RedCube-owned route、review、artifact 和 export surfaces。
+- 当前 repo-local 命令、命令 target 与验证矩阵由文档索引、contracts 和 `scripts/test-registry.ts` 维护；Agent 不需要先从零散实现文件里反推当前执行真相。
+- `docs/active/` 用来读当前 baton，`docs/references/` 用来读当前支撑参考，`docs/history/` 用来读已吸收里程碑、proof 记录、tombstone 和 provenance。
 
 </details>
 

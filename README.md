@@ -112,15 +112,11 @@ You can start with prompts like:
 <details>
   <summary><strong>Technical OPL / executor boundary</strong></summary>
 
-- OPL is the stage-led agent runtime framework that can host RedCube as an external domain agent. Its path is an internal integration / hosted-runtime path, not RedCube's first public identity.
-- OPL/Temporal hosting is the standard default runtime posture: after task start, OPL/Temporal owns persistent online scheduling, wakeup, retry/dead-letter handling, and resume. RCA does not embed a daemon, scheduler, or attempt loop.
-- An Agent executor is the minimum concrete execution unit. `Codex CLI` is the current first-class stage executor; other executor or proof adapters must be selected explicitly.
-- Hermes-Agent and similar executors are opt-in adapters. RedCube only promises connection, lifecycle, receipts, and auditability for those adapters; it does not assume behavior or output quality matches Codex CLI.
-- Both direct and OPL-hosted paths converge on the same downstream RedCube domain-agent entry (`invokeDomainEntry` service-safe surface).
-- An RCA stage pack gives the executor a goal, context, authority boundary, skills, knowledge refs, tool affordances, and visual quality gate. The route manages owner, recovery, and evidence boundaries; it does not pre-script visual creation strategy.
-- RCA's tool catalog is an affordance catalog, not a workflow script. RCA declares boundaries for visual tools, native helpers, rendering, repair, and export capabilities; the executor may choose, combine, skip, replace, or ask about them inside the stage attempt.
-- The visual StageRun canary is backed by a controlled fixture: visual direction candidates -> grounded reflection -> comparative selection -> revision/evolution -> meta-review -> independent quality gate -> owner receipt or typed blocker. Its operator summary only follows stage, manifest, current pointer, role artifact, and closeout refs. Render/tool refs support that attempt, and legacy runtime residue is guarded from becoming the active runtime owner; none of these surfaces become a hardcoded workflow, visual readiness verdict, export claim, production claim, or live-progress claim.
-- RedCube owns the visual-deliverable stage pack, prompts, skills, review gates, visual-domain truth, canonical artifacts, and export authority. OPL may provide queue, wakeup, handoff, receipts, retry/dead-letter handling, and projection support, but it does not become the visual-domain brain or artifact owner.
+- OPL can host RedCube as an external domain agent, but that hosted path is an internal integration surface, not RedCube's first public identity.
+- After task start, OPL/Temporal may own persistent scheduling, wakeup, retry/dead-letter handling, and resume. RCA does not embed a daemon, scheduler, or attempt loop.
+- `Codex CLI` is the current first-class executor; Hermes-Agent, Claude Code, and similar executors are explicit opt-in adapters with auditable receipts.
+- RedCube keeps the visual-deliverable authority: visual-domain truth, review/export gates, canonical artifacts, artifact handoff, and owner receipts.
+- The full entry taxonomy, service-safe domain entry, generated-wrapper boundary, contract refs, canary evidence, and no-readiness rules are maintained in the [Docs Guide](./docs/README.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 
 </details>
 
@@ -135,16 +131,12 @@ You can start with prompts like:
 <details>
   <summary><strong>Start here if you are handing this repo to Codex or another agent</strong></summary>
 
-- No. Cloning this repo does not auto-install OPL Framework or the hosted runtime. To make RedCube usable, first make the current `one-person-lab` checkout or release bundle available, then use the single `redcube-ai` app skill and the repo-local `redcube product invoke` target or the CLI-backed command shown below.
-- Read the [Docs Guide](./docs/README.md) first. It explains the direct RedCube route, the OPL-hosted integration path, the stable capability surface, and the current technical baseline.
-- Then read [Contracts Overview](./contracts/README.md) plus [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md) before changing entry wording or integration language.
-- Treat the public package as `RedCube AI Foundry Agent`: an OPL-compatible package built on the OPL Framework that publishes one app skill, one service-safe domain entry, product domain_handler/projection refs, and stage-control projection metadata while keeping domain truth inside RCA.
-- The current repo-verified public entry surfaces are the single `redcube-ai` app skill, `CLI`, and `MCP`; `controller` remains an internal control-plane label. Under strict OPL Agent purity, `invokeDomainEntry`, `invokeProductEntry`, local scripts, product-entry read models, and repo-tracked contracts must shrink to visual handler targets, authority refs, or machine-readable contracts as OPL generated/default callers replace repo-local shells. OPL/Temporal hosted scheduling is the default runtime posture after task start, `Codex CLI` remains the default concrete stage executor, and non-default executor / proof adapters remain explicit opt-in lanes.
-- RedCube can be invoked directly through its Codex app skill or through OPL as an external domain agent. Both routes must converge on the same RedCube-owned route, review, artifact, and export surfaces.
-- Treat the implementation surface as TypeScript orchestration plus Python native helpers. Repo-tracked JavaScript is retired; new product, test, or script JavaScript is blocked by the closeout audit.
-- When an external agent or OPL wants the repo-tracked skill surface directly, use the single `redcube-ai` app skill and launch CLI-backed commands through `npm run --prefix <redcube-ai-repo> redcube -- ...`; the repo-native `npm run --prefix <redcube-ai-repo> rca -- ...` script is the RCA shorthand alias to the same CLI. `redcube product invoke` is the repo-local direct product target, while product-entry status / session / manifest are generated/default wrapper responsibilities owned by OPL. The product-entry status surface remains the agent-facing overview / intake shell; it does not imply a mature human-facing GUI or WebUI. The OPL-hosted path stays an internal integration surface.
-- Test lane truth lives in `scripts/test-registry.ts` and the current verification matrix is maintained in [Status](./docs/status.md). `smoke` is the minimal local entry, `fast` is the core regression lane, hosted CI is equivalent to `npm run test:ci`, and `historical` runs only when explicitly requested.
-- Use `docs/active/` for current baton records, `docs/references/` for current support references, and `docs/history/` for absorbed milestones, proof records, tombstones, and provenance. Do not reconstruct execution truth from scattered implementation files.
+- Cloning this repo does not install the OPL Framework or hosted runtime. If you need hosted execution, prepare the current `one-person-lab` checkout or release bundle first.
+- Read the [Docs Guide](./docs/README.md) first, then [Contracts Overview](./contracts/README.md), [Project](./docs/project.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), and [Decisions](./docs/decisions.md).
+- Treat the public package as `RedCube AI Foundry Agent`: one app skill and one service-safe domain entry, with OPL-generated wrapper/projection refs and visual-domain truth kept inside RCA.
+- Direct RedCube use and OPL-hosted use must converge on the same RedCube-owned route, review, artifact, and export surfaces.
+- Use the repo-local commands, command targets, and verification matrix maintained in the Docs Guide, contracts, and `scripts/test-registry.ts`; do not reconstruct current execution truth from scattered implementation files.
+- Use `docs/active/` for current baton records, `docs/references/` for current support references, and `docs/history/` for absorbed milestones, proof records, tombstones, and provenance.
 
 </details>
 
