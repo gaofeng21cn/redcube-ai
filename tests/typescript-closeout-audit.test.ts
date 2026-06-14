@@ -60,36 +60,26 @@ test('P18 closeout audit proves structural TypeScript coverage across baseline, 
   );
 });
 
-test('P18 closeout audit keeps JS residue explicit instead of silently drifting', () => {
+test('P18 closeout audit keeps repo-tracked JS physically retired', () => {
   const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
 
-  assert.equal(audit.criteria.js_residue_explicitly_closed_out, true);
-  assert.equal(audit.criteria.new_unregistered_js_blocked, true);
+  assert.equal(audit.criteria.js_source_absent, true);
+  assert.equal(audit.criteria.repo_tracked_js_blocked, true);
   assert.equal(audit.criteria.js_residue_file_count_locked, true);
   assert.equal(audit.criteria.test_and_script_language_policy_closed, true);
   assert.deepEqual(audit.language_target.primary_implementation_languages, ['TypeScript', 'Python']);
   assert.equal(audit.language_target.javascript_policy, 'repo_tracked_javascript_retired');
   assert.equal(audit.language_target.test_language_policy, 'new_tests_default_to_typescript');
   assert.equal(audit.language_target.script_language_policy, 'new_scripts_default_to_typescript');
-  assert.equal(audit.evidence.js_residue_summary.totals.unregistered_js_file_count, 0);
-  assert.equal(audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count, 0);
-  assert.equal(
-    audit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count,
-    audit.evidence.js_residue_summary.totals.legacy_allowlisted_js_file_count,
-  );
-  assert.equal(audit.evidence.js_residue_retirement_budget.legacy_allowlisted_js_file_count_within_budget, true);
-  assert.equal(audit.evidence.js_residue_retirement_budget.actual_js_line_count_within_budget, true);
+  assert.equal(audit.evidence.js_residue_summary.totals.forbidden_js_file_count, 0);
+  assert.equal(audit.evidence.js_source_zero_gate.actual_js_file_count, 0);
+  assert.equal(audit.evidence.js_source_zero_gate.actual_js_file_count_within_zero_gate, true);
+  assert.equal(audit.evidence.js_source_zero_gate.actual_js_line_count_within_zero_gate, true);
   assert.equal(audit.evidence.js_residue_summary.by_directory.length, 0);
   for (const residue of audit.evidence.js_residue_inventory) {
-    assert.deepEqual(
-      residue.actual_js_files,
-      residue.expected_js_files,
-      residue.directory,
-    );
-    assert.deepEqual(residue.unregistered_js_files, []);
-    assert.equal(typeof residue.exception_registration?.owner, 'string');
-    assert.equal(typeof residue.exception_registration?.reason, 'string');
-    assert.equal(typeof residue.exception_registration?.migration_window, 'string');
+    assert.deepEqual(residue.actual_js_files, [], residue.directory);
+    assert.deepEqual(residue.forbidden_js_files, []);
+    assert.equal(residue.zero_js_source, true);
   }
 });
 
@@ -101,14 +91,12 @@ test('P18 closeout audit blocks repo-tracked JS tests and scripts after TS migra
   assert.equal(policy.tests.scan_glob, 'tests/**/*.{js,mjs,cjs,ts}');
   assert.equal(policy.tests.allowed_new_extension, '.test.ts');
   assert.equal(policy.tests.actual_js_files.length, 0);
-  assert.equal(policy.tests.registered_js_files.length, 0);
-  assert.equal(policy.tests.unregistered_js_files.length, 0);
+  assert.equal(policy.tests.forbidden_js_files.length, 0);
   assert.equal(policy.tests.registered_ts_files.includes('tests/typescript-baseline.test.ts'), true);
   assert.equal(policy.scripts.scan_glob, 'scripts/**/*.{js,mjs,cjs,ts}');
   assert.equal(policy.scripts.allowed_new_extension, '.ts');
   assert.equal(policy.scripts.actual_js_files.length, 0);
-  assert.equal(policy.scripts.registered_js_files.length, 0);
-  assert.equal(policy.scripts.unregistered_js_files.length, 0);
+  assert.equal(policy.scripts.forbidden_js_files.length, 0);
   assert.equal(policy.scripts.actual_ts_files.includes('scripts/run-test-group.ts'), true);
 });
 
@@ -126,8 +114,8 @@ test('P18 closeout audit line-locks product source JS at zero', () => {
   assert.equal(audit.criteria.js_residue_line_growth_locked, true);
   assert.equal(audit.evidence.js_residue_line_lock.contract_file, JS_RESIDUE_LINE_LOCK_FILE);
   assert.equal(audit.evidence.js_residue_line_lock.entries.length, 0);
-  assert.equal(audit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count, 0);
-  assert.equal(audit.evidence.js_residue_retirement_budget.actual_js_line_count, 0);
+  assert.equal(audit.evidence.js_source_zero_gate.actual_js_file_count, 0);
+  assert.equal(audit.evidence.js_source_zero_gate.actual_js_line_count, 0);
 });
 
 test('P18 closeout audit fails closed when nested JS appears without an explicit migration exception', () => {
@@ -146,20 +134,19 @@ test('P18 closeout audit fails closed when nested JS appears without an explicit
     const residue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === residueDirectory);
     const summary = audit.evidence.js_residue_summary.by_directory.find((entry) => entry.directory === residueDirectory);
 
-    assert.equal(audit.criteria.js_residue_explicitly_closed_out, false);
-    assert.equal(audit.criteria.new_unregistered_js_blocked, false);
+    assert.equal(audit.criteria.js_source_absent, false);
+    assert.equal(audit.criteria.repo_tracked_js_blocked, false);
     assert.equal(audit.criteria.closeout_ready, false);
     assert.ok(residue, residueDirectory);
     assert.ok(summary, residueDirectory);
-    assert.deepEqual(residue.unexpected_js_files, [unexpectedFile]);
-    assert.deepEqual(residue.unregistered_js_files, [unexpectedFile]);
+    assert.deepEqual(residue.forbidden_js_files, [unexpectedFile]);
     assert.equal(
       residue.residue_classification.some((entry) => (
-        entry.file === unexpectedFile && entry.status === 'unregistered_js_residue'
+        entry.file === unexpectedFile && entry.status === 'forbidden_js_source'
       )),
       true,
     );
-    assert.equal(summary.unregistered_js_file_count, 1);
+    assert.equal(summary.forbidden_js_file_count, 1);
   } finally {
     rmSync(path.dirname(unexpectedPath), { recursive: true, force: true });
     rmSync(caseDirectory, { recursive: true, force: true });
@@ -178,13 +165,12 @@ test('P18 closeout audit fails closed when a new package adds JS without registr
     const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
     const residue = audit.evidence.js_residue_inventory.find((entry) => entry.directory === residueDirectory);
 
-    assert.equal(audit.criteria.js_residue_explicitly_closed_out, false);
-    assert.equal(audit.criteria.new_unregistered_js_blocked, false);
+    assert.equal(audit.criteria.js_source_absent, false);
+    assert.equal(audit.criteria.repo_tracked_js_blocked, false);
     assert.equal(audit.criteria.closeout_ready, false);
     assert.ok(residue, residueDirectory);
     assert.equal(residue.package_name, null);
-    assert.deepEqual(residue.expected_js_files, []);
-    assert.deepEqual(residue.unregistered_js_files, [unexpectedFile]);
+    assert.deepEqual(residue.forbidden_js_files, [unexpectedFile]);
   } finally {
     rmSync(residueDirectory, { recursive: true, force: true });
   }
@@ -201,20 +187,18 @@ test('P18 closeout audit fails closed when a new JS script appears without regis
 
     assert.equal(audit.criteria.test_and_script_language_policy_closed, false);
     assert.equal(audit.criteria.closeout_ready, false);
-    assert.deepEqual(scriptsPolicy.unregistered_js_files, [unexpectedPath]);
+    assert.deepEqual(scriptsPolicy.forbidden_js_files, [unexpectedPath]);
   } finally {
     rmSync(unexpectedPath, { force: true });
   }
 });
 
-test('P18 closeout audit fails closed when the registered JS residue budget grows', () => {
+test('P18 closeout audit fails closed when the zero JS source gate contract is relaxed', () => {
   const previousContent = readFileSync(JS_RESIDUE_LINE_LOCK_FILE, 'utf-8');
   const previousContract = JSON.parse(previousContent);
-  const baselineAudit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
   const tightenedContract = {
     ...previousContract,
-    max_legacy_allowlisted_js_file_count:
-      baselineAudit.evidence.js_residue_retirement_budget.actual_legacy_allowlisted_js_file_count - 1,
+    max_js_file_count: 1,
   };
 
   writeFileSync(JS_RESIDUE_LINE_LOCK_FILE, `${JSON.stringify(tightenedContract, null, 2)}\n`, 'utf-8');
@@ -224,7 +208,7 @@ test('P18 closeout audit fails closed when the registered JS residue budget grow
 
     assert.equal(audit.criteria.js_residue_file_count_locked, false);
     assert.equal(audit.criteria.closeout_ready, false);
-    assert.equal(audit.evidence.js_residue_retirement_budget.legacy_allowlisted_js_file_count_within_budget, false);
+    assert.equal(audit.evidence.js_source_zero_gate.actual_js_file_count_within_zero_gate, false);
   } finally {
     writeFileSync(JS_RESIDUE_LINE_LOCK_FILE, previousContent, 'utf-8');
   }

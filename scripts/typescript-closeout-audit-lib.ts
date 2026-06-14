@@ -51,14 +51,7 @@ const HIGH_CHURN_PACKAGES = [
   'packages/redcube-runtime-family-poster-onepager',
 ];
 
-const JS_RESIDUE_ALLOWLIST = {};
-
 const JS_RESIDUE_SCAN_ROOTS = ['apps', 'packages'];
-const DEFAULT_JS_EXCEPTION_REGISTRATION = Object.freeze({
-  owner: 'redcube-ai-maintainers',
-  reason: 'product source JavaScript is retired; new apps/packages source JavaScript must be rejected before merge',
-  migration_window: 'closed after RCA source TypeScript retirement tranche',
-});
 const LANGUAGE_TARGET = Object.freeze({
   primary_implementation_languages: ['TypeScript', 'Python'],
   default_new_runtime_code: 'TypeScript',
@@ -73,9 +66,6 @@ const LANGUAGE_TARGET = Object.freeze({
     'New JavaScript under apps/*, packages/*, tests/*, or scripts/* is blocked before merge.',
   ],
 });
-
-const TEST_JS_SUPPORT_ALLOWLIST = Object.freeze([]);
-const SCRIPT_JS_ALLOWLIST = Object.freeze([]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
@@ -142,10 +132,6 @@ function readRegisteredRootTestFiles() {
 
 function languageSurfaceAudit() {
   const registeredRootTests = readRegisteredRootTestFiles();
-  const registeredTestJs = [...new Set([
-    ...registeredRootTests.filter((file) => file.endsWith('.js')),
-    ...TEST_JS_SUPPORT_ALLOWLIST,
-  ])].sort();
   const actualTestJs = listFilesUnder('tests', (file) => (
     file.endsWith('.js') || file.endsWith('.mjs') || file.endsWith('.cjs')
   ));
@@ -154,31 +140,24 @@ function languageSurfaceAudit() {
     file.endsWith('.mjs') || file.endsWith('.js') || file.endsWith('.cjs')
   ));
   const actualScriptTs = listFilesUnder('scripts', (file) => file.endsWith('.ts'));
-  const registeredScriptJs = [...SCRIPT_JS_ALLOWLIST].sort();
 
   const tests = {
     scan_glob: 'tests/**/*.{js,mjs,cjs,ts}',
     allowed_new_extension: '.test.ts',
-    registered_js_files: registeredTestJs,
     registered_ts_files: registeredRootTests.filter((file) => file.endsWith('.ts')),
     actual_js_files: actualTestJs,
     actual_ts_files: actualTestTs,
-    unregistered_js_files: fileDifference(actualTestJs, registeredTestJs),
-    missing_registered_js_files: fileDifference(registeredTestJs, actualTestJs),
+    forbidden_js_files: actualTestJs,
   };
   const scripts = {
     scan_glob: 'scripts/**/*.{js,mjs,cjs,ts}',
     allowed_new_extension: '.ts',
-    registered_js_files: registeredScriptJs,
     actual_js_files: actualScriptJs,
     actual_ts_files: actualScriptTs,
-    unregistered_js_files: fileDifference(actualScriptJs, registeredScriptJs),
-    missing_registered_js_files: fileDifference(registeredScriptJs, actualScriptJs),
+    forbidden_js_files: actualScriptJs,
   };
-  const closed = tests.unregistered_js_files.length === 0
-    && tests.missing_registered_js_files.length === 0
-    && scripts.unregistered_js_files.length === 0
-    && scripts.missing_registered_js_files.length === 0;
+  const closed = tests.forbidden_js_files.length === 0
+    && scripts.forbidden_js_files.length === 0;
 
   return {
     status: closed ? 'closed' : 'open',
@@ -189,7 +168,7 @@ function languageSurfaceAudit() {
 }
 
 function listResidueDirectories() {
-  const directories = new Set(Object.keys(JS_RESIDUE_ALLOWLIST));
+  const directories = new Set();
   for (const root of JS_RESIDUE_SCAN_ROOTS) {
     const rootPath = path.resolve(root);
     if (!existsSync(rootPath)) continue;
@@ -206,33 +185,11 @@ function listResidueDirectories() {
   return [...directories].sort();
 }
 
-function fileDifference(files, baseline) {
-  const baselineFiles = new Set(baseline);
-  return files.filter((file) => !baselineFiles.has(file));
-}
-
-function classifyResidueFiles({ expectedFiles, actualFiles }) {
-  const expected = new Set(expectedFiles);
-  const actual = new Set(actualFiles);
-  const classifications = [];
-
-  for (const file of actualFiles) {
-    classifications.push({
-      file,
-      status: expected.has(file) ? 'legacy_allowlisted' : 'unregistered_js_residue',
-    });
-  }
-
-  for (const file of expectedFiles) {
-    if (!actual.has(file)) {
-      classifications.push({
-        file,
-        status: 'registered_legacy_residue_missing',
-      });
-    }
-  }
-
-  return classifications;
+function classifyResidueFiles(actualFiles) {
+  return actualFiles.map((file) => ({
+    file,
+    status: 'forbidden_js_source',
+  }));
 }
 
 function packageAudit(directory, rootTsconfig) {
@@ -255,27 +212,16 @@ function packageAudit(directory, rootTsconfig) {
 
 function residueAudit() {
   return listResidueDirectories().map((directory) => {
-    const expectedFiles = [...(JS_RESIDUE_ALLOWLIST[directory] ?? [])].sort();
     const actualFiles = listSourceFiles(directory, '.js');
-    const unexpectedFiles = fileDifference(actualFiles, expectedFiles);
-    const missingFiles = fileDifference(expectedFiles, actualFiles);
-    const residueClassification = classifyResidueFiles({
-      expectedFiles,
-      actualFiles,
-    });
+    const residueClassification = classifyResidueFiles(actualFiles);
 
     return {
       directory,
       package_name: readPackageName(directory),
-      exception_registration: DEFAULT_JS_EXCEPTION_REGISTRATION,
-      expected_js_files: expectedFiles,
       actual_js_files: actualFiles,
-      legacy_allowlisted_js_files: actualFiles.filter((file) => expectedFiles.includes(file)),
-      unregistered_js_files: unexpectedFiles,
-      unexpected_js_files: unexpectedFiles,
-      missing_js_files: missingFiles,
+      forbidden_js_files: actualFiles,
       residue_classification: residueClassification,
-      explicit_residue_only: unexpectedFiles.length === 0 && missingFiles.length === 0,
+      zero_js_source: actualFiles.length === 0,
     };
   });
 }
@@ -306,7 +252,7 @@ function residueLineLockAudit(residueInventory = residueAudit()) {
   return {
     contract_file: JS_RESIDUE_LINE_LOCK_FILE,
     policy: lock.policy,
-    max_legacy_allowlisted_js_file_count: lock.max_legacy_allowlisted_js_file_count ?? null,
+    max_js_file_count: lock.max_js_file_count ?? null,
     max_actual_js_line_count: lock.max_actual_js_line_count ?? null,
     entries,
   };
@@ -323,51 +269,45 @@ function residueSummary(residueInventory, residueLineLock) {
   }
 
   const byDirectory = residueInventory
-    .filter((entry) => entry.actual_js_files.length > 0 || entry.expected_js_files.length > 0)
+    .filter((entry) => entry.actual_js_files.length > 0)
     .map((entry) => ({
       directory: entry.directory,
       package_name: entry.package_name,
-      legacy_allowlisted_js_file_count: entry.legacy_allowlisted_js_files.length,
-      unregistered_js_file_count: entry.unregistered_js_files.length,
-      missing_registered_legacy_js_file_count: entry.missing_js_files.length,
+      forbidden_js_file_count: entry.forbidden_js_files.length,
       actual_js_line_count: lineCountsByDirectory.get(entry.directory) ?? 0,
-      legacy_allowlisted_js_files: entry.legacy_allowlisted_js_files,
-      unregistered_js_files: entry.unregistered_js_files,
-      missing_registered_legacy_js_files: entry.missing_js_files,
+      forbidden_js_files: entry.forbidden_js_files,
     }));
 
   return {
     policy: 'TypeScript/Python-first; product source JavaScript is retired.',
-    blocked_residue_statuses: ['unregistered_js_residue', 'registered_legacy_residue_missing'],
+    blocked_residue_statuses: ['forbidden_js_source'],
     line_lock_contract_file: JS_RESIDUE_LINE_LOCK_FILE,
     totals: {
       scanned_directories: residueInventory.length,
       directories_with_js_residue: byDirectory.length,
-      legacy_allowlisted_js_file_count: byDirectory.reduce((sum, entry) => sum + entry.legacy_allowlisted_js_file_count, 0),
-      unregistered_js_file_count: byDirectory.reduce((sum, entry) => sum + entry.unregistered_js_file_count, 0),
-      missing_registered_legacy_js_file_count: byDirectory.reduce((sum, entry) => sum + entry.missing_registered_legacy_js_file_count, 0),
+      forbidden_js_file_count: byDirectory.reduce((sum, entry) => sum + entry.forbidden_js_file_count, 0),
       actual_js_line_count: byDirectory.reduce((sum, entry) => sum + entry.actual_js_line_count, 0),
     },
     by_directory: byDirectory,
   };
 }
 
-function residueRetirementBudgetAudit({ jsResidueSummary, residueLineLock }) {
-  const maxLegacyFiles = residueLineLock.max_legacy_allowlisted_js_file_count;
+function zeroJsSourceGateAudit({ jsResidueSummary, residueLineLock }) {
+  const maxJsFiles = residueLineLock.max_js_file_count;
   const maxActualLines = residueLineLock.max_actual_js_line_count;
-  const legacyFileCount = jsResidueSummary.totals.legacy_allowlisted_js_file_count;
+  const actualFileCount = jsResidueSummary.totals.forbidden_js_file_count;
   const actualLineCount = jsResidueSummary.totals.actual_js_line_count;
 
   return {
     policy: 'Product source JavaScript must remain at zero files and zero lines.',
-    max_legacy_allowlisted_js_file_count: maxLegacyFiles,
-    actual_legacy_allowlisted_js_file_count: legacyFileCount,
-    legacy_allowlisted_js_file_count_within_budget:
-      typeof maxLegacyFiles === 'number' && legacyFileCount <= maxLegacyFiles,
+    max_js_file_count: maxJsFiles,
+    actual_js_file_count: actualFileCount,
+    actual_js_file_count_within_zero_gate:
+      maxJsFiles === 0 && actualFileCount === 0,
     max_actual_js_line_count: maxActualLines,
     actual_js_line_count: actualLineCount,
-    actual_js_line_count_within_budget:
-      typeof maxActualLines === 'number' && actualLineCount <= maxActualLines,
+    actual_js_line_count_within_zero_gate:
+      maxActualLines === 0 && actualLineCount === 0,
   };
 }
 
@@ -418,7 +358,7 @@ export function buildCloseoutAudit(options = {}) {
   const residueInventory = residueAudit();
   const residueLineLock = residueLineLockAudit(residueInventory);
   const jsResidueSummary = residueSummary(residueInventory, residueLineLock);
-  const jsResidueRetirementBudget = residueRetirementBudgetAudit({
+  const jsSourceZeroGate = zeroJsSourceGateAudit({
     jsResidueSummary,
     residueLineLock,
   });
@@ -438,11 +378,11 @@ export function buildCloseoutAudit(options = {}) {
       service_boundaries_typed: serviceBoundaries.every((entry) => entry.typed_boundary_ready),
       utility_boundaries_typed: utilityBoundaries.every((entry) => entry.typed_boundary_ready),
       high_churn_paths_typed: highChurnPackages.every((entry) => entry.typed_boundary_ready),
-      js_residue_explicitly_closed_out: residueInventory.every((entry) => entry.explicit_residue_only),
-      new_unregistered_js_blocked: jsResidueSummary.totals.unregistered_js_file_count === 0,
+      js_source_absent: residueInventory.every((entry) => entry.zero_js_source),
+      repo_tracked_js_blocked: jsResidueSummary.totals.forbidden_js_file_count === 0,
       js_residue_file_count_locked:
-        jsResidueRetirementBudget.legacy_allowlisted_js_file_count_within_budget
-        && jsResidueRetirementBudget.actual_js_line_count_within_budget,
+        jsSourceZeroGate.actual_js_file_count_within_zero_gate
+        && jsSourceZeroGate.actual_js_line_count_within_zero_gate,
       js_residue_line_growth_locked: residueLineLock.entries.every((entry) => entry.within_lock),
       test_and_script_language_policy_closed: testAndScriptLanguagePolicy.status === 'closed',
       quality_gates_green: Object.values(qualityGates).every((gate) => gate.status === 'pass' && gate.exit_code === 0),
@@ -454,7 +394,7 @@ export function buildCloseoutAudit(options = {}) {
       high_churn_packages: highChurnPackages,
       js_residue_inventory: residueInventory,
       js_residue_line_lock: residueLineLock,
-      js_residue_retirement_budget: jsResidueRetirementBudget,
+      js_source_zero_gate: jsSourceZeroGate,
       js_residue_summary: jsResidueSummary,
       test_and_script_language_policy: testAndScriptLanguagePolicy,
     },

@@ -1,8 +1,8 @@
 {
   "contract_id": "js-residue-line-lock",
   "date_anchor": "2026-04-27",
-  "policy": "Product source JavaScript under apps/*/src and packages/*/src is retired. New implementation belongs in TypeScript or Python-owned helpers.",
-  "max_legacy_allowlisted_js_file_count": 0,
+  "policy": "Product source JavaScript under apps/*/src and packages/*/src is retired. New implementation belongs in TypeScript or Python-owned helpers. Legacy JS source allowlists are closed.",
+  "max_js_file_count": 0,
   "max_actual_js_line_count": 0,
   "line_counts": {}
 }
