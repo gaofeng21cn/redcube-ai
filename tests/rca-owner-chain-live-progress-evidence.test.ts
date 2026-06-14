@@ -184,6 +184,20 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
     claims_handoffable: false,
     claims_production_visual_soak_complete: false,
   });
+  assert.deepEqual(
+    evidence.human_ready_export_handoff_followthrough.observed_owner_receipt_refs,
+    ['rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614'],
+  );
+  assert.equal(
+    evidence.human_ready_export_handoff_followthrough.observed_closed_typed_blocker_ref,
+    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
+  );
+  assert.deepEqual(evidence.human_ready_export_handoff_followthrough.readiness_claims, {
+    claims_visual_ready: false,
+    claims_exportable: false,
+    claims_handoffable: false,
+    claims_production_visual_soak_complete: false,
+  });
 
   assert.equal(evidence.remaining_evidence_gates.real_visual_artifact_generation, 'mock_safe_canary_recorded_live_provider_not_run');
   assert.equal(evidence.remaining_evidence_gates.real_review_export_receipt_instance, 'mock_safe_canary_recorded_live_provider_not_run');
@@ -198,7 +212,8 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, 'contracts/owner_chain_live_progress_evidence.json');
   assert.equal(liveProgress.refs.owner_receipt_refs.includes(evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref), true);
   assert.equal(liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression'), true);
-  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
+  assert.equal(liveProgress.refs.owner_receipt_refs.includes('rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), false);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'), true);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:no-regression:cross-family-production-scaleout-pending'), true);
@@ -210,12 +225,26 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
     'rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore',
     'rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention',
   ]);
-  assertLiveProgressBlockedEntry(
-    liveProgress,
-    'human_ready_export_handoff',
-    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
-    { humanGateRefs: ['human_gate:redcube_operator_review_gate'] },
+  const humanReadyExportHandoff = liveProgress.progress_entries.find((entry) =>
+    entry.entry_id === 'human_ready_export_handoff'
   );
+  assert.ok(humanReadyExportHandoff);
+  assert.equal(humanReadyExportHandoff.status, 'refs_observed');
+  assert.deepEqual(humanReadyExportHandoff.refs.owner_receipt_refs, [
+    'rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614',
+    'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain',
+  ]);
+  assert.deepEqual(humanReadyExportHandoff.refs.typed_blocker_refs, []);
+  assert.deepEqual(humanReadyExportHandoff.refs.human_gate_refs, ['human_gate:redcube_operator_review_gate']);
+  assert.equal(
+    humanReadyExportHandoff.owner_followthrough_ref,
+    'rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614',
+  );
+  assert.equal(
+    humanReadyExportHandoff.closed_typed_blocker_ref,
+    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
+  );
+  assert.equal(humanReadyExportHandoff.ready_claim_allowed, false);
   assertLiveProgressBlockedEntry(
     liveProgress,
     'temporal_controlled_visual_stage_long_soak',
@@ -239,7 +268,6 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
       .filter((entry) => entry.status === 'blocked_by_domain_owned_typed_blocker')
       .map((entry) => entry.entry_id),
     [
-      'human_ready_export_handoff',
       'temporal_controlled_visual_stage_long_soak',
       'memory_lifecycle_receipt_scaleout',
       'cross_family_repeated_no_regression',
@@ -289,6 +317,7 @@ test('RCA domain-owner-chain scaleout exposes OPL backfill refs without ready cl
 
   assert.deepEqual(scaleout.opl_backfill_refs.owner_receipt_refs, [
     ...evidence.live_visual_owner_chain_canary.observed_owner_receipt_refs,
+    ...evidence.human_ready_export_handoff_followthrough.observed_owner_receipt_refs,
     evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref,
   ]);
   assert.deepEqual(
@@ -302,7 +331,7 @@ test('RCA domain-owner-chain scaleout exposes OPL backfill refs without ready cl
     evidence.rca_owned_owner_action_canary.observed_no_regression_evidence_ref,
   ]);
   assert.deepEqual(scaleout.observed_ref_counts, {
-    owner_receipt_ref_count: 4,
+    owner_receipt_ref_count: 5,
     review_export_receipt_ref_count: 3,
     typed_blocker_ref_count: 1,
     memory_lifecycle_receipt_ref_count: 0,

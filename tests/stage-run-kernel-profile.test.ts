@@ -383,7 +383,8 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     'no_regression_refs',
     'long_soak_refs',
   ]);
-  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), true);
+  assert.equal(liveProgress.refs.owner_receipt_refs.includes('rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614'), true);
+  assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:review-export:human-ready-export-handoff-pending'), false);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending'), true);
   assert.equal(liveProgress.refs.typed_blocker_refs.includes('rca-typed-blocker:no-regression:cross-family-production-scaleout-pending'), true);
   assert.equal(liveProgress.refs.human_gate_refs.includes('human_gate:redcube_operator_review_gate'), true);
@@ -397,11 +398,17 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
     true,
   );
   assert.equal(liveProgress.refs.long_soak_refs.includes('rca-typed-blocker:controlled-soak:temporal-long-soak-pending'), true);
-  assertLiveProgressBlockedEntry(
-    liveProgress,
-    'human_ready_export_handoff',
-    'rca-typed-blocker:review-export:human-ready-export-handoff-pending',
+  const humanReadyExportHandoff = liveProgress.progress_entries.find((entry) =>
+    entry.entry_id === 'human_ready_export_handoff'
   );
+  assert.ok(humanReadyExportHandoff);
+  assert.equal(humanReadyExportHandoff.status, 'refs_observed');
+  assert.deepEqual(humanReadyExportHandoff.refs.owner_receipt_refs, [
+    'rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614',
+    'rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain',
+  ]);
+  assert.deepEqual(humanReadyExportHandoff.refs.typed_blocker_refs, []);
+  assert.equal(humanReadyExportHandoff.ready_claim_allowed, false);
   assertLiveProgressBlockedEntry(
     liveProgress,
     'temporal_controlled_visual_stage_long_soak',
@@ -435,6 +442,7 @@ test('RCA owner-chain live progress evidence exposes accepted refs without readi
   assert.deepEqual(evidence.accepted_ref_shapes.domain_owner_receipt_refs, [
     'rca-owner-receipt:visual-stage:<receipt-id>',
     'rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>',
+    'rca-operator-ready:export-handoff:<handoff-id>',
   ]);
   assert.deepEqual(evidence.accepted_ref_shapes.typed_blocker_refs, [
     'rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>',

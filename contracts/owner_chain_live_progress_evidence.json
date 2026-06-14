@@ -74,6 +74,22 @@
       "claims_production_visual_soak_complete": false
     }
   },
+  "human_ready_export_handoff_followthrough": {
+    "followthrough_kind": "operator_ready_export_handoff_owner_followthrough_ref",
+    "source_contract_ref": "contracts/live_stage_run_progress_evidence.json#/progress_entries/human_ready_export_handoff",
+    "observed_owner_receipt_refs": [
+      "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614"
+    ],
+    "observed_closed_typed_blocker_ref": "rca-typed-blocker:review-export:human-ready-export-handoff-pending",
+    "review_export_receipt_ref": "rca-review-export:ppt_deck:export_pptx:deck-owner-chain",
+    "payload_body_included": false,
+    "readiness_claims": {
+      "claims_visual_ready": false,
+      "claims_exportable": false,
+      "claims_handoffable": false,
+      "claims_production_visual_soak_complete": false
+    }
+  },
   "producer_surface_refs": {
     "review_export_closeout_builder": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/review-export-closeout.ts#buildReviewExportCloseout",
     "domain_handler_owner_receipt_action": "domain-handler:dispatch#emit_domain_owner_receipt",
@@ -156,7 +172,8 @@
     ],
     "domain_owner_receipt_refs": [
       "rca-owner-receipt:visual-stage:<receipt-id>",
-      "rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>"
+      "rca-owner-receipt:review-export:<family>:<route-stage-id>:<deliverable-id>",
+      "rca-operator-ready:export-handoff:<handoff-id>"
     ],
     "typed_blocker_refs": [
       "rca-typed-blocker:review-export:<family>:<route-stage-id>:<deliverable-id>",
@@ -209,6 +226,7 @@
         "rca-owner-receipt:review-export:ppt_deck:visual_director_review:deck-owner-chain",
         "rca-owner-receipt:review-export:ppt_deck:screenshot_review:deck-owner-chain",
         "rca-owner-receipt:review-export:ppt_deck:export_pptx:deck-owner-chain",
+        "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614",
         "rca-owner-receipt:visual-stage:owner-chain-canary-domain-owner"
       ],
       "review_export_receipt_refs": [
@@ -225,7 +243,7 @@
       ]
     },
     "observed_ref_counts": {
-      "owner_receipt_ref_count": 4,
+      "owner_receipt_ref_count": 5,
       "review_export_receipt_ref_count": 3,
       "typed_blocker_ref_count": 1,
       "memory_lifecycle_receipt_ref_count": 0,
