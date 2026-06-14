@@ -20,8 +20,8 @@ import { buildVisualTransitionEvaluatorProjection } from './visual-transition-ev
 
 export const DOMAIN_ACTION_ADAPTER_ID = 'redcube_domain_action_adapter_adapter.v1';
 export const DOMAIN_ID = 'redcube_ai';
-export const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
-export const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
+const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
+const OPL_PROVIDER_TRANSPORT = 'opl_family_runtime_provider';
 
 function buildRouteStageHandoffBoundary(manifest) {
   return {
