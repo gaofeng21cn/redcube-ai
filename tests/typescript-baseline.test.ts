@@ -188,10 +188,17 @@ test('typescript package build contract requires runtime exports to resolve thro
   assert.equal(contract.current_transition_model.compiled_types_target, './dist/index.d.ts');
   assert.equal(contract.transition_policy.new_packages_must_use_typescript_source, true);
   assert.equal(contract.transition_policy.new_runtime_js_exports_forbidden_without_contract, true);
+  assert.equal(contract.transition_policy.source_js_exports_forbidden, true);
+  assert.equal(contract.transition_policy.legacy_source_js_export_allowlist_retired, true);
+  assert.equal(
+    contract.transition_policy.zero_js_source_gate_contract,
+    'contracts/runtime-program/js-residue-line-lock.json',
+  );
+  assert.equal(Object.hasOwn(contract.transition_policy, 'source_js_exports_allowlisted_only'), false);
+  assert.equal(Object.hasOwn(contract, 'legacy_source_js_runtime_exports'), false);
   assert.equal(contract.quality_gates.typecheck, 'npm run typecheck');
   assert.equal(contract.quality_gates.typecheck_model, 'build_compiled_exports_then_no_emit');
   assert.equal(contract.quality_gates.build, 'npm run build');
-  assert.equal(contract.legacy_source_js_runtime_exports.length, 0);
 
   const actualSourceJsExports = workspacePackageFiles().flatMap((file) => {
     const pkg = readJson(file);

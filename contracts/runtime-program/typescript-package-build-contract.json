@@ -13,7 +13,9 @@
   "transition_policy": {
     "new_packages_must_use_typescript_source": true,
     "new_runtime_js_exports_forbidden_without_contract": true,
-    "source_js_exports_allowlisted_only": true,
+    "source_js_exports_forbidden": true,
+    "legacy_source_js_export_allowlist_retired": true,
+    "zero_js_source_gate_contract": "contracts/runtime-program/js-residue-line-lock.json",
     "package_build_migration_order": [
       "leaf utility packages",
       "contract/governance/overlay packages",
@@ -28,7 +30,6 @@
     "build": "npm run build",
     "package_contract_test": "node --test tests/typescript-baseline.test.ts"
   },
-  "legacy_source_js_runtime_exports": [],
   "compiled_dist_runtime_exports": [
     {
       "directory": "packages/redcube-codex-cli-client",
