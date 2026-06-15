@@ -1,0 +1,43 @@
+{
+  "surface_kind": "rca_current_program_pack_bundle_manifest",
+  "schema_version": 1,
+  "bundle_id": "redcube-ai.current-program",
+  "owner": "RedCube AI",
+  "state": "active_generated_bundle_metadata",
+  "program_id": "redcube-runtime-program",
+  "date_anchor": "2026-04-26",
+  "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
+  "index_ref": "contracts/runtime-program/current-program.index.json",
+  "source_root_ref": "contracts/runtime-program/current-program-parts",
+  "source_ref_count": 332,
+  "source_digest": "44ef9b2758553af15bfffe3514995050c1aa9d4b088a3aa842775900d4060e94",
+  "generated_aggregate": {
+    "ref": "contracts/runtime-program/current-program.json",
+    "role": "generated_read_through_snapshot_for_existing_consumers",
+    "do_not_edit": true,
+    "write_command": "npm run contracts:current-program:write",
+    "check_command": "npm run contracts:current-program:check"
+  },
+  "commands": {
+    "write": "npm run contracts:current-program:write",
+    "check": "npm run contracts:current-program:check",
+    "sync_compat_alias": "npm run contracts:current-program:sync"
+  },
+  "false_authority_flags": {
+    "aggregate_snapshot_is_canonical_source": false,
+    "aggregate_snapshot_is_edit_surface": false,
+    "source_refs_are_generated_from_aggregate": false,
+    "docs_are_machine_truth": false,
+    "manifest_can_claim_domain_ready": false,
+    "manifest_can_authorize_quality_or_export": false
+  },
+  "not_claims": [
+    "domain_ready",
+    "production_ready",
+    "visual_ready",
+    "quality_or_export_verdict",
+    "owner_receipt",
+    "typed_blocker",
+    "artifact_authority"
+  ]
+}

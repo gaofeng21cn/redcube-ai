@@ -87,6 +87,7 @@ const HISTORICAL_CONTRACTS = Object.freeze([
     status: 'closeout_completed',
   },
 ]);
+const CURRENT_PROGRAM_BUNDLE_MANIFEST = 'contracts/runtime-program/current-program.bundle-manifest.json';
 
 test('current runtime program is backed by source parts and a generated consumer aggregate', () => {
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
@@ -96,17 +97,24 @@ test('current runtime program is backed by source parts and a generated consumer
 
   assert.equal(assembly.surface_kind, 'rca_current_program_pack_bundle_assembly');
   assert.equal(assembly.schema_version, 1);
+  assert.equal(assembly.bundle_id, 'redcube-ai.current-program');
   assert.equal(assembly.source_root_ref, 'contracts/runtime-program/current-program-parts');
   assert.equal(assembly.aggregate_ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(assembly.manifest_ref, 'contracts/runtime-program/current-program.index.json');
+  assert.equal(assembly.index_ref, 'contracts/runtime-program/current-program.index.json');
+  assert.equal(assembly.manifest_ref, CURRENT_PROGRAM_BUNDLE_MANIFEST);
+  assert.equal(assembly.commands.write, 'npm run contracts:current-program:write');
+  assert.equal(assembly.commands.check, 'npm run contracts:current-program:check');
+  assert.equal(assembly.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
+  assert.equal(assembly.false_authority_flags.manifest_can_authorize_quality_or_export, false);
   assert.equal(assembly.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
   assert.equal(assembly.generated_aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
   assert.equal(Array.isArray(assembly.generated_array_fields), true);
   assert.equal(assembly.generated_array_fields.includes('/current_state/active_baton/scope/privatized_functional_module_audit/modules'), true);
 
-  assert.equal(index.surface_kind, 'rca_current_program_pack_bundle_manifest');
+  assert.equal(index.surface_kind, 'rca_current_program_source_index');
   assert.equal(index.schema_version, 3);
   assert.equal(index.assembly_ref, 'contracts/runtime-program/current-program.assembly.json');
+  assert.equal(index.manifest_ref, CURRENT_PROGRAM_BUNDLE_MANIFEST);
   assert.equal(index.source_root_ref, 'contracts/runtime-program/current-program-parts');
   assert.equal(index.aggregate_ref, 'contracts/runtime-program/current-program.json');
   assert.equal(index.aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
@@ -141,6 +149,29 @@ test('current runtime program is backed by source parts and a generated consumer
     assert.match(sourcePart.sha256, /^[a-f0-9]{64}$/);
     assert.deepEqual(readJson(sourcePart.ref), valueAtJsonPointer(currentProgram, sourcePart.json_pointer), sourcePart.ref);
   }
+});
+
+test('current runtime program has an explicit source-to-generated bundle manifest', () => {
+  const index = readJson('contracts/runtime-program/current-program.index.json');
+  const manifest = readJson(CURRENT_PROGRAM_BUNDLE_MANIFEST);
+
+  assert.equal(manifest.surface_kind, 'rca_current_program_pack_bundle_manifest');
+  assert.equal(manifest.schema_version, 1);
+  assert.equal(manifest.bundle_id, 'redcube-ai.current-program');
+  assert.equal(manifest.assembly_ref, 'contracts/runtime-program/current-program.assembly.json');
+  assert.equal(manifest.index_ref, 'contracts/runtime-program/current-program.index.json');
+  assert.equal(manifest.source_root_ref, 'contracts/runtime-program/current-program-parts');
+  assert.equal(manifest.source_ref_count, index.source_part_refs.length);
+  assert.match(manifest.source_digest, /^[a-f0-9]{64}$/);
+  assert.equal(manifest.generated_aggregate.ref, 'contracts/runtime-program/current-program.json');
+  assert.equal(manifest.generated_aggregate.do_not_edit, true);
+  assert.equal(manifest.generated_aggregate.write_command, 'npm run contracts:current-program:write');
+  assert.equal(manifest.generated_aggregate.check_command, 'npm run contracts:current-program:check');
+  assert.equal(manifest.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
+  assert.equal(manifest.false_authority_flags.manifest_can_claim_domain_ready, false);
+  assert.equal(manifest.false_authority_flags.manifest_can_authorize_quality_or_export, false);
+  assert.equal(manifest.not_claims.includes('quality_or_export_verdict'), true);
+  assert.equal(manifest.not_claims.includes('artifact_authority'), true);
 });
 
 test('current runtime program keeps one active baton and machine-readable historical provenance', () => {

@@ -1,9 +1,10 @@
 {
-  "surface_kind": "rca_current_program_pack_bundle_manifest",
+  "surface_kind": "rca_current_program_source_index",
   "schema_version": 3,
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-26",
   "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
+  "manifest_ref": "contracts/runtime-program/current-program.bundle-manifest.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
   "aggregate_ref": "contracts/runtime-program/current-program.json",
   "aggregate_role": "generated_read_through_snapshot_for_existing_consumers",
@@ -4737,5 +4738,6 @@
       "line_count": 14,
       "sha256": "a02d9259cf6a6358059a74555f5ce08f9b5b199c2141e23271e0a53aae7dd995"
     }
-  ]
+  ],
+  "source_ref_count": 332
 }

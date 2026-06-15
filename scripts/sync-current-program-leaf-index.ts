@@ -9,9 +9,21 @@ import { isDeepStrictEqual } from 'node:util';
 
 const AGGREGATE_SNAPSHOT_REF = 'contracts/runtime-program/current-program.json';
 const INDEX_REF = 'contracts/runtime-program/current-program.index.json';
+const MANIFEST_REF = 'contracts/runtime-program/current-program.bundle-manifest.json';
 const ASSEMBLY_REF = 'contracts/runtime-program/current-program.assembly.json';
 const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
 const MAX_LEAF_JSON_LINE_COUNT = 800;
+const WRITE_COMMAND = 'npm run contracts:current-program:write';
+const CHECK_COMMAND = 'npm run contracts:current-program:check';
+const SYNC_COMMAND = 'npm run contracts:current-program:sync';
+const FALSE_AUTHORITY_FLAGS = Object.freeze({
+  aggregate_snapshot_is_canonical_source: false,
+  aggregate_snapshot_is_edit_surface: false,
+  source_refs_are_generated_from_aggregate: false,
+  docs_are_machine_truth: false,
+  manifest_can_claim_domain_ready: false,
+  manifest_can_authorize_quality_or_export: false,
+});
 
 const SECTION_ROOTS = Object.freeze([
   {
@@ -309,10 +321,19 @@ function buildCurrentProgramAssembly(sourcePartRefs = sourcePartRefsFromFiles())
   return {
     surface_kind: 'rca_current_program_pack_bundle_assembly',
     schema_version: 1,
+    bundle_id: 'redcube-ai.current-program',
+    owner: 'RedCube AI',
+    state: 'active_source_bundle',
     source_root_ref: PARTS_ROOT,
     aggregate_ref: AGGREGATE_SNAPSHOT_REF,
-    manifest_ref: INDEX_REF,
+    index_ref: INDEX_REF,
+    manifest_ref: MANIFEST_REF,
     generated_array_fields: generatedArrayFields(sourcePartRefs),
+    commands: {
+      write: WRITE_COMMAND,
+      check: CHECK_COMMAND,
+      sync_compat_alias: SYNC_COMMAND,
+    },
     generated_aggregate_role: 'generated_read_through_snapshot_for_existing_consumers',
     canonical_truth_model: 'source_parts_are_canonical_current_program_sources',
     source_part_contract: {
@@ -320,18 +341,20 @@ function buildCurrentProgramAssembly(sourcePartRefs = sourcePartRefsFromFiles())
       max_part_json_line_count: MAX_LEAF_JSON_LINE_COUNT,
       aggregate_must_be_rebuilt_from_parts: true,
     },
+    false_authority_flags: FALSE_AUTHORITY_FLAGS,
   };
 }
 
-export function buildCurrentProgramPackBundleManifest() {
+export function buildCurrentProgramSourceIndex() {
   const sourcePartRefs = sourcePartRefsFromFiles();
   const currentProgram = assembleCurrentProgramFromParts(sourcePartRefs);
   return {
-    surface_kind: 'rca_current_program_pack_bundle_manifest',
+    surface_kind: 'rca_current_program_source_index',
     schema_version: 3,
     program_id: currentProgram.program_id,
     date_anchor: currentProgram.date_anchor,
     assembly_ref: ASSEMBLY_REF,
+    manifest_ref: MANIFEST_REF,
     source_root_ref: PARTS_ROOT,
     aggregate_ref: AGGREGATE_SNAPSHOT_REF,
     aggregate_role: 'generated_read_through_snapshot_for_existing_consumers',
@@ -352,17 +375,64 @@ export function buildCurrentProgramPackBundleManifest() {
     generated_array_fields: generatedArrayFields(sourcePartRefs),
     source_part_refs: sourcePartRefs,
     leaf_refs: sourcePartRefs,
+    source_ref_count: sourcePartRefs.length,
+  };
+}
+
+export function buildCurrentProgramPackBundleManifest() {
+  const sourceIndex = buildCurrentProgramSourceIndex();
+  return {
+    surface_kind: 'rca_current_program_pack_bundle_manifest',
+    schema_version: 1,
+    bundle_id: 'redcube-ai.current-program',
+    owner: 'RedCube AI',
+    state: 'active_generated_bundle_metadata',
+    program_id: sourceIndex.program_id,
+    date_anchor: sourceIndex.date_anchor,
+    assembly_ref: ASSEMBLY_REF,
+    index_ref: INDEX_REF,
+    source_root_ref: PARTS_ROOT,
+    source_ref_count: sourceIndex.source_part_refs.length,
+    source_digest: sha256(stable(sourceIndex.source_part_refs.map((sourcePart) => ({
+      json_pointer: sourcePart.json_pointer,
+      ref: sourcePart.ref,
+      sha256: sourcePart.sha256,
+    })))),
+    generated_aggregate: {
+      ref: AGGREGATE_SNAPSHOT_REF,
+      role: 'generated_read_through_snapshot_for_existing_consumers',
+      do_not_edit: true,
+      write_command: WRITE_COMMAND,
+      check_command: CHECK_COMMAND,
+    },
+    commands: {
+      write: WRITE_COMMAND,
+      check: CHECK_COMMAND,
+      sync_compat_alias: SYNC_COMMAND,
+    },
+    false_authority_flags: FALSE_AUTHORITY_FLAGS,
+    not_claims: [
+      'domain_ready',
+      'production_ready',
+      'visual_ready',
+      'quality_or_export_verdict',
+      'owner_receipt',
+      'typed_blocker',
+      'artifact_authority',
+    ],
   };
 }
 
 function expectedGeneratedFiles() {
   const sourcePartRefs = sourcePartRefsFromFiles();
   const aggregate = assembleCurrentProgramFromParts(sourcePartRefs);
-  const manifest = buildCurrentProgramPackBundleManifest();
+  const sourceIndex = buildCurrentProgramSourceIndex();
+  const bundleManifest = buildCurrentProgramPackBundleManifest();
   const assembly = buildCurrentProgramAssembly(sourcePartRefs);
   return new Map([
     [AGGREGATE_SNAPSHOT_REF, stable(aggregate)],
-    [INDEX_REF, stable(manifest)],
+    [INDEX_REF, stable(sourceIndex)],
+    [MANIFEST_REF, stable(bundleManifest)],
     [ASSEMBLY_REF, stable(assembly)],
   ]);
 }
@@ -425,7 +495,7 @@ export function syncCurrentProgramLeafIndex() {
 }
 
 function assertGeneratedManifestMatchesSourceParts() {
-  const generated = buildCurrentProgramPackBundleManifest();
+  const generated = buildCurrentProgramSourceIndex();
   const tracked = readJson(INDEX_REF);
   assert.equal(isDeepStrictEqual(tracked, generated), true);
 }

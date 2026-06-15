@@ -1,9 +1,13 @@
 {
   "surface_kind": "rca_current_program_pack_bundle_assembly",
   "schema_version": 1,
+  "bundle_id": "redcube-ai.current-program",
+  "owner": "RedCube AI",
+  "state": "active_source_bundle",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
   "aggregate_ref": "contracts/runtime-program/current-program.json",
-  "manifest_ref": "contracts/runtime-program/current-program.index.json",
+  "index_ref": "contracts/runtime-program/current-program.index.json",
+  "manifest_ref": "contracts/runtime-program/current-program.bundle-manifest.json",
   "generated_array_fields": [
     "/current_state/active_baton/scope/privatized_functional_module_audit/modules",
     "/current_state/privatized_functional_module_audit/modules",
@@ -11,11 +15,24 @@
     "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules",
     "/product_release_metadata/privatized_functional_module_audit/modules"
   ],
+  "commands": {
+    "write": "npm run contracts:current-program:write",
+    "check": "npm run contracts:current-program:check",
+    "sync_compat_alias": "npm run contracts:current-program:sync"
+  },
   "generated_aggregate_role": "generated_read_through_snapshot_for_existing_consumers",
   "canonical_truth_model": "source_parts_are_canonical_current_program_sources",
   "source_part_contract": {
     "part_ref_path_rule": "source_root_ref plus JSON pointer path segments; array indexes are zero-padded to four digits",
     "max_part_json_line_count": 800,
     "aggregate_must_be_rebuilt_from_parts": true
+  },
+  "false_authority_flags": {
+    "aggregate_snapshot_is_canonical_source": false,
+    "aggregate_snapshot_is_edit_surface": false,
+    "source_refs_are_generated_from_aggregate": false,
+    "docs_are_machine_truth": false,
+    "manifest_can_claim_domain_ready": false,
+    "manifest_can_authorize_quality_or_export": false
   }
 }
