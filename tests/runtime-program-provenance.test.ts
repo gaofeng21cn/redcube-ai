@@ -88,17 +88,30 @@ const HISTORICAL_CONTRACTS = Object.freeze([
   },
 ]);
 
-test('current runtime program is backed by indexed leaf refs instead of a monolithic truth owner', () => {
+test('current runtime program is backed by source parts and a generated consumer aggregate', () => {
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const assembly = readJson('contracts/runtime-program/current-program.assembly.json');
   const index = readJson('contracts/runtime-program/current-program.index.json');
   const syncCheck = checkCurrentProgramLeafIndex();
 
-  assert.equal(index.surface_kind, 'rca_current_program_leaf_index');
-  assert.equal(index.schema_version, 2);
-  assert.equal(index.aggregate_snapshot_ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(index.aggregate_snapshot_role, 'generated_read_through_snapshot_for_existing_consumers');
-  assert.equal(index.canonical_truth_model, 'leaf_refs_are_canonical_current_program_sources');
-  assert.equal(index.no_second_truth_rule.includes('must mirror every indexed leaf ref'), true);
+  assert.equal(assembly.surface_kind, 'rca_current_program_pack_bundle_assembly');
+  assert.equal(assembly.schema_version, 1);
+  assert.equal(assembly.source_root_ref, 'contracts/runtime-program/current-program-parts');
+  assert.equal(assembly.aggregate_ref, 'contracts/runtime-program/current-program.json');
+  assert.equal(assembly.manifest_ref, 'contracts/runtime-program/current-program.index.json');
+  assert.equal(assembly.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
+  assert.equal(assembly.generated_aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
+  assert.equal(Array.isArray(assembly.generated_array_fields), true);
+  assert.equal(assembly.generated_array_fields.includes('/current_state/active_baton/scope/privatized_functional_module_audit/modules'), true);
+
+  assert.equal(index.surface_kind, 'rca_current_program_pack_bundle_manifest');
+  assert.equal(index.schema_version, 3);
+  assert.equal(index.assembly_ref, 'contracts/runtime-program/current-program.assembly.json');
+  assert.equal(index.source_root_ref, 'contracts/runtime-program/current-program-parts');
+  assert.equal(index.aggregate_ref, 'contracts/runtime-program/current-program.json');
+  assert.equal(index.aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
+  assert.equal(index.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
+  assert.equal(index.no_second_truth_rule.includes('generated from current-program-parts'), true);
   assert.equal(index.split_policy.aggregate_snapshot_is_not_canonical_edit_surface, true);
 
   const indexedSectionIds = index.section_roots.map((section) => section.section_id);
@@ -114,16 +127,19 @@ test('current runtime program is backed by indexed leaf refs instead of a monoli
     'historical_snapshots',
   ]);
 
-  assert.equal(index.leaf_refs.length > index.section_roots.length, true);
+  assert.equal(index.source_part_refs.length > index.section_roots.length, true);
+  assert.deepEqual(index.leaf_refs, index.source_part_refs);
   assert.deepEqual(syncCheck.mismatches, []);
-  assert.equal(syncCheck.leaf_ref_count, index.leaf_refs.length);
+  assert.equal(syncCheck.source_part_ref_count, index.source_part_refs.length);
   for (const section of index.section_roots) {
-    assert.equal(existsSync(path.resolve(section.ref_root)), true, section.ref_root);
+    assert.equal(existsSync(path.resolve(section.source_root_ref)), true, section.source_root_ref);
   }
-  for (const leaf of index.leaf_refs) {
-    assert.equal(existsSync(path.resolve(leaf.ref)), true, leaf.ref);
-    assert.equal(leaf.line_count <= index.split_policy.max_leaf_json_line_count, true, leaf.ref);
-    assert.deepEqual(readJson(leaf.ref), valueAtJsonPointer(currentProgram, leaf.json_pointer), leaf.ref);
+  for (const sourcePart of index.source_part_refs) {
+    assert.equal(existsSync(path.resolve(sourcePart.ref)), true, sourcePart.ref);
+    assert.equal(sourcePart.ref.startsWith(`${assembly.source_root_ref}/`), true, sourcePart.ref);
+    assert.equal(sourcePart.line_count <= index.split_policy.max_part_json_line_count, true, sourcePart.ref);
+    assert.match(sourcePart.sha256, /^[a-f0-9]{64}$/);
+    assert.deepEqual(readJson(sourcePart.ref), valueAtJsonPointer(currentProgram, sourcePart.json_pointer), sourcePart.ref);
   }
 });
 
