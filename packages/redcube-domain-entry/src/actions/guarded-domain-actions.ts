@@ -661,6 +661,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         current_surface_refs: FUNCTIONAL_MODULE_CURRENT_SURFACE_REFS[entry.module_id] || [entry.surface_ref],
         rca_projection_mode: replacementGuard.rca_projection_mode || 'refs_only_projection',
         rca_exports_only: replacementGuard.rca_exports_only || [],
+        default_caller_contract: replacementGuard.default_caller_contract
+          ? { ...replacementGuard.default_caller_contract }
+          : undefined,
         forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
         physical_deletion_guard: buildFunctionalModulePhysicalDeletionGuard(entry),
         rca_retains: entry.rcaRetains || [],

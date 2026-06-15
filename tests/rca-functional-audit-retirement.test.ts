@@ -419,6 +419,28 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     byId.product_entry_continuity_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
+  assert.deepEqual(byId.product_entry_continuity_refs_adapter.default_caller_cutover_gate, {
+    generated_session_shell_owner: 'one-person-lab',
+    generated_session_command: 'opl_generated:product_session',
+    generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+    current_status: 'opl_generated_session_shell_domain_refs',
+    rca_role_after_cutover: 'domain_session_snapshot_refs_only',
+    rca_owns_generic_session_shell: false,
+    rca_owns_generic_workbench: false,
+    rca_owns_generated_wrapper: false,
+    physical_delete_authorized_now: false,
+    physical_delete_requires_owner_receipt_ref:
+      'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
+    no_forbidden_write_ref:
+      'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+  });
+  assert.deepEqual(byId.product_entry_continuity_refs_adapter.no_resurrection_gate, {
+    generic_session_runtime_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generated_wrapper_owner_allowed: false,
+    compatibility_alias_allowed: false,
+    physical_delete_without_owner_receipt_allowed: false,
+  });
   assert.equal(
     byId.redcube_domain_entry_package_protocol_boundary.current_rca_role,
     'package_protocol_boundary_for_domain_action_protocol_not_public_framework_identity',

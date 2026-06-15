@@ -193,6 +193,28 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'latest_visual_run_ref',
       'operator_navigation_refs',
     ],
+    default_caller_cutover_gate: {
+      generated_session_shell_owner: 'one-person-lab',
+      generated_session_command: 'opl_generated:product_session',
+      generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+      current_status: 'opl_generated_session_shell_domain_refs',
+      rca_role_after_cutover: 'domain_session_snapshot_refs_only',
+      rca_owns_generic_session_shell: false,
+      rca_owns_generic_workbench: false,
+      rca_owns_generated_wrapper: false,
+      physical_delete_authorized_now: false,
+      physical_delete_requires_owner_receipt_ref:
+        'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
+      no_forbidden_write_ref:
+        'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+    },
+    no_resurrection_gate: {
+      generic_session_runtime_owner_allowed: false,
+      generic_workbench_owner_allowed: false,
+      generated_wrapper_owner_allowed: false,
+      compatibility_alias_allowed: false,
+      physical_delete_without_owner_receipt_allowed: false,
+    },
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime', 'session'],
       allowed_as: ['refs_only_read_model', 'contract_safe_semantic_id', 'locator_protocol_boundary'],

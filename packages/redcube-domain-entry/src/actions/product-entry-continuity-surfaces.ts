@@ -78,6 +78,50 @@ const REDCUBE_OPERATOR_REVIEW_GATE_ID = 'redcube_operator_review_gate';
 const DEFAULT_INTERRUPT_POLICY = 'continue_autonomously_until_runtime_gate';
 const REVIEW_INTERRUPT_POLICY = 'human_gate_required_before_continuation';
 
+const SESSION_REFS_ADAPTER_EXPORTS = Object.freeze([
+  'entry_session_id',
+  'topic_deliverable_run_locator_refs',
+  'latest_visual_run_ref',
+  'domain_snapshot_ref',
+]);
+
+const SESSION_REFS_ADAPTER_RETAINED_RCA_AUTHORITY = Object.freeze([
+  'entry_session_domain_refs',
+  'deliverable_locator_refs',
+  'latest_visual_run_ref',
+]);
+
+export function buildGeneratedSessionShellBoundary() {
+  return {
+    surface_kind: 'generated_session_shell_boundary',
+    surface_id: 'product_entry_continuity_refs_adapter',
+    generated_session_shell_owner: 'one-person-lab',
+    generated_session_command: 'opl_generated:product_session',
+    generated_session_command_template: PRODUCT_ENTRY_SESSION_COMMAND_TEMPLATE,
+    rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+    classification: 'refs_only_read_model',
+    default_caller_status: 'opl_generated_session_shell_domain_refs',
+    rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
+    rca_exports_only: [...SESSION_REFS_ADAPTER_EXPORTS],
+    retained_rca_authority: [...SESSION_REFS_ADAPTER_RETAINED_RCA_AUTHORITY],
+    rca_owns_generic_session_shell: false,
+    rca_owns_generic_workbench: false,
+    rca_owns_generated_wrapper: false,
+    physical_delete_authorized_now: false,
+    physical_delete_requires_owner_receipt_ref: 'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
+    no_forbidden_write_ref: 'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+    forbidden_writes: [
+      'visual_truth_body',
+      'artifact_body',
+      'visual_memory_body',
+      'review_export_verdict_body',
+      'owner_receipt_body',
+      'generic_session_store_state',
+      'generic_workbench_state',
+    ],
+  };
+}
+
 function buildControlPolicy({ projection, typedBlocker = null, manifestProjection = false }) {
   const needsUserDecision = Boolean(projection?.needs_user_decision);
   const contentStatus = safeText(projection?.content_status);
@@ -157,9 +201,11 @@ export function buildSessionContinuitySurface({
       profile_id: deliveryIdentity?.profile_id ?? null,
     },
     restore_point: restorePoint,
+    generated_session_shell_boundary: buildGeneratedSessionShellBoundary(),
     summary: {
       entry_session_id: entrySessionId,
       latest_handle: restorePoint.latest_handle,
+      default_caller: 'opl_generated:product_session',
     },
   };
 }

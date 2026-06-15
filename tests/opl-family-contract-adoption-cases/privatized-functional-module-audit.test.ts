@@ -251,6 +251,20 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(byId.product_entry_continuity_refs_adapter.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
   assert.equal(byId.product_entry_continuity_refs_adapter.opl_generic_primitive, 'workbench_shell');
   assert.equal(byId.product_entry_continuity_refs_adapter.migration_class, 'refs_only_adapter');
+  assert.deepEqual(byId.product_entry_continuity_refs_adapter.default_caller_contract, {
+    surface_kind: 'generated_session_shell_boundary',
+    generated_session_shell_owner: 'one-person-lab',
+    generated_session_command: 'opl_generated:product_session',
+    generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+    rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+    default_caller_status: 'opl_generated_session_shell_domain_refs',
+    rca_owns_generic_session_shell: false,
+    physical_delete_authorized_now: false,
+    physical_delete_requires_owner_receipt_ref:
+      'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
+    no_forbidden_write_ref:
+      'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+  });
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
   assert.equal(byId.workspace_source_intake.activeCallerStatus, 'opl_workspace_source_shell_domain_handler_refs');
   assert.equal(byId.workspace_source_intake.migration_class, 'refs_only_adapter');

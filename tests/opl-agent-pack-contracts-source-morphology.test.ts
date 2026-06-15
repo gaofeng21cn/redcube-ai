@@ -108,6 +108,18 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.product_entry_continuity_refs_adapter.current_rca_role,
     'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell',
   );
+  assert.equal(
+    byId.product_entry_continuity_refs_adapter.default_caller_cutover_gate.generated_session_command,
+    'opl_generated:product_session',
+  );
+  assert.equal(
+    byId.product_entry_continuity_refs_adapter.default_caller_cutover_gate.rca_owns_generic_session_shell,
+    false,
+  );
+  assert.equal(
+    byId.product_entry_continuity_refs_adapter.no_resurrection_gate.physical_delete_without_owner_receipt_allowed,
+    false,
+  );
   assert.deepEqual(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.allowed_as, [
     'refs_only_read_model',
     'contract_safe_semantic_id',

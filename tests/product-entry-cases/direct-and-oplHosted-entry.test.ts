@@ -341,6 +341,46 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     );
     assert.equal(session.session_continuity.surface_kind, 'session_continuity');
     assert.equal(session.session_continuity.entry_session_id, 'session-a');
+    assert.deepEqual(session.session_continuity.generated_session_shell_boundary, {
+      surface_kind: 'generated_session_shell_boundary',
+      surface_id: 'product_entry_continuity_refs_adapter',
+      generated_session_shell_owner: 'one-person-lab',
+      generated_session_command: 'opl_generated:product_session',
+      generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+      rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
+      classification: 'refs_only_read_model',
+      default_caller_status: 'opl_generated_session_shell_domain_refs',
+      rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
+      rca_exports_only: [
+        'entry_session_id',
+        'topic_deliverable_run_locator_refs',
+        'latest_visual_run_ref',
+        'domain_snapshot_ref',
+      ],
+      retained_rca_authority: [
+        'entry_session_domain_refs',
+        'deliverable_locator_refs',
+        'latest_visual_run_ref',
+      ],
+      rca_owns_generic_session_shell: false,
+      rca_owns_generic_workbench: false,
+      rca_owns_generated_wrapper: false,
+      physical_delete_authorized_now: false,
+      physical_delete_requires_owner_receipt_ref:
+        'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
+      no_forbidden_write_ref:
+        'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+      forbidden_writes: [
+        'visual_truth_body',
+        'artifact_body',
+        'visual_memory_body',
+        'review_export_verdict_body',
+        'owner_receipt_body',
+        'generic_session_store_state',
+        'generic_workbench_state',
+      ],
+    });
+    assert.equal(session.session_continuity.summary.default_caller, 'opl_generated:product_session');
     assert.equal(session.summary.target_handle, session.summary.latest_handle);
     assert.equal(session.ppt_deck_visual_route_session.default_visual_route, 'author_image_pages');
     assert.equal(session.ppt_deck_visual_route_session.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
