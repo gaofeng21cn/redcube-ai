@@ -73,7 +73,7 @@
 - 修改 formal-entry、execution handle、runtime mainline、program brief 路径、测试命令或 CI 分层时，必须同步改 README、docs、contracts 与相关测试。
 - 叙述性 `README*`、`docs/**` 和参考文档不作为脚本/测试的断言对象；可以测试 machine-readable contract、schema、CLI/API 行为、生成产物结构与路径，但不要用测试固定文档措辞、章节或状态文案。
 - 默认最小验证入口是 `scripts/verify.sh`。
-- 默认 smoke 是 `npm test` / `npm run test:fast`。
+- 默认 smoke 是 `npm test` / `npm run test:smoke`；`npm run test:fast` 是显式标准本地入口，不作为裸 `npm test` 的默认成本。
 - `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。
 - `npm run test:full` 是 clean-clone 基线。
 - `scripts/run-test-group.ts` 是默认 Node 测试分组入口；它必须给所有 Python native helper 子进程注入仓外 cache 环境。新增直接启动 Python 的测试或脚本时，必须显式继承 `PYTHONDONTWRITEBYTECODE`、`PYTHONPYCACHEPREFIX`、pytest 仓外 `cache_dir` 和仓外 project venv 路径，不得把 `.venv`、`__pycache__`、`.pytest_cache` 或 `*.egg-info` 写回开发 checkout。

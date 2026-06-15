@@ -103,7 +103,7 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
-  assert.equal(pkg.scripts.test, 'npm run test:fast');
+  assert.equal(pkg.scripts.test, 'npm run test:smoke');
   assert.equal(pkg.scripts['test:smoke'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts smoke');
   assert.equal(pkg.scripts['test:fast'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts fast');
   assert.equal(
