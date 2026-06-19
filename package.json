@@ -44,7 +44,7 @@
     "@redcube/domain-entry": "0.1.0",
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
-    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#c5d4a93bd4bb64adf1228ecf7f2a9038c7dce278"
+    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#3a3aaddd0a3e980f86e762ca1ed942bbda6f30d7"
   },
   "devDependencies": {
     "typescript": "^5.9.2",

@@ -31,6 +31,7 @@ import {
   mergeArtifactInventoryWithPublicationRefs,
   publicationProjectionForDeliverable,
 } from './get-product-entry-session-parts/session-artifacts.js';
+import type { ProductEntrySessionResponse } from '../types.js';
 import {
   buildProductEntrySessionSummary,
   buildPptImageRouteSessionSurface,
@@ -59,7 +60,7 @@ function productEntrySessionPath(entrySessionId) {
   return productEntrySessionFile(entrySessionId);
 }
 
-export async function getProductEntrySession(request) {
+export async function getProductEntrySession(request): Promise<ProductEntrySessionResponse> {
   const entrySessionId = requireField(
     'entry_session_id',
     request?.entry_session_id || request?.entrySessionId,

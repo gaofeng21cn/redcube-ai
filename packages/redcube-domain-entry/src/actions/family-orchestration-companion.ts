@@ -3,6 +3,8 @@ import {
   buildFamilyProductEntryPresetOrchestration,
 } from 'opl-framework-shared/family-orchestration';
 
+import type { FamilyOrchestrationCompanion } from '../types.js';
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -65,7 +67,7 @@ export function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
 export function buildSessionContinuationFamilyOrchestration({
   continuationSnapshot,
   sessionLocatorField = 'entry_session.entry_session_id',
-}) {
+}): FamilyOrchestrationCompanion {
   return buildFamilyOrchestrationCompanion({
     sessionLocatorField,
     gateStatus: resolveHumanGateStatusFromContinuation(continuationSnapshot),
@@ -81,7 +83,7 @@ export function buildFamilyOrchestrationCompanion({
   reviewSurfaceRef = null,
   eventEnvelopeSurfaceRef = null,
   checkpointLineageSurfaceRef = null,
-}) {
+}): FamilyOrchestrationCompanion {
   const sessionField = safeText(sessionLocatorField);
   if (!sessionField) {
     throw new Error('family_orchestration.resume_contract.session_locator_field 不能为空');
