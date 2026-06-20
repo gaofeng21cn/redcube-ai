@@ -14,7 +14,7 @@ RCA 采用 OPL-family canonical docs taxonomy：
 
 `active/public/product/runtime/delivery/source/policies/specs/references/history`
 
-这个目录集合按长期职责保留，不按当前文件数量决定。RCA 当前 `active/product/runtime/delivery/source/policies/references/history` 都已有真实承载；`public/specs` 可以保持薄索引，但必须写清职责和新增正文准入规则。
+这个目录集合按长期职责保留，不按当前文件数量决定。RCA 当前 `active/product/runtime/delivery/source/policies/references/history` 都已有真实承载；`public/specs` 可以保持薄索引，但必须写清职责和新增正文准入规则。OPL family Foundry Agent OS target delta 的机器 owner 是 `contracts/foundry-agent-os-domain-kernel-manifest.json`，人读 support owner 是 `docs/active/foundry-agent-os-target-delta.md`；它只解释 Visual Authority Kernel 与 OPL upcollect surfaces，不替代 active gap plan 或 readiness evidence。
 
 ## 与 OPL 的分层
 
@@ -27,7 +27,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | 目录 | 长期职责 | 当前 RCA 承载 |
 | --- | --- | --- |
 | `docs/` root | docs 入口、核心五件套、docs governance | `README.md`、核心五件套、本文件。 |
-| `docs/active/` | 当前执行、当前计划、当前差距、active baton、当前完成门槛 | 当前只承接 `rca-ideal-state-gap-plan.md` 这类仍在推进的完成计划。 |
+| `docs/active/` | 当前执行、当前计划、当前差距、active baton、当前完成门槛、target-delta support | `rca-ideal-state-gap-plan.md` 是唯一 active gap plan；`foundry-agent-os-target-delta.md` 是 `contracts/foundry-agent-os-domain-kernel-manifest.json` 的人读 support，不替代 active plan。 |
 | `docs/public/` | public narrative index | 当前较薄；除非未来有真正公开材料，否则保持薄索引。 |
 | `docs/product/` | quickstart、profile、public publish、product/operator handoff | 真实承载。 |
 | `docs/runtime/` | runtime topology、executor/backend、service-safe entry、watch/projection | 真实承载但较薄，核心是 runtime architecture。 |
@@ -54,19 +54,21 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | Runtime / delivery / source historical freezes | 旧 OPL managed runtime 三层讨论、route evolution probe、direct-delivery/source future freeze、Deep Research auto-first product semantics 和 creative-stage audit 只作为 history/provenance 读取；当前 truth 回到 owner docs、active gap plan、machine-readable contracts、source 和 tests。 |
 | Old route vocabulary | `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/`、`docs/history/positioning/` 和 `docs/history/tombstones/` 只保留 provenance/tombstone；Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。 |
 | Capability-like material | 不恢复 `docs/capabilities/`；新增 capability-like 内容先进入 contracts、manifest、domain action catalog 或对应 owner doc。 |
+| Foundry Agent OS target delta | `contracts/foundry-agent-os-domain-kernel-manifest.json` 是机器 SSOT；`docs/active/foundry-agent-os-target-delta.md` 只解释 retained Visual Authority Kernel、OPL upcollect surfaces、`current_owner_delta` 默认读根和 false-authority flags。 |
 
 ## 内容级整合规则
 
 1. 当前 visual truth、route truth、review/export verdict、artifact authority 合入核心五件套、runtime/delivery/source owner docs 或 machine surfaces。
 2. 当前 baton 和 active plan 留在 `docs/active/`；已完成且只解释合同面的 support brief 进入 `docs/references/`。
 2.1. dated follow-through、tranche closeout、命令证据流水、run/probe id、截图路径和阶段性校准过程进入 `docs/history/process/`、`docs/history/plans/` 或其他 precise history/provenance 层；active/reference 主文档只保留当前定位、边界、差距、证据缺口和下一步顺序。
-3. Product/operator/profile/release 支撑进入 `docs/product/`。
-4. Runtime topology、service-safe entry、watch/projection 进入 `docs/runtime/`。
-5. Deliverable route/proof/export/manual validation 进入 `docs/delivery/`。
-6. Source readiness、augmentation、deep research trigger/gate 进入 `docs/source/`。
-7. AI-first、visual memory、runtime model、deliverable contract model 等稳定规则进入 `docs/policies/`。
-8. 目标态、OPL handoff、governance checklist 和支持性技术参考进入 `docs/references/`，不得写成 current truth。
-9. Hermes-first、gateway/harness/bridge/federation 旧叙事进入 `docs/history/` 或 tombstone。
+3. Foundry Agent OS target delta 的机器合同入口是 `contracts/foundry-agent-os-domain-kernel-manifest.json`；`docs/active/foundry-agent-os-target-delta.md` 只解释 retained Visual Authority Kernel、OPL upcollect surfaces、`current_owner_delta` 默认读根和 false-authority flags。
+4. Product/operator/profile/release 支撑进入 `docs/product/`。
+5. Runtime topology、service-safe entry、watch/projection 进入 `docs/runtime/`。
+6. Deliverable route/proof/export/manual validation 进入 `docs/delivery/`。
+7. Source readiness、augmentation、deep research trigger/gate 进入 `docs/source/`。
+8. AI-first、visual memory、runtime model、deliverable contract model 等稳定规则进入 `docs/policies/`。
+9. 目标态、OPL handoff、governance checklist 和支持性技术参考进入 `docs/references/`，不得写成 current truth。
+10. Hermes-first、gateway/harness/bridge/federation 旧叙事进入 `docs/history/` 或 tombstone。
 
 ## Direct Retirement
 
@@ -96,6 +98,7 @@ Future foldback uses this routing:
 | Future evidence | Owner |
 | --- | --- |
 | Durable RCA current truth, gap, owner-delta or no-ready boundary | Core five docs, active gap plan, owner docs, contracts, source or tests |
+| Foundry Agent OS target-delta owner split or default-read-root rule | `contracts/foundry-agent-os-domain-kernel-manifest.json`, with `docs/active/foundry-agent-os-target-delta.md` as human support |
 | Production evidence proof, route probe details, run/probe ids, screenshots, no-regression refs | Runtime/evidence ledger, retained process record, precise history/provenance owner, or git history |
 | Docs lifecycle tranche closeout | `docs/history/process/README.md` as a compressed theme row, not a dated proof ledger |
 | Retired command/helper/fallback/test/workflow no-resurrection | `retired-surface-provenance.md` plus machine guard/source/test owner |
