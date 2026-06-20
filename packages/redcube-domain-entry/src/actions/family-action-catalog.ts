@@ -198,7 +198,29 @@ function action({
   };
 }
 
-const ACTION_CATALOG = normalizeFamilyActionCatalog({
+function attachSourceOfWork(catalog: JsonMap | null): JsonMap | null {
+  if (!catalog) return catalog;
+  return {
+    ...catalog,
+    actions: (catalog.actions ?? []).map((entry: JsonMap) => ({
+      ...entry,
+      source_of_work: sourceOfWork(entry.action_id),
+    })),
+  };
+}
+
+function sourceOfWork(actionId: string): JsonMap {
+  return {
+    source_catalog: 'family_action_catalog',
+    source_catalog_ref: 'family_action_catalog:redcube_product_entry_action_catalog',
+    source_action_id: actionId,
+    stage_catalog_ref: 'family_stage_control_plane',
+    derived_surface_policy: 'derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog',
+    domain_repo_wrapper_policy: 'handler_target_refs_only_adapter_or_tombstone_candidate',
+  };
+}
+
+const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
   surface_kind: 'family_action_catalog',
   version: 'family-action-catalog.v1',
   catalog_id: 'redcube_product_entry_action_catalog',
@@ -426,7 +448,7 @@ const ACTION_CATALOG = normalizeFamilyActionCatalog({
     'RCA owns action semantics and domain handlers; OPL owns generated CLI/MCP/Skill/product/status/workbench descriptors derived from this catalog.',
     'Repo-local redcube CLI/MCP remain domain handler targets and direct diagnostic entries, not unified metadata owners.',
   ],
-});
+}));
 
 if (!ACTION_CATALOG) {
   throw new Error('Failed to build RedCube family action catalog');

@@ -319,6 +319,44 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     ],
   },
   {
+    surface_id: 'product_entry_manifest_projection',
+    source_refs: [
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/',
+    ],
+    classification: 'refs_only_read_model',
+    current_rca_role: 'body_free_product_entry_manifest_projection_and_shell_catalog_not_generated_wrapper_owner',
+    allowed_outputs: [
+      'product_entry_manifest_refs',
+      'domain_entry_contract_refs',
+      'visual_route_policy_refs',
+      'operator_projection_refs',
+      'opl_generated_shell_projection_refs',
+      'typed_blocker_refs',
+    ],
+    legacy_name_allowance: legacyNameAllowance({
+      legacy_terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
+      allowed_as: [
+        'refs_only_read_model',
+        'domain_handler_target',
+        'contract_safe_semantic_id',
+        'locator_protocol_boundary',
+        'negative_test_guard',
+      ],
+      rationale: 'Product-entry manifest assembly and parts expose body-free RCA domain refs, visual route policy refs, OPL generated shell refs, operator projections, and typed blockers; legacy control-plane wording is limited to refs, semantic ids, negative guards, or generated-shell pointers and cannot create RCA-owned product/session/workbench/domain_action_adapter wrappers.',
+    }),
+    no_resurrection_gate: {
+      generic_product_wrapper_owner_allowed: false,
+      generic_session_runtime_owner_allowed: false,
+      generic_workbench_owner_allowed: false,
+      generic_domain_action_adapter_owner_allowed: false,
+      generic_generated_wrapper_owner_allowed: false,
+      compatibility_alias_allowed: false,
+      callable_alias_allowed: false,
+      production_readiness_claim_allowed: false,
+    },
+  },
+  {
     surface_id: 'visual_authority_functions',
     source_refs: [
       'packages/redcube-runtime/src/creative-ownership.ts',
