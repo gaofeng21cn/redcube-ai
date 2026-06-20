@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
-export const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
+const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
   'visual_truth',
   'visual_truth_body',
   'visual_verdict',

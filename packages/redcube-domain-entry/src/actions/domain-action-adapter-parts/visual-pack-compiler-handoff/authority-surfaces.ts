@@ -10,14 +10,14 @@ export const RCA_MINIMAL_AUTHORITY_FUNCTIONS = Object.freeze([
   'native_helper_implementation',
 ]);
 
-export const RCA_AI_FIRST_JUDGMENT_SURFACES = Object.freeze([
+const RCA_AI_FIRST_JUDGMENT_SURFACES = Object.freeze([
   'source_readiness_verdict',
   'communication_visual_direction_decision',
   'review_export_verdict',
   'visual_memory_accept_reject',
 ]);
 
-export const RCA_PROGRAMMATIC_AUTHORITY_SURFACES = Object.freeze([
+const RCA_PROGRAMMATIC_AUTHORITY_SURFACES = Object.freeze([
   'artifact_mutation_authorization',
   'owner_receipt_signer',
   'native_helper_implementation',

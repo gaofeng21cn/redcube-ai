@@ -15,7 +15,7 @@ export const RCA_RETAINED_VISUAL_AUTHORITY = Object.freeze([
   'safe_action_refs',
 ]);
 
-export const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
+const OPL_OWNED_GENERIC_PRIMITIVES = Object.freeze([
   'standard_domain_agent_scaffold',
   'functional_harness',
   'generic_runtime',
@@ -95,7 +95,7 @@ export const OPL_GENERATED_INTERFACE_CONSUMPTION = Object.freeze({
   },
 });
 
-export const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
+const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
   'family_conflict_envelope',
   'control_loop_summary',
   'usage_projection',
@@ -104,7 +104,7 @@ export const OPL_STABILITY_READ_MODEL_SURFACES = Object.freeze([
   'external_stability_policy',
 ]);
 
-export const OPL_FUNCTIONAL_HARNESS_COVERAGE = Object.freeze({
+const OPL_FUNCTIONAL_HARNESS_COVERAGE = Object.freeze({
   harness_role: 'functional_harness_consumer',
   coverage_status: 'domain_authority_pack_landed',
   pass_claim_scope: 'consumer_contract_coverage_only',

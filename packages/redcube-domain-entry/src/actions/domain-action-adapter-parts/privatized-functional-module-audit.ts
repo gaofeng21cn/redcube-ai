@@ -103,13 +103,13 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
   },
 });
 
-export const RCA_BRIDGE_EXIT_REQUIRED_GATES = Object.freeze([
+const RCA_BRIDGE_EXIT_REQUIRED_GATES = Object.freeze([
   'domain_authority_refs_preserved',
   'no_regression_proof_recorded',
   'explicit_owner_receipt_authorizes_physical_delete',
 ]);
 
-export const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
+const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
   'source_readiness_verdict',
   'communication_visual_direction_decision',
   'review_export_verdict',

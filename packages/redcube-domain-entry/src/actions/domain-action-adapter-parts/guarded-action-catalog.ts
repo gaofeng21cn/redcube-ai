@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-export const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
+const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
   {
     action: 'emit_no_regression_evidence',
     effect: 'guarded_runtime_evidence_write',
@@ -114,14 +114,14 @@ export const DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS = Object.freeze([
   },
 ]);
 
-export const DOMAIN_ACTION_ADAPTER_FORBIDDEN_WRITES = Object.freeze([
+const DOMAIN_ACTION_ADAPTER_FORBIDDEN_WRITES = Object.freeze([
   'visual_truth',
   'review_verdict',
   'publication_gate',
   'canonical_artifacts',
 ]);
 
-export const DOMAIN_ACTION_ADAPTER_BLOCKED_ACTIONS = Object.freeze([
+const DOMAIN_ACTION_ADAPTER_BLOCKED_ACTIONS = Object.freeze([
   'write_visual_truth',
   'write_canonical_artifacts',
   'write_review_verdict',

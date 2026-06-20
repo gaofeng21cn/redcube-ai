@@ -135,7 +135,7 @@ export const RCA_PACKAGE_DISTRIBUTION_GATE = Object.freeze({
   external_runtime_authority_allowed: false,
 });
 
-export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
+const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'prompt_refs',
   'skill_refs',
   'tool_refs',
@@ -148,14 +148,14 @@ export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'handoff_policy',
 ]);
 
-export const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
+const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
   ref: 'agent/tools/domain_affordances.md',
   ref_kind: 'repo_path',
   role: 'domain_tool_affordance_catalog',
   catalog_role: 'available_affordance_catalog_not_workflow_script',
 });
 
-export const RCA_COGNITIVE_TOOL_AFFORDANCE_BOUNDARY = Object.freeze({
+const RCA_COGNITIVE_TOOL_AFFORDANCE_BOUNDARY = Object.freeze({
   catalog_role: 'available_affordance_catalog_not_workflow_script',
   capability_refs: [
     { ref: 'source_context_and_visual_brief_reading', ref_kind: 'policy_ref', role: 'capability_boundary' },

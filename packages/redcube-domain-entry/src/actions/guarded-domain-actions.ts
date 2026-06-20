@@ -16,9 +16,6 @@ import {
 } from './domain-action-adapter-parts/visual-pack-compiler-handoff.js';
 export {
   OPL_GENERATED_INTERFACE_CONSUMPTION,
-  OPL_FUNCTIONAL_HARNESS_COVERAGE,
-  OPL_OWNED_GENERIC_PRIMITIVES,
-  OPL_STABILITY_READ_MODEL_SURFACES,
   RCA_RETAINED_VISUAL_AUTHORITY,
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
