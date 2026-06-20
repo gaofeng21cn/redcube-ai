@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.ts';
+import { assertRepoRefResolves } from './helpers/rca-retired-surface-guard.ts';
 
 test('RCA physical source morphology policy classifies active source tails without generic ownership', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
@@ -174,6 +175,41 @@ test('RCA physical source morphology policy classifies active source tails witho
   for (const entry of policy.active_surface_classifications) {
     for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
       assert.equal(value, false, entry.surface_id);
+    }
+  }
+});
+
+test('RCA physical source morphology source refs resolve under source_ref_integrity_gate', () => {
+  const policy = readJson('contracts/physical_source_morphology_policy.json');
+
+  assert.deepEqual(policy.source_ref_integrity_gate, {
+    policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
+    applies_to: [
+      'active_surface_classifications[*].source_refs',
+      'active_surface_classifications[*].machine_boundary_refs',
+    ],
+    accepted_ref_shapes: ['repo_path', 'repo_directory', 'repo_path_anchor'],
+    anchor_separator: '#',
+    repo_local_refs_only: true,
+    absolute_path_allowed: false,
+    parent_directory_traversal_allowed: false,
+    uri_ref_allowed: false,
+    machine_boundary_refs_require_anchor: true,
+    stale_source_ref_reopens_gap: true,
+    missing_source_ref_allowed: false,
+    missing_machine_boundary_anchor_allowed: false,
+    generic_owner_classification_from_unresolved_ref_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
+
+  for (const entry of policy.active_surface_classifications) {
+    assert.notDeepEqual(entry.source_refs ?? [], [], `${entry.surface_id}.source_refs`);
+    for (const sourceRef of entry.source_refs ?? []) {
+      assertRepoRefResolves(sourceRef, `${entry.surface_id}.source_refs`);
+    }
+    for (const sourceRef of entry.machine_boundary_refs ?? []) {
+      assert.equal(String(sourceRef).includes('#'), true, `${entry.surface_id}.machine_boundary_refs`);
+      assertRepoRefResolves(sourceRef, `${entry.surface_id}.machine_boundary_refs`);
     }
   }
 });
