@@ -69,6 +69,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
   assert.equal(byId.domain_action_adapter_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
+  assert.equal(byId.product_entry_manifest_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
   assert.equal(byId.visual_route_runtime_family_implementations.classification, 'visual_route_runtime_family_implementation');
   assert.equal(byId.repo_shell_verification_wrappers.classification, 'repo_native_verification_wrapper');
@@ -215,6 +216,39 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.operator_evidence_stability_projection.current_rca_role,
     'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
   );
+  assert.deepEqual(byId.product_entry_manifest_projection.source_refs, [
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/',
+  ]);
+  assert.equal(
+    byId.product_entry_manifest_projection.current_rca_role,
+    'body_free_product_entry_manifest_projection_and_shell_catalog_not_generated_wrapper_owner',
+  );
+  assert.deepEqual(byId.product_entry_manifest_projection.allowed_outputs, [
+    'product_entry_manifest_refs',
+    'domain_entry_contract_refs',
+    'visual_route_policy_refs',
+    'operator_projection_refs',
+    'opl_generated_shell_projection_refs',
+    'typed_blocker_refs',
+  ]);
+  assert.deepEqual(byId.product_entry_manifest_projection.legacy_name_allowance.allowed_as, [
+    'refs_only_read_model',
+    'domain_handler_target',
+    'contract_safe_semantic_id',
+    'locator_protocol_boundary',
+    'negative_test_guard',
+  ]);
+  assert.deepEqual(byId.product_entry_manifest_projection.no_resurrection_gate, {
+    generic_product_wrapper_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generic_domain_action_adapter_owner_allowed: false,
+    generic_generated_wrapper_owner_allowed: false,
+    compatibility_alias_allowed: false,
+    callable_alias_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
   assert.equal(
     byId.domain_action_adapter_guarded_actions.allowed_outputs.includes('visual_transition_decision_refs'),
     true,

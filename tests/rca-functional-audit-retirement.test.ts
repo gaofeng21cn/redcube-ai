@@ -368,6 +368,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     runtime_watch_projection: 'refs_only_read_model',
     domain_action_adapter_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
+    product_entry_manifest_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
     visual_route_runtime_family_implementations: 'visual_route_runtime_family_implementation',
     repo_shell_verification_wrappers: 'repo_native_verification_wrapper',
@@ -415,6 +416,16 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     repo_shell_verification_wrappers: {
       terms: ['runtime', 'session', 'domain_action_adapter'],
       allowedAs: ['repo_native_verification_wrapper', 'negative_test_guard'],
+    },
+    product_entry_manifest_projection: {
+      terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
+      allowedAs: [
+        'refs_only_read_model',
+        'domain_handler_target',
+        'contract_safe_semantic_id',
+        'locator_protocol_boundary',
+        'negative_test_guard',
+      ],
     },
     retired_product_entry_contract_tombstone_refs: {
       terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
@@ -584,6 +595,24 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     byId.operator_evidence_stability_projection.current_rca_role,
     'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
   );
+  assert.deepEqual(byId.product_entry_manifest_projection.source_refs, [
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/',
+  ]);
+  assert.equal(
+    byId.product_entry_manifest_projection.current_rca_role,
+    'body_free_product_entry_manifest_projection_and_shell_catalog_not_generated_wrapper_owner',
+  );
+  assert.deepEqual(byId.product_entry_manifest_projection.no_resurrection_gate, {
+    generic_product_wrapper_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generic_domain_action_adapter_owner_allowed: false,
+    generic_generated_wrapper_owner_allowed: false,
+    compatibility_alias_allowed: false,
+    callable_alias_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
   assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
   assert.equal(
     byId.retired_product_entry_contract_tombstone_refs.current_rca_role,
