@@ -1,9 +1,15 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.ts';
-import { assertRepoRefResolves } from './helpers/rca-retired-surface-guard.ts';
+import {
+  assertRepoRefResolves,
+  normalizePath,
+  sourceRefCoversFile,
+} from './helpers/rca-retired-surface-guard.ts';
 
 test('RCA physical source morphology policy classifies active source tails without generic ownership', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
@@ -36,6 +42,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'domain_handler_target',
     'minimal_visual_authority_function',
     'visual_native_helper_path',
+    'repo_native_verification_wrapper',
     'locator_protocol_boundary',
   ]);
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
@@ -50,6 +57,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
   assert.equal(policy.allowed_surface_classes.includes('refs_only_read_model'), true);
   assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
+  assert.equal(policy.allowed_surface_classes.includes('repo_native_verification_wrapper'), true);
 
   assert.equal(byId.mcp_product_entry_domain_entry.classification, 'service_safe_domain_entry');
   assert.equal(byId.redcube_cli_domain_entry_adapter.classification, 'service_safe_domain_entry');
@@ -60,6 +68,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.domain_action_adapter_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
+  assert.equal(byId.repo_shell_verification_wrappers.classification, 'repo_native_verification_wrapper');
   assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
   assert.equal(byId.retired_product_entry_contract_tombstone_refs.classification, 'tombstone_or_provenance');
   assert.deepEqual(byId.retired_product_entry_contract_tombstone_refs.retired_legacy_refs, [
@@ -90,6 +99,41 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.redcube_cli_domain_entry_adapter.current_rca_role,
     'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',
   );
+  assert.deepEqual(byId.repo_shell_verification_wrappers.source_refs, [
+    'scripts/opl-module-bootstrap.sh',
+    'scripts/opl-module-healthcheck.sh',
+    'scripts/repo-hygiene.sh',
+    'scripts/run-opl-quality-details.sh',
+    'scripts/run-structural-quality-gate.sh',
+    'scripts/run-with-repo-temp-env.sh',
+    'scripts/verify.sh',
+  ]);
+  assert.equal(
+    byId.repo_shell_verification_wrappers.current_rca_role,
+    'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_and_quality_gate_wrapper_not_runtime_owner',
+  );
+  assert.deepEqual(byId.repo_shell_verification_wrappers.allowed_outputs, [
+    'repo_hygiene_check_refs',
+    'external_temp_env_boundary_refs',
+    'repo_native_verification_refs',
+    'module_bootstrap_refs',
+    'module_healthcheck_refs',
+    'structural_quality_gate_refs',
+    'quality_details_refs',
+  ]);
+  assert.deepEqual(byId.repo_shell_verification_wrappers.legacy_name_allowance.allowed_as, [
+    'repo_native_verification_wrapper',
+    'negative_test_guard',
+  ]);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_runner_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_attempt_ledger_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_workbench_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_session_runtime_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_domain_entry_runtime_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.generic_supervisor_owner_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.compatibility_alias_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.callable_alias_allowed, false);
+  assert.equal(byId.repo_shell_verification_wrappers.no_resurrection_gate.production_readiness_claim_allowed, false);
   assert.deepEqual(byId.redcube_cli_domain_entry_adapter.legacy_name_allowance.allowed_as, [
     'service_safe_domain_entry',
     'domain_handler_target',
@@ -176,6 +220,38 @@ test('RCA physical source morphology policy classifies active source tails witho
     for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
       assert.equal(value, false, entry.surface_id);
     }
+  }
+});
+
+test('RCA physical source morphology classifies every active shell wrapper explicitly', () => {
+  const policy = readJson('contracts/physical_source_morphology_policy.json');
+  const byId = Object.fromEntries(policy.active_surface_classifications.map((entry) => [entry.surface_id, entry]));
+  const activeShellScripts = fs.readdirSync(path.resolve('scripts'))
+    .filter((entry) => entry.endsWith('.sh'))
+    .map((entry) => normalizePath(path.join('scripts', entry)))
+    .sort();
+  const shellSurface = byId.repo_shell_verification_wrappers;
+
+  assert.deepEqual(activeShellScripts, [
+    'scripts/opl-module-bootstrap.sh',
+    'scripts/opl-module-healthcheck.sh',
+    'scripts/repo-hygiene.sh',
+    'scripts/run-opl-quality-details.sh',
+    'scripts/run-structural-quality-gate.sh',
+    'scripts/run-with-repo-temp-env.sh',
+    'scripts/verify.sh',
+  ]);
+  assert.deepEqual([...shellSurface.source_refs].sort(), activeShellScripts);
+
+  for (const scriptPath of activeShellScripts) {
+    const coveringEntries = policy.active_surface_classifications.filter((entry) => (
+      entry.source_refs || []
+    ).some((sourceRef) => sourceRefCoversFile(sourceRef, scriptPath)));
+    assert.deepEqual(
+      coveringEntries.map((entry) => entry.surface_id),
+      ['repo_shell_verification_wrappers'],
+      scriptPath,
+    );
   }
 });
 

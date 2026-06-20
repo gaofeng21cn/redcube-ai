@@ -21,6 +21,7 @@
     "refs_only_read_model",
     "minimal_visual_authority_function",
     "visual_native_helper_implementation",
+    "repo_native_verification_wrapper",
     "diagnostic_or_fixture",
     "tombstone_or_provenance"
   ],
@@ -541,6 +542,77 @@
       }
     },
     {
+      "surface_id": "repo_shell_verification_wrappers",
+      "source_refs": [
+        "scripts/opl-module-bootstrap.sh",
+        "scripts/opl-module-healthcheck.sh",
+        "scripts/repo-hygiene.sh",
+        "scripts/run-opl-quality-details.sh",
+        "scripts/run-structural-quality-gate.sh",
+        "scripts/run-with-repo-temp-env.sh",
+        "scripts/verify.sh"
+      ],
+      "classification": "repo_native_verification_wrapper",
+      "current_rca_role": "repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_and_quality_gate_wrapper_not_runtime_owner",
+      "allowed_outputs": [
+        "repo_hygiene_check_refs",
+        "external_temp_env_boundary_refs",
+        "repo_native_verification_refs",
+        "module_bootstrap_refs",
+        "module_healthcheck_refs",
+        "structural_quality_gate_refs",
+        "quality_details_refs"
+      ],
+      "no_resurrection_gate": {
+        "generic_scheduler_owner_allowed": false,
+        "generic_runner_owner_allowed": false,
+        "generic_attempt_ledger_owner_allowed": false,
+        "generic_workbench_owner_allowed": false,
+        "generic_review_repair_transport_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_artifact_lifecycle_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "generic_domain_entry_runtime_owner_allowed": false,
+        "generic_supervisor_owner_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
+      },
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "runtime",
+          "session",
+          "domain_action_adapter"
+        ],
+        "allowed_as": [
+          "repo_native_verification_wrapper",
+          "negative_test_guard"
+        ],
+        "rationale": "Shell scripts are repo-native verification, hygiene, temp-env, module healthcheck/bootstrap, and structural quality wrappers. Their runtime/session/domain_action_adapter wording comes from test names, forbidden path checks, or quality output locations; it cannot create RCA-owned runtime/session/domain_action_adapter shells.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_scheduler": false,
+        "rca_owns_generic_runner": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_generic_review_repair_transport": false,
+        "rca_owns_generic_session_runtime": false,
+        "rca_owns_generic_artifact_lifecycle": false,
+        "rca_owns_generic_generated_wrapper": false,
+        "rca_owns_generic_domain_entry_runtime": false
+      }
+    },
+    {
       "surface_id": "retired_product_entry_contract_tombstone_refs",
       "source_refs": [
         "contracts/runtime-program/product-entry-session-continuity.json",
@@ -638,6 +710,7 @@
       "domain_handler_target",
       "minimal_visual_authority_function",
       "visual_native_helper_path",
+      "repo_native_verification_wrapper",
       "locator_protocol_boundary"
     ],
     "tracked_legacy_terms": [
@@ -658,6 +731,7 @@
       "domain_handler_target",
       "minimal_visual_authority_function",
       "visual_native_helper_path",
+      "repo_native_verification_wrapper",
       "locator_protocol_boundary"
     ],
     "forbidden_active_surface_ids": [
@@ -742,6 +816,7 @@
       "refs_only_read_model",
       "minimal_visual_authority_function",
       "visual_native_helper_implementation",
+      "repo_native_verification_wrapper",
       "diagnostic_or_fixture"
     ],
     "forbidden_new_rca_roles": [

@@ -307,6 +307,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'domain_handler_target',
     'minimal_visual_authority_function',
     'visual_native_helper_path',
+    'repo_native_verification_wrapper',
     'locator_protocol_boundary',
   ]);
   assert.deepEqual(policy.legacy_name_policy.retired_control_plane_terms_allowed_only_as, [
@@ -320,6 +321,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'domain_handler_target',
     'minimal_visual_authority_function',
     'visual_native_helper_path',
+    'repo_native_verification_wrapper',
     'locator_protocol_boundary',
   ]);
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
@@ -362,6 +364,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     domain_action_adapter_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
+    repo_shell_verification_wrappers: 'repo_native_verification_wrapper',
     retired_product_entry_contract_tombstone_refs: 'tombstone_or_provenance',
     redcube_cli_domain_entry_adapter: 'service_safe_domain_entry',
   };
@@ -398,6 +401,10 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     visual_authority_functions: {
       terms: ['runtime', 'session'],
       allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path', 'locator_protocol_boundary'],
+    },
+    repo_shell_verification_wrappers: {
+      terms: ['runtime', 'session', 'domain_action_adapter'],
+      allowedAs: ['repo_native_verification_wrapper', 'negative_test_guard'],
     },
     retired_product_entry_contract_tombstone_refs: {
       terms: ['managed', 'runtime', 'gateway', 'session', 'domain_action_adapter'],
