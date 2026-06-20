@@ -131,6 +131,21 @@ attempt-ledger/generated-wrapper owner。它关闭的是 runtime-family active s
 caller thinning、physical delete、production evidence、visual ready、exportable、
 handoffable 或 domain ready。
 
+2026-06-21 current slice：`runDeliverableRoute` / `run-deliverable-route-parts/`
+和 executor route-run record surface 已进入
+`contracts/physical_source_morphology_policy.json#/active_surface_classifications`
+的 `deliverable_route_attempt_shell` 与 `executor_runtime_route_run_records`
+surface，并由 `tests/opl-agent-pack-contracts-source-morphology.test.ts`
+覆盖 source refs、legacy allowance、default caller cutover gate 与
+no-resurrection flags。该分类只关闭这两个 active default-caller tail 未被
+strict morphology surface 单独分类的结构卫生缺口：RCA 当前只保留 visual route
+domain handler target、route dependency / continuation / repair refs、executor policy
+refs 和 neutral route-run record refs；OPL 仍是 generic route attempt shell、
+retry/dead-letter、Agent Executor Adapter、attempt ledger、runtime record store 和
+event log 的目标 owner。它不授权 physical delete，不声明 OPL default caller parity
+已完成，也不关闭 production evidence、visual ready、exportable、handoffable 或
+domain ready。
+
 不能直接删除的 explicit remainder：
 
 - `contracts/runtime-program/managed-product-entry-hardening.json` 是 tombstone-only / semantic-id provenance surface，仍被 runtime-program provenance、session continuity legacy refs 和 morphology policy 消费。
@@ -139,6 +154,7 @@ handoffable 或 domain ready。
 - `contracts/physical_source_morphology_policy.json` 的 `retired_compatibility_payload_field_policy` 已把旧 managed compatibility payload 字段限定到 forbidden payload / receipt negative-guard 字段值，并声明 `retired_field_ids_as_json_keys_allowed=false`；guard tests 会阻断它出现在 active payload template、success payload、JSON key、retired-alias resurrection 或 readiness claim。
 - `contracts/physical_source_morphology_policy.json` 已把 active `.sh` verification / proof wrappers 分类为 `repo_shell_verification_wrappers` / `repo_native_verification_wrapper`，覆盖 repo hygiene、仓外 temp env、默认 verify、module bootstrap/healthcheck、Sentrux structural gate、quality details、image-first proof runner、native PPT proof runner 和 optional native dependency installer 输出。该分类只关闭 shell-wrapper source-purity guard 缺口；它不把 shell wrapper 写成 RCA runtime/session/workbench/attempt-ledger/generated-wrapper owner，也不替代 generated/default caller thinning、physical retirement、visual/export verdict 或 production evidence。
 - `contracts/physical_source_morphology_policy.json` 已把 `getProductEntryManifest` 和 `get-product-entry-manifest-parts/` 分类为 `product_entry_manifest_projection` / `refs_only_read_model`，覆盖 product-entry manifest assembly、shell catalog、operator projection、OPL generated shell refs 和 typed blocker refs 的 active source morphology。该分类只证明 manifest projection root 受 no-resurrection guard 约束；它不关闭 generated/default caller thinning、physical retirement、visual/export verdict、production evidence 或 App/operator release evidence。
+- `contracts/physical_source_morphology_policy.json` 已把 `runDeliverableRoute` / `run-deliverable-route-parts/` 分类为 `deliverable_route_attempt_shell` / `domain_handler_target`，并把 `executor-runtime.ts` / `executor-runtime-parts/route-run-records.ts` 分类为 `executor_runtime_route_run_records` / `refs_only_read_model`。这两类 active source 只能产生 route precondition / continuation / repair refs、stage artifact contract refs、domain-entry response refs、executor policy refs、route-run record/event refs、stale attempt audit refs、cross-provider attempt refs 和 typed blocker；不能成为 RCA-owned generic route attempt shell、retry/dead-letter owner、attempt ledger、runtime record store、event log、session runtime 或 generated wrapper owner。
 - Production evidence scaleout active contract 与 generated manifest 已不再输出 `legacy_payload_field_aliases`；guard tests 会阻断该 alias map 回到 active machine contracts。OPL 仍可消费 `domain_receipt_refs` / `no_regression_refs` 当前 refs path，但 RCA 不再把它们声明成旧字段兼容映射。
 - Hermes-Agent loop bridge / API client 仍是显式 opt-in proof backend、executor routing schema、runtime-protocol client 与 Python helper catalog target；它不是默认 runtime owner，也不是 RCA-owned generic executor runtime。当前 machine receipt 使用 `owner=opl_runtime_manager` 与 `selected_executor_backend=hermes_agent` 分开表达，避免把 backend key 误读成 owner。
 

@@ -552,6 +552,152 @@
       }
     },
     {
+      "surface_id": "deliverable_route_attempt_shell",
+      "source_refs": [
+        "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
+        "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/"
+      ],
+      "classification": "domain_handler_target",
+      "current_rca_role": "visual_route_attempt_domain_handler_target_not_generic_route_attempt_shell",
+      "allowed_outputs": [
+        "visual_route_precondition_refs",
+        "allowed_next_stage_refs",
+        "route_dependency_recovery_refs",
+        "stop_after_stage_continuation_refs",
+        "repair_target_refs",
+        "stage_artifact_contract_refs",
+        "domain_entry_response_refs",
+        "typed_blocker"
+      ],
+      "default_caller_cutover_gate": {
+        "generated_route_attempt_shell_owner": "one-person-lab",
+        "current_status": "source_split_landed_default_caller_tail",
+        "rca_role_after_cutover": "visual_route_handler_target_and_precondition_refs",
+        "rca_owns_generic_route_attempt_shell": false,
+        "rca_owns_retry_dead_letter_transport": false,
+        "rca_owns_attempt_ledger": false,
+        "physical_delete_authorized_now": false,
+        "physical_delete_requires_owner_receipt_ref": "rca-typed-blocker:private-platform-retirement:deliverable-route-attempt-shell:physical-delete-requires-explicit-owner-receipt",
+        "no_forbidden_write_ref": "no-forbidden-write:rca/default-caller-deletion/deliverable_route_attempt_shell/domain-handler-boundary"
+      },
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "runtime"
+        ],
+        "allowed_as": [
+          "domain_handler_target",
+          "refs_only_read_model",
+          "negative_test_guard"
+        ],
+        "rationale": "runDeliverableRoute and its parts remain a RCA visual route domain handler target plus route dependency / continuation / repair refs; OPL owns the generic route attempt shell, retry/dead-letter, and attempt ledger.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "no_resurrection_gate": {
+        "generic_runner_owner_allowed": false,
+        "generic_attempt_ledger_owner_allowed": false,
+        "generic_retry_dead_letter_owner_allowed": false,
+        "generic_route_attempt_shell_owner_allowed": false,
+        "generic_review_repair_transport_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_scheduler": false,
+        "rca_owns_generic_runner": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_generic_review_repair_transport": false,
+        "rca_owns_generic_session_runtime": false,
+        "rca_owns_generic_artifact_lifecycle": false,
+        "rca_owns_generic_generated_wrapper": false,
+        "rca_owns_generic_domain_entry_runtime": false
+      }
+    },
+    {
+      "surface_id": "executor_runtime_route_run_records",
+      "source_refs": [
+        "packages/redcube-runtime-protocol/src/executor-runtime.ts",
+        "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts"
+      ],
+      "classification": "refs_only_read_model",
+      "current_rca_role": "executor_policy_and_route_run_record_refs_adapter_not_attempt_ledger",
+      "allowed_outputs": [
+        "executor_policy_refs",
+        "route_run_record_refs",
+        "route_run_event_refs",
+        "stale_attempt_audit_refs",
+        "cross_provider_attempt_refs",
+        "typed_blocker"
+      ],
+      "default_caller_cutover_gate": {
+        "generated_attempt_ledger_owner": "one-person-lab",
+        "generated_runtime_record_owner": "one-person-lab",
+        "current_status": "refs_only_route_run_record_default_caller_tail",
+        "rca_role_after_cutover": "route_executor_policy_refs_only",
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_runtime_record_store": false,
+        "rca_owns_generic_event_log": false,
+        "physical_delete_authorized_now": false,
+        "physical_delete_requires_owner_receipt_ref": "rca-typed-blocker:private-platform-retirement:executor-runtime-route-run-records:physical-delete-requires-explicit-owner-receipt",
+        "no_forbidden_write_ref": "no-forbidden-write:rca/default-caller-deletion/executor_runtime_route_run_records/refs-only-boundary"
+      },
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "runtime"
+        ],
+        "allowed_as": [
+          "refs_only_read_model",
+          "package_protocol_boundary",
+          "locator_protocol_boundary"
+        ],
+        "rationale": "executor-runtime protocol files expose executor policy and neutral route-run record refs only; OPL owns the generic Agent Executor Adapter, attempt ledger, runtime record store, and event log default caller.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "no_resurrection_gate": {
+        "generic_runner_owner_allowed": false,
+        "generic_attempt_ledger_owner_allowed": false,
+        "generic_event_log_owner_allowed": false,
+        "generic_runtime_record_store_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_scheduler": false,
+        "rca_owns_generic_runner": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_generic_review_repair_transport": false,
+        "rca_owns_generic_session_runtime": false,
+        "rca_owns_generic_artifact_lifecycle": false,
+        "rca_owns_generic_generated_wrapper": false,
+        "rca_owns_generic_domain_entry_runtime": false
+      }
+    },
+    {
       "surface_id": "visual_authority_functions",
       "source_refs": [
         "packages/redcube-runtime/src/creative-ownership.ts",
@@ -698,21 +844,6 @@
         "proof_lane_artifact_refs",
         "optional_native_dependency_install_refs"
       ],
-      "no_resurrection_gate": {
-        "generic_scheduler_owner_allowed": false,
-        "generic_runner_owner_allowed": false,
-        "generic_attempt_ledger_owner_allowed": false,
-        "generic_workbench_owner_allowed": false,
-        "generic_review_repair_transport_owner_allowed": false,
-        "generic_session_runtime_owner_allowed": false,
-        "generic_artifact_lifecycle_owner_allowed": false,
-        "generic_generated_wrapper_owner_allowed": false,
-        "generic_domain_entry_runtime_owner_allowed": false,
-        "generic_supervisor_owner_allowed": false,
-        "compatibility_alias_allowed": false,
-        "callable_alias_allowed": false,
-        "production_readiness_claim_allowed": false
-      },
       "legacy_name_allowance": {
         "legacy_terms": [
           "runtime",
@@ -734,6 +865,21 @@
         "active_generic_domain_action_adapter_owner_allowed": false,
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "no_resurrection_gate": {
+        "generic_scheduler_owner_allowed": false,
+        "generic_runner_owner_allowed": false,
+        "generic_attempt_ledger_owner_allowed": false,
+        "generic_workbench_owner_allowed": false,
+        "generic_review_repair_transport_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_artifact_lifecycle_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "generic_domain_entry_runtime_owner_allowed": false,
+        "generic_supervisor_owner_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
       },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,

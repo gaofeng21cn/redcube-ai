@@ -257,6 +257,66 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.operator_evidence_stability_projection.allowed_outputs.includes('stability_read_model_refs'),
     true,
   );
+  assert.deepEqual(byId.deliverable_route_attempt_shell.source_refs, [
+    'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts',
+    'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/',
+  ]);
+  assert.equal(
+    byId.deliverable_route_attempt_shell.current_rca_role,
+    'visual_route_attempt_domain_handler_target_not_generic_route_attempt_shell',
+  );
+  assert.equal(byId.deliverable_route_attempt_shell.classification, 'domain_handler_target');
+  assert.deepEqual(byId.deliverable_route_attempt_shell.legacy_name_allowance.allowed_as, [
+    'domain_handler_target',
+    'refs_only_read_model',
+    'negative_test_guard',
+  ]);
+  assert.equal(
+    byId.deliverable_route_attempt_shell.default_caller_cutover_gate.generated_route_attempt_shell_owner,
+    'one-person-lab',
+  );
+  assert.equal(
+    byId.deliverable_route_attempt_shell.default_caller_cutover_gate.rca_owns_generic_route_attempt_shell,
+    false,
+  );
+  assert.equal(
+    byId.deliverable_route_attempt_shell.no_resurrection_gate.generic_route_attempt_shell_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.deliverable_route_attempt_shell.no_resurrection_gate.generic_attempt_ledger_owner_allowed,
+    false,
+  );
+  assert.deepEqual(byId.executor_runtime_route_run_records.source_refs, [
+    'packages/redcube-runtime-protocol/src/executor-runtime.ts',
+    'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
+  ]);
+  assert.equal(byId.executor_runtime_route_run_records.classification, 'refs_only_read_model');
+  assert.equal(
+    byId.executor_runtime_route_run_records.current_rca_role,
+    'executor_policy_and_route_run_record_refs_adapter_not_attempt_ledger',
+  );
+  assert.deepEqual(byId.executor_runtime_route_run_records.legacy_name_allowance.allowed_as, [
+    'refs_only_read_model',
+    'package_protocol_boundary',
+    'locator_protocol_boundary',
+  ]);
+  assert.equal(
+    byId.executor_runtime_route_run_records.default_caller_cutover_gate.generated_attempt_ledger_owner,
+    'one-person-lab',
+  );
+  assert.equal(
+    byId.executor_runtime_route_run_records.default_caller_cutover_gate.rca_owns_generic_attempt_ledger,
+    false,
+  );
+  assert.equal(
+    byId.executor_runtime_route_run_records.no_resurrection_gate.generic_runtime_record_store_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.executor_runtime_route_run_records.no_resurrection_gate.generic_event_log_owner_allowed,
+    false,
+  );
   assert.deepEqual(byId.visual_route_runtime_family_implementations.source_refs, [
     'packages/redcube-runtime-family-ppt/src/',
     'packages/redcube-runtime-family-xiaohongshu/src/',
@@ -299,6 +359,32 @@ test('RCA physical source morphology policy classifies active source tails witho
     for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
       assert.equal(value, false, entry.surface_id);
     }
+  }
+});
+
+test('RCA route attempt and route-run record tails are explicitly classified', () => {
+  const policy = readJson('contracts/physical_source_morphology_policy.json');
+  const expectedCoverage = {
+    'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts': 'deliverable_route_attempt_shell',
+    'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/': 'deliverable_route_attempt_shell',
+    'packages/redcube-runtime-protocol/src/executor-runtime.ts': 'executor_runtime_route_run_records',
+    'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts': 'executor_runtime_route_run_records',
+  };
+
+  for (const [sourceRef, expectedSurfaceId] of Object.entries(expectedCoverage)) {
+    assert.equal(fs.existsSync(path.resolve(sourceRef)), true, sourceRef);
+    const coveringEntries = policy.active_surface_classifications.filter((entry) => (
+      entry.source_refs || []
+    ).some((candidateRef) => sourceRefCoversFile(candidateRef, sourceRef)));
+    assert.deepEqual(
+      coveringEntries.map((entry) => entry.surface_id),
+      [expectedSurfaceId],
+      sourceRef,
+    );
+    const [surface] = coveringEntries;
+    assert.equal(surface.legacy_name_allowance.compatibility_alias_allowed, false, sourceRef);
+    assert.equal(surface.legacy_name_allowance.active_generic_runtime_owner_allowed, false, sourceRef);
+    assert.equal(surface.legacy_name_allowance.active_generic_attempt_ledger_owner_allowed, false, sourceRef);
   }
 });
 
