@@ -306,6 +306,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'refs_only_read_model',
     'domain_handler_target',
     'minimal_visual_authority_function',
+    'visual_route_runtime_family_implementation',
     'visual_native_helper_path',
     'repo_native_verification_wrapper',
     'locator_protocol_boundary',
@@ -320,6 +321,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'refs_only_read_model',
     'domain_handler_target',
     'minimal_visual_authority_function',
+    'visual_route_runtime_family_implementation',
     'visual_native_helper_path',
     'repo_native_verification_wrapper',
     'locator_protocol_boundary',
@@ -364,6 +366,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     domain_action_adapter_guarded_actions: 'domain_handler_target',
     operator_evidence_stability_projection: 'refs_only_read_model',
     visual_authority_functions: 'minimal_visual_authority_function',
+    visual_route_runtime_family_implementations: 'visual_route_runtime_family_implementation',
     repo_shell_verification_wrappers: 'repo_native_verification_wrapper',
     retired_product_entry_contract_tombstone_refs: 'tombstone_or_provenance',
     redcube_cli_domain_entry_adapter: 'service_safe_domain_entry',
@@ -401,6 +404,10 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     visual_authority_functions: {
       terms: ['runtime', 'session'],
       allowedAs: ['minimal_visual_authority_function', 'visual_native_helper_path', 'locator_protocol_boundary'],
+    },
+    visual_route_runtime_family_implementations: {
+      terms: ['runtime'],
+      allowedAs: ['visual_route_runtime_family_implementation', 'package_protocol_boundary'],
     },
     repo_shell_verification_wrappers: {
       terms: ['runtime', 'session', 'domain_action_adapter'],
@@ -482,6 +489,31 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     ),
     false,
   );
+  assert.deepEqual(byId.visual_route_runtime_family_implementations.source_refs, [
+    'packages/redcube-runtime-family-ppt/src/',
+    'packages/redcube-runtime-family-xiaohongshu/src/',
+    'packages/redcube-runtime-family-poster-onepager/src/',
+    'packages/redcube-runtime-family-registry/src/',
+  ]);
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.current_rca_role,
+    'visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner',
+  );
+  assert.deepEqual(byId.visual_route_runtime_family_implementations.no_resurrection_gate, {
+    generic_scheduler_owner_allowed: false,
+    generic_runner_owner_allowed: false,
+    generic_attempt_ledger_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generic_review_repair_transport_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    generic_artifact_lifecycle_owner_allowed: false,
+    generic_generated_wrapper_owner_allowed: false,
+    generic_domain_entry_runtime_owner_allowed: false,
+    generic_supervisor_owner_allowed: false,
+    compatibility_alias_allowed: false,
+    callable_alias_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
   assert.equal(
     byId.redcube_cli_domain_entry_adapter.current_rca_role,
     'direct_cli_adapter_domain_handler_target_not_generated_wrapper_owner',

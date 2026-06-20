@@ -20,6 +20,7 @@
     "domain_handler_target",
     "refs_only_read_model",
     "minimal_visual_authority_function",
+    "visual_route_runtime_family_implementation",
     "visual_native_helper_implementation",
     "repo_native_verification_wrapper",
     "diagnostic_or_fixture",
@@ -542,6 +543,70 @@
       }
     },
     {
+      "surface_id": "visual_route_runtime_family_implementations",
+      "source_refs": [
+        "packages/redcube-runtime-family-ppt/src/",
+        "packages/redcube-runtime-family-xiaohongshu/src/",
+        "packages/redcube-runtime-family-poster-onepager/src/",
+        "packages/redcube-runtime-family-registry/src/"
+      ],
+      "classification": "visual_route_runtime_family_implementation",
+      "current_rca_role": "visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner",
+      "allowed_outputs": [
+        "visual_route_artifact_refs",
+        "route_family_policy_refs",
+        "review_export_gate_refs",
+        "stage_artifact_refs",
+        "runtime_family_catalog_refs"
+      ],
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "runtime"
+        ],
+        "allowed_as": [
+          "visual_route_runtime_family_implementation",
+          "package_protocol_boundary"
+        ],
+        "rationale": "runtime-family packages implement RCA visual route families and the direct registry for those route handlers; they cannot own generic runtime, session, workbench, attempt ledger, scheduler, review/repair transport, or generated wrapper surfaces.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "no_resurrection_gate": {
+        "generic_scheduler_owner_allowed": false,
+        "generic_runner_owner_allowed": false,
+        "generic_attempt_ledger_owner_allowed": false,
+        "generic_workbench_owner_allowed": false,
+        "generic_review_repair_transport_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_artifact_lifecycle_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "generic_domain_entry_runtime_owner_allowed": false,
+        "generic_supervisor_owner_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
+      },
+      "forbidden_generic_owner_flags": {
+        "rca_owns_generic_scheduler": false,
+        "rca_owns_generic_runner": false,
+        "rca_owns_generic_attempt_ledger": false,
+        "rca_owns_generic_workbench": false,
+        "rca_owns_generic_review_repair_transport": false,
+        "rca_owns_generic_session_runtime": false,
+        "rca_owns_generic_artifact_lifecycle": false,
+        "rca_owns_generic_generated_wrapper": false,
+        "rca_owns_generic_domain_entry_runtime": false
+      }
+    },
+    {
       "surface_id": "repo_shell_verification_wrappers",
       "source_refs": [
         "scripts/opl-module-bootstrap.sh",
@@ -709,6 +774,7 @@
       "refs_only_read_model",
       "domain_handler_target",
       "minimal_visual_authority_function",
+      "visual_route_runtime_family_implementation",
       "visual_native_helper_path",
       "repo_native_verification_wrapper",
       "locator_protocol_boundary"
@@ -730,6 +796,7 @@
       "refs_only_read_model",
       "domain_handler_target",
       "minimal_visual_authority_function",
+      "visual_route_runtime_family_implementation",
       "visual_native_helper_path",
       "repo_native_verification_wrapper",
       "locator_protocol_boundary"
@@ -815,6 +882,7 @@
       "domain_handler_target",
       "refs_only_read_model",
       "minimal_visual_authority_function",
+      "visual_route_runtime_family_implementation",
       "visual_native_helper_implementation",
       "repo_native_verification_wrapper",
       "diagnostic_or_fixture"

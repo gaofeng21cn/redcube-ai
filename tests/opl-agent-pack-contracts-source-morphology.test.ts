@@ -41,6 +41,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'refs_only_read_model',
     'domain_handler_target',
     'minimal_visual_authority_function',
+    'visual_route_runtime_family_implementation',
     'visual_native_helper_path',
     'repo_native_verification_wrapper',
     'locator_protocol_boundary',
@@ -68,6 +69,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.domain_action_adapter_guarded_actions.classification, 'domain_handler_target');
   assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
+  assert.equal(byId.visual_route_runtime_family_implementations.classification, 'visual_route_runtime_family_implementation');
   assert.equal(byId.repo_shell_verification_wrappers.classification, 'repo_native_verification_wrapper');
   assert.equal(byId.legacy_managed_runtime_gateway_names, undefined);
   assert.equal(byId.retired_product_entry_contract_tombstone_refs.classification, 'tombstone_or_provenance');
@@ -215,11 +217,71 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.operator_evidence_stability_projection.allowed_outputs.includes('stability_read_model_refs'),
     true,
   );
+  assert.deepEqual(byId.visual_route_runtime_family_implementations.source_refs, [
+    'packages/redcube-runtime-family-ppt/src/',
+    'packages/redcube-runtime-family-xiaohongshu/src/',
+    'packages/redcube-runtime-family-poster-onepager/src/',
+    'packages/redcube-runtime-family-registry/src/',
+  ]);
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.current_rca_role,
+    'visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner',
+  );
+  assert.deepEqual(byId.visual_route_runtime_family_implementations.allowed_outputs, [
+    'visual_route_artifact_refs',
+    'route_family_policy_refs',
+    'review_export_gate_refs',
+    'stage_artifact_refs',
+    'runtime_family_catalog_refs',
+  ]);
+  assert.deepEqual(byId.visual_route_runtime_family_implementations.legacy_name_allowance.allowed_as, [
+    'visual_route_runtime_family_implementation',
+    'package_protocol_boundary',
+  ]);
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.no_resurrection_gate.generic_attempt_ledger_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.no_resurrection_gate.generic_session_runtime_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.no_resurrection_gate.generic_generated_wrapper_owner_allowed,
+    false,
+  );
+  assert.equal(
+    byId.visual_route_runtime_family_implementations.no_resurrection_gate.production_readiness_claim_allowed,
+    false,
+  );
 
   for (const entry of policy.active_surface_classifications) {
     for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
       assert.equal(value, false, entry.surface_id);
     }
+  }
+});
+
+test('RCA runtime-family route implementations are classified as visual route implementations only', () => {
+  const policy = readJson('contracts/physical_source_morphology_policy.json');
+  const runtimeFamilySourceRoots = [
+    'packages/redcube-runtime-family-ppt/src/',
+    'packages/redcube-runtime-family-xiaohongshu/src/',
+    'packages/redcube-runtime-family-poster-onepager/src/',
+    'packages/redcube-runtime-family-registry/src/',
+  ];
+
+  for (const sourceRoot of runtimeFamilySourceRoots) {
+    const rootPath = path.resolve(sourceRoot);
+    assert.equal(fs.existsSync(rootPath), true, sourceRoot);
+    const coveringEntries = policy.active_surface_classifications.filter((entry) => (
+      entry.source_refs || []
+    ).some((sourceRef) => sourceRefCoversFile(sourceRef, sourceRoot)));
+    assert.deepEqual(
+      coveringEntries.map((entry) => entry.surface_id),
+      ['visual_route_runtime_family_implementations'],
+      sourceRoot,
+    );
   }
 });
 
