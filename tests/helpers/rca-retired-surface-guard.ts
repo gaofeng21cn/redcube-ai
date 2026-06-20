@@ -55,6 +55,17 @@ export function listTextFiles(root) {
   });
 }
 
+export function activeShellScripts() {
+  return ACTIVE_ROOTS.flatMap((root) => {
+    const rootPath = path.resolve(root);
+    if (!existsSync(rootPath)) return [];
+    return path.extname(root) ? [root] : listTextFiles(root);
+  })
+    .filter((file) => path.extname(file) === '.sh')
+    .map(normalizePath)
+    .sort();
+}
+
 export function normalizePath(value) {
   return value.split(path.sep).join('/');
 }

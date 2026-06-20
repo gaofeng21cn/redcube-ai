@@ -4,7 +4,10 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
 
-import { assertRepoRefResolves } from './helpers/rca-retired-surface-guard.ts';
+import {
+  activeShellScripts,
+  assertRepoRefResolves,
+} from './helpers/rca-retired-surface-guard.ts';
 
 test('RCA functional audit exposes OPL replacement expectations and retired generic domain_action_adapter dispatch', () => {
   const currentProgram = JSON.parse(readFileSync(
@@ -495,6 +498,31 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'packages/redcube-runtime-family-poster-onepager/src/',
     'packages/redcube-runtime-family-registry/src/',
   ]);
+  assert.deepEqual(byId.repo_shell_verification_wrappers.source_refs, [
+    'scripts/opl-module-bootstrap.sh',
+    'scripts/opl-module-healthcheck.sh',
+    'scripts/repo-hygiene.sh',
+    'scripts/run-opl-quality-details.sh',
+    'scripts/run-structural-quality-gate.sh',
+    'scripts/run-with-repo-temp-env.sh',
+    'scripts/verify.sh',
+    'tools/image-ppt-proof/run.sh',
+    'tools/native-ppt-proof/install-deps.sh',
+    'tools/native-ppt-proof/run.sh',
+  ]);
+  assert.deepEqual([...byId.repo_shell_verification_wrappers.source_refs].sort(), activeShellScripts());
+  assert.equal(
+    byId.repo_shell_verification_wrappers.current_rca_role,
+    'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_quality_gate_and_proof_wrapper_not_runtime_owner',
+  );
+  assert.equal(
+    byId.repo_shell_verification_wrappers.allowed_outputs.includes('proof_lane_artifact_refs'),
+    true,
+  );
+  assert.equal(
+    byId.repo_shell_verification_wrappers.allowed_outputs.includes('optional_native_dependency_install_refs'),
+    true,
+  );
   assert.equal(
     byId.visual_route_runtime_family_implementations.current_rca_role,
     'visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner',

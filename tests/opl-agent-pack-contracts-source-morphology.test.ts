@@ -6,6 +6,7 @@ import path from 'node:path';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.ts';
 import {
+  activeShellScripts,
   assertRepoRefResolves,
   normalizePath,
   sourceRefCoversFile,
@@ -109,10 +110,13 @@ test('RCA physical source morphology policy classifies active source tails witho
     'scripts/run-structural-quality-gate.sh',
     'scripts/run-with-repo-temp-env.sh',
     'scripts/verify.sh',
+    'tools/image-ppt-proof/run.sh',
+    'tools/native-ppt-proof/install-deps.sh',
+    'tools/native-ppt-proof/run.sh',
   ]);
   assert.equal(
     byId.repo_shell_verification_wrappers.current_rca_role,
-    'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_and_quality_gate_wrapper_not_runtime_owner',
+    'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_quality_gate_and_proof_wrapper_not_runtime_owner',
   );
   assert.deepEqual(byId.repo_shell_verification_wrappers.allowed_outputs, [
     'repo_hygiene_check_refs',
@@ -122,6 +126,8 @@ test('RCA physical source morphology policy classifies active source tails witho
     'module_healthcheck_refs',
     'structural_quality_gate_refs',
     'quality_details_refs',
+    'proof_lane_artifact_refs',
+    'optional_native_dependency_install_refs',
   ]);
   assert.deepEqual(byId.repo_shell_verification_wrappers.legacy_name_allowance.allowed_as, [
     'repo_native_verification_wrapper',
@@ -288,13 +294,10 @@ test('RCA runtime-family route implementations are classified as visual route im
 test('RCA physical source morphology classifies every active shell wrapper explicitly', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
   const byId = Object.fromEntries(policy.active_surface_classifications.map((entry) => [entry.surface_id, entry]));
-  const activeShellScripts = fs.readdirSync(path.resolve('scripts'))
-    .filter((entry) => entry.endsWith('.sh'))
-    .map((entry) => normalizePath(path.join('scripts', entry)))
-    .sort();
+  const activeShellScriptPaths = activeShellScripts();
   const shellSurface = byId.repo_shell_verification_wrappers;
 
-  assert.deepEqual(activeShellScripts, [
+  assert.deepEqual(activeShellScriptPaths, [
     'scripts/opl-module-bootstrap.sh',
     'scripts/opl-module-healthcheck.sh',
     'scripts/repo-hygiene.sh',
@@ -302,10 +305,13 @@ test('RCA physical source morphology classifies every active shell wrapper expli
     'scripts/run-structural-quality-gate.sh',
     'scripts/run-with-repo-temp-env.sh',
     'scripts/verify.sh',
+    'tools/image-ppt-proof/run.sh',
+    'tools/native-ppt-proof/install-deps.sh',
+    'tools/native-ppt-proof/run.sh',
   ]);
-  assert.deepEqual([...shellSurface.source_refs].sort(), activeShellScripts);
+  assert.deepEqual([...shellSurface.source_refs].sort(), activeShellScriptPaths);
 
-  for (const scriptPath of activeShellScripts) {
+  for (const scriptPath of activeShellScriptPaths) {
     const coveringEntries = policy.active_surface_classifications.filter((entry) => (
       entry.source_refs || []
     ).some((sourceRef) => sourceRefCoversFile(sourceRef, scriptPath)));
