@@ -28,6 +28,14 @@
         "command": "opl_generated:product_status",
         "surface_kind": "product_status"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "get_product_status",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.product_status.request.v1",
       "output_schema_ref": "schema:redcube.product_status.response.v1",
       "workspace_locator_fields": [],
@@ -51,6 +59,14 @@
       "source_command": {
         "command": "opl_generated:product_start",
         "surface_kind": "product_entry_start"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "get_product_start",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "schema:redcube.product_start.request.v1",
       "output_schema_ref": "schema:redcube.product_start.response.v1",
@@ -76,6 +92,14 @@
         "command": "opl_generated:product_preflight",
         "surface_kind": "product_entry_preflight"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "get_product_preflight",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.product_preflight.request.v1",
       "output_schema_ref": "schema:redcube.product_preflight.response.v1",
       "workspace_locator_fields": [],
@@ -99,6 +123,14 @@
       "source_command": {
         "command": "redcube product invoke",
         "surface_kind": "product_entry"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "invoke_product_entry",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "schema:redcube.product_entry.invoke.request.v1",
       "output_schema_ref": "schema:redcube.product_entry.invoke.response.v1",
@@ -142,6 +174,14 @@
         "command": "opl_generated:product_session",
         "surface_kind": "product_entry_session"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "get_product_entry_session",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.product_entry.session.request.v1",
       "output_schema_ref": "schema:redcube.product_entry.session.response.v1",
       "workspace_locator_fields": [
@@ -173,6 +213,14 @@
         "command": "opl_generated:product_entry_manifest",
         "surface_kind": "product_entry_manifest"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "get_product_entry_manifest",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.product_entry.manifest.request.v1",
       "output_schema_ref": "schema:redcube.product_entry.manifest.response.v2",
       "workspace_locator_fields": [],
@@ -200,6 +248,14 @@
       "source_command": {
         "command": "redcube domain-handler export",
         "surface_kind": "product_domain_handler_export"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "export_domain_handler",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "schema:redcube.domain_handler.export.request.v1",
       "output_schema_ref": "schema:redcube.domain_handler.export.response.v1",
@@ -233,6 +289,14 @@
       "source_command": {
         "command": "redcube domain-handler dispatch",
         "surface_kind": "product_domain_handler_dispatch"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "dispatch_domain_handler",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "schema:redcube.domain_handler.dispatch.request.v1",
       "output_schema_ref": "schema:redcube.domain_handler.dispatch.response.v1",
@@ -282,6 +346,14 @@
         "command": "redcube image-ppt proof",
         "surface_kind": "image_ppt_product_entry_proof"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "run_image_ppt_proof",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.image_ppt_proof.request.v1",
       "output_schema_ref": "schema:redcube.image_ppt_proof.response.v1",
       "workspace_locator_fields": [
@@ -318,6 +390,14 @@
         "command": "redcube native-ppt proof",
         "surface_kind": "native_ppt_product_entry_proof"
       },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "run_native_ppt_proof",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
+      },
       "input_schema_ref": "schema:redcube.native_ppt_proof.request.v1",
       "output_schema_ref": "schema:redcube.native_ppt_proof.response.v1",
       "workspace_locator_fields": [
@@ -353,6 +433,14 @@
       "source_command": {
         "command": "redcube service-safe domain entry",
         "surface_kind": "domain_entry"
+      },
+      "source_of_work": {
+        "source_catalog": "family_action_catalog",
+        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
+        "source_action_id": "invoke_domain_entry",
+        "stage_catalog_ref": "family_stage_control_plane",
+        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
+        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
       },
       "input_schema_ref": "schema:redcube.domain_entry.request.v1",
       "output_schema_ref": "schema:redcube.domain_entry.response.v1",

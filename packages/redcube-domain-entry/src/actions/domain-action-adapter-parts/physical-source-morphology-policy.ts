@@ -394,9 +394,12 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'scripts/run-structural-quality-gate.sh',
       'scripts/run-with-repo-temp-env.sh',
       'scripts/verify.sh',
+      'tools/image-ppt-proof/run.sh',
+      'tools/native-ppt-proof/install-deps.sh',
+      'tools/native-ppt-proof/run.sh',
     ],
     classification: 'repo_native_verification_wrapper',
-    current_rca_role: 'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_and_quality_gate_wrapper_not_runtime_owner',
+    current_rca_role: 'repo_native_bootstrap_healthcheck_hygiene_temp_env_verification_quality_gate_and_proof_wrapper_not_runtime_owner',
     allowed_outputs: [
       'repo_hygiene_check_refs',
       'external_temp_env_boundary_refs',
@@ -405,11 +408,13 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'module_healthcheck_refs',
       'structural_quality_gate_refs',
       'quality_details_refs',
+      'proof_lane_artifact_refs',
+      'optional_native_dependency_install_refs',
     ],
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime', 'session', 'domain_action_adapter'],
       allowed_as: ['repo_native_verification_wrapper', 'negative_test_guard'],
-      rationale: 'Shell scripts are repo-native verification, hygiene, temp-env, module healthcheck/bootstrap, and structural quality wrappers. Their runtime/session/domain_action_adapter wording comes from test names, forbidden path checks, or quality output locations; it cannot create RCA-owned runtime/session/domain_action_adapter shells.',
+      rationale: 'Shell scripts are repo-native verification, hygiene, temp-env, module healthcheck/bootstrap, structural quality, and optional proof-lane wrappers. Their runtime/session/domain_action_adapter wording comes from test names, forbidden path checks, quality output locations, proof artifact paths, or explicit proof dependency setup; it cannot create RCA-owned runtime/session/domain_action_adapter shells.',
     }),
     no_resurrection_gate: {
       generic_scheduler_owner_allowed: false,
