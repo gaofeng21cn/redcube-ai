@@ -91,7 +91,7 @@ RCA 当前只允许一个 active completion plan：[RCA 理想目标态差距与
 
 Dated coverage entries, docs lifecycle inventories, SSOT closeouts and retirement proof/read-model foldbacks are compressed under [RCA process history](./history/process/README.md), with durable no-resurrection rules in [RCA retired surface provenance](./history/process/retired-surface-provenance.md).
 
-The process history index is now topic-level only. It records retained records, compressed provenance groups, a coverage summary, remaining reopened scope and next write scope; it must not grow back into six-repo snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs. The current RCA human-doc recheck covers every tracked root `README*`, `docs/**/*.md`, and docs-like tracked support `README.md` outside `docs/` through this lifecycle map, directory indexes, and retained provenance owners.
+The process history index is now topic-level only. It records retained records, compressed provenance groups, a coverage summary, remaining reopened scope and next write scope; it must not grow back into seven-repo OPL series snapshots, branch cleanup attempts, command transcripts, proof-by-proof tranches, or absorbed closeout logs. The current RCA human-doc recheck covers every tracked root `README*`, `docs/**/*.md`, and docs-like tracked support `README.md` outside `docs/` through this lifecycle map, directory indexes, and retained provenance owners.
 
 Future foldback uses this routing:
 
