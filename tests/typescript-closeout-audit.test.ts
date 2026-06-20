@@ -98,6 +98,11 @@ test('P18 closeout audit blocks repo-tracked JS tests and scripts after TS migra
   assert.equal(policy.scripts.actual_js_files.length, 0);
   assert.equal(policy.scripts.forbidden_js_files.length, 0);
   assert.equal(policy.scripts.actual_ts_files.includes('scripts/run-test-group.ts'), true);
+  assert.equal(policy.tools.scan_glob, 'tools/**/*.{js,mjs,cjs,ts}');
+  assert.equal(policy.tools.allowed_new_extension, '.ts');
+  assert.equal(policy.tools.actual_js_files.length, 0);
+  assert.equal(policy.tools.forbidden_js_files.length, 0);
+  assert.equal(policy.tools.actual_ts_files.includes('tools/native-ppt-proof/build-fixture-input.ts'), true);
 });
 
 test('P18 closeout audit records zero product source JS residue', () => {
@@ -188,6 +193,23 @@ test('P18 closeout audit fails closed when a new JS script appears without regis
     assert.equal(audit.criteria.test_and_script_language_policy_closed, false);
     assert.equal(audit.criteria.closeout_ready, false);
     assert.deepEqual(scriptsPolicy.forbidden_js_files, [unexpectedPath]);
+  } finally {
+    rmSync(unexpectedPath, { force: true });
+  }
+});
+
+test('P18 closeout audit fails closed when a repo proof helper keeps JavaScript', () => {
+  const unexpectedPath = `tools/native-ppt-proof/__closeout-unregistered-helper-${randomUUID()}.mjs`;
+
+  writeFileSync(unexpectedPath, 'export const unregistered = true;\n', 'utf-8');
+
+  try {
+    const audit = buildCloseoutAudit({ qualityGates: passingQualityGates() });
+    const toolsPolicy = audit.evidence.test_and_script_language_policy.tools;
+
+    assert.equal(audit.criteria.test_and_script_language_policy_closed, false);
+    assert.equal(audit.criteria.closeout_ready, false);
+    assert.deepEqual(toolsPolicy.forbidden_js_files, [unexpectedPath]);
   } finally {
     rmSync(unexpectedPath, { force: true });
   }

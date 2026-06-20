@@ -1,9 +1,10 @@
 #!/usr/bin/env node
+// @ts-nocheck
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 
 function usage() {
-  console.error('Usage: build-fixture-input.mjs <benchmark.json> <output.json> [suite_id]');
+  console.error('Usage: build-fixture-input.ts <benchmark.json> <output.json> [suite_id]');
 }
 
 const [, , fixturePath, outputPath, requestedSuiteId = 'data_charts'] = process.argv;

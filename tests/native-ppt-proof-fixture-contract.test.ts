@@ -14,7 +14,8 @@ function buildNativeProofFixture() {
   execFileSync(
     process.execPath,
     [
-      'tools/native-ppt-proof/build-fixture-input.mjs',
+      '--experimental-strip-types',
+      'tools/native-ppt-proof/build-fixture-input.ts',
       'tests/fixtures/ppt-native-visual-benchmark/benchmark.json',
       outputFile,
       'data_charts',

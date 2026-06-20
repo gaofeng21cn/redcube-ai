@@ -99,6 +99,8 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
   assert.equal(typecheck.include.includes('tests/**/*.mjs'), true);
   assert.equal(typecheck.include.includes('scripts/**/*.mjs'), true);
   assert.equal(typecheck.include.includes('scripts/**/*.ts'), true);
+  assert.equal(typecheck.include.includes('tools/**/*.mjs'), true);
+  assert.equal(typecheck.include.includes('tools/**/*.ts'), true);
 });
 
 test('root package exposes formal typecheck entrypoint', () => {

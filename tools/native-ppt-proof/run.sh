@@ -122,7 +122,7 @@ fs.writeFileSync(manifestReport, `${JSON.stringify(manifest, null, 2)}\n`);
 fs.writeFileSync(statusReport, `${JSON.stringify(status, null, 2)}\n`);
 NODE
 
-node tools/native-ppt-proof/build-fixture-input.mjs \
+node --experimental-strip-types tools/native-ppt-proof/build-fixture-input.ts \
   "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
   "$fixture_input" \
   "$suite_id"

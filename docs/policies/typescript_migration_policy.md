@@ -19,7 +19,7 @@ Machine boundary: 人读实现语言 policy。机器真相继续归 source、pac
 ## JS 例外登记 / JS Exception Registration
 
 - Repo-tracked JavaScript residue is retired and must remain at zero files.
-- New `.js`, `.mjs`, or `.cjs` files under product, test, or script surfaces make the TypeScript closeout audit fail closed.
+- New `.js`, `.mjs`, or `.cjs` files under product, test, script, or proof-helper surfaces make the TypeScript closeout audit fail closed.
 - `contracts/runtime-program/js-residue-line-lock.json` locks product-source JS at zero files and zero lines.
 - Any new implementation must land in TypeScript, or in Python-owned native helper surfaces when the work is Office/PPT/document automation.
 

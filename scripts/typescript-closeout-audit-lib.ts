@@ -62,8 +62,8 @@ const LANGUAGE_TARGET = Object.freeze({
   agent_guidance: [
     'New product/runtime contracts, CLI/MCP surfaces, domain actions, packages, and tests should land as TypeScript.',
     'New Office/PPT/document automation helpers should land in Python-owned helper surfaces.',
-    'Repo-tracked product, test, and script JavaScript is retired.',
-    'New JavaScript under apps/*, packages/*, tests/*, or scripts/* is blocked before merge.',
+    'Repo-tracked product, test, script, and proof-helper JavaScript is retired.',
+    'New JavaScript under apps/*, packages/*, tests/*, scripts/*, or tools/* is blocked before merge.',
   ],
 });
 
@@ -140,6 +140,10 @@ function languageSurfaceAudit() {
     file.endsWith('.mjs') || file.endsWith('.js') || file.endsWith('.cjs')
   ));
   const actualScriptTs = listFilesUnder('scripts', (file) => file.endsWith('.ts'));
+  const actualToolJs = listFilesUnder('tools', (file) => (
+    file.endsWith('.mjs') || file.endsWith('.js') || file.endsWith('.cjs')
+  ));
+  const actualToolTs = listFilesUnder('tools', (file) => file.endsWith('.ts'));
 
   const tests = {
     scan_glob: 'tests/**/*.{js,mjs,cjs,ts}',
@@ -156,14 +160,23 @@ function languageSurfaceAudit() {
     actual_ts_files: actualScriptTs,
     forbidden_js_files: actualScriptJs,
   };
+  const tools = {
+    scan_glob: 'tools/**/*.{js,mjs,cjs,ts}',
+    allowed_new_extension: '.ts',
+    actual_js_files: actualToolJs,
+    actual_ts_files: actualToolTs,
+    forbidden_js_files: actualToolJs,
+  };
   const closed = tests.forbidden_js_files.length === 0
-    && scripts.forbidden_js_files.length === 0;
+    && scripts.forbidden_js_files.length === 0
+    && tools.forbidden_js_files.length === 0;
 
   return {
     status: closed ? 'closed' : 'open',
-    policy: 'Repo-tracked tests and scripts are TypeScript-only; JavaScript is blocked.',
+    policy: 'Repo-tracked tests, scripts, and proof helpers are TypeScript-only; JavaScript is blocked.',
     tests,
     scripts,
+    tools,
   };
 }
 
