@@ -10,3 +10,4 @@ Gate rules:
 - Repair scope comes from blocked page refs; unblocked pages may be reused only with preserved page refs or hashes.
 - Mechanical checks may emit blocker refs, repair target refs, preserved page refs, evidence refs, inventory refs, or no-regression refs. They cannot emit visual ready, exportable, handoffable, publication-ready, review-pass, or source-ready verdicts.
 - Agent Lab efficiency telemetry may reference screenshot review gate refs, but cannot issue review verdicts, export verdicts, or visual ready claims.
+- Screenshot/render gates block review, export, handoff, publication, and readiness claims when rendered evidence is missing or unsafe. They do not block ordinary communication strategy, visual direction exploration, candidate generation, or source triage that does not claim rendered artifact readiness.

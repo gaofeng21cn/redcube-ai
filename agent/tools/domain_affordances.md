@@ -9,6 +9,8 @@ Machine boundary: This file declares available domain tool affordances for RCA s
 
 RCA stage attempts may use tools to read source context, inspect visual workspaces, render or screenshot artifacts, and produce refs-only evidence. Tool use stays inside the permission, credential, write-scope, side-effect, and forbidden-authority boundaries declared by `contracts/pack_compiler_input.json`, `contracts/stage_control_plane.json`, and `contracts/cognitive_kernel_adoption.json`.
 
+Tool affordances are advisory capabilities, not workflow control. They may expose ways to inspect, render, compare, and repair, but they do not prescribe executor order, choose the visual route, score candidates, or replace AI-first communication / visual direction judgment.
+
 ## Affordances
 
 - `source_context_and_visual_brief_reading`: Read source readiness, audience constraints, brand cues, and deliverable requirements for grounded visual work.
@@ -21,3 +23,4 @@ RCA stage attempts may use tools to read source context, inspect visual workspac
 - Tools do not declare visual-ready, review-ready, export-ready, handoff-ready, App release ready, or production ready.
 - Tools do not write visual truth, review verdict body, export verdict body, visual memory body, or artifact body without RCA artifact authority.
 - Tools do not prescribe executor order, candidate strategy, stage goal, or required parallelism.
+- Tools and visual memory refs do not become visual route scorers, winning-layout generators, review-pass gates, export gates, artifact-ready signals, or owner receipts.

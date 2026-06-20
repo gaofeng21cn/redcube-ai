@@ -7,6 +7,8 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 
 这份 policy 固定 RCA visual pattern memory 的长期边界：视觉经验可以作为小规模、可追溯的自然语言记忆进入 AI author / reviewer 上下文，但不能变成布局配方引擎、隐藏模板、review/export verdict 或 artifact authority。
 
+默认读法是 advisory-by-default：visual pattern memory 是 AI-readable Markdown / prose-first prompt context。它可以帮助 Codex 注意风格、密度、故事节奏、反复失败模式和修复预期；它不是 visual route scorer、layout controller、export gate、review-pass gate、artifact authority 或 production-readiness gate。
+
 ## 记忆形态
 
 正确形态：
@@ -21,6 +23,7 @@ Machine boundary: 人读 visual memory policy。机器真相继续归 `contracts
 禁止形态：
 
 - universal layout recipe engine；
+- visual route scorer 或 winning-layout generator；
 - 代替 AI author artifact 生成正文、页面、视觉方向或 layout 的 hidden template；
 - 仅靠 memory score、mechanical scorecard 或 projection 通过 visual acceptance；
 - 把全部风格规则和历史失败全局塞回 prompt；
@@ -72,6 +75,8 @@ Memory 只能小规模进入对应 stage：
 
 Memory 可以影响 prompt context 和 reviewer attention；它不能接受视觉结果、批准导出、选择 route、写 artifact body 或修改 canonical artifact。
 
+缺少或陈旧 visual pattern memory 默认不阻断 source intake、communication strategy、visual direction exploration 或 candidate generation。它只在两类场景变成 hard blocker：输出试图用 memory ref 声明 review/export/handoff/production readiness，或 memory-derived action 会越过 artifact authority、owner receipt、source boundary、review/export gate。
+
 ## AI-first 边界
 
 本 policy 扩展 [AI-first 质量边界 Policy](./ai_first_quality_boundary.md)。
@@ -91,6 +96,7 @@ OPL 不能：
 - 发出 quality verdict 或 review/export verdict；
 - 写 artifact body；
 - 授权 artifact authority、visual ready、exportable、handoffable、domain ready 或 production ready。
+- 把 visual pattern memory refs 做成 visual route scorer、layout controller、review-pass gate、export gate 或 artifact-ready signal。
 
 Family-level governance 读 `/Users/gaofeng/workspace/one-person-lab/docs/references/operating-governance/family-domain-memory-governance.md`。该路径是人读治理参考，不是 RCA 机器接口。
 
