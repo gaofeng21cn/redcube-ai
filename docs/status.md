@@ -9,6 +9,8 @@ Last reviewed: `2026-06-12`
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
+Live Evidence 后置 / 功能结构优先是 RCA 日常开发读法。repo-local session / domain_action_adapter / runtimeWatch / operator projection / route-run record adapter 的收薄或退役、generated/default caller cutover、strict source-purity、Stage Folder / artifact locator / review-repair transport 的功能边界和 no-resurrection guard，可以作为功能/结构 lane 先推进。Temporal controlled visual-stage long-soak、production-like repeated no-regression、真实 visual memory lifecycle receipt、human review success receipt、App/operator sustained consumption 和 production visual-stage evidence 属于后置 Live Evidence / production evidence lane；它们不反向阻塞可独立完成的结构清理，也不能由 conformance、mock route chain、provider completion、refs-only ledger 或 dated sample proof 替代为 visual ready、exportable、handoffable、domain ready 或 production ready。
+
 Codex Developer Mode source pointer: 仓库根层 `.codex-plugin/plugin.json` 是 `rca-local` 指向 live developer checkout 时的 Codex plugin manifest 入口；它只把 Codex source root 固定到当前 `redcube-ai` repo，并通过 `./plugins/rca/skills/` 和 `./plugins/rca/assets/` 引用现有 RCA app skill scaffold。`plugins/rca/.codex-plugin/plugin.json` 继续作为 packaged/scaffold plugin payload 保留；repo-local `.agents/plugins/marketplace.json` 是已退役副产物，`scripts/install-codex-plugin.ts` 只校验 source 并清理旧副产物。Codex marketplace registration 由 OPL-owned wrapper 写入 `OPL_STATE_DIR/codex-plugin-marketplaces/rca-local`。该入口只解决 Codex plugin metadata/source channel 路径，不声明 visual ready、exportable、handoffable、domain ready 或 production ready。
 
 ## 当前角色

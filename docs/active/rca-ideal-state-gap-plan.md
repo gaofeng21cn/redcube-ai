@@ -12,6 +12,8 @@ Dated native proof、workspace path、attempt id、screenshot path、no-regressi
 
 RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [RedCube AI 理想目标态](../references/rca-visual-deliverable-agent-ideal-state.md)；项目当前角色、架构、硬约束和决策读核心五件套；过程性 dated follow-through、closeout tranche、proof 命令流水、run/probe id 和旧路线读 `docs/history/**`、runtime evidence 或提交历史。
 
+Live Evidence 后置是本文执行原则。功能/结构 lane 优先推进 generated/default caller cutover、repo-local session / domain_action_adapter / runtimeWatch / operator projection / neutral route-run adapter thinning、compatibility-free retirement、naming / legacy string hygiene、Stage Artifact / review-repair / artifact locator functional boundary 和 no-resurrection guard；这些不等待真实 Temporal long-soak 或 production-like repeated no-regression。后置 Live Evidence lane 仍负责 visual ready、exportable、handoffable、human approval、production visual-stage long-soak、real visual memory lifecycle receipt、App/operator sustained consumption 和 production-ready claim；conformance、mock provider route chain、refs-only production acceptance、single dated sample proof 或 provider completion 不能替代。
+
 ## 当前完成进度
 
 当前读数：
