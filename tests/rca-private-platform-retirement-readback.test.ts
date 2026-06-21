@@ -69,6 +69,25 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
 });
 
 test('RCA private platform retirement strict script emits JSON readback', () => {
+  const directReadbackPath = `/tmp/redcube-ai-private-platform-direct-readback-${process.pid}.json`;
+  const readbackResult = spawnSync(
+    'sh',
+    ['-c', `npm run --silent private-platform:readback > "${directReadbackPath}"`],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    },
+  );
+
+  assert.equal(readbackResult.status, 0, readbackResult.stderr || readbackResult.stdout);
+  const directPayload = JSON.parse(readFileSync(directReadbackPath, 'utf-8'));
+  assert.equal(directPayload.surface_kind, 'rca_private_platform_retirement_strict_readback');
+  assert.equal(directPayload.state, 'passed_repo_source_guard_only');
+  assert.equal(directPayload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(directPayload.default_caller_tail_compact_retirement_summary.can_apply_cleanup, false);
+  assert.equal(directPayload.authority_boundary.readback_can_authorize_physical_delete, false);
+  assert.equal(directPayload.authority_boundary.readback_can_claim_production_ready, false);
+
   const result = spawnSync('npm', ['run', '--silent', 'test:private-platform:strict'], {
     cwd: process.cwd(),
     encoding: 'utf8',
@@ -76,6 +95,5 @@ test('RCA private platform retirement strict script emits JSON readback', () => 
 
   assert.equal(result.status, 0, result.stderr || result.stdout);
   const payload = JSON.parse(readFileSync('/tmp/redcube-ai-private-platform-retirement.json', 'utf-8'));
-  assert.equal(payload.surface_kind, 'rca_private_platform_retirement_strict_readback');
-  assert.equal(payload.state, 'passed_repo_source_guard_only');
+  assert.deepEqual(payload, directPayload);
 });
