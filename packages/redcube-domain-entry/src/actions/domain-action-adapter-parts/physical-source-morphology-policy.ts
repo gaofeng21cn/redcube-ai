@@ -68,6 +68,59 @@ const LEGACY_NAME_GUARD_DEFAULTS = Object.freeze({
   active_generic_attempt_ledger_owner_allowed: false,
 });
 
+const SOURCE_THINNING_TAIL_GATE = Object.freeze({
+  gate_id: 'rca.source_morphology.default_caller_tail_thinning.v1',
+  state: 'non_live_functional_structure_gate_landed',
+  gate_role:
+    'classify_retained_repo_local_tails_before_default_caller_cutover_without_authorizing_delete_or_readiness',
+  applies_to_surface_ids: [
+    'product_entry_continuity_refs_adapter',
+    'runtime_watch_projection',
+    'domain_action_adapter_guarded_actions',
+    'operator_evidence_stability_projection',
+    'product_entry_manifest_projection',
+    'deliverable_route_attempt_shell',
+    'executor_runtime_route_run_records',
+    'repo_shell_verification_wrappers',
+  ],
+  allowed_current_roles: [
+    'refs_only_read_model',
+    'domain_handler_target',
+    'service_safe_domain_entry',
+    'minimal_visual_authority_function',
+    'visual_native_helper_implementation',
+    'repo_native_verification_wrapper',
+    'tombstone_or_provenance',
+  ],
+  required_before_physical_delete_or_further_thin: [
+    'opl_generated_default_caller_parity',
+    'no_active_repo_local_default_caller',
+    'rca_owner_receipt_or_typed_blocker_roundtrip',
+    'no_forbidden_write_proof',
+    'retired_alias_no_resurrection_proof',
+    'tombstone_or_provenance_pointer',
+  ],
+  false_ready_guard: {
+    source_classification_can_claim_physical_delete_authorized: false,
+    source_classification_can_claim_default_caller_cutover_complete: false,
+    source_classification_can_claim_visual_ready: false,
+    source_classification_can_claim_exportable: false,
+    source_classification_can_claim_handoffable: false,
+    source_classification_can_claim_domain_ready: false,
+    source_classification_can_claim_production_ready: false,
+  },
+  no_resurrection_guard: {
+    runtimeWatch_can_return_to_domain_action_adapter_default_dispatch: false,
+    domain_action_adapter_can_become_generic_dispatch_owner: false,
+    domain_action_adapter_can_become_generated_wrapper_owner: false,
+    product_session_can_become_generic_session_shell_owner: false,
+    operator_projection_can_become_generic_workbench_owner: false,
+    route_run_records_can_become_attempt_ledger_owner: false,
+    shell_wrappers_can_become_runtime_owner: false,
+    compatibility_alias_or_facade_allowed: false,
+  },
+});
+
 function legacyNameAllowance({ legacy_terms, allowed_as, rationale }) {
   return {
     legacy_terms,
@@ -643,6 +696,7 @@ export function buildPhysicalSourceMorphologyPolicy() {
       ...entry,
       forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
     })),
+    default_caller_tail_thinning_gate: SOURCE_THINNING_TAIL_GATE,
     source_ref_integrity_gate: {
       policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
       applies_to: [

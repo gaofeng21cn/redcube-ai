@@ -165,6 +165,37 @@ test('RCA domain_action_adapter implementation legacy names stay under domain-ha
   assert.deepEqual(violations, []);
 });
 
+test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const gate = policy.default_caller_tail_thinning_gate;
+  assert.equal(gate.gate_id, 'rca.source_morphology.default_caller_tail_thinning.v1');
+  assert.equal(gate.state, 'non_live_functional_structure_gate_landed');
+  assert.equal(gate.applies_to_surface_ids.includes('runtime_watch_projection'), true);
+  assert.equal(gate.applies_to_surface_ids.includes('domain_action_adapter_guarded_actions'), true);
+  assert.equal(gate.applies_to_surface_ids.includes('product_entry_continuity_refs_adapter'), true);
+  assert.equal(gate.applies_to_surface_ids.includes('repo_shell_verification_wrappers'), true);
+  assert.deepEqual(gate.allowed_current_roles, [
+    'refs_only_read_model',
+    'domain_handler_target',
+    'service_safe_domain_entry',
+    'minimal_visual_authority_function',
+    'visual_native_helper_implementation',
+    'repo_native_verification_wrapper',
+    'tombstone_or_provenance',
+  ]);
+  assert.equal(gate.no_resurrection_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch, false);
+  assert.equal(gate.no_resurrection_guard.domain_action_adapter_can_become_generic_dispatch_owner, false);
+  assert.equal(gate.no_resurrection_guard.domain_action_adapter_can_become_generated_wrapper_owner, false);
+  assert.equal(gate.no_resurrection_guard.route_run_records_can_become_attempt_ledger_owner, false);
+  assert.equal(gate.no_resurrection_guard.shell_wrappers_can_become_runtime_owner, false);
+  assert.equal(gate.false_ready_guard.source_classification_can_claim_physical_delete_authorized, false);
+  assert.equal(gate.false_ready_guard.source_classification_can_claim_visual_ready, false);
+  assert.equal(gate.false_ready_guard.source_classification_can_claim_production_ready, false);
+});
+
 test('RCA product-entry manifest projection legacy names stay under manifest source classification', () => {
   const policy = JSON.parse(readFileSync(
     path.resolve('contracts/physical_source_morphology_policy.json'),
