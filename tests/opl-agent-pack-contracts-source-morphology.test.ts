@@ -91,6 +91,45 @@ test('RCA physical source morphology policy classifies active source tails witho
     policy.default_caller_tail_thinning_gate.no_resurrection_guard.compatibility_alias_or_facade_allowed,
     false,
   );
+  const readbackGuard = policy.default_caller_tail_thinning_gate.retirement_readback_cleanup_guard;
+  assert.equal(
+    readbackGuard.guard_id,
+    'rca.source_morphology.retirement_readback_cleanup_guard.v1',
+  );
+  assert.equal(
+    readbackGuard.state,
+    'readback_guard_available_physical_delete_not_authorized',
+  );
+  assert.equal(
+    readbackGuard.readback_surface_ref,
+    'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate',
+  );
+  assert.deepEqual(readbackGuard.allowed_readback_outputs, [
+    'active_surface_classification',
+    'missing_evidence_worklist',
+    'owner_delta_route',
+    'typed_blocker_ref_shape',
+    'no_resurrection_policy',
+  ]);
+  assert.deepEqual(readbackGuard.required_before_cleanup_apply, [
+    'opl_generated_default_caller_parity',
+    'no_active_repo_local_default_caller',
+    'rca_owner_receipt_or_typed_blocker_roundtrip',
+    'no_forbidden_write_proof',
+    'retired_alias_no_resurrection_proof',
+    'tombstone_or_provenance_pointer',
+    'owner_receipt://redcube_ai/physical_delete_or_tombstone_authorization',
+  ]);
+  assert.equal(readbackGuard.claims.claims_retirement_cleanup_complete, false);
+  assert.equal(readbackGuard.claims.claims_physical_delete_authorized, false);
+  assert.equal(readbackGuard.claims.claims_visual_ready, false);
+  assert.equal(readbackGuard.claims.claims_production_ready, false);
+  assert.equal(readbackGuard.authority_boundary.guard_can_identify_cleanup_candidates, true);
+  assert.equal(readbackGuard.authority_boundary.guard_can_route_owner_delta, true);
+  assert.equal(readbackGuard.authority_boundary.guard_can_authorize_physical_delete, false);
+  assert.equal(readbackGuard.authority_boundary.guard_can_sign_owner_receipt, false);
+  assert.equal(readbackGuard.authority_boundary.guard_can_create_typed_blocker, false);
+  assert.equal(readbackGuard.authority_boundary.guard_can_claim_default_caller_cutover, false);
   assert.ok(
     policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('runtime_watch_projection'),
   );

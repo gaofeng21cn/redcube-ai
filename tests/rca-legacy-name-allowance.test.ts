@@ -194,6 +194,33 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
   assert.equal(gate.false_ready_guard.source_classification_can_claim_physical_delete_authorized, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_visual_ready, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_production_ready, false);
+  assert.equal(
+    gate.retirement_readback_cleanup_guard.guard_id,
+    'rca.source_morphology.retirement_readback_cleanup_guard.v1',
+  );
+  assert.equal(
+    gate.retirement_readback_cleanup_guard.authority_boundary.guard_can_authorize_physical_delete,
+    false,
+  );
+  assert.equal(
+    gate.retirement_readback_cleanup_guard.authority_boundary.guard_can_sign_owner_receipt,
+    false,
+  );
+  assert.equal(
+    gate.retirement_readback_cleanup_guard.claims.claims_retirement_cleanup_complete,
+    false,
+  );
+  assert.equal(
+    gate.retirement_readback_cleanup_guard.claims.claims_visual_ready,
+    false,
+  );
+  assert.deepEqual(gate.retirement_readback_cleanup_guard.false_ready_claim_guard_keys, [
+    'retirement_readback_cleanup_complete',
+    'retirement_readback_guard_satisfied',
+    'cleanup_readback_physical_delete_authorized',
+    'claims_cleanup_readback_authorizes_delete',
+    'claims_retirement_cleanup_applied',
+  ]);
 });
 
 test('RCA product-entry manifest projection legacy names stay under manifest source classification', () => {
