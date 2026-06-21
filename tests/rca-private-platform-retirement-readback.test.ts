@@ -28,6 +28,27 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
   );
   assert.equal(payload.runtime_watch_boundary.refs_only, true);
   assert.equal(payload.runtime_watch_boundary.read_only, true);
+  assert.deepEqual(
+    payload.default_caller_tail_compact_retirement_summary,
+    payload.physical_source_morphology_policy.default_caller_tail_readback.compact_retirement_summary,
+  );
+  assert.equal(
+    payload.default_caller_tail_compact_retirement_summary.state,
+    'no_cleanup_candidates_owner_delta_required',
+  );
+  assert.equal(payload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(payload.default_caller_tail_compact_retirement_summary.can_apply_cleanup, false);
+  assert.equal(payload.default_caller_tail_compact_retirement_summary.can_authorize_physical_delete, false);
+  assert.equal(
+    payload.default_caller_tail_compact_retirement_summary.can_claim_default_caller_cutover_complete,
+    false,
+  );
+  assert.equal(payload.default_caller_tail_compact_retirement_summary.can_claim_domain_ready, false);
+  assert.ok(
+    payload.default_caller_tail_compact_retirement_summary.missing_evidence_ids.includes(
+      'no_active_repo_local_default_caller',
+    ),
+  );
   assert.ok(payload.domain_action_adapter_boundary.blocked_actions.includes('write_visual_truth'));
   assert.ok(payload.domain_action_adapter_boundary.forbidden_writes.includes('review_verdict'));
   assert.ok(payload.allowed_outputs.includes('typed_blocker_ref_shape'));

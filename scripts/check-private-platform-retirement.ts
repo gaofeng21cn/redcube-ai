@@ -8,7 +8,7 @@ import {
   buildPrivatizedFunctionalModuleAuditProjection,
   listDomainActionAdapterBlockedActions,
   listDomainActionAdapterForbiddenWrites,
-} from '@redcube/domain-entry';
+} from '../packages/redcube-domain-entry/dist/index.js';
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
@@ -85,6 +85,33 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
     if (value !== false) {
       failures.push({ check_id: 'default_caller_tail_false_ready_guard', key, value });
     }
+  }
+  const compactSummary = physicalPolicy.default_caller_tail_readback?.compact_retirement_summary || {};
+  for (const key of [
+    'can_apply_cleanup',
+    'can_authorize_physical_delete',
+    'can_claim_default_caller_cutover_complete',
+    'can_claim_visual_ready',
+    'can_claim_domain_ready',
+    'can_claim_production_ready',
+  ]) {
+    if (compactSummary[key] !== false) {
+      failures.push({ check_id: 'default_caller_tail_compact_summary_false_ready_guard', key, value: compactSummary[key] });
+    }
+  }
+  if (compactSummary.cleanup_candidate_count !== 0) {
+    failures.push({
+      check_id: 'default_caller_tail_compact_cleanup_candidate_count',
+      state: 'failed',
+      cleanup_candidate_count: compactSummary.cleanup_candidate_count,
+    });
+  }
+  if (compactSummary.owner_delta_required !== true) {
+    failures.push({
+      check_id: 'default_caller_tail_compact_owner_delta_required',
+      state: 'failed',
+      owner_delta_required: compactSummary.owner_delta_required,
+    });
   }
   if (runtimeWatchBoundary.refs_only !== true || runtimeWatchBoundary.read_only !== true) {
     failures.push({
@@ -177,6 +204,8 @@ export function buildPrivatePlatformRetirementReadback() {
     failed_checks: failures,
     functional_privatization_audit: audit,
     physical_source_morphology_policy: physicalPolicy,
+    default_caller_tail_compact_retirement_summary:
+      physicalPolicy.default_caller_tail_readback?.compact_retirement_summary ?? null,
     runtime_watch_boundary: runtimeWatchBoundary,
     domain_action_adapter_boundary: {
       blocked_actions: blockedActions,

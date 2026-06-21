@@ -206,6 +206,12 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
         },
       };
     });
+  const missingEvidenceIds = [
+    ...SOURCE_THINNING_TAIL_GATE.required_before_physical_delete_or_further_thin,
+  ];
+  const cleanupCandidateSurfaceIds = tailClassifications
+    .filter((entry) => entry.missing_evidence_worklist.length === 0)
+    .map((entry) => entry.surface_id);
   return {
     readback_id: 'rca.source_morphology.default_caller_tail_readback.v1',
     state: 'active_missing_evidence_worklist_available',
@@ -213,8 +219,28 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
     tail_surface_count: tailClassifications.length,
     missing_evidence_surface_count: tailClassifications.length,
     all_tail_surfaces_missing_delete_or_further_thin_evidence: true,
+    compact_retirement_summary: {
+      summary_id: 'rca.source_morphology.default_caller_tail.compact_retirement_summary.v1',
+      state: 'no_cleanup_candidates_owner_delta_required',
+      total_tail_surface_count: tailClassifications.length,
+      cleanup_candidate_count: cleanupCandidateSurfaceIds.length,
+      missing_evidence_surface_count: tailClassifications.length - cleanupCandidateSurfaceIds.length,
+      missing_evidence_ids: missingEvidenceIds,
+      cleanup_candidate_surface_ids: cleanupCandidateSurfaceIds,
+      owner_delta_required: true,
+      next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
+      required_delta:
+        'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
+      can_apply_cleanup: false,
+      can_authorize_physical_delete: false,
+      can_claim_default_caller_cutover_complete: false,
+      can_claim_visual_ready: false,
+      can_claim_domain_ready: false,
+      can_claim_production_ready: false,
+    },
     readback_outputs: [
       'active_surface_classification',
+      'compact_retirement_summary',
       'missing_evidence_worklist',
       'owner_delta_route',
       'typed_blocker_ref_shape',
