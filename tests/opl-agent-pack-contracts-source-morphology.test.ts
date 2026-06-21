@@ -185,6 +185,85 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.ok(
     policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('executor_runtime_route_run_records'),
   );
+  assert.equal(
+    policy.default_caller_tail_readback.readback_id,
+    'rca.source_morphology.default_caller_tail_readback.v1',
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.source_gate_ref,
+    'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate',
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.tail_surface_count,
+    policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.missing_evidence_surface_count,
+    policy.default_caller_tail_readback.tail_surface_count,
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.all_tail_surfaces_missing_delete_or_further_thin_evidence,
+    true,
+  );
+  assert.deepEqual(policy.default_caller_tail_readback.readback_outputs, [
+    'active_surface_classification',
+    'missing_evidence_worklist',
+    'owner_delta_route',
+    'typed_blocker_ref_shape',
+    'no_resurrection_policy',
+  ]);
+  assert.equal(
+    policy.default_caller_tail_readback.false_ready_guard.readback_can_claim_physical_delete_authorized,
+    false,
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.false_ready_guard.readback_can_claim_default_caller_cutover_complete,
+    false,
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.false_ready_guard.readback_can_claim_production_ready,
+    false,
+  );
+  const tailReadbackById = Object.fromEntries(
+    policy.default_caller_tail_readback.tail_classifications
+      .map((entry) => [entry.surface_id, entry]),
+  );
+  assert.deepEqual(
+    Object.keys(tailReadbackById).sort(),
+    [...policy.default_caller_tail_thinning_gate.applies_to_surface_ids].sort(),
+  );
+  for (const surfaceId of policy.default_caller_tail_thinning_gate.applies_to_surface_ids) {
+    const readback = tailReadbackById[surfaceId];
+    assert.ok(readback, `${surfaceId} should have a default caller tail readback`);
+    assert.equal(readback.classification, byId[surfaceId].classification);
+    assert.equal(readback.current_rca_role, byId[surfaceId].current_rca_role);
+    assert.deepEqual(readback.source_refs, byId[surfaceId].source_refs);
+    assert.deepEqual(
+      readback.required_before_physical_delete_or_further_thin,
+      policy.default_caller_tail_thinning_gate.required_before_physical_delete_or_further_thin,
+    );
+    assert.deepEqual(readback.missing_evidence_worklist, [
+      'opl_generated_default_caller_parity',
+      'no_active_repo_local_default_caller',
+      'rca_owner_receipt_or_typed_blocker_roundtrip',
+      'no_forbidden_write_proof',
+      'retired_alias_no_resurrection_proof',
+      'tombstone_or_provenance_pointer',
+    ]);
+    assert.equal(
+      readback.owner_delta_route.next_owner,
+      'one-person-lab_or_redcube_ai_owner_receipt_surface',
+    );
+    assert.ok(
+      readback.owner_delta_route.typed_blocker_ref_shape
+        .startsWith('rca-typed-blocker:private-platform-retirement:'),
+      `${surfaceId} typed blocker route should remain RCA-owned`,
+    );
+    assert.equal(readback.readback_claims.can_claim_physical_delete_authorized, false);
+    assert.equal(readback.readback_claims.can_claim_default_caller_cutover_complete, false);
+    assert.equal(readback.readback_claims.can_claim_visual_ready, false);
+    assert.equal(readback.readback_claims.can_claim_production_ready, false);
+  }
   assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
   assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
   assert.equal(policy.allowed_surface_classes.includes('refs_only_read_model'), true);

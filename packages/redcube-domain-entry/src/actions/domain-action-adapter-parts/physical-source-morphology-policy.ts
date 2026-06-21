@@ -163,6 +163,77 @@ function sourceRefIntegrityGate(activeSurfaceClassifications) {
   };
 }
 
+function defaultCallerTailReadback(activeSurfaceClassifications) {
+  const tailSurfaceIds = SOURCE_THINNING_TAIL_GATE.applies_to_surface_ids;
+  const tailClassifications = activeSurfaceClassifications
+    .filter((entry) => tailSurfaceIds.includes(entry.surface_id))
+    .map((entry) => {
+      const deleteGate = entry.default_caller_cutover_gate ?? {};
+      const typedBlockerRef = deleteGate.physical_delete_requires_owner_receipt_ref
+        ?? `rca-typed-blocker:private-platform-retirement:${entry.surface_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`;
+      return {
+        surface_id: entry.surface_id,
+        classification: entry.classification,
+        current_rca_role: entry.current_rca_role,
+        source_refs: entry.source_refs ?? [],
+        required_before_physical_delete_or_further_thin: [
+          ...SOURCE_THINNING_TAIL_GATE.required_before_physical_delete_or_further_thin,
+        ],
+        missing_evidence_worklist: [
+          'opl_generated_default_caller_parity',
+          'no_active_repo_local_default_caller',
+          'rca_owner_receipt_or_typed_blocker_roundtrip',
+          'no_forbidden_write_proof',
+          'retired_alias_no_resurrection_proof',
+          'tombstone_or_provenance_pointer',
+        ],
+        owner_delta_route: {
+          next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
+          required_delta:
+            'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
+          typed_blocker_ref_shape: typedBlockerRef,
+        },
+        no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+        readback_claims: {
+          can_claim_cleanup_complete: false,
+          can_claim_physical_delete_authorized: false,
+          can_claim_default_caller_cutover_complete: false,
+          can_claim_visual_ready: false,
+          can_claim_exportable: false,
+          can_claim_handoffable: false,
+          can_claim_domain_ready: false,
+          can_claim_production_ready: false,
+        },
+      };
+    });
+  return {
+    readback_id: 'rca.source_morphology.default_caller_tail_readback.v1',
+    state: 'active_missing_evidence_worklist_available',
+    source_gate_ref: 'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate',
+    tail_surface_count: tailClassifications.length,
+    missing_evidence_surface_count: tailClassifications.length,
+    all_tail_surfaces_missing_delete_or_further_thin_evidence: true,
+    readback_outputs: [
+      'active_surface_classification',
+      'missing_evidence_worklist',
+      'owner_delta_route',
+      'typed_blocker_ref_shape',
+      'no_resurrection_policy',
+    ],
+    tail_classifications: tailClassifications,
+    false_ready_guard: {
+      readback_can_claim_cleanup_complete: false,
+      readback_can_claim_physical_delete_authorized: false,
+      readback_can_claim_default_caller_cutover_complete: false,
+      readback_can_claim_visual_ready: false,
+      readback_can_claim_exportable: false,
+      readback_can_claim_handoffable: false,
+      readback_can_claim_domain_ready: false,
+      readback_can_claim_production_ready: false,
+    },
+  };
+}
+
 function legacyNameAllowance({ legacy_terms, allowed_as, rationale }) {
   return {
     legacy_terms,
@@ -740,6 +811,7 @@ export function buildPhysicalSourceMorphologyPolicy() {
       forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
     })),
     default_caller_tail_thinning_gate: SOURCE_THINNING_TAIL_GATE,
+    default_caller_tail_readback: defaultCallerTailReadback(ACTIVE_SURFACE_CLASSIFICATIONS),
     source_ref_integrity_gate: sourceRefIntegrityGate(ACTIVE_SURFACE_CLASSIFICATIONS),
     legacy_name_policy: {
       retired_control_plane_terms_allowed_only_as: [
