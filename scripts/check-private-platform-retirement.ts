@@ -174,6 +174,115 @@ function buildRuntimeWatchBoundaryReadback(physicalPolicy) {
   };
 }
 
+function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
+  const failures = [];
+  if (!tailReadback || typeof tailReadback !== 'object') {
+    failures.push({
+      check_id: 'default_caller_tail_readback',
+      state: 'missing',
+    });
+    return failures;
+  }
+  const falseReadyGuard = tailReadback.false_ready_guard || {};
+  for (const [key, value] of Object.entries(falseReadyGuard)) {
+    if (value !== false) {
+      failures.push({ check_id: 'default_caller_tail_false_ready_guard', key, value });
+    }
+  }
+  for (const key of [
+    'can_apply_cleanup',
+    'can_authorize_physical_delete',
+    'can_claim_default_caller_cutover_complete',
+    'can_claim_visual_ready',
+    'can_claim_domain_ready',
+    'can_claim_production_ready',
+  ]) {
+    if (compactSummary[key] !== false) {
+      failures.push({
+        check_id: 'default_caller_tail_compact_summary_false_ready_guard',
+        key,
+        value: compactSummary[key],
+      });
+    }
+  }
+  if (compactSummary.cleanup_candidate_count !== 0) {
+    failures.push({
+      check_id: 'default_caller_tail_compact_cleanup_candidate_count',
+      state: 'failed',
+      cleanup_candidate_count: compactSummary.cleanup_candidate_count,
+    });
+  }
+  if (compactSummary.owner_delta_required !== true) {
+    failures.push({
+      check_id: 'default_caller_tail_compact_owner_delta_required',
+      state: 'failed',
+      owner_delta_required: compactSummary.owner_delta_required,
+    });
+  }
+  for (const classification of tailReadback.tail_classifications || []) {
+    const route = classification.owner_delta_route || {};
+    if (!route.typed_blocker_ref_shape) {
+      failures.push({
+        check_id: 'default_caller_tail_typed_blocker_ref_shape',
+        state: 'missing',
+        surface_id: classification.surface_id,
+      });
+    }
+    for (const [key, value] of Object.entries(classification.no_resurrection_gate || {})) {
+      if (value !== false) {
+        failures.push({
+          check_id: 'default_caller_tail_no_resurrection_gate',
+          surface_id: classification.surface_id,
+          key,
+          value,
+        });
+      }
+    }
+  }
+  return failures;
+}
+
+export function buildDefaultCallerTailOwnerDeltaReadback() {
+  const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
+  const tailReadback = physicalPolicy.default_caller_tail_readback ?? null;
+  const compactSummary = tailReadback?.compact_retirement_summary ?? {};
+  const tailClassifications = tailReadback?.tail_classifications ?? [];
+  const failures = collectDefaultCallerTailFailures(tailReadback, compactSummary);
+
+  return {
+    surface_kind: 'rca_default_caller_tail_owner_delta_readback',
+    schema_version: 1,
+    target_domain_id: 'redcube-ai',
+    state: failures.length === 0 ? 'passed_repo_source_guard_only' : 'failed',
+    failed_checks: failures,
+    default_caller_tail_readback: tailReadback,
+    compact_retirement_summary: compactSummary,
+    owner_delta_routes: tailClassifications.map((classification) => ({
+      surface_id: classification.surface_id,
+      owner_delta_route: classification.owner_delta_route ?? null,
+    })),
+    typed_blocker_ref_shapes: tailClassifications.map((classification) => ({
+      surface_id: classification.surface_id,
+      typed_blocker_ref_shape: classification.owner_delta_route?.typed_blocker_ref_shape ?? null,
+    })),
+    authority_boundary: {
+      readback_can_write_visual_truth: false,
+      readback_can_write_artifact_blob: false,
+      readback_can_write_memory_body: false,
+      readback_can_issue_review_or_export_verdict: false,
+      readback_can_sign_owner_receipt: false,
+      readback_can_create_typed_blocker_instance: false,
+      readback_can_authorize_physical_delete: false,
+      readback_can_claim_default_caller_cutover: false,
+      readback_can_claim_visual_ready: false,
+      readback_can_claim_exportable: false,
+      readback_can_claim_handoffable: false,
+      readback_can_claim_domain_ready: false,
+      readback_can_claim_production_ready: false,
+    },
+  };
+}
+
 export function buildPrivatePlatformRetirementReadback() {
   const audit = buildPrivatizedFunctionalModuleAuditProjection();
   const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
@@ -252,13 +361,20 @@ function parseArgs(argv) {
   if (!['json', 'text'].includes(format)) {
     throw new Error('--format must be json or text');
   }
-  return { format };
+  const scopeIndex = argv.indexOf('--scope');
+  const scope = scopeIndex >= 0 ? argv[scopeIndex + 1] : 'private-platform';
+  if (!['private-platform', 'default-caller-tail'].includes(scope)) {
+    throw new Error('--scope must be private-platform or default-caller-tail');
+  }
+  return { format, scope };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   try {
     const args = parseArgs(process.argv.slice(2));
-    const payload = buildPrivatePlatformRetirementReadback();
+    const payload = args.scope === 'default-caller-tail'
+      ? buildDefaultCallerTailOwnerDeltaReadback()
+      : buildPrivatePlatformRetirementReadback();
     if (args.format === 'json') {
       process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
     } else {

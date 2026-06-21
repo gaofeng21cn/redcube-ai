@@ -34,6 +34,9 @@ case "$lane" in
   private-platform|private-platform-strict|private-platform:strict)
     npm run --silent test:private-platform:strict
     ;;
+  default-caller-tail|default-caller-tail-strict|default-caller-tail:strict)
+    npm run --silent test:default-caller-tail:strict
+    ;;
   structure)
     scripts/run-structural-quality-gate.sh
     ;;
@@ -69,7 +72,7 @@ case "$lane" in
     ;;
   *)
     echo "Unknown lane: $lane" >&2
-    echo "Usage: scripts/verify.sh [smoke|fast|ci|line-budget|line-budget-strict|private-platform|private-platform-strict|private-platform:strict|structure|structure-strict|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining|full-with-historical]" >&2
+    echo "Usage: scripts/verify.sh [smoke|fast|ci|line-budget|line-budget-strict|private-platform|private-platform-strict|private-platform:strict|default-caller-tail|default-caller-tail-strict|default-caller-tail:strict|structure|structure-strict|meta|family|integration|integration-remaining|e2e|historical|full|full-remaining|full-with-historical]" >&2
     exit 1
     ;;
 esac
