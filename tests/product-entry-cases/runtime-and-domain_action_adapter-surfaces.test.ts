@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { SERIAL_ENV_TEST, assert, getDomainActionAdapterGuardedActionMetadata, exportDomainActionAdapter, dispatchDomainActionAdapter, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
+import { SERIAL_ENV_TEST, assert, getDomainActionAdapterGuardedActionMetadata, exportDomainActionAdapter, dispatchDomainActionAdapter, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
 
 test('domain-handler export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
@@ -10,9 +10,30 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       workspace_root: workspaceRoot,
     });
     const domain_action_adapterGuardedActionMetadata = await getDomainActionAdapterGuardedActionMetadata();
+    const physicalSourceMorphologyPolicy = readJson('contracts/physical_source_morphology_policy.json');
+    const adapterSourceClassification = physicalSourceMorphologyPolicy.active_surface_classifications.find(
+      (entry) => entry.surface_id === 'domain_action_adapter_guarded_actions',
+    );
 
     assert.equal(domain_action_adapter.ok, true);
     assert.equal(domain_action_adapter.surface_kind, 'domain_action_adapter_export');
+    assert.ok(adapterSourceClassification);
+    assert.equal(adapterSourceClassification.classification, 'domain_handler_target');
+    assert.equal(
+      adapterSourceClassification.current_rca_role,
+      'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner',
+    );
+    assert.equal(
+      adapterSourceClassification.source_refs.includes(
+        'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/',
+      ),
+      true,
+    );
+    assert.equal(adapterSourceClassification.no_resurrection_gate.generic_dispatch_owner_allowed, false);
+    assert.equal(
+      adapterSourceClassification.no_resurrection_gate.generic_domain_action_adapter_owner_allowed,
+      false,
+    );
     assert.equal(domain_action_adapter.runtime_framework.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(domain_action_adapter.runtime_framework.provider_transport_owner, 'opl_family_runtime_provider');
     assert.equal(domain_action_adapter.runtime_framework.managed_by, 'opl_runtime_manager');
