@@ -62,6 +62,40 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(policy.legacy_name_policy.forbidden_active_surface_ids, [
     'legacy_managed_runtime_gateway_names',
   ]);
+  assert.deepEqual(policy.policy_source_structure, {
+    source_structure_id: 'rca.physical_source_morphology_policy.source_structure.v1',
+    state: 'tail_gate_extracted_builder_remains_thin',
+    builder_ref:
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy.ts#buildPhysicalSourceMorphologyPolicy',
+    extracted_gate_refs: [
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy-tail-gate.ts#SOURCE_THINNING_TAIL_GATE',
+    ],
+    retained_builder_role:
+      'assemble_physical_source_morphology_policy_from_classifications_and_extracted_tail_gate',
+    extracted_gate_role:
+      'default_caller_tail_false_ready_and_no_resurrection_policy_without_delete_or_readiness_authority',
+    no_second_truth_policy: {
+      contract_json_remains_builder_output: true,
+      extracted_gate_module_is_source_for_default_caller_tail_gate: true,
+      markdown_docs_do_not_define_machine_policy: true,
+    },
+    authority_boundary: {
+      source_structure_can_claim_physical_delete_authorized: false,
+      source_structure_can_claim_default_caller_cutover_complete: false,
+      source_structure_can_claim_visual_ready: false,
+      source_structure_can_claim_exportable: false,
+      source_structure_can_claim_handoffable: false,
+      source_structure_can_claim_domain_ready: false,
+      source_structure_can_claim_production_ready: false,
+    },
+  });
+  assertRepoRefResolves(
+    policy.policy_source_structure.builder_ref,
+    'policy_source_structure.builder_ref',
+  );
+  for (const sourceRef of policy.policy_source_structure.extracted_gate_refs) {
+    assertRepoRefResolves(sourceRef, 'policy_source_structure.extracted_gate_refs');
+  }
   assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.package_name, '@redcube/domain-entry');
   assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_identity, 'redcube-ai');
   assert.equal(policy.legacy_name_policy.package_protocol_boundary_policy.public_framework_identity_allowed, false);
@@ -566,9 +600,11 @@ test('RCA physical source morphology classifies every active shell wrapper expli
 
 test('RCA physical source morphology source refs resolve under source_ref_integrity_gate', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
-  const allSourceRefs = [...new Set(policy.active_surface_classifications.flatMap(
-    (entry) => entry.source_refs ?? [],
-  ))].sort();
+  const allSourceRefs = [...new Set([
+    ...policy.active_surface_classifications.flatMap((entry) => entry.source_refs ?? []),
+    policy.policy_source_structure.builder_ref,
+    ...policy.policy_source_structure.extracted_gate_refs,
+  ])].sort();
   const allMachineBoundaryRefs = [...new Set(policy.active_surface_classifications.flatMap(
     (entry) => entry.machine_boundary_refs ?? [],
   ))].sort();
@@ -579,6 +615,8 @@ test('RCA physical source morphology source refs resolve under source_ref_integr
     applies_to: [
       'active_surface_classifications[*].source_refs',
       'active_surface_classifications[*].machine_boundary_refs',
+      'policy_source_structure.builder_ref',
+      'policy_source_structure.extracted_gate_refs',
       'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
       'legacy_name_policy.retired_compatibility_payload_field_policy',
     ],
@@ -615,6 +653,12 @@ test('RCA physical source morphology source refs resolve under source_ref_integr
       gate_can_claim_production_ready: false,
     },
   });
+  assert.ok(
+    policy.source_ref_integrity_gate.checked_source_refs.includes(policy.policy_source_structure.builder_ref),
+  );
+  for (const sourceRef of policy.policy_source_structure.extracted_gate_refs) {
+    assert.ok(policy.source_ref_integrity_gate.checked_source_refs.includes(sourceRef));
+  }
   assert.deepEqual(sourceRefIntegrityViolations('/tmp/redcube.ts'), [
     'absolute_path',
   ]);

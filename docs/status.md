@@ -90,6 +90,8 @@ Purpose-first domain-thinning 和 source morphology 的字段级判断不在 sta
 
 2026-06-21 tranche follow-through：`default_caller_tail_thinning_gate` 下新增 `retirement_readback_cleanup_guard`。该 guard 只允许 source classification readback 输出 active surface classification、missing evidence worklist、owner delta route、typed blocker ref shape 和 no-resurrection policy；明确禁止 physical delete operation、owner receipt signature、typed blocker instance creation、visual/export/production readiness、default-caller cutover 或 App/live readiness claim。它把 cleanup/readback 本身固定为非 Live、非 authority、非第二真相源的结构 guard。
 
+2026-06-21 structure follow-through：同一 policy 现在新增 `policy_source_structure`，把 `buildPhysicalSourceMorphologyPolicy` builder 和拆出的 `physical-source-morphology-policy-tail-gate.ts#SOURCE_THINNING_TAIL_GATE` 纳入 machine-readable source refs。`source_ref_integrity_gate` 会检查这些 refs 可解析，防止 tail gate 拆分后形成第二真相源；该结构读面只证明 builder/tail-gate 组装边界清楚，不授权 default-caller cutover、physical delete、visual/export/handoff/domain/production ready。
+
 Hermes-Agent / executor runtime protocol 仍只读为显式 opt-in proof backend 和 route-level executor policy迁移输入。删除门属于 Agent Executor Adapter / attempt ledger / runtime record default-caller tail；它不是 RCA production visual evidence。
 
 ## 当前测试/证据差距
