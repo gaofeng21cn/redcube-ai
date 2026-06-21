@@ -447,6 +447,45 @@
         "safe_action_refs",
         "no_regression_evidence_refs"
       ],
+      "legacy_name_allowance": {
+        "legacy_terms": [
+          "managed",
+          "runtime",
+          "gateway",
+          "session",
+          "domain_action_adapter"
+        ],
+        "allowed_as": [
+          "domain_handler_target",
+          "refs_only_read_model",
+          "contract_safe_semantic_id",
+          "negative_test_guard"
+        ],
+        "rationale": "domain_action_adapter implementation paths are RCA guarded domain-handler targets and refs-only contract/read-model projections; legacy control-plane wording is limited to semantic ids, negative guards, OPL generated refs, and explicit tombstone fields and cannot restore RCA-owned generic dispatch, runtime, session, gateway, or wrapper ownership.",
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "public_identity_allowed": false,
+        "active_generic_runtime_owner_allowed": false,
+        "active_generic_domain_entry_owner_allowed": false,
+        "active_generic_gateway_owner_allowed": false,
+        "active_generic_session_runtime_owner_allowed": false,
+        "active_generic_domain_action_adapter_owner_allowed": false,
+        "active_generic_workbench_owner_allowed": false,
+        "active_generic_attempt_ledger_owner_allowed": false
+      },
+      "no_resurrection_gate": {
+        "generic_dispatch_owner_allowed": false,
+        "generic_domain_action_adapter_owner_allowed": false,
+        "generic_runtime_owner_allowed": false,
+        "generic_session_runtime_owner_allowed": false,
+        "generic_gateway_owner_allowed": false,
+        "generic_workbench_owner_allowed": false,
+        "generic_generated_wrapper_owner_allowed": false,
+        "default_runtime_watch_dispatch_allowed": false,
+        "compatibility_alias_allowed": false,
+        "callable_alias_allowed": false,
+        "production_readiness_claim_allowed": false
+      },
       "forbidden_generic_owner_flags": {
         "rca_owns_generic_scheduler": false,
         "rca_owns_generic_runner": false,

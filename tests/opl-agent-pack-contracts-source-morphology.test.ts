@@ -212,6 +212,31 @@ test('RCA physical source morphology policy classifies active source tails witho
     byId.domain_action_adapter_guarded_actions.current_rca_role,
     'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner',
   );
+  assert.deepEqual(byId.domain_action_adapter_guarded_actions.legacy_name_allowance.allowed_as, [
+    'domain_handler_target',
+    'refs_only_read_model',
+    'contract_safe_semantic_id',
+    'negative_test_guard',
+  ]);
+  assert.equal(byId.domain_action_adapter_guarded_actions.legacy_name_allowance.compatibility_alias_allowed, false);
+  assert.equal(byId.domain_action_adapter_guarded_actions.legacy_name_allowance.callable_alias_allowed, false);
+  assert.equal(
+    byId.domain_action_adapter_guarded_actions.legacy_name_allowance.active_generic_domain_action_adapter_owner_allowed,
+    false,
+  );
+  assert.deepEqual(byId.domain_action_adapter_guarded_actions.no_resurrection_gate, {
+    generic_dispatch_owner_allowed: false,
+    generic_domain_action_adapter_owner_allowed: false,
+    generic_runtime_owner_allowed: false,
+    generic_session_runtime_owner_allowed: false,
+    generic_gateway_owner_allowed: false,
+    generic_workbench_owner_allowed: false,
+    generic_generated_wrapper_owner_allowed: false,
+    default_runtime_watch_dispatch_allowed: false,
+    compatibility_alias_allowed: false,
+    callable_alias_allowed: false,
+    production_readiness_claim_allowed: false,
+  });
   assert.equal(
     byId.operator_evidence_stability_projection.current_rca_role,
     'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',

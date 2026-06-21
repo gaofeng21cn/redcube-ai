@@ -97,6 +97,74 @@ test('RCA active code source legacy names are covered by explicit morphology all
   assert.deepEqual(violations, []);
 });
 
+test('RCA domain_action_adapter implementation legacy names stay under domain-handler no-resurrection guard', () => {
+  const policy = JSON.parse(readFileSync(
+    path.resolve('contracts/physical_source_morphology_policy.json'),
+    'utf-8',
+  ));
+  const trackedTerms = policy.legacy_name_policy.tracked_legacy_terms;
+  const adapterSurface = policy.active_surface_classifications.find(
+    (entry) => entry.surface_id === 'domain_action_adapter_guarded_actions',
+  );
+  assert.ok(adapterSurface);
+  assert.equal(adapterSurface.classification, 'domain_handler_target');
+  assert.deepEqual(adapterSurface.source_refs, [
+    'packages/redcube-domain-entry/src/actions/domain-action-adapter.ts',
+    'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts',
+    'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/',
+  ]);
+  const allowedTerms = new Set(adapterSurface.legacy_name_allowance.legacy_terms);
+  assert.deepEqual([...allowedTerms].sort(), [...trackedTerms].sort());
+  assert.deepEqual(adapterSurface.legacy_name_allowance.allowed_as, [
+    'domain_handler_target',
+    'refs_only_read_model',
+    'contract_safe_semantic_id',
+    'negative_test_guard',
+  ]);
+  for (const field of policy.legacy_name_policy.allowance_guard_required_fields) {
+    assert.equal(adapterSurface.legacy_name_allowance[field], false, `domain_action_adapter_guarded_actions.${field}`);
+  }
+  assert.equal(adapterSurface.no_resurrection_gate.generic_dispatch_owner_allowed, false);
+  assert.equal(adapterSurface.no_resurrection_gate.generic_domain_action_adapter_owner_allowed, false);
+  assert.equal(adapterSurface.no_resurrection_gate.default_runtime_watch_dispatch_allowed, false);
+  assert.equal(adapterSurface.no_resurrection_gate.production_readiness_claim_allowed, false);
+
+  const adapterFiles = adapterSurface.source_refs.flatMap((sourceRef) => {
+    const sourcePath = sourceRefPath(sourceRef);
+    return sourcePath.endsWith('/')
+      ? listTextFiles(sourcePath)
+      : [sourcePath];
+  })
+    .filter((file) => TEXT_EXTENSIONS.has(path.extname(file)))
+    .map(normalizePath)
+    .sort();
+
+  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/domain-action-adapter.ts'));
+  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts'));
+  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts'));
+
+  const violations = [];
+  for (const file of adapterFiles) {
+    const text = readFileSync(path.resolve(file), 'utf-8');
+    const hits = trackedTerms.filter((term) => new RegExp(`\\b${term}\\b`, 'i').test(text));
+    if (hits.length === 0) continue;
+    const coveringSurfaceIds = policy.active_surface_classifications
+      .filter((entry) => (entry.source_refs || []).some((sourceRef) => sourceRefCoversFile(sourceRef, file)))
+      .map((entry) => entry.surface_id);
+    if (!coveringSurfaceIds.includes('domain_action_adapter_guarded_actions')) {
+      violations.push(`${file}:missing-domain_action_adapter_guarded_actions`);
+      continue;
+    }
+    for (const term of hits) {
+      if (!allowedTerms.has(term)) {
+        violations.push(`${file}:unallowed-${term}`);
+      }
+    }
+  }
+
+  assert.deepEqual(violations, []);
+});
+
 test('RCA product-entry manifest projection legacy names stay under manifest source classification', () => {
   const policy = JSON.parse(readFileSync(
     path.resolve('contracts/physical_source_morphology_policy.json'),
