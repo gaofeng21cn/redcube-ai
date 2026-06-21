@@ -276,21 +276,57 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   assert.equal(policy.consumer, 'opl');
   assert.equal(policy.legacy_name_policy.compatibility_alias_allowed, false);
   assert.equal(policy.legacy_name_policy.allowance_required_for_active_surface_text_matches, true);
+  const allSourceRefs = [...new Set([
+    ...policy.active_surface_classifications.flatMap((entry) => entry.source_refs ?? []),
+    policy.policy_source_structure.builder_ref,
+    ...policy.policy_source_structure.extracted_gate_refs,
+  ])].sort();
+  const allMachineBoundaryRefs = [...new Set(policy.active_surface_classifications.flatMap(
+    (entry) => entry.machine_boundary_refs ?? [],
+  ))].sort();
   assert.deepEqual(policy.source_ref_integrity_gate, {
     policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
-    applies_to: ['active_surface_classifications[*].source_refs', 'active_surface_classifications[*].machine_boundary_refs'],
+    state: 'repo_local_source_refs_declared_no_second_truth',
+    applies_to: [
+      'active_surface_classifications[*].source_refs',
+      'active_surface_classifications[*].machine_boundary_refs',
+      'policy_source_structure.builder_ref',
+      'policy_source_structure.extracted_gate_refs',
+      'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
+      'legacy_name_policy.retired_compatibility_payload_field_policy',
+    ],
+    checked_source_ref_count: allSourceRefs.length,
+    checked_machine_boundary_ref_count: allMachineBoundaryRefs.length,
+    checked_source_refs: allSourceRefs,
+    checked_machine_boundary_refs: allMachineBoundaryRefs,
     accepted_ref_shapes: ['repo_path', 'repo_directory', 'repo_path_anchor'],
     anchor_separator: '#',
     repo_local_refs_only: true,
     absolute_path_allowed: false,
     parent_directory_traversal_allowed: false,
     uri_ref_allowed: false,
+    human_doc_ref_allowed_as_machine_source_ref: false,
+    retired_compatibility_source_refs_allowed_only_as_tombstone_or_negative_guard: true,
     machine_boundary_refs_require_anchor: true,
     stale_source_ref_reopens_gap: true,
     missing_source_ref_allowed: false,
     missing_machine_boundary_anchor_allowed: false,
     generic_owner_classification_from_unresolved_ref_allowed: false,
+    source_ref_integrity_can_claim_visual_ready: false,
+    source_ref_integrity_can_claim_exportable: false,
+    source_ref_integrity_can_claim_handoffable: false,
     production_readiness_claim_allowed: false,
+    authority_boundary: {
+      gate_can_create_missing_refs: false,
+      gate_can_create_alias_files: false,
+      gate_can_authorize_physical_delete: false,
+      gate_can_claim_default_caller_cutover: false,
+      gate_can_claim_app_or_live_readiness: false,
+      gate_can_claim_visual_or_export_readiness: false,
+      gate_can_claim_handoffable: false,
+      gate_can_claim_domain_ready: false,
+      gate_can_claim_production_ready: false,
+    },
   });
   assert.deepEqual(policy.legacy_name_policy.tracked_legacy_terms, [
     'managed',
