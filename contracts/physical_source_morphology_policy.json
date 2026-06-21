@@ -1069,6 +1069,47 @@
       "shell_wrappers_can_become_runtime_owner": false,
       "compatibility_alias_or_facade_allowed": false
     },
+    "active_source_resurrection_scan_policy": {
+      "policy_id": "rca.source_morphology.active_source_no_resurrection_scan.v1",
+      "scan_roots": [
+        "agent",
+        "apps",
+        "packages",
+        "contracts",
+        "plugins",
+        "scripts",
+        "tools",
+        "python"
+      ],
+      "helper_ref": "tests/helpers/rca-retired-surface-guard.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS",
+      "test_ref": "tests/rca-legacy-name-allowance.test.ts#RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection",
+      "forbidden_true_claim_keys": [
+        "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch",
+        "domain_action_adapter_can_become_generic_dispatch_owner",
+        "domain_action_adapter_can_become_generated_wrapper_owner",
+        "default_runtime_watch_dispatch_allowed",
+        "generic_dispatch_owner_allowed",
+        "generic_domain_action_adapter_owner_allowed",
+        "generic_generated_wrapper_owner_allowed",
+        "generic_session_runtime_owner_allowed",
+        "generic_workbench_owner_allowed",
+        "generic_runtime_owner_allowed"
+      ],
+      "fail_closed_conditions": [
+        "active_source_claims_runtimeWatch_default_dispatch",
+        "active_source_claims_generic_domain_action_adapter_owner",
+        "active_source_claims_generated_wrapper_owner",
+        "active_source_claims_generic_runtime_or_workbench_owner",
+        "compatibility_alias_or_facade_resurrection_claim"
+      ],
+      "authority_boundary": {
+        "scan_can_authorize_physical_delete": false,
+        "scan_can_claim_default_caller_cutover": false,
+        "scan_can_claim_visual_ready": false,
+        "scan_can_claim_domain_ready": false,
+        "scan_can_claim_production_ready": false
+      }
+    },
     "retirement_readback_cleanup_guard": {
       "guard_id": "rca.source_morphology.retirement_readback_cleanup_guard.v1",
       "state": "readback_guard_available_physical_delete_not_authorized",

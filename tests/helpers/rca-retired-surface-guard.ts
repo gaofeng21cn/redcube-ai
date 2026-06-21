@@ -41,6 +41,18 @@ export const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
   /\b(?:default|active|live|normal)[_-]?(?:compatibility|legacy)[_-]?alias(?:es)?\b/i,
   /\b(?:compatibility|legacy)[_-]?alias(?:es)?[_-]?(?:default|active|live|normal)\b/i,
 ]);
+export const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze([
+  /\bruntimeWatch_can_return_to_domain_action_adapter_default_dispatch\b\s*[:=]\s*true/i,
+  /\bdomain_action_adapter_can_become_generic_dispatch_owner\b\s*[:=]\s*true/i,
+  /\bdomain_action_adapter_can_become_generated_wrapper_owner\b\s*[:=]\s*true/i,
+  /\bdefault_runtime_watch_dispatch_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_dispatch_owner_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_domain_action_adapter_owner_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_generated_wrapper_owner_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_session_runtime_owner_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_workbench_owner_allowed\b\s*[:=]\s*true/i,
+  /\bgeneric_runtime_owner_allowed\b\s*[:=]\s*true/i,
+]);
 
 export function listTextFiles(root) {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
@@ -64,6 +76,24 @@ export function activeShellScripts() {
     .filter((file) => path.extname(file) === '.sh')
     .map(normalizePath)
     .sort();
+}
+
+export function activePrivatePlatformResurrectionViolations(scanRoots = ACTIVE_ROOTS) {
+  const violations = [];
+  for (const file of scanRoots.flatMap((root) => {
+    if (!existsSync(path.resolve(root))) return [];
+    return path.extname(root) ? [root] : listTextFiles(root);
+  })) {
+    const normalized = normalizePath(file);
+    if (RETIRED_SURFACE_GUARD_TEST_FILES.has(normalized)) continue;
+    const text = readFileSync(file, 'utf-8');
+    for (const pattern of ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS) {
+      if (pattern.test(text)) {
+        violations.push(`${normalized}: ${pattern}`);
+      }
+    }
+  }
+  return violations;
 }
 
 export function normalizePath(value) {
