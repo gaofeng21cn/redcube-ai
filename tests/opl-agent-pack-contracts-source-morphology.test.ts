@@ -12,6 +12,18 @@ import {
   sourceRefCoversFile,
 } from './helpers/rca-retired-surface-guard.ts';
 
+function sourceRefIntegrityViolations(sourceRef) {
+  const sourcePath = String(sourceRef).split('#')[0];
+  const parts = sourcePath.split('/');
+  const violations = [];
+  if (sourcePath.trim() === '') violations.push('empty_ref');
+  if (/^[a-z][a-z0-9+.-]*:/i.test(sourcePath)) violations.push('uri_or_url');
+  if (path.isAbsolute(sourcePath) || sourcePath.startsWith('/')) violations.push('absolute_path');
+  if (parts.includes('..')) violations.push('parent_directory_traversal');
+  if (String(sourceRef).startsWith('human_doc:')) violations.push('human_doc_ref_as_machine_source_ref');
+  return violations;
+}
+
 test('RCA physical source morphology policy classifies active source tails without generic ownership', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
   const byId = Object.fromEntries(policy.active_surface_classifications.map((entry) => [entry.surface_id, entry]));
@@ -554,34 +566,77 @@ test('RCA physical source morphology classifies every active shell wrapper expli
 
 test('RCA physical source morphology source refs resolve under source_ref_integrity_gate', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
+  const allSourceRefs = [...new Set(policy.active_surface_classifications.flatMap(
+    (entry) => entry.source_refs ?? [],
+  ))].sort();
+  const allMachineBoundaryRefs = [...new Set(policy.active_surface_classifications.flatMap(
+    (entry) => entry.machine_boundary_refs ?? [],
+  ))].sort();
 
   assert.deepEqual(policy.source_ref_integrity_gate, {
     policy_kind: 'active_surface_source_refs_must_resolve_before_classification_is_trusted',
+    state: 'repo_local_source_refs_declared_no_second_truth',
     applies_to: [
       'active_surface_classifications[*].source_refs',
       'active_surface_classifications[*].machine_boundary_refs',
+      'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
+      'legacy_name_policy.retired_compatibility_payload_field_policy',
     ],
+    checked_source_ref_count: allSourceRefs.length,
+    checked_machine_boundary_ref_count: allMachineBoundaryRefs.length,
+    checked_source_refs: allSourceRefs,
+    checked_machine_boundary_refs: allMachineBoundaryRefs,
     accepted_ref_shapes: ['repo_path', 'repo_directory', 'repo_path_anchor'],
     anchor_separator: '#',
     repo_local_refs_only: true,
     absolute_path_allowed: false,
     parent_directory_traversal_allowed: false,
     uri_ref_allowed: false,
+    human_doc_ref_allowed_as_machine_source_ref: false,
+    retired_compatibility_source_refs_allowed_only_as_tombstone_or_negative_guard: true,
     machine_boundary_refs_require_anchor: true,
     stale_source_ref_reopens_gap: true,
     missing_source_ref_allowed: false,
     missing_machine_boundary_anchor_allowed: false,
     generic_owner_classification_from_unresolved_ref_allowed: false,
+    source_ref_integrity_can_claim_visual_ready: false,
+    source_ref_integrity_can_claim_exportable: false,
+    source_ref_integrity_can_claim_handoffable: false,
     production_readiness_claim_allowed: false,
+    authority_boundary: {
+      gate_can_create_missing_refs: false,
+      gate_can_create_alias_files: false,
+      gate_can_authorize_physical_delete: false,
+      gate_can_claim_default_caller_cutover: false,
+      gate_can_claim_app_or_live_readiness: false,
+      gate_can_claim_visual_or_export_readiness: false,
+      gate_can_claim_handoffable: false,
+      gate_can_claim_domain_ready: false,
+      gate_can_claim_production_ready: false,
+    },
   });
+  assert.deepEqual(sourceRefIntegrityViolations('/tmp/redcube.ts'), [
+    'absolute_path',
+  ]);
+  assert.deepEqual(sourceRefIntegrityViolations('../redcube.ts'), [
+    'parent_directory_traversal',
+  ]);
+  assert.deepEqual(sourceRefIntegrityViolations('https://example.test/redcube.ts'), [
+    'uri_or_url',
+  ]);
+  assert.deepEqual(sourceRefIntegrityViolations('human_doc:docs/status.md'), [
+    'human_doc_ref_as_machine_source_ref',
+  ]);
 
   for (const entry of policy.active_surface_classifications) {
     assert.notDeepEqual(entry.source_refs ?? [], [], `${entry.surface_id}.source_refs`);
     for (const sourceRef of entry.source_refs ?? []) {
+      assert.deepEqual(sourceRefIntegrityViolations(sourceRef), [], `${entry.surface_id}.source_refs`);
       assertRepoRefResolves(sourceRef, `${entry.surface_id}.source_refs`);
     }
     for (const sourceRef of entry.machine_boundary_refs ?? []) {
       assert.equal(String(sourceRef).includes('#'), true, `${entry.surface_id}.machine_boundary_refs`);
+      assert.deepEqual(sourceRefIntegrityViolations(sourceRef), [], `${entry.surface_id}.machine_boundary_refs`);
       assertRepoRefResolves(sourceRef, `${entry.surface_id}.machine_boundary_refs`);
     }
   }
