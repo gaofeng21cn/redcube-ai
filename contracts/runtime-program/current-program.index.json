@@ -183,8 +183,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption_ref",
@@ -295,8 +295,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_owned_generic_primitives",
@@ -386,8 +386,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -498,8 +498,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -813,8 +813,8 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -925,8 +925,8 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -1065,8 +1065,8 @@
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "current_program_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -1079,8 +1079,8 @@
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "current_program_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -1429,8 +1429,8 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -1541,8 +1541,8 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -1744,8 +1744,8 @@
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -1758,8 +1758,8 @@
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -2024,8 +2024,8 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -2136,8 +2136,8 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -2304,8 +2304,8 @@
       "json_pointer": "/current_state/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -2318,8 +2318,8 @@
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -2509,8 +2509,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/generated_interface_consumption_ref",
@@ -2621,8 +2621,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/opl_owned_generic_primitives",
@@ -2712,8 +2712,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -2824,8 +2824,8 @@
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -3139,8 +3139,8 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -3251,8 +3251,8 @@
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "current_program_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/product_release_metadata/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -3391,8 +3391,8 @@
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "current_program_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -3405,8 +3405,8 @@
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "current_program_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -3755,8 +3755,8 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -3867,8 +3867,8 @@
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -4070,8 +4070,8 @@
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -4084,8 +4084,8 @@
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/generated_surface_handoff_ref",
@@ -4350,8 +4350,8 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/generated_interface_consumption_ref",
@@ -4462,8 +4462,8 @@
       "json_pointer": "/current_state/privatized_functional_module_audit/opl_generated_interface_consumption",
       "ref": "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit/opl_generated_interface_consumption.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 108,
-      "sha256": "468bc4cd9020c1538eb5e331aed4eebdfa0cc076d9f0f27510f15c156bcc91c2"
+      "line_count": 118,
+      "sha256": "122e3ffe0739748f332a2f548f75e4860f8c736992864c1433f38d2a1636a4f2"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit/opl_owned_generic_primitives",
@@ -4630,8 +4630,8 @@
       "json_pointer": "/current_state/visual_pack_compiler_handoff/declarative_visual_pack_input",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/declarative_visual_pack_input.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 549,
-      "sha256": "f3f24c9af43d336a42f30555b240704ca73964cc4ff722f440036dfb74f3d899"
+      "line_count": 917,
+      "sha256": "0a664c13f2272fa225ed3a9b7951ca17b5d146439d21e660e0121c938de089d4"
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/declares_production_soak_complete",
@@ -4644,8 +4644,8 @@
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/generated_surface_handoff.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 167,
-      "sha256": "4563b91976c74989852085530f9799ffec617d098337bde8dfcc6d683058965c"
+      "line_count": 177,
+      "sha256": "25789c9c74ecdf4833c5d0c8395d77ad66331bb34b3059d8d067c352f107dea4"
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/generated_surface_handoff_ref",

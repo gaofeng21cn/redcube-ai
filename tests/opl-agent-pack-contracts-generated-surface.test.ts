@@ -51,13 +51,23 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     true,
   );
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.rca_can_own_generated_surface, false);
-  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_generated_surface_consumption_complete, true);
-  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_production_consumption_complete, true);
+  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_generated_surface_descriptor_consumed, true);
+  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_generated_surface_consumption_complete, false);
+  assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_production_consumption_complete, false);
   assert.equal(
     generatedSurfaceHandoff.bridge_exit_gate.production_consumption_scope,
-    'opl_generated_surface_consumption_only_not_visual_stage_live_soak',
+    'descriptor_and_contract_consumed_not_production_default_caller_live_soak',
   );
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
+  assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.false_ready_guard, {
+    descriptor_consumption_can_claim_generated_surface_completion: false,
+    descriptor_consumption_can_claim_production_consumption: false,
+    descriptor_consumption_can_claim_default_caller_cutover: false,
+    descriptor_consumption_can_claim_app_operator_consumption: false,
+    descriptor_consumption_can_claim_visual_stage_long_soak: false,
+    descriptor_consumption_can_claim_domain_ready: false,
+    descriptor_consumption_can_claim_artifact_ready: false,
+  });
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_blocker_ids, []);
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_evidence_gate_ids, [
     'real_artifact_producing_domain_owner_receipt',

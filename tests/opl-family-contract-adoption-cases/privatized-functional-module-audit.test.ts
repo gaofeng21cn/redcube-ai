@@ -321,7 +321,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     'product_entry',
     'product_status',
     'product_session',
-    'domain_action_adapter',
+    'domain_handler',
     'workbench',
   ];
   for (const handoff of [
@@ -332,6 +332,23 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   ]) {
     assert.deepEqual(handoff.generated_surface_targets, expectedGeneratedTargets);
     assert.deepEqual(handoff.generated_descriptor_scope, expectedDescriptorScope);
+    assert.equal(handoff.bridge_exit_gate.declares_generated_surface_descriptor_consumed, true);
+    assert.equal(handoff.bridge_exit_gate.declares_generated_surface_consumption_complete, false);
+    assert.equal(handoff.bridge_exit_gate.declares_production_consumption_complete, false);
+    assert.equal(
+      handoff.bridge_exit_gate.production_consumption_scope,
+      'descriptor_and_contract_consumed_not_production_default_caller_live_soak',
+    );
+    assert.equal(handoff.bridge_exit_gate.declares_visual_stage_long_soak_complete, false);
+    assert.deepEqual(handoff.bridge_exit_gate.false_ready_guard, {
+      descriptor_consumption_can_claim_generated_surface_completion: false,
+      descriptor_consumption_can_claim_production_consumption: false,
+      descriptor_consumption_can_claim_default_caller_cutover: false,
+      descriptor_consumption_can_claim_app_operator_consumption: false,
+      descriptor_consumption_can_claim_visual_stage_long_soak: false,
+      descriptor_consumption_can_claim_domain_ready: false,
+      descriptor_consumption_can_claim_artifact_ready: false,
+    });
     assert.equal(handoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner, 'one-person-lab');
     assert.equal(handoff.repo_local_launcher_policy.product_entry_continuity_refs_adapter_is_generic_session_owner, false);
     assert.equal(handoff.wrappers.skill.owner, 'opl');
