@@ -57,6 +57,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/rca-foundry-agent-os-domain-kernel-manifest.test.ts',
     'tests/rca-one-shot-closeout.test.ts',
     'tests/rca-functional-audit-retirement.test.ts',
+    'tests/rca-private-platform-retirement-readback.test.ts',
     'tests/rca-legacy-name-allowance.test.ts',
     'tests/rca-opl-generic-primitive-consumption.test.ts',
     'tests/rca-retired-payload-pointer-guard.test.ts',

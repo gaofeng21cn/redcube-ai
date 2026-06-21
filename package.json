@@ -27,6 +27,7 @@
     "test:full:with-historical": "npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:with-historical",
     "test:line-budget": "npm run --silent line-budget",
     "test:line-budget:strict": "npm run --silent line-budget:strict",
+    "test:private-platform:strict": "npm run --silent build && node --experimental-strip-types scripts/check-private-platform-retirement.ts --format json >/tmp/redcube-ai-private-platform-retirement.json",
     "repo:hygiene": "scripts/repo-hygiene.sh",
     "repo:hygiene:fix": "scripts/repo-hygiene.sh --fix",
     "contracts:current-program:write": "node --experimental-strip-types scripts/sync-current-program-leaf-index.ts --write",
