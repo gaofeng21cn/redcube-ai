@@ -219,6 +219,25 @@ function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
       owner_delta_required: compactSummary.owner_delta_required,
     });
   }
+  const workOrderPack = compactSummary.owner_delta_work_order_pack || {};
+  if (workOrderPack.owner_delta_route_count !== tailReadback.tail_surface_count) {
+    failures.push({
+      check_id: 'default_caller_tail_owner_delta_work_order_route_count',
+      state: 'failed',
+      owner_delta_route_count: workOrderPack.owner_delta_route_count,
+      tail_surface_count: tailReadback.tail_surface_count,
+    });
+  }
+  const workOrderBoundary = workOrderPack.authority_boundary || {};
+  for (const [key, value] of Object.entries(workOrderBoundary)) {
+    if (value !== false) {
+      failures.push({
+        check_id: 'default_caller_tail_owner_delta_work_order_authority_boundary',
+        key,
+        value,
+      });
+    }
+  }
   for (const classification of tailReadback.tail_classifications || []) {
     const route = classification.owner_delta_route || {};
     if (!route.typed_blocker_ref_shape) {
@@ -246,6 +265,7 @@ export function buildDefaultCallerTailOwnerDeltaReadback() {
   const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
   const tailReadback = physicalPolicy.default_caller_tail_readback ?? null;
   const compactSummary = tailReadback?.compact_retirement_summary ?? {};
+  const ownerDeltaWorkOrderPack = compactSummary.owner_delta_work_order_pack ?? null;
   const tailClassifications = tailReadback?.tail_classifications ?? [];
   const failures = collectDefaultCallerTailFailures(tailReadback, compactSummary);
 
@@ -257,6 +277,7 @@ export function buildDefaultCallerTailOwnerDeltaReadback() {
     failed_checks: failures,
     default_caller_tail_readback: tailReadback,
     compact_retirement_summary: compactSummary,
+    owner_delta_work_order_pack: ownerDeltaWorkOrderPack,
     owner_delta_routes: tailClassifications.map((classification) => ({
       surface_id: classification.surface_id,
       owner_delta_route: classification.owner_delta_route ?? null,

@@ -1193,6 +1193,153 @@
       "owner_delta_required": true,
       "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
       "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+      "owner_delta_work_order_pack": {
+        "surface_kind": "rca_default_caller_tail_owner_delta_work_order_pack",
+        "pack_id": "rca.source_morphology.default_caller_tail.owner_delta_work_order_pack.v1",
+        "state": "owner_delta_required_cleanup_not_authorized",
+        "target_domain_id": "redcube-ai",
+        "source_summary_ref": "contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary",
+        "tail_surface_count": 8,
+        "cleanup_candidate_count": 0,
+        "owner_delta_route_count": 8,
+        "missing_evidence_ids": [
+          "opl_generated_default_caller_parity",
+          "no_active_repo_local_default_caller",
+          "rca_owner_receipt_or_typed_blocker_roundtrip",
+          "no_forbidden_write_proof",
+          "retired_alias_no_resurrection_proof",
+          "tombstone_or_provenance_pointer"
+        ],
+        "owner_delta_routes": [
+          {
+            "surface_id": "product_entry_continuity_refs_adapter",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "runtime_watch_projection",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:runtime-watch-projection:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "domain_action_adapter_guarded_actions",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:domain-action-adapter-guarded-actions:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "operator_evidence_stability_projection",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:operator-evidence-stability-projection:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "product_entry_manifest_projection",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:product-entry-manifest-projection:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "deliverable_route_attempt_shell",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:deliverable-route-attempt-shell:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "executor_runtime_route_run_records",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:executor-runtime-route-run-records:physical-delete-requires-explicit-owner-receipt"
+          },
+          {
+            "surface_id": "repo_shell_verification_wrappers",
+            "next_owner": "one-person-lab_or_redcube_ai_owner_receipt_surface",
+            "required_delta": "provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin",
+            "required_evidence_ids": [
+              "opl_generated_default_caller_parity",
+              "no_active_repo_local_default_caller",
+              "rca_owner_receipt_or_typed_blocker_roundtrip",
+              "no_forbidden_write_proof",
+              "retired_alias_no_resurrection_proof",
+              "tombstone_or_provenance_pointer"
+            ],
+            "typed_blocker_ref_shape": "rca-typed-blocker:private-platform-retirement:repo-shell-verification-wrappers:physical-delete-requires-explicit-owner-receipt"
+          }
+        ],
+        "authority_boundary": {
+          "work_order_can_write_visual_truth": false,
+          "work_order_can_write_artifact_blob": false,
+          "work_order_can_write_memory_body": false,
+          "work_order_can_issue_review_or_export_verdict": false,
+          "work_order_can_sign_owner_receipt": false,
+          "work_order_can_create_typed_blocker_instance": false,
+          "work_order_can_authorize_physical_delete": false,
+          "work_order_can_claim_default_caller_cutover": false,
+          "work_order_can_claim_visual_ready": false,
+          "work_order_can_claim_exportable": false,
+          "work_order_can_claim_handoffable": false,
+          "work_order_can_claim_domain_ready": false,
+          "work_order_can_claim_production_ready": false
+        }
+      },
       "can_apply_cleanup": false,
       "can_authorize_physical_delete": false,
       "can_claim_default_caller_cutover_complete": false,
@@ -1205,6 +1352,7 @@
       "compact_retirement_summary",
       "missing_evidence_worklist",
       "owner_delta_route",
+      "owner_delta_work_order_pack",
       "typed_blocker_ref_shape",
       "no_resurrection_policy"
     ],

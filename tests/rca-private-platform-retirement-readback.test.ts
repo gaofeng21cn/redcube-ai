@@ -113,6 +113,31 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
   assert.equal(payload.compact_retirement_summary.owner_delta_required, true);
   assert.equal(payload.compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(payload.compact_retirement_summary.can_authorize_physical_delete, false);
+  assert.deepEqual(
+    payload.owner_delta_work_order_pack,
+    payload.compact_retirement_summary.owner_delta_work_order_pack,
+  );
+  assert.equal(
+    payload.owner_delta_work_order_pack.surface_kind,
+    'rca_default_caller_tail_owner_delta_work_order_pack',
+  );
+  assert.equal(
+    payload.owner_delta_work_order_pack.state,
+    'owner_delta_required_cleanup_not_authorized',
+  );
+  assert.equal(payload.owner_delta_work_order_pack.tail_surface_count, 8);
+  assert.equal(payload.owner_delta_work_order_pack.owner_delta_route_count, 8);
+  assert.equal(payload.owner_delta_work_order_pack.cleanup_candidate_count, 0);
+  assert.deepEqual(
+    payload.owner_delta_work_order_pack.owner_delta_routes.map((route) => route.surface_id),
+    payload.owner_delta_routes.map((route) => route.surface_id),
+  );
+  assert.ok(
+    payload.owner_delta_work_order_pack.owner_delta_routes.every((route) => (
+      route.typed_blocker_ref_shape.startsWith('rca-typed-blocker:private-platform-retirement:')
+      && route.typed_blocker_ref_shape.endsWith(':physical-delete-requires-explicit-owner-receipt')
+    )),
+  );
   assert.equal(payload.owner_delta_routes.length, 8);
   assert.equal(payload.typed_blocker_ref_shapes.length, 8);
   assert.ok(
@@ -154,6 +179,7 @@ test('RCA default-caller tail owner-delta script emits JSON readback', () => {
   assert.equal(directPayload.surface_kind, 'rca_default_caller_tail_owner_delta_readback');
   assert.equal(directPayload.state, 'passed_repo_source_guard_only');
   assert.equal(directPayload.compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(directPayload.owner_delta_work_order_pack.owner_delta_route_count, 8);
   assert.equal(directPayload.authority_boundary.readback_can_create_typed_blocker_instance, false);
   assert.equal(directPayload.authority_boundary.readback_can_claim_production_ready, false);
 

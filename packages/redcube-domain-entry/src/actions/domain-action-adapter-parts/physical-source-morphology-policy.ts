@@ -212,6 +212,11 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
   const cleanupCandidateSurfaceIds = tailClassifications
     .filter((entry) => entry.missing_evidence_worklist.length === 0)
     .map((entry) => entry.surface_id);
+  const ownerDeltaWorkOrderPack = defaultCallerTailOwnerDeltaWorkOrderPack({
+    tailClassifications,
+    missingEvidenceIds,
+    cleanupCandidateSurfaceIds,
+  });
   return {
     readback_id: 'rca.source_morphology.default_caller_tail_readback.v1',
     state: 'active_missing_evidence_worklist_available',
@@ -231,6 +236,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
       required_delta:
         'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
+      owner_delta_work_order_pack: ownerDeltaWorkOrderPack,
       can_apply_cleanup: false,
       can_authorize_physical_delete: false,
       can_claim_default_caller_cutover_complete: false,
@@ -243,6 +249,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       'compact_retirement_summary',
       'missing_evidence_worklist',
       'owner_delta_route',
+      'owner_delta_work_order_pack',
       'typed_blocker_ref_shape',
       'no_resurrection_policy',
     ],
@@ -256,6 +263,47 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       readback_can_claim_handoffable: false,
       readback_can_claim_domain_ready: false,
       readback_can_claim_production_ready: false,
+    },
+  };
+}
+
+function defaultCallerTailOwnerDeltaWorkOrderPack({
+  tailClassifications,
+  missingEvidenceIds,
+  cleanupCandidateSurfaceIds,
+}) {
+  return {
+    surface_kind: 'rca_default_caller_tail_owner_delta_work_order_pack',
+    pack_id: 'rca.source_morphology.default_caller_tail.owner_delta_work_order_pack.v1',
+    state: 'owner_delta_required_cleanup_not_authorized',
+    target_domain_id: 'redcube-ai',
+    source_summary_ref:
+      'contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary',
+    tail_surface_count: tailClassifications.length,
+    cleanup_candidate_count: cleanupCandidateSurfaceIds.length,
+    owner_delta_route_count: tailClassifications.length,
+    missing_evidence_ids: [...missingEvidenceIds],
+    owner_delta_routes: tailClassifications.map((classification) => ({
+      surface_id: classification.surface_id,
+      next_owner: classification.owner_delta_route.next_owner,
+      required_delta: classification.owner_delta_route.required_delta,
+      required_evidence_ids: [...classification.missing_evidence_worklist],
+      typed_blocker_ref_shape: classification.owner_delta_route.typed_blocker_ref_shape,
+    })),
+    authority_boundary: {
+      work_order_can_write_visual_truth: false,
+      work_order_can_write_artifact_blob: false,
+      work_order_can_write_memory_body: false,
+      work_order_can_issue_review_or_export_verdict: false,
+      work_order_can_sign_owner_receipt: false,
+      work_order_can_create_typed_blocker_instance: false,
+      work_order_can_authorize_physical_delete: false,
+      work_order_can_claim_default_caller_cutover: false,
+      work_order_can_claim_visual_ready: false,
+      work_order_can_claim_exportable: false,
+      work_order_can_claim_handoffable: false,
+      work_order_can_claim_domain_ready: false,
+      work_order_can_claim_production_ready: false,
     },
   };
 }
