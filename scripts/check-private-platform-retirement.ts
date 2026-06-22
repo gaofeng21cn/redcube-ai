@@ -542,9 +542,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     } else {
       process.stdout.write(`${payload.surface_kind}: ${payload.state} (${payload.failed_checks.length} failed checks)\n`);
     }
-    process.exit(payload.state === 'passed_repo_source_guard_only' ? 0 : 1);
+    process.exitCode = payload.state === 'passed_repo_source_guard_only' ? 0 : 1;
   } catch (error) {
     process.stderr.write(`${error.message}\n`);
-    process.exit(1);
+    process.exitCode = 1;
   }
 }

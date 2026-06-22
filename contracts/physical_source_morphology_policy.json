@@ -1114,6 +1114,27 @@
       "guard_id": "rca.source_morphology.retirement_readback_cleanup_guard.v1",
       "state": "readback_guard_available_physical_delete_not_authorized",
       "readback_surface_ref": "contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate",
+      "json_transport_guard": {
+        "guard_id": "rca.source_morphology.retirement_readback_json_transport_guard.v1",
+        "state": "complete_parseable_json_required",
+        "command_refs": [
+          "npm run private-platform:readback",
+          "npm run test:private-platform:strict"
+        ],
+        "required_properties": [
+          "stdout_must_flush_before_exit",
+          "direct_readback_json_must_parse",
+          "strict_gate_payload_must_equal_direct_readback_payload",
+          "large_readback_over_64kb_must_not_truncate"
+        ],
+        "false_ready_guard": {
+          "parseable_json_can_claim_physical_delete_authorized": false,
+          "parseable_json_can_claim_default_caller_cutover_complete": false,
+          "parseable_json_can_claim_visual_ready": false,
+          "parseable_json_can_claim_domain_ready": false,
+          "parseable_json_can_claim_production_ready": false
+        }
+      },
       "allowed_readback_outputs": [
         "active_surface_classification",
         "missing_evidence_worklist",

@@ -113,7 +113,9 @@ test('RCA private platform retirement strict script emits JSON readback', () => 
   );
 
   assert.equal(readbackResult.status, 0, readbackResult.stderr || readbackResult.stdout);
-  const directPayload = JSON.parse(readFileSync(directReadbackPath, 'utf-8'));
+  const directReadbackText = readFileSync(directReadbackPath, 'utf-8');
+  assert.ok(directReadbackText.length > 65536);
+  const directPayload = JSON.parse(directReadbackText);
   assert.equal(directPayload.surface_kind, 'rca_private_platform_retirement_strict_readback');
   assert.equal(directPayload.state, 'passed_repo_source_guard_only');
   assert.equal(directPayload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
