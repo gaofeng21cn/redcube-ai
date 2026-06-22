@@ -311,11 +311,12 @@ test('run-test-group usage and verify shim include the family verification lane'
   assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
   assert.match(verifyScript, /smoke\)/);
   assert.match(verifyScript, /family\)/);
+  assert.match(verifyScript, /default-caller-tail\|default-caller-tail-strict\|default-caller-tail:strict\)/);
   assert.match(verifyScript, /ci\)/);
   assert.match(verifyScript, /integration-remaining\)/);
   assert.match(verifyScript, /full-remaining\)/);
   assert.match(verifyScript, /full-with-historical\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|ci\|line-budget\|line-budget-strict\|private-platform\|private-platform-strict\|private-platform:strict\|structure\|structure-strict\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\|full-with-historical\]/);
+  assert.match(verifyScript, /\[smoke\|fast\|ci\|line-budget\|line-budget-strict\|private-platform\|private-platform-strict\|private-platform:strict\|default-caller-tail\|default-caller-tail-strict\|default-caller-tail:strict\|structure\|structure-strict\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\|full-with-historical\]/);
 });
 
 test('deliverable review loop integration stays on the mock Codex runtime instead of the live CLI', () => {
