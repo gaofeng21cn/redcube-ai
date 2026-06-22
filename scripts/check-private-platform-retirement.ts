@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -11,12 +11,143 @@ import {
 } from '../packages/redcube-domain-entry/dist/index.js';
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
+const TEXT_EXTENSIONS = new Set([
+  '.md',
+  '.json',
+  '.ts',
+  '.tsx',
+  '.js',
+  '.mjs',
+  '.cjs',
+  '.py',
+  '.sh',
+  '.yaml',
+  '.yml',
+]);
+const RETIRED_SURFACE_GUARD_SOURCE_REFS = new Set([
+  'tests/helpers/rca-retired-surface-guard.ts',
+  'tests/rca-retired-surface-active-guard.test.ts',
+  'tests/rca-opl-generic-primitive-consumption.test.ts',
+  'tests/rca-functional-audit-retirement.test.ts',
+  'tests/rca-legacy-name-allowance.test.ts',
+  'tests/rca-retired-payload-pointer-guard.test.ts',
+  'tests/python-native-helper-catalog.test.ts',
+]);
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.resolve(REPO_ROOT, relativePath), 'utf-8'));
 }
 
-function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedActions, forbiddenWrites }) {
+function normalizePath(value) {
+  return value.split(path.sep).join('/');
+}
+
+function listTextFiles(root) {
+  const fullRoot = path.resolve(REPO_ROOT, root);
+  if (!existsSync(fullRoot)) return [];
+  if (path.extname(root)) return [fullRoot];
+  return readdirSync(fullRoot, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(fullRoot, entry.name);
+    const normalized = normalizePath(path.relative(REPO_ROOT, file));
+    if (entry.isDirectory()) {
+      if (normalized.includes('__closeout-audit-test__')) return [];
+      if (['dist', 'build', 'node_modules'].includes(entry.name)) return [];
+      return listTextFiles(normalized);
+    }
+    return entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name)) ? [file] : [];
+  });
+}
+
+function patternFromForbiddenClaimKey(key) {
+  return new RegExp(`\\b${key}\\b\\s*[:=]\\s*true`, 'i');
+}
+
+function buildActiveSourceResurrectionScanReadback(physicalPolicy) {
+  const scanPolicy = physicalPolicy.default_caller_tail_thinning_gate
+    ?.active_source_resurrection_scan_policy ?? null;
+  if (!scanPolicy || typeof scanPolicy !== 'object') {
+    return {
+      surface_kind: 'rca_active_source_resurrection_scan_readback',
+      state: 'missing_scan_policy',
+      failed_checks: [{ check_id: 'active_source_resurrection_scan_policy', state: 'missing' }],
+      authority_boundary: {},
+      forbidden_true_claim_keys: [],
+      scanned_file_count: 0,
+      violation_count: 0,
+      violations: [],
+    };
+  }
+
+  const violations = [];
+  const forbiddenKeys = Array.isArray(scanPolicy.forbidden_true_claim_keys)
+    ? scanPolicy.forbidden_true_claim_keys
+    : [];
+  for (const root of scanPolicy.scan_roots || []) {
+    for (const file of listTextFiles(root)) {
+      const relativePath = normalizePath(path.relative(REPO_ROOT, file));
+      if (RETIRED_SURFACE_GUARD_SOURCE_REFS.has(relativePath)) continue;
+      const text = readFileSync(file, 'utf-8');
+      for (const key of forbiddenKeys) {
+        if (patternFromForbiddenClaimKey(key).test(text)) {
+          violations.push({
+            file: relativePath,
+            forbidden_true_claim_key: key,
+          });
+        }
+      }
+    }
+  }
+
+  const boundary = scanPolicy.authority_boundary || {};
+  const failedChecks = [];
+  for (const [key, value] of Object.entries(boundary)) {
+    if (value !== false) {
+      failedChecks.push({
+        check_id: 'active_source_scan_authority_boundary',
+        key,
+        value,
+      });
+    }
+  }
+  if (violations.length > 0) {
+    failedChecks.push({
+      check_id: 'active_source_resurrection_violations',
+      violation_count: violations.length,
+    });
+  }
+
+  const scannedFiles = (scanPolicy.scan_roots || [])
+    .flatMap((root) => listTextFiles(root))
+    .map((file) => normalizePath(path.relative(REPO_ROOT, file)))
+    .filter((file) => !RETIRED_SURFACE_GUARD_SOURCE_REFS.has(file));
+
+  return {
+    surface_kind: 'rca_active_source_resurrection_scan_readback',
+    scan_policy_id: scanPolicy.policy_id,
+    state: failedChecks.length === 0
+      ? 'passed_active_source_no_resurrection_scan'
+      : 'failed',
+    failed_checks: failedChecks,
+    scan_roots: [...(scanPolicy.scan_roots || [])],
+    helper_ref: scanPolicy.helper_ref,
+    test_ref: scanPolicy.test_ref,
+    forbidden_true_claim_keys: [...forbiddenKeys],
+    fail_closed_conditions: [...(scanPolicy.fail_closed_conditions || [])],
+    scanned_file_count: scannedFiles.length,
+    violation_count: violations.length,
+    violations,
+    authority_boundary: { ...boundary },
+    false_ready_guard: {
+      scan_can_authorize_physical_delete: false,
+      scan_can_claim_default_caller_cutover: false,
+      scan_can_claim_visual_ready: false,
+      scan_can_claim_domain_ready: false,
+      scan_can_claim_production_ready: false,
+    },
+  };
+}
+
+function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedActions, forbiddenWrites, activeSourceScan }) {
   const failures = [];
   const closure = audit.functional_structure_gap_closure || {};
   if (closure.functional_structure_gap_count !== 0 || closure.remaining_gap_class !== 'none') {
@@ -142,6 +273,13 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
     if (!forbiddenWrites.includes(write)) {
       failures.push({ check_id: 'domain_action_adapter_forbidden_write_missing', write });
     }
+  }
+  if (activeSourceScan.state !== 'passed_active_source_no_resurrection_scan') {
+    failures.push({
+      check_id: 'active_source_resurrection_scan',
+      state: activeSourceScan.state,
+      violation_count: activeSourceScan.violation_count,
+    });
   }
   return failures;
 }
@@ -308,6 +446,7 @@ export function buildPrivatePlatformRetirementReadback() {
   const audit = buildPrivatizedFunctionalModuleAuditProjection();
   const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
   const runtimeWatchBoundary = buildRuntimeWatchBoundaryReadback(physicalPolicy);
+  const activeSourceScan = buildActiveSourceResurrectionScanReadback(physicalPolicy);
   const blockedActions = listDomainActionAdapterBlockedActions();
   const forbiddenWrites = listDomainActionAdapterForbiddenWrites();
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
@@ -318,6 +457,7 @@ export function buildPrivatePlatformRetirementReadback() {
     runtimeWatchBoundary,
     blockedActions,
     forbiddenWrites,
+    activeSourceScan,
   });
   if (JSON.stringify(contractAudit.functional_structure_gap_closure)
     !== JSON.stringify(audit.functional_structure_gap_closure)) {
@@ -334,6 +474,7 @@ export function buildPrivatePlatformRetirementReadback() {
     failed_checks: failures,
     functional_privatization_audit: audit,
     physical_source_morphology_policy: physicalPolicy,
+    active_source_resurrection_scan: activeSourceScan,
     default_caller_tail_compact_retirement_summary:
       physicalPolicy.default_caller_tail_readback?.compact_retirement_summary ?? null,
     runtime_watch_boundary: runtimeWatchBoundary,

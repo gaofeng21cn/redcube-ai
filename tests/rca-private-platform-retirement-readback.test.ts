@@ -29,6 +29,38 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
   );
   assert.equal(payload.runtime_watch_boundary.refs_only, true);
   assert.equal(payload.runtime_watch_boundary.read_only, true);
+  assert.equal(
+    payload.active_source_resurrection_scan.surface_kind,
+    'rca_active_source_resurrection_scan_readback',
+  );
+  assert.equal(
+    payload.active_source_resurrection_scan.scan_policy_id,
+    'rca.source_morphology.active_source_no_resurrection_scan.v1',
+  );
+  assert.equal(
+    payload.active_source_resurrection_scan.state,
+    'passed_active_source_no_resurrection_scan',
+  );
+  assert.deepEqual(payload.active_source_resurrection_scan.failed_checks, []);
+  assert.equal(payload.active_source_resurrection_scan.violation_count, 0);
+  assert.ok(payload.active_source_resurrection_scan.scanned_file_count > 0);
+  assert.ok(
+    payload.active_source_resurrection_scan.forbidden_true_claim_keys.includes(
+      'runtimeWatch_can_return_to_domain_action_adapter_default_dispatch',
+    ),
+  );
+  assert.ok(
+    payload.active_source_resurrection_scan.forbidden_true_claim_keys.includes(
+      'domain_action_adapter_can_become_generated_wrapper_owner',
+    ),
+  );
+  assert.deepEqual(payload.active_source_resurrection_scan.false_ready_guard, {
+    scan_can_authorize_physical_delete: false,
+    scan_can_claim_default_caller_cutover: false,
+    scan_can_claim_visual_ready: false,
+    scan_can_claim_domain_ready: false,
+    scan_can_claim_production_ready: false,
+  });
   assert.deepEqual(
     payload.default_caller_tail_compact_retirement_summary,
     payload.physical_source_morphology_policy.default_caller_tail_readback.compact_retirement_summary,
@@ -85,6 +117,11 @@ test('RCA private platform retirement strict script emits JSON readback', () => 
   assert.equal(directPayload.surface_kind, 'rca_private_platform_retirement_strict_readback');
   assert.equal(directPayload.state, 'passed_repo_source_guard_only');
   assert.equal(directPayload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(
+    directPayload.active_source_resurrection_scan.state,
+    'passed_active_source_no_resurrection_scan',
+  );
+  assert.equal(directPayload.active_source_resurrection_scan.violation_count, 0);
   assert.equal(directPayload.default_caller_tail_compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(directPayload.authority_boundary.readback_can_authorize_physical_delete, false);
   assert.equal(directPayload.authority_boundary.readback_can_claim_production_ready, false);
