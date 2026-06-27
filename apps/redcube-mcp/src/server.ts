@@ -204,6 +204,10 @@ export const TOOL_DEFINITIONS = [
       mode: z.string().optional().describe('Execution mode such as draft_new or optimize_existing.'),
       baselineDeliverableId: z.string().optional().describe('Optional approved baseline deliverable id.'),
       runId: z.string().optional().describe('Run identifier.'),
+      crossProviderAttemptIndex: PASSTHROUGH_OBJECT.optional()
+        .describe('OPL-owned cross-provider attempt index required for route execution ownership.'),
+      cross_provider_attempt_index: PASSTHROUGH_OBJECT.optional()
+        .describe('OPL-owned cross-provider attempt index required for route execution ownership.'),
     },
   },
   {

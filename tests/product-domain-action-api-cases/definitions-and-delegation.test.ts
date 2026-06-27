@@ -1,6 +1,7 @@
 // @ts-nocheck
 import {
   assert,
+  buildOplRouteAttemptIndexForTest,
   callDomainTool,
   Client,
   completeSourceReadiness,
@@ -700,6 +701,11 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         route: 'storyline',
+        crossProviderAttemptIndex: buildOplRouteAttemptIndexForTest({
+          topicId: 'topic-a',
+          deliverableId: 'deck-a',
+          route: 'storyline',
+        }),
       }),
     });
 
@@ -714,6 +720,11 @@ test('stdio MCP server can create deliverable, run declared route, and fetch run
         topicId: 'topic-a',
         deliverableId: 'deck-a',
         route: 'detailed_outline',
+        crossProviderAttemptIndex: buildOplRouteAttemptIndexForTest({
+          topicId: 'topic-a',
+          deliverableId: 'deck-a',
+          route: 'detailed_outline',
+        }),
       }),
     });
 
@@ -796,6 +807,11 @@ test('stdio MCP server can create and run xiaohongshu deliverable routes on shar
         topicId: 'topic-a',
         deliverableId: 'note-a',
         route: 'research',
+        crossProviderAttemptIndex: buildOplRouteAttemptIndexForTest({
+          topicId: 'topic-a',
+          deliverableId: 'note-a',
+          route: 'research',
+        }),
       }),
     });
 

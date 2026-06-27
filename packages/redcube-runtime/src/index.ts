@@ -44,13 +44,6 @@ import {
   buildCreativeOwnershipResidueAudit as buildCreativeOwnershipResidueAuditJs,
 } from './creative-ownership.js';
 import { runDeliverableRoute as runDeliverableRouteJs } from './deliverable-routes.js';
-import {
-  PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY as PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY_JS,
-  loadProductEntryContinuityRef as loadProductEntryContinuityRefJs,
-  productEntrySessionDir as productEntrySessionDirJs,
-  productEntrySessionFile as productEntrySessionFileJs,
-  saveProductEntryContinuityRef as saveProductEntryContinuityRefJs,
-} from './product-entry-continuity-ref-adapter.js';
 import { resolveExecutorAdapter as resolveExecutorAdapterJs } from './executors.js';
 import {
   completeRouteRun as completeRunJs,
@@ -80,7 +73,6 @@ import type {
   RuntimeCompleteRunRequest,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
-  RuntimeProductEntrySessionRecord,
   RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
@@ -176,34 +168,6 @@ export async function runDeliverableRoute(request: RuntimeRunRouteRequest): Prom
     request: RuntimeRunRouteRequest,
   ) => Promise<RuntimeRunRouteResponse>;
   return runRoute(request);
-}
-
-export function productEntrySessionDir(): string {
-  return productEntrySessionDirJs() as string;
-}
-
-export function productEntrySessionFile(entrySessionId: string): string {
-  return productEntrySessionFileJs(entrySessionId) as string;
-}
-
-export const PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY = PRODUCT_ENTRY_CONTINUITY_REF_ADAPTER_BOUNDARY_JS;
-
-export function loadProductEntryContinuityRef(request: {
-  entrySessionId: string;
-}): RuntimeProductEntrySessionRecord | null {
-  return loadProductEntryContinuityRefJs(request) as RuntimeProductEntrySessionRecord | null;
-}
-
-export function saveProductEntryContinuityRef(request: {
-  session: RuntimeProductEntrySessionRecord;
-}): {
-  session: RuntimeProductEntrySessionRecord;
-  file: string;
-} {
-  return saveProductEntryContinuityRefJs(request) as {
-    session: RuntimeProductEntrySessionRecord;
-    file: string;
-  };
 }
 
 export const resolveExecutorAdapter = resolveExecutorAdapterJs;

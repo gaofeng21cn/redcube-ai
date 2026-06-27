@@ -15,9 +15,6 @@ import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
   getPublicationProjection,
   getReviewState,
-  loadProductEntryContinuityRef,
-  productEntrySessionFile,
-  saveProductEntryContinuityRef,
 } from '@redcube/runtime';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
@@ -39,6 +36,10 @@ import {
   buildContinuationSnapshotFromSessionRecord,
   resolveProductEntryCurrentness,
 } from './product-entry-currentness-resolver.js';
+import {
+  loadProductEntrySessionRef,
+  saveProductEntrySessionRef,
+} from './product-entry-session-refs.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -576,7 +577,7 @@ function buildProductEntryResponse({
 export async function invokeProductEntry(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const entrySession = normalizeEntrySessionContract(request);
-  const storedSession = loadProductEntryContinuityRef({ entrySessionId: entrySession.entrySessionId });
+  const storedSession = loadProductEntrySessionRef({ entrySessionId: entrySession.entrySessionId });
   const currentness = storedSession ? resolveProductEntryCurrentness({ session: storedSession }) : null;
   const existingSession = currentness?.session || storedSession;
   const delivery = normalizeDeliveryRequest(request);
@@ -632,7 +633,7 @@ export async function invokeProductEntry(request) {
       extra_payload: buildContinuationSnapshotFromSessionRecord(existingSession),
     })
     : buildContinuationSnapshot(domainEntrySurface);
-  const persisted = saveProductEntryContinuityRef({
+  const persisted = saveProductEntrySessionRef({
     session: buildSessionRecord({
       entrySessionId: entrySession.entrySessionId,
       workspaceRoot,

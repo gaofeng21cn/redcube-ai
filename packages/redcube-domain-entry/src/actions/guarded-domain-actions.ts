@@ -147,7 +147,7 @@ export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     rca_scope: 'product_entry_session_domain_snapshot_refs',
     audit_readout: 'project_opl_session_shell_retain_domain_snapshot_refs',
     codePaths: [
-      'packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts',
+      'packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts',

@@ -2,8 +2,6 @@
 import {
   getPublicationProjection,
   getReviewState,
-  loadProductEntryContinuityRef,
-  productEntrySessionFile,
 } from '@redcube/runtime';
 import {
   buildDeliveryIdentitySurface,
@@ -38,6 +36,10 @@ import {
   buildRecommendedAction,
   buildSessionDeliveryIdentityPayload,
 } from './get-product-entry-session-parts/session-surfaces.js';
+import {
+  loadProductEntrySessionRef,
+  productEntrySessionFile,
+} from './product-entry-session-refs.js';
 
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -65,7 +67,7 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
     'entry_session_id',
     request?.entry_session_id || request?.entrySessionId,
   );
-  const storedSession = loadProductEntryContinuityRef({ entrySessionId });
+  const storedSession = loadProductEntrySessionRef({ entrySessionId });
   if (!storedSession) {
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }

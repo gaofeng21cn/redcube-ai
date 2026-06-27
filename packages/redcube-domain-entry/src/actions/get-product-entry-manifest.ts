@@ -1,7 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
 
-import { productEntrySessionDir } from '@redcube/runtime';
 import {
   buildFamilyProductEntryManifest,
   collectFamilyHumanGateIds,
@@ -60,6 +59,7 @@ import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-ma
 import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
 import { buildProductEntryManifestEntrySurfaces } from './get-product-entry-manifest-parts/entry-surfaces.js';
+import { productEntrySessionDir } from './product-entry-session-refs.js';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);

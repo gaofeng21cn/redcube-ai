@@ -1,7 +1,6 @@
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 
-import { productEntrySessionDir } from '@redcube/runtime';
 import {
   buildProductEntryPreflight,
   buildProgramCheck,
@@ -9,6 +8,7 @@ import {
 
 import { doctorWorkspace } from './doctor-workspace.js';
 import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
+import { productEntrySessionDir } from './product-entry-session-refs.js';
 
 const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 

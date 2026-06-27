@@ -365,7 +365,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   ]);
 
   assert.deepEqual(byId.product_entry_continuity_refs_adapter.source_refs, [
-    'packages/redcube-runtime/src/product-entry-continuity-ref-adapter.ts',
+    'packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts',
     'packages/redcube-domain-entry/src/actions/get-product-entry-session.ts',
     'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts',
     'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts',

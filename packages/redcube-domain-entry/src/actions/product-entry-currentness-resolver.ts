@@ -3,11 +3,9 @@ import path from 'node:path';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 import {
-  productEntrySessionFile,
-} from '@redcube/runtime';
-import {
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
+import { productEntrySessionFile } from './product-entry-session-refs.js';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();

@@ -36,7 +36,10 @@ import {
   researchSource,
   writeSourceAugmentationResult,
 } from '@redcube/domain-entry';
-import { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';
+import {
+  buildOplRouteAttemptIndexForTest,
+  runDeliverableRoute,
+} from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import {
   assertReceiptOnlyHostedAttemptProjection as assertReceiptOnlyHostedAttemptProjectionImpl,
@@ -281,6 +284,7 @@ export {
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
   buildHostedAttemptBridgeFixture,
+  buildOplRouteAttemptIndexForTest,
   callDomainTool,
   chmodSync,
   completeSourceReadiness,
