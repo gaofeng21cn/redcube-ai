@@ -17,7 +17,7 @@ export const RUNTIME_WATCH_BOUNDARY = Object.freeze({
   owner: 'redcube_ai',
   consumer: 'opl',
   role: 'existing_run_locator_refs_only_projection',
-  classification: 'refs_only_read_model',
+  classification: 'retained_current_refs_only_boundary',
   refs_only: true,
   read_only: true,
   active_caller_status: 'direct_review_watch_and_opl_operator_projection_target',

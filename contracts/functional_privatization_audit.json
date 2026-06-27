@@ -3673,7 +3673,7 @@
     "domain_can_claim_generic_runtime_owner": false,
     "domain_repo_can_own_generated_surface": false
   },
-  "privatized_functional_module_audit": {
+  "functional_privatization_audit": {
     "ref": "/privatized_functional_module_audit",
     "contract_ref": "rca.privatized_functional_module_audit.v1",
     "owner": "redcube_ai",
@@ -7352,6 +7352,14 @@
       "rca_artifact_lifecycle_owner": false,
       "rca_review_repair_transport_owner": false,
       "rca_observability_export_owner": false
-    }
+    },
+    "surface_kind": "functional_privatization_audit",
+    "schema_version": 1,
+    "domain_id": "redcube_ai",
+    "target_domain_id": "redcube_ai",
+    "source_shape": "functional_privatization_audit",
+    "source_field_role": "standard_contract_source",
+    "legacy_import_source_fields": [],
+    "legacy_import_source_shape_retired": true
   }
 }
