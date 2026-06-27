@@ -6,6 +6,8 @@ import {
 } from 'opl-framework-shared/family-action-catalog';
 
 import {
+  IMAGE_PPT_PROOF_COMMAND,
+  NATIVE_PPT_PROOF_COMMAND,
   PRODUCT_INVOKE_COMMAND,
   PRODUCT_MANIFEST_COMMAND,
   PRODUCT_PREFLIGHT_COMMAND,
@@ -22,8 +24,6 @@ import {
 
 type JsonMap = Record<string, any>;
 
-const IMAGE_PPT_PROOF_COMMAND = 'redcube image-ppt proof';
-const NATIVE_PPT_PROOF_COMMAND = 'redcube native-ppt proof';
 const SERVICE_SAFE_DOMAIN_ENTRY_COMMAND = 'redcube service-safe domain entry';
 const RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS = new Set([
   'get_product_status',

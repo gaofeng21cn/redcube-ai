@@ -1,6 +1,9 @@
 // @ts-nocheck
-export const NATIVE_PPT_PROOF_COMMAND = 'redcube native-ppt proof';
-export const IMAGE_PPT_PROOF_COMMAND = 'redcube image-ppt proof';
+import {
+  IMAGE_PPT_PROOF_COMMAND,
+  NATIVE_PPT_PROOF_COMMAND,
+} from './policy.js';
+
 const IMAGE_FIRST_OPERATOR_COPY = 'Default route is image-first page authoring; HTML and native editable PPTX routes require explicit operator selection.';
 
 function safeText(value, fallback = '') {
