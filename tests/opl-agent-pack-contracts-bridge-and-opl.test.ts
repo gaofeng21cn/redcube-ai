@@ -15,7 +15,7 @@ function readJson(relativePath) {
 }
 
 test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {
-  const rootAudit = readJson('contracts/functional_privatization_audit.json').privatized_functional_module_audit;
+  const rootAudit = readJson('contracts/functional_privatization_audit.json');
   const current = readJson('contracts/runtime-program/current-program.json');
   const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
   const surfaces = [

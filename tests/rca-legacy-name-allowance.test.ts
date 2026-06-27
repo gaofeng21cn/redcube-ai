@@ -181,6 +181,7 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
   assert.equal(gate.current_non_tail_surface_ids.includes('repo_shell_verification_wrappers'), true);
   assert.deepEqual(gate.allowed_current_roles, [
     'refs_only_read_model',
+    'retained_current_refs_only_boundary',
     'domain_handler_target',
     'service_safe_domain_entry',
     'minimal_visual_authority_function',

@@ -16,7 +16,6 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   const generatedSurfaceHandoff = readJson('contracts/generated_surface_handoff.json');
   const functionalAudit = readJson('contracts/functional_privatization_audit.json');
   const generatedScope = functionalAudit
-    .privatized_functional_module_audit
     .generated_interface_consumption
     .generated_descriptor_scope;
   const requestedSurfaces = packCompilerInput.generated_surfaces_requested;

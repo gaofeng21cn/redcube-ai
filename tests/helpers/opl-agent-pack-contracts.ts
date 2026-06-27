@@ -151,7 +151,7 @@ export function buildCanonicalPack() {
     productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
-  const functionalAudit = { ...buildPrivatizedFunctionalModuleAuditProjection(), fresh_large_private_surface_scan: readJson('contracts/functional_privatization_audit.json').fresh_large_private_surface_scan };
+  const functionalAudit = readJson('contracts/functional_privatization_audit.json');
   const generatedSurfaceIds = [
     ...oplCanonicalGeneratedSurfaceIds,
     ...wrapperDescriptorScopeIds,
@@ -230,7 +230,6 @@ export function buildCanonicalPack() {
       domain_id: 'redcube_ai',
       target_domain_id: 'redcube_ai',
       ...functionalAudit,
-      privatized_functional_module_audit: functionalAudit,
       opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
       functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
       authority_boundary: {
