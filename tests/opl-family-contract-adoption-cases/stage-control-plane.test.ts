@@ -84,6 +84,41 @@ test('RCA stage control plane requires visual-facing user stage log semantics', 
   }
 });
 
+test('RCA stage control plane declares standard domain stage completion policy', () => {
+  const plane = stageControlPlane();
+
+  for (const stage of plane.stages) {
+    const policy = stage.stage_contract.stage_completion_policy;
+
+    assert.equal(policy.surface_kind, 'domain_stage_completion_policy', stage.stage_id);
+    assert.equal(policy.version, 'domain-stage-completion-policy.v1', stage.stage_id);
+    assert.equal(policy.completion_judgment_owner, 'domain_stage', stage.stage_id);
+    assert.equal(policy.closeout_packet_required, true, stage.stage_id);
+    assert.equal(policy.provider_completion_is_domain_completion, false, stage.stage_id);
+    assert.equal(policy.opl_content_judgment_allowed, false, stage.stage_id);
+    assert.equal(policy.next_stage_transition_owner, 'opl_runtime', stage.stage_id);
+    assert.deepEqual(policy.required_closeout_outcomes, [
+      'completed_and_continue',
+      'completed_and_wait_owner',
+      'route_back',
+      'blocked',
+      'rejected',
+    ]);
+    assert.deepEqual(policy.accepted_closeout_ref_fields, [
+      'owner_receipt_ref',
+      'typed_blocker_ref',
+      'human_gate_ref',
+      'route_back_ref',
+    ]);
+    assert.equal(policy.authority_boundary.opl_can_decide_domain_completion, false, stage.stage_id);
+    assert.equal(policy.authority_boundary.provider_completion_counts_as_stage_complete, false, stage.stage_id);
+    assert.equal(policy.authority_boundary.suite_pass_counts_as_stage_complete, false, stage.stage_id);
+    assert.equal(policy.authority_boundary.opl_can_write_visual_truth, false, stage.stage_id);
+    assert.equal(policy.authority_boundary.opl_can_authorize_review_export_verdict, false, stage.stage_id);
+    assert.equal(policy.authority_boundary.opl_can_mutate_artifacts, false, stage.stage_id);
+  }
+});
+
 test('RCA stage control plane declares cognitive-kernel strategy sections for each visual stage', () => {
   const plane = stageControlPlane();
   const defaultStageIds = plane.stages

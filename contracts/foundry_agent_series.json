@@ -72,6 +72,7 @@
     "stage_pack_sections": [
       "prompts",
       "stages",
+      "stage_completion_policy",
       "skills",
       "knowledge",
       "quality_gates"
@@ -339,6 +340,7 @@
     "identity_hygiene_policy"
   ],
   "required_stage_packets": [
+    "stage_completion_policy",
     "user_stage_log_contract",
     "progress_delta_policy",
     "typed_blocker_lineage_policy",
