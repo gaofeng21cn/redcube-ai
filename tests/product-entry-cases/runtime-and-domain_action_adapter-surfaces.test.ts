@@ -200,7 +200,10 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner, 'one-person-lab');
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.rca_direct_read_model_owner, 'redcube_ai');
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.surface_kind, 'runtime_watch_boundary');
-    assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.classification, 'refs_only_read_model');
+    assert.equal(
+      domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.classification,
+      'retained_current_refs_only_boundary',
+    );
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.refs_only, true);
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.refs_only, true);
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.domain_action_adapter_dispatch_allowed, false);

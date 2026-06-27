@@ -52,6 +52,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'tombstone_or_provenance',
     'negative_test_guard',
     'refs_only_read_model',
+    'retained_current_refs_only_boundary',
     'domain_handler_target',
     'minimal_visual_authority_function',
     'visual_route_runtime_family_implementation',
@@ -175,6 +176,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'active_surface_classification',
     'missing_evidence_worklist',
     'owner_delta_route',
+    'retained_current_refs_only_boundary',
     'typed_blocker_ref_shape',
     'no_resurrection_policy',
   ]);
@@ -198,14 +200,13 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(readbackGuard.authority_boundary.guard_can_create_typed_blocker, false);
   assert.equal(readbackGuard.authority_boundary.guard_can_claim_default_caller_cutover, false);
   assert.ok(
-    policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('runtime_watch_projection'),
-  );
-  assert.ok(
     policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('domain_action_adapter_guarded_actions'),
   );
-  assert.ok(
-    policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('executor_runtime_route_run_records'),
-  );
+  assert.deepEqual(policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids, [
+    'runtime_watch_projection',
+    'operator_evidence_stability_projection',
+    'executor_runtime_route_run_records',
+  ]);
   assert.equal(
     policy.default_caller_tail_readback.readback_id,
     'rca.source_morphology.default_caller_tail_readback.v1',
@@ -272,6 +273,8 @@ test('RCA physical source morphology policy classifies active source tails witho
         work_order_can_claim_production_ready: false,
       },
     },
+    retained_current_refs_only_boundary_surface_ids:
+      policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
     can_apply_cleanup: false,
     can_authorize_physical_delete: false,
     can_claim_default_caller_cutover_complete: false,
@@ -285,9 +288,14 @@ test('RCA physical source morphology policy classifies active source tails witho
     'missing_evidence_worklist',
     'owner_delta_route',
     'owner_delta_work_order_pack',
+    'retained_current_refs_only_boundary',
     'typed_blocker_ref_shape',
     'no_resurrection_policy',
   ]);
+  assert.deepEqual(
+    policy.default_caller_tail_readback.retained_current_refs_only_boundaries.map((entry) => entry.surface_id),
+    policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
+  );
   assert.equal(
     policy.default_caller_tail_readback.false_ready_guard.readback_can_claim_physical_delete_authorized,
     false,
@@ -343,6 +351,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(policy.allowed_surface_classes.includes('package_protocol_boundary'), true);
   assert.equal(policy.allowed_surface_classes.includes('service_safe_domain_entry'), true);
   assert.equal(policy.allowed_surface_classes.includes('refs_only_read_model'), true);
+  assert.equal(policy.allowed_surface_classes.includes('retained_current_refs_only_boundary'), true);
   assert.equal(policy.allowed_surface_classes.includes('minimal_visual_authority_function'), true);
   assert.equal(policy.allowed_surface_classes.includes('repo_native_verification_wrapper'), true);
 
@@ -351,9 +360,12 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(byId.redcube_domain_entry_package_protocol_boundary.classification, 'package_protocol_boundary');
   assert.equal(byId.product_entry_continuity_refs_adapter.classification, 'refs_only_read_model');
   assert.equal(byId.workspace_run_envelope_helpers.classification, 'refs_only_read_model');
-  assert.equal(byId.runtime_watch_projection.classification, 'refs_only_read_model');
+  assert.equal(byId.runtime_watch_projection.classification, 'retained_current_refs_only_boundary');
   assert.equal(byId.domain_action_adapter_guarded_actions.classification, 'domain_handler_target');
-  assert.equal(byId.operator_evidence_stability_projection.classification, 'refs_only_read_model');
+  assert.equal(
+    byId.operator_evidence_stability_projection.classification,
+    'retained_current_refs_only_boundary',
+  );
   assert.equal(byId.product_entry_manifest_projection.classification, 'refs_only_read_model');
   assert.equal(byId.visual_authority_functions.classification, 'minimal_visual_authority_function');
   assert.equal(byId.visual_route_runtime_family_implementations.classification, 'visual_route_runtime_family_implementation');
@@ -466,7 +478,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   ]);
   assert.equal(byId.product_entry_continuity_refs_adapter.legacy_name_allowance.compatibility_alias_allowed, false);
   assert.deepEqual(byId.runtime_watch_projection.legacy_name_allowance.allowed_as, [
-    'refs_only_read_model',
+    'retained_current_refs_only_boundary',
     'negative_test_guard',
   ]);
   assert.equal(byId.runtime_watch_projection.legacy_name_allowance.active_generic_runtime_owner_allowed, false);
@@ -601,13 +613,16 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-runtime-protocol/src/executor-runtime.ts',
     'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
   ]);
-  assert.equal(byId.executor_runtime_route_run_records.classification, 'refs_only_read_model');
+  assert.equal(
+    byId.executor_runtime_route_run_records.classification,
+    'retained_current_refs_only_boundary',
+  );
   assert.equal(
     byId.executor_runtime_route_run_records.current_rca_role,
     'executor_policy_and_route_run_record_refs_adapter_not_attempt_ledger',
   );
   assert.deepEqual(byId.executor_runtime_route_run_records.legacy_name_allowance.allowed_as, [
-    'refs_only_read_model',
+    'retained_current_refs_only_boundary',
     'package_protocol_boundary',
     'locator_protocol_boundary',
   ]);

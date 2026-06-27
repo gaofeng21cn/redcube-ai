@@ -303,7 +303,10 @@ function buildRuntimeWatchBoundaryReadback(physicalPolicy) {
     consumer: physicalPolicy.consumer,
     role: runtimeWatchSurface.current_rca_role,
     classification: runtimeWatchSurface.classification,
-    refs_only: runtimeWatchSurface.classification === 'refs_only_read_model',
+    refs_only: [
+      'refs_only_read_model',
+      'retained_current_refs_only_boundary',
+    ].includes(runtimeWatchSurface.classification),
     read_only: true,
     source_refs: [...(runtimeWatchSurface.source_refs || [])],
     machine_boundary_refs: [...(runtimeWatchSurface.machine_boundary_refs || [])],

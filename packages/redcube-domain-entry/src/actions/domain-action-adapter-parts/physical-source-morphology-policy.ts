@@ -11,6 +11,7 @@ const RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES = Object.freeze([
   'service_safe_domain_entry',
   'domain_handler_target',
   'refs_only_read_model',
+  'retained_current_refs_only_boundary',
   'minimal_visual_authority_function',
   'visual_route_runtime_family_implementation',
   'visual_native_helper_implementation',
@@ -51,6 +52,7 @@ const RCA_LEGACY_NAME_ALLOWANCE_ROLES = Object.freeze([
   'tombstone_or_provenance',
   'negative_test_guard',
   'refs_only_read_model',
+  'retained_current_refs_only_boundary',
   'domain_handler_target',
   'minimal_visual_authority_function',
   'visual_route_runtime_family_implementation',
@@ -165,6 +167,8 @@ function sourceRefIntegrityGate(activeSurfaceClassifications) {
 
 function defaultCallerTailReadback(activeSurfaceClassifications) {
   const tailSurfaceIds = SOURCE_THINNING_TAIL_GATE.applies_to_surface_ids;
+  const retainedCurrentRefsOnlyBoundaryIds =
+    SOURCE_THINNING_TAIL_GATE.retained_current_refs_only_boundary_ids ?? [];
   const tailClassifications = activeSurfaceClassifications
     .filter((entry) => tailSurfaceIds.includes(entry.surface_id))
     .map((entry) => {
@@ -209,6 +213,25 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
   const missingEvidenceIds = [
     ...SOURCE_THINNING_TAIL_GATE.required_before_physical_delete_or_further_thin,
   ];
+  const retainedCurrentRefsOnlyBoundaries = activeSurfaceClassifications
+    .filter((entry) => retainedCurrentRefsOnlyBoundaryIds.includes(entry.surface_id))
+    .map((entry) => ({
+      surface_id: entry.surface_id,
+      classification: entry.classification,
+      current_rca_role: entry.current_rca_role,
+      source_refs: entry.source_refs ?? [],
+      no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+      readback_claims: {
+        can_claim_cleanup_complete: false,
+        can_claim_physical_delete_authorized: false,
+        can_claim_default_caller_cutover_complete: false,
+        can_claim_visual_ready: false,
+        can_claim_exportable: false,
+        can_claim_handoffable: false,
+        can_claim_domain_ready: false,
+        can_claim_production_ready: false,
+      },
+    }));
   const cleanupCandidateSurfaceIds = tailClassifications
     .filter((entry) => entry.missing_evidence_worklist.length === 0)
     .map((entry) => entry.surface_id);
@@ -222,6 +245,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
     state: 'active_missing_evidence_worklist_available',
     source_gate_ref: 'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate',
     tail_surface_count: tailClassifications.length,
+    retained_current_refs_only_boundary_count: retainedCurrentRefsOnlyBoundaries.length,
     missing_evidence_surface_count: tailClassifications.length,
     all_tail_surfaces_missing_delete_or_further_thin_evidence: true,
     compact_retirement_summary: {
@@ -237,6 +261,9 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       required_delta:
         'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
       owner_delta_work_order_pack: ownerDeltaWorkOrderPack,
+      retained_current_refs_only_boundary_surface_ids: retainedCurrentRefsOnlyBoundaries.map(
+        (entry) => entry.surface_id,
+      ),
       can_apply_cleanup: false,
       can_authorize_physical_delete: false,
       can_claim_default_caller_cutover_complete: false,
@@ -250,10 +277,12 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       'missing_evidence_worklist',
       'owner_delta_route',
       'owner_delta_work_order_pack',
+      'retained_current_refs_only_boundary',
       'typed_blocker_ref_shape',
       'no_resurrection_policy',
     ],
     tail_classifications: tailClassifications,
+    retained_current_refs_only_boundaries: retainedCurrentRefsOnlyBoundaries,
     false_ready_guard: {
       readback_can_claim_cleanup_complete: false,
       readback_can_claim_physical_delete_authorized: false,
@@ -501,7 +530,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     source_refs: [
       'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts',
     ],
-    classification: 'refs_only_read_model',
+    classification: 'retained_current_refs_only_boundary',
     current_rca_role: 'run_review_existing_run_locator_refs_only_projection_not_supervisor',
     allowed_outputs: [
       'run_status_refs',
@@ -511,7 +540,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     ],
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime'],
-      allowed_as: ['refs_only_read_model', 'negative_test_guard'],
+      allowed_as: ['retained_current_refs_only_boundary', 'negative_test_guard'],
       rationale: 'runtimeWatch is a direct review/progress refs read model and remains retired from domain_action_adapter default dispatch.',
     }),
     machine_boundary_refs: [
@@ -572,7 +601,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts',
     ],
-    classification: 'refs_only_read_model',
+    classification: 'retained_current_refs_only_boundary',
     current_rca_role: 'operator_evidence_and_stability_refs_only_read_model_consuming_opl_workbench',
     allowed_outputs: [
       'operator_evidence_refs',
@@ -674,7 +703,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-runtime-protocol/src/executor-runtime.ts',
       'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
     ],
-    classification: 'refs_only_read_model',
+    classification: 'retained_current_refs_only_boundary',
     current_rca_role: 'executor_policy_and_route_run_record_refs_adapter_not_attempt_ledger',
     allowed_outputs: [
       'executor_policy_refs',
@@ -700,7 +729,11 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     },
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime'],
-      allowed_as: ['refs_only_read_model', 'package_protocol_boundary', 'locator_protocol_boundary'],
+      allowed_as: [
+        'retained_current_refs_only_boundary',
+        'package_protocol_boundary',
+        'locator_protocol_boundary',
+      ],
       rationale: 'executor-runtime protocol files expose executor policy and neutral route-run record refs only; OPL owns the generic Agent Executor Adapter, attempt ledger, runtime record store, and event log default caller.',
     }),
     no_resurrection_gate: {
