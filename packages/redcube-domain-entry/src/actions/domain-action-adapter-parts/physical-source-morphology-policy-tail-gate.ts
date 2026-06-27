@@ -5,7 +5,8 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
   state: 'non_live_functional_structure_gate_landed',
   gate_role:
     'classify_retained_repo_local_tails_before_default_caller_cutover_without_authorizing_delete_or_readiness',
-  applies_to_surface_ids: [
+  applies_to_surface_ids: [],
+  current_non_tail_surface_ids: [
     'product_entry_continuity_refs_adapter',
     'domain_action_adapter_guarded_actions',
     'product_entry_manifest_projection',
@@ -122,6 +123,7 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
     },
     allowed_readback_outputs: [
       'active_surface_classification',
+      'current_non_tail_surface',
       'missing_evidence_worklist',
       'owner_delta_route',
       'retained_current_refs_only_boundary',

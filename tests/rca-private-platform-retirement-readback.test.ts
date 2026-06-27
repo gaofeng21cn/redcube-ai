@@ -67,9 +67,11 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
   );
   assert.equal(
     payload.default_caller_tail_compact_retirement_summary.state,
-    'no_cleanup_candidates_owner_delta_required',
+    'tail_worklist_empty_current_surfaces_guarded',
   );
   assert.equal(payload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(payload.default_caller_tail_compact_retirement_summary.owner_delta_required, false);
+  assert.deepEqual(payload.default_caller_tail_compact_retirement_summary.missing_evidence_ids, []);
   assert.equal(payload.default_caller_tail_compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(payload.default_caller_tail_compact_retirement_summary.can_authorize_physical_delete, false);
   assert.equal(
@@ -77,11 +79,6 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
     false,
   );
   assert.equal(payload.default_caller_tail_compact_retirement_summary.can_claim_domain_ready, false);
-  assert.ok(
-    payload.default_caller_tail_compact_retirement_summary.missing_evidence_ids.includes(
-      'no_active_repo_local_default_caller',
-    ),
-  );
   assert.ok(payload.domain_action_adapter_boundary.blocked_actions.includes('write_visual_truth'));
   assert.ok(payload.domain_action_adapter_boundary.forbidden_writes.includes('review_verdict'));
   assert.ok(payload.allowed_outputs.includes('typed_blocker_ref_shape'));
@@ -146,10 +143,10 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
   assert.deepEqual(payload.failed_checks, []);
   assert.equal(
     payload.default_caller_tail_readback.compact_retirement_summary.state,
-    'no_cleanup_candidates_owner_delta_required',
+    'tail_worklist_empty_current_surfaces_guarded',
   );
   assert.equal(payload.compact_retirement_summary.cleanup_candidate_count, 0);
-  assert.equal(payload.compact_retirement_summary.owner_delta_required, true);
+  assert.equal(payload.compact_retirement_summary.owner_delta_required, false);
   assert.equal(payload.compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(payload.compact_retirement_summary.can_authorize_physical_delete, false);
   assert.deepEqual(
@@ -162,11 +159,25 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
   );
   assert.equal(
     payload.owner_delta_work_order_pack.state,
-    'owner_delta_required_cleanup_not_authorized',
+    'tail_worklist_empty_no_owner_delta_required',
   );
-  assert.equal(payload.owner_delta_work_order_pack.tail_surface_count, 5);
-  assert.equal(payload.owner_delta_work_order_pack.owner_delta_route_count, 5);
+  assert.equal(payload.owner_delta_work_order_pack.tail_surface_count, 0);
+  assert.equal(payload.owner_delta_work_order_pack.owner_delta_route_count, 0);
   assert.equal(payload.owner_delta_work_order_pack.cleanup_candidate_count, 0);
+  assert.deepEqual(payload.owner_delta_work_order_pack.missing_evidence_ids, []);
+  assert.deepEqual(payload.owner_delta_work_order_pack.owner_delta_routes, []);
+  assert.equal(payload.default_caller_tail_readback.tail_surface_count, 0);
+  assert.equal(payload.default_caller_tail_readback.missing_evidence_surface_count, 0);
+  assert.deepEqual(
+    payload.default_caller_tail_readback.current_non_tail_surfaces.map((entry) => entry.surface_id),
+    [
+      'product_entry_continuity_refs_adapter',
+      'domain_action_adapter_guarded_actions',
+      'product_entry_manifest_projection',
+      'deliverable_route_attempt_shell',
+      'repo_shell_verification_wrappers',
+    ],
+  );
   assert.deepEqual(
     payload.default_caller_tail_readback.retained_current_refs_only_boundaries.map((entry) => entry.surface_id),
     [
@@ -185,14 +196,8 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
       && route.typed_blocker_ref_shape.endsWith(':physical-delete-requires-explicit-owner-receipt')
     )),
   );
-  assert.equal(payload.owner_delta_routes.length, 5);
-  assert.equal(payload.typed_blocker_ref_shapes.length, 5);
-  assert.ok(
-    payload.typed_blocker_ref_shapes.every((entry) => (
-      entry.typed_blocker_ref_shape.startsWith('rca-typed-blocker:private-platform-retirement:')
-      && entry.typed_blocker_ref_shape.endsWith(':physical-delete-requires-explicit-owner-receipt')
-    )),
-  );
+  assert.equal(payload.owner_delta_routes.length, 0);
+  assert.equal(payload.typed_blocker_ref_shapes.length, 0);
   assert.deepEqual(payload.authority_boundary, {
     readback_can_write_visual_truth: false,
     readback_can_write_artifact_blob: false,
@@ -226,7 +231,9 @@ test('RCA default-caller tail owner-delta script emits JSON readback', () => {
   assert.equal(directPayload.surface_kind, 'rca_default_caller_tail_owner_delta_readback');
   assert.equal(directPayload.state, 'passed_repo_source_guard_only');
   assert.equal(directPayload.compact_retirement_summary.cleanup_candidate_count, 0);
-  assert.equal(directPayload.owner_delta_work_order_pack.owner_delta_route_count, 5);
+  assert.equal(directPayload.default_caller_tail_readback.tail_surface_count, 0);
+  assert.equal(directPayload.default_caller_tail_readback.missing_evidence_surface_count, 0);
+  assert.equal(directPayload.owner_delta_work_order_pack.owner_delta_route_count, 0);
   assert.equal(directPayload.default_caller_tail_readback.retained_current_refs_only_boundary_count, 3);
   assert.equal(directPayload.authority_boundary.readback_can_create_typed_blocker_instance, false);
   assert.equal(directPayload.authority_boundary.readback_can_claim_production_ready, false);

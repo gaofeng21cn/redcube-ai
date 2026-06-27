@@ -202,7 +202,7 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.surface_kind, 'runtime_watch_boundary');
     assert.equal(
       domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.classification,
-      'retained_current_refs_only_boundary',
+      'refs_only_read_model',
     );
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.owner_boundary.refs_only, true);
     assert.equal(domain_action_adapter.mapped_surfaces.runtime_watch.refs_only, true);

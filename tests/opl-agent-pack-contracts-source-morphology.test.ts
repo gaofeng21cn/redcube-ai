@@ -174,6 +174,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   });
   assert.deepEqual(readbackGuard.allowed_readback_outputs, [
     'active_surface_classification',
+    'current_non_tail_surface',
     'missing_evidence_worklist',
     'owner_delta_route',
     'retained_current_refs_only_boundary',
@@ -199,9 +200,14 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.equal(readbackGuard.authority_boundary.guard_can_sign_owner_receipt, false);
   assert.equal(readbackGuard.authority_boundary.guard_can_create_typed_blocker, false);
   assert.equal(readbackGuard.authority_boundary.guard_can_claim_default_caller_cutover, false);
-  assert.ok(
-    policy.default_caller_tail_thinning_gate.applies_to_surface_ids.includes('domain_action_adapter_guarded_actions'),
-  );
+  assert.deepEqual(policy.default_caller_tail_thinning_gate.applies_to_surface_ids, []);
+  assert.deepEqual(policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids, [
+    'product_entry_continuity_refs_adapter',
+    'domain_action_adapter_guarded_actions',
+    'product_entry_manifest_projection',
+    'deliverable_route_attempt_shell',
+    'repo_shell_verification_wrappers',
+  ]);
   assert.deepEqual(policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids, [
     'runtime_watch_projection',
     'operator_evidence_stability_projection',
@@ -217,46 +223,35 @@ test('RCA physical source morphology policy classifies active source tails witho
   );
   assert.equal(
     policy.default_caller_tail_readback.tail_surface_count,
-    policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
+    0,
   );
-  assert.equal(
-    policy.default_caller_tail_readback.missing_evidence_surface_count,
-    policy.default_caller_tail_readback.tail_surface_count,
-  );
-  assert.equal(
-    policy.default_caller_tail_readback.all_tail_surfaces_missing_delete_or_further_thin_evidence,
-    true,
-  );
+  assert.equal(policy.default_caller_tail_readback.current_non_tail_surface_count, 5);
+  assert.equal(policy.default_caller_tail_readback.missing_evidence_surface_count, 0);
+  assert.equal(policy.default_caller_tail_readback.all_tail_surfaces_missing_delete_or_further_thin_evidence, false);
   assert.deepEqual(policy.default_caller_tail_readback.compact_retirement_summary, {
     summary_id: 'rca.source_morphology.default_caller_tail.compact_retirement_summary.v1',
-    state: 'no_cleanup_candidates_owner_delta_required',
-    total_tail_surface_count: policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
+    state: 'tail_worklist_empty_current_surfaces_guarded',
+    total_tail_surface_count: 0,
+    current_non_tail_surface_count: 5,
     cleanup_candidate_count: 0,
-    missing_evidence_surface_count: policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
-    missing_evidence_ids: policy.default_caller_tail_thinning_gate.required_before_physical_delete_or_further_thin,
+    missing_evidence_surface_count: 0,
+    missing_evidence_ids: [],
     cleanup_candidate_surface_ids: [],
-    owner_delta_required: true,
-    next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
-    required_delta:
-      'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
+    owner_delta_required: false,
+    next_owner: null,
+    required_delta: null,
     owner_delta_work_order_pack: {
       surface_kind: 'rca_default_caller_tail_owner_delta_work_order_pack',
       pack_id: 'rca.source_morphology.default_caller_tail.owner_delta_work_order_pack.v1',
-      state: 'owner_delta_required_cleanup_not_authorized',
+      state: 'tail_worklist_empty_no_owner_delta_required',
       target_domain_id: 'redcube-ai',
       source_summary_ref:
         'contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary',
-      tail_surface_count: policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
+      tail_surface_count: 0,
       cleanup_candidate_count: 0,
-      owner_delta_route_count: policy.default_caller_tail_thinning_gate.applies_to_surface_ids.length,
-      missing_evidence_ids: policy.default_caller_tail_thinning_gate.required_before_physical_delete_or_further_thin,
-      owner_delta_routes: policy.default_caller_tail_readback.tail_classifications.map((entry) => ({
-        surface_id: entry.surface_id,
-        next_owner: entry.owner_delta_route.next_owner,
-        required_delta: entry.owner_delta_route.required_delta,
-        required_evidence_ids: entry.missing_evidence_worklist,
-        typed_blocker_ref_shape: entry.owner_delta_route.typed_blocker_ref_shape,
-      })),
+      owner_delta_route_count: 0,
+      missing_evidence_ids: [],
+      owner_delta_routes: [],
       authority_boundary: {
         work_order_can_write_visual_truth: false,
         work_order_can_write_artifact_blob: false,
@@ -273,6 +268,8 @@ test('RCA physical source morphology policy classifies active source tails witho
         work_order_can_claim_production_ready: false,
       },
     },
+    current_non_tail_surface_ids:
+      policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids,
     retained_current_refs_only_boundary_surface_ids:
       policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
     can_apply_cleanup: false,
@@ -285,6 +282,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(policy.default_caller_tail_readback.readback_outputs, [
     'active_surface_classification',
     'compact_retirement_summary',
+    'current_non_tail_surface',
     'missing_evidence_worklist',
     'owner_delta_route',
     'owner_delta_work_order_pack',
@@ -314,35 +312,22 @@ test('RCA physical source morphology policy classifies active source tails witho
   );
   assert.deepEqual(
     Object.keys(tailReadbackById).sort(),
-    [...policy.default_caller_tail_thinning_gate.applies_to_surface_ids].sort(),
+    [],
   );
-  for (const surfaceId of policy.default_caller_tail_thinning_gate.applies_to_surface_ids) {
-    const readback = tailReadbackById[surfaceId];
-    assert.ok(readback, `${surfaceId} should have a default caller tail readback`);
+  const currentNonTailById = Object.fromEntries(
+    policy.default_caller_tail_readback.current_non_tail_surfaces
+      .map((entry) => [entry.surface_id, entry]),
+  );
+  assert.deepEqual(
+    Object.keys(currentNonTailById).sort(),
+    [...policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids].sort(),
+  );
+  for (const surfaceId of policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids) {
+    const readback = currentNonTailById[surfaceId];
+    assert.ok(readback, `${surfaceId} should have a current non-tail readback`);
     assert.equal(readback.classification, byId[surfaceId].classification);
     assert.equal(readback.current_rca_role, byId[surfaceId].current_rca_role);
     assert.deepEqual(readback.source_refs, byId[surfaceId].source_refs);
-    assert.deepEqual(
-      readback.required_before_physical_delete_or_further_thin,
-      policy.default_caller_tail_thinning_gate.required_before_physical_delete_or_further_thin,
-    );
-    assert.deepEqual(readback.missing_evidence_worklist, [
-      'opl_generated_default_caller_parity',
-      'no_active_repo_local_default_caller',
-      'rca_owner_receipt_or_typed_blocker_roundtrip',
-      'no_forbidden_write_proof',
-      'retired_alias_no_resurrection_proof',
-      'tombstone_or_provenance_pointer',
-    ]);
-    assert.equal(
-      readback.owner_delta_route.next_owner,
-      'one-person-lab_or_redcube_ai_owner_receipt_surface',
-    );
-    assert.ok(
-      readback.owner_delta_route.typed_blocker_ref_shape
-        .startsWith('rca-typed-blocker:private-platform-retirement:'),
-      `${surfaceId} typed blocker route should remain RCA-owned`,
-    );
     assert.equal(readback.readback_claims.can_claim_physical_delete_authorized, false);
     assert.equal(readback.readback_claims.can_claim_default_caller_cutover_complete, false);
     assert.equal(readback.readback_claims.can_claim_visual_ready, false);

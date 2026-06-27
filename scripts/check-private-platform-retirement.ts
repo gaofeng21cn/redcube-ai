@@ -237,11 +237,13 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
       cleanup_candidate_count: compactSummary.cleanup_candidate_count,
     });
   }
-  if (compactSummary.owner_delta_required !== true) {
+  const tailSurfaceCount = physicalPolicy.default_caller_tail_readback?.tail_surface_count ?? 0;
+  if (compactSummary.owner_delta_required !== (tailSurfaceCount > 0)) {
     failures.push({
       check_id: 'default_caller_tail_compact_owner_delta_required',
       state: 'failed',
       owner_delta_required: compactSummary.owner_delta_required,
+      tail_surface_count: tailSurfaceCount,
     });
   }
   if (runtimeWatchBoundary.refs_only !== true || runtimeWatchBoundary.read_only !== true) {
@@ -353,11 +355,12 @@ function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
       cleanup_candidate_count: compactSummary.cleanup_candidate_count,
     });
   }
-  if (compactSummary.owner_delta_required !== true) {
+  if (compactSummary.owner_delta_required !== (tailReadback.tail_surface_count > 0)) {
     failures.push({
       check_id: 'default_caller_tail_compact_owner_delta_required',
       state: 'failed',
       owner_delta_required: compactSummary.owner_delta_required,
+      tail_surface_count: tailReadback.tail_surface_count,
     });
   }
   const workOrderPack = compactSummary.owner_delta_work_order_pack || {};

@@ -167,6 +167,8 @@ function sourceRefIntegrityGate(activeSurfaceClassifications) {
 
 function defaultCallerTailReadback(activeSurfaceClassifications) {
   const tailSurfaceIds = SOURCE_THINNING_TAIL_GATE.applies_to_surface_ids;
+  const currentNonTailSurfaceIds =
+    SOURCE_THINNING_TAIL_GATE.current_non_tail_surface_ids ?? [];
   const retainedCurrentRefsOnlyBoundaryIds =
     SOURCE_THINNING_TAIL_GATE.retained_current_refs_only_boundary_ids ?? [];
   const tailClassifications = activeSurfaceClassifications
@@ -213,6 +215,25 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
   const missingEvidenceIds = [
     ...SOURCE_THINNING_TAIL_GATE.required_before_physical_delete_or_further_thin,
   ];
+  const currentNonTailSurfaces = activeSurfaceClassifications
+    .filter((entry) => currentNonTailSurfaceIds.includes(entry.surface_id))
+    .map((entry) => ({
+      surface_id: entry.surface_id,
+      classification: entry.classification,
+      current_rca_role: entry.current_rca_role,
+      source_refs: entry.source_refs ?? [],
+      no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+      readback_claims: {
+        can_claim_cleanup_complete: false,
+        can_claim_physical_delete_authorized: false,
+        can_claim_default_caller_cutover_complete: false,
+        can_claim_visual_ready: false,
+        can_claim_exportable: false,
+        can_claim_handoffable: false,
+        can_claim_domain_ready: false,
+        can_claim_production_ready: false,
+      },
+    }));
   const retainedCurrentRefsOnlyBoundaries = activeSurfaceClassifications
     .filter((entry) => retainedCurrentRefsOnlyBoundaryIds.includes(entry.surface_id))
     .map((entry) => ({
@@ -242,25 +263,34 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
   });
   return {
     readback_id: 'rca.source_morphology.default_caller_tail_readback.v1',
-    state: 'active_missing_evidence_worklist_available',
+    state: tailClassifications.length === 0
+      ? 'tail_worklist_empty_current_surfaces_guarded'
+      : 'active_missing_evidence_worklist_available',
     source_gate_ref: 'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate',
     tail_surface_count: tailClassifications.length,
+    current_non_tail_surface_count: currentNonTailSurfaces.length,
     retained_current_refs_only_boundary_count: retainedCurrentRefsOnlyBoundaries.length,
-    missing_evidence_surface_count: tailClassifications.length,
-    all_tail_surfaces_missing_delete_or_further_thin_evidence: true,
+    missing_evidence_surface_count: tailClassifications.length - cleanupCandidateSurfaceIds.length,
+    all_tail_surfaces_missing_delete_or_further_thin_evidence: tailClassifications.length > 0
+      && cleanupCandidateSurfaceIds.length === 0,
     compact_retirement_summary: {
       summary_id: 'rca.source_morphology.default_caller_tail.compact_retirement_summary.v1',
-      state: 'no_cleanup_candidates_owner_delta_required',
+      state: tailClassifications.length === 0
+        ? 'tail_worklist_empty_current_surfaces_guarded'
+        : 'no_cleanup_candidates_owner_delta_required',
       total_tail_surface_count: tailClassifications.length,
+      current_non_tail_surface_count: currentNonTailSurfaces.length,
       cleanup_candidate_count: cleanupCandidateSurfaceIds.length,
       missing_evidence_surface_count: tailClassifications.length - cleanupCandidateSurfaceIds.length,
-      missing_evidence_ids: missingEvidenceIds,
+      missing_evidence_ids: tailClassifications.length === 0 ? [] : missingEvidenceIds,
       cleanup_candidate_surface_ids: cleanupCandidateSurfaceIds,
-      owner_delta_required: true,
-      next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
-      required_delta:
-        'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
+      owner_delta_required: tailClassifications.length > 0,
+      next_owner: tailClassifications.length === 0 ? null : 'one-person-lab_or_redcube_ai_owner_receipt_surface',
+      required_delta: tailClassifications.length === 0
+        ? null
+        : 'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
       owner_delta_work_order_pack: ownerDeltaWorkOrderPack,
+      current_non_tail_surface_ids: currentNonTailSurfaces.map((entry) => entry.surface_id),
       retained_current_refs_only_boundary_surface_ids: retainedCurrentRefsOnlyBoundaries.map(
         (entry) => entry.surface_id,
       ),
@@ -274,6 +304,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
     readback_outputs: [
       'active_surface_classification',
       'compact_retirement_summary',
+      'current_non_tail_surface',
       'missing_evidence_worklist',
       'owner_delta_route',
       'owner_delta_work_order_pack',
@@ -282,6 +313,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       'no_resurrection_policy',
     ],
     tail_classifications: tailClassifications,
+    current_non_tail_surfaces: currentNonTailSurfaces,
     retained_current_refs_only_boundaries: retainedCurrentRefsOnlyBoundaries,
     false_ready_guard: {
       readback_can_claim_cleanup_complete: false,
@@ -304,14 +336,16 @@ function defaultCallerTailOwnerDeltaWorkOrderPack({
   return {
     surface_kind: 'rca_default_caller_tail_owner_delta_work_order_pack',
     pack_id: 'rca.source_morphology.default_caller_tail.owner_delta_work_order_pack.v1',
-    state: 'owner_delta_required_cleanup_not_authorized',
+    state: tailClassifications.length === 0
+      ? 'tail_worklist_empty_no_owner_delta_required'
+      : 'owner_delta_required_cleanup_not_authorized',
     target_domain_id: 'redcube-ai',
     source_summary_ref:
       'contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary',
     tail_surface_count: tailClassifications.length,
     cleanup_candidate_count: cleanupCandidateSurfaceIds.length,
     owner_delta_route_count: tailClassifications.length,
-    missing_evidence_ids: [...missingEvidenceIds],
+    missing_evidence_ids: tailClassifications.length === 0 ? [] : [...missingEvidenceIds],
     owner_delta_routes: tailClassifications.map((classification) => ({
       surface_id: classification.surface_id,
       next_owner: classification.owner_delta_route.next_owner,
