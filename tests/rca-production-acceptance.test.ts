@@ -629,7 +629,7 @@ test('RCA evidence receipt fixture records artifact receipt refs, memory workspa
   );
   assert.equal(fixture.forbidden_payload_fields.includes('artifact_blob'), true);
   assert.equal(fixture.forbidden_payload_fields.includes('generic_runtime_state'), true);
-  assert.equal(fixture.forbidden_payload_fields.includes('managed_runtime_compatibility_alias'), true);
+  assert.deepEqual(fixture.forbidden_payload_roles, ['compatibility_alias']);
 });
 
 test('RCA production evidence tail workorder keeps evidence-after-contract refs open and body-free', () => {

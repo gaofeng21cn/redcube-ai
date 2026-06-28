@@ -662,28 +662,8 @@
       },
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 0,
-        "deleted_or_thinned_default_surfaces": [
-          "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
-          "retired_repo_local_visual_runtime.legacy_run_store_tombstone",
-          "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
-        ],
-        "retired_legacy_surface_ids": [
-          "domain_action_adapter_dispatch.runtime_watch",
-          "domain_action_adapter_dispatch.retired_managed_supervision",
-          "domain_action_adapter_dispatch.product_entry_continuation",
-          "public_cli_mcp_gateway.get_managed_run",
-          "public_cli_mcp_gateway.retired_managed_supervision",
-          "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
-          "repo_local_visual_runtime.legacy_run_store_deleted",
-          "repo_local_visual_runtime.legacy_dag_runtime_deleted"
-        ],
-        "surface_id_policy": "current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id",
-        "deletion_status": "legacy_runtime_physical_cleanup_closed",
+        "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
+        "deletion_status": "closed_retirements_counted_current_roles_guarded",
         "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
         "required_before_remaining_physical_delete": [],
         "physical_delete_authorization_ref": null,
@@ -765,7 +745,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -781,6 +761,33 @@
             "opl_can_issue_rca_owner_receipt": false,
             "opl_can_create_rca_typed_blocker": false
           }
+        },
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
         }
       },
       "fresh_large_private_surface_scan": {
@@ -957,7 +964,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -1114,7 +1121,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1203,7 +1210,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1353,7 +1360,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1428,7 +1435,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1576,7 +1583,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1651,7 +1658,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1800,7 +1807,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -1875,7 +1882,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2024,7 +2031,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2100,7 +2107,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2248,7 +2255,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2323,7 +2330,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2472,7 +2479,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2551,7 +2558,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2701,7 +2708,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2782,7 +2789,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -2951,7 +2958,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -3026,7 +3033,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -3174,7 +3181,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -3250,7 +3257,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -4056,68 +4063,6 @@
         "owner_receipt",
         "native_helper_implementation"
       ],
-      "retired_no_resurrection_guards": [
-        {
-          "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
-          "retired_at": "2026-05-21",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_status_workbench_runtime_read_model",
-          "retained_rca_surface": "runtimeWatch direct review/progress read model",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
-          "retained_rca_surface": "direct product entry invoke/session surfaces",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.get_managed_run",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_status_session_workbench_read_model",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.retired_managed_supervision",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        }
-      ],
       "must_not_retire": [
         "visual_stage_descriptor",
         "visual_review_export_gate",
@@ -4140,6 +4085,38 @@
         "rca_artifact_lifecycle_owner": false,
         "rca_review_repair_transport_owner": false,
         "rca_observability_export_owner": false
+      },
+      "closed_retirement_summary": {
+        "surface_kind": "rca_closed_retirement_count_summary",
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
+        },
+        "compatibility_alias_allowed": false,
+        "active_default_caller_alias_allowed": false
       }
     },
     "visual_pack_compiler_handoff": {
@@ -5912,28 +5889,8 @@
       },
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 0,
-        "deleted_or_thinned_default_surfaces": [
-          "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
-          "retired_repo_local_visual_runtime.legacy_run_store_tombstone",
-          "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
-        ],
-        "retired_legacy_surface_ids": [
-          "domain_action_adapter_dispatch.runtime_watch",
-          "domain_action_adapter_dispatch.retired_managed_supervision",
-          "domain_action_adapter_dispatch.product_entry_continuation",
-          "public_cli_mcp_gateway.get_managed_run",
-          "public_cli_mcp_gateway.retired_managed_supervision",
-          "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
-          "repo_local_visual_runtime.legacy_run_store_deleted",
-          "repo_local_visual_runtime.legacy_dag_runtime_deleted"
-        ],
-        "surface_id_policy": "current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id",
-        "deletion_status": "legacy_runtime_physical_cleanup_closed",
+        "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
+        "deletion_status": "closed_retirements_counted_current_roles_guarded",
         "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
         "required_before_remaining_physical_delete": [],
         "physical_delete_authorization_ref": null,
@@ -6015,7 +5972,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -6031,6 +5988,33 @@
             "opl_can_issue_rca_owner_receipt": false,
             "opl_can_create_rca_typed_blocker": false
           }
+        },
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
         }
       },
       "fresh_large_private_surface_scan": {
@@ -6207,7 +6191,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -6364,7 +6348,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -6453,7 +6437,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -6603,7 +6587,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -6678,7 +6662,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -6826,7 +6810,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -6901,7 +6885,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7050,7 +7034,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7125,7 +7109,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7274,7 +7258,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7350,7 +7334,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7498,7 +7482,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7573,7 +7557,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7722,7 +7706,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7801,7 +7785,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -7951,7 +7935,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -8032,7 +8016,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -8201,7 +8185,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -8276,7 +8260,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -8424,7 +8408,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -8500,7 +8484,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -9306,68 +9290,6 @@
         "owner_receipt",
         "native_helper_implementation"
       ],
-      "retired_no_resurrection_guards": [
-        {
-          "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
-          "retired_at": "2026-05-21",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_status_workbench_runtime_read_model",
-          "retained_rca_surface": "runtimeWatch direct review/progress read model",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
-          "retained_rca_surface": "direct product entry invoke/session surfaces",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.get_managed_run",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_status_session_workbench_read_model",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.retired_managed_supervision",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        }
-      ],
       "must_not_retire": [
         "visual_stage_descriptor",
         "visual_review_export_gate",
@@ -9376,11 +9298,20 @@
         "codex_cli_default_route_policy"
       ],
       "authority_boundary": {
-        "opl_can_write_domain_truth": false,
-        "opl_can_write_memory_body": false,
-        "opl_can_authorize_quality_or_export": false,
-        "domain_can_claim_generic_runtime_owner": false,
-        "domain_repo_can_own_generated_surface": false
+        "opl_can_index_audit_projection": true,
+        "opl_can_import_generic_primitives": true,
+        "opl_can_write_rca_visual_truth": false,
+        "opl_can_write_rca_artifact_blob": false,
+        "opl_can_write_rca_memory_body": false,
+        "opl_can_declare_visual_ready": false,
+        "opl_can_declare_exportable": false,
+        "opl_can_declare_handoffable": false,
+        "opl_can_claim_production_soak_complete": false,
+        "rca_generic_scheduler_owner": false,
+        "rca_native_helper_generic_envelope_owner": false,
+        "rca_artifact_lifecycle_owner": false,
+        "rca_review_repair_transport_owner": false,
+        "rca_observability_export_owner": false
       },
       "privatized_functional_module_audit": {
         "ref": "/privatized_functional_module_audit",
@@ -9583,28 +9514,8 @@
         },
         "physical_deletion_guard": {
           "current_safe_tombstone_candidate_count": 0,
-          "deleted_or_thinned_default_surfaces": [
-            "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-            "retired_domain_action_adapter.supervision_action_tombstone",
-            "retired_domain_action_adapter.continuation_action_tombstone",
-            "retired_public_cli_mcp.managed_run_lookup_tombstone",
-            "retired_public_cli_mcp.managed_supervision_tombstone",
-            "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
-            "retired_repo_local_visual_runtime.legacy_run_store_tombstone",
-            "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
-          ],
-          "retired_legacy_surface_ids": [
-            "domain_action_adapter_dispatch.runtime_watch",
-            "domain_action_adapter_dispatch.retired_managed_supervision",
-            "domain_action_adapter_dispatch.product_entry_continuation",
-            "public_cli_mcp_gateway.get_managed_run",
-            "public_cli_mcp_gateway.retired_managed_supervision",
-            "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
-            "repo_local_visual_runtime.legacy_run_store_deleted",
-            "repo_local_visual_runtime.legacy_dag_runtime_deleted"
-          ],
-          "surface_id_policy": "current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id",
-          "deletion_status": "legacy_runtime_physical_cleanup_closed",
+          "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
+          "deletion_status": "closed_retirements_counted_current_roles_guarded",
           "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
           "required_before_remaining_physical_delete": [],
           "physical_delete_authorization_ref": null,
@@ -9686,7 +9597,7 @@
               "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
             ],
             "source_contract_refs": {
-              "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+              "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
               "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
               "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
             },
@@ -9702,6 +9613,33 @@
               "opl_can_issue_rca_owner_receipt": false,
               "opl_can_create_rca_typed_blocker": false
             }
+          },
+          "closed_retirement_count": 8,
+          "closed_default_caller_retirement_count": 5,
+          "current_role_guard": {
+            "guard_id": "rca.private_platform.current_role_guard.v1",
+            "allowed_roles": [
+              "domain_handler_target",
+              "refs_only_adapter",
+              "declarative_pack",
+              "minimal_authority_function",
+              "native_helper_implementation",
+              "repo_native_verification_wrapper",
+              "package_protocol_boundary"
+            ],
+            "forbidden_owner_flags": {
+              "rca_owns_generic_scheduler": false,
+              "rca_owns_generic_runner": false,
+              "rca_owns_generic_attempt_ledger": false,
+              "rca_owns_generic_workbench": false,
+              "rca_owns_generic_review_repair_transport": false,
+              "rca_owns_generic_session_runtime": false,
+              "rca_owns_generic_artifact_lifecycle": false,
+              "rca_owns_generic_generated_wrapper": false,
+              "rca_owns_generic_domain_entry_runtime": false
+            },
+            "compatibility_alias_allowed": false,
+            "active_default_caller_alias_allowed": false
           }
         },
         "fresh_large_private_surface_scan": {
@@ -9878,7 +9816,7 @@
               "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
             ],
             "source_contract_refs": {
-              "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+              "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
               "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
               "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
             },
@@ -10035,7 +9973,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10124,7 +10062,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10274,7 +10212,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10349,7 +10287,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10497,7 +10435,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10572,7 +10510,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10721,7 +10659,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10796,7 +10734,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -10945,7 +10883,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11021,7 +10959,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11169,7 +11107,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11244,7 +11182,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11393,7 +11331,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11472,7 +11410,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11622,7 +11560,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11703,7 +11641,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11872,7 +11810,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -11947,7 +11885,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -12095,7 +12033,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -12171,7 +12109,7 @@
                   "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                 ],
                 "source_contract_refs": {
-                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                  "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                   "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                   "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                 },
@@ -12977,68 +12915,6 @@
           "owner_receipt",
           "native_helper_implementation"
         ],
-        "retired_no_resurrection_guards": [
-          {
-            "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-            "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
-            "retired_at": "2026-05-21",
-            "replacement_owner": "opl",
-            "replacement_surface": "opl_status_workbench_runtime_read_model",
-            "retained_rca_surface": "runtimeWatch direct review/progress read model",
-            "active_default_caller": false,
-            "active_caller": false,
-            "compatibility_alias_allowed": false,
-            "resurrection_policy": "forbidden"
-          },
-          {
-            "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
-            "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
-            "retired_at": "2026-05-17",
-            "replacement_owner": "opl",
-            "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-            "retained_rca_surface": null,
-            "active_default_caller": false,
-            "active_caller": false,
-            "compatibility_alias_allowed": false,
-            "resurrection_policy": "forbidden"
-          },
-          {
-            "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
-            "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
-            "retired_at": "2026-05-17",
-            "replacement_owner": "opl",
-            "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
-            "retained_rca_surface": "direct product entry invoke/session surfaces",
-            "active_default_caller": false,
-            "active_caller": false,
-            "compatibility_alias_allowed": false,
-            "resurrection_policy": "forbidden"
-          },
-          {
-            "surface_id": "retired_public_cli_mcp.managed_run_lookup_tombstone",
-            "retired_legacy_surface_id": "public_cli_mcp_gateway.get_managed_run",
-            "retired_at": "2026-05-18",
-            "replacement_owner": "opl",
-            "replacement_surface": "opl_generated_status_session_workbench_read_model",
-            "retained_rca_surface": null,
-            "active_default_caller": false,
-            "active_caller": false,
-            "compatibility_alias_allowed": false,
-            "resurrection_policy": "forbidden"
-          },
-          {
-            "surface_id": "retired_public_cli_mcp.managed_supervision_tombstone",
-            "retired_legacy_surface_id": "public_cli_mcp_gateway.retired_managed_supervision",
-            "retired_at": "2026-05-18",
-            "replacement_owner": "opl",
-            "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-            "retained_rca_surface": null,
-            "active_default_caller": false,
-            "active_caller": false,
-            "compatibility_alias_allowed": false,
-            "resurrection_policy": "forbidden"
-          }
-        ],
         "must_not_retire": [
           "visual_stage_descriptor",
           "visual_review_export_gate",
@@ -13061,7 +12937,71 @@
           "rca_artifact_lifecycle_owner": false,
           "rca_review_repair_transport_owner": false,
           "rca_observability_export_owner": false
+        },
+        "closed_retirement_summary": {
+          "surface_kind": "rca_closed_retirement_count_summary",
+          "closed_retirement_count": 8,
+          "closed_default_caller_retirement_count": 5,
+          "current_role_guard": {
+            "guard_id": "rca.private_platform.current_role_guard.v1",
+            "allowed_roles": [
+              "domain_handler_target",
+              "refs_only_adapter",
+              "declarative_pack",
+              "minimal_authority_function",
+              "native_helper_implementation",
+              "repo_native_verification_wrapper",
+              "package_protocol_boundary"
+            ],
+            "forbidden_owner_flags": {
+              "rca_owns_generic_scheduler": false,
+              "rca_owns_generic_runner": false,
+              "rca_owns_generic_attempt_ledger": false,
+              "rca_owns_generic_workbench": false,
+              "rca_owns_generic_review_repair_transport": false,
+              "rca_owns_generic_session_runtime": false,
+              "rca_owns_generic_artifact_lifecycle": false,
+              "rca_owns_generic_generated_wrapper": false,
+              "rca_owns_generic_domain_entry_runtime": false
+            },
+            "compatibility_alias_allowed": false,
+            "active_default_caller_alias_allowed": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
         }
+      },
+      "closed_retirement_summary": {
+        "surface_kind": "rca_closed_retirement_count_summary",
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
+        },
+        "compatibility_alias_allowed": false,
+        "active_default_caller_alias_allowed": false
       }
     },
     "stage_artifact_kernel_adoption": {
@@ -15200,28 +15140,8 @@
           },
           "physical_deletion_guard": {
             "current_safe_tombstone_candidate_count": 0,
-            "deleted_or_thinned_default_surfaces": [
-              "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-              "retired_domain_action_adapter.supervision_action_tombstone",
-              "retired_domain_action_adapter.continuation_action_tombstone",
-              "retired_public_cli_mcp.managed_run_lookup_tombstone",
-              "retired_public_cli_mcp.managed_supervision_tombstone",
-              "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
-              "retired_repo_local_visual_runtime.legacy_run_store_tombstone",
-              "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
-            ],
-            "retired_legacy_surface_ids": [
-              "domain_action_adapter_dispatch.runtime_watch",
-              "domain_action_adapter_dispatch.retired_managed_supervision",
-              "domain_action_adapter_dispatch.product_entry_continuation",
-              "public_cli_mcp_gateway.get_managed_run",
-              "public_cli_mcp_gateway.retired_managed_supervision",
-              "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
-              "repo_local_visual_runtime.legacy_run_store_deleted",
-              "repo_local_visual_runtime.legacy_dag_runtime_deleted"
-            ],
-            "surface_id_policy": "current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id",
-            "deletion_status": "legacy_runtime_physical_cleanup_closed",
+            "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
+            "deletion_status": "closed_retirements_counted_current_roles_guarded",
             "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
             "required_before_remaining_physical_delete": [],
             "physical_delete_authorization_ref": null,
@@ -15303,7 +15223,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -15319,6 +15239,33 @@
                 "opl_can_issue_rca_owner_receipt": false,
                 "opl_can_create_rca_typed_blocker": false
               }
+            },
+            "closed_retirement_count": 8,
+            "closed_default_caller_retirement_count": 5,
+            "current_role_guard": {
+              "guard_id": "rca.private_platform.current_role_guard.v1",
+              "allowed_roles": [
+                "domain_handler_target",
+                "refs_only_adapter",
+                "declarative_pack",
+                "minimal_authority_function",
+                "native_helper_implementation",
+                "repo_native_verification_wrapper",
+                "package_protocol_boundary"
+              ],
+              "forbidden_owner_flags": {
+                "rca_owns_generic_scheduler": false,
+                "rca_owns_generic_runner": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_generic_review_repair_transport": false,
+                "rca_owns_generic_session_runtime": false,
+                "rca_owns_generic_artifact_lifecycle": false,
+                "rca_owns_generic_generated_wrapper": false,
+                "rca_owns_generic_domain_entry_runtime": false
+              },
+              "compatibility_alias_allowed": false,
+              "active_default_caller_alias_allowed": false
             }
           },
           "fresh_large_private_surface_scan": {
@@ -15495,7 +15442,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -15652,7 +15599,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -15741,7 +15688,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -15891,7 +15838,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -15966,7 +15913,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16114,7 +16061,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16189,7 +16136,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16338,7 +16285,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16413,7 +16360,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16562,7 +16509,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16638,7 +16585,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16786,7 +16733,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -16861,7 +16808,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17010,7 +16957,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17089,7 +17036,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17239,7 +17186,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17320,7 +17267,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17489,7 +17436,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17564,7 +17511,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17712,7 +17659,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -17788,7 +17735,7 @@
                     "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
                   ],
                   "source_contract_refs": {
-                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                    "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                     "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
                   },
@@ -18594,68 +18541,6 @@
             "owner_receipt",
             "native_helper_implementation"
           ],
-          "retired_no_resurrection_guards": [
-            {
-              "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-              "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
-              "retired_at": "2026-05-21",
-              "replacement_owner": "opl",
-              "replacement_surface": "opl_status_workbench_runtime_read_model",
-              "retained_rca_surface": "runtimeWatch direct review/progress read model",
-              "active_default_caller": false,
-              "active_caller": false,
-              "compatibility_alias_allowed": false,
-              "resurrection_policy": "forbidden"
-            },
-            {
-              "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
-              "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
-              "retired_at": "2026-05-17",
-              "replacement_owner": "opl",
-              "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-              "retained_rca_surface": null,
-              "active_default_caller": false,
-              "active_caller": false,
-              "compatibility_alias_allowed": false,
-              "resurrection_policy": "forbidden"
-            },
-            {
-              "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
-              "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
-              "retired_at": "2026-05-17",
-              "replacement_owner": "opl",
-              "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
-              "retained_rca_surface": "direct product entry invoke/session surfaces",
-              "active_default_caller": false,
-              "active_caller": false,
-              "compatibility_alias_allowed": false,
-              "resurrection_policy": "forbidden"
-            },
-            {
-              "surface_id": "retired_public_cli_mcp.managed_run_lookup_tombstone",
-              "retired_legacy_surface_id": "public_cli_mcp_gateway.get_managed_run",
-              "retired_at": "2026-05-18",
-              "replacement_owner": "opl",
-              "replacement_surface": "opl_generated_status_session_workbench_read_model",
-              "retained_rca_surface": null,
-              "active_default_caller": false,
-              "active_caller": false,
-              "compatibility_alias_allowed": false,
-              "resurrection_policy": "forbidden"
-            },
-            {
-              "surface_id": "retired_public_cli_mcp.managed_supervision_tombstone",
-              "retired_legacy_surface_id": "public_cli_mcp_gateway.retired_managed_supervision",
-              "retired_at": "2026-05-18",
-              "replacement_owner": "opl",
-              "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-              "retained_rca_surface": null,
-              "active_default_caller": false,
-              "active_caller": false,
-              "compatibility_alias_allowed": false,
-              "resurrection_policy": "forbidden"
-            }
-          ],
           "must_not_retire": [
             "visual_stage_descriptor",
             "visual_review_export_gate",
@@ -18678,6 +18563,38 @@
             "rca_artifact_lifecycle_owner": false,
             "rca_review_repair_transport_owner": false,
             "rca_observability_export_owner": false
+          },
+          "closed_retirement_summary": {
+            "surface_kind": "rca_closed_retirement_count_summary",
+            "closed_retirement_count": 8,
+            "closed_default_caller_retirement_count": 5,
+            "current_role_guard": {
+              "guard_id": "rca.private_platform.current_role_guard.v1",
+              "allowed_roles": [
+                "domain_handler_target",
+                "refs_only_adapter",
+                "declarative_pack",
+                "minimal_authority_function",
+                "native_helper_implementation",
+                "repo_native_verification_wrapper",
+                "package_protocol_boundary"
+              ],
+              "forbidden_owner_flags": {
+                "rca_owns_generic_scheduler": false,
+                "rca_owns_generic_runner": false,
+                "rca_owns_generic_attempt_ledger": false,
+                "rca_owns_generic_workbench": false,
+                "rca_owns_generic_review_repair_transport": false,
+                "rca_owns_generic_session_runtime": false,
+                "rca_owns_generic_artifact_lifecycle": false,
+                "rca_owns_generic_generated_wrapper": false,
+                "rca_owns_generic_domain_entry_runtime": false
+              },
+              "compatibility_alias_allowed": false,
+              "active_default_caller_alias_allowed": false
+            },
+            "compatibility_alias_allowed": false,
+            "active_default_caller_alias_allowed": false
           }
         },
         "visual_pack_compiler_handoff": {
@@ -20877,28 +20794,8 @@
       },
       "physical_deletion_guard": {
         "current_safe_tombstone_candidate_count": 0,
-        "deleted_or_thinned_default_surfaces": [
-          "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone",
-          "retired_repo_local_visual_runtime.legacy_run_store_tombstone",
-          "retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone"
-        ],
-        "retired_legacy_surface_ids": [
-          "domain_action_adapter_dispatch.runtime_watch",
-          "domain_action_adapter_dispatch.retired_managed_supervision",
-          "domain_action_adapter_dispatch.product_entry_continuation",
-          "public_cli_mcp_gateway.get_managed_run",
-          "public_cli_mcp_gateway.retired_managed_supervision",
-          "repo_local_visual_runtime.legacy_deliverable_runner_deleted",
-          "repo_local_visual_runtime.legacy_run_store_deleted",
-          "repo_local_visual_runtime.legacy_dag_runtime_deleted"
-        ],
-        "surface_id_policy": "current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id",
-        "deletion_status": "legacy_runtime_physical_cleanup_closed",
+        "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
+        "deletion_status": "closed_retirements_counted_current_roles_guarded",
         "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
         "required_before_remaining_physical_delete": [],
         "physical_delete_authorization_ref": null,
@@ -20980,7 +20877,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -20996,6 +20893,33 @@
             "opl_can_issue_rca_owner_receipt": false,
             "opl_can_create_rca_typed_blocker": false
           }
+        },
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
         }
       },
       "fresh_large_private_surface_scan": {
@@ -21172,7 +21096,7 @@
             "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
           ],
           "source_contract_refs": {
-            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+            "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
             "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
             "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
           },
@@ -21329,7 +21253,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -21418,7 +21342,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -21568,7 +21492,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -21643,7 +21567,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -21791,7 +21715,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -21866,7 +21790,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22015,7 +21939,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22090,7 +22014,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22239,7 +22163,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22315,7 +22239,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22463,7 +22387,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22538,7 +22462,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22687,7 +22611,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22766,7 +22690,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22916,7 +22840,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -22997,7 +22921,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -23166,7 +23090,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -23241,7 +23165,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -23389,7 +23313,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -23465,7 +23389,7 @@
                 "rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention"
               ],
               "source_contract_refs": {
-                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/privatized_functional_module_audit",
+                "functional_privatization_audit_ref": "contracts/functional_privatization_audit.json#/",
                 "live_stage_run_progress_ref": "contracts/live_stage_run_progress_evidence.json",
                 "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
               },
@@ -24271,68 +24195,6 @@
         "owner_receipt",
         "native_helper_implementation"
       ],
-      "retired_no_resurrection_guards": [
-        {
-          "surface_id": "retired_domain_action_adapter.runtime_watch_dispatch_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.runtime_watch",
-          "retired_at": "2026-05-21",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_status_workbench_runtime_read_model",
-          "retained_rca_surface": "runtimeWatch direct review/progress read model",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.supervision_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.retired_managed_supervision",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_domain_action_adapter.continuation_action_tombstone",
-          "retired_legacy_surface_id": "domain_action_adapter_dispatch.product_entry_continuation",
-          "retired_at": "2026-05-17",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_session_shell_and_product_entry_wrapper",
-          "retained_rca_surface": "direct product entry invoke/session surfaces",
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_run_lookup_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.get_managed_run",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generated_status_session_workbench_read_model",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        },
-        {
-          "surface_id": "retired_public_cli_mcp.managed_supervision_tombstone",
-          "retired_legacy_surface_id": "public_cli_mcp_gateway.retired_managed_supervision",
-          "retired_at": "2026-05-18",
-          "replacement_owner": "opl",
-          "replacement_surface": "opl_generic_runner_and_supervisor_tick",
-          "retained_rca_surface": null,
-          "active_default_caller": false,
-          "active_caller": false,
-          "compatibility_alias_allowed": false,
-          "resurrection_policy": "forbidden"
-        }
-      ],
       "must_not_retire": [
         "visual_stage_descriptor",
         "visual_review_export_gate",
@@ -24355,6 +24217,38 @@
         "rca_artifact_lifecycle_owner": false,
         "rca_review_repair_transport_owner": false,
         "rca_observability_export_owner": false
+      },
+      "closed_retirement_summary": {
+        "surface_kind": "rca_closed_retirement_count_summary",
+        "closed_retirement_count": 8,
+        "closed_default_caller_retirement_count": 5,
+        "current_role_guard": {
+          "guard_id": "rca.private_platform.current_role_guard.v1",
+          "allowed_roles": [
+            "domain_handler_target",
+            "refs_only_adapter",
+            "declarative_pack",
+            "minimal_authority_function",
+            "native_helper_implementation",
+            "repo_native_verification_wrapper",
+            "package_protocol_boundary"
+          ],
+          "forbidden_owner_flags": {
+            "rca_owns_generic_scheduler": false,
+            "rca_owns_generic_runner": false,
+            "rca_owns_generic_attempt_ledger": false,
+            "rca_owns_generic_workbench": false,
+            "rca_owns_generic_review_repair_transport": false,
+            "rca_owns_generic_session_runtime": false,
+            "rca_owns_generic_artifact_lifecycle": false,
+            "rca_owns_generic_generated_wrapper": false,
+            "rca_owns_generic_domain_entry_runtime": false
+          },
+          "compatibility_alias_allowed": false,
+          "active_default_caller_alias_allowed": false
+        },
+        "compatibility_alias_allowed": false,
+        "active_default_caller_alias_allowed": false
       }
     },
     "visual_pack_compiler_handoff": {

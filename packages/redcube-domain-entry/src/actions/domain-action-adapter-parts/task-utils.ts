@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
-const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
+const FORBIDDEN_RECEIPT_PAYLOAD_ROLES = Object.freeze([
   'visual_truth',
   'visual_truth_body',
   'visual_verdict',
@@ -18,7 +18,7 @@ const FORBIDDEN_RECEIPT_PAYLOAD_FIELDS = Object.freeze([
   'memory_body',
   'memory_content_body',
   'generic_runtime_state',
-  'managed_runtime_compatibility_alias',
+  'compatibility_alias',
 ]);
 
 export function safeText(value, fallback = '') {
@@ -132,7 +132,7 @@ export function findForbiddenPayloadFieldPaths(value, path = '', found = new Set
   }
   for (const [key, nested] of Object.entries(value)) {
     const currentPath = path ? `${path}.${key}` : key;
-    if (FORBIDDEN_RECEIPT_PAYLOAD_FIELDS.includes(key)) {
+    if (FORBIDDEN_RECEIPT_PAYLOAD_ROLES.some((role) => key === role || key.endsWith(`_${role}`))) {
       found.add(currentPath);
     }
     findForbiddenPayloadFieldPaths(nested, currentPath, found);

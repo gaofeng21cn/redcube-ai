@@ -344,7 +344,9 @@ export function buildDomainActionAdapterReceiptRefs() {
       'artifact_body',
       'memory_content_body',
       'generic_runtime_state',
-      'managed_runtime_compatibility_alias',
+    ],
+    forbidden_receipt_roles: [
+      'compatibility_alias',
     ],
     authority_boundary: {
       receipt_owner: DOMAIN_OWNER,

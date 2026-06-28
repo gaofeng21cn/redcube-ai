@@ -33,8 +33,8 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
     'no_active_repo_local_default_caller',
     'rca_owner_receipt_or_typed_blocker_roundtrip',
     'no_forbidden_write_proof',
-    'retired_alias_no_resurrection_proof',
-    'tombstone_or_provenance_pointer',
+    'current_role_guard_no_alias_proof',
+    'compressed_history_index_pointer',
   ],
   false_ready_guard: {
     source_classification_can_claim_physical_delete_authorized: false,
@@ -45,7 +45,7 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
     source_classification_can_claim_domain_ready: false,
     source_classification_can_claim_production_ready: false,
   },
-  no_resurrection_guard: {
+  current_role_guard: {
     runtimeWatch_can_return_to_domain_action_adapter_default_dispatch: false,
     domain_action_adapter_can_become_generic_dispatch_owner: false,
     domain_action_adapter_can_become_generated_wrapper_owner: false,
@@ -128,7 +128,7 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
       'owner_delta_route',
       'retained_current_refs_only_boundary',
       'typed_blocker_ref_shape',
-      'no_resurrection_policy',
+      'current_role_guard',
     ],
     forbidden_readback_outputs: [
       'physical_delete_operation',
@@ -143,8 +143,8 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
       'no_active_repo_local_default_caller',
       'rca_owner_receipt_or_typed_blocker_roundtrip',
       'no_forbidden_write_proof',
-      'retired_alias_no_resurrection_proof',
-      'tombstone_or_provenance_pointer',
+      'current_role_guard_no_alias_proof',
+      'compressed_history_index_pointer',
       'owner_receipt://redcube_ai/physical_delete_or_tombstone_authorization',
     ],
     false_ready_claim_guard_keys: [

@@ -10,8 +10,8 @@ import {
 } from './helpers/rca-retired-surface-guard.ts';
 
 test('RCA functional audit exposes OPL replacement expectations and retired generic domain_action_adapter dispatch', () => {
-  const currentProgram = JSON.parse(readFileSync(
-    path.resolve('contracts/runtime-program/current-program.json'),
+  const rootAudit = JSON.parse(readFileSync(
+    path.resolve('contracts/functional_privatization_audit.json'),
     'utf-8',
   ));
   const adoption = JSON.parse(readFileSync(
@@ -20,9 +20,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
   ));
 
   const surfaces = [
-    currentProgram.product_release_metadata.privatized_functional_module_audit,
-    currentProgram.current_state.privatized_functional_module_audit,
-    currentProgram.current_state.active_baton.scope.privatized_functional_module_audit,
+    rootAudit,
     adoption.privatized_functional_module_audit,
   ];
   const expectedReplacementSurfaces = {
@@ -46,20 +44,14 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
   for (const surface of surfaces) {
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
-    assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
-      'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
-      'retired_domain_action_adapter.supervision_action_tombstone',
-      'retired_domain_action_adapter.continuation_action_tombstone',
-      'retired_public_cli_mcp.managed_run_lookup_tombstone',
-      'retired_public_cli_mcp.managed_supervision_tombstone',
-      'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
-      'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
-      'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
-    ]);
+    assert.equal(surface.physical_deletion_guard.closed_retirement_count, 8);
+    assert.equal(surface.physical_deletion_guard.closed_default_caller_retirement_count, 5);
     assert.equal(
       surface.physical_deletion_guard.surface_id_policy,
-      'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
+      'current_role_guard_with_count_only_closed_retirement_summary',
     );
+    assert.equal(surface.physical_deletion_guard.current_role_guard.compatibility_alias_allowed, false);
+    assert.equal(surface.physical_deletion_guard.current_role_guard.forbidden_owner_flags.rca_owns_generic_runner, false);
     assert.equal(surface.physical_deletion_guard.physical_delete_authorization_ref, null);
     assert.deepEqual(surface.physical_deletion_guard.physical_delete_authorization_refs, []);
     assert.equal(
@@ -105,32 +97,11 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       surface.physical_deletion_guard.owner_evidence_lane.authority_boundary.open_count_zero_can_authorize_physical_delete,
       false,
     );
-    assert.equal(surface.physical_deletion_guard.retired_legacy_surface_ids.length, 8);
-    assert.equal(
-      new Set(surface.physical_deletion_guard.retired_legacy_surface_ids).size,
-      surface.physical_deletion_guard.retired_legacy_surface_ids.length,
-    );
-    assert.equal(
-      surface.physical_deletion_guard.retired_legacy_surface_ids.every((surfaceId) =>
-        typeof surfaceId === 'string'
-        && !surfaceId.endsWith('_tombstone')
-        && !surfaceId.includes('compatibility_alias')),
-      true,
-    );
     assert.equal(surface.retire_tombstone_candidates, undefined);
-    assert.equal(surface.retired_no_resurrection_guards.length, 5);
-    for (const entry of surface.retired_no_resurrection_guards) {
-      assert.equal(entry.surface_id.endsWith('_tombstone'), true, entry.surface_id);
-      assert.equal(
-        surface.physical_deletion_guard.retired_legacy_surface_ids.includes(entry.retired_legacy_surface_id),
-        true,
-        entry.retired_legacy_surface_id,
-      );
-      assert.equal(entry.active_default_caller, false, entry.surface_id);
-      assert.equal(entry.active_caller, false, entry.surface_id);
-      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
-      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
-    }
+    assert.equal(surface.retired_no_resurrection_guards, undefined);
+    assert.equal(surface.closed_retirement_summary.closed_retirement_count, 8);
+    assert.equal(surface.closed_retirement_summary.closed_default_caller_retirement_count, 5);
+    assert.equal(surface.closed_retirement_summary.current_role_guard.compatibility_alias_allowed, false);
     assert.deepEqual(surface.classification_values, [
       'domain_handler_target',
       'refs_only_adapter',
@@ -292,8 +263,8 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       'active_surface_classifications[*].machine_boundary_refs',
       'policy_source_structure.builder_ref',
       'policy_source_structure.extracted_gate_refs',
-      'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
-      'legacy_name_policy.retired_compatibility_payload_field_policy',
+      'legacy_name_policy.current_role_guard_policy',
+      'legacy_name_policy.forbidden_payload_role_policy',
     ],
     checked_source_ref_count: allSourceRefs.length,
     checked_machine_boundary_ref_count: allMachineBoundaryRefs.length,

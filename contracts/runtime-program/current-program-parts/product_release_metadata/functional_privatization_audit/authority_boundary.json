@@ -1,7 +1,16 @@
 {
-  "opl_can_write_domain_truth": false,
-  "opl_can_write_memory_body": false,
-  "opl_can_authorize_quality_or_export": false,
-  "domain_can_claim_generic_runtime_owner": false,
-  "domain_repo_can_own_generated_surface": false
+  "opl_can_index_audit_projection": true,
+  "opl_can_import_generic_primitives": true,
+  "opl_can_write_rca_visual_truth": false,
+  "opl_can_write_rca_artifact_blob": false,
+  "opl_can_write_rca_memory_body": false,
+  "opl_can_declare_visual_ready": false,
+  "opl_can_declare_exportable": false,
+  "opl_can_declare_handoffable": false,
+  "opl_can_claim_production_soak_complete": false,
+  "rca_generic_scheduler_owner": false,
+  "rca_native_helper_generic_envelope_owner": false,
+  "rca_artifact_lifecycle_owner": false,
+  "rca_review_repair_transport_owner": false,
+  "rca_observability_export_owner": false
 }

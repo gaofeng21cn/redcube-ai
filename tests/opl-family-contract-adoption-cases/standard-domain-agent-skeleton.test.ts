@@ -120,10 +120,12 @@ test('RCA artifact locator and domain_action_adapter receipts expose refs withou
     'artifact_body',
     'memory_content_body',
     'generic_runtime_state',
-    'managed_runtime_compatibility_alias',
   ]) {
     assert.ok(skeleton.domain_action_adapter_receipt_refs.forbidden_receipt_fields.includes(field));
   }
+  assert.deepEqual(skeleton.domain_action_adapter_receipt_refs.forbidden_receipt_roles, [
+    'compatibility_alias',
+  ]);
   assert.equal(skeleton.controlled_visual_stage_attempt_fixture.fixture_id, 'rca.controlled_visual_stage_attempt.fixture.v1');
   assert.equal(
     skeleton.controlled_visual_stage_attempt_fixture.proof_model,

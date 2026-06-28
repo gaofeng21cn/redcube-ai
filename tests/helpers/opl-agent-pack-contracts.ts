@@ -151,7 +151,7 @@ export function buildCanonicalPack() {
     productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
-  const functionalAudit = readJson('contracts/functional_privatization_audit.json');
+  const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
   const generatedSurfaceIds = [
     ...oplCanonicalGeneratedSurfaceIds,
     ...wrapperDescriptorScopeIds,
@@ -224,22 +224,7 @@ export function buildCanonicalPack() {
         domain_can_claim_generated_surface_owner: false,
       },
     },
-    functionalAudit: {
-      surface_kind: 'functional_privatization_audit',
-      schema_version: 1,
-      domain_id: 'redcube_ai',
-      target_domain_id: 'redcube_ai',
-      ...functionalAudit,
-      opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
-      functional_structure_gap_closure: functionalAudit.functional_structure_gap_closure,
-      authority_boundary: {
-        opl_can_write_domain_truth: false,
-        opl_can_write_memory_body: false,
-        opl_can_authorize_quality_or_export: false,
-        domain_can_claim_generic_runtime_owner: false,
-        domain_repo_can_own_generated_surface: false,
-      },
-    },
+    functionalAudit,
     privateFunctionalSurfacePolicy: {
       surface_kind: 'opl_domain_private_functional_surface_admission_policy',
       schema_version: 1,
@@ -314,8 +299,8 @@ export function buildCanonicalPack() {
           'no_active_caller',
           'rca_owner_receipt_or_typed_blocker_roundtrip',
           'no_forbidden_write_proof',
-          'retired_alias_no_resurrection_proof',
-          'tombstone_or_provenance_pointer',
+          'current_role_guard_no_alias_proof',
+          'compressed_history_index_pointer',
         ],
         allowed_before_gate: [
           'refs_only_adapter',

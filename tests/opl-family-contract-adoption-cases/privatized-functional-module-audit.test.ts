@@ -1,14 +1,12 @@
 // @ts-nocheck
-import { assert, contract, currentProgram, test } from './shared.ts';
+import { assert, contract, read, test } from './shared.ts';
 
 test('RCA privatized functional module audit is machine readable for OPL with generic domain_action_adapter dispatch retired', () => {
   const adoption = contract();
-  const current = currentProgram();
+  const rootAudit = JSON.parse(read('contracts/functional_privatization_audit.json'));
   const surfaces = [
+    rootAudit,
     adoption.privatized_functional_module_audit,
-    current.product_release_metadata.privatized_functional_module_audit,
-    current.current_state.privatized_functional_module_audit,
-    current.current_state.active_baton.scope.privatized_functional_module_audit,
   ];
   const expectedModules = [
     'product_entry_continuity_refs_adapter',
@@ -89,26 +87,11 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       ],
     });
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
-    assert.deepEqual(surface.physical_deletion_guard.deleted_or_thinned_default_surfaces, [
-      'retired_domain_action_adapter.runtime_watch_dispatch_tombstone', 'retired_domain_action_adapter.supervision_action_tombstone',
-      'retired_domain_action_adapter.continuation_action_tombstone', 'retired_public_cli_mcp.managed_run_lookup_tombstone',
-      'retired_public_cli_mcp.managed_supervision_tombstone', 'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
-      'retired_repo_local_visual_runtime.legacy_run_store_tombstone', 'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
-    ]);
-    assert.equal(surface.physical_deletion_guard.surface_id_policy, 'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id');
-    assert.equal(surface.physical_deletion_guard.retired_legacy_surface_ids.length, 8);
-    assert.equal(
-      new Set(surface.physical_deletion_guard.retired_legacy_surface_ids).size,
-      surface.physical_deletion_guard.retired_legacy_surface_ids.length,
-    );
-    assert.equal(
-      surface.physical_deletion_guard.retired_legacy_surface_ids.every((surfaceId) =>
-        typeof surfaceId === 'string'
-        && !surfaceId.endsWith('_tombstone')
-        && !surfaceId.includes('compatibility_alias')),
-      true,
-    );
-    assert.equal(surface.physical_deletion_guard.deletion_status, 'legacy_runtime_physical_cleanup_closed');
+    assert.equal(surface.physical_deletion_guard.closed_retirement_count, 8);
+    assert.equal(surface.physical_deletion_guard.closed_default_caller_retirement_count, 5);
+    assert.equal(surface.physical_deletion_guard.surface_id_policy, 'current_role_guard_with_count_only_closed_retirement_summary');
+    assert.equal(surface.physical_deletion_guard.deletion_status, 'closed_retirements_counted_current_roles_guarded');
+    assert.equal(surface.physical_deletion_guard.current_role_guard.forbidden_owner_flags.rca_owns_generic_runner, false);
     assert.equal(surface.fresh_large_private_surface_scan.surface_kind, 'rca_large_private_platform_surface_scan');
     assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.no_obvious_safe_large_generic_control_plane_split_found, true);
     assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.functional_structure_gap_reopened, false);
@@ -132,19 +115,9 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     }
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
     assert.equal(surface.retire_tombstone_candidates, undefined);
-    assert.equal(surface.retired_no_resurrection_guards.length, 5);
-    for (const entry of surface.retired_no_resurrection_guards) {
-      assert.equal(entry.surface_id.endsWith('_tombstone'), true, entry.surface_id);
-      assert.equal(
-        surface.physical_deletion_guard.retired_legacy_surface_ids.includes(entry.retired_legacy_surface_id),
-        true,
-        entry.retired_legacy_surface_id,
-      );
-      assert.equal(entry.active_default_caller, false, entry.surface_id);
-      assert.equal(entry.active_caller, false, entry.surface_id);
-      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
-      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
-    }
+    assert.equal(surface.retired_no_resurrection_guards, undefined);
+    assert.equal(surface.closed_retirement_summary.closed_retirement_count, 8);
+    assert.equal(surface.closed_retirement_summary.current_role_guard.compatibility_alias_allowed, false);
     assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
     assert.equal(surface.authority_boundary.opl_can_write_rca_visual_truth, false);
     assert.equal(surface.authority_boundary.opl_can_claim_production_soak_complete, false);
@@ -325,9 +298,6 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     'workbench',
   ];
   for (const handoff of [
-    current.product_release_metadata.visual_pack_compiler_handoff.generated_surface_handoff,
-    current.current_state.visual_pack_compiler_handoff.generated_surface_handoff,
-    current.current_state.active_baton.scope.visual_pack_compiler_handoff.generated_surface_handoff,
     adoption.visual_pack_compiler_handoff.generated_surface_handoff,
   ]) {
     assert.deepEqual(handoff.generated_surface_targets, expectedGeneratedTargets);

@@ -344,14 +344,9 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retire_tombstone_candidates,
       undefined,
     );
-    assert.equal(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards.length, 5);
-    for (const entry of domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
-      assert.equal(entry.surface_id.endsWith('_tombstone'), true, entry.surface_id);
-      assert.equal(entry.active_default_caller, false, entry.surface_id);
-      assert.equal(entry.active_caller, false, entry.surface_id);
-      assert.equal(entry.compatibility_alias_allowed, false, entry.surface_id);
-      assert.equal(entry.resurrection_policy, 'forbidden', entry.surface_id);
-    }
+    assert.equal(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards, undefined);
+    assert.equal(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.closed_retirement_summary.closed_retirement_count, 8);
+    assert.equal(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.closed_retirement_summary.closed_default_caller_retirement_count, 5);
     assert.equal(
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.replacement_expectation_mode,
       'opl_replacement_expectation_or_refs_only_projection',
@@ -410,38 +405,15 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       '/visual_pack_compiler_handoff',
     );
     assert.deepEqual(
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.deleted_or_thinned_default_surfaces,
       [
-        'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
-        'retired_domain_action_adapter.supervision_action_tombstone',
-        'retired_domain_action_adapter.continuation_action_tombstone',
-        'retired_public_cli_mcp.managed_run_lookup_tombstone',
-        'retired_public_cli_mcp.managed_supervision_tombstone',
-        'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
-        'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
-        'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
+        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.closed_retirement_count,
+        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.closed_default_caller_retirement_count,
       ],
+      [8, 5],
     );
-    assert.equal(
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.length,
-      8,
-    );
-    assert.equal(
-      new Set(
-        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids,
-      ).size,
-      domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.length,
-    );
-    for (const entry of domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.retired_no_resurrection_guards) {
-      assert.equal(
-        domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.retired_legacy_surface_ids.includes(entry.retired_legacy_surface_id),
-        true,
-        entry.retired_legacy_surface_id,
-      );
-    }
     assert.equal(
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.surface_id_policy,
-      'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
+      'current_role_guard_with_count_only_closed_retirement_summary',
     );
     assert.ok(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('visual_review_export_gate'));
     assert.ok(domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.must_not_retire.includes('native_helper_implementation'));

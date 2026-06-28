@@ -185,19 +185,33 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
       value: deletionGuard.physical_delete_authorization_refs,
     });
   }
-  for (const entry of audit.retired_no_resurrection_guards || []) {
-    if (
-      entry.active_default_caller !== false
-      || entry.active_caller !== false
-      || entry.compatibility_alias_allowed !== false
-      || entry.resurrection_policy !== 'forbidden'
-    ) {
+  const roleGuard = audit.closed_retirement_summary?.current_role_guard
+    || deletionGuard.current_role_guard
+    || {};
+  for (const [key, value] of Object.entries(roleGuard.forbidden_owner_flags || {})) {
+    if (value !== false) {
       failures.push({
-        check_id: 'retired_no_resurrection_guard',
+        check_id: 'current_role_guard_forbidden_owner_flag',
         state: 'failed',
-        surface_id: entry.surface_id,
+        key,
+        value,
       });
     }
+  }
+  if (roleGuard.compatibility_alias_allowed !== false) {
+    failures.push({
+      check_id: 'current_role_guard_compatibility_alias',
+      state: 'failed',
+      value: roleGuard.compatibility_alias_allowed,
+    });
+  }
+  if (audit.closed_retirement_summary?.closed_retirement_count !== deletionGuard.closed_retirement_count) {
+    failures.push({
+      check_id: 'closed_retirement_count_consistency',
+      state: 'failed',
+      summary_count: audit.closed_retirement_summary?.closed_retirement_count,
+      deletion_guard_count: deletionGuard.closed_retirement_count,
+    });
   }
   const sourceRefGate = physicalPolicy.source_ref_integrity_gate || {};
   if (sourceRefGate.state !== 'repo_local_source_refs_declared_no_second_truth') {
@@ -455,8 +469,7 @@ export function buildPrivatePlatformRetirementReadback() {
   const activeSourceScan = buildActiveSourceResurrectionScanReadback(physicalPolicy);
   const blockedActions = listDomainActionAdapterBlockedActions();
   const forbiddenWrites = listDomainActionAdapterForbiddenWrites();
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
-  const contractAudit = currentProgram.product_release_metadata.privatized_functional_module_audit;
+  const contractAudit = readJson('contracts/functional_privatization_audit.json');
   const failures = collectFailures({
     audit,
     physicalPolicy,
@@ -465,8 +478,7 @@ export function buildPrivatePlatformRetirementReadback() {
     forbiddenWrites,
     activeSourceScan,
   });
-  if (JSON.stringify(contractAudit.functional_structure_gap_closure)
-    !== JSON.stringify(audit.functional_structure_gap_closure)) {
+  if (JSON.stringify(contractAudit) !== JSON.stringify(audit)) {
     failures.push({
       check_id: 'current_program_audit_readback_sync',
       state: 'failed',

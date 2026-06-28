@@ -74,7 +74,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     retained_builder_role:
       'assemble_physical_source_morphology_policy_from_classifications_and_extracted_tail_gate',
     extracted_gate_role:
-      'default_caller_tail_false_ready_and_no_resurrection_policy_without_delete_or_readiness_authority',
+      'default_caller_tail_false_ready_and_current_role_guard_without_delete_or_readiness_authority',
     no_second_truth_policy: {
       contract_json_remains_builder_output: true,
       extracted_gate_module_is_source_for_default_caller_tail_gate: true,
@@ -115,8 +115,8 @@ test('RCA physical source morphology policy classifies active source tails witho
     'no_active_repo_local_default_caller',
     'rca_owner_receipt_or_typed_blocker_roundtrip',
     'no_forbidden_write_proof',
-    'retired_alias_no_resurrection_proof',
-    'tombstone_or_provenance_pointer',
+    'current_role_guard_no_alias_proof',
+    'compressed_history_index_pointer',
   ]);
   assert.equal(
     policy.default_caller_tail_thinning_gate.false_ready_guard.source_classification_can_claim_default_caller_cutover_complete,
@@ -127,15 +127,15 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
   assert.equal(
-    policy.default_caller_tail_thinning_gate.no_resurrection_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch,
+    policy.default_caller_tail_thinning_gate.current_role_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch,
     false,
   );
   assert.equal(
-    policy.default_caller_tail_thinning_gate.no_resurrection_guard.domain_action_adapter_can_become_generic_dispatch_owner,
+    policy.default_caller_tail_thinning_gate.current_role_guard.domain_action_adapter_can_become_generic_dispatch_owner,
     false,
   );
   assert.equal(
-    policy.default_caller_tail_thinning_gate.no_resurrection_guard.compatibility_alias_or_facade_allowed,
+    policy.default_caller_tail_thinning_gate.current_role_guard.compatibility_alias_or_facade_allowed,
     false,
   );
   const readbackGuard = policy.default_caller_tail_thinning_gate.retirement_readback_cleanup_guard;
@@ -179,15 +179,15 @@ test('RCA physical source morphology policy classifies active source tails witho
     'owner_delta_route',
     'retained_current_refs_only_boundary',
     'typed_blocker_ref_shape',
-    'no_resurrection_policy',
+    'current_role_guard',
   ]);
   assert.deepEqual(readbackGuard.required_before_cleanup_apply, [
     'opl_generated_default_caller_parity',
     'no_active_repo_local_default_caller',
     'rca_owner_receipt_or_typed_blocker_roundtrip',
     'no_forbidden_write_proof',
-    'retired_alias_no_resurrection_proof',
-    'tombstone_or_provenance_pointer',
+    'current_role_guard_no_alias_proof',
+    'compressed_history_index_pointer',
     'owner_receipt://redcube_ai/physical_delete_or_tombstone_authorization',
   ]);
   assert.equal(readbackGuard.claims.claims_retirement_cleanup_complete, false);
@@ -288,7 +288,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'owner_delta_work_order_pack',
     'retained_current_refs_only_boundary',
     'typed_blocker_ref_shape',
-    'no_resurrection_policy',
+    'current_role_guard',
   ]);
   assert.deepEqual(
     policy.default_caller_tail_readback.retained_current_refs_only_boundaries.map((entry) => entry.surface_id),
@@ -772,8 +772,8 @@ test('RCA physical source morphology source refs resolve under source_ref_integr
       'active_surface_classifications[*].machine_boundary_refs',
       'policy_source_structure.builder_ref',
       'policy_source_structure.extracted_gate_refs',
-      'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
-      'legacy_name_policy.retired_compatibility_payload_field_policy',
+      'legacy_name_policy.current_role_guard_policy',
+      'legacy_name_policy.forbidden_payload_role_policy',
     ],
     checked_source_ref_count: allSourceRefs.length,
     checked_machine_boundary_ref_count: allMachineBoundaryRefs.length,

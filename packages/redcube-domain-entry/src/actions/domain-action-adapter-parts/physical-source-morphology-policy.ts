@@ -33,8 +33,8 @@ function sourceRefIntegrityGate(activeSurfaceClassifications) {
       'active_surface_classifications[*].machine_boundary_refs',
       'policy_source_structure.builder_ref',
       'policy_source_structure.extracted_gate_refs',
-      'legacy_name_policy.retired_legacy_surface_id_pointer_policy',
-      'legacy_name_policy.retired_compatibility_payload_field_policy',
+      'legacy_name_policy.current_role_guard_policy',
+      'legacy_name_policy.forbidden_payload_role_policy',
     ],
     checked_source_ref_count: checkedSourceRefs.length,
     checked_machine_boundary_ref_count: checkedMachineBoundaryRefs.length,
@@ -100,8 +100,8 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
           'no_active_repo_local_default_caller',
           'rca_owner_receipt_or_typed_blocker_roundtrip',
           'no_forbidden_write_proof',
-          'retired_alias_no_resurrection_proof',
-          'tombstone_or_provenance_pointer',
+          'current_role_guard_no_alias_proof',
+          'compressed_history_index_pointer',
         ],
         owner_delta_route: {
           next_owner: 'one-person-lab_or_redcube_ai_owner_receipt_surface',
@@ -109,7 +109,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
             'provide_default_caller_parity_no_active_caller_no_forbidden_write_and_owner_receipt_or_typed_blocker_refs_before_delete_or_further_thin',
           typed_blocker_ref_shape: typedBlockerRef,
         },
-        no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+        current_role_guard: entry.current_role_guard ?? SOURCE_THINNING_TAIL_GATE.current_role_guard,
         readback_claims: {
           can_claim_cleanup_complete: false,
           can_claim_physical_delete_authorized: false,
@@ -132,7 +132,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       classification: entry.classification,
       current_rca_role: entry.current_rca_role,
       source_refs: entry.source_refs ?? [],
-      no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+      current_role_guard: entry.current_role_guard ?? SOURCE_THINNING_TAIL_GATE.current_role_guard,
       readback_claims: {
         can_claim_cleanup_complete: false,
         can_claim_physical_delete_authorized: false,
@@ -151,7 +151,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       classification: entry.classification,
       current_rca_role: entry.current_rca_role,
       source_refs: entry.source_refs ?? [],
-      no_resurrection_policy: entry.no_resurrection_gate ?? SOURCE_THINNING_TAIL_GATE.no_resurrection_guard,
+      current_role_guard: entry.current_role_guard ?? SOURCE_THINNING_TAIL_GATE.current_role_guard,
       readback_claims: {
         can_claim_cleanup_complete: false,
         can_claim_physical_delete_authorized: false,
@@ -220,7 +220,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       'owner_delta_work_order_pack',
       'retained_current_refs_only_boundary',
       'typed_blocker_ref_shape',
-      'no_resurrection_policy',
+      'current_role_guard',
     ],
     tail_classifications: tailClassifications,
     current_non_tail_surfaces: currentNonTailSurfaces,
@@ -879,22 +879,11 @@ export function buildPhysicalSourceMorphologyPolicy() {
       forbidden_active_surface_ids: [
         'legacy_managed_runtime_gateway_names',
       ],
-      retired_legacy_surface_id_pointer_policy: {
-        policy_kind: 'retired_legacy_surface_ids_must_stay_inside_tombstone_or_provenance_fields',
-        allowed_json_pointer_suffixes: [
-          '/physical_deletion_guard/retired_legacy_surface_ids/*',
-          '/retired_no_resurrection_guards/*/retired_legacy_surface_id',
-        ],
-        allowed_leaf_file_pointer_suffixes: [
-          {
-            file_suffix: '/physical_deletion_guard.json',
-            pointer_suffix: '/retired_legacy_surface_ids/*',
-          },
-          {
-            file_suffix: '/retired_no_resurrection_guards.json',
-            pointer_suffix: '/*/retired_legacy_surface_id',
-          },
-        ],
+      current_role_guard_policy: {
+        policy_kind: 'active_surfaces_must_match_allowed_roles_and_false_forbidden_owner_flags',
+        allowed_role_field: '/current_role_guard/allowed_roles/*',
+        forbidden_owner_flags_field: '/current_role_guard/forbidden_owner_flags',
+        closed_retirement_count_only: true,
         generated_read_through_snapshot_refs: [
           'contracts/runtime-program/current-program.json',
           'contracts/runtime-program/current-program-parts/',
@@ -904,18 +893,18 @@ export function buildPhysicalSourceMorphologyPolicy() {
         compatibility_alias_allowed: false,
         production_readiness_claim_allowed: false,
       },
-      retired_compatibility_payload_field_policy: {
-        policy_kind: 'retired_compatibility_payload_fields_must_stay_inside_negative_guard_fields',
-        retired_field_ids: [
-          'managed_runtime_compatibility_alias',
+      forbidden_payload_role_policy: {
+        policy_kind: 'compatibility_alias_payload_role_must_stay_forbidden',
+        forbidden_payload_roles: [
+          'compatibility_alias',
         ],
-        retired_field_ids_as_json_keys_allowed: false,
+        legacy_field_ids_allowed: false,
         policy_declaration_pointer_suffixes: [
-          '/legacy_name_policy/retired_compatibility_payload_field_policy/retired_field_ids/*',
+          '/legacy_name_policy/forbidden_payload_role_policy/forbidden_payload_roles/*',
         ],
         allowed_json_pointer_suffixes: [
-          '/forbidden_payload_fields/*',
-          '/forbidden_receipt_fields/*',
+          '/forbidden_payload_roles/*',
+          '/forbidden_receipt_roles/*',
         ],
         active_payload_template_allowed: false,
         compatibility_alias_allowed: false,

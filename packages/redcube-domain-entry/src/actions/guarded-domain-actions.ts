@@ -29,90 +29,34 @@ import {
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
 } from './domain-action-adapter-parts/opl-generic-boundaries.js';
-const RETIRED_DEFAULT_SURFACE_TOMBSTONES = Object.freeze([
-  {
-    surface_id: 'retired_domain_action_adapter.runtime_watch_dispatch_tombstone',
-    retired_legacy_surface_id: 'domain_action_adapter_dispatch.runtime_watch',
-    retired_at: '2026-05-21',
-    replacement_owner: 'opl',
-    replacement_surface: 'opl_status_workbench_runtime_read_model',
-    retained_rca_surface: 'runtimeWatch direct review/progress read model',
-    active_default_caller: false,
-    active_caller: false,
-    compatibility_alias_allowed: false,
-    resurrection_policy: 'forbidden',
-  },
-  {
-    surface_id: 'retired_domain_action_adapter.supervision_action_tombstone',
-    retired_legacy_surface_id: 'domain_action_adapter_dispatch.retired_managed_supervision',
-    retired_at: '2026-05-17',
-    replacement_owner: 'opl',
-    replacement_surface: 'opl_generic_runner_and_supervisor_tick',
-    retained_rca_surface: null,
-    active_default_caller: false,
-    active_caller: false,
-    compatibility_alias_allowed: false,
-    resurrection_policy: 'forbidden',
-  },
-  {
-    surface_id: 'retired_domain_action_adapter.continuation_action_tombstone',
-    retired_legacy_surface_id: 'domain_action_adapter_dispatch.product_entry_continuation',
-    retired_at: '2026-05-17',
-    replacement_owner: 'opl',
-    replacement_surface: 'opl_generated_session_shell_and_product_entry_wrapper',
-    retained_rca_surface: 'direct product entry invoke/session surfaces',
-    active_default_caller: false,
-    active_caller: false,
-    compatibility_alias_allowed: false,
-    resurrection_policy: 'forbidden',
-  },
-  {
-    surface_id: 'retired_public_cli_mcp.managed_run_lookup_tombstone',
-    retired_legacy_surface_id: 'public_cli_mcp_gateway.get_managed_run',
-    retired_at: '2026-05-18',
-    replacement_owner: 'opl',
-    replacement_surface: 'opl_generated_status_session_workbench_read_model',
-    retained_rca_surface: null,
-    active_default_caller: false,
-    active_caller: false,
-    compatibility_alias_allowed: false,
-    resurrection_policy: 'forbidden',
-  },
-  {
-    surface_id: 'retired_public_cli_mcp.managed_supervision_tombstone',
-    retired_legacy_surface_id: 'public_cli_mcp_gateway.retired_managed_supervision',
-    retired_at: '2026-05-18',
-    replacement_owner: 'opl',
-    replacement_surface: 'opl_generic_runner_and_supervisor_tick',
-    retained_rca_surface: null,
-    active_default_caller: false,
-    active_caller: false,
-    compatibility_alias_allowed: false,
-    resurrection_policy: 'forbidden',
-  },
-]);
+const CLOSED_DEFAULT_RETIREMENT_COUNT = 8;
+const CLOSED_DEFAULT_CALLER_RETIREMENT_COUNT = 5;
 
-const RETIRED_REPO_LOCAL_RUNTIME_TOMBSTONES = Object.freeze([
-  'retired_repo_local_visual_runtime.legacy_deliverable_runner_tombstone',
-  'retired_repo_local_visual_runtime.legacy_run_store_tombstone',
-  'retired_repo_local_visual_runtime.legacy_dag_runtime_tombstone',
-]);
-
-const LEGACY_REPO_LOCAL_RUNTIME_SURFACE_REFS = Object.freeze([
-  'repo_local_visual_runtime.legacy_deliverable_runner_deleted',
-  'repo_local_visual_runtime.legacy_run_store_deleted',
-  'repo_local_visual_runtime.legacy_dag_runtime_deleted',
-]);
-
-const RETIRED_DEFAULT_SURFACE_TOMBSTONE_IDS = Object.freeze([
-  ...RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => entry.surface_id),
-  ...RETIRED_REPO_LOCAL_RUNTIME_TOMBSTONES,
-]);
-
-const RETIRED_DEFAULT_LEGACY_SURFACE_IDS = Object.freeze([
-  ...RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => entry.retired_legacy_surface_id),
-  ...LEGACY_REPO_LOCAL_RUNTIME_SURFACE_REFS,
-]);
+const CURRENT_ROLE_GUARD = Object.freeze({
+  guard_id: 'rca.private_platform.current_role_guard.v1',
+  allowed_roles: Object.freeze([
+    'domain_handler_target',
+    'refs_only_adapter',
+    'declarative_pack',
+    'minimal_authority_function',
+    'native_helper_implementation',
+    'repo_native_verification_wrapper',
+    'package_protocol_boundary',
+  ]),
+  forbidden_owner_flags: Object.freeze({
+    rca_owns_generic_scheduler: false,
+    rca_owns_generic_runner: false,
+    rca_owns_generic_attempt_ledger: false,
+    rca_owns_generic_workbench: false,
+    rca_owns_generic_review_repair_transport: false,
+    rca_owns_generic_session_runtime: false,
+    rca_owns_generic_artifact_lifecycle: false,
+    rca_owns_generic_generated_wrapper: false,
+    rca_owns_generic_domain_entry_runtime: false,
+  }),
+  compatibility_alias_allowed: false,
+  active_default_caller_alias_allowed: false,
+});
 
 export const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
   'real_artifact_producing_domain_owner_receipt',
@@ -599,10 +543,11 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     },
     physical_deletion_guard: {
       current_safe_tombstone_candidate_count: 0,
-      deleted_or_thinned_default_surfaces: [...RETIRED_DEFAULT_SURFACE_TOMBSTONE_IDS],
-      retired_legacy_surface_ids: [...RETIRED_DEFAULT_LEGACY_SURFACE_IDS],
-      surface_id_policy: 'current_deletion_proof_uses_tombstone_ids_legacy_names_only_in_retired_legacy_surface_id',
-      deletion_status: 'legacy_runtime_physical_cleanup_closed',
+      closed_retirement_count: CLOSED_DEFAULT_RETIREMENT_COUNT,
+      closed_default_caller_retirement_count: CLOSED_DEFAULT_CALLER_RETIREMENT_COUNT,
+      surface_id_policy: 'current_role_guard_with_count_only_closed_retirement_summary',
+      deletion_status: 'closed_retirements_counted_current_roles_guarded',
+      current_role_guard: { ...CURRENT_ROLE_GUARD },
       remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
       required_before_remaining_physical_delete: [],
       physical_delete_authorization_ref: null,
@@ -699,7 +644,14 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'owner_receipt',
       'native_helper_implementation',
     ],
-    retired_no_resurrection_guards: RETIRED_DEFAULT_SURFACE_TOMBSTONES.map((entry) => ({ ...entry })),
+    closed_retirement_summary: {
+      surface_kind: 'rca_closed_retirement_count_summary',
+      closed_retirement_count: CLOSED_DEFAULT_RETIREMENT_COUNT,
+      closed_default_caller_retirement_count: CLOSED_DEFAULT_CALLER_RETIREMENT_COUNT,
+      current_role_guard: { ...CURRENT_ROLE_GUARD },
+      compatibility_alias_allowed: false,
+      active_default_caller_alias_allowed: false,
+    },
     must_not_retire: [
       'visual_stage_descriptor',
       'visual_review_export_gate',

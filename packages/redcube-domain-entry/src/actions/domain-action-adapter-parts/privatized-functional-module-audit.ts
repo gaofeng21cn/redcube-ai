@@ -254,7 +254,7 @@ export function buildPrivatePlatformRetirementOwnerEvidenceLane(target = null) {
     memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
     memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
     source_contract_refs: {
-      functional_privatization_audit_ref: 'contracts/functional_privatization_audit.json#/privatized_functional_module_audit',
+      functional_privatization_audit_ref: 'contracts/functional_privatization_audit.json#/',
       live_stage_run_progress_ref: 'contracts/live_stage_run_progress_evidence.json',
       workspace_receipt_scaleout_ref: 'contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json',
     },

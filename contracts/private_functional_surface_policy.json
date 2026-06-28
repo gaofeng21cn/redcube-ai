@@ -90,8 +90,8 @@
       "no_active_caller",
       "rca_owner_receipt_or_typed_blocker_roundtrip",
       "no_forbidden_write_proof",
-      "retired_alias_no_resurrection_proof",
-      "tombstone_or_provenance_pointer"
+      "current_role_guard_no_alias_proof",
+      "compressed_history_index_pointer"
     ],
     "allowed_before_gate": [
       "refs_only_adapter",

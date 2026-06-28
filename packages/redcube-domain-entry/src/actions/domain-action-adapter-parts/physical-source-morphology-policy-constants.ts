@@ -81,7 +81,7 @@ export const POLICY_SOURCE_STRUCTURE = Object.freeze({
   retained_builder_role:
     'assemble_physical_source_morphology_policy_from_classifications_and_extracted_tail_gate',
   extracted_gate_role:
-    'default_caller_tail_false_ready_and_no_resurrection_policy_without_delete_or_readiness_authority',
+    'default_caller_tail_false_ready_and_current_role_guard_without_delete_or_readiness_authority',
   no_second_truth_policy: {
     contract_json_remains_builder_output: true,
     extracted_gate_module_is_source_for_default_caller_tail_gate: true,
