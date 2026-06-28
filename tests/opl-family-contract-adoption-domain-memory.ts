@@ -99,28 +99,33 @@ export function registerDomainMemoryAdoptionTests(contract) {
     assert.equal(memory.memory_model, 'natural_language_pattern_cards');
     assert.equal(memory.descriptor_model, 'repo_tracked_descriptor_refs_only');
     assert.equal(memory.locator_model, 'rca_owned_memory_ref_locator');
-    assert.equal(memory.policy_ref, 'human_doc:visual_pattern_memory_policy');
-    assert.equal(memory.human_doc_ref, 'human_doc:domain_memory_descriptor_locator');
-    assert.deepEqual(memory.opl_consumes, [
-      'memory locator refs',
-      'memory provenance refs',
-      'writeback receipt refs',
+    assert.equal(memory.policy_ref.ref_kind, 'human_doc');
+    assert.equal(memory.policy_ref.ref, 'human_doc:visual_pattern_memory_policy');
+    assert.equal(memory.human_doc_ref.ref_kind, 'human_doc');
+    assert.equal(memory.human_doc_ref.ref, 'human_doc:domain_memory_descriptor_locator');
+    assert.deepEqual(memory.memory_locator.opl_consumable_fields, [
+      'memory_id',
+      'stage_scope',
+      'deliverable_family',
+      'provenance_refs',
+      'content_ref',
+      'writeback_receipt_ref',
     ]);
-    for (const forbidden of [
-      'own_memory_content',
-      'choose_visual_route',
-      'issue_review_or_export_verdict',
-      'mutate_canonical_artifacts',
-    ]) {
-      assert.ok(memory.opl_forbidden.includes(forbidden));
-    }
+    assert.equal(memory.authority_boundary.opl_can_hold_memory_content, false);
+    assert.equal(memory.authority_boundary.opl_can_choose_visual_route, false);
+    assert.equal(memory.authority_boundary.opl_can_issue_review_or_export_verdict, false);
+    assert.equal(memory.authority_boundary.opl_can_mutate_canonical_artifacts, false);
     assert.deepEqual(memory.authority_boundary, {
       memory_content_owner: 'redcube_ai',
       route_truth_owner: 'redcube_ai',
       review_export_verdict_owner: 'redcube_ai',
       artifact_authority_owner: 'redcube_ai',
       opl_role: 'locator_ref_receipt_consumer_only',
+      opl_can_hold_memory_content: false,
+      opl_can_choose_visual_route: false,
       opl_can_accept_or_reject_memory_writeback: false,
+      opl_can_issue_review_or_export_verdict: false,
+      opl_can_mutate_canonical_artifacts: false,
     });
   });
 

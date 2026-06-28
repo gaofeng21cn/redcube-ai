@@ -58,10 +58,10 @@ export const REPO_SOURCE_BOUNDARIES = [
     boundary_id: 'docs',
     role: 'human-readable owner boundary, lifecycle, and operator guidance',
     repo_refs: [
-      'docs/project.md',
-      'docs/architecture.md',
-      'docs/status.md',
-      'docs/decisions.md',
+      'human_doc:rca_project',
+      'human_doc:rca_architecture',
+      'human_doc:rca_current_status',
+      'human_doc:rca_decisions',
     ],
   },
 ];

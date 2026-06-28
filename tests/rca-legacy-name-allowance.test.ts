@@ -189,11 +189,11 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
     'repo_native_verification_wrapper',
     'tombstone_or_provenance',
   ]);
-  assert.equal(gate.no_resurrection_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch, false);
-  assert.equal(gate.no_resurrection_guard.domain_action_adapter_can_become_generic_dispatch_owner, false);
-  assert.equal(gate.no_resurrection_guard.domain_action_adapter_can_become_generated_wrapper_owner, false);
-  assert.equal(gate.no_resurrection_guard.route_run_records_can_become_attempt_ledger_owner, false);
-  assert.equal(gate.no_resurrection_guard.shell_wrappers_can_become_runtime_owner, false);
+  assert.equal(gate.current_role_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch, false);
+  assert.equal(gate.current_role_guard.domain_action_adapter_can_become_generic_dispatch_owner, false);
+  assert.equal(gate.current_role_guard.domain_action_adapter_can_become_generated_wrapper_owner, false);
+  assert.equal(gate.current_role_guard.route_run_records_can_become_attempt_ledger_owner, false);
+  assert.equal(gate.current_role_guard.shell_wrappers_can_become_runtime_owner, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_physical_delete_authorized, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_visual_ready, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_production_ready, false);

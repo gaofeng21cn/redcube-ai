@@ -352,7 +352,7 @@ export function buildVisualTransitionSpec() {
     owner: DOMAIN_OWNER,
     status: 'contract_landed_thin_evaluator_landed_runner_owned_by_opl',
     transition_model: 'rca_owned_transition_table_oracle_fixture_refs_only',
-    source_contract: 'docs/active/rca-ideal-state-gap-plan.md#declare_visual_transition_spec',
+    source_contract: 'human_doc:rca_ideal_state_gap_plan#declare_visual_transition_spec',
     covered_family_stage_kinds: stageKinds,
     transition_table: [
       {
@@ -497,7 +497,7 @@ export function buildPhysicalSkeletonFollowThrough() {
         boundary_id: 'contracts',
         status: 'present_with_runtime_program_contracts',
         entrypoint_refs: [
-          'contracts/README.md',
+          'human_doc:contracts_index',
           'contracts/runtime-program/current-program.json',
           'contracts/runtime-program/opl-family-contract-adoption.json',
         ],
@@ -505,12 +505,12 @@ export function buildPhysicalSkeletonFollowThrough() {
       {
         boundary_id: 'runtime',
         status: 'present_with_repo_source_entrypoint',
-        entrypoint_refs: ['runtime/README.md', 'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts'],
+        entrypoint_refs: ['human_doc:runtime_index', 'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts'],
       },
       {
         boundary_id: 'docs',
         status: 'present_with_owner_docs',
-        entrypoint_refs: ['docs/status.md', 'docs/architecture.md', 'docs/decisions.md'],
+        entrypoint_refs: ['human_doc:rca_current_status', 'human_doc:rca_architecture', 'human_doc:rca_decisions'],
       },
     ],
     forbidden_moves: [

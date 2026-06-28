@@ -26,6 +26,9 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   assert.deepEqual(skeleton.repo_source_boundary.audit_surface.missing_roots, []);
   for (const root of skeleton.repo_source_boundary.allowed_roots) {
     for (const ref of root.repo_refs) {
+      if (ref.startsWith('human_doc:')) {
+        continue;
+      }
       assert.equal(fs.existsSync(path.join(repoRoot, ref)), true, `${root.boundary_id}:${ref}`);
     }
   }

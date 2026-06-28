@@ -646,10 +646,10 @@
           "boundary_id": "docs",
           "role": "human-readable owner boundary, lifecycle, and operator guidance",
           "repo_refs": [
-            "docs/project.md",
-            "docs/architecture.md",
-            "docs/status.md",
-            "docs/decisions.md"
+            "human_doc:rca_project",
+            "human_doc:rca_architecture",
+            "human_doc:rca_current_status",
+            "human_doc:rca_decisions"
           ]
         }
       ],
@@ -702,10 +702,10 @@
             "boundary_id": "docs",
             "status": "present",
             "repo_refs": [
-              "docs/project.md",
-              "docs/architecture.md",
-              "docs/status.md",
-              "docs/decisions.md"
+              "human_doc:rca_project",
+              "human_doc:rca_architecture",
+              "human_doc:rca_current_status",
+              "human_doc:rca_decisions"
             ]
           }
         ],
@@ -1883,7 +1883,7 @@
       "owner": "redcube_ai",
       "status": "contract_landed_thin_evaluator_landed_runner_owned_by_opl",
       "transition_model": "rca_owned_transition_table_oracle_fixture_refs_only",
-      "source_contract": "docs/active/rca-ideal-state-gap-plan.md#declare_visual_transition_spec",
+      "source_contract": "human_doc:rca_ideal_state_gap_plan#declare_visual_transition_spec",
       "covered_family_stage_kinds": [
         "source_intake",
         "communication_strategy",
@@ -2057,7 +2057,7 @@
           "boundary_id": "contracts",
           "status": "present_with_runtime_program_contracts",
           "entrypoint_refs": [
-            "contracts/README.md",
+            "human_doc:contracts_index",
             "contracts/runtime-program/current-program.json",
             "contracts/runtime-program/opl-family-contract-adoption.json"
           ]
@@ -2066,7 +2066,7 @@
           "boundary_id": "runtime",
           "status": "present_with_repo_source_entrypoint",
           "entrypoint_refs": [
-            "runtime/README.md",
+            "human_doc:runtime_index",
             "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts"
           ]
         },
@@ -2074,9 +2074,9 @@
           "boundary_id": "docs",
           "status": "present_with_owner_docs",
           "entrypoint_refs": [
-            "docs/status.md",
-            "docs/architecture.md",
-            "docs/decisions.md"
+            "human_doc:rca_current_status",
+            "human_doc:rca_architecture",
+            "human_doc:rca_decisions"
           ]
         }
       ],
@@ -16113,7 +16113,7 @@
         "surface_id": "retired_product_entry_contract_tombstone_refs",
         "source_refs": [
           "contracts/runtime-program/product-entry-session-continuity.json",
-          "docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md",
+          "human_doc:retired_managed_product_entry_contract_tombstone",
           "docs/history/"
         ],
         "classification": "tombstone_or_provenance",
@@ -16712,7 +16712,7 @@
         "contracts/runtime-program/product-entry-session-continuity.json",
         "contracts/runtime-program/python-native-helper-catalog.json",
         "docs/history/",
-        "docs/history/tombstones/retired-managed-product-entry-contract-2026-05-20.md",
+        "human_doc:retired_managed_product_entry_contract_tombstone",
         "packages/redcube-domain-entry/package.json",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy-tail-gate.ts#SOURCE_THINNING_TAIL_GATE",
