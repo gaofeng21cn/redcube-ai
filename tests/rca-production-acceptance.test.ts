@@ -13,6 +13,7 @@ import {
   realNoRegressionRefs,
   repoRoot,
 } from './rca-production-acceptance-shared.ts';
+import './rca-production-acceptance-cases/visual-evidence-scaleout-refs.test.ts';
 
 test('RCA production acceptance surface exists and records domain-owned scope', () => {
   assert.equal(fs.existsSync(path.join(repoRoot, acceptancePath)), true);

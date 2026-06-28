@@ -24,6 +24,7 @@ export const expectedSeriesDesignProfile = {
   stage_pack_sections: [
     'prompts',
     'stages',
+    'stage_completion_policy',
     'skills',
     'knowledge',
     'quality_gates',

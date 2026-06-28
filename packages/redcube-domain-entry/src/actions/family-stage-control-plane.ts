@@ -668,6 +668,46 @@ function buildReplayEvidenceRefs(stage) {
   };
 }
 
+function buildStageCompletionPolicy(stage) {
+  return {
+    surface_kind: 'domain_stage_completion_policy',
+    version: 'domain-stage-completion-policy.v1',
+    owner: 'one-person-lab',
+    target_domain_id: 'redcube_ai',
+    stage_id: stage.stage_id,
+    policy_ref: `stage-completion-policy:rca/${stage.stage_id}`,
+    standard_agent_requirement: 'domain_stage_owns_completion_judgment_and_emits_standard_closeout_packet',
+    completion_judgment_owner: 'domain_stage',
+    closeout_packet_required: true,
+    provider_completion_is_domain_completion: false,
+    opl_content_judgment_allowed: false,
+    next_stage_transition_owner: 'opl_runtime',
+    required_closeout_outcomes: [
+      'completed_and_continue',
+      'completed_and_wait_owner',
+      'route_back',
+      'blocked',
+      'rejected',
+    ],
+    accepted_closeout_ref_fields: [
+      'owner_receipt_ref',
+      'typed_blocker_ref',
+      'human_gate_ref',
+      'route_back_ref',
+    ],
+    authority_boundary: {
+      opl_can_decide_domain_completion: false,
+      provider_completion_counts_as_stage_complete: false,
+      file_presence_counts_as_stage_complete: false,
+      suite_pass_counts_as_stage_complete: false,
+      conformance_pass_counts_as_stage_complete: false,
+      opl_can_write_visual_truth: false,
+      opl_can_authorize_review_export_verdict: false,
+      opl_can_mutate_artifacts: false,
+    },
+  };
+}
+
 function stageDescriptor(stage, actionIds) {
   const expectedOutputRoles = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[stage.stage_id] || [];
   const skillRefs = [
@@ -782,6 +822,7 @@ function stageDescriptor(stage, actionIds) {
       runtime_event_refs: stage.runtime_event_refs || [],
       ...buildCohortLoopRefs(stage),
       ...buildReplayEvidenceRefs(stage),
+      stage_completion_policy: buildStageCompletionPolicy(stage),
       user_stage_log_contract: USER_STAGE_LOG_CONTRACT,
       progress_delta_policy: PROGRESS_DELTA_POLICY,
       typed_blocker_lineage_policy: TYPED_BLOCKER_LINEAGE_POLICY,
