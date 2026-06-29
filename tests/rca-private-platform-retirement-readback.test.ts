@@ -61,13 +61,24 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
     scan_can_claim_domain_ready: false,
     scan_can_claim_production_ready: false,
   });
-  assert.deepEqual(
-    payload.default_caller_tail_compact_retirement_summary,
-    payload.physical_source_morphology_policy.default_caller_tail_readback.compact_retirement_summary,
-  );
+  const sourceCompactSummary = payload.physical_source_morphology_policy
+    .default_caller_tail_readback.compact_retirement_summary;
   assert.equal(
     payload.default_caller_tail_compact_retirement_summary.state,
-    'tail_worklist_empty_current_surfaces_guarded',
+    sourceCompactSummary.state,
+  );
+  assert.deepEqual(
+    payload.default_caller_tail_compact_retirement_summary.owner_delta_work_order_pack,
+    sourceCompactSummary.owner_delta_work_order_pack,
+  );
+  assert.equal(
+    payload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count_semantics,
+    'zero_means_no_current_cleanup_candidate_not_physical_delete_authority',
+  );
+  assert.equal(
+    payload.default_caller_tail_compact_retirement_summary.count_zero_guard.false_ready_guard
+      .empty_tail_worklist_can_claim_domain_ready,
+    false,
   );
   assert.equal(payload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
   assert.equal(payload.default_caller_tail_compact_retirement_summary.owner_delta_required, false);
@@ -90,6 +101,7 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
     readback_can_issue_review_or_export_verdict: false,
     readback_can_sign_owner_receipt: false,
     readback_can_authorize_physical_delete: false,
+    readback_can_claim_generic_runtime_owner: false,
     readback_can_claim_default_caller_cutover: false,
     readback_can_claim_visual_ready: false,
     readback_can_claim_exportable: false,
@@ -123,6 +135,7 @@ test('RCA private platform retirement strict script emits JSON readback', () => 
   assert.equal(directPayload.active_source_resurrection_scan.violation_count, 0);
   assert.equal(directPayload.default_caller_tail_compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(directPayload.authority_boundary.readback_can_authorize_physical_delete, false);
+  assert.equal(directPayload.authority_boundary.readback_can_claim_generic_runtime_owner, false);
   assert.equal(directPayload.authority_boundary.readback_can_claim_production_ready, false);
 
   const result = spawnSync('npm', ['run', '--silent', 'test:private-platform:strict'], {

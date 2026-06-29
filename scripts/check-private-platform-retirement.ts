@@ -631,6 +631,7 @@ export function buildPrivatePlatformRetirementReadback() {
       readback_can_issue_review_or_export_verdict: false,
       readback_can_sign_owner_receipt: false,
       readback_can_authorize_physical_delete: false,
+      readback_can_claim_generic_runtime_owner: false,
       readback_can_claim_default_caller_cutover: false,
       readback_can_claim_visual_ready: false,
       readback_can_claim_exportable: false,

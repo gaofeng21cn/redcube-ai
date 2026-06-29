@@ -662,6 +662,8 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     authority_boundary: {
       opl_can_index_audit_projection: true,
       opl_can_import_generic_primitives: true,
+      domain_can_claim_generic_runtime_owner: false,
+      domain_repo_can_own_generated_surface: false,
       opl_can_write_rca_visual_truth: false,
       opl_can_write_rca_artifact_blob: false,
       opl_can_write_rca_memory_body: false,

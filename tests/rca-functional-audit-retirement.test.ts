@@ -42,6 +42,8 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
   ];
 
   for (const surface of surfaces) {
+    assert.equal(surface.authority_boundary.domain_can_claim_generic_runtime_owner, false);
+    assert.equal(surface.authority_boundary.domain_repo_can_own_generated_surface, false);
     assert.equal(surface.replacement_expectation_mode, 'opl_replacement_expectation_or_refs_only_projection');
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.equal(surface.physical_deletion_guard.closed_retirement_count, 8);
