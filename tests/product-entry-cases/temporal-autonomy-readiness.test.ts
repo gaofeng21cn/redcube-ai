@@ -1,4 +1,7 @@
 // @ts-nocheck
+import fs from 'node:fs';
+import path from 'node:path';
+
 import {
   SERIAL_ENV_TEST,
   assert,
@@ -8,6 +11,12 @@ import {
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
+
+const repoRoot = path.resolve(import.meta.dirname, '../..');
+
+function readRepoJson(relativePath) {
+  return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
+}
 
 test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract with RCA evidence gates', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
@@ -92,8 +101,13 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     assert.equal(readiness.authority_boundary.rca_writes_opl_stage_attempts, false);
 
     const consumptionPolicy = manifest.temporal_stage_run_consumption_policy;
+    const repoConsumptionPolicy = readRepoJson('contracts/temporal_stage_run_consumption_policy.json');
     assert.equal(consumptionPolicy.surface_kind, 'temporal_stage_run_consumption_policy');
     assert.equal(consumptionPolicy.policy_id, 'rca.temporal_stage_run_consumption_policy.v1');
+    assert.equal(repoConsumptionPolicy.surface_kind, consumptionPolicy.surface_kind);
+    assert.equal(repoConsumptionPolicy.policy_id, consumptionPolicy.policy_id);
+    assert.equal(repoConsumptionPolicy.temporal_runtime_owner, consumptionPolicy.temporal_runtime_owner);
+    assert.equal(repoConsumptionPolicy.temporal_attempt_ledger_owner, consumptionPolicy.temporal_attempt_ledger_owner);
     assert.equal(consumptionPolicy.temporal_runtime_owner, 'one-person-lab/OPL');
     assert.equal(consumptionPolicy.temporal_attempt_ledger_owner, 'one-person-lab/OPL');
     assert.equal(consumptionPolicy.provider_completion_is_domain_completion, false);
@@ -111,6 +125,7 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
       'artifact_authority_receipt_ref',
       'no_regression_evidence_ref',
     ]);
+    assert.deepEqual(repoConsumptionPolicy.domain_completion_closeout_refs, consumptionPolicy.domain_completion_closeout_refs);
     for (const forbiddenSource of [
       'provider_completion',
       'generated_surface_ready',
@@ -123,9 +138,30 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
         true,
         forbiddenSource,
       );
+      assert.equal(
+        repoConsumptionPolicy.forbidden_domain_completion_sources.includes(forbiddenSource),
+        true,
+        `repo.${forbiddenSource}`,
+      );
     }
+    assert.equal(repoConsumptionPolicy.forbidden_domain_completion_sources.includes('mock_safe_canary'), true);
+    assert.equal(repoConsumptionPolicy.forbidden_domain_completion_sources.includes('controlled_canary'), true);
     assert.equal(consumptionPolicy.forbidden_domain_writes.includes('opl_stage_attempt'), true);
     assert.equal(consumptionPolicy.forbidden_domain_writes.includes('opl_provider_attempt_ledger'), true);
+    assert.equal(repoConsumptionPolicy.forbidden_domain_writes.includes('owner_receipt_body'), true);
+    assert.equal(repoConsumptionPolicy.forbidden_domain_writes.includes('typed_blocker_body'), true);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.completion_status, 'blocked_requires_real_visual_stage_owner_acceptance');
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.requires_real_visual_stage_owner_acceptance, true);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.requires_review_export_acceptance_for_export_claim, true);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.provider_completion_counts_as_completion, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.generated_surface_readiness_counts_as_completion, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.mock_safe_canary_counts_as_completion, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_owner_chain_complete, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_visual_ready, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_exportable, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_domain_ready, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_production_ready, false);
+    assert.equal(repoConsumptionPolicy.owner_chain_completion_audit.declares_production_visual_stage_long_soak_complete, false);
 
     const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
     assert.equal(

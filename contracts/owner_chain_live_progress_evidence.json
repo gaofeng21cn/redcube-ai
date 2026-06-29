@@ -11,6 +11,7 @@
   "controlled_fixture_is_live_progress": false,
   "source_contract_refs": {
     "stage_run_kernel_profile_ref": "contracts/stage_run_kernel_profile.json",
+    "temporal_stage_run_consumption_policy_ref": "contracts/temporal_stage_run_consumption_policy.json",
     "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
     "production_acceptance_ref": "contracts/production_acceptance/rca-production-acceptance.json",
     "workspace_receipt_scaleout_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json"
@@ -267,6 +268,42 @@
       "opl_can_claim_visual_or_production_ready": false
     }
   },
+  "owner_chain_completion_audit": {
+    "audit_id": "rca.owner_chain_completion_audit.v1",
+    "source_policy_ref": "contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit",
+    "completion_status": "blocked_requires_real_visual_stage_owner_acceptance",
+    "accepted_terminal_evidence_refs": [
+      "owner_receipt_ref",
+      "typed_blocker_ref",
+      "human_gate_ref",
+      "route_back_ref",
+      "review_export_receipt_ref",
+      "artifact_authority_receipt_ref",
+      "no_regression_evidence_ref"
+    ],
+    "forbidden_completion_substitutes": [
+      "provider_completion",
+      "generated_surface_ready",
+      "stage_run_terminal_state",
+      "queue_empty",
+      "attempt_ledger_written",
+      "mock_safe_canary",
+      "controlled_canary",
+      "conformance_pass",
+      "read_model_current"
+    ],
+    "requires_real_visual_stage_owner_acceptance": true,
+    "requires_review_export_acceptance_for_export_claim": true,
+    "mock_safe_canary_counts_as_completion": false,
+    "generated_surface_readiness_counts_as_completion": false,
+    "provider_completion_counts_as_completion": false,
+    "declares_owner_chain_complete": false,
+    "declares_visual_ready": false,
+    "declares_exportable": false,
+    "declares_domain_ready": false,
+    "declares_production_ready": false,
+    "declares_production_visual_stage_long_soak_complete": false
+  },
   "opl_hosted_path_boundary": {
     "entry_path": "opl_hosted_product_entry_to_redcube_service_safe_domain_entry",
     "opl_can_store_owner_chain_refs": true,
@@ -302,6 +339,10 @@
     "declares_production_ready": false,
     "declares_production_visual_stage_long_soak_complete": false,
     "provider_completion_counts_as_visual_progress": false,
+    "generated_surface_ready_counts_as_visual_progress": false,
+    "stage_run_terminal_counts_as_live_progress": false,
+    "queue_empty_counts_as_live_progress": false,
+    "attempt_ledger_written_counts_as_live_progress": false,
     "conformance_pass_counts_as_live_progress": false,
     "controlled_canary_counts_as_live_progress": false,
     "mock_safe_canary_counts_as_production_progress": false,

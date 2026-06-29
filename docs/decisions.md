@@ -5,6 +5,15 @@ Purpose: `active_decision_log`
 State: `current_policy_with_historical_context`
 Machine boundary: 人读决策日志。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
+## 2026-06-30
+
+### 决策：Temporal StageRun live acceptance 采用 owner-chain completion audit
+
+- `contracts/temporal_stage_run_consumption_policy.json` 是 RCA 对 OPL Temporal-backed StageRun 的顶层机器消费 policy。它复用 product-entry manifest / domain_action_adapter 中已有 `temporal_stage_run_consumption_policy` 语义，固定 RCA 只消费 OPL StageRun、provider attempt、attempt ledger、lease 与 receipt refs，不自建 Temporal runtime、不写 OPL stage attempts、不写 provider queue 或 attempt ledger。
+- RCA owner-chain completion 只能由 RCA-owned `owner_receipt_ref`、`typed_blocker_ref`、`human_gate_ref`、`route_back_ref`、`review_export_receipt_ref`、`artifact_authority_receipt_ref` 或 `no_regression_evidence_ref` 关闭；provider completion、generated surface ready、stage-run terminal state、queue empty、attempt ledger written、mock-safe canary、controlled canary、conformance pass 或 read-model current 都是禁止的 completion substitute。
+- `contracts/owner_chain_live_progress_evidence.json#/owner_chain_completion_audit` 与 `contracts/live_stage_run_progress_evidence.json#/owner_chain_completion_audit` 只记录 body-free audit refs 和 open blocker。它们不写 visual truth、artifact body、owner receipt body、typed blocker body、memory body 或 review/export verdict body，也不声明 owner-chain complete、visual ready、exportable、handoffable、domain ready、production ready 或 production visual-stage long-soak complete。
+- 当前 completion audit 状态是 `blocked_requires_real_visual_stage_owner_acceptance`。真实 Temporal controlled visual-stage long-soak、真实 visual-stage owner receipt / typed blocker / human gate / route-back、以及 review-export acceptance 仍是 live evidence gap；mock-safe canary 和 generated surface readiness 只能证明合同形状与 refs 可消费，不能替代真实 owner acceptance。
+
 ## 2026-06-08
 
 ### 决策：RCA 接入 OPL Family Foundry Agent OS target pattern

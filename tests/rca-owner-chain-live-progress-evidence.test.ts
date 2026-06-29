@@ -110,9 +110,37 @@ async function runImageFirstOwnerChainCanary(workspaceRoot) {
 }
 
 test('RCA owner-chain evidence contract records mock-safe visual canary refs without readiness overclaim', () => {
+  const temporalPolicy = readRepoJson('contracts/temporal_stage_run_consumption_policy.json');
   const evidence = readRepoJson('contracts/owner_chain_live_progress_evidence.json');
   const liveProgress = readRepoJson('contracts/live_stage_run_progress_evidence.json');
 
+  assert.equal(temporalPolicy.owner_chain_completion_audit.completion_status, 'blocked_requires_real_visual_stage_owner_acceptance');
+  assert.deepEqual(temporalPolicy.owner_chain_completion_audit.accepted_terminal_evidence_refs, [
+    'owner_receipt_ref',
+    'typed_blocker_ref',
+    'human_gate_ref',
+    'route_back_ref',
+    'review_export_receipt_ref',
+    'artifact_authority_receipt_ref',
+    'no_regression_evidence_ref',
+  ]);
+  assert.deepEqual(temporalPolicy.owner_chain_completion_audit.forbidden_completion_substitutes, [
+    'provider_completion',
+    'generated_surface_ready',
+    'stage_run_terminal_state',
+    'queue_empty',
+    'attempt_ledger_written',
+    'mock_safe_canary',
+    'controlled_canary',
+    'conformance_pass',
+    'read_model_current',
+  ]);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.requires_real_visual_stage_owner_acceptance, true);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.requires_review_export_acceptance_for_export_claim, true);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.provider_completion_counts_as_completion, false);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.generated_surface_readiness_counts_as_completion, false);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.mock_safe_canary_counts_as_completion, false);
+  assert.equal(temporalPolicy.owner_chain_completion_audit.declares_owner_chain_complete, false);
   assert.equal(evidence.progress_readout.current_status, 'mock_safe_visual_owner_chain_canary_recorded_live_provider_evidence_open');
   assert.equal(evidence.progress_readout.live_progress_claim_kind, 'mock_safe_artifact_producing_owner_chain_canary_plus_refs_only_owner_actions');
   assert.equal(evidence.progress_readout.artifact_generation_run, true);
@@ -204,11 +232,27 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(evidence.remaining_evidence_gates.real_memory_lifecycle_receipt_instances, 'blocked_by_domain_owned_typed_blocker');
   assert.equal(evidence.remaining_evidence_gates.temporal_controlled_visual_stage_long_soak, 'open');
   assert.equal(evidence.remaining_evidence_gates.cross_family_repeated_no_regression_evidence, 'blocked_by_domain_owned_typed_blocker');
+  assert.equal(
+    evidence.source_contract_refs.temporal_stage_run_consumption_policy_ref,
+    'contracts/temporal_stage_run_consumption_policy.json',
+  );
+  assert.deepEqual(evidence.owner_chain_completion_audit.accepted_terminal_evidence_refs, temporalPolicy.owner_chain_completion_audit.accepted_terminal_evidence_refs);
+  assert.deepEqual(evidence.owner_chain_completion_audit.forbidden_completion_substitutes, temporalPolicy.owner_chain_completion_audit.forbidden_completion_substitutes);
+  assert.equal(evidence.owner_chain_completion_audit.completion_status, 'blocked_requires_real_visual_stage_owner_acceptance');
+  assert.equal(evidence.owner_chain_completion_audit.requires_real_visual_stage_owner_acceptance, true);
+  assert.equal(evidence.owner_chain_completion_audit.provider_completion_counts_as_completion, false);
+  assert.equal(evidence.owner_chain_completion_audit.generated_surface_readiness_counts_as_completion, false);
+  assert.equal(evidence.owner_chain_completion_audit.mock_safe_canary_counts_as_completion, false);
+  assert.equal(evidence.owner_chain_completion_audit.declares_owner_chain_complete, false);
   assert.equal(liveProgress.surface_kind, 'domain_live_stage_run_progress_evidence');
   assert.equal(liveProgress.rca_surface_kind, 'rca_live_stage_run_progress_evidence');
   assert.equal(liveProgress.schema_ref, 'contracts/opl-framework/domain-live-stage-run-progress-evidence.schema.json');
   assert.equal(liveProgress.schema_version, 1);
   assert.equal(liveProgress.status, 'owner_typed_blocker_recorded_not_ready_claim');
+  assert.equal(
+    liveProgress.source_contract_refs.temporal_stage_run_consumption_policy_ref,
+    'contracts/temporal_stage_run_consumption_policy.json',
+  );
   assert.equal(liveProgress.source_contract_refs.owner_chain_input_ref, 'contracts/owner_chain_live_progress_evidence.json');
   assert.equal(liveProgress.refs.owner_receipt_refs.includes(evidence.rca_owned_owner_action_canary.observed_owner_receipt_ref), true);
   assert.equal(liveProgress.refs.no_regression_refs.includes('rca-no-regression:visual-stage:production-evidence-tail-ppt-image-first-no-regression'), true);
@@ -289,6 +333,18 @@ test('RCA owner-chain evidence contract records mock-safe visual canary refs wit
   assert.equal(liveProgress.authority_boundary.opl_can_claim_production_ready, false);
   assert.equal(liveProgress.authority_boundary.provider_completion_counts_as_domain_ready, false);
   assert.equal(liveProgress.authority_boundary.structural_conformance_counts_as_live_progress, false);
+  assert.equal(liveProgress.authority_boundary.generated_surface_ready_counts_as_visual_ready, false);
+  assert.equal(liveProgress.authority_boundary.stage_run_terminal_counts_as_owner_chain_completion, false);
+  assert.equal(liveProgress.authority_boundary.queue_empty_counts_as_owner_chain_completion, false);
+  assert.equal(liveProgress.authority_boundary.attempt_ledger_written_counts_as_owner_chain_completion, false);
+  assert.deepEqual(liveProgress.owner_chain_completion_audit.accepted_terminal_evidence_refs, temporalPolicy.owner_chain_completion_audit.accepted_terminal_evidence_refs);
+  assert.deepEqual(liveProgress.owner_chain_completion_audit.forbidden_completion_substitutes, temporalPolicy.owner_chain_completion_audit.forbidden_completion_substitutes);
+  assert.equal(liveProgress.owner_chain_completion_audit.temporal_long_soak_status, 'blocked_by_domain_owned_typed_blocker');
+  assert.equal(liveProgress.owner_chain_completion_audit.temporal_long_soak_blocker_ref, 'rca-typed-blocker:controlled-soak:temporal-long-soak-pending');
+  assert.equal(liveProgress.owner_chain_completion_audit.provider_completion_counts_as_completion, false);
+  assert.equal(liveProgress.owner_chain_completion_audit.generated_surface_readiness_counts_as_completion, false);
+  assert.equal(liveProgress.owner_chain_completion_audit.mock_safe_canary_counts_as_completion, false);
+  assert.equal(liveProgress.owner_chain_completion_audit.declares_owner_chain_complete, false);
   assertNoReadyClaims(liveProgress);
   assertNoReadyClaims(evidence);
 });

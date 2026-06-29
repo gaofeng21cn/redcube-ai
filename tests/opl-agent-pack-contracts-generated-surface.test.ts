@@ -168,6 +168,9 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   assert.deepEqual(generatedSurfaceHandoff.temporal_stage_run_consumption_policy, {
     surface_kind: 'temporal_stage_run_consumption_policy',
     policy_id: 'rca.temporal_stage_run_consumption_policy.v1',
+    policy_ref: 'contracts/temporal_stage_run_consumption_policy.json',
+    owner_chain_completion_audit_ref: 'contracts/temporal_stage_run_consumption_policy.json#/owner_chain_completion_audit',
+    owner_chain_completion_audit_status: 'blocked_requires_real_visual_stage_owner_acceptance',
     owner: 'redcube_ai',
     temporal_runtime_owner: 'one-person-lab/OPL',
     temporal_attempt_ledger_owner: 'one-person-lab/OPL',
