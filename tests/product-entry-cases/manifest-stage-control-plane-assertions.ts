@@ -21,6 +21,20 @@ export function assertManifestActionAndStageControlPlane({
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
     default_supervision_owner: 'one-person-lab',
+    temporal_stage_run_consumption_policy: {
+      policy_ref: '/temporal_stage_run_consumption_policy',
+      temporal_attempt_ledger_owner: 'one-person-lab/OPL',
+      provider_completion_is_domain_completion: false,
+      domain_repo_can_own_temporal_runtime: false,
+      rca_writes_opl_stage_attempts: false,
+      generated_surface_ready_can_claim_domain_ready: false,
+      domain_completion_requires_one_of: [
+        'owner_receipt_ref',
+        'typed_blocker_ref',
+        'human_gate_ref',
+        'route_back_ref',
+      ],
+    },
     write_policy: 'no_domain_truth_writes',
   });
   assert.deepEqual(
@@ -59,6 +73,8 @@ export function assertManifestActionAndStageControlPlane({
     domainHandlerDispatchAction.authority_boundary.forbidden_writes,
     domain_action_adapterGuardedActionMetadata.forbiddenWrites,
   );
+  assert.deepEqual(domainHandlerDispatchAction.authority_boundary.allowed_temporal_stage_run_writes, []);
+  assert.equal(domainHandlerDispatchAction.authority_boundary.rca_writes_opl_stage_attempts, false);
   assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');
   assert.equal(manifest.family_action_catalog_parity.status, 'aligned');
   assert.deepEqual(manifest.family_action_catalog_parity.issues, []);

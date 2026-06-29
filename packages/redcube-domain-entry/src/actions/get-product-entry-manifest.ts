@@ -221,6 +221,7 @@ export async function getProductEntryManifest(request) {
     skillCatalog,
     taskLifecycle,
     temporalAutonomyReadiness,
+    temporalStageRunConsumptionPolicy,
     visualPackCompilerHandoff,
   } = buildProductEntryManifestShellProjections({
     actionMetadata,
@@ -311,6 +312,7 @@ export async function getProductEntryManifest(request) {
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness,
+    temporal_stage_run_consumption_policy: temporalStageRunConsumptionPolicy,
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
@@ -418,5 +420,6 @@ export async function getProductEntryManifest(request) {
     workspaceReceiptInventoryProjection,
     temporalLongSoakEvidenceInventory,
     temporalAutonomyReadiness,
+    temporalStageRunConsumptionPolicy,
   });
 		}

@@ -36,6 +36,10 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
   }
   assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.cli_mcp_skill_product_status_workbench_metadata_owner, 'one-person-lab');
   assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.default_generic_dispatch_owner, 'one-person-lab');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.temporal_runtime_owner, 'one-person-lab/OPL');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.temporal_attempt_ledger_owner, 'one-person-lab/OPL');
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.domain_repo_can_own_temporal_runtime, false);
+  assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.rca_writes_opl_stage_attempts, false);
   assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.domain_handler_role, 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only');
   assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.default_supervision_owner, 'one-person-lab');
   assert.equal(generatedSurfaceHandoff.repo_local_launcher_policy.legacy_supervision_public_surface, 'retired');
@@ -66,6 +70,8 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     descriptor_consumption_can_claim_visual_stage_long_soak: false,
     descriptor_consumption_can_claim_domain_ready: false,
     descriptor_consumption_can_claim_artifact_ready: false,
+    generated_surface_ready_can_claim_domain_ready: false,
+    provider_completion_can_claim_domain_completion: false,
   });
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_blocker_ids, []);
   assert.deepEqual(generatedSurfaceHandoff.bridge_exit_gate.remaining_evidence_gate_ids, [
@@ -158,6 +164,53 @@ test('RCA root generated surface handoff names OPL as owner for skill, product s
     packageClaims.external_runtime_authority_allowed,
   ], ['redcube_ai', 'agent/quality_gates/package_distribution.md', 'rca.package_distribution_consistency.v1', true, false, false, false]);
   assert.equal(packageClaims.required_consistency_checks.includes('source_to_package_required_domain_pack_paths_match'), true);
+
+  assert.deepEqual(generatedSurfaceHandoff.temporal_stage_run_consumption_policy, {
+    surface_kind: 'temporal_stage_run_consumption_policy',
+    policy_id: 'rca.temporal_stage_run_consumption_policy.v1',
+    owner: 'redcube_ai',
+    temporal_runtime_owner: 'one-person-lab/OPL',
+    temporal_attempt_ledger_owner: 'one-person-lab/OPL',
+    consumer_role: 'refs_only_domain_agent_consumer',
+    provider_completion_is_domain_completion: false,
+    domain_repo_can_own_temporal_runtime: false,
+    domain_repo_can_write_opl_stage_attempts: false,
+    rca_writes_opl_stage_attempts: false,
+    generated_surface_ready_can_claim_domain_ready: false,
+    domain_completion_closeout_refs: [
+      'owner_receipt_ref',
+      'typed_blocker_ref',
+      'human_gate_ref',
+      'route_back_ref',
+    ],
+  });
+
+  const actionCatalog = readJson('contracts/action_catalog.json');
+  assert.equal(
+    actionCatalog.authority_boundary.temporal_stage_run_consumption_policy.provider_completion_is_domain_completion,
+    false,
+  );
+  assert.equal(
+    actionCatalog.authority_boundary.temporal_stage_run_consumption_policy.domain_repo_can_own_temporal_runtime,
+    false,
+  );
+  assert.equal(
+    actionCatalog.authority_boundary.temporal_stage_run_consumption_policy.rca_writes_opl_stage_attempts,
+    false,
+  );
+  const actionBoundaryById = Object.fromEntries(
+    actionCatalog.actions.map((entry) => [entry.action_id, entry.authority_boundary]),
+  );
+  assert.equal(
+    actionBoundaryById.get_product_entry_manifest.generated_surface_ready_can_claim_domain_ready,
+    false,
+  );
+  assert.equal(
+    actionBoundaryById.export_domain_handler.domain_repo_can_own_temporal_runtime,
+    false,
+  );
+  assert.deepEqual(actionBoundaryById.dispatch_domain_handler.allowed_temporal_stage_run_writes, []);
+  assert.equal(actionBoundaryById.dispatch_domain_handler.rca_writes_opl_stage_attempts, false);
 
   assertNoLegacyAuthorityFunctionFields(packCompilerInput, 'contracts/pack_compiler_input.json');
   assertNoLegacyAuthorityFunctionFields(functionalAudit, 'contracts/functional_privatization_audit.json');

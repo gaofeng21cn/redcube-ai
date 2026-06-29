@@ -16,6 +16,7 @@ import {
 import { RUNTIME_WATCH_BOUNDARY } from '../run-review-ref-projection.js';
 import { buildDomainActionAdapterOwnerBoundary } from './owner-boundary.js';
 import { buildTemporalAutonomyReadinessProjection } from './temporal-autonomy-readiness.js';
+import { buildTemporalStageRunConsumptionPolicy } from './temporal-stage-run-consumption-policy.js';
 import { buildVisualTransitionEvaluatorProjection } from './visual-transition-evaluator.js';
 
 export const DOMAIN_ACTION_ADAPTER_ID = 'redcube_domain_action_adapter_adapter.v1';
@@ -160,6 +161,9 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       domainActionAdapterGuardedActionIds: listDomainActionAdapterGuardedActions().map((entry) => entry.action),
     })
   );
+  const temporalStageRunConsumptionPolicy = (
+    manifest.temporal_stage_run_consumption_policy || buildTemporalStageRunConsumptionPolicy()
+  );
   return {
     ok: true,
     surface_kind: 'domain_action_adapter_export',
@@ -191,6 +195,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         opl_substrate_adapter_export: oplSubstrateAdapterExport,
         visual_pack_compiler_handoff: visualPackCompilerHandoff,
         route_stage_handoff_boundary: routeStageHandoffBoundary,
+        temporal_stage_run_consumption_policy: temporalStageRunConsumptionPolicy,
         rca_is_functional_harness_owner: false,
         rca_is_generic_runtime_owner: false,
         rca_is_generic_scheduler_owner: false,
@@ -399,6 +404,13 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         capability_gates: temporalAutonomyReadiness.capability_gates,
         typed_blockers: temporalAutonomyReadiness.typed_blockers,
         authority_boundary: temporalAutonomyReadiness.authority_boundary,
+        writable_by_domain_action_adapter: false,
+        refs_only: true,
+      },
+      temporal_stage_run_consumption_policy: {
+        ...temporalStageRunConsumptionPolicy,
+        ref: '/temporal_stage_run_consumption_policy',
+        owner: DOMAIN_ID,
         writable_by_domain_action_adapter: false,
         refs_only: true,
       },

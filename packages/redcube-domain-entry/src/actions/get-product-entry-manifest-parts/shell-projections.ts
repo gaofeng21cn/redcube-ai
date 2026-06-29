@@ -24,6 +24,7 @@ import {
   buildVisualPackCompilerHandoffProjection,
 } from '../guarded-domain-actions.js';
 import { buildTemporalAutonomyReadinessProjection } from '../domain-action-adapter-parts/temporal-autonomy-readiness.js';
+import { buildTemporalStageRunConsumptionPolicy } from '../domain-action-adapter-parts/temporal-stage-run-consumption-policy.js';
 import { OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT } from './contracts.js';
 import { buildProductEntryManifestShellCatalog } from './shell-catalog.js';
 
@@ -231,6 +232,7 @@ export function buildProductEntryManifestShellProjections({
     taskLifecycle,
     domainActionAdapterGuardedActionIds,
   });
+  const temporalStageRunConsumptionPolicy = buildTemporalStageRunConsumptionPolicy();
   const shellCatalog = buildProductEntryManifestShellCatalog({
     actionMetadata,
     familySchedulerReplacement,
@@ -419,6 +421,7 @@ export function buildProductEntryManifestShellProjections({
     runtimeInventory,
     taskLifecycle,
     temporalAutonomyReadiness,
+    temporalStageRunConsumptionPolicy,
     visualPackCompilerHandoff,
     ...shellCatalog,
   };

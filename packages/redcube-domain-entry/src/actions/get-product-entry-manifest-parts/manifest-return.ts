@@ -33,6 +33,7 @@ export function buildReturnedManifestProjection({
   workspaceReceiptInventoryProjection,
   temporalLongSoakEvidenceInventory,
   temporalAutonomyReadiness,
+  temporalStageRunConsumptionPolicy,
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
     familyStageControlPlane,
@@ -133,6 +134,10 @@ export function buildReturnedManifestProjection({
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness || manifest.temporal_autonomy_readiness,
+    temporal_stage_run_consumption_policy: (
+      temporalStageRunConsumptionPolicy
+      || manifest.temporal_stage_run_consumption_policy
+    ),
     controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
     no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,

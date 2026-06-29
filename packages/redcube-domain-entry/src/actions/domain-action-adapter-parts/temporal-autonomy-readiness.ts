@@ -3,6 +3,7 @@
 const DOMAIN_ID = 'redcube_ai';
 const OPL_OWNER = 'one-person-lab';
 const TEMPORAL_PROVIDER = 'temporal';
+const OPL_TEMPORAL_RUNTIME_OWNER = 'one-person-lab/OPL';
 
 function ref(value, fallback) {
   return String(value || fallback);
@@ -27,6 +28,8 @@ export function buildTemporalAutonomyReadinessProjection({
     target_domain_id: DOMAIN_ID,
     owner: DOMAIN_ID,
     provider_owner: OPL_OWNER,
+    temporal_runtime_owner: OPL_TEMPORAL_RUNTIME_OWNER,
+    temporal_attempt_ledger_owner: OPL_TEMPORAL_RUNTIME_OWNER,
     provider_kind_required_for_production: TEMPORAL_PROVIDER,
     status: 'standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending',
     can_be_opl_temporal_hosted: true,
@@ -39,6 +42,8 @@ export function buildTemporalAutonomyReadinessProjection({
     rca_owns_generic_scheduler_or_daemon: false,
     rca_owns_generic_attempt_loop: false,
     rca_owns_generic_attempt_ledger: false,
+    domain_repo_can_own_temporal_runtime: false,
+    rca_writes_opl_stage_attempts: false,
     source_refs: {
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
@@ -201,9 +206,13 @@ export function buildTemporalAutonomyReadinessProjection({
       opl_can_authorize_review_export_verdict: false,
       rca_owns_generic_daemon_scheduler_attempt_loop: false,
       provider_completion_is_visual_ready: false,
+      provider_completion_is_domain_completion: false,
       provider_completion_is_exportable: false,
       provider_completion_is_handoffable: false,
       provider_completion_is_production_soak_complete: false,
+      generated_surface_ready_can_claim_domain_ready: false,
+      domain_repo_can_own_temporal_runtime: false,
+      rca_writes_opl_stage_attempts: false,
     },
   };
 }

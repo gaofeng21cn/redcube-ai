@@ -1048,6 +1048,13 @@
       "sha256": "458993c2b640abf1e54b93999a787483894b40f0f3e221894f8735900638d69d"
     },
     {
+      "json_pointer": "/product_release_metadata/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/temporal_stage_run_consumption_policy.json",
+      "role": "current_program_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
+    },
+    {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/consumer",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/consumer.json",
       "role": "current_program_leaf_source",
@@ -1825,6 +1832,13 @@
       "sha256": "3da251d65d4497b23bfc05c54d3c2e1306a8941f5d1ef910f420b7264b77b8da"
     },
     {
+      "json_pointer": "/current_state/active_baton/scope/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/temporal_stage_run_consumption_policy.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
+    },
+    {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/consumer",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/consumer.json",
       "role": "active_current_truth_leaf_source",
@@ -2481,6 +2495,13 @@
       "role": "active_current_truth_leaf_source",
       "line_count": 7,
       "sha256": "a6b9e3d290a7ffcf9f912ae11a3e0720d9ab36821547a514a01a1ac513fd3c2f"
+    },
+    {
+      "json_pointer": "/current_state/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/temporal_stage_run_consumption_policy.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
     },
     {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/consumer",
@@ -3668,6 +3689,13 @@
       "sha256": "458993c2b640abf1e54b93999a787483894b40f0f3e221894f8735900638d69d"
     },
     {
+      "json_pointer": "/product_release_metadata/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/temporal_stage_run_consumption_policy.json",
+      "role": "current_program_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
+    },
+    {
       "json_pointer": "/product_release_metadata/visual_pack_compiler_handoff/consumer",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata/visual_pack_compiler_handoff/consumer.json",
       "role": "current_program_leaf_source",
@@ -4445,6 +4473,13 @@
       "sha256": "3da251d65d4497b23bfc05c54d3c2e1306a8941f5d1ef910f420b7264b77b8da"
     },
     {
+      "json_pointer": "/current_state/active_baton/scope/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/temporal_stage_run_consumption_policy.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
+    },
+    {
       "json_pointer": "/current_state/active_baton/scope/visual_pack_compiler_handoff/consumer",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton/scope/visual_pack_compiler_handoff/consumer.json",
       "role": "active_current_truth_leaf_source",
@@ -5103,6 +5138,13 @@
       "sha256": "a6b9e3d290a7ffcf9f912ae11a3e0720d9ab36821547a514a01a1ac513fd3c2f"
     },
     {
+      "json_pointer": "/current_state/temporal_stage_run_consumption_policy",
+      "ref": "contracts/runtime-program/current-program-parts/current_state/temporal_stage_run_consumption_policy.json",
+      "role": "active_current_truth_leaf_source",
+      "line_count": 9,
+      "sha256": "8a82a5765add949a9d04f4d4162da542bb9b638ba2e393aed1bb1b7c71c64e07"
+    },
+    {
       "json_pointer": "/current_state/visual_pack_compiler_handoff/consumer",
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff/consumer.json",
       "role": "active_current_truth_leaf_source",
@@ -5327,5 +5369,5 @@
       "sha256": "a02d9259cf6a6358059a74555f5ce08f9b5b199c2141e23271e0a53aae7dd995"
     }
   ],
-  "source_ref_count": 374
+  "source_ref_count": 377
 }

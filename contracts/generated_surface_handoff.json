@@ -114,7 +114,11 @@
     "legacy_supervision_public_surface": "retired",
     "redcube_cli_is_unified_metadata_owner": false,
     "redcube_mcp_is_unified_metadata_owner": false,
-    "product_entry_continuity_refs_adapter_is_generic_session_owner": false
+    "product_entry_continuity_refs_adapter_is_generic_session_owner": false,
+    "temporal_runtime_owner": "one-person-lab/OPL",
+    "temporal_attempt_ledger_owner": "one-person-lab/OPL",
+    "domain_repo_can_own_temporal_runtime": false,
+    "rca_writes_opl_stage_attempts": false
   },
   "bridge_exit_gate": {
     "gate_id": "rca.generated_surface_bridge_exit.v1",
@@ -159,7 +163,9 @@
       "descriptor_consumption_can_claim_app_operator_consumption": false,
       "descriptor_consumption_can_claim_visual_stage_long_soak": false,
       "descriptor_consumption_can_claim_domain_ready": false,
-      "descriptor_consumption_can_claim_artifact_ready": false
+      "descriptor_consumption_can_claim_artifact_ready": false,
+      "generated_surface_ready_can_claim_domain_ready": false,
+      "provider_completion_can_claim_domain_completion": false
     },
     "remaining_blocker_ids": [],
     "remaining_evidence_gate_ids": [
@@ -174,5 +180,24 @@
     "typed_blocker_schema",
     "minimal_authority_function_refs",
     "no_forbidden_write_evidence"
-  ]
+  ],
+  "temporal_stage_run_consumption_policy": {
+    "surface_kind": "temporal_stage_run_consumption_policy",
+    "policy_id": "rca.temporal_stage_run_consumption_policy.v1",
+    "owner": "redcube_ai",
+    "temporal_runtime_owner": "one-person-lab/OPL",
+    "temporal_attempt_ledger_owner": "one-person-lab/OPL",
+    "consumer_role": "refs_only_domain_agent_consumer",
+    "provider_completion_is_domain_completion": false,
+    "domain_repo_can_own_temporal_runtime": false,
+    "domain_repo_can_write_opl_stage_attempts": false,
+    "rca_writes_opl_stage_attempts": false,
+    "generated_surface_ready_can_claim_domain_ready": false,
+    "domain_completion_closeout_refs": [
+      "owner_receipt_ref",
+      "typed_blocker_ref",
+      "human_gate_ref",
+      "route_back_ref"
+    ]
+  }
 }

@@ -240,6 +240,20 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
     generic_workbench_owner: 'one-person-lab',
     default_generic_dispatch_owner: 'one-person-lab',
     default_supervision_owner: 'one-person-lab',
+    temporal_stage_run_consumption_policy: {
+      policy_ref: '/temporal_stage_run_consumption_policy',
+      temporal_attempt_ledger_owner: 'one-person-lab/OPL',
+      provider_completion_is_domain_completion: false,
+      domain_repo_can_own_temporal_runtime: false,
+      rca_writes_opl_stage_attempts: false,
+      generated_surface_ready_can_claim_domain_ready: false,
+      domain_completion_requires_one_of: [
+        'owner_receipt_ref',
+        'typed_blocker_ref',
+        'human_gate_ref',
+        'route_back_ref',
+      ],
+    },
     write_policy: 'no_domain_truth_writes',
   },
   actions: [
@@ -348,6 +362,9 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
         manifest_owner: 'redcube_ai',
         generated_surface_owner: 'one-person-lab',
         rca_role: 'declarative_visual_pack_and_domain_handler_refs',
+        temporal_stage_run_consumption_policy_ref: '/temporal_stage_run_consumption_policy',
+        provider_completion_is_domain_completion: false,
+        generated_surface_ready_can_claim_domain_ready: false,
       },
     }),
     action({
@@ -371,6 +388,9 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
         rca_role: 'domain_handler_target_or_refs_only_adapter',
         internal_implementation_ref: 'exportDomainActionAdapter',
         write_policy: 'read_projection_only',
+        temporal_stage_run_consumption_policy_ref: '/temporal_stage_run_consumption_policy',
+        domain_repo_can_own_temporal_runtime: false,
+        rca_writes_opl_stage_attempts: false,
       },
     }),
     action({
@@ -394,6 +414,9 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
         default_supervision_owner: 'one-person-lab',
         rca_role: 'guarded_domain_handler_target_only',
         internal_implementation_ref: 'dispatchDomainActionAdapter',
+        temporal_stage_run_consumption_policy_ref: '/temporal_stage_run_consumption_policy',
+        allowed_temporal_stage_run_writes: [],
+        rca_writes_opl_stage_attempts: false,
       },
     }),
     action({
