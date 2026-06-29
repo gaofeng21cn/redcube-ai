@@ -305,6 +305,43 @@ function sourcePartRefsFromFiles(): Array<unknown> {
     }));
 }
 
+function sourcePartRefsFromAggregate(currentProgram = readJson(AGGREGATE_SNAPSHOT_REF)): Array<unknown> {
+  return orderedSourcePartRefs(SECTION_ROOTS.flatMap((section) => {
+    const value = valueAtJsonPointer(currentProgram, section.aggregate_json_pointer);
+    return collectLeaves(value, section.aggregate_json_pointer, section.ref_kind === 'single_leaf_ref');
+  }));
+}
+
+function removeEmptyDirectories(root: string) {
+  if (!fs.existsSync(path.resolve(root))) return;
+  for (const entry of fs.readdirSync(path.resolve(root), { withFileTypes: true })) {
+    if (!entry.isDirectory()) continue;
+    removeEmptyDirectories(path.join(root, entry.name));
+  }
+  if (root !== PARTS_ROOT && fs.readdirSync(path.resolve(root)).length === 0) {
+    fs.rmdirSync(path.resolve(root));
+  }
+}
+
+function syncSourcePartsFromAggregate() {
+  const currentProgram = readJson(AGGREGATE_SNAPSHOT_REF);
+  const sourcePartRefs = sourcePartRefsFromAggregate(currentProgram);
+  const expectedRefs = new Set(sourcePartRefs.map((sourcePart) => sourcePart.ref));
+
+  for (const existingRef of listJsonFiles(PARTS_ROOT)) {
+    if (!expectedRefs.has(existingRef)) {
+      fs.rmSync(path.resolve(existingRef));
+    }
+  }
+  for (const sourcePartRef of sourcePartRefs) {
+    writeFile(
+      sourcePartRef.ref,
+      stable(valueAtJsonPointer(currentProgram, sourcePartRef.json_pointer)),
+    );
+  }
+  removeEmptyDirectories(PARTS_ROOT);
+}
+
 function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFiles()) {
   const children = childSegmentMap(sourcePartRefs);
   const assembled = {};
@@ -398,6 +435,13 @@ export function buildCurrentProgramPackBundleManifest() {
       ref: sourcePart.ref,
       sha256: sourcePart.sha256,
     })))),
+    aggregate: {
+      ref: AGGREGATE_SNAPSHOT_REF,
+      role: 'generated_read_through_snapshot_for_existing_consumers',
+      do_not_edit: true,
+      write_command: WRITE_COMMAND,
+      check_command: CHECK_COMMAND,
+    },
     generated_aggregate: {
       ref: AGGREGATE_SNAPSHOT_REF,
       role: 'generated_read_through_snapshot_for_existing_consumers',
@@ -482,6 +526,7 @@ function writeFile(relativePath: string, content: string) {
 }
 
 export function syncCurrentProgramLeafIndex() {
+  syncSourcePartsFromAggregate();
   const expectedFiles = expectedGeneratedFiles();
   for (const [relativePath, content] of expectedFiles) {
     writeFile(relativePath, content);

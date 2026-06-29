@@ -8,7 +8,13 @@
   "aggregate_ref": "contracts/runtime-program/current-program.json",
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "manifest_ref": "contracts/runtime-program/current-program.bundle-manifest.json",
-  "generated_array_fields": [],
+  "generated_array_fields": [
+    "/current_state/active_baton/scope/privatized_functional_module_audit/modules",
+    "/current_state/privatized_functional_module_audit/modules",
+    "/product_release_metadata/functional_privatization_audit/modules",
+    "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules",
+    "/product_release_metadata/privatized_functional_module_audit/modules"
+  ],
   "commands": {
     "write": "npm run contracts:current-program:write",
     "check": "npm run contracts:current-program:check",

@@ -70,11 +70,18 @@
     "rca_can_own_generated_surface": false,
     "rca_can_own_generic_session_shell": false,
     "rca_can_own_generic_workbench": false,
-    "declares_generated_surface_descriptor_consumed": true,
     "declares_generated_surface_consumption_complete": false,
     "declares_production_consumption_complete": false,
     "production_consumption_scope": "descriptor_and_contract_consumed_not_production_default_caller_live_soak",
     "declares_visual_stage_long_soak_complete": false,
+    "remaining_blocker_ids": [],
+    "remaining_evidence_gate_ids": [
+      "real_artifact_producing_domain_owner_receipt",
+      "opl_hosted_controlled_visual_stage_long_soak",
+      "real_memory_lifecycle_receipt_instances",
+      "cross_family_repeated_no_regression_evidence"
+    ],
+    "declares_generated_surface_descriptor_consumed": true,
     "false_ready_guard": {
       "descriptor_consumption_can_claim_generated_surface_completion": false,
       "descriptor_consumption_can_claim_production_consumption": false,
@@ -83,14 +90,7 @@
       "descriptor_consumption_can_claim_visual_stage_long_soak": false,
       "descriptor_consumption_can_claim_domain_ready": false,
       "descriptor_consumption_can_claim_artifact_ready": false
-    },
-    "remaining_blocker_ids": [],
-    "remaining_evidence_gate_ids": [
-      "real_artifact_producing_domain_owner_receipt",
-      "opl_hosted_controlled_visual_stage_long_soak",
-      "real_memory_lifecycle_receipt_instances",
-      "cross_family_repeated_no_regression_evidence"
-    ]
+    }
   },
   "consumed_from_refs": [
     "/domain_descriptor",

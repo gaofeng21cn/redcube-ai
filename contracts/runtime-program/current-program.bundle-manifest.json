@@ -9,8 +9,15 @@
   "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
-  "source_ref_count": 277,
-  "source_digest": "0ee1d124df2b64c1390c27cd519a6bc49177f88fd579fca27f0527c615ee56ff",
+  "source_ref_count": 374,
+  "source_digest": "4a54d9b068b03df1e2db00c01eb7056d38694a48e9d85b6b6152eb62bceade65",
+  "aggregate": {
+    "ref": "contracts/runtime-program/current-program.json",
+    "role": "generated_read_through_snapshot_for_existing_consumers",
+    "do_not_edit": true,
+    "write_command": "npm run contracts:current-program:write",
+    "check_command": "npm run contracts:current-program:check"
+  },
   "generated_aggregate": {
     "ref": "contracts/runtime-program/current-program.json",
     "role": "generated_read_through_snapshot_for_existing_consumers",

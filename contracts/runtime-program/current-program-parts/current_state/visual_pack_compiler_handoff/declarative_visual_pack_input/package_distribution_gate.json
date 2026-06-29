@@ -1,0 +1,15 @@
+{
+  "owner": "redcube_ai",
+  "policy_ref": "agent/quality_gates/package_distribution.md",
+  "gate_id": "rca.package_distribution_consistency.v1",
+  "refs_only": true,
+  "required_consistency_checks": [
+    "source_to_package_required_domain_pack_paths_match",
+    "plugin_skill_refs_resolve_to_repo_tracked_pack_paths",
+    "package_manifest_does_not_add_runtime_authority",
+    "packaging_does_not_change_route_default"
+  ],
+  "package_can_omit_required_domain_pack_refs": false,
+  "packaging_can_change_route_default": false,
+  "external_runtime_authority_allowed": false
+}

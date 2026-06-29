@@ -1,34 +1,7 @@
 {
   "current_safe_tombstone_candidate_count": 0,
-  "closed_retirement_count": 8,
-  "closed_default_caller_retirement_count": 5,
   "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
   "deletion_status": "closed_retirements_counted_current_roles_guarded",
-  "current_role_guard": {
-    "guard_id": "rca.private_platform.current_role_guard.v1",
-    "allowed_roles": [
-      "domain_handler_target",
-      "refs_only_adapter",
-      "declarative_pack",
-      "minimal_authority_function",
-      "native_helper_implementation",
-      "repo_native_verification_wrapper",
-      "package_protocol_boundary"
-    ],
-    "forbidden_owner_flags": {
-      "rca_owns_generic_scheduler": false,
-      "rca_owns_generic_runner": false,
-      "rca_owns_generic_attempt_ledger": false,
-      "rca_owns_generic_workbench": false,
-      "rca_owns_generic_review_repair_transport": false,
-      "rca_owns_generic_session_runtime": false,
-      "rca_owns_generic_artifact_lifecycle": false,
-      "rca_owns_generic_generated_wrapper": false,
-      "rca_owns_generic_domain_entry_runtime": false
-    },
-    "compatibility_alias_allowed": false,
-    "active_default_caller_alias_allowed": false
-  },
   "remaining_deletion_scope": "Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.",
   "required_before_remaining_physical_delete": [],
   "physical_delete_authorization_ref": null,
@@ -126,5 +99,32 @@
       "opl_can_issue_rca_owner_receipt": false,
       "opl_can_create_rca_typed_blocker": false
     }
+  },
+  "closed_retirement_count": 8,
+  "closed_default_caller_retirement_count": 5,
+  "current_role_guard": {
+    "guard_id": "rca.private_platform.current_role_guard.v1",
+    "allowed_roles": [
+      "domain_handler_target",
+      "refs_only_adapter",
+      "declarative_pack",
+      "minimal_authority_function",
+      "native_helper_implementation",
+      "repo_native_verification_wrapper",
+      "package_protocol_boundary"
+    ],
+    "forbidden_owner_flags": {
+      "rca_owns_generic_scheduler": false,
+      "rca_owns_generic_runner": false,
+      "rca_owns_generic_attempt_ledger": false,
+      "rca_owns_generic_workbench": false,
+      "rca_owns_generic_review_repair_transport": false,
+      "rca_owns_generic_session_runtime": false,
+      "rca_owns_generic_artifact_lifecycle": false,
+      "rca_owns_generic_generated_wrapper": false,
+      "rca_owns_generic_domain_entry_runtime": false
+    },
+    "compatibility_alias_allowed": false,
+    "active_default_caller_alias_allowed": false
   }
 }

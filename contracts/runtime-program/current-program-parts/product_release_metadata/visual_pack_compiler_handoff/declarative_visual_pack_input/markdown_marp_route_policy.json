@@ -1,0 +1,16 @@
+{
+  "owner": "redcube_ai",
+  "policy_ref": "agent/knowledge/markdown_route_policy.md",
+  "route_family": "markdown_marp",
+  "route_default": false,
+  "explicit_selection_required": true,
+  "refs_only": true,
+  "allowed_route_use": [
+    "operator_explicit_markdown_or_marp_request",
+    "source_to_slide_text_structuring_refs",
+    "intermediate_outline_or_script_packaging_refs"
+  ],
+  "default_visual_route_ref": "author_image_pages",
+  "external_runtime_authority_allowed": false,
+  "provider_completion_can_issue_visual_verdict": false
+}

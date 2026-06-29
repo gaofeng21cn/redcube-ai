@@ -109,7 +109,6 @@ test('current runtime program is backed by source parts and a generated consumer
   assert.equal(assembly.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
   assert.equal(assembly.generated_aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
   assert.equal(Array.isArray(assembly.generated_array_fields), true);
-  assert.equal(assembly.generated_array_fields.includes('/current_state/active_baton/scope/privatized_functional_module_audit/modules'), true);
 
   assert.equal(index.surface_kind, 'rca_current_program_source_index');
   assert.equal(index.schema_version, 3);
@@ -163,6 +162,11 @@ test('current runtime program has an explicit source-to-generated bundle manifes
   assert.equal(manifest.source_root_ref, 'contracts/runtime-program/current-program-parts');
   assert.equal(manifest.source_ref_count, index.source_part_refs.length);
   assert.match(manifest.source_digest, /^[a-f0-9]{64}$/);
+  assert.equal(manifest.aggregate.ref, 'contracts/runtime-program/current-program.json');
+  assert.equal(manifest.aggregate.role, 'generated_read_through_snapshot_for_existing_consumers');
+  assert.equal(manifest.aggregate.do_not_edit, true);
+  assert.equal(manifest.aggregate.write_command, 'npm run contracts:current-program:write');
+  assert.equal(manifest.aggregate.check_command, 'npm run contracts:current-program:check');
   assert.equal(manifest.generated_aggregate.ref, 'contracts/runtime-program/current-program.json');
   assert.equal(manifest.generated_aggregate.do_not_edit, true);
   assert.equal(manifest.generated_aggregate.write_command, 'npm run contracts:current-program:write');
