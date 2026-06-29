@@ -95,7 +95,7 @@ Purpose-first domain-thinning gate：
 
 ## Ready / Export 声明边界
 
-本文不维护 production / live evidence tail。visual ready、exportable、handoffable、human approval、Temporal controlled visual-stage long-soak、production-like repeated no-regression、workspace receipt scaleout、App/operator sustained consumption 和 production-ready claim 只在 RCA-owned evidence contracts、runtime/evidence ledger 或单独 evidence owner 中读取。
+本文不维护 ready / production evidence worklist。visual ready、exportable、handoffable、human approval、Temporal controlled visual-stage long-soak、production-like repeated no-regression、workspace receipt scaleout、App/operator sustained consumption 和 production-ready claim 只在 RCA-owned evidence contracts、runtime/evidence ledger 或单独 evidence owner 中读取。
 
 Active plan 只保留可独立落地的非 live 缺口：generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene、Stage Artifact / review-repair / artifact locator functional boundary 和 no-resurrection guard。结构 conformance、focused proof、no-regression refs、AgentLab suite、production acceptance refs-only payload、provider completion 或 sample proof 只能作为 false-ready 边界，不在本文形成执行 worklist。
 
