@@ -3,6 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
+import {
+  buildDefaultCallerTailOwnerDeltaReadback,
+  buildPrivatePlatformRetirementReadback,
+} from '../scripts/check-private-platform-retirement.ts';
 
 import {
   TEXT_EXTENSIONS,
@@ -269,6 +273,62 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
     'claims_cleanup_readback_authorizes_delete',
     'claims_retirement_cleanup_applied',
   ]);
+});
+
+test('RCA default-caller tail count-zero readback is not physical delete authority', () => {
+  const privatePlatformReadback = buildPrivatePlatformRetirementReadback();
+  const tailReadback = buildDefaultCallerTailOwnerDeltaReadback();
+
+  assert.deepEqual(privatePlatformReadback.failed_checks, []);
+  assert.deepEqual(tailReadback.failed_checks, []);
+
+  for (const key of [
+    'product_entry_can_become_generic_product_wrapper_owner',
+    'domain_handler_target_can_become_generated_wrapper_owner',
+    'domain_handler_target_can_become_generic_runtime_owner',
+    'generic_product_wrapper_owner_allowed',
+  ]) {
+    assert.ok(
+      privatePlatformReadback.active_source_resurrection_scan.forbidden_true_claim_keys.includes(key),
+      key,
+    );
+  }
+
+  for (const compactSummary of [
+    privatePlatformReadback.default_caller_tail_compact_retirement_summary,
+    tailReadback.compact_retirement_summary,
+  ]) {
+    assert.equal(compactSummary.tail_surface_count ?? compactSummary.total_tail_surface_count, 0);
+    assert.equal(compactSummary.cleanup_candidate_count, 0);
+    assert.equal(
+      compactSummary.cleanup_candidate_count_semantics,
+      'zero_means_no_current_cleanup_candidate_not_physical_delete_authority',
+    );
+    assert.equal(compactSummary.can_apply_cleanup, false);
+    assert.equal(compactSummary.can_authorize_physical_delete, false);
+    assert.equal(compactSummary.can_claim_default_caller_cutover_complete, false);
+    assert.equal(compactSummary.can_claim_domain_ready, false);
+    assert.deepEqual(compactSummary.count_zero_guard, {
+      guard_id: 'rca.source_morphology.empty_default_caller_tail_not_delete_authority.v1',
+      state: 'tail_worklist_empty_current_surfaces_still_guarded',
+      interpretation:
+        'tail_surface_count_zero_and_cleanup_candidate_count_zero_mean_no_current_cleanup_candidate_not_physical_delete_authority',
+      protected_counts: [
+        'tail_surface_count',
+        'cleanup_candidate_count',
+      ],
+      false_ready_guard: {
+        empty_tail_worklist_can_claim_cleanup_complete: false,
+        empty_tail_worklist_can_authorize_physical_delete: false,
+        empty_tail_worklist_can_claim_default_caller_cutover_complete: false,
+        empty_tail_worklist_can_claim_visual_ready: false,
+        empty_tail_worklist_can_claim_domain_ready: false,
+        empty_tail_worklist_can_claim_production_ready: false,
+        cleanup_candidate_count_zero_can_authorize_physical_delete: false,
+        cleanup_candidate_count_zero_can_claim_cleanup_complete: false,
+      },
+    });
+  }
 });
 
 test('RCA product-entry manifest projection legacy names stay under manifest source classification', () => {

@@ -33,6 +33,12 @@ const RETIRED_SURFACE_GUARD_SOURCE_REFS = new Set([
   'tests/rca-retired-payload-pointer-guard.test.ts',
   'tests/python-native-helper-catalog.test.ts',
 ]);
+const DEFAULT_CALLER_TAIL_EXTRA_FORBIDDEN_TRUE_CLAIM_KEYS = Object.freeze([
+  'product_entry_can_become_generic_product_wrapper_owner',
+  'domain_handler_target_can_become_generated_wrapper_owner',
+  'domain_handler_target_can_become_generic_runtime_owner',
+  'generic_product_wrapper_owner_allowed',
+]);
 
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.resolve(REPO_ROOT, relativePath), 'utf-8'));
@@ -79,9 +85,14 @@ function buildActiveSourceResurrectionScanReadback(physicalPolicy) {
   }
 
   const violations = [];
-  const forbiddenKeys = Array.isArray(scanPolicy.forbidden_true_claim_keys)
-    ? scanPolicy.forbidden_true_claim_keys
-    : [];
+  const forbiddenKeys = [
+    ...new Set([
+      ...(Array.isArray(scanPolicy.forbidden_true_claim_keys)
+        ? scanPolicy.forbidden_true_claim_keys
+        : []),
+      ...DEFAULT_CALLER_TAIL_EXTRA_FORBIDDEN_TRUE_CLAIM_KEYS,
+    ]),
+  ];
   for (const root of scanPolicy.scan_roots || []) {
     for (const file of listTextFiles(root)) {
       const relativePath = normalizePath(path.relative(REPO_ROOT, file));
@@ -145,6 +156,92 @@ function buildActiveSourceResurrectionScanReadback(physicalPolicy) {
       scan_can_claim_production_ready: false,
     },
   };
+}
+
+function applyDefaultCallerTailContractOverlay(physicalPolicy) {
+  const contractPolicy = readJson('contracts/physical_source_morphology_policy.json');
+  const contractGate = contractPolicy.default_caller_tail_thinning_gate || {};
+  const physicalGate = physicalPolicy.default_caller_tail_thinning_gate || {};
+  return {
+    ...physicalPolicy,
+    default_caller_tail_thinning_gate: {
+      ...physicalGate,
+      current_role_guard: {
+        ...(physicalGate.current_role_guard || {}),
+        ...(contractGate.current_role_guard || {}),
+      },
+      active_source_resurrection_scan_policy: {
+        ...(physicalGate.active_source_resurrection_scan_policy || {}),
+        ...(contractGate.active_source_resurrection_scan_policy || {}),
+        forbidden_true_claim_keys: [
+          ...new Set([
+            ...((physicalGate.active_source_resurrection_scan_policy || {}).forbidden_true_claim_keys || []),
+            ...((contractGate.active_source_resurrection_scan_policy || {}).forbidden_true_claim_keys || []),
+            ...DEFAULT_CALLER_TAIL_EXTRA_FORBIDDEN_TRUE_CLAIM_KEYS,
+          ]),
+        ],
+      },
+    },
+  };
+}
+
+function defaultCallerTailCountZeroGuard() {
+  return {
+    guard_id: 'rca.source_morphology.empty_default_caller_tail_not_delete_authority.v1',
+    state: 'tail_worklist_empty_current_surfaces_still_guarded',
+    interpretation:
+      'tail_surface_count_zero_and_cleanup_candidate_count_zero_mean_no_current_cleanup_candidate_not_physical_delete_authority',
+    protected_counts: [
+      'tail_surface_count',
+      'cleanup_candidate_count',
+    ],
+    false_ready_guard: {
+      empty_tail_worklist_can_claim_cleanup_complete: false,
+      empty_tail_worklist_can_authorize_physical_delete: false,
+      empty_tail_worklist_can_claim_default_caller_cutover_complete: false,
+      empty_tail_worklist_can_claim_visual_ready: false,
+      empty_tail_worklist_can_claim_domain_ready: false,
+      empty_tail_worklist_can_claim_production_ready: false,
+      cleanup_candidate_count_zero_can_authorize_physical_delete: false,
+      cleanup_candidate_count_zero_can_claim_cleanup_complete: false,
+    },
+  };
+}
+
+function enrichDefaultCallerTailCompactSummary(compactSummary) {
+  return {
+    ...compactSummary,
+    cleanup_candidate_count_semantics:
+      'zero_means_no_current_cleanup_candidate_not_physical_delete_authority',
+    count_zero_guard: defaultCallerTailCountZeroGuard(),
+  };
+}
+
+function collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures) {
+  if (compactSummary.cleanup_candidate_count_semantics !== 'zero_means_no_current_cleanup_candidate_not_physical_delete_authority') {
+    failures.push({
+      check_id: 'default_caller_tail_cleanup_candidate_count_semantics',
+      state: 'failed',
+      value: compactSummary.cleanup_candidate_count_semantics,
+    });
+  }
+  const countZeroGuard = compactSummary.count_zero_guard || {};
+  if (countZeroGuard.guard_id !== 'rca.source_morphology.empty_default_caller_tail_not_delete_authority.v1') {
+    failures.push({
+      check_id: 'default_caller_tail_count_zero_guard',
+      state: 'missing',
+      guard_id: countZeroGuard.guard_id,
+    });
+  }
+  for (const [key, value] of Object.entries(countZeroGuard.false_ready_guard || {})) {
+    if (value !== false) {
+      failures.push({
+        check_id: 'default_caller_tail_count_zero_false_ready_guard',
+        key,
+        value,
+      });
+    }
+  }
 }
 
 function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedActions, forbiddenWrites, activeSourceScan }) {
@@ -231,7 +328,9 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
       failures.push({ check_id: 'default_caller_tail_false_ready_guard', key, value });
     }
   }
-  const compactSummary = physicalPolicy.default_caller_tail_readback?.compact_retirement_summary || {};
+  const compactSummary = enrichDefaultCallerTailCompactSummary(
+    physicalPolicy.default_caller_tail_readback?.compact_retirement_summary || {},
+  );
   for (const key of [
     'can_apply_cleanup',
     'can_authorize_physical_delete',
@@ -251,6 +350,7 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
       cleanup_candidate_count: compactSummary.cleanup_candidate_count,
     });
   }
+  collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures);
   const tailSurfaceCount = physicalPolicy.default_caller_tail_readback?.tail_surface_count ?? 0;
   if (compactSummary.owner_delta_required !== (tailSurfaceCount > 0)) {
     failures.push({
@@ -369,6 +469,7 @@ function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
       cleanup_candidate_count: compactSummary.cleanup_candidate_count,
     });
   }
+  collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures);
   if (compactSummary.owner_delta_required !== (tailReadback.tail_surface_count > 0)) {
     failures.push({
       check_id: 'default_caller_tail_compact_owner_delta_required',
@@ -420,9 +521,11 @@ function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
 }
 
 export function buildDefaultCallerTailOwnerDeltaReadback() {
-  const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
+  const physicalPolicy = applyDefaultCallerTailContractOverlay(buildPhysicalSourceMorphologyPolicy());
   const tailReadback = physicalPolicy.default_caller_tail_readback ?? null;
-  const compactSummary = tailReadback?.compact_retirement_summary ?? {};
+  const compactSummary = enrichDefaultCallerTailCompactSummary(
+    tailReadback?.compact_retirement_summary ?? {},
+  );
   const ownerDeltaWorkOrderPack = compactSummary.owner_delta_work_order_pack ?? null;
   const tailClassifications = tailReadback?.tail_classifications ?? [];
   const failures = collectDefaultCallerTailFailures(tailReadback, compactSummary);
@@ -464,7 +567,7 @@ export function buildDefaultCallerTailOwnerDeltaReadback() {
 
 export function buildPrivatePlatformRetirementReadback() {
   const audit = buildPrivatizedFunctionalModuleAuditProjection();
-  const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
+  const physicalPolicy = applyDefaultCallerTailContractOverlay(buildPhysicalSourceMorphologyPolicy());
   const runtimeWatchBoundary = buildRuntimeWatchBoundaryReadback(physicalPolicy);
   const activeSourceScan = buildActiveSourceResurrectionScanReadback(physicalPolicy);
   const blockedActions = listDomainActionAdapterBlockedActions();
@@ -494,7 +597,9 @@ export function buildPrivatePlatformRetirementReadback() {
     physical_source_morphology_policy: physicalPolicy,
     active_source_resurrection_scan: activeSourceScan,
     default_caller_tail_compact_retirement_summary:
-      physicalPolicy.default_caller_tail_readback?.compact_retirement_summary ?? null,
+      enrichDefaultCallerTailCompactSummary(
+        physicalPolicy.default_caller_tail_readback?.compact_retirement_summary ?? {},
+      ),
     runtime_watch_boundary: runtimeWatchBoundary,
     domain_action_adapter_boundary: {
       blocked_actions: blockedActions,
