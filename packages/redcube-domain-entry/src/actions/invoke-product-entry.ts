@@ -171,11 +171,10 @@ function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession 
   return delivery.stopAfterStage;
 }
 
-function resolveTaskIntent(request, delivery) {
-  const taskIntent = safeText(
-    request?.task_intent || request?.taskIntent || delivery.taskIntent,
-    'run_opl_stage_execution_plan',
-  );
+function resolveTaskIntent(request, delivery, existingSession) {
+  const explicitTaskIntent = safeText(request?.task_intent || request?.taskIntent || delivery.taskIntent);
+  const taskIntent = explicitTaskIntent
+    || (existingSession && delivery.route ? 'run_deliverable_route' : 'run_opl_stage_execution_plan');
   if (!SUPPORTED_TASK_INTENTS.has(taskIntent)) {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);
   }
@@ -589,7 +588,7 @@ export async function invokeProductEntry(request) {
   const currentness = storedSession ? resolveProductEntryCurrentness({ session: storedSession }) : null;
   const existingSession = currentness?.session || storedSession;
   const delivery = normalizeDeliveryRequest(request);
-  const taskIntent = resolveTaskIntent(request, delivery);
+  const taskIntent = resolveTaskIntent(request, delivery, existingSession);
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
   const runtimeOwner = entryMode === 'opl_hosted' ? HOSTED_RUNTIME_OWNER : DEFAULT_RUNTIME_OWNER;
 
