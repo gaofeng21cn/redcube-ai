@@ -111,30 +111,16 @@ Active plan 只保留可独立落地的非 live 缺口：generated/default calle
 | compatibility-free retirement | 旧 public path、alias、facade、gateway/runtime/session/domain_action_adapter compatibility path 只能在 no-active-caller、owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance pointer 成立后直接删除或 tombstone。 | 私有实现迁移台账、`contracts/physical_source_morphology_policy.json`、retired-surface provenance |
 | naming / legacy string hygiene | `managed`、`gateway`、`runtime`、`session` 和 `domain_action_adapter` 等词只可作为 semantic-id、tombstone/provenance、negative guard、refs-only adapter、domain handler target 或 package/protocol boundary。 | `contracts/physical_source_morphology_policy.json#legacy_name_allowance`、private inventory、guard tests |
 
-2026-06-20 current slice：`packages/redcube-runtime-family-*` 与 runtime-family registry 已进入
-`contracts/physical_source_morphology_policy.json#/active_surface_classifications`
-的 `visual_route_runtime_family_implementations` surface。该分类只说明这些
-`runtime` 命名目录是 RCA-owned visual route family implementation、route policy、
-stage artifact refs 和 review/export gate refs，不是 generic runtime/session/workbench/
-attempt-ledger/generated-wrapper owner。它关闭的是 runtime-family active source
-未被 strict morphology surface 单独分类的结构卫生缺口；不关闭 generated/default
-caller thinning、physical delete、production evidence、visual ready、exportable、
-handoffable 或 domain ready。
-
-2026-06-21 current slice：`runDeliverableRoute` / `run-deliverable-route-parts/`
-和 executor route-run record surface 已进入
-`contracts/physical_source_morphology_policy.json#/active_surface_classifications`
-的 `deliverable_route_attempt_shell` 与 `executor_runtime_route_run_records`
-surface，并由 `tests/opl-agent-pack-contracts-source-morphology.test.ts`
-覆盖 source refs、legacy allowance、default caller cutover gate 与
-no-resurrection flags。该分类只关闭这两个 active default-caller tail 未被
-strict morphology surface 单独分类的结构卫生缺口：RCA 当前只保留 visual route
-domain handler target、route dependency / continuation / repair refs、executor policy
-refs 和 neutral route-run record refs；OPL 仍是 generic route attempt shell、
-retry/dead-letter、Agent Executor Adapter、attempt ledger、runtime record store 和
-event log 的目标 owner。它不授权 physical delete，不声明 OPL default caller parity
-已完成，也不关闭 production evidence、visual ready、exportable、handoffable 或
-domain ready。
+Default-caller / source morphology current readout：runtime-family source、`runDeliverableRoute` /
+`run-deliverable-route-parts/`、executor route-run record 和 related route refs 的 path-level
+classification 归 `contracts/physical_source_morphology_policy.json#/active_surface_classifications`
+与 [RCA 私有实现与 OPL 迁移台账](./opl-private-implementation-migration-inventory.md)。本文只保留
+当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、domain handler target、
+stage artifact / review-export refs、executor policy refs 或 neutral route-run record refs；它们不能成为
+RCA-owned generic runtime、session/workbench、attempt ledger、runtime record store、event log、
+generated wrapper owner 或 default-caller cutover evidence。历史 dated slice、source-ref list、
+legacy allowance 和 test closeout 过程归 `docs/history/process/`、machine contracts、source/tests
+或 git history。
 
 不能直接删除的 explicit remainder：
 
