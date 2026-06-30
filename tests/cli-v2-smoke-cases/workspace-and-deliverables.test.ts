@@ -590,7 +590,7 @@ test('CLI subcommand --help returns machine-readable command help without execut
     {
       args: ['deliverable', 'run', '--help'],
       command: 'deliverable run',
-      actionRef: 'runDeliverableRoute',
+      actionRef: 'invokeDomainEntry',
       usageIncludes: '--route <stage>',
     },
   ];
@@ -800,7 +800,7 @@ test('CLI deliverable create works from isolated install without monorepo siblin
   assert.equal(parsed.deliverable.profile_id, 'standard_note');
 });
 
-test('CLI deliverable run works from isolated install through the upstream Hermes service-entry bridge', async () => {
+test('CLI deliverable run returns an OPL StageRun plan from isolated install', async () => {
   await withMockCodexRuntimeCli(async () => {
     const { cliPath, installRoot } = createIsolatedCliInstall();
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-deliverable-isolated-run-'));
@@ -849,12 +849,17 @@ test('CLI deliverable run works from isolated install through the upstream Herme
     );
 
     assert.equal(parsed.ok, true);
-    assert.equal(parsed.surface_kind, 'route_run');
-    assert.equal(parsed.run.executor.codex_cli_runtime?.owner, 'codex_cli');
+    assert.equal(parsed.surface_kind, 'domain_entry');
+    assert.equal(parsed.task_intent, 'run_opl_stage_execution_plan');
+    assert.equal(parsed.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(parsed.result_surface.owner, 'one-person-lab');
+    assert.equal(parsed.result_surface.delivery_identity.route, 'storyline');
+    assert.equal(parsed.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(parsed.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
   });
 });
 
-test('CLI deliverable run and runs get proxy the contract-driven runtime mainline', async () => {
+test('CLI deliverable run defaults to StageRun owner-chain instead of local route-run records', async () => {
   await withMockCodexRuntimeCli(async () => {
     const cliPath = path.resolve('apps/redcube-cli/dist/cli.js');
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-cli-v2-run-'));
@@ -901,7 +906,11 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
       { cwd: path.resolve('.') },
     );
     assert.equal(runParsed.ok, true);
-    assert.equal(runParsed.run.current_stage, 'storyline');
+    assert.equal(runParsed.surface_kind, 'domain_entry');
+    assert.equal(runParsed.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(runParsed.result_surface.delivery_identity.route, 'storyline');
+    assert.equal(runParsed.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(runParsed.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
 
     const secondRunParsed = await execCliAsync(
       cliPath,
@@ -922,22 +931,11 @@ test('CLI deliverable run and runs get proxy the contract-driven runtime mainlin
       { cwd: path.resolve('.') },
     );
     assert.equal(secondRunParsed.ok, true);
-    assert.equal(secondRunParsed.run.current_stage, 'detailed_outline');
-
-    const getParsed = await execCliAsync(
-      cliPath,
-      [
-        'runs',
-        'get',
-        '--workspace-root',
-        workspaceRoot,
-        '--run-id',
-        secondRunParsed.run.run_id,
-      ],
-      { cwd: path.resolve('.') },
-    );
-    assert.equal(getParsed.ok, true);
-    assert.equal(getParsed.run.status, 'completed');
-    assert.equal(getParsed.run.current_stage, 'detailed_outline');
+    assert.equal(secondRunParsed.surface_kind, 'domain_entry');
+    assert.equal(secondRunParsed.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(secondRunParsed.result_surface.delivery_identity.route, 'detailed_outline');
+    assert.equal(secondRunParsed.result_surface.control_policy.requested_stop_after_stage, 'detailed_outline');
+    assert.equal(secondRunParsed.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
+    assert.equal(secondRunParsed.result_surface.attempt_ledger_owner, 'one-person-lab');
   });
 });

@@ -52,6 +52,38 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
   });
 });
 
+test('invokeProductEntry treats route as a StageRun stop target unless route handler intent is explicit', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+
+    const response = await invokeProductEntry({
+      workspace_locator: {
+        workspace_root: workspaceRoot,
+      },
+      entry_session_contract: {
+        entry_session_id: 'session-route-defaults-to-stagerun',
+      },
+      delivery_request: {
+        deliverable_family: 'ppt_deck',
+        topic_id: 'topic-a',
+        deliverable_id: 'deck-route-defaults-to-stagerun',
+        profile_id: 'lecture_student',
+        title: 'Route defaults to StageRun',
+        goal: '验证 route 默认进入 OPL StageRun plan',
+        route: 'storyline',
+      },
+    });
+
+    assert.equal(response.ok, true);
+    assert.equal(response.summary.task_intent, 'run_opl_stage_execution_plan');
+    assert.equal(response.domain_entry_surface.task_intent, 'run_opl_stage_execution_plan');
+    assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(response.domain_entry_surface.result_surface.delivery_identity.route, 'storyline');
+    assert.equal(response.domain_entry_surface.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(response.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
+  });
+});
+
 test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
     const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);

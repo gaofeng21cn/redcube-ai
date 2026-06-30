@@ -187,9 +187,9 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
     'deliverable run': {
-      summary: '按 hydrated contract 执行单个 deliverable route。',
+      summary: '生成按指定 stage 截止的 OPL stage execution plan，由 OPL provider 接管 StageRun。',
       usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
-      action_ref: 'runDeliverableRoute',
+      action_ref: 'invokeDomainEntry',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
     'report performance': {
@@ -328,7 +328,7 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
         command: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing>',
       },
       {
-        task: '按声明的 route 执行当前交付阶段',
+        task: '按声明的 route 生成 OPL StageRun 执行计划',
         command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
       },
       {

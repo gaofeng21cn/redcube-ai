@@ -103,7 +103,7 @@ test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickst
     ['researchSource', 'source_research'],
     ['createDeliverable', 'create_deliverable'],
     ['auditDeliverable', 'audit_deliverable'],
-    ['runDeliverableRoute', 'run_deliverable_route'],
+    ['invokeDomainEntry', 'invoke_domain_entry'],
     ['getReviewState', 'get_review_state'],
     ['getPublicationProjection', 'get_publication_projection'],
   ]) {
@@ -205,13 +205,17 @@ test('brand-new workspace quickstart converges doctor -> source research -> crea
 
     const run = runCli(['deliverable', 'run', '--workspace-root', workspaceRoot, '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--route', 'storyline']);
     assert.equal(run.ok, true);
-    assert.equal(run.run.status, 'completed');
-    assert.equal(run.run.current_stage, 'storyline');
+    assert.equal(run.surface_kind, 'domain_entry');
+    assert.equal(run.task_intent, 'run_opl_stage_execution_plan');
+    assert.equal(run.result_surface.surface_kind, 'opl_stage_execution_plan');
+    assert.equal(run.result_surface.delivery_identity.route, 'storyline');
+    assert.equal(run.result_surface.control_policy.requested_stop_after_stage, 'storyline');
+    assert.equal(run.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
 
     const review = runCli(['review', 'get', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a']);
     const projection = runCli(['review', 'projection', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a']);
     try {
-      runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', run.run.run_id]);
+      runCli(['review', 'watch', '--workspace-root', workspaceRoot, '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--run-id', 'opl-stage-plan-only']);
       assert.fail('review watch CLI wrapper must fail closed');
     } catch (error) {
       const failure = JSON.parse(error.stdout);

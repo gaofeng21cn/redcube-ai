@@ -148,7 +148,15 @@ function normalizeDeliveryRequest(request) {
 }
 
 function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession }) {
-  if (delivery.stopAfterStage || delivery.route || taskIntent !== 'run_opl_stage_execution_plan' || existingSession) {
+  if (delivery.stopAfterStage || taskIntent !== 'run_opl_stage_execution_plan') {
+    return delivery.stopAfterStage;
+  }
+
+  if (delivery.route) {
+    return delivery.route;
+  }
+
+  if (existingSession) {
     return delivery.stopAfterStage;
   }
 
@@ -166,7 +174,7 @@ function resolveLifecycleStopAfterStage({ delivery, taskIntent, existingSession 
 function resolveTaskIntent(request, delivery) {
   const taskIntent = safeText(
     request?.task_intent || request?.taskIntent || delivery.taskIntent,
-    delivery.route ? 'run_deliverable_route' : 'run_opl_stage_execution_plan',
+    'run_opl_stage_execution_plan',
   );
   if (!SUPPORTED_TASK_INTENTS.has(taskIntent)) {
     throw new Error(`Unsupported task_intent: ${taskIntent}`);

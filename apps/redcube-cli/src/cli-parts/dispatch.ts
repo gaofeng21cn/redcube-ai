@@ -21,7 +21,6 @@ import {
   writeSourceAugmentationResult,
   executeSourceAugmentation,
   listTopics as listTopicsDomainEntry,
-  runDeliverableRoute,
 } from '@redcube/domain-entry';
 
 import {
@@ -67,7 +66,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
   writeSourceAugmentationResult,
   executeSourceAugmentation,
   listTopics: listTopicsDomainEntry,
-  runDeliverableRoute,
 };
 
 export function getCliDomainActions(overrides: Record<string, unknown> = {}): typeof DEFAULT_DOMAIN_ACTIONS {
@@ -340,13 +338,31 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'run') {
-      return domainEntry.runDeliverableRoute({
-        workspaceRoot: resolveWorkspaceRoot(options, cwd),
-        overlay: options.overlay || '',
-        topicId: options.topicId || '',
-        deliverableId: options.deliverableId || '',
-        route: options.route || '',
-        adapter: options.adapter || undefined,
+      return domainEntry.invokeDomainEntry({
+        target_domain_id: 'redcube_ai',
+        task_intent: 'run_opl_stage_execution_plan',
+        entry_mode: 'service_call',
+        workspace_locator: {
+          workspace_root: resolveWorkspaceRoot(options, cwd),
+        },
+        runtime_session_contract: {
+          runtime_owner: 'configured_family_runtime_provider',
+          session_mode: 'ephemeral_run',
+        },
+        return_surface_contract: {
+          surface_kind: 'opl_stage_execution_plan',
+        },
+        domain_payload: {
+          deliverable_family: options.overlay || '',
+          topic_id: options.topicId || '',
+          deliverable_id: options.deliverableId || '',
+          route: options.route || '',
+          adapter: options.adapter || undefined,
+          user_intent: options.userIntent || '',
+          stop_after_stage: options.stopAfterStage || options.route || '',
+          mode: options.mode || 'draft_new',
+          baseline_deliverable_id: options.baselineDeliverableId || '',
+        },
       });
     }
 

@@ -62,9 +62,13 @@ test('CLI --json-summary narrows long operator surfaces to machine-readable key 
       name: 'deliverable run',
       argv: ['deliverable', 'run', '--workspace-root', '/tmp/ws', '--overlay', 'ppt_deck', '--topic-id', 'topic-a', '--deliverable-id', 'deck-a', '--route', 'screenshot_review', '--json-summary'],
       domainActions: {
-        runDeliverableRoute: async () => minimalLongSurface('route_run'),
+        invokeDomainEntry: async () => minimalLongSurface('domain_entry', {
+          result_surface: {
+            surface_kind: 'opl_stage_execution_plan',
+          },
+        }),
       },
-      expectedSurfaceKind: 'route_run',
+      expectedSurfaceKind: 'domain_entry',
     },
     {
       name: 'deliverable execute',

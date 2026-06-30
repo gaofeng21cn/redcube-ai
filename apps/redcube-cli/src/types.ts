@@ -13,7 +13,6 @@ import type {
   ReviewMutationRequest,
   ReviewMutationResponse,
   ReviewStateResponse,
-  RouteRunResponse,
   RunRecordResponse,
   SourceAugmentationResponse,
   SourceAugmentationExecutionResponse,
@@ -74,14 +73,6 @@ export interface CliDomainActions {
   getRun(request: { workspaceRoot: string; runId: string }): Promise<RunRecordResponse>;
   auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse>;
   applyReviewMutation(request: ReviewMutationRequest): Promise<ReviewMutationResponse>;
-  runDeliverableRoute(request: {
-    workspaceRoot: string;
-    overlay: string;
-    topicId: string;
-    deliverableId: string;
-    route: string;
-    adapter?: string;
-  }): Promise<RouteRunResponse>;
 }
 
 export interface CliDependencies {
@@ -103,7 +94,6 @@ export type CliRunSurface =
   | DeliverableRecordResponse
   | DomainEntryResponse
   | DeliverableAuditResponse
-  | RouteRunResponse
   | ProductEntryResponse
   | RunRecordResponse
   | PublicationProjectionResponse
