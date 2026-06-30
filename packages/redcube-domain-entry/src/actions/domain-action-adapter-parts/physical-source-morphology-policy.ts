@@ -166,6 +166,11 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
   const cleanupCandidateSurfaceIds = tailClassifications
     .filter((entry) => entry.missing_evidence_worklist.length === 0)
     .map((entry) => entry.surface_id);
+  const retainedBoundaryIds = [
+    ...currentNonTailSurfaces.map((entry) => entry.surface_id),
+    ...retainedCurrentRefsOnlyBoundaries.map((entry) => entry.surface_id),
+  ];
+  const retainedBoundaryGate = retainedDefaultCallerBoundaryGate(retainedBoundaryIds);
   const ownerDeltaWorkOrderPack = defaultCallerTailOwnerDeltaWorkOrderPack({
     tailClassifications,
     missingEvidenceIds,
@@ -204,6 +209,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       retained_current_refs_only_boundary_surface_ids: retainedCurrentRefsOnlyBoundaries.map(
         (entry) => entry.surface_id,
       ),
+      retained_default_caller_boundary_gate: retainedBoundaryGate,
       can_apply_cleanup: false,
       can_authorize_physical_delete: false,
       can_claim_default_caller_cutover_complete: false,
@@ -225,6 +231,7 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
     tail_classifications: tailClassifications,
     current_non_tail_surfaces: currentNonTailSurfaces,
     retained_current_refs_only_boundaries: retainedCurrentRefsOnlyBoundaries,
+    retained_default_caller_boundary_gate: retainedBoundaryGate,
     false_ready_guard: {
       readback_can_claim_cleanup_complete: false,
       readback_can_claim_physical_delete_authorized: false,
@@ -234,6 +241,48 @@ function defaultCallerTailReadback(activeSurfaceClassifications) {
       readback_can_claim_handoffable: false,
       readback_can_claim_domain_ready: false,
       readback_can_claim_production_ready: false,
+    },
+  };
+}
+
+function retainedDefaultCallerBoundaryGate(surfaceIds) {
+  return {
+    gate_id: 'rca.source_morphology.retained_default_caller_boundary_gate.v1',
+    state: 'retained_boundaries_require_generated_default_caller_parity_before_delete_or_further_thin',
+    applies_to_surface_ids: [...surfaceIds],
+    required_before_delete_or_further_thin: [
+      'opl_generated_default_caller_parity',
+      'no_active_repo_local_default_caller',
+      'rca_owner_receipt_or_typed_blocker_roundtrip',
+      'no_forbidden_write_proof',
+      'retired_alias_no_resurrection_proof',
+      'tombstone_or_provenance_pointer',
+    ],
+    allowed_terminal_decisions: [
+      'retain_as_domain_handler_target_or_refs_only_boundary',
+      'delete_after_explicit_owner_receipt',
+      'tombstone_after_domain_typed_blocker_or_owner_decision',
+    ],
+    forbidden_terminal_decisions: [
+      'delete_from_empty_tail_worklist',
+      'delete_from_cleanup_candidate_count_zero',
+      'retain_as_generic_session_or_workbench_owner',
+      'claim_default_caller_cutover_without_external_parity',
+    ],
+    authority_boundary: {
+      gate_can_write_visual_truth: false,
+      gate_can_write_artifact_blob: false,
+      gate_can_write_memory_body: false,
+      gate_can_issue_review_or_export_verdict: false,
+      gate_can_sign_owner_receipt: false,
+      gate_can_create_typed_blocker_instance: false,
+      gate_can_authorize_physical_delete: false,
+      gate_can_claim_default_caller_cutover: false,
+      gate_can_claim_visual_ready: false,
+      gate_can_claim_exportable: false,
+      gate_can_claim_handoffable: false,
+      gate_can_claim_domain_ready: false,
+      gate_can_claim_production_ready: false,
     },
   };
 }

@@ -272,6 +272,48 @@ test('RCA physical source morphology policy classifies active source tails witho
       policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids,
     retained_current_refs_only_boundary_surface_ids:
       policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
+    retained_default_caller_boundary_gate: {
+      gate_id: 'rca.source_morphology.retained_default_caller_boundary_gate.v1',
+      state: 'retained_boundaries_require_generated_default_caller_parity_before_delete_or_further_thin',
+      applies_to_surface_ids: [
+        ...policy.default_caller_tail_thinning_gate.current_non_tail_surface_ids,
+        ...policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
+      ],
+      required_before_delete_or_further_thin: [
+        'opl_generated_default_caller_parity',
+        'no_active_repo_local_default_caller',
+        'rca_owner_receipt_or_typed_blocker_roundtrip',
+        'no_forbidden_write_proof',
+        'retired_alias_no_resurrection_proof',
+        'tombstone_or_provenance_pointer',
+      ],
+      allowed_terminal_decisions: [
+        'retain_as_domain_handler_target_or_refs_only_boundary',
+        'delete_after_explicit_owner_receipt',
+        'tombstone_after_domain_typed_blocker_or_owner_decision',
+      ],
+      forbidden_terminal_decisions: [
+        'delete_from_empty_tail_worklist',
+        'delete_from_cleanup_candidate_count_zero',
+        'retain_as_generic_session_or_workbench_owner',
+        'claim_default_caller_cutover_without_external_parity',
+      ],
+      authority_boundary: {
+        gate_can_write_visual_truth: false,
+        gate_can_write_artifact_blob: false,
+        gate_can_write_memory_body: false,
+        gate_can_issue_review_or_export_verdict: false,
+        gate_can_sign_owner_receipt: false,
+        gate_can_create_typed_blocker_instance: false,
+        gate_can_authorize_physical_delete: false,
+        gate_can_claim_default_caller_cutover: false,
+        gate_can_claim_visual_ready: false,
+        gate_can_claim_exportable: false,
+        gate_can_claim_handoffable: false,
+        gate_can_claim_domain_ready: false,
+        gate_can_claim_production_ready: false,
+      },
+    },
     can_apply_cleanup: false,
     can_authorize_physical_delete: false,
     can_claim_default_caller_cutover_complete: false,
@@ -293,6 +335,15 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(
     policy.default_caller_tail_readback.retained_current_refs_only_boundaries.map((entry) => entry.surface_id),
     policy.default_caller_tail_thinning_gate.retained_current_refs_only_boundary_ids,
+  );
+  assert.deepEqual(
+    policy.default_caller_tail_readback.retained_default_caller_boundary_gate,
+    policy.default_caller_tail_readback.compact_retirement_summary.retained_default_caller_boundary_gate,
+  );
+  assert.equal(
+    policy.default_caller_tail_readback.retained_default_caller_boundary_gate
+      .authority_boundary.gate_can_authorize_physical_delete,
+    false,
   );
   assert.equal(
     policy.default_caller_tail_readback.false_ready_guard.readback_can_claim_physical_delete_authorized,

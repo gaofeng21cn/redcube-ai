@@ -162,6 +162,41 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
   assert.equal(payload.compact_retirement_summary.owner_delta_required, false);
   assert.equal(payload.compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(payload.compact_retirement_summary.can_authorize_physical_delete, false);
+  const retainedBoundaryGate = payload.compact_retirement_summary
+    .retained_default_caller_boundary_gate;
+  assert.equal(
+    retainedBoundaryGate.gate_id,
+    'rca.source_morphology.retained_default_caller_boundary_gate.v1',
+  );
+  assert.deepEqual(
+    retainedBoundaryGate.applies_to_surface_ids,
+    [
+      ...payload.default_caller_tail_readback.current_non_tail_surfaces.map(
+        (entry) => entry.surface_id,
+      ),
+      ...payload.default_caller_tail_readback.retained_current_refs_only_boundaries.map(
+        (entry) => entry.surface_id,
+      ),
+    ],
+  );
+  assert.ok(
+    retainedBoundaryGate.required_before_delete_or_further_thin.includes(
+      'tombstone_or_provenance_pointer',
+    ),
+  );
+  assert.ok(
+    retainedBoundaryGate.forbidden_terminal_decisions.includes(
+      'delete_from_empty_tail_worklist',
+    ),
+  );
+  assert.equal(
+    retainedBoundaryGate.authority_boundary.gate_can_authorize_physical_delete,
+    false,
+  );
+  assert.deepEqual(
+    payload.default_caller_tail_readback.retained_default_caller_boundary_gate,
+    retainedBoundaryGate,
+  );
   assert.deepEqual(
     payload.owner_delta_work_order_pack,
     payload.compact_retirement_summary.owner_delta_work_order_pack,
