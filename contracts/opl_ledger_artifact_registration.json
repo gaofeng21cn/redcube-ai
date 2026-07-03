@@ -98,16 +98,16 @@
   ],
   "opl_ledger_command_refs": [
     {
-      "command_ref_id": "opl-ledger:artifact-register-ref-only.v1",
+      "command_ref_id": "opl-ledger:bundle-record-ref-only.v1",
       "owner": "one-person-lab/OPL Ledger",
-      "command_template": "opl ledger artifact register --domain redcube_ai --contract contracts/opl_ledger_artifact_registration.json --artifact-ref <ref> --sha256 <hash> --index-ref <ref> --review-ref <ref> --receipt-ref <ref>",
+      "command_template": "opl ledger bundle record --bundle <bundle.json> --domain redcube_ai --artifact <artifact_ref> --json",
       "effect": "ledger_registration_write",
-      "rca_role": "produce_refs_only_registration_envelope"
+      "rca_role": "produce_refs_only_artifact_provenance_bundle"
     },
     {
-      "command_ref_id": "opl-ledger:artifact-readback.v1",
+      "command_ref_id": "opl-ledger:bundle-artifact-inspect.v1",
       "owner": "one-person-lab/OPL Ledger",
-      "command_template": "opl ledger artifact read --registration-ref <ledger-registration-ref> --format json",
+      "command_template": "opl ledger bundle inspect --artifact <artifact_ref> --json",
       "effect": "read_only",
       "rca_role": "consume_registration_ref_only"
     }
