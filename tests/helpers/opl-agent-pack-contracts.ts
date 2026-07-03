@@ -36,6 +36,12 @@ export const requiredDomainPackPaths = [
   'agent/skills/visual_deliverable_authoring.md',
   'agent/skills/native_helper_policy.md',
   'agent/skills/visual_memory_policy.md',
+  'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+  'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+  'agent/professional_skills/rca-ppt-page-author/SKILL.md',
+  'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+  'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
+  'agent/professional_skills/rca-template-profiler/SKILL.md',
   'agent/quality_gates/visual_authority_boundaries.md',
   'agent/quality_gates/source_and_truth.md',
   'agent/quality_gates/communication_and_direction.md',
@@ -48,7 +54,8 @@ export const requiredDomainPackPaths = [
   'agent/knowledge/artifact_and_export_authority.md',
   'agent/knowledge/review_export_memory.md',
   'agent/knowledge/markdown_route_policy.md',
-  'agent/knowledge/owner_receipt_policy.md', 'agent/tools/domain_affordances.md',
+  'agent/knowledge/owner_receipt_policy.md',
+  'agent/tools/domain_affordances.md',
 ];
 
 export const oplCanonicalGeneratedSurfaceIds = [

@@ -109,10 +109,12 @@ test('RCA visual pack compiler handoff exposes cognitive-kernel refs-only inputs
     entry.source_id === 'cognitive_kernel_adoption'
     || entry.source_id === 'golden_path_profile'
     || entry.source_id === 'domain_tool_affordance_catalog'
+    || entry.source_id === 'professional_specialist_skill_pack'
   )), [
     { source_id: 'cognitive_kernel_adoption', ref: 'contracts/cognitive_kernel_adoption.json' },
     { source_id: 'golden_path_profile', ref: 'contracts/golden_path_profile.json' },
     { source_id: 'domain_tool_affordance_catalog', ref: 'agent/tools/domain_affordances.md' },
+    { source_id: 'professional_specialist_skill_pack', ref: 'agent/professional_skills/' },
   ]);
 });
 

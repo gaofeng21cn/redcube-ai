@@ -269,6 +269,38 @@ const CANONICAL_STAGE_SKILL_REFS = {
   ],
 };
 
+const RCA_PROFESSIONAL_SKILL_REFS = {
+  story_architect: 'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+  visual_director: 'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+  page_author: 'agent/professional_skills/rca-ppt-page-author/SKILL.md',
+  reviewer: 'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+  native_ppt_designer: 'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
+  template_profiler: 'agent/professional_skills/rca-template-profiler/SKILL.md',
+};
+
+const CANONICAL_STAGE_PROFESSIONAL_SKILL_REFS = {
+  source_intake: [],
+  communication_strategy: [
+    RCA_PROFESSIONAL_SKILL_REFS.story_architect,
+  ],
+  visual_direction: [
+    RCA_PROFESSIONAL_SKILL_REFS.visual_director,
+    RCA_PROFESSIONAL_SKILL_REFS.template_profiler,
+  ],
+  artifact_creation: [
+    RCA_PROFESSIONAL_SKILL_REFS.page_author,
+    RCA_PROFESSIONAL_SKILL_REFS.native_ppt_designer,
+    RCA_PROFESSIONAL_SKILL_REFS.template_profiler,
+  ],
+  review_and_revision: [
+    RCA_PROFESSIONAL_SKILL_REFS.reviewer,
+    RCA_PROFESSIONAL_SKILL_REFS.visual_director,
+  ],
+  package_and_handoff: [
+    RCA_PROFESSIONAL_SKILL_REFS.reviewer,
+  ],
+};
+
 const CANONICAL_STAGE_KNOWLEDGE_REFS = {
   source_intake: [
     'agent/knowledge/visual_truth_boundaries.md',
@@ -449,6 +481,13 @@ function repoPathRefs(refs, role) {
     ref,
     role,
   }));
+}
+
+function professionalSkillRefs(stageId) {
+  return repoPathRefs(
+    CANONICAL_STAGE_PROFESSIONAL_SKILL_REFS[stageId] || [],
+    'professional_specialist_skill',
+  );
 }
 
 function buildFreshness(sourceRefs) {
@@ -710,8 +749,14 @@ function buildStageCompletionPolicy(stage) {
 
 function stageDescriptor(stage, actionIds) {
   const expectedOutputRoles = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[stage.stage_id] || [];
+  const stageSkillPolicyRefs = repoPathRefs(
+    CANONICAL_STAGE_SKILL_REFS[stage.stage_id],
+    'canonical_stage_skill_policy',
+  );
+  const professionalSpecialistSkillRefs = professionalSkillRefs(stage.stage_id);
   const skillRefs = [
-    ...repoPathRefs(CANONICAL_STAGE_SKILL_REFS[stage.stage_id], 'canonical_stage_skill_policy'),
+    ...stageSkillPolicyRefs,
+    ...professionalSpecialistSkillRefs,
     { ref_kind: 'skill_id', ref: 'redcube-ai', role: 'domain_skill' },
     { ref_kind: 'skill_id', ref: 'imagegen', role: 'visual_generation' },
     { ref_kind: 'skill_id', ref: 'presentations', role: 'presentation_output' },
@@ -772,6 +817,8 @@ function stageDescriptor(stage, actionIds) {
     ],
     skills: skillRefs,
     skill_refs: skillRefs,
+    stage_skill_policy_refs: stageSkillPolicyRefs,
+    professional_skill_refs: professionalSpecialistSkillRefs,
     prompt_refs: promptRefs,
     legacy_prompt_asset_refs: [
       { ref_kind: 'repo_path', ref: 'prompts/ppt_deck', role: 'ppt_detailed_prompt_assets' },
@@ -801,6 +848,7 @@ function stageDescriptor(stage, actionIds) {
       golden_path_profile_ref: GOLDEN_PATH_PROFILE_REF,
       cognitive_kernel_required_sections: COGNITIVE_KERNEL_REQUIRED_SECTIONS,
       strategy_refs: strategyRefs,
+      professional_skill_refs: professionalSpecialistSkillRefs,
       tool_affordance_boundary_ref: `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
       candidate_pool_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/candidate_pool_policy`,
       independent_gate_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/independent_gate_policy`,

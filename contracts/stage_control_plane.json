@@ -387,6 +387,14 @@
           "role": "presentation_output"
         }
       ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [],
       "prompt_refs": [
         {
           "ref_kind": "repo_path",
@@ -673,6 +681,7 @@
           "source_scope_freeze",
           "material_gap_detection"
         ],
+        "professional_skill_refs": [],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/source_intake/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/source_intake/candidate_pool_policy",
         "independent_gate_policy_ref": "/family_stage_control_plane/stages/source_intake/independent_gate_policy",
@@ -1197,6 +1206,11 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -1219,6 +1233,11 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -1232,6 +1251,20 @@
           "ref_kind": "skill_id",
           "ref": "presentations",
           "role": "presentation_output"
+        }
+      ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+          "role": "professional_specialist_skill"
         }
       ],
       "prompt_refs": [
@@ -1519,6 +1552,13 @@
           "candidate_storyline_generation",
           "grounded_source_reflection",
           "comparative_narrative_selection"
+        ],
+        "professional_skill_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+            "role": "professional_specialist_skill"
+          }
         ],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/communication_strategy/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/communication_strategy/candidate_pool_policy",
@@ -2027,6 +2067,16 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -2049,6 +2099,16 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -2062,6 +2122,25 @@
           "ref_kind": "skill_id",
           "ref": "presentations",
           "role": "presentation_output"
+        }
+      ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
         }
       ],
       "prompt_refs": [
@@ -2349,6 +2428,18 @@
           "candidate_visual_direction_generation",
           "brand_grounded_reflection",
           "comparative_visual_selection"
+        ],
+        "professional_skill_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+            "role": "professional_specialist_skill"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+            "role": "professional_specialist_skill"
+          }
         ],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/visual_direction/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/visual_direction/candidate_pool_policy",
@@ -2865,6 +2956,21 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -2892,6 +2998,21 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -2905,6 +3026,35 @@
           "ref_kind": "skill_id",
           "ref": "presentations",
           "role": "presentation_output"
+        }
+      ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/native_helper_policy.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "professional_specialist_skill"
         }
       ],
       "prompt_refs": [
@@ -3207,6 +3357,23 @@
           "image_first_candidate_generation",
           "tool_grounded_render_reflection",
           "artifact_lineage_evolution"
+        ],
+        "professional_skill_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+            "role": "professional_specialist_skill"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+            "role": "professional_specialist_skill"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+            "role": "professional_specialist_skill"
+          }
         ],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/artifact_creation/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/artifact_creation/candidate_pool_policy",
@@ -3757,6 +3924,16 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -3784,6 +3961,16 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -3797,6 +3984,30 @@
           "ref_kind": "skill_id",
           "ref": "presentations",
           "role": "presentation_output"
+        }
+      ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_deliverable_authoring.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_memory_policy.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "professional_specialist_skill"
         }
       ],
       "prompt_refs": [
@@ -4098,6 +4309,18 @@
           "grounded_visual_review",
           "repair_target_selection",
           "revision_lineage_review"
+        ],
+        "professional_skill_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+            "role": "professional_specialist_skill"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+            "role": "professional_specialist_skill"
+          }
         ],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/review_and_revision/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/review_and_revision/candidate_pool_policy",
@@ -4646,6 +4869,11 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -4673,6 +4901,11 @@
           "role": "canonical_stage_skill_policy"
         },
         {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
+        },
+        {
           "ref_kind": "skill_id",
           "ref": "redcube-ai",
           "role": "domain_skill"
@@ -4686,6 +4919,25 @@
           "ref_kind": "skill_id",
           "ref": "presentations",
           "role": "presentation_output"
+        }
+      ],
+      "stage_skill_policy_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/native_helper_policy.md",
+          "role": "canonical_stage_skill_policy"
+        },
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/skills/visual_memory_policy.md",
+          "role": "canonical_stage_skill_policy"
+        }
+      ],
+      "professional_skill_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "professional_specialist_skill"
         }
       ],
       "prompt_refs": [
@@ -4988,6 +5240,13 @@
           "export_candidate_verification",
           "handoff_manifest_review",
           "artifact_lineage_closeout"
+        ],
+        "professional_skill_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+            "role": "professional_specialist_skill"
+          }
         ],
         "tool_affordance_boundary_ref": "/family_stage_control_plane/stages/package_and_handoff/tool_affordance_boundary",
         "candidate_pool_policy_ref": "/family_stage_control_plane/stages/package_and_handoff/candidate_pool_policy",

@@ -167,9 +167,23 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
       true,
       stage.stage_id,
     );
-    for (const [index, skillRef] of stageSkillRefs.entries()) {
-      assertCleanAgentRepoPathRef(skillRef, 'agent/skills/', `${stage.stage_id}.skills[${index}]`);
+    for (const [index, skillRef] of stage.stage_skill_policy_refs.entries()) {
+      assert.equal(skillRef.role, 'canonical_stage_skill_policy', stage.stage_id);
+      assertCleanAgentRepoPathRef(skillRef, 'agent/skills/', `${stage.stage_id}.stage_skill_policy_refs[${index}]`);
     }
+    assert.deepEqual(
+      stage.professional_skill_refs,
+      stage.skills.filter((skill) => skill.role === 'professional_specialist_skill'),
+      stage.stage_id,
+    );
+    for (const [index, skillRef] of stage.professional_skill_refs.entries()) {
+      assertCleanAgentRepoPathRef(
+        skillRef,
+        'agent/professional_skills/',
+        `${stage.stage_id}.professional_skill_refs[${index}]`,
+      );
+    }
+    assert.deepEqual(stage.stage_contract.professional_skill_refs, stage.professional_skill_refs, stage.stage_id);
     assert.equal(Array.isArray(stage.knowledge_refs), true, stage.stage_id);
     assert.equal(stage.knowledge_refs.length > 0, true, stage.stage_id);
     for (const [index, knowledgeRef] of stage.knowledge_refs.entries()) {

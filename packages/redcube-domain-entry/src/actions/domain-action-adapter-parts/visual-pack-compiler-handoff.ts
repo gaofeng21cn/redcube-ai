@@ -237,6 +237,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         { source_id: 'cognitive_kernel_adoption', ref: 'contracts/cognitive_kernel_adoption.json' },
         { source_id: 'golden_path_profile', ref: 'contracts/golden_path_profile.json' },
         { source_id: 'domain_tool_affordance_catalog', ref: 'agent/tools/domain_affordances.md' },
+        { source_id: 'professional_specialist_skill_pack', ref: 'agent/professional_skills/' },
       ],
       required_input_families: [
         'domain_descriptor',
