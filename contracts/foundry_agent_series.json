@@ -108,6 +108,7 @@
     "stage_pack_sections": [
       "prompts",
       "stages",
+      "tools",
       "stage_completion_policy",
       "skills",
       "knowledge",

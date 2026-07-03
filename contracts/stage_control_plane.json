@@ -1010,7 +1010,81 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/source_intake/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/source_intake/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/source_intake/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/source_intake/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/source_intake/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/source_intake/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#source_readiness_verdict",
+            "role": "source_readiness_verdict"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "domain_agent",
@@ -1046,7 +1120,8 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": false
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     },
     {
       "stage_id": "communication_strategy",
@@ -1093,7 +1168,7 @@
       "owner": "redcube_ai",
       "selected_executor": {
         "executor_kind": "codex_cli",
-        "default_executor": false,
+        "default_executor": true,
         "executor_binding_ref": "default_codex_cli",
         "binding_policy": "default_first_class_executor_for_ai_first_stage_execution",
         "required_capabilities": [
@@ -1101,7 +1176,8 @@
           "domain_skill_invocation",
           "receipt_or_typed_blocker_return",
           "no_forbidden_write_guard"
-        ]
+        ],
+        "lane_kind": "variant"
       },
       "summary": "Communication strategy projected from RCA-owned route stages for OPL family discovery.",
       "source_refs": [
@@ -1888,7 +1964,81 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/communication_strategy/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/communication_strategy/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/communication_strategy/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/communication_strategy/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/communication_strategy/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/communication_strategy/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#communication_visual_direction_decision",
+            "role": "communication_visual_direction_decision"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "ai_decision",
@@ -1924,7 +2074,8 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     },
     {
       "stage_id": "visual_direction",
@@ -1962,7 +2113,7 @@
       "owner": "redcube_ai",
       "selected_executor": {
         "executor_kind": "codex_cli",
-        "default_executor": false,
+        "default_executor": true,
         "executor_binding_ref": "default_codex_cli",
         "binding_policy": "default_first_class_executor_for_ai_first_stage_execution",
         "required_capabilities": [
@@ -1970,7 +2121,8 @@
           "domain_skill_invocation",
           "receipt_or_typed_blocker_return",
           "no_forbidden_write_guard"
-        ]
+        ],
+        "lane_kind": "variant"
       },
       "summary": "Visual direction projected from RCA-owned route stages for OPL family discovery.",
       "source_refs": [
@@ -2765,7 +2917,81 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/visual_direction/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/visual_direction/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/visual_direction/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/visual_direction/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/visual_direction/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/visual_direction/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#communication_visual_direction_decision",
+            "role": "communication_visual_direction_decision"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "ai_decision",
@@ -2801,7 +3027,8 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     },
     {
       "stage_id": "artifact_creation",
@@ -2841,7 +3068,7 @@
       "owner": "redcube_ai",
       "selected_executor": {
         "executor_kind": "codex_cli",
-        "default_executor": false,
+        "default_executor": true,
         "executor_binding_ref": "default_codex_cli",
         "binding_policy": "default_first_class_executor_for_ai_first_stage_execution",
         "required_capabilities": [
@@ -2849,7 +3076,8 @@
           "domain_skill_invocation",
           "receipt_or_typed_blocker_return",
           "no_forbidden_write_guard"
-        ]
+        ],
+        "lane_kind": "variant"
       },
       "summary": "Artifact creation projected from RCA-owned route stages for OPL family discovery.",
       "source_refs": [
@@ -3702,7 +3930,81 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/artifact_creation/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/artifact_creation/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/artifact_creation/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/artifact_creation/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/artifact_creation/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/artifact_creation/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#artifact_mutation_authorization",
+            "role": "artifact_mutation_authorization"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "codex_executor",
@@ -3738,7 +4040,8 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": false
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     },
     {
       "stage_id": "review_and_revision",
@@ -3794,7 +4097,7 @@
       "owner": "redcube_ai",
       "selected_executor": {
         "executor_kind": "codex_cli",
-        "default_executor": false,
+        "default_executor": true,
         "executor_binding_ref": "default_codex_cli",
         "binding_policy": "default_first_class_executor_for_ai_first_stage_execution",
         "required_capabilities": [
@@ -3802,7 +4105,8 @@
           "domain_skill_invocation",
           "receipt_or_typed_blocker_return",
           "no_forbidden_write_guard"
-        ]
+        ],
+        "lane_kind": "variant"
       },
       "summary": "Review and revision projected from RCA-owned route stages for OPL family discovery.",
       "source_refs": [
@@ -4650,7 +4954,86 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/review_and_revision/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/review_and_revision/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/review_and_revision/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/review_and_revision/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/review_and_revision/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/review_and_revision/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#review_export_verdict",
+            "role": "review_export_verdict"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#visual_memory_accept_reject",
+            "role": "visual_memory_accept_reject"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "ai_decision",
@@ -4686,7 +5069,8 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     },
     {
       "stage_id": "package_and_handoff",
@@ -4740,7 +5124,7 @@
       "owner": "redcube_ai",
       "selected_executor": {
         "executor_kind": "codex_cli",
-        "default_executor": false,
+        "default_executor": true,
         "executor_binding_ref": "default_codex_cli",
         "binding_policy": "default_first_class_executor_for_ai_first_stage_execution",
         "required_capabilities": [
@@ -4748,7 +5132,8 @@
           "domain_skill_invocation",
           "receipt_or_typed_blocker_return",
           "no_forbidden_write_guard"
-        ]
+        ],
+        "lane_kind": "variant"
       },
       "summary": "Package and handoff projected from RCA-owned route stages for OPL family discovery.",
       "source_refs": [
@@ -5578,7 +5963,81 @@
         "boundary_assumptions": [
           "RCA owns visual truth, review/export verdict, artifact authority, and visual memory decisions.",
           "OPL admission only checks descriptor composition and cannot declare visual-ready, exportable, or handoffable."
-        ]
+        ],
+        "expected_receipt_refs": [
+          {
+            "ref_kind": "stage_attempt_receipt_ref",
+            "ref": "stage-attempt-receipt-ref:rca/package_and_handoff/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "executor_receipt_ref",
+            "ref": "executor-receipt-ref:rca/package_and_handoff/codex-cli/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "boundary_receipt_ref",
+            "ref": "boundary-receipt-ref:rca/package_and_handoff/refs-only/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "owner_receipt_ref",
+            "ref": "owner-receipt-ref:rca/package_and_handoff/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "independent_gate_receipt_ref",
+            "ref": "independent-gate-receipt-ref:rca/package_and_handoff/{stage_attempt_id}"
+          },
+          {
+            "ref_kind": "typed_blocker_ref",
+            "ref": "typed-blocker-ref:rca/package_and_handoff/{stage_attempt_id}"
+          }
+        ],
+        "receipt_schema_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "contracts/owner_receipt_contract.json",
+            "role": "owner_receipt_or_typed_blocker_schema"
+          }
+        ],
+        "authority_function_refs": [
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#review_export_verdict",
+            "role": "review_export_verdict"
+          },
+          {
+            "ref_kind": "repo_path",
+            "ref": "runtime/authority_functions/README.md#owner_receipt_signer",
+            "role": "owner_receipt_signer"
+          }
+        ],
+        "l4_entry_gate": {
+          "entry_level": "L4_structural_baseline",
+          "required_gates": [
+            "repo_layout_declared",
+            "stage_pack_v2_required",
+            "stage_prompt_skill_knowledge_quality_gate_refs_resolve",
+            "tool_affordance_boundary_declared",
+            "receipt_schema_declared",
+            "minimal_authority_functions_declared",
+            "generated_surface_handoff_declared",
+            "no_forbidden_write_contract_declared"
+          ],
+          "can_claim_l5": false,
+          "can_claim_domain_ready": false
+        },
+        "l5_entry_gate": {
+          "entry_level": "L5_production_operating_maturity",
+          "evidence_required": [
+            "real_user_path",
+            "long_soak_recovery",
+            "release_install_evidence",
+            "owner_acceptance",
+            "direct_and_opl_hosted_parity_at_scale"
+          ],
+          "conformance_pass_counts_as_l5": false,
+          "contract_validation_counts_as_l5": false,
+          "provider_completion_counts_as_l5": false,
+          "app_projection_counts_as_l5": false
+        }
       },
       "trust_boundary": {
         "lane": "domain_agent",
@@ -5614,11 +6073,13 @@
         "repo_local_stage_runner_retired": true,
         "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
         "independent_gate_receipt_required": true
-      }
+      },
+      "stage_pack_conformance_version": "standard-stage-pack.v2"
     }
   ],
   "notes": [
     "Descriptor-only projection over existing RCA route stages.",
     "OPL provider may schedule stage attempts from this descriptor; it must not own RCA visual/artifact/review authority."
-  ]
+  ],
+  "stage_pack_conformance_version": "standard-stage-pack.v2"
 }
