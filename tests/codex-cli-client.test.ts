@@ -187,7 +187,7 @@ test('buildGenerationInput includes declared RCA professional specialist guidanc
       assert.match(input, /## RCA Professional Specialist Skill Guidance/);
       assert.match(input, /### Story Architect/);
       assert.match(input, /agent\/professional_skills\/rca-ppt-story-architect\/SKILL\.md/);
-      assert.match(input, /Keep storyline, outline, and slide blueprint decisions professionally structured\./);
+      assert.match(input, /Build a claim spine before slide count|Keep storyline, outline, and slide blueprint decisions professionally structured\./);
       assert.doesNotMatch(input, /agent\/professional_skills\/rca-ppt-visual-director\/SKILL\.md/);
     },
   );
