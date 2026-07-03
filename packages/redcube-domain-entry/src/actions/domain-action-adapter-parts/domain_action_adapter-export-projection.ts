@@ -18,6 +18,7 @@ import { buildDomainActionAdapterOwnerBoundary } from './owner-boundary.js';
 import { buildTemporalAutonomyReadinessProjection } from './temporal-autonomy-readiness.js';
 import { buildTemporalStageRunConsumptionPolicy } from './temporal-stage-run-consumption-policy.js';
 import { buildVisualTransitionEvaluatorProjection } from './visual-transition-evaluator.js';
+import { buildOplLedgerArtifactRegistrationContract } from '../get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
 
 export const DOMAIN_ACTION_ADAPTER_ID = 'redcube_domain_action_adapter_adapter.v1';
 export const DOMAIN_ID = 'redcube_ai';
@@ -164,6 +165,9 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
   const temporalStageRunConsumptionPolicy = (
     manifest.temporal_stage_run_consumption_policy || buildTemporalStageRunConsumptionPolicy()
   );
+  const oplLedgerArtifactRegistration = (
+    manifest.opl_ledger_artifact_registration || buildOplLedgerArtifactRegistrationContract()
+  );
   return {
     ok: true,
     surface_kind: 'domain_action_adapter_export',
@@ -294,6 +298,13 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         writable_by_domain_action_adapter: false,
         lifecycle_transport_owner: 'opl',
         rca_retained_authority: ['artifact_authority'],
+      },
+      opl_ledger_artifact_registration: {
+        ...oplLedgerArtifactRegistration,
+        ref: '/opl_ledger_artifact_registration',
+        projection_mode: 'refs_only_registration_contract',
+        writable_by_domain_action_adapter: false,
+        ledger_transport_owner: 'one-person-lab/OPL Ledger',
       },
       receipt_refs: {
         ref: '/domain_action_adapter_receipt_refs',
@@ -501,6 +512,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       family_action_catalog_ref: '/family_action_catalog',
       standard_domain_agent_skeleton_ref: '/standard_domain_agent_skeleton',
       artifact_locator_contract_ref: '/artifact_locator_contract',
+      opl_ledger_artifact_registration_ref: '/opl_ledger_artifact_registration',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       domain_action_adapter_receipt_refs_ref: '/domain_action_adapter_receipt_refs',
       workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',

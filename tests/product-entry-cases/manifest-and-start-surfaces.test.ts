@@ -6,6 +6,7 @@ import {
   getProductEntryManifest,
   getDomainActionAdapterGuardedActionMetadata,
   importDomainEntrySharedModule,
+  readJson,
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
@@ -442,6 +443,71 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     assert.equal(manifest.artifact_locator_contract.workspace_runtime_artifact_root.session_continuity_root, manifest.runtime.session_continuity_root);
     assert.equal(manifest.artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs, false);
     assert.equal(manifest.artifact_locator_contract.opl_consumption_policy.forbidden.includes('declare_visual_export_verdict'), true);
+    const oplLedgerArtifactRegistration = readJson('contracts/opl_ledger_artifact_registration.json');
+    assert.deepEqual(manifest.opl_ledger_artifact_registration, oplLedgerArtifactRegistration);
+    assert.equal(manifest.opl_ledger_artifact_registration.refs_only, true);
+    assert.equal(manifest.opl_ledger_artifact_registration.registration_mode, 'refs_only');
+    assert.equal(manifest.opl_ledger_artifact_registration.not_mas_per_figure_provenance_bundle, true);
+    assert.deepEqual(manifest.opl_ledger_artifact_registration.required_registration_refs, [
+      'artifact_ref',
+      'sha256',
+      'artifact_index_ref',
+      'review_ref',
+      'receipt_ref',
+    ]);
+    assert.equal(
+      manifest.opl_ledger_artifact_registration.registration_payload_contract.payload_body_allowed,
+      false,
+    );
+    for (const forbiddenField of [
+      'artifact_body',
+      'artifact_blob',
+      'review_verdict',
+      'export_verdict',
+      'owner_receipt_body',
+      'typed_blocker_body',
+      'runtime_queue_state',
+    ]) {
+      assert.equal(
+        manifest.opl_ledger_artifact_registration.forbidden_payload_fields.includes(forbiddenField),
+        true,
+        forbiddenField,
+      );
+      assert.equal(
+        manifest.opl_ledger_artifact_registration.registration_payload_contract.required_fields.includes(forbiddenField),
+        false,
+        forbiddenField,
+      );
+    }
+    assert.deepEqual(manifest.opl_ledger_artifact_registration.owner_boundary, {
+      rca_role: 'visual_deliverable_ref_producer',
+      opl_ledger_role: 'refs_hash_index_review_receipt_registration_ledger',
+      rca_owns_visual_truth: true,
+      rca_owns_review_export_verdict: true,
+      rca_owns_artifact_authority: true,
+      rca_can_write_artifact_body_through_ledger: false,
+      rca_can_issue_ledger_owner_receipt: false,
+      opl_ledger_can_store_artifact_body: false,
+      opl_ledger_can_issue_rca_owner_receipt: false,
+      opl_ledger_can_create_rca_typed_blocker: false,
+      opl_ledger_can_authorize_review_export_verdict: false,
+      opl_ledger_can_enqueue_runtime_work: false,
+    });
+    assert.equal(
+      manifest.artifact_inventory.supporting_files.some(
+        (entry) => entry.file_id === 'opl_ledger_artifact_registration'
+          && entry.ref.ref === '/opl_ledger_artifact_registration',
+      ),
+      true,
+    );
+    assert.equal(
+      manifest.artifact_inventory.inspect_paths.includes('/opl_ledger_artifact_registration'),
+      true,
+    );
+    assert.equal(
+      readJson('contracts/domain_descriptor.json').standard_contract_refs.opl_ledger_artifact_registration,
+      'contracts/opl_ledger_artifact_registration.json',
+    );
     assert.equal(manifest.opl_generic_primitive_consumption.ref, '/opl_generic_primitive_consumption');
     assert.equal(manifest.opl_generic_primitive_consumption.owner, 'opl');
     assert.equal(manifest.opl_generic_primitive_consumption.consumer, 'redcube_ai');

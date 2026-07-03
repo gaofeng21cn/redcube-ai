@@ -405,6 +405,10 @@ export {
   buildPhysicalSourceMorphologyPolicy,
 } from './actions/domain-action-adapter-parts/physical-source-morphology-policy.js';
 
+export {
+  buildOplLedgerArtifactRegistrationContract,
+} from './actions/get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
+
 export type {
   CreateDeliverableRequest,
   DeliverableAuditRequest,

@@ -41,6 +41,7 @@ import {
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
 import { buildReturnedManifestProjection } from './get-product-entry-manifest-parts/manifest-return.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
+import { buildOplLedgerArtifactRegistrationContract } from './get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
 import {
   DEFAULT_RUNTIME_OWNER,
   OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
@@ -136,6 +137,7 @@ export async function getProductEntryManifest(request) {
     workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
   });
   const temporalLongSoakEvidenceInventory = buildTemporalLongSoakEvidenceInventory({ workspaceRoot });
+  const oplLedgerArtifactRegistration = buildOplLedgerArtifactRegistrationContract();
   const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
   const routeEquivalence = buildRouteEquivalenceContract({
     runtime,
@@ -310,6 +312,7 @@ export async function getProductEntryManifest(request) {
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    opl_ledger_artifact_registration: oplLedgerArtifactRegistration,
     temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness,
     temporal_stage_run_consumption_policy: temporalStageRunConsumptionPolicy,
@@ -386,6 +389,7 @@ export async function getProductEntryManifest(request) {
       routeEquivalence,
       deliverableFacade,
       nativePptOperatorUx,
+      oplLedgerArtifactRegistration,
       productEntrySessionCommand,
       sourceProvenance,
     }),
@@ -418,6 +422,7 @@ export async function getProductEntryManifest(request) {
     visualTransitionEvaluator,
     visualPatternMemoryWriteback,
     workspaceReceiptInventoryProjection,
+    oplLedgerArtifactRegistration,
     temporalLongSoakEvidenceInventory,
     temporalAutonomyReadiness,
     temporalStageRunConsumptionPolicy,

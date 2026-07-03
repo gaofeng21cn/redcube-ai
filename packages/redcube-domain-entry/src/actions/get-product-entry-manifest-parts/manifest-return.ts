@@ -31,6 +31,7 @@ export function buildReturnedManifestProjection({
   visualTransitionEvaluator,
   visualPatternMemoryWriteback,
   workspaceReceiptInventoryProjection,
+  oplLedgerArtifactRegistration,
   temporalLongSoakEvidenceInventory,
   temporalAutonomyReadiness,
   temporalStageRunConsumptionPolicy,
@@ -132,6 +133,7 @@ export function buildReturnedManifestProjection({
     controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
     controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    opl_ledger_artifact_registration: oplLedgerArtifactRegistration || manifest.opl_ledger_artifact_registration,
     temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness || manifest.temporal_autonomy_readiness,
     temporal_stage_run_consumption_policy: (

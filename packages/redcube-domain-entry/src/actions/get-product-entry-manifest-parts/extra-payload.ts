@@ -10,6 +10,7 @@ import {
 export function buildManifestExtraPayload({
   deliverableFacade,
   nativePptOperatorUx,
+  oplLedgerArtifactRegistration,
   productEntrySessionCommand,
   routeEquivalence,
   sourceProvenance,
@@ -158,12 +159,22 @@ export function buildManifestExtraPayload({
           summary: 'RCA-owned domain-handler receipt refs backed by internal domain_action_adapter implementation; OPL may index refs but cannot issue owner receipts.',
           ref: { ref_kind: 'json_pointer', ref: '/domain_action_adapter_receipt_refs' },
         },
+        {
+          file_id: 'opl_ledger_artifact_registration',
+          label: 'RCA OPL Ledger artifact registration contract',
+          kind: 'supporting',
+          path: '/opl_ledger_artifact_registration',
+          summary: 'Refs-only OPL Ledger registration contract for artifact refs, hashes, index refs, review refs, and receipt refs.',
+          ref: { ref_kind: 'json_pointer', ref: '/opl_ledger_artifact_registration' },
+          contract_ref: oplLedgerArtifactRegistration?.contract_id,
+        },
       ],
       inspect_paths: [
         '/artifact_locator_contract',
         '/workspace_receipt_inventory_projection',
         '/operator_evidence_readiness_projection',
         '/domain_action_adapter_receipt_refs',
+        '/opl_ledger_artifact_registration',
       ],
       artifact_refs_ref: {
         ref_kind: 'json_pointer',

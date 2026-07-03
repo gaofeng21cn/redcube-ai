@@ -6,6 +6,7 @@ await import('./product-entry-cases/domain-memory-ref-adapter.test.ts');
 await import('./product-entry-cases/manifest-memory-and-attempt-surfaces.test.ts');
 await import('./product-entry-cases/memory-skeleton-retirement-proof.test.ts');
 await import('./product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts');
+await import('./product-entry-cases/opl-ledger-artifact-registration.test.ts');
 await import('./product-entry-cases/runtime-default-product-entry.test.ts');
 await import('./product-entry-cases/domain_action_adapter-receipt-and-workspace-proof.test.ts');
 await import('./product-entry-cases/substrate-adapter-export.test.ts');
