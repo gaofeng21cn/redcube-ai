@@ -10,6 +10,10 @@ Canonical policy:
 - Record source review refs, conversion invocation refs, page-count checks, artifact inventory refs, and handoff receipt refs.
 - Do not let OPL generated surfaces write artifact bodies, visual truth, memory bodies, review/export verdicts, or owner receipts.
 
+Professional skill routing:
+- Route export-readiness review evidence, weak page carryover, package blockers, and handoff repair targets to `agent/professional_skills/rca-ppt-reviewer/SKILL.md`.
+- Keep native/Office/PPT helpers limited to export, validation, package manifests, and evidence refs; helpers do not authorize review/export verdicts.
+
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/export_pptx.md`
 - `xiaohongshu`: `prompts/xiaohongshu/publish_copy.md`, `prompts/xiaohongshu/export_bundle.md`

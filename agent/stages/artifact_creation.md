@@ -2,6 +2,7 @@
 
 Prompt policy: `agent/prompts/artifact_creation.md`
 Required skills: `agent/skills/visual_deliverable_authoring.md`, `agent/skills/native_helper_policy.md`
+Professional skills: `agent/professional_skills/rca-ppt-page-author/SKILL.md`, `agent/professional_skills/rca-native-ppt-designer/SKILL.md`, `agent/professional_skills/rca-template-profiler/SKILL.md`
 Quality gates: `agent/quality_gates/visual_authority_boundaries.md`, `agent/quality_gates/artifact_authority.md`
 Knowledge refs: `agent/knowledge/artifact_and_export_authority.md`
 

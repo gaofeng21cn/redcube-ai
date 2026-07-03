@@ -11,6 +11,38 @@ import {
   requiredDomainPackPaths,
 } from './helpers/opl-agent-pack-contracts.ts';
 
+const expectedProfessionalSkillRefs = [
+  'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+  'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+  'agent/professional_skills/rca-ppt-page-author/SKILL.md',
+  'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+  'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
+  'agent/professional_skills/rca-template-profiler/SKILL.md',
+];
+
+const expectedStageProfessionalSkillRefs = {
+  source_intake: [],
+  communication_strategy: [
+    'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+  ],
+  visual_direction: [
+    'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+    'agent/professional_skills/rca-template-profiler/SKILL.md',
+  ],
+  artifact_creation: [
+    'agent/professional_skills/rca-ppt-page-author/SKILL.md',
+    'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
+    'agent/professional_skills/rca-template-profiler/SKILL.md',
+  ],
+  review_and_revision: [
+    'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+    'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+  ],
+  package_and_handoff: [
+    'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+  ],
+};
+
 test('RCA canonical semantic pack paths are concrete, clean, and stage semantic refs resolve under agent', () => {
   const packCompilerInput = readJson('contracts/pack_compiler_input.json');
   const stageControlPlane = readJson('contracts/stage_control_plane.json');
@@ -26,6 +58,11 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
     'implementation_detail_prompt_assets_only_not_stage_control_prompt_refs',
   );
   assert.deepEqual(packCompilerInput.required_domain_pack_paths, requiredDomainPackPaths);
+  assert.deepEqual(
+    packCompilerInput.required_domain_pack_paths.filter((relativePath) =>
+      relativePath.startsWith('agent/professional_skills/')),
+    expectedProfessionalSkillRefs,
+  );
 
   for (const relativePath of packCompilerInput.required_domain_pack_paths) {
     assert.equal(relativePath.startsWith('agent/'), true, relativePath);
@@ -176,6 +213,11 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
       stage.skills.filter((skill) => skill.role === 'professional_specialist_skill'),
       stage.stage_id,
     );
+    assert.deepEqual(
+      stage.professional_skill_refs.map((skill) => skill.ref),
+      expectedStageProfessionalSkillRefs[stage.stage_id],
+      stage.stage_id,
+    );
     for (const [index, skillRef] of stage.professional_skill_refs.entries()) {
       assertCleanAgentRepoPathRef(
         skillRef,
@@ -184,6 +226,17 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
       );
     }
     assert.deepEqual(stage.stage_contract.professional_skill_refs, stage.professional_skill_refs, stage.stage_id);
+    const promptPolicyContent = fs.readFileSync(path.join(repoRoot, `agent/prompts/${stage.stage_id}.md`), 'utf8');
+    const stageDescriptorContent = fs.readFileSync(path.join(repoRoot, `agent/stages/${stage.stage_id}.md`), 'utf8');
+    for (const skillRef of expectedStageProfessionalSkillRefs[stage.stage_id]) {
+      assert.equal(promptPolicyContent.includes(skillRef), true, `${stage.stage_id} prompt missing ${skillRef}`);
+      assert.equal(stageDescriptorContent.includes(skillRef), true, `${stage.stage_id} stage missing ${skillRef}`);
+    }
+    assert.equal(
+      promptPolicyContent.includes('agent/skills/') && !promptPolicyContent.includes('agent/professional_skills/'),
+      false,
+      `${stage.stage_id} prompt only cites old stage skill policy refs`,
+    );
     assert.equal(Array.isArray(stage.knowledge_refs), true, stage.stage_id);
     assert.equal(stage.knowledge_refs.length > 0, true, stage.stage_id);
     for (const [index, knowledgeRef] of stage.knowledge_refs.entries()) {

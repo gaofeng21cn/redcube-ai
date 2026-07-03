@@ -11,6 +11,12 @@ Canonical policy:
 - Do not expose prompt metadata, route names, internal fields, source ids, or operator notes in visible artifacts.
 - Artifact mutation requires RCA authorization, owner receipt refs, or typed blockers.
 
+Professional skill routing:
+- Route page-level PPT authoring, visible text safety, text fit, and blocked-slide repair planning to `agent/professional_skills/rca-ppt-page-author/SKILL.md`.
+- Route native editable PPTX design spec locks, shape plans, coordinate repair, and Office editability constraints to `agent/professional_skills/rca-native-ppt-designer/SKILL.md`.
+- Route template-aware layout grammar and placeholder capacity constraints to `agent/professional_skills/rca-template-profiler/SKILL.md`.
+- Keep tool/helper calls limited to materialization, screenshots, validation, export, and evidence refs.
+
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/author_image_pages.md`, `prompts/ppt_deck/render_html.md`, `prompts/ppt_deck/author_pptx_native.md`
 - `xiaohongshu`: `prompts/xiaohongshu/author_image_pages.md`, `prompts/xiaohongshu/render_html.md`

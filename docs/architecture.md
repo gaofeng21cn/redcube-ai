@@ -36,6 +36,8 @@ Stage prompt / professional specialist skill / tool-helper 的架构分工固定
 
 因此，新增 professional specialist skill 是为了把“可复用专业方法”从单个 stage prompt 和旧 policy ref 中拆出来；旧 `agent/skills/*.md` 继续只是 stage skill policy refs，约束 stage 使用 authoring / helper / memory policy 的边界，不是 standalone Codex professional skill。
 
+当前 RCA 是正例：`agent/skills/*.md` 只保留 policy ref，`agent/prompts/*.md` 负责阶段目标、输入输出和交付边界，并显式路由到 `agent/professional_skills/*/SKILL.md`；professional skill 只沉淀 PPT 专业方法，tool/helper 只物化、截图、导出和校验 refs。`contracts/stage_control_plane.json` 与 `contracts/pack_compiler_input.json` 是这条路由进入 pack/stage discovery 的机器合同，不新增第二套 skill registry。
+
 OPL family `Foundry Agent OS` target delta 当前由 [RCA Foundry Agent OS 目标差异页](./active/foundry-agent-os-target-delta.md) 维护。架构读法是：`OPL Agent OS + Declarative Visual Pack + Visual Authority Kernel + Visual Capability Registry`。Capability Registry 由 OPL `Atlas + Pack + Stagecraft` 承载 catalog / ABI / use policy；RCA 只声明 visual capability refs、route-specific safe use policy 和 review/export authority guard。默认 reader 必须回到 `current_owner_delta`，OPL generated surface、Vault、Console、Runway、Pack、gallery/handoff shell 或 Capability Registry 均不能签 RCA owner receipt、创建 RCA typed blocker、写 artifact body 或授权 review/export verdict。
 
 `contracts/foundry-agent-os-domain-kernel-manifest.json` 是这条 owner split 的机器合同入口。它把 visual truth、review/export verdict、artifact mutation/export authority、visual memory decision、owner receipt、typed blocker 和 visual-native helper authority 固定为 RCA kernel，把 runtime、generated surfaces、artifact gallery/handoff shell、review/repair transport、native-helper envelope、projection、Vault lineage 和 capability ABI 固定为 OPL upcollect surface；架构与测试均不得从 OPL refs-only surface 推导 visual completion。

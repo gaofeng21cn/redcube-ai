@@ -2,6 +2,7 @@
 
 Prompt policy: `agent/prompts/visual_direction.md`
 Required skills: `agent/skills/visual_deliverable_authoring.md`
+Professional skills: `agent/professional_skills/rca-ppt-visual-director/SKILL.md`, `agent/professional_skills/rca-template-profiler/SKILL.md`
 Quality gates: `agent/quality_gates/visual_authority_boundaries.md`, `agent/quality_gates/communication_and_direction.md`
 Knowledge refs: `agent/knowledge/communication_visual_direction.md`
 

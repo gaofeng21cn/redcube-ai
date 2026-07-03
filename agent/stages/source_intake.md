@@ -2,6 +2,7 @@
 
 Prompt policy: `agent/prompts/source_intake.md`
 Required skills: `agent/skills/visual_deliverable_authoring.md`
+Professional skills: none; source truth is frozen before PPT-specific professional routing begins.
 Quality gates: `agent/quality_gates/visual_authority_boundaries.md`, `agent/quality_gates/source_and_truth.md`
 Knowledge refs: `agent/knowledge/visual_truth_boundaries.md`
 

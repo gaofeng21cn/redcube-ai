@@ -10,6 +10,11 @@ Canonical policy:
 - Preserve source-language discipline and audience-facing wording boundaries.
 - Return visual direction refs and blockers; do not write final artifact blobs.
 
+Professional skill routing:
+- Route PPT visual language, rhythm, density, peak pages, layout variety, and anti-template constraints to `agent/professional_skills/rca-ppt-visual-director/SKILL.md`.
+- Route template/reference deck profiling, semantic zones, placeholder capacity, and layout grammar to `agent/professional_skills/rca-template-profiler/SKILL.md`.
+- Keep `agent/skills/*.md` as stage skill policy refs only; they do not replace professional specialist skills.
+
 Detailed prompt locators:
 - `ppt_deck`: `prompts/ppt_deck/visual_direction.md`
 - `xiaohongshu`: `prompts/xiaohongshu/visual_direction.md`

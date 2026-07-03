@@ -2,6 +2,7 @@
 
 Prompt policy: `agent/prompts/package_and_handoff.md`
 Required skills: `agent/skills/native_helper_policy.md`
+Professional skills: `agent/professional_skills/rca-ppt-reviewer/SKILL.md`
 Quality gates: `agent/quality_gates/visual_authority_boundaries.md`, `agent/quality_gates/artifact_authority.md`, `agent/quality_gates/review_export_memory.md`
 Knowledge refs: `agent/knowledge/artifact_and_export_authority.md`, `agent/knowledge/owner_receipt_policy.md`
 
