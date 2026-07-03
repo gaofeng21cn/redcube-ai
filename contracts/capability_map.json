@@ -1,0 +1,275 @@
+{
+  "surface_kind": "rca_professional_capability_map",
+  "schema_version": 1,
+  "domain_id": "redcube_ai",
+  "domain_label": "RedCube AI",
+  "owner": "redcube_ai",
+  "state": "active_contract",
+  "purpose": "Route AgentLab and OMA PPT feedback to RCA repo-local professional skills without creating a second visual truth source.",
+  "source_of_truth_refs": [
+    "user_request:2026-07-03:agent-lab-ppt-professional-skill-capability-map",
+    "contracts/stage_control_plane.json#/stages",
+    "contracts/standard-agent-principles-adoption.json#/module_organization/professional_skill_surfaces",
+    "agent/professional_skills/*/SKILL.md"
+  ],
+  "professional_skill_policy": {
+    "skill_files_are_method_source_of_truth": true,
+    "stage_prompts_remain_schema_owner": true,
+    "tool_helpers_remain_materialization_and_validation_only": true,
+    "capability_map_is_routing_metadata_only": true,
+    "does_not_authorize_visual_ready_or_exportable_claim": true
+  },
+  "professional_capabilities": [
+    {
+      "capability_id": "rca-ppt-story-architect",
+      "skill_ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+      "stage_refs": [
+        "communication_strategy"
+      ],
+      "primary_feedback_tokens": [
+        "storyline"
+      ],
+      "maps_feedback_about": [
+        "claim_spine",
+        "narrative_sequence",
+        "detailed_outline",
+        "slide_blueprint",
+        "page_role",
+        "evidence_placement"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/prompts/communication_strategy.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-visual-director",
+      "skill_ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+      "stage_refs": [
+        "visual_direction",
+        "review_and_revision"
+      ],
+      "primary_feedback_tokens": [
+        "visual_density",
+        "layout_quality"
+      ],
+      "maps_feedback_about": [
+        "visual_language",
+        "layout_rhythm",
+        "density_controls",
+        "peak_pages",
+        "layout_variety",
+        "template_profile_consumption"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "agent/quality_gates/visual_pack_discipline.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-page-author",
+      "skill_ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+      "stage_refs": [
+        "artifact_creation"
+      ],
+      "primary_feedback_tokens": [
+        "page_authoring",
+        "layout_quality",
+        "visual_density"
+      ],
+      "maps_feedback_about": [
+        "page_level_authoring",
+        "route_specific_page_payload",
+        "structural_visual",
+        "text_fit",
+        "blocked_slide_repair",
+        "visible_text_safety"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/prompts/artifact_creation.md",
+        "agent/skills/visual_deliverable_authoring.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-reviewer",
+      "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+      "stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "primary_feedback_tokens": [
+        "ppt_review",
+        "layout_quality",
+        "visual_density"
+      ],
+      "maps_feedback_about": [
+        "rendered_page_review",
+        "screenshot_review",
+        "source_fidelity",
+        "repair_target_selection",
+        "weak_page_detection",
+        "review_export_gate_evidence"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/prompts/review_and_revision.md",
+        "agent/quality_gates/review_export_memory.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    },
+    {
+      "capability_id": "rca-native-ppt-designer",
+      "skill_ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+      "stage_refs": [
+        "artifact_creation"
+      ],
+      "primary_feedback_tokens": [
+        "native_pptx_editability"
+      ],
+      "maps_feedback_about": [
+        "editable_shape_plan",
+        "native_pptx_design_spec_lock",
+        "template_layout_grammar",
+        "shape_coordinates",
+        "office_editability",
+        "native_repair_targets"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "prompts/ppt_deck/repair_pptx_native.md",
+        "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    },
+    {
+      "capability_id": "rca-template-profiler",
+      "skill_ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+      "stage_refs": [
+        "visual_direction",
+        "artifact_creation"
+      ],
+      "primary_feedback_tokens": [
+        "template_profile"
+      ],
+      "maps_feedback_about": [
+        "template_profile",
+        "reference_deck_analysis",
+        "semantic_layout_inventory",
+        "placeholder_capacity",
+        "layout_grammar",
+        "title_safe_zone"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "docs/references/native-ppt-open-source-design-discipline.md",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ]
+    }
+  ],
+  "feedback_token_index": {
+    "visual_density": {
+      "canonical_capability_ids": [
+        "rca-ppt-visual-director",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "owner_stage_refs": [
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision"
+      ],
+      "default_patch_surface_hint": "Update the professional skill or stage prompt that owns density planning, page fit, or rendered review; do not edit visual truth artifacts."
+    },
+    "layout_quality": {
+      "canonical_capability_ids": [
+        "rca-ppt-visual-director",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "owner_stage_refs": [
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision"
+      ],
+      "default_patch_surface_hint": "Route repeated layout, rhythm, hierarchy, or collision feedback to visual direction, page authoring, or review skill refs."
+    },
+    "page_authoring": {
+      "canonical_capability_ids": [
+        "rca-ppt-page-author"
+      ],
+      "owner_stage_refs": [
+        "artifact_creation"
+      ],
+      "default_patch_surface_hint": "Patch page-level authoring policy or tests; helpers may materialize refs but cannot choose the design."
+    },
+    "native_pptx_editability": {
+      "canonical_capability_ids": [
+        "rca-native-ppt-designer",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "owner_stage_refs": [
+        "artifact_creation",
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "default_patch_surface_hint": "Route native editability failures to editable_shape_plan, shape manifest, true render proof, or native repair policy."
+    },
+    "template_profile": {
+      "canonical_capability_ids": [
+        "rca-template-profiler",
+        "rca-ppt-visual-director",
+        "rca-native-ppt-designer"
+      ],
+      "owner_stage_refs": [
+        "visual_direction",
+        "artifact_creation"
+      ],
+      "default_patch_surface_hint": "Treat templates as semantic layout grammar, zones, placeholder capacity, and rhythm rules, not as visual skins."
+    },
+    "ppt_review": {
+      "canonical_capability_ids": [
+        "rca-ppt-reviewer",
+        "rca-ppt-visual-director"
+      ],
+      "owner_stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "default_patch_surface_hint": "Patch review criteria or repair-target routing; AgentLab/OMA scores are not RCA review/export verdicts."
+    },
+    "storyline": {
+      "canonical_capability_ids": [
+        "rca-ppt-story-architect"
+      ],
+      "owner_stage_refs": [
+        "communication_strategy"
+      ],
+      "default_patch_surface_hint": "Patch claim spine, outline, slide blueprint, or evidence placement policy before visual direction."
+    }
+  },
+  "oma_patch_authority_boundary": {
+    "oma_can_route_feedback_to_professional_skill": true,
+    "oma_can_patch_repo_source_docs_tests_skills": true,
+    "oma_can_patch_visual_truth_artifacts": false,
+    "oma_can_write_artifact_blobs": false,
+    "oma_can_write_owner_receipts": false,
+    "oma_can_write_export_or_quality_verdicts": false,
+    "oma_can_write_runtime_data": false,
+    "oma_can_claim_visual_ready": false,
+    "oma_can_claim_exportable": false,
+    "rca_owner_receipt_or_typed_blocker_required_for_domain_closeout": true
+  }
+}

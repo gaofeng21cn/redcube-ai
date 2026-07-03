@@ -22,6 +22,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
 const oplBin = process.env.OPL_BIN || '/Users/gaofeng/workspace/one-person-lab/bin/opl';
 const suitePath = 'contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json';
+const agentLabHandoffPath = 'contracts/agent_lab_handoff.json';
+const capabilityMapPath = 'contracts/capability_map.json';
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,
   '--experimental-strip-types',
@@ -53,6 +55,66 @@ function assertRefsOnlyAuthorityBoundary(boundary, label) {
   assert.equal(boundary.opl_agent_lab_can_authorize_export_verdict, false, label);
   assert.equal(boundary.opl_agent_lab_can_mutate_artifact_body, false, label);
   assert.equal(boundary.opl_agent_lab_can_write_owner_receipt, false, label);
+}
+
+function assertPptCapabilityMapShape(map, handoff, adoption) {
+  const expectedCapabilityIds = [
+    'rca-ppt-story-architect',
+    'rca-ppt-visual-director',
+    'rca-ppt-page-author',
+    'rca-ppt-reviewer',
+    'rca-native-ppt-designer',
+    'rca-template-profiler',
+  ];
+  const expectedTokens = [
+    'visual_density',
+    'layout_quality',
+    'page_authoring',
+    'native_pptx_editability',
+    'template_profile',
+    'ppt_review',
+    'storyline',
+  ];
+
+  assert.equal(map.surface_kind, 'rca_professional_capability_map');
+  assert.equal(map.owner, 'redcube_ai');
+  assert.equal(map.professional_skill_policy.skill_files_are_method_source_of_truth, true);
+  assert.equal(map.professional_skill_policy.capability_map_is_routing_metadata_only, true);
+  assert.deepEqual(map.professional_capabilities.map((entry) => entry.capability_id), expectedCapabilityIds);
+  assert.deepEqual(Object.keys(map.feedback_token_index), expectedTokens);
+
+  for (const capability of map.professional_capabilities) {
+    assert.equal(fs.existsSync(path.join(repoRoot, capability.skill_ref)), true, capability.skill_ref);
+    assert.equal(capability.allowed_change_refs.includes(capability.skill_ref), true, capability.capability_id);
+  }
+
+  assert.equal(handoff.capability_map_ref, capabilityMapPath);
+  assert.equal(handoff.external_suite_improvement_policy.capability_map_ref, capabilityMapPath);
+  assert.deepEqual(handoff.external_suite_improvement_policy.feedback_token_contract, expectedTokens);
+  assert.equal(handoff.patch_surface_hints.allowed_patch_roots.includes('agent/professional_skills/'), true);
+  assert.equal(handoff.patch_surface_hints.forbidden_patch_roots.includes('owner receipts'), true);
+  assert.equal(handoff.authority_boundary.opl_meta_agent_can_patch_repo_source_docs_tests_skills, true);
+  assert.equal(handoff.authority_boundary.opl_meta_agent_can_write_visual_truth_artifacts, false);
+  assert.equal(handoff.authority_boundary.opl_meta_agent_can_write_artifact_blobs, false);
+  assert.equal(handoff.authority_boundary.opl_meta_agent_can_write_export_or_quality_verdicts, false);
+  assert.equal(handoff.authority_boundary.opl_meta_agent_can_write_runtime_data, false);
+  assert.equal(adoption.source_refs.capability_map_ref, capabilityMapPath);
+
+  for (const token of expectedTokens) {
+    assert.equal(Boolean(handoff.change_ref_mappings[token]), true, token);
+    assert.equal(handoff.change_ref_mappings[token].capability_map_pointer, `/feedback_token_index/${token}`);
+    assert.deepEqual(
+      handoff.change_ref_mappings[token].capability_ids,
+      map.feedback_token_index[token].canonical_capability_ids,
+      token,
+    );
+  }
+
+  assert.deepEqual(map.feedback_token_index.storyline.canonical_capability_ids, ['rca-ppt-story-architect']);
+  assert.equal(
+    map.feedback_token_index.native_pptx_editability.canonical_capability_ids.includes('rca-native-ppt-designer'),
+    true,
+  );
 }
 
 function assertPptThreeRouteSuiteShape(suite) {
@@ -275,6 +337,14 @@ function assertCommonExport({ exported, expectedRoute }) {
 
 test('RCA PPT three-route AgentLab suite is a top-level refs-only external suite contract', () => {
   assertPptThreeRouteSuiteShape(readRepoJson(suitePath));
+});
+
+test('RCA PPT capability map routes OMA feedback tokens to professional skills only', () => {
+  assertPptCapabilityMapShape(
+    readRepoJson(capabilityMapPath),
+    readRepoJson(agentLabHandoffPath),
+    readRepoJson('contracts/standard-agent-principles-adoption.json'),
+  );
 });
 
 test('artifact-producing PPT workflow reaches export_pptx through image-first, HTML, and native PPT routes', SERIAL_ENV_TEST, async () => {

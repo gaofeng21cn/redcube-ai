@@ -9,6 +9,7 @@
     "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
     "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
   ],
+  "capability_map_ref": "contracts/capability_map.json",
   "external_suite_seed": {
     "suite_id": "redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1",
     "suite_kind": "agent_lab_external_suite",
@@ -32,6 +33,163 @@
       }
     ]
   },
+  "external_suite_improvement_policy": {
+    "policy_id": "rca.agent_lab.external_suite_improvement_policy.v1",
+    "owner": "redcube_ai",
+    "consumer_refs": [
+      "opl_agent_lab",
+      "opl_meta_agent"
+    ],
+    "feedback_token_contract": [
+      "visual_density",
+      "layout_quality",
+      "page_authoring",
+      "native_pptx_editability",
+      "template_profile",
+      "ppt_review",
+      "storyline"
+    ],
+    "capability_map_ref": "contracts/capability_map.json",
+    "routing_rule": "Map PPT feedback tokens to contracts/capability_map.json before proposing or patching RCA professional skill, stage prompt, docs, contract, or focused test surfaces.",
+    "oma_allowed_change_scope": [
+      "repo_source",
+      "docs",
+      "tests",
+      "contracts",
+      "agent/principles",
+      "agent/professional_skills"
+    ],
+    "oma_forbidden_change_scope": [
+      "visual_truth_artifacts",
+      "artifact_blobs",
+      "owner_receipts",
+      "export_verdicts",
+      "quality_verdicts",
+      "runtime_data"
+    ],
+    "closeout_rule": "OMA may return refs, patch candidates, no-regression evidence, or typed blockers; RCA owner receipt, review/export verdict, and artifact authority remain RCA-owned."
+  },
+  "change_ref_mappings": {
+    "visual_density": {
+      "capability_ids": [
+        "rca-ppt-visual-director",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "capability_map_pointer": "/feedback_token_index/visual_density",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch density planning, page fit, or rendered review policy; do not edit generated visual artifacts."
+    },
+    "layout_quality": {
+      "capability_ids": [
+        "rca-ppt-visual-director",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "capability_map_pointer": "/feedback_token_index/layout_quality",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Route hierarchy, collision, rhythm, and repeated-layout issues to visual direction, page authoring, or review skill refs."
+    },
+    "page_authoring": {
+      "capability_ids": [
+        "rca-ppt-page-author"
+      ],
+      "capability_map_pointer": "/feedback_token_index/page_authoring",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch page-level authoring policy or focused tests when individual slide construction fails."
+    },
+    "native_pptx_editability": {
+      "capability_ids": [
+        "rca-native-ppt-designer",
+        "rca-ppt-page-author",
+        "rca-ppt-reviewer"
+      ],
+      "capability_map_pointer": "/feedback_token_index/native_pptx_editability",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch editable_shape_plan, native route policy, shape manifest expectations, or native review criteria; do not wrap full-page PNGs as native PPTX."
+    },
+    "template_profile": {
+      "capability_ids": [
+        "rca-template-profiler",
+        "rca-ppt-visual-director",
+        "rca-native-ppt-designer"
+      ],
+      "capability_map_pointer": "/feedback_token_index/template_profile",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch semantic layout grammar, zones, placeholder capacity, and reference-deck profile rules."
+    },
+    "ppt_review": {
+      "capability_ids": [
+        "rca-ppt-reviewer",
+        "rca-ppt-visual-director"
+      ],
+      "capability_map_pointer": "/feedback_token_index/ppt_review",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch review criteria, screenshot evidence expectations, or repair-target routing; OMA cannot sign RCA review/export verdicts."
+    },
+    "storyline": {
+      "capability_ids": [
+        "rca-ppt-story-architect"
+      ],
+      "capability_map_pointer": "/feedback_token_index/storyline",
+      "primary_skill_refs": [
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md"
+      ],
+      "allowed_patch_surface_hint": "Patch claim spine, outline, slide blueprint, or evidence placement policy before visual direction."
+    }
+  },
+  "patch_surface_hints": {
+    "preferred_patch_order": [
+      "contracts/capability_map.json",
+      "contracts/agent_lab_handoff.json",
+      "agent/professional_skills/<capability>/SKILL.md",
+      "agent/prompts/<owner-stage>.md",
+      "agent/quality_gates/<owner-gate>.md",
+      "docs",
+      "tests"
+    ],
+    "allowed_patch_roots": [
+      "contracts/agent_lab_handoff.json",
+      "contracts/capability_map.json",
+      "contracts/standard-agent-principles-adoption.json",
+      "agent/principles/",
+      "agent/professional_skills/",
+      "agent/prompts/",
+      "agent/quality_gates/",
+      "docs/",
+      "tests/"
+    ],
+    "forbidden_patch_roots": [
+      "visual truth artifacts",
+      "artifact blobs",
+      "owner receipts",
+      "export verdicts",
+      "quality verdicts",
+      "runtime data"
+    ],
+    "fallback_rule": "If no token maps cleanly, return a typed blocker with the missing capability route instead of patching runtime artifacts or verdict surfaces."
+  },
   "no_forbidden_write_proof_refs": [
     "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only",
     "no-forbidden-write:rca/goal-workflow/runtime-artifacts-not-repo-source",
@@ -48,7 +206,12 @@
     "opl_meta_agent_can_authorize_quality_or_export": false,
     "opl_meta_agent_can_write_owner_receipt": false,
     "rca_owner_receipt_or_typed_blocker_required": true,
-    "opl_meta_agent_can_record_ppt_native_terminal_refs": true
+    "opl_meta_agent_can_record_ppt_native_terminal_refs": true,
+    "opl_meta_agent_can_patch_repo_source_docs_tests_skills": true,
+    "opl_meta_agent_can_write_visual_truth_artifacts": false,
+    "opl_meta_agent_can_write_artifact_blobs": false,
+    "opl_meta_agent_can_write_export_or_quality_verdicts": false,
+    "opl_meta_agent_can_write_runtime_data": false
   },
   "external_suite_seeds": {
     "goal_workflow": {
