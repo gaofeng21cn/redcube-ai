@@ -48,6 +48,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
 - `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
 - `export_gate_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, and forbidden-authority flags before handoff.
+- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
 

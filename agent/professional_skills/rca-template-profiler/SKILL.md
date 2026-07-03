@@ -47,6 +47,7 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 - `template_profile_row`: `layout_id`, use case, zones, required roles, title safe zone, content capacity, minimum font floor, spacing rules, and reuse ceiling.
 - `placeholder_capacity`: per zone record max headline/body/label length, object count, image/chart/table affordance, safe inset, and overflow risk.
 - `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
+- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
 

@@ -1,0 +1,50 @@
+# RCA PPT Story Architect Minimal Resource Pack
+
+Owner: `redcube_ai`
+State: `skill_local_resource`
+Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.
+
+## Template
+
+```text
+story_spec_lock:
+  audience:
+  goal:
+  source_refs:
+  forbidden_claims:
+  slide_budget:
+  approval_state:
+
+blueprint_row:
+  slide_id:
+  page_role:
+  action_title:
+  core_claim:
+  evidence_refs:
+  proof_object:
+  visible_text_budget:
+  speaker_note_goal:
+  transition:
+```
+
+## Example
+
+```text
+slide_id: S03
+page_role: evidence_turn
+action_title: The current workflow loses time at the approval handoff
+core_claim: The problem is not content generation speed; it is unclear owner acceptance.
+evidence_refs: source:intake-notes#handoff-gap, source:operator-log#blocked-review
+proof_object: handoff swimlane with blocked owner decision marker
+visible_text_budget: title <= 14 words, 3 evidence labels, no internal route ids
+speaker_note_goal: explain why the next slide evaluates the owner route
+transition: This makes owner-route clarity the next design constraint.
+```
+
+## Checklist
+
+- Source refs are frozen before claims are written.
+- Every slide has one audience decision, one proof object, and one transition.
+- Action titles state claims, not topic labels.
+- Dense slides have split/shorten repair targets before visual direction.
+- Visible text contains no local paths, prompt names, route names, or operator wording.

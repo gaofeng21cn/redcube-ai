@@ -46,6 +46,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `rhythm_row`: `slide_id`, `page_role`, `proof_object`, `layout_family`, `density_band`, `peak_role`, `template_binding`, `repair_risk`.
 - `ppt_visual_density`: classify each slide as `sparse`, `balanced`, or `dense`; dense pages need a named reason, readable floor, and split/shorten fallback.
 - `progressive_disclosure`: move from overview to proof to decision through visible structure, not by revealing more small text on the same page.
+- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
 

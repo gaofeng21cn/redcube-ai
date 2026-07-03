@@ -85,6 +85,12 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-native-ppt-designer',
     'rca-template-profiler',
   ];
+  const expectedResourceRefs = Object.fromEntries(
+    expectedCapabilityIds.map((capabilityId) => [
+      capabilityId,
+      `agent/professional_skills/${capabilityId}/resources/minimal-resource-pack.md`,
+    ]),
+  );
   const requiredVisualFailureTokens = [
     'storyline',
     'outline',
@@ -118,6 +124,34 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   assert.equal(map.owner, 'redcube_ai');
   assert.equal(map.professional_skill_policy.skill_files_are_method_source_of_truth, true);
   assert.equal(map.professional_skill_policy.capability_map_is_routing_metadata_only, true);
+  assert.equal(map.professional_skill_policy.skill_local_resource_pack_is_refs_only, true);
+  assert.equal(map.professional_skill_policy.resource_pack_does_not_authorize_visual_truth, true);
+  assert.equal(map.professional_skill_policy.resource_pack_does_not_authorize_export_or_quality_verdict, true);
+  assert.equal(map.professional_skill_policy.resource_pack_does_not_write_runtime_state, true);
+  assert.equal(map.skill_local_resource_pack.pack_kind, 'rca_ppt_professional_skill_local_resource_pack');
+  assert.equal(map.skill_local_resource_pack.refs_only, true);
+  assert.equal(map.skill_local_resource_pack.does_not_authorize_visual_truth, true);
+  assert.equal(map.skill_local_resource_pack.does_not_authorize_artifact_body, true);
+  assert.equal(map.skill_local_resource_pack.does_not_authorize_owner_receipt, true);
+  assert.equal(map.skill_local_resource_pack.does_not_authorize_quality_or_export_verdict, true);
+  assert.equal(map.skill_local_resource_pack.does_not_write_runtime_state, true);
+  assert.deepEqual(
+    map.skill_local_resource_pack.capability_resource_refs.map((entry) => entry.capability_id),
+    expectedCapabilityIds,
+  );
+  for (const resourceEntry of map.skill_local_resource_pack.capability_resource_refs) {
+    const expectedResourceRef = expectedResourceRefs[resourceEntry.capability_id];
+    assert.equal(resourceEntry.skill_ref, `agent/professional_skills/${resourceEntry.capability_id}/SKILL.md`);
+    assert.deepEqual(resourceEntry.resource_refs, [expectedResourceRef]);
+    assert.deepEqual(resourceEntry.required_sections, ['## Template', '## Example', '## Checklist']);
+    const resourcePath = path.join(repoRoot, expectedResourceRef);
+    assert.equal(fs.existsSync(resourcePath), true, expectedResourceRef);
+    const resource = fs.readFileSync(resourcePath, 'utf8');
+    assert.equal(resource.includes('Boundary: refs-only professional method resource.'), true, expectedResourceRef);
+    for (const section of resourceEntry.required_sections) {
+      assert.equal(resource.includes(section), true, `${expectedResourceRef}:${section}`);
+    }
+  }
   assert.deepEqual(map.professional_capabilities.map((entry) => entry.capability_id), expectedCapabilityIds);
   assert.deepEqual(Object.keys(map.feedback_token_index), expectedTokens);
   assert.deepEqual(map.ppt_visual_failure_token_contract.required_tokens, requiredVisualFailureTokens);
@@ -142,9 +176,16 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   );
 
   for (const capability of map.professional_capabilities) {
+    const expectedResourceRef = expectedResourceRefs[capability.capability_id];
     assert.equal(fs.existsSync(path.join(repoRoot, capability.skill_ref)), true, capability.skill_ref);
     assert.equal(capability.allowed_change_refs.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(capability.allowed_change_refs.includes(expectedResourceRef), true, capability.capability_id);
     assert.equal(capability.canonical_paths.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(capability.canonical_paths.includes(expectedResourceRef), true, capability.capability_id);
+    assert.equal(capability.target_repo_file_hints.includes(expectedResourceRef), true, capability.capability_id);
+    assert.deepEqual(capability.resource_refs, [expectedResourceRef]);
+    assert.equal(capability.resource_pack_boundary_ref, 'contracts/capability_map.json#/skill_local_resource_pack');
+    assert.equal(capability.verification_refs.includes('contracts/capability_map.json#/skill_local_resource_pack'), true);
     assert.equal(capability.verification_refs.includes('contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture'), true);
     assert.equal(
       capability.verification_refs.includes(
@@ -165,6 +206,11 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     const resolverCapability = map.capabilities.find((entry) => entry.capability_id === capability.capability_id);
     assert.equal(Boolean(resolverCapability), true, capability.capability_id);
     assert.equal(resolverCapability.canonical_paths.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(resolverCapability.canonical_paths.includes(expectedResourceRef), true, capability.capability_id);
+    assert.equal(resolverCapability.target_repo_file_hints.includes(expectedResourceRef), true, capability.capability_id);
+    assert.deepEqual(resolverCapability.resource_refs, [expectedResourceRef]);
+    assert.equal(resolverCapability.resource_pack_boundary_ref, 'contracts/capability_map.json#/skill_local_resource_pack');
+    assert.equal(resolverCapability.verification_refs.includes('contracts/capability_map.json#/skill_local_resource_pack'), true);
     assert.equal(resolverCapability.verification_refs.includes('contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture'), true);
     assert.equal(resolverCapability.forbidden_surfaces.includes('visual_truth_artifacts'), true, capability.capability_id);
     assertCapabilityRouterBoundary(resolverCapability.authority_boundary, `${capability.capability_id}.resolver`);

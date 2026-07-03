@@ -45,6 +45,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - `story_spec_lock`: audience, goal, non-negotiable source refs, forbidden claims, slide ids, page roles, action-title language, evidence placement, and approval state.
 - `progressive_disclosure`: one audience decision per page, one proof object per page, and one transition into the next page; overflow becomes a split-page or repair target.
 - `blueprint_row`: `slide_id`, `page_role`, `action_title`, `core_claim`, `evidence_refs`, `proof_object`, `visible_text_budget`, `speaker_note_goal`, `transition`.
+- Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
 
