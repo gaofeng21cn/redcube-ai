@@ -1,78 +1,71 @@
 {
-  "surface_kind": "standard_agent_principles_adoption",
+  "surface_kind": "opl_standard_agent_principles_adoption",
   "version": "standard-agent-principles-adoption.v1",
-  "state": "active_contract",
   "owner": "redcube-ai",
   "domain_id": "redcube-ai",
-  "principle_pack_owner": "one-person-lab",
-  "source_refs": {
-    "opl_principle_projection": "agent/principles/opl-standard-agent-principles.md",
-    "domain_principle_specialization": "agent/principles/redcube-ai-principles.md",
-    "stage_operating_principles": "contracts/stage_operating_principles.json",
-    "canonical_domain_descriptor": "contracts/domain_descriptor.json",
-    "pack_compiler_input": "contracts/pack_compiler_input.json",
-    "stage_control_plane": "contracts/stage_control_plane.json"
-  },
-  "adopted_opl_principle_ids": [
-    "opl.truth-owner",
-    "opl.big-rocks-first",
-    "opl.goal-before-path",
-    "opl.ai-first-contract-light",
-    "opl.stage-delivery",
-    "opl.single-source-thin-entry",
-    "opl.converge-retire-history",
-    "opl.risk-matched-evidence"
+  "domain_label": "RedCube AI",
+  "state": "active_contract",
+  "adopted_principle_pack_ref": "contracts/opl-framework/standard-agent-principles.json",
+  "adopted_principle_ids": [
+    "ai_first_execution",
+    "contract_backed_boundary",
+    "domain_truth_authority",
+    "stage_prompt_skill_tool_separation",
+    "domain_intake_mapping",
+    "workspace_source_intake_shell",
+    "owner_delta_progress",
+    "parallel_executor_autonomy",
+    "module_organization"
   ],
-  "domain_authority_owner": {
-    "owner_id": "redcube-ai",
-    "owns": [
-      "visual_truth",
-      "communication_strategy",
-      "visual_direction",
-      "review_export_verdict",
-      "artifact_authority",
-      "visual_memory_accept_reject",
-      "owner_receipt_signing",
-      "rca_typed_blockers"
-    ],
-    "authority_refs": [
-      "contracts/domain_descriptor.json#/domain_specific_profile/rca_domain_authority",
-      "contracts/owner_receipt_contract.json",
-      "contracts/private_functional_surface_policy.json",
-      "contracts/functional_privatization_audit.json"
-    ]
+  "source_refs": {
+    "opl_projection_ref": "agent/principles/opl-standard-agent-principles.md",
+    "domain_specialization_ref": "agent/principles/domain-specialization.md",
+    "domain_specific_principles_ref": "agent/principles/redcube-ai-principles.md",
+    "stage_control_plane_ref": "contracts/stage_control_plane.json",
+    "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
+    "action_catalog_ref": "contracts/action_catalog.json",
+    "domain_descriptor_ref": "contracts/domain_descriptor.json",
+    "stage_operating_principles_ref": "contracts/stage_operating_principles.json"
   },
-  "domain_intake_starter_stage_mapping": {
-    "intake_is_standalone_skill": false,
-    "starter_stage_id": "source_intake",
-    "stage_ref": "agent/stages/source_intake.md",
-    "prompt_ref": "agent/prompts/source_intake.md",
-    "tool_affordance_ref": "agent/tools/domain_affordances.md",
-    "knowledge_refs": [
-      "agent/knowledge/visual_truth_boundaries.md",
-      "agent/knowledge/owner_receipt_policy.md"
-    ],
-    "quality_gate_refs": [
-      "agent/quality_gates/source_and_truth.md",
-      "agent/quality_gates/visual_authority_boundaries.md"
-    ],
-    "admission_refs": [
-      "contracts/stage_control_plane.json#/stages/0",
-      "contracts/action_catalog.json#/actions/1",
-      "contracts/stage_operating_principles.json"
-    ],
-    "accepted_outputs": [
-      "source_manifest_ref",
-      "visual_material_ref",
-      "owner_receipt_ref",
-      "typed_blocker_ref",
-      "human_gate_ref",
-      "route_back_ref",
-      "handoff_packet_ref"
-    ]
+  "domain_mapping": {
+    "domain_intake": {
+      "principle_id": "domain_intake_mapping",
+      "domain_stage_ref": "contracts/stage_control_plane.json#/stages/0",
+      "stage_id": "source_intake",
+      "prompt_ref": "agent/prompts/source_intake.md",
+      "is_standalone_skill": false,
+      "owner_receipt_or_typed_blocker_required": true,
+      "accepted_outputs": [
+        "source_manifest_ref",
+        "visual_material_ref",
+        "owner_receipt_ref",
+        "typed_blocker_ref",
+        "human_gate_ref",
+        "route_back_ref",
+        "handoff_packet_ref"
+      ]
+    },
+    "workspace_source_intake_shell": {
+      "principle_id": "workspace_source_intake_shell",
+      "opl_owned_shell_ref": "contracts/opl-framework/standard-agent-principles.json#principles/workspace_source_intake_shell",
+      "domain_source_truth_owner": "redcube-ai",
+      "domain_source_refs": [
+        "contracts/domain_descriptor.json",
+        "contracts/pack_compiler_input.json",
+        "contracts/stage_control_plane.json",
+        "contracts/action_catalog.json",
+        "contracts/artifact_locator_contract.json",
+        "contracts/memory_descriptor.json"
+      ]
+    }
   },
   "module_organization": {
-    "principle_projection_root": "agent/principles/",
+    "framework_module_registry_ref": "contracts/opl-framework/brand-module-registry.json",
+    "domain_pack_root": "agent/",
+    "domain_pack_role": "declarative_domain_pack",
+    "minimal_authority_functions_ref": "contracts/domain_descriptor.json#/domain_specific_profile/rca_domain_authority",
+    "generated_surface_handoff_ref": "contracts/generated_surface_handoff.json",
+    "capability_pack_is_not_domain_intake": true,
     "stage_surfaces": [
       "agent/stages/source_intake.md",
       "agent/stages/communication_strategy.md",
@@ -105,14 +98,6 @@
     "tool_surfaces": [
       "agent/tools/domain_affordances.md"
     ],
-    "source_surfaces": [
-      "contracts/domain_descriptor.json",
-      "contracts/pack_compiler_input.json",
-      "contracts/stage_control_plane.json",
-      "contracts/action_catalog.json",
-      "contracts/artifact_locator_contract.json",
-      "contracts/memory_descriptor.json"
-    ],
     "quality_surfaces": [
       "agent/quality_gates/source_and_truth.md",
       "agent/quality_gates/communication_and_direction.md",
@@ -121,15 +106,25 @@
       "agent/quality_gates/artifact_authority.md",
       "agent/quality_gates/review_export_memory.md",
       "agent/quality_gates/visual_authority_boundaries.md"
+    ]
+  },
+  "domain_authority_owner": {
+    "owner_id": "redcube-ai",
+    "owns": [
+      "visual_truth",
+      "communication_strategy",
+      "visual_direction",
+      "review_export_verdict",
+      "artifact_authority",
+      "visual_memory_accept_reject",
+      "owner_receipt_signing",
+      "rca_typed_blockers"
     ],
-    "admission_surfaces": [
-      "contracts/stage_operating_principles.json",
-      "contracts/cognitive_kernel_adoption.json",
-      "contracts/golden_path_profile.json",
-      "contracts/generated_surface_handoff.json",
-      "contracts/stage_run_kernel_profile.json",
-      "contracts/stage_run_canary_evidence.json",
-      "contracts/state_index_kernel_adoption.json"
+    "authority_refs": [
+      "contracts/domain_descriptor.json#/domain_specific_profile/rca_domain_authority",
+      "contracts/owner_receipt_contract.json",
+      "contracts/private_functional_surface_policy.json",
+      "contracts/functional_privatization_audit.json"
     ]
   },
   "quality_readback_surface": {
@@ -156,9 +151,14 @@
       "requires_rca_owner_receipt_for_domain_closeout": true
     }
   },
-  "non_authority_boundary": {
+  "authority_boundary": {
+    "adoption_can_claim_domain_ready": false,
+    "adoption_can_claim_production_ready": false,
     "opl_can_write_domain_truth": false,
     "opl_can_write_memory_body": false,
+    "opl_can_authorize_quality_or_export": false,
+    "opl_can_create_owner_receipt": false,
+    "opl_can_create_typed_blocker": false,
     "opl_can_mutate_canonical_artifacts": false,
     "opl_can_sign_domain_owner_receipt": false,
     "opl_can_create_rca_typed_blocker": false,
