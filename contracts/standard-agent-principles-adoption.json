@@ -1,0 +1,169 @@
+{
+  "surface_kind": "standard_agent_principles_adoption",
+  "version": "standard-agent-principles-adoption.v1",
+  "state": "active_contract",
+  "owner": "redcube-ai",
+  "domain_id": "redcube-ai",
+  "principle_pack_owner": "one-person-lab",
+  "source_refs": {
+    "opl_principle_projection": "agent/principles/opl-standard-agent-principles.md",
+    "domain_principle_specialization": "agent/principles/redcube-ai-principles.md",
+    "stage_operating_principles": "contracts/stage_operating_principles.json",
+    "canonical_domain_descriptor": "contracts/domain_descriptor.json",
+    "pack_compiler_input": "contracts/pack_compiler_input.json",
+    "stage_control_plane": "contracts/stage_control_plane.json"
+  },
+  "adopted_opl_principle_ids": [
+    "opl.truth-owner",
+    "opl.big-rocks-first",
+    "opl.goal-before-path",
+    "opl.ai-first-contract-light",
+    "opl.stage-delivery",
+    "opl.single-source-thin-entry",
+    "opl.converge-retire-history",
+    "opl.risk-matched-evidence"
+  ],
+  "domain_authority_owner": {
+    "owner_id": "redcube-ai",
+    "owns": [
+      "visual_truth",
+      "communication_strategy",
+      "visual_direction",
+      "review_export_verdict",
+      "artifact_authority",
+      "visual_memory_accept_reject",
+      "owner_receipt_signing",
+      "rca_typed_blockers"
+    ],
+    "authority_refs": [
+      "contracts/domain_descriptor.json#/domain_specific_profile/rca_domain_authority",
+      "contracts/owner_receipt_contract.json",
+      "contracts/private_functional_surface_policy.json",
+      "contracts/functional_privatization_audit.json"
+    ]
+  },
+  "domain_intake_starter_stage_mapping": {
+    "intake_is_standalone_skill": false,
+    "starter_stage_id": "source_intake",
+    "stage_ref": "agent/stages/source_intake.md",
+    "prompt_ref": "agent/prompts/source_intake.md",
+    "tool_affordance_ref": "agent/tools/domain_affordances.md",
+    "knowledge_refs": [
+      "agent/knowledge/visual_truth_boundaries.md",
+      "agent/knowledge/owner_receipt_policy.md"
+    ],
+    "quality_gate_refs": [
+      "agent/quality_gates/source_and_truth.md",
+      "agent/quality_gates/visual_authority_boundaries.md"
+    ],
+    "admission_refs": [
+      "contracts/stage_control_plane.json#/stages/0",
+      "contracts/action_catalog.json#/actions/1",
+      "contracts/stage_operating_principles.json"
+    ],
+    "accepted_outputs": [
+      "source_manifest_ref",
+      "visual_material_ref",
+      "owner_receipt_ref",
+      "typed_blocker_ref",
+      "human_gate_ref",
+      "route_back_ref",
+      "handoff_packet_ref"
+    ]
+  },
+  "module_organization": {
+    "principle_projection_root": "agent/principles/",
+    "stage_surfaces": [
+      "agent/stages/source_intake.md",
+      "agent/stages/communication_strategy.md",
+      "agent/stages/visual_direction.md",
+      "agent/stages/artifact_creation.md",
+      "agent/stages/review_and_revision.md",
+      "agent/stages/package_and_handoff.md"
+    ],
+    "prompt_surfaces": [
+      "agent/prompts/source_intake.md",
+      "agent/prompts/communication_strategy.md",
+      "agent/prompts/visual_direction.md",
+      "agent/prompts/artifact_creation.md",
+      "agent/prompts/review_and_revision.md",
+      "agent/prompts/package_and_handoff.md"
+    ],
+    "skill_surfaces": [
+      "agent/skills/visual_deliverable_authoring.md",
+      "agent/skills/native_helper_policy.md",
+      "agent/skills/visual_memory_policy.md"
+    ],
+    "professional_skill_surfaces": [
+      "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+      "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+      "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+      "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+      "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+      "agent/professional_skills/rca-template-profiler/SKILL.md"
+    ],
+    "tool_surfaces": [
+      "agent/tools/domain_affordances.md"
+    ],
+    "source_surfaces": [
+      "contracts/domain_descriptor.json",
+      "contracts/pack_compiler_input.json",
+      "contracts/stage_control_plane.json",
+      "contracts/action_catalog.json",
+      "contracts/artifact_locator_contract.json",
+      "contracts/memory_descriptor.json"
+    ],
+    "quality_surfaces": [
+      "agent/quality_gates/source_and_truth.md",
+      "agent/quality_gates/communication_and_direction.md",
+      "agent/quality_gates/visual_pack_discipline.md",
+      "agent/quality_gates/package_distribution.md",
+      "agent/quality_gates/artifact_authority.md",
+      "agent/quality_gates/review_export_memory.md",
+      "agent/quality_gates/visual_authority_boundaries.md"
+    ],
+    "admission_surfaces": [
+      "contracts/stage_operating_principles.json",
+      "contracts/cognitive_kernel_adoption.json",
+      "contracts/golden_path_profile.json",
+      "contracts/generated_surface_handoff.json",
+      "contracts/stage_run_kernel_profile.json",
+      "contracts/stage_run_canary_evidence.json",
+      "contracts/state_index_kernel_adoption.json"
+    ]
+  },
+  "quality_readback_surface": {
+    "quality_gate_refs": [
+      "agent/quality_gates/source_and_truth.md",
+      "agent/quality_gates/communication_and_direction.md",
+      "agent/quality_gates/artifact_authority.md",
+      "agent/quality_gates/review_export_memory.md",
+      "agent/quality_gates/package_distribution.md",
+      "agent/quality_gates/visual_authority_boundaries.md"
+    ],
+    "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
+    "readback_refs": [
+      "contracts/live_stage_run_progress_evidence.json",
+      "contracts/owner_chain_live_progress_evidence.json",
+      "contracts/production_acceptance/rca-production-acceptance.json",
+      "contracts/stage_run_canary_evidence.json"
+    ],
+    "readback_claim_boundary": {
+      "can_claim_structural_adoption": true,
+      "can_claim_live_visual_progress": false,
+      "can_claim_visual_ready": false,
+      "can_claim_export_ready": false,
+      "requires_rca_owner_receipt_for_domain_closeout": true
+    }
+  },
+  "non_authority_boundary": {
+    "opl_can_write_domain_truth": false,
+    "opl_can_write_memory_body": false,
+    "opl_can_mutate_canonical_artifacts": false,
+    "opl_can_sign_domain_owner_receipt": false,
+    "opl_can_create_rca_typed_blocker": false,
+    "opl_can_authorize_review_or_export": false,
+    "generated_surface_or_conformance_can_claim_domain_ready": false,
+    "intake_skill_is_independent_authority": false
+  }
+}
