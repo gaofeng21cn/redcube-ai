@@ -1,6 +1,6 @@
 {
-  "surface_kind": "rca_professional_capability_map",
-  "schema_version": 1,
+  "surface_kind": "opl_standard_agent_capability_map",
+  "schema_version": "standard-agent-capability-map.v1",
   "domain_id": "redcube_ai",
   "domain_label": "RedCube AI",
   "owner": "redcube_ai",
@@ -271,5 +271,771 @@
     "oma_can_claim_visual_ready": false,
     "oma_can_claim_exportable": false,
     "rca_owner_receipt_or_typed_blocker_required_for_domain_closeout": true
-  }
+  },
+  "domain_capability_map_kind": "rca_professional_capability_map",
+  "schema_ref": "contracts/opl-framework/standard-agent-capability-map.schema.json",
+  "resolver_policy": "resolver_index_only_no_domain_truth",
+  "capability_pack": {
+    "pack_id": "redcube-ai.agent-capability-pack",
+    "pack_root_ref": "agent/",
+    "map_ref": "contracts/capability_map.json",
+    "pack_role": "declarative_domain_capability_pack",
+    "capability_pack_can_claim_domain_ready": false
+  },
+  "authority_boundary": {
+    "can_write_domain_truth": false,
+    "can_write_memory_body": false,
+    "can_mutate_artifact_body": false,
+    "can_sign_owner_receipt": false,
+    "can_create_typed_blocker": false,
+    "can_authorize_quality_or_export": false,
+    "can_claim_domain_ready": false,
+    "can_claim_production_ready": false,
+    "refs_only_professional_skill_router": true,
+    "forbidden_surfaces": [
+      "visual truth artifacts",
+      "artifact blobs",
+      "owner receipts",
+      "export or quality verdicts",
+      "runtime data"
+    ]
+  },
+  "capabilities": [
+    {
+      "capability_id": "rca-ppt-story-architect",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "storyline",
+        "claim_spine",
+        "narrative_sequence",
+        "detailed_outline",
+        "slide_blueprint",
+        "page_role",
+        "evidence_placement",
+        "rca-ppt-story-architect"
+      ],
+      "failure_tokens": [
+        "storyline",
+        "claim_spine",
+        "narrative_sequence",
+        "detailed_outline",
+        "slide_blueprint",
+        "page_role",
+        "evidence_placement",
+        "rca-ppt-story-architect"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/prompts/communication_strategy.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/prompts/communication_strategy.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "communication_strategy"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-visual-director",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "visual_density",
+        "layout_quality",
+        "visual_language",
+        "layout_rhythm",
+        "density_controls",
+        "peak_pages",
+        "layout_variety",
+        "template_profile_consumption",
+        "rca-ppt-visual-director"
+      ],
+      "failure_tokens": [
+        "visual_density",
+        "layout_quality",
+        "visual_language",
+        "layout_rhythm",
+        "density_controls",
+        "peak_pages",
+        "layout_variety",
+        "template_profile_consumption",
+        "rca-ppt-visual-director"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "agent/quality_gates/visual_pack_discipline.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "agent/quality_gates/visual_pack_discipline.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "visual_direction",
+        "review_and_revision"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-page-author",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "page_authoring",
+        "layout_quality",
+        "visual_density",
+        "page_level_authoring",
+        "route_specific_page_payload",
+        "structural_visual",
+        "text_fit",
+        "blocked_slide_repair",
+        "visible_text_safety",
+        "rca-ppt-page-author"
+      ],
+      "failure_tokens": [
+        "page_authoring",
+        "layout_quality",
+        "visual_density",
+        "page_level_authoring",
+        "route_specific_page_payload",
+        "structural_visual",
+        "text_fit",
+        "blocked_slide_repair",
+        "visible_text_safety",
+        "rca-ppt-page-author"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/prompts/artifact_creation.md",
+        "agent/skills/visual_deliverable_authoring.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "agent/prompts/artifact_creation.md",
+        "agent/skills/visual_deliverable_authoring.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "artifact_creation"
+      ]
+    },
+    {
+      "capability_id": "rca-ppt-reviewer",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "ppt_review",
+        "layout_quality",
+        "visual_density",
+        "rendered_page_review",
+        "screenshot_review",
+        "source_fidelity",
+        "repair_target_selection",
+        "weak_page_detection",
+        "review_export_gate_evidence",
+        "rca-ppt-reviewer"
+      ],
+      "failure_tokens": [
+        "ppt_review",
+        "layout_quality",
+        "visual_density",
+        "rendered_page_review",
+        "screenshot_review",
+        "source_fidelity",
+        "repair_target_selection",
+        "weak_page_detection",
+        "review_export_gate_evidence",
+        "rca-ppt-reviewer"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/prompts/review_and_revision.md",
+        "agent/quality_gates/review_export_memory.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/prompts/review_and_revision.md",
+        "agent/quality_gates/review_export_memory.md",
+        "contracts/stage_control_plane.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ]
+    },
+    {
+      "capability_id": "rca-native-ppt-designer",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "native_pptx_editability",
+        "editable_shape_plan",
+        "native_pptx_design_spec_lock",
+        "template_layout_grammar",
+        "shape_coordinates",
+        "office_editability",
+        "native_repair_targets",
+        "rca-native-ppt-designer"
+      ],
+      "failure_tokens": [
+        "native_pptx_editability",
+        "editable_shape_plan",
+        "native_pptx_design_spec_lock",
+        "template_layout_grammar",
+        "shape_coordinates",
+        "office_editability",
+        "native_repair_targets",
+        "rca-native-ppt-designer"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "prompts/ppt_deck/repair_pptx_native.md",
+        "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "prompts/ppt_deck/repair_pptx_native.md",
+        "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "artifact_creation"
+      ]
+    },
+    {
+      "capability_id": "rca-template-profiler",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA PPT professional methods are first-class repo-local specialist skills; tools only materialize refs and cannot own visual judgment.",
+      "improvement_tokens": [
+        "template_profile",
+        "reference_deck_analysis",
+        "semantic_layout_inventory",
+        "placeholder_capacity",
+        "layout_grammar",
+        "title_safe_zone",
+        "rca-template-profiler"
+      ],
+      "failure_tokens": [
+        "template_profile",
+        "reference_deck_analysis",
+        "semantic_layout_inventory",
+        "placeholder_capacity",
+        "layout_grammar",
+        "title_safe_zone",
+        "rca-template-profiler"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "docs/references/native-ppt-open-source-design-discipline.md",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "agent/prompts/visual_direction.md",
+        "prompts/ppt_deck/author_pptx_native.md",
+        "docs/references/native-ppt-open-source-design-discipline.md",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false
+      },
+      "stage_refs": [
+        "visual_direction",
+        "artifact_creation"
+      ]
+    },
+    {
+      "capability_id": "rca-stage-prompts",
+      "surface_role": "stage_prompt",
+      "capability_kind": "stage_prompt",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/prompts/",
+        "role": "stage_operating_prompt_sources"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/prompts/",
+          "role": "stage_prompt_pack"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/stage_control_plane.json",
+          "role": "stage_control_plane"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA stage prompts own stage goals and receipts while professional skills own reusable PPT methods.",
+      "improvement_tokens": [
+        "stage_prompt",
+        "visual_stage_prompt",
+        "ppt_stage"
+      ],
+      "failure_tokens": [
+        "stage_prompt",
+        "visual_stage_prompt",
+        "ppt_stage"
+      ],
+      "canonical_paths": [
+        "agent/prompts/",
+        "contracts/stage_control_plane.json"
+      ],
+      "target_repo_file_hints": [
+        "agent/prompts/",
+        "contracts/stage_control_plane.json"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false
+      }
+    },
+    {
+      "capability_id": "rca-tool-connector-catalog",
+      "surface_role": "tool_connector",
+      "capability_kind": "tool_connector",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/tools/domain_affordances.md",
+        "role": "domain_tool_connector_catalog"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/tools/domain_affordances.md",
+          "role": "tool_affordance_boundary"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/action_catalog.json",
+          "role": "action_catalog"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA tools materialize PPT, screenshots, and exports; they do not choose visual strategy.",
+      "improvement_tokens": [
+        "tool_connector",
+        "native_helper",
+        "officecli",
+        "render",
+        "export"
+      ],
+      "failure_tokens": [
+        "tool_connector",
+        "native_helper",
+        "officecli",
+        "render",
+        "export"
+      ],
+      "canonical_paths": [
+        "agent/tools/domain_affordances.md",
+        "contracts/action_catalog.json"
+      ],
+      "target_repo_file_hints": [
+        "agent/tools/domain_affordances.md",
+        "contracts/action_catalog.json"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false
+      }
+    },
+    {
+      "capability_id": "rca-visual-knowledge-pack",
+      "surface_role": "knowledge_pack",
+      "capability_kind": "reference_pack",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/knowledge/",
+        "role": "visual_knowledge_pack"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/knowledge/",
+          "role": "knowledge_pack"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/domain_descriptor.json",
+          "role": "domain_descriptor"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA visual truth, source, export, and review memory are declarative knowledge refs.",
+      "improvement_tokens": [
+        "knowledge_pack",
+        "visual_truth",
+        "review_export_memory"
+      ],
+      "failure_tokens": [
+        "knowledge_pack",
+        "visual_truth",
+        "review_export_memory"
+      ],
+      "canonical_paths": [
+        "agent/knowledge/",
+        "contracts/domain_descriptor.json"
+      ],
+      "target_repo_file_hints": [
+        "agent/knowledge/",
+        "contracts/domain_descriptor.json"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false
+      }
+    },
+    {
+      "capability_id": "rca-review-quality-gates",
+      "surface_role": "quality_gate",
+      "capability_kind": "contract_module",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/quality_gates/",
+        "role": "visual_quality_gate_pack"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/quality_gates/",
+          "role": "quality_gate_pack"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/artifact_locator_contract.json",
+          "role": "artifact_locator_contract"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA quality gates review refs and repair targets; review/export verdicts remain owner-gated.",
+      "improvement_tokens": [
+        "quality_gate",
+        "screenshot_review",
+        "review_export_memory"
+      ],
+      "failure_tokens": [
+        "quality_gate",
+        "screenshot_review",
+        "review_export_memory"
+      ],
+      "canonical_paths": [
+        "agent/quality_gates/",
+        "contracts/artifact_locator_contract.json"
+      ],
+      "target_repo_file_hints": [
+        "agent/quality_gates/",
+        "contracts/artifact_locator_contract.json"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false
+      }
+    },
+    {
+      "capability_id": "rca-ppt-agent-lab-eval-suite",
+      "surface_role": "eval_suite",
+      "capability_kind": "contract_module",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "contract_ref",
+        "ref": "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
+        "role": "agent_lab_external_suite"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/agent_lab_handoff.json",
+          "role": "agent_lab_handoff"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
+          "role": "ppt_three_route_eval_suite"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "Agent Lab receives RCA suite refs and feedback tokens without writing visual truth or export verdicts.",
+      "improvement_tokens": [
+        "agent_lab",
+        "eval_suite",
+        "ppt_three_route",
+        "visual_density"
+      ],
+      "failure_tokens": [
+        "agent_lab",
+        "eval_suite",
+        "ppt_three_route",
+        "visual_density"
+      ],
+      "canonical_paths": [
+        "contracts/agent_lab_handoff.json",
+        "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
+      ],
+      "target_repo_file_hints": [
+        "contracts/agent_lab_handoff.json",
+        "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
+      ],
+      "authority_boundary": {
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false
+      }
+    }
+  ]
 }

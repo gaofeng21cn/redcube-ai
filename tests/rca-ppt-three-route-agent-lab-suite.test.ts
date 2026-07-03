@@ -76,7 +76,8 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'storyline',
   ];
 
-  assert.equal(map.surface_kind, 'rca_professional_capability_map');
+  assert.equal(map.surface_kind, 'opl_standard_agent_capability_map');
+  assert.equal(map.domain_capability_map_kind, 'rca_professional_capability_map');
   assert.equal(map.owner, 'redcube_ai');
   assert.equal(map.professional_skill_policy.skill_files_are_method_source_of_truth, true);
   assert.equal(map.professional_skill_policy.capability_map_is_routing_metadata_only, true);
