@@ -39,6 +39,13 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 8. Plan for show-don't-tell. Prefer concrete proof objects, comparisons, timelines, system maps, metrics, and decisions over generic summary bullets.
 9. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
 
+## Minimal Template Resource
+
+- `serial_pipeline`: `source_lock -> claim_spine -> detailed_outline -> slide_blueprint -> visual_direction_ready`. Each step names the accepted input ref, output ref, next gate, and repair owner before the next step starts.
+- `story_spec_lock`: audience, goal, non-negotiable source refs, forbidden claims, slide ids, page roles, action-title language, evidence placement, and approval state.
+- `progressive_disclosure`: one audience decision per page, one proof object per page, and one transition into the next page; overflow becomes a split-page or repair target.
+- `blueprint_row`: `slide_id`, `page_role`, `action_title`, `core_claim`, `evidence_refs`, `proof_object`, `visible_text_budget`, `speaker_note_goal`, `transition`.
+
 ## Stage Prompt Boundary
 
 - `source_intake` owns source readiness and source gaps.

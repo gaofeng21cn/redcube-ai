@@ -41,6 +41,13 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 8. For native PPTX, produce zones and placeholder rules that the `editable_shape_plan` can bind to directly.
 9. For image-first or HTML routes, still provide semantic layout and capacity guidance, but do not claim native editability.
 
+## Minimal Template Resource
+
+- `style_boundary`: separate reusable layout intelligence from decorative skin; RCA keeps route policy, source truth, visual judgment, and review/export authority.
+- `template_profile_row`: `layout_id`, use case, zones, required roles, title safe zone, content capacity, minimum font floor, spacing rules, and reuse ceiling.
+- `placeholder_capacity`: per zone record max headline/body/label length, object count, image/chart/table affordance, safe inset, and overflow risk.
+- `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
+
 ## Stage Prompt Boundary
 
 - `source_intake` and `communication_strategy` own content truth and story sequence.

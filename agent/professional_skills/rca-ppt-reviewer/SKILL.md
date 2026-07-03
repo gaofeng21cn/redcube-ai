@@ -42,6 +42,13 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
 
+## Minimal Template Resource
+
+- `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.
+- `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
+- `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
+- `export_gate_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, and forbidden-authority flags before handoff.
+
 ## Stage Prompt Boundary
 
 - `review_and_revision` owns visual director review, screenshot review, repair targeting, and memory proposals.

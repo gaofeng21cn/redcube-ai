@@ -42,6 +42,14 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 8. For repair, target only blocked pages when the review surface names them; preserve passed pages and record what feedback was consumed.
 9. Treat helpers as materializers. Python, Office, screenshot, and export helpers execute the RCA plan and return evidence; they do not choose design or declare visual readiness.
 
+## Minimal Template Resource
+
+- `page_contract`: `slide_id`, approved claim, proof object, visual direction ref, selected route, density band, text budget, required evidence, and review risk.
+- `serial_page_pipeline`: read page contract, choose structural visual, place title/proof/evidence zones, check density, then emit route-specific payload.
+- `ppt_visual_density`: reduce labels, slots, or secondary notes before shrinking text below the readable floor; if the page still fails, return a repair target.
+- `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
+- `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
+
 ## Stage Prompt Boundary
 
 - `artifact_creation` owns artifact production under selected route policy.

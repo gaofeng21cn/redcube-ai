@@ -39,6 +39,14 @@ Operate as the visual direction specialist between blueprint approval and page a
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
 
+## Minimal Template Resource
+
+- `spec_lock`: deck thesis, palette, typography scale, grid, motif, title safe zone, density ceiling, route policy, proof-object families, and forbidden regressions.
+- `style_boundary`: what the deck may borrow from a reference deck, what must stay RCA-owned, and which visible elements must not appear as template skin.
+- `rhythm_row`: `slide_id`, `page_role`, `proof_object`, `layout_family`, `density_band`, `peak_role`, `template_binding`, `repair_risk`.
+- `ppt_visual_density`: classify each slide as `sparse`, `balanced`, or `dense`; dense pages need a named reason, readable floor, and split/shorten fallback.
+- `progressive_disclosure`: move from overview to proof to decision through visible structure, not by revealing more small text on the same page.
+
 ## Stage Prompt Boundary
 
 - `visual_direction` owns visual language, rhythm, page family ceilings, density controls, and forbidden regressions.

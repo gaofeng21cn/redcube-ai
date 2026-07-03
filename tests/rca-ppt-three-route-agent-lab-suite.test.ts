@@ -96,8 +96,18 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'template_profile',
     'placeholder_capacity',
   ];
+  const methodTokens = [
+    'ppt_visual_density',
+    'serial_pipeline',
+    'spec_lock',
+    'progressive_disclosure',
+    'style_boundary',
+    'visual_qa',
+    'editable_pptx_grammar',
+  ];
   const expectedTokens = [
     ...requiredVisualFailureTokens,
+    ...methodTokens,
     'visual_density',
     'layout_quality',
     'ppt_review',
@@ -117,6 +127,8 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'template_profile',
     'placeholder_capacity',
   ]);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.skill_method_tokens, methodTokens);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.all_supported_tokens, expectedTokens);
   assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('visual_truth'), true);
   assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('review_export_verdict'), true);
   assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('artifact_authority'), true);
@@ -203,6 +215,37 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-ppt-visual-director',
     'rca-native-ppt-designer',
   ]);
+  assert.deepEqual(map.feedback_token_index.ppt_visual_density.canonical_capability_ids, [
+    'rca-ppt-visual-director',
+    'rca-ppt-page-author',
+    'rca-ppt-reviewer',
+  ]);
+  assert.deepEqual(map.feedback_token_index.serial_pipeline.canonical_capability_ids, [
+    'rca-ppt-story-architect',
+    'rca-ppt-page-author',
+  ]);
+  assert.deepEqual(map.feedback_token_index.spec_lock.canonical_capability_ids, [
+    'rca-ppt-visual-director',
+    'rca-native-ppt-designer',
+  ]);
+  assert.deepEqual(map.feedback_token_index.progressive_disclosure.canonical_capability_ids, [
+    'rca-ppt-story-architect',
+    'rca-ppt-visual-director',
+    'rca-ppt-page-author',
+  ]);
+  assert.deepEqual(map.feedback_token_index.style_boundary.canonical_capability_ids, [
+    'rca-ppt-visual-director',
+    'rca-template-profiler',
+  ]);
+  assert.deepEqual(map.feedback_token_index.visual_qa.canonical_capability_ids, [
+    'rca-ppt-reviewer',
+    'rca-ppt-visual-director',
+  ]);
+  assert.deepEqual(map.feedback_token_index.editable_pptx_grammar.canonical_capability_ids, [
+    'rca-native-ppt-designer',
+    'rca-template-profiler',
+    'rca-ppt-page-author',
+  ]);
   assert.equal(
     map.feedback_token_index.native_pptx_editability.canonical_capability_ids.includes('rca-native-ppt-designer'),
     true,
@@ -220,6 +263,67 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('visual_truth'), true);
   assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('review_export_verdict'), true);
   assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('artifact_authority'), true);
+}
+
+function assertPptDryRunTokenMapping(map, handoff) {
+  const dryRunTokens = [
+    'ppt_visual_density',
+    'native_pptx_editability',
+    'serial_pipeline',
+    'spec_lock',
+    'progressive_disclosure',
+    'style_boundary',
+    'visual_qa',
+    'editable_pptx_grammar',
+  ];
+  assert.equal(map.dry_run_token_mapping_check.check_kind, 'non_live_feedback_token_to_professional_skill_mapping');
+  assert.equal(map.dry_run_token_mapping_check.dry_run_only, true);
+  assert.equal(map.dry_run_token_mapping_check.invokes_live_provider, false);
+  assert.equal(map.dry_run_token_mapping_check.writes_runtime_state, false);
+  assert.equal(map.dry_run_token_mapping_check.writes_visual_truth_or_artifacts, false);
+  assert.deepEqual(map.dry_run_token_mapping_check.tokens, dryRunTokens);
+  assert.equal(handoff.dry_run_token_mapping_check.check_kind, map.dry_run_token_mapping_check.check_kind);
+  assert.equal(handoff.dry_run_token_mapping_check.dry_run_only, true);
+  assert.deepEqual(handoff.dry_run_token_mapping_check.source_feedback.tokens, dryRunTokens);
+  assert.equal(
+    handoff.external_suite_improvement_policy.dry_run_token_mapping_check_ref,
+    'contracts/agent_lab_handoff.json#/dry_run_token_mapping_check',
+  );
+
+  for (const dryRunCase of map.dry_run_token_mapping_check.token_cases) {
+    const token = dryRunCase.feedback_token;
+    const tokenIndex = map.feedback_token_index[token];
+    const mapping = handoff.change_ref_mappings[token];
+    const handoffCase = handoff.dry_run_token_mapping_check.token_cases.find((entry) => entry.feedback_token === token);
+    assert.equal(Boolean(tokenIndex), true, token);
+    assert.equal(Boolean(mapping), true, token);
+    assert.equal(Boolean(handoffCase), true, token);
+    assert.deepEqual(dryRunCase.capability_ids, tokenIndex.canonical_capability_ids, token);
+    assert.deepEqual(mapping.capability_ids, tokenIndex.canonical_capability_ids, token);
+    assert.deepEqual(mapping.primary_skill_refs, dryRunCase.primary_skill_refs, token);
+    assert.deepEqual(handoffCase.primary_skill_refs, dryRunCase.primary_skill_refs, token);
+    assert.equal(mapping.forbidden_surfaces.includes('runtime_data'), true, token);
+    assert.equal(mapping.forbidden_surfaces.includes('owner_receipts'), true, token);
+    assert.equal(
+      mapping.verification_refs.includes(
+        'tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts',
+      ),
+      true,
+      token,
+    );
+
+    for (const skillRef of dryRunCase.primary_skill_refs) {
+      const skillPath = path.join(repoRoot, skillRef);
+      assert.equal(fs.existsSync(skillPath), true, `${token}:${skillRef}`);
+      const skill = fs.readFileSync(skillPath, 'utf8');
+      assert.equal(skill.includes('## Minimal Template Resource'), true, `${token}:${skillRef}`);
+    }
+  }
+
+  assert.equal(handoff.dry_run_token_mapping_check.authority_boundary.can_write_domain_truth, false);
+  assert.equal(handoff.dry_run_token_mapping_check.authority_boundary.can_mutate_artifact_body, false);
+  assert.equal(handoff.dry_run_token_mapping_check.authority_boundary.can_sign_owner_receipt, false);
+  assert.equal(handoff.dry_run_token_mapping_check.authority_boundary.can_authorize_quality_or_export, false);
 }
 
 function assertPptThreeRouteSuiteShape(suite) {
@@ -450,6 +554,10 @@ test('RCA PPT capability map routes AgentLab visual feedback fixture to professi
     readRepoJson(agentLabHandoffPath),
     readRepoJson('contracts/standard-agent-principles-adoption.json'),
   );
+});
+
+test('RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts', () => {
+  assertPptDryRunTokenMapping(readRepoJson(capabilityMapPath), readRepoJson(agentLabHandoffPath));
 });
 
 test('artifact-producing PPT workflow reaches export_pptx through image-first, HTML, and native PPT routes', SERIAL_ENV_TEST, async () => {
