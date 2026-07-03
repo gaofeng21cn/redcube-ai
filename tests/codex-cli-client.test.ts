@@ -13,6 +13,7 @@ import {
   probeCodexCli,
   readCodexCliContract,
 } from './package-surfaces.ts';
+import { buildGenerationInput } from '../packages/redcube-codex-cli-client/dist/index-parts/prompt-guidance.js';
 
 const ONE_PIXEL_PNG = Buffer.from(
   '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000000020001e221bc330000000049454e44ae426082',
@@ -59,6 +60,39 @@ function codexGeneratedImagesStdout({ generatedDir, generatedFile, outputFile, t
     }),
     JSON.stringify({ type: 'turn.completed', usage: { prompt_tokens: 19, completion_tokens: 3, total_tokens: 22 } }),
   ].join('\n');
+}
+
+function withTemporaryProfessionalSkillFile(relativePath, content, callback) {
+  const absolutePath = path.resolve(relativePath);
+  const parentDir = path.dirname(absolutePath);
+  const fileExisted = existsSync(absolutePath);
+  const dirExisted = existsSync(parentDir);
+
+  if (!fileExisted) {
+    mkdirSync(parentDir, { recursive: true });
+    writeFileSync(absolutePath, content, 'utf-8');
+  }
+
+  const cleanup = () => {
+    if (!fileExisted) {
+      rmSync(absolutePath, { force: true });
+    }
+    if (!dirExisted) {
+      rmSync(parentDir, { recursive: true, force: true });
+    }
+  };
+
+  try {
+    const result = callback();
+    if (result && typeof result.then === 'function') {
+      return result.finally(cleanup);
+    }
+    cleanup();
+    return result;
+  } catch (error) {
+    cleanup();
+    throw error;
+  }
 }
 
 test('readCodexCliContract falls back to local Codex defaults', () => {
@@ -137,57 +171,125 @@ test('probeCodexCli proves the local exec surface with a mock spawn implementati
   assert.equal(result.steps.exec_surface.terminal_event, 'run.completed');
 });
 
-test('generateStructuredArtifactViaCodexCli records deterministic prompt telemetry without faking provider tokens', async () => {
-  const result = await generateStructuredArtifactViaCodexCli({
-    family: 'ppt_deck',
+test('buildGenerationInput includes declared RCA professional specialist guidance for mapped ppt routes', () => {
+  withTemporaryProfessionalSkillFile(
+    'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+    '# Story Architect\n\nKeep storyline, outline, and slide blueprint decisions professionally structured.',
+    () => {
+      const input = buildGenerationInput({
+        family: 'ppt_deck',
+        route: 'storyline',
+        promptRelativePath: 'prompts/ppt_deck/storyline.md',
+        context: { goal: 'professional deck' },
+        outputContract: { type: 'object' },
+      });
+
+      assert.match(input, /## RCA Professional Specialist Skill Guidance/);
+      assert.match(input, /### Story Architect/);
+      assert.match(input, /agent\/professional_skills\/rca-ppt-story-architect\/SKILL\.md/);
+      assert.match(input, /Keep storyline, outline, and slide blueprint decisions professionally structured\./);
+      assert.doesNotMatch(input, /agent\/professional_skills\/rca-ppt-visual-director\/SKILL\.md/);
+    },
+  );
+});
+
+test('buildGenerationInput does not require professional specialist guidance for unrelated routes', () => {
+  const input = buildGenerationInput({
+    family: 'poster_onepager',
     route: 'storyline',
-    promptRelativePath: 'prompts/ppt_deck/storyline.md',
-    context: {
-      target_slide_ids: ['S05'],
-      revision_context: {
-        operator_revision_brief: {
-          target_slide_ids: ['S07'],
-        },
-      },
-      slides: [
-        { slide_id: 'S01', title: '开场' },
-      ],
-    },
-    outputContract: {
-      type: 'object',
-      required: ['headline'],
-    },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-      REDCUBE_CODEX_MODEL: 'gpt-5.4',
-    }),
-    spawnSyncImpl(_command, args) {
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        [
-          REDCUBE_STAGE_JSON_BEGIN,
-          JSON.stringify({ headline: 'AI-first storyline' }),
-          REDCUBE_STAGE_JSON_END,
-        ].join('\n'),
-        'utf-8',
-      );
-      return {
-        status: 0,
-        stdout: JSON.stringify({
-          event: 'run.completed',
-          run_id: 'mock-run',
-          usage: {
-            prompt_tokens: 11,
-            completion_tokens: 2,
-            total_tokens: 13,
-          },
-        }),
-        stderr: '',
-        error: null,
-      };
-    },
+    promptRelativePath: 'prompts/poster_onepager/storyline.md',
+    context: { goal: 'poster' },
+    outputContract: { type: 'object' },
   });
+
+  assert.doesNotMatch(input, /## RCA Professional Specialist Skill Guidance/);
+});
+
+test('buildGenerationInput fail-closes mapped ppt routes when declared specialist guidance is missing', () => {
+  const nativeDesigner = path.resolve('agent/professional_skills/rca-native-ppt-designer/SKILL.md');
+  const templateProfiler = path.resolve('agent/professional_skills/rca-template-profiler/SKILL.md');
+  const allDeclaredFilesExist = existsSync(nativeDesigner) && existsSync(templateProfiler);
+
+  if (allDeclaredFilesExist) {
+    const input = buildGenerationInput({
+      family: 'ppt_deck',
+      route: 'author_pptx_native',
+      promptRelativePath: 'prompts/ppt_deck/author_pptx_native.md',
+      context: { goal: 'editable pptx' },
+      outputContract: { type: 'object' },
+    });
+    assert.match(input, /### Native PPT Designer/);
+    assert.match(input, /### Template Profiler/);
+    return;
+  }
+
+  assert.throws(
+    () => buildGenerationInput({
+      family: 'ppt_deck',
+      route: 'author_pptx_native',
+      promptRelativePath: 'prompts/ppt_deck/author_pptx_native.md',
+      context: { goal: 'editable pptx' },
+      outputContract: { type: 'object' },
+    }),
+    /Missing RCA professional specialist skill guidance for ppt_deck:author_pptx_native/,
+  );
+});
+
+test('generateStructuredArtifactViaCodexCli records deterministic prompt telemetry without faking provider tokens', async () => {
+  const result = await withTemporaryProfessionalSkillFile(
+    'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+    '# Story Architect\n\nKeep storyline, outline, and slide blueprint decisions professionally structured.',
+    () => generateStructuredArtifactViaCodexCli({
+      family: 'ppt_deck',
+      route: 'storyline',
+      promptRelativePath: 'prompts/ppt_deck/storyline.md',
+      context: {
+        target_slide_ids: ['S05'],
+        revision_context: {
+          operator_revision_brief: {
+            target_slide_ids: ['S07'],
+          },
+        },
+        slides: [
+          { slide_id: 'S01', title: '开场' },
+        ],
+      },
+      outputContract: {
+        type: 'object',
+        required: ['headline'],
+      },
+      contract: readCodexCliContract({
+        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+        REDCUBE_CODEX_MODEL: 'gpt-5.4',
+      }),
+      spawnSyncImpl(_command, args) {
+        const outputFlagIndex = args.indexOf('--output-last-message');
+        writeFileSync(
+          args[outputFlagIndex + 1],
+          [
+            REDCUBE_STAGE_JSON_BEGIN,
+            JSON.stringify({ headline: 'AI-first storyline' }),
+            REDCUBE_STAGE_JSON_END,
+          ].join('\n'),
+          'utf-8',
+        );
+        return {
+          status: 0,
+          stdout: JSON.stringify({
+            event: 'run.completed',
+            run_id: 'mock-run',
+            usage: {
+              prompt_tokens: 11,
+              completion_tokens: 2,
+              total_tokens: 13,
+            },
+          }),
+          stderr: '',
+          error: null,
+        };
+      },
+    }),
+  );
 
   assert.equal(result.data.headline, 'AI-first storyline');
   assert.equal(result.generationRuntime.prompt_pack_file, 'prompts/ppt_deck/storyline.md');

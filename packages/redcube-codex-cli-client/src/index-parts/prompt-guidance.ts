@@ -13,6 +13,49 @@ import {
 } from './constants.js';
 import { compactStringArray, safeText } from './shared.js';
 
+const PROFESSIONAL_SPECIALIST_SKILL_FILES = Object.freeze({
+  story_architect: {
+    title: 'Story Architect',
+    path: 'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
+  },
+  visual_director: {
+    title: 'Visual Director',
+    path: 'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
+  },
+  template_profiler: {
+    title: 'Template Profiler',
+    path: 'agent/professional_skills/rca-template-profiler/SKILL.md',
+  },
+  page_author: {
+    title: 'Page Author',
+    path: 'agent/professional_skills/rca-ppt-page-author/SKILL.md',
+  },
+  native_ppt_designer: {
+    title: 'Native PPT Designer',
+    path: 'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
+  },
+  reviewer: {
+    title: 'Reviewer',
+    path: 'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
+  },
+});
+
+const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
+  'ppt_deck:storyline': ['story_architect'],
+  'ppt_deck:detailed_outline': ['story_architect'],
+  'ppt_deck:slide_blueprint': ['story_architect'],
+  'ppt_deck:visual_direction': ['visual_director', 'template_profiler'],
+  'ppt_deck:author_image_pages': ['page_author', 'visual_director'],
+  'ppt_deck:render_html': ['page_author', 'visual_director'],
+  'ppt_deck:author_pptx_native': ['native_ppt_designer', 'template_profiler'],
+  'ppt_deck:repair_pptx_native': ['native_ppt_designer', 'template_profiler', 'reviewer'],
+  'ppt_deck:director_review': ['reviewer'],
+  'ppt_deck:visual_director_review': ['reviewer'],
+  'ppt_deck:screenshot_review': ['reviewer'],
+  'ppt_deck:repair_image_pages': ['reviewer'],
+  'ppt_deck:fix_html': ['reviewer'],
+});
+
 function readPromptGuidance(relativePath) {
   const absolutePath = path.join(REPO_ROOT, relativePath);
   if (!existsSync(absolutePath)) {
@@ -25,6 +68,47 @@ function readPromptGuidance(relativePath) {
     return raw.trim();
   }
   return raw.slice(0, runtimeSectionIndex).trim();
+}
+
+function routeKeyFor(family, route) {
+  return `${safeText(family)}:${safeText(route)}`;
+}
+
+function readProfessionalSkillGuidance(skill, routeKey) {
+  const relativePath = safeText(skill?.path);
+  const absolutePath = path.join(REPO_ROOT, relativePath);
+  if (!existsSync(absolutePath)) {
+    throw new Error(`Missing RCA professional specialist skill guidance for ${routeKey}: ${relativePath}`);
+  }
+  return readFileSync(absolutePath, 'utf-8').trim();
+}
+
+export function buildProfessionalSkillGuidanceSection(family, route) {
+  const routeKey = routeKeyFor(family, route);
+  const skillIds = Array.from(new Set((PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE[routeKey] || [])
+    .map((skillId) => safeText(skillId))
+    .filter(Boolean)));
+  if (skillIds.length === 0) {
+    return '';
+  }
+
+  return [
+    '## RCA Professional Specialist Skill Guidance',
+    'Use only the repo-local declared specialist guidance below. Do not browse or inspect other files for skill guidance.',
+    '',
+    ...skillIds.flatMap((skillId) => {
+      const skill = PROFESSIONAL_SPECIALIST_SKILL_FILES[skillId];
+      if (!skill) {
+        throw new Error(`Missing RCA professional specialist skill mapping for ${routeKey}: ${skillId}`);
+      }
+      return [
+        `### ${skill.title}`,
+        `Source: ${skill.path}`,
+        readProfessionalSkillGuidance(skill, routeKey),
+        '',
+      ];
+    }),
+  ].join('\n').trim();
 }
 
 export function extractMarkedJson(text) {
@@ -128,6 +212,7 @@ export function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = [], 
 
 export function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {
   const guidance = readPromptGuidance(promptRelativePath);
+  const professionalSkillSection = buildProfessionalSkillGuidanceSection(family, route);
   const localFileSection = buildLocalFileInspectionSection(localFileInspection);
   return [
     '# RedCube Structured Generation',
@@ -145,6 +230,7 @@ export function buildGenerationInput({ family, route, promptRelativePath, contex
     '## Prompt Pack Guidance',
     guidance,
     '',
+    ...(professionalSkillSection ? [professionalSkillSection, ''] : []),
     '## Context',
     '```json',
     JSON.stringify(context, null, 2),
