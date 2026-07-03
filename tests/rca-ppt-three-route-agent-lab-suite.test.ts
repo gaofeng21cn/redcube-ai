@@ -57,6 +57,25 @@ function assertRefsOnlyAuthorityBoundary(boundary, label) {
   assert.equal(boundary.opl_agent_lab_can_write_owner_receipt, false, label);
 }
 
+function assertCapabilityRouterBoundary(boundary, label) {
+  assert.equal(boundary.refs_only, true, label);
+  for (const key of [
+    'can_write_domain_truth',
+    'can_write_memory_body',
+    'can_mutate_artifact_body',
+    'can_sign_owner_receipt',
+    'can_create_typed_blocker',
+    'can_authorize_quality_or_export',
+    'can_claim_domain_ready',
+    'can_claim_production_ready',
+    'can_write_visual_truth_artifact',
+    'can_write_export_or_quality_verdict',
+  ]) {
+    assert.equal(boundary[key], false, `${label}.${key}`);
+  }
+  assert.equal(boundary.rca_owner_receipt_or_typed_blocker_required, true, label);
+}
+
 function assertPptCapabilityMapShape(map, handoff, adoption) {
   const expectedCapabilityIds = [
     'rca-ppt-story-architect',
@@ -66,14 +85,22 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-native-ppt-designer',
     'rca-template-profiler',
   ];
-  const expectedTokens = [
-    'visual_density',
-    'layout_quality',
+  const requiredVisualFailureTokens = [
+    'storyline',
+    'outline',
+    'visual_direction',
+    'style',
     'page_authoring',
+    'visual_review',
     'native_pptx_editability',
     'template_profile',
+    'placeholder_capacity',
+  ];
+  const expectedTokens = [
+    ...requiredVisualFailureTokens,
+    'visual_density',
+    'layout_quality',
     'ppt_review',
-    'storyline',
   ];
 
   assert.equal(map.surface_kind, 'opl_standard_agent_capability_map');
@@ -83,10 +110,52 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   assert.equal(map.professional_skill_policy.capability_map_is_routing_metadata_only, true);
   assert.deepEqual(map.professional_capabilities.map((entry) => entry.capability_id), expectedCapabilityIds);
   assert.deepEqual(Object.keys(map.feedback_token_index), expectedTokens);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.required_tokens, requiredVisualFailureTokens);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.required_token_groups.storyline_outline, ['storyline', 'outline']);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.required_token_groups.visual_direction_style, ['visual_direction', 'style']);
+  assert.deepEqual(map.ppt_visual_failure_token_contract.required_token_groups.template_profile_placeholder_capacity, [
+    'template_profile',
+    'placeholder_capacity',
+  ]);
+  assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('visual_truth'), true);
+  assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('review_export_verdict'), true);
+  assert.equal(map.ppt_visual_failure_token_contract.owner_closeout_boundary.rca_holds.includes('artifact_authority'), true);
+  assert.equal(
+    map.ppt_visual_failure_token_contract.owner_closeout_boundary.opl_oma_allowed_outputs.includes('refs_only_work_order'),
+    true,
+  );
+  assert.equal(
+    map.ppt_visual_failure_token_contract.owner_closeout_boundary.opl_oma_allowed_outputs.includes('typed_blocker_candidate'),
+    true,
+  );
 
   for (const capability of map.professional_capabilities) {
     assert.equal(fs.existsSync(path.join(repoRoot, capability.skill_ref)), true, capability.skill_ref);
     assert.equal(capability.allowed_change_refs.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(capability.canonical_paths.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(capability.verification_refs.includes('contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture'), true);
+    assert.equal(
+      capability.verification_refs.includes(
+        'tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary',
+      ),
+      true,
+      capability.capability_id,
+    );
+    assert.equal(capability.forbidden_surfaces.includes('visual_truth_artifacts'), true, capability.capability_id);
+    assert.equal(capability.forbidden_surfaces.includes('owner_receipts'), true, capability.capability_id);
+    assertCapabilityRouterBoundary(capability.authority_boundary, capability.capability_id);
+    assert.equal(
+      capability.owner_closeout_boundary_ref,
+      'contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary',
+      capability.capability_id,
+    );
+
+    const resolverCapability = map.capabilities.find((entry) => entry.capability_id === capability.capability_id);
+    assert.equal(Boolean(resolverCapability), true, capability.capability_id);
+    assert.equal(resolverCapability.canonical_paths.includes(capability.skill_ref), true, capability.capability_id);
+    assert.equal(resolverCapability.verification_refs.includes('contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture'), true);
+    assert.equal(resolverCapability.forbidden_surfaces.includes('visual_truth_artifacts'), true, capability.capability_id);
+    assertCapabilityRouterBoundary(resolverCapability.authority_boundary, `${capability.capability_id}.resolver`);
   }
 
   assert.equal(handoff.capability_map_ref, capabilityMapPath);
@@ -109,13 +178,48 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
       map.feedback_token_index[token].canonical_capability_ids,
       token,
     );
+    assert.equal(
+      handoff.change_ref_mappings[token].verification_refs.includes(`contracts/capability_map.json#/feedback_token_index/${token}`),
+      true,
+      token,
+    );
+    assert.equal(handoff.change_ref_mappings[token].forbidden_surfaces.includes('visual_truth_artifacts'), true, token);
+    assert.equal(
+      handoff.change_ref_mappings[token].owner_closeout_boundary_ref,
+      'contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary',
+      token,
+    );
   }
 
   assert.deepEqual(map.feedback_token_index.storyline.canonical_capability_ids, ['rca-ppt-story-architect']);
+  assert.deepEqual(map.feedback_token_index.outline.canonical_capability_ids, ['rca-ppt-story-architect']);
+  assert.deepEqual(map.feedback_token_index.visual_direction.canonical_capability_ids, ['rca-ppt-visual-director']);
+  assert.deepEqual(map.feedback_token_index.visual_review.canonical_capability_ids, [
+    'rca-ppt-reviewer',
+    'rca-ppt-visual-director',
+  ]);
+  assert.deepEqual(map.feedback_token_index.placeholder_capacity.canonical_capability_ids, [
+    'rca-template-profiler',
+    'rca-ppt-visual-director',
+    'rca-native-ppt-designer',
+  ]);
   assert.equal(
     map.feedback_token_index.native_pptx_editability.canonical_capability_ids.includes('rca-native-ppt-designer'),
     true,
   );
+  assert.deepEqual(handoff.visual_feedback_failure_fixture.source_feedback.tokens, requiredVisualFailureTokens);
+  assert.equal(handoff.visual_feedback_failure_fixture.fixture_kind, 'visual_negative_feedback_to_capability_hit_and_owner_closeout_boundary');
+  assert.deepEqual(
+    handoff.visual_feedback_failure_fixture.capability_hits.map((entry) => entry.feedback_token),
+    requiredVisualFailureTokens,
+  );
+  for (const hit of handoff.visual_feedback_failure_fixture.capability_hits) {
+    assert.deepEqual(hit.capability_ids, map.feedback_token_index[hit.feedback_token].canonical_capability_ids, hit.feedback_token);
+    assert.equal(hit.verification_refs.includes(`contracts/capability_map.json#/feedback_token_index/${hit.feedback_token}`), true);
+  }
+  assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('visual_truth'), true);
+  assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('review_export_verdict'), true);
+  assert.equal(handoff.visual_feedback_failure_fixture.owner_closeout_boundary.rca_holds.includes('artifact_authority'), true);
 }
 
 function assertPptThreeRouteSuiteShape(suite) {
@@ -340,7 +444,7 @@ test('RCA PPT three-route AgentLab suite is a top-level refs-only external suite
   assertPptThreeRouteSuiteShape(readRepoJson(suitePath));
 });
 
-test('RCA PPT capability map routes OMA feedback tokens to professional skills only', () => {
+test('RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary', () => {
   assertPptCapabilityMapShape(
     readRepoJson(capabilityMapPath),
     readRepoJson(agentLabHandoffPath),
@@ -434,7 +538,7 @@ test('artifact-producing PPT workflow reaches export_pptx through image-first, H
   }
 });
 
-test('OPL AgentLab runner consumes the RCA PPT three-route suite without missing observations', {
+test('OPL AgentLab runner consumes the RCA PPT three-route suite with refs-only pass or typed-blocker boundary', {
   skip: !fs.existsSync(oplBin) ? `OPL bin not found: ${oplBin}` : false,
 }, () => {
   const result = spawnSync(oplBin, [
@@ -453,10 +557,19 @@ test('OPL AgentLab runner consumes the RCA PPT three-route suite without missing
   const suiteResult = payload.agent_lab_run.suite_result;
   assert.equal(payload.agent_lab_run.surface_id, 'opl_agent_lab_external_suite_run');
   assert.equal(suiteResult.suite_id, 'redcube-ai.ppt-three-route-agent-lab-suite.v1');
-  assert.equal(suiteResult.status, 'passed');
   assert.deepEqual(suiteResult.missing_observations, []);
   assert.equal(suiteResult.summary.forbidden_authority_flag_count, 0);
   assert.equal(suiteResult.summary.memory_body_observed, false);
+  assert.equal(['passed', 'blocked'].includes(suiteResult.status), true);
+  if (suiteResult.status === 'blocked') {
+    assert.equal(suiteResult.summary.stage_completion_policy_blocker_count > 0, true);
+    assert.equal(
+      suiteResult.refs.stage_completion_policy_blocker_refs.includes('stage-completion-policy-blocker:stage_completion_policy_missing'),
+      true,
+    );
+    assert.equal(suiteResult.authority_boundary.can_write_domain_truth, false);
+    assert.equal(suiteResult.authority_boundary.can_write_owner_receipt, false);
+  }
 });
 
 test('manifest and domain-handler export expose the RCA PPT three-route AgentLab suite', SERIAL_ENV_TEST, async () => {
