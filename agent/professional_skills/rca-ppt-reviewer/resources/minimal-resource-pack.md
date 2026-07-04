@@ -25,6 +25,12 @@ repair_target_row:
   rerun_route:
   owner_stage:
   preserve_or_redraw:
+
+visual_qa:
+  pixel_evidence:
+  source_fidelity:
+  density_verdict:
+  export_refs:
 ```
 
 ## Example

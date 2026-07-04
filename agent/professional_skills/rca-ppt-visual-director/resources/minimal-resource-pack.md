@@ -27,6 +27,16 @@ rhythm_row:
   peak_role:
   template_binding:
   repair_risk:
+
+visual_qa:
+  screenshot_check:
+  density_risk:
+  repair_owner:
+
+progressive_disclosure:
+  overview_step:
+  proof_step:
+  decision_step:
 ```
 
 ## Example
@@ -47,5 +57,6 @@ repair_risk: avoid repeated card grid from S04-S05
 - The blueprint is approved and slide ids are stable.
 - Style, grid, typography, and motif are locked before page authoring.
 - Consecutive slides do not repeat the same first-glance composition.
+- Progressive disclosure moves from overview to proof to decision before adding detail.
 - Dense pages name a reason, readable floor, and split fallback.
 - Reference decks contribute layout intelligence, not visual authority.

@@ -18,6 +18,21 @@ page_contract:
   required_evidence:
   review_risk:
 
+serial_pipeline:
+  upstream_ref:
+  page_payload_ref:
+  review_gate:
+  repair_owner:
+
+progressive_disclosure:
+  primary_message:
+  secondary_detail_destination:
+
+editable_pptx_grammar:
+  route_gate:
+  zone_binding:
+  stable_shape_id:
+
 editable_shape_row:
   id:
   role:
@@ -49,6 +64,7 @@ review_risk: internal status words may leak into visible copy
 
 - Source, story, blueprint, and visual direction exist for the page.
 - The page uses a structural visual rather than decorative fragments.
+- Progressive disclosure keeps secondary detail in notes, appendix, or the next slide.
 - Text is shortened before font size drops below the readable floor.
 - Native shapes have roles, zones, inch bounds, text sizes, and stable ids.
 - Repair scope targets blocked pages only when review names them.

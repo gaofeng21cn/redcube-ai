@@ -13,6 +13,7 @@ template_profile_row:
   zones:
   required_roles:
   title_safe_zone:
+  template_capacity:
   content_capacity:
   minimum_font_floor:
   spacing_rules:
@@ -26,6 +27,12 @@ placeholder_capacity:
   allowed_objects:
   safe_inset:
   overflow_risk:
+
+editable_pptx_grammar:
+  stable_zone_id:
+  allowed_shape_roles:
+  coordinate_bounds:
+  prohibited_mistakes:
 ```
 
 ## Example

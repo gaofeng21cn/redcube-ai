@@ -15,6 +15,16 @@ story_spec_lock:
   slide_budget:
   approval_state:
 
+serial_pipeline:
+  accepted_input_ref:
+  output_ref:
+  next_gate:
+  repair_owner:
+
+progressive_disclosure:
+  first_glance_decision:
+  overflow_action:
+
 blueprint_row:
   slide_id:
   page_role:
@@ -45,6 +55,7 @@ transition: This makes owner-route clarity the next design constraint.
 
 - Source refs are frozen before claims are written.
 - Every slide has one audience decision, one proof object, and one transition.
+- Progressive disclosure is explicit: overflow becomes a split-page or repair target.
 - Action titles state claims, not topic labels.
 - Dense slides have split/shorten repair targets before visual direction.
 - Visible text contains no local paths, prompt names, route names, or operator wording.

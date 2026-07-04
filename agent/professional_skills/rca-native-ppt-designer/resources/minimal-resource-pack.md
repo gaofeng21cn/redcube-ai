@@ -18,6 +18,13 @@ design_spec_lock:
   qa_gates:
   forbidden_native_shortcuts:
 
+editable_pptx_grammar:
+  zone_ids:
+  role_ids:
+  coordinate_bounds:
+  hierarchy:
+  prohibited_mistakes:
+
 native_shape:
   id:
   slide_id:

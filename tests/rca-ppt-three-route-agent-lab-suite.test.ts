@@ -91,6 +91,14 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
       `agent/professional_skills/${capabilityId}/resources/minimal-resource-pack.md`,
     ]),
   );
+  const expectedResourceSignals = {
+    'rca-ppt-story-architect': ['serial_pipeline', 'story_spec_lock', 'progressive_disclosure'],
+    'rca-ppt-visual-director': ['spec_lock', 'progressive_disclosure', 'visual_qa'],
+    'rca-ppt-page-author': ['serial_pipeline', 'progressive_disclosure', 'editable_pptx_grammar'],
+    'rca-ppt-reviewer': ['visual_qa'],
+    'rca-native-ppt-designer': ['spec_lock', 'editable_pptx_grammar'],
+    'rca-template-profiler': ['template_capacity', 'placeholder_capacity', 'editable_pptx_grammar'],
+  };
   const requiredVisualFailureTokens = [
     'storyline',
     'outline',
@@ -144,12 +152,17 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     assert.equal(resourceEntry.skill_ref, `agent/professional_skills/${resourceEntry.capability_id}/SKILL.md`);
     assert.deepEqual(resourceEntry.resource_refs, [expectedResourceRef]);
     assert.deepEqual(resourceEntry.required_sections, ['## Template', '## Example', '## Checklist']);
+    const skill = fs.readFileSync(path.join(repoRoot, resourceEntry.skill_ref), 'utf8');
+    assert.equal(skill.includes('resources/minimal-resource-pack.md'), true, resourceEntry.skill_ref);
     const resourcePath = path.join(repoRoot, expectedResourceRef);
     assert.equal(fs.existsSync(resourcePath), true, expectedResourceRef);
     const resource = fs.readFileSync(resourcePath, 'utf8');
     assert.equal(resource.includes('Boundary: refs-only professional method resource.'), true, expectedResourceRef);
     for (const section of resourceEntry.required_sections) {
       assert.equal(resource.includes(section), true, `${expectedResourceRef}:${section}`);
+    }
+    for (const signal of expectedResourceSignals[resourceEntry.capability_id]) {
+      assert.equal(resource.includes(signal), true, `${expectedResourceRef}:${signal}`);
     }
   }
   assert.deepEqual(map.professional_capabilities.map((entry) => entry.capability_id), expectedCapabilityIds);
