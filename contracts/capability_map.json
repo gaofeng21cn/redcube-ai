@@ -2040,7 +2040,7 @@
     ],
     "verification_refs": [
       "contracts/capability_map.json#/feedback_token_index",
-      "contracts/agent_lab_handoff.json#/change_ref_mappings",
+      "contracts/agent_lab_handoff.json#/change_ref_mappings/source_of_truth_ref",
       "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
       "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
       "contracts/capability_map.json#/dry_run_token_mapping_check",
@@ -2281,7 +2281,7 @@
     ],
     "required_observations": [
       "each_token_exists_in_feedback_token_index",
-      "handoff_change_ref_mapping_matches_capability_map",
+      "handoff_points_to_capability_map_source",
       "primary_skill_refs_exist",
       "skill_refs_include_minimal_template_sections",
       "forbidden_authority_flags_all_false"
