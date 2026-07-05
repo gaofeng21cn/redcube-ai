@@ -3,12 +3,8 @@ import {
   buildCodexRuntimeTopology as buildProtocolCodexRuntimeTopology,
 } from './runtime-topology.js';
 import {
-  RUNNING_RUN_STALE_TTL_MS as RUNNING_RUN_STALE_TTL_MS_FROM_ROUTE_RUN_RECORDS,
-  appendRouteRunEvent as appendRouteRunEventFromRouteRunRecords,
   completeRouteRun as completeRouteRunFromRouteRunRecords,
   failRouteRun as failRouteRunFromRouteRunRecords,
-  loadRouteRun as loadRouteRunFromRouteRunRecords,
-  readRouteRunEvents as readRouteRunEventsFromRouteRunRecords,
   startRouteRun as startRouteRunFromRouteRunRecords,
 } from './executor-runtime-parts/route-run-records.js';
 
@@ -42,7 +38,6 @@ export const OPL_RUNTIME_MANAGER_OWNER = 'OPL Runtime Manager';
 export const OPL_RUNTIME_MANAGER_RUNTIME_OWNER = 'opl_runtime_manager';
 export const RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER = 'redcube_ai_visual_deliverable_runtime';
 export const RCA_REVIEW_EXPORT_GATE_OWNER = 'redcube_ai';
-export const RUNNING_RUN_STALE_TTL_MS = RUNNING_RUN_STALE_TTL_MS_FROM_ROUTE_RUN_RECORDS;
 
 export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
 export type HermesAgentLoopExecutionModel = ReturnType<typeof buildHermesAgentLoopExecutionModel>;
@@ -306,6 +301,12 @@ function resolveRuntimeTopologyForExecutor(executor) {
 }
 
 export {
+  appendRouteRunEvent,
+  loadRouteRun,
+  readRouteRunEvents,
+  RUNNING_RUN_STALE_TTL_MS,
+} from './executor-runtime-parts/route-run-records.js';
+export {
   generateStructuredArtifactViaHermesAgentLoop,
   probeHermesAgentLoop,
   readHermesAgentLoopContract,
@@ -446,16 +447,4 @@ export function failRouteRun({
     telemetry,
     status,
   }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
-}
-
-export function loadRouteRun({ workspaceRoot, runId }) {
-  return loadRouteRunFromRouteRunRecords({ workspaceRoot, runId });
-}
-
-export function appendRouteRunEvent(workspaceRoot, runId, event) {
-  return appendRouteRunEventFromRouteRunRecords(workspaceRoot, runId, event);
-}
-
-export function readRouteRunEvents(workspaceRoot, runId) {
-  return readRouteRunEventsFromRouteRunRecords(workspaceRoot, runId);
 }
