@@ -140,6 +140,23 @@ test('RCA /goal workflow AgentLab suite is a top-level external suite contract',
   assert.equal(handoff.external_suite_seed.suite_id, suite.suite_id);
   assert.equal(handoff.external_suite_seed.tasks[0].suite_ref, suitePath);
   assert.equal(handoff.no_forbidden_write_proof_refs.includes(suite.no_forbidden_write_refs[0]), true);
+  assert.equal(
+    handoff.feedback_self_evolution_trigger.surface_kind,
+    'opl_foundry_agent_feedback_self_evolution_trigger',
+  );
+  assert.equal(
+    handoff.feedback_self_evolution_trigger.policy_ref,
+    'contracts/foundry_agent_series.json#/standard_feedback_self_evolution_trigger_policy',
+  );
+  assert.equal(handoff.feedback_self_evolution_trigger.target_agent_id, 'redcube');
+  assert.equal(
+    handoff.feedback_self_evolution_trigger.external_suite_ref,
+    'contracts/agent_lab_handoff.json#/external_suite_seed',
+  );
+  assert.deepEqual(handoff.feedback_self_evolution_trigger.developer_mode_execution_gate_refs, [
+    'opl-developer-mode:repo-fix-execution',
+    'opl-developer-mode:direct-fix-or-fork-pr-route',
+  ]);
   assert.equal(descriptor.standard_contract_refs.agent_lab_handoff, agentLabHandoffPath);
 });
 

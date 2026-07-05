@@ -18,6 +18,7 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
 
   const foundrySeries = readJson('contracts/foundry_agent_series.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
+  const agentLabHandoff = readJson('contracts/agent_lab_handoff.json');
   assert.deepEqual(readJson('contracts/action_catalog.json'), canonical.actionCatalog);
   assert.deepEqual(readJson('contracts/stage_control_plane.json'), canonical.stageControlPlane);
   assert.deepEqual(readJson('contracts/memory_descriptor.json'), canonical.memoryDescriptor);
@@ -104,6 +105,21 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     domain_contract_version_pin_does_not_authorize_domain_truth: true,
   });
   assert.deepEqual(foundrySeries.shared_policy_release, sharedFoundryPolicyRelease);
+  assert.equal(
+    foundrySeries.standard_feedback_self_evolution_trigger_policy.policy_id,
+    'standard_agent_feedback_self_evolution_trigger.v1',
+  );
+  assert.equal(
+    foundrySeries.standard_feedback_self_evolution_trigger_policy.feedbackops_event_kind,
+    'target_agent_feedback_external_suite',
+  );
+  assert.deepEqual(
+    foundrySeries.standard_feedback_self_evolution_trigger_policy.developer_mode_execution_gate_refs,
+    [
+      'opl-developer-mode:repo-fix-execution',
+      'opl-developer-mode:direct-fix-or-fork-pr-route',
+    ],
+  );
   assert.deepEqual(foundrySeries.identity_hygiene_policy.canonical_identities, {
     series_domain_id: foundrySeries.domain_id,
     foundry_agent_id: foundrySeries.foundry_agent_id,
@@ -163,6 +179,23 @@ test('root OPL pack contracts stay aligned with RCA canonical metadata', () => {
     can_claim_domain_ready: false,
     can_claim_production_ready: false,
   });
+  assert.equal(
+    agentLabHandoff.feedback_self_evolution_trigger.surface_kind,
+    'opl_foundry_agent_feedback_self_evolution_trigger',
+  );
+  assert.equal(
+    agentLabHandoff.feedback_self_evolution_trigger.policy_ref,
+    'contracts/foundry_agent_series.json#/standard_feedback_self_evolution_trigger_policy',
+  );
+  assert.equal(agentLabHandoff.feedback_self_evolution_trigger.target_agent_id, 'redcube');
+  assert.equal(
+    agentLabHandoff.feedback_self_evolution_trigger.external_suite_ref,
+    'contracts/agent_lab_handoff.json#/external_suite_seed',
+  );
+  assert.deepEqual(agentLabHandoff.feedback_self_evolution_trigger.developer_mode_execution_gate_refs, [
+    'opl-developer-mode:repo-fix-execution',
+    'opl-developer-mode:direct-fix-or-fork-pr-route',
+  ]);
   assert.equal(foundrySeries.domain_adapter_policy.no_parallel_progress_schema, true);
   const thinning = foundrySeries.purpose_first_adapter_thinning_policy;
   assert.deepEqual(thinning.default_retained_surface_roles, [
