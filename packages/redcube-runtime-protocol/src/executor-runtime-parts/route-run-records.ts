@@ -1,30 +1,18 @@
 // @ts-nocheck
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { appendFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 
 import {
   createRunRecord,
 } from '../runs.js';
 import {
-  resolveWorkspaceContract,
-} from '../workspace.js';
+  appendRouteRunEventRecord,
+  loadRouteRunRecord,
+  readRouteRunEventRecords,
+  readStoredRouteRuns,
+  writeRouteRunRecord,
+} from './route-run-record-store.js';
 
 export const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
-
-function requireSafeSegment(name, value) {
-  const text = String(value || '').trim();
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  if (/[\\/]/.test(text)) {
-    throw new Error(`${name} 不能包含路径分隔符`);
-  }
-  if (text.includes('..')) {
-    throw new Error(`${name} 不能包含父目录引用`);
-  }
-  return text;
-}
 
 function computeLatencyMs(startedAt, finishedAt) {
   const startMs = Date.parse(String(startedAt || ''));
@@ -62,43 +50,8 @@ function runningRunStaleAudit(run, now = new Date()) {
   };
 }
 
-function runFile(workspaceRoot, runId) {
-  const contract = resolveWorkspaceContract({ workspaceRoot });
-  const runsDir = path.join(contract.runtimeDir, 'runs');
-  mkdirSync(runsDir, { recursive: true });
-  return path.join(runsDir, `${requireSafeSegment('runId', runId)}.json`);
-}
-
-function getRunsDir(workspaceRoot) {
-  const contract = resolveWorkspaceContract({ workspaceRoot });
-  const runsDir = path.join(contract.runtimeDir, 'runs');
-  mkdirSync(runsDir, { recursive: true });
-  return runsDir;
-}
-
-function eventFile(workspaceRoot, runId) {
-  const contract = resolveWorkspaceContract({ workspaceRoot });
-  const eventsDir = path.join(contract.runtimeDir, 'events');
-  mkdirSync(eventsDir, { recursive: true });
-  return path.join(eventsDir, `${requireSafeSegment('runId', runId)}.jsonl`);
-}
-
-function readStoredRuns(workspaceRoot) {
-  const runsDir = getRunsDir(workspaceRoot);
-  return readdirSync(runsDir)
-    .filter((file) => file.endsWith('.json'))
-    .map((file) => {
-      try {
-        return JSON.parse(readFileSync(path.join(runsDir, file), 'utf-8'));
-      } catch {
-        return null;
-      }
-    })
-    .filter(Boolean);
-}
-
 function findPriorRuns({ workspaceRoot, route, scope, target, overlay }) {
-  return readStoredRuns(workspaceRoot)
+  return readStoredRouteRuns(workspaceRoot)
     .filter((run) => run?.route === route
       && run?.scope === scope
       && run?.target === target
@@ -170,20 +123,8 @@ function normalizeError(error) {
   };
 }
 
-function loadRouteRunRaw({ workspaceRoot, runId }) {
-  const file = runFile(workspaceRoot, runId);
-  if (!existsSync(file)) {
-    throw new Error(`Run not found: ${runId}`);
-  }
-
-  return {
-    file,
-    run: JSON.parse(readFileSync(file, 'utf-8')),
-  };
-}
-
 function markStaleRunningRunIfNeeded({ workspaceRoot, runId, checkedSurface = 'loadRun' }) {
-  const { file, run } = loadRouteRunRaw({ workspaceRoot, runId });
+  const run = loadRouteRunRecord({ workspaceRoot, runId });
   const staleAudit = runningRunStaleAudit(run);
   if (!staleAudit) {
     return run;
@@ -224,8 +165,7 @@ function markStaleRunningRunIfNeeded({ workspaceRoot, runId, checkedSurface = 'l
     markedRun.status,
     markedRun.finished_at,
   );
-  writeFileSync(file, JSON.stringify(markedRun, null, 2), 'utf-8');
-  return markedRun;
+  return writeRouteRunRecord({ workspaceRoot, runId, run: markedRun });
 }
 
 function requireRuntimeTopologyResolver(deps) {
@@ -316,8 +256,7 @@ export function startRouteRun({
   };
   run.telemetry = buildRunTelemetry(run, executor, 'running', null);
 
-  writeFileSync(runFile(workspaceRoot, resolvedRunId), JSON.stringify(run, null, 2), 'utf-8');
-  return run;
+  return writeRouteRunRecord({ workspaceRoot, runId: resolvedRunId, run });
 }
 
 export function completeRouteRun({
@@ -333,7 +272,7 @@ export function completeRouteRun({
   crossProviderAttemptIndex = null,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const { run } = loadRouteRunRaw({ workspaceRoot, runId });
+  const run = loadRouteRunRecord({ workspaceRoot, runId });
   const runStatus = String(status || '').trim() || 'completed';
   const completedRun = {
     ...run,
@@ -375,8 +314,7 @@ export function completeRouteRun({
     completedRun.finished_at,
   );
 
-  writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(completedRun, null, 2), 'utf-8');
-  return completedRun;
+  return writeRouteRunRecord({ workspaceRoot, runId, run: completedRun });
 }
 
 export function failRouteRun({
@@ -390,7 +328,7 @@ export function failRouteRun({
   status = 'failed',
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const { run } = loadRouteRunRaw({ workspaceRoot, runId });
+  const run = loadRouteRunRecord({ workspaceRoot, runId });
   const runStatus = String(status || '').trim() || 'failed';
   const failedRun = {
     ...run,
@@ -417,8 +355,7 @@ export function failRouteRun({
     failedRun.finished_at,
   );
 
-  writeFileSync(runFile(workspaceRoot, runId), JSON.stringify(failedRun, null, 2), 'utf-8');
-  return failedRun;
+  return writeRouteRunRecord({ workspaceRoot, runId, run: failedRun });
 }
 
 export function loadRouteRun({ workspaceRoot, runId }) {
@@ -426,17 +363,9 @@ export function loadRouteRun({ workspaceRoot, runId }) {
 }
 
 export function appendRouteRunEvent(workspaceRoot, runId, event) {
-  appendFileSync(eventFile(workspaceRoot, runId), `${JSON.stringify(event)}\n`, 'utf-8');
+  appendRouteRunEventRecord({ workspaceRoot, runId, event });
 }
 
 export function readRouteRunEvents(workspaceRoot, runId) {
-  const file = eventFile(workspaceRoot, runId);
-  if (!existsSync(file)) {
-    return [];
-  }
-
-  return readFileSync(file, 'utf-8')
-    .split('\n')
-    .filter(Boolean)
-    .map((line) => JSON.parse(line));
+  return readRouteRunEventRecords({ workspaceRoot, runId });
 }

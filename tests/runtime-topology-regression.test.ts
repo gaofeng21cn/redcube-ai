@@ -15,6 +15,10 @@ import {
   startRouteRun,
   structuredCallViaHermesAgentApi,
 } from './package-surfaces.ts';
+import {
+  appendRouteRunEvent,
+  readRouteRunEvents,
+} from '@redcube/runtime-protocol';
 
 function tempWorkspaceRoot() {
   return mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-topology-'));
@@ -204,6 +208,33 @@ test('failed route runs retain diagnostic artifact refs from typed errors', () =
     '/tmp/native-candidate.json',
     '/tmp/native-structural-validation.json',
   ]);
+});
+
+test('route run events round-trip through the extracted refs-only record store', () => {
+  const workspaceRoot = tempWorkspaceRoot();
+  const executor = buildCodexExecutorDescriptor();
+  const run = startRouteRun({
+    workspaceRoot,
+    route: 'storyline',
+    overlay: 'ppt_deck',
+    target: 'deck-a',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+    executor,
+    allowLocalDiagnosticRecord: true,
+  });
+
+  appendRouteRunEvent(workspaceRoot, run.run_id, {
+    event_id: 'event-1',
+    kind: 'route_started',
+    route: 'storyline',
+  });
+
+  assert.deepEqual(readRouteRunEvents(workspaceRoot, run.run_id), [{
+    event_id: 'event-1',
+    kind: 'route_started',
+    route: 'storyline',
+  }]);
 });
 
 test('Hermes-Agent API structured_call posts chat completions and records server-selected proof', async () => {

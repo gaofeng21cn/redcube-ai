@@ -112,7 +112,7 @@ Active plan 只保留可独立落地的非 live 缺口：generated/default calle
 | naming / legacy string hygiene | `managed`、`gateway`、`runtime`、`session` 和 `domain_action_adapter` 等词只可作为 semantic-id、tombstone/provenance、negative guard、refs-only adapter、domain handler target 或 package/protocol boundary。 | `contracts/physical_source_morphology_policy.json#legacy_name_allowance`、private inventory、guard tests |
 
 Default-caller / source morphology current readout：runtime-family source、`runDeliverableRoute` /
-`run-deliverable-route-parts/`、executor route-run record 和 related route refs 的 path-level
+`run-deliverable-route-parts/`、executor route-run record / record-store parts 和 related route refs 的 path-level
 classification 归 `contracts/physical_source_morphology_policy.json#/active_surface_classifications`
 与 [RCA 私有实现与 OPL 迁移台账](./opl-private-implementation-migration-inventory.md)。本文只保留
 当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、domain handler target、
