@@ -24,8 +24,7 @@ import {
   stageArtifactFileForRequest,
 } from './stage-artifacts.js';
 import {
-  continueToStopAfterStage,
-  runWithRecoverableDependencies,
+  runRouteWithRecoveryAndContinuation,
 } from './recovery.js';
 import { readJsonRecord } from './shared.js';
 
@@ -160,17 +159,7 @@ async function runFixHtmlAttempt(request: RunDeliverableRouteRequest): Promise<{
   continuationRouteRuns: DependencyRouteRun[];
   recoveryTerminalReason: string | null;
 }> {
-  const routed = await runWithRecoverableDependencies(request);
-  const continued = await continueToStopAfterStage({
-    request,
-    result: routed.result,
-  });
-  return {
-    result: continued.result,
-    dependencyRouteRuns: routed.dependencyRouteRuns,
-    continuationRouteRuns: continued.continuationRouteRuns,
-    recoveryTerminalReason: routed.recoveryTerminalReason,
-  };
+  return await runRouteWithRecoveryAndContinuation(request);
 }
 
 export async function runFixHtmlWithAgenticEscalation(request: RunDeliverableRouteRequest): Promise<{

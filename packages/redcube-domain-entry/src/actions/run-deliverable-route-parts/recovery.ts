@@ -297,6 +297,25 @@ export async function runWithRecoverableDependencies(request: RunDeliverableRout
   };
 }
 
+export async function runRouteWithRecoveryAndContinuation(request: RunDeliverableRouteRequest): Promise<{
+  result: RuntimeRouteResult;
+  dependencyRouteRuns: DependencyRouteRun[];
+  continuationRouteRuns: DependencyRouteRun[];
+  recoveryTerminalReason: string | null;
+}> {
+  const routed = await runWithRecoverableDependencies(request);
+  const continued = await continueToStopAfterStage({
+    request,
+    result: routed.result,
+  });
+  return {
+    result: continued.result,
+    dependencyRouteRuns: routed.dependencyRouteRuns,
+    continuationRouteRuns: continued.continuationRouteRuns,
+    recoveryTerminalReason: routed.recoveryTerminalReason,
+  };
+}
+
 export async function continueToStopAfterStage({
   request,
   result,

@@ -118,7 +118,9 @@ classification 归 `contracts/physical_source_morphology_policy.json#/active_sur
 当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、domain handler target、
 stage artifact / review-export refs、executor policy refs 或 neutral route-run record refs；它们不能成为
 RCA-owned generic runtime、session/workbench、attempt ledger、runtime record store、event log、
-generated wrapper owner 或 default-caller cutover evidence。历史 dated slice、source-ref list、
+generated wrapper owner 或 default-caller cutover evidence。2026-07-05 已进一步把 route recovery +
+`stop_after_stage` continuation 收成 `recovery.ts::runRouteWithRecoveryAndContinuation()` 共享薄入口，
+避免主 route 入口与 `fix_html` escalation 继续各保一份私有 attempt-shell glue。历史 dated slice、source-ref list、
 legacy allowance 和 test closeout 过程归 `docs/history/process/`、machine contracts、source/tests
 或 git history。
 

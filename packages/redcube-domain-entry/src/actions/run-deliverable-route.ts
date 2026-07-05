@@ -4,8 +4,7 @@ import type { RouteRunDomainEntryResponse } from './run-deliverable-route-parts/
 import { runFixHtmlWithAgenticEscalation } from './run-deliverable-route-parts/fix-html-escalation.js';
 import { buildRouteRunDomainEntryResponse } from './run-deliverable-route-parts/domain-entry-response.js';
 import {
-  continueToStopAfterStage,
-  runWithRecoverableDependencies,
+  runRouteWithRecoveryAndContinuation,
 } from './run-deliverable-route-parts/recovery.js';
 import { safeText } from './run-deliverable-route-parts/shared.js';
 
@@ -25,16 +24,12 @@ export async function runDeliverableRoute(request: RunDeliverableRouteRequest): 
     });
   }
 
-  const routed = await runWithRecoverableDependencies(request);
-  const continued = await continueToStopAfterStage({
-    request,
-    result: routed.result,
-  });
+  const routed = await runRouteWithRecoveryAndContinuation(request);
   return buildRouteRunDomainEntryResponse({
     request,
-    result: continued.result,
+    result: routed.result,
     dependencyRouteRuns: routed.dependencyRouteRuns,
-    continuationRouteRuns: continued.continuationRouteRuns,
+    continuationRouteRuns: routed.continuationRouteRuns,
     recoveryTerminalReason: routed.recoveryTerminalReason,
     executionProof: null,
   });
