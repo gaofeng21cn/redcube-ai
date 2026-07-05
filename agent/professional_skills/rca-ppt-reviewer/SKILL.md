@@ -42,12 +42,22 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
 
+## Workbench Lessons To Preserve
+
+- A draft can be useful without being export-ready. Label V0/V1 outcomes honestly and record known weak pages instead of calling the deck final because PPTX assembly succeeded.
+- Contact-sheet review must include rhythm and density, not only image count and file sizes. Generated image decks commonly pass mechanical checks while still having too much text on selected pages.
+- First-use naming and public link/source treatment are reviewable content quality issues. Block or repair when abbreviations appear before full names, when evidence pages omit available public links, or when visible links crowd the page.
+- Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
+- Screenshot/contact-sheet evidence is required before export/handoff; a PPTX assembled from unreviewed images remains draft-only.
+
 ## Minimal Template Resource
 
 - `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.
 - `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
 - `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
 - `export_gate_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, and forbidden-authority flags before handoff.
+- `story_arc_visual_check`: pixels and titles prove necessity, feasibility, and landing path in order; product names do not outrun audience motivation.
+- `draft_label_check`: declare `draft`, `reviewed_draft`, or `export_ready` based on screenshot review and unresolved weak/blocking pages.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

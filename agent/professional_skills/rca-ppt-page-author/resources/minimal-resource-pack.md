@@ -46,6 +46,23 @@ editable_shape_row:
   fill:
   line:
   z_order:
+
+image_first_page_payload:
+  slide_id:
+  style_ref:
+  prompt_text:
+  visible_label_budget:
+  forbidden_text:
+  expected_16x9_output_ref:
+  import_ref:
+  contact_sheet_ref:
+
+draft_to_export_gate:
+  generated_page_ref:
+  normalized_16x9_ref:
+  contact_sheet_review_ref:
+  blocked_page_repairs:
+  pptx_assembly_ref:
 ```
 
 ## Example
@@ -68,3 +85,5 @@ review_risk: internal status words may leak into visible copy
 - Text is shortened before font size drops below the readable floor.
 - Native shapes have roles, zones, inch bounds, text sizes, and stable ids.
 - Repair scope targets blocked pages only when review names them.
+- Image-first pages are imported, normalized, and contact-sheet reviewed before PPTX assembly.
+- Dense generated text is repaired by reducing labels and redrawing blocked pages.

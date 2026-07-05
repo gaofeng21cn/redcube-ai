@@ -40,6 +40,13 @@ native_shape:
   line:
   z_order:
   quality_role:
+
+image_to_native_followup:
+  approved_director_notes_ref:
+  contact_sheet_findings_ref:
+  selected_editable_targets:
+  source_refs:
+  native_shape_plan_ref:
 ```
 
 ## Example
@@ -66,3 +73,5 @@ native_shapes:
 - Every visible non-decorative shape binds to a declared zone.
 - Text shapes declare font size; structural shapes declare fill or line.
 - Repair changes the AI-authored plan, then rerenders and reviews screenshots.
+- Full-page PNG decks are image-first artifacts, not native editable evidence.
+- Native follow-up starts from director notes and review findings, not blind pixel tracing.

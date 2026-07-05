@@ -43,6 +43,13 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 9. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
 10. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
 
+## Workbench Lessons To Preserve
+
+- If the current route is image-first, do not retrofit it into a native claim. Full-page PNG decks can be the right draft/export route, but they are not editable_shape_plan evidence.
+- When converting an image-first success into native PPTX later, start from the approved page-by-page director notes and contact-sheet findings, not from tracing pixels blindly.
+- Native follow-up should target the pages that need editability, links, charts, or live text most. Do not make the whole deck native unless the user or route contract requires it.
+- Public GitHub/source links are native-friendly candidates: keep them as editable text or hyperlink shapes when native PPTX is selected, not baked into a low-resolution image.
+
 ## Minimal Template Resource
 
 - `spec_lock`: `design_spec_lock_id`, design thesis, palette, typography, grid, motif, rhythm, route constraints, QA gates, and forbidden native shortcuts.
@@ -50,6 +57,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `editable_pptx_grammar`: `template_layout_grammar`, `template_layout_binding`, and `native_shapes[]` must use editable Office objects, declared zones, inch bounds, role ids, quality roles, font sizes, fills/lines, and z-order.
 - `shape_row`: `id`, `slide_id`, `role`, `zone_id`, `left_in`, `top_in`, `width_in`, `height_in`, `text`, `font_size_pt`, `fill`, `line`, `z_order`, `quality_role`.
 - `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs or typed blocker.
+- `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

@@ -35,6 +35,18 @@ blueprint_row:
   visible_text_budget:
   speaker_note_goal:
   transition:
+
+first_use_contract:
+  full_visible_name:
+  accepted_abbreviation:
+  public_link_or_source_ref:
+  first_use_slide_id:
+
+necessity_feasibility_landing_check:
+  audience_problem:
+  why_existing_tools_fail:
+  feasibility_proof:
+  credible_landing_path:
 ```
 
 ## Example
@@ -59,3 +71,5 @@ transition: This makes owner-route clarity the next design constraint.
 - Action titles state claims, not topic labels.
 - Dense slides have split/shorten repair targets before visual direction.
 - Visible text contains no local paths, prompt names, route names, or operator wording.
+- Product/platform decks motivate necessity before naming the product family.
+- First-use project names include full names and source/link refs when allowed.

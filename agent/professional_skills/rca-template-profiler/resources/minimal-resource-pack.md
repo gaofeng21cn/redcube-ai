@@ -33,6 +33,13 @@ editable_pptx_grammar:
   allowed_shape_roles:
   coordinate_bounds:
   prohibited_mistakes:
+
+current_style_ref_pack:
+  current_source_deck_or_version:
+  representative_page_refs:
+  allowed_reuse:
+  stale_refs_to_reject:
+  prompt_facing_density_limits:
 ```
 
 ## Example
@@ -54,3 +61,5 @@ reuse_ceiling: no more than 2 consecutive pages
 - Title, body, evidence, label, caption, and footer roles stay separate.
 - Reference deck patterns are adapted into RCA rules, not copied as authority.
 - Native routes receive stable zone ids and prohibited mistakes.
+- The latest approved visual line is profiled before older archive decks.
+- Representative refs cover cover, roadmap, proof, system map, dense evidence, and closing behavior.

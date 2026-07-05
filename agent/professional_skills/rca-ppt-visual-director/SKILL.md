@@ -39,6 +39,14 @@ Operate as the visual direction specialist between blueprint approval and page a
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
 
+## Workbench Lessons To Preserve
+
+- Visual direction for image-first decks must be page-by-page, not only deck-level. Each real slide id needs first-glance hook, composition, visible text budget, style reference, and image-prompt intent before image prompts are written.
+- A reference deck must be version-locked. Record the current source path/ref, representative pages, and what may be borrowed. Do not silently reuse stale archive pages just because they are visually familiar.
+- When the user asks to reuse a current deck style, profile the latest approved visual line first, then bind each slide to that style boundary. Treat older decks as historical references unless explicitly approved.
+- Image-first density ceiling is stricter than editable PPTX: keep on-image text to a small number of short labels, and move explanation to speaker notes or the next page.
+- Contact sheets are a visual rhythm gate. The reviewer should be able to spot story order, repeated layouts, and overloaded pages from the sheet before opening individual slides.
+
 ## Minimal Template Resource
 
 - `spec_lock`: deck thesis, palette, typography scale, grid, motif, title safe zone, density ceiling, route policy, proof-object families, and forbidden regressions.
@@ -46,6 +54,8 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `rhythm_row`: `slide_id`, `page_role`, `proof_object`, `layout_family`, `density_band`, `peak_role`, `template_binding`, `repair_risk`.
 - `ppt_visual_density`: classify each slide as `sparse`, `balanced`, or `dense`; dense pages need a named reason, readable floor, and split/shorten fallback.
 - `progressive_disclosure`: move from overview to proof to decision through visible structure, not by revealing more small text on the same page.
+- `page_visual_direction_row`: `slide_id`, `first_glance_hook`, `composition`, `visible_text_budget`, `style_ref`, `image_prompt_intent`, `density_risk`, and `repair_fallback`.
+- `style_ref_lock`: approved reference deck/version, representative slide refs, allowed borrowings, forbidden stale refs, and owner approval state.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

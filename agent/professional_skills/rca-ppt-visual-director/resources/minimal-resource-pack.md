@@ -37,6 +37,23 @@ progressive_disclosure:
   overview_step:
   proof_step:
   decision_step:
+
+page_visual_direction_row:
+  slide_id:
+  first_glance_hook:
+  composition:
+  visible_text_budget:
+  style_ref:
+  image_prompt_intent:
+  density_risk:
+  repair_fallback:
+
+style_ref_lock:
+  approved_reference_deck_or_version:
+  representative_slide_refs:
+  allowed_borrowings:
+  forbidden_stale_refs:
+  approval_state:
 ```
 
 ## Example
@@ -60,3 +77,5 @@ repair_risk: avoid repeated card grid from S04-S05
 - Progressive disclosure moves from overview to proof to decision before adding detail.
 - Dense pages name a reason, readable floor, and split fallback.
 - Reference decks contribute layout intelligence, not visual authority.
+- Image-first visual direction is page-by-page before prompts are written.
+- Current approved style refs override older familiar archive refs.

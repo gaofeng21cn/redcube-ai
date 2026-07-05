@@ -31,6 +31,17 @@ visual_qa:
   source_fidelity:
   density_verdict:
   export_refs:
+
+story_arc_visual_check:
+  necessity_visible:
+  feasibility_visible:
+  landing_path_visible:
+  product_names_do_not_outrun_motivation:
+
+draft_label_check:
+  label:
+  unresolved_weak_pages:
+  unresolved_blocked_pages:
 ```
 
 ## Example
@@ -52,3 +63,5 @@ preserve_or_redraw: redraw S07 only
 - Internal routes, local paths, prompt names, and operator wording are blockers.
 - Weak findings and blocking defects use different fields.
 - Export can proceed only with required review, screenshot, PPTX/PDF, and gallery refs.
+- Contact sheets are checked for rhythm and density, not only file count.
+- Drafts with known weak pages stay labeled as drafts until repaired.

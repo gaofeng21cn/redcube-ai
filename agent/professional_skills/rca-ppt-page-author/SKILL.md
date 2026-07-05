@@ -36,11 +36,19 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 2. Work page by page. Re-read the page contract before authoring, then check it against deck-level rhythm and style.
 3. Preserve approved claims and evidence. Do not rewrite the story to fit a convenient layout unless returning a repair target.
 4. Keep visible text clean. Do not expose prompt names, source ids, local paths, route names, RCA internals, operator notes, or system fields.
-5. Prefer fewer, larger, meaningful visual groups over many small cards.
+5. Prefer fewer, larger, meaningful visual groups over many small cards. For image-first prompts, use fewer than the maximum readable labels; generated text often becomes denser and less controllable than the written prompt suggests.
 6. Use structural visuals, not decoration: connectors, rails, bands, timelines, maps, tables, charts, proof strips, and decision panels must carry first-glance logic.
 7. Size content before committing layout. If text cannot fit at the readability floor, shorten copy, reduce slots, change layout, or return a repair target.
 8. For repair, target only blocked pages when the review surface names them; preserve passed pages and record what feedback was consumed.
 9. Treat helpers as materializers. Python, Office, screenshot, and export helpers execute the RCA plan and return evidence; they do not choose design or declare visual readiness.
+
+## Workbench Lessons To Preserve
+
+- Do not skip route gates: visual direction -> page prompts/payloads -> generated/rendered pages -> contact sheet -> visual QA -> PPTX assembly/export. A PPTX made before screenshot review is only a draft artifact.
+- For image-first decks, every generated page must be imported into the artifact workspace, normalized to 16:9, included in a contact sheet, and only then wrapped into PPTX.
+- Keep full-page image PPTX honest. It is acceptable for the image-first route, but it must not be described as native editable PPTX.
+- When a page is text-dense after generation, redraw the page with fewer labels rather than accepting tiny generated text. Preserve unaffected pages and repair only the blocked slide ids when possible.
+- Page authoring must consume the current approved style refs. If the style source changes, regenerate prompts or payloads that cite the old style rather than mixing old and new visual lines.
 
 ## Minimal Template Resource
 
@@ -49,6 +57,8 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - `ppt_visual_density`: reduce labels, slots, or secondary notes before shrinking text below the readable floor; if the page still fails, return a repair target.
 - `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
 - `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
+- `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
+- `draft_to_export_gate`: generated/rendered page exists, 16:9 normalized page exists, contact sheet reviewed, blocked pages repaired, then PPTX assembly.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
