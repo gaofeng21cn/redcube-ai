@@ -1,5 +1,13 @@
 // @ts-nocheck
 
+import {
+  buildDeliveryIdentitySurface,
+  buildEntrySessionSurface,
+} from 'opl-framework-shared/product-entry-companions';
+
+import type { ProductEntrySessionResponse } from '../../types.js';
+import { publicationProjectionForDeliverable } from './session-artifacts.js';
+
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
@@ -107,5 +115,90 @@ export function buildProductEntrySessionSummary({
     resume_command: runtimeLoopClosure?.control_policy?.continue_action?.command || null,
     session_locator_field: familyOrchestration?.resume_contract?.session_locator_field || null,
     checkpoint_locator_field: familyOrchestration?.resume_contract?.checkpoint_locator_field || null,
+  };
+}
+
+export function buildProductEntrySessionResponse({
+  entrySessionId,
+  sessionFile,
+  session,
+  continuationSnapshot,
+  sessionContinuity,
+  progressProjection,
+  artifactInventory,
+  workspaceReceiptInventoryProjection,
+  nativeProofArtifactInventory,
+  pptImageRouteSession,
+  runtimeLoopClosure,
+  reviewState,
+  publicationProjection,
+  oplFamilyLifecycleAdapter,
+  familyOrchestration,
+}: {
+  entrySessionId: string;
+  sessionFile: string;
+  session: Record<string, unknown>;
+  continuationSnapshot: Record<string, unknown>;
+  sessionContinuity: Record<string, unknown>;
+  progressProjection: Record<string, unknown>;
+  artifactInventory: Record<string, unknown>;
+  workspaceReceiptInventoryProjection: Record<string, unknown>;
+  nativeProofArtifactInventory: Record<string, unknown>;
+  pptImageRouteSession: Record<string, unknown> | null;
+  runtimeLoopClosure: Record<string, unknown>;
+  reviewState: Record<string, unknown>;
+  publicationProjection: Record<string, unknown>;
+  oplFamilyLifecycleAdapter: Record<string, unknown>;
+  familyOrchestration: Record<string, unknown>;
+}): ProductEntrySessionResponse {
+  const deliveryIdentity = buildSessionDeliveryIdentityPayload(session);
+  return {
+    ok: true,
+    surface_kind: 'product_entry_session',
+    recommended_action: buildRecommendedAction({
+      runtimeProjectionSurface: null,
+      runtimeLoopClosure,
+      reviewState,
+      publicationProjection,
+      deliverableId: session.deliverable_id,
+      publicationProjectionForDeliverable,
+    }),
+    product_entry_contract_id: 'redcube_product_entry_session_continuity',
+    entry_session: buildEntrySessionSurface({
+      entry_session_id: entrySessionId,
+      session_file: sessionFile,
+      runtime_owner: session.runtime_owner,
+    }),
+    delivery_identity: buildDeliveryIdentitySurface({
+      deliverable_family: session.deliverable_family,
+      topic_id: session.topic_id,
+      deliverable_id: session.deliverable_id,
+      profile_id: session.profile_id || undefined,
+      extra_payload: session.profile_id
+        ? undefined
+        : {
+            profile_id: null,
+          },
+    }),
+    continuation_snapshot: continuationSnapshot,
+    session_continuity: sessionContinuity,
+    progress_projection: progressProjection,
+    artifact_inventory: artifactInventory,
+    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
+    native_proof_artifact_inventory: nativeProofArtifactInventory,
+    ppt_deck_visual_route_session: pptImageRouteSession,
+    runtime_loop_closure: runtimeLoopClosure,
+    review_state: reviewState,
+    publication_projection: publicationProjection,
+    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
+    family_orchestration: familyOrchestration,
+    summary: buildProductEntrySessionSummary({
+      entrySessionId,
+      session,
+      nativeProofArtifactInventory,
+      pptImageRouteSession,
+      runtimeLoopClosure,
+      familyOrchestration,
+    }),
   };
 }

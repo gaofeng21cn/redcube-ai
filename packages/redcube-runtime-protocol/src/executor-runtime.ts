@@ -47,6 +47,8 @@ export const RUNNING_RUN_STALE_TTL_MS = RUNNING_RUN_STALE_TTL_MS_FROM_ROUTE_RUN_
 export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
 export type HermesAgentLoopExecutionModel = ReturnType<typeof buildHermesAgentLoopExecutionModel>;
 
+const ROUTE_RUN_RECORD_RUNTIME_DEPS = Object.freeze({ resolveRuntimeTopologyForExecutor });
+
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
   executor_backend: HERMES_AGENT_EXECUTOR_BACKEND,
@@ -395,7 +397,7 @@ export function startRouteRun({
     executor,
     crossProviderAttemptIndex,
     allowLocalDiagnosticRecord,
-  }, { resolveRuntimeTopologyForExecutor });
+  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
 }
 
 export function completeRouteRun({
@@ -421,7 +423,7 @@ export function completeRouteRun({
     status,
     errorKind,
     crossProviderAttemptIndex,
-  }, { resolveRuntimeTopologyForExecutor });
+  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
 }
 
 export function failRouteRun({
@@ -443,7 +445,7 @@ export function failRouteRun({
     executor,
     telemetry,
     status,
-  }, { resolveRuntimeTopologyForExecutor });
+  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
 }
 
 export function loadRouteRun({ workspaceRoot, runId }) {

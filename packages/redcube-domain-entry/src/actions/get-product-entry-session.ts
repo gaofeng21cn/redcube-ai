@@ -3,11 +3,7 @@ import {
   getPublicationProjection,
   getReviewState,
 } from '@redcube/runtime';
-import {
-  buildDeliveryIdentitySurface,
-  buildEntrySessionSurface,
-  buildProductEntryContinuationSnapshot,
-} from 'opl-framework-shared/product-entry-companions';
+import { buildProductEntryContinuationSnapshot } from 'opl-framework-shared/product-entry-companions';
 
 import {
   buildSessionContinuationFamilyOrchestration,
@@ -27,13 +23,11 @@ import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-ma
 import {
   buildNativeProofArtifactInventory,
   mergeArtifactInventoryWithPublicationRefs,
-  publicationProjectionForDeliverable,
 } from './get-product-entry-session-parts/session-artifacts.js';
 import type { ProductEntrySessionResponse } from '../types.js';
 import {
-  buildProductEntrySessionSummary,
+  buildProductEntrySessionResponse,
   buildPptImageRouteSessionSurface,
-  buildRecommendedAction,
   buildSessionDeliveryIdentityPayload,
 } from './get-product-entry-session-parts/session-surfaces.js';
 import {
@@ -41,9 +35,7 @@ import {
   productEntrySessionFile,
 } from './product-entry-session-refs.js';
 
-const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
-const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
-const SUPPORTED_RUNTIME_OWNERS = new Set([DEFAULT_RUNTIME_OWNER, HOSTED_RUNTIME_OWNER]);
+const SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNERS = new Set(['configured_family_runtime_provider']);
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -72,9 +64,11 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
   const { session } = resolveProductEntryCurrentness({ session: storedSession, persist: false });
-  if (!SUPPORTED_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
+  if (!SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
     throw new Error('product entry session runtime_owner 漂移');
   }
+  const sessionFile = productEntrySessionPath(entrySessionId);
+  const deliveryIdentity = buildSessionDeliveryIdentityPayload(session);
 
   const [reviewState, publicationProjection] = await Promise.all([
     getReviewState({
@@ -96,16 +90,16 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
   });
   const sessionContinuity = buildSessionContinuitySurface({
     entrySessionId,
-    sessionFile: productEntrySessionPath(entrySessionId),
+    sessionFile,
     runtimeOwner: session.runtime_owner,
-    deliveryIdentity: buildSessionDeliveryIdentityPayload(session),
+    deliveryIdentity,
     continuationSnapshot,
   });
   const progressProjection = buildProgressProjectionSurface({ continuationSnapshot });
   const artifactInventory = mergeArtifactInventoryWithPublicationRefs({
     artifactInventory: buildArtifactInventorySurface({
       entrySessionId,
-      sessionFile: productEntrySessionPath(entrySessionId),
+      sessionFile,
       continuationSnapshot,
     }),
     publicationProjection,
@@ -122,7 +116,7 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
   });
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
-    sessionFile: productEntrySessionPath(entrySessionId),
+    sessionFile,
     runtimeOwner: session.runtime_owner,
     deliveryIdentity: buildSessionDeliveryIdentityPayload(session, { includeProfile: false }),
     continuationSnapshot,
@@ -133,8 +127,8 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
   const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
     runtimeOwner: session.runtime_owner,
     entrySessionId,
-    sessionFile: productEntrySessionPath(entrySessionId),
-    deliveryIdentity: buildSessionDeliveryIdentityPayload(session),
+    sessionFile,
+    deliveryIdentity,
     continuationSnapshot,
     runtimeLoopClosure,
     reviewState,
@@ -143,53 +137,21 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
     entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
   });
 
-  return {
-    ok: true,
-    surface_kind: 'product_entry_session',
-    recommended_action: buildRecommendedAction({
-      runtimeProjectionSurface: null,
-      runtimeLoopClosure,
-      reviewState,
-      publicationProjection,
-      deliverableId: session.deliverable_id,
-      publicationProjectionForDeliverable,
-    }),
-    product_entry_contract_id: 'redcube_product_entry_session_continuity',
-    entry_session: buildEntrySessionSurface({
-      entry_session_id: entrySessionId,
-      session_file: productEntrySessionPath(entrySessionId),
-      runtime_owner: session.runtime_owner,
-    }),
-    delivery_identity: buildDeliveryIdentitySurface({
-      deliverable_family: session.deliverable_family,
-      topic_id: session.topic_id,
-      deliverable_id: session.deliverable_id,
-      profile_id: session.profile_id || undefined,
-      extra_payload: session.profile_id
-        ? undefined
-        : {
-          profile_id: null,
-        },
-    }),
-    continuation_snapshot: continuationSnapshot,
-    session_continuity: sessionContinuity,
-    progress_projection: progressProjection,
-    artifact_inventory: artifactInventory,
-    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
-    native_proof_artifact_inventory: nativeProofArtifactInventory,
-    ppt_deck_visual_route_session: pptImageRouteSession,
-    runtime_loop_closure: runtimeLoopClosure,
-    review_state: reviewState,
-    publication_projection: publicationProjection,
-    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
-    family_orchestration: familyOrchestration,
-    summary: buildProductEntrySessionSummary({
-      entrySessionId,
-      session,
-      nativeProofArtifactInventory,
-      pptImageRouteSession,
-      runtimeLoopClosure,
-      familyOrchestration,
-    }),
-  };
+  return buildProductEntrySessionResponse({
+    entrySessionId,
+    sessionFile,
+    session,
+    continuationSnapshot,
+    sessionContinuity,
+    progressProjection,
+    artifactInventory,
+    workspaceReceiptInventoryProjection,
+    nativeProofArtifactInventory,
+    pptImageRouteSession,
+    runtimeLoopClosure,
+    reviewState,
+    publicationProjection,
+    oplFamilyLifecycleAdapter,
+    familyOrchestration,
+  });
 }
