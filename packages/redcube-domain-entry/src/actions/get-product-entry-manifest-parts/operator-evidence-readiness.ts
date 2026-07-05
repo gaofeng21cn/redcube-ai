@@ -6,6 +6,14 @@ import {
   buildProductionEvidenceTailWorkOrder,
   buildRcaEfficiencyHandoffProjection,
 } from './operator-evidence-refs.js';
+import {
+  RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF,
+  RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,
+  RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF,
+  RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
+  RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
+  buildOperatorEvidenceTailWorkorderItemRef,
+} from './operator-evidence-refs/evidence-constants.js';
 import { buildRcaGoalWorkflowAgentLabSuite } from './goal-workflow-agent-lab-suite.js';
 import { buildRcaPptThreeRouteAgentLabSuite } from './ppt-three-route-agent-lab-suite.js';
 
@@ -74,19 +82,19 @@ export function buildOperatorEvidenceReadinessProjection({
       },
       {
         source_id: 'production_evidence_scaleout_refs',
-        ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
+        ref: RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
         status: productionEvidenceScaleoutRefs.status,
         evidence_receipt_fixture_ref: productionEvidenceScaleoutRefs.evidence_receipt_fixture_ref,
       },
       {
         source_id: 'opl_expected_receipt_monitor_freshness_handoff',
-        ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+        ref: RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,
         status: oplExpectedReceiptMonitorFreshnessHandoff.status,
         evidence_receipt_fixture_ref: oplExpectedReceiptMonitorFreshnessHandoff.evidence_receipt_fixture_ref,
       },
       {
         source_id: 'production_evidence_tail_workorder',
-        ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
+        ref: RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
         status: productionEvidenceTailWorkOrder.status,
         workorder_id: productionEvidenceTailWorkOrder.workorder_id,
       },
@@ -99,14 +107,14 @@ export function buildOperatorEvidenceReadinessProjection({
       },
       {
         source_id: 'goal_workflow_agent_lab_suite',
-        ref: '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+        ref: RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF,
         status: goalWorkflowAgentLabSuite.status,
         suite_id: goalWorkflowAgentLabSuite.suite_id,
         suite_ref: goalWorkflowAgentLabSuite.handoff_surface.agent_lab_suite_ref,
       },
       {
         source_id: 'ppt_three_route_agent_lab_suite',
-        ref: '/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+        ref: RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF,
         status: pptThreeRouteAgentLabSuite.status,
         suite_id: pptThreeRouteAgentLabSuite.suite_id,
         suite_ref: pptThreeRouteAgentLabSuite.handoff_surface.agent_lab_suite_ref,
@@ -219,7 +227,7 @@ export function buildOperatorEvidenceReadinessProjection({
         required_evidence: 'A real OPL-hosted controlled visual-stage run repeatedly consumes RCA domain_action_adapter refs and receives RCA domain receipt, typed blocker, or no-regression evidence refs without writing RCA visual truth.',
         current_best_ref: temporalLongSoakEvidenceInventory?.latest_evidence_ref || '/controlled_soak_no_regression_attempt',
         observed_long_soak_evidence_ref_count: temporalLongSoakEvidenceInventory?.evidence_count || 0,
-        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
+        workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(2),
       },
       {
         gap_id: 'real_memory_lifecycle_receipt_instances',
@@ -228,7 +236,7 @@ export function buildOperatorEvidenceReadinessProjection({
         required_evidence: 'Accepted/rejected memory writeback and cleanup/restore/retention lifecycle receipts exist in workspace runtime roots and remain refs-only for OPL.',
         current_best_ref: receiptInventoryGapProjection.current_best_ref || '/controlled_memory_apply_proof/runtime_receipt_instances',
         missing_receipt_kinds: receiptInventoryGapProjection.missing_receipt_kinds || [],
-        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1',
+        workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(1),
       },
       {
         gap_id: 'cross_family_repeated_no_regression_evidence',
@@ -236,7 +244,7 @@ export function buildOperatorEvidenceReadinessProjection({
         status: 'pending_repeated_runtime_evidence',
         required_evidence: 'Repeated no-regression evidence refs across at least two deliverable families without artifact blobs, memory bodies, or review/export verdict payloads in OPL state.',
         current_best_ref: '/no_regression_owner_receipt_opl_consumption_proof',
-        workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3',
+        workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(3),
       },
     ],
     authority_boundary: {

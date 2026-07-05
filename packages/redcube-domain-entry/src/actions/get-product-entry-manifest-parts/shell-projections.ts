@@ -26,6 +26,14 @@ import {
 import { buildTemporalAutonomyReadinessProjection } from '../domain-action-adapter-parts/temporal-autonomy-readiness.js';
 import { buildTemporalStageRunConsumptionPolicy } from '../domain-action-adapter-parts/temporal-stage-run-consumption-policy.js';
 import { OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT } from './contracts.js';
+import {
+  RCA_EFFICIENCY_HANDOFF_PROJECTION_NESTED_REF,
+  RCA_EFFICIENCY_HANDOFF_PROJECTION_REF,
+  RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF,
+  RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_REF,
+  RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF,
+  RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_REF,
+} from './operator-evidence-refs/evidence-constants.js';
 import { buildProductEntryManifestShellCatalog } from './shell-catalog.js';
 
 export function buildProductEntryManifestShellProjections({
@@ -375,32 +383,32 @@ export function buildProductEntryManifestShellProjections({
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/rca_efficiency_handoff_projection',
+        ref: RCA_EFFICIENCY_HANDOFF_PROJECTION_REF,
         label: 'Agent Lab refs-only efficiency handoff projection',
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+        ref: RCA_EFFICIENCY_HANDOFF_PROJECTION_NESTED_REF,
         label: 'operator evidence readiness efficiency handoff',
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/goal_workflow_agent_lab_suite',
+        ref: RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_REF,
         label: 'Agent Lab /goal workflow suite',
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+        ref: RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF,
         label: 'operator evidence readiness /goal workflow suite',
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/ppt_three_route_agent_lab_suite',
+        ref: RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_REF,
         label: 'Agent Lab PPT three-route suite',
       },
       {
         ref_kind: 'json_pointer',
-        ref: '/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+        ref: RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF,
         label: 'operator evidence readiness PPT three-route suite',
       },
     ],

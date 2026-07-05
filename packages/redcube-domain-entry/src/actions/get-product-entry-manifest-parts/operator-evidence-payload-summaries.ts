@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { buildOperatorEvidenceTailWorkorderItemRef } from './operator-evidence-refs/evidence-constants.js';
+
 const RCA_OWNER_PAYLOAD_PATH_POLICY =
   'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks';
 
@@ -15,28 +17,28 @@ const RCA_OWNER_PAYLOAD_ITEM_DEFINITIONS = Object.freeze([
     item_id: 'owner_chain_apply',
     sequence: 1,
     remaining_gap_id: 'owner_chain_apply_to_real_opl_attempt',
-    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/0',
+    workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(0),
     typed_blocker_ref_index: 0,
   }),
   Object.freeze({
     item_id: 'memory_lifecycle_receipt_scaleout',
     sequence: 2,
     remaining_gap_id: 'real_memory_lifecycle_receipt_instances',
-    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1',
+    workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(1),
     typed_blocker_ref_index: 1,
   }),
   Object.freeze({
     item_id: 'temporal_controlled_visual_stage_long_soak',
     sequence: 3,
     remaining_gap_id: 'opl_hosted_controlled_visual_stage_long_soak',
-    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2',
+    workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(2),
     typed_blocker_ref_index: 0,
   }),
   Object.freeze({
     item_id: 'cross_family_repeated_no_regression',
     sequence: 4,
     remaining_gap_id: 'cross_family_repeated_no_regression_evidence',
-    workorder_item_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3',
+    workorder_item_ref: buildOperatorEvidenceTailWorkorderItemRef(3),
     typed_blocker_ref_index: 2,
   }),
 ]);

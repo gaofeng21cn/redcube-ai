@@ -232,6 +232,32 @@ test('product manifest exposes RCA efficiency handoff and owner route consumptio
       true,
     );
     assert.equal(
+      manifest.owner_route.projection_refs.some(
+        (entry) => entry.ref === '/operator_evidence_readiness_projection/rca_efficiency_handoff_projection',
+      ),
+      true,
+    );
+    assert.equal(
+      manifest.owner_route.projection_refs.some((entry) => entry.ref === '/goal_workflow_agent_lab_suite'),
+      true,
+    );
+    assert.equal(
+      manifest.owner_route.projection_refs.some(
+        (entry) => entry.ref === '/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite',
+      ),
+      true,
+    );
+    assert.equal(
+      manifest.owner_route.projection_refs.some((entry) => entry.ref === '/ppt_three_route_agent_lab_suite'),
+      true,
+    );
+    assert.equal(
+      manifest.owner_route.projection_refs.some(
+        (entry) => entry.ref === '/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite',
+      ),
+      true,
+    );
+    assert.equal(
       manifest.domain_owner_receipt_contract.efficiency_handoff_owner_projection.refs_only,
       true,
     );
