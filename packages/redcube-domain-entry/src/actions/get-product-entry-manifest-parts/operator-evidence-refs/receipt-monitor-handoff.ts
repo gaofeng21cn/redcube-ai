@@ -4,7 +4,12 @@ import {
   buildStageExpectedReceiptPayloadSummary,
   buildStageReplayHumanGateBlockerSummary,
 } from '../operator-evidence-payload-summaries.js';
-import { RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE } from './evidence-constants.js';
+import {
+  RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF,
+  RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
+  RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
+  RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE,
+} from './evidence-constants.js';
 
 export function buildOplExpectedReceiptMonitorFreshnessHandoff({
   familyStageControlPlane,
@@ -25,8 +30,8 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
     evidence_model: 'refs_only_no_visual_truth_artifact_blob_memory_body_or_review_verdict_body',
     evidence_receipt_fixture_ref: productionEvidenceScaleoutRefs.evidence_receipt_fixture_ref,
     source_projection_refs: {
-      operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
-      production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
+      operator_evidence_readiness_projection_ref: RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF,
+      production_evidence_scaleout_refs_ref: RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
       workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
       domain_handler_export_ref: '/product_entry_shell/domain_handler',
     },
@@ -73,7 +78,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       freshness_ref_group: 'workspace_receipt_inventory_and_no_regression_refs',
       observed_workspace_count_ref: '/workspace_receipt_inventory_projection/scaleout_projection/observed_workspace_count',
       observed_receipt_count_ref: '/workspace_receipt_inventory_projection/scaleout_projection/observed_receipt_count',
-      no_regression_evidence_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs/repeated_no_regression_evidence_refs/evidence_refs',
+      no_regression_evidence_refs_ref: `${RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF}/repeated_no_regression_evidence_refs/evidence_refs`,
       monitor_freshness_payload_body_required: false,
       production_soak_claimed: false,
     },
@@ -83,7 +88,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       blocker_owner: 'redcube_ai',
       payload_body_included: false,
       blocks_stage_expected_receipt_or_monitor_refs: false,
-      production_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
+      production_tail_workorder_ref: RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
     },
     stage_expected_receipt_payload_summary: buildStageExpectedReceiptPayloadSummary({
       familyStageControlPlane,

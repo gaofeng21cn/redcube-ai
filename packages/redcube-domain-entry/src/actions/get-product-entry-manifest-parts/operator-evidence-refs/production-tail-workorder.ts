@@ -1,6 +1,9 @@
 // @ts-nocheck
 
 import {
+  RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF,
+  RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,
+  RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
   RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_ID,
   RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS,
 } from './evidence-constants.js';
@@ -16,9 +19,9 @@ export function buildProductionEvidenceTailWorkOrder({
     ...RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS,
   ];
   const sourceProjectionRefs = {
-    operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
-    production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
-    opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+    operator_evidence_readiness_projection_ref: RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF,
+    production_evidence_scaleout_refs_ref: RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF,
+    opl_expected_receipt_monitor_freshness_handoff_ref: RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,
     temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
     temporal_long_soak_evidence_inventory_ref: '/temporal_controlled_visual_stage_long_soak_evidence_inventory',
     workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',

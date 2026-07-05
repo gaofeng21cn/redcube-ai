@@ -148,6 +148,28 @@ export const RCA_REAL_NO_REGRESSION_EVIDENCE_PROVENANCE = Object.freeze([
 
 export const RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_ID = 'rca.production_evidence_tail_workorder.v1';
 
+export const RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF =
+  '/operator_evidence_readiness_projection';
+export const RCA_PRODUCTION_EVIDENCE_SCALEOUT_REFS_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/production_evidence_scaleout_refs`;
+export const RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/opl_expected_receipt_monitor_freshness_handoff`;
+export const RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/production_evidence_tail_workorder`;
+export const RCA_EFFICIENCY_HANDOFF_PROJECTION_REF = '/rca_efficiency_handoff_projection';
+export const RCA_EFFICIENCY_HANDOFF_PROJECTION_NESTED_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/rca_efficiency_handoff_projection`;
+export const RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_REF = '/goal_workflow_agent_lab_suite';
+export const RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/goal_workflow_agent_lab_suite`;
+export const RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_REF = '/ppt_three_route_agent_lab_suite';
+export const RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF =
+  `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/ppt_three_route_agent_lab_suite`;
+
+export function buildOperatorEvidenceTailWorkorderItemRef(index) {
+  return `${RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF}/work_items/${index}`;
+}
+
 export const RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES = Object.freeze([
   'domain_owner_receipt_ref',
   'no_regression_evidence_ref',
