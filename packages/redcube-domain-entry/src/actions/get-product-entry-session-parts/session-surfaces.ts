@@ -6,11 +6,28 @@ import {
 } from 'opl-framework-shared/product-entry-companions';
 
 import type { ProductEntrySessionResponse } from '../../types.js';
+import { productEntrySessionFile } from '../product-entry-session-refs.js';
 import { publicationProjectionForDeliverable } from './session-artifacts.js';
+
+const SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNER = 'configured_family_runtime_provider';
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
   return text || fallback;
+}
+
+export function buildProductEntrySessionSurfaceContext({ entrySessionId, session }) {
+  const runtimeOwner = safeText(session.runtime_owner);
+  if (runtimeOwner !== SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNER) {
+    throw new Error('product entry session runtime_owner 漂移');
+  }
+  return {
+    sessionFile: productEntrySessionFile(entrySessionId),
+    runtimeOwner,
+    deliveryIdentity: buildSessionDeliveryIdentityPayload(session),
+    runtimeLoopClosureDeliveryIdentity: buildSessionDeliveryIdentityPayload(session, { includeProfile: false }),
+    entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
+  };
 }
 
 export function deliveryProjectionIsOutputReady({ reviewState, publicationProjection, deliverableId, publicationProjectionForDeliverable }) {

@@ -26,16 +26,13 @@ import {
 } from './get-product-entry-session-parts/session-artifacts.js';
 import type { ProductEntrySessionResponse } from '../types.js';
 import {
+  buildProductEntrySessionSurfaceContext,
   buildProductEntrySessionResponse,
   buildPptImageRouteSessionSurface,
-  buildSessionDeliveryIdentityPayload,
 } from './get-product-entry-session-parts/session-surfaces.js';
 import {
   loadProductEntrySessionRef,
-  productEntrySessionFile,
 } from './product-entry-session-refs.js';
-
-const SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNERS = new Set(['configured_family_runtime_provider']);
 
 function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -50,10 +47,6 @@ function requireField(name, value) {
   return text;
 }
 
-function productEntrySessionPath(entrySessionId) {
-  return productEntrySessionFile(entrySessionId);
-}
-
 export async function getProductEntrySession(request): Promise<ProductEntrySessionResponse> {
   const entrySessionId = requireField(
     'entry_session_id',
@@ -64,11 +57,13 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
     throw new Error(`product entry session 不存在: ${entrySessionId}`);
   }
   const { session } = resolveProductEntryCurrentness({ session: storedSession, persist: false });
-  if (!SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNERS.has(safeText(session.runtime_owner))) {
-    throw new Error('product entry session runtime_owner 漂移');
-  }
-  const sessionFile = productEntrySessionPath(entrySessionId);
-  const deliveryIdentity = buildSessionDeliveryIdentityPayload(session);
+  const {
+    sessionFile,
+    runtimeOwner,
+    deliveryIdentity,
+    runtimeLoopClosureDeliveryIdentity,
+    entryMode,
+  } = buildProductEntrySessionSurfaceContext({ entrySessionId, session });
 
   const [reviewState, publicationProjection] = await Promise.all([
     getReviewState({
@@ -91,7 +86,7 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
   const sessionContinuity = buildSessionContinuitySurface({
     entrySessionId,
     sessionFile,
-    runtimeOwner: session.runtime_owner,
+    runtimeOwner,
     deliveryIdentity,
     continuationSnapshot,
   });
@@ -117,15 +112,15 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
   const runtimeLoopClosure = buildRuntimeLoopClosureSurface({
     entrySessionId,
     sessionFile,
-    runtimeOwner: session.runtime_owner,
-    deliveryIdentity: buildSessionDeliveryIdentityPayload(session, { includeProfile: false }),
+    runtimeOwner,
+    deliveryIdentity: runtimeLoopClosureDeliveryIdentity,
     continuationSnapshot,
     source: 'session',
-    entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
+    entryMode,
   });
   const pptImageRouteSession = buildPptImageRouteSessionSurface({ session });
   const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
-    runtimeOwner: session.runtime_owner,
+    runtimeOwner,
     entrySessionId,
     sessionFile,
     deliveryIdentity,
@@ -134,7 +129,7 @@ export async function getProductEntrySession(request): Promise<ProductEntrySessi
     reviewState,
     publicationProjection,
     source: 'session',
-    entryMode: safeText(session.last_entry_mode, 'redcube_product_entry'),
+    entryMode,
   });
 
   return buildProductEntrySessionResponse({
