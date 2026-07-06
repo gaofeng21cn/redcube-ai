@@ -387,6 +387,7 @@ export interface RuntimeSourceIntakeRequest {
   brief?: string;
   keywords?: string[] | string;
   sourceFiles?: string[] | string;
+  operatorFiles?: string[] | string;
   modeHint?: string;
 }
 

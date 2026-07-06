@@ -24,6 +24,10 @@ import {
   safeText,
   writeJson,
 } from './source-intake-parts/workspace-setup.js';
+import type {
+  RuntimeSourceIntakeRequest,
+  RuntimeSourceIntakeResponse,
+} from './types.js';
 
 export async function intakeSource({
   workspaceRoot,
@@ -34,7 +38,7 @@ export async function intakeSource({
   sourceFiles = [],
   operatorFiles = [],
   modeHint = '',
-}) {
+}: RuntimeSourceIntakeRequest): Promise<RuntimeSourceIntakeResponse> {
   const normalizedKeywords = normalizeKeywords(keywords);
   const normalizedSourceFiles = normalizeSourceFiles(sourceFiles);
   const normalizedOperatorFiles = normalizeOperatorFiles(operatorFiles);

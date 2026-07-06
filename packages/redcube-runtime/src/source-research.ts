@@ -194,7 +194,7 @@ export async function researchSource(request: SourceResearchRequest) {
     topicId,
   } = request;
   const sourcePaths = getSourceArtifactPaths(workspaceRoot, topicId);
-  const intake = await intakeSource(request) as JsonRecord;
+  const intake = await intakeSource(request) as unknown as JsonRecord;
   if (intake.ok !== true) {
     return finalizeResearchResult({
       workspaceRoot,
