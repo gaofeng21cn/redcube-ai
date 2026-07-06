@@ -18,10 +18,10 @@ import {
   buildSourceIntakeResponse,
   reuseFrozenSourcePackIfAvailable,
 } from './source-intake-parts/response-assembly.js';
+import { safeText } from './runtime-utils.js';
 import {
   ensureWorkspaceAndTopic,
   readJsonIfExists,
-  safeText,
   writeJson,
 } from './source-intake-parts/workspace-setup.js';
 import type {
