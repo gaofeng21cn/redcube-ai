@@ -92,7 +92,7 @@ function writeFile(relativePath: string, content: string) {
   fs.writeFileSync(absolutePath, content);
 }
 
-export function syncSourcePartsFromAggregate() {
+function syncSourcePartsFromAggregate() {
   const currentProgram = readJson(AGGREGATE_SNAPSHOT_REF);
   const sourcePartRefs = sourcePartRefsFromAggregate(currentProgram);
   const expectedRefs = new Set(sourcePartRefs.map((sourcePart) => sourcePart.ref));
@@ -111,7 +111,7 @@ export function syncSourcePartsFromAggregate() {
   removeEmptyDirectories(PARTS_ROOT);
 }
 
-export function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFiles()) {
+function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFiles()) {
   const children = childSegmentMap(sourcePartRefs);
   const assembled: Record<string, unknown> = {};
   for (const sourcePartRef of sourcePartRefs) {
@@ -131,7 +131,7 @@ export function buildCurrentProgramPackBundleManifest(sourceIndex = buildCurrent
   return buildCurrentProgramPackBundleManifestForSourceIndex(sourceIndex);
 }
 
-export function expectedGeneratedFiles() {
+function expectedGeneratedFiles() {
   const sourcePartRefs = sourcePartRefsFromFiles();
   const aggregate = assembleCurrentProgramFromParts(sourcePartRefs);
   const sourceIndex = buildCurrentProgramSourceIndex(aggregate);

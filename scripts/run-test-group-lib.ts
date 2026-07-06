@@ -57,12 +57,12 @@ export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
 ]);
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
-export const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
+const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
   '@redcube/runtime',
   '@redcube/runtime-protocol',
   '@redcube/domain-entry',
 ]);
-export const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
+const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   {
     specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
     resolve_from: 'packages/redcube-runtime/package.json',
@@ -322,17 +322,6 @@ export function partitionTestFilesForExecution({ groupName, files = [] }) {
   };
 }
 
-export function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
-  const covered = new Set(coveredFiles);
-  const selected = [];
-  for (const file of baseFiles) {
-    if (!covered.has(file) && !selected.includes(file)) {
-      selected.push(file);
-    }
-  }
-  return selected;
-}
-
 export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
   const args = ['--experimental-strip-types', '--test'];
   if (serialized) {
@@ -380,7 +369,7 @@ export function parseRunTestGroupArgs(argv = []) {
   };
 }
 
-export function normalizeRequestedTestFiles(files = []) {
+function normalizeRequestedTestFiles(files = []) {
   const normalized = files.map((file) => String(file).trim().replaceAll(path.sep, '/').replace(/^\.\//, ''));
   const invalid = normalized.filter((file) => !/^tests\/[^/]+\.test\.(?:js|ts)$/.test(file));
   if (invalid.length > 0) {

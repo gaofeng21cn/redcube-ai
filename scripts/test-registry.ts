@@ -1,9 +1,9 @@
 // @ts-nocheck
 import path from 'node:path';
 
-export const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical']);
-export const TEST_SIZES = Object.freeze(['small', 'medium', 'large']);
-export const TEST_STATES = Object.freeze(['active', 'historical']);
+const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical']);
+const TEST_SIZES = Object.freeze(['small', 'medium', 'large']);
+const TEST_STATES = Object.freeze(['active', 'historical']);
 
 const PRIMARY_TEST_FILES = Object.freeze({
   meta: Object.freeze([
@@ -246,24 +246,18 @@ export function rootPartitionFiles() {
   return TEST_REGISTRY.map((entry) => entry.file);
 }
 
-export function primaryLaneFiles(lane) {
+function primaryLaneFiles(lane) {
   return TEST_REGISTRY
     .filter((entry) => entry.lane === lane)
     .map((entry) => entry.file);
 }
 
-export function fastFiles() {
+function fastFiles() {
   return FAST_FILES.filter((file) => TEST_REGISTRY.some((entry) => entry.file === file));
 }
 
-export function smokeFiles() {
+function smokeFiles() {
   return SMOKE_FILES.filter((file) => TEST_REGISTRY.some((entry) => entry.file === file));
-}
-
-export function ciDefaultFiles() {
-  return TEST_REGISTRY
-    .filter((entry) => entry.ci_default)
-    .map((entry) => entry.file);
 }
 
 function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {

@@ -21,7 +21,7 @@ export const FALSE_AUTHORITY_FLAGS = Object.freeze({
   manifest_can_authorize_quality_or_export: false,
 });
 
-export const SECTION_ROOTS = Object.freeze([
+const SECTION_ROOTS = Object.freeze([
   {
     section_id: 'program_id',
     aggregate_json_pointer: '/program_id',
@@ -103,7 +103,7 @@ export function sha256(content: string): string {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
-export function lineCount(value: unknown): number {
+function lineCount(value: unknown): number {
   return stable(value).split('\n').length - 1;
 }
 
@@ -154,7 +154,7 @@ function refPathFor(pointer: string): string {
   return `${PARTS_ROOT}/${fileSegments.join('/')}.json`;
 }
 
-export function leafRole(pointer: string): string {
+function leafRole(pointer: string): string {
   return pointer.startsWith('/current_state') ? 'active_current_truth_leaf_source' : 'current_program_leaf_source';
 }
 
@@ -222,7 +222,7 @@ export function childSegmentMap(sourcePartRefs: Array<{ json_pointer: string }>)
   return children;
 }
 
-export function orderedSourcePartRefs(sourcePartRefs: SourcePartRef[]): SourcePartRef[] {
+function orderedSourcePartRefs(sourcePartRefs: SourcePartRef[]): SourcePartRef[] {
   const orderBySection = new Map(SECTION_ROOTS.map((section, index) => [section.aggregate_json_pointer, index]));
   const sectionFor = (pointer: string) => SECTION_ROOTS.find((section) => (
     pointer === section.aggregate_json_pointer || pointer.startsWith(`${section.aggregate_json_pointer}/`)

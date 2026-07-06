@@ -1,7 +1,6 @@
 // @ts-nocheck
 
-export const OPL_LEDGER_ARTIFACT_REGISTRATION_CONTRACT_REF = 'contracts/opl_ledger_artifact_registration.json';
-export const OPL_LEDGER_ARTIFACT_REGISTRATION_POINTER = '/opl_ledger_artifact_registration';
+const OPL_LEDGER_ARTIFACT_REGISTRATION_POINTER = '/opl_ledger_artifact_registration';
 
 export function buildOplLedgerArtifactRegistrationContract() {
   return {
