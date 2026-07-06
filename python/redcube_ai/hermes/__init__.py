@@ -1,1 +1,1 @@
-"""Hermes proof-lane helpers for RedCube AI."""
+"""Retired Hermes proof-lane boundary for RedCube AI."""

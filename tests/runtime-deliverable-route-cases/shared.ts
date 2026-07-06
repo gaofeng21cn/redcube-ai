@@ -21,11 +21,7 @@ import {
 import { completeSourceReadiness } from '../helpers/complete-source-readiness.ts';
 
 export const MODULE_DIR = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
-export const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = JSON.stringify([
-  process.execPath,
-  '--experimental-strip-types',
-  path.join(MODULE_DIR, 'helpers/mock-hermes-agent-loop-bridge.ts'),
-]);
+export const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = '';
 export const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,
   '--experimental-strip-types',
@@ -47,14 +43,7 @@ export async function withMockCodexRuntime(testFn) {
 }
 
 export async function withMockHermesAgentLoop(testFn) {
-  const restoreEnv = withEnv({
-    REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND: MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
-  });
-  try {
-    return await testFn();
-  } finally {
-    restoreEnv();
-  }
+  return testFn();
 }
 
 export {

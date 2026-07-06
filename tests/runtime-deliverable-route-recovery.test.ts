@@ -28,11 +28,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
-const MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND = JSON.stringify([
-  process.execPath,
-  '--experimental-strip-types',
-  fileURLToPath(new URL('./helpers/mock-hermes-agent-loop-bridge.ts', import.meta.url)),
-]);
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -62,7 +57,6 @@ async function withMockCodexRuntime(testFn) {
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
     REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
-    REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND: MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   });
   try {
     return await testFn();

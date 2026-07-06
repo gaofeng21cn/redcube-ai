@@ -85,6 +85,7 @@
     },
     "opl_hosted_executor_requirement": {
       "type": "object",
+      "description": "Non-default external adapter policy ref only; RCA-owned Hermes implementation is retired and must fail closed until OPL owns the executor adapter receipt.",
       "additionalProperties": false,
       "required": ["source", "required_receipt_source", "hosted_adapter_reference"],
       "properties": {

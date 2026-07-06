@@ -1,7 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, readdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import os from 'node:os';
 import path from 'node:path';
@@ -453,7 +453,6 @@ test('Runtime Python helper callers prefer package module invocation over wrappe
   assert.doesNotMatch(combinedSource, /DEFAULT_BRIDGE_SCRIPT/);
   assert.match(combinedSource, /'-m',\s*helper\.packageModule/);
   assert.match(combinedSource, /runRedCubePythonHelper/);
-  assert.match(combinedSource, /'-m',\s*DEFAULT_AGENT_LOOP_MODULE/);
   assert.match(combinedSource, /python-native-helper-catalog\.json/);
 
   for (const helper of readJson(CATALOG_FILE).helpers) {
@@ -514,32 +513,13 @@ test('Retired wrapper script invocation shape has no active callers or contract 
   assert.deepEqual(violations, []);
 });
 
-test('Hermes-Agent loop client defaults to the package module bridge', () => {
-  const tempDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-hermes-module-entry-'));
-  const argvFile = path.join(tempDir, 'argv.json');
-  const mockPython = path.join(tempDir, 'mock-python.mjs');
-  writeFileSync(mockPython, [
-    '#!/usr/bin/env node',
-    "import { readFileSync, writeFileSync } from 'node:fs';",
-    `writeFileSync(${JSON.stringify(argvFile)}, JSON.stringify(process.argv.slice(2)));`,
-    'const request = JSON.parse(readFileSync(process.argv.at(-1), "utf-8"));',
-    'if (request.action !== "probe") throw new Error("expected probe request");',
-    'process.stdout.write(JSON.stringify({ ok: true, contract: { model: "mock-model" } }) + "\\n");',
-  ].join('\n'), { mode: 0o755 });
+test('Hermes-Agent loop client is a retired fail-closed boundary, not a Python bridge launcher', () => {
+  const probe = probeHermesAgentLoop({ cwd: path.resolve('.') });
 
-  const probe = probeHermesAgentLoop({
-    cwd: path.resolve('.'),
-    env: {
-      ...process.env,
-      REDCUBE_HERMES_AGENT_LOOP_PYTHON_COMMAND: mockPython,
-      REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND: '',
-    },
-  });
-
-  assert.equal(probe.ok, true, probe.blocking_reason);
-  const argv = JSON.parse(readFileSync(argvFile, 'utf-8'));
-  assert.deepEqual(argv.slice(0, 2), ['-m', 'redcube_ai.hermes.agent_loop_bridge_impl']);
-  assert.equal(path.basename(argv.at(-1)), 'request.json');
+  assert.equal(probe.ok, false);
+  assert.equal(probe.error_kind, 'hermes_agent_loop_retired');
+  assert.match(probe.blocking_reason, /RCA-owned Hermes-Agent loop bridge has been retired/);
+  assert.equal(probe.retirement_boundary.adapter_deletion_gate_owner, 'opl_agent_executor_adapter');
 });
 
 test('Native PPT helper routes stay tied to the engine contract and review/export gates', () => {

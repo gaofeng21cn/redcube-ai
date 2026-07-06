@@ -150,9 +150,9 @@ test('runDeliverableRoute executes other declared stages through Codex-backed ex
   });
 });
 
-test('runDeliverableRoute supports explicit hermes_agent adapter without changing the default executor', async () => {
-  await withMockHermesAgentLoop(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-hermes-proof-'));
+test('runDeliverableRoute fails closed for explicit retired hermes_agent adapter without changing the default executor', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-hermes-retired-'));
 
     await createDeliverable({
       workspaceRoot,
@@ -160,216 +160,20 @@ test('runDeliverableRoute supports explicit hermes_agent adapter without changin
       profileId: 'lecture_student',
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      title: 'Hermes-Agent loop route',
-      goal: '验证 RedCube 可显式走 Hermes-Agent loop full agent loop route',
+      title: 'Hermes-Agent retired route',
+      goal: '验证 RedCube 显式 Hermes-Agent adapter 退役后 fail closed',
     });
 
-    const result = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'storyline',
-      adapter: 'hermes_agent',
-    });
-
-    assert.equal(result.ok, true);
-    assert.equal(result.run.executor.adapter, 'hermes_agent');
-    assert.equal(result.run.executor.primary, false);
-    assert.equal(result.run.executor.execution_surface, 'hermes_agent_loop');
-    assert.equal(result.run.executor.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(result.run.executor.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(result.run.executor.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
-    assert.equal(result.run.executor.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
-    assert.equal(
-      result.run.executor.execution_model.opl_executor_adapter_receipt?.hosted_adapter_reference,
-      'opl_hosted:hermes_agent_loop',
+    await assert.rejects(
+      () => runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        route: 'storyline',
+        adapter: 'hermes_agent',
+      }),
+      /RCA-owned Hermes-Agent loop bridge has been retired/,
     );
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.owner, 'opl_runtime_manager');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.source, 'opl_executor_adapter_receipt');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.hosted_adapter_reference, 'opl_hosted:hermes_agent_loop');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.selected_executor_backend, 'hermes_agent');
-    assert.equal(
-      result.run.executor.hermes_agent_loop_runtime?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.review_export_gate_owner, 'redcube_ai');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.activation, 'explicit_opt_in_only');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.auditability, 'receipt_backed');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.failure_mode, 'fail_closed');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.effect_equivalence_guaranteed, false);
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.model_selection, 'inherit_local_hermes_default');
-    assert.equal(result.run.executor.hermes_agent_loop_runtime?.reasoning_selection, 'inherit_local_hermes_default');
-    assert.equal(result.events.some((event) => event?.type === 'hermes_agent_loop_route_started'), true);
-
-    const stored = await getRun({ workspaceRoot, runId: result.run.run_id });
-    assert.equal(stored.run.executor.adapter, 'hermes_agent');
-    assert.equal(stored.run.executor.execution_surface, 'hermes_agent_loop');
-    assert.equal(stored.run.executor.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(stored.run.executor.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
-    assert.equal(stored.run.executor.hermes_agent_loop_runtime?.owner, 'opl_runtime_manager');
-    assert.equal(stored.run.executor.hermes_agent_loop_runtime?.source, 'opl_executor_adapter_receipt');
-    assert.equal(stored.run_telemetry.executor_kind, 'hermes_agent');
-    assert.equal(stored.cost_summary.executor_identity, 'hermes_agent_loop');
-
-    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
-    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.review_export_gate_owner, 'redcube_ai');
-    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
-    assert.equal(artifact.creative_execution?.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.creative_execution?.generation_runtime?.owner, 'opl_runtime_manager');
-    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
-      'opl_hosted:hermes_agent_loop',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.creative_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.review_export_gate_owner, 'redcube_ai');
-    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.proof?.opl_executor_adapter_receipt?.source,
-      'opl_executor_adapter_receipt',
-    );
-  });
-});
-
-test('runDeliverableRoute supports explicit hermes_agent adapter for xiaohongshu storyline', async () => {
-  await withMockHermesAgentLoop(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-xhs-hermes-proof-'));
-
-    await completeSourceReadiness({
-      workspaceRoot,
-      topicId: 'topic-a',
-      title: 'Hermes-Agent loop xiaohongshu proof route',
-      brief: '验证小红书 family 可以显式走 Hermes-Agent loop full agent loop storyline。',
-      keywords: ['小红书', 'Hermes'],
-    });
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'xiaohongshu',
-      profileId: 'standard_note',
-      topicId: 'topic-a',
-      deliverableId: 'note-a',
-      title: 'Hermes-Agent loop 小红书 proof route',
-      goal: '验证 RedCube xiaohongshu family 可显式走 Hermes-Agent loop full agent loop route',
-    });
-
-    const research = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'xiaohongshu',
-      topicId: 'topic-a',
-      deliverableId: 'note-a',
-      route: 'research',
-      adapter: 'hermes_agent',
-    });
-    assert.equal(research.ok, true);
-
-    const result = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'xiaohongshu',
-      topicId: 'topic-a',
-      deliverableId: 'note-a',
-      route: 'storyline',
-      adapter: 'hermes_agent',
-    });
-
-    assert.equal(result.ok, true);
-    assert.equal(result.run.executor.adapter, 'hermes_agent');
-    assert.equal(result.run.executor.execution_surface, 'hermes_agent_loop');
-    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
-    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
-    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
-      'opl_hosted:hermes_agent_loop',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.creative_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
-  });
-});
-
-test('runDeliverableRoute supports explicit hermes_agent adapter for poster storyline', async () => {
-  await withMockHermesAgentLoop(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-poster-hermes-proof-'));
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'poster_onepager',
-      profileId: 'knowledge_poster',
-      topicId: 'topic-a',
-      deliverableId: 'poster-a',
-      title: 'Hermes-Agent loop 海报 proof route',
-      goal: '验证 RedCube poster family 可显式走 Hermes-Agent loop full agent loop route',
-    });
-
-    const result = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'poster_onepager',
-      topicId: 'topic-a',
-      deliverableId: 'poster-a',
-      route: 'storyline',
-      adapter: 'hermes_agent',
-    });
-
-    assert.equal(result.ok, true);
-    assert.equal(result.run.executor.adapter, 'hermes_agent');
-    assert.equal(result.run.executor.execution_surface, 'hermes_agent_loop');
-    const artifact = JSON.parse(readFileSync(result.artifactFile, 'utf-8'));
-    assert.equal(artifact.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(artifact.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(artifact.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
-    assert.equal(artifact.execution_model.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.execution_model.opl_executor_adapter_receipt?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.creative_execution?.owner, 'redcube_ai_visual_deliverable_runtime');
-    assert.equal(artifact.creative_execution?.generation_runtime?.source, 'opl_executor_adapter_receipt');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.hosted_adapter_reference,
-      'opl_hosted:hermes_agent_loop',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.selected_executor_backend, 'hermes_agent');
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.creative_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(
-      artifact.creative_execution?.generation_runtime?.domain_truth_owner,
-      'redcube_ai_visual_deliverable_runtime',
-    );
-    assert.equal(artifact.creative_execution?.generation_runtime?.proof?.full_agent_loop_proved, true);
   });
 });
