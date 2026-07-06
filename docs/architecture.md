@@ -148,9 +148,9 @@ RCA 暴露给 OPL/App/operator/Agent Lab 的 operator evidence readiness、effic
 
 ## Hermes-Agent、RedCube AI 与 concrete executor 的分工
 
-`Hermes-Agent` 在 `RedCube AI` 当前主线里只作为显式 hosted/proof backend、非默认 executor adapter 或技术参考载体。它不承担 RCA 默认 runtime owner，也不承担 OPL production online runtime substrate；OPL production online substrate 固定为 Temporal-backed family provider。
+`Hermes-Agent` 在 `RedCube AI` 当前主线里只作为 historical / opt-in / deferred external adapter、显式 hosted/proof backend、非默认 executor adapter 或技术参考载体。它不承担 RCA 默认 runtime owner，也不承担 OPL production online runtime substrate；OPL production online substrate 固定为 Temporal-backed family provider。
 
-RCA runtime-protocol 的 `opl_executor_adapter_receipt` 现在把 `owner=opl_runtime_manager` 与 `selected_executor_backend=hermes_agent` 分开保存。`owner` 表示 OPL generic executor adapter / receipt owner；`selected_executor_backend` 只表示本次显式非默认 backend。不得再把 backend key 解释成 runtime owner，也不得把 Python loop bridge 或 Hermes API client 写成 RCA-owned generic executor runtime。
+RCA runtime-protocol 的 `opl_executor_adapter_receipt` 现在把 `owner=opl_runtime_manager`、`selected_executor_backend=hermes_agent`、`backend_lifecycle=historical_opt_in_deferred_external_adapter` 和 `rca_default_backend=false` 分开保存。`owner` 表示 OPL generic executor adapter / receipt owner；`selected_executor_backend` 只表示本次显式非默认 backend。不得再把 backend key 解释成 runtime owner，也不得把 Python loop bridge 或 Hermes API client 写成 RCA-owned generic executor runtime。
 
 启用 `hermes_agent` 时，它只能在显式 proof / agent-loop lane 内承担一次具体 executor session 的连接、生命周期、回执和审计：
 
@@ -189,6 +189,7 @@ RCA runtime-protocol 的 `opl_executor_adapter_receipt` 现在把 `owner=opl_run
   - 底层不是单轮 chat relay，而是 external Hermes-Agent loop bridge
   - 默认 model / reasoning 继承本机 Hermes 默认配置，不在 repo 内 pin 死
   - `fallback_with_proof` 只允许 `lane=experimental_proof`，且必须显式声明回到 effective default executor；它不表示 Hermes 与 Codex 在质量或行为上等价
+  - 删除门归 OPL Agent Executor Adapter：default-caller parity、attempt ledger / runtime record parity、RCA route policy / receipt refs preserved、focused proof tests 迁到 OPL-owned surface、no-active RCA caller scan、RCA owner receipt 或 typed blocker
 
 这意味着 RedCube 现在的 family runtime 并不是“写死 Codex-only”，而是：
 

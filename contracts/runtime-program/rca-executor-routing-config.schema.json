@@ -14,6 +14,10 @@
         "owner",
         "hosted_adapter_reference",
         "selected_executor_backend",
+        "backend_lifecycle",
+        "rca_default_backend",
+        "adapter_deletion_gate_owner",
+        "adapter_deletion_gate",
         "domain_truth_owner",
         "review_export_gate_owner",
         "activation",
@@ -33,6 +37,31 @@
         },
         "selected_executor_backend": {
           "const": "hermes_agent"
+        },
+        "backend_lifecycle": {
+          "const": "historical_opt_in_deferred_external_adapter"
+        },
+        "rca_default_backend": {
+          "const": false
+        },
+        "adapter_deletion_gate_owner": {
+          "const": "opl_agent_executor_adapter"
+        },
+        "adapter_deletion_gate": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "opl_agent_executor_adapter_default_caller_parity",
+              "attempt_ledger_runtime_record_parity",
+              "rca_route_policy_and_receipt_refs_preserved",
+              "focused_proof_tests_migrated_to_opl_owned_surface",
+              "no_active_rca_caller_scan",
+              "rca_owner_receipt_or_typed_blocker"
+            ]
+          },
+          "minItems": 6,
+          "maxItems": 6,
+          "uniqueItems": true
         },
         "domain_truth_owner": {
           "const": "redcube_ai_visual_deliverable_runtime"

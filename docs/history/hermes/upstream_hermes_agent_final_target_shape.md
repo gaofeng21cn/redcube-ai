@@ -7,7 +7,7 @@ Machine boundary: 人读历史 target brief。当前机器真相继续归 contra
 
 状态锚点：`2026-04-12`
 
-生命周期说明：本文件仍作为 contract-linked target/provenance brief 保留，但当前解释口径已被 2026-05-10 provider-backed OPL runtime target 更新。OPL 是可外部依赖的 stage-led、以 Agent executor 为最小执行单位 运行框架；Hermes 只保留 legacy/optional provider 或显式 proof lane；RedCube 的第一公开身份仍是视觉交付领域智能体。
+生命周期说明：本文件仍作为 contract-linked target/provenance brief 保留，但当前解释口径已被 2026-05-10 provider-backed OPL runtime target 更新。OPL 是可外部依赖的 stage-led、以 Agent executor 为最小执行单位运行框架；Hermes 只保留 historical / opt-in / deferred external adapter 或显式 proof lane；RedCube 的第一公开身份仍是视觉交付领域智能体。
 
 ## 历史 target 摘要
 
@@ -17,7 +17,7 @@ Machine boundary: 人读历史 target brief。当前机器真相继续归 contra
 | --- | --- | --- |
 | Direct product entry | `User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces` | RCA product-entry manifest、domain handler target、source/tests、core docs。 |
 | OPL-hosted route | `User -> OPL Product Entry -> OPL Runtime Manager -> configured family runtime provider -> RedCube service-safe domain entry -> executor adapter -> concrete executor -> RedCube visual-domain truth surfaces` | OPL / Temporal provider 和 OPL generated/hosted shells 持有通用 runtime/workbench/session wrapper；RCA 持有 visual-domain truth 与 owner receipts。 |
-| Hermes role | 当时作为 upstream proof / optional provider / migration target 读取。 | 只作为显式 optional / proof backend、executor adapter 评估、diagnostic 或历史参考；不是默认 runtime owner。 |
+| Hermes role | 当时作为 upstream proof / optional provider / migration target 读取。 | 只作为 historical / opt-in / deferred external adapter、显式 proof backend、executor adapter 评估、diagnostic 或历史参考；不是默认 runtime owner。 |
 | Default executor | 保持 concrete executor owner 不被 runtime cutover 改写。 | `Codex CLI` 是当前第一公民 concrete executor。 |
 
 ## 当前读法

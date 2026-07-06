@@ -2,6 +2,12 @@ import {
   createRunRecord as createRunRecordJs,
   RUN_LOCATOR_ENVELOPE_BOUNDARY as RUN_LOCATOR_ENVELOPE_BOUNDARY_JS,
 } from './runs.js';
+export {
+  HERMES_AGENT_ADAPTER_DELETION_GATE,
+  HERMES_AGENT_ADAPTER_DELETION_GATE_OWNER,
+  HERMES_AGENT_BACKEND_LIFECYCLE,
+  hermesAgentAdapterRetirementBoundary,
+} from './executor-runtime.js';
 import {
   getDeliverablePaths as getDeliverablePathsJs,
   getNotePaths as getNotePathsJs,

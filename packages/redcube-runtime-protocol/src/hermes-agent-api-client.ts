@@ -3,6 +3,8 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
+import { hermesAgentAdapterRetirementBoundary } from './executor-runtime.js';
+
 const HERMES_AGENT_API_OWNER = 'upstream_hermes_agent';
 const HERMES_AGENT_API_SURFACE = 'hermes_agent_api_server';
 const CHAT_COMPLETIONS_PATH = '/v1/chat/completions';
@@ -427,12 +429,13 @@ function buildGenerationRuntime({
     ...(executorRouting ? { executor_routing: executorRouting } : {}),
     creative_owner: 'hermes_agent',
     primary_surface: HERMES_AGENT_API_SURFACE,
+    ...hermesAgentAdapterRetirementBoundary(),
     execution_model: {
       mainline_adapter: 'hermes_agent',
       executor_backend: 'hermes_agent',
       execution_shape: executionShape,
       primary_surface: HERMES_AGENT_API_SURFACE,
-      adapter_role: 'primary_creative_executor',
+      adapter_role: 'opt_in_external_executor_adapter_proof',
       runtime_substrate_owner: 'Hermes-Agent',
       deployment_host: 'external_hermes_agent_api_server',
       deployment_host_status: 'explicit_runtime_switch',
@@ -440,6 +443,7 @@ function buildGenerationRuntime({
       route: safeText(route) || null,
       hermes_profile: safeText(proof.hermes_profile || hermesProfile) || null,
       freeze_origin_milestone: 'Hermes.API.A',
+      ...hermesAgentAdapterRetirementBoundary(),
     },
   };
 }

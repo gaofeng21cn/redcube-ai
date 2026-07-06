@@ -1,9 +1,13 @@
 // @ts-nocheck
 import { createHash } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
 
-import { findForbiddenPayloadFieldPaths } from './task-utils.js';
+import { writeRuntimeJson } from './dispatch-shared.js';
+import {
+  findForbiddenPayloadFieldPaths,
+  missingFields,
+  safeText,
+  slugId,
+} from './task-utils.js';
 
 const DOMAIN_ID = 'redcube_ai';
 const ARTIFACT_PRODUCING_ROUTE = Object.freeze({
@@ -17,26 +21,13 @@ const ARTIFACT_PRODUCING_ROUTE = Object.freeze({
   ],
 });
 
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function slugId(value, fallback) {
-  return safeText(value, fallback).replace(/[^A-Za-z0-9_.:-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
-}
-
-function taskValue(task, snake, camel = null) {
-  return task?.[snake] ?? (camel ? task?.[camel] : undefined);
-}
-
 function missingRequiredRefs(task) {
-  return [
+  return missingFields(task, [
     'attempt_ref',
     'artifact_locator_ref',
     'review_export_ref',
     'forbidden_write_proof_ref',
-  ].filter((field) => !safeText(taskValue(task, field, field.replace(/_([a-z])/g, (_, char) => char.toUpperCase()))));
+  ]);
 }
 
 function proofId(task) {
@@ -54,16 +45,6 @@ function proofId(task) {
   ].join(':');
   const digest = createHash('sha256').update(seed).digest('hex').slice(0, 12);
   return `receipt-proof-${digest}`;
-}
-
-function writeRuntimeJson({ workspaceRoot, parts, fileName, payload }) {
-  const dir = path.join(workspaceRoot, '.redcube', 'runtime', ...parts);
-  const file = path.join(dir, fileName);
-  const digest = createHash('sha256').update(JSON.stringify(payload)).digest('hex');
-  const payloadWithDigest = { ...payload, sha256: digest };
-  mkdirSync(dir, { recursive: true });
-  writeFileSync(file, `${JSON.stringify(payloadWithDigest, null, 2)}\n`, 'utf-8');
-  return { file, payload: payloadWithDigest };
 }
 
 export async function emitWorkspaceReceiptProof({

@@ -11,6 +11,15 @@ import {
 } from './package-surfaces.ts';
 import { createStructuredArtifactExecutor } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/executor-routing.ts';
 
+const HERMES_ADAPTER_DELETION_GATE = [
+  'opl_agent_executor_adapter_default_caller_parity',
+  'attempt_ledger_runtime_record_parity',
+  'rca_route_policy_and_receipt_refs_preserved',
+  'focused_proof_tests_migrated_to_opl_owned_surface',
+  'no_active_rca_caller_scan',
+  'rca_owner_receipt_or_typed_blocker',
+];
+
 function safeText(value: unknown, fallback = ''): string {
   const text = String(value ?? '').trim();
   return text || fallback;
@@ -34,6 +43,7 @@ test('RCA executor contract exposes only canonical public backends and execution
   assert.equal(codex.execution_shape, 'structured_call');
   assert.equal(codex.execution_model.executor_backend, 'codex_cli');
   assert.equal(codex.execution_model.execution_shape, 'structured_call');
+  assert.notEqual(codex.execution_model.backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
 
   const hermes = buildHermesAgentLoopExecutorDescriptor();
   const hermesExecutionModel = hermes.execution_model as Record<string, any>;
@@ -45,9 +55,20 @@ test('RCA executor contract exposes only canonical public backends and execution
   assert.equal(hermes.execution_model.execution_shape, 'agent_loop');
   assert.equal(hermes.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
   assert.equal(hermes.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+  assert.equal(hermes.execution_model.backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
+  assert.equal(hermes.execution_model.rca_default_backend, false);
+  assert.equal(hermes.execution_model.adapter_deletion_gate_owner, 'opl_agent_executor_adapter');
+  assert.deepEqual(hermes.execution_model.adapter_deletion_gate, HERMES_ADAPTER_DELETION_GATE);
   assert.equal(hermesExecutionModel.opl_executor_adapter_receipt?.owner, 'opl_runtime_manager');
   assert.equal(hermesExecutionModel.opl_executor_adapter_receipt?.source, 'opl_executor_adapter_receipt');
   assert.equal(hermesExecutionModel.opl_executor_adapter_receipt?.hosted_adapter_reference, 'opl_hosted:hermes_agent_loop');
+  assert.equal(
+    hermesExecutionModel.opl_executor_adapter_receipt?.backend_lifecycle,
+    'historical_opt_in_deferred_external_adapter',
+  );
+  assert.equal(hermesExecutionModel.opl_executor_adapter_receipt?.rca_default_backend, false);
+  assert.equal(hermesExecutionModel.opl_executor_adapter_receipt?.adapter_deletion_gate_owner, 'opl_agent_executor_adapter');
+  assert.deepEqual(hermesExecutionModel.opl_executor_adapter_receipt?.adapter_deletion_gate, HERMES_ADAPTER_DELETION_GATE);
   assert.equal(
     hermesExecutionModel.opl_executor_adapter_receipt?.domain_truth_owner,
     'redcube_ai_visual_deliverable_runtime',
@@ -73,6 +94,10 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
     'owner',
     'hosted_adapter_reference',
     'selected_executor_backend',
+    'backend_lifecycle',
+    'rca_default_backend',
+    'adapter_deletion_gate_owner',
+    'adapter_deletion_gate',
     'domain_truth_owner',
     'review_export_gate_owner',
     'activation',
@@ -83,6 +108,10 @@ test('RCA executor routing schema requires OPL receipt or requirement for non-de
   assert.equal(receipt.properties.owner.const, 'opl_runtime_manager');
   assert.equal(receipt.properties.hosted_adapter_reference.const, 'opl_hosted:hermes_agent_loop');
   assert.equal(receipt.properties.selected_executor_backend.const, 'hermes_agent');
+  assert.equal(receipt.properties.backend_lifecycle.const, 'historical_opt_in_deferred_external_adapter');
+  assert.equal(receipt.properties.rca_default_backend.const, false);
+  assert.equal(receipt.properties.adapter_deletion_gate_owner.const, 'opl_agent_executor_adapter');
+  assert.deepEqual(receipt.properties.adapter_deletion_gate.items.enum, HERMES_ADAPTER_DELETION_GATE);
   assert.equal(receipt.properties.domain_truth_owner.const, 'redcube_ai_visual_deliverable_runtime');
   assert.equal(receipt.properties.review_export_gate_owner.const, 'redcube_ai');
   assert.equal(receipt.properties.activation.const, 'explicit_opt_in_only');

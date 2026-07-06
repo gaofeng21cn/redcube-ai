@@ -6,6 +6,9 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'no
 import { fileURLToPath } from 'node:url';
 
 import {
+  hermesAgentAdapterRetirementBoundary,
+} from './executor-runtime.js';
+import {
   buildPythonHelperEnv,
   resolvePythonNativeHelper,
 } from './python-native-helper.js';
@@ -230,6 +233,7 @@ function buildHermesAgentLoopExecutionModel(requestedAdapter = HERMES_AGENT_ADAP
     adapter: HERMES_AGENT_ADAPTER,
     selected_executor_backend: HERMES_AGENT_ADAPTER,
     runtime_surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+    ...hermesAgentAdapterRetirementBoundary(),
     domain_truth_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
     review_export_gate_owner: RCA_REVIEW_EXPORT_GATE_OWNER,
     activation: 'explicit_opt_in_only',
@@ -248,6 +252,7 @@ function buildHermesAgentLoopExecutionModel(requestedAdapter = HERMES_AGENT_ADAP
     default_model_selection: HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION,
     default_reasoning_effort: HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION,
     freeze_origin_milestone: HERMES_AGENT_LOOP_FREEZE_ORIGIN,
+    ...hermesAgentAdapterRetirementBoundary(),
     opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
   };
 }
