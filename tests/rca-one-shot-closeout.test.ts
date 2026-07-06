@@ -1,23 +1,7 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import path from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const repoRoot = path.resolve(__dirname, '..');
-
-function readJson(relativePath) {
-  return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
-}
-
-function assertRefString(value, label) {
-  assert.equal(typeof value, 'string', label);
-  assert.notEqual(value.trim(), '', label);
-  assert.equal(value.startsWith('/'), false, `${label} must be portable`);
-  assert.equal(value.includes('\n'), false, label);
-}
+import { assertRefString, readJson } from './rca-production-acceptance-shared.ts';
 
 test('RCA one-shot closeout records planned done deferred skipped verification and commit-push state', () => {
   const closeout = readJson('contracts/runtime-program/rca-one-shot-production-hardening-closeout.json');

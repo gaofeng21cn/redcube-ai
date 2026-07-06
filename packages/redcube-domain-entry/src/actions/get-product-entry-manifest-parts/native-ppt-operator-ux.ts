@@ -3,13 +3,9 @@ import {
   IMAGE_PPT_PROOF_COMMAND,
   NATIVE_PPT_PROOF_COMMAND,
 } from './policy.js';
+import { safeText } from './utils.js';
 
 const IMAGE_FIRST_OPERATOR_COPY = 'Default route is image-first page authoring; HTML and native editable PPTX routes require explicit operator selection.';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 function checkStatus(checks, checkId) {
   return safeText(checks.find((check) => check.check_id === checkId)?.status, 'unknown');

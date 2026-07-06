@@ -2,6 +2,8 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
+import { safeText } from './utils.js';
+
 const DOMAIN_ID = 'redcube_ai';
 const PROJECTION_ID = 'rca.workspace_receipt_inventory.v1';
 const RECEIPT_ROOT_MODEL = '<workspace-root>/.redcube/runtime/receipts/';
@@ -24,11 +26,6 @@ const FORBIDDEN_PAYLOAD_FIELDS = Object.freeze([
   'artifact_blob',
   'memory_content_body',
 ]);
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 function listJsonFiles(root) {
   if (!existsSync(root)) {
