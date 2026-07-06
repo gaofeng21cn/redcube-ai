@@ -7,7 +7,7 @@ export const INDEX_REF = 'contracts/runtime-program/current-program.index.json';
 export const MANIFEST_REF = 'contracts/runtime-program/current-program.bundle-manifest.json';
 export const ASSEMBLY_REF = 'contracts/runtime-program/current-program.assembly.json';
 export const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
-export const MAX_LEAF_JSON_LINE_COUNT = 800;
+export const MAX_LEAF_JSON_LINE_COUNT = 1000;
 export const WRITE_COMMAND = 'npm run contracts:current-program:write';
 export const CHECK_COMMAND = 'npm run contracts:current-program:check';
 

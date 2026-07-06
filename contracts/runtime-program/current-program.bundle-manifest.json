@@ -9,8 +9,8 @@
   "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
-  "source_ref_count": 76,
-  "source_digest": "aae520b23cc00aee197f7ae18186b18549138fa8b59776c2dc3ad8e4b2d4875d",
+  "source_ref_count": 34,
+  "source_digest": "ffa5b68da93f9cf7ca87641f172871785ab582ee7f45f24491b0b256a14a3854",
   "aggregate": {
     "ref": "contracts/runtime-program/current-program.json",
     "role": "generated_read_through_snapshot_for_existing_consumers",
