@@ -1,3 +1,5 @@
+import { safeText } from './core-helpers.js';
+
 type JsonRecord = Record<string, any>;
 
 interface IncrementalDirectorReviewTargetInput {
@@ -11,11 +13,6 @@ interface IncrementalScreenshotReviewTargetInput {
   renderArtifact: JsonRecord | null | undefined;
   priorReviewArtifact: JsonRecord | null | undefined;
   pageFixRoute: unknown;
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value ?? '').trim();
-  return text || fallback;
 }
 
 function safeArray(value: unknown): unknown[] {

@@ -1,4 +1,5 @@
 import type { SourceReadinessSummary } from './types.js';
+import { safeText } from './protocol-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -19,11 +20,6 @@ function asRecord(value: unknown): JsonRecord {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
     ? value as JsonRecord
     : {};
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function normalizeList(value: unknown): string[] {

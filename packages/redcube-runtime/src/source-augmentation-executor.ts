@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 
 import { validateSourceAugmentationResultContract } from '@redcube/runtime-protocol';
+import { safeText } from './runtime-utils.js';
 
 const DEFAULT_SOURCE_AUGMENTATION_ADAPTER = 'external_command';
 const DEFAULT_SOURCE_AUGMENTATION_EXECUTOR_IDENTITY = 'source_augmentation_external_command';
@@ -25,11 +26,6 @@ interface SourceAugmentationAdapterResult {
 
 function asRecord(value: unknown): JsonRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : {};
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function parseExecutorJson(text: unknown): JsonRecord {

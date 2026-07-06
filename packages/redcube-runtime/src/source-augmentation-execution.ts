@@ -2,8 +2,6 @@
 import path from 'node:path';
 import {
   existsSync,
-  mkdirSync,
-  readFileSync,
   writeFileSync,
 } from 'node:fs';
 
@@ -16,24 +14,11 @@ import {
   getRequestedSourceAugmentationAdapterId,
   resolveSourceAugmentationAdapter,
 } from './source-augmentation-executor.js';
-
-function ensureDir(dir) {
-  mkdirSync(dir, { recursive: true });
-  return dir;
-}
+import { ensureDir, readJson, safeText } from './runtime-utils.js';
 
 function writeJson(file, value) {
   ensureDir(path.dirname(file));
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function safeArray(value) {

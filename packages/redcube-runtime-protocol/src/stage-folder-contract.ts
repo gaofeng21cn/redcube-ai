@@ -4,18 +4,13 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import {
   existsSync,
-  mkdirSync,
   readFileSync,
   readdirSync,
   renameSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
-
-function safeText(value, fallback = '') {
-  const text = String(value ?? '').trim();
-  return text || fallback;
-}
+import { ensureDir, readJson, safeText } from './protocol-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -120,11 +115,6 @@ function safeSegmentFromText(value, fallback) {
   return safeSegment(compact.slice(0, 96), fallback);
 }
 
-function ensureDir(dir) {
-  mkdirSync(dir, { recursive: true });
-  return dir;
-}
-
 function writeTextAtomic(file, payload) {
   ensureDir(path.dirname(file));
   const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
@@ -134,10 +124,6 @@ function writeTextAtomic(file, payload) {
 
 function writeJson(file, payload) {
   writeTextAtomic(file, `${JSON.stringify(payload, null, 2)}\n`);
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 function fileHashRecord(rootDir, file, role) {

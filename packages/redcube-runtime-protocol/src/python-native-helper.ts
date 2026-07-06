@@ -1,8 +1,9 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import { resolveRedCubePythonCommand } from './python-command.js';
+import { readJson, safeText } from './protocol-utils.js';
 
 import type {
   RedCubePythonHelperInvocation,
@@ -12,14 +13,6 @@ import type {
   ResolveRedCubePythonNativeHelperOptions,
   RunRedCubePythonHelperOptions,
 } from './types.js';
-
-function safeText(value: unknown): string {
-  return String(value || '').trim();
-}
-
-function readJson(file: string): unknown {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
 
 export function buildPythonHelperEnv(
   pythonRoot: string,

@@ -18,6 +18,7 @@ import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import { resolveExecutorAdapter } from './executors.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
 import { fileContentHash, helperOutputRefsForArtifact } from './stage-folder-helper-refs.js';
+import { safeText } from './runtime-utils.js';
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
   if (!text) {
@@ -140,11 +141,6 @@ function stableJson(value) {
 function fileMtimeMs(file) {
   if (!file || !existsSync(file)) return 0;
   return Number(statSync(file).mtimeMs || 0);
-}
-
-function safeText(value) {
-  const text = String(value || '').trim();
-  return text;
 }
 
 function assertOplRouteAttemptBoundary(oplRouteAttemptIndex) {

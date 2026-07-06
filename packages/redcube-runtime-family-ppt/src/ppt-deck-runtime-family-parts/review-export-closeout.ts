@@ -1,3 +1,5 @@
+import { safeText } from './core-helpers.js';
+
 type JsonRecord = Record<string, any>;
 
 interface ReviewExportCloseoutInput {
@@ -10,11 +12,6 @@ interface ReviewExportCloseoutInput {
   nextRequiredOwnerAction?: string | null;
   reviewExportRefs?: unknown[];
   artifactRefs?: unknown[];
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value ?? '').trim();
-  return text || fallback;
 }
 
 function safeArray(value: unknown): unknown[] {

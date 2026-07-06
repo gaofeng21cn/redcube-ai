@@ -1,3 +1,5 @@
+import { safeText } from './runtime-utils.js';
+
 type CandidateGateStatus = 'pass' | 'block' | string;
 
 interface CandidatePlanInput {
@@ -61,11 +63,6 @@ function asRecord(value: unknown): Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
     ? value as Record<string, unknown>
     : {};
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function safeArray(value: unknown): unknown[] {

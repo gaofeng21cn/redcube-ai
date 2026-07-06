@@ -1,11 +1,7 @@
 // @ts-nocheck
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-
-function safeText(value) {
-  const text = String(value || '').trim();
-  return text;
-}
+import { safeText } from './runtime-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

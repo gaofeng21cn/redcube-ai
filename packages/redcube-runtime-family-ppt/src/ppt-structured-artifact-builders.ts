@@ -1,8 +1,5 @@
 // @ts-nocheck
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
+import { safeText } from './ppt-deck-runtime-family-parts/core-helpers.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

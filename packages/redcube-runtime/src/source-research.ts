@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -16,6 +16,7 @@ import {
   writeSourceAugmentationResult,
 } from './source-augmentation-result.js';
 import { executeSourceAugmentation } from './source-augmentation-execution.js';
+import { ensureDir, readJson, safeText } from './runtime-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -50,11 +51,6 @@ function asRecord(value: unknown): JsonRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : {};
 }
 
-function safeText(value: unknown, fallback: unknown = ''): string {
-  const text = String(value || '').trim();
-  return text || String(fallback || '').trim();
-}
-
 function safeArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
 }
@@ -63,17 +59,8 @@ function safeStringArray(value: unknown): string[] {
   return safeArray(value).map((item) => safeText(item)).filter(Boolean);
 }
 
-function ensureDir(dir: string): string {
-  mkdirSync(dir, { recursive: true });
-  return dir;
-}
-
 function mergeArtifactFiles(...groups: Array<JsonRecord | null | undefined>): JsonRecord {
   return Object.assign({}, ...groups.map((group) => asRecord(group?.artifactFiles)));
-}
-
-function readJson(file: string): JsonRecord {
-  return JSON.parse(readFileSync(file, 'utf-8')) as JsonRecord;
 }
 
 function writeJson(file: string, value: unknown): void {

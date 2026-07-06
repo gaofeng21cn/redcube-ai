@@ -10,9 +10,9 @@ import {
   unchangedSourcePackReuseDecision,
 } from './fingerprint-reuse.js';
 import { isConsumableSource } from './materialization.js';
+import { safeText } from '../runtime-utils.js';
 import {
   readJsonIfExists,
-  safeText,
   writeJson,
 } from './workspace-setup.js';
 

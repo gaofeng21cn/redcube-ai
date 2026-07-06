@@ -1,3 +1,5 @@
+import { safeText } from './core-helpers.js';
+
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';
 
@@ -183,11 +185,6 @@ const PROFESSIONAL_DESIGN_PACK_CONTRACT = Object.freeze({
     'slides[].native_shapes[].layout_zone_id',
   ],
 });
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 export function buildNativePptQualityNonregressionReadModel({
   route,

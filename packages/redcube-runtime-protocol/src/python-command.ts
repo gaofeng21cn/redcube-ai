@@ -9,6 +9,7 @@ import type {
   ResolvedRedCubePythonCommand,
   ResolveRedCubePythonCommandOptions,
 } from './types.js';
+import { safeText } from './protocol-utils.js';
 
 export const REDCUBE_PYTHON_COMMAND_ENV = 'REDCUBE_PYTHON_COMMAND';
 const PYTHON_PLAYWRIGHT_PROBE_COMMAND = 'python3';
@@ -38,10 +39,6 @@ type ManagedPythonPaths = {
   pythonCommand: string;
   markerFile: string;
 };
-
-function safeText(value: unknown): string {
-  return String(value || '').trim();
-}
 
 function parseExplicitPythonCommand(value: string): Pick<ResolvedRedCubePythonCommand, 'command' | 'args'> {
   const raw = safeText(value);

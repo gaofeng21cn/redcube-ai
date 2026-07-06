@@ -1,12 +1,9 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
+import { readJson } from './runtime-utils.js';
 
 type JsonRecord = Record<string, unknown>;
-
-function readJson(file: string): JsonRecord {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
 
 export function loadSharedSourceTruth(workspaceRoot: string, topicId: string): JsonRecord | null {
   const paths = getSourceArtifactPaths(workspaceRoot, topicId);

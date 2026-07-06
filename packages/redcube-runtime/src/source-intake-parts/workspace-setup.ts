@@ -2,7 +2,6 @@
 import path from 'node:path';
 import {
   existsSync,
-  mkdirSync,
   readFileSync,
   writeFileSync,
 } from 'node:fs';
@@ -13,11 +12,7 @@ import {
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
 import { ensureWorkspaceXiaohongshuAuthorTemplate } from '@redcube/redcube-config/xiaohongshu-author-profile';
-
-function ensureDir(dir) {
-  mkdirSync(dir, { recursive: true });
-  return dir;
-}
+import { ensureDir, safeText } from '../runtime-utils.js';
 
 export function writeJson(file, value) {
   ensureDir(path.dirname(file));
@@ -27,10 +22,6 @@ export function writeJson(file, value) {
 export function readJsonIfExists(file) {
   if (!existsSync(file)) return null;
   return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-export function safeText(value) {
-  return String(value || '').trim();
 }
 
 function buildTopicRecord(topicId, title) {

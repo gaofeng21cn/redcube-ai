@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
-import { safeText } from './workspace-setup.js';
+import { safeText } from '../runtime-utils.js';
 
 export function sha256Text(value) {
   return createHash('sha256').update(String(value || ''), 'utf-8').digest('hex');

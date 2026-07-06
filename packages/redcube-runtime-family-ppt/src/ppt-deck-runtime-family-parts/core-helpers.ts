@@ -8,6 +8,20 @@ import {
   stageOrderForCanonicalStage,
 } from '@redcube/runtime-protocol';
 
+export function safeText(value, fallback = '') {
+  const text = String(value ?? '').replace(/\uFFFD+/g, '').trim();
+  return text || fallback;
+}
+
+export function ensureDir(dir) {
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+export function readJson(file) {
+  return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
 export function createPptDeckCoreHelpers({
   REPO_ROOT,
   PROMPT_PACK,
@@ -16,11 +30,6 @@ export function createPptDeckCoreHelpers({
   MIN_REVIEW_PRIMARY_POINTS,
   PAGE_FIX_ROUTE,
 }) {
-  function safeText(value, fallback = '') {
-    const text = String(value ?? '').replace(/\uFFFD+/g, '').trim();
-    return text || fallback;
-  }
-
   function safeArray(value) {
     return Array.isArray(value) ? value : [];
   }
@@ -106,11 +115,6 @@ export function createPptDeckCoreHelpers({
       .replaceAll('__PPT_DECK_SLIDES_DATA__', slidesLiteral);
   }
 
-  function ensureDir(dir) {
-    mkdirSync(dir, { recursive: true });
-    return dir;
-  }
-
   function writeJson(file, data) {
     ensureDir(path.dirname(file));
     writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
@@ -120,12 +124,6 @@ export function createPptDeckCoreHelpers({
     ensureDir(path.dirname(file));
     writeFileSync(file, content, 'utf-8');
   }
-
-
-  function readJson(file) {
-    return JSON.parse(readFileSync(file, 'utf-8'));
-  }
-
 
   function safeFileMtimeMs(file) {
     if (!safeText(file) || !existsSync(file)) return 0;

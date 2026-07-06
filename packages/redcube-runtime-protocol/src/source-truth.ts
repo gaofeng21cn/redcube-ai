@@ -7,6 +7,7 @@ import type {
   SourceTruthConsumptionSummary,
   TopicPaths,
 } from './types.js';
+import { safeText } from './protocol-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -18,11 +19,6 @@ function asRecord(value: unknown): JsonRecord {
 
 function safeArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function isAudienceFacingItem(item: unknown): boolean {

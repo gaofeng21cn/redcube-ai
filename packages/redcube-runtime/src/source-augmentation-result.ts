@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -6,6 +6,7 @@ import {
   validateSourceAugmentationRequestContract,
   validateSourceAugmentationResultContract,
 } from '@redcube/runtime-protocol';
+import { ensureDir, readJson, safeText } from './runtime-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -18,23 +19,9 @@ function asRecord(value: unknown): JsonRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : {};
 }
 
-function ensureDir(dir: string): string {
-  mkdirSync(dir, { recursive: true });
-  return dir;
-}
-
 function writeJson(file: string, value: unknown): void {
   ensureDir(path.dirname(file));
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
-
-function readJson(file: string): JsonRecord {
-  return JSON.parse(readFileSync(file, 'utf-8')) as JsonRecord;
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
 }
 
 function safeArray(value: unknown): unknown[] {

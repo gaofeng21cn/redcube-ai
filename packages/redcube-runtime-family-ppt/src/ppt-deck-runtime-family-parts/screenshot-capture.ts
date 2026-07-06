@@ -1,4 +1,5 @@
 import { materializeScreenshotCaptureStore } from '@redcube/runtime-protocol';
+import { safeText } from './core-helpers.js';
 
 type JsonRecord = Record<string, any>;
 
@@ -13,11 +14,6 @@ interface PptScreenshotCaptureDeps {
   targetSlideIds?: unknown[];
   priorCaptureManifest?: JsonRecord | null;
   captureMode?: 'full' | 'delta';
-}
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value ?? '').trim();
-  return text || fallback;
 }
 
 function safeArray(value: unknown): JsonRecord[] {

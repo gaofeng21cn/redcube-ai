@@ -8,8 +8,8 @@ import {
 } from 'node:fs';
 
 import { enrichSourceFingerprint, sourceReuseKey } from './fingerprint-reuse.js';
+import { safeText } from '../runtime-utils.js';
 import {
-  safeText,
   sourceIntakeMaterialInboxDir,
 } from './workspace-setup.js';
 

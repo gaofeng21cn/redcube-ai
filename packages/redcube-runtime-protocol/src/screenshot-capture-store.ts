@@ -4,12 +4,12 @@ import {
   copyFileSync,
   existsSync,
   linkSync,
-  mkdirSync,
   readFileSync,
   rmSync,
   statSync,
   writeFileSync,
 } from 'node:fs';
+import { ensureDir, safeText } from './protocol-utils.js';
 
 interface SlideReviewInput {
   slide_id?: unknown;
@@ -32,18 +32,8 @@ interface PngDimensions {
   height: number;
 }
 
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value ?? '').trim();
-  return text || fallback;
-}
-
 function safeArray(value: unknown): unknown[] {
   return Array.isArray(value) ? value : [];
-}
-
-function ensureDir(dir: string): string {
-  mkdirSync(dir, { recursive: true });
-  return dir;
 }
 
 function writeJson(file: string, data: unknown): void {
