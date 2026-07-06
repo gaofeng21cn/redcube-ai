@@ -427,19 +427,17 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
 });
 
 test('registry source manifests stay aligned with direct package dependencies and literal loaders', () => {
-  const overlayPackage = readJson('packages/redcube-overlay-registry/package.json');
-  const overlaySource = readText('packages/redcube-overlay-registry/src/index.ts');
-  const runtimePackage = readJson('packages/redcube-runtime-family-registry/package.json');
-  const runtimeSource = readText('packages/redcube-runtime-family-registry/src/index.ts');
+  const runtimePackage = readJson('packages/redcube-runtime/package.json');
+  const runtimeSource = readText('packages/redcube-runtime/src/default-registries.ts');
 
   for (const { module } of listDefaultOverlayModules()) {
     assert.equal(
-      overlayPackage.dependencies[module],
+      runtimePackage.dependencies[module],
       '0.1.0',
-      `${module} must be a direct overlay-registry dependency`,
+      `${module} must be a direct runtime dependency`,
     );
     assert.match(
-      overlaySource,
+      runtimeSource,
       new RegExp(`module:\\s*['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"][\\s\\S]*?load:\\s*async`),
       `${module} must have a literal overlay loader`,
     );
@@ -449,7 +447,7 @@ test('registry source manifests stay aligned with direct package dependencies an
     assert.equal(
       runtimePackage.dependencies[module_name],
       '0.1.0',
-      `${module_name} must be a direct runtime-family-registry dependency`,
+      `${module_name} must be a direct runtime dependency`,
     );
     assert.match(
       runtimeSource,

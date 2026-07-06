@@ -11,11 +11,11 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-test('overlay onboarding is registry-driven at the package boundary', () => {
-  const registryPackage = readJson('packages/redcube-overlay-registry/package.json');
+test('overlay onboarding is runtime-registry driven without standalone package facades', () => {
+  const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const domainEntryPackage = readJson('packages/redcube-domain-entry/package.json');
 
-  assert.equal(registryPackage.name, '@redcube/overlay-registry');
+  assert.equal(Boolean(runtimePackage.dependencies?.['@redcube/overlay-registry']), false);
   assert.deepEqual(
     listDefaultOverlayModules(),
     [
@@ -36,6 +36,9 @@ test('overlay onboarding is registry-driven at the package boundary', () => {
       },
     ],
   );
+  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-ppt'], '0.1.0');
+  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-xiaohongshu'], '0.1.0');
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-ppt']), false);
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
+  assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-registry']), false);
 });

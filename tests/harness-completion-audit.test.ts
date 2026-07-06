@@ -11,15 +11,15 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-test('harness audit keeps runtime package-scoped through manifests and registry readback', () => {
+test('harness audit keeps runtime package-scoped through direct default registry readback', () => {
   const runtimePackageJson = readJson('packages/redcube-runtime/package.json');
 
   assert.equal(runtimePackageJson.dependencies['@redcube/governance'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies['@redcube/reference-os'], '0.1.0');
-  assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-registry'], '0.1.0');
+  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-registry']), false);
   assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-ppt']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies['@redcube/runtime-family-xiaohongshu']), false);
+  assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-ppt'], '0.1.0');
+  assert.equal(runtimePackageJson.dependencies['@redcube/runtime-family-xiaohongshu'], '0.1.0');
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/ppt-deck-runtime.ts')), false);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/xiaohongshu-runtime.ts')), false);
   assert.deepEqual(

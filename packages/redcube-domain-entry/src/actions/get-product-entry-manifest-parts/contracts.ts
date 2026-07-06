@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
+import { getDefaultOverlayRegistry } from '@redcube/runtime';
 
 import {
   DELIVERABLE_FACADE_TRUTH_SURFACES,

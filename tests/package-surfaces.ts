@@ -6,13 +6,9 @@ export {
 export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
-} from '@redcube/overlay-registry';
-export {
-  listDefaultRuntimeFamilyModules,
-} from '../packages/redcube-runtime-family-registry/src/index.ts';
-export {
   listDefaultOverlayModules,
-} from '../packages/redcube-overlay-registry/src/index.ts';
+  listDefaultRuntimeFamilyModules,
+} from '@redcube/runtime';
 export {
   buildTopicRecord,
   buildTopicRecord as buildXiaohongshuTopic,

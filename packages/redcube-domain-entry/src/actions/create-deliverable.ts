@@ -6,8 +6,10 @@ import {
   buildGovernanceSurfaceContract,
   hydrateDeliverableContract,
 } from '@redcube/overlay-core';
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
-import { rebuildTopicPublicationProjection } from '@redcube/runtime';
+import {
+  getDefaultOverlayRegistry,
+  rebuildTopicPublicationProjection,
+} from '@redcube/runtime';
 import {
   buildSourcePackFanoutArtifact,
   ensureWorkspaceGitBoundary,

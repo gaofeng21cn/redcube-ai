@@ -715,7 +715,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
       'packages/redcube-runtime-family-ppt/src/',
       'packages/redcube-runtime-family-xiaohongshu/src/',
       'packages/redcube-runtime-family-poster-onepager/src/',
-      'packages/redcube-runtime-family-registry/src/',
+      'packages/redcube-runtime/src/default-registries.ts',
     ],
     classification: 'visual_route_runtime_family_implementation',
     current_rca_role: 'visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner',

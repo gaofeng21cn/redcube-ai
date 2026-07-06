@@ -14,7 +14,7 @@ import {
 import { persistReviewStatePatch } from '@redcube/governance';
 import { CODEX_DEFAULT_ADAPTER } from '@redcube/runtime-protocol';
 import { hydrateDeliverableContract } from '@redcube/overlay-core';
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
+import { getDefaultOverlayRegistry } from './default-registries.js';
 import { resolveExecutorAdapter } from './executors.js';
 import { loadSharedSourceTruth } from './shared-source-truth.js';
 import { fileContentHash, helperOutputRefsForArtifact } from './stage-folder-helper-refs.js';

@@ -521,7 +521,7 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     'packages/redcube-runtime-family-ppt/src/',
     'packages/redcube-runtime-family-xiaohongshu/src/',
     'packages/redcube-runtime-family-poster-onepager/src/',
-    'packages/redcube-runtime-family-registry/src/',
+    'packages/redcube-runtime/src/default-registries.ts',
   ]);
   assert.deepEqual(byId.repo_shell_verification_wrappers.source_refs, [
     'scripts/opl-module-bootstrap.sh',

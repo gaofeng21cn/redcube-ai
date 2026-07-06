@@ -23,9 +23,6 @@
       "path": "./packages/redcube-overlay-poster-onepager"
     },
     {
-      "path": "./packages/redcube-overlay-registry"
-    },
-    {
       "path": "./packages/redcube-config"
     },
     {
@@ -39,9 +36,6 @@
     },
     {
       "path": "./packages/redcube-runtime-family-poster-onepager"
-    },
-    {
-      "path": "./packages/redcube-runtime-family-registry"
     },
     {
       "path": "./packages/redcube-runtime"

@@ -823,7 +823,7 @@
         "packages/redcube-runtime-family-ppt/src/",
         "packages/redcube-runtime-family-xiaohongshu/src/",
         "packages/redcube-runtime-family-poster-onepager/src/",
-        "packages/redcube-runtime-family-registry/src/"
+        "packages/redcube-runtime/src/default-registries.ts"
       ],
       "classification": "visual_route_runtime_family_implementation",
       "current_rca_role": "visual_route_truth_and_runtime_family_implementation_not_generic_runtime_owner",
@@ -1681,13 +1681,13 @@
       "packages/redcube-domain-entry/src/index.ts",
       "packages/redcube-runtime-family-poster-onepager/src/",
       "packages/redcube-runtime-family-ppt/src/",
-      "packages/redcube-runtime-family-registry/src/",
       "packages/redcube-runtime-family-xiaohongshu/src/",
       "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
       "packages/redcube-runtime-protocol/src/executor-runtime.ts",
       "packages/redcube-runtime-protocol/src/runs.ts",
       "packages/redcube-runtime-protocol/src/workspace.ts",
       "packages/redcube-runtime/src/creative-ownership.ts",
+      "packages/redcube-runtime/src/default-registries.ts",
       "packages/redcube-runtime/src/deliverable-routes.ts",
       "packages/redcube-runtime/src/executors.ts",
       "packages/redcube-runtime/src/shared-source-truth.ts",

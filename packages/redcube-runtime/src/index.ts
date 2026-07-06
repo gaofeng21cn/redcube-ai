@@ -49,6 +49,26 @@ export {
   buildCreativeOwnershipResidueAudit,
 } from './creative-ownership.js';
 export {
+  getDefaultOverlayCatalog,
+  getDefaultOverlayRegistry,
+  getDefaultRuntimeFamilyCatalog,
+  listDefaultOverlayModules,
+  listDefaultRuntimeFamilyModules,
+  loadRuntimeFamilyRunner,
+  resolveRuntimeFamilyModule,
+} from './default-registries.js';
+export type {
+  DefaultOverlayCatalogSurface,
+  DefaultOverlayModuleSpec,
+  DefaultRuntimeFamilyCatalogSurface,
+  LoadedRuntimeFamilyRunner,
+  OverlayCatalogEntry,
+  OverlayCatalogSurface,
+  RuntimeFamilyCatalogSurface,
+  RuntimeFamilyContract,
+  RuntimeFamilyModuleSpec,
+} from './default-registries.js';
+export {
   runDeliverableRoute,
 } from './deliverable-routes.js';
 export {

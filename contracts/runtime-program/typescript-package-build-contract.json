@@ -113,16 +113,6 @@
       ]
     },
     {
-      "directory": "packages/redcube-overlay-registry",
-      "package_name": "@redcube/overlay-registry",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-overlay-xiaohongshu",
       "package_name": "@redcube/overlay-xiaohongshu",
       "exports": [
@@ -155,16 +145,6 @@
     {
       "directory": "packages/redcube-runtime-family-ppt",
       "package_name": "@redcube/runtime-family-ppt",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-runtime-family-registry",
-      "package_name": "@redcube/runtime-family-registry",
       "exports": [
         {
           "subpath": ".",

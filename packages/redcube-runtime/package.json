@@ -13,9 +13,13 @@
     "@redcube/runtime-protocol": "0.1.0",
     "@redcube/governance": "0.1.0",
     "@redcube/overlay-core": "0.1.0",
-    "@redcube/overlay-registry": "0.1.0",
+    "@redcube/overlay-poster-onepager": "0.1.0",
+    "@redcube/overlay-ppt": "0.1.0",
+    "@redcube/overlay-xiaohongshu": "0.1.0",
     "@redcube/reference-os": "0.1.0",
-    "@redcube/runtime-family-registry": "0.1.0"
+    "@redcube/runtime-family-poster-onepager": "0.1.0",
+    "@redcube/runtime-family-ppt": "0.1.0",
+    "@redcube/runtime-family-xiaohongshu": "0.1.0"
   },
   "license": "Apache-2.0"
 }

@@ -11,8 +11,8 @@ import {
   buildGovernanceSurfaceContract,
   hydrateDeliverableContract,
 } from '@redcube/overlay-core';
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
+  getDefaultOverlayRegistry,
   getPublicationProjection,
   getReviewState,
 } from '@redcube/runtime';

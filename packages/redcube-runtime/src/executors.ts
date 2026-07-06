@@ -1,4 +1,3 @@
-import { loadRuntimeFamilyRunner } from '@redcube/runtime-family-registry';
 import {
   AGENT_LOOP_EXECUTION_SHAPE,
   CODEX_DEFAULT_ADAPTER,
@@ -10,7 +9,8 @@ import {
   buildHermesAgentLoopExecutorDescriptor,
   failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
-import type { RuntimeFamilyContract } from '@redcube/runtime-family-registry';
+import { loadRuntimeFamilyRunner } from './default-registries.js';
+import type { RuntimeFamilyContract } from './default-registries.js';
 
 interface ExecutorRouteInput {
   workspaceRoot: string;

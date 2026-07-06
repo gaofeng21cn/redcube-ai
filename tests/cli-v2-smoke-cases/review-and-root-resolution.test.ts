@@ -138,10 +138,6 @@ function createIsolatedCliInstall() {
     path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-registry'),
-    path.join(domainEntryNodeModulesDir, 'runtime-family-registry'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-core'),
     path.join(domainEntryNodeModulesDir, 'overlay-core'),
   );
@@ -156,10 +152,6 @@ function createIsolatedCliInstall() {
   copyPackageIntoInstall(
     path.resolve('prompts'),
     path.join(domainEntryPackagePath, 'node_modules', 'prompts'),
-  );
-  copyPackageIntoInstall(
-    path.resolve('packages/redcube-overlay-registry'),
-    path.join(domainEntryNodeModulesDir, 'overlay-registry'),
   );
   copyPackageIntoInstall(
     path.resolve('packages/redcube-overlay-ppt'),

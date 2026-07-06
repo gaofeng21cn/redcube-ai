@@ -47,21 +47,24 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain 
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
 });
 
-test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and typed registry contracts', () => {
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts')), true);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json')), true);
-
-  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/package.json'), 'utf-8'));
+test('P20.B: default registries are package-local runtime contracts, not standalone package facades', () => {
   const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
-  const packageTsconfig = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json'), 'utf-8'));
-  assert.equal(pkg.types, './dist/index.d.ts');
-  assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
+  const runtimeSource = readFileSync(path.resolve('packages/redcube-runtime/src/default-registries.ts'), 'utf-8');
+
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/package.json')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-overlay-registry/package.json')), false);
   assert.equal(
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-registry'),
-    true,
+    false,
+  );
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-registry'),
+    false,
   );
 
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/index.js')), false);
+  assert.match(runtimeSource, /export function getDefaultOverlayRegistry/);
+  assert.match(runtimeSource, /export async function loadRuntimeFamilyRunner/);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/default-registries.js')), false);
 });
 
 test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed local-exec contracts', () => {

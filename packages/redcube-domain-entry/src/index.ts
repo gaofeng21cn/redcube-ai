@@ -48,7 +48,7 @@ export { doctorWorkspace } from './actions/doctor-workspace.js';
 export { listTopics } from './actions/list-topics.js';
 
 async function getOverlayCatalogJs() {
-  const { getDefaultOverlayCatalog } = await import('@redcube/overlay-registry');
+  const { getDefaultOverlayCatalog } = await import('@redcube/runtime');
   const catalog = getDefaultOverlayCatalog();
   return {
     ok: true,

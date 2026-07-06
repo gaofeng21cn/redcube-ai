@@ -682,7 +682,7 @@ test('RCA physical source morphology policy classifies active source tails witho
     'packages/redcube-runtime-family-ppt/src/',
     'packages/redcube-runtime-family-xiaohongshu/src/',
     'packages/redcube-runtime-family-poster-onepager/src/',
-    'packages/redcube-runtime-family-registry/src/',
+    'packages/redcube-runtime/src/default-registries.ts',
   ]);
   assert.equal(
     byId.visual_route_runtime_family_implementations.current_rca_role,
@@ -755,7 +755,7 @@ test('RCA runtime-family route implementations are classified as visual route im
     'packages/redcube-runtime-family-ppt/src/',
     'packages/redcube-runtime-family-xiaohongshu/src/',
     'packages/redcube-runtime-family-poster-onepager/src/',
-    'packages/redcube-runtime-family-registry/src/',
+    'packages/redcube-runtime/src/default-registries.ts',
   ];
 
   for (const sourceRoot of runtimeFamilySourceRoots) {

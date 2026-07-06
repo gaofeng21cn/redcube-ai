@@ -2,11 +2,11 @@
 import path from 'node:path';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 
-import { getDefaultOverlayRegistry } from '@redcube/overlay-registry';
 import {
   auditDeliverableRequest,
   buildGateSummary,
   buildSourceReadinessReport,
+  getDefaultOverlayRegistry,
   getPublicationProjection as getRuntimePublicationProjection,
   getReviewState as getRuntimeReviewState,
   isBaselineApprovedState,
