@@ -181,6 +181,10 @@ test('OPL AgentLab runner consumes the RCA /goal workflow suite without missing 
   assert.equal(suiteResult.suite_id, 'redcube-ai.goal-workflow.minimal-autonomous-visual-delivery.v1');
   assert.equal(suiteResult.status, 'passed');
   assert.deepEqual(suiteResult.missing_observations, []);
+  assert.equal(suiteResult.summary.stage_completion_policy_blocker_count, 0);
+  assert.deepEqual(suiteResult.refs.stage_completion_policy_refs, [
+    'stage-completion-policy:rca/goal-workflow/minimal-autonomous-visual-delivery',
+  ]);
   assert.equal(suiteResult.summary.forbidden_authority_flag_count, 0);
   assert.equal(suiteResult.summary.memory_body_observed, false);
 });

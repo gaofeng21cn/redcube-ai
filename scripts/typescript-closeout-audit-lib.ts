@@ -12,7 +12,7 @@ import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime
 import { rootPartitionFiles } from './test-registry.ts';
 
 export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
-const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
+export const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',

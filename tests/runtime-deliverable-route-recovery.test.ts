@@ -176,7 +176,7 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
         ['visual_director_review', 'screenshot_review'],
       );
       assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
-      assert.equal(result.execution_proof?.escalation_status, 'escalated_still_requires_fix_html');
+      assert.equal(result.execution_proof?.escalation_status, 'escalation_unavailable');
       assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
       const fixArtifact = readJson(routeArtifactFile(result));
       assert.deepEqual(fixArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
@@ -677,14 +677,14 @@ test('runDeliverableRoute reports repeated ppt screenshot blocks after image rep
   });
 });
 
-test('runDeliverableRoute escalates repeated ppt fix_html review blocks through Hermes agent loop once', async () => {
+test('runDeliverableRoute fails closed when repeated ppt fix_html review blocks cannot escalate to retired Hermes loop', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-escalation-'));
     await completeSourceReadiness({
       workspaceRoot,
       topicId: 'topic-a',
       title: 'Route escalation proof',
-      brief: '验证 fix_html 复审仍阻断时升级到 Hermes agent loop。',
+      brief: '验证 fix_html 复审仍阻断且 Hermes loop 已退役时保持 fail-closed。',
       keywords: ['ppt', 'fix_html', 'agent_loop'],
     });
 
@@ -733,21 +733,20 @@ test('runDeliverableRoute escalates repeated ppt fix_html review blocks through 
       assert.equal(result.summary.executed_route, 'screenshot_review');
       assert.equal(result.summary.stop_after_stage, 'screenshot_review');
       assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
-      assert.equal(result.execution_proof?.escalation_status, 'escalated_still_requires_fix_html');
+      assert.equal(result.execution_proof?.escalation_status, 'escalation_unavailable');
       assert.deepEqual(
         result.execution_proof?.attempts.map((attempt) => [attempt.executor_backend, attempt.execution_shape]),
         [
           ['codex_cli', 'structured_call'],
-          ['hermes_agent', 'agent_loop'],
         ],
       );
       assert.deepEqual(
         result.execution_proof?.attempts.map((attempt) => attempt.review_requires_fix_html),
-        [true, true],
+        [true],
       );
 
       const reviewArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'screenshot_review');
-      assert.equal(reviewArtifact.execution_proof.escalation_status, 'escalated_still_requires_fix_html');
+      assert.equal(reviewArtifact.execution_proof.escalation_status, 'escalation_unavailable');
     } finally {
       restoreVariants();
     }

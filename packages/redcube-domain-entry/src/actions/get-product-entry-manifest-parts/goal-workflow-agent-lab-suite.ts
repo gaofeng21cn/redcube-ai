@@ -17,6 +17,33 @@ const GOAL_WORKFLOW_AUTHORITY_BOUNDARY = Object.freeze({
   rca_owner_receipt_or_typed_blocker_required: true,
 });
 
+const GOAL_WORKFLOW_STAGE_COMPLETION_POLICY = Object.freeze({
+  surface_kind: 'domain_stage_completion_policy',
+  policy_ref: 'stage-completion-policy:rca/goal-workflow/minimal-autonomous-visual-delivery',
+  completion_judgment_owner: 'domain_stage',
+  closeout_packet_required: true,
+  provider_completion_is_domain_completion: false,
+  opl_content_judgment_allowed: false,
+  next_stage_transition_owner: 'opl_runtime',
+  required_closeout_outcomes: [
+    'completed_and_continue',
+    'completed_and_wait_owner',
+    'route_back',
+    'blocked',
+    'rejected',
+  ],
+  accepted_closeout_ref_fields: [
+    'owner_receipt_ref',
+    'typed_blocker_ref',
+    'human_gate_ref',
+    'route_back_ref',
+  ],
+  authority_boundary: {
+    opl_can_decide_domain_completion: false,
+    provider_completion_counts_as_stage_complete: false,
+  },
+});
+
 export function buildRcaGoalWorkflowAgentLabSuite() {
   return {
     surface_kind: 'rca_goal_workflow_agent_lab_suite_handoff',
@@ -123,6 +150,9 @@ export function buildRcaGoalWorkflowAgentLabSuite() {
           'scorer:rca/domain-owner-receipt-or-typed-blocker',
           'scorer:rca/no-forbidden-write-boundary',
         ],
+        stage_completion_policy: {
+          ...GOAL_WORKFLOW_STAGE_COMPLETION_POLICY,
+        },
         recovery_probes: [
           {
             probe_ref: 'recovery-probe:rca/goal-workflow/session-requery',
