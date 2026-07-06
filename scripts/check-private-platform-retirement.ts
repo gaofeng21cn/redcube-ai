@@ -208,12 +208,72 @@ function defaultCallerTailCountZeroGuard() {
   };
 }
 
-function enrichDefaultCallerTailCompactSummary(compactSummary) {
+function staticGuardClassFor(entry) {
+  if (entry.classification === 'domain_handler_target') return 'active_domain_handler_target';
+  if (entry.classification === 'refs_only_read_model') return 'active_refs_only_read_model';
+  if (entry.classification === 'retained_current_refs_only_boundary') return 'retained_refs_only_boundary';
+  if (entry.classification === 'repo_native_verification_wrapper') return 'repo_native_verification_wrapper';
+  return 'active_surface_classification_guard';
+}
+
+function repoLocalDefaultCallerStatusFor(entry) {
+  if (entry.classification === 'domain_handler_target') {
+    return 'repo_local_domain_handler_target_active_not_default_caller';
+  }
+  if (entry.classification === 'repo_native_verification_wrapper') {
+    return 'repo_local_verification_wrapper_active_not_runtime_owner';
+  }
+  return 'repo_local_refs_only_boundary_active_not_default_caller';
+}
+
+function buildRetainedBoundaryStaticCallerMatrix(physicalPolicy) {
+  const tailReadback = physicalPolicy.default_caller_tail_readback || {};
+  const gate = tailReadback.retained_default_caller_boundary_gate
+    || tailReadback.compact_retirement_summary?.retained_default_caller_boundary_gate
+    || {};
+  const surfaceById = Object.fromEntries(
+    (physicalPolicy.active_surface_classifications || [])
+      .map((entry) => [entry.surface_id, entry]),
+  );
+
+  return (gate.applies_to_surface_ids || []).map((surfaceId) => {
+    const entry = surfaceById[surfaceId] || { surface_id: surfaceId };
+    return {
+      surface_id: surfaceId,
+      current_role: entry.current_rca_role ?? null,
+      static_guard_class: staticGuardClassFor(entry),
+      repo_local_default_caller_status: repoLocalDefaultCallerStatusFor(entry),
+      delete_authorization_status:
+        'blocked_requires_retained_default_caller_boundary_gate_evidence',
+      blocking_static_refs: [
+        ...(entry.source_refs || []),
+        ...(entry.machine_boundary_refs || []),
+      ],
+      guard_refs: [
+        'contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary/retained_default_caller_boundary_gate',
+        'npm run default-caller-tail:readback',
+        'tests/rca-private-platform-retirement-readback.test.ts',
+      ],
+      static_evidence_boundary: {
+        static_analysis_can_prove_current_repo_role: true,
+        static_analysis_can_prove_no_active_repo_local_default_caller: false,
+        static_analysis_can_prove_opl_generated_default_caller_parity: false,
+        static_analysis_can_authorize_physical_delete: false,
+        static_analysis_can_claim_default_caller_cutover_complete: false,
+      },
+    };
+  });
+}
+
+function enrichDefaultCallerTailCompactSummary(compactSummary, physicalPolicy = null) {
   return {
     ...compactSummary,
     cleanup_candidate_count_semantics:
       'zero_means_no_current_cleanup_candidate_not_physical_delete_authority',
     count_zero_guard: defaultCallerTailCountZeroGuard(),
+    ...(physicalPolicy
+      ? { retained_boundary_static_caller_matrix: buildRetainedBoundaryStaticCallerMatrix(physicalPolicy) }
+      : {}),
   };
 }
 
@@ -240,6 +300,57 @@ function collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures
         key,
         value,
       });
+    }
+  }
+}
+
+function collectRetainedBoundaryStaticCallerMatrixFailures(compactSummary, failures) {
+  const gate = compactSummary.retained_default_caller_boundary_gate || {};
+  const expectedIds = gate.applies_to_surface_ids || [];
+  const matrix = compactSummary.retained_boundary_static_caller_matrix || [];
+  if (matrix.length !== expectedIds.length) {
+    failures.push({
+      check_id: 'retained_boundary_static_caller_matrix_count',
+      state: 'failed',
+      matrix_count: matrix.length,
+      expected_count: expectedIds.length,
+    });
+  }
+  const matrixById = Object.fromEntries(matrix.map((entry) => [entry.surface_id, entry]));
+  for (const surfaceId of expectedIds) {
+    const entry = matrixById[surfaceId];
+    if (!entry) {
+      failures.push({
+        check_id: 'retained_boundary_static_caller_matrix_surface',
+        state: 'missing',
+        surface_id: surfaceId,
+      });
+      continue;
+    }
+    if ((entry.blocking_static_refs || []).length === 0) {
+      failures.push({
+        check_id: 'retained_boundary_static_caller_matrix_blocking_refs',
+        state: 'missing',
+        surface_id: surfaceId,
+      });
+    }
+    if (entry.delete_authorization_status !== 'blocked_requires_retained_default_caller_boundary_gate_evidence') {
+      failures.push({
+        check_id: 'retained_boundary_static_caller_matrix_delete_status',
+        surface_id: surfaceId,
+        value: entry.delete_authorization_status,
+      });
+    }
+    for (const [key, value] of Object.entries(entry.static_evidence_boundary || {})) {
+      if (key === 'static_analysis_can_prove_current_repo_role') {
+        if (value !== true) {
+          failures.push({ check_id: 'retained_boundary_static_caller_matrix_boundary', surface_id: surfaceId, key, value });
+        }
+        continue;
+      }
+      if (value !== false) {
+        failures.push({ check_id: 'retained_boundary_static_caller_matrix_boundary', surface_id: surfaceId, key, value });
+      }
     }
   }
 }
@@ -330,6 +441,7 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
   }
   const compactSummary = enrichDefaultCallerTailCompactSummary(
     physicalPolicy.default_caller_tail_readback?.compact_retirement_summary || {},
+    physicalPolicy,
   );
   for (const key of [
     'can_apply_cleanup',
@@ -351,6 +463,7 @@ function collectFailures({ audit, physicalPolicy, runtimeWatchBoundary, blockedA
     });
   }
   collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures);
+  collectRetainedBoundaryStaticCallerMatrixFailures(compactSummary, failures);
   const tailSurfaceCount = physicalPolicy.default_caller_tail_readback?.tail_surface_count ?? 0;
   if (compactSummary.owner_delta_required !== (tailSurfaceCount > 0)) {
     failures.push({
@@ -470,6 +583,7 @@ function collectDefaultCallerTailFailures(tailReadback, compactSummary) {
     });
   }
   collectDefaultCallerTailCountZeroGuardFailures(compactSummary, failures);
+  collectRetainedBoundaryStaticCallerMatrixFailures(compactSummary, failures);
   if (compactSummary.owner_delta_required !== (tailReadback.tail_surface_count > 0)) {
     failures.push({
       check_id: 'default_caller_tail_compact_owner_delta_required',
@@ -525,6 +639,7 @@ export function buildDefaultCallerTailOwnerDeltaReadback() {
   const tailReadback = physicalPolicy.default_caller_tail_readback ?? null;
   const compactSummary = enrichDefaultCallerTailCompactSummary(
     tailReadback?.compact_retirement_summary ?? {},
+    physicalPolicy,
   );
   const ownerDeltaWorkOrderPack = compactSummary.owner_delta_work_order_pack ?? null;
   const tailClassifications = tailReadback?.tail_classifications ?? [];
@@ -599,6 +714,7 @@ export function buildPrivatePlatformRetirementReadback() {
     default_caller_tail_compact_retirement_summary:
       enrichDefaultCallerTailCompactSummary(
         physicalPolicy.default_caller_tail_readback?.compact_retirement_summary ?? {},
+        physicalPolicy,
       ),
     runtime_watch_boundary: runtimeWatchBoundary,
     domain_action_adapter_boundary: {
