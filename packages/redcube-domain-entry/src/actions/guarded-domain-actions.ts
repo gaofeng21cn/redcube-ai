@@ -16,7 +16,6 @@ import {
 } from './domain-action-adapter-parts/visual-pack-compiler-handoff.js';
 export {
   OPL_GENERATED_INTERFACE_CONSUMPTION,
-  RCA_RETAINED_VISUAL_AUTHORITY,
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
@@ -58,17 +57,17 @@ const CURRENT_ROLE_GUARD = Object.freeze({
   active_default_caller_alias_allowed: false,
 });
 
-export const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
+const RCA_REMAINING_EVIDENCE_GATES = Object.freeze([
   'real_artifact_producing_domain_owner_receipt',
   'opl_hosted_controlled_visual_stage_long_soak',
   'real_memory_lifecycle_receipt_instances',
   'cross_family_repeated_no_regression_evidence',
 ]);
 
-export const RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS = Object.freeze([
+const RCA_FUNCTIONAL_STRUCTURE_FOLLOWTHROUGH_GAPS = Object.freeze([
 ]);
 
-export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
+const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
   'opl_generated_surface_production_consumption',
   'repo_local_wrapper_active_caller_migration',
   'focused_hosted_attempt_real_path_cutover',
@@ -79,7 +78,7 @@ export const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
   'legacy_physical_cleanup',
 ]);
 
-export const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
+const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
     module_id: 'product_entry_continuity_refs_adapter',
     surface_ref: '/session_continuity',

@@ -1,11 +1,8 @@
 // @ts-nocheck
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
-import { domainActionAdapterGuardedActionSet } from './domain-action-adapter-parts/guarded-action-catalog.js';
 import { dispatchDomainActionAdapter as dispatchDomainActionAdapterImpl } from './domain-action-adapter-parts/dispatch-orchestration.js';
-import { buildDomainActionAdapterProjection, DOMAIN_ID, DOMAIN_ACTION_ADAPTER_ID } from './domain-action-adapter-parts/domain_action_adapter-export-projection.js';
+import { buildDomainActionAdapterProjection } from './domain-action-adapter-parts/domain_action_adapter-export-projection.js';
 import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
-
-const GUARDED_ACTIONS = domainActionAdapterGuardedActionSet();
 
 export async function exportDomainActionAdapter(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -22,9 +19,3 @@ export async function exportDomainActionAdapter(request) {
 export async function dispatchDomainActionAdapter(request) {
   return dispatchDomainActionAdapterImpl(request);
 }
-
-export {
-  DOMAIN_ACTION_ADAPTER_ID,
-  DOMAIN_ID,
-  GUARDED_ACTIONS,
-};

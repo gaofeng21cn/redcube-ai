@@ -91,7 +91,7 @@ const SESSION_REFS_ADAPTER_RETAINED_RCA_AUTHORITY = Object.freeze([
   'latest_visual_run_ref',
 ]);
 
-export function buildGeneratedSessionShellBoundary() {
+function buildGeneratedSessionShellBoundary() {
   return {
     surface_kind: 'generated_session_shell_boundary',
     surface_id: 'product_entry_continuity_refs_adapter',

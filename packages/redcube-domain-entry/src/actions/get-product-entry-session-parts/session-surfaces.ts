@@ -30,7 +30,7 @@ export function buildProductEntrySessionSurfaceContext({ entrySessionId, session
   };
 }
 
-export function deliveryProjectionIsOutputReady({ reviewState, publicationProjection, deliverableId, publicationProjectionForDeliverable }) {
+function deliveryProjectionIsOutputReady({ reviewState, publicationProjection, deliverableId, publicationProjectionForDeliverable }) {
   const deliverableProjection = publicationProjectionForDeliverable(publicationProjection, deliverableId);
   const gateSummary = deliverableProjection?.gate_summary || reviewState?.gate_summary || {};
   const operatorHandoff = deliverableProjection?.operator_handoff || {};
@@ -46,7 +46,7 @@ export function deliveryProjectionIsOutputReady({ reviewState, publicationProjec
     );
 }
 
-export function buildRecommendedAction({
+function buildRecommendedAction({
   runtimeProjectionSurface,
   runtimeLoopClosure,
   reviewState,
@@ -96,7 +96,7 @@ export function buildPptImageRouteSessionSurface({ session }) {
   };
 }
 
-export function buildSessionDeliveryIdentityPayload(session, { includeProfile = true } = {}) {
+function buildSessionDeliveryIdentityPayload(session, { includeProfile = true } = {}) {
   const payload = {
     deliverable_family: session.deliverable_family,
     topic_id: session.topic_id,
@@ -108,7 +108,7 @@ export function buildSessionDeliveryIdentityPayload(session, { includeProfile = 
   return payload;
 }
 
-export function buildProductEntrySessionSummary({
+function buildProductEntrySessionSummary({
   entrySessionId,
   session,
   nativeProofArtifactInventory,

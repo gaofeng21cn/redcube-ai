@@ -1,24 +1,13 @@
 // @ts-nocheck
 
 export {
-  RCA_MINIMAL_AUTHORITY_FUNCTIONS,
   buildRcaMinimalAuthoritySurfaceContracts,
   buildRcaMinimalAuthoritySurfaceTaxonomy,
 } from './visual-pack-compiler-handoff/authority-surfaces.js';
 export {
-  OPL_GENERATED_DESCRIPTOR_SCOPE,
-  OPL_GENERATED_SURFACE_TARGETS,
-  RCA_REPO_LOCAL_HANDLER_TARGETS,
-} from './visual-pack-compiler-handoff/generated-surfaces.js';
-export {
   RCA_COGNITIVE_KERNEL_ADOPTION,
-  RCA_COGNITIVE_STAGE_PACK_CONTRACT,
   RCA_GOLDEN_PATH_PROFILE,
-  RCA_MARKDOWN_MARP_ROUTE_POLICY,
   OPL_GENERATED_SURFACE_EXIT_GATE,
-  RCA_PACKAGE_DISTRIBUTION_GATE,
-  RCA_REQUIRED_DOMAIN_PACK_PATHS,
-  RCA_VISUAL_PACK_DISCIPLINE_CONTRACT,
 } from './visual-pack-compiler-handoff/visual-pack-contracts.js';
 
 import {
