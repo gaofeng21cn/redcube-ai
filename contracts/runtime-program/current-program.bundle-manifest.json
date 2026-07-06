@@ -9,14 +9,19 @@
   "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
-  "source_ref_count": 377,
-  "source_digest": "a18394f713a1760f1584ae11458b279db87b0f3d0a34d35a6bbe744764cf9c32",
+  "source_ref_count": 76,
+  "source_digest": "aae520b23cc00aee197f7ae18186b18549138fa8b59776c2dc3ad8e4b2d4875d",
   "aggregate": {
     "ref": "contracts/runtime-program/current-program.json",
     "role": "generated_read_through_snapshot_for_existing_consumers",
     "do_not_edit": true,
     "write_command": "npm run contracts:current-program:write",
     "check_command": "npm run contracts:current-program:check"
+  },
+  "canonical_projection_contract": {
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_current_program": false,
+    "duplicate_entity_policy": "current-program may repeat refs to canonical contracts but must not repeat the same large object body across paths"
   },
   "commands": {
     "write": "npm run contracts:current-program:write",

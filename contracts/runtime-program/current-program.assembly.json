@@ -8,13 +8,7 @@
   "aggregate_ref": "contracts/runtime-program/current-program.json",
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "manifest_ref": "contracts/runtime-program/current-program.bundle-manifest.json",
-  "generated_array_fields": [
-    "/current_state/active_baton/scope/privatized_functional_module_audit/modules",
-    "/current_state/privatized_functional_module_audit/modules",
-    "/product_release_metadata/functional_privatization_audit/modules",
-    "/product_release_metadata/functional_privatization_audit/privatized_functional_module_audit/modules",
-    "/product_release_metadata/privatized_functional_module_audit/modules"
-  ],
+  "generated_array_fields": [],
   "commands": {
     "write": "npm run contracts:current-program:write",
     "check": "npm run contracts:current-program:check"
@@ -24,7 +18,19 @@
   "source_part_contract": {
     "part_ref_path_rule": "source_root_ref plus JSON pointer path segments; array indexes are zero-padded to four digits",
     "max_part_json_line_count": 800,
-    "aggregate_must_be_rebuilt_from_parts": true
+    "aggregate_must_be_rebuilt_from_parts": true,
+    "duplicate_entity_policy": "repeat canonical projection refs, not full machine snapshot bodies"
+  },
+  "canonical_projection_contract": {
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_current_program": false,
+    "allowed_targets": [
+      "contracts/runtime-program/opl-family-contract-adoption.json",
+      "contracts/functional_privatization_audit.json",
+      "contracts/pack_compiler_input.json",
+      "contracts/generated_surface_handoff.json",
+      "contracts/action_catalog.json"
+    ]
   },
   "false_authority_flags": {
     "aggregate_snapshot_is_canonical_source": false,

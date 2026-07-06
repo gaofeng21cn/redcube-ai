@@ -88,6 +88,22 @@ const HISTORICAL_CONTRACTS = Object.freeze([
   },
 ]);
 const CURRENT_PROGRAM_BUNDLE_MANIFEST = 'contracts/runtime-program/current-program.bundle-manifest.json';
+const CANONICAL_PROJECTION_MODE = 'canonical_ref_only_no_body_copy';
+
+const CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS = Object.freeze([
+  '/current_state/opl_generic_primitive_consumption',
+  '/current_state/opl_stability_read_model_consumption',
+  '/current_state/privatized_functional_module_audit',
+  '/current_state/visual_pack_compiler_handoff',
+  '/current_state/active_baton/scope/opl_generic_primitive_consumption',
+  '/current_state/active_baton/scope/opl_stability_read_model_consumption',
+  '/current_state/active_baton/scope/privatized_functional_module_audit',
+  '/current_state/active_baton/scope/visual_pack_compiler_handoff',
+  '/product_release_metadata/opl_generic_primitive_consumption',
+  '/product_release_metadata/opl_stability_read_model_consumption',
+  '/product_release_metadata/privatized_functional_module_audit',
+  '/product_release_metadata/visual_pack_compiler_handoff',
+]);
 
 test('current runtime program is backed by source parts and a generated consumer aggregate', () => {
   const currentProgram = readJson('contracts/runtime-program/current-program.json');
@@ -109,6 +125,16 @@ test('current runtime program is backed by source parts and a generated consumer
   assert.equal(assembly.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
   assert.equal(assembly.generated_aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
   assert.equal(Array.isArray(assembly.generated_array_fields), true);
+  assert.equal(
+    assembly.source_part_contract.duplicate_entity_policy,
+    'repeat canonical projection refs, not full machine snapshot bodies',
+  );
+  assert.equal(assembly.canonical_projection_contract.projection_mode, CANONICAL_PROJECTION_MODE);
+  assert.equal(assembly.canonical_projection_contract.body_copy_in_current_program, false);
+  assert.equal(
+    assembly.canonical_projection_contract.allowed_targets.includes('contracts/functional_privatization_audit.json'),
+    true,
+  );
 
   assert.equal(index.surface_kind, 'rca_current_program_source_index');
   assert.equal(index.schema_version, 3);
@@ -135,6 +161,7 @@ test('current runtime program is backed by source parts and a generated consumer
   ]);
 
   assert.equal(index.source_part_refs.length > index.section_roots.length, true);
+  assert.equal(index.source_part_refs.length <= 100, true);
   assert.deepEqual(index.leaf_refs, index.source_part_refs);
   assert.deepEqual(syncCheck.mismatches, []);
   assert.equal(syncCheck.source_part_ref_count, index.source_part_refs.length);
@@ -148,6 +175,31 @@ test('current runtime program is backed by source parts and a generated consumer
     assert.match(sourcePart.sha256, /^[a-f0-9]{64}$/);
     assert.deepEqual(readJson(sourcePart.ref), valueAtJsonPointer(currentProgram, sourcePart.json_pointer), sourcePart.ref);
   }
+
+  for (const pointer of CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS) {
+    const projection = valueAtJsonPointer(currentProgram, pointer);
+    assert.equal(projection.surface_kind, 'rca_current_program_canonical_projection_ref', pointer);
+    assert.equal(projection.projection_mode, CANONICAL_PROJECTION_MODE, pointer);
+    assert.equal(projection.body_copy_in_current_program, false, pointer);
+    assert.equal(
+      projection.duplicate_entity_policy,
+      'reference_canonical_contract_instead_of_repeating_machine_snapshot_body',
+      pointer,
+    );
+    assert.equal(JSON.stringify(projection).length < 1600, true, pointer);
+  }
+
+  const functionalAuditProjection = currentProgram.product_release_metadata.functional_privatization_audit;
+  assert.equal(functionalAuditProjection.surface_kind, 'functional_privatization_audit_projection');
+  assert.equal(functionalAuditProjection.schema_version, 2);
+  assert.equal(functionalAuditProjection.projection_mode, CANONICAL_PROJECTION_MODE);
+  assert.equal(functionalAuditProjection.body_copy_in_current_program, false);
+  assert.equal(functionalAuditProjection.canonical_contract_ref, 'contracts/functional_privatization_audit.json#/');
+  assert.equal(Object.prototype.hasOwnProperty.call(functionalAuditProjection, 'modules'), false);
+  assert.equal(
+    Object.prototype.hasOwnProperty.call(functionalAuditProjection, 'privatized_functional_module_audit'),
+    false,
+  );
 });
 
 test('current runtime program has an explicit source-to-generated bundle manifest', () => {
@@ -167,6 +219,12 @@ test('current runtime program has an explicit source-to-generated bundle manifes
   assert.equal(manifest.aggregate.do_not_edit, true);
   assert.equal(manifest.aggregate.write_command, 'npm run contracts:current-program:write');
   assert.equal(manifest.aggregate.check_command, 'npm run contracts:current-program:check');
+  assert.equal(manifest.canonical_projection_contract.projection_mode, CANONICAL_PROJECTION_MODE);
+  assert.equal(manifest.canonical_projection_contract.body_copy_in_current_program, false);
+  assert.match(
+    manifest.canonical_projection_contract.duplicate_entity_policy,
+    /must not repeat the same large object body/,
+  );
   assert.deepEqual(Object.keys(manifest).filter((key) => key.endsWith('aggregate')), ['aggregate']);
   assert.deepEqual(Object.keys(manifest.commands), ['write', 'check']);
   assert.equal(manifest.false_authority_flags.aggregate_snapshot_is_canonical_source, false);

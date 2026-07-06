@@ -38,8 +38,8 @@ const SECTION_ROOTS = Object.freeze([
   {
     section_id: 'product_release_metadata',
     aggregate_json_pointer: '/product_release_metadata',
-    ref_root: `${PARTS_ROOT}/product_release_metadata`,
-    ref_kind: 'leaf_ref_directory',
+    ref_root: `${PARTS_ROOT}/product_release_metadata.json`,
+    ref_kind: 'single_leaf_ref',
     role: 'current_program_support_section',
   },
   {

@@ -1,9 +1,0 @@
-{
-  "policy_ref": "opl_generated:product_entry_manifest#/temporal_stage_run_consumption_policy",
-  "temporal_runtime_owner": "one-person-lab/OPL",
-  "temporal_attempt_ledger_owner": "one-person-lab/OPL",
-  "provider_completion_is_domain_completion": false,
-  "domain_repo_can_own_temporal_runtime": false,
-  "rca_writes_opl_stage_attempts": false,
-  "generated_surface_ready_can_claim_domain_ready": false
-}

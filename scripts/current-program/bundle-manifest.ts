@@ -37,6 +37,18 @@ export function buildCurrentProgramAssembly(sourcePartRefs = sourcePartRefsFromF
       part_ref_path_rule: 'source_root_ref plus JSON pointer path segments; array indexes are zero-padded to four digits',
       max_part_json_line_count: MAX_LEAF_JSON_LINE_COUNT,
       aggregate_must_be_rebuilt_from_parts: true,
+      duplicate_entity_policy: 'repeat canonical projection refs, not full machine snapshot bodies',
+    },
+    canonical_projection_contract: {
+      projection_mode: 'canonical_ref_only_no_body_copy',
+      body_copy_in_current_program: false,
+      allowed_targets: [
+        'contracts/runtime-program/opl-family-contract-adoption.json',
+        'contracts/functional_privatization_audit.json',
+        'contracts/pack_compiler_input.json',
+        'contracts/generated_surface_handoff.json',
+        'contracts/action_catalog.json',
+      ],
     },
     false_authority_flags: FALSE_AUTHORITY_FLAGS,
   };
@@ -66,6 +78,11 @@ export function buildCurrentProgramPackBundleManifestForSourceIndex(sourceIndex:
       do_not_edit: true,
       write_command: WRITE_COMMAND,
       check_command: CHECK_COMMAND,
+    },
+    canonical_projection_contract: {
+      projection_mode: 'canonical_ref_only_no_body_copy',
+      body_copy_in_current_program: false,
+      duplicate_entity_policy: 'current-program may repeat refs to canonical contracts but must not repeat the same large object body across paths',
     },
     commands: {
       write: WRITE_COMMAND,

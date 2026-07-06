@@ -1,36 +1,25 @@
 {
-  "status": "refs_only_consumer_projection_landed",
-  "source_manifest_surface": "opl_generated:product_entry_manifest#/opl_stability_read_model_consumption",
-  "source_domain_handler_surface": "redcube domain-handler export#/mapped_surfaces/opl_stability_read_model_consumption",
-  "contract_ref": "opl.family_operator_stability_read_model.v1",
+  "surface_kind": "rca_current_program_canonical_projection_ref",
+  "schema_version": 1,
+  "surface_id": "opl_stability_read_model_consumption",
+  "projection_mode": "canonical_ref_only_no_body_copy",
+  "canonical_contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/opl_stability_read_model_consumption",
+  "canonical_json_pointer": "/opl_stability_read_model_consumption",
   "owner": "opl",
   "consumer": "redcube_ai",
-  "projection_mode": "consumer_projection_only",
+  "status": "refs_only_consumer_projection_landed",
+  "body_copy_in_current_program": false,
+  "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
   "observability_only": true,
-  "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
   "completion_scope": "stability_read_model_refs_projected_not_live_soak",
   "live_soak_claimed": false,
-  "rca_does_not_own": [
-    "family_conflict_envelope_schema",
-    "control_loop_summary_builder",
-    "usage_projection_aggregator",
-    "resource_pressure_projection",
-    "runtime_observability_exporter",
-    "external_stability_policy_runtime",
-    "generic_fallback_completion",
-    "string_rule_retry_execution",
-    "generic_event_bus_truth_source",
-    "generic_runtime_adapter_success_semantics"
-  ],
-  "rca_retained_authority": [
-    "visual_truth",
-    "review_export_verdict",
-    "artifact_authority",
-    "visual_memory_body",
+  "not_claims": [
+    "domain_ready",
+    "production_ready",
+    "visual_ready",
+    "quality_or_export_verdict",
     "owner_receipt",
-    "native_helper_implementation",
     "typed_blocker",
-    "safe_action_refs"
-  ],
-  "source_contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/opl_stability_read_model_consumption"
+    "artifact_authority"
+  ]
 }

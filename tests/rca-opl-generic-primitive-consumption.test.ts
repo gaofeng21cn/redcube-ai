@@ -45,13 +45,23 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
     'typed_blocker',
     'safe_action_refs',
   ];
+  const resolveCanonicalProjection = (surface) => {
+    if (surface?.projection_mode !== 'canonical_ref_only_no_body_copy') return surface;
+    assert.equal(surface.body_copy_in_current_program, false);
+    assert.match(surface.canonical_contract_ref, /^contracts\/runtime-program\/opl-family-contract-adoption\.json#/);
+    return surface.canonical_json_pointer
+      .slice(1)
+      .split('/')
+      .filter(Boolean)
+      .reduce((value, part) => value[part], adoption);
+  };
 
   for (const surface of [
     currentProgram.product_release_metadata.opl_generic_primitive_consumption,
     currentProgram.current_state.opl_generic_primitive_consumption,
     currentProgram.current_state.active_baton.scope.opl_generic_primitive_consumption,
     adoption.opl_generic_primitive_consumption,
-  ]) {
+  ].map(resolveCanonicalProjection)) {
     assert.equal(surface.owner, 'opl');
     assert.equal(surface.consumer, 'redcube_ai');
     assert.equal(surface.status, 'functional_consumer_follow_through_landed');
@@ -104,13 +114,23 @@ test('RCA consumes OPL stability read-model surfaces without implementing observ
     'observability_export',
     'external_stability_policy',
   ];
+  const resolveCanonicalProjection = (surface) => {
+    if (surface?.projection_mode !== 'canonical_ref_only_no_body_copy') return surface;
+    assert.equal(surface.body_copy_in_current_program, false);
+    assert.match(surface.canonical_contract_ref, /^contracts\/runtime-program\/opl-family-contract-adoption\.json#/);
+    return surface.canonical_json_pointer
+      .slice(1)
+      .split('/')
+      .filter(Boolean)
+      .reduce((value, part) => value[part], adoption);
+  };
 
   for (const surface of [
     currentProgram.product_release_metadata.opl_stability_read_model_consumption,
     currentProgram.current_state.opl_stability_read_model_consumption,
     currentProgram.current_state.active_baton.scope.opl_stability_read_model_consumption,
     adoption.opl_stability_read_model_consumption,
-  ]) {
+  ].map(resolveCanonicalProjection)) {
     assert.equal(surface.owner, 'opl');
     assert.equal(surface.consumer, 'redcube_ai');
     assert.equal(surface.status, 'refs_only_consumer_projection_landed');
