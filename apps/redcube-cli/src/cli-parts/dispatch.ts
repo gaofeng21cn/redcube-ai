@@ -22,6 +22,7 @@ import {
   executeSourceAugmentation,
   listTopics as listTopicsDomainEntry,
 } from '@redcube/domain-entry';
+import type { DomainEntryRequest } from '@redcube/domain-entry';
 
 import {
   buildFoundrySeriesSurface,
@@ -135,6 +136,39 @@ function deliveryConstraintsFromOptions(options: JsonMap): Record<string, unknow
   }
   const normalized = plainObject(constraints);
   return Object.keys(normalized).length > 0 ? normalized : undefined;
+}
+
+function deliverableStagePlanRequest(
+  options: JsonMap,
+  cwd: () => string,
+  useRouteAsStopAfterStage = false,
+): DomainEntryRequest {
+  return {
+    target_domain_id: 'redcube_ai',
+    task_intent: 'run_opl_stage_execution_plan',
+    entry_mode: 'service_call',
+    workspace_locator: {
+      workspace_root: resolveWorkspaceRoot(options, cwd),
+    },
+    runtime_session_contract: {
+      runtime_owner: 'configured_family_runtime_provider',
+      session_mode: 'ephemeral_run',
+    },
+    return_surface_contract: {
+      surface_kind: 'opl_stage_execution_plan',
+    },
+    domain_payload: {
+      deliverable_family: options.overlay || '',
+      topic_id: options.topicId || '',
+      deliverable_id: options.deliverableId || '',
+      route: options.route || '',
+      adapter: options.adapter || undefined,
+      user_intent: options.userIntent || '',
+      stop_after_stage: options.stopAfterStage || (useRouteAsStopAfterStage ? options.route || '' : ''),
+      mode: options.mode || 'draft_new',
+      baseline_deliverable_id: options.baselineDeliverableId || '',
+    },
+  };
 }
 
 function runRepoOwnedImagePptProof(options: JsonMap, cwd: () => string): JsonMap {
@@ -338,60 +372,11 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     if (subcommand === 'run') {
-      return domainEntry.invokeDomainEntry({
-        target_domain_id: 'redcube_ai',
-        task_intent: 'run_opl_stage_execution_plan',
-        entry_mode: 'service_call',
-        workspace_locator: {
-          workspace_root: resolveWorkspaceRoot(options, cwd),
-        },
-        runtime_session_contract: {
-          runtime_owner: 'configured_family_runtime_provider',
-          session_mode: 'ephemeral_run',
-        },
-        return_surface_contract: {
-          surface_kind: 'opl_stage_execution_plan',
-        },
-        domain_payload: {
-          deliverable_family: options.overlay || '',
-          topic_id: options.topicId || '',
-          deliverable_id: options.deliverableId || '',
-          route: options.route || '',
-          adapter: options.adapter || undefined,
-          user_intent: options.userIntent || '',
-          stop_after_stage: options.stopAfterStage || options.route || '',
-          mode: options.mode || 'draft_new',
-          baseline_deliverable_id: options.baselineDeliverableId || '',
-        },
-      });
+      return domainEntry.invokeDomainEntry(deliverableStagePlanRequest(options, cwd, true));
     }
 
     if (subcommand === 'execute') {
-      return domainEntry.invokeDomainEntry({
-        target_domain_id: 'redcube_ai',
-        task_intent: 'run_opl_stage_execution_plan',
-        entry_mode: 'service_call',
-        workspace_locator: {
-          workspace_root: resolveWorkspaceRoot(options, cwd),
-        },
-        runtime_session_contract: {
-          runtime_owner: 'configured_family_runtime_provider',
-          session_mode: 'ephemeral_run',
-        },
-        return_surface_contract: {
-          surface_kind: 'opl_stage_execution_plan',
-        },
-        domain_payload: {
-          deliverable_family: options.overlay || '',
-          topic_id: options.topicId || '',
-          deliverable_id: options.deliverableId || '',
-          adapter: options.adapter || undefined,
-          user_intent: options.userIntent || '',
-          stop_after_stage: options.stopAfterStage || '',
-          mode: options.mode || 'draft_new',
-          baseline_deliverable_id: options.baselineDeliverableId || '',
-        },
-      });
+      return domainEntry.invokeDomainEntry(deliverableStagePlanRequest(options, cwd));
     }
 
     throw new Error('deliverable 命令仅支持 create|get|audit|execute|run');
