@@ -1,64 +1,106 @@
-import {
-  createRunRecord as createRunRecordJs,
-  RUN_LOCATOR_ENVELOPE_BOUNDARY as RUN_LOCATOR_ENVELOPE_BOUNDARY_JS,
+export {
+  RUN_LOCATOR_ENVELOPE_BOUNDARY,
+  createRunRecord,
 } from './runs.js';
+export {
+  WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
+  ensureWorkspaceGitBoundary,
+  getDeliverablePaths,
+  getNotePaths,
+  getTopicPaths,
+  renderWorkspaceGitignore,
+  resolveWorkspaceContract,
+} from './workspace.js';
+export {
+  RCA_STAGE_OUTPUT_CANONICAL_ROLES,
+  RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
+  canonicalStageForRoute,
+  readStageFolderArtifact,
+  stageFolderArtifactPath,
+  stageFolderAttemptPaths,
+  stageFolderOutputPath,
+  stageOrderForCanonicalStage,
+  writeStageFolderArtifact,
+} from './stage-folder-contract.js';
+export {
+  buildSourcePackFanoutArtifact,
+  buildSourceTruthConsumptionSummary,
+  getSourceArtifactPaths,
+  getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
+} from './source-truth.js';
+export {
+  loadSourceReadinessSummary,
+} from './source-readiness-summary.js';
+export {
+  validateSourceAugmentationRequestContract,
+  validateSourceAugmentationResultContract,
+} from './source-augmentation-contract.js';
+export {
+  REDCUBE_PYTHON_COMMAND_ENV,
+  resolveRedCubePythonCommand,
+} from './python-command.js';
+export {
+  buildPythonHelperEnv,
+  pythonHelperReference,
+  resolvePythonHelperInvocation,
+  resolvePythonNativeHelper,
+  runRedCubePythonHelper,
+} from './python-native-helper.js';
+export {
+  materializeScreenshotCaptureStore,
+} from './screenshot-capture-store.js';
+export {
+  buildCodexRuntimeTopology,
+} from './runtime-topology.js';
 export {
   HERMES_AGENT_ADAPTER_DELETION_GATE,
   HERMES_AGENT_ADAPTER_DELETION_GATE_OWNER,
   HERMES_AGENT_BACKEND_LIFECYCLE,
+  AGENT_LOOP_EXECUTION_SHAPE,
+  CODEX_DEFAULT_ADAPTER,
+  CODEX_DEFAULT_MODEL_SELECTION,
+  CODEX_DEFAULT_REASONING_SELECTION,
+  CODEX_EXECUTOR_BACKEND,
+  CODEX_RUNTIME_SURFACE,
+  HERMES_AGENT_ADAPTER,
+  HERMES_AGENT_EXECUTOR_BACKEND,
+  HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+  HERMES_RUNTIME_SURFACE,
+  STRUCTURED_CALL_EXECUTION_SHAPE,
+  appendRouteRunEvent,
+  buildCodexExecutorDescriptor,
+  buildCodexExecutionModel,
+  buildExecutorBackendContract,
+  buildHermesAgentLoopExecutorDescriptor,
+  buildHermesAgentLoopExecutionModel,
+  buildHermesExecutorDescriptor,
+  buildHermesExecutionModel,
+  buildHermesRuntimeTopology,
+  completeRouteRun,
+  failRouteRun,
   hermesAgentAdapterRetirementBoundary,
+  loadRouteRun,
+  normalizeExecutorBackend,
+  readRouteRunEvents,
+  startRouteRun,
 } from './executor-runtime.js';
-import {
-  getDeliverablePaths as getDeliverablePathsJs,
-  getNotePaths as getNotePathsJs,
-  getTopicPaths as getTopicPathsJs,
-  ensureWorkspaceGitBoundary as ensureWorkspaceGitBoundaryJs,
-  renderWorkspaceGitignore as renderWorkspaceGitignoreJs,
-  resolveWorkspaceContract as resolveWorkspaceContractJs,
-  WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY as WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY_JS,
-} from './workspace.js';
-import {
-  canonicalStageForRoute as canonicalStageForRouteJs,
-  RCA_STAGE_OUTPUT_CANONICAL_ROLES as RCA_STAGE_OUTPUT_CANONICAL_ROLES_JS,
-  RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS as RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS_JS,
-  stageFolderArtifactPath as stageFolderArtifactPathJs,
-  readStageFolderArtifact as readStageFolderArtifactJs,
-  stageFolderAttemptPaths as stageFolderAttemptPathsJs,
-  stageFolderOutputPath as stageFolderOutputPathJs,
-  stageOrderForCanonicalStage as stageOrderForCanonicalStageJs,
-  writeStageFolderArtifact as writeStageFolderArtifactJs,
-} from './stage-folder-contract.js';
-import {
-  buildSourcePackFanoutArtifact as buildSourcePackFanoutArtifactJs,
-  buildSourceTruthConsumptionSummary as buildSourceTruthConsumptionSummaryJs,
-  getSourceArtifactPaths as getSourceArtifactPathsJs,
-} from './source-truth.js';
-import {
-  loadSourceReadinessSummary as loadSourceReadinessSummaryJs,
-} from './source-readiness-summary.js';
-import {
-  validateSourceAugmentationRequestContract as validateSourceAugmentationRequestContractJs,
-  validateSourceAugmentationResultContract as validateSourceAugmentationResultContractJs,
-} from './source-augmentation-contract.js';
-import {
-  REDCUBE_PYTHON_COMMAND_ENV as REDCUBE_PYTHON_COMMAND_ENV_JS,
-  resolveRedCubePythonCommand as resolveRedCubePythonCommandJs,
-} from './python-command.js';
-import {
-  materializeScreenshotCaptureStore as materializeScreenshotCaptureStoreJs,
-} from './screenshot-capture-store.js';
-import {
-  buildCodexRuntimeTopology as buildCodexRuntimeTopologyTs,
-} from './runtime-topology.js';
-import {
-  buildPythonHelperEnv as buildPythonHelperEnvTs,
-  pythonHelperReference as pythonHelperReferenceTs,
-  resolvePythonHelperInvocation as resolvePythonHelperInvocationTs,
-  resolvePythonNativeHelper as resolvePythonNativeHelperTs,
-  runRedCubePythonHelper as runRedCubePythonHelperTs,
-} from './python-native-helper.js';
+export {
+  generateStructuredArtifactViaHermesAgentApi,
+  generateStructuredArtifactViaHermesAgentStructuredCall,
+  runAgentLoopViaHermesAgentApi,
+  structuredCallViaHermesAgentApi,
+} from './hermes-agent-api-client.js';
+export {
+  generateStructuredArtifactViaHermesAgentLoop,
+  probeHermesAgentLoop,
+  readHermesAgentLoopContract,
+} from './hermes-agent-loop-bridge-client.js';
 
-import type {
+export type {
+  CodexExecutionModel,
+  HermesAgentLoopExecutionModel,
+} from './executor-runtime.js';
+export type {
   BuildSourceTruthConsumptionSummaryOptions,
   CodexRuntimeTopology,
   CreateRunRecordInput,
@@ -87,246 +129,3 @@ import type {
   WorkspaceContract,
   WorkspaceGitBoundary,
 } from './types.js';
-
-export function createRunRecord(input: CreateRunRecordInput = {}): RunRecord {
-  return createRunRecordJs(input) as RunRecord;
-}
-
-export const RUN_LOCATOR_ENVELOPE_BOUNDARY = RUN_LOCATOR_ENVELOPE_BOUNDARY_JS;
-
-export function resolveWorkspaceContract(input: { workspaceRoot: string }): WorkspaceContract {
-  return resolveWorkspaceContractJs(input) as WorkspaceContract;
-}
-
-export const WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY = WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY_JS;
-
-export function renderWorkspaceGitignore(): string {
-  return renderWorkspaceGitignoreJs() as string;
-}
-
-export function ensureWorkspaceGitBoundary(input: { workspaceRoot: string }): WorkspaceGitBoundary {
-  return ensureWorkspaceGitBoundaryJs(input) as WorkspaceGitBoundary;
-}
-
-export function getTopicPaths(workspaceRoot: string, topicId: string): TopicPaths {
-  return getTopicPathsJs(workspaceRoot, topicId) as TopicPaths;
-}
-
-export function getDeliverablePaths(workspaceRoot: string, topicId: string, deliverableId: string): DeliverablePaths {
-  return getDeliverablePathsJs(workspaceRoot, topicId, deliverableId) as DeliverablePaths;
-}
-
-export function canonicalStageForRoute(stageId: string): string {
-  return canonicalStageForRouteJs(stageId) as string;
-}
-
-export const RCA_STAGE_OUTPUT_CANONICAL_ROLES = RCA_STAGE_OUTPUT_CANONICAL_ROLES_JS as readonly string[];
-
-export const RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS = RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS_JS as Record<string, readonly string[]>;
-
-export function stageOrderForCanonicalStage(stageId: string): number {
-  return stageOrderForCanonicalStageJs(stageId) as number;
-}
-
-export function stageFolderAttemptPaths(input: Record<string, unknown>): Record<string, string> {
-  return stageFolderAttemptPathsJs(input) as Record<string, string>;
-}
-
-export function stageFolderArtifactPath(input: Record<string, unknown>): string {
-  return stageFolderArtifactPathJs(input) as string;
-}
-
-export function stageFolderOutputPath(input: Record<string, unknown>): string {
-  return stageFolderOutputPathJs(input) as string;
-}
-
-export function writeStageFolderArtifact(input: Record<string, unknown>): Record<string, unknown> {
-  return writeStageFolderArtifactJs(input) as Record<string, unknown>;
-}
-
-export function readStageFolderArtifact(input: Record<string, unknown>): Record<string, unknown> | null {
-  return readStageFolderArtifactJs(input) as Record<string, unknown> | null;
-}
-
-export function getNotePaths(workspaceRoot: string, topicId: string, noteId: string): NotePaths {
-  return getNotePathsJs(workspaceRoot, topicId, noteId) as NotePaths;
-}
-
-export function getSourceArtifactPaths(workspaceRoot: string, topicId: string): SourceArtifactPaths {
-  return getSourceArtifactPathsJs(workspaceRoot, topicId) as SourceArtifactPaths;
-}
-
-export function buildSourcePackFanoutArtifact(request: {
-  workspaceRoot: string;
-  topicId: string;
-  sourceIndex?: unknown;
-  extractedMaterials?: unknown;
-  sourceAudit?: unknown;
-  sourceBrief?: unknown;
-  sourceReadinessPack?: unknown;
-  consumerFamilies?: unknown[];
-}): Record<string, unknown> {
-  return buildSourcePackFanoutArtifactJs(
-    request as Parameters<typeof buildSourcePackFanoutArtifactJs>[0],
-  ) as Record<string, unknown>;
-}
-
-export function buildSourceTruthConsumptionSummary(
-  sharedSourceTruth: unknown,
-  options: BuildSourceTruthConsumptionSummaryOptions,
-): SourceTruthConsumptionSummary {
-  return buildSourceTruthConsumptionSummaryJs(sharedSourceTruth, options) as SourceTruthConsumptionSummary;
-}
-
-export function loadSourceReadinessSummary(
-  workspaceRoot: string,
-  topicId: string,
-): SourceReadinessSummary | null {
-  return loadSourceReadinessSummaryJs(workspaceRoot, topicId) as SourceReadinessSummary | null;
-}
-
-export function validateSourceAugmentationRequestContract(
-  contract: unknown,
-): ValidationResult {
-  return validateSourceAugmentationRequestContractJs(contract) as ValidationResult;
-}
-
-export function validateSourceAugmentationResultContract(
-  contract: unknown,
-  options: ValidateSourceAugmentationResultOptions = {},
-): ValidationResult {
-  return validateSourceAugmentationResultContractJs(contract, options) as ValidationResult;
-}
-
-export const REDCUBE_PYTHON_COMMAND_ENV = REDCUBE_PYTHON_COMMAND_ENV_JS;
-
-export function resolveRedCubePythonCommand(
-  options: ResolveRedCubePythonCommandOptions = {},
-): ResolvedRedCubePythonCommand {
-  return resolveRedCubePythonCommandJs(options) as ResolvedRedCubePythonCommand;
-}
-
-export function buildPythonHelperEnv(
-  pythonRoot: string,
-  env: Record<string, string | undefined> = process.env,
-): Record<string, string | undefined> {
-  return buildPythonHelperEnvTs(pythonRoot, env);
-}
-
-export function resolvePythonNativeHelper(
-  repoRoot: string,
-  helperId: string,
-  options: ResolveRedCubePythonNativeHelperOptions = {},
-): RedCubePythonNativeHelper {
-  return resolvePythonNativeHelperTs(repoRoot, helperId, options);
-}
-
-export function resolvePythonHelperInvocation(
-  helper: RedCubePythonNativeHelper,
-  options: RunRedCubePythonHelperOptions = {},
-): RedCubePythonHelperInvocation {
-  return resolvePythonHelperInvocationTs(helper, options);
-}
-
-export function pythonHelperReference(
-  helper: RedCubePythonNativeHelper,
-): RedCubePythonHelperReference {
-  return pythonHelperReferenceTs(helper);
-}
-
-export function runRedCubePythonHelper(
-  helper: RedCubePythonNativeHelper,
-  args: string[],
-  options: RunRedCubePythonHelperOptions = {},
-): RedCubePythonHelperRunResult {
-  return runRedCubePythonHelperTs(helper, args, options);
-}
-
-export function materializeScreenshotCaptureStore(input: Record<string, unknown> = {}): Record<string, unknown> {
-  return materializeScreenshotCaptureStoreJs(input) as Record<string, unknown>;
-}
-
-export function buildCodexRuntimeTopology(): CodexRuntimeTopology {
-  return buildCodexRuntimeTopologyTs();
-}
-
-export {
-  getSourceArtifactPaths as getCanonicalSourceArtifactPaths,
-};
-
-export {
-  AGENT_LOOP_EXECUTION_SHAPE,
-  CODEX_DEFAULT_ADAPTER,
-  CODEX_DEFAULT_MODEL_SELECTION,
-  CODEX_DEFAULT_REASONING_SELECTION,
-  CODEX_EXECUTOR_BACKEND,
-  CODEX_RUNTIME_SURFACE,
-  HERMES_AGENT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_AGENT_LOOP_RUNTIME_SURFACE,
-  HERMES_RUNTIME_SURFACE,
-  STRUCTURED_CALL_EXECUTION_SHAPE,
-  appendRouteRunEvent,
-  buildCodexExecutorDescriptor,
-  buildCodexExecutionModel,
-  buildExecutorBackendContract,
-  buildHermesAgentLoopExecutorDescriptor,
-  buildHermesAgentLoopExecutionModel,
-  buildHermesExecutorDescriptor,
-  buildHermesExecutionModel,
-  buildHermesRuntimeTopology,
-  completeRouteRun,
-  failRouteRun,
-  loadRouteRun,
-  normalizeExecutorBackend,
-  readRouteRunEvents,
-  startRouteRun,
-} from './executor-runtime.js';
-
-export {
-  generateStructuredArtifactViaHermesAgentApi,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
-  runAgentLoopViaHermesAgentApi,
-  structuredCallViaHermesAgentApi,
-} from './hermes-agent-api-client.js';
-
-export {
-  generateStructuredArtifactViaHermesAgentLoop,
-  probeHermesAgentLoop,
-  readHermesAgentLoopContract,
-} from './hermes-agent-loop-bridge-client.js';
-
-export type {
-  CodexExecutionModel,
-  HermesAgentLoopExecutionModel,
-} from './executor-runtime.js';
-
-export type {
-  BuildSourceTruthConsumptionSummaryOptions,
-  CodexRuntimeTopology,
-  CreateRunRecordInput,
-  DeliverablePaths,
-  NotePaths,
-  RerunLinkage,
-  RunRecord,
-  SourceTruthConsumptionSummary,
-  RunTelemetryEnvelope,
-  RuntimeErrorKind,
-  ResolvedRedCubePythonCommand,
-  ResolveRedCubePythonCommandOptions,
-  RedCubePythonHelperInvocation,
-  RedCubePythonHelperReference,
-  RedCubePythonHelperRunResult,
-  RedCubePythonNativeHelper,
-  ResolveRedCubePythonNativeHelperOptions,
-  RunRedCubePythonHelperOptions,
-  SourceArtifactPaths,
-  SourceReadinessSummary,
-  SourceAugmentationRequestContract,
-  SourceAugmentationResultContract,
-  TopicPaths,
-  ValidateSourceAugmentationResultOptions,
-  ValidationResult,
-  WorkspaceContract,
-  WorkspaceGitBoundary,
-};

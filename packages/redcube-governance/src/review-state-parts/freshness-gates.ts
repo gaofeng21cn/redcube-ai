@@ -159,3 +159,45 @@ export function buildGateSummary({
     delivery_state_owner: safeText(operatorHandoff?.delivery_state_owner) || null,
   };
 }
+
+export function buildSourceReadinessReport(summary) {
+  if (!summary) {
+    return {
+      status: 'pass',
+      issues: [],
+      rerun_from_stage: null,
+      recommended_action: 'continue',
+    };
+  }
+
+  if (summary.status === 'missing') {
+    return {
+      status: 'block',
+      issues: uniqueList(summary.blocking_reasons).length > 0
+        ? uniqueList(summary.blocking_reasons)
+        : ['source_readiness_missing'],
+      rerun_from_stage: 'source_readiness',
+      recommended_action: 'run_source_research',
+    };
+  }
+
+  if (summary.status !== 'pass') {
+    return {
+      status: 'block',
+      issues: summary.status === 'invalid'
+        ? (uniqueList(summary.blocking_reasons).length > 0
+            ? uniqueList(summary.blocking_reasons)
+            : ['source_readiness_invalid'])
+        : ['source_readiness_not_planning_ready', ...uniqueList(summary.blocking_evidence_gaps)],
+      rerun_from_stage: 'source_readiness',
+      recommended_action: 'run_source_research',
+    };
+  }
+
+  return {
+    status: 'pass',
+    issues: [],
+    rerun_from_stage: null,
+    recommended_action: 'continue',
+  };
+}

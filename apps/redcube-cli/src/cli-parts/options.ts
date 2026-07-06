@@ -3,6 +3,7 @@ import type { CliOptionsMap } from './types.js';
 export function parseArgs(argv: string[]): CliOptionsMap {
   const options: CliOptionsMap = {};
 
+  // ponytail: node:util.parseArgs cannot preserve unknown "--key value" pairs without a longer option schema.
   for (let i = 0; i < argv.length; i += 1) {
     const token = argv[i];
     if (!token.startsWith('--')) continue;

@@ -10,7 +10,10 @@ import {
 } from '@redcube/runtime-protocol';
 import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
 import { buildGovernanceSurface } from './governance-surface.js';
-import { buildGateSummary } from './review-state-parts/freshness-gates.js';
+import {
+  buildGateSummary,
+  buildSourceReadinessReport,
+} from './review-state-parts/freshness-gates.js';
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   if (!workspaceRoot || !topicId || !deliverableId) {
@@ -92,44 +95,6 @@ function toFailedIssue(check) {
 
 function loadSourceReadinessSummary({ workspaceRoot, topicId }) {
   return workspaceRoot && topicId ? loadCanonicalSourceReadinessSummary(workspaceRoot, topicId) : null;
-}
-
-function buildSourceReadinessReport(summary) {
-  if (!summary) {
-    return {
-      status: 'pass',
-      issues: [],
-      rerun_from_stage: null,
-      recommended_action: 'continue',
-    };
-  }
-
-  if (summary.status === 'missing') {
-    return {
-      status: 'block',
-      issues: summary.blocking_reasons?.length > 0 ? summary.blocking_reasons : ['source_readiness_missing'],
-      rerun_from_stage: 'source_readiness',
-      recommended_action: 'run_source_research',
-    };
-  }
-
-  if (summary.status !== 'pass') {
-    return {
-      status: 'block',
-      issues: summary.status === 'invalid'
-        ? (summary.blocking_reasons?.length > 0 ? summary.blocking_reasons : ['source_readiness_invalid'])
-        : ['source_readiness_not_planning_ready', ...(summary.blocking_evidence_gaps || [])],
-      rerun_from_stage: 'source_readiness',
-      recommended_action: 'run_source_research',
-    };
-  }
-
-  return {
-    status: 'pass',
-    issues: [],
-    rerun_from_stage: null,
-    recommended_action: 'continue',
-  };
 }
 
 export function auditDeliverableRequest({ mode, baselineDeliverableId }) {

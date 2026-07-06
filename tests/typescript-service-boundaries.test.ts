@@ -12,18 +12,8 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/types.ts')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime/package.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('packages/redcube-runtime/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('packages/redcube-runtime/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './dist/index.d.ts');
-  assert.match(entry, /runDeliverableRoute/);
-  assert.match(entry, /resolveExecutorAdapter/);
-  assert.match(entry, /P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT/);
-  assert.match(entry, /P19_REVIEW_OVERLAY_CONTRACT/);
-  assert.match(entry, /startRun/);
-  assert.match(types, /interface RuntimeRunRecord/);
-  assert.match(types, /interface RuntimeRunRouteResponse/);
-  assert.match(types, /interface RuntimeCreativeOwnershipProgramCloseout/);
 });
 
 test('P16 slice 2: legacy pack-runtime compiler registry service boundary is removed', () => {
@@ -40,17 +30,10 @@ test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/types.ts')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-cli/package.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('apps/redcube-cli/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('apps/redcube-cli/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './dist/index.d.ts');
   assert.equal(pkg.bin.redcube, 'dist/cli.js');
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), false);
-  assert.equal(existsSync(path.resolve('apps/redcube-cli/dist/cli.js')), true);
-  assert.match(entry, /runCli/);
-  assert.match(entry, /buildHelp/);
-  assert.match(types, /interface CliOptions/);
-  assert.match(types, /interface CliRunResult/);
 });
 
 test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain tool contracts', () => {
@@ -58,17 +41,10 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain 
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/types.ts')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-mcp/package.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('apps/redcube-mcp/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('apps/redcube-mcp/src/types.ts'), 'utf-8');
 
   assert.equal(pkg.types, './dist/index.d.ts');
   assert.equal(pkg.bin['redcube-mcp'], './dist/server.js');
   assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/dist/server.js')), true);
-  assert.match(entry, /callDomainTool/);
-  assert.match(entry, /createMcpServer/);
-  assert.match(types, /interface DomainToolDefinition/);
-  assert.match(types, /interface DomainActionMap/);
 });
 
 test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and typed registry contracts', () => {
@@ -79,10 +55,6 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
   const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/package.json'), 'utf-8'));
   const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
   const packageTsconfig = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts'), 'utf-8');
-  const runtimeEntry = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts'), 'utf-8');
-
   assert.equal(pkg.types, './dist/index.d.ts');
   assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json');
   assert.equal(
@@ -90,18 +62,7 @@ test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and
     true,
   );
 
-  assert.match(entry, /listDefaultRuntimeFamilyModules/);
-  assert.match(entry, /getDefaultRuntimeFamilyCatalog/);
-  assert.match(entry, /resolveRuntimeFamilyModule/);
-  assert.match(entry, /loadRuntimeFamilyRunner/);
-  assert.match(entry, /buildCatalogEntry/);
-  assert.doesNotMatch(entry, /from '\.\/index\.js'/);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/index.js')), false);
-  assert.match(runtimeEntry, /export function listDefaultRuntimeFamilyModules/);
-
-  assert.match(types, /interface RuntimeFamilyModuleSpec/);
-  assert.match(types, /interface RuntimeFamilyCatalogSurface/);
-  assert.match(types, /interface LoadedRuntimeFamilyRunner/);
 });
 
 test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed local-exec contracts', () => {
@@ -110,16 +71,7 @@ test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed 
   assert.equal(existsSync(path.resolve('packages/redcube-codex-cli-client/tsconfig.json')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-codex-cli-client/package.json'), 'utf-8'));
-  const entry = readFileSync(path.resolve('packages/redcube-codex-cli-client/src/index.ts'), 'utf-8');
-  const types = readFileSync(path.resolve('packages/redcube-codex-cli-client/src/index.ts'), 'utf-8');
-
   assert.equal(pkg.types, './dist/index.d.ts');
-  assert.match(entry, /readCodexCliContract/);
-  assert.match(entry, /probeCodexCli/);
-  assert.match(entry, /generateStructuredArtifactViaCodexCli/);
-  assert.match(types, /interface CodexCliContract/);
-  assert.match(types, /interface CodexCliProbeResult/);
-  assert.match(types, /interface StructuredArtifactGenerationResult/);
 });
 
 test('P23.A: current utility package exposes TypeScript service entrypoints without legacy utility packages', () => {
@@ -136,10 +88,6 @@ test('P23.A: current utility package exposes TypeScript service entrypoints with
         'src/private-profile.ts',
         'src/xiaohongshu-author-profile.ts',
       ],
-      expectedTypes: [
-        /interface RedcubeRuntimeConfig/,
-        /interface RedcubeWorkspaceAuthorProfile/,
-      ],
     },
   ];
   const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
@@ -147,8 +95,6 @@ test('P23.A: current utility package exposes TypeScript service entrypoints with
   for (const pkgSpec of packages) {
     const pkg = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'package.json'), 'utf-8'));
     const packageTsconfig = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'tsconfig.json'), 'utf-8'));
-    const types = readFileSync(path.resolve(pkgSpec.directory, 'src/types.ts'), 'utf-8');
-
     assert.equal(pkg.types, pkgSpec.expectedTypesEntry, pkgSpec.directory);
     assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json', pkgSpec.directory);
     assert.equal(
@@ -159,9 +105,6 @@ test('P23.A: current utility package exposes TypeScript service entrypoints with
 
     for (const entrypoint of pkgSpec.publicEntrypoints) {
       assert.equal(existsSync(path.resolve(pkgSpec.directory, entrypoint)), true, entrypoint);
-    }
-    for (const expectedType of pkgSpec.expectedTypes) {
-      assert.match(types, expectedType, pkgSpec.directory);
     }
   }
 

@@ -8,6 +8,8 @@ import {
   isBaselineApprovedState as isBaselineApprovedStateJs,
   persistReviewStatePatch as persistReviewStatePatchJs,
   rebuildTopicPublicationProjection as rebuildTopicPublicationProjectionJs,
+  buildGateSummary as buildGateSummaryJs,
+  buildSourceReadinessReport as buildSourceReadinessReportJs,
 } from '@redcube/governance';
 import {
   loadReferenceSampleFixture as loadReferenceSampleFixtureJs,
@@ -110,6 +112,8 @@ export const getReviewState = getReviewStateJs;
 export const isBaselineApprovedState = isBaselineApprovedStateJs;
 export const persistReviewStatePatch = persistReviewStatePatchJs;
 export const rebuildTopicPublicationProjection = rebuildTopicPublicationProjectionJs;
+export const buildGateSummary = buildGateSummaryJs;
+export const buildSourceReadinessReport = buildSourceReadinessReportJs;
 
 export const loadReferenceSampleFixture = loadReferenceSampleFixtureJs;
 export const listPromotedReferences = listPromotedReferencesJs;

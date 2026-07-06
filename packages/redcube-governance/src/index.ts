@@ -12,6 +12,10 @@ import {
   rebuildTopicPublicationProjection as rebuildTopicPublicationProjectionJs,
 } from './review-state.js';
 import { buildGovernanceSurface as buildGovernanceSurfaceJs } from './governance-surface.js';
+import {
+  buildGateSummary as buildGateSummaryJs,
+  buildSourceReadinessReport as buildSourceReadinessReportJs,
+} from './review-state-parts/freshness-gates.js';
 
 import type {
   AuditDeliverableRequest,
@@ -64,6 +68,14 @@ export function rebuildTopicPublicationProjection(request: { workspaceRoot: stri
 
 export function buildGovernanceSurface(contract: Record<string, unknown>): GovernanceSurfaceContract {
   return buildGovernanceSurfaceJs(contract) as GovernanceSurfaceContract;
+}
+
+export function buildGateSummary(request: any): Record<string, unknown> {
+  return buildGateSummaryJs(request);
+}
+
+export function buildSourceReadinessReport(summary: Record<string, unknown> | null | undefined): ReviewSurfaceResult {
+  return buildSourceReadinessReportJs(summary) as ReviewSurfaceResult;
 }
 
 export type {
