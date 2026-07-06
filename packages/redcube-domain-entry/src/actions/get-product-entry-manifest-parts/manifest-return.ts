@@ -1,6 +1,7 @@
 // @ts-nocheck
 
 import { buildOperatorEvidenceReadinessProjection } from './operator-evidence-readiness.js';
+import { buildActionMetadataProjection, buildSkillCommandContracts } from './utils.js';
 
 export function buildReturnedManifestProjection({
   actionMetadata,
@@ -95,22 +96,7 @@ export function buildReturnedManifestProjection({
     skill_catalog: {
       ...manifest.skill_catalog,
       supported_commands: actionMetadata.skill_commands.map((contract) => contract.command),
-      command_contracts: actionMetadata.skill_commands.map((contract) => {
-        const result = {
-          action_id: contract.action_id,
-          command_contract_id: contract.command_contract_id,
-          command: contract.command,
-          shell_key: contract.shell_key,
-          target_surface_kind: contract.surface_kind,
-          required_fields: contract.required_fields,
-          effect: contract.effect,
-          summary: contract.summary,
-        };
-        if (contract.public_skill_policy) {
-          result.public_skill_policy = contract.public_skill_policy;
-        }
-        return result;
-      }),
+      command_contracts: buildSkillCommandContracts(actionMetadata),
     },
     family_action_catalog: actionMetadata.family_action_catalog,
     family_action_catalog_parity: actionMetadata.parity,
@@ -176,17 +162,6 @@ export function buildReturnedManifestProjection({
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
-    action_metadata: {
-      surface_kind: 'redcube_action_metadata_projection',
-      product_entry: actionMetadata.product_entry,
-      cli_commands: actionMetadata.cli_commands,
-      mcp_tools: actionMetadata.mcp_tools,
-      mcp_actions: actionMetadata.mcp_actions,
-      skill_commands: actionMetadata.skill_commands,
-      generated_interface_owner: actionMetadata.generated_interface_owner,
-      domain_handler_owner: actionMetadata.domain_handler_owner,
-      owner_model: actionMetadata.owner_model,
-      repo_local_handler_targets: actionMetadata.repo_local_handler_targets,
-    },
+    action_metadata: buildActionMetadataProjection(actionMetadata),
   };
 }

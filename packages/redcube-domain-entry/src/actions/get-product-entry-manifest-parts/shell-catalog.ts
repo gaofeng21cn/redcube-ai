@@ -20,6 +20,7 @@ import {
   PRODUCT_START_COMMAND,
   PRODUCT_STATUS_COMMAND,
 } from './policy.js';
+import { buildSkillCommandContracts } from './utils.js';
 
 export function buildProductEntryManifestShellCatalog({
   actionMetadata,
@@ -44,22 +45,7 @@ export function buildProductEntryManifestShellCatalog({
   visualPackCompilerHandoff,
   workspaceRoot,
 }) {
-  const skillCommandContracts = actionMetadata.skill_commands.map((contract) => {
-    const result = {
-      action_id: contract.action_id,
-      command_contract_id: contract.command_contract_id,
-      command: contract.command,
-      shell_key: contract.shell_key,
-      target_surface_kind: contract.surface_kind,
-      required_fields: contract.required_fields,
-      effect: contract.effect,
-      summary: contract.summary,
-    };
-    if (contract.public_skill_policy) {
-      result.public_skill_policy = contract.public_skill_policy;
-    }
-    return result;
-  });
+  const skillCommandContracts = buildSkillCommandContracts(actionMetadata);
   const skillActivationHints = {
     plugin_name: 'redcube-ai',
     skill_semantics: 'single_domain_app_skill',
