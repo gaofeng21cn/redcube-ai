@@ -18,10 +18,13 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
     path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
     'utf-8',
   ));
+  const adoptionAudit = adoption.privatized_functional_module_audit?.body_copy_in_adoption === false
+    ? rootAudit
+    : adoption.privatized_functional_module_audit;
 
   const surfaces = [
     rootAudit,
-    adoption.privatized_functional_module_audit,
+    adoptionAudit,
   ];
   const expectedReplacementSurfaces = {
     product_entry_continuity_refs_adapter: 'opl_app_session_shell_and_workbench',

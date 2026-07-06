@@ -6,6 +6,9 @@ import {
 import {
   USER_STAGE_LOG_CONTRACT,
 } from './family-stage-control-plane-parts/user-stage-log-contract.js';
+import {
+  buildCompactFamilyStageControlPlaneContract,
+} from './family-stage-control-plane-parts/static-contract.js';
 
 const STAGES = [
   {
@@ -977,4 +980,8 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
       'OPL provider may schedule stage attempts from this descriptor; it must not own RCA visual/artifact/review authority.',
     ],
   };
+}
+
+export function buildRedCubeFamilyStageControlPlaneContract(input = {}) {
+  return buildCompactFamilyStageControlPlaneContract(buildRedCubeFamilyStageControlPlane(input));
 }

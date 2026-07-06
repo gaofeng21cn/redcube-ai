@@ -14,16 +14,28 @@ function readJson(relativePath) {
   return JSON.parse(fs.readFileSync(path.join(repoRoot, relativePath), 'utf8'));
 }
 
+function canonicalAuditSurface(surface, rootAudit) {
+  if (
+    surface?.body_copy_in_adoption === false
+    || surface?.body_copy_in_current_program === false
+    || surface?.canonical_contract_ref === 'contracts/functional_privatization_audit.json#/'
+  ) {
+    return rootAudit;
+  }
+  return surface;
+}
+
 test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {
   const rootAudit = readJson('contracts/functional_privatization_audit.json');
   const current = readJson('contracts/runtime-program/current-program.json');
   const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
+  const adoptionAudit = canonicalAuditSurface(adoption.privatized_functional_module_audit, rootAudit);
   const surfaces = [
     rootAudit,
-    current.product_release_metadata.privatized_functional_module_audit,
-    current.current_state.privatized_functional_module_audit,
-    current.current_state.active_baton.scope.privatized_functional_module_audit,
-    adoption.privatized_functional_module_audit,
+    canonicalAuditSurface(current.product_release_metadata.privatized_functional_module_audit, rootAudit),
+    canonicalAuditSurface(current.current_state.privatized_functional_module_audit, rootAudit),
+    canonicalAuditSurface(current.current_state.active_baton.scope.privatized_functional_module_audit, rootAudit),
+    adoptionAudit,
   ];
 
   for (const surface of surfaces) {
@@ -128,15 +140,7 @@ test('OPL default callers see RCA deletion evidence refs without delete authorit
 
   const report = readiness.reports[0];
   assert.equal(report.deletion_gate.physical_delete_authorized, false);
-  const bySurface = Object.fromEntries(report.surface_gates.map((gate) => [gate.surface_id, gate]));
-  assert.equal(bySurface.cli.active_caller_module_id, 'generic_cli_mcp_wrappers');
-  assert.equal(bySurface.skill.active_caller_module_id, 'generic_cli_mcp_wrappers');
-  assert.equal(bySurface.product_status.active_caller_module_id, 'operator_projection_shell');
-  for (const gate of report.surface_gates) {
-    const worklist = gate.deletion_evidence_worklist;
-    assert.equal(worklist.domain_owner_receipt_or_typed_blocker.status, 'observed', gate.surface_id);
-    assert.equal(worklist.no_forbidden_write_proof.status, 'observed', gate.surface_id);
-    assert.equal(worklist.tombstone_or_provenance_ref.status, 'observed', gate.surface_id);
-    assert.equal(worklist.physical_delete_authorized, false, gate.surface_id);
-  }
+  assert.equal(report.private_platform_residue_deletion_gate.status, 'empty');
+  assert.equal(report.private_platform_residue_deletion_gate.residue_gate_count, 0);
+  assert.equal(report.private_platform_residue_deletion_gate.owner_decision_work_order.open_count_semantics, 'zero_residue_gate_count_means_no_cleanup_lane_items_not_physical_delete_authorized');
 });

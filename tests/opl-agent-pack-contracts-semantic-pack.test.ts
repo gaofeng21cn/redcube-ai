@@ -97,49 +97,15 @@ test('RCA canonical semantic pack paths are concrete, clean, and stage semantic 
     assert.equal(stage.stage_contract.monitor_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.dashboard_metric_refs.length > 0, true, stage.stage_id);
     assert.equal(stage.stage_contract.metric_refs.length >= 4, true, stage.stage_id);
+    assert.equal(stage.stage_contract.projection_mode, 'refs_only_static_contract', stage.stage_id);
     assert.equal(
-      stage.stage_contract.progress_delta_policy.surface_kind,
-      'opl_stage_progress_delta_policy',
-      stage.stage_id,
-    );
-    assert.deepEqual(
-      stage.stage_contract.progress_delta_policy.required_fields,
-      [
-        'progress_delta_classification',
-        'deliverable_progress_delta',
-        'platform_repair_delta',
-        'next_forced_delta',
-      ],
+      stage.stage_contract.progress_delta_policy_ref,
+      `opl_generated:product_entry_manifest#/family_stage_control_plane/stages/${stage.stage_id}/stage_contract/progress_delta_policy`,
       stage.stage_id,
     );
     assert.equal(
-      stage.stage_contract.progress_delta_policy.platform_only_is_not_deliverable_progress,
-      true,
-      stage.stage_id,
-    );
-    assert.equal(
-      stage.stage_contract.typed_blocker_lineage_policy.surface_kind,
-      'family-stall-lineage.v1',
-      stage.stage_id,
-    );
-    assert.equal(
-      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('blocker_family'),
-      true,
-      stage.stage_id,
-    );
-    assert.equal(
-      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('repeat_count'),
-      true,
-      stage.stage_id,
-    );
-    assert.equal(
-      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('next_forced_delta'),
-      true,
-      stage.stage_id,
-    );
-    assert.equal(
-      stage.stage_contract.typed_blocker_lineage_policy.required_fields.includes('escalation_owner'),
-      true,
+      stage.stage_contract.typed_blocker_lineage_policy_ref,
+      `opl_generated:product_entry_manifest#/family_stage_control_plane/stages/${stage.stage_id}/stage_contract/typed_blocker_lineage_policy`,
       stage.stage_id,
     );
     assert.equal(

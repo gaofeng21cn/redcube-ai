@@ -4,6 +4,10 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  buildStandardDomainAgentSkeleton,
+  buildVisualPackCompilerHandoffProjection,
+} from '../../packages/redcube-domain-entry/dist/index.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(__dirname, '../..');
@@ -27,8 +31,42 @@ export function read(relativePath) {
   return fs.readFileSync(path.join(repoRoot, relativePath), 'utf8');
 }
 
+function isRefProjection(value) {
+  return Boolean(value && typeof value === 'object' && value.body_copy_in_adoption === false);
+}
+
+function hydrateAdoptionContract(payload) {
+  if (!payload || typeof payload !== 'object') return payload;
+  return {
+    ...payload,
+    privatized_functional_module_audit: isRefProjection(payload.privatized_functional_module_audit)
+      ? JSON.parse(read('contracts/functional_privatization_audit.json'))
+      : payload.privatized_functional_module_audit,
+    functional_privatization_audit: isRefProjection(payload.functional_privatization_audit)
+      ? JSON.parse(read('contracts/functional_privatization_audit.json'))
+      : payload.functional_privatization_audit,
+    physical_source_morphology_policy: isRefProjection(payload.physical_source_morphology_policy)
+      ? JSON.parse(read('contracts/physical_source_morphology_policy.json'))
+      : payload.physical_source_morphology_policy,
+    standard_domain_agent_skeleton: isRefProjection(payload.standard_domain_agent_skeleton)
+      ? buildStandardDomainAgentSkeleton({
+        workspaceRoot: '<workspace_root>',
+        runtime: {
+          runtime_owner: 'codex_cli',
+          runtime_state_root: '<runtime_state_root>',
+          session_continuity_root: '<session_continuity_root>',
+        },
+        productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
+      })
+      : payload.standard_domain_agent_skeleton,
+    visual_pack_compiler_handoff: isRefProjection(payload.visual_pack_compiler_handoff)
+      ? buildVisualPackCompilerHandoffProjection()
+      : payload.visual_pack_compiler_handoff,
+  };
+}
+
 export function contract() {
-  return JSON.parse(read(CONTRACT_PATH));
+  return hydrateAdoptionContract(JSON.parse(read(CONTRACT_PATH)));
 }
 
 export function currentProgram() {

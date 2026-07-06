@@ -1,6 +1,14 @@
 // @ts-nocheck
 import { assert, contract, currentProgram, test } from './shared.ts';
 
+function resolveAdoptionProjection(surface, payload) {
+  if (surface?.body_copy_in_current_program === false && typeof surface?.canonical_contract_ref === 'string') {
+    const match = surface.canonical_contract_ref.match(/^contracts\/runtime-program\/opl-family-contract-adoption\.json#\/(.+)$/);
+    if (match) return payload[match[1]];
+  }
+  return surface;
+}
+
 test('RCA standard OPL primitive consumption is complete as a functional consumer projection', () => {
   const payload = contract();
   const current = currentProgram();
@@ -38,9 +46,9 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
 
   for (const surface of [
     payload.opl_generic_primitive_consumption,
-    current.product_release_metadata.opl_generic_primitive_consumption,
-    current.current_state.opl_generic_primitive_consumption,
-    current.current_state.active_baton.scope.opl_generic_primitive_consumption,
+    resolveAdoptionProjection(current.product_release_metadata.opl_generic_primitive_consumption, payload),
+    resolveAdoptionProjection(current.current_state.opl_generic_primitive_consumption, payload),
+    resolveAdoptionProjection(current.current_state.active_baton.scope.opl_generic_primitive_consumption, payload),
   ]) {
     assert.equal(surface.contract_ref, 'opl.standard_domain_agent_scaffold_and_generic_primitives.v1');
     assert.equal(surface.owner, 'opl');
@@ -124,9 +132,9 @@ test('RCA consumes OPL stability read-model surfaces as refs-only projections', 
 
   for (const surface of [
     payload.opl_stability_read_model_consumption,
-    current.product_release_metadata.opl_stability_read_model_consumption,
-    current.current_state.opl_stability_read_model_consumption,
-    current.current_state.active_baton.scope.opl_stability_read_model_consumption,
+    resolveAdoptionProjection(current.product_release_metadata.opl_stability_read_model_consumption, payload),
+    resolveAdoptionProjection(current.current_state.opl_stability_read_model_consumption, payload),
+    resolveAdoptionProjection(current.current_state.active_baton.scope.opl_stability_read_model_consumption, payload),
   ]) {
     assert.equal(surface.contract_ref, 'opl.family_operator_stability_read_model.v1');
     assert.equal(surface.owner, 'opl');

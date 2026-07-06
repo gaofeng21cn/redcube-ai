@@ -370,6 +370,7 @@ export {
 
 export {
   buildRedCubeFamilyStageControlPlane,
+  buildRedCubeFamilyStageControlPlaneContract,
 } from './actions/family-stage-control-plane.js';
 
 export {

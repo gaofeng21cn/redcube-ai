@@ -7,6 +7,17 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
 }
 
+function canonicalAuditSurface(surface) {
+  if (
+    surface?.body_copy_in_adoption === false
+    || surface?.body_copy_in_current_program === false
+    || surface?.canonical_contract_ref === 'contracts/functional_privatization_audit.json#/'
+  ) {
+    return readJson('contracts/functional_privatization_audit.json');
+  }
+  return surface;
+}
+
 function modulesById(surface) {
   return Object.fromEntries(surface.modules.map((entry) => [entry.module_id, entry]));
 }
@@ -18,11 +29,12 @@ test('RCA privatized functional audit source shape is landed across runtime cont
   const surfaces = [
     root,
     current.product_release_metadata.privatized_functional_module_audit,
-    current.product_release_metadata.functional_privatization_audit.privatized_functional_module_audit,
+    current.product_release_metadata.functional_privatization_audit?.privatized_functional_module_audit
+      || current.product_release_metadata.functional_privatization_audit,
     current.current_state.privatized_functional_module_audit,
     current.current_state.active_baton.scope.privatized_functional_module_audit,
-    adoption.privatized_functional_module_audit,
-  ];
+    canonicalAuditSurface(adoption.privatized_functional_module_audit),
+  ].map(canonicalAuditSurface);
 
   for (const surface of surfaces) {
     const scan = surface.fresh_large_private_surface_scan;
@@ -41,7 +53,7 @@ test('RCA privatized functional audit source shape is landed across runtime cont
 
 test('RCA source-shape tail modules are refs-only or native-helper tails, not bridge residues', () => {
   const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
-  const byId = modulesById(adoption.privatized_functional_module_audit);
+  const byId = modulesById(canonicalAuditSurface(adoption.privatized_functional_module_audit));
 
   assert.equal(byId.workspace_source_intake.status, 'source_readiness_refs_adapter_landed');
   assert.equal(byId.memory_writeback_receipt_transport.status, 'memory_receipt_refs_adapter_landed');

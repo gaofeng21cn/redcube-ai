@@ -10,12 +10,11 @@ import {
   buildPrivatizedFunctionalModuleAuditProjection,
   buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
-  buildRedCubeFamilyStageControlPlane,
+  buildRedCubeFamilyStageControlPlaneContract,
   buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
 } from '../../packages/redcube-domain-entry/dist/index.js';
-import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from '../../scripts/run-test-group-lib.ts';
-export { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from '../../scripts/run-test-group-lib.ts';
+export const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = 'contracts/family-release/shared-owner-release.json';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(__dirname, '..', '..');
@@ -145,7 +144,7 @@ export function assertCleanAgentRepoPathRef(refEntry, expectedPrefix, label) {
 
 export function buildCanonicalPack() {
   const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
-  const stageControlPlane = buildRedCubeFamilyStageControlPlane({
+  const stageControlPlane = buildRedCubeFamilyStageControlPlaneContract({
     familyActionCatalog: actionCatalog,
   });
   const skeleton = buildStandardDomainAgentSkeleton({
