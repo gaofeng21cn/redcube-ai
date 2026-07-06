@@ -43,7 +43,7 @@ test('RCA executor contract exposes only canonical public backends and execution
   assert.equal(codex.execution_shape, 'structured_call');
   assert.equal(codex.execution_model.executor_backend, 'codex_cli');
   assert.equal(codex.execution_model.execution_shape, 'structured_call');
-  assert.notEqual(codex.execution_model.backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
+  assert.notEqual((codex.execution_model as Record<string, any>).backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
 
   const hermes = buildHermesAgentLoopExecutorDescriptor();
   const hermesExecutionModel = hermes.execution_model as Record<string, any>;
