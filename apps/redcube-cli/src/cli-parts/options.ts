@@ -1,23 +1,25 @@
+import { parseArgs as parseNodeArgs } from 'node:util';
+
 import type { CliOptionsMap } from './types.js';
 
 export function parseArgs(argv: string[]): CliOptionsMap {
   const options: CliOptionsMap = {};
+  const { tokens } = parseNodeArgs({
+    args: argv,
+    strict: false,
+    allowPositionals: true,
+    tokens: true,
+  });
 
-  // ponytail: node:util.parseArgs cannot preserve unknown "--key value" pairs without a longer option schema.
-  for (let i = 0; i < argv.length; i += 1) {
-    const token = argv[i];
-    if (!token.startsWith('--')) continue;
+  for (const token of tokens || []) {
+    if (token.kind !== 'option' || !token.rawName.startsWith('--')) continue;
 
-    const key = token.slice(2);
-    const next = argv[i + 1];
+    const key = token.name;
+    const next = argv[token.index + 1];
 
-    if (!next || next.startsWith('--')) {
-      options[toCamel(key)] = true;
-      continue;
-    }
-
-    options[toCamel(key)] = next;
-    i += 1;
+    options[toCamel(key)] = token.inlineValue
+      ? token.value
+      : (!next || next.startsWith('--') ? true : next);
   }
 
   return options;

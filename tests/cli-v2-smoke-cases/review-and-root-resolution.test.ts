@@ -19,9 +19,28 @@ import {
   startMockCodexCli,
   withEnv,
 } from '../helpers/mock-codex-cli.ts';
+import { parseArgs } from '../../apps/redcube-cli/dist/cli-parts/options.js';
 
 const execFileAsync = promisify(execFile);
 const domainEntryResolve = createRequire(path.resolve('packages/redcube-domain-entry/package.json'));
+
+test('CLI parser uses node util tokens while preserving unknown long option values', () => {
+  assert.deepEqual(
+    parseArgs([
+      '--workspace-root', '/tmp/ws',
+      '--json-summary',
+      '--native-sample-slide-count=3',
+      '--user-intent', 'tight deck',
+      '-x', 'ignored',
+    ]),
+    {
+      workspaceRoot: '/tmp/ws',
+      jsonSummary: true,
+      nativeSampleSlideCount: '3',
+      userIntent: 'tight deck',
+    },
+  );
+});
 
 function copyPackageIntoInstall(sourceDir, targetDir) {
   cpSync(sourceDir, targetDir, {
