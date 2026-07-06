@@ -244,7 +244,7 @@ export interface XhsVisualDirectionArtifact {
   visual_direction: XhsVisualDirection;
 }
 
-export interface XhsRenderContract {
+interface XhsRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<XhsLayoutFamily | 'default', XhsRecipeId>>;

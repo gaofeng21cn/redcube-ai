@@ -1,6 +1,5 @@
 import type {
   OverlayCatalogEntry,
-  OverlayRegistry,
 } from '@redcube/overlay-core';
 
 export interface DefaultOverlayModuleSpec {
@@ -18,5 +17,4 @@ export interface DefaultOverlayCatalogSurface extends OverlayCatalogSurface {}
 
 export type {
   OverlayCatalogEntry,
-  OverlayRegistry,
 };
