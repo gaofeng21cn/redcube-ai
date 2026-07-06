@@ -7,28 +7,6 @@
   "exports": {
     ".": "./dist/index.js"
   },
-  "redcube": {
-    "defaultRuntimeFamilyModules": [
-      {
-        "overlayId": "ppt_deck",
-        "deliverableKind": "ppt_deck",
-        "module": "@redcube/runtime-family-ppt",
-        "exportName": "runPptDeckRoute"
-      },
-      {
-        "overlayId": "xiaohongshu",
-        "deliverableKind": "xiaohongshu_note",
-        "module": "@redcube/runtime-family-xiaohongshu",
-        "exportName": "runXiaohongshuRoute"
-      },
-      {
-        "overlayId": "poster_onepager",
-        "deliverableKind": "poster_onepager",
-        "module": "@redcube/runtime-family-poster-onepager",
-        "exportName": "runPosterOnepagerRoute"
-      }
-    ]
-  },
   "dependencies": {
     "@redcube/runtime-family-ppt": "0.1.0",
     "@redcube/runtime-family-xiaohongshu": "0.1.0",

@@ -3,6 +3,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
+import {
+  listDefaultOverlayModules,
+} from './package-surfaces.ts';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -44,7 +47,7 @@ test('overlay registry package exports default registry entrypoint', () => {
   assert.equal(registryIndex.includes("from '@redcube/overlay-xiaohongshu'"), false);
   assert.equal(registryPackage.name, '@redcube/overlay-registry');
   assert.deepEqual(
-    registryPackage.redcube?.defaultOverlayModules,
+    listDefaultOverlayModules(),
     [
       {
         overlayId: 'ppt_deck',

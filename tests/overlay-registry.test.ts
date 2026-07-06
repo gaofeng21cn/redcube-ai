@@ -8,6 +8,8 @@ import {
   createOverlayRegistry,
   buildXiaohongshuTopic,
   getDefaultOverlayCatalog,
+  listDefaultOverlayModules,
+  listDefaultRuntimeFamilyModules,
   pptDeckOverlay,
   xiaohongshuOverlay,
 } from './package-surfaces.ts';
@@ -424,13 +426,13 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   );
 });
 
-test('registry package manifests stay aligned with literal loader dependencies', () => {
+test('registry source manifests stay aligned with direct package dependencies and literal loaders', () => {
   const overlayPackage = readJson('packages/redcube-overlay-registry/package.json');
   const overlaySource = readText('packages/redcube-overlay-registry/src/index.ts');
   const runtimePackage = readJson('packages/redcube-runtime-family-registry/package.json');
   const runtimeSource = readText('packages/redcube-runtime-family-registry/src/index.ts');
 
-  for (const { module } of overlayPackage.redcube.defaultOverlayModules) {
+  for (const { module } of listDefaultOverlayModules()) {
     assert.equal(
       overlayPackage.dependencies[module],
       '0.1.0',
@@ -438,21 +440,21 @@ test('registry package manifests stay aligned with literal loader dependencies',
     );
     assert.match(
       overlaySource,
-      new RegExp(`['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]:\\s*async`),
+      new RegExp(`module:\\s*['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"][\\s\\S]*?load:\\s*async`),
       `${module} must have a literal overlay loader`,
     );
   }
 
-  for (const { module } of runtimePackage.redcube.defaultRuntimeFamilyModules) {
+  for (const { module_name } of listDefaultRuntimeFamilyModules()) {
     assert.equal(
-      runtimePackage.dependencies[module],
+      runtimePackage.dependencies[module_name],
       '0.1.0',
-      `${module} must be a direct runtime-family-registry dependency`,
+      `${module_name} must be a direct runtime-family-registry dependency`,
     );
     assert.match(
       runtimeSource,
-      new RegExp(`['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]:\\s*async`),
-      `${module} must have a literal runtime-family loader`,
+      new RegExp(`module:\\s*['"]${module_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"][\\s\\S]*?load:\\s*async`),
+      `${module_name} must have a literal runtime-family loader`,
     );
   }
 });

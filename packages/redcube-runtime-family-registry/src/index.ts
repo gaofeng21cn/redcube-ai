@@ -1,5 +1,3 @@
-import packageJsonData from '../package.json' with { type: 'json' };
-
 import type {
   DefaultRuntimeFamilyCatalogSurface,
   LoadedRuntimeFamilyRunner,
@@ -8,31 +6,46 @@ import type {
 } from './types.js';
 
 interface RuntimeFamilyModuleManifestSpec {
-  overlayId?: unknown;
-  deliverableKind?: unknown;
-  module?: unknown;
-  exportName?: unknown;
+  overlayId: string;
+  deliverableKind: string;
+  module: string;
+  exportName: string;
 }
 
-interface RuntimeFamilyRegistryPackageJson {
-  redcube?: {
-    defaultRuntimeFamilyModules?: RuntimeFamilyModuleManifestSpec[];
-  };
+interface RuntimeFamilyRegistryEntry extends RuntimeFamilyModuleManifestSpec {
+  load: () => Promise<Record<string, unknown>>;
 }
 
-const packageJson = packageJsonData as RuntimeFamilyRegistryPackageJson;
-const defaultRuntimeFamilyModuleLoaders: Record<string, () => Promise<Record<string, unknown>>> = {
-  '@redcube/runtime-family-ppt': async () => await import('@redcube/runtime-family-ppt') as Record<string, unknown>,
-  '@redcube/runtime-family-xiaohongshu': async () => await import('@redcube/runtime-family-xiaohongshu') as Record<string, unknown>,
-  '@redcube/runtime-family-poster-onepager': async () => await import('@redcube/runtime-family-poster-onepager') as Record<string, unknown>,
-};
+const defaultRuntimeFamilyModules: RuntimeFamilyRegistryEntry[] = [
+  {
+    overlayId: 'ppt_deck',
+    deliverableKind: 'ppt_deck',
+    module: '@redcube/runtime-family-ppt',
+    exportName: 'runPptDeckRoute',
+    load: async () => await import('@redcube/runtime-family-ppt') as Record<string, unknown>,
+  },
+  {
+    overlayId: 'xiaohongshu',
+    deliverableKind: 'xiaohongshu_note',
+    module: '@redcube/runtime-family-xiaohongshu',
+    exportName: 'runXiaohongshuRoute',
+    load: async () => await import('@redcube/runtime-family-xiaohongshu') as Record<string, unknown>,
+  },
+  {
+    overlayId: 'poster_onepager',
+    deliverableKind: 'poster_onepager',
+    module: '@redcube/runtime-family-poster-onepager',
+    exportName: 'runPosterOnepagerRoute',
+    load: async () => await import('@redcube/runtime-family-poster-onepager') as Record<string, unknown>,
+  },
+];
 
 function safeText(value: unknown, fallback = ''): string {
   const text = String(value || '').trim();
   return text || fallback;
 }
 
-function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec = {}): RuntimeFamilyModuleSpec {
+function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec): RuntimeFamilyModuleSpec {
   return {
     overlay_id: safeText(spec.overlayId),
     deliverable_kind: safeText(spec.deliverableKind),
@@ -42,8 +55,7 @@ function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec = {}): RuntimeF
 }
 
 export function listDefaultRuntimeFamilyModules(): RuntimeFamilyModuleSpec[] {
-  const specs = packageJson.redcube?.defaultRuntimeFamilyModules || [];
-  return specs.map((spec) => buildCatalogEntry(spec));
+  return defaultRuntimeFamilyModules.map((spec) => buildCatalogEntry(spec));
 }
 
 export function getDefaultRuntimeFamilyCatalog(): DefaultRuntimeFamilyCatalogSurface {
@@ -74,11 +86,11 @@ export async function loadRuntimeFamilyRunner(contract: RuntimeFamilyContract): 
   const moduleRef = resolveRuntimeFamilyModule(contract);
   let loaded: Record<string, unknown>;
   try {
-    const loader = defaultRuntimeFamilyModuleLoaders[moduleRef.module_name];
-    if (!loader) {
-      throw new Error(`Runtime family module is not declared as a direct registry dependency: ${moduleRef.module_name}`);
+    const registryEntry = defaultRuntimeFamilyModules.find((entry) => entry.module === moduleRef.module_name);
+    if (!registryEntry) {
+      throw new Error(`Runtime family module is not declared in the default registry: ${moduleRef.module_name}`);
     }
-    loaded = await loader();
+    loaded = await registryEntry.load();
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`Failed to load runtime family package ${moduleRef.module_name}: ${detail}`, { cause: error });

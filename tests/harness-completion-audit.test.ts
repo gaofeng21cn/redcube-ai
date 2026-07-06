@@ -3,6 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
+import {
+  listDefaultOverlayModules,
+  listDefaultRuntimeFamilyModules,
+} from './package-surfaces.ts';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -35,7 +39,6 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   const runtimeIndex = readImplementation('packages/redcube-runtime/src/index.ts');
   const runtimePackageJson = JSON.parse(read('packages/redcube-runtime/package.json'));
   const executors = readImplementation('packages/redcube-runtime/src/executors.ts');
-  const runtimeFamilyRegistryPackageJson = JSON.parse(read('packages/redcube-runtime-family-registry/package.json'));
 
   assert.equal(runtimeIndex.includes("@redcube/governance"), true);
   assert.equal(runtimeIndex.includes("@redcube/reference-os"), true);
@@ -55,7 +58,7 @@ test('harness audit: runtime/kernel no longer owns family render branches and co
   assert.equal(executors.includes('./ppt-deck-runtime.ts'), false);
   assert.equal(executors.includes('./xiaohongshu-runtime.ts'), false);
   assert.deepEqual(
-    runtimeFamilyRegistryPackageJson.redcube.defaultRuntimeFamilyModules.map((entry) => entry.overlayId),
+    listDefaultRuntimeFamilyModules().map((entry) => entry.overlay_id),
     ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
 });
@@ -137,12 +140,11 @@ test('harness audit: product/domain surface is stable across success and failure
 });
 
 test('harness audit: extension proof shows onboarding is registry-driven instead of trunk hardcoded', () => {
-  const overlayRegistryPackage = JSON.parse(read('packages/redcube-overlay-registry/package.json'));
   const createDeliverable = read('packages/redcube-domain-entry/src/actions/create-deliverable.ts');
   const auditDeliverable = read('packages/redcube-domain-entry/src/actions/audit-deliverable.ts');
 
   assert.deepEqual(
-    overlayRegistryPackage.redcube.defaultOverlayModules.map((item) => item.overlayId),
+    listDefaultOverlayModules().map((item) => item.overlayId),
     ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.deepEqual(

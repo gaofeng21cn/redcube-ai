@@ -1,5 +1,4 @@
 import { createOverlayRegistry } from '@redcube/overlay-core';
-import packageJsonData from '../package.json' with { type: 'json' };
 
 import type {
   DefaultOverlayCatalogSurface,
@@ -10,18 +9,30 @@ import type {
   OverlayRegistry,
 } from '@redcube/overlay-core';
 
-interface OverlayRegistryPackageJson {
-  redcube?: {
-    defaultOverlayModules?: DefaultOverlayModuleSpec[];
-  };
+interface DefaultOverlayRegistryEntry extends DefaultOverlayModuleSpec {
+  load: () => Promise<Record<string, unknown>>;
 }
 
-const packageJson = packageJsonData as OverlayRegistryPackageJson;
-const defaultOverlayModuleLoaders: Record<string, () => Promise<Record<string, unknown>>> = {
-  '@redcube/overlay-ppt': async () => await import('@redcube/overlay-ppt') as Record<string, unknown>,
-  '@redcube/overlay-xiaohongshu': async () => await import('@redcube/overlay-xiaohongshu') as Record<string, unknown>,
-  '@redcube/overlay-poster-onepager': async () => await import('@redcube/overlay-poster-onepager') as Record<string, unknown>,
-};
+const defaultOverlayModules: DefaultOverlayRegistryEntry[] = [
+  {
+    overlayId: 'ppt_deck',
+    module: '@redcube/overlay-ppt',
+    exportName: 'pptDeckOverlay',
+    load: async () => await import('@redcube/overlay-ppt') as Record<string, unknown>,
+  },
+  {
+    overlayId: 'xiaohongshu',
+    module: '@redcube/overlay-xiaohongshu',
+    exportName: 'xiaohongshuOverlay',
+    load: async () => await import('@redcube/overlay-xiaohongshu') as Record<string, unknown>,
+  },
+  {
+    overlayId: 'poster_onepager',
+    module: '@redcube/overlay-poster-onepager',
+    exportName: 'posterOnepagerOverlay',
+    load: async () => await import('@redcube/overlay-poster-onepager') as Record<string, unknown>,
+  },
+];
 
 function isOverlayDefinition(value: unknown): value is OverlayDefinition {
   return Boolean(value)
@@ -30,13 +41,8 @@ function isOverlayDefinition(value: unknown): value is OverlayDefinition {
 }
 
 async function loadDefaultOverlayEntries(): Promise<Array<readonly [string, OverlayDefinition]>> {
-  const specs = packageJson.redcube?.defaultOverlayModules || [];
-  return Promise.all(specs.map(async ({ overlayId, module, exportName }) => {
-    const loader = defaultOverlayModuleLoaders[module];
-    if (!loader) {
-      throw new Error(`Overlay module is not declared as a direct registry dependency: ${module}`);
-    }
-    const namespace = await loader();
+  return Promise.all(defaultOverlayModules.map(async ({ overlayId, module, exportName, load }) => {
+    const namespace = await load();
     const overlay = namespace?.[exportName];
     if (!isOverlayDefinition(overlay)) {
       throw new Error(`Overlay export not found: ${module}#${exportName}`);
@@ -45,6 +51,14 @@ async function loadDefaultOverlayEntries(): Promise<Array<readonly [string, Over
       throw new Error(`Overlay manifest mismatch: expected ${overlayId}, got ${overlay.overlayId}`);
     }
     return [overlayId, overlay] as const;
+  }));
+}
+
+export function listDefaultOverlayModules(): DefaultOverlayModuleSpec[] {
+  return defaultOverlayModules.map(({ overlayId, module, exportName }) => ({
+    overlayId,
+    module,
+    exportName,
   }));
 }
 
