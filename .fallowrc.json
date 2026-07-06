@@ -49,6 +49,18 @@
         "canRunXiaohongshu",
         "runXiaohongshuRoute"
       ]
+    },
+    {
+      "file": "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
+      "exports": [
+        "routeSequenceStageIds"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/export.ts",
+      "exports": [
+        "BuildExportArtifactInput"
+      ]
     }
   ]
 }
