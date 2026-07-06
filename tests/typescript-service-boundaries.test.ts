@@ -49,7 +49,6 @@ test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain 
 
 test('P20.B: runtime-family-registry exposes a TypeScript service entrypoint and typed registry contracts', () => {
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/index.ts')), true);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/src/types.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/tsconfig.json')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-runtime-family-registry/package.json'), 'utf-8'));

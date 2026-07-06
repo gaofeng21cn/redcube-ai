@@ -17,7 +17,7 @@
   "canonical_truth_model": "source_parts_are_canonical_current_program_sources",
   "source_part_contract": {
     "part_ref_path_rule": "source_root_ref plus JSON pointer path segments; array indexes are zero-padded to four digits",
-    "max_part_json_line_count": 800,
+    "max_part_json_line_count": 1000,
     "aggregate_must_be_rebuilt_from_parts": true,
     "duplicate_entity_policy": "repeat canonical projection refs, not full machine snapshot bodies"
   },

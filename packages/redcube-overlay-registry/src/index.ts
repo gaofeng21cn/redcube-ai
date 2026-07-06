@@ -1,13 +1,23 @@
 import { createOverlayRegistry } from '@redcube/overlay-core';
 
 import type {
-  DefaultOverlayCatalogSurface,
-  DefaultOverlayModuleSpec,
-} from './types.js';
-import type {
+  OverlayCatalogEntry,
   OverlayDefinition,
   OverlayRegistry,
 } from '@redcube/overlay-core';
+
+export interface DefaultOverlayModuleSpec {
+  overlayId: string;
+  module: string;
+  exportName: string;
+}
+
+export interface OverlayCatalogSurface {
+  surface_kind: 'overlay_catalog';
+  overlays: OverlayCatalogEntry[];
+}
+
+export interface DefaultOverlayCatalogSurface extends OverlayCatalogSurface {}
 
 interface DefaultOverlayRegistryEntry extends DefaultOverlayModuleSpec {
   load: () => Promise<Record<string, unknown>>;
@@ -78,6 +88,5 @@ export function getDefaultOverlayCatalog(): DefaultOverlayCatalogSurface {
 }
 
 export type {
-  DefaultOverlayCatalogSurface,
-  DefaultOverlayModuleSpec,
-} from './types.js';
+  OverlayCatalogEntry,
+};

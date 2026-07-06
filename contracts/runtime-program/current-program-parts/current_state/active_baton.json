@@ -1,0 +1,898 @@
+{
+  "id": "product_entry_session_continuity",
+  "status": "closeout_completed",
+  "review_status": "verified",
+  "program_mode": "repo_verified_product_entry_service_surface",
+  "scope": {
+    "hardening_axis": "product_entry_service_surface_and_opl_hosted_handoff",
+    "implementation_in_scope": true,
+    "runtime_substrate_owner": "configured_family_runtime_provider",
+    "default_runtime_owner": "configured_family_runtime_provider",
+    "hosted_runtime_owner_policy": "OPL provider owns stage attempt runtime and attempt ledger; RCA returns OPL stage execution plans and authority refs",
+    "deployment_host": "codex_local_operator_host",
+    "consumer_families": [
+      "ppt_deck",
+      "xiaohongshu",
+      "poster_onepager"
+    ],
+    "entry_surfaces": [
+      "invokeProductEntry",
+      "invokeOplHostedProductEntry",
+      "getProductEntrySession",
+      "redcube product invoke",
+      "redcube domain-handler export",
+      "opl_generated:product_session",
+      "invoke_product_entry",
+      "redcube domain-handler dispatch",
+      "get_product_entry_session"
+    ],
+    "required_downstream_domain_surfaces": [
+      "invokeDomainEntry",
+      "buildOplStageExecutionPlan",
+      "runDeliverableRoute"
+    ],
+    "required_audit_surfaces": [
+      "auditDeliverable",
+      "runtimeWatch",
+      "getReviewState",
+      "getPublicationProjection",
+      "privatized_functional_module_audit"
+    ],
+    "required_identity_fields": [
+      "program_id",
+      "topic_id",
+      "deliverable_id",
+      "run_id"
+    ],
+    "required_session_continuity_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "excluded_scope": [
+      "managed web runtime control plane",
+      "controller expansion",
+      "academic poster advancement",
+      "chat UI",
+      "new family onboarding"
+    ],
+    "route_equivalence": {
+      "status": "repo_tracked_manifest_contract",
+      "routes": [
+        "product_status",
+        "product_invoke",
+        "session_continuation",
+        "opl_hosted_stage_runtime"
+      ],
+      "shared_truth_surfaces": [
+        "domain_entry_surface",
+        "session_continuity",
+        "progress_projection",
+        "artifact_inventory",
+        "runtime_loop_closure",
+        "review_state",
+        "publication_projection"
+      ],
+      "public_skill_policy": {
+        "canonical_skill_id": "redcube-ai",
+        "second_public_skill_allowed": false
+      },
+      "runtime_semantics_policy": {
+        "second_runtime_semantics_allowed": false,
+        "downstream_entry_surface_kind": "domain_entry"
+      },
+      "default_runtime_owner": "configured_family_runtime_provider",
+      "default_result_surface": "opl_stage_execution_plan",
+      "downstream_stage_attempt_owner": "one-person-lab"
+    },
+    "deliverable_facade": {
+      "status": "repo_tracked_manifest_contract",
+      "covered_families": [
+        "ppt_deck",
+        "xiaohongshu"
+      ],
+      "truth_surfaces": [
+        "createDeliverable",
+        "buildOplStageExecutionPlan",
+        "runDeliverableRoute",
+        "auditDeliverable",
+        "runtimeWatch",
+        "getReviewState",
+        "getPublicationProjection"
+      ],
+      "core_generation_logic_changed": false,
+      "default_truth_surface": "buildOplStageExecutionPlan",
+      "repo_local_stage_runner_active_caller": false,
+      "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
+    },
+    "opl_family_lifecycle_adapter": {
+      "status": "repo_tracked_projection_contract",
+      "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
+      "source_surfaces": [
+        "session-continuity run envelopes",
+        "product-entry sessions",
+        "review/publication projections",
+        "artifact inventory",
+        "runtime loop closure"
+      ],
+      "exposes": [
+        "family persistence",
+        "lifecycle projection",
+        "owner-route discovery",
+        "adoption surface"
+      ],
+      "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
+      "domain_truth_owner": "redcube_ai",
+      "opl_role": "projection_consumer_only",
+      "state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+      "state_index_kernel_adoption": {
+        "owner": "one-person-lab",
+        "consumer": "redcube_ai",
+        "sqlite_enabled_now": false,
+        "index_backend": "sqlite_sidecar_index",
+        "refs_only": true,
+        "rebuildable": true,
+        "sidecar_is_domain_runtime": false,
+        "sqlite_can_be_truth_source": false,
+        "sqlite_can_store_visual_artifact_body": false,
+        "sqlite_can_store_review_export_judgment": false
+      }
+    },
+    "opl_family_stage_control_projection": {
+      "status": "repo_tracked_projection_contract",
+      "projection_id": "rca.opl.family.stage-control.projection.v1",
+      "adapter_model": "descriptor_and_stage_execution_plan_provider",
+      "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
+      "covered_families": [
+        "ppt_deck",
+        "xiaohongshu",
+        "poster_onepager"
+      ],
+      "family_stage_kinds": [
+        "source_intake",
+        "communication_strategy",
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "domain_truth_owner": "redcube_ai",
+      "opl_role": "stage_attempt_scheduler_and_projection_consumer",
+      "default_ppt_route_changed": false,
+      "repo_local_stage_runner_retired": true,
+      "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
+    },
+    "domain_memory_descriptor_locator": {
+      "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
+      "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
+      "locator_id": "rca.visual_pattern_memory.locator.v1",
+      "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+      "policy_ref": "human_doc:visual_pattern_memory_policy",
+      "human_doc_ref": "human_doc:domain_memory_descriptor_locator",
+      "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
+      "seed_fixture_locator_id": "rca.visual_pattern_memory.seed_fixture_locator.v1",
+      "writeback_receipt_locator_id": "rca.visual_pattern_memory.writeback_receipt_locator.v1",
+      "migration_state": "descriptor_proof_contract_landed_runtime_writeback_pending",
+      "memory_family": "visual_pattern_memory",
+      "memory_content_owner": "redcube_ai",
+      "route_truth_owner": "redcube_ai",
+      "review_export_verdict_owner": "redcube_ai",
+      "artifact_authority_owner": "redcube_ai",
+      "opl_role": "locator_ref_receipt_consumer_only",
+      "repo_tracks_memory_entries": false,
+      "repo_tracks_receipt_instances": false,
+      "repo_tracks_visual_or_export_artifacts": false,
+      "visual_truth_changed": false,
+      "route_truth_changed": false,
+      "writeback_proposal_generator_id": "rca.visual_pattern_memory.writeback_proposal_generator.v1",
+      "accept_reject_command_id": "rca.visual_pattern_memory.accept_reject.v1",
+      "operator_receipt_projection_id": "rca.visual_pattern_memory.operator_receipt_projection.v1",
+      "repo_tracks_proposal_instances": false,
+      "operator_receipt_projection_ready": true,
+      "opl_can_accept_or_reject_memory_writeback": false,
+      "descriptor_proof_contract_state": "landed",
+      "runtime_writeback_state": "pending",
+      "controlled_apply_proof_state": "controlled_apply_proof_landed_memory_body_external",
+      "controlled_memory_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof"
+    },
+    "controlled_visual_stage_attempt": {
+      "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
+      "fixture_id": "rca.controlled_visual_stage_attempt.fixture.v1",
+      "provider_controlled_proof_id": "rca.opl_hosted.controlled_visual_stage_attempt_memory_proof.v1",
+      "controlled_memory_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+      "apply_proof_state": "controlled_apply_proof_landed_memory_body_external",
+      "covered_family": "ppt_deck",
+      "stage_kinds": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "consumed_memory_ref_contract_id": "rca.visual_pattern_memory.consumed_memory_refs.v1",
+      "writeback_receipt_proof_contract_id": "rca.visual_pattern_memory.writeback_receipt_proof.v1",
+      "direct_and_opl_share_descriptor_refs": true,
+      "direct_and_opl_share_consumed_memory_refs": true,
+      "direct_and_opl_share_domain_action_adapter_refs": true,
+      "direct_and_opl_share_quality_refs": true,
+      "downstream_truth_owner": "redcube_ai",
+      "opl_writes_visual_truth": false,
+      "opl_writes_review_export_verdict": false,
+      "opl_writes_artifact_blob": false,
+      "opl_writes_memory_content": false,
+      "opl_writes_receipt_instance": false,
+      "opl_consumes_memory_refs": true,
+      "opl_consumes_writeback_receipt_refs": true,
+      "opl_holds_memory_content": false,
+      "opl_holds_receipt_instance": false,
+      "repo_tracks_memory_entries": false,
+      "repo_tracks_proposal_instances": false,
+      "repo_tracks_receipt_instances": false,
+      "repo_tracks_visual_or_export_artifacts": false,
+      "proof_contract_state": "landed",
+      "runtime_writeback_state": "pending"
+    },
+    "controlled_memory_apply_proof": {
+      "status": "controlled_apply_proof_landed_memory_body_external",
+      "proof_id": "rca.visual_pattern_memory.controlled_apply_proof.v1",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+      "consumes_visual_pattern_memory_refs": true,
+      "projects_writeback_proposal_ref": true,
+      "projects_accept_reject_receipt_cases": [
+        "accepted",
+        "rejected"
+      ],
+      "writes_visual_truth": false,
+      "writes_review_verdict": false,
+      "writes_export_verdict": false,
+      "writes_artifact_blob": false,
+      "writes_memory_content_body_to_repo": false,
+      "writes_receipt_instance_to_repo": false,
+      "repo_tracks_memory_content_body": false,
+      "repo_tracks_receipt_instances": false,
+      "repo_tracks_visual_truth": false,
+      "repo_tracks_review_export_verdict": false,
+      "repo_tracks_artifact_blobs": false,
+      "runtime_receipt_instances_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
+      "projects_runtime_receipt_statuses": [
+        "accepted",
+        "rejected"
+      ]
+    },
+    "standard_domain_agent_skeleton_repo_source_layout": {
+      "status": "audit_surface_landed",
+      "mapping_model": "physical_skeleton_repo_source_layout_with_manifest_projection",
+      "audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+      "expected_roots": [
+        "agent",
+        "contracts",
+        "runtime",
+        "docs"
+      ],
+      "missing_roots": [],
+      "forbidden_repo_writes": [
+        "visual_truth",
+        "review_export_verdict",
+        "canonical_artifact_blob",
+        "memory_content_body",
+        "receipt_instance"
+      ]
+    },
+    "runtime_residue_retirement": {
+      "status": "active_path_retired",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/runtime_residue_retirement",
+      "retired_default_surfaces": [
+        "hermes_first_default_runtime",
+        "retired_gateway_protocol_boundary_public_entry",
+        "repo_local_manager_default"
+      ],
+      "allowed_remaining_roles": [
+        "explicit_proof_backend",
+        "provenance",
+        "history"
+      ]
+    },
+    "domain_owner_receipt_contract": {
+      "status": "contract_landed_runtime_no_regression_evidence_ref_available",
+      "contract_id": "rca.domain_owner_receipt.v1",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
+      "allowed_return_shapes": [
+        "domain_receipt",
+        "typed_blocker",
+        "no_regression_evidence"
+      ],
+      "required_refs": [
+        "attempt_ref",
+        "artifact_locator_ref",
+        "memory_receipt_ref",
+        "lifecycle_receipt_ref",
+        "review_export_ref",
+        "forbidden_write_proof_ref"
+      ],
+      "owner": "redcube_ai",
+      "no_regression_evidence": {
+        "action": "emit_no_regression_evidence",
+        "dispatch_surface": "redcube domain-handler dispatch",
+        "surface_kind": "no_regression_evidence",
+        "evidence_ref_model": "rca-no-regression:visual-stage:<evidence-id>",
+        "runtime_locator_ref_model": "workspace-runtime-ref:no-regression-evidence:<evidence-id>",
+        "workspace_path_model": "<workspace-root>/.redcube/runtime/evidence/no-regression/<evidence-id>.json",
+        "long_visual_soak_claimed": false,
+        "repo_tracks_runtime_evidence_instance": false,
+        "writes_visual_or_export_artifact": false
+      },
+      "runtime_receipt_actions": {
+        "domain_owner_receipt_action": "emit_domain_owner_receipt",
+        "domain_owner_receipt_surface_kind": "domain_owner_receipt",
+        "domain_owner_receipt_workspace_path_model": "<workspace-root>/.redcube/runtime/receipts/domain-owner/<receipt-id>.json",
+        "visual_memory_writeback_action": "apply_visual_memory_writeback",
+        "visual_memory_writeback_surface_kind": "visual_pattern_memory_writeback_receipt",
+        "visual_memory_receipt_workspace_path_model": "<workspace-root>/.redcube/runtime/receipts/memory/visual-pattern/<receipt-id>.json",
+        "workspace_lifecycle_action": "apply_visual_workspace_lifecycle",
+        "workspace_lifecycle_surface_kind": "visual_workspace_lifecycle_receipt",
+        "workspace_lifecycle_receipt_path_model": "<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json",
+        "typed_blocker_on_missing_required_refs": true,
+        "visual_ready_claimed": false,
+        "repo_tracks_live_receipt_instances": false
+      },
+      "opl_can_store_receipt_refs": true,
+      "opl_can_store_visual_truth": false,
+      "opl_can_store_review_export_verdict": false,
+      "opl_can_store_canonical_artifact_blob": false
+    },
+    "lifecycle_guarded_apply_proof": {
+      "status": "guarded_apply_proof_landed_domain_artifact_mutation_requires_receipt",
+      "proof_id": "rca.lifecycle_guarded_apply_proof.v1",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
+      "operations": [
+        "cleanup",
+        "restore",
+        "retention"
+      ],
+      "domain_artifact_mutation_requires_domain_receipt": true,
+      "runtime_receipt_action": "apply_visual_workspace_lifecycle",
+      "workspace_receipt_path_model": "<workspace-root>/.redcube/runtime/receipts/lifecycle/<operation>/<receipt-id>.json",
+      "opl_can_apply_domain_artifact_mutation": false,
+      "repo_tracks_lifecycle_receipt_instances": false,
+      "repo_tracks_visual_or_export_artifacts": false
+    },
+    "workspace_receipt_inventory_projection": {
+      "status": "refs_only_read_model_landed_runtime_instances_workspace_scoped",
+      "projection_id": "rca.workspace_receipt_inventory.v1",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+      "source_status_surface": "opl_generated:product_status#/workspace_receipt_inventory_projection",
+      "source_session_surface": "opl_generated:product_session#/workspace_receipt_inventory_projection",
+      "projection_model": "workspace_runtime_receipt_refs_only_read_model",
+      "receipt_root_model": "<workspace-root>/.redcube/runtime/receipts/",
+      "owner": "redcube_ai",
+      "consumer": "opl_app_operator",
+      "read_only": true,
+      "refs_only": true,
+      "declares_production_soak_complete": false,
+      "implements_opl_artifact_gallery": false,
+      "implements_opl_workbench": false,
+      "opl_can_write_receipt_instance": false,
+      "opl_can_write_rca_visual_truth": false,
+      "repo_tracks_live_receipt_instances": false
+    },
+    "visual_transition_spec": {
+      "status": "contract_landed_thin_evaluator_landed_runner_owned_by_opl",
+      "spec_id": "rca.visual_transition_spec.v1",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_spec",
+      "transition_model": "rca_owned_transition_table_oracle_fixture_refs_only",
+      "covered_family_stage_kinds": [
+        "source_intake",
+        "communication_strategy",
+        "visual_direction",
+        "artifact_creation",
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "oracle_fixture_id": "rca.visual_transition_oracle.fixture.v1",
+      "transition_count": 5,
+      "opl_can_execute_transition_spec": true,
+      "opl_can_declare_visual_ready": false,
+      "opl_can_declare_exportable": false,
+      "opl_can_mutate_artifacts": false,
+      "repo_tracks_runner_state": false,
+      "repo_tracks_visual_or_export_artifacts": false,
+      "evaluator_descriptor_id": "rca.visual_transition_evaluator.v1",
+      "evaluator_action": "evaluate_visual_transition",
+      "family_transition_spec_descriptor_ref": "/visual_transition_spec/family_transition_spec_descriptor",
+      "rca_can_evaluate_guard_refs": true,
+      "rca_implements_opl_generic_transition_runner": false,
+      "repo_tracks_evaluator_contract": true
+    },
+    "physical_skeleton_follow_through": {
+      "status": "low_risk_repo_source_follow_through_landed",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
+      "physical_roots": [
+        "agent",
+        "contracts",
+        "runtime",
+        "docs"
+      ],
+      "forbidden_moves": [
+        "workspace_runtime_artifacts",
+        "receipt_instances",
+        "memory_content_body",
+        "png_pptx_pdf_exports",
+        "review_export_verdicts"
+      ]
+    },
+    "review_helper_baseline_follow_through": {
+      "status": "summary_and_geometry_split_landed_baseline_removed",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
+      "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
+      "current_line_budget_baseline": null,
+      "current_helper_line_budget_state": "within_budget_after_summary_and_geometry_split",
+      "growth_guard": "default_1000_line_budget",
+      "split_plan_module_boundaries": [
+        "screenshot_capture_remaining",
+        "geometry_audit_landed",
+        "markdown_report_landed",
+        "summary_projection_landed"
+      ],
+      "landed_modules": [
+        "python/redcube_ai/native_helpers/ppt_deck/review_geometry.py",
+        "python/redcube_ai/native_helpers/ppt_deck/review_summary.py"
+      ],
+      "remaining_split_target": "screenshot_capture"
+    },
+    "opl_generic_primitive_consumption": {
+      "surface_kind": "rca_current_program_canonical_projection_ref",
+      "schema_version": 1,
+      "surface_id": "opl_generic_primitive_consumption",
+      "projection_mode": "canonical_ref_only_no_body_copy",
+      "canonical_contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/opl_generic_primitive_consumption",
+      "canonical_json_pointer": "/opl_generic_primitive_consumption",
+      "owner": "opl",
+      "consumer": "redcube_ai",
+      "status": "functional_consumer_follow_through_landed",
+      "body_copy_in_current_program": false,
+      "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
+      "rca_surface_role": "visual_domain_authority_pack_plus_thin_program_surface",
+      "completion_scope": "functional_consumer_follow_through_complete_not_live_soak",
+      "live_soak_claimed": false,
+      "not_claims": [
+        "domain_ready",
+        "production_ready",
+        "visual_ready",
+        "quality_or_export_verdict",
+        "owner_receipt",
+        "typed_blocker",
+        "artifact_authority"
+      ]
+    },
+    "opl_stability_read_model_consumption": {
+      "surface_kind": "rca_current_program_canonical_projection_ref",
+      "schema_version": 1,
+      "surface_id": "opl_stability_read_model_consumption",
+      "projection_mode": "canonical_ref_only_no_body_copy",
+      "canonical_contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/opl_stability_read_model_consumption",
+      "canonical_json_pointer": "/opl_stability_read_model_consumption",
+      "owner": "opl",
+      "consumer": "redcube_ai",
+      "status": "refs_only_consumer_projection_landed",
+      "body_copy_in_current_program": false,
+      "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
+      "observability_only": true,
+      "completion_scope": "stability_read_model_refs_projected_not_live_soak",
+      "live_soak_claimed": false,
+      "not_claims": [
+        "domain_ready",
+        "production_ready",
+        "visual_ready",
+        "quality_or_export_verdict",
+        "owner_receipt",
+        "typed_blocker",
+        "artifact_authority"
+      ]
+    },
+    "operator_evidence_readiness_projection": {
+      "status": "refs_only_operator_projection_landed",
+      "source_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+      "source_status_surface": "opl_generated:product_status#/operator_evidence_readiness_projection",
+      "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/operator_evidence_readiness_projection",
+      "owner": "redcube_ai",
+      "consumer": "opl_app_operator",
+      "projection_mode": "derived_from_existing_manifest_source_refs_only",
+      "read_only": true,
+      "refs_only": true,
+      "declares_production_soak_complete": false,
+      "declares_artifact_producing_owner_receipt": true,
+      "declares_artifact_producing_owner_receipt_scope": "refs_only_receipt_chain_closed_not_visual_ready",
+      "production_acceptance": {
+        "surface_kind": "rca_domain_owned_visual_production_acceptance_evidence",
+        "status": "closed_by_domain_owned_acceptance_receipt",
+        "contract_ref": "contracts/production_acceptance/rca-production-acceptance.json",
+        "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+        "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+        "receipt_chain_scope": "rca_owned_refs_only_artifact_producing_receipt_chain",
+        "visual_ready_claimed": false,
+        "exportable_claimed": false,
+        "handoffable_claimed": false,
+        "domain_ready_claimed": false
+      },
+      "implements_opl_generic_runtime": false,
+      "implements_opl_workbench": false,
+      "implements_opl_observability": false,
+      "remaining_gap_classification": {
+        "functional_structure_gap_status": "functional_structure_gaps_closed_evidence_gates_open",
+        "functional_structure_gap_count": 0,
+        "completed_functional_structure_gap_count": 8,
+        "completed_functional_structure_gap_ids": [
+          "opl_generated_surface_production_consumption",
+          "repo_local_wrapper_active_caller_migration",
+          "focused_hosted_attempt_real_path_cutover",
+          "artifact_gallery_handoff_shell",
+          "review_repair_transport",
+          "opl_app_operator_drilldown",
+          "workspace_source_lifecycle_receipt_shell",
+          "legacy_physical_cleanup"
+        ],
+        "remaining_gap_class": "none",
+        "remaining_functional_structure_gap_ids": [],
+        "remaining_evidence_gate_ids": [
+          "opl_hosted_controlled_visual_stage_long_soak",
+          "real_memory_lifecycle_receipt_instances",
+          "cross_family_repeated_no_regression_evidence"
+        ],
+        "evidence_gap_class": "production_live_soak_evidence_only"
+      },
+      "aggregated_source_refs": [
+        "no_regression_owner_receipt_opl_consumption_proof",
+        "domain_owner_receipt_contract",
+        "operator_evidence_readiness_projection/production_evidence_scaleout_refs",
+        "controlled_memory_apply_proof/runtime_receipt_instances",
+        "lifecycle_guarded_apply_proof",
+        "controlled_soak_no_regression_attempt",
+        "workspace_receipt_inventory_projection",
+        "production_acceptance",
+        "visual_transition_evaluator",
+        "opl_generic_primitive_consumption/functional_harness_consumer_coverage",
+        "opl_stability_read_model_consumption"
+      ],
+      "next_evidence_gaps": [
+        "opl_hosted_controlled_visual_stage_long_soak",
+        "real_memory_lifecycle_receipt_instances",
+        "cross_family_repeated_no_regression_evidence"
+      ],
+      "forbidden_upgrades": [
+        "visual_ready",
+        "exportable",
+        "handoffable",
+        "production_soak_complete",
+        "artifact_blob",
+        "memory_body",
+        "review_export_verdict"
+      ],
+      "production_evidence_scaleout_refs": {
+        "surface_kind": "rca_visual_production_evidence_scaleout_refs",
+        "owner": "redcube_ai",
+        "status": "refs_landed_scaleout_runtime_evidence_pending",
+        "evidence_model": "refs_only_no_visual_truth_artifact_blob_or_memory_body",
+        "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
+        "owner_receipt_refs": {
+          "status": "artifact_producing_owner_receipt_ref_closed",
+          "contract_ref": "/domain_owner_receipt_contract",
+          "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
+          "opl_can_store_receipt_refs": true,
+          "visual_readiness_claimed": false,
+          "export_readiness_claimed": false
+        },
+        "workspace_receipt_scaleout_refs": {
+          "status": "workspace_receipt_scaleout_ref_model_ready_more_workspaces_pending",
+          "workspace_receipt_inventory_ref": "/workspace_receipt_inventory_projection",
+          "workspace_receipt_proof_action": "emit_workspace_receipt_proof",
+          "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
+          "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
+          "required_workspace_count_for_scaleout": 2,
+          "workspace_receipt_scaleout_claimed": false
+        },
+        "visual_memory_body_reuse_refs": {
+          "status": "body_external_reuse_ref_landed",
+          "memory_locator_ref": "/domain_memory_descriptor_locator/memory_locator",
+          "controlled_apply_proof_ref": "/controlled_memory_apply_proof",
+          "consumed_memory_ref": "rca-memory:visual-pattern:<memory-id>",
+          "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
+          "body_owner": "redcube_ai",
+          "projected_body_to_opl": false,
+          "contains_memory_body": false
+        },
+        "repeated_no_regression_evidence_refs": {
+          "status": "repeated_refs_available_not_production_soak",
+          "generator_action": "emit_no_regression_evidence",
+          "proof_contract_ref": "/no_regression_owner_receipt_opl_consumption_proof",
+          "evidence_refs": [
+            "rca-no-regression:visual-stage:transition-hosted-no-regression",
+            "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+            "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+            "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+            "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+            "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+            "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+          ],
+          "deliverable_family_refs": [
+            "ppt_deck",
+            "xiaohongshu"
+          ],
+          "required_minimum_evidence_ref_count": 6,
+          "repeated_no_regression_claimed_as_soak": false,
+          "real_runtime_evidence_refs": [
+            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+            "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+            "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+            "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+            "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+            "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+          ],
+          "real_runtime_evidence_ref_count": 7,
+          "real_runtime_evidence_provenance": [
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-a",
+              "sha256": "411f05e8b9cd07f8e6789c23dbeae050d9d0f20666d5a78a1370ccba8886e8dd"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b",
+              "sha256": "668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-ppt-window2",
+              "sha256": "e0e965fa14c15c9b6d6b076d4ed1d45b9872fb82dafcdfb8b415426ca4c08acd"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-xhs-window2",
+              "sha256": "d476325dfa59bf8f6443a46882630be60001f6b0197f91d71ecf58e3a65d4744"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-native-repeat",
+              "sha256": "59a03cd84db896dd0511d0dce5f9069e82faf00875f94b2698a064f708b232f3"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat",
+              "sha256": "7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4"
+            },
+            {
+              "evidence_ref": "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat",
+              "workspace_ref": "user-runtime-state:redcube-ai/rca-native-live-20260531-tranche1/workspace",
+              "sha256": "7f05bc52871961dff4fbce1acee32b276ccbc51f376a8fa6e31caa845ccd38cc"
+            }
+          ],
+          "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs",
+          "evidence_cadence": "cross_route_cross_window_repeated_refs_only"
+        },
+        "naming_tombstone_follow_through_refs": {
+          "status": "tombstone_follow_through_refs_landed_no_compatibility_alias",
+          "active_caller_compatibility_alias_restored": false,
+          "tombstone_refs": [
+            "human_doc:retired_route_narratives_tombstone"
+          ],
+          "retained_provenance_refs": [
+            "contracts/runtime-program/managed-product-entry-hardening.json",
+            "human_doc:retired_managed_product_entry_contract_tombstone"
+          ],
+          "forbidden_active_occurrence_classes": [
+            "compatibility_alias",
+            "default_runtime_owner",
+            "public_action_key",
+            "domain_action_adapter_template"
+          ]
+        },
+        "authority_boundary": {
+          "opl_can_store_projection_refs": true,
+          "opl_can_write_rca_visual_truth": false,
+          "opl_can_store_artifact_blob": false,
+          "opl_can_store_memory_body": false,
+          "opl_can_authorize_review_export_verdict": false,
+          "opl_can_claim_production_soak_complete": false
+        },
+        "no_regression_evidence_refs": [
+          "rca-no-regression:visual-stage:transition-hosted-no-regression",
+          "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+        ],
+        "no_regression_refs": [
+          "rca-no-regression:visual-stage:transition-hosted-no-regression",
+          "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
+          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
+          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
+          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
+          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+        ]
+      }
+    },
+    "privatized_functional_module_audit": {
+      "surface_kind": "rca_current_program_canonical_projection_ref",
+      "schema_version": 1,
+      "surface_id": "privatized_functional_module_audit",
+      "projection_mode": "canonical_ref_only_no_body_copy",
+      "canonical_contract_ref": "contracts/functional_privatization_audit.json#/",
+      "canonical_json_pointer": "/",
+      "owner": "redcube_ai",
+      "consumer": "opl",
+      "status": "machine_audit_projection_landed",
+      "body_copy_in_current_program": false,
+      "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
+      "contract_ref": "rca.privatized_functional_module_audit.v1",
+      "read_only": true,
+      "refs_only": true,
+      "current_program_repeated_body_removed": true,
+      "not_claims": [
+        "domain_ready",
+        "production_ready",
+        "visual_ready",
+        "quality_or_export_verdict",
+        "owner_receipt",
+        "typed_blocker",
+        "artifact_authority"
+      ]
+    },
+    "visual_pack_compiler_handoff": {
+      "surface_kind": "rca_current_program_canonical_projection_ref",
+      "schema_version": 1,
+      "surface_id": "visual_pack_compiler_handoff",
+      "projection_mode": "canonical_ref_only_no_body_copy",
+      "canonical_contract_ref": "contracts/pack_compiler_input.json#/declarative_visual_pack_input",
+      "canonical_json_pointer": "/declarative_visual_pack_input",
+      "owner": "redcube_ai",
+      "consumer": "opl_pack_compiler",
+      "status": "machine_handoff_surface_landed",
+      "body_copy_in_current_program": false,
+      "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
+      "contract_ref": "rca.visual_pack_compiler_handoff.v1",
+      "read_only": true,
+      "refs_only": true,
+      "generated_surface_handoff_ref": "contracts/generated_surface_handoff.json#/",
+      "minimal_authority_function_contract_ref": "contracts/action_catalog.json#/minimal_authority_functions",
+      "current_program_repeated_body_removed": true,
+      "not_claims": [
+        "domain_ready",
+        "production_ready",
+        "visual_ready",
+        "quality_or_export_verdict",
+        "owner_receipt",
+        "typed_blocker",
+        "artifact_authority"
+      ]
+    },
+    "repo_local_stage_runner_active_caller": false,
+    "repo_local_stage_runner_role": "tombstone_or_historical_regression_only",
+    "stage_artifact_kernel_adoption": {
+      "surface_kind": "opl_stage_artifact_kernel_adoption_projection",
+      "ref": "/stage_artifact_kernel_adoption",
+      "contract_ref": "contracts/stage_artifact_kernel_adoption.json",
+      "owner": "redcube_ai",
+      "consumer": "opl_framework",
+      "status": "root_conformance_entrypoint_landed",
+      "projection_mode": "machine_readable_conformance_entrypoint",
+      "stage_artifact_runtime_ref": "contracts/stage_control_plane.json#/stage_artifact_runtime",
+      "stage_output_role_interface_ref": "contracts/stage_artifact_kernel_adoption.json#/stage_output_role_interface",
+      "review_repair_export_receipts_ref": "contracts/stage_artifact_kernel_adoption.json#/review_repair_export_receipts",
+      "native_helper_manifest_ref": "contracts/stage_artifact_kernel_adoption.json#/native_helper_manifest",
+      "artifact_gallery_handoff_shell_ref": "contracts/stage_artifact_kernel_adoption.json#/artifact_gallery_handoff_shell",
+      "visual_ready_claimed": false,
+      "exportable_claimed": false,
+      "handoffable_claimed": false,
+      "domain_ready_claimed": false,
+      "production_ready_claimed": false,
+      "authority_boundary": {
+        "rca_owns_visual_truth": true,
+        "rca_owns_review_export_verdict": true,
+        "rca_owns_artifact_authority": true,
+        "rca_owns_owner_receipt": true,
+        "opl_can_index_refs": true,
+        "opl_can_rebuild_projection": true,
+        "opl_can_provide_gallery_handoff_shell": true,
+        "opl_can_write_visual_truth": false,
+        "opl_can_authorize_quality_or_export": false,
+        "opl_can_issue_rca_owner_receipt": false
+      },
+      "opl_state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+      "opl_state_index_kernel_adoption": {
+        "ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
+        "owner": "one-person-lab",
+        "consumer": "redcube_ai",
+        "adoption_status": "deferred_until_measured_trigger",
+        "sqlite_enabled_now": false,
+        "index_backend": "sqlite_sidecar_index",
+        "refs_only": true,
+        "rebuildable": true,
+        "sidecar_is_domain_runtime": false,
+        "allowed_index_entities": [
+          "session",
+          "deliverable",
+          "route",
+          "artifact",
+          "review",
+          "export"
+        ],
+        "allowed_payload_classes": [
+          "locator",
+          "hash",
+          "provenance",
+          "manifest_ref",
+          "receipt_ref",
+          "route_ref",
+          "lineage_ref"
+        ],
+        "forbidden_storage": [
+          "PNG body",
+          "PPTX body",
+          "PDF body",
+          "visual artifact blob",
+          "canonical artifact truth",
+          "visual-domain truth",
+          "review/export judgment",
+          "owner receipt body",
+          "visual memory body"
+        ],
+        "sqlite_can_be_truth_source": false,
+        "sqlite_can_store_visual_artifact_body": false,
+        "sqlite_can_store_review_export_judgment": false
+      }
+    },
+    "temporal_stage_run_consumption_policy": {
+      "policy_ref": "opl_generated:product_entry_manifest#/temporal_stage_run_consumption_policy",
+      "temporal_runtime_owner": "one-person-lab/OPL",
+      "temporal_attempt_ledger_owner": "one-person-lab/OPL",
+      "provider_completion_is_domain_completion": false,
+      "domain_repo_can_own_temporal_runtime": false,
+      "rca_writes_opl_stage_attempts": false,
+      "generated_surface_ready_can_claim_domain_ready": false
+    }
+  },
+  "artifacts": {
+    "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
+    "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
+    "session_continuity_provenance_contract": "contracts/runtime-program/product-entry-session-continuity.json",
+    "product_entry_brief": "human_doc:program_redcube_product_entry_mvp",
+    "opl_hosted_product_entry_brief": "human_doc:program_opl_framework_hosted_product_entry",
+    "session_continuity_provenance_brief": "human_doc:program_product_entry_session_continuity",
+    "route_equivalence_manifest_surface": "opl_generated:product_entry_manifest#/route_equivalence",
+    "deliverable_facade_manifest_surface": "opl_generated:product_entry_manifest#/deliverable_facade",
+    "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
+    "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+    "visual_pattern_memory_writeback_manifest_surface": "opl_generated:product_entry_manifest#/visual_pattern_memory_writeback",
+    "controlled_visual_stage_attempt_manifest_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt",
+    "controlled_consumed_memory_writeback_receipt_proof_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt/writeback_proof_contract",
+    "controlled_memory_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+    "standard_domain_agent_skeleton_layout_audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+    "runtime_residue_retirement_manifest_surface": "opl_generated:product_entry_manifest#/runtime_residue_retirement",
+    "controlled_memory_runtime_receipt_instances_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
+    "domain_owner_receipt_contract_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
+    "lifecycle_guarded_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
+    "workspace_receipt_inventory_projection_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+    "visual_transition_spec_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_spec",
+    "physical_skeleton_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
+    "review_helper_baseline_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
+    "opl_stability_read_model_consumption_manifest_surface": "opl_generated:product_entry_manifest#/opl_stability_read_model_consumption",
+    "operator_evidence_readiness_projection_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
+    "visual_transition_evaluator_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_evaluator"
+  },
+  "closeout": {
+    "closeout_id": "rca_one_shot_production_hardening_closeout",
+    "closeout_ref": "contracts/runtime-program/rca-one-shot-production-hardening-closeout.json",
+    "status": "closed_with_typed_production_evidence_blockers",
+    "planned_done_deferred_skipped_verification_commit_push_state": "machine_readable_in_closeout_ref",
+    "docs_assertion_policy": "machine_contracts_only_no_markdown_prose_assertions",
+    "production_evidence_success_claimed": false,
+    "deferred_typed_blocker_refs": [
+      "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+      "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
+      "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
+    ],
+    "latest_closeout_lane": "codex/rca-doc-contract-closeout"
+  }
+}
