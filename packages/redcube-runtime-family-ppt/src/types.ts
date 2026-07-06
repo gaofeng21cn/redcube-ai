@@ -18,13 +18,13 @@ export type PptProfileId =
   | 'executive_briefing'
   | 'defense_deck';
 
-export type PptStageRoute =
+type PptStageRoute =
   | 'detailed_outline'
   | 'slide_blueprint'
   | 'visual_direction'
   | 'render_html';
 
-export type PptPromptRoute =
+type PptPromptRoute =
   | 'detailed_outline'
   | 'slide_blueprint'
   | 'visual_direction';
@@ -77,12 +77,12 @@ export interface PptCanvasContract {
   ratio: string;
 }
 
-export interface PptSourceMaterial {
+interface PptSourceMaterial {
   excerpt?: string;
   content_text?: string;
 }
 
-export interface PptHydratedContract {
+interface PptHydratedContract {
   overlay: string;
   profile_id: PptProfileId;
   title: string;
@@ -93,7 +93,7 @@ export interface PptHydratedContract {
   };
 }
 
-export interface PptDetailedOutlineSeedSlide {
+interface PptDetailedOutlineSeedSlide {
   slide_id: string;
   slide_no: number;
   page_type: PptPageType;
@@ -111,11 +111,11 @@ export interface PptDetailedOutlineSeedSlide {
   public_sources?: string[];
 }
 
-export interface PptDetailedOutlineSeed {
+interface PptDetailedOutlineSeed {
   slides?: PptDetailedOutlineSeedSlide[];
 }
 
-export interface PptSlideBlueprintSeed {
+interface PptSlideBlueprintSeed {
   quality_guards?: {
     max_primary_points_per_slide?: number;
     max_evidence_points_per_slide?: number;
@@ -123,7 +123,7 @@ export interface PptSlideBlueprintSeed {
   profile_checks?: Partial<Record<PptProfileId, string[]>>;
 }
 
-export interface PptVisualDirectionSeed {
+interface PptVisualDirectionSeed {
   visual_direction?: {
     visual_manifest?: string;
     what_it_is?: string[];
@@ -285,7 +285,7 @@ export interface PptVisualDirectionArtifact {
   visual_direction: PptVisualDirection;
 }
 
-export interface PptDeliverablePaths {
+interface PptDeliverablePaths {
   deliverableId: string;
   deliverableDir: string;
   artifactsDir: string;
@@ -293,7 +293,7 @@ export interface PptDeliverablePaths {
   reportsDir: string;
 }
 
-export interface PptRenderContract {
+interface PptRenderContract {
   compiler_module?: string;
   render_strategy?: string;
   shell_file?: string;
@@ -387,7 +387,7 @@ interface PptOutlineDependencies {
   sharedSourceMaterials(contract: PptHydratedContract): PptSourceMaterial[];
 }
 
-export interface PptArtifactBase {
+interface PptArtifactBase {
   route: PptStageRoute;
   overlay: string;
   profile_id: PptProfileId;
@@ -422,7 +422,7 @@ interface PptBuildRenderArtifactInput {
   deliverablePaths: PptDeliverablePaths;
 }
 
-export interface PptPathModuleLike {
+interface PptPathModuleLike {
   join(...paths: string[]): string;
 }
 

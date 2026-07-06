@@ -9,8 +9,8 @@ import type {
 } from '@redcube/runtime-protocol';
 
 export type PosterProfileId = 'knowledge_poster';
-export type PosterStageRoute = 'poster_blueprint' | 'visual_direction' | 'render_html';
-export type PosterPromptRoute = 'poster_blueprint' | 'visual_direction';
+type PosterStageRoute = 'poster_blueprint' | 'visual_direction' | 'render_html';
+type PosterPromptRoute = 'poster_blueprint' | 'visual_direction';
 export type PosterMigrationMode = 'draft_new' | 'optimize_existing';
 export type PosterLayoutFamily = 'hero_band' | 'evidence_columns' | 'pathway_strip' | 'action_footer';
 export type PosterRecipeId = 'poster.hero_band' | 'poster.evidence_columns' | 'poster.pathway_strip' | 'poster.action_footer';
@@ -31,7 +31,7 @@ export interface PosterCanvasContract {
   ratio: string;
 }
 
-export interface PosterDeliverablePaths {
+interface PosterDeliverablePaths {
   deliverableId: string;
   deliverableDir: string;
   artifactsDir: string;
@@ -39,7 +39,7 @@ export interface PosterDeliverablePaths {
   reportsDir: string;
 }
 
-export interface PosterHydratedContract {
+interface PosterHydratedContract {
   overlay: string;
   profile_id: PosterProfileId;
   title: string;
@@ -66,7 +66,7 @@ export interface PosterStorylineArtifact {
   };
 }
 
-export interface PosterBlueprintSeedPanel {
+interface PosterBlueprintSeedPanel {
   panel_id: string;
   region: PosterLayoutFamily;
   label: string;
@@ -74,7 +74,7 @@ export interface PosterBlueprintSeedPanel {
   support_points?: string[];
 }
 
-export interface PosterBlueprintSeed {
+interface PosterBlueprintSeed {
   poster_blueprint?: {
     render_recipe_id?: PosterRecipeId;
     headline?: string;
@@ -141,7 +141,7 @@ export interface PosterBlueprintArtifact {
   };
 }
 
-export interface PosterVisualDirectionSeed {
+interface PosterVisualDirectionSeed {
   visual_direction?: {
     visual_manifest?: string;
     poster_motif?: string;
@@ -190,7 +190,7 @@ export interface PosterVisualDirectionArtifact {
   };
 }
 
-export interface PosterRenderContract {
+interface PosterRenderContract {
   render_strategy?: string;
   shell_file?: string;
   recipe_registry?: Partial<Record<PosterLayoutFamily | 'default', PosterRecipeId>>;

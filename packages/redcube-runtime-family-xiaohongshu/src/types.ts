@@ -4,8 +4,8 @@ import type {
 } from '@redcube/runtime-protocol';
 
 export type XhsRunMode = 'single' | 'series';
-export type XhsPromptRoute = 'single_note_plan' | 'visual_direction';
-export type XhsStageRoute =
+type XhsPromptRoute = 'single_note_plan' | 'visual_direction';
+type XhsStageRoute =
   | 'research'
   | 'storyline'
   | 'single_note_plan'
@@ -40,7 +40,7 @@ export type XhsRecipeId =
 
 export type XhsPackProvenanceSource = 'prompt_pack_seed' | 'runtime_artifact_provenance';
 
-export interface PackDeliverablePaths {
+interface PackDeliverablePaths {
   deliverableId: string;
   deliverableDir: string;
   artifactsDir: string;
@@ -48,18 +48,18 @@ export interface PackDeliverablePaths {
   reportsDir: string;
 }
 
-export interface XhsSourceMaterial {
+interface XhsSourceMaterial {
   material_id?: string;
   excerpt?: string;
   content_text?: string;
 }
 
-export interface XhsPromptPackContract {
+interface XhsPromptPackContract {
   pack_id?: string;
   render_contract?: XhsRenderContract;
 }
 
-export interface XhsHydratedContract {
+interface XhsHydratedContract {
   overlay: string;
   profile_id: string;
   title: string;
@@ -109,7 +109,7 @@ export interface XhsStorylineArtifact {
   };
 }
 
-export interface XhsPlanningSeedSlide {
+interface XhsPlanningSeedSlide {
   slide_id: string;
   title: string;
   layout_family: XhsLayoutFamily;
@@ -124,7 +124,7 @@ export interface XhsPlanningSeedSlide {
   core_sentence?: string;
 }
 
-export interface XhsPlanningSeed {
+interface XhsPlanningSeed {
   plan?: {
     title_options?: string[];
     slides?: XhsPlanningSeedSlide[];
@@ -142,7 +142,7 @@ export interface XhsMaterialRules {
   warning_accent: string;
 }
 
-export interface XhsVisualDirectionSeed {
+interface XhsVisualDirectionSeed {
   visual_direction?: {
     director_statement?: string;
     visual_motif?: string;
@@ -349,7 +349,7 @@ interface XhsPlanningDependencies {
   inferTension(contract: XhsHydratedContract): string;
 }
 
-export interface XhsArtifactBase {
+interface XhsArtifactBase {
   route: XhsStageRoute;
   overlay: string;
   profile_id: string;
@@ -366,7 +366,7 @@ interface XhsVisualDirectionDependencies {
   inferMemoryHook(contract: XhsHydratedContract): string;
 }
 
-export interface XhsPathModuleLike {
+interface XhsPathModuleLike {
   join(...paths: string[]): string;
 }
 
