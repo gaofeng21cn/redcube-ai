@@ -1,5 +1,5 @@
 {
-  "name": "rca",
+  "name": "redcube-ai",
   "version": "0.1.0",
   "description": "Codex plugin shell for the RedCube AI visual deliverable domain app.",
   "author": {
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "RedCube AI",
     "shortDescription": "Visual deliverable domain app for Codex.",
-    "longDescription": "Adds a thin Codex plugin entry for RedCube AI while routing generated status/session/manifest wrappers through OPL and preserving RCA direct product invoke plus domain-handler export/dispatch targets.",
+    "longDescription": "Adds a thin Codex plugin entry for RedCube AI while routing generated status/session/manifest wrappers through OPL, preserving direct product invoke plus domain-handler export/dispatch targets, and keeping the legacy rca alias as a compatibility path.",
     "developerName": "Gao Feng",
     "category": "Creative",
     "capabilities": [

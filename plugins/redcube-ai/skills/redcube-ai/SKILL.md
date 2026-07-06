@@ -1,11 +1,11 @@
 ---
-name: rca
+name: redcube-ai
 description: Operate RedCube AI as the formal RCA visual-deliverable domain app through TypeScript orchestration, Python native helpers, product-entry, recoverable deliverable loops, and same-session continuation contracts.
 ---
 
-# RCA App Skill
+# RedCube AI App Skill
 
-当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。
+当 Codex 需要把 `RedCube AI` 作为正式 domain app 来操作，而不是把仓库当成临时脚本集合时，使用这个 plugin。canonical 机器名是 `redcube-ai`；旧 `rca` 只保留为兼容 alias。
 
 ## 这个 plugin 是什么
 

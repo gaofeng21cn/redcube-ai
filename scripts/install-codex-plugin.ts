@@ -64,10 +64,38 @@ function parseArgs(argv: string[]): ParsedArgs {
   };
 }
 
+function resolveTrackedPluginRoot(repoRoot: string): string {
+  const canonicalRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
+  if (fs.existsSync(canonicalRoot)) {
+    return canonicalRoot;
+  }
+
+  const legacyRoot = path.join(repoRoot, 'plugins', 'rca');
+  if (fs.existsSync(legacyRoot)) {
+    return legacyRoot;
+  }
+
+  return canonicalRoot;
+}
+
+function resolveTrackedSkillRoot(pluginRoot: string): string {
+  const canonicalRoot = path.join(pluginRoot, 'skills', 'redcube-ai');
+  if (fs.existsSync(canonicalRoot)) {
+    return canonicalRoot;
+  }
+
+  const legacyRoot = path.join(pluginRoot, 'skills', 'rca');
+  if (fs.existsSync(legacyRoot)) {
+    return legacyRoot;
+  }
+
+  return canonicalRoot;
+}
+
 function main(): void {
   const args = parseArgs(process.argv.slice(2));
-  const pluginRoot = path.join(args.repoRoot, 'plugins', 'rca');
-  const skillRoot = path.join(pluginRoot, 'skills', 'rca');
+  const pluginRoot = resolveTrackedPluginRoot(args.repoRoot);
+  const skillRoot = resolveTrackedSkillRoot(pluginRoot);
   const devSourceManifestPath = path.join(args.repoRoot, '.codex-plugin', 'plugin.json');
   const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
   const skillEntryPath = path.join(skillRoot, 'SKILL.md');
@@ -79,7 +107,7 @@ function main(): void {
     fail(`missing Codex plugin manifest: ${pluginManifestPath}`);
   }
   if (!fs.existsSync(skillEntryPath)) {
-    fail(`missing RCA skill entry: ${skillEntryPath}`);
+    fail(`missing RedCube AI skill entry: ${skillEntryPath}`);
   }
 
   const marketplacePath = path.join(args.repoRoot, '.agents', 'plugins', 'marketplace.json');

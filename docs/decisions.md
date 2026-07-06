@@ -98,7 +98,7 @@ RCA 当前 file authority、artifact index 和 Git source control 足以承载 c
 
 ### Developer checkout plugin manifest 只做 source locator
 
-RCA Developer Mode 可以把 Codex marketplace source 指向 `redcube-ai` developer checkout 根目录；根层 `.codex-plugin/plugin.json` 只作为 developer source locator。`skills`、icon 和默认 prompt 继续引用 `plugins/rca/` 下的 canonical RCA plugin scaffold；不得复制第二套 skill、icon 或 marketplace truth。
+RCA Developer Mode 可以把 Codex marketplace source 指向 `redcube-ai` developer checkout 根目录；根层 `.codex-plugin/plugin.json` 只作为 developer source locator。canonical Codex plugin scaffold 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`；根层 manifest 继续通过 `plugins/rca/` legacy alias path 指向同一套 scaffold。不得复制第二套 skill、icon 或 marketplace truth。
 
 ## 历史压缩
 
