@@ -80,6 +80,12 @@ test('RCA private platform retirement strict readback is a guard, not readiness 
       .empty_tail_worklist_can_claim_domain_ready,
     false,
   );
+  assert.deepEqual(
+    payload.default_caller_tail_compact_retirement_summary.retained_boundary_static_caller_matrix
+      .map((entry) => entry.surface_id),
+    payload.default_caller_tail_compact_retirement_summary
+      .retained_default_caller_boundary_gate.applies_to_surface_ids,
+  );
   assert.equal(payload.default_caller_tail_compact_retirement_summary.cleanup_candidate_count, 0);
   assert.equal(payload.default_caller_tail_compact_retirement_summary.owner_delta_required, false);
   assert.deepEqual(payload.default_caller_tail_compact_retirement_summary.missing_evidence_ids, []);
@@ -234,6 +240,30 @@ test('RCA default-caller tail owner-delta readback is a narrow guard surface', (
       'executor_runtime_route_run_records',
     ],
   );
+  const staticCallerMatrix = payload.compact_retirement_summary.retained_boundary_static_caller_matrix;
+  assert.equal(staticCallerMatrix.length, 8);
+  assert.deepEqual(
+    staticCallerMatrix.map((entry) => entry.surface_id),
+    retainedBoundaryGate.applies_to_surface_ids,
+  );
+  assert.deepEqual(
+    staticCallerMatrix.map((entry) => entry.delete_authorization_status),
+    Array(8).fill('blocked_requires_retained_default_caller_boundary_gate_evidence'),
+  );
+  assert.equal(
+    staticCallerMatrix.every((entry) => (entry.blocking_static_refs || []).length > 0),
+    true,
+  );
+  for (const entry of staticCallerMatrix) {
+    assert.equal(entry.static_evidence_boundary.static_analysis_can_prove_current_repo_role, true);
+    assert.equal(entry.static_evidence_boundary.static_analysis_can_prove_no_active_repo_local_default_caller, false);
+    assert.equal(entry.static_evidence_boundary.static_analysis_can_prove_opl_generated_default_caller_parity, false);
+    assert.equal(entry.static_evidence_boundary.static_analysis_can_authorize_physical_delete, false);
+    assert.equal(
+      entry.static_evidence_boundary.static_analysis_can_claim_default_caller_cutover_complete,
+      false,
+    );
+  }
   assert.deepEqual(
     payload.owner_delta_work_order_pack.owner_delta_routes.map((route) => route.surface_id),
     payload.owner_delta_routes.map((route) => route.surface_id),
@@ -279,6 +309,12 @@ test('RCA default-caller tail owner-delta script emits JSON readback', () => {
   assert.equal(directPayload.surface_kind, 'rca_default_caller_tail_owner_delta_readback');
   assert.equal(directPayload.state, 'passed_repo_source_guard_only');
   assert.equal(directPayload.compact_retirement_summary.cleanup_candidate_count, 0);
+  assert.equal(directPayload.compact_retirement_summary.retained_boundary_static_caller_matrix.length, 8);
+  assert.equal(
+    directPayload.compact_retirement_summary.retained_boundary_static_caller_matrix
+      .every((entry) => entry.static_evidence_boundary.static_analysis_can_authorize_physical_delete === false),
+    true,
+  );
   assert.equal(directPayload.default_caller_tail_readback.tail_surface_count, 0);
   assert.equal(directPayload.default_caller_tail_readback.missing_evidence_surface_count, 0);
   assert.equal(directPayload.owner_delta_work_order_pack.owner_delta_route_count, 0);
