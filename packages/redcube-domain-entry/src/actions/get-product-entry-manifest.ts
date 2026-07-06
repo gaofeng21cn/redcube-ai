@@ -55,7 +55,12 @@ import {
   SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
 } from './get-product-entry-manifest-parts/policy.js';
 import { buildProductEntryManifestShellProjections } from './get-product-entry-manifest-parts/shell-projections.js';
-import { normalizeWorkspaceRoot, readCurrentProgramContract, safeText } from './get-product-entry-manifest-parts/utils.js';
+import {
+  buildActionMetadataProjection,
+  normalizeWorkspaceRoot,
+  readCurrentProgramContract,
+  safeText,
+} from './get-product-entry-manifest-parts/utils.js';
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
@@ -332,18 +337,7 @@ export async function getProductEntryManifest(request) {
     physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
     review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
-    action_metadata: {
-      surface_kind: 'redcube_action_metadata_projection',
-      product_entry: actionMetadata.product_entry,
-      cli_commands: actionMetadata.cli_commands,
-      mcp_tools: actionMetadata.mcp_tools,
-      mcp_actions: actionMetadata.mcp_actions,
-      skill_commands: actionMetadata.skill_commands,
-      generated_interface_owner: actionMetadata.generated_interface_owner,
-      domain_handler_owner: actionMetadata.domain_handler_owner,
-      owner_model: actionMetadata.owner_model,
-      repo_local_handler_targets: actionMetadata.repo_local_handler_targets,
-    },
+    action_metadata: buildActionMetadataProjection(actionMetadata),
     skill_catalog: skillCatalog,
     automation,
     product_entry_shell: productEntryShell,
