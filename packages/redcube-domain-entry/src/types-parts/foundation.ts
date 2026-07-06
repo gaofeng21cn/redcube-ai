@@ -71,7 +71,7 @@ export interface WorkspaceDoctorResponse extends SurfaceBase<'workspace_doctor'>
   };
 }
 
-interface TopicCatalogResponse extends SurfaceBase<'topic_catalog'> {
+export interface TopicCatalogResponse extends SurfaceBase<'topic_catalog'> {
   workspaceRoot: string;
   total: number;
   topics: Array<Record<string, unknown>>;

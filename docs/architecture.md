@@ -152,7 +152,7 @@ RCA 暴露给 OPL/App/operator/Agent Lab 的 operator evidence readiness、effic
 
 RCA runtime-protocol 的 `opl_executor_adapter_receipt` 现在把 `owner=opl_runtime_manager`、`selected_executor_backend=hermes_agent`、`backend_lifecycle=historical_opt_in_deferred_external_adapter` 和 `rca_default_backend=false` 分开保存。`owner` 表示 OPL generic executor adapter / receipt owner；`selected_executor_backend` 只表示本次显式非默认 backend。不得再把 backend key 解释成 runtime owner，也不得把 retired Python loop module 或 Hermes API symbols 写成 RCA-owned generic executor runtime。
 
-启用 `hermes_agent` 时，RCA 仓内只保留非默认 external adapter policy refs 与 fail-closed retired boundary。当前 active production importers 仍需要这些 symbol / module 存在，因此它们只能返回 deletion-gate blocker，不能承担 API 连接、Python subprocess、upstream Hermes import、agent-loop 执行、mock proof 或视觉产出：
+启用 `hermes_agent` 时，RCA 仓内只保留非默认 external adapter policy refs 与 fail-closed retired boundary。旧 Hermes API / loop bridge symbols、Python subprocess helper 和 helper catalog entry 已无 active caller 并物理退役；显式选择 `hermes_agent` 只能命中 fail-closed boundary，不能承担 API 连接、Python subprocess、upstream Hermes import、agent-loop 执行、mock proof 或视觉产出：
 
 - session / run / watch events 的 executor-side proof 已不由 RCA-owned Hermes backend 生成
 - tool / message / interrupt / resume 能力 proof 必须迁到 OPL-owned executor adapter surface
