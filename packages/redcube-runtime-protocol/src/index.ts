@@ -78,23 +78,13 @@ export {
   buildHermesRuntimeTopology,
   completeRouteRun,
   failRouteRun,
+  failRetiredHermesAgentAdapter,
   hermesAgentAdapterRetirementBoundary,
   loadRouteRun,
   normalizeExecutorBackend,
   readRouteRunEvents,
   startRouteRun,
 } from './executor-runtime.js';
-export {
-  generateStructuredArtifactViaHermesAgentApi,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
-  runAgentLoopViaHermesAgentApi,
-  structuredCallViaHermesAgentApi,
-} from './hermes-agent-api-client.js';
-export {
-  generateStructuredArtifactViaHermesAgentLoop,
-  probeHermesAgentLoop,
-  readHermesAgentLoopContract,
-} from './hermes-agent-loop-bridge-client.js';
 
 export type {
   CodexExecutionModel,

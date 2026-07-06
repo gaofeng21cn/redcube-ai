@@ -8,11 +8,9 @@ import { mkdtempSync } from 'node:fs';
 import {
   buildCodexExecutorDescriptor,
   completeRouteRun,
+  failRetiredHermesAgentAdapter,
   failRouteRun,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
-  runAgentLoopViaHermesAgentApi,
   startRouteRun,
-  structuredCallViaHermesAgentApi,
 } from './package-surfaces.ts';
 import {
   appendRouteRunEvent,
@@ -153,34 +151,9 @@ test('route run events round-trip through the extracted refs-only record store',
   }]);
 });
 
-test('retired Hermes-Agent API entrypoints fail closed instead of running mock proof backend', async () => {
-  await assert.rejects(
-    () => structuredCallViaHermesAgentApi({
-      baseUrl: 'http://127.0.0.1:1',
-      model: 'caller-compat-model',
-      messages: [{ role: 'user', content: 'return structured JSON' }],
-    }),
-    /RCA-owned Hermes-Agent API client has been retired/,
-  );
-
-  await assert.rejects(
-    () => generateStructuredArtifactViaHermesAgentStructuredCall({
-      family: 'ppt_deck',
-      route: 'render_html',
-      promptRelativePath: 'prompts/ppt_deck/render_html.md',
-      context: {},
-      outputContract: {},
-      env: { REDCUBE_HERMES_AGENT_API_BASE_URL: 'http://127.0.0.1:1' },
-    }),
-    /adapter_deletion_gate_owner=opl_agent_executor_adapter/,
-  );
-
-  await assert.rejects(
-    () => runAgentLoopViaHermesAgentApi({
-      baseUrl: 'http://127.0.0.1:1',
-      model: 'caller-compat-model',
-      input: { task: 'execute agent loop' },
-    }),
-    /active production importers still require the exported symbol/,
+test('retired Hermes-Agent adapter fails closed at the executor boundary', () => {
+  assert.throws(
+    () => failRetiredHermesAgentAdapter({ surface: 'hermes_agent_api_server' }),
+    /RCA-owned Hermes-Agent adapter has been retired.*adapter_deletion_gate_owner=opl_agent_executor_adapter/,
   );
 });

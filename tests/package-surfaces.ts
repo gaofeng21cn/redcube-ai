@@ -77,14 +77,11 @@ export {
   buildExecutorBackendContract,
   buildHermesAgentLoopExecutorDescriptor,
   completeRouteRun,
+  failRetiredHermesAgentAdapter,
   failRouteRun,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
   RUN_LOCATOR_ENVELOPE_BOUNDARY,
   normalizeExecutorBackend,
-  probeHermesAgentLoop,
-  runAgentLoopViaHermesAgentApi,
   startRouteRun,
-  structuredCallViaHermesAgentApi,
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from '@redcube/runtime-protocol';
 export { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';

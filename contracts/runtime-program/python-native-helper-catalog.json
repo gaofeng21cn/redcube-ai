@@ -259,39 +259,6 @@
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "contracts/runtime-program/ppt-native-python-engine-contract.json"
       ]
-    },
-    {
-      "helper_id": "hermes_agent_loop_bridge",
-      "package_module": "redcube_ai.hermes.agent_loop_bridge_impl",
-      "package_entrypoint": {
-        "console_script": "redcube-hermes-agent-loop-bridge",
-        "module": "redcube_ai.hermes.agent_loop_bridge_impl",
-        "callable": "main",
-        "module_command": "python -m redcube_ai.hermes.agent_loop_bridge_impl"
-      },
-      "preferred_invocation": {
-        "kind": "package_module",
-        "argv": [
-          "-m",
-          "redcube_ai.hermes.agent_loop_bridge_impl"
-        ]
-      },
-      "owner": "python_native_helper",
-      "deliverable_family": "runtime_protocol",
-      "runtime_surface": "hermes_agent_loop",
-      "routes": [],
-      "gates": [],
-      "purpose": "Opt-in Hermes-Agent loop full-agent-loop proof bridge used by the TypeScript executor adapter.",
-      "requires": [
-        "upstream-hermes-agent-local"
-      ],
-      "outputs": [
-        "structured_generation_payload",
-        "full_agent_loop_proof"
-      ],
-      "contract_refs": [
-        "contracts/runtime-program/current-program.json"
-      ]
     }
   ]
 }

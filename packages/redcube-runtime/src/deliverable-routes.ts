@@ -7,11 +7,12 @@ import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,
   HERMES_AGENT_ADAPTER,
+  STRUCTURED_CALL_EXECUTION_SHAPE,
   appendRouteRunEvent,
   completeRouteRun,
   failRouteRun,
+  failRetiredHermesAgentAdapter,
   hermesAgentAdapterRetirementBoundary,
-  readHermesAgentLoopContract,
   readRouteRunEvents,
   startRouteRun,
 } from '@redcube/runtime-protocol';
@@ -52,7 +53,7 @@ function buildCodexRuntimeDescriptor(codexContract) {
   };
 }
 
-function buildHermesAgentLoopRuntimeDescriptor(hermesContract) {
+function buildHermesAgentLoopRuntimeDescriptor(hermesContract = {}) {
   const defaultOplExecutorAdapterReceipt = {
     source: 'opl_executor_adapter_receipt',
     owner: 'opl_runtime_manager',
@@ -342,7 +343,7 @@ function requestHasExplicitAdapter(request) {
 
 function buildRuntimeDescriptor({ workspaceRoot, selectedExecutor, fallbackExecutor }) {
   if (fallbackExecutor.adapter === HERMES_AGENT_ADAPTER && fallbackExecutor.execution_shape === AGENT_LOOP_EXECUTION_SHAPE) {
-    return buildHermesAgentLoopRuntimeDescriptor(readHermesAgentLoopContract({ cwd: workspaceRoot }));
+    return buildHermesAgentLoopRuntimeDescriptor();
   }
   if (fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND) {
     return buildHermesAgentRuntimeDescriptor(
@@ -825,6 +826,13 @@ export async function runDeliverableRoute(request) {
     request,
     adapter,
   });
+  if (selectedExecutor.executor_backend === HERMES_AGENT_EXECUTOR_BACKEND) {
+    return failRetiredHermesAgentAdapter({
+      surface: selectedExecutor.execution_shape === STRUCTURED_CALL_EXECUTION_SHAPE
+        ? 'hermes_agent_api_server'
+        : 'hermes_agent_loop',
+    });
+  }
   const effectiveCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
     ? crossProviderAttemptIndex
     : null;
