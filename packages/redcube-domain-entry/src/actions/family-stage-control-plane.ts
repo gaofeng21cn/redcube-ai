@@ -3,6 +3,9 @@ import {
   RCA_STAGE_OUTPUT_CANONICAL_ROLES,
   RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
 } from '@redcube/runtime-protocol';
+import {
+  USER_STAGE_LOG_CONTRACT,
+} from './family-stage-control-plane-parts/user-stage-log-contract.js';
 
 const STAGES = [
   {
@@ -120,42 +123,6 @@ const STAGES = [
     ],
   },
 ];
-
-const USER_STAGE_LOG_REQUIRED_FIELDS = [
-  'stage_name',
-  'problem_summary',
-  'stage_goal',
-  'stage_work_done',
-  'changed_stage_surfaces',
-  'outcome',
-  'remaining_blockers',
-  'evidence_refs',
-];
-
-const USER_STAGE_LOG_CONTRACT = {
-  surface_kind: 'opl_standard_agent_user_stage_log_contract',
-  version: 'standard-user-stage-log.v1',
-  owner: 'one-person-lab',
-  standard_agent_requirement: 'domain_stage_closeout_must_return_user_readable_stage_semantics_or_typed_blocker',
-  opl_projection_surface: 'stage_progress_log.user_stage_log',
-  domain_semantic_sources: [
-    'typed_closeout_packet.user_stage_log',
-    'typed_closeout_packet.stage_log_summary',
-    'route_impact.user_stage_log',
-    'route_impact.stage_log_summary',
-  ],
-  required_domain_semantic_fields: USER_STAGE_LOG_REQUIRED_FIELDS,
-  required_observability_fields: ['duration', 'token_usage', 'cost'],
-  missing_semantics_policy: 'typed_blocker_or_missing_domain_semantic_summary_no_opl_inference',
-  token_policy: 'observed_or_explicit_missing_null_no_zero_fill',
-  authority_boundary: {
-    opl_can_infer_domain_semantics: false,
-    opl_can_read_artifact_body: false,
-    opl_can_write_domain_truth: false,
-    opl_can_authorize_quality_or_export: false,
-    provider_completion_can_claim_stage_semantics_complete: false,
-  },
-};
 
 const PROGRESS_DELTA_POLICY = {
   surface_kind: 'opl_stage_progress_delta_policy',

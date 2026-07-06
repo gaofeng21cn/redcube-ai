@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-Last reviewed: `2026-06-12`
+Last reviewed: `2026-07-06`
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
@@ -154,6 +154,13 @@ evidence。Default caller parity、no-active-caller、RCA owner receipt / typed
 blocker roundtrip、no-forbidden-write proof 与 tombstone/provenance pointer
 同时成立后，repo-local wrapper、facade、alias、compatibility path 和只保护旧
 public path 的测试直接删除或 tombstone，不新增兼容面。
+
+2026-07-06 line-budget strict closure 只做源码结构拆分：`family-stage-control-plane.ts`
+把 user-stage-log contract 移入 `family-stage-control-plane-parts/`，
+`physical-source-morphology-policy.ts` 把 source-ref integrity gate 移入
+`physical-source-morphology-policy-parts/`。这只解除两个超长文件的 strict
+line-budget blocker，不声明 visual ready、exportable、handoffable、domain
+ready、production ready、default-caller cutover 或 physical delete authority。
 
 ## 当前保留的 visual authority surfaces
 
