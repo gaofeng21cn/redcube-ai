@@ -9,23 +9,11 @@ import {
 import { doctorWorkspace } from './doctor-workspace.js';
 import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
 import { productEntrySessionDir } from './product-entry-session-refs.js';
+import { requireField } from './action-utils.js';
 
 const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type ProductPreflightRequest = Record<string, any>;
-
-function safeText(value: unknown, fallback = ''): string {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name: string, value: unknown): string {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
 
 function normalizeWorkspaceRoot(request: ProductPreflightRequest): string {
   return requireField(

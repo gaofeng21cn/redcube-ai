@@ -1,14 +1,7 @@
 // @ts-nocheck
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function readJsonRecord(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
+import { readJson, safeText } from '../action-utils.js';
 
 export function publicationProjectionForDeliverable(publicationProjection, deliverableId) {
   const deliverables = publicationProjection?.publication?.deliverables || {};
@@ -18,7 +11,7 @@ export function publicationProjectionForDeliverable(publicationProjection, deliv
 function collectArtifactRefsFromPublishBundle(publishBundleFile) {
   const file = safeText(publishBundleFile);
   if (!file || !existsSync(file)) return [];
-  const artifact = readJsonRecord(file);
+  const artifact = readJson(file);
   const exportBundle = artifact?.export_bundle || {};
   return [
     file,

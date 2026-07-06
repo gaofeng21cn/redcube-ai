@@ -5,22 +5,10 @@ import {
 } from 'opl-framework-shared/product-entry-companions';
 
 import { invokeProductEntry } from './invoke-product-entry.js';
+import { requireField } from './action-utils.js';
 
 const OPL_HOSTED_PRODUCT_ENTRY_ID = 'opl_framework_hosted_product_entry';
 const OPL_PROVIDER_RUNTIME_OWNER = 'configured_family_runtime_provider';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
 
 function normalizeTargetDomainId(request) {
   const targetDomainId = requireField('target_domain_id', request?.target_domain_id || request?.targetDomainId);

@@ -8,13 +8,9 @@ import {
 import type { ProductEntrySessionResponse } from '../../types.js';
 import { productEntrySessionFile } from '../product-entry-session-refs.js';
 import { publicationProjectionForDeliverable } from './session-artifacts.js';
+import { safeText } from '../action-utils.js';
 
 const SUPPORTED_PRODUCT_ENTRY_RUNTIME_OWNER = 'configured_family_runtime_provider';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 export function buildProductEntrySessionSurfaceContext({ entrySessionId, session }) {
   const runtimeOwner = safeText(session.runtime_owner);

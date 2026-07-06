@@ -1,15 +1,11 @@
 // @ts-nocheck
 import { getDeliverable } from './get-deliverable.js';
+import { safeText } from './action-utils.js';
 
 const OPL_STAGE_EXECUTION_OWNER = 'one-person-lab';
 const OPL_STAGE_ATTEMPT_OWNER = 'opl_family_runtime_provider';
 const OPL_ATTEMPT_LEDGER_OWNER = 'one-person-lab';
 const RCA_DOMAIN_OWNER = 'redcube_ai';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

@@ -4,11 +4,7 @@ import {
 } from 'opl-framework-shared/family-orchestration';
 
 import type { FamilyOrchestrationCompanion } from '../types.js';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
+import { safeText } from './action-utils.js';
 
 const PRODUCT_ENTRY_ACTION_GRAPH_REF = Object.freeze({
   ref_kind: 'json_pointer',

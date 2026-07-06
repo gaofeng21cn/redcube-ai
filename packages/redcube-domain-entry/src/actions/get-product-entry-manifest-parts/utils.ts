@@ -1,23 +1,14 @@
 // @ts-nocheck
-import { readFileSync } from 'node:fs';
+import {
+  readJson,
+  requireField,
+} from '../action-utils.js';
+export { safeText } from '../action-utils.js';
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
   '../../../../../contracts/runtime-program/current-program.json',
   import.meta.url,
 );
-
-export function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
 
 export function normalizeWorkspaceRoot(request) {
   return requireField(
@@ -27,5 +18,5 @@ export function normalizeWorkspaceRoot(request) {
 }
 
 export function readCurrentProgramContract() {
-  return JSON.parse(readFileSync(CURRENT_PROGRAM_CONTRACT_URL, 'utf8'));
+  return readJson(CURRENT_PROGRAM_CONTRACT_URL);
 }

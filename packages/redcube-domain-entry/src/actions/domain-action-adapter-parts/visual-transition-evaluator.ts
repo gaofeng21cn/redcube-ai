@@ -1,13 +1,9 @@
 // @ts-nocheck
+import { safeText } from '../action-utils.js';
 
 const DOMAIN_ID = 'redcube_ai';
 const DESCRIPTOR_ID = 'rca.visual_transition_evaluator.v1';
 const SPEC_REF = '/visual_transition_spec';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 function camelField(name) {
   return name.replace(/_([a-z])/g, (_, char) => char.toUpperCase());

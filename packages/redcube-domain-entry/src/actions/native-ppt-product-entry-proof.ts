@@ -1,28 +1,10 @@
 // @ts-nocheck
-import { readFileSync } from 'node:fs';
-
 import { invokeProductEntry } from './invoke-product-entry.js';
 import { getProductEntrySession } from './get-product-entry-session.js';
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
+import { readJson, requireField, safeText } from './action-utils.js';
 
 const NATIVE_PPT_ROUTES = ['author_pptx_native', 'repair_pptx_native'];
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
 
 function plainObject(value) {
   return value && typeof value === 'object' && !Array.isArray(value) ? value : {};

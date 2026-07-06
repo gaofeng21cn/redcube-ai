@@ -1,16 +1,12 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 
 import {
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
 import { productEntrySessionFile } from './product-entry-session-refs.js';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
+import { readJson, safeText } from './action-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -18,10 +14,6 @@ function safeArray(value) {
 
 function isPlainObject(value) {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 function writeJson(file, value) {

@@ -1,23 +1,15 @@
 // @ts-nocheck
-import { readFileSync, writeFileSync } from 'node:fs';
+import { writeFileSync } from 'node:fs';
 
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
 
 import { createDeliverable } from './create-deliverable.js';
 import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';
 import { researchSource } from './source-research.js';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
+import { readJson, safeText } from './action-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 function writeJson(file, value) {

@@ -2,11 +2,7 @@
 import {
   buildOplProductEntryLifecycleAdapterSurface,
 } from 'opl-framework-shared/product-entry-companions';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
+import { safeText } from './action-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

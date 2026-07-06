@@ -1,6 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 
 import {
   buildDeliveryIdentitySurface,
@@ -40,6 +40,7 @@ import {
   loadProductEntrySessionRef,
   saveProductEntrySessionRef,
 } from './product-entry-session-refs.js';
+import { readJson, requireField, safeText } from './action-utils.js';
 
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -47,11 +48,6 @@ const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
 const SUPPORTED_TASK_INTENTS = new Set(['run_opl_stage_execution_plan', 'run_deliverable_route']);
 const overlayRegistry = getDefaultOverlayRegistry();
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
 
 function isPlainObject(value) {
   return value && typeof value === 'object' && !Array.isArray(value);
@@ -79,21 +75,9 @@ function stableJson(value) {
   return JSON.stringify(value);
 }
 
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
 function writeJson(file, value) {
   mkdirSync(path.dirname(file), { recursive: true });
   writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
 }
 
 function normalizeWorkspaceRoot(request) {

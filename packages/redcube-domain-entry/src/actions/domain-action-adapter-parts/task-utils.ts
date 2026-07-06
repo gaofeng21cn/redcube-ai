@@ -1,6 +1,10 @@
 // @ts-nocheck
 import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import {
+  requireField,
+  safeText,
+} from '../action-utils.js';
 
 const FORBIDDEN_RECEIPT_PAYLOAD_ROLES = Object.freeze([
   'visual_truth',
@@ -21,18 +25,7 @@ const FORBIDDEN_RECEIPT_PAYLOAD_ROLES = Object.freeze([
   'compatibility_alias',
 ]);
 
-export function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-export function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
+export { requireField, safeText };
 
 export function normalizeWorkspaceRoot(request) {
   return requireField(

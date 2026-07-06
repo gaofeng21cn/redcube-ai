@@ -1,17 +1,9 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 
 import { resolveRuntimeStatePath } from '@redcube/runtime';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
+import { readJson, safeText } from './action-utils.js';
 
 function writeJson(file, value) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');

@@ -6,6 +6,7 @@ import {
 
 import { runDeliverableRoute } from './run-deliverable-route.js';
 import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';
+import { requireField, safeText } from './action-utils.js';
 
 const SERVICE_SAFE_DOMAIN_ENTRY_ID = 'redcube_service_safe_domain_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
@@ -15,19 +16,6 @@ const TASK_INTENT_SURFACE_KIND = {
   run_opl_stage_execution_plan: 'opl_stage_execution_plan',
   run_deliverable_route: 'route_run',
 };
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
 
 function normalizeWorkspaceRoot(request) {
   return requireField(

@@ -33,19 +33,7 @@ import {
 import {
   loadProductEntrySessionRef,
 } from './product-entry-session-refs.js';
-
-function safeText(value, fallback = '') {
-  const text = String(value || '').trim();
-  return text || fallback;
-}
-
-function requireField(name, value) {
-  const text = safeText(value);
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
+import { requireField } from './action-utils.js';
 
 export async function getProductEntrySession(request): Promise<ProductEntrySessionResponse> {
   const entrySessionId = requireField(
