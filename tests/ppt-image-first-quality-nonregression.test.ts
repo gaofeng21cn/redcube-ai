@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdtempSync } from 'node:fs';
 
 import { buildDeckRecord, hydratePptDeckContract } from '@redcube/overlay-ppt';
 import {
@@ -14,19 +14,11 @@ import {
   writeStageFolderArtifact,
 } from '@redcube/runtime-protocol';
 import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
+import { readJson, writeJson } from './helpers/json-io.ts';
 
 const CONTRACT_PATH = 'contracts/runtime-program/ppt-image-first-quality-nonregression.json';
 const PRODUCTION_ROUTE_PATH = 'contracts/runtime-program/ppt-image-first-production-route.json';
 const EFFICIENCY_PROJECTION_PATH = 'contracts/production_acceptance/rca-efficiency-handoff-projection.json';
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, data) {
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
 
 function assertRefString(value, label) {
   assert.equal(typeof value, 'string', label);

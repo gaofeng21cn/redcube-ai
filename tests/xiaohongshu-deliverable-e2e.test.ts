@@ -20,15 +20,7 @@ import {
   runDeliverableRoute,
 } from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, data) {
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
+import { readJson, writeJson } from './helpers/json-io.ts';
 
 function stageContractEntry(paths, stageId) {
   const contractFile = path.join(paths.deliverableDir, 'contracts', 'hydrated-deliverable.json');
@@ -353,7 +345,7 @@ test('xiaohongshu render_html fails when prompt pack shell asset is missing', as
     const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
     const contract = readJson(contractFile);
     contract.prompt_pack.render_contract.shell_file = 'missing-shell.html';
-    writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
+    writeJson(contractFile, contract);
 
     for (const route of ['research', 'storyline', 'single_note_plan', 'visual_direction']) {
       const result = await runDeliverableRoute({
