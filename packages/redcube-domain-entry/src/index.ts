@@ -1,10 +1,3 @@
-import {
-  doctorWorkspace as doctorWorkspaceJs,
-} from './actions/doctor-workspace.js';
-import {
-  listTopics as listTopicsJs,
-} from './actions/list-topics.js';
-
 import type {
   CreateDeliverableRequest,
   DeliverableAuditRequest,
@@ -46,11 +39,12 @@ import type {
   SourceAugmentationResultWriteResponse,
   SourceAugmentationExecutionResponse,
   TopicRequest,
-  TopicCatalogResponse,
-  WorkspaceDoctorResponse,
   WorkspaceRootRequest,
   ReviewStateResponse,
 } from './types.js';
+
+export { doctorWorkspace } from './actions/doctor-workspace.js';
+export { listTopics } from './actions/list-topics.js';
 
 async function getOverlayCatalogJs() {
   const { getDefaultOverlayCatalog } = await import('@redcube/overlay-registry');
@@ -219,14 +213,6 @@ async function getReviewStateJs(request: any) {
 async function applyReviewMutationJs(request: any) {
   const { applyReviewMutation: mutateReviewState } = await import('@redcube/runtime');
   return mutateReviewState(request);
-}
-
-export function doctorWorkspace(request: WorkspaceRootRequest): Promise<WorkspaceDoctorResponse> {
-  return doctorWorkspaceJs(request) as Promise<WorkspaceDoctorResponse>;
-}
-
-export function listTopics(request: WorkspaceRootRequest): Promise<TopicCatalogResponse> {
-  return listTopicsJs(request) as Promise<TopicCatalogResponse>;
 }
 
 export function getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse> {
