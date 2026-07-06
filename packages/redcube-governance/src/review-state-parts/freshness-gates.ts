@@ -32,7 +32,7 @@ export function stageArtifactPath(contract, deliverablePaths, stageId) {
   });
 }
 
-export function stageSequence(contract) {
+function stageSequence(contract) {
   return Array.isArray(contract?.stage_sequence?.stages)
     ? contract.stage_sequence.stages
       .map((stage) => safeText(stage?.stage_id))
@@ -40,12 +40,12 @@ export function stageSequence(contract) {
     : [];
 }
 
-export function stageIndex(contract, stageId) {
+function stageIndex(contract, stageId) {
   const sequence = stageSequence(contract);
   return sequence.indexOf(safeText(stageId));
 }
 
-export function safeMtimeMs(file) {
+function safeMtimeMs(file) {
   if (!safeText(file) || !existsSync(file)) {
     return 0;
   }

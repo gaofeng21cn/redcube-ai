@@ -328,7 +328,7 @@ export interface XhsRenderArtifact {
   artifact_refs: string[];
 }
 
-export interface CompileXhsRenderSlidesInput {
+interface CompileXhsRenderSlidesInput {
   slides: XhsPlanSlide[];
   visualDirection: XhsVisualDirection;
   canvas: RenderCanvas;
@@ -336,7 +336,7 @@ export interface CompileXhsRenderSlidesInput {
   recipeMarkupArtifacts: Partial<Record<XhsRecipeId, string>>;
 }
 
-export interface XhsPlanningDependencies {
+interface XhsPlanningDependencies {
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
   promptSeed(contract: XhsHydratedContract, route: XhsPromptRoute, vars?: { title?: string }): XhsPlanningSeed | XhsVisualDirectionSeed | null;
@@ -356,7 +356,7 @@ export interface XhsArtifactBase {
   produced_at: string;
 }
 
-export interface XhsVisualDirectionDependencies {
+interface XhsVisualDirectionDependencies {
   attachCommon(route: XhsStageRoute, contract: XhsHydratedContract): XhsArtifactBase;
   safeText(value: unknown, fallback?: string): string;
   safeArray<T>(value: T[] | null | undefined): T[];
@@ -370,7 +370,7 @@ export interface XhsPathModuleLike {
   join(...paths: string[]): string;
 }
 
-export interface XhsRenderArtifactDependencies {
+interface XhsRenderArtifactDependencies {
   readStageArtifact<T>(contract: XhsHydratedContract, deliverablePaths: PackDeliverablePaths, stageId: XhsStageRoute): T | null;
   renderContract(contract: XhsHydratedContract): XhsRenderContract;
   safeText(value: unknown, fallback?: string): string;

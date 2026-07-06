@@ -72,7 +72,7 @@ export function buildGovernanceSurface(contract: GovernanceRecord = {}): Governa
   ) as GovernanceSurfaceContract;
 }
 
-export function validateGovernanceRecord(surfaceName: unknown, record: unknown): GovernanceRecord {
+function validateGovernanceRecord(surfaceName: unknown, record: unknown): GovernanceRecord {
   const normalizedSurfaceName = summarizeField(surfaceName) || 'governance_surface';
   const fields = requiredGovernanceFields(record);
   const governanceSurface = fields.governance_surface;

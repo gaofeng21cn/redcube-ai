@@ -17,7 +17,7 @@ export function lifecycleStageForRoute(contract, route) {
   return contract?.lifecycle_model?.route_to_stage?.[route] || null;
 }
 
-export function reviewOverlayForRoute(contract, route) {
+function reviewOverlayForRoute(contract, route) {
   return contract?.lifecycle_model?.review_overlay_routes?.[route] || null;
 }
 

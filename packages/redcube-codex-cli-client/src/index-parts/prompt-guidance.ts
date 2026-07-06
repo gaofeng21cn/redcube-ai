@@ -83,7 +83,7 @@ function readProfessionalSkillGuidance(skill, routeKey) {
   return readFileSync(absolutePath, 'utf-8').trim();
 }
 
-export function buildProfessionalSkillGuidanceSection(family, route) {
+function buildProfessionalSkillGuidanceSection(family, route) {
   const routeKey = routeKeyFor(family, route);
   const skillIds = Array.from(new Set((PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE[routeKey] || [])
     .map((skillId) => safeText(skillId))

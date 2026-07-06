@@ -100,7 +100,7 @@ export interface RuntimeWatchResponse {
   required_export_bundle: Record<string, unknown> | null;
 }
 
-export interface MetricExtensionRegistration {
+interface MetricExtensionRegistration {
   extension_id: string;
   overlay_scope: string[];
   profile_scope: string[];

@@ -11,7 +11,7 @@ import {
   resolveOwnerRepoRoot,
 } from 'opl-framework-shared/family-shared-release';
 
-export const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
+const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'integration',
@@ -21,7 +21,7 @@ export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'full:remaining',
   'full:with-historical',
 ]);
-export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
+const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
   'smoke',
   'fast',
   'integration',
@@ -31,7 +31,7 @@ export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
   'full:remaining',
   'full:with-historical',
 ]);
-export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
+const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',
   'tests/family-parity-governance-surface.test.ts',
@@ -108,7 +108,7 @@ function isWithinRepoRoot(repoRoot, resolvedPath) {
   return relative === '.' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-export function inspectWorkspacePackageResolution({
+function inspectWorkspacePackageResolution({
   repoRoot,
   specifiers = WORKSPACE_PACKAGE_SPECIFIERS,
   resolve,
@@ -147,7 +147,7 @@ export function assertWorkspacePackageResolution(options = {}) {
   return inspection;
 }
 
-export function inspectRequiredRuntimeSharedResolution({
+function inspectRequiredRuntimeSharedResolution({
   repoRoot,
   checks = REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS,
   resolve,
@@ -251,7 +251,7 @@ function buildRepoLocalSharedPinFallbackContract({
   };
 }
 
-export function inspectCurrentRepoSharedPinAlignment({
+function inspectCurrentRepoSharedPinAlignment({
   repoRoot,
   consumerRepoId = 'redcube',
   ownerRepoRoot,

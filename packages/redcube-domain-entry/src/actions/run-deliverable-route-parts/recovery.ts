@@ -236,13 +236,13 @@ function dependencyRouteCanContinue({
   return artifactRequestsFixHtml(readStageArtifactForRequest(request, 'screenshot_review'));
 }
 
-export async function runHostedRoute(request: RunDeliverableRouteRequest): Promise<RuntimeRouteResult> {
+async function runHostedRoute(request: RunDeliverableRouteRequest): Promise<RuntimeRouteResult> {
   return await runHostedDeliverableRoute(
     routeRequestForProviderAttempt(request, request.route),
   ) as RuntimeRouteResult;
 }
 
-export async function runWithRecoverableDependencies(request: RunDeliverableRouteRequest): Promise<{
+async function runWithRecoverableDependencies(request: RunDeliverableRouteRequest): Promise<{
   result: RuntimeRouteResult;
   dependencyRouteRuns: DependencyRouteRun[];
   recoveryTerminalReason: string | null;
@@ -316,7 +316,7 @@ export async function runRouteWithRecoveryAndContinuation(request: RunDeliverabl
   };
 }
 
-export async function continueToStopAfterStage({
+async function continueToStopAfterStage({
   request,
   result,
 }: {

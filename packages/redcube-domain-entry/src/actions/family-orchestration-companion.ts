@@ -56,7 +56,7 @@ const SESSION_CONTINUATION_CHECKPOINT_LINEAGE_SURFACE_REF = Object.freeze({
   label: 'latest OPL stage execution plan locator',
 });
 
-export function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
+function resolveHumanGateStatusFromContinuation(continuationSnapshot) {
   const needsUserDecision = Boolean(
     continuationSnapshot?.runtime_progress_projection?.needs_user_decision
     || continuationSnapshot?.stage_execution_plan?.control_policy?.approval_required,

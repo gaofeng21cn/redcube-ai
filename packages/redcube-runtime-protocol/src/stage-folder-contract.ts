@@ -248,7 +248,7 @@ function resolveStageDir(stageRoot, canonicalStageId) {
   return match ? path.join(stageRoot, match.name) : direct;
 }
 
-export const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
+const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
   owner: 'redcube_ai',
   opl_role: 'stage_folder_locator_and_index_consumer',
   stage_folder_current_pointer_role: 'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
@@ -293,7 +293,7 @@ export function stageOrderForCanonicalStage(stageId) {
   }[stageId] ?? 99;
 }
 
-export function stageFolderRoot(input = {}) {
+function stageFolderRoot(input = {}) {
   const locator = stageArtifactLocator(input);
   return path.join(
     resolveOplStateRoot(input),

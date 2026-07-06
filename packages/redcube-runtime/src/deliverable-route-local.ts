@@ -451,7 +451,7 @@ function reviewExportRefsForRoute(artifact) {
   ]);
 }
 
-export function attachRouteArtifactCloseoutRefs({ artifact }) {
+function attachRouteArtifactCloseoutRefs({ artifact }) {
   if (artifact?.status === 'block' || artifact?.status === 'failed') {
     return {
       ...artifact,

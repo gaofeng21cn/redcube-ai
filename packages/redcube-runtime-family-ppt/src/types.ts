@@ -132,7 +132,7 @@ export interface PptVisualDirectionSeed {
   };
 }
 
-export interface PptOutlineSlide {
+interface PptOutlineSlide {
   slide_id: string;
   slide_no: number;
   page_type: PptPageType;
@@ -331,7 +331,7 @@ export interface PptRenderSlide {
   content: string;
 }
 
-export interface PptRenderPlan {
+interface PptRenderPlan {
   render_strategy: string;
   shell_file: string;
   pack_id: string;
@@ -370,7 +370,7 @@ export interface PptRenderArtifact {
   artifact_refs: string[];
 }
 
-export interface PptOutlineDependencies {
+interface PptOutlineDependencies {
   safeText(value: unknown): string;
   promptSeed(
     route: PptPromptRoute,
@@ -394,14 +394,14 @@ export interface PptArtifactBase {
   produced_at: string;
 }
 
-export interface PptSlideBlueprintDependencies {
+interface PptSlideBlueprintDependencies {
   attachCommon(route: Extract<PptStageRoute, 'detailed_outline' | 'slide_blueprint'>, contract: PptHydratedContract): PptArtifactBase;
   safeArray<T>(value: T[] | null | undefined): T[];
   CANVAS: PptCanvasContract;
   BANNED_RENDER_TOKENS: string[];
 }
 
-export interface PptVisualDirectionDependencies {
+interface PptVisualDirectionDependencies {
   attachCommon(route: 'visual_direction', contract: PptHydratedContract): PptArtifactBase;
   safeText(value: unknown): string;
   safeArray<T>(value: T[] | null | undefined): T[];
@@ -414,7 +414,7 @@ export interface PptVisualDirectionDependencies {
   sharedSourceConfidence(contract: PptHydratedContract): string;
 }
 
-export interface PptBuildRenderArtifactInput {
+interface PptBuildRenderArtifactInput {
   workspaceRoot: string;
   topicId: string;
   deliverableId: string;
@@ -426,7 +426,7 @@ export interface PptPathModuleLike {
   join(...paths: string[]): string;
 }
 
-export interface PptRenderArtifactDependencies {
+interface PptRenderArtifactDependencies {
   readStageArtifact<T>(
     contract: PptHydratedContract,
     deliverablePaths: PptDeliverablePaths,
@@ -452,7 +452,7 @@ export interface PptRenderArtifactDependencies {
   path: PptPathModuleLike;
 }
 
-export interface CompilePptRenderSlidesInput {
+interface CompilePptRenderSlidesInput {
   slides: PptBlueprintSlide[];
   visualDirection: PptVisualDirection;
   canvas: PptCanvasContract;

@@ -25,7 +25,7 @@ export function reviewHistoryFile(deliverablePaths) {
   return path.join(deliverablePaths.reportsDir, 'review-history.jsonl');
 }
 
-export function ensureDir(dir) {
+function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
 }
 

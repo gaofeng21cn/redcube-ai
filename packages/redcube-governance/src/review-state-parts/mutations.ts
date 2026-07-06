@@ -15,7 +15,7 @@ import {
 } from './state-io.js';
 import { buildQualitySummary, stageArtifactPath } from './freshness-gates.js';
 
-export function deriveArtifactGovernanceState({ previous, patch, contract }) {
+function deriveArtifactGovernanceState({ previous, patch, contract }) {
   const approvalRequired = Boolean(contract?.delivery_contract?.human_gate?.required);
   const baseApproval = previous?.approval_state || defaultState({
     contract,

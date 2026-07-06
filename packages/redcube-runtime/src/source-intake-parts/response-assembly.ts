@@ -16,7 +16,7 @@ import {
   writeJson,
 } from './workspace-setup.js';
 
-export function stageResult(status, extra = {}) {
+function stageResult(status, extra = {}) {
   return {
     status,
     produced_at: new Date().toISOString(),
@@ -24,7 +24,7 @@ export function stageResult(status, extra = {}) {
   };
 }
 
-export function sourceArtifactFiles(sourcePaths) {
+function sourceArtifactFiles(sourcePaths) {
   return {
     sourceIndexFile: sourcePaths.sourceIndexFile,
     extractedMaterialsFile: sourcePaths.extractedMaterialsFile,
@@ -77,7 +77,7 @@ export function reuseFrozenSourcePackIfAvailable({ sourcePaths, previousManifest
   });
 }
 
-export function inferInputMode({ modeHint, sources }) {
+function inferInputMode({ modeHint, sources }) {
   const kinds = new Set(
     sources
       .filter((source) => {
@@ -99,7 +99,7 @@ export function inferInputMode({ modeHint, sources }) {
   return 'files';
 }
 
-export function inferConfidence({ inputMode, materials }) {
+function inferConfidence({ inputMode, materials }) {
   if (inputMode === 'brief_keywords') return 'low';
   return materials.length > 0 ? 'medium' : 'low';
 }

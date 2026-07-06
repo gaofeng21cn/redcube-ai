@@ -12,7 +12,7 @@ import {
   writeRouteRunRecord,
 } from './route-run-record-store.js';
 
-export const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
+const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
 
 function computeLatencyMs(startedAt, finishedAt) {
   const startMs = Date.parse(String(startedAt || ''));
@@ -63,7 +63,7 @@ function findPriorRuns({ workspaceRoot, route, scope, target, overlay }) {
     });
 }
 
-export function buildRunTelemetry(run, executor, status, finishedAt = run.finished_at) {
+function buildRunTelemetry(run, executor, status, finishedAt = run.finished_at) {
   return {
     ...(run?.telemetry || {}),
     run_id: run.run_id,

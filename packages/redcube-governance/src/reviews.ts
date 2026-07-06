@@ -150,7 +150,7 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
   };
 }
 
-export async function auditDeliverable(request) {
+async function auditDeliverable(request) {
   const reviewResponse = loadPlatformReviewState(request);
   const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
   const reviewState = reviewResponse?.state || null;

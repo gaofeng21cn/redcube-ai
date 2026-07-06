@@ -26,7 +26,7 @@ import {
   writeState,
 } from './state-io.js';
 
-export function loadDeliveryArtifact({ contract, deliverablePaths }) {
+function loadDeliveryArtifact({ contract, deliverablePaths }) {
   const route = safeText(contract?.delivery_contract?.required_export_route);
   if (!route) return null;
   return safeReadJson(stageArtifactPath(contract, deliverablePaths, route));
@@ -49,7 +49,7 @@ function toDirectDeliveryNext(current) {
   return null;
 }
 
-export function buildProjectionState({ reviewState, contract, deliveryArtifact, deliverablePaths }) {
+function buildProjectionState({ reviewState, contract, deliveryArtifact, deliverablePaths }) {
   const deliveryContract = contract?.delivery_contract || null;
   const projectionModel = safeText(deliveryContract?.projection_model);
   const artifactDeliveryState = deliveryArtifact?.export_bundle?.delivery_state || null;
@@ -86,7 +86,7 @@ export function buildProjectionState({ reviewState, contract, deliveryArtifact, 
   };
 }
 
-export function buildOperatorHandoffSummary({
+function buildOperatorHandoffSummary({
   sourceReadinessSummary,
   reviewState,
   contract,
@@ -156,7 +156,7 @@ function normalizeObjectMap(value) {
   );
 }
 
-export function buildLifecycleStageSummary(contract) {
+function buildLifecycleStageSummary(contract) {
   const lifecycleStageContract = contract?.lifecycle_stage_contract || null;
   if (!lifecycleStageContract) {
     return null;
@@ -233,7 +233,7 @@ export function toPublicationProjectionEntry({
   };
 }
 
-export function publicationPriority(current) {
+function publicationPriority(current) {
   if (current === 'published') return 6;
   if (current === 'approved_pending_publish') return 5;
   if (current === 'approval_pending') return 4;
@@ -245,7 +245,7 @@ export function publicationPriority(current) {
   return 0;
 }
 
-export function sortPublicationEntries(left, right) {
+function sortPublicationEntries(left, right) {
   const priorityDelta = publicationPriority(right?.current) - publicationPriority(left?.current);
   if (priorityDelta !== 0) return priorityDelta;
   return String(right?.updated_at || '').localeCompare(String(left?.updated_at || ''));

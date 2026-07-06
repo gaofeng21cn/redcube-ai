@@ -25,8 +25,8 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
-export type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
-export type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
+type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
+type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
 
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
@@ -352,7 +352,7 @@ export interface RuntimeFailRunRequest {
   executor: Record<string, unknown>;
 }
 
-export interface RuntimeProductEntrySessionRecord {
+interface RuntimeProductEntrySessionRecord {
   schema_version: 1;
   entry_session_id: string;
   workspace_root: string;

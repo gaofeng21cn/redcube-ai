@@ -275,7 +275,7 @@ export interface PosterRenderArtifact {
   artifact_refs: string[];
 }
 
-export interface PosterBlueprintDependencies {
+interface PosterBlueprintDependencies {
   safeText: (value: unknown, fallback?: string) => string;
   safeArray: <T>(value: unknown) => T[];
   promptSeed: (contract: PosterHydratedContract, route: PosterPromptRoute, vars?: Record<string, string>) => PosterBlueprintSeed | PosterVisualDirectionSeed | null;
@@ -285,14 +285,14 @@ export interface PosterBlueprintDependencies {
   sourceLabels: (contract: PosterHydratedContract) => string[];
 }
 
-export interface PosterVisualDirectionDependencies {
+interface PosterVisualDirectionDependencies {
   safeText: (value: unknown, fallback?: string) => string;
   safeArray: <T>(value: unknown) => T[];
   promptSeed: (contract: PosterHydratedContract, route: PosterPromptRoute, vars?: Record<string, string>) => PosterVisualDirectionSeed | null;
   attachCommon: (route: PosterStageRoute, contract: PosterHydratedContract) => Record<string, unknown>;
 }
 
-export interface PosterRenderArtifactDependencies {
+interface PosterRenderArtifactDependencies {
   readStageArtifact: (contract: PosterHydratedContract, deliverablePaths: PosterDeliverablePaths, stageId: string) => PosterBlueprintArtifact | PosterVisualDirectionArtifact | null;
   renderContract: (contract: PosterHydratedContract) => PosterRenderContract;
   promptArtifact: (contract: PosterHydratedContract, route: 'render_html') => { render_markup_artifact?: { artifact_surface?: string; binding_model?: string; authored_markup_registry?: Record<string, string>; }; } | null;
@@ -307,7 +307,7 @@ export interface PosterRenderArtifactDependencies {
   writeJson: (file: string, value: unknown) => void;
 }
 
-export interface PosterBuildRenderArtifactInput {
+interface PosterBuildRenderArtifactInput {
   workspaceRoot: string;
   topicId: string;
   deliverableId: string;
@@ -315,7 +315,7 @@ export interface PosterBuildRenderArtifactInput {
   deliverablePaths: PosterDeliverablePaths;
 }
 
-export interface CompilePosterRenderSlidesInput {
+interface CompilePosterRenderSlidesInput {
   slides: PosterBlueprintSlide[];
   visualDirection: PosterVisualDirectionArtifact['visual_direction'];
   canvas: PosterCanvasContract;

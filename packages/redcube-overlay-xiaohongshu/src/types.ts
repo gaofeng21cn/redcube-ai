@@ -61,7 +61,7 @@ export type XiaohongshuForbiddenTemplateRoute =
   | 'layoutByType'
   | 'cardsGrid'
   | 'pageType';
-export type XiaohongshuRecipeId =
+type XiaohongshuRecipeId =
   | 'xhs.hero_note'
   | 'xhs.split_contrast'
   | 'xhs.staggered_steps'

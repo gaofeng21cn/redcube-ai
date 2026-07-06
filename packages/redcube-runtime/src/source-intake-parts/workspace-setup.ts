@@ -14,7 +14,7 @@ import {
 } from '@redcube/runtime-protocol';
 import { ensureWorkspaceXiaohongshuAuthorTemplate } from '@redcube/redcube-config/xiaohongshu-author-profile';
 
-export function ensureDir(dir) {
+function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -33,7 +33,7 @@ export function safeText(value) {
   return String(value || '').trim();
 }
 
-export function buildTopicRecord(topicId, title) {
+function buildTopicRecord(topicId, title) {
   return {
     topic_id: topicId,
     title: title || topicId,

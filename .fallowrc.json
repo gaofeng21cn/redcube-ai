@@ -7,6 +7,48 @@
     "scripts/real-route-evolution-probe-parts/terminal-evidence.ts",
     "scripts/real-route-evolution-probe-parts/timeout-blocker.ts",
     "scripts/run-real-route-evolution-probe.ts",
-    "tools/native-ppt-proof/build-fixture-input.mjs"
+    "tools/native-ppt-proof/build-fixture-input.ts"
+  ],
+  "ignoreExports": [
+    {
+      "file": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
+      "exports": [
+        "dispatchDomainActionAdapter"
+      ]
+    },
+    {
+      "file": "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+      "exports": [
+        "dispatchDomainActionAdapter"
+      ]
+    },
+    {
+      "file": "packages/redcube-governance/src/review-state-parts/mutations.ts",
+      "exports": [
+        "applyReviewMutation",
+        "persistReviewStatePatch"
+      ]
+    },
+    {
+      "file": "packages/redcube-governance/src/review-state.ts",
+      "exports": [
+        "applyReviewMutation",
+        "persistReviewStatePatch"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts",
+      "exports": [
+        "canRunXiaohongshu",
+        "runXiaohongshuRoute"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts",
+      "exports": [
+        "canRunXiaohongshu",
+        "runXiaohongshuRoute"
+      ]
+    }
   ]
 }

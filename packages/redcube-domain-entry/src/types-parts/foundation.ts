@@ -340,7 +340,7 @@ export interface StageExecutionResponse extends SurfaceBase<'opl_stage_execution
   };
 }
 
-export interface RunStageDeliverableRequest extends DeliverableRequest, OverlayRequest {
+interface RunStageDeliverableRequest extends DeliverableRequest, OverlayRequest {
   adapter?: string;
   userIntent?: string;
   stopAfterStage?: string;

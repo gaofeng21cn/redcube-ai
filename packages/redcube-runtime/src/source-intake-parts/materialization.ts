@@ -13,7 +13,7 @@ import {
   sourceIntakeMaterialInboxDir,
 } from './workspace-setup.js';
 
-export function detectSourceKind(file) {
+function detectSourceKind(file) {
   const ext = path.extname(file).toLowerCase();
   if (ext === '.md' || ext === '.markdown') return 'markdown';
   if (ext === '.txt') return 'text';
@@ -21,7 +21,7 @@ export function detectSourceKind(file) {
   return 'unsupported';
 }
 
-export function isOperatorContextSource(source) {
+function isOperatorContextSource(source) {
   const kind = safeText(source?.kind);
   return safeText(source?.source_role) === 'operator_context'
     || kind === 'brief'
@@ -32,7 +32,7 @@ export function isConsumableSource(source) {
   return !isOperatorContextSource(source);
 }
 
-export function copySourceIntoTopic(sourceFile, topicPaths, index, sourceLabel = 'source') {
+function copySourceIntoTopic(sourceFile, topicPaths, index, sourceLabel = 'source') {
   const absolute = path.resolve(sourceFile);
   if (!existsSync(absolute)) {
     throw new Error(`source file 不存在: ${sourceFile}`);
@@ -53,7 +53,7 @@ export function copySourceIntoTopic(sourceFile, topicPaths, index, sourceLabel =
   };
 }
 
-export function createBriefSources({ brief, keywords, title }) {
+function createBriefSources({ brief, keywords, title }) {
   const sources = [];
   if (safeText(brief)) {
     sources.push({
@@ -116,7 +116,7 @@ export function buildIntakeSources({
   ].map((source) => enrichSourceFingerprint(source));
 }
 
-export function extractPdfSource(source) {
+function extractPdfSource(source) {
   const mineruToken = safeText(process.env.MINERU_TOKEN);
   const extractorCmd = safeText(process.env.MINERU_EXTRACTOR_CMD);
 
@@ -151,7 +151,7 @@ export function extractPdfSource(source) {
   };
 }
 
-export function extractSourceContent(source) {
+function extractSourceContent(source) {
   if (source.kind === 'brief') {
     return {
       status: 'ready',

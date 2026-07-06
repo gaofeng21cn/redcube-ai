@@ -38,7 +38,7 @@ export function normalizeOperatorFiles(input) {
     .filter(Boolean);
 }
 
-export function sourceContentHashInput(source) {
+function sourceContentHashInput(source) {
   if (source.kind === 'brief') return `brief\n${safeText(source.brief_text)}`;
   if (source.kind === 'keywords') return `keywords\n${source.keywords.join('\n')}`;
   if (source.kind === 'markdown' || source.kind === 'text' || source.kind === 'pdf') {

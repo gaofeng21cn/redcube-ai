@@ -11,8 +11,8 @@ import type {
 } from './types.js';
 
 export const REDCUBE_PYTHON_COMMAND_ENV = 'REDCUBE_PYTHON_COMMAND';
-export const PYTHON_PLAYWRIGHT_PROBE_COMMAND = 'python3';
-export const PYTHON_PLAYWRIGHT_PROBE_ARGS = ['-c', 'import sys; import playwright; print(sys.executable)'];
+const PYTHON_PLAYWRIGHT_PROBE_COMMAND = 'python3';
+const PYTHON_PLAYWRIGHT_PROBE_ARGS = ['-c', 'import sys; import playwright; print(sys.executable)'];
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
