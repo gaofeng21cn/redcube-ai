@@ -770,7 +770,7 @@ test('CLI review projection proxies topic publication projection read path', asy
     assert.equal(projection.ok, true);
     assert.equal(projection.surface_kind, 'publication_projection');
     assert.equal(projection.state_type, 'projection');
-    assert.equal(projection.publication.current, 'approval_pending');
+    assert.equal(projection.publication.current, 'draft');
     assert.equal(projection.canonical_source.kind, 'review_state.delivery_projection');
   });
 });

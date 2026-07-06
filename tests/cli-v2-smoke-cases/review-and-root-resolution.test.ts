@@ -275,6 +275,7 @@ test('CLI review watch fails closed because the default watch wrapper is OPL-own
       { cwd: path.resolve('.') },
     );
     assert.equal(runParsed.ok, true);
+    assert.equal(runParsed.result_surface?.surface_kind, 'opl_stage_execution_plan');
 
     const failure = await execCliExpectFailureAsync(
       cliPath,
@@ -284,7 +285,7 @@ test('CLI review watch fails closed because the default watch wrapper is OPL-own
         '--workspace-root', workspaceRoot,
         '--topic-id', 'topic-a',
         '--deliverable-id', 'deck-a',
-        '--run-id', runParsed.run.run_id,
+        '--run-id', runParsed.summary.target_handle,
       ],
       { cwd: path.resolve('.') },
     );

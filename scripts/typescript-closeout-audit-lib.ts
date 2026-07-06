@@ -20,7 +20,6 @@ const CONTRACT_SURFACES = [
   'packages/redcube-governance',
   'packages/redcube-reference-os',
   'packages/redcube-overlay-core',
-  'packages/redcube-overlay-registry',
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',
   'packages/redcube-overlay-poster-onepager',
@@ -28,7 +27,6 @@ const CONTRACT_SURFACES = [
 
 const SERVICE_BOUNDARIES = [
   'packages/redcube-runtime',
-  'packages/redcube-runtime-family-registry',
   'apps/redcube-cli',
   'apps/redcube-mcp',
 ];
@@ -39,7 +37,6 @@ const UTILITY_BOUNDARIES = [
 
 const HIGH_CHURN_PACKAGES = [
   'packages/redcube-overlay-core',
-  'packages/redcube-overlay-registry',
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',
   'packages/redcube-overlay-poster-onepager',
