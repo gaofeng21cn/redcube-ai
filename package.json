@@ -34,7 +34,6 @@
     "repo:hygiene": "scripts/repo-hygiene.sh",
     "repo:hygiene:fix": "scripts/repo-hygiene.sh --fix",
     "contracts:current-program:write": "node --experimental-strip-types scripts/sync-current-program-leaf-index.ts --write",
-    "contracts:current-program:sync": "npm run --silent contracts:current-program:write",
     "contracts:current-program:check": "node --experimental-strip-types scripts/sync-current-program-leaf-index.ts --check",
     "typecheck": "npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false",
     "build": "tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts",
