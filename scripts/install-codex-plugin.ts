@@ -65,31 +65,11 @@ function parseArgs(argv: string[]): ParsedArgs {
 }
 
 function resolveTrackedPluginRoot(repoRoot: string): string {
-  const canonicalRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
-  if (fs.existsSync(canonicalRoot)) {
-    return canonicalRoot;
-  }
-
-  const legacyRoot = path.join(repoRoot, 'plugins', 'rca');
-  if (fs.existsSync(legacyRoot)) {
-    return legacyRoot;
-  }
-
-  return canonicalRoot;
+  return path.join(repoRoot, 'plugins', 'redcube-ai');
 }
 
 function resolveTrackedSkillRoot(pluginRoot: string): string {
-  const canonicalRoot = path.join(pluginRoot, 'skills', 'redcube-ai');
-  if (fs.existsSync(canonicalRoot)) {
-    return canonicalRoot;
-  }
-
-  const legacyRoot = path.join(pluginRoot, 'skills', 'rca');
-  if (fs.existsSync(legacyRoot)) {
-    return legacyRoot;
-  }
-
-  return canonicalRoot;
+  return path.join(pluginRoot, 'skills', 'redcube-ai');
 }
 
 function main(): void {

@@ -1,4 +1,4 @@
 interface:
   display_name: "RedCube AI"
   short_description: "Visual deliverable runtime for Codex"
-  default_prompt: "Use $redcube-ai to inspect the current RedCube AI product entry and continue the active deliverable loop. The legacy alias $rca still works. Treat implementation work as TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit."
+  default_prompt: "Use $redcube-ai to inspect the current RedCube AI product entry and continue the active deliverable loop. Treat implementation work as TypeScript orchestration plus Python native helpers; repo-tracked JavaScript is retired and blocked by closeout audit."
