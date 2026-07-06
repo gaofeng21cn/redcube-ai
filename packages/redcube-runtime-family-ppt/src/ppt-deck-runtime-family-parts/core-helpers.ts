@@ -13,12 +13,12 @@ export function safeText(value, fallback = '') {
   return text || fallback;
 }
 
-export function ensureDir(dir) {
+function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
 }
 
-export function readJson(file) {
+function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 

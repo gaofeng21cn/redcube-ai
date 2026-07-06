@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import { parseArgs as parseNodeArgs } from 'node:util';
 
 import {
   buildPhysicalSourceMorphologyPolicy,
@@ -758,13 +759,19 @@ export function buildPrivatePlatformRetirementReadback() {
 }
 
 function parseArgs(argv) {
-  const formatIndex = argv.indexOf('--format');
-  const format = formatIndex >= 0 ? argv[formatIndex + 1] : 'text';
+  const parsed = parseNodeArgs({
+    args: argv,
+    allowPositionals: false,
+    options: {
+      format: { type: 'string', default: 'text' },
+      scope: { type: 'string', default: 'private-platform' },
+    },
+  });
+  const format = parsed.values.format;
   if (!['json', 'text'].includes(format)) {
     throw new Error('--format must be json or text');
   }
-  const scopeIndex = argv.indexOf('--scope');
-  const scope = scopeIndex >= 0 ? argv[scopeIndex + 1] : 'private-platform';
+  const scope = parsed.values.scope;
   if (!['private-platform', 'default-caller-tail'].includes(scope)) {
     throw new Error('--scope must be private-platform or default-caller-tail');
   }

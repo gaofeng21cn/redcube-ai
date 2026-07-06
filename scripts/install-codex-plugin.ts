@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import fs from 'node:fs';
 import path from 'node:path';
+import { parseArgs as parseNodeArgs } from 'node:util';
 
 const DEFAULT_REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 
@@ -21,46 +22,33 @@ function usage(): never {
 }
 
 function parseArgs(argv: string[]): ParsedArgs {
-  const parsed: ParsedArgs = {
-    repoRoot: DEFAULT_REPO_ROOT,
-    home: process.env.HOME ?? '',
-    skipTools: false,
-  };
-
-  for (let index = 0; index < argv.length;) {
-    const arg = argv[index];
-    if (arg === '--repo-root') {
-      const value = argv[index + 1];
-      if (!value) fail('--repo-root requires a value');
-      parsed.repoRoot = value;
-      index += 2;
-      continue;
-    }
-    if (arg === '--home') {
-      const value = argv[index + 1];
-      if (!value) fail('--home requires a value');
-      parsed.home = value;
-      index += 2;
-      continue;
-    }
-    if (arg === '--skip-tools') {
-      parsed.skipTools = true;
-      index += 1;
-      continue;
-    }
-    if (arg === '-h' || arg === '--help') {
-      usage();
-    }
-    fail(`unknown argument: ${arg}`);
+  let parsed;
+  try {
+    parsed = parseNodeArgs({
+      args: argv,
+      allowPositionals: false,
+      options: {
+        'repo-root': { type: 'string' },
+        home: { type: 'string' },
+        'skip-tools': { type: 'boolean' },
+        help: { type: 'boolean', short: 'h' },
+      },
+    });
+  } catch (error) {
+    fail(error instanceof Error ? error.message : String(error));
   }
-
-  if (!parsed.home) {
+  const values = parsed.values;
+  if (values.help) {
+      usage();
+  }
+  const home = values.home ?? process.env.HOME ?? '';
+  if (!home) {
     fail('HOME is required when --home is not provided');
   }
   return {
-    repoRoot: path.resolve(parsed.repoRoot),
-    home: path.resolve(parsed.home),
-    skipTools: parsed.skipTools,
+    repoRoot: path.resolve(values['repo-root'] ?? DEFAULT_REPO_ROOT),
+    home: path.resolve(home),
+    skipTools: values['skip-tools'] === true,
   };
 }
 

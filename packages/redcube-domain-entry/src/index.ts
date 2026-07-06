@@ -437,7 +437,6 @@ export type {
   SourceAugmentationResultPreparationResponse,
   SourceAugmentationResultWriteResponse,
   SourceAugmentationExecutionResponse,
-  TopicCatalogResponse,
   TopicRequest,
   WorkspaceDoctorResponse,
   WorkspaceRootRequest,

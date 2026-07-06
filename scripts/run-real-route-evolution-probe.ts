@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import { parseArgs as parseNodeArgs } from 'node:util';
 
 import {
   buildPerformanceReport,
@@ -647,53 +648,43 @@ function collectSourcePackRefs({ workspaceRoot, topicId }) {
 }
 
 function parseArgs(argv) {
-  const options = {
-    routes: [],
-    iterations: null,
-    providerMode: 'mock',
-    json: false,
-    probeCodex: true,
-    routeTimeoutMs: 0,
+  const parsed = parseNodeArgs({
+    args: argv,
+    allowPositionals: false,
+    tokens: true,
+    options: {
+      'workspace-root': { type: 'string' },
+      'output-dir': { type: 'string' },
+      routes: { type: 'string' },
+      iterations: { type: 'string' },
+      live: { type: 'boolean' },
+      mock: { type: 'boolean' },
+      'mock-providers': { type: 'boolean' },
+      adapter: { type: 'string' },
+      'route-timeout-ms': { type: 'string' },
+      'native-sample-slide-count': { type: 'string' },
+      json: { type: 'boolean' },
+      'skip-codex-probe': { type: 'boolean' },
+      help: { type: 'boolean', short: 'h' },
+    },
+  });
+  const values = parsed.values;
+  const providerToken = [...parsed.tokens]
+    .reverse()
+    .find((token) => token.kind === 'option' && ['live', 'mock', 'mock-providers'].includes(token.name));
+  return {
+    workspaceRoot: values['workspace-root'],
+    outputDir: values['output-dir'],
+    routes: String(values.routes || '').split(',').map((item) => item.trim()).filter(Boolean),
+    iterations: values.iterations === undefined ? null : Number(values.iterations || 0),
+    providerMode: providerToken?.name === 'live' ? 'live' : 'mock',
+    adapter: values.adapter,
+    routeTimeoutMs: Number(values['route-timeout-ms'] || 0),
+    nativeSampleSlideCount: Number(values['native-sample-slide-count'] || 0),
+    json: values.json === true,
+    probeCodex: values['skip-codex-probe'] !== true,
+    help: values.help === true,
   };
-  for (let index = 0; index < argv.length; index += 1) {
-    const token = argv[index];
-    const next = argv[index + 1];
-    if (token === '--workspace-root') {
-      options.workspaceRoot = next;
-      index += 1;
-    } else if (token === '--output-dir') {
-      options.outputDir = next;
-      index += 1;
-    } else if (token === '--routes') {
-      options.routes = String(next || '').split(',').map((item) => item.trim()).filter(Boolean);
-      index += 1;
-    } else if (token === '--iterations') {
-      options.iterations = Number(next || 0);
-      index += 1;
-    } else if (token === '--live') {
-      options.providerMode = 'live';
-    } else if (token === '--mock' || token === '--mock-providers') {
-      options.providerMode = 'mock';
-    } else if (token === '--adapter') {
-      options.adapter = next;
-      index += 1;
-    } else if (token === '--route-timeout-ms') {
-      options.routeTimeoutMs = Number(next || 0);
-      index += 1;
-    } else if (token === '--native-sample-slide-count') {
-      options.nativeSampleSlideCount = Number(next || 0);
-      index += 1;
-    } else if (token === '--json') {
-      options.json = true;
-    } else if (token === '--skip-codex-probe') {
-      options.probeCodex = false;
-    } else if (token === '--help' || token === '-h') {
-      options.help = true;
-    } else {
-      throw new Error(`Unknown option: ${token}`);
-    }
-  }
-  return options;
 }
 
 function printUsage() {
