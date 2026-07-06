@@ -173,7 +173,7 @@ test('runDeliverableRoute fails closed for explicit retired hermes_agent adapter
         route: 'storyline',
         adapter: 'hermes_agent',
       }),
-      /RCA-owned Hermes-Agent loop bridge has been retired/,
+      /RCA-owned Hermes-Agent adapter has been retired/,
     );
   });
 });

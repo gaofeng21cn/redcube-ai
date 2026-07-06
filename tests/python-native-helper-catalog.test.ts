@@ -7,7 +7,6 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { probeHermesAgentLoop } from './package-surfaces.ts';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
@@ -28,7 +27,6 @@ const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts',
   'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts',
   'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts',
-  'packages/redcube-runtime-protocol/src/hermes-agent-loop-bridge-client.ts',
 ];
 const TEST_PYTHON_PROOF_CALLER_FILES = [
   'tests/block-content-fit-review-cases/shared.ts',
@@ -215,7 +213,7 @@ test('Python native helper catalog only points at tracked package modules', () =
 
   assert.deepEqual(
     Object.keys(helpers).sort(),
-    ['hermes_agent_loop_bridge', 'ppt_deck_export', 'ppt_deck_native', 'ppt_deck_review'],
+    ['ppt_deck_export', 'ppt_deck_native', 'ppt_deck_review'],
   );
 
   for (const helper of catalog.helpers) {
@@ -236,7 +234,6 @@ test('Python native helper catalog only points at tracked package modules', () =
   assert.equal(helpers.ppt_deck_review.deliverable_family, 'ppt_deck');
   assert.equal(helpers.ppt_deck_export.deliverable_family, 'ppt_deck');
   assert.equal(helpers.ppt_deck_native.deliverable_family, 'ppt_deck');
-  assert.equal(helpers.hermes_agent_loop_bridge.deliverable_family, 'runtime_protocol');
 });
 
 test('Python helper package modules and entrypoint callables import from the formal package root', () => {
@@ -513,15 +510,6 @@ test('Retired wrapper script invocation shape has no active callers or contract 
   assert.deepEqual(violations, []);
 });
 
-test('Hermes-Agent loop client is a retired fail-closed boundary, not a Python bridge launcher', () => {
-  const probe = probeHermesAgentLoop({ cwd: path.resolve('.') });
-
-  assert.equal(probe.ok, false);
-  assert.equal(probe.error_kind, 'hermes_agent_loop_retired');
-  assert.match(probe.blocking_reason, /RCA-owned Hermes-Agent loop bridge has been retired/);
-  assert.equal(probe.retirement_boundary.adapter_deletion_gate_owner, 'opl_agent_executor_adapter');
-});
-
 test('Native PPT helper routes stay tied to the engine contract and review/export gates', () => {
   const catalog = readJson(CATALOG_FILE);
   const helpers = helperById(catalog);
@@ -598,8 +586,4 @@ test('Review and export helpers stay scoped to their existing runtime gates', ()
   assert.deepEqual(helpers.ppt_deck_export.routes, ['export_pptx']);
   assert.deepEqual(helpers.ppt_deck_export.gates, ['export_pptx']);
   assert.deepEqual(helpers.ppt_deck_export.requires, ['Pillow', 'python-pptx']);
-
-  assert.deepEqual(helpers.hermes_agent_loop_bridge.routes, []);
-  assert.deepEqual(helpers.hermes_agent_loop_bridge.gates, []);
-  assert.deepEqual(helpers.hermes_agent_loop_bridge.requires, ['upstream-hermes-agent-local']);
 });

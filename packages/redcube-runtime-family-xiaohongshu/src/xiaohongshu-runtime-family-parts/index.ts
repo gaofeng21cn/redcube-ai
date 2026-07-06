@@ -18,7 +18,7 @@ import {
   HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
   buildHermesAgentLoopExecutionModel,
-  generateStructuredArtifactViaHermesAgentLoop,
+  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
@@ -132,7 +132,7 @@ async function generateStructuredArtifact({
   ...input
 }) {
   if (adapter === HERMES_AGENT_ADAPTER) {
-    return generateStructuredArtifactViaHermesAgentLoop(input);
+    return failRetiredHermesAgentAdapter();
   }
   return generateStructuredArtifactViaCodexCli(input);
 }
@@ -142,33 +142,7 @@ async function generateStructuredArtifactBatch({
   ...input
 }) {
   if (adapter === HERMES_AGENT_ADAPTER) {
-    const data = [];
-    for (const stage of shared.safeArray(input.stages)) {
-      const stageInput = typeof stage === 'function'
-        ? {
-            ...await stage({ previousResults: data, stage_id: stage.stage_id }),
-            stage_id: stage.stage_id,
-          }
-        : stage;
-      const result = await generateStructuredArtifactViaHermesAgentLoop(stageInput);
-      data.push({
-        stage_id: stageInput.stage_id,
-        data: result.data,
-        generationRuntime: result.generationRuntime,
-      });
-    }
-    return {
-      data,
-      batchRuntime: {
-        owner: shared.safeText(data[0]?.generationRuntime?.owner),
-        session_pool: {
-          reuse_supported: false,
-          reuse_claimed: false,
-          reuse_status: 'hermes_native_sequential_batch_fallback',
-          invocation_count: data.length,
-        },
-      },
-    };
+    return failRetiredHermesAgentAdapter();
   }
   return generateStructuredArtifactBatchViaCodexCli(input);
 }

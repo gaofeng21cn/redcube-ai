@@ -168,14 +168,8 @@ test('RCA runtime fallback gate requires experimental proof lane even for direct
         generationRuntime: { owner: 'codex_cli' },
       };
     },
-    generateStructuredArtifactViaHermesAgentStructuredCall: async () => {
-      throw new Error('hermes structured call failed');
-    },
-    generateStructuredArtifactViaHermesAgentApi: async () => {
-      throw new Error('unexpected hermes api call');
-    },
-    generateStructuredArtifactViaHermesAgentLoop: async () => {
-      throw new Error('unexpected hermes loop call');
+    failRetiredHermesAgentAdapter: () => {
+      throw new Error('hermes adapter retired');
     },
     isHermesAgentAdapter: (adapter: string) => adapter === 'hermes_agent',
     safeText,
@@ -206,7 +200,7 @@ test('RCA runtime fallback gate requires experimental proof lane even for direct
         },
       },
     }),
-    /hermes structured call failed/,
+    /hermes adapter retired/,
   );
   assert.equal(codexCalls, 0);
 

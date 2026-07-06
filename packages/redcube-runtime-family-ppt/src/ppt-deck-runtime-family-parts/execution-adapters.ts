@@ -10,9 +10,7 @@ import {
   buildCodexExecutionModel,
   buildHermesExecutionModel,
   buildHermesAgentLoopExecutionModel,
-  generateStructuredArtifactViaHermesAgentApi,
-  generateStructuredArtifactViaHermesAgentStructuredCall,
-  generateStructuredArtifactViaHermesAgentLoop,
+  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 import { createStructuredArtifactExecutor } from './executor-routing.js';
 
@@ -120,10 +118,8 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     CODEX_DEFAULT_ADAPTER,
     HERMES_AGENT_EXECUTOR_BACKEND,
     HERMES_AGENT_ADAPTER,
+    failRetiredHermesAgentAdapter,
     generateStructuredArtifactViaCodexCli,
-    generateStructuredArtifactViaHermesAgentApi,
-    generateStructuredArtifactViaHermesAgentStructuredCall,
-    generateStructuredArtifactViaHermesAgentLoop,
     isHermesAgentAdapter,
     safeText,
   });
@@ -137,56 +133,9 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     ...input
   }) {
     if (isHermesAgentAdapter(adapter)) {
-      const data = [];
-      for (const stage of stages) {
-        const result = await generateStructuredArtifact({
-          adapter,
-          executionShape,
-          hermesProfile,
-          executorRouting,
-          ...stage,
-        });
-        data.push({
-          stage_id: safeText(stage?.stage_id),
-          data: result.data,
-          generationRuntime: result.generationRuntime,
-        });
-      }
-      return {
-        data,
-        batchRuntime: {
-          owner: HERMES_AGENT_EXECUTOR_BACKEND,
-          session_pool: {
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'unsupported_by_adapter',
-            invocation_count: data.length,
-          },
-        },
-      };
-    }
-    if (adapter === HERMES_AGENT_ADAPTER) {
-      const data = [];
-      for (const stage of stages) {
-        const result = await generateStructuredArtifactViaHermesAgentLoop(stage);
-        data.push({
-          stage_id: safeText(stage?.stage_id),
-          data: result.data,
-          generationRuntime: result.generationRuntime,
-        });
-      }
-      return {
-        data,
-        batchRuntime: {
-          owner: HERMES_AGENT_ADAPTER,
-          session_pool: {
-            reuse_supported: false,
-            reuse_claimed: false,
-            reuse_status: 'unsupported_by_adapter',
-            invocation_count: data.length,
-          },
-        },
-      };
+      return failRetiredHermesAgentAdapter({
+        surface: executionShape === 'structured_call' ? 'hermes_agent_api_server' : 'hermes_agent_loop',
+      });
     }
     return generateStructuredArtifactBatchViaCodexCli({ stages, ...input });
   }

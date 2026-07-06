@@ -8,6 +8,7 @@ import {
   buildCodexExecutorDescriptor,
   buildHermesExecutorDescriptor,
   buildHermesAgentLoopExecutorDescriptor,
+  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 import type { RuntimeFamilyContract } from '@redcube/runtime-family-registry';
 
@@ -178,6 +179,13 @@ export function resolveExecutorAdapter({
       }
       if (stageContract.stage_id !== route) {
         throw new Error(`Stage contract mismatch: expected ${route}, got ${stageContract.stage_id}`);
+      }
+      if (descriptor.executor_backend === HERMES_AGENT_EXECUTOR_BACKEND) {
+        return failRetiredHermesAgentAdapter({
+          surface: descriptor.execution_shape === STRUCTURED_CALL_EXECUTION_SHAPE
+            ? 'hermes_agent_api_server'
+            : 'hermes_agent_loop',
+        }) as never;
       }
 
       const familyRunner = await loadRuntimeFamilyRunner(contract);

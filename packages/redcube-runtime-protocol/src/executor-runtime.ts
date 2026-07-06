@@ -57,6 +57,21 @@ export function hermesAgentAdapterRetirementBoundary() {
   };
 }
 
+function retiredHermesAgentAdapterError({ surface = HERMES_AGENT_LOOP_RUNTIME_SURFACE } = {}) {
+  const boundary = hermesAgentAdapterRetirementBoundary();
+  return new Error([
+    'RCA-owned Hermes-Agent adapter has been retired.',
+    `surface=${String(surface || HERMES_AGENT_LOOP_RUNTIME_SURFACE).trim() || HERMES_AGENT_LOOP_RUNTIME_SURFACE}`,
+    `backend_lifecycle=${boundary.backend_lifecycle}`,
+    `adapter_deletion_gate_owner=${boundary.adapter_deletion_gate_owner}`,
+    'use OPL executor adapter receipt refs instead.',
+  ].join(' '));
+}
+
+export function failRetiredHermesAgentAdapter(options = {}) {
+  throw retiredHermesAgentAdapterError(options);
+}
+
 export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
 export type HermesAgentLoopExecutionModel = ReturnType<typeof buildHermesAgentLoopExecutionModel>;
 

@@ -5,7 +5,7 @@ import {
   HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
   buildHermesAgentLoopExecutionModel,
-  generateStructuredArtifactViaHermesAgentLoop,
+  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 
 export { CODEX_DEFAULT_ADAPTER };
@@ -26,7 +26,7 @@ export async function generateStructuredArtifact({
   ...input
 }) {
   if (adapter === HERMES_AGENT_ADAPTER) {
-    return generateStructuredArtifactViaHermesAgentLoop(input);
+    return failRetiredHermesAgentAdapter();
   }
   return generateStructuredArtifactViaCodexCli(input);
 }
