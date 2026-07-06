@@ -7,9 +7,9 @@ import {
   buildSharedHandoffReturnSurface,
 } from 'opl-framework-shared/family-entry-contracts';
 
-export const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
-export const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
-export const RCA_DOMAIN_AGENT_ENTRY_SPEC_V1 = {
+const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
+const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
+const RCA_DOMAIN_AGENT_ENTRY_SPEC_V1 = {
   surface_kind: 'domain_agent_entry_spec',
   agent_id: 'rca',
   title: 'RedCube Agent Entry (RCA)',

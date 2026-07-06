@@ -1,7 +1,5 @@
 // @ts-nocheck
 export const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
-export const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
-export const OPL_PROVIDER_RUNTIME_OWNER = HOSTED_RUNTIME_OWNER;
 export const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
 export const PRODUCT_MANIFEST_COMMAND = 'opl_generated:product_entry_manifest';
 export const PRODUCT_STATUS_COMMAND = 'opl_generated:product_status';
