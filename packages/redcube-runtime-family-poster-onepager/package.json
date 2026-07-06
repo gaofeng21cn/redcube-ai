@@ -12,7 +12,6 @@
     "@redcube/codex-cli-client": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
     "@redcube/overlay-poster-onepager": "0.1.0",
-    "@redcube/pack-poster-onepager": "0.1.0",
     "@redcube/reference-os": "0.1.0"
   },
   "license": "Apache-2.0"

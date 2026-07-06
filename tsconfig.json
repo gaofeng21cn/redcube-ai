@@ -32,15 +32,6 @@
       "path": "./packages/redcube-codex-cli-client"
     },
     {
-      "path": "./packages/redcube-pack-ppt"
-    },
-    {
-      "path": "./packages/redcube-pack-xiaohongshu"
-    },
-    {
-      "path": "./packages/redcube-pack-poster-onepager"
-    },
-    {
       "path": "./packages/redcube-runtime-family-xiaohongshu"
     },
     {

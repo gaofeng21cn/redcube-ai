@@ -36,7 +36,7 @@ async function withMockCodexRuntime(testFn) {
 }
 
 test('poster_onepager creative mainline no longer lets runtime artifacts, seeds, or pack compilers author content', () => {
-  const packEntry = read('packages/redcube-pack-poster-onepager/src/index.ts');
+  const familyTypes = read('packages/redcube-runtime-family-poster-onepager/src/types.ts');
   const runtime = [
     read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.ts'),
     read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/authoring.ts'),
@@ -50,11 +50,12 @@ test('poster_onepager creative mainline no longer lets runtime artifacts, seeds,
   const directorReviewPrompt = read('prompts/poster_onepager/director_review.md');
   const screenshotReviewPrompt = read('prompts/poster_onepager/screenshot_review.md');
 
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/render-compiler.js')), false);
-  assert.equal(packEntry.includes('buildPosterBlueprint'), false);
-  assert.equal(packEntry.includes('buildPosterVisualDirection'), false);
-  assert.equal(packEntry.includes('buildPosterRenderArtifact'), false);
-  assert.equal(packEntry.includes('compilePosterRenderSlides'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
+  assert.equal(familyTypes.includes('@redcube/pack-poster-onepager'), false);
+  assert.equal(familyTypes.includes('buildPosterBlueprint'), false);
+  assert.equal(familyTypes.includes('buildPosterVisualDirection'), false);
+  assert.equal(familyTypes.includes('buildPosterRenderArtifact'), false);
+  assert.equal(familyTypes.includes('compilePosterRenderSlides'), false);
   assert.equal(runtime.includes("const authoredArtifact = promptArtifact(contract, 'storyline', {"), false);
   assert.equal(runtime.includes("const seed = promptSeed(contract, 'visual_director_review', {"), false);
   assert.equal(runtime.includes('buildPosterBlueprint(contract, storylineArtifact,'), false);

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 
 function read(file) {
   return readFileSync(path.resolve(file), 'utf-8');
@@ -14,53 +14,31 @@ function readImplementation(file) {
   return shell ? read(path.join(path.dirname(file), shell[1])) : source;
 }
 
-function sourceFiles(dir) {
-  return readdirSync(path.resolve(dir), { withFileTypes: true }).flatMap((entry) => {
-    const file = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      return sourceFiles(file);
-    }
-    if (entry.isFile() && /\.(?:ts|js|mjs|cjs)$/.test(entry.name)) {
-      return [file];
-    }
-    return [];
-  });
-}
-
-test('pack shells no longer export xiaohongshu creative builders or compilers', () => {
-  const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
+test('type-only pack workspaces are retired and runtime-family types own artifact contracts', () => {
+  const rootTsconfig = JSON.parse(read('tsconfig.json'));
+  const pptFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-ppt/package.json'));
+  const xhsFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-xiaohongshu/package.json'));
+  const posterFamilyPackageJson = JSON.parse(read('packages/redcube-runtime-family-poster-onepager/package.json'));
+  const pptFamilyTypes = read('packages/redcube-runtime-family-ppt/src/types.ts');
+  const xhsFamilyTypes = read('packages/redcube-runtime-family-xiaohongshu/src/types.ts');
+  const posterFamilyTypes = read('packages/redcube-runtime-family-poster-onepager/src/types.ts');
   const renderPrompt = read('prompts/xiaohongshu/render_html.md');
 
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/planning.js')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/render-compiler.js')), false);
-  assert.equal(packEntry.includes('buildXhsPlanSlides'), false);
-  assert.equal(packEntry.includes('buildXhsVisualDirection'), false);
-  assert.equal(packEntry.includes('buildXhsRenderHtml'), false);
-  assert.equal(packEntry.includes('compileXhsRenderSlides'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
+  assert.equal(rootTsconfig.references.some((entry) => entry.path.includes('redcube-pack-')), false);
+  assert.equal(Boolean(pptFamilyPackageJson.dependencies?.['@redcube/pack-ppt']), false);
+  assert.equal(Boolean(xhsFamilyPackageJson.dependencies?.['@redcube/pack-xiaohongshu']), false);
+  assert.equal(Boolean(posterFamilyPackageJson.dependencies?.['@redcube/pack-poster-onepager']), false);
+  assert.equal(pptFamilyTypes.includes('@redcube/pack-ppt'), false);
+  assert.equal(xhsFamilyTypes.includes('@redcube/pack-xiaohongshu'), false);
+  assert.equal(posterFamilyTypes.includes('@redcube/pack-poster-onepager'), false);
+  assert.match(pptFamilyTypes, /interface PptBlueprintArtifact/);
+  assert.match(xhsFamilyTypes, /interface XhsPlanArtifact/);
+  assert.match(posterFamilyTypes, /interface PosterBlueprintArtifact/);
   assert.equal(renderPrompt.includes('authored_markup_registry'), true);
-});
-
-test('ppt pack shell no longer exports creative builders or compilers', () => {
-  const packEntry = read('packages/redcube-pack-ppt/src/index.ts');
-  const renderPrompt = read('prompts/ppt_deck/render_html.md');
-
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js')), false);
-  assert.equal(packEntry.includes('buildPptDetailedOutline'), false);
-  assert.equal(packEntry.includes('buildPptSlideBlueprint'), false);
-  assert.equal(packEntry.includes('buildPptVisualDirection'), false);
-  assert.equal(packEntry.includes('buildPptRenderArtifact'), false);
-  assert.equal(packEntry.includes('compilePptRenderSlides'), false);
-  assert.equal(renderPrompt.includes('authored_markup_registry'), true);
-});
-
-test('poster pack shell no longer exports creative builders or compilers', () => {
-  const packEntry = read('packages/redcube-pack-poster-onepager/src/index.ts');
-
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager/src/render-compiler.js')), false);
-  assert.equal(packEntry.includes('buildPosterBlueprint'), false);
-  assert.equal(packEntry.includes('buildPosterVisualDirection'), false);
-  assert.equal(packEntry.includes('buildPosterRenderArtifact'), false);
-  assert.equal(packEntry.includes('compilePosterRenderSlides'), false);
+  assert.equal(read('prompts/ppt_deck/render_html.md').includes('authored_markup_registry'), true);
 });
 
 test('overlay render contracts keep pack ids but no longer declare compiler registry wiring', () => {
@@ -119,20 +97,19 @@ test('family runtimes no longer import pack-runtime or pack-local creative build
 });
 
 test('poster_onepager onboarding still reads prompt-pack and rerun policy from hydrated contract', () => {
-  const posterPack = read('packages/redcube-pack-poster-onepager/src/index.ts');
   const posterRuntimeCore = read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts');
 
-  assert.equal(posterPack.includes('prompts/poster_onepager'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
   assert.equal(posterRuntimeCore.includes('prompts/poster_onepager'), false);
   assert.equal(posterRuntimeCore.includes('DEFAULT_PROMPT_PACK'), false);
   assert.equal(posterRuntimeCore.includes('contract?.review_surface?.rerun_from_stage'), true);
 });
 
-test('pack source types do not encode executor-owner provenance strings', () => {
-  const packSourceRoots = [
-    'packages/redcube-pack-ppt/src',
-    'packages/redcube-pack-poster-onepager/src',
-    'packages/redcube-pack-xiaohongshu/src',
+test('runtime-family artifact types do not encode executor-owner provenance strings', () => {
+  const familyTypeFiles = [
+    'packages/redcube-runtime-family-ppt/src/types.ts',
+    'packages/redcube-runtime-family-poster-onepager/src/types.ts',
+    'packages/redcube-runtime-family-xiaohongshu/src/types.ts',
   ];
   const bannedExecutorOwnerStrings = [
     'codex_cli',
@@ -142,14 +119,12 @@ test('pack source types do not encode executor-owner provenance strings', () => 
   ];
   const violations = [];
 
-  for (const root of packSourceRoots) {
-    assert.equal(statSync(path.resolve(root)).isDirectory(), true);
-    for (const file of sourceFiles(root)) {
-      const source = read(file);
-      for (const banned of bannedExecutorOwnerStrings) {
-        if (source.includes(banned)) {
-          violations.push(`${file}: ${banned}`);
-        }
+  for (const sourceFile of familyTypeFiles) {
+    assert.equal(statSync(path.resolve(sourceFile)).isFile(), true);
+    const source = read(sourceFile);
+    for (const banned of bannedExecutorOwnerStrings) {
+      if (source.includes(banned)) {
+        violations.push(`${sourceFile}: ${banned}`);
       }
     }
   }

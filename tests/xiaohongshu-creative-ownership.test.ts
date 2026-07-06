@@ -157,7 +157,7 @@ test.after(async () => {
 });
 
 test('xiaohongshu Codex-backed mainline owns protected creative outputs instead of JS builders', () => {
-  const packEntry = read('packages/redcube-pack-xiaohongshu/src/index.ts');
+  const familyTypes = read('packages/redcube-runtime-family-xiaohongshu/src/types.ts');
   const runtimeEntry = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
   const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
   const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
@@ -169,12 +169,12 @@ test('xiaohongshu Codex-backed mainline owns protected creative outputs instead 
   const directorReviewPrompt = read('prompts/xiaohongshu/director_review.md');
   const screenshotReviewPrompt = read('prompts/xiaohongshu/screenshot_review.md');
 
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/planning.js')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu/src/render-compiler.js')), false);
-  assert.equal(packEntry.includes('buildXhsPlanSlides'), false);
-  assert.equal(packEntry.includes('buildXhsVisualDirection'), false);
-  assert.equal(packEntry.includes('buildXhsRenderHtml'), false);
-  assert.equal(packEntry.includes('compileXhsRenderSlides'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu')), false);
+  assert.equal(familyTypes.includes('@redcube/pack-xiaohongshu'), false);
+  assert.equal(familyTypes.includes('buildXhsPlanSlides'), false);
+  assert.equal(familyTypes.includes('buildXhsVisualDirection'), false);
+  assert.equal(familyTypes.includes('buildXhsRenderHtml'), false);
+  assert.equal(familyTypes.includes('compileXhsRenderSlides'), false);
   assert.match(runtime, /from '\.\/xiaohongshu-runtime-family-parts\/index\.js'/);
   assert.match(runtime, /export async function runXiaohongshuRoute\(/);
   assert.equal(runtime.includes('async function buildStoryline('), false);

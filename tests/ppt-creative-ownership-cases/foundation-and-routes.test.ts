@@ -212,7 +212,7 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
 }
 
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
-  const packTypes = read('packages/redcube-pack-ppt/src/index.ts');
+  const familyTypes = read('packages/redcube-runtime-family-ppt/src/types.ts');
   const runtime = [
     read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts'),
     read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.ts'),
@@ -221,9 +221,6 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
     read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.ts'),
     read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/surface.ts'),
   ].join('\n');
-  const renderCompiler = existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js'))
-    ? read('packages/redcube-pack-ppt/src/render-compiler.js')
-    : '';
   const storylinePrompt = read('prompts/ppt_deck/storyline.md');
   const outlinePrompt = read('prompts/ppt_deck/detailed_outline.md');
   const visualPrompt = read('prompts/ppt_deck/visual_direction.md');
@@ -241,17 +238,12 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
 
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
   assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);
-  assert.equal(renderCompiler.includes('function pickRecipeId('), false);
-  assert.equal(renderCompiler.includes('function renderSlideMarkup('), false);
-  assert.equal(renderCompiler.includes('function renderTemplate('), false);
-  assert.equal(renderCompiler.includes("renderContract?.template_registry?.[recipeId]"), false);
-  assert.equal(renderCompiler.includes("materializedFrom: 'prompt_runtime_template'"), false);
-  assert.equal(renderCompiler.includes('compiled.content = renderTemplate(templateText, buildTemplateState(compiled, canvas));'), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt/src/render-compiler.js')), false);
-  assert.equal(packTypes.includes('buildPptDetailedOutline'), false);
-  assert.equal(packTypes.includes('buildPptSlideBlueprint'), false);
-  assert.equal(packTypes.includes('buildPptVisualDirection'), false);
-  assert.equal(packTypes.includes('compilePptRenderSlides'), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt')), false);
+  assert.equal(familyTypes.includes('@redcube/pack-ppt'), false);
+  assert.equal(familyTypes.includes('buildPptDetailedOutline'), false);
+  assert.equal(familyTypes.includes('buildPptSlideBlueprint'), false);
+  assert.equal(familyTypes.includes('buildPptVisualDirection'), false);
+  assert.equal(familyTypes.includes('compilePptRenderSlides'), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), false);
   assert.equal(runtime.includes("const renderArtifact = deps.promptArtifact('render_html')?.render_markup_artifact || {};"), false);
   assert.equal(runtime.includes('compileRenderSlides({'), false);

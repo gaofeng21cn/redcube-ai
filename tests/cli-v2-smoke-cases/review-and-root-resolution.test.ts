@@ -99,18 +99,6 @@ function createIsolatedCliInstall() {
     path.join(domainEntryNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-pack-ppt'),
-    path.join(domainEntryNodeModulesDir, 'pack-ppt'),
-  );
-  copyPackageIntoInstall(
-    path.resolve('packages/redcube-pack-xiaohongshu'),
-    path.join(domainEntryNodeModulesDir, 'pack-xiaohongshu'),
-  );
-  copyPackageIntoInstall(
-    path.resolve('packages/redcube-pack-poster-onepager'),
-    path.join(domainEntryNodeModulesDir, 'pack-poster-onepager'),
-  );
-  copyPackageIntoInstall(
     path.resolve('packages/redcube-runtime-family-ppt'),
     path.join(domainEntryNodeModulesDir, 'runtime-family-ppt'),
   );

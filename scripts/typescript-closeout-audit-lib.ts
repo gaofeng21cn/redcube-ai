@@ -38,9 +38,6 @@ const UTILITY_BOUNDARIES = [
 ];
 
 const HIGH_CHURN_PACKAGES = [
-  'packages/redcube-pack-xiaohongshu',
-  'packages/redcube-pack-ppt',
-  'packages/redcube-pack-poster-onepager',
   'packages/redcube-overlay-core',
   'packages/redcube-overlay-registry',
   'packages/redcube-overlay-xiaohongshu',
