@@ -7,7 +7,6 @@ import {
   MANIFEST_REF,
   MAX_LEAF_JSON_LINE_COUNT,
   PARTS_ROOT,
-  SYNC_COMMAND,
   WRITE_COMMAND,
   generatedArrayFields,
   sha256,
@@ -31,7 +30,6 @@ export function buildCurrentProgramAssembly(sourcePartRefs = sourcePartRefsFromF
     commands: {
       write: WRITE_COMMAND,
       check: CHECK_COMMAND,
-      sync_compat_alias: SYNC_COMMAND,
     },
     generated_aggregate_role: 'generated_read_through_snapshot_for_existing_consumers',
     canonical_truth_model: 'source_parts_are_canonical_current_program_sources',
@@ -69,17 +67,9 @@ export function buildCurrentProgramPackBundleManifestForSourceIndex(sourceIndex:
       write_command: WRITE_COMMAND,
       check_command: CHECK_COMMAND,
     },
-    generated_aggregate: {
-      ref: AGGREGATE_SNAPSHOT_REF,
-      role: 'generated_read_through_snapshot_for_existing_consumers',
-      do_not_edit: true,
-      write_command: WRITE_COMMAND,
-      check_command: CHECK_COMMAND,
-    },
     commands: {
       write: WRITE_COMMAND,
       check: CHECK_COMMAND,
-      sync_compat_alias: SYNC_COMMAND,
     },
     false_authority_flags: FALSE_AUTHORITY_FLAGS,
     not_claims: [

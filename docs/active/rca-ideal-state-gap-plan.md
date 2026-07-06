@@ -72,7 +72,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Standard stage pack v2 launch gate | done structurally | `contracts/stage_control_plane.json` 中 6 个 visual stage 均声明 `user_stage_log_contract`、`progress_delta_policy` 和 `typed_blocker_lineage_policy`；OPL installed runtime 对 RCA conformance 读为 passed，stage readiness 读为 `launch_warning` 且 hard blocker 为 0。 |
 | Executable visual pack discipline | done structurally | `agent/quality_gates/visual_pack_discipline.md`、`agent/knowledge/markdown_route_policy.md`、`agent/quality_gates/package_distribution.md`、`contracts/pack_compiler_input.json`、product-entry manifest refs 和 `declarative_visual_pack_input.visual_pack_discipline_contract` 已把 Kami 可学习的高层实践折成 RCA-owned brand precedence、source/material pass transparency、density/sparse-page evidence、显式可选 Markdown/Marp refs-only route、package distribution consistency、render evidence、review/export gate 和 owner refs，不采用外部审美、模板、运行面或 authority。 |
 | Minimal `/goal` and PPT AgentLab surfaces | done structurally | `contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json`、`contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json`、`contracts/agent_lab_handoff.json` |
-| Current-program source shape | done | `contracts/runtime-program/current-program.index.json` 与 `contracts/runtime-program/current-program-parts/**` |
+| Current-program source shape | done | `contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/current-program-parts/**` 与收薄后的单一 aggregate bundle manifest metadata |
 
 已闭合项不在 active plan 里追加 dated closeout。需要追溯 run、probe、commit 或 verification transcript 时读 `docs/history/process/**`、runtime evidence 或提交历史。
 

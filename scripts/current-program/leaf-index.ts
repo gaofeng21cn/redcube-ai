@@ -10,7 +10,6 @@ export const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
 export const MAX_LEAF_JSON_LINE_COUNT = 800;
 export const WRITE_COMMAND = 'npm run contracts:current-program:write';
 export const CHECK_COMMAND = 'npm run contracts:current-program:check';
-export const SYNC_COMMAND = 'npm run contracts:current-program:sync';
 
 export const FALSE_AUTHORITY_FLAGS = Object.freeze({
   aggregate_snapshot_is_canonical_source: false,

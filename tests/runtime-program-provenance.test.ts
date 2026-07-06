@@ -167,10 +167,8 @@ test('current runtime program has an explicit source-to-generated bundle manifes
   assert.equal(manifest.aggregate.do_not_edit, true);
   assert.equal(manifest.aggregate.write_command, 'npm run contracts:current-program:write');
   assert.equal(manifest.aggregate.check_command, 'npm run contracts:current-program:check');
-  assert.equal(manifest.generated_aggregate.ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(manifest.generated_aggregate.do_not_edit, true);
-  assert.equal(manifest.generated_aggregate.write_command, 'npm run contracts:current-program:write');
-  assert.equal(manifest.generated_aggregate.check_command, 'npm run contracts:current-program:check');
+  assert.deepEqual(Object.keys(manifest).filter((key) => key.endsWith('aggregate')), ['aggregate']);
+  assert.deepEqual(Object.keys(manifest.commands), ['write', 'check']);
   assert.equal(manifest.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
   assert.equal(manifest.false_authority_flags.manifest_can_claim_domain_ready, false);
   assert.equal(manifest.false_authority_flags.manifest_can_authorize_quality_or_export, false);

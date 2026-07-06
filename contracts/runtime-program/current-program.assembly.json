@@ -17,8 +17,7 @@
   ],
   "commands": {
     "write": "npm run contracts:current-program:write",
-    "check": "npm run contracts:current-program:check",
-    "sync_compat_alias": "npm run contracts:current-program:sync"
+    "check": "npm run contracts:current-program:check"
   },
   "generated_aggregate_role": "generated_read_through_snapshot_for_existing_consumers",
   "canonical_truth_model": "source_parts_are_canonical_current_program_sources",
