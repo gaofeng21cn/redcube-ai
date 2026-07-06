@@ -31,18 +31,8 @@ import {
 } from './standard-domain-agent-skeleton-parts/runtime-descriptors.js';
 
 export {
-  buildDomainOwnerReceiptContract,
-  buildLifecycleGuardedApplyProof,
-  buildNoRegressionOwnerReceiptOplConsumptionProof,
-  buildPhysicalSkeletonFollowThrough,
-  buildReviewHelperBaselineFollowThrough,
-  buildVisualTransitionSpec,
   buildRuntimeResidueRetirementAudit,
   buildVisualPatternMemoryWritebackProjection,
-  buildArtifactLocatorContract,
-  buildControlledVisualStageAttemptFixture,
-  buildDomainActionAdapterReceiptRefs,
-  buildDomainMemoryDescriptorLocator,
   buildFamilyDomainMemoryDescriptor,
 };
 

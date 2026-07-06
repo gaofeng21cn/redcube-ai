@@ -32,7 +32,7 @@ export interface PptDeckExportStageDeps {
   writeText(file: string, content: string): void;
 }
 
-interface BuildExportArtifactInput {
+export interface BuildExportArtifactInput {
   workspaceRoot: string;
   topicId: string;
   deliverableId: string;

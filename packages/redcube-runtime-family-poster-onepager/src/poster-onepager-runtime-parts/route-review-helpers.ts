@@ -8,7 +8,7 @@ import {
   generateStructuredArtifactViaHermesAgentLoop,
 } from '@redcube/runtime-protocol';
 
-export { CODEX_DEFAULT_ADAPTER, HERMES_AGENT_ADAPTER };
+export { CODEX_DEFAULT_ADAPTER };
 
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
 const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());

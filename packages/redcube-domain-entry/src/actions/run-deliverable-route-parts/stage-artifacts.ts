@@ -87,7 +87,7 @@ export function stageDefinitions(contract: JsonObject, includeAlternates = true)
   return stages;
 }
 
-function routeSequenceStageIds(contract: JsonObject): string[] {
+export function routeSequenceStageIds(contract: JsonObject): string[] {
   return stageDefinitions(contract, false)
     .map((stage) => safeText((stage as { stage_id?: unknown })?.stage_id))
     .filter(Boolean);
