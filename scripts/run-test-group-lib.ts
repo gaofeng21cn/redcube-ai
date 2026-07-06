@@ -11,7 +11,7 @@ import {
   resolveOwnerRepoRoot,
 } from 'opl-framework-shared/family-shared-release';
 
-const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
+export const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
 
 export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'integration',
@@ -21,7 +21,7 @@ export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
   'full:remaining',
   'full:with-historical',
 ]);
-const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
+export const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
   'smoke',
   'fast',
   'integration',
@@ -31,7 +31,7 @@ const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
   'full:remaining',
   'full:with-historical',
 ]);
-const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
+export const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',
   'tests/family-parity-governance-surface.test.ts',

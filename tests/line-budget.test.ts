@@ -126,7 +126,7 @@ test('RedCube AI skill prefers repo-local launcher over PATH global CLI', () => 
   assert.match(skill, /npm run --prefix <redcube-ai-repo> redcube --/);
   assert.match(skill, /shell PATH lookup/);
   assert.match(skill, /用户 PATH 上的裸 `redcube`/);
-  assert.match(skill, /旧 `rca` 只保留为兼容 alias/);
+  assert.match(skill, /RCA deck-oriented alias `deck <operation>`/);
 });
 
 function makeLines(lineCount) {

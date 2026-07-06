@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import { runtimeStateDisplayGlob, runtimeStateDisplayPath } from './runtime-state.js';
@@ -26,6 +26,9 @@ interface ResidueViolation extends ResidueDefinition {
 
 function readRepoFile(relativePath: string): string {
   const absolutePath = path.join(REPO_ROOT, relativePath);
+  if (!existsSync(absolutePath)) {
+    return '';
+  }
   const source = readFileSync(absolutePath, 'utf-8');
   const tsBackedShell = source.trim().match(/^export \* from '\.\/([^']+\.ts)';$/);
   return tsBackedShell
