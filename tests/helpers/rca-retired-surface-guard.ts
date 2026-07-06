@@ -42,6 +42,7 @@ export const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
   /\b(?:compatibility|legacy)[_-]?alias(?:es)?[_-]?(?:default|active|live|normal)\b/i,
 ]);
 export const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze([
+  ...ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS,
   /\bruntimeWatch_can_return_to_domain_action_adapter_default_dispatch\b\s*[:=]\s*true/i,
   /\bdomain_action_adapter_can_become_generic_dispatch_owner\b\s*[:=]\s*true/i,
   /\bdomain_action_adapter_can_become_generated_wrapper_owner\b\s*[:=]\s*true/i,

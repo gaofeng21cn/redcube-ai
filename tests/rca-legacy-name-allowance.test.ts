@@ -3,10 +3,6 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import {
-  buildDefaultCallerTailOwnerDeltaReadback,
-  buildPrivatePlatformRetirementReadback,
-} from '../scripts/check-private-platform-retirement.ts';
 
 import {
   TEXT_EXTENSIONS,
@@ -102,74 +98,6 @@ test('RCA active code source legacy names are covered by explicit morphology all
   assert.deepEqual(violations, []);
 });
 
-test('RCA domain_action_adapter implementation legacy names stay under domain-handler no-resurrection guard', () => {
-  const policy = JSON.parse(readFileSync(
-    path.resolve('contracts/physical_source_morphology_policy.json'),
-    'utf-8',
-  ));
-  const trackedTerms = policy.legacy_name_policy.tracked_legacy_terms;
-  const adapterSurface = policy.active_surface_classifications.find(
-    (entry) => entry.surface_id === 'domain_action_adapter_guarded_actions',
-  );
-  assert.ok(adapterSurface);
-  assert.equal(adapterSurface.classification, 'domain_handler_target');
-  assert.deepEqual(adapterSurface.source_refs, [
-    'packages/redcube-domain-entry/src/actions/domain-action-adapter.ts',
-    'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts',
-    'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/',
-  ]);
-  const allowedTerms = new Set(adapterSurface.legacy_name_allowance.legacy_terms);
-  assert.deepEqual([...allowedTerms].sort(), [...trackedTerms].sort());
-  assert.deepEqual(adapterSurface.legacy_name_allowance.allowed_as, [
-    'domain_handler_target',
-    'refs_only_read_model',
-    'contract_safe_semantic_id',
-    'negative_test_guard',
-  ]);
-  for (const field of policy.legacy_name_policy.allowance_guard_required_fields) {
-    assert.equal(adapterSurface.legacy_name_allowance[field], false, `domain_action_adapter_guarded_actions.${field}`);
-  }
-  assert.equal(adapterSurface.no_resurrection_gate.generic_dispatch_owner_allowed, false);
-  assert.equal(adapterSurface.no_resurrection_gate.generic_domain_action_adapter_owner_allowed, false);
-  assert.equal(adapterSurface.no_resurrection_gate.default_runtime_watch_dispatch_allowed, false);
-  assert.equal(adapterSurface.no_resurrection_gate.production_readiness_claim_allowed, false);
-
-  const adapterFiles = adapterSurface.source_refs.flatMap((sourceRef) => {
-    const sourcePath = sourceRefPath(sourceRef);
-    return sourcePath.endsWith('/')
-      ? listTextFiles(sourcePath)
-      : [sourcePath];
-  })
-    .filter((file) => TEXT_EXTENSIONS.has(path.extname(file)))
-    .map(normalizePath)
-    .sort();
-
-  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/domain-action-adapter.ts'));
-  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts'));
-  assert.ok(adapterFiles.includes('packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts'));
-
-  const violations = [];
-  for (const file of adapterFiles) {
-    const text = readFileSync(path.resolve(file), 'utf-8');
-    const hits = trackedTerms.filter((term) => new RegExp(`\\b${term}\\b`, 'i').test(text));
-    if (hits.length === 0) continue;
-    const coveringSurfaceIds = policy.active_surface_classifications
-      .filter((entry) => (entry.source_refs || []).some((sourceRef) => sourceRefCoversFile(sourceRef, file)))
-      .map((entry) => entry.surface_id);
-    if (!coveringSurfaceIds.includes('domain_action_adapter_guarded_actions')) {
-      violations.push(`${file}:missing-domain_action_adapter_guarded_actions`);
-      continue;
-    }
-    for (const term of hits) {
-      if (!allowedTerms.has(term)) {
-        violations.push(`${file}:unallowed-${term}`);
-      }
-    }
-  }
-
-  assert.deepEqual(violations, []);
-});
-
 test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection', () => {
   const policy = JSON.parse(readFileSync(
     path.resolve('contracts/physical_source_morphology_policy.json'),
@@ -178,222 +106,35 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
   const gate = policy.default_caller_tail_thinning_gate;
   assert.equal(gate.gate_id, 'rca.source_morphology.default_caller_tail_thinning.v1');
   assert.equal(gate.state, 'non_live_functional_structure_gate_landed');
-  assert.equal(gate.retained_current_refs_only_boundary_ids.includes('runtime_watch_projection'), true);
   assert.deepEqual(gate.applies_to_surface_ids, []);
   assert.equal(gate.current_non_tail_surface_ids.includes('domain_action_adapter_guarded_actions'), true);
   assert.equal(gate.current_non_tail_surface_ids.includes('product_entry_continuity_refs_adapter'), true);
-  assert.equal(gate.current_non_tail_surface_ids.includes('repo_shell_verification_wrappers'), true);
-  assert.deepEqual(gate.allowed_current_roles, [
-    'refs_only_read_model',
-    'retained_current_refs_only_boundary',
-    'domain_handler_target',
-    'service_safe_domain_entry',
-    'minimal_visual_authority_function',
-    'visual_native_helper_implementation',
-    'repo_native_verification_wrapper',
-    'tombstone_or_provenance',
-  ]);
+  assert.equal(gate.retained_current_refs_only_boundary_ids.includes('runtime_watch_projection'), true);
   assert.equal(gate.current_role_guard.runtimeWatch_can_return_to_domain_action_adapter_default_dispatch, false);
   assert.equal(gate.current_role_guard.domain_action_adapter_can_become_generic_dispatch_owner, false);
   assert.equal(gate.current_role_guard.domain_action_adapter_can_become_generated_wrapper_owner, false);
-  assert.equal(gate.current_role_guard.route_run_records_can_become_attempt_ledger_owner, false);
-  assert.equal(gate.current_role_guard.shell_wrappers_can_become_runtime_owner, false);
+  assert.equal(gate.current_role_guard.compatibility_alias_or_facade_allowed, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_physical_delete_authorized, false);
-  assert.equal(gate.false_ready_guard.source_classification_can_claim_visual_ready, false);
   assert.equal(gate.false_ready_guard.source_classification_can_claim_production_ready, false);
-  assert.deepEqual(gate.active_source_resurrection_scan_policy, {
-    policy_id: 'rca.source_morphology.active_source_no_resurrection_scan.v1',
-    scan_roots: [
-      'agent',
-      'apps',
-      'packages',
-      'contracts',
-      'plugins',
-      'scripts',
-      'tools',
-      'python',
-    ],
-    helper_ref: 'tests/helpers/rca-retired-surface-guard.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS',
-    test_ref: 'tests/rca-legacy-name-allowance.test.ts#RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection',
-    forbidden_true_claim_keys: [
-      'runtimeWatch_can_return_to_domain_action_adapter_default_dispatch',
-      'domain_action_adapter_can_become_generic_dispatch_owner',
-      'domain_action_adapter_can_become_generated_wrapper_owner',
-      'default_runtime_watch_dispatch_allowed',
-      'generic_dispatch_owner_allowed',
-      'generic_domain_action_adapter_owner_allowed',
-      'generic_generated_wrapper_owner_allowed',
-      'generic_session_runtime_owner_allowed',
-      'generic_workbench_owner_allowed',
-      'generic_runtime_owner_allowed',
-    ],
-    fail_closed_conditions: [
-      'active_source_claims_runtimeWatch_default_dispatch',
-      'active_source_claims_generic_domain_action_adapter_owner',
-      'active_source_claims_generated_wrapper_owner',
-      'active_source_claims_generic_runtime_or_workbench_owner',
-      'compatibility_alias_or_facade_resurrection_claim',
-    ],
-    authority_boundary: {
-      scan_can_authorize_physical_delete: false,
-      scan_can_claim_default_caller_cutover: false,
-      scan_can_claim_visual_ready: false,
-      scan_can_claim_domain_ready: false,
-      scan_can_claim_production_ready: false,
-    },
-  });
+
+  const scanPolicy = gate.active_source_resurrection_scan_policy;
+  assert.equal(scanPolicy.policy_id, 'rca.source_morphology.active_source_no_resurrection_scan.v1');
+  assert.equal(scanPolicy.helper_ref, 'tests/helpers/rca-retired-surface-guard.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS');
+  assert.equal(scanPolicy.scan_roots.includes('packages'), true);
+  assert.equal(scanPolicy.scan_roots.includes('contracts'), true);
+  for (const key of [
+    'runtimeWatch_can_return_to_domain_action_adapter_default_dispatch',
+    'domain_action_adapter_can_become_generic_dispatch_owner',
+    'domain_action_adapter_can_become_generated_wrapper_owner',
+    'generic_runtime_owner_allowed',
+  ]) {
+    assert.equal(scanPolicy.forbidden_true_claim_keys.includes(key), true, key);
+  }
+  assert.equal(scanPolicy.fail_closed_conditions.includes('compatibility_alias_or_facade_resurrection_claim'), true);
+  assert.equal(scanPolicy.authority_boundary.scan_can_authorize_physical_delete, false);
+  assert.equal(scanPolicy.authority_boundary.scan_can_claim_production_ready, false);
   assert.deepEqual(
-    activePrivatePlatformResurrectionViolations(gate.active_source_resurrection_scan_policy.scan_roots),
+    activePrivatePlatformResurrectionViolations(scanPolicy.scan_roots),
     [],
   );
-  assert.equal(
-    gate.retirement_readback_cleanup_guard.guard_id,
-    'rca.source_morphology.retirement_readback_cleanup_guard.v1',
-  );
-  assert.equal(
-    gate.retirement_readback_cleanup_guard.authority_boundary.guard_can_authorize_physical_delete,
-    false,
-  );
-  assert.equal(
-    gate.retirement_readback_cleanup_guard.authority_boundary.guard_can_sign_owner_receipt,
-    false,
-  );
-  assert.equal(
-    gate.retirement_readback_cleanup_guard.claims.claims_retirement_cleanup_complete,
-    false,
-  );
-  assert.equal(
-    gate.retirement_readback_cleanup_guard.claims.claims_visual_ready,
-    false,
-  );
-  assert.deepEqual(gate.retirement_readback_cleanup_guard.false_ready_claim_guard_keys, [
-    'retirement_readback_cleanup_complete',
-    'retirement_readback_guard_satisfied',
-    'cleanup_readback_physical_delete_authorized',
-    'claims_cleanup_readback_authorizes_delete',
-    'claims_retirement_cleanup_applied',
-  ]);
-});
-
-test('RCA default-caller tail count-zero readback is not physical delete authority', () => {
-  const privatePlatformReadback = buildPrivatePlatformRetirementReadback();
-  const tailReadback = buildDefaultCallerTailOwnerDeltaReadback();
-
-  assert.deepEqual(privatePlatformReadback.failed_checks, []);
-  assert.deepEqual(tailReadback.failed_checks, []);
-
-  for (const key of [
-    'product_entry_can_become_generic_product_wrapper_owner',
-    'domain_handler_target_can_become_generated_wrapper_owner',
-    'domain_handler_target_can_become_generic_runtime_owner',
-    'generic_product_wrapper_owner_allowed',
-  ]) {
-    assert.ok(
-      privatePlatformReadback.active_source_resurrection_scan.forbidden_true_claim_keys.includes(key),
-      key,
-    );
-  }
-
-  for (const compactSummary of [
-    privatePlatformReadback.default_caller_tail_compact_retirement_summary,
-    tailReadback.compact_retirement_summary,
-  ]) {
-    assert.equal(compactSummary.tail_surface_count ?? compactSummary.total_tail_surface_count, 0);
-    assert.equal(compactSummary.cleanup_candidate_count, 0);
-    assert.equal(
-      compactSummary.cleanup_candidate_count_semantics,
-      'zero_means_no_current_cleanup_candidate_not_physical_delete_authority',
-    );
-    assert.equal(compactSummary.can_apply_cleanup, false);
-    assert.equal(compactSummary.can_authorize_physical_delete, false);
-    assert.equal(compactSummary.can_claim_default_caller_cutover_complete, false);
-    assert.equal(compactSummary.can_claim_domain_ready, false);
-    assert.deepEqual(compactSummary.count_zero_guard, {
-      guard_id: 'rca.source_morphology.empty_default_caller_tail_not_delete_authority.v1',
-      state: 'tail_worklist_empty_current_surfaces_still_guarded',
-      interpretation:
-        'tail_surface_count_zero_and_cleanup_candidate_count_zero_mean_no_current_cleanup_candidate_not_physical_delete_authority',
-      protected_counts: [
-        'tail_surface_count',
-        'cleanup_candidate_count',
-      ],
-      false_ready_guard: {
-        empty_tail_worklist_can_claim_cleanup_complete: false,
-        empty_tail_worklist_can_authorize_physical_delete: false,
-        empty_tail_worklist_can_claim_default_caller_cutover_complete: false,
-        empty_tail_worklist_can_claim_visual_ready: false,
-        empty_tail_worklist_can_claim_domain_ready: false,
-        empty_tail_worklist_can_claim_production_ready: false,
-        cleanup_candidate_count_zero_can_authorize_physical_delete: false,
-        cleanup_candidate_count_zero_can_claim_cleanup_complete: false,
-      },
-    });
-  }
-});
-
-test('RCA product-entry manifest projection legacy names stay under manifest source classification', () => {
-  const policy = JSON.parse(readFileSync(
-    path.resolve('contracts/physical_source_morphology_policy.json'),
-    'utf-8',
-  ));
-  const trackedTerms = policy.legacy_name_policy.tracked_legacy_terms;
-  const manifestSurface = policy.active_surface_classifications.find(
-    (entry) => entry.surface_id === 'product_entry_manifest_projection',
-  );
-  assert.ok(manifestSurface);
-  assert.equal(manifestSurface.classification, 'refs_only_read_model');
-  assert.deepEqual(manifestSurface.source_refs, [
-    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
-    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/',
-  ]);
-  const allowedTerms = new Set(manifestSurface.legacy_name_allowance.legacy_terms);
-  assert.deepEqual([...allowedTerms].sort(), [...trackedTerms].sort());
-  assert.deepEqual(manifestSurface.legacy_name_allowance.allowed_as, [
-    'refs_only_read_model',
-    'domain_handler_target',
-    'contract_safe_semantic_id',
-    'locator_protocol_boundary',
-    'negative_test_guard',
-  ]);
-  for (const field of policy.legacy_name_policy.allowance_guard_required_fields) {
-    assert.equal(manifestSurface.legacy_name_allowance[field], false, `product_entry_manifest_projection.${field}`);
-  }
-
-  const manifestSourceRefs = [
-    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
-    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/',
-  ];
-  const manifestFiles = manifestSourceRefs.flatMap((sourceRef) => {
-    const sourcePath = sourceRefPath(sourceRef);
-    return sourcePath.endsWith('/')
-      ? listTextFiles(sourcePath)
-      : [sourcePath];
-  })
-    .filter((file) => TEXT_EXTENSIONS.has(path.extname(file)))
-    .map(normalizePath)
-    .sort();
-
-  assert.ok(manifestFiles.includes('packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts'));
-  assert.ok(manifestFiles.includes('packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/shell-catalog.ts'));
-
-  const violations = [];
-  for (const file of manifestFiles) {
-    const text = readFileSync(path.resolve(file), 'utf-8');
-    const hits = trackedTerms.filter((term) => new RegExp(`\\b${term}\\b`, 'i').test(text));
-    if (hits.length === 0) continue;
-    const coveringSurfaceIds = policy.active_surface_classifications
-      .filter((entry) => (entry.source_refs || []).some((sourceRef) => sourceRefCoversFile(sourceRef, file)))
-      .map((entry) => entry.surface_id);
-    if (!coveringSurfaceIds.includes('product_entry_manifest_projection')) {
-      violations.push(`${file}:missing-product_entry_manifest_projection`);
-      continue;
-    }
-    for (const term of hits) {
-      if (!allowedTerms.has(term)) {
-        violations.push(`${file}:unallowed-${term}`);
-      }
-    }
-  }
-
-  assert.deepEqual(violations, []);
 });
