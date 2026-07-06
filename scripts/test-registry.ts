@@ -230,7 +230,7 @@ function layerFor({ lane, file }) {
   return lane;
 }
 
-const TEST_REGISTRY = Object.freeze(
+export const TEST_REGISTRY = Object.freeze(
   TEST_LANES.flatMap((lane) => PRIMARY_TEST_FILES[lane].map((file) => Object.freeze({
     file,
     lane,

@@ -61,6 +61,12 @@
       "exports": [
         "BuildExportArtifactInput"
       ]
+    },
+    {
+      "file": "scripts/test-registry.ts",
+      "exports": [
+        "TEST_REGISTRY"
+      ]
     }
   ]
 }
