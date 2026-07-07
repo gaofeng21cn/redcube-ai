@@ -92,13 +92,27 @@ export function createPosterOnepagerRuntimeCore() {
       return earliest;
     }, null);
   }
+  const routeReviewHelpers = createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText });
   const {
-    attachCommon,
     creativeExecution,
     creativeSourceStamp,
     primarySurface,
     reviewAuthorship,
-  } = createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText });
+  } = routeReviewHelpers;
+
+  function refSegment(value, fallback) {
+    return safeText(value, fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
+  }
+
+  function attachCommon(route, contract, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+    const safeRoute = refSegment(route, 'route');
+    const safeDeliverableId = refSegment(contract?.deliverable_id, 'deliverable');
+    return {
+      ...routeReviewHelpers.attachCommon(route, contract, generationRuntime, adapter),
+      owner_receipt_refs: [`rca-owner-receipt:visual-stage:poster_onepager:${safeRoute}:${safeDeliverableId}`],
+      typed_blocker_refs: [`rca-typed-blocker:visual-stage:poster_onepager:${safeRoute}:${safeDeliverableId}`],
+    };
+  }
   
   const {
     requireText,
