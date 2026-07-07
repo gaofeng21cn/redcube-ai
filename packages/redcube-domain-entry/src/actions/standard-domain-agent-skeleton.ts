@@ -40,7 +40,7 @@ export function buildStandardDomainAgentSkeleton({
   workspaceRoot,
   runtime,
   productEntrySessionCommand,
-  familyStageControlPlaneRef = '/family_stage_control_plane',
+  familyStageControlPlaneRef = '/rca_stage_control_refs',
   domainActionAdapterRef = '/product_entry_shell/domain_handler',
   lifecycleAdapterRef = '/opl_family_lifecycle_adapter',
 } = {}) {
@@ -61,12 +61,13 @@ export function buildStandardDomainAgentSkeleton({
   const reviewHelperBaselineFollowThrough = buildReviewHelperBaselineFollowThrough();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
-    surface_kind: 'standard_domain_agent_skeleton',
+    surface_kind: 'rca_domain_authority_refs',
     skeleton_id: SKELETON_ID,
     version: 'v1',
     domain_id: DOMAIN_ID,
     owner: DOMAIN_OWNER,
-    mapping_model: 'physical_skeleton_repo_source_layout_with_manifest_projection',
+    mapping_model: 'rca_refs_only_opl_generated_standard_domain_agent',
+    generated_standard_skeleton_owner: 'one-person-lab',
     repo_source_boundary: {
       allowed_roots: REPO_SOURCE_BOUNDARIES,
       physical_relayout_required_now: false,
@@ -97,6 +98,8 @@ export function buildStandardDomainAgentSkeleton({
       runtime_owner: runtime?.runtime_owner || 'configured_family_runtime_provider',
       executor_owner: 'configured_by_opl_runtime_provider',
       creates_visual_artifacts_in_repo: false,
+      rca_owns_generic_runtime: false,
+      rca_owns_standard_skeleton: false,
     },
     artifact_locator_contract: artifactLocatorContract,
     domain_memory_descriptor_locator: domainMemoryDescriptorLocator,
@@ -128,6 +131,8 @@ export function buildStandardDomainAgentSkeleton({
         'canonical_artifact_content',
       ],
       domain_handler_dispatch_policy: 'guarded_rca_owned_actions_only',
+      generated_standard_skeleton_owner: 'one-person-lab',
+      rca_role: 'artifact_memory_receipt_and_guarded_action_refs_only',
     },
     source_refs: [
       { ref_kind: 'json_pointer', ref: familyStageControlPlaneRef, role: 'projection_builder' },

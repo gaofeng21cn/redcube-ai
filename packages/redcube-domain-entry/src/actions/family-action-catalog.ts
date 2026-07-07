@@ -214,8 +214,8 @@ function sourceOfWork(actionId: string): JsonMap {
     source_catalog: 'family_action_catalog',
     source_catalog_ref: 'family_action_catalog:redcube_product_entry_action_catalog',
     source_action_id: actionId,
-    stage_catalog_ref: 'family_stage_control_plane',
-    derived_surface_policy: 'derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog',
+    stage_catalog_ref: 'rca_stage_control_refs',
+    derived_surface_policy: 'opl_generates_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_rca_refs',
     domain_repo_wrapper_policy: 'handler_target_refs_only_adapter_or_tombstone_candidate',
   };
 }
@@ -226,6 +226,7 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
   catalog_id: 'redcube_product_entry_action_catalog',
   target_domain_id: 'redcube_ai',
   owner: 'redcube_ai',
+  projection_mode: 'minimal_authority_and_domain_handler_targets_only',
   generated_interface_owner: 'one-person-lab',
   domain_handler_owner: 'redcube_ai',
   owner_model: 'opl_generated_descriptor_catalog_with_rca_domain_handlers',
