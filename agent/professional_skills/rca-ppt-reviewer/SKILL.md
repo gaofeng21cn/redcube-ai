@@ -11,6 +11,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 
 - Use AI judgment here for visual verdicts, source-fidelity review, story-arc-in-pixels assessment, weak-vs-blocking classification, and repair target selection.
 - Treat contracts, screenshot gates, artifact inventories, and `contracts/capability_map.json` as evidence routing and false-authority guards; they can prove what was reviewed, not whether the deck is visually good.
+- Treat `visual_pack_compiler_handoff` and stage-control route decisions as refs-only handoff inputs. They may name route policy, stage ids, screenshot refs, review refs, receipt refs, and forbidden-authority flags; they must not encode the visual pass/block decision, repair route selection, or export/handoff judgment.
 - Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return a typed blocker.
 
 ## Inputs
@@ -47,6 +48,14 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 7. Preserve passed pages. Do not request full-deck redraw when blocked-slide repair is sufficient.
 8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
+10. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
+
+## Contract Foldback Map
+
+- `visual_pack_compiler_handoff`: carries review evidence refs, artifact inventory refs, repair target refs, export readiness refs, and forbidden-authority flags only.
+- Stage-control route decisions: consume this skill's verdict / repair target refs when selecting continue, repair, route-back, human gate, or typed blocker; stage-control does not own the visual reasoning.
+- RCA reviewer method: owns the flexible judgment over pixels, story arc, source fidelity, density, visible leaks, weak-vs-blocking classification, and blocked-page-only repair scope.
+- Contract surfaces may reject missing, stale, mismatched, or authority-violating refs; they may not turn mechanical completeness into `export_ready`.
 
 ## Workbench Lessons To Preserve
 

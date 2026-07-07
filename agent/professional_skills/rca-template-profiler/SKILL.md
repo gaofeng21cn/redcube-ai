@@ -11,6 +11,7 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 
 - Use AI judgment here for semantic zone interpretation, placeholder capacity, reference-deck rhythm, style-boundary selection, stale-reference rejection, and whether a template can support the requested story.
 - Treat `contracts/capability_map.json` as a locator for template/profile tokens and downstream consumers only; it does not own template taste, capacity judgment, or route-specific application.
+- Treat `visual_pack_compiler_handoff`, `contracts/pack_compiler_input.json`, and stage-control profile refs as handoff surfaces. They may point to profile rows, template refs, route policy, receipt refs, and forbidden-authority flags; they must not embed capacity judgment, template taste, stale-reference decisions, or layout recipes as contract truth.
 - Keep profile output small and reusable. Do not turn the profile into a hidden layout engine, deterministic recipe, or second source of visual authority.
 
 ## Consolidation Decision
@@ -51,6 +52,15 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 8. For native PPTX, produce zones and placeholder rules that the `editable_shape_plan` can bind to directly.
 9. For image-first or HTML routes, still provide semantic layout and capacity guidance, but do not claim native editability.
 10. Stop at profile output. Downstream visual direction, page authoring, or native PPT design must own route-specific application and repair.
+11. Keep stage-control light. If stage-control needs template/profile judgment, return profile refs, capacity blockers, route caveats, and downstream owner hints; do not move profiling heuristics, layout scoring, or deterministic placement recipes into stage-control contracts.
+
+## Contract Foldback Map
+
+- `visual_pack_compiler_handoff` and `pack_compiler_input`: carry template/profile refs, layout inventory refs, placeholder-capacity refs, route caveats, receipt refs, and forbidden-authority flags only.
+- Stage-control route decisions: may consume profile refs to choose continue, repair, route-back, human gate, or typed blocker; the contract does not own template feasibility or capacity reasoning.
+- RCA template profiler method: owns the flexible judgment over semantic zones, placeholder capacity, current-vs-stale references, style boundary, route-agnostic profile fit, and whether a template can support the requested story.
+- Downstream skills own application: `rca-ppt-visual-director` consumes profile for visual language / rhythm; `rca-native-ppt-designer` binds profile only on explicit native PPTX routes.
+- Contract surfaces may reject missing, stale, or authority-violating refs; they may not convert a profile table into a hidden layout engine or visual-ready claim.
 
 ## Workbench Lessons To Preserve
 

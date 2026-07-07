@@ -11,6 +11,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 
 - Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, or an authority bypass.
 - Treat memory descriptors, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
+- Treat `visual_pack_compiler_handoff` as a carrier for memory proposal refs and accept/reject receipt refs only. It may route memory evidence to this skill, but it must not carry reusable lesson text as authority or decide accept/reject through contract fields.
 - Keep memory proposals prose-first and small. Reject attempts to encode visual taste, route scoring, review verdicts, or artifact state as contract data.
 
 ## Inputs
@@ -40,6 +41,13 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 5. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL may only transport locator, proposal, receipt, and projection refs.
 6. A missing or stale memory ref is usually non-blocking. It is blocking only when someone tries to use memory as review/export/handoff/production authority or to bypass artifact authority.
 7. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
+
+## Contract Foldback Map
+
+- `visual_pack_compiler_handoff`: carries proposal refs, evidence refs, memory locator refs, RCA accept/reject receipt refs, and forbidden-authority flags only.
+- Stage-control and generated descriptors: may route memory writeback work to this skill and transport receipt refs after review; they do not accept/reject visual memory and do not own memory body text.
+- RCA curator method: owns the flexible accept/reject judgment over reusability, stage scope, stale evidence, provenance, authority bypass, and whether a lesson is too broad for memory.
+- Contract surfaces may fail closed on missing provenance or forbidden payload fields; they may not turn a descriptor, score, or operator note into accepted memory.
 
 ## Minimal Template Resource
 
