@@ -12,7 +12,7 @@ import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime
 import { rootPartitionFiles } from './test-registry.ts';
 
 export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P18_TYPESCRIPT_CLOSEOUT_AUDIT.json');
-const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
+export const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
 
 const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
@@ -38,9 +38,6 @@ const HIGH_CHURN_PACKAGES = [
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',
   'packages/redcube-overlay-poster-onepager',
-  'packages/redcube-runtime/src/families/xiaohongshu',
-  'packages/redcube-runtime/src/families/ppt',
-  'packages/redcube-runtime/src/families/poster-onepager',
 ];
 
 const JS_RESIDUE_SCAN_ROOTS = ['apps', 'packages'];

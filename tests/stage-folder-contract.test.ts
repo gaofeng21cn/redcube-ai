@@ -454,7 +454,7 @@ test('RCA route closeout records native helper, export, gallery, and handoff ref
   });
 });
 
-test('RCA route stage folder helper fails closed without explicit owner receipt refs', () => {
+test('RCA route stage folder helper supplies deterministic owner receipt refs', () => {
   withTempOplState((stateRoot) => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-route-helper-missing-ref-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
@@ -478,23 +478,23 @@ test('RCA route stage folder helper fails closed without explicit owner receipt 
     writeJson(artifactFile, artifact);
     const pointers = stageFolderAttemptPaths(base);
 
-    assert.throws(
-      () => refreshStageFolderRouteArtifact({
-        deliverablePaths: paths,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route: 'export_pptx',
-        attemptId: 'attempt-export-missing-ref',
-        artifactFile,
-        artifact,
-      }),
-      /requires explicit ownerReceiptRefs/,
-    );
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), false);
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
-    assert.equal(existsSync(pointers.latest_pointer), false);
-    assert.equal(existsSync(pointers.stage_current_file), false);
+    const result = refreshStageFolderRouteArtifact({
+      deliverablePaths: paths,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      route: 'export_pptx',
+      attemptId: 'attempt-export-missing-ref',
+      artifactFile,
+      artifact,
+    });
+    assert.deepEqual(result.manifest.owner_receipt_refs, [
+      'rca-owner-receipt:visual-stage:ppt_deck:export_pptx:deck-a',
+    ]);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), true);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), true);
+    assert.equal(existsSync(pointers.latest_pointer), true);
+    assert.equal(existsSync(pointers.stage_current_file), true);
   });
 });
 
@@ -716,7 +716,7 @@ test('RCA route execution writes manifest-backed Stage Folder attempt and curren
         false,
       );
       assert.equal(loaded?.manifest?.stage_id, 'source_intake');
-      assert.equal(loaded?.manifest?.attempt_id, 'route-run-1');
+      assert.equal(loaded?.manifest?.attempt_id, 'opl-stage-attempt-test-redcube_ai-route-run-1');
       assert.equal(existsSync(loaded?.manifest_file), true);
       assert.equal(readJson(path.join(path.dirname(loaded.manifest_file), 'receipts', 'domain-owner-receipt.json')).owner, 'redcube_ai');
       assert.equal(readJson(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'note-a', 'current.json')).current_stage.status, 'success');

@@ -634,6 +634,7 @@ export function readStageFolderArtifact(input) {
   const stageDir = resolveStageDir(path.join(stageFolderRoot(input), 'stages'), canonicalStageId);
   const latestPointer = path.join(stageDir, 'latest');
   const expectedRouteStageId = safeText(input.routeStageId || input.route_stage_id);
+  const expectedOutputName = expectedRouteStageId ? `${expectedRouteStageId}.json` : '';
   const candidates = listAttemptDirs(stageDir);
   if (existsSync(latestPointer)) {
     const latestAttemptId = safeText(readFileSync(latestPointer, 'utf-8'));
@@ -648,7 +649,11 @@ export function readStageFolderArtifact(input) {
     expectedStageId: canonicalStageId,
   }));
   const routeMatched = expectedRouteStageId
-    ? inspected.filter((attempt) => attempt.route_stage_id === expectedRouteStageId || !attempt.route_stage_id)
+    ? inspected.filter((attempt) => (
+        attempt.route_stage_id === expectedRouteStageId
+        || !attempt.route_stage_id
+        || attempt.output_names?.includes(expectedOutputName)
+      ))
     : inspected;
   if (expectedRouteStageId && routeMatched.length === 0) {
     return null;
@@ -658,7 +663,21 @@ export function readStageFolderArtifact(input) {
       Number(left.attempt_sort_key || 0) - Number(right.attempt_sort_key || 0)
       || String(left.attempt_id || '').localeCompare(String(right.attempt_id || ''))
     ));
-  return ranked.at(-1) ?? null;
+  const selected = ranked.at(-1);
+  if (!selected) return null;
+  if (
+    expectedOutputName
+    && selected.route_stage_id !== expectedRouteStageId
+    && selected.output_names?.includes(expectedOutputName)
+  ) {
+    const outputFile = path.join(selected.outputs_dir, expectedOutputName);
+    return {
+      ...selected,
+      artifact: ['success', 'blocked'].includes(selected.status) && existsSync(outputFile) ? readJson(outputFile) : null,
+      output_file: outputFile,
+    };
+  }
+  return selected;
 }
 
 function listAttemptDirs(stageDir) {
@@ -682,6 +701,8 @@ function inspectStageFolderAttempt({ attemptDir, expectedStageId }) {
       manifest: null,
       manifest_file: manifestFile,
       output_file: '',
+      output_names: outputNames,
+      outputs_dir: outputsDir,
       missing_outputs: [],
       orphan_outputs: outputNames,
       route_stage_id: '',
@@ -718,6 +739,8 @@ function inspectStageFolderAttempt({ attemptDir, expectedStageId }) {
     manifest,
     manifest_file: manifestFile,
     output_file: outputFile,
+    output_names: outputNames,
+    outputs_dir: outputsDir,
     missing_outputs: missingOutputs,
     orphan_outputs: status === 'orphan' ? outputNames : [],
     route_stage_id: safeText(manifest.route_stage_id),
