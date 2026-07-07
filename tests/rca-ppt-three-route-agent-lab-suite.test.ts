@@ -425,6 +425,16 @@ function assertPptThreeRouteSuiteShape(suite) {
   assert.equal(suite.required_observations.includes('task_manifests_observed'), true);
   assert.equal(suite.required_observations.includes('recovery_probes_observed'), true);
   assert.equal(suite.required_observations.includes('forbidden_authority_flags_all_false'), true);
+  assert.equal(suite.native_pptx_real_route_probe.probe_state, 'retired_to_history_provenance');
+  assert.equal(
+    suite.native_pptx_real_route_probe.current_proof_command_ref,
+    'opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json',
+  );
+  assert.equal(
+    suite.native_pptx_real_route_probe.real_probe_command_ref,
+    'history/provenance:docs/history/process/real-route-evolution-probe.md#retired-real-route-evolution-probe-command',
+  );
+  assert.equal(JSON.stringify(suite).includes('scripts/run-real-route-evolution-probe.ts'), false);
   assert.deepEqual(suite.native_pptx_real_route_probe.required_report_observations, [
     'native_pptx_terminal_export_refs_observed',
     'agent_lab_run_report_ref_observed',
@@ -511,7 +521,12 @@ function assertPptThreeRouteSuiteShape(suite) {
   assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/quality_gate.json'), true);
   assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:artifacts/publish_bundle.json'), true);
   assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:publish/artifact_gallery/index.json'), true);
-  assert.equal(suite.artifact_sample_refs.includes('artifact-sample:path:<probe-output>/real-route-evolution-probe.json'), true);
+  assert.equal(
+    suite.artifact_sample_refs.includes(
+      'artifact-sample:history:docs/history/process/real-route-evolution-probe.md#legacy-output-shape',
+    ),
+    true,
+  );
   assert.equal(suite.native_live_evidence_policy.required_for_native_visual_quality_claim, true);
   assert.equal(suite.native_live_evidence_policy.mock_provider_can_satisfy, false);
   assert.equal(suite.native_live_evidence_policy.agent_lab_records_refs_only, true);

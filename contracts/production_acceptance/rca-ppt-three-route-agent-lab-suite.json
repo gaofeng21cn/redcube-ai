@@ -786,7 +786,8 @@
     "target-verification:redcube-ai/real-native-pptx-product-entry-route-terminal-refs"
   ],
   "native_pptx_real_route_probe": {
-    "proof_kind": "real_rca_product_entry_route_probe",
+    "proof_kind": "retired_real_route_probe_provenance",
+    "probe_state": "retired_to_history_provenance",
     "entry_surface": "redcube product invoke",
     "entry_api_surface": "invokeProductEntry",
     "task_intent": "run_deliverable_route",
@@ -803,9 +804,10 @@
       "export_pptx"
     ],
     "route_chain_source_ref": "RCA hydrated ppt_deck stage_sequence plus explicit author_pptx_native route selection",
-    "real_probe_command_ref": "node --experimental-strip-types scripts/run-real-route-evolution-probe.ts --live --routes native --iterations 1 --native-sample-slide-count 1 --json",
-    "ci_plumbing_probe_command_ref": "node --experimental-strip-types scripts/run-real-route-evolution-probe.ts --mock --routes native --iterations 1 --native-sample-slide-count 1 --json",
-    "report_shape_ref": "scripts/run-real-route-evolution-probe.ts#/terminal_evidence/native_pptx",
+    "current_proof_command_ref": "opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json",
+    "real_probe_command_ref": "history/provenance:docs/history/process/real-route-evolution-probe.md#retired-real-route-evolution-probe-command",
+    "ci_plumbing_probe_command_ref": "opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json",
+    "report_shape_ref": "history/provenance:docs/history/process/real-route-evolution-probe.md#legacy-terminal-evidence-native-pptx",
     "required_report_observations": [
       "native_pptx_terminal_export_refs_observed",
       "agent_lab_run_report_ref_observed",
@@ -857,7 +859,7 @@
   "terminal_evidence_contract": {
     "surface_kind": "rca_ppt_native_terminal_evidence_refs_contract_v1",
     "evidence_owner": "redcube_ai",
-    "evidence_collector": "agent_lab_or_real_route_probe",
+    "evidence_collector": "agent_lab_or_rca_product_entry_route_refs",
     "route_family": "ppt_deck",
     "route_id": "ppt_deck.native.explicit_author_pptx_native.v1",
     "terminal_route": "export_pptx",
@@ -910,8 +912,8 @@
       "mutates_export_artifacts": false
     },
     "report_refs": [
-      "scripts/run-real-route-evolution-probe.ts#/lanes/native/terminal_evidence",
-      "scripts/run-real-route-evolution-probe.ts#/report_file"
+      "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/ppt_three_route_agent_lab_suite/terminal_evidence_contract",
+      "workspace-runtime-ref:artifact-locator:ppt-three-route:explicit_author_pptx_native"
     ],
     "authority_boundary": {
       "refs_only": true,
@@ -1010,7 +1012,7 @@
     "artifact-sample:path:artifacts/quality_gate.json",
     "artifact-sample:path:artifacts/publish_bundle.json",
     "artifact-sample:path:publish/artifact_gallery/index.json",
-    "artifact-sample:path:<probe-output>/real-route-evolution-probe.json",
+    "artifact-sample:history:docs/history/process/real-route-evolution-probe.md#legacy-output-shape",
     "artifact-sample:path:publish/<deliverable>.pptx",
     "artifact-sample:path:publish/<deliverable>.pdf"
   ],

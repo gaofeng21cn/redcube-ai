@@ -133,7 +133,7 @@ upstream Hermes proof/provenance 进入 `docs/history/hermes/`，历史定位材
 - [AI-first 质量边界 Policy](./policies/ai_first_quality_boundary.md)：固定 author / reviewer 判断必须由 AI-authored artifact 持有，pack、schema、gate、audit 与 projection 只承担机械约束和证据传递。
 - [视觉模式记忆 Policy](./policies/visual_pattern_memory_policy.md)：固定视觉叙事、风格、信息密度、route 选择 caveat 和 review failure mode 先按自然语言 memory 管理，不能替代 AI author/reviewer artifact、route contract、export gate 或 canonical artifact authority。
 - [Direct-delivery longrun target state](./history/plans/2026-04-09-direct-delivery-longrun-target-state.md)：历史 future-facing 设计目标 freeze，已退出 active/reference 支撑面
-- [Real-route evolution probe](./history/process/real-route-evolution-probe.md)：历史 process/provenance，只保留 probe owner map 和压缩历史读法；probe 命令、输出字段、cache / typed blocker 行为回到 scripts、contracts、tests 和 RCA-owned gates
+- [Real-route evolution probe](./history/process/real-route-evolution-probe.md)：历史 process/provenance，只保留 probe owner map 和压缩历史读法；active command / test / contract refs 已退役，当前 PPT 三路线 proof 回到 AgentLab suite refs 与 RCA-owned gates，不声明 production readiness
 - [Source readiness deep research longrun target state](./history/plans/2026-04-09-source-readiness-deep-research-longrun-target-state.md)：历史 source-plane future target freeze，当前 source truth 回到 source owner docs 和 contracts
 - [Historical OPL managed runtime three-layer contract](./history/runtime/opl-managed-runtime-three-layer-contract.md)：历史 owner-boundary provenance，当前 runtime 口径回到核心五件套、runtime docs、active gap plan 和 contracts
 

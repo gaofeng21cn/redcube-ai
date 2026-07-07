@@ -30,7 +30,7 @@ Machine boundary: 本文是人读过程历史索引。当前机器真相继续�
 | File | Role | Current read |
 | --- | --- | --- |
 | [RCA dated production evidence foldback](./2026-06-03-rca-dated-production-evidence-foldback.md) | dated production evidence provenance | Preserves native live proof and no-regression ref details. Current readiness truth still returns to the active gap plan and production acceptance contracts. |
-| [Real-route evolution probe](./real-route-evolution-probe.md) | route probe provenance | Preserves compressed owner map and historical readout. Probe command shape, output fields, cache behavior and typed blockers return to scripts, contracts, tests, runtime-family source, artifacts, review/export gates and owner receipts. |
+| [Real-route evolution probe](./real-route-evolution-probe.md) | route probe provenance tombstone | Preserves compressed owner map and historical readout. The active probe script/test are retired; current route truth returns to contracts, product-entry route source/tests, artifacts, review/export gates and owner receipts. |
 | [Retired surface provenance](./retired-surface-provenance.md) | compressed no-resurrection / process foldback record | Replaces per-tranche closeout files for docs lifecycle SSOT lanes, command-surface cleanup, helper/fallback/facade/test retirement, and stale workflow/entry provenance. |
 
 ## Compressed Provenance

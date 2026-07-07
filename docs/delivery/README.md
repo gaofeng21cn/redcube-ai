@@ -23,6 +23,6 @@ Delivery docs 解释当前 deliverable families、default routes、proof environ
 - [Image-first PPT production route](./image-first-ppt-production-route.md)
 - [HTML PPT route quality](./html-ppt-route-quality.md)
 - [Native PPT proof environment](./native-ppt-proof-environment.md)：解释 native editable PPTX 的 AI-first design pack、`editable_shape_plan`、officecli writer / validator、true render QA、AgentLab refs-only 和 mock-not-sample 边界。
-历史 stable deliverable 手工测试简报已进入 [history/phase-2](../history/phase-2/stable_deliverable_manual_test_brief.md)，real-route evolution probe 已进入 [history/process](../history/process/real-route-evolution-probe.md)，不再作为当前 delivery 材料读取。
+历史 stable deliverable 手工测试简报已进入 [history/phase-2](../history/phase-2/stable_deliverable_manual_test_brief.md)，real-route evolution probe 已进入 [history/process](../history/process/real-route-evolution-probe.md)，不再作为当前 delivery 材料或 active command 读取；当前 PPT 三路线 refs-only proof command 是 `opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json`，它不声明 production readiness。
 
 Runtime contracts 应使用 `human_doc:*` semantic pointers 作为读者上下文，不把本目录布局当稳定机器接口。

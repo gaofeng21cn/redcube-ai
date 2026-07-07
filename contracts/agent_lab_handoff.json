@@ -227,8 +227,7 @@
             "mock_visual_quality_claims_absent"
           ],
           "required_command_refs": [
-            "opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json",
-            "node --experimental-strip-types scripts/run-real-route-evolution-probe.ts --live --routes native --iterations 1 --native-sample-slide-count 1 --json"
+            "opl agent-lab run --suite contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json --json"
           ]
         }
       ],
