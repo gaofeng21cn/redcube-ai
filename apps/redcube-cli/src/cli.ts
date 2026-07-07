@@ -6,10 +6,6 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { main as cliMain } from './cli-parts/dispatch.js';
 import { fail } from './cli-parts/output.js';
 
-export { executeCli, getCliDomainActions, main, runCli } from './cli-parts/dispatch.js';
-export { buildCommandHelp, buildHelp } from './cli-parts/help.js';
-export { parseArgs, resolveWorkspaceRoot } from './cli-parts/options.js';
-
 function isDirectExecution() {
   if (!process.argv[1]) {
     return false;

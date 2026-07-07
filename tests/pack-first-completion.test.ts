@@ -8,21 +8,34 @@ function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
 
-test('retired pack workspaces stay out of workspace and package manifests', () => {
+test('retired package and MCP surfaces stay out of workspace and package manifests', () => {
   const rootTsconfig = readJson('tsconfig.json');
   const runtimePackageJson = readJson('packages/redcube-runtime/package.json');
+  const retiredWorkspaces = [
+    'apps/redcube-mcp',
+    'packages/redcube-pack-ppt',
+    'packages/redcube-pack-xiaohongshu',
+    'packages/redcube-pack-poster-onepager',
+    'packages/redcube-pack-runtime',
+    'packages/redcube-runtime-family-ppt',
+    'packages/redcube-runtime-family-xiaohongshu',
+    'packages/redcube-runtime-family-poster-onepager',
+    'packages/redcube-runtime-family-registry',
+    'packages/redcube-overlay-registry',
+  ];
+  const retiredRuntimeDependencies = [
+    '@redcube/pack-runtime',
+    '@redcube/runtime-family-ppt',
+    '@redcube/runtime-family-xiaohongshu',
+    '@redcube/runtime-family-poster-onepager',
+    '@redcube/runtime-family-registry',
+  ];
 
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-ppt')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-xiaohongshu')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-poster-onepager')), false);
-  assert.equal(rootTsconfig.references.some((entry) => entry.path.includes('redcube-pack-')), false);
-  assert.equal(rootTsconfig.references.some((entry) => entry.path.includes('redcube-runtime-family-')), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu']), false);
-  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-poster-onepager']), false);
+  for (const workspace of retiredWorkspaces) {
+    assert.equal(existsSync(path.resolve(workspace)), false, workspace);
+    assert.equal(rootTsconfig.references.some((entry) => entry.path === `./${workspace}`), false, workspace);
+  }
+  for (const dependency of retiredRuntimeDependencies) {
+    assert.equal(Boolean(runtimePackageJson.dependencies?.[dependency]), false, dependency);
+  }
 });

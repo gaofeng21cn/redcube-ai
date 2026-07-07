@@ -21,7 +21,7 @@ import {
 } from '../helpers/mock-codex-cli.ts';
 import {
   executeCli,
-} from '../../apps/redcube-cli/dist/cli.js';
+} from '../../apps/redcube-cli/dist/index.js';
 
 const execFileAsync = promisify(execFile);
 const domainEntryResolve = createRequire(path.resolve('packages/redcube-domain-entry/package.json'));

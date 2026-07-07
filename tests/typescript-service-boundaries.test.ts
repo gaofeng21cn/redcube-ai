@@ -16,57 +16,25 @@ test('P16 slice 1: runtime exposes a TypeScript service entrypoint and typed bou
   assert.equal(pkg.types, './dist/index.d.ts');
 });
 
-test('P16 slice 2: legacy pack-runtime compiler registry service boundary is removed', () => {
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
-  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
-  assert.equal(
-    rootTsconfig.references.some((entry) => entry.path === './packages/redcube-pack-runtime'),
-    false,
-  );
-});
-
-test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command contracts', () => {
+test('P16 slice 3: CLI exposes public APIs from index while cli remains the bin runner', async () => {
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/index.ts')), true);
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/types.ts')), true);
 
   const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-cli/package.json'), 'utf-8'));
+  const cliModule = await import('../apps/redcube-cli/dist/cli.js');
+  const publicModule = await import('../apps/redcube-cli/dist/index.js');
 
   assert.equal(pkg.types, './dist/index.d.ts');
   assert.equal(pkg.bin.redcube, 'dist/cli.js');
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), false);
-});
-
-test('P16 slice 4: RCA no longer self-maintains a production MCP API app', () => {
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp')), false);
-  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
-  assert.equal(
-    rootTsconfig.references.some((entrypoint) => entrypoint.path === './apps/redcube-mcp'),
-    false,
-  );
+  assert.deepEqual(Object.keys(cliModule), []);
+  assert.equal(typeof publicModule.executeCli, 'function');
+  assert.equal(typeof publicModule.runCli, 'function');
 });
 
 test('P20.B: default registries are package-local runtime contracts, not standalone package facades', () => {
-  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
   const runtimeSource = readFileSync(path.resolve('packages/redcube-runtime/src/default-registries.ts'), 'utf-8');
 
-  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-registry/package.json')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-overlay-registry/package.json')), false);
-  assert.equal(
-    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-runtime-family-registry'),
-    false,
-  );
-  assert.equal(
-    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-registry'),
-    false,
-  );
-  for (const retiredFamilyPackage of [
-    './packages/redcube-runtime-family-ppt',
-    './packages/redcube-runtime-family-xiaohongshu',
-    './packages/redcube-runtime-family-poster-onepager',
-  ]) {
-    assert.equal(rootTsconfig.references.some((entrypoint) => entrypoint.path === retiredFamilyPackage), false);
-    assert.equal(existsSync(path.resolve(retiredFamilyPackage)), false);
-  }
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/ppt/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/xiaohongshu/index.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/poster-onepager/index.ts')), true);
