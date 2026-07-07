@@ -40,8 +40,9 @@
   "run_id": {
     "role": "single routed execution handle",
     "durable_surfaces": [
-      "runtime/runs/<run>.json",
-      "runtime/events/<run>.jsonl",
+      "OPL provider attempt ref",
+      "OPL provider attempt ledger ref",
+      "refs-only route event projection",
       "runtimeWatch",
       "ops_eval_summary"
     ],

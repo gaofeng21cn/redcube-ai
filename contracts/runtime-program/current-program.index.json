@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "85757bd21ecbac380ba1c36c48f89f5b60b007d8a8663c93d66a9c00aa93b4da",
+  "source_digest": "b56e0d9301aad3fd2296ec5d766c7263f4c6040d18e9466427540afd9dbcc9a3",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -120,8 +120,8 @@
       "json_pointer": "/execution_handle_contract",
       "ref": "contracts/runtime-program/current-program-parts/execution_handle_contract.json",
       "role": "current_program_leaf_source",
-      "line_count": 54,
-      "sha256": "ea2a67fc07b95dcf7c8f3aa67acac9734e0fe2803a177773b97c610b345142b4"
+      "line_count": 55,
+      "sha256": "9bb4dcc31ef37977afff6219b10ae1568b306260372889a44b35dddb46e3961e"
     },
     {
       "json_pointer": "/durable_surface_contract",
@@ -360,8 +360,8 @@
       "json_pointer": "/execution_handle_contract",
       "ref": "contracts/runtime-program/current-program-parts/execution_handle_contract.json",
       "role": "current_program_leaf_source",
-      "line_count": 54,
-      "sha256": "ea2a67fc07b95dcf7c8f3aa67acac9734e0fe2803a177773b97c610b345142b4"
+      "line_count": 55,
+      "sha256": "9bb4dcc31ef37977afff6219b10ae1568b306260372889a44b35dddb46e3961e"
     },
     {
       "json_pointer": "/durable_surface_contract",

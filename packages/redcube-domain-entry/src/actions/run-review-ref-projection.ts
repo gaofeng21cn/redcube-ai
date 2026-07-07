@@ -69,7 +69,7 @@ function resolveRun(request: AnyRecord): AnyRecord {
     return loadRun({
       workspaceRoot: request.workspaceRoot,
       runId: providedRunId,
-    });
+    }) as unknown as AnyRecord;
   }
 
   return {};

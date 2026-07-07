@@ -308,13 +308,6 @@ export function failRouteRun({
 export function loadRouteRun({ workspaceRoot, runId }) {
   requireSafeSegment('runId', runId);
   throw new Error('RCA-local route-run record store is retired; use OPL stage attempt and provider ledger refs');
-  return createRunRecord({
-    runId,
-    route: 'retired_route_run_record_store',
-    scope: 'route',
-    target: 'retired_route_run_record_store',
-    overlay: 'redcube_ai',
-  });
 }
 
 export function appendRouteRunEvent(workspaceRoot, runId, event) {

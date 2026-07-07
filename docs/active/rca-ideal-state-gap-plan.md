@@ -132,11 +132,11 @@ Active plan 只保留可独立落地的非 live 缺口：generated/default calle
 | naming / legacy string hygiene | `managed`、`gateway`、`runtime`、`session` 和 `domain_action_adapter` 等词只可作为 semantic-id、tombstone/provenance、negative guard、refs-only adapter、domain handler target 或 package/protocol boundary。 | `contracts/physical_source_morphology_policy.json#legacy_name_allowance`、private inventory、guard tests |
 
 Default-caller / source morphology current readout：runtime-family source、`runDeliverableRoute` /
-`run-deliverable-route-parts/`、executor route-run record / record-store parts 和 related route refs 的 path-level
+`run-deliverable-route-parts/`、executor route-run refs-only parts 和 related route refs 的 path-level
 classification 归 `contracts/physical_source_morphology_policy.json#/active_surface_classifications`
 与 [RCA 私有实现与 OPL 迁移台账](./opl-private-implementation-migration-inventory.md)。本文只保留
 当前读法：这些 surfaces 可以是 RCA-owned visual route implementation、domain handler target、
-stage artifact / review-export refs、executor policy refs 或 neutral route-run record refs；它们不能成为
+stage artifact / review-export refs、executor policy refs 或 refs-only route-run projections；它们不能成为
 RCA-owned generic runtime、session/workbench、attempt ledger、runtime record store、event log、
 generated wrapper owner 或 default-caller cutover evidence。2026-07-05 已进一步把 route recovery +
 `stop_after_stage` continuation 收成 `recovery.ts::runRouteWithRecoveryAndContinuation()` 共享薄入口，
@@ -156,7 +156,7 @@ legacy allowance 和 test closeout 过程归 `docs/history/process/`、machine c
 | Payload / retired field no-resurrection | `contracts/physical_source_morphology_policy.json` | Payload guard 只允许 forbidden payload / receipt role 字段表达禁止项；retired alias 不得回到 active payload template、success payload、JSON key 或 readiness claim。 |
 | Verification / proof shell wrappers | `contracts/physical_source_morphology_policy.json` | Active `.sh` wrappers 只按 repo-native verification / proof runner / dependency helper 读取，不是 RCA runtime、session、workbench、attempt ledger 或 generated-wrapper owner，也不替代 generated/default caller thinning、physical retirement、visual/export verdict 或 production evidence。 |
 | Product-entry manifest projection | `contracts/physical_source_morphology_policy.json` | `getProductEntryManifest` 及 parts 只作为 refs-only manifest projection root；不关闭 generated/default caller thinning、physical retirement、visual/export verdict、production evidence 或 App/operator release evidence。 |
-| Deliverable route and executor run records | `contracts/physical_source_morphology_policy.json` | `runDeliverableRoute` / executor route-run records 只能产生 route refs、stage artifact refs、domain-entry response refs、executor policy refs、route-run record/event refs 和 typed blocker；不能成为 RCA-owned generic route attempt shell、retry/dead-letter owner、attempt ledger、runtime record store、event log、session runtime 或 generated wrapper owner。 |
+| Deliverable route and executor run refs | `contracts/physical_source_morphology_policy.json` | `runDeliverableRoute` / executor route-run refs 只能产生 route refs、stage artifact refs、domain-entry response refs、executor policy refs、refs-only route-run / event projections 和 typed blocker；不能成为 RCA-owned generic route attempt shell、retry/dead-letter owner、attempt ledger、runtime record store、event log、session runtime 或 generated wrapper owner。 |
 | Default-caller tail readback | `contracts/physical_source_morphology_policy.json#/default_caller_tail_readback` | Static / local readback 只证明 active-caller matrix、false-delete guard、no-resurrection / forbidden-write guard、当前 role guard、missing evidence 和 typed-blocker ref shape；不证明 OPL generated default-caller parity 或 owner/live acceptance，不执行 physical delete、不签 owner receipt、不创建 typed blocker 实例、不声明 default-caller cutover、visual/export/handoff/domain/production ready 或 App/live readiness。 |
 | Source-ref integrity | `contracts/physical_source_morphology_policy.json#/source_ref_integrity_gate` | Active source refs 和 machine-boundary refs 必须解析到 repo-local path / directory / anchor；URI / URL、绝对路径、父目录穿越、`human_doc:*` machine ref、悬空 ref 或 retired compatibility ref 越界都会重新打开 naming/source hygiene gap。 |
 | Policy source structure | `contracts/physical_source_morphology_policy.json#/policy_source_structure` | Policy builder 与 tail-gate module 拆分只关闭结构维护缺口，避免 tail gate 变成第二真相源；不表示 physical delete、OPL default caller parity、visual/export/handoff/domain/production ready 或 App/operator release evidence。 |

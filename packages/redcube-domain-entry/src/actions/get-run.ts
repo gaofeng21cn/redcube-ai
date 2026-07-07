@@ -32,7 +32,7 @@ export async function getRun({
   workspaceRoot,
   runId,
 }: WorkspaceRootRequest & { runId: string }): Promise<RunRecordResponse> {
-  const run = loadRun({ workspaceRoot, runId }) as RuntimeRecordSurface;
+  const run = loadRun({ workspaceRoot, runId }) as unknown as RuntimeRecordSurface;
   const staleStatus = run.status === 'expired' || run.status === 'orphaned';
   const recommendedAction = staleStatus
     ? 'inspect_stale_run'

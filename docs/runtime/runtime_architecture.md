@@ -73,7 +73,7 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 | `program_id` | active mainline pointer、program truth 与 absorbed provenance routing |
 | `topic_id` | topic 聚合根，承载 source audit 与 publication projection |
 | `deliverable_id` | topic 内交付物身份，承载 delivery contract、review state 与 export readiness |
-| `run_id` | 单次执行句柄，承载 telemetry、rerun linkage、runtime watch 与 event log |
+| `run_id` | 单次 route execution 句柄，承载 telemetry、OPL attempt / provider ledger refs、runtime watch locator 与 refs-only event projection；RCA 不再写 repo-local event log |
 
 当前 canonical callable surfaces 固定为：
 
