@@ -123,14 +123,6 @@ function createIsolatedCliInstall() {
     path.join(domainEntryNodeModulesDir, 'overlay-core'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-codex-cli-client'),
-    path.join(domainEntryNodeModulesDir, 'codex-cli-client'),
-  );
-  copyPackageIntoInstall(
-    path.resolve('packages/redcube-codex-cli-client'),
-    path.join(domainEntryNodeModulesDir, 'runtime', 'node_modules', '@redcube', 'codex-cli-client'),
-  );
-  copyPackageIntoInstall(
     path.resolve('prompts'),
     path.join(domainEntryPackagePath, 'node_modules', 'prompts'),
   );

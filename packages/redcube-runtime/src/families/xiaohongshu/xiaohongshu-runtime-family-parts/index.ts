@@ -6,7 +6,7 @@ import { existsSync } from 'node:fs';
 import {
   generateStructuredArtifactBatchViaCodexCli,
   generateStructuredArtifactViaCodexCli,
-} from '@redcube/codex-cli-client';
+} from '../../../executors/codex-caller.js';
 import {
   buildSourceTruthConsumptionSummary,
   getDeliverablePaths,

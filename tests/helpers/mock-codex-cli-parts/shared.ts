@@ -13,7 +13,7 @@ import {
   REDCUBE_STAGE_JSON_BEGIN,
   REDCUBE_STAGE_JSON_END,
   REDCUBE_CREATIVE_GENERATION_META_END,
-} from '@redcube/codex-cli-client';
+} from '@redcube/runtime';
 
 export const MODULE_DIR = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 

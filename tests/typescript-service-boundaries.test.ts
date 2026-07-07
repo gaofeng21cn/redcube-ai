@@ -77,13 +77,18 @@ test('P20.B: default registries are package-local runtime contracts, not standal
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/default-registries.js')), false);
 });
 
-test('P22.A: codex-cli-client exposes a TypeScript service entrypoint and typed local-exec contracts', () => {
-  assert.equal(existsSync(path.resolve('packages/redcube-codex-cli-client/src/index.ts')), true);
-  assert.equal(existsSync(path.resolve('packages/redcube-codex-cli-client/src/index.impl.ts')), true);
-  assert.equal(existsSync(path.resolve('packages/redcube-codex-cli-client/tsconfig.json')), true);
+test('P22.A: Codex executor substrate is internal to runtime, not a standalone RCA package', () => {
+  assert.equal(existsSync(path.resolve('packages/redcube-codex-cli-client')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/executors/codex-caller.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/executors/index-parts/command-process.ts')), true);
 
-  const pkg = JSON.parse(readFileSync(path.resolve('packages/redcube-codex-cli-client/package.json'), 'utf-8'));
-  assert.equal(pkg.types, './dist/index.d.ts');
+  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
+  const runtimeSource = readFileSync(path.resolve('packages/redcube-runtime/src/executors/index-parts/constants.ts'), 'utf-8');
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-codex-cli-client'),
+    false,
+  );
+  assert.match(runtimeSource, /OPL_CODEX_EXECUTOR_SURFACE = 'opl_codex_executor'/);
 });
 
 test('P23.A: current utility package exposes TypeScript service entrypoints without legacy utility packages', () => {

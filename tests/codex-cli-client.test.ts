@@ -13,7 +13,7 @@ import {
   probeCodexCli,
   readCodexCliContract,
 } from './package-surfaces.ts';
-import { buildGenerationInput } from '../packages/redcube-codex-cli-client/dist/index-parts/prompt-guidance.js';
+import { buildGenerationInput } from '../packages/redcube-runtime/dist/executors/index-parts/prompt-guidance.js';
 
 const ONE_PIXEL_PNG = Buffer.from(
   '89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000000020001e221bc330000000049454e44ae426082',
@@ -741,9 +741,9 @@ test('generateImageViaCodexNativeImagegen rejects PNGs created without native im
   rmSync(workspaceRoot, { recursive: true, force: true });
 });
 
-test('codex-cli client keeps async codex exec attached while preserving timeout cleanup', () => {
+test('runtime Codex executor keeps async codex exec attached while preserving timeout cleanup', () => {
   const source = readFileSync(
-    new URL('../packages/redcube-codex-cli-client/src/index-parts/command-process.ts', import.meta.url),
+    new URL('../packages/redcube-runtime/src/executors/index-parts/command-process.ts', import.meta.url),
     'utf-8',
   );
 

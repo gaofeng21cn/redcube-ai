@@ -14,7 +14,7 @@ import {
   invokeProductEntry,
   researchSource,
 } from '@redcube/domain-entry';
-import { probeCodexCli, readCodexCliContract } from '@redcube/codex-cli-client';
+import { probeCodexCli, readCodexCliContract } from '@redcube/runtime';
 import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
 import { collectNativeTerminalEvidence } from './real-route-evolution-probe-parts/terminal-evidence.ts';
 import {

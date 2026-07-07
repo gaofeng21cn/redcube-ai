@@ -77,7 +77,7 @@ test('invokeDomainEntry returns an OPL stage execution plan under the configured
       },
       runtime_session_contract: {
         runtime_owner: 'configured_family_runtime_provider',
-        adapter_surface: '@redcube/codex-cli-client',
+        adapter_surface: 'opl_codex_executor',
         session_mode: 'ephemeral_run',
       },
       return_surface_contract: {
@@ -102,7 +102,7 @@ test('invokeDomainEntry returns an OPL stage execution plan under the configured
       sharedCompanions.buildRuntimeSessionContract({
         runtime_owner: 'configured_family_runtime_provider',
         expected_runtime_owner: 'configured_family_runtime_provider',
-        adapter_surface: '@redcube/codex-cli-client',
+        adapter_surface: 'opl_codex_executor',
         session_mode: 'ephemeral_run',
       }),
     );
@@ -163,7 +163,7 @@ test('invokeDomainEntry rejects requests missing entry_mode from the minimal OPL
         },
         runtime_session_contract: {
           runtime_owner: 'configured_family_runtime_provider',
-          adapter_surface: '@redcube/codex-cli-client',
+          adapter_surface: 'opl_codex_executor',
           session_mode: 'ephemeral_run',
         },
         return_surface_contract: {
@@ -194,7 +194,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
         },
         runtime_session_contract: {
           runtime_owner: 'configured_family_runtime_provider',
-          adapter_surface: '@redcube/codex-cli-client',
+          adapter_surface: 'opl_codex_executor',
           session_mode: 'ephemeral_run',
         },
         return_surface_contract: {

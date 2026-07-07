@@ -8,7 +8,6 @@
     ".": "./dist/index.js"
   },
   "dependencies": {
-    "@redcube/codex-cli-client": "0.1.0",
     "@redcube/redcube-config": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
     "@redcube/governance": "0.1.0",

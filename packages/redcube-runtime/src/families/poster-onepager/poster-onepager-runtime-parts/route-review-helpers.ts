@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { generateStructuredArtifactViaCodexCli } from '@redcube/codex-cli-client';
+import { generateStructuredArtifactViaCodexCli } from '../../../executors/codex-caller.js';
 import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_ADAPTER,

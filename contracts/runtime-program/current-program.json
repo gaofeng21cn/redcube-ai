@@ -1247,7 +1247,7 @@
           "getManagedRun",
           "superviseManagedRun"
         ],
-        "adapter_surface": "@redcube/codex-cli-client"
+        "adapter_surface": "opl_codex_executor"
       },
       "service_safe_domain_entry_adapter": {
         "status": "closeout_completed",
@@ -1320,7 +1320,7 @@
       "status": "closeout_completed",
       "contract": "contracts/runtime-program/product-entry-session-continuity.json",
       "brief": "human_doc:program_product_entry_session_continuity",
-      "adapter_surface": "@redcube/codex-cli-client",
+      "adapter_surface": "opl_codex_executor",
       "probe_script": "redcube product invoke"
     },
     "active_baton": {

@@ -16,7 +16,7 @@ import {
 import { optionalText, safeText, summarizeError } from './shared.js';
 
 function ensureTempDir() {
-  const dir = path.join(os.tmpdir(), 'redcube-codex-cli-client');
+  const dir = path.join(os.tmpdir(), 'redcube-opl-codex-executor');
   mkdirSync(dir, { recursive: true });
   return dir;
 }

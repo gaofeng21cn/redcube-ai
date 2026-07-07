@@ -60,7 +60,7 @@ test('runDeliverableRoute uses Codex-backed executor by default', async () => {
     assert.equal(result.run.executor.execution_model.primary_surface, 'codex_cli_runtime');
     assert.equal(result.run.executor.execution_model.freeze_origin_milestone, 'P19.A');
     assert.equal(result.run.executor.codex_cli_runtime?.owner, 'codex_cli');
-    assert.equal(result.run.executor.codex_cli_runtime?.adapter_surface, '@redcube/codex-cli-client');
+    assert.equal(result.run.executor.codex_cli_runtime?.adapter_surface, 'opl_codex_executor');
     assert.equal(result.run.topic_id, 'topic-a');
     assert.equal(result.run.deliverable_id, 'deck-a');
     assert.equal(result.run.status, 'completed');

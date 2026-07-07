@@ -71,7 +71,7 @@ test('default product-entry path returns an OPL stage execution plan without req
     assert.equal(invoked.session_continuity.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(invoked.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
     assert.equal(invoked.domain_entry_surface.runtime_session_contract.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, '@redcube/codex-cli-client');
+    assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, 'opl_codex_executor');
     assert.equal(invoked.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
     assert.equal(invoked.domain_entry_surface.result_surface.owner, 'one-person-lab');
     assert.equal(invoked.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);

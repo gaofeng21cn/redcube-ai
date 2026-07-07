@@ -31,16 +31,6 @@
   },
   "compiled_dist_runtime_exports": [
     {
-      "directory": "packages/redcube-codex-cli-client",
-      "package_name": "@redcube/codex-cli-client",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-config",
       "package_name": "@redcube/redcube-config",
       "exports": [

@@ -45,7 +45,7 @@ import { readJson, requireField, safeText } from './action-utils.js';
 const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 const HOSTED_RUNTIME_OWNER = 'configured_family_runtime_provider';
-const DEFAULT_EXECUTOR_ADAPTER_SURFACE = '@redcube/codex-cli-client';
+const DEFAULT_EXECUTOR_ADAPTER_SURFACE = 'opl_codex_executor';
 const SUPPORTED_TASK_INTENTS = new Set(['run_opl_stage_execution_plan', 'run_deliverable_route']);
 const overlayRegistry = getDefaultOverlayRegistry();
 

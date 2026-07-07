@@ -277,7 +277,7 @@ test('compiled dist runtime entrypoints preserve package runtime exports', async
       exports: ['CODEX_DEFAULT_MODEL_SELECTION', 'buildCodexRuntimeTopology'],
     },
     {
-      packageName: '@redcube/codex-cli-client',
+      packageName: '@redcube/runtime',
       exports: ['probeCodexCli', 'generateStructuredArtifactViaCodexCli'],
     },
     {

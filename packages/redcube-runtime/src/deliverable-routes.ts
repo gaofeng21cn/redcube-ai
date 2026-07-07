@@ -17,7 +17,7 @@ import {
   startRouteRun,
 } from '@redcube/runtime-protocol';
 
-import { readCodexCliContract } from '@redcube/codex-cli-client';
+import { readCodexCliContract } from './executors/codex-caller.js';
 import { resolveExecutorRouting } from '@redcube/redcube-config';
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
 import { runCandidateRaceRoute } from './candidate-racing.js';
@@ -26,7 +26,7 @@ import {
   refreshStageFolderRouteArtifact,
   validateDeliverableRouteInput,
 } from './deliverable-route-local.js';
-import { resolveExecutorAdapter } from './executors.js';
+import { resolveExecutorAdapter } from './executors/index.js';
 
 function requireSafeSegment(name, value) {
   const text = String(value || '').trim();
@@ -45,7 +45,7 @@ function requireSafeSegment(name, value) {
 function buildCodexRuntimeDescriptor(codexContract) {
   return {
     owner: 'codex_cli',
-    adapter_surface: '@redcube/codex-cli-client',
+    adapter_surface: 'opl_codex_executor',
     model_selection: codexContract.model_selection,
     reasoning_selection: codexContract.reasoning_selection,
     sandbox: codexContract.sandbox,

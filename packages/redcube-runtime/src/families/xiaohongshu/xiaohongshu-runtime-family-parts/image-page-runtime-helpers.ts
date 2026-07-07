@@ -9,7 +9,7 @@ import {
   readFileSync,
   statSync,
 } from 'node:fs';
-import { generateImageViaCodexNativeImagegen } from '@redcube/codex-cli-client';
+import { generateImageViaCodexNativeImagegen } from '../../../executors/codex-caller.js';
 
 const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 const DEFAULT_IMAGE_SIZE = '1086x1448';

@@ -534,7 +534,7 @@ export function buildCloseoutBlockedDomainEntrySurface({
     runtime_session_contract: {
       runtime_owner: runtimeOwner,
       expected_runtime_owner: runtimeOwner,
-      adapter_surface: '@redcube/codex-cli-client',
+      adapter_surface: 'opl_codex_executor',
       session_mode: 'entry_session',
     },
     return_surface_contract: {

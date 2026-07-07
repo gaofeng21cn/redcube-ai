@@ -186,7 +186,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
       sharedCompanions.buildRuntimeSessionContract({
         runtime_owner: 'configured_family_runtime_provider',
         expected_runtime_owner: 'configured_family_runtime_provider',
-        adapter_surface: '@redcube/codex-cli-client',
+        adapter_surface: 'opl_codex_executor',
         session_mode: 'entry_session',
       }),
     );

@@ -92,4 +92,4 @@ export {
   readCodexCliContract,
   REDCUBE_STAGE_JSON_BEGIN,
   REDCUBE_STAGE_JSON_END,
-} from '@redcube/codex-cli-client';
+} from '@redcube/runtime';

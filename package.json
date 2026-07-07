@@ -42,7 +42,6 @@
     "line-budget:strict": "node --experimental-strip-types scripts/line-budget.ts --strict"
   },
   "dependencies": {
-    "@redcube/codex-cli-client": "0.1.0",
     "@redcube/domain-entry": "0.1.0",
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",

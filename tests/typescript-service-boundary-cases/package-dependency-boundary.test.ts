@@ -23,19 +23,17 @@ const LAYER_BY_PACKAGE = new Map([
   ['@redcube/redcube-config', 'config'],
   ['@redcube/reference-os', 'reference'],
   ['@redcube/governance', 'governance'],
-  ['@redcube/codex-cli-client', 'client'],
 ]);
 
 const ALLOWED_DEPENDENCY_LAYERS = new Map([
   ['app', new Set(['domain-entry', 'config'])],
   ['domain-entry', new Set(['overlay', 'runtime', 'protocol'])],
-  ['runtime', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'protocol', 'substrate'])],
+  ['runtime', new Set(['config', 'governance', 'overlay', 'reference', 'protocol', 'substrate'])],
   ['overlay', new Set(['overlay', 'protocol'])],
   ['protocol', new Set(['protocol'])],
   ['config', new Set(['config', 'protocol'])],
   ['reference', new Set(['reference', 'protocol'])],
   ['governance', new Set(['overlay', 'protocol'])],
-  ['client', new Set(['protocol', 'substrate'])],
   ['substrate', new Set(['protocol'])],
 ]);
 

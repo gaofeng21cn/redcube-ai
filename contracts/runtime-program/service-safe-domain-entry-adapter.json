@@ -34,7 +34,7 @@
     "default_runtime_owner": "configured_family_runtime_provider",
     "hosted_runtime_owner_when_opl_hosted": "configured_family_runtime_provider",
     "opl_runtime_manager_role": "provider-backed stage attempt runtime and attempt ledger owner",
-    "adapter_surface": "@redcube/codex-cli-client",
+    "adapter_surface": "opl_codex_executor",
     "session_mode": "ephemeral_run"
   },
   "redcube_domain_payload": {

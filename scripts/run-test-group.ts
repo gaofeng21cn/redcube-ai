@@ -26,7 +26,7 @@ import {
 import {
   probeCodexCli,
   readCodexCliContract,
-} from '@redcube/codex-cli-client';
+} from '@redcube/runtime';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDir, '..');

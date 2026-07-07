@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
-import { generateImageViaCodexNativeImagegen } from '@redcube/codex-cli-client';
+import { generateImageViaCodexNativeImagegen } from '../../../../executors/codex-caller.js';
 
 type JsonRecord = Record<string, any>;
 type ImagePageRoute = 'author_image_pages' | 'repair_image_pages';

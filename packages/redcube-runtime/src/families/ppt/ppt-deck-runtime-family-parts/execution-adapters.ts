@@ -2,7 +2,7 @@
 import {
   generateStructuredArtifactBatchViaCodexCli,
   generateStructuredArtifactViaCodexCli,
-} from '@redcube/codex-cli-client';
+} from '../../../executors/codex-caller.js';
 import {
   CODEX_DEFAULT_ADAPTER,
   HERMES_AGENT_EXECUTOR_BACKEND,

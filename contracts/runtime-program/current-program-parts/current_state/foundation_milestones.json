@@ -30,7 +30,7 @@
       "getManagedRun",
       "superviseManagedRun"
     ],
-    "adapter_surface": "@redcube/codex-cli-client"
+    "adapter_surface": "opl_codex_executor"
   },
   "service_safe_domain_entry_adapter": {
     "status": "closeout_completed",

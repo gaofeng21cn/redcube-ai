@@ -3,7 +3,10 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { REDCUBE_CODEX_RUNTIME_OWNER } from './index-parts/constants.js';
+import {
+  OPL_CODEX_EXECUTOR_SURFACE,
+  REDCUBE_CODEX_RUNTIME_OWNER,
+} from './index-parts/constants.js';
 import {
   buildGenerationInput,
   buildGenerationInstructions,
@@ -20,6 +23,7 @@ import { safeText } from './index-parts/shared.js';
 
 export {
   REDCUBE_CODEX_RUNTIME_OWNER,
+  OPL_CODEX_EXECUTOR_SURFACE,
   REDCUBE_CREATIVE_GENERATION_META_BEGIN,
   REDCUBE_CREATIVE_GENERATION_META_END,
   REDCUBE_STAGE_JSON_BEGIN,
@@ -71,7 +75,7 @@ export async function generateStructuredArtifactViaCodexCli({
   });
   const buildFailureRuntime = ({ usage = null, codexRun = null, error = null } = {}) => ({
     owner: REDCUBE_CODEX_RUNTIME_OWNER,
-    adapter_surface: '@redcube/codex-cli-client',
+    adapter_surface: OPL_CODEX_EXECUTOR_SURFACE,
     run_id: safeText(codexRun?.run_id),
     session_id: safeText(codexRun?.session_id || codexRun?.run_id),
     model_selection: contract.model_selection,
@@ -136,7 +140,7 @@ export async function generateStructuredArtifactViaCodexCli({
     data,
     generationRuntime: {
       owner: REDCUBE_CODEX_RUNTIME_OWNER,
-      adapter_surface: '@redcube/codex-cli-client',
+      adapter_surface: OPL_CODEX_EXECUTOR_SURFACE,
       run_id: execution.codexRun.run_id,
       session_id: execution.codexRun.session_id,
       model_selection: execution.contract.model_selection,
@@ -407,7 +411,7 @@ export async function generateImageViaCodexNativeImagegen({
     dimensions,
     generationRuntime: {
       owner: REDCUBE_CODEX_RUNTIME_OWNER,
-      adapter_surface: '@redcube/codex-cli-client',
+      adapter_surface: OPL_CODEX_EXECUTOR_SURFACE,
       task_surface: 'codex_native_imagegen_skill',
       run_id: execution.codexRun.run_id,
       session_id: execution.codexRun.session_id,

@@ -1,7 +1,10 @@
 // @ts-nocheck
 import { randomUUID } from 'node:crypto';
 
-import { REDCUBE_CODEX_RUNTIME_OWNER } from './constants.js';
+import {
+  OPL_CODEX_EXECUTOR_SURFACE,
+  REDCUBE_CODEX_RUNTIME_OWNER,
+} from './constants.js';
 import { readCodexCliContract } from './command-process.js';
 import { safeText } from './shared.js';
 
@@ -98,7 +101,7 @@ export async function generateCodexCliBatch({
     data,
     batchRuntime: {
       owner: REDCUBE_CODEX_RUNTIME_OWNER,
-      adapter_surface: '@redcube/codex-cli-client',
+      adapter_surface: OPL_CODEX_EXECUTOR_SURFACE,
       batch_descriptor: {
         kind: 'codex_cli_batch_descriptor',
         stage_count: normalizedStages.length,
