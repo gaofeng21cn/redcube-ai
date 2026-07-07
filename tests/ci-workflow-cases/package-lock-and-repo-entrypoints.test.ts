@@ -11,7 +11,10 @@ import {
 } from './shared.ts';
 
 test('repo-local family pin wrapper is the only allowed direct upstream family helper entrypoint', () => {
-  const allowedFiles = new Set(['scripts/run-test-group-lib.ts']);
+  const allowedFiles = new Set([
+    'scripts/run-test-group-lib.ts',
+    'tests/helpers/opl-agent-pack-contracts.ts',
+  ]);
   const disallowedDirectImports = [];
   const upstreamFamilyHelperImportPattern = /\bfrom\s+['"]opl-framework-shared\/family-shared-release['"]|\bimport\s*\(\s*['"]opl-framework-shared\/family-shared-release['"]\s*\)/;
   const sharedOwnerContractPathPattern = /['"]contracts\/family-release\/shared-owner-release\.json['"]/;

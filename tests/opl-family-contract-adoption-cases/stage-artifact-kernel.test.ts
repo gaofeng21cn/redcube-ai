@@ -133,7 +133,7 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
     sqlite_can_store_review_export_judgment: false,
   });
   assert.equal(adoption.stage_artifact_runtime_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
-  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.artifact_contract_ref);
+  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.stage_artifact_runtime.contract_ref);
   assert.deepEqual(adoption.authority_boundary, {
     opl_can_index_refs: true,
     opl_can_rebuild_projection: true,
