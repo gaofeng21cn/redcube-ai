@@ -1,6 +1,7 @@
 {
   "surface_kind": "domain_agent_descriptor",
   "schema_version": 2,
+  "lifecycle_state": "domain_specific_descriptor_after_generic_surface_cutover",
   "domain_id": "redcube_ai",
   "domain_label": "RedCube AI",
   "package_id": "redcube-ai",

@@ -1,10 +1,13 @@
 {
   "surface_kind": "rca_declarative_visual_pack_refs",
   "schema_version": 2,
+  "lifecycle_state": "refs_only_anchor_after_private_pack_compiler_input_retirement",
   "domain_id": "redcube_ai",
   "domain_pack_owner": "redcube_ai",
   "pack_compiler_owner": "one-person-lab",
   "projection_mode": "repo_source_refs_only",
+  "source_of_truth_boundary": "agent/ is the RCA declarative visual pack source; OPL pack compiler owns generated package/control surfaces",
+  "retired_private_surface": "rca_private_opl_pack_compiler_input_body",
   "canonical_semantic_pack_root": "agent/",
   "canonical_semantic_pack_role": "repo_source_declarative_visual_pack",
   "required_domain_pack_paths": [

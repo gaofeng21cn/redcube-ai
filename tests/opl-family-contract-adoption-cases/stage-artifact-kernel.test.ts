@@ -1,11 +1,10 @@
 // @ts-nocheck
-import { assert, currentProgram, domainDescriptor, stageArtifactKernelAdoption, stageControlPlane, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH, STAGE_CONTROL_PLANE_PATH, test } from './shared.ts';
+import { assert, currentProgram, stageArtifactKernelAdoption, stageControlPlane, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH, STAGE_CONTROL_PLANE_PATH, test } from './shared.ts';
 
 test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint', () => {
   const adoption = stageArtifactKernelAdoption();
   const plane = stageControlPlane();
   const current = currentProgram();
-  const descriptor = domainDescriptor();
 
   assert.equal(adoption.surface_kind, 'opl_stage_artifact_kernel_adoption');
   assert.equal(adoption.version, 'opl-stage-artifact-kernel-adoption.v1');
@@ -27,12 +26,9 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.conformance_gate.fails_on.includes('missing_required_output_role'), true);
   assert.equal(adoption.conformance_gate.fails_on.includes('missing_owner_receipt_or_typed_blocker_ref'), true);
   assert.equal(adoption.conformance_gate.domain_readiness_claim, false);
+  assert.equal(adoption.conformance_entrypoint, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH);
   assert.equal(
-    descriptor.standard_contract_refs.stage_artifact_kernel_adoption,
-    STAGE_ARTIFACT_KERNEL_ADOPTION_PATH,
-  );
-  assert.equal(
-    descriptor.standard_contract_refs.opl_state_index_kernel_adoption,
+    `${adoption.conformance_entrypoint}#/opl_state_index_kernel_adoption`,
     `${STAGE_ARTIFACT_KERNEL_ADOPTION_PATH}#/opl_state_index_kernel_adoption`,
   );
   assert.deepEqual(adoption.stage_folder_unit, [
@@ -136,8 +132,8 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
     sqlite_can_store_visual_artifact_body: false,
     sqlite_can_store_review_export_judgment: false,
   });
-  assert.equal(adoption.stage_artifact_runtime_ref, '/stage_artifact_runtime');
-  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.stage_artifact_runtime.contract_ref);
+  assert.equal(adoption.stage_artifact_runtime_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
+  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.artifact_contract_ref);
   assert.deepEqual(adoption.authority_boundary, {
     opl_can_index_refs: true,
     opl_can_rebuild_projection: true,

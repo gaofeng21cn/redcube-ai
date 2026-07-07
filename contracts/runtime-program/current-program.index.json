@@ -85,7 +85,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "1edb75a2e56f3430b07e271ac24d79dd0bba7b48ae64c3655254533d87db9146",
+  "source_digest": "e0803b414d6bb00a69c003557b4967baa366bc9e528076b6ffa61e1c0ce52fc5",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -106,7 +106,7 @@
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata.json",
       "role": "current_program_leaf_source",
       "line_count": 375,
-      "sha256": "65433797c7b3ddcb8324b0cd930cf35b32e5e218c66547439967c3da2f92c1ba"
+      "sha256": "bb7cf13454bc90350ca2f2bf846fd1d529184ab4e8e90fc77d754590eabcf42d"
     },
     {
       "json_pointer": "/longrun_goal",
@@ -141,7 +141,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "3b61fa28655389813be5204f1364afceb6ef983871bf5ca229a58c311992d815"
+      "sha256": "33fe33e5c5a920ba4ad9449f167c70b1665bcd291b817b89a4abf943f857e2fc"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -288,7 +288,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/stage_artifact_kernel_adoption.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 74,
-      "sha256": "458993c2b640abf1e54b93999a787483894b40f0f3e221894f8735900638d69d"
+      "sha256": "887a9c240c8576d7893bf5ab8e4899c63df5d85151a51fc195c60cd3ff8eb891"
     },
     {
       "json_pointer": "/current_state/stop_conditions",
@@ -309,7 +309,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 28,
-      "sha256": "f491b284021a4ef8778d1b342b35c70578284e9da1f4acc2ead6555846a0e94c"
+      "sha256": "715acc0f69c0943ab43eec6b5fe710d4568ad6d0028ff41f3747683691b2f80c"
     },
     {
       "json_pointer": "/current_state/workstream",
@@ -346,7 +346,7 @@
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata.json",
       "role": "current_program_leaf_source",
       "line_count": 375,
-      "sha256": "65433797c7b3ddcb8324b0cd930cf35b32e5e218c66547439967c3da2f92c1ba"
+      "sha256": "bb7cf13454bc90350ca2f2bf846fd1d529184ab4e8e90fc77d754590eabcf42d"
     },
     {
       "json_pointer": "/longrun_goal",
@@ -381,7 +381,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "3b61fa28655389813be5204f1364afceb6ef983871bf5ca229a58c311992d815"
+      "sha256": "33fe33e5c5a920ba4ad9449f167c70b1665bcd291b817b89a4abf943f857e2fc"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -528,7 +528,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/stage_artifact_kernel_adoption.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 74,
-      "sha256": "458993c2b640abf1e54b93999a787483894b40f0f3e221894f8735900638d69d"
+      "sha256": "887a9c240c8576d7893bf5ab8e4899c63df5d85151a51fc195c60cd3ff8eb891"
     },
     {
       "json_pointer": "/current_state/stop_conditions",
@@ -549,7 +549,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 28,
-      "sha256": "f491b284021a4ef8778d1b342b35c70578284e9da1f4acc2ead6555846a0e94c"
+      "sha256": "715acc0f69c0943ab43eec6b5fe710d4568ad6d0028ff41f3747683691b2f80c"
     },
     {
       "json_pointer": "/current_state/workstream",

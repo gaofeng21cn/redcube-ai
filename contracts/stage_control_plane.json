@@ -1,11 +1,14 @@
 {
   "surface_kind": "rca_stage_control_refs",
   "version": "rca-stage-control-refs.v1",
+  "lifecycle_state": "refs_only_anchor_after_private_stage_control_retirement",
   "plane_id": "redcube_ai_stage_refs",
   "target_domain_id": "redcube_ai",
   "owner": "redcube_ai",
   "generated_stage_control_owner": "one-person-lab",
   "projection_mode": "rca_refs_only_opl_generated_stage_control",
+  "source_of_truth_boundary": "agent/ holds RCA declarative visual pack refs; OPL generated/hosted substrate owns generic stage-control body",
+  "retired_private_surface": "rca_private_family_stage_control_plane_body",
   "stage_descriptor_body_copied": false,
   "stage_ids": [
     "source_intake",

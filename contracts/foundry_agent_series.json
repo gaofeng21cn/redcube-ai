@@ -1,6 +1,7 @@
 {
   "surface_kind": "rca_foundry_agent_profile_ref",
   "version": "rca-foundry-agent-profile-ref.v1",
+  "lifecycle_state": "domain_profile_ref_after_generic_foundry_spine_retirement",
   "domain_id": "redcube_ai",
   "package_id": "redcube-ai",
   "owner": "redcube_ai",

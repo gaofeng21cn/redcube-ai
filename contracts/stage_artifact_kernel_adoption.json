@@ -85,7 +85,7 @@
     "status_source_of_truth": "physical_stage_folder",
     "orphan_artifact_is_completion": false
   },
-  "stage_artifact_runtime_ref": "/stage_artifact_runtime",
+  "stage_artifact_runtime_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "stage_artifact_runtime_contract_id": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "stage_output_role_interface": {
     "surface_kind": "rca_stage_output_role_interface",

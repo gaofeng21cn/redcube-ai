@@ -1,11 +1,14 @@
 {
   "surface_kind": "rca_action_target_refs",
   "version": "rca-action-target-refs.v1",
+  "lifecycle_state": "refs_only_anchor_after_private_action_catalog_retirement",
   "catalog_id": "redcube_product_entry_action_catalog",
   "target_domain_id": "redcube_ai",
   "owner": "redcube_ai",
   "generated_surface_owner": "one-person-lab",
   "projection_mode": "minimal_authority_and_domain_handler_targets_only",
+  "source_of_truth_boundary": "RCA keeps action targets and minimal authority function refs; OPL generated descriptors own generic action catalog/interface body",
+  "retired_private_surface": "rca_private_family_action_catalog_body",
   "domain_repo_can_own_generated_surface": false,
   "action_targets": [
     "invoke_product_entry",

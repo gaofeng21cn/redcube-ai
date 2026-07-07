@@ -10,9 +10,9 @@ Machine boundary: 人读硬约束。机器真相继续归 contracts、schema、s
 - 对外主语固定为独立 visual-deliverable domain agent；`gateway / harness` 只作为内部架构边界语言，不成为公开第一身份。
 - 当前 formal-entry matrix 固定为 `CLI`（默认正式入口）/ `MCP`（支持协议层）/ `controller`（内部控制面）。不得把 `controller` 写成公开产品入口。
 - 当前默认公开 capability contract 固定为 `CLI / MCP / product-entry/service-safe-domain-entry surface + OPL/Temporal hosted scheduling + Codex-default stage execution`；任务启动后的持久在线调度、唤醒、resume、retry/dead-letter 与 attempt ledger 归 OPL/Temporal，`Codex CLI` 仍是 RCA 的最小具体 stage executor。
-- `contracts/runtime-program/current-program.json` 是当前 active mainline pointer；`contracts/runtime-program/*.json` 是 tranche / board / provenance 的机器可读真相面。`docs/active/*.md` 与 `docs/history/phase-2/*.md` 是对应人读 brief，必须与 contracts 和 tests 同步。
+- `contracts/runtime-program/current-program-parts/**` 是 current-program canonical source；`contracts/runtime-program/current-program.index.json` 是最薄 machine-readable locator / check 输入；`contracts/runtime-program/current-program.json` 只作为 legacy read-through projection 给既有 consumer 读取，不是 canonical edit/check surface。`contracts/runtime-program/*.json` 继续承载 tranche / board / provenance 的机器可读真相面。`docs/active/*.md` 与 `docs/history/phase-2/*.md` 是对应人读 brief，必须与 contracts 和 tests 同步。
 - repo-verified direct route 与 OPL-hosted route 必须共用同一个 downstream domain-agent entry（service-safe domain entry）。
-- Codex-visible RCA plugin source 有两个受控层次：仓库根层 `.codex-plugin/plugin.json` 只能作为 OPL Developer Mode / `rca-local` 指向 live developer checkout 的入口；canonical skill 内容、icon 和 packaged plugin scaffold 统一在 `plugins/redcube-ai/` 下维护，legacy `plugins/rca` 与 `plugins/redcube-ai/skills/rca` 只允许作为兼容 alias path。不得把 `.agents/plugins/marketplace.json` 作为 tracked source，也不得复制第二份根层 `skills/rca` 或 `assets/icon.*` 来制造 parallel skill truth。
+- Codex-visible RCA plugin source 统一在 `plugins/redcube-ai/`：`plugins/redcube-ai/.codex-plugin/plugin.json` 是 canonical scaffold/source locator，skill 内容与 icon 也在该 plugin tree 下维护。仓库根层 `.codex-plugin/plugin.json`、repo-local installer、legacy `plugins/rca` 与 `plugins/redcube-ai/skills/rca` alias path 已退役，不得恢复；`.agents/plugins/marketplace.json` 不得作为 tracked source，也不得复制第二份根层 `skills/rca` 或 `assets/icon.*` 来制造 parallel skill truth。
 
 ## OPL 边界与 runtime substrate
 
