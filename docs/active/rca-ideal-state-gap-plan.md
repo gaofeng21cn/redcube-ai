@@ -54,6 +54,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | Area | Current status | Current owner / evidence |
 | --- | --- | --- |
 | Standard OPL Agent structure | done | `agent/`、`contracts/stage_control_plane.json`、`contracts/pack_compiler_input.json`、`contracts/runtime-program/current-program.index.json` |
+| Visual memory curator professional skill | done structurally | `agent/professional_skills/rca-visual-memory-curator/SKILL.md`、`contracts/capability_map.json` 和核心 docs 已把 visual memory proposal / accept-reject review / writeback lifecycle 收为 refs-only professional method layer；RCA 继续持有 memory body、accept/reject judgment、owner receipt 和 typed blocker，OPL 只 transport/project locator、proposal、receipt 和 coverage refs。本项不声明 real memory lifecycle receipt scaleout、visual ready、exportable、handoffable、domain ready 或 production ready。 |
 | Generic private runtime cleanup | done | `docs/status.md`、`docs/decisions.md`、`contracts/functional_privatization_audit.json`、`contracts/physical_source_morphology_policy.json` |
 | RCA retained authority surfaces | done | `authority_surface_id` contracts、production acceptance surface、product-entry manifest |
 | Direct / hosted boundary | done structurally | product-entry manifest、family action catalog、RCA `domain-handler export|dispatch` target、OPL-generated `domain_action_adapter` descriptor refs、stage control projection |

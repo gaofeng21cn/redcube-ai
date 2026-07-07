@@ -5,8 +5,9 @@
   "domain_label": "RedCube AI",
   "owner": "redcube_ai",
   "state": "active_contract",
-  "purpose": "Route AgentLab and OMA PPT feedback to RCA repo-local professional skills without creating a second visual truth source.",
+  "purpose": "Route AgentLab, OMA, and RCA feedback to repo-local professional skills without creating a second visual truth source, visual memory body owner, or export gate.",
   "source_of_truth_refs": [
+    "user_request:2026-07-07:rca-visual-memory-curator-professional-skill",
     "user_request:2026-07-03:agent-lab-ppt-professional-skill-capability-map",
     "contracts/stage_control_plane.json#/stages",
     "contracts/standard-agent-principles-adoption.json#/module_organization/professional_skill_surfaces",
@@ -16,7 +17,13 @@
     "contracts/capability_map.json#/dry_run_token_mapping_check",
     "contracts/agent_lab_handoff.json#/dry_run_token_mapping_check",
     "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
-    "agent/professional_skills/*/resources/minimal-resource-pack.md"
+    "agent/professional_skills/*/resources/minimal-resource-pack.md",
+    "docs/policies/visual_pattern_memory_policy.md",
+    "agent/skills/visual_memory_policy.md",
+    "agent/quality_gates/review_export_memory.md",
+    "agent/knowledge/review_export_memory.md",
+    "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+    "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
   ],
   "professional_skill_policy": {
     "skill_files_are_method_source_of_truth": true,
@@ -90,6 +97,18 @@
         "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
         "resource_refs": [
           "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
+        ],
+        "required_sections": [
+          "## Template",
+          "## Example",
+          "## Checklist"
+        ]
+      },
+      {
+        "capability_id": "rca-visual-memory-curator",
+        "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "resource_refs": [
+          "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
         ],
         "required_sections": [
           "## Template",
@@ -518,6 +537,91 @@
       ]
     },
     {
+      "capability_id": "rca-visual-memory-curator",
+      "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+      "stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "primary_feedback_tokens": [
+        "visual_memory",
+        "memory_writeback",
+        "review_export_memory"
+      ],
+      "maps_feedback_about": [
+        "visual_pattern_memory",
+        "visual_memory_writeback_proposal",
+        "accept_reject_review",
+        "accepted_memory_receipt",
+        "rejected_memory_receipt",
+        "consumed_memory_refs",
+        "locator_projection_refs",
+        "review_export_memory"
+      ],
+      "allowed_change_refs": [
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "docs/policies/visual_pattern_memory_policy.md",
+        "agent/skills/visual_memory_policy.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/knowledge/review_export_memory.md",
+        "contracts/memory_descriptor.json",
+        "contracts/capability_map.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "docs/policies/visual_pattern_memory_policy.md",
+        "agent/skills/visual_memory_policy.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/knowledge/review_export_memory.md",
+        "contracts/memory_descriptor.json",
+        "contracts/capability_map.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/professional_capabilities/rca-visual-memory-curator",
+        "contracts/capability_map.json#/feedback_token_index/visual_memory",
+        "contracts/capability_map.json#/feedback_token_index/memory_writeback",
+        "contracts/capability_map.json#/feedback_token_index/review_export_memory",
+        "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "contracts/capability_map.json#/skill_local_resource_pack"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "authority_boundary": {
+        "refs_only": true,
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false,
+        "rca_owner_receipt_or_typed_blocker_required": true
+      },
+      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
+      "resource_refs": [
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ]
+    },
+    {
       "capability_id": "rca-native-ppt-designer",
       "skill_ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
       "stage_refs": [
@@ -856,6 +960,37 @@
         "package_and_handoff"
       ],
       "default_patch_surface_hint": "Patch visual QA criteria, screenshot review checks, or repair-target routing; AgentLab score is not an RCA verdict."
+    },
+    "visual_memory": {
+      "canonical_capability_ids": [
+        "rca-visual-memory-curator"
+      ],
+      "owner_stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "default_patch_surface_hint": "Route visual memory feedback to RCA memory proposal and accept/reject review methods; do not patch memory body, artifacts, verdicts, or owner receipts through OPL."
+    },
+    "memory_writeback": {
+      "canonical_capability_ids": [
+        "rca-visual-memory-curator"
+      ],
+      "owner_stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "default_patch_surface_hint": "Patch writeback proposal, evidence-linking, or accept/reject lifecycle guidance; OPL may transport refs only and cannot accept/reject visual memory."
+    },
+    "review_export_memory": {
+      "canonical_capability_ids": [
+        "rca-visual-memory-curator",
+        "rca-ppt-reviewer"
+      ],
+      "owner_stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "default_patch_surface_hint": "Route review/export memory feedback to curator and reviewer method refs; memory cannot replace screenshot review, export verdict, or owner receipt."
     },
     "editable_pptx_grammar": {
       "canonical_capability_ids": [
@@ -1460,6 +1595,120 @@
       "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
     },
     {
+      "capability_id": "rca-visual-memory-curator",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "RCA visual memory curation is a first-class repo-local professional method; OPL only transports locator, proposal, receipt, and projection refs.",
+      "improvement_tokens": [
+        "visual_memory",
+        "memory_writeback",
+        "review_export_memory",
+        "visual_pattern_memory",
+        "visual_memory_writeback_proposal",
+        "accept_reject_review",
+        "accepted_memory_receipt",
+        "rejected_memory_receipt",
+        "consumed_memory_refs",
+        "locator_projection_refs",
+        "rca-visual-memory-curator"
+      ],
+      "failure_tokens": [
+        "visual_memory",
+        "memory_writeback",
+        "review_export_memory",
+        "visual_pattern_memory",
+        "visual_memory_writeback_proposal",
+        "accept_reject_review",
+        "accepted_memory_receipt",
+        "rejected_memory_receipt",
+        "consumed_memory_refs",
+        "locator_projection_refs",
+        "rca-visual-memory-curator"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "docs/policies/visual_pattern_memory_policy.md",
+        "agent/skills/visual_memory_policy.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/knowledge/review_export_memory.md",
+        "contracts/memory_descriptor.json",
+        "contracts/capability_map.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "target_repo_file_hints": [
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "docs/policies/visual_pattern_memory_policy.md",
+        "agent/skills/visual_memory_policy.md",
+        "agent/quality_gates/review_export_memory.md",
+        "agent/knowledge/review_export_memory.md",
+        "contracts/memory_descriptor.json",
+        "contracts/capability_map.json",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "authority_boundary": {
+        "refs_only": true,
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false,
+        "rca_owner_receipt_or_typed_blocker_required": true
+      },
+      "stage_refs": [
+        "review_and_revision",
+        "package_and_handoff"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-visual-memory-curator",
+        "contracts/capability_map.json#/feedback_token_index/visual_memory",
+        "contracts/capability_map.json#/feedback_token_index/memory_writeback",
+        "contracts/capability_map.json#/feedback_token_index/review_export_memory",
+        "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "contracts/capability_map.json#/skill_local_resource_pack"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
+      "resource_refs": [
+        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
+      ],
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+    },
+    {
       "capability_id": "rca-native-ppt-designer",
       "surface_role": "professional_skill",
       "capability_kind": "professional_skill",
@@ -2033,6 +2282,9 @@
       "progressive_disclosure",
       "style_boundary",
       "visual_qa",
+      "visual_memory",
+      "memory_writeback",
+      "review_export_memory",
       "editable_pptx_grammar",
       "visual_density",
       "layout_quality",
@@ -2045,7 +2297,10 @@
       "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
       "contracts/capability_map.json#/dry_run_token_mapping_check",
       "contracts/agent_lab_handoff.json#/dry_run_token_mapping_check",
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+      "contracts/capability_map.json#/feedback_token_index/visual_memory",
+      "contracts/capability_map.json#/feedback_token_index/memory_writeback",
+      "contracts/capability_map.json#/feedback_token_index/review_export_memory"
     ],
     "forbidden_surfaces": [
       "visual_truth_artifacts",
@@ -2063,7 +2318,8 @@
         "review_export_verdict",
         "artifact_authority",
         "owner_receipt",
-        "typed_blocker"
+        "typed_blocker",
+        "visual_memory_accept_reject"
       ],
       "opl_oma_allowed_outputs": [
         "refs_only_work_order",
@@ -2085,7 +2341,8 @@
         "rca_owner_receipt",
         "rca_typed_blocker",
         "rca_review_export_receipt",
-        "rca_artifact_authority_receipt"
+        "rca_artifact_authority_receipt",
+        "rca_visual_memory_accept_reject_receipt"
       ]
     },
     "skill_method_tokens": [
@@ -2095,6 +2352,9 @@
       "progressive_disclosure",
       "style_boundary",
       "visual_qa",
+      "visual_memory",
+      "memory_writeback",
+      "review_export_memory",
       "editable_pptx_grammar"
     ]
   },

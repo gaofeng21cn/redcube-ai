@@ -82,6 +82,7 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-ppt-visual-director',
     'rca-ppt-page-author',
     'rca-ppt-reviewer',
+    'rca-visual-memory-curator',
     'rca-native-ppt-designer',
     'rca-template-profiler',
   ];
@@ -96,6 +97,7 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-ppt-visual-director': ['spec_lock', 'progressive_disclosure', 'visual_qa'],
     'rca-ppt-page-author': ['serial_pipeline', 'progressive_disclosure', 'editable_pptx_grammar'],
     'rca-ppt-reviewer': ['visual_qa'],
+    'rca-visual-memory-curator': ['memory_proposal_card', 'accept_reject_review', 'writeback_lifecycle'],
     'rca-native-ppt-designer': ['spec_lock', 'editable_pptx_grammar'],
     'rca-template-profiler': ['template_capacity', 'placeholder_capacity', 'editable_pptx_grammar'],
   };
@@ -117,6 +119,9 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'progressive_disclosure',
     'style_boundary',
     'visual_qa',
+    'visual_memory',
+    'memory_writeback',
+    'review_export_memory',
     'editable_pptx_grammar',
   ];
   const expectedTokens = [
@@ -299,6 +304,16 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   assert.deepEqual(map.feedback_token_index.visual_qa.canonical_capability_ids, [
     'rca-ppt-reviewer',
     'rca-ppt-visual-director',
+  ]);
+  assert.deepEqual(map.feedback_token_index.visual_memory.canonical_capability_ids, [
+    'rca-visual-memory-curator',
+  ]);
+  assert.deepEqual(map.feedback_token_index.memory_writeback.canonical_capability_ids, [
+    'rca-visual-memory-curator',
+  ]);
+  assert.deepEqual(map.feedback_token_index.review_export_memory.canonical_capability_ids, [
+    'rca-visual-memory-curator',
+    'rca-ppt-reviewer',
   ]);
   assert.deepEqual(map.feedback_token_index.editable_pptx_grammar.canonical_capability_ids, [
     'rca-native-ppt-designer',

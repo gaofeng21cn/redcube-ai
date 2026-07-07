@@ -31,10 +31,10 @@ Stage prompt / professional specialist skill / tool-helper 的架构分工固定
 | 层 | 角色 | 不做什么 |
 | --- | --- | --- |
 | Stage prompt | Stage operating surface。定义某个 stage 的目标、输入 refs、输出 receipts / refs / typed blockers / repair targets，以及能否进入下一 stage。 | 不沉淀跨 stage 专业方法，不直接物化文件，不声明 visual/export ready。 |
-| Professional specialist skill | Repo-local reusable professional method。沉淀 story architecture、visual direction、page authoring、review、native PPT design、template profiling 等可复用专业做法，供 stage 调用。 | 不成为外部 repo / 外部产品 / 第二公开 skill，不持有 runtime、artifact body 或 review/export authority。 |
+| Professional specialist skill | Repo-local reusable professional method。沉淀 story architecture、visual direction、page authoring、review、visual memory curation、native PPT design、template profiling 等可复用专业做法，供 stage 调用。 | 不成为外部 repo / 外部产品 / 第二公开 skill，不持有 runtime、artifact body、memory body、accept/reject receipt body 或 review/export authority。 |
 | Tool/helper | Materialization / validation / export surface。imagegen、screenshot/render、Office/PPT helper、manifest / locator / export helper 负责生成、渲染、校验、打包和返回 evidence refs。 | 不选择叙事、不替代专业判断、不签 visual truth、review verdict、export verdict 或 owner receipt。 |
 
-因此，新增 professional specialist skill 是为了把“可复用专业方法”从单个 stage prompt 和旧 policy ref 中拆出来；旧 `agent/skills/*.md` 继续只是 stage skill policy refs，约束 stage 使用 authoring / helper / memory policy 的边界，不是 standalone Codex professional skill。
+因此，新增 professional specialist skill 是为了把“可复用专业方法”从单个 stage prompt 和旧 policy ref 中拆出来；旧 `agent/skills/*.md` 继续只是 stage skill policy refs，约束 stage 使用 authoring / helper / memory policy 的边界，不是 standalone Codex professional skill。`agent/skills/visual_memory_policy.md` 只读为 visual memory 的 stage policy ref；`agent/professional_skills/rca-visual-memory-curator/SKILL.md` 才是 memory proposal、RCA accept/reject review 与 writeback lifecycle 的 curator/reviewer 方法层。
 
 当前 RCA 是正例：`agent/skills/*.md` 只保留 policy ref，`agent/prompts/*.md` 负责阶段目标、输入输出和交付边界，并显式路由到 `agent/professional_skills/*/SKILL.md`；professional skill 只沉淀 PPT 专业方法，tool/helper 只物化、截图、导出和校验 refs。`contracts/stage_control_plane.json` 与 `contracts/pack_compiler_input.json` 是这条路由进入 pack/stage discovery 的机器合同，不新增第二套 skill registry。
 
