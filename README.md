@@ -65,6 +65,9 @@ Each review round, rerun, revision target, and export result stays connected, so
 **Routes Match The Output Type**<br/>
 Slides, Xiaohongshu notes, and knowledge posters use different default routes; editable PPTX and HTML routes are explicit selectable routes.
 
+**Template Intelligence Before Rendering**<br/>
+When a template or reference deck matters, RedCube profiles layout zones and placeholder capacity before visual direction or native PPTX authoring consumes those constraints.
+
 **Progress Stays Visible During Long Jobs**<br/>
 During generation, checking, reruns, and export, RCA progress and review surfaces expose the current step, remaining issues, and the next review focus.
 

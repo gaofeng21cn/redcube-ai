@@ -7,6 +7,10 @@ description: "Use when RedCube AI needs a PPT template or reference deck special
 
 Operate as the template and reference-deck analysis specialist. Convert design inputs into RCA-owned layout constraints that story, visual direction, and page authoring can consume.
 
+## Consolidation Decision
+
+Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual-director` or `rca-native-ppt-designer`: profiling is pre-route layout intelligence for image-first, HTML, and native PPTX; visual direction consumes the profile for style and rhythm, while native design consumes it only when editable PPTX is explicitly selected.
+
 ## Inputs
 
 - User-provided PPTX template, reference deck, screenshots, brand guide, or existing deck.
@@ -40,6 +44,7 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 7. Keep source and artifact boundaries clean. Profiling can inspect templates and screenshots, but it cannot mutate canonical artifacts or sign review/export verdicts.
 8. For native PPTX, produce zones and placeholder rules that the `editable_shape_plan` can bind to directly.
 9. For image-first or HTML routes, still provide semantic layout and capacity guidance, but do not claim native editability.
+10. Stop at profile output. Downstream visual direction, page authoring, or native PPT design must own route-specific application and repair.
 
 ## Workbench Lessons To Preserve
 

@@ -12,7 +12,7 @@ Canonical policy:
 
 Professional skill routing:
 - Route PPT visual language, rhythm, density, peak pages, layout variety, and anti-template constraints to `agent/professional_skills/rca-ppt-visual-director/SKILL.md`.
-- Route template/reference deck profiling, semantic zones, placeholder capacity, and layout grammar to `agent/professional_skills/rca-template-profiler/SKILL.md`.
+- Route template/reference deck profiling, semantic zones, placeholder capacity, and layout grammar first to `agent/professional_skills/rca-template-profiler/SKILL.md`; visual direction consumes that profile instead of re-profiling it.
 - Keep `agent/skills/*.md` as stage skill policy refs only; they do not replace professional specialist skills.
 
 Detailed prompt locators:

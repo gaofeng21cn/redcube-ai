@@ -13,8 +13,8 @@ Canonical policy:
 
 Professional skill routing:
 - Route page-level PPT authoring, visible text safety, text fit, and blocked-slide repair planning to `agent/professional_skills/rca-ppt-page-author/SKILL.md`.
-- Route native editable PPTX design spec locks, shape plans, coordinate repair, and Office editability constraints to `agent/professional_skills/rca-native-ppt-designer/SKILL.md`.
-- Route template-aware layout grammar and placeholder capacity constraints to `agent/professional_skills/rca-template-profiler/SKILL.md`.
+- Route template-aware layout grammar and placeholder capacity constraints first to `agent/professional_skills/rca-template-profiler/SKILL.md`.
+- Route native editable PPTX design spec locks, shape plans, coordinate repair, and Office editability constraints to `agent/professional_skills/rca-native-ppt-designer/SKILL.md` after template/profile inputs exist when needed.
 - Keep tool/helper calls limited to materialization, screenshots, validation, export, and evidence refs.
 
 Detailed prompt locators:

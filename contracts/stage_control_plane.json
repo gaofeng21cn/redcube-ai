@@ -34,6 +34,62 @@
     "agent/prompts/review_and_revision.md",
     "agent/prompts/package_and_handoff.md"
   ],
+  "professional_skill_refs": {
+    "communication_strategy": [
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "role": "story_architecture_owner"
+      }
+    ],
+    "visual_direction": [
+      {
+        "skill_ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "role": "pre_route_template_profile_owner"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "role": "visual_direction_consumer_and_style_owner"
+      }
+    ],
+    "artifact_creation": [
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
+        "role": "page_authoring_owner"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
+        "role": "template_capacity_owner"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
+        "role": "native_pptx_route_specific_shape_plan_owner"
+      }
+    ],
+    "review_and_revision": [
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "role": "rendered_review_owner"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "role": "visual_direction_regression_consumer"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "role": "visual_memory_proposal_review_owner"
+      }
+    ],
+    "package_and_handoff": [
+      {
+        "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "role": "export_readiness_evidence_consumer"
+      },
+      {
+        "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
+        "role": "memory_receipt_ref_consumer"
+      }
+    ]
+  },
   "artifact_contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "authority_boundary": {
     "domain_truth_owner": "redcube_ai",

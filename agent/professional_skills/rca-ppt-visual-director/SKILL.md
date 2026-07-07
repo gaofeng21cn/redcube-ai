@@ -38,6 +38,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 7. Define readable floors. Titles, body text, labels, tables, captions, and auxiliary metadata need explicit typography and spacing rules.
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
+10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
 
 ## Workbench Lessons To Preserve
 
@@ -61,6 +62,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 ## Stage Prompt Boundary
 
 - `visual_direction` owns visual language, rhythm, page family ceilings, density controls, and forbidden regressions.
+- `rca-template-profiler` owns template/reference-deck profiling, semantic zones, and placeholder capacity; this skill consumes that profile.
 - `artifact_creation` consumes the approved visual direction; it must not rediscover the deck style from scratch.
 - `review_and_revision` judges rendered pages; this skill supplies the intended standard, not the final verdict.
 - Do not materialize PPTX/PNG/HTML, mutate artifacts, sign review/export receipts, or override route policy.

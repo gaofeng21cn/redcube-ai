@@ -42,6 +42,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 8. Respect readability floors: title, body, labels, tables, captions, gaps, edge margins, and title hierarchy must be planned before materialization.
 9. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
 10. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
+11. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
 
 ## Workbench Lessons To Preserve
 
@@ -63,6 +64,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 ## Stage Prompt Boundary
 
 - `visual_direction` supplies deck-level visual intent; this skill turns it into native editable shape design.
+- `rca-template-profiler` supplies route-agnostic template profile and placeholder capacity when a template or reference deck exists.
 - `artifact_creation` owns native page materialization through the selected route.
 - `review_and_revision` owns rendered review and repair verdict.
 - `package_and_handoff` owns export after gates pass.

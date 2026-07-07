@@ -274,11 +274,12 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     'rca-ppt-reviewer',
     'rca-ppt-visual-director',
   ]);
-  assert.deepEqual(map.feedback_token_index.placeholder_capacity.canonical_capability_ids, [
-    'rca-template-profiler',
-    'rca-ppt-visual-director',
-    'rca-native-ppt-designer',
-  ]);
+  assert.deepEqual(map.feedback_token_index.template_profile.canonical_capability_ids, ['rca-template-profiler']);
+  assert.deepEqual(map.feedback_token_index.placeholder_capacity.canonical_capability_ids, ['rca-template-profiler']);
+  assert.equal(
+    map.professional_skill_consolidation.template_profiler_merge_decision,
+    'retain_separate_refs_only_professional_skill',
+  );
   assert.deepEqual(map.feedback_token_index.ppt_visual_density.canonical_capability_ids, [
     'rca-ppt-visual-director',
     'rca-ppt-page-author',

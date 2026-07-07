@@ -9,7 +9,8 @@
   "source_of_truth_refs": [
     "user_request:2026-07-07:rca-visual-memory-curator-professional-skill",
     "user_request:2026-07-03:agent-lab-ppt-professional-skill-capability-map",
-    "contracts/stage_control_plane.json#/stages",
+    "contracts/stage_control_plane.json#/stage_ids",
+    "contracts/stage_control_plane.json#/professional_skill_refs",
     "contracts/standard-agent-principles-adoption.json#/module_organization/professional_skill_surfaces",
     "agent/professional_skills/*/SKILL.md",
     "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
@@ -37,7 +38,25 @@
     "skill_local_resource_pack_is_refs_only": true,
     "resource_pack_does_not_authorize_visual_truth": true,
     "resource_pack_does_not_authorize_export_or_quality_verdict": true,
-    "resource_pack_does_not_write_runtime_state": true
+    "resource_pack_does_not_write_runtime_state": true,
+    "template_profiler_is_profile_owner": true,
+    "visual_and_native_skills_consume_template_profile_without_owning_profiling": true
+  },
+  "professional_skill_consolidation": {
+    "last_reviewed": "2026-07-07",
+    "template_profiler_merge_decision": "retain_separate_refs_only_professional_skill",
+    "evaluated_merge_targets": [
+      "rca-ppt-visual-director",
+      "rca-native-ppt-designer"
+    ],
+    "no_merge_rationale": [
+      "Template profiling is a pre-route reference-deck and layout-capacity analysis method that can feed image-first, HTML, and native PPTX routes.",
+      "Visual direction owns deck-level style, rhythm, density, and anti-template constraints after the profile exists.",
+      "Native PPT designer owns editable_shape_plan, coordinates, shape grammar, and repair only when native PPTX is explicitly selected.",
+      "Merging profiler into visual director would blur profiling with visual judgment; merging it into native designer would incorrectly bind non-native template analysis to a native-only route."
+    ],
+    "consolidation_result": "template_profile and placeholder_capacity feedback tokens now route first to rca-template-profiler; downstream visual/native capabilities consume the profile for style lock or route-specific binding.",
+    "old_entry_policy": "No tombstone is needed because rca-template-profiler remains active. If retired later, keep only a thin redirect to the surviving owner and preserve this rationale."
   },
   "skill_local_resource_pack": {
     "pack_kind": "rca_ppt_professional_skill_local_resource_pack",
@@ -266,6 +285,7 @@
         "style_boundary",
         "visual_qa"
       ],
+      "template_profiler_relationship": "Consumes template_profile and placeholder_capacity from rca-template-profiler; does not own reference deck profiling or placeholder measurement.",
       "allowed_change_refs": [
         "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
         "agent/prompts/visual_direction.md",
@@ -643,6 +663,7 @@
         "spec_lock",
         "editable_pptx_grammar"
       ],
+      "template_profiler_relationship": "Consumes template_profile and placeholder_capacity when binding editable_shape_plan to native zones; does not own route-agnostic template profiling.",
       "allowed_change_refs": [
         "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
         "prompts/ppt_deck/author_pptx_native.md",
@@ -731,6 +752,8 @@
         "style_boundary",
         "editable_pptx_grammar"
       ],
+      "consolidation_decision": "retained_as_pre_route_template_profile_owner",
+      "no_merge_rationale_ref": "contracts/capability_map.json#/professional_skill_consolidation",
       "allowed_change_refs": [
         "agent/professional_skills/rca-template-profiler/SKILL.md",
         "agent/prompts/visual_direction.md",
@@ -870,27 +893,23 @@
     },
     "template_profile": {
       "canonical_capability_ids": [
-        "rca-template-profiler",
-        "rca-ppt-visual-director",
-        "rca-native-ppt-designer"
+        "rca-template-profiler"
       ],
       "owner_stage_refs": [
         "visual_direction",
         "artifact_creation"
       ],
-      "default_patch_surface_hint": "Treat templates as semantic layout grammar, zones, placeholder capacity, and rhythm rules, not as visual skins."
+      "default_patch_surface_hint": "Patch reference deck profiling, semantic layout inventory, zones, and template profile rows in rca-template-profiler before downstream visual or native binding."
     },
     "placeholder_capacity": {
       "canonical_capability_ids": [
-        "rca-template-profiler",
-        "rca-ppt-visual-director",
-        "rca-native-ppt-designer"
+        "rca-template-profiler"
       ],
       "owner_stage_refs": [
         "visual_direction",
         "artifact_creation"
       ],
-      "default_patch_surface_hint": "Patch template capacity, zone limits, readable text floors, and native shape-plan bindings before rendering."
+      "default_patch_surface_hint": "Patch per-zone capacity, readable floors, object affordances, safe insets, and overflow risk in rca-template-profiler; visual/native consumers only bind or apply the profile."
     },
     "ppt_visual_density": {
       "canonical_capability_ids": [
@@ -1308,6 +1327,7 @@
         "style_boundary",
         "visual_qa"
       ],
+      "template_profiler_relationship": "Consumes template_profile and placeholder_capacity from rca-template-profiler; does not own reference deck profiling or placeholder measurement.",
       "failure_tokens": [
         "visual_direction",
         "style",
@@ -1844,6 +1864,7 @@
         "spec_lock",
         "editable_pptx_grammar"
       ],
+      "template_profiler_relationship": "Consumes template_profile and placeholder_capacity when binding editable_shape_plan to native zones; does not own route-agnostic template profiling.",
       "failure_tokens": [
         "native_pptx_editability",
         "editable_shape_plan",
@@ -1966,6 +1987,8 @@
         "style_boundary",
         "editable_pptx_grammar"
       ],
+      "consolidation_decision": "retained_as_pre_route_template_profile_owner",
+      "no_merge_rationale_ref": "contracts/capability_map.json#/professional_skill_consolidation",
       "failure_tokens": [
         "template_profile",
         "placeholder_capacity",
