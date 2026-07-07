@@ -13,7 +13,6 @@ import {
   failRouteRun,
   failRetiredHermesAgentAdapter,
   hermesAgentAdapterRetirementBoundary,
-  readRouteRunEvents,
   startRouteRun,
 } from '@redcube/runtime-protocol';
 
@@ -140,6 +139,22 @@ function safeIndexText(index, ...keys) {
     if (text) return text;
   }
   return '';
+}
+
+function routeArtifactAttemptId(index) {
+  return safeIndexText(
+    index,
+    'stage_attempt_ref',
+    'stageAttemptRef',
+    'attempt_lease_ref',
+    'attemptLeaseRef',
+    'lease_ref',
+    'leaseRef',
+    'attempt_receipt_ref',
+    'attemptReceiptRef',
+    'closeout_receipt_ref',
+    'closeoutReceiptRef',
+  );
 }
 
 function buildMissingOplRouteAttemptBlocker({ safeRoute, overlay, topicId, deliverableId, runId, reasons }) {
@@ -604,13 +619,23 @@ function materializeRouteResult({
   patchArtifactExecutionModel(routeResult.artifact_file, executor);
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const patchedArtifact = JSON.parse(readFileSync(routeResult.artifact_file, 'utf-8'));
+  const stageAttemptId = safeIndexText(
+    crossProviderAttemptIndex,
+    'stage_attempt_ref',
+    'stageAttemptRef',
+    'opl_stage_attempt_ref',
+    'oplStageAttemptRef',
+  )
+    || safeIndexText(crossProviderAttemptIndex, 'attempt_lease_ref', 'attemptLeaseRef', 'lease_ref', 'leaseRef')
+    || safeIndexText(crossProviderAttemptIndex, 'attempt_receipt_ref', 'attemptReceiptRef', 'closeout_receipt_ref', 'closeoutReceiptRef')
+    || safeText(runId);
   const stageFolderRefs = refreshStageFolderRouteArtifact({
     deliverablePaths,
     overlay,
     topicId,
     deliverableId,
     route: safeRoute,
-    attemptId: runId,
+    attemptId: stageAttemptId,
     artifactFile: routeResult.artifact_file,
     artifact: patchedArtifact,
     oplRouteAttemptIndex: crossProviderAttemptIndex,
@@ -685,11 +710,13 @@ function buildCompletedRouteResponse({
   routeResult,
   executor,
   crossProviderAttemptIndex = null,
+  startedEvent = null,
 }) {
   const routeRunStatus = isQualityBlockedArtifact(routeResult.artifact) ? 'quality_blocked' : 'completed';
   const completedRun = completeRouteRun({
     workspaceRoot,
     runId: run.run_id,
+    run,
     currentStage: safeRoute,
     stageResults: [{
       stage: safeRoute,
@@ -703,7 +730,7 @@ function buildCompletedRouteResponse({
     crossProviderAttemptIndex,
   });
 
-  appendRouteRunEvent(workspaceRoot, completedRun.run_id, {
+  const completedEvent = {
     type: routeRunStatus === 'quality_blocked' ? 'run_quality_blocked' : 'run_completed',
     route: safeRoute,
     overlay,
@@ -711,12 +738,12 @@ function buildCompletedRouteResponse({
     profile_id: routeResult.artifact?.contract?.profile_id || null,
     artifact_file: routeResult.artifact_file,
     cache_status: routeResult.cache_status || 'miss',
-  });
+  };
 
   return {
     ok: true,
     run: completedRun,
-    events: readRouteRunEvents(workspaceRoot, completedRun.run_id),
+    events: [startedEvent, completedEvent].filter(Boolean),
     artifactFile: routeResult.artifact_file,
     artifact: routeResult.artifact,
     cache_status: routeResult.cache_status || 'miss',
@@ -764,12 +791,14 @@ function buildFailedRouteResponse({
   deliverableId,
   error,
   executor,
+  startedEvent = null,
 }) {
   const { failure, qualityBlocked } = normalizeRouteFailure(error);
   const failedArtifact = failedArtifactForError(error, failure);
   const failedRun = failRouteRun({
     workspaceRoot,
     runId: run.run_id,
+    run,
     currentStage: safeRoute,
     error: failure,
     executor,
@@ -783,19 +812,19 @@ function buildFailedRouteResponse({
       : {},
   });
 
-  appendRouteRunEvent(workspaceRoot, failedRun.run_id, {
+  const failedEvent = {
     type: qualityBlocked ? 'run_quality_blocked' : 'run_failed',
     route: safeRoute,
     overlay,
     deliverable_id: deliverableId,
     error: failedRun.error,
-  });
+  };
 
   const includeFailedArtifact = failure.failure_kind === 'repeated_block_without_input_change';
   return {
     ok: false,
     run: failedRun,
-    events: readRouteRunEvents(workspaceRoot, failedRun.run_id),
+    events: [startedEvent, failedEvent].filter(Boolean),
     error: failedRun.error,
     artifact: includeFailedArtifact ? failedArtifact : null,
     artifactFile: includeFailedArtifact ? (failure.artifact_file || null) : undefined,
@@ -861,12 +890,13 @@ export async function runDeliverableRoute(request) {
     crossProviderAttemptIndex: normalizedRouteAttempt.index,
   });
 
-  appendRouteRunEvent(workspaceRoot, run.run_id, buildRouteStartedEvent({
+  const startedEvent = buildRouteStartedEvent({
     executor,
     safeRoute,
     overlay,
     deliverableId,
-  }));
+  });
+  appendRouteRunEvent(workspaceRoot, run.run_id, startedEvent);
 
   try {
     const routeResult = await executeRouteCandidateRace({
@@ -883,7 +913,7 @@ export async function runDeliverableRoute(request) {
       candidateCount,
       executor,
       crossProviderAttemptIndex: normalizedRouteAttempt.index,
-      runId: run.run_id,
+      runId: routeArtifactAttemptId(normalizedRouteAttempt.index),
     });
     return buildCompletedRouteResponse({
       workspaceRoot,
@@ -894,6 +924,7 @@ export async function runDeliverableRoute(request) {
       routeResult,
       executor,
       crossProviderAttemptIndex: normalizedRouteAttempt.index,
+      startedEvent,
     });
   } catch (error) {
     return buildFailedRouteResponse({
@@ -904,6 +935,7 @@ export async function runDeliverableRoute(request) {
       deliverableId,
       error,
       executor,
+      startedEvent,
     });
   }
 }

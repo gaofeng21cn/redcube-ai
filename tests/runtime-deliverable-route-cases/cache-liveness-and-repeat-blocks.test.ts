@@ -202,7 +202,7 @@ test('image authoring cache survives downstream review and export artifacts', as
   });
 });
 
-test('getRun and runtimeWatch expire stale persisted running route runs with an audit trail', async () => {
+test('startRun rejects local diagnostic records after route-run store retirement', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-stale-run-'));
 
   await createDeliverable({
@@ -215,44 +215,21 @@ test('getRun and runtimeWatch expire stale persisted running route runs with an 
     goal: '验证旧 running run 不会继续被当作活跃事实',
   });
 
-  const run = startRun({
-    workspaceRoot,
-    route: 'render_html',
-    overlay: 'ppt_deck',
-    target: 'deck-a',
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
-    allowLocalDiagnosticRecord: true,
-  });
-  const runFile = path.join(workspaceRoot, 'runtime', 'runs', `${run.run_id}.json`);
-  const staleRun = JSON.parse(readFileSync(runFile, 'utf-8'));
-  staleRun.started_at = '2020-01-01T00:00:00.000Z';
-  staleRun.telemetry = { ...(staleRun.telemetry || {}), started_at: staleRun.started_at };
-  writeFileSync(runFile, JSON.stringify(staleRun, null, 2), 'utf-8');
-
-  const stored = await getRun({ workspaceRoot, runId: run.run_id });
-  assert.equal(stored.run.status, 'expired');
-  assert.equal(stored.summary.status, 'expired');
-  assert.equal(stored.recommended_action, 'inspect_stale_run');
-  assert.equal(stored.run.stale_run_audit.status_before, 'running');
-  assert.equal(stored.run.stale_run_audit.status_after, 'expired');
-  assert.equal(stored.run.stale_run_audit.reason_code, 'running_run_exceeded_stale_ttl');
-  assert.equal(stored.run.telemetry.status, 'expired');
-
-  const persisted = JSON.parse(readFileSync(runFile, 'utf-8'));
-  assert.equal(persisted.status, 'expired');
-  assert.equal(persisted.stale_run_audit.marked_by, 'redcube_runtime_run_reader');
-
-  const watch = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'deck-a',
-    runId: run.run_id,
-  });
-  assert.equal(watch.run_id, run.run_id);
-  assert.equal(watch.run_telemetry.status, 'expired');
-  assert.equal(watch.run_stale_audit.status_after, 'expired');
+  assert.throws(
+    () => startRun({
+      workspaceRoot,
+      route: 'render_html',
+      overlay: 'ppt_deck',
+      target: 'deck-a',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
+      allowLocalDiagnosticRecord: true,
+    }),
+    /RCA-local diagnostic route-run records are retired/,
+  );
+  assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
+  assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
 });
 
 test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts with unchanged route cache input', async () => {
@@ -287,6 +264,7 @@ test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts wi
     pptArtifact.target_slide_ids = ['S03'];
     pptArtifact.blocking_reasons = ['visual_density_ok'];
     pptArtifact.checks = { visual_density_ok: false };
+    pptArtifact.typed_blocker_refs = ['rca-typed-blocker:test:ppt-render-html-repeat'];
     writeFileSync(pptArtifactFile, JSON.stringify(pptArtifact, null, 2), 'utf-8');
 
     const xhsWorkspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-xhs-fastfail-'));
@@ -324,6 +302,7 @@ test('PPT and xiaohongshu HTML routes fail fast on repeated blocked artifacts wi
     xhsArtifact.target_slide_ids = ['N02'];
     xhsArtifact.blocking_reasons = ['block_content_fit_ok'];
     xhsArtifact.checks = { block_content_fit_ok: false };
+    xhsArtifact.typed_blocker_refs = ['rca-typed-blocker:test:xhs-render-html-repeat'];
     writeFileSync(xhsArtifactFile, JSON.stringify(xhsArtifact, null, 2), 'utf-8');
 
     const restoreEnv = withEnv({ REDCUBE_MOCK_FAIL_ROUTE: 'render_html' });

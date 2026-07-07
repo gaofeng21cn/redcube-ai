@@ -69,6 +69,8 @@ test('poster_onepager mainline runs through review and export on shared runtime'
       goal: '为门诊患者生成单页知识海报',
     });
 
+    let screenshotResult = null;
+    let exportResult = null;
     for (const route of [
       'storyline',
       'poster_blueprint',
@@ -86,16 +88,12 @@ test('poster_onepager mainline runs through review and export on shared runtime'
         route,
       });
       assert.equal(result.ok, true);
+      if (route === 'screenshot_review') screenshotResult = result;
+      if (route === 'export_bundle') exportResult = result;
     }
 
-    const screenshotArtifact = JSON.parse(readFileSync(path.join(
-      workspaceRoot,
-      'topics/topic-a/deliverables/poster-a/artifacts/quality_gate.json',
-    ), 'utf-8'));
-    const exportArtifact = JSON.parse(readFileSync(path.join(
-      workspaceRoot,
-      'topics/topic-a/deliverables/poster-a/artifacts/publish_bundle.json',
-    ), 'utf-8'));
+    const screenshotArtifact = JSON.parse(readFileSync(screenshotResult.artifactFile, 'utf-8'));
+    const exportArtifact = JSON.parse(readFileSync(exportResult.artifactFile, 'utf-8'));
 
     assert.equal(screenshotArtifact.status, 'pass');
     assert.equal(screenshotArtifact.review_state_patch.rerun_from_stage, null);

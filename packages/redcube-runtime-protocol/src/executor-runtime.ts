@@ -408,6 +408,7 @@ export function startRouteRun({
 export function completeRouteRun({
   workspaceRoot,
   runId,
+  run = null,
   currentStage,
   stageResults,
   artifactRefs,
@@ -420,6 +421,7 @@ export function completeRouteRun({
   return completeRouteRunFromRouteRunRecords({
     workspaceRoot,
     runId,
+    run,
     currentStage,
     stageResults,
     artifactRefs,
@@ -434,6 +436,7 @@ export function completeRouteRun({
 export function failRouteRun({
   workspaceRoot,
   runId,
+  run = null,
   currentStage,
   error,
   errorKind = 'execution_error',
@@ -444,6 +447,7 @@ export function failRouteRun({
   return failRouteRunFromRouteRunRecords({
     workspaceRoot,
     runId,
+    run,
     currentStage,
     error,
     errorKind,

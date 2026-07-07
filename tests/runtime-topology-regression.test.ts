@@ -21,6 +21,16 @@ function tempWorkspaceRoot() {
   return mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-topology-'));
 }
 
+function oplAttempt(route = 'storyline') {
+  return {
+    owner: 'one-person-lab',
+    provider_attempt_owner: 'one-person-lab',
+    provider_attempt_ref: `opl-provider-attempt:test/${route}`,
+    provider_attempt_ledger_ref: `attempt-ledger:opl/test/${route}`,
+    stage_attempt_ref: `opl-stage-attempt:test/${route}`,
+  };
+}
+
 test('completed route runs keep Codex runtime topology for Codex-native executor', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
@@ -32,12 +42,13 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
-    allowLocalDiagnosticRecord: true,
+    crossProviderAttemptIndex: oplAttempt('storyline'),
   });
 
   const completed = completeRouteRun({
     workspaceRoot,
     runId: run.run_id,
+    run,
     currentStage: 'storyline',
     stageResults: [{ stage: 'storyline', status: 'completed' }],
     artifactRefs: [],
@@ -70,12 +81,13 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
-    allowLocalDiagnosticRecord: true,
+    crossProviderAttemptIndex: oplAttempt('storyline'),
   });
 
   const failed = failRouteRun({
     workspaceRoot,
     runId: run.run_id,
+    run,
     currentStage: 'storyline',
     error: new Error('boom'),
     executor,
@@ -106,7 +118,7 @@ test('failed route runs retain diagnostic artifact refs from typed errors', () =
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
-    allowLocalDiagnosticRecord: true,
+    crossProviderAttemptIndex: oplAttempt('author_pptx_native'),
   });
   const error = new Error('native structural blocker');
   error.artifact_refs = [
@@ -118,6 +130,7 @@ test('failed route runs retain diagnostic artifact refs from typed errors', () =
   const failed = failRouteRun({
     workspaceRoot,
     runId: run.run_id,
+    run,
     currentStage: 'author_pptx_native',
     error,
     executor,
@@ -133,7 +146,7 @@ test('failed route runs retain diagnostic artifact refs from typed errors', () =
   ]);
 });
 
-test('route run events round-trip through the extracted refs-only record store', () => {
+test('route run events stay refs-only and do not create a local event log', () => {
   const workspaceRoot = tempWorkspaceRoot();
   const executor = buildCodexExecutorDescriptor();
   const run = startRouteRun({
@@ -144,20 +157,18 @@ test('route run events round-trip through the extracted refs-only record store',
     topicId: 'topic-a',
     deliverableId: 'deck-a',
     executor,
-    allowLocalDiagnosticRecord: true,
+    crossProviderAttemptIndex: oplAttempt('storyline'),
   });
 
-  appendRouteRunEvent(workspaceRoot, run.run_id, {
+  const eventRef = appendRouteRunEvent(workspaceRoot, run.run_id, {
     event_id: 'event-1',
     kind: 'route_started',
     route: 'storyline',
   });
 
-  assert.deepEqual(readRouteRunEvents(workspaceRoot, run.run_id), [{
-    event_id: 'event-1',
-    kind: 'route_started',
-    route: 'storyline',
-  }]);
+  assert.equal(eventRef.event_log_owner, 'one-person-lab');
+  assert.equal(eventRef.local_event_log_written, false);
+  assert.deepEqual(readRouteRunEvents(workspaceRoot, run.run_id), []);
 });
 
 test('retired Hermes-Agent adapter fails closed at the executor boundary', () => {

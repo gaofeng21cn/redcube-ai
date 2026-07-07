@@ -4,15 +4,6 @@ import { randomUUID } from 'node:crypto';
 import {
   createRunRecord,
 } from '../runs.js';
-import {
-  appendRouteRunEventRecord,
-  loadRouteRunRecord,
-  readRouteRunEventRecords,
-  readStoredRouteRuns,
-  writeRouteRunRecord,
-} from './route-run-record-store.js';
-
-const RUNNING_RUN_STALE_TTL_MS = 2 * 60 * 60 * 1000;
 
 function computeLatencyMs(startedAt, finishedAt) {
   const startMs = Date.parse(String(startedAt || ''));
@@ -21,46 +12,6 @@ function computeLatencyMs(startedAt, finishedAt) {
     return null;
   }
   return Math.max(finishMs - startMs, 0);
-}
-
-function runningRunStaleAudit(run, now = new Date()) {
-  if (String(run?.status || '').trim() !== 'running') {
-    return null;
-  }
-  const checkedAt = now.toISOString();
-  const startedAt = String(run?.started_at || '').trim();
-  const startedMs = Date.parse(startedAt);
-  if (!Number.isFinite(startedMs)) {
-    return {
-      status_after: 'orphaned',
-      reason_code: 'running_run_missing_started_at',
-      age_ms: null,
-      marked_at: checkedAt,
-    };
-  }
-  const ageMs = Math.max(now.getTime() - startedMs, 0);
-  if (ageMs <= RUNNING_RUN_STALE_TTL_MS) {
-    return null;
-  }
-  return {
-    status_after: 'expired',
-    reason_code: 'running_run_exceeded_stale_ttl',
-    age_ms: ageMs,
-    marked_at: checkedAt,
-  };
-}
-
-function findPriorRuns({ workspaceRoot, route, scope, target, overlay }) {
-  return readStoredRouteRuns(workspaceRoot)
-    .filter((run) => run?.route === route
-      && run?.scope === scope
-      && run?.target === target
-      && run?.overlay === overlay)
-    .sort((left, right) => {
-      const leftTime = Date.parse(left?.started_at || '') || 0;
-      const rightTime = Date.parse(right?.started_at || '') || 0;
-      return leftTime - rightTime;
-    });
 }
 
 function buildRunTelemetry(run, executor, status, finishedAt = run.finished_at) {
@@ -123,57 +74,33 @@ function normalizeError(error) {
   };
 }
 
-function markStaleRunningRunIfNeeded({ workspaceRoot, runId, checkedSurface = 'loadRun' }) {
-  const run = loadRouteRunRecord({ workspaceRoot, runId });
-  const staleAudit = runningRunStaleAudit(run);
-  if (!staleAudit) {
-    return run;
-  }
-  const markedRun = {
-    ...run,
-    status: staleAudit.status_after,
-    finished_at: run.finished_at || staleAudit.marked_at,
-    error_kind: run.error_kind || 'execution_error',
-    error: run.error || {
-      code: staleAudit.status_after,
-      message: staleAudit.status_after === 'expired'
-        ? 'Running run exceeded stale TTL and was marked expired on read'
-        : 'Running run has no valid start timestamp and was marked orphaned on read',
-    },
-    stale_run_audit: {
-      schema_version: 1,
-      audit_contract: 'redcube_stale_running_run.v1',
-      marked_at: staleAudit.marked_at,
-      marked_by: 'redcube_runtime_run_reader',
-      checked_surface: checkedSurface,
-      status_before: 'running',
-      status_after: staleAudit.status_after,
-      reason_code: staleAudit.reason_code,
-      run_id: run.run_id,
-      route: run.route,
-      overlay: run.overlay,
-      topic_id: run.topic_id || null,
-      deliverable_id: run.deliverable_id || null,
-      started_at: run.started_at || null,
-      stale_after_ms: RUNNING_RUN_STALE_TTL_MS,
-      age_ms: staleAudit.age_ms,
-    },
-  };
-  markedRun.telemetry = buildRunTelemetry(
-    markedRun,
-    markedRun?.executor,
-    markedRun.status,
-    markedRun.finished_at,
-  );
-  return writeRouteRunRecord({ workspaceRoot, runId, run: markedRun });
-}
-
 function requireRuntimeTopologyResolver(deps) {
   const resolver = deps?.resolveRuntimeTopologyForExecutor;
   if (typeof resolver !== 'function') {
     throw new Error('resolveRuntimeTopologyForExecutor is required');
   }
   return resolver;
+}
+
+function requireSafeSegment(name, value) {
+  const text = String(value || '').trim();
+  if (!text) {
+    throw new Error(`${name} 不能为空`);
+  }
+  if (/[\\/]/.test(text)) {
+    throw new Error(`${name} 不能包含路径分隔符`);
+  }
+  if (text.includes('..')) {
+    throw new Error(`${name} 不能包含父目录引用`);
+  }
+  return text;
+}
+
+function requireStartedRun(run, surface) {
+  if (run && typeof run === 'object' && !Array.isArray(run)) {
+    return run;
+  }
+  throw new Error(`${surface} no longer reads RCA-local route-run records; pass the current run ref from the OPL-bound caller`);
 }
 
 function normalizeCrossProviderAttemptIndex(index, routeRunRef) {
@@ -208,7 +135,9 @@ function buildRouteRunRecordBoundary({ diagnosticOnly = false } = {}) {
     generic_runtime_record_owner: 'one-person-lab',
     generic_event_log_owner: 'one-person-lab',
     rca_role: 'route_executor_policy_refs_only',
-    record_mode: diagnosticOnly ? 'local_refs_only_diagnostic_record' : 'opl_attempt_ledger_bound_record_ref',
+    record_mode: diagnosticOnly ? 'diagnostic_rejected_no_local_store' : 'opl_attempt_ledger_refs_only',
+    local_record_store_retired: true,
+    local_event_log_retired: true,
     rca_owns_generic_attempt_ledger: false,
     rca_owns_generic_runtime_record_store: false,
     rca_owns_generic_event_log: false,
@@ -242,16 +171,9 @@ export function startRouteRun({
     crossProviderAttemptIndex,
     resolvedRouteRunRef,
   );
-  if (!hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex) && allowLocalDiagnosticRecord !== true) {
-    throw new Error('startRouteRun requires OPL-owned stage attempt evidence; set allowLocalDiagnosticRecord only for explicit refs-only diagnostics');
+  if (!hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex)) {
+    throw new Error('startRouteRun requires OPL-owned stage attempt evidence; RCA-local diagnostic route-run records are retired');
   }
-  const priorRuns = findPriorRuns({
-    workspaceRoot,
-    route,
-    scope,
-    target,
-    overlay,
-  });
   const run = {
     ...createRunRecord({
       runId: resolvedRunId,
@@ -261,9 +183,9 @@ export function startRouteRun({
       overlay,
       topicId,
       deliverableId,
-      rerunCount: priorRuns.length,
-      previousRunId: priorRuns.at(-1)?.run_id || null,
-      sourceStage: priorRuns.at(-1)?.current_stage || null,
+      rerunCount: 0,
+      previousRunId: null,
+      sourceStage: null,
       baselineDeliverableId,
     }),
     started_at: new Date().toISOString(),
@@ -279,12 +201,13 @@ export function startRouteRun({
   };
   run.telemetry = buildRunTelemetry(run, executor, 'running', null);
 
-  return writeRouteRunRecord({ workspaceRoot, runId: resolvedRunId, run });
+  return run;
 }
 
 export function completeRouteRun({
   workspaceRoot,
   runId,
+  run: startedRun = null,
   currentStage,
   stageResults,
   artifactRefs,
@@ -295,7 +218,7 @@ export function completeRouteRun({
   crossProviderAttemptIndex = null,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const run = loadRouteRunRecord({ workspaceRoot, runId });
+  const run = requireStartedRun(startedRun, 'completeRouteRun');
   const runStatus = String(status || '').trim() || 'completed';
   const completedRun = {
     ...run,
@@ -337,12 +260,13 @@ export function completeRouteRun({
     completedRun.finished_at,
   );
 
-  return writeRouteRunRecord({ workspaceRoot, runId, run: completedRun });
+  return completedRun;
 }
 
 export function failRouteRun({
   workspaceRoot,
   runId,
+  run: startedRun = null,
   currentStage,
   error,
   errorKind = 'execution_error',
@@ -351,7 +275,7 @@ export function failRouteRun({
   status = 'failed',
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
-  const run = loadRouteRunRecord({ workspaceRoot, runId });
+  const run = requireStartedRun(startedRun, 'failRouteRun');
   const runStatus = String(status || '').trim() || 'failed';
   const failedRun = {
     ...run,
@@ -378,17 +302,33 @@ export function failRouteRun({
     failedRun.finished_at,
   );
 
-  return writeRouteRunRecord({ workspaceRoot, runId, run: failedRun });
+  return failedRun;
 }
 
 export function loadRouteRun({ workspaceRoot, runId }) {
-  return markStaleRunningRunIfNeeded({ workspaceRoot, runId });
+  requireSafeSegment('runId', runId);
+  throw new Error('RCA-local route-run record store is retired; use OPL stage attempt and provider ledger refs');
+  return createRunRecord({
+    runId,
+    route: 'retired_route_run_record_store',
+    scope: 'route',
+    target: 'retired_route_run_record_store',
+    overlay: 'redcube_ai',
+  });
 }
 
 export function appendRouteRunEvent(workspaceRoot, runId, event) {
-  appendRouteRunEventRecord({ workspaceRoot, runId, event });
+  requireSafeSegment('runId', runId);
+  return {
+    surface_kind: 'route_run_event_ref',
+    run_id: String(runId || '').trim(),
+    event,
+    event_log_owner: 'one-person-lab',
+    local_event_log_written: false,
+  };
 }
 
 export function readRouteRunEvents(workspaceRoot, runId) {
-  return readRouteRunEventRecords({ workspaceRoot, runId });
+  requireSafeSegment('runId', runId);
+  return [];
 }

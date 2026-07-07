@@ -251,8 +251,10 @@ function routeCacheDependencyFiles({ overlay, route, deliverablePaths, contract,
         stageArtifactFile(deliverablePaths, contract, 'repair_image_pages'),
         stageArtifactFile(deliverablePaths, contract, 'author_pptx_native'),
         stageArtifactFile(deliverablePaths, contract, 'repair_pptx_native'),
-        ...pptDraftViewFiles(deliverablePaths, deliverableId),
       );
+    }
+    if (['visual_director_review', 'screenshot_review'].includes(route)) {
+      files.push(...pptDraftViewFiles(deliverablePaths, deliverableId));
     }
   }
   if (overlay === 'xiaohongshu' && ['visual_director_review', 'screenshot_review', 'publish_copy', 'export_bundle'].includes(route)) {
@@ -419,12 +421,18 @@ function readCachedStageFolderRouteArtifact({
   } : null;
 }
 
-function ownerReceiptRefsForRoute({ artifact }) {
+function refSegment(value, fallback) {
+  return safeText(value, fallback).replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '') || fallback;
+}
+
+function ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }) {
   if (artifact?.status === 'block' || artifact?.status === 'failed') return [];
-  return uniqueStrings([
+  const explicitRefs = uniqueStrings([
     ...safeArray(artifact?.owner_receipt_refs),
     ...safeArray(artifact?.receipt_refs),
   ]);
+  if (explicitRefs.length > 0) return explicitRefs;
+  return [`rca-owner-receipt:visual-stage:${refSegment(overlay, 'overlay')}:${refSegment(route, 'route')}:${refSegment(deliverableId, 'deliverable')}`];
 }
 
 function typedBlockerRefsForRoute({ artifact }) {
@@ -447,7 +455,7 @@ function reviewExportRefsForRoute(artifact) {
   ]);
 }
 
-function attachRouteArtifactCloseoutRefs({ artifact }) {
+function attachRouteArtifactCloseoutRefs({ artifact, overlay, route, deliverableId }) {
   if (artifact?.status === 'block' || artifact?.status === 'failed') {
     return {
       ...artifact,
@@ -461,10 +469,7 @@ function attachRouteArtifactCloseoutRefs({ artifact }) {
   }
   return {
     ...artifact,
-    owner_receipt_refs: uniqueStrings([
-      ...safeArray(artifact?.owner_receipt_refs),
-      ...safeArray(artifact?.receipt_refs),
-    ]),
+    owner_receipt_refs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
     typed_blocker_refs: [],
   };
 }
@@ -494,7 +499,7 @@ export function refreshStageFolderRouteArtifact({
     artifactFile,
     outputName: path.basename(artifactFile),
     requiredOutputs: [path.basename(artifactFile)],
-    ownerReceiptRefs: ownerReceiptRefsForRoute({ artifact }),
+    ownerReceiptRefs: ownerReceiptRefsForRoute({ artifact, overlay, route, deliverableId }),
     typedBlockerRefs: typedBlockerRefsForRoute({ artifact }),
     blockingReasons: safeArray(artifact?.blocking_reasons),
     artifactRefs: safeArray(artifact?.artifact_refs),
@@ -722,9 +727,10 @@ export async function executeDeliverableRouteLocally({
   const stageContract = routeStageDefinitions(contract).find(
     (stage) => stage?.stage_id === safeRoute,
   ) || null;
-  const attemptId = safeText(runId)
-    || safeText(oplRouteAttemptIndex?.stage_attempt_ref || oplRouteAttemptIndex?.stageAttemptRef)
+  const attemptId = safeText(oplRouteAttemptIndex?.stage_attempt_ref || oplRouteAttemptIndex?.stageAttemptRef)
+    || safeText(oplRouteAttemptIndex?.attempt_lease_ref || oplRouteAttemptIndex?.attemptLeaseRef || oplRouteAttemptIndex?.lease_ref || oplRouteAttemptIndex?.leaseRef)
     || safeText(oplRouteAttemptIndex?.attempt_receipt_ref || oplRouteAttemptIndex?.attemptReceiptRef)
+    || safeText(runId)
     || `attempt-${safeRoute}`;
   const canonicalStageId = canonicalStageIdForRoute(safeRoute);
   const artifactFile = stageFolderOutputPath({
