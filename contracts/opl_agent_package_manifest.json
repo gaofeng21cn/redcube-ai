@@ -1,0 +1,37 @@
+{
+  "surface_kind": "opl_agent_package_manifest.v1",
+  "agent_id": "redcube-ai",
+  "package_id": "redcube-ai",
+  "display_name": "RedCube AI",
+  "publisher": "one-person-lab",
+  "version": "0.1.0",
+  "source": "first_party_repo_local",
+  "carrier_source_role": "codex_plugin_default_carrier_not_package_truth",
+  "schema_ref": "one-person-lab/contracts/opl-framework/agent-package-manifest.schema.json",
+  "machine_boundary": "This repo-local sidecar declares OPL Agent Package management semantics. The repo plugin directory is the Codex carrier source, not the package truth or domain truth owner.",
+  "distribution_payload": {
+    "payload_kind": "ghcr_oci_agent_package",
+    "payload_ref": "ghcr.io/gaofeng21cn/opl-agent-redcube-ai:latest",
+    "payload_digest_ref": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
+    "required_skill_pack_lock_refs": [],
+    "proof_status": "non_live_contract_fixture",
+    "live_download_proof": false,
+    "installed_reload_proof": false,
+    "oci_ref": "ghcr.io/gaofeng21cn/opl-agent-redcube-ai:latest",
+    "oci_media_type": "application/vnd.oci.image.manifest.v1+json",
+    "immutable_tag": "0.1.0",
+    "rolling_tag": "latest",
+    "promotion_policy": "daily_candidate_gates_then_promote_latest",
+    "install_truth": "resolved_digest_lock"
+  },
+  "codex_surface": {
+    "plugin_id": "redcube-ai",
+    "standalone_distribution": "repo_carrier_source",
+    "required_skill_ids": [
+      "redcube-ai"
+    ],
+    "bundled_capability_package_ids": [],
+    "user_install_action_count": 1
+  },
+  "capability_dependencies": []
+}
