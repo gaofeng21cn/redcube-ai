@@ -1,43 +1,21 @@
 import {
-  buildGovernanceSurfaceContract,
+  buildSurfaceArtifactSpecs,
+  buildSurfaceBundle,
+  listSurfaceArtifactPaths,
+  type SurfaceContract,
+  type SurfaceValidator,
   validateGovernanceSurfaceContract,
+  validateSurfaceArtifact,
 } from '@redcube/overlay-core';
 
-type SurfaceContract = Record<string, any>;
-type SurfaceValidator = (content: SurfaceContract) => boolean;
+const SURFACE_ARTIFACTS = buildSurfaceArtifactSpecs({ includeLifecycleStageContract: true });
 
 export function buildPosterSurfaceBundle({ contract }: { contract: SurfaceContract }) {
-  return [
-    { relativePath: 'contracts/stage-sequence.json', content: contract.stage_sequence },
-    { relativePath: 'contracts/stage-requirements.json', content: contract.stage_requirements },
-    { relativePath: 'contracts/lifecycle-stage-contract.json', content: contract.lifecycle_stage_contract },
-    { relativePath: 'contracts/prompt-pack.json', content: contract.prompt_pack },
-    { relativePath: 'contracts/review-surface.json', content: contract.review_surface },
-    { relativePath: 'contracts/layout-rules.json', content: contract.layout_rules },
-    { relativePath: 'contracts/baseline-policy.json', content: contract.baseline_policy },
-    { relativePath: 'contracts/export-bundle.json', content: contract.export_bundle },
-    { relativePath: 'contracts/delivery-contract.json', content: contract.delivery_contract },
-    { relativePath: 'contracts/governance-surface.json', content: buildGovernanceSurfaceContract(contract) },
-    { relativePath: 'contracts/hydrated-deliverable.json', content: contract },
-    { relativePath: 'views/display-registry.json', content: contract.display_registry },
-  ];
+  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS);
 }
 
 export function listPosterSurfaceArtifactPaths() {
-  return [
-    'contracts/stage-sequence.json',
-    'contracts/stage-requirements.json',
-    'contracts/lifecycle-stage-contract.json',
-    'contracts/prompt-pack.json',
-    'contracts/review-surface.json',
-    'contracts/layout-rules.json',
-    'contracts/baseline-policy.json',
-    'contracts/export-bundle.json',
-    'contracts/delivery-contract.json',
-    'contracts/governance-surface.json',
-    'contracts/hydrated-deliverable.json',
-    'views/display-registry.json',
-  ];
+  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
 }
 
 const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
@@ -102,9 +80,10 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
 };
 
 export function validatePosterSurfaceArtifact(relativePath: string, content: unknown): boolean {
-  const validator = SURFACE_VALIDATORS[relativePath];
-  if (!validator) {
-    throw new Error(`Unknown poster surface artifact: ${relativePath}`);
-  }
-  return Boolean(validator(content as SurfaceContract));
+  return validateSurfaceArtifact({
+    family: 'poster',
+    validators: SURFACE_VALIDATORS,
+    relativePath,
+    content,
+  });
 }
