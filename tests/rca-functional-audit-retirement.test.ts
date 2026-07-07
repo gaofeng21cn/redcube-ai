@@ -89,6 +89,13 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       surface.physical_deletion_guard.owner_evidence_lane_builder_ref,
       /privatized-functional-module-audit\.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue$/,
     );
+    assert.deepEqual(
+      surface.owner_evidence_lane_index?.['all-retained-private-platform-residue'],
+      {
+        source_ref: 'contracts/functional_privatization_audit.json#/physical_deletion_guard',
+        builder_ref: surface.physical_deletion_guard.owner_evidence_lane_builder_ref,
+      },
+    );
     assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.equal(surface.retired_no_resurrection_guards, undefined);
     assert.equal(surface.closed_retirement_summary.closed_retirement_count, 8);
@@ -138,7 +145,7 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       assert.equal(value, false);
     }
 
-    for (const entry of surface.modules) {
+    for (const [index, entry] of surface.modules.entries()) {
       assert.ok(['opl', 'redcube_ai'].includes(entry.opl_replacement_expectation.owner), entry.module_id);
       assert.ok([
         'consumer_projection_only',
@@ -198,6 +205,14 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
         assert.match(
           entry.physical_deletion_guard.owner_evidence_lane_builder_ref,
           new RegExp(`buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}$`),
+          entry.module_id,
+        );
+        assert.deepEqual(
+          surface.owner_evidence_lane_index?.[entry.module_id.replaceAll('_', '-')],
+          {
+            source_ref: `contracts/functional_privatization_audit.json#/modules/${index}/physical_deletion_guard`,
+            builder_ref: entry.physical_deletion_guard.owner_evidence_lane_builder_ref,
+          },
           entry.module_id,
         );
         assert.equal(entry.bridge_exit_gate.physical_delete_authorization_ref, null, entry.module_id);

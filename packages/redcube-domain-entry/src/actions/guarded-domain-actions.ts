@@ -77,6 +77,24 @@ const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
   'legacy_physical_cleanup',
 ]);
 
+function ownerEvidenceLaneIndexFor(moduleItems) {
+  return {
+    'all-retained-private-platform-residue': {
+      source_ref: 'contracts/functional_privatization_audit.json#/physical_deletion_guard',
+      builder_ref:
+        'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
+    },
+    ...Object.fromEntries(moduleItems.map((entry, index) => [
+      entry.module_id.replaceAll('_', '-'),
+      {
+        source_ref: `contracts/functional_privatization_audit.json#/modules/${index}/physical_deletion_guard`,
+        builder_ref:
+          `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}`,
+      },
+    ])),
+  };
+}
+
 const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
     module_id: 'product_entry_continuity_refs_adapter',
@@ -571,6 +589,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       owner_evidence_lane_builder_ref:
         'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
     },
+    owner_evidence_lane_index: ownerEvidenceLaneIndexFor(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     fresh_large_private_surface_scan: RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN,
     bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },

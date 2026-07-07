@@ -266,6 +266,52 @@
     "owner_evidence_lane_ref": "contracts/functional_privatization_audit.json#/owner_evidence_lane_index/all-retained-private-platform-residue",
     "owner_evidence_lane_builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue"
   },
+  "owner_evidence_lane_index": {
+    "all-retained-private-platform-residue": {
+      "source_ref": "contracts/functional_privatization_audit.json#/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue"
+    },
+    "product-entry-continuity-refs-adapter": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/0/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:product-entry-continuity-refs-adapter"
+    },
+    "workspace-source-intake": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/1/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:workspace-source-intake"
+    },
+    "memory-writeback-receipt-transport": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/2/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:memory-writeback-receipt-transport"
+    },
+    "artifact-export-lifecycle": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/3/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:artifact-export-lifecycle"
+    },
+    "review-repair-transport": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/4/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:review-repair-transport"
+    },
+    "native-helper-envelope": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/5/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:native-helper-envelope"
+    },
+    "operator-projection-shell": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/6/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:operator-projection-shell"
+    },
+    "generic-cli-mcp-wrappers": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/7/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:generic-cli-mcp-wrappers"
+    },
+    "codex-executor-adapter": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/8/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:codex-executor-adapter"
+    },
+    "observability-stability-read-model": {
+      "source_ref": "contracts/functional_privatization_audit.json#/modules/9/physical_deletion_guard",
+      "builder_ref": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:observability-stability-read-model"
+    }
+  },
   "fresh_large_private_surface_scan": {
     "surface_kind": "rca_large_private_platform_surface_scan",
     "scan_date": "2026-06-06",
