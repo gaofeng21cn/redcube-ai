@@ -1579,7 +1579,7 @@
         },
         "standard_domain_agent_skeleton_repo_source_layout": {
           "status": "audit_surface_landed",
-          "mapping_model": "physical_skeleton_repo_source_layout_with_manifest_projection",
+          "mapping_model": "rca_refs_only_opl_generated_standard_domain_agent",
           "audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
           "expected_roots": [
             "agent",

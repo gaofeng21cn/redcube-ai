@@ -124,7 +124,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(applyProof.repo_tracks_receipt_instances, false);
 
   assert.equal(skeletonLayout.status, 'audit_surface_landed');
-  assert.equal(skeletonLayout.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+  assert.equal(skeletonLayout.mapping_model, 'rca_refs_only_opl_generated_standard_domain_agent');
   assert.deepEqual(skeletonLayout.expected_roots, ['agent', 'contracts', 'runtime', 'docs']);
   assert.deepEqual(skeletonLayout.missing_roots, []);
   assert.ok(skeletonLayout.forbidden_repo_writes.includes('memory_content_body'));

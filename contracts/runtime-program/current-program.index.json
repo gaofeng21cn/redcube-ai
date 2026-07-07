@@ -85,7 +85,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "e0803b414d6bb00a69c003557b4967baa366bc9e528076b6ffa61e1c0ce52fc5",
+  "source_digest": "cbb1253dcb269459dc52a898c741eb3ee236eedb78fb2958bbe77c15872f8ae5",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -141,7 +141,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "33fe33e5c5a920ba4ad9449f167c70b1665bcd291b817b89a4abf943f857e2fc"
+      "sha256": "2011b366157fdd2390f3707934e9ad12b39748e773ed34b352b882b292e746be"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -381,7 +381,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "33fe33e5c5a920ba4ad9449f167c70b1665bcd291b817b89a4abf943f857e2fc"
+      "sha256": "2011b366157fdd2390f3707934e9ad12b39748e773ed34b352b882b292e746be"
     },
     {
       "json_pointer": "/current_state/active_mainline",

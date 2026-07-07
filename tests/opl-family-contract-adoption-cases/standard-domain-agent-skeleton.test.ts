@@ -5,9 +5,9 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
   const payload = contract();
   const skeleton = payload.standard_domain_agent_skeleton;
 
-  assert.equal(skeleton.surface_kind, 'standard_domain_agent_skeleton');
+  assert.equal(skeleton.surface_kind, 'rca_domain_authority_refs');
   assert.equal(skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
-  assert.equal(skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+  assert.equal(skeleton.mapping_model, 'rca_refs_only_opl_generated_standard_domain_agent');
   assert.deepEqual(skeleton.repo_source_boundary.allowed_roots.map((root) => root.boundary_id), [
     'agent',
     'contracts',
