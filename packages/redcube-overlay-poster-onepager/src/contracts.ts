@@ -1,57 +1,28 @@
-import { buildDeliverableRecord } from '@redcube/overlay-core';
+import { buildDeliverableRecord, buildSharedSourceTruthContract } from '@redcube/overlay-core';
 
 import type {
   PosterOnepagerDeliverableRecord,
   PosterOnepagerDeliverableRecordInput,
   PosterOnepagerHydrateContractRequest,
   PosterOnepagerHydratedContract,
+  PosterOnepagerSourceTruthContract,
   PosterOnepagerStageDefinition,
 } from './types.js';
 
-const SOURCE_TRUTH_CONSUMPTION_FIELDS = Object.freeze([
-  'authoritative_source_kind',
-  'consumption_role',
-  'input_mode',
-  'confidence',
-  'material_count',
-  'material_ids',
-  'source_labels',
-  'source_audit_status',
-  'source_audit_blocking_reasons',
-]);
-
-const SOURCE_TRUTH_FIELD_WHITELIST = Object.freeze({
-  source_index: ['sources[].status', 'sources[].relative_path', 'sources[].kind'],
-  extracted_materials: ['materials[].material_id', 'materials[].excerpt', 'materials[].content_text'],
-  source_brief: ['brief_text', 'input_mode', 'confidence'],
-});
-
 const POSTER_SOURCE_TRUTH_CONTRACT = Object.freeze({
-  authoritative_surface: 'shared_source_truth',
-  authoritative_gate: 'topics/<topic>/canonical/source-readiness-pack.json',
-  authoritative_gate_inputs: ['source_audit', 'source_readiness_pack'],
-  authoritative_artifacts: ['source_index', 'extracted_materials', 'source_audit', 'source_brief', 'source_readiness_pack'],
-  readiness_target: 'planning_ready',
-  pass_condition: 'source_audit.status=pass && source_readiness_pack.readiness.planning_ready=true',
-  route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch',
-  hydration_model: {
-    hydrated_contract_surface: 'contracts/hydrated-deliverable.json',
-    runtime_injection_surface: 'shared_source_truth',
-    static_contract_written_at_create_deliverable: true,
-  },
-  readable_shared_source_truth_fields: SOURCE_TRUTH_FIELD_WHITELIST,
-  consumption_summary_fields: SOURCE_TRUTH_CONSUMPTION_FIELDS,
-  route_to_consumption_role: {
-    storyline: 'story_architecture',
-    poster_blueprint: 'story_architecture',
-    visual_direction: 'visual_authorship',
-  },
-  required_hydrated_export_surface: 'export_bundle',
+  ...buildSharedSourceTruthContract({
+    routeToConsumptionRole: {
+      storyline: 'story_architecture',
+      poster_blueprint: 'story_architecture',
+      visual_direction: 'visual_authorship',
+    },
+    requiredHydratedExportSurface: 'export_bundle',
+  }),
   poster_guarded_boundary: {
     profile_id: 'knowledge_poster',
     academic_contract_active: false,
   },
-});
+}) as unknown as PosterOnepagerSourceTruthContract;
 
 const POSTER_DELIVERY_CONTRACT = Object.freeze({
   authoritative_projection_surface: 'getPublicationProjection',

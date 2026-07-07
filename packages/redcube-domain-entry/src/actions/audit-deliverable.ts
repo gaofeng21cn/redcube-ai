@@ -4,14 +4,18 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 
 import {
   auditDeliverableRequest,
+  buildBaselineAuditSummary,
   buildGateSummary,
   buildSourceReadinessReport,
   getDefaultOverlayRegistry,
   getPublicationProjection as getRuntimePublicationProjection,
   getReviewState as getRuntimeReviewState,
-  isBaselineApprovedState,
 } from '@redcube/runtime';
-import { getDeliverablePaths, loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary } from '@redcube/runtime-protocol';
+import {
+  getDeliverablePaths,
+  loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary,
+  readHydratedDeliverableContract,
+} from '@redcube/runtime-protocol';
 
 function mergeAuditReports(reports) {
   const normalized = reports.filter(Boolean);
@@ -77,12 +81,7 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
   }
 
   try {
-    const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-    const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
-    const contractRef = String(
-      deliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
-    ).trim();
-    return JSON.parse(readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'));
+    return readHydratedDeliverableContract({ workspaceRoot, topicId, deliverableId });
   } catch {
     return null;
   }
@@ -231,29 +230,8 @@ export async function auditDeliverable(request) {
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
-  let qualitySummary = {
-    baseline_promotion_state: null,
-    promoted_reference_id: null,
-  };
-  if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
-    const baselineState = getRuntimeReviewState({
-      workspaceRoot: request.workspaceRoot,
-      topicId: request.topicId,
-      deliverableId: request.baselineDeliverableId,
-    }).state;
-    qualitySummary = {
-      baseline_promotion_state: baselineState?.baseline?.promotion_state || null,
-      promoted_reference_id: baselineState?.baseline?.promoted_reference_id || null,
-    };
-    if (!isBaselineApprovedState(baselineState)) {
-      reports.push({
-        status: 'block',
-        issues: ['baseline_not_approved'],
-        rerun_from_stage: 'intake',
-        recommended_action: 'approve_or_publish_baseline',
-      });
-    }
-  }
+  const baselineAudit = buildBaselineAuditSummary(request, getRuntimeReviewState);
+  reports.push(...baselineAudit.reports);
   reports.push(overlaySurfaceReport);
   const mergedReport = mergeAuditReports(reports);
 
@@ -261,7 +239,7 @@ export async function auditDeliverable(request) {
     surface_kind: 'audit',
     ...mergedReport,
     recommended_action: mergedReport.status === 'pass' ? 'run_deliverable_route' : mergedReport.recommended_action,
-    quality_summary: qualitySummary,
+    quality_summary: baselineAudit.quality_summary,
     review_state: reviewState,
     publication_projection: publicationProjection,
     source_readiness_summary: sourceReadinessSummary,

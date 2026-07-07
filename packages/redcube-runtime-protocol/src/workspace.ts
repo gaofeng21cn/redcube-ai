@@ -205,6 +205,23 @@ export function getDeliverablePaths(
   };
 }
 
+export function readHydratedDeliverableContract({
+  workspaceRoot,
+  topicId,
+  deliverableId,
+}: {
+  workspaceRoot: string;
+  topicId: string;
+  deliverableId: string;
+}): unknown {
+  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
+  const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
+  const contractRef = String(
+    deliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
+  ).trim();
+  return JSON.parse(readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'));
+}
+
 export function getNotePaths(workspaceRoot: string, topicId: string, noteId: string): NotePaths {
   const topicPaths = getTopicPaths(workspaceRoot, topicId);
   const note = requireSegment('noteId', noteId, {

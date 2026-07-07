@@ -8,6 +8,7 @@ export {
   getDeliverablePaths,
   getNotePaths,
   getTopicPaths,
+  readHydratedDeliverableContract,
   renderWorkspaceGitignore,
   resolveWorkspaceContract,
 } from './workspace.js';

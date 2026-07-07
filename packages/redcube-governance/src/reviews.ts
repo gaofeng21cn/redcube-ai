@@ -1,14 +1,15 @@
 // @ts-nocheck
-import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 import {
   canonicalStageForRoute,
   getDeliverablePaths,
   loadSourceReadinessSummary as loadCanonicalSourceReadinessSummary,
+  readHydratedDeliverableContract,
   readStageFolderArtifact,
 } from '@redcube/runtime-protocol';
 import { getPublicationProjection as loadPublicationProjection, getReviewState as loadReviewState } from './review-state.js';
+import { isBaselineApprovedState } from './review-state.js';
 import { buildGovernanceSurface } from './governance-surface.js';
 import {
   buildGateSummary,
@@ -20,14 +21,7 @@ function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {
     return null;
   }
 
-  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
-  const contractRef = String(
-    deliverable?.hydrated_contract_ref || 'contracts/hydrated-deliverable.json',
-  ).trim();
-  return JSON.parse(
-    readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'),
-  );
+  return readHydratedDeliverableContract({ workspaceRoot, topicId, deliverableId });
 }
 
 function safeReadJson(file) {
@@ -115,6 +109,43 @@ export function auditDeliverableRequest({ mode, baselineDeliverableId }) {
   };
 }
 
+export function buildBaselineAuditSummary(request, loadBaselineState) {
+  const qualitySummary = {
+    baseline_promotion_state: null,
+    promoted_reference_id: null,
+  };
+  if (!(request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId)) {
+    return {
+      quality_summary: qualitySummary,
+      reports: [],
+    };
+  }
+
+  const baselineState = loadBaselineState({
+    workspaceRoot: request.workspaceRoot,
+    topicId: request.topicId,
+    deliverableId: request.baselineDeliverableId,
+  })?.state;
+  qualitySummary.baseline_promotion_state = baselineState?.baseline?.promotion_state || null;
+  qualitySummary.promoted_reference_id = baselineState?.baseline?.promoted_reference_id || null;
+  if (isBaselineApprovedState(baselineState)) {
+    return {
+      quality_summary: qualitySummary,
+      reports: [],
+    };
+  }
+
+  return {
+    quality_summary: qualitySummary,
+    reports: [{
+      status: 'block',
+      issues: ['baseline_not_approved'],
+      rerun_from_stage: 'intake',
+      recommended_action: 'approve_or_publish_baseline',
+    }],
+  };
+}
+
 async function auditDeliverable(request) {
   const reviewResponse = loadPlatformReviewState(request);
   const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
@@ -125,45 +156,13 @@ async function auditDeliverable(request) {
   const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
   const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
   const reports = [auditDeliverableRequest(request), buildSourceReadinessReport(sourceReadinessSummary)];
-  let qualitySummary = {
-    baseline_promotion_state: null,
-    promoted_reference_id: null,
-  };
-  if (request?.mode === 'optimize_existing' && request?.baselineDeliverableId && request?.workspaceRoot && request?.topicId) {
-    const baselineState = loadReviewState({
-      workspaceRoot: request.workspaceRoot,
-      topicId: request.topicId,
-      deliverableId: request.baselineDeliverableId,
-    }).state;
-    qualitySummary = {
-      baseline_promotion_state: baselineState?.baseline?.promotion_state || null,
-      promoted_reference_id: baselineState?.baseline?.promoted_reference_id || null,
-    };
-    if (baselineState) {
-      if (baselineState.approval_state?.required) {
-        if (!(baselineState.approval_state.status === 'approved' || baselineState.publish_state?.current === 'published')) {
-          reports.push({
-            status: 'block',
-            issues: ['baseline_not_approved'],
-            rerun_from_stage: 'intake',
-            recommended_action: 'approve_or_publish_baseline',
-          });
-        }
-      } else if (!baselineState.ready_for_export) {
-        reports.push({
-          status: 'block',
-          issues: ['baseline_not_approved'],
-          rerun_from_stage: 'intake',
-          recommended_action: 'approve_or_publish_baseline',
-        });
-      }
-    }
-  }
+  const baselineAudit = buildBaselineAuditSummary(request, loadReviewState);
+  reports.push(...baselineAudit.reports);
   reports.push(auditOverlaySurface(request));
   return {
     surface_kind: 'audit',
     ...mergeAuditReports(reports),
-    quality_summary: qualitySummary,
+    quality_summary: baselineAudit.quality_summary,
     source_readiness_summary: sourceReadinessSummary,
     gate_summary: reviewResponse?.gate_summary || publicationProjectionEntry?.gate_summary || buildGateSummary({
       sourceReadinessSummary,

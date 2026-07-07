@@ -1,6 +1,7 @@
 export {
   buildDeliverableRecord,
   buildGovernanceSurfaceContract,
+  buildSharedSourceTruthContract,
   buildUiUxProMaxHtmlCompanion,
   hydrateDeliverableContract,
   mergeContractLayers,

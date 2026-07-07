@@ -1,6 +1,7 @@
 export {
   applyReviewMutation,
   auditDeliverableRequest,
+  buildBaselineAuditSummary,
   buildGateSummary,
   buildSourceReadinessReport,
   getPublicationProjection,

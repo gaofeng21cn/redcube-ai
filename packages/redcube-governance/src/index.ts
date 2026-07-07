@@ -1,5 +1,6 @@
 import {
   auditDeliverableRequest as auditDeliverableRequestJs,
+  buildBaselineAuditSummary as buildBaselineAuditSummaryJs,
   reviewRenderedDeliverable as reviewRenderedDeliverableJs,
   watchRuntimeReviewLoop as watchRuntimeReviewLoopJs,
 } from './reviews.js';
@@ -32,6 +33,10 @@ import type {
 
 export function auditDeliverableRequest(request: AuditDeliverableRequest): ReviewSurfaceResult {
   return auditDeliverableRequestJs(request) as ReviewSurfaceResult;
+}
+
+export function buildBaselineAuditSummary(request: AuditDeliverableRequest, loadBaselineState: any): any {
+  return buildBaselineAuditSummaryJs(request, loadBaselineState);
 }
 
 export function reviewRenderedDeliverable(request: DeliverableReviewRequest): ReviewSurfaceResult {
