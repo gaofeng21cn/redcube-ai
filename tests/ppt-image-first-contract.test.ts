@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -9,7 +10,7 @@ function readJson(file) {
 
 test('ppt image-first production contract absorbs long-deck fact and asset governance', () => {
   const contract = readJson('contracts/runtime-program/ppt-image-first-production-route.json');
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = readCurrentProgramContract();
   const activeLane = currentProgram.current_state.exploration_lanes.ppt_image_first_production_route;
 
   assert.equal(contract.fact_governance.fact_whitelist_surface, 'shared_source_truth.readable_shared_source_truth_fields');
@@ -30,7 +31,7 @@ test('ppt image-first production contract absorbs long-deck fact and asset gover
 
 test('ppt image-first production contract blocks internal-language, title-zone, and table-legibility regressions', () => {
   const contract = readJson('contracts/runtime-program/ppt-image-first-production-route.json');
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = readCurrentProgramContract();
   const activeLane = currentProgram.current_state.exploration_lanes.ppt_image_first_production_route;
 
   assert.equal(contract.audience_language_policy.visible_operator_language_allowed, false);

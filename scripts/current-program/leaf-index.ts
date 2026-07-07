@@ -2,7 +2,6 @@ import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 
-export const AGGREGATE_SNAPSHOT_REF = 'contracts/runtime-program/current-program.json';
 export const INDEX_REF = 'contracts/runtime-program/current-program.index.json';
 export const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
 const MAX_LEAF_JSON_LINE_COUNT = 1000;
@@ -10,9 +9,9 @@ const WRITE_COMMAND = 'npm run contracts:current-program:write';
 const CHECK_COMMAND = 'npm run contracts:current-program:check';
 
 const FALSE_AUTHORITY_FLAGS = Object.freeze({
-  aggregate_snapshot_is_canonical_source: false,
-  aggregate_snapshot_is_edit_surface: false,
-  aggregate_snapshot_is_check_input: false,
+  retired_aggregate_snapshot_is_canonical_source: false,
+  retired_aggregate_snapshot_is_edit_surface: false,
+  retired_aggregate_snapshot_is_check_input: false,
   source_refs_are_generated_from_aggregate: false,
   docs_are_machine_truth: false,
   manifest_can_claim_domain_ready: false,
@@ -196,17 +195,11 @@ export function buildCurrentProgramSourceIndexFromParts() {
     date_anchor: readJson(`${PARTS_ROOT}/date_anchor.json`),
     source_root_ref: PARTS_ROOT,
     canonical_truth_model: 'current_program_parts_are_canonical_sources',
-    no_second_truth_rule: 'contracts:current-program:check validates current-program-parts and this index only; current-program.json is a legacy consumer projection, not a canonical or required check input',
-    generated_aggregate_snapshot: {
-      ref: AGGREGATE_SNAPSHOT_REF,
-      role: 'legacy_read_through_projection_for_existing_consumers',
-      canonical_source: false,
-      edit_surface: false,
-      check_input: false,
-    },
+    no_second_truth_rule: 'contracts:current-program:check validates current-program-parts and this index only; current-program.json is retired and must not exist as a generated aggregate, canonical source, edit surface, or check input',
     split_policy: {
       max_part_json_line_count: MAX_LEAF_JSON_LINE_COUNT,
       large_objects_and_arrays_are_split_recursively: true,
+      retired_aggregate_snapshot_must_not_exist: true,
       aggregate_snapshot_is_not_canonical_edit_surface: true,
       aggregate_snapshot_is_not_required_check_input: true,
     },

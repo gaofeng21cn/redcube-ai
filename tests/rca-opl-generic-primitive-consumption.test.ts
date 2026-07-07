@@ -3,12 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 test('RCA consumes OPL generic primitives as projections while retaining only visual authority', () => {
-  const currentProgram = JSON.parse(readFileSync(
-    path.resolve('contracts/runtime-program/current-program.json'),
-    'utf-8',
-  ));
+  const currentProgram = readCurrentProgramContract();
   const adoption = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
     'utf-8',
@@ -97,10 +95,7 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
 });
 
 test('RCA consumes OPL stability read-model surfaces without implementing observability runtime', () => {
-  const currentProgram = JSON.parse(readFileSync(
-    path.resolve('contracts/runtime-program/current-program.json'),
-    'utf-8',
-  ));
+  const currentProgram = readCurrentProgramContract();
   const adoption = JSON.parse(readFileSync(
     path.resolve('contracts/runtime-program/opl-family-contract-adoption.json'),
     'utf-8',

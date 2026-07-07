@@ -6,9 +6,54 @@ import {
 export { safeText } from '../action-utils.js';
 
 const CURRENT_PROGRAM_CONTRACT_URL = new URL(
-  '../../../../../contracts/runtime-program/current-program.json',
+  '../../../../../contracts/runtime-program/current-program.index.json',
   import.meta.url,
 );
+const REPO_ROOT_URL = new URL('../../../../../', import.meta.url);
+
+function repoPathUrl(ref) {
+  return new URL(ref, REPO_ROOT_URL);
+}
+
+function pointerSegment(segment) {
+  return segment.replace(/~/g, '~0').replace(/\//g, '~1');
+}
+
+function childSegmentMap(sourcePartRefs) {
+  const children = new Map();
+  for (const sourcePartRef of sourcePartRefs) {
+    const segments = sourcePartRef.json_pointer.slice(1).split('/').filter(Boolean);
+    for (let index = 0; index < segments.length; index += 1) {
+      const parent = `/${segments.slice(0, index).join('/')}`.replace(/\/$/, '') || '';
+      if (!children.has(parent)) children.set(parent, new Set());
+      children.get(parent).add(segments[index]);
+    }
+  }
+  return children;
+}
+
+function buildContainer(pointer, children) {
+  const childSegments = children.get(pointer);
+  return childSegments && [...childSegments].every((segment) => /^\d+$/.test(segment)) ? [] : {};
+}
+
+function setJsonPointerValue(document, pointer, value, children) {
+  const segments = pointer.slice(1).split('/').filter(Boolean).map((part) => part.replace(/~1/g, '/').replace(/~0/g, '~'));
+  let cursor = document;
+  for (let index = 0; index < segments.length; index += 1) {
+    const segment = segments[index];
+    const childPointer = `/${segments.slice(0, index + 1).map(pointerSegment).join('/')}`;
+    const isLast = index === segments.length - 1;
+    if (isLast) {
+      cursor[segment] = value;
+      return;
+    }
+    if (cursor[segment] === undefined) {
+      cursor[segment] = buildContainer(childPointer, children);
+    }
+    cursor = cursor[segment];
+  }
+}
 
 export function normalizeWorkspaceRoot(request) {
   return requireField(
@@ -18,7 +63,17 @@ export function normalizeWorkspaceRoot(request) {
 }
 
 export function readCurrentProgramContract() {
-  return readJson(CURRENT_PROGRAM_CONTRACT_URL);
+  const index = readJson(CURRENT_PROGRAM_CONTRACT_URL);
+  if (index.canonical_truth_model !== 'current_program_parts_are_canonical_sources') {
+    throw new Error('current-program index must point to canonical source parts');
+  }
+  const sourcePartRefs = index.source_part_refs || [];
+  const children = childSegmentMap(sourcePartRefs);
+  const currentProgram = {};
+  for (const sourcePartRef of sourcePartRefs) {
+    setJsonPointerValue(currentProgram, sourcePartRef.json_pointer, readJson(repoPathUrl(sourcePartRef.ref)), children);
+  }
+  return currentProgram;
 }
 
 export function buildSkillCommandContracts(actionMetadata) {

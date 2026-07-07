@@ -273,10 +273,15 @@ export function buildProductEntryManifestShellProjections({
         owner: 'redcube_ai',
         ref: {
           ref_kind: 'repo_path',
-          ref: 'contracts/runtime-program/current-program.json',
-          label: 'current runtime program contract',
+          ref: 'contracts/runtime-program/current-program.index.json',
+          label: 'current runtime program source index',
         },
         rebuild_from_refs: [
+          {
+            ref_kind: 'repo_path',
+            ref: 'contracts/runtime-program/current-program-parts',
+            label: 'current runtime program canonical source parts',
+          },
           {
             ref_kind: 'repo_path',
             ref: 'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
@@ -335,8 +340,8 @@ export function buildProductEntryManifestShellProjections({
         result: 'verified',
         manifest_ref: {
           ref_kind: 'repo_path',
-          ref: 'contracts/runtime-program/current-program.json',
-          label: 'current runtime program contract',
+          ref: 'contracts/runtime-program/current-program.index.json',
+          label: 'current runtime program source index',
         },
         sha256: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff',
         restore_ref: {

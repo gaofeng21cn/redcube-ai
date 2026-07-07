@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 import {
   buildNodeTestArgs,
@@ -395,7 +396,7 @@ function readTestFileWithStaticRelativeImports(file) {
 }
 
 test('serialized verification rule is documented in current program contract', () => {
-  const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.light_files, 'runner_default');
   assert.equal(currentProgram.current_state.green_baseline.local_codex_execution.node_test_file_concurrency.route_heavy_files, 1);
@@ -585,7 +586,7 @@ test('run-test-group fails fast when no Python with playwright can be resolved',
 });
 
 test('Codex-backed verification Python command contract is frozen in current program', () => {
-  const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(
     currentProgram.current_state.green_baseline.local_codex_execution.python_command_env,

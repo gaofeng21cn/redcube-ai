@@ -5,17 +5,11 @@
   "date_anchor": "2026-04-26",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
   "canonical_truth_model": "current_program_parts_are_canonical_sources",
-  "no_second_truth_rule": "contracts:current-program:check validates current-program-parts and this index only; current-program.json is a legacy consumer projection, not a canonical or required check input",
-  "generated_aggregate_snapshot": {
-    "ref": "contracts/runtime-program/current-program.json",
-    "role": "legacy_read_through_projection_for_existing_consumers",
-    "canonical_source": false,
-    "edit_surface": false,
-    "check_input": false
-  },
+  "no_second_truth_rule": "contracts:current-program:check validates current-program-parts and this index only; current-program.json is retired and must not exist as a generated aggregate, canonical source, edit surface, or check input",
   "split_policy": {
     "max_part_json_line_count": 1000,
     "large_objects_and_arrays_are_split_recursively": true,
+    "retired_aggregate_snapshot_must_not_exist": true,
     "aggregate_snapshot_is_not_canonical_edit_surface": true,
     "aggregate_snapshot_is_not_required_check_input": true
   },
@@ -85,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "cbb1253dcb269459dc52a898c741eb3ee236eedb78fb2958bbe77c15872f8ae5",
+  "source_digest": "0723bb9bd4cb822df38ff3d67fa7f6ab122f6392b7a7537d826e4c74b7dc4f8f",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -126,8 +120,8 @@
       "json_pointer": "/execution_handle_contract",
       "ref": "contracts/runtime-program/current-program-parts/execution_handle_contract.json",
       "role": "current_program_leaf_source",
-      "line_count": 53,
-      "sha256": "8dcfe1950ec00263da58147839fb2543eb247377269cfc0ab60b72dcf5ab8f62"
+      "line_count": 54,
+      "sha256": "ea2a67fc07b95dcf7c8f3aa67acac9734e0fe2803a177773b97c610b345142b4"
     },
     {
       "json_pointer": "/durable_surface_contract",
@@ -366,8 +360,8 @@
       "json_pointer": "/execution_handle_contract",
       "ref": "contracts/runtime-program/current-program-parts/execution_handle_contract.json",
       "role": "current_program_leaf_source",
-      "line_count": 53,
-      "sha256": "8dcfe1950ec00263da58147839fb2543eb247377269cfc0ab60b72dcf5ab8f62"
+      "line_count": 54,
+      "sha256": "ea2a67fc07b95dcf7c8f3aa67acac9734e0fe2803a177773b97c610b345142b4"
     },
     {
       "json_pointer": "/durable_surface_contract",
@@ -572,9 +566,9 @@
     "check": "npm run contracts:current-program:check"
   },
   "false_authority_flags": {
-    "aggregate_snapshot_is_canonical_source": false,
-    "aggregate_snapshot_is_edit_surface": false,
-    "aggregate_snapshot_is_check_input": false,
+    "retired_aggregate_snapshot_is_canonical_source": false,
+    "retired_aggregate_snapshot_is_edit_surface": false,
+    "retired_aggregate_snapshot_is_check_input": false,
     "source_refs_are_generated_from_aggregate": false,
     "docs_are_machine_truth": false,
     "manifest_can_claim_domain_ready": false,

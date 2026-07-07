@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 import {
   createDeliverable,
@@ -213,7 +214,7 @@ test('invokeDomainEntry rejects mismatched requested surface kinds', async () =>
 
 test('service-safe domain entry contract is frozen in contracts and current program', () => {
   const contract = JSON.parse(readFileSync('contracts/runtime-program/service-safe-domain-entry-adapter.json', 'utf-8'));
-  const currentProgram = JSON.parse(readFileSync('contracts/runtime-program/current-program.json', 'utf-8'));
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(contract.entry_contract_id, 'redcube_service_safe_domain_entry');
   assert.equal(contract.runtime_session_contract.default_runtime_owner, 'configured_family_runtime_provider');

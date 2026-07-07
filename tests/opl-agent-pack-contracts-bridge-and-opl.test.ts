@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(__dirname, '..');
@@ -27,7 +28,7 @@ function canonicalAuditSurface(surface, rootAudit) {
 
 test('RCA bridge residue exposes exit gates without claiming generic ownership', () => {
   const rootAudit = readJson('contracts/functional_privatization_audit.json');
-  const current = readJson('contracts/runtime-program/current-program.json');
+  const current = readCurrentProgramContract();
   const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
   const adoptionAudit = canonicalAuditSurface(adoption.privatized_functional_module_audit, rootAudit);
   const surfaces = [

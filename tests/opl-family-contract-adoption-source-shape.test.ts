@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf8'));
@@ -24,7 +25,7 @@ function modulesById(surface) {
 
 test('RCA privatized functional audit source shape is landed across runtime contract projections', () => {
   const root = readJson('contracts/functional_privatization_audit.json');
-  const current = readJson('contracts/runtime-program/current-program.json');
+  const current = readCurrentProgramContract();
   const adoption = readJson('contracts/runtime-program/opl-family-contract-adoption.json');
   const surfaces = [
     root,

@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 const DOMAIN_MEMORY_ADOPTION_STATE = 'descriptor_proof_contract_landed_runtime_writeback_pending';
 
@@ -10,7 +11,7 @@ function readJson(file) {
 }
 
 function currentProgram() {
-  return readJson('contracts/runtime-program/current-program.json');
+  return readCurrentProgramContract();
 }
 
 test('current runtime program points OPL Runtime Manager at the RCA lifecycle adapter projection', () => {

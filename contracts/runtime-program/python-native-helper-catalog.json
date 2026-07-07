@@ -73,7 +73,8 @@
         "quality_gate.json"
       ],
       "contract_refs": [
-        "contracts/runtime-program/current-program.json",
+        "contracts/runtime-program/current-program.index.json",
+        "contracts/runtime-program/current-program-parts/",
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json"
       ]
     },
@@ -112,7 +113,8 @@
         "publish_bundle.pdf"
       ],
       "contract_refs": [
-        "contracts/runtime-program/current-program.json"
+        "contracts/runtime-program/current-program.index.json",
+        "contracts/runtime-program/current-program-parts/"
       ]
     },
     {
@@ -255,7 +257,8 @@
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",
       "proof_lane_contract": "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
       "contract_refs": [
-        "contracts/runtime-program/current-program.json",
+        "contracts/runtime-program/current-program.index.json",
+        "contracts/runtime-program/current-program-parts/",
         "contracts/runtime-program/ppt-native-authoring-proof-lane.json",
         "contracts/runtime-program/ppt-native-python-engine-contract.json"
       ]

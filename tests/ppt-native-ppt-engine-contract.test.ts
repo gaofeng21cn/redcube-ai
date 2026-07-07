@@ -6,11 +6,12 @@ import {
   nativeEngineContract,
   readJson,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
   const engineContract = nativeEngineContract();
   const proofLane = readJson(path.resolve('contracts/runtime-program/ppt-native-authoring-proof-lane.json'));
-  const currentProgram = readJson(path.resolve('contracts/runtime-program/current-program.json'));
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(engineContract.language, 'python');
   assert.deepEqual(engineContract.owned_routes, ['author_pptx_native', 'repair_pptx_native']);

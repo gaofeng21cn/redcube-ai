@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { assertRefString, readJson } from './rca-production-acceptance-shared.ts';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 test('RCA one-shot closeout records planned done deferred skipped verification and commit-push state', () => {
   const closeout = readJson('contracts/runtime-program/rca-one-shot-production-hardening-closeout.json');
@@ -79,7 +80,7 @@ test('RCA one-shot closeout does not upgrade deferred production evidence blocke
 
 test('RCA one-shot closeout links current-program active closeout without making docs prose the test target', () => {
   const closeout = readJson('contracts/runtime-program/rca-one-shot-production-hardening-closeout.json');
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = readCurrentProgramContract();
   const activeCloseout = currentProgram.current_state.active_baton.closeout;
 
   assert.equal(activeCloseout.closeout_ref, 'contracts/runtime-program/rca-one-shot-production-hardening-closeout.json');

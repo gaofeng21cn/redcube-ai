@@ -2,7 +2,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import {
-  AGGREGATE_SNAPSHOT_REF,
   INDEX_REF,
   PARTS_ROOT,
   buildCurrentProgramSourceIndexFromParts,
@@ -14,6 +13,8 @@ import {
   stable,
 } from './leaf-index.ts';
 import type { SourcePartRef } from './leaf-index.ts';
+
+const RETIRED_AGGREGATE_SNAPSHOT_REF = 'contracts/runtime-program/current-program.json';
 
 function buildContainer(pointer: string, children: Map<string, Set<string>>): unknown {
   const childSegments = children.get(pointer);
@@ -41,30 +42,6 @@ function setJsonPointerValue(document: any, pointer: string, value: unknown, chi
   }
 }
 
-function reorderLikeTemplate(value: any, template: any): unknown {
-  if (Array.isArray(value)) {
-    return value.map((item, index) => reorderLikeTemplate(item, Array.isArray(template) ? template[index] : undefined));
-  }
-  if (!value || typeof value !== 'object') return value;
-
-  const ordered: Record<string, unknown> = {};
-  const valueObject = value as Record<string, unknown>;
-  const templateKeys = template && typeof template === 'object' && !Array.isArray(template)
-    ? Object.keys(template)
-    : [];
-  for (const key of templateKeys) {
-    if (Object.prototype.hasOwnProperty.call(valueObject, key)) {
-      ordered[key] = reorderLikeTemplate(valueObject[key], template[key]);
-    }
-  }
-  for (const key of Object.keys(valueObject)) {
-    if (!Object.prototype.hasOwnProperty.call(ordered, key)) {
-      ordered[key] = reorderLikeTemplate(valueObject[key], undefined);
-    }
-  }
-  return ordered;
-}
-
 function writeFile(relativePath: string, content: string) {
   const absolutePath = path.resolve(relativePath);
   fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
@@ -76,9 +53,6 @@ export function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsF
   const assembled: Record<string, unknown> = {};
   for (const sourcePartRef of sourcePartRefs) {
     setJsonPointerValue(assembled, sourcePartRef.json_pointer, readJson(sourcePartRef.ref), children);
-  }
-  if (fs.existsSync(path.resolve(AGGREGATE_SNAPSHOT_REF))) {
-    return reorderLikeTemplate(assembled, readJson(AGGREGATE_SNAPSHOT_REF));
   }
   return assembled;
 }
@@ -109,6 +83,10 @@ function compareFile(relativePath: string, expected: string, mismatches: string[
 export function checkCurrentProgramLeafIndex() {
   const mismatches: string[] = [];
 
+  if (fs.existsSync(path.resolve(RETIRED_AGGREGATE_SNAPSHOT_REF))) {
+    mismatches.push(`retired aggregate must not exist ${RETIRED_AGGREGATE_SNAPSHOT_REF}`);
+  }
+
   const expectedFiles = expectedGeneratedFiles();
   for (const [relativePath, expected] of expectedFiles) {
     compareFile(relativePath, expected, mismatches);
@@ -133,6 +111,7 @@ export function checkCurrentProgramLeafIndex() {
 }
 
 export function syncCurrentProgramLeafIndex() {
+  fs.rmSync(path.resolve(RETIRED_AGGREGATE_SNAPSHOT_REF), { force: true });
   const expectedFiles = expectedGeneratedFiles();
   for (const [relativePath, content] of expectedFiles) {
     writeFile(relativePath, content);

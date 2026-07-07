@@ -1791,8 +1791,8 @@
       "allowed_role_field": "/current_role_guard/allowed_roles/*",
       "forbidden_owner_flags_field": "/current_role_guard/forbidden_owner_flags",
       "closed_retirement_count_only": true,
-      "generated_read_through_snapshot_refs": [
-        "contracts/runtime-program/current-program.json",
+      "current_program_source_refs": [
+        "contracts/runtime-program/current-program.index.json",
         "contracts/runtime-program/current-program-parts/",
         "contracts/runtime-program/opl-family-contract-adoption.json"
       ],

@@ -8,6 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 const CATALOG_FILE = 'contracts/runtime-program/python-native-helper-catalog.json';
 const ENGINE_CONTRACT_FILE = 'contracts/runtime-program/ppt-native-python-engine-contract.json';
@@ -150,7 +151,7 @@ function readPyprojectScripts() {
 
 test('Python native helper catalog records the repo-owned helper boundary', () => {
   const catalog = readJson(CATALOG_FILE);
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(catalog.contract_id, 'python-native-helper-catalog');
   assert.equal(catalog.language, 'python');

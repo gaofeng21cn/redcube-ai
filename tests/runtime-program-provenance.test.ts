@@ -89,7 +89,7 @@ const HISTORICAL_CONTRACTS = Object.freeze([
     status: 'closeout_completed',
   },
 ]);
-const CURRENT_PROGRAM_AGGREGATE = 'contracts/runtime-program/current-program.json';
+const RETIRED_CURRENT_PROGRAM_AGGREGATE = 'contracts/runtime-program/current-program.json';
 const CURRENT_PROGRAM_ASSEMBLY = 'contracts/runtime-program/current-program.assembly.json';
 const CURRENT_PROGRAM_BUNDLE_MANIFEST = 'contracts/runtime-program/current-program.bundle-manifest.json';
 const CANONICAL_PROJECTION_MODE = 'canonical_ref_only_no_body_copy';
@@ -119,18 +119,17 @@ test('current runtime program is backed by source parts and one source index loc
   assert.equal(index.source_root_ref, 'contracts/runtime-program/current-program-parts');
   assert.equal(index.canonical_truth_model, 'current_program_parts_are_canonical_sources');
   assert.equal(index.no_second_truth_rule.includes('validates current-program-parts and this index only'), true);
-  assert.equal(index.generated_aggregate_snapshot.ref, CURRENT_PROGRAM_AGGREGATE);
-  assert.equal(index.generated_aggregate_snapshot.role, 'legacy_read_through_projection_for_existing_consumers');
-  assert.equal(index.generated_aggregate_snapshot.canonical_source, false);
-  assert.equal(index.generated_aggregate_snapshot.edit_surface, false);
-  assert.equal(index.generated_aggregate_snapshot.check_input, false);
+  assert.equal(index.no_second_truth_rule.includes('current-program.json is retired'), true);
+  assert.equal(Object.prototype.hasOwnProperty.call(index, 'generated_aggregate_snapshot'), false);
+  assert.equal(existsSync(path.resolve(RETIRED_CURRENT_PROGRAM_AGGREGATE)), false);
+  assert.equal(index.split_policy.retired_aggregate_snapshot_must_not_exist, true);
   assert.equal(index.split_policy.aggregate_snapshot_is_not_canonical_edit_surface, true);
   assert.equal(index.split_policy.aggregate_snapshot_is_not_required_check_input, true);
   assert.match(index.source_digest, /^[a-f0-9]{64}$/);
   assert.equal(index.commands.write, 'npm run contracts:current-program:write');
   assert.equal(index.commands.check, 'npm run contracts:current-program:check');
-  assert.equal(index.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
-  assert.equal(index.false_authority_flags.aggregate_snapshot_is_check_input, false);
+  assert.equal(index.false_authority_flags.retired_aggregate_snapshot_is_canonical_source, false);
+  assert.equal(index.false_authority_flags.retired_aggregate_snapshot_is_check_input, false);
   assert.equal(index.false_authority_flags.manifest_can_authorize_quality_or_export, false);
   assert.equal(index.not_claims.includes('quality_or_export_verdict'), true);
   assert.equal(index.not_claims.includes('artifact_authority'), true);

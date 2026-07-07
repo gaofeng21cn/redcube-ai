@@ -38,7 +38,8 @@ export const REPO_SOURCE_BOUNDARIES = [
     boundary_id: 'contracts',
     role: 'machine-readable runtime, OPL adoption, service-safe entry, and helper contracts',
     repo_refs: [
-      'contracts/runtime-program/current-program.json',
+      'contracts/runtime-program/current-program.index.json',
+      'contracts/runtime-program/current-program-parts/',
       'contracts/runtime-program/opl-family-contract-adoption.json',
       'contracts/runtime-program/service-safe-domain-entry-adapter.json',
       'contracts/runtime-program/python-native-helper-catalog.json',

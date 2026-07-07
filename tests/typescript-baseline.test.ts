@@ -3,6 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
 
 import {
   assertRootTestPartition,
@@ -174,7 +175,7 @@ test('root package build graph lists dist-export dependencies before consumers',
 test('typescript package build contract requires runtime exports to resolve through compiled dist artifacts', () => {
   const contractFile = 'contracts/runtime-program/typescript-package-build-contract.json';
   const contract = readJson(contractFile);
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = readCurrentProgramContract();
 
   assert.equal(contract.contract_id, 'typescript-package-build-contract');
   assert.equal(contract.language, 'typescript');

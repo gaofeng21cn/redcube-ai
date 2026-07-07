@@ -498,7 +498,8 @@ export function buildPhysicalSkeletonFollowThrough() {
         status: 'present_with_runtime_program_contracts',
         entrypoint_refs: [
           'human_doc:contracts_index',
-          'contracts/runtime-program/current-program.json',
+          'contracts/runtime-program/current-program.index.json',
+          'contracts/runtime-program/current-program-parts/',
           'contracts/runtime-program/opl-family-contract-adoption.json',
         ],
       },
