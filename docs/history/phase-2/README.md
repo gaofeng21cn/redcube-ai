@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `historical_phase_2_provenance_index`
 State: `history`
-Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/runtime-program/current-program.json`、runtime-program leaf parts、source、CLI/MCP/API behavior、workspace/runtime artifacts、owner receipts、核心五件套和当前 owner docs。
+Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/current-program-parts/**`、source、CLI/MCP/API behavior、workspace/runtime artifacts、owner receipts、核心五件套和当前 owner docs。
 
 生命周期说明：本目录只保留已吸收的 Phase 2 tranche、continuation board、proof lane、manual-test brief 与 closeout provenance。它由旧 `docs/program/phase-2/` 迁入 history；多个 runtime-program contracts 继续通过 `human_doc:program_phase_2_*` 语义 ID 指向这些 brief 的读者上下文。
 

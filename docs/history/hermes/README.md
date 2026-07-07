@@ -3,7 +3,7 @@
 Owner: `RedCube AI`
 Purpose: `historical_hermes_provenance_index`
 State: `history`
-Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/runtime-program/current-program.json`、runtime-program leaf parts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、核心五件套和 runtime owner docs。
+Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/current-program-parts/**`、source、CLI/MCP/API behavior、runtime artifacts、owner receipts、核心五件套和 runtime owner docs。
 
 本目录保存 RCA repo-local Hermes migration line、upstream `Hermes-Agent` proof lane、service-safe domain entry proof 和相关 blocker / closeout 的历史 provenance。它解释过去为什么推进、如何验证和在哪里停车；它不改变当前 public capability contract，不恢复 Hermes-first runtime ownership，也不证明 upstream `Hermes-Agent` 持有 RCA 当前 runtime truth。
 
@@ -20,7 +20,8 @@ Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/ru
 - `../../status.md`
 - `../../architecture.md`
 - `../../active/rca-ideal-state-gap-plan.md`
-- `../../../contracts/runtime-program/current-program.json`
+- `../../../contracts/runtime-program/current-program.index.json`
+- `../../../contracts/runtime-program/current-program-parts/`
 
 ## 历史 brief 读法
 

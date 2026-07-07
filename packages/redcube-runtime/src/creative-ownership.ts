@@ -137,7 +137,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
   ],
   frozen_contracts: {
     shared_contract: [
-      'packages/redcube-runtime/src/executors.ts',
+      'packages/redcube-runtime/src/executors/index.ts',
       'packages/redcube-runtime/src/deliverable-routes.ts',
       'packages/redcube-runtime/src/creative-ownership.ts',
     ],

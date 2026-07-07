@@ -4,7 +4,7 @@ Status: `active_docs_governance`
 Owner: `RedCube AI`
 Purpose: `docs_lifecycle_governance`
 State: `active_support`
-Machine boundary: 本文是人读治理入口。RCA runtime-program 机器真相继续归 `contracts/runtime-program/current-program-parts/**` 与 `contracts/runtime-program/current-program.index.json`；其他机器真相归 schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和语义化 `human_doc:*` id。`current-program.json` 只是 legacy read-through projection，不是 canonical check 输入。
+Machine boundary: 本文是人读治理入口。RCA runtime-program 机器真相继续归 `contracts/runtime-program/current-program-parts/**` 与 `contracts/runtime-program/current-program.index.json`；其他机器真相归 schema、source、CLI/MCP/API 行为、runtime artifacts、owner receipts 和语义化 `human_doc:*` id。`contracts/runtime-program/current-program.json` 已退役，不再生成、保留或作为 canonical/check/read-through 输入。
 
 ## 当前结论
 

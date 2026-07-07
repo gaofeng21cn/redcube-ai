@@ -5,7 +5,7 @@ Purpose: `historical_hermes_runtime_closure_provenance`
 State: `historical_provenance`
 Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、source、CLI/MCP/API behavior、runtime artifacts、owner receipts 和当前 owner docs。
 
-> 历史说明：这份文档记录 repo-local Hermes-backed closure 的当时事实，不代表当前仓库已经接入上游 `Hermes-Agent`，也不代表 Hermes 是当前默认 runtime substrate。当前状态以 `docs/status.md`、`docs/architecture.md` 和 `contracts/runtime-program/current-program.json` 为准。
+> 历史说明：这份文档记录 repo-local Hermes-backed closure 的当时事实，不代表当前仓库已经接入上游 `Hermes-Agent`，也不代表 Hermes 是当前默认 runtime substrate。当前状态以 `docs/status.md`、`docs/architecture.md`、`contracts/runtime-program/current-program.index.json` 和 `contracts/runtime-program/current-program-parts/**` 为准。
 
 ## 历史 canonical closure 摘要
 

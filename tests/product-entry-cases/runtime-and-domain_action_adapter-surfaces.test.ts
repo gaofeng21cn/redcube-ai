@@ -426,7 +426,7 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       [
         'packages/redcube-runtime-protocol/src/executor-runtime.ts',
         'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
-        'packages/redcube-runtime/src/executors.ts',
+        'packages/redcube-runtime/src/executors/index.ts',
         'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts',
         'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts',
         'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts',

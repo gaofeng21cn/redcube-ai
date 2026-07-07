@@ -686,7 +686,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     source_refs: [
       'packages/redcube-runtime/src/creative-ownership.ts',
       'packages/redcube-runtime/src/deliverable-routes.ts',
-      'packages/redcube-runtime/src/executors.ts',
+      'packages/redcube-runtime/src/executors/index.ts',
       'packages/redcube-runtime/src/source-intake.ts',
       'packages/redcube-runtime/src/source-readiness-pack.ts',
       'packages/redcube-runtime/src/shared-source-truth.ts',
