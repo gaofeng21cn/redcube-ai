@@ -105,6 +105,14 @@ export interface RuntimeFamilyModuleSpec {
 
 export interface RuntimeFamilyCatalogSurface {
   surface_kind: 'runtime_family_catalog';
+  owner_boundary: {
+    generic_runtime_family_registry_owner: 'one-person-lab';
+    rca_role: 'visual_route_family_handler_refs';
+    rca_owns_generic_runtime: false;
+    rca_owns_generic_registry: false;
+    rca_owns_generic_attempt_ledger: false;
+    retained_authority_refs: string[];
+  };
   families: RuntimeFamilyModuleSpec[];
 }
 
@@ -167,6 +175,19 @@ export function listDefaultRuntimeFamilyModules(): RuntimeFamilyModuleSpec[] {
 export function getDefaultRuntimeFamilyCatalog(): DefaultRuntimeFamilyCatalogSurface {
   return {
     surface_kind: 'runtime_family_catalog',
+    owner_boundary: {
+      generic_runtime_family_registry_owner: 'one-person-lab',
+      rca_role: 'visual_route_family_handler_refs',
+      rca_owns_generic_runtime: false,
+      rca_owns_generic_registry: false,
+      rca_owns_generic_attempt_ledger: false,
+      retained_authority_refs: [
+        'visual_route_truth',
+        'route_family_policy_refs',
+        'review_export_gate_refs',
+        'stage_artifact_refs',
+      ],
+    },
     families: listDefaultRuntimeFamilyModules(),
   };
 }

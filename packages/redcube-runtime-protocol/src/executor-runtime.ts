@@ -33,10 +33,12 @@ const HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION = 'inherit_local_hermes_defa
 const HERMES_AGENT_LOOP_FREEZE_ORIGIN = 'Hermes.Proof.A';
 const OPL_EXECUTOR_ADAPTER_RECEIPT_SOURCE = 'opl_executor_adapter_receipt';
 const OPL_HOSTED_HERMES_AGENT_LOOP_REFERENCE = 'opl_hosted:hermes_agent_loop';
+const OPL_AGENT_EXECUTOR_ADAPTER_OWNER = 'one-person-lab';
 const OPL_RUNTIME_MANAGER_OWNER = 'OPL Runtime Manager';
 const OPL_RUNTIME_MANAGER_RUNTIME_OWNER = 'opl_runtime_manager';
 const RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER = 'redcube_ai_visual_deliverable_runtime';
 const RCA_REVIEW_EXPORT_GATE_OWNER = 'redcube_ai';
+const RCA_ROUTE_EXECUTOR_POLICY_OWNER = 'redcube_ai';
 export const HERMES_AGENT_BACKEND_LIFECYCLE = 'historical_opt_in_deferred_external_adapter';
 export const HERMES_AGENT_ADAPTER_DELETION_GATE_OWNER = 'opl_agent_executor_adapter';
 export const HERMES_AGENT_ADAPTER_DELETION_GATE = Object.freeze([
@@ -135,6 +137,27 @@ function buildOplExecutorAdapterReceipt({
   };
 }
 
+function buildExecutorAdapterOwnerBoundary({
+  concreteExecutorHost,
+  surface,
+  adapter,
+} = {}) {
+  return {
+    generic_executor_adapter_owner: OPL_AGENT_EXECUTOR_ADAPTER_OWNER,
+    concrete_executor_host: concreteExecutorHost,
+    executor_surface: surface,
+    selected_executor_backend: adapter,
+    route_executor_policy_owner: RCA_ROUTE_EXECUTOR_POLICY_OWNER,
+    visual_truth_owner: RCA_VISUAL_DELIVERABLE_RUNTIME_OWNER,
+    review_export_gate_owner: RCA_REVIEW_EXPORT_GATE_OWNER,
+    rca_role: 'route_executor_policy_and_receipt_refs_only',
+    rca_owns_generic_executor_adapter: false,
+    rca_owns_generic_attempt_ledger: false,
+    rca_owns_generic_runtime_record_store: false,
+    rca_owns_generic_event_log: false,
+  };
+}
+
 export function normalizeExecutorBackend(value = CODEX_DEFAULT_ADAPTER) {
   const requested = String(value || '').trim();
   if (!requested || requested === CODEX_DEFAULT_ADAPTER || requested === CODEX_EXECUTOR_BACKEND) {
@@ -211,6 +234,11 @@ export function buildHermesExecutionModel({ adapter = HERMES_AGENT_ADAPTER } = {
     deployment_host_status: HERMES_DEPLOYMENT_STATUS,
     requested_adapter: requestedAdapter || HERMES_AGENT_ADAPTER,
     freeze_origin_milestone: HERMES_FREEZE_ORIGIN,
+    executor_adapter_owner_boundary: buildExecutorAdapterOwnerBoundary({
+      concreteExecutorHost: HERMES_SUBSTRATE_OWNER,
+      surface: HERMES_RUNTIME_SURFACE,
+      adapter: HERMES_AGENT_EXECUTOR_BACKEND,
+    }),
     ...hermesAgentAdapterRetirementBoundary(),
   };
 }
@@ -232,6 +260,11 @@ export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {
     default_model_selection: CODEX_DEFAULT_MODEL_SELECTION,
     default_reasoning_effort: CODEX_DEFAULT_REASONING_SELECTION,
     freeze_origin_milestone: CODEX_FREEZE_ORIGIN,
+    executor_adapter_owner_boundary: buildExecutorAdapterOwnerBoundary({
+      concreteExecutorHost: 'Codex CLI',
+      surface: CODEX_RUNTIME_SURFACE,
+      adapter: CODEX_EXECUTOR_BACKEND,
+    }),
   };
 }
 
@@ -255,6 +288,11 @@ export function buildHermesAgentLoopExecutionModel({ adapter = HERMES_AGENT_ADAP
     default_model_selection: HERMES_AGENT_LOOP_DEFAULT_MODEL_SELECTION,
     default_reasoning_effort: HERMES_AGENT_LOOP_DEFAULT_REASONING_SELECTION,
     freeze_origin_milestone: HERMES_AGENT_LOOP_FREEZE_ORIGIN,
+    executor_adapter_owner_boundary: buildExecutorAdapterOwnerBoundary({
+      concreteExecutorHost: OPL_RUNTIME_MANAGER_OWNER,
+      surface: HERMES_AGENT_LOOP_RUNTIME_SURFACE,
+      adapter: HERMES_AGENT_EXECUTOR_BACKEND,
+    }),
     ...hermesAgentAdapterRetirementBoundary(),
     opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
   };

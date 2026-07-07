@@ -6,6 +6,7 @@ export {
 export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
+  getDefaultRuntimeFamilyCatalog,
   listDefaultOverlayModules,
   listDefaultRuntimeFamilyModules,
 } from '@redcube/runtime';

@@ -235,8 +235,11 @@ function resolveStageDir(stageRoot, canonicalStageId) {
 }
 
 const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
-  owner: 'redcube_ai',
-  opl_role: 'stage_folder_locator_and_index_consumer',
+  owner: 'one-person-lab',
+  substrate_owner: 'one-person-lab',
+  domain_authority_owner: 'redcube_ai',
+  opl_role: 'stage_folder_contract_owner_and_locator_index_provider',
+  rca_role: 'domain_artifact_authority_receipt_refs_only',
   stage_folder_current_pointer_role: 'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
   stage_folder_terminal_status_role: 'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
   stage_transition_authority_required_for_opl_stage_run_current: true,
@@ -248,6 +251,8 @@ const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
   opl_can_write_review_export_verdict: false,
   opl_can_write_domain_artifact_body: false,
   rca_owns_artifact_authority: true,
+  rca_owns_stage_folder_substrate: false,
+  rca_owns_generic_stage_run_current_pointer: false,
 };
 
 export function canonicalStageForRoute(stageId) {

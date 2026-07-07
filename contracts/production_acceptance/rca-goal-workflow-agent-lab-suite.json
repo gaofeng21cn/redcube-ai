@@ -64,7 +64,7 @@
       "executor_task_surface": "codex_native_imagegen_skill",
       "explicit_provider_token_required": false,
       "provider_token_source": "codex_executor_native_tool",
-      "proof_test_ref": "tests/codex-cli-client.test.ts#generateImageViaCodexNativeImagegen",
+      "proof_test_ref": "tests/codex-executor-adapter.test.ts#generateImageViaCodexNativeImagegen",
       "live_sample_requirement": "run Codex executor imagegen probe when visual quality, not CI plumbing, must be proven"
     },
     "proves_artifact_export_chain": true,
@@ -310,7 +310,7 @@
   ],
   "artifact_sample_refs": [
     "artifact-sample:test:rca-goal-workflow-agent-lab-suite#artifact-producing-xiaohongshu-export-bundle",
-    "artifact-sample:test:codex-cli-client#generateImageViaCodexNativeImagegen",
+    "artifact-sample:test:codex-executor-adapter#generateImageViaCodexNativeImagegen",
     "artifact-sample:path:artifacts/image_pages/author_image_pages/N01.png",
     "artifact-sample:path:publish/screenshots/N01.png",
     "artifact-sample:path:artifacts/publish_bundle.json"

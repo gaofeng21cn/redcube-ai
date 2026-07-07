@@ -43,6 +43,9 @@ test('RCA executor contract exposes only canonical public backends and execution
   assert.equal(codex.execution_shape, 'structured_call');
   assert.equal(codex.execution_model.executor_backend, 'codex_cli');
   assert.equal(codex.execution_model.execution_shape, 'structured_call');
+  assert.equal(codex.execution_model.executor_adapter_owner_boundary.generic_executor_adapter_owner, 'one-person-lab');
+  assert.equal(codex.execution_model.executor_adapter_owner_boundary.route_executor_policy_owner, 'redcube_ai');
+  assert.equal(codex.execution_model.executor_adapter_owner_boundary.rca_owns_generic_executor_adapter, false);
   assert.notEqual((codex.execution_model as Record<string, any>).backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
 
   const hermes = buildHermesAgentLoopExecutorDescriptor();
@@ -55,6 +58,8 @@ test('RCA executor contract exposes only canonical public backends and execution
   assert.equal(hermes.execution_model.execution_shape, 'agent_loop');
   assert.equal(hermes.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
   assert.equal(hermes.execution_model.runtime_substrate_owner, 'OPL Runtime Manager');
+  assert.equal(hermes.execution_model.executor_adapter_owner_boundary.generic_executor_adapter_owner, 'one-person-lab');
+  assert.equal(hermes.execution_model.executor_adapter_owner_boundary.rca_owns_generic_attempt_ledger, false);
   assert.equal(hermes.execution_model.backend_lifecycle, 'historical_opt_in_deferred_external_adapter');
   assert.equal(hermes.execution_model.rca_default_backend, false);
   assert.equal(hermes.execution_model.adapter_deletion_gate_owner, 'opl_agent_executor_adapter');

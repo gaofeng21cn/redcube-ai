@@ -8,6 +8,7 @@ import {
   createOverlayRegistry,
   buildXiaohongshuTopic,
   getDefaultOverlayCatalog,
+  getDefaultRuntimeFamilyCatalog,
   listDefaultOverlayModules,
   listDefaultRuntimeFamilyModules,
   pptDeckOverlay,
@@ -438,6 +439,12 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
 test('registry source manifests stay aligned with direct package dependencies and literal loaders', () => {
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const runtimeSource = readText('packages/redcube-runtime/src/default-registries.ts');
+  const runtimeFamilyCatalog = getDefaultRuntimeFamilyCatalog();
+
+  assert.equal(runtimeFamilyCatalog.owner_boundary.generic_runtime_family_registry_owner, 'one-person-lab');
+  assert.equal(runtimeFamilyCatalog.owner_boundary.rca_owns_generic_runtime, false);
+  assert.equal(runtimeFamilyCatalog.owner_boundary.rca_owns_generic_registry, false);
+  assert.equal(runtimeFamilyCatalog.owner_boundary.retained_authority_refs.includes('review_export_gate_refs'), true);
 
   for (const { module } of listDefaultOverlayModules()) {
     assert.equal(

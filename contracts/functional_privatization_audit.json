@@ -546,6 +546,8 @@
       "classification": "refs_only_adapter",
       "opl_generic_primitive": "workbench_shell",
       "oplAbsorbCandidate": true,
+      "generic_substrate_owner": "one-person-lab",
+      "rca_owns_generic_substrate": false,
       "rcaRetains": [
         "entry_session_domain_refs",
         "deliverable_locator_refs",
@@ -688,6 +690,8 @@
       ],
       "default_caller_contract": {
         "surface_kind": "generated_session_shell_boundary",
+        "generic_session_shell_owner": "one-person-lab",
+        "generic_workbench_owner": "one-person-lab",
         "generated_session_shell_owner": "one-person-lab",
         "generated_session_command": "opl_generated:product_session",
         "generated_session_command_template": "opl_generated:product_session --entry-session-id <entry-session-id>",
@@ -2133,6 +2137,10 @@
       "classification": "domain_handler_target",
       "opl_generic_primitive": "standard_domain_agent_scaffold",
       "oplAbsorbCandidate": true,
+      "generic_substrate_owner": "one-person-lab",
+      "rca_owns_generic_substrate": false,
+      "production_api_owner": "one-person-lab",
+      "rca_production_api_role": "domain_handler_target_refs_only",
       "rcaRetains": [
         "rca_action_metadata",
         "domain_action_handlers",
@@ -2366,6 +2374,10 @@
       "classification": "refs_only_adapter",
       "opl_generic_primitive": "agent_executor_adapter",
       "oplAbsorbCandidate": true,
+      "generic_substrate_owner": "one-person-lab",
+      "rca_owns_generic_substrate": false,
+      "route_run_record_owner": "one-person-lab",
+      "executor_adapter_owner": "one-person-lab",
       "rcaRetains": [
         "default_codex_executor_policy",
         "route_executor_requirements",
@@ -2376,7 +2388,7 @@
       "codePaths": [
         "packages/redcube-runtime-protocol/src/executor-runtime.ts",
         "packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts",
-        "packages/redcube-runtime/src/executors.ts",
+        "packages/redcube-runtime/src/executors/index.ts",
         "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
         "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts",
         "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts",
@@ -2392,7 +2404,7 @@
       ],
       "activeCallerStatus": "route_run_record_api_refs_only_delete_tail",
       "migrationAction": "Keep executor lifecycle/provisioning, attempt ledger ownership, route-run record persistence policy, event log ownership, stale-running-run audit read model, and generic route dependency/continuation orchestration in OPL generic Agent Executor Adapter and route attempt shell; RCA returns route policy, neutral route-run refs, and receipt refs only.",
-      "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class default for visual deliverables, and neutral refs-only route-run record materialization until OPL attempt ledger/runtime record caller parity is proven.",
+      "retentionReason": "RCA keeps route-level executor requirements, Codex CLI as current first-class concrete executor for visual deliverables, and neutral refs-only route-run record refs until OPL attempt ledger/runtime record caller parity is proven.",
       "cannotAbsorbReason": "OPL can provide executor adapter and attempt record mechanics but cannot promise non-Codex outputs are visually equivalent for RCA routes or issue RCA visual review/export verdicts.",
       "semantic_equivalence_status": "cleared_by_boundary",
       "semantic_equivalence_reason": "RCA exposes only route-level executor policy, neutral route-run refs, executor requirement refs, executor receipt refs, typed blocker refs and no-forbidden-write refs; OPL attempt shell parity remains a bridge-exit blocker, not unresolved semantic ownership.",

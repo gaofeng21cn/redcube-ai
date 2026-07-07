@@ -201,6 +201,26 @@ function hasOplRouteAttemptEvidence(index) {
     && (stageAttemptRef || attemptLeaseRef || attemptReceiptRef);
 }
 
+function buildRouteRunRecordBoundary({ diagnosticOnly = false } = {}) {
+  return {
+    surface_kind: 'route_run_record_boundary',
+    generic_attempt_ledger_owner: 'one-person-lab',
+    generic_runtime_record_owner: 'one-person-lab',
+    generic_event_log_owner: 'one-person-lab',
+    rca_role: 'route_executor_policy_refs_only',
+    record_mode: diagnosticOnly ? 'local_refs_only_diagnostic_record' : 'opl_attempt_ledger_bound_record_ref',
+    rca_owns_generic_attempt_ledger: false,
+    rca_owns_generic_runtime_record_store: false,
+    rca_owns_generic_event_log: false,
+    rca_retained_refs: [
+      'route_executor_policy_refs',
+      'executor_receipt_refs',
+      'typed_blocker_refs',
+      'no_forbidden_write_refs',
+    ],
+  };
+}
+
 export function startRouteRun({
   workspaceRoot,
   runId = null,
@@ -249,6 +269,9 @@ export function startRouteRun({
     started_at: new Date().toISOString(),
     current_stage: route,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor),
+    route_run_record_boundary: buildRouteRunRecordBoundary({
+      diagnosticOnly: !hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex),
+    }),
     executor,
     ...(normalizedCrossProviderAttemptIndex ? {
       cross_provider_attempt_index: normalizedCrossProviderAttemptIndex,

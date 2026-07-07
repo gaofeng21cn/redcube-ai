@@ -29,6 +29,8 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     ],
     default_caller_contract: {
       surface_kind: 'generated_session_shell_boundary',
+      generic_session_shell_owner: 'one-person-lab',
+      generic_workbench_owner: 'one-person-lab',
       generated_session_shell_owner: 'one-person-lab',
       generated_session_command: 'opl_generated:product_session',
       generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
@@ -82,6 +84,9 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     expectation_ref: '/family_action_catalog',
     opl_replacement_surface: 'opl_standard_domain_agent_generated_cli_mcp_wrappers',
     rca_projection_mode: 'canonical_action_metadata_refs_only',
+    generic_substrate_owner: 'one-person-lab',
+    production_api_owner: 'one-person-lab',
+    rca_production_api_role: 'domain_handler_target_refs_only',
     rca_exports_only: [
       'family_action_catalog_refs',
       'guarded_action_refs',
@@ -93,6 +98,9 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     expectation_ref: '/domain_entry_contract/executor',
     opl_replacement_surface: 'opl_agent_executor_adapter',
     rca_projection_mode: 'route_level_executor_policy_refs_only',
+    generic_substrate_owner: 'one-person-lab',
+    route_run_record_owner: 'one-person-lab',
+    executor_adapter_owner: 'one-person-lab',
     rca_exports_only: ['executor_requirement_refs', 'executor_receipt_refs', 'route_policy_refs'],
   },
   observability_stability_read_model: {

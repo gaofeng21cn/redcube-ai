@@ -46,6 +46,11 @@ test('completed route runs keep Codex runtime topology for Codex-native executor
 
   assert.equal(completed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(completed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
+  assert.equal(completed.runtime_topology.generic_executor_adapter_owner, 'one-person-lab');
+  assert.equal(completed.runtime_topology.domain_authority_owner, 'redcube_ai');
+  assert.equal(completed.runtime_topology.rca_owns_generic_runtime, false);
+  assert.equal(completed.route_run_record_boundary.generic_attempt_ledger_owner, 'one-person-lab');
+  assert.equal(completed.route_run_record_boundary.rca_owns_generic_runtime_record_store, false);
   assert.equal(completed.runtime_topology.deployment_host_status, 'active_primary');
   assert.equal(
     completed.runtime_topology.domain_entry_protocol_role,
@@ -78,6 +83,10 @@ test('failed route runs keep Codex runtime topology for Codex-native executor', 
 
   assert.equal(failed.runtime_topology.runtime_substrate_owner, 'Codex CLI');
   assert.equal(failed.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
+  assert.equal(failed.runtime_topology.generic_executor_adapter_owner, 'one-person-lab');
+  assert.equal(failed.runtime_topology.rca_owns_generic_executor_adapter, false);
+  assert.equal(failed.route_run_record_boundary.generic_event_log_owner, 'one-person-lab');
+  assert.equal(failed.route_run_record_boundary.rca_owns_generic_event_log, false);
   assert.equal(failed.runtime_topology.deployment_host_status, 'active_primary');
   assert.equal(
     failed.runtime_topology.domain_entry_protocol_role,

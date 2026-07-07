@@ -72,6 +72,16 @@ function assertGoalWorkflowSuiteShape(suite) {
     true,
   );
   assert.equal(
+    suite.artifact_sample_policy.codex_native_imagegen_policy.proof_test_ref,
+    'tests/codex-executor-adapter.test.ts#generateImageViaCodexNativeImagegen',
+  );
+  assert.equal(
+    suite.artifact_sample_refs.includes(
+      'artifact-sample:test:codex-executor-adapter#generateImageViaCodexNativeImagegen',
+    ),
+    true,
+  );
+  assert.equal(
     suite.target_verification_refs.includes('target-verification:redcube-ai/codex-native-imagegen-executor-task'),
     true,
   );
