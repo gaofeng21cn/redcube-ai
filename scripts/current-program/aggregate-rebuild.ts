@@ -1,29 +1,19 @@
-import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { isDeepStrictEqual } from 'node:util';
 
 import {
   AGGREGATE_SNAPSHOT_REF,
-  ASSEMBLY_REF,
   INDEX_REF,
-  MANIFEST_REF,
   PARTS_ROOT,
-  buildCurrentProgramSourceIndexFromAggregate,
+  buildCurrentProgramSourceIndexFromParts,
   childSegmentMap,
   listJsonFiles,
   pointerSegment,
   readJson,
-  sourcePartRefsFromAggregate,
   sourcePartRefsFromFiles,
   stable,
-  valueAtJsonPointer,
 } from './leaf-index.ts';
 import type { SourcePartRef } from './leaf-index.ts';
-import {
-  buildCurrentProgramAssembly,
-  buildCurrentProgramPackBundleManifestForSourceIndex,
-} from './bundle-manifest.ts';
 
 function buildContainer(pointer: string, children: Map<string, Set<string>>): unknown {
   const childSegments = children.get(pointer);
@@ -75,43 +65,13 @@ function reorderLikeTemplate(value: any, template: any): unknown {
   return ordered;
 }
 
-function removeEmptyDirectories(root: string) {
-  if (!fs.existsSync(path.resolve(root))) return;
-  for (const entry of fs.readdirSync(path.resolve(root), { withFileTypes: true })) {
-    if (!entry.isDirectory()) continue;
-    removeEmptyDirectories(path.join(root, entry.name));
-  }
-  if (root !== PARTS_ROOT && fs.readdirSync(path.resolve(root)).length === 0) {
-    fs.rmdirSync(path.resolve(root));
-  }
-}
-
 function writeFile(relativePath: string, content: string) {
   const absolutePath = path.resolve(relativePath);
   fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
   fs.writeFileSync(absolutePath, content);
 }
 
-function syncSourcePartsFromAggregate() {
-  const currentProgram = readJson(AGGREGATE_SNAPSHOT_REF);
-  const sourcePartRefs = sourcePartRefsFromAggregate(currentProgram);
-  const expectedRefs = new Set(sourcePartRefs.map((sourcePart) => sourcePart.ref));
-
-  for (const existingRef of listJsonFiles(PARTS_ROOT)) {
-    if (!expectedRefs.has(existingRef)) {
-      fs.rmSync(path.resolve(existingRef));
-    }
-  }
-  for (const sourcePartRef of sourcePartRefs) {
-    writeFile(
-      sourcePartRef.ref,
-      stable(valueAtJsonPointer(currentProgram, sourcePartRef.json_pointer)),
-    );
-  }
-  removeEmptyDirectories(PARTS_ROOT);
-}
-
-function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFiles()) {
+export function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFiles()) {
   const children = childSegmentMap(sourcePartRefs);
   const assembled: Record<string, unknown> = {};
   for (const sourcePartRef of sourcePartRefs) {
@@ -123,25 +83,14 @@ function assembleCurrentProgramFromParts(sourcePartRefs = sourcePartRefsFromFile
   return assembled;
 }
 
-export function buildCurrentProgramSourceIndex(currentProgram = assembleCurrentProgramFromParts()) {
-  return buildCurrentProgramSourceIndexFromAggregate(currentProgram);
-}
-
-export function buildCurrentProgramPackBundleManifest(sourceIndex = buildCurrentProgramSourceIndex()) {
-  return buildCurrentProgramPackBundleManifestForSourceIndex(sourceIndex);
+export function buildCurrentProgramSourceIndex() {
+  return buildCurrentProgramSourceIndexFromParts();
 }
 
 function expectedGeneratedFiles() {
-  const sourcePartRefs = sourcePartRefsFromFiles();
-  const aggregate = assembleCurrentProgramFromParts(sourcePartRefs);
-  const sourceIndex = buildCurrentProgramSourceIndex(aggregate);
-  const bundleManifest = buildCurrentProgramPackBundleManifest(sourceIndex);
-  const assembly = buildCurrentProgramAssembly(sourcePartRefs);
+  const sourceIndex = buildCurrentProgramSourceIndex();
   return new Map([
-    [AGGREGATE_SNAPSHOT_REF, stable(aggregate)],
     [INDEX_REF, stable(sourceIndex)],
-    [MANIFEST_REF, stable(bundleManifest)],
-    [ASSEMBLY_REF, stable(assembly)],
   ]);
 }
 
@@ -165,14 +114,14 @@ export function checkCurrentProgramLeafIndex() {
     compareFile(relativePath, expected, mismatches);
   }
 
-  const currentProgram = readJson(AGGREGATE_SNAPSHOT_REF);
   const index = readJson(INDEX_REF);
+  const indexedRefs = new Set((index.source_part_refs as SourcePartRef[]).map((leaf) => leaf.ref));
+  const sourceRefs = new Set(listJsonFiles(PARTS_ROOT));
+  for (const sourceRef of sourceRefs) {
+    if (!indexedRefs.has(sourceRef)) mismatches.push(`unindexed ${sourceRef}`);
+  }
   for (const leaf of index.source_part_refs as SourcePartRef[]) {
-    assert.deepEqual(
-      readJson(leaf.ref),
-      valueAtJsonPointer(currentProgram, leaf.json_pointer),
-      leaf.ref,
-    );
+    if (!sourceRefs.has(leaf.ref)) mismatches.push(`missing source part ${leaf.ref}`);
   }
 
   return {
@@ -184,7 +133,6 @@ export function checkCurrentProgramLeafIndex() {
 }
 
 export function syncCurrentProgramLeafIndex() {
-  syncSourcePartsFromAggregate();
   const expectedFiles = expectedGeneratedFiles();
   for (const [relativePath, content] of expectedFiles) {
     writeFile(relativePath, content);
@@ -195,10 +143,4 @@ export function syncCurrentProgramLeafIndex() {
     source_part_ref_count: index.source_part_refs.length,
     leaf_ref_count: index.source_part_refs.length,
   };
-}
-
-export function assertGeneratedManifestMatchesSourceParts() {
-  const generated = buildCurrentProgramSourceIndex(assembleCurrentProgramFromParts());
-  const tracked = readJson(INDEX_REF);
-  assert.equal(isDeepStrictEqual(tracked, generated), true);
 }

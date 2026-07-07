@@ -1,19 +1,23 @@
 {
   "surface_kind": "rca_current_program_source_index",
-  "schema_version": 3,
+  "schema_version": 4,
   "program_id": "redcube-runtime-program",
   "date_anchor": "2026-04-26",
-  "assembly_ref": "contracts/runtime-program/current-program.assembly.json",
-  "manifest_ref": "contracts/runtime-program/current-program.bundle-manifest.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
-  "aggregate_ref": "contracts/runtime-program/current-program.json",
-  "aggregate_role": "generated_read_through_snapshot_for_existing_consumers",
-  "canonical_truth_model": "source_parts_are_canonical_current_program_sources",
-  "no_second_truth_rule": "current-program.json is generated from current-program-parts and must not be edited as the canonical source",
+  "canonical_truth_model": "current_program_parts_are_canonical_sources",
+  "no_second_truth_rule": "contracts:current-program:check validates current-program-parts and this index only; current-program.json is a legacy consumer projection, not a canonical or required check input",
+  "generated_aggregate_snapshot": {
+    "ref": "contracts/runtime-program/current-program.json",
+    "role": "legacy_read_through_projection_for_existing_consumers",
+    "canonical_source": false,
+    "edit_surface": false,
+    "check_input": false
+  },
   "split_policy": {
     "max_part_json_line_count": 1000,
     "large_objects_and_arrays_are_split_recursively": true,
-    "aggregate_snapshot_is_not_canonical_edit_surface": true
+    "aggregate_snapshot_is_not_canonical_edit_surface": true,
+    "aggregate_snapshot_is_not_required_check_input": true
   },
   "section_roots": [
     {
@@ -81,6 +85,7 @@
     }
   ],
   "generated_array_fields": [],
+  "source_digest": "1edb75a2e56f3430b07e271ac24d79dd0bba7b48ae64c3655254533d87db9146",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -561,5 +566,27 @@
       "sha256": "a02d9259cf6a6358059a74555f5ce08f9b5b199c2141e23271e0a53aae7dd995"
     }
   ],
-  "source_ref_count": 34
+  "source_ref_count": 34,
+  "commands": {
+    "write": "npm run contracts:current-program:write",
+    "check": "npm run contracts:current-program:check"
+  },
+  "false_authority_flags": {
+    "aggregate_snapshot_is_canonical_source": false,
+    "aggregate_snapshot_is_edit_surface": false,
+    "aggregate_snapshot_is_check_input": false,
+    "source_refs_are_generated_from_aggregate": false,
+    "docs_are_machine_truth": false,
+    "manifest_can_claim_domain_ready": false,
+    "manifest_can_authorize_quality_or_export": false
+  },
+  "not_claims": [
+    "domain_ready",
+    "production_ready",
+    "visual_ready",
+    "quality_or_export_verdict",
+    "owner_receipt",
+    "typed_blocker",
+    "artifact_authority"
+  ]
 }

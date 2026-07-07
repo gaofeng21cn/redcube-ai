@@ -4,8 +4,6 @@ import path from 'node:path';
 
 export const AGGREGATE_SNAPSHOT_REF = 'contracts/runtime-program/current-program.json';
 export const INDEX_REF = 'contracts/runtime-program/current-program.index.json';
-export const MANIFEST_REF = 'contracts/runtime-program/current-program.bundle-manifest.json';
-export const ASSEMBLY_REF = 'contracts/runtime-program/current-program.assembly.json';
 export const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
 export const MAX_LEAF_JSON_LINE_COUNT = 1000;
 export const WRITE_COMMAND = 'npm run contracts:current-program:write';
@@ -14,6 +12,7 @@ export const CHECK_COMMAND = 'npm run contracts:current-program:check';
 export const FALSE_AUTHORITY_FLAGS = Object.freeze({
   aggregate_snapshot_is_canonical_source: false,
   aggregate_snapshot_is_edit_surface: false,
+  aggregate_snapshot_is_check_input: false,
   source_refs_are_generated_from_aggregate: false,
   docs_are_machine_truth: false,
   manifest_can_claim_domain_ready: false,
@@ -110,21 +109,8 @@ export function readJson(file: string): any {
   return JSON.parse(fs.readFileSync(path.resolve(file), 'utf-8'));
 }
 
-export function valueAtJsonPointer(document: any, pointer: string): any {
-  if (pointer === '') return document;
-  return pointer
-    .slice(1)
-    .split('/')
-    .map((part) => part.replace(/~1/g, '/').replace(/~0/g, '~'))
-    .reduce((value, part) => value[part], document);
-}
-
 export function pointerSegment(segment: string): string {
   return segment.replace(/~/g, '~0').replace(/\//g, '~1');
-}
-
-function pathSegment(segment: string): string {
-  return segment.replace(/[^a-zA-Z0-9._-]/g, '_');
 }
 
 function pointerFromPartRef(ref: string): string {
@@ -137,65 +123,8 @@ function pointerFromPartRef(ref: string): string {
     .join('/')}`;
 }
 
-function childEntries(value: unknown): Array<[string, unknown]> {
-  if (Array.isArray(value)) {
-    return value.map((item, index) => [String(index), item]);
-  }
-  if (value && typeof value === 'object') {
-    return Object.keys(value).map((key) => [key, (value as Record<string, unknown>)[key]]);
-  }
-  return [];
-}
-
-function refPathFor(pointer: string): string {
-  const segments = pointer.slice(1).split('/').map((part) => part.replace(/~1/g, '/').replace(/~0/g, '~'));
-  const fileSegments = segments.map((segment) => (/^\d+$/.test(segment) ? segment.padStart(4, '0') : pathSegment(segment)));
-  return `${PARTS_ROOT}/${fileSegments.join('/')}.json`;
-}
-
 function leafRole(pointer: string): string {
   return pointer.startsWith('/current_state') ? 'active_current_truth_leaf_source' : 'current_program_leaf_source';
-}
-
-function collectLeaves(value: unknown, pointer: string, forcedLeaf = false): SourcePartRef[] {
-  const children = childEntries(value);
-  if (forcedLeaf || children.length === 0 || lineCount(value) <= MAX_LEAF_JSON_LINE_COUNT) {
-    return [{
-      json_pointer: pointer,
-      ref: refPathFor(pointer),
-      role: leafRole(pointer),
-      line_count: lineCount(value),
-    }];
-  }
-
-  return children.flatMap(([key, child]) => (
-    collectLeaves(child, `${pointer}/${pointerSegment(key)}`)
-  ));
-}
-
-export function buildCurrentProgramLeafIndex(currentProgram = readJson(AGGREGATE_SNAPSHOT_REF)) {
-  const leafRefs = SECTION_ROOTS.flatMap((section) => {
-    const value = valueAtJsonPointer(currentProgram, section.aggregate_json_pointer);
-    return collectLeaves(value, section.aggregate_json_pointer, section.ref_kind === 'single_leaf_ref');
-  }).sort((left, right) => left.json_pointer.localeCompare(right.json_pointer));
-
-  return {
-    surface_kind: 'rca_current_program_leaf_index',
-    schema_version: 2,
-    program_id: currentProgram.program_id,
-    date_anchor: currentProgram.date_anchor,
-    aggregate_snapshot_ref: AGGREGATE_SNAPSHOT_REF,
-    aggregate_snapshot_role: 'generated_read_through_snapshot_for_existing_consumers',
-    canonical_truth_model: 'leaf_refs_are_canonical_current_program_sources',
-    no_second_truth_rule: 'current-program.json must mirror every indexed leaf ref at JSON pointer level',
-    split_policy: {
-      max_leaf_json_line_count: MAX_LEAF_JSON_LINE_COUNT,
-      large_objects_and_arrays_are_split_recursively: true,
-      aggregate_snapshot_is_not_canonical_edit_surface: true,
-    },
-    section_roots: SECTION_ROOTS,
-    leaf_refs: leafRefs,
-  };
 }
 
 export function listJsonFiles(root: string): string[] {
@@ -258,31 +187,28 @@ export function sourcePartRefsFromFiles(): SourcePartRef[] {
     }));
 }
 
-export function sourcePartRefsFromAggregate(currentProgram = readJson(AGGREGATE_SNAPSHOT_REF)): SourcePartRef[] {
-  return orderedSourcePartRefs(SECTION_ROOTS.flatMap((section) => {
-    const value = valueAtJsonPointer(currentProgram, section.aggregate_json_pointer);
-    return collectLeaves(value, section.aggregate_json_pointer, section.ref_kind === 'single_leaf_ref');
-  }));
-}
-
-export function buildCurrentProgramSourceIndexFromAggregate(currentProgram: any) {
+export function buildCurrentProgramSourceIndexFromParts() {
   const sourcePartRefs = sourcePartRefsFromFiles();
   return {
     surface_kind: 'rca_current_program_source_index',
-    schema_version: 3,
-    program_id: currentProgram.program_id,
-    date_anchor: currentProgram.date_anchor,
-    assembly_ref: ASSEMBLY_REF,
-    manifest_ref: MANIFEST_REF,
+    schema_version: 4,
+    program_id: readJson(`${PARTS_ROOT}/program_id.json`),
+    date_anchor: readJson(`${PARTS_ROOT}/date_anchor.json`),
     source_root_ref: PARTS_ROOT,
-    aggregate_ref: AGGREGATE_SNAPSHOT_REF,
-    aggregate_role: 'generated_read_through_snapshot_for_existing_consumers',
-    canonical_truth_model: 'source_parts_are_canonical_current_program_sources',
-    no_second_truth_rule: 'current-program.json is generated from current-program-parts and must not be edited as the canonical source',
+    canonical_truth_model: 'current_program_parts_are_canonical_sources',
+    no_second_truth_rule: 'contracts:current-program:check validates current-program-parts and this index only; current-program.json is a legacy consumer projection, not a canonical or required check input',
+    generated_aggregate_snapshot: {
+      ref: AGGREGATE_SNAPSHOT_REF,
+      role: 'legacy_read_through_projection_for_existing_consumers',
+      canonical_source: false,
+      edit_surface: false,
+      check_input: false,
+    },
     split_policy: {
       max_part_json_line_count: MAX_LEAF_JSON_LINE_COUNT,
       large_objects_and_arrays_are_split_recursively: true,
       aggregate_snapshot_is_not_canonical_edit_surface: true,
+      aggregate_snapshot_is_not_required_check_input: true,
     },
     section_roots: SECTION_ROOTS.map((section) => ({
       section_id: section.section_id,
@@ -292,8 +218,27 @@ export function buildCurrentProgramSourceIndexFromAggregate(currentProgram: any)
       role: section.role,
     })),
     generated_array_fields: generatedArrayFields(sourcePartRefs),
+    source_digest: sha256(stable(sourcePartRefs.map((sourcePart) => ({
+      json_pointer: sourcePart.json_pointer,
+      ref: sourcePart.ref,
+      sha256: sourcePart.sha256,
+    })))),
     source_part_refs: sourcePartRefs,
     leaf_refs: sourcePartRefs,
     source_ref_count: sourcePartRefs.length,
+    commands: {
+      write: WRITE_COMMAND,
+      check: CHECK_COMMAND,
+    },
+    false_authority_flags: FALSE_AUTHORITY_FLAGS,
+    not_claims: [
+      'domain_ready',
+      'production_ready',
+      'visual_ready',
+      'quality_or_export_verdict',
+      'owner_receipt',
+      'typed_blocker',
+      'artifact_authority',
+    ],
   };
 }

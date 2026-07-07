@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import {
@@ -9,6 +10,7 @@ import {
   TEST_REGISTRY,
 } from '../scripts/test-registry.ts';
 import {
+  assembleCurrentProgramFromParts,
   checkCurrentProgramLeafIndex,
 } from '../scripts/sync-current-program-leaf-index.ts';
 
@@ -87,6 +89,8 @@ const HISTORICAL_CONTRACTS = Object.freeze([
     status: 'closeout_completed',
   },
 ]);
+const CURRENT_PROGRAM_AGGREGATE = 'contracts/runtime-program/current-program.json';
+const CURRENT_PROGRAM_ASSEMBLY = 'contracts/runtime-program/current-program.assembly.json';
 const CURRENT_PROGRAM_BUNDLE_MANIFEST = 'contracts/runtime-program/current-program.bundle-manifest.json';
 const CANONICAL_PROJECTION_MODE = 'canonical_ref_only_no_body_copy';
 
@@ -105,47 +109,34 @@ const CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS = Object.freeze([
   '/product_release_metadata/visual_pack_compiler_handoff',
 ]);
 
-test('current runtime program is backed by source parts and a generated consumer aggregate', () => {
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
-  const assembly = readJson('contracts/runtime-program/current-program.assembly.json');
+test('current runtime program is backed by source parts and one source index locator', () => {
+  const currentProgram = assembleCurrentProgramFromParts();
   const index = readJson('contracts/runtime-program/current-program.index.json');
   const syncCheck = checkCurrentProgramLeafIndex();
 
-  assert.equal(assembly.surface_kind, 'rca_current_program_pack_bundle_assembly');
-  assert.equal(assembly.schema_version, 1);
-  assert.equal(assembly.bundle_id, 'redcube-ai.current-program');
-  assert.equal(assembly.source_root_ref, 'contracts/runtime-program/current-program-parts');
-  assert.equal(assembly.aggregate_ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(assembly.index_ref, 'contracts/runtime-program/current-program.index.json');
-  assert.equal(assembly.manifest_ref, CURRENT_PROGRAM_BUNDLE_MANIFEST);
-  assert.equal(assembly.commands.write, 'npm run contracts:current-program:write');
-  assert.equal(assembly.commands.check, 'npm run contracts:current-program:check');
-  assert.equal(assembly.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
-  assert.equal(assembly.false_authority_flags.manifest_can_authorize_quality_or_export, false);
-  assert.equal(assembly.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
-  assert.equal(assembly.generated_aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
-  assert.equal(Array.isArray(assembly.generated_array_fields), true);
-  assert.equal(
-    assembly.source_part_contract.duplicate_entity_policy,
-    'repeat canonical projection refs, not full machine snapshot bodies',
-  );
-  assert.equal(assembly.canonical_projection_contract.projection_mode, CANONICAL_PROJECTION_MODE);
-  assert.equal(assembly.canonical_projection_contract.body_copy_in_current_program, false);
-  assert.equal(
-    assembly.canonical_projection_contract.allowed_targets.includes('contracts/functional_privatization_audit.json'),
-    true,
-  );
-
   assert.equal(index.surface_kind, 'rca_current_program_source_index');
-  assert.equal(index.schema_version, 3);
-  assert.equal(index.assembly_ref, 'contracts/runtime-program/current-program.assembly.json');
-  assert.equal(index.manifest_ref, CURRENT_PROGRAM_BUNDLE_MANIFEST);
+  assert.equal(index.schema_version, 4);
   assert.equal(index.source_root_ref, 'contracts/runtime-program/current-program-parts');
-  assert.equal(index.aggregate_ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(index.aggregate_role, 'generated_read_through_snapshot_for_existing_consumers');
-  assert.equal(index.canonical_truth_model, 'source_parts_are_canonical_current_program_sources');
-  assert.equal(index.no_second_truth_rule.includes('generated from current-program-parts'), true);
+  assert.equal(index.canonical_truth_model, 'current_program_parts_are_canonical_sources');
+  assert.equal(index.no_second_truth_rule.includes('validates current-program-parts and this index only'), true);
+  assert.equal(index.generated_aggregate_snapshot.ref, CURRENT_PROGRAM_AGGREGATE);
+  assert.equal(index.generated_aggregate_snapshot.role, 'legacy_read_through_projection_for_existing_consumers');
+  assert.equal(index.generated_aggregate_snapshot.canonical_source, false);
+  assert.equal(index.generated_aggregate_snapshot.edit_surface, false);
+  assert.equal(index.generated_aggregate_snapshot.check_input, false);
   assert.equal(index.split_policy.aggregate_snapshot_is_not_canonical_edit_surface, true);
+  assert.equal(index.split_policy.aggregate_snapshot_is_not_required_check_input, true);
+  assert.match(index.source_digest, /^[a-f0-9]{64}$/);
+  assert.equal(index.commands.write, 'npm run contracts:current-program:write');
+  assert.equal(index.commands.check, 'npm run contracts:current-program:check');
+  assert.equal(index.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
+  assert.equal(index.false_authority_flags.aggregate_snapshot_is_check_input, false);
+  assert.equal(index.false_authority_flags.manifest_can_authorize_quality_or_export, false);
+  assert.equal(index.not_claims.includes('quality_or_export_verdict'), true);
+  assert.equal(index.not_claims.includes('artifact_authority'), true);
+  assert.equal(Object.prototype.hasOwnProperty.call(index, 'assembly_ref'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(index, 'manifest_ref'), false);
+  assert.equal(Object.prototype.hasOwnProperty.call(index, 'aggregate_ref'), false);
 
   const indexedSectionIds = index.section_roots.map((section) => section.section_id);
   assert.deepEqual(indexedSectionIds, [
@@ -169,11 +160,14 @@ test('current runtime program is backed by source parts and a generated consumer
     assert.equal(existsSync(path.resolve(section.source_root_ref)), true, section.source_root_ref);
   }
   for (const sourcePart of index.source_part_refs) {
+    const sourcePartValue = readJson(sourcePart.ref);
+    const sourcePartText = `${JSON.stringify(sourcePartValue, null, 2)}\n`;
     assert.equal(existsSync(path.resolve(sourcePart.ref)), true, sourcePart.ref);
-    assert.equal(sourcePart.ref.startsWith(`${assembly.source_root_ref}/`), true, sourcePart.ref);
+    assert.equal(sourcePart.ref.startsWith(`${index.source_root_ref}/`), true, sourcePart.ref);
     assert.equal(sourcePart.line_count <= index.split_policy.max_part_json_line_count, true, sourcePart.ref);
     assert.match(sourcePart.sha256, /^[a-f0-9]{64}$/);
-    assert.deepEqual(readJson(sourcePart.ref), valueAtJsonPointer(currentProgram, sourcePart.json_pointer), sourcePart.ref);
+    assert.equal(sourcePart.sha256, createHash('sha256').update(sourcePartText).digest('hex'), sourcePart.ref);
+    assert.deepEqual(sourcePartValue, valueAtJsonPointer(currentProgram, sourcePart.json_pointer), sourcePart.ref);
   }
 
   for (const pointer of CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS) {
@@ -200,42 +194,12 @@ test('current runtime program is backed by source parts and a generated consumer
     Object.prototype.hasOwnProperty.call(functionalAuditProjection, 'privatized_functional_module_audit'),
     false,
   );
-});
-
-test('current runtime program has an explicit source-to-generated bundle manifest', () => {
-  const index = readJson('contracts/runtime-program/current-program.index.json');
-  const manifest = readJson(CURRENT_PROGRAM_BUNDLE_MANIFEST);
-
-  assert.equal(manifest.surface_kind, 'rca_current_program_pack_bundle_manifest');
-  assert.equal(manifest.schema_version, 1);
-  assert.equal(manifest.bundle_id, 'redcube-ai.current-program');
-  assert.equal(manifest.assembly_ref, 'contracts/runtime-program/current-program.assembly.json');
-  assert.equal(manifest.index_ref, 'contracts/runtime-program/current-program.index.json');
-  assert.equal(manifest.source_root_ref, 'contracts/runtime-program/current-program-parts');
-  assert.equal(manifest.source_ref_count, index.source_part_refs.length);
-  assert.match(manifest.source_digest, /^[a-f0-9]{64}$/);
-  assert.equal(manifest.aggregate.ref, 'contracts/runtime-program/current-program.json');
-  assert.equal(manifest.aggregate.role, 'generated_read_through_snapshot_for_existing_consumers');
-  assert.equal(manifest.aggregate.do_not_edit, true);
-  assert.equal(manifest.aggregate.write_command, 'npm run contracts:current-program:write');
-  assert.equal(manifest.aggregate.check_command, 'npm run contracts:current-program:check');
-  assert.equal(manifest.canonical_projection_contract.projection_mode, CANONICAL_PROJECTION_MODE);
-  assert.equal(manifest.canonical_projection_contract.body_copy_in_current_program, false);
-  assert.match(
-    manifest.canonical_projection_contract.duplicate_entity_policy,
-    /must not repeat the same large object body/,
-  );
-  assert.deepEqual(Object.keys(manifest).filter((key) => key.endsWith('aggregate')), ['aggregate']);
-  assert.deepEqual(Object.keys(manifest.commands), ['write', 'check']);
-  assert.equal(manifest.false_authority_flags.aggregate_snapshot_is_canonical_source, false);
-  assert.equal(manifest.false_authority_flags.manifest_can_claim_domain_ready, false);
-  assert.equal(manifest.false_authority_flags.manifest_can_authorize_quality_or_export, false);
-  assert.equal(manifest.not_claims.includes('quality_or_export_verdict'), true);
-  assert.equal(manifest.not_claims.includes('artifact_authority'), true);
+  assert.equal(existsSync(path.resolve(CURRENT_PROGRAM_ASSEMBLY)), false);
+  assert.equal(existsSync(path.resolve(CURRENT_PROGRAM_BUNDLE_MANIFEST)), false);
 });
 
 test('current runtime program keeps one active baton and machine-readable historical provenance', () => {
-  const currentProgram = readJson('contracts/runtime-program/current-program.json');
+  const currentProgram = assembleCurrentProgramFromParts();
   const activeBaton = currentProgram.current_state.active_baton;
 
   assert.equal(currentProgram.program_id, 'redcube-runtime-program');
