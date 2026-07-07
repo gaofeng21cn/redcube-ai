@@ -11,9 +11,6 @@
       "path": "./packages/redcube-governance"
     },
     {
-      "path": "./packages/redcube-reference-os"
-    },
-    {
       "path": "./packages/redcube-overlay-xiaohongshu"
     },
     {

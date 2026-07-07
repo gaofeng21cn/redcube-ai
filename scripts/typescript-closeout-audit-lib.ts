@@ -18,7 +18,6 @@ const CONTRACT_SURFACES = [
   'packages/redcube-runtime-protocol',
   'packages/redcube-domain-entry',
   'packages/redcube-governance',
-  'packages/redcube-reference-os',
   'packages/redcube-overlay-core',
   'packages/redcube-overlay-xiaohongshu',
   'packages/redcube-overlay-ppt',

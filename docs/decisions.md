@@ -96,9 +96,9 @@ RCA 当前 file authority、artifact index 和 Git source control 足以承载 c
 
 若未来启用 SQLite，也只能作为 OPL-owned State Index Kernel / SQLite sidecar index：可删除、可重建，只索引 locator、hash、manifest/receipt ref 与 provenance，不存 PNG/PPTX/PDF body，不成为 visual-domain truth、canonical artifact truth、review/export judgment、owner receipt body 或 visual memory body owner。
 
-### Developer checkout plugin manifest 只做 source locator
+### Codex plugin scaffold/source locator 归一到 plugin 目录
 
-RCA Developer Mode 可以把 Codex marketplace source 指向 `redcube-ai` developer checkout 根目录；根层 `.codex-plugin/plugin.json` 只作为 developer source locator。canonical Codex plugin scaffold 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`；根层 manifest 继续通过 `plugins/rca/` legacy alias path 指向同一套 scaffold。不得复制第二套 skill、icon 或 marketplace truth。
+RCA Developer Mode 的 canonical Codex plugin scaffold/source locator 统一在 `plugins/redcube-ai/` 下维护，plugin manifest name 与 skill frontmatter name 都使用 repo slug `redcube-ai`。根层 `.codex-plugin/plugin.json`、repo-local installer、`plugins/rca/` legacy alias path 和第二套 skill/icon/marketplace truth 均不得恢复。
 
 ## 历史压缩
 

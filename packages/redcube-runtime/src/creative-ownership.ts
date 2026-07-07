@@ -214,12 +214,10 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lifecycle_focus: ['regression', 'audit', 'reports'],
       write_scopes: [
         'tests/review-platform.test.ts',
-        'tests/reference-regression.test.ts',
         runtimeStateDisplayGlob('reports', 'redcube-runtime-program', '**'),
       ],
       verification_commands: [
         'node --test tests/review-platform.test.ts',
-        'node --test tests/reference-regression.test.ts',
         'npm test -- --test-reporter=dot',
       ],
     },

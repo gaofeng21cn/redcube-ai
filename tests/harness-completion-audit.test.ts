@@ -15,7 +15,7 @@ test('harness audit keeps runtime package-scoped through direct default registry
   const runtimePackageJson = readJson('packages/redcube-runtime/package.json');
 
   assert.equal(runtimePackageJson.dependencies['@redcube/governance'], '0.1.0');
-  assert.equal(runtimePackageJson.dependencies['@redcube/reference-os'], '0.1.0');
+  assert.equal(runtimePackageJson.dependencies['@redcube/reference-os'], undefined);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts')), true);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts')), true);
   assert.deepEqual(

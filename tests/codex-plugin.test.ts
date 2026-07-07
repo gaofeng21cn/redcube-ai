@@ -2,12 +2,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import os from 'node:os';
-import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 const repoRoot = path.resolve('.');
-const devSourceManifestPath = path.join(repoRoot, '.codex-plugin', 'plugin.json');
 const pluginRoot = path.join(repoRoot, 'plugins', 'redcube-ai');
 const pluginManifestPath = path.join(pluginRoot, '.codex-plugin', 'plugin.json');
 const pluginIconPath = path.join(pluginRoot, 'assets', 'icon.png');
@@ -54,63 +51,7 @@ test('codex plugin scaffold tracks repo metadata and skill layout', () => {
   assert.equal(existsSync(path.join(pluginRoot, 'skills', 'rca')), false);
 });
 
-test('codex plugin dev source manifest is available at repository root', () => {
-  const packageJson = readJson(path.join(repoRoot, 'package.json'));
-  const manifest = readJson(devSourceManifestPath);
-
-  assert.equal(manifest.name, 'rca');
-  assert.equal(manifest.version, packageJson.version);
-  assert.equal(manifest.skills, './plugins/redcube-ai/skills/');
-  assert.equal(manifest.interface.displayName, 'RedCube AI');
-  assert.equal(manifest.interface.category, 'Creative');
-  assert.equal(manifest.interface.composerIcon, './plugins/redcube-ai/assets/icon.png');
-  assert.equal(manifest.interface.logo, './plugins/redcube-ai/assets/icon.png');
-  assert.equal(existsSync(path.join(repoRoot, manifest.skills, 'redcube-ai', 'SKILL.md')), true);
-  assert.equal(existsSync(path.join(repoRoot, manifest.interface.logo)), true);
-});
-
-test('codex plugin repo-local installer validates tracked source without marketplace write', () => {
-  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-codex-plugin-installer-'));
-  const fixturePluginRoot = path.join(fixtureRoot, 'plugins', 'redcube-ai');
-  const fixtureHome = path.join(fixtureRoot, 'home');
-  const installerPath = path.join(repoRoot, 'scripts', 'install-codex-plugin.ts');
-
-  try {
-    cpSync(pluginRoot, fixturePluginRoot, { recursive: true });
-    cpSync(path.join(repoRoot, '.codex-plugin'), path.join(fixtureRoot, '.codex-plugin'), { recursive: true });
-    const result = spawnSync(
-      process.execPath,
-      [
-        '--experimental-strip-types',
-        installerPath,
-        '--repo-root',
-        fixtureRoot,
-        '--home',
-        fixtureHome,
-        '--skip-tools',
-      ],
-      {
-        cwd: repoRoot,
-        encoding: 'utf8',
-      },
-    );
-
-    assert.equal(result.status, 0, result.stderr);
-    const output = JSON.parse(result.stdout);
-    assert.equal(output.repo_root, fixtureRoot);
-    assert.equal(output.home, fixtureHome);
-    assert.equal(output.dev_source_root, fixtureRoot);
-    assert.equal(output.dev_source_manifest, path.join(fixtureRoot, '.codex-plugin', 'plugin.json'));
-    assert.equal(output.plugin_root, fixturePluginRoot);
-    assert.equal(output.skill_root, path.join(fixturePluginRoot, 'skills', 'redcube-ai'));
-    assert.equal(output.marketplace_path, path.join(fixtureRoot, '.agents', 'plugins', 'marketplace.json'));
-    assert.equal(output.repo_local_marketplace_written, 'false');
-    assert.equal(output.codex_marketplace_owner, 'opl_owned_wrapper');
-    assert.equal(existsSync(output.marketplace_path), false);
-    assert.equal(existsSync(path.join(fixtureRoot, 'plugins', 'rca')), false);
-    assert.equal(existsSync(path.join(fixturePluginRoot, 'skills', 'rca')), false);
-    assert.equal(existsSync(path.join(fixtureHome, '.codex', 'skills', 'rca', 'SKILL.md')), false);
-  } finally {
-    rmSync(fixtureRoot, { recursive: true, force: true });
-  }
+test('codex plugin has no duplicate repository-root manifest or repo-local installer', () => {
+  assert.equal(existsSync(path.join(repoRoot, '.codex-plugin', 'plugin.json')), false);
+  assert.equal(existsSync(path.join(repoRoot, 'scripts', 'install-codex-plugin.ts')), false);
 });

@@ -28,11 +28,6 @@ export {
   appendEvent,
   buildCreativeOwnershipResidueAudit,
   buildPerformanceReport,
-  buildReferenceQualityReport,
-  buildReferencePromotionReport,
-  buildReferenceReplacementReport,
-  listReferenceSamples,
-  loadReferenceSampleFixture,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
@@ -44,8 +39,6 @@ export {
   runCandidateRaceRoute,
   selectCandidateRaceWinner,
   startRun,
-  summarizeReferenceCoverage,
-  validateReferenceSampleMeta,
 } from '@redcube/runtime';
 export {
   createRunRecord,

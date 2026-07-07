@@ -12,18 +12,10 @@ export {
   watchRuntimeReviewLoop,
 } from '@redcube/governance';
 export {
-  buildReferencePromotionReport,
-  buildReferenceQualityReport,
-  buildReferenceReplacementReport,
   buildRelativeQualityRubric,
   compareFailuresAndDensity,
-  loadReferenceSampleFixture,
-  listPromotedReferences,
-  listReferenceSamples,
-  summarizeReferenceCoverage,
   summarizeRelativeQuality,
-  validateReferenceSampleMeta,
-} from '@redcube/reference-os';
+} from './relative-quality.js';
 export {
   appendRouteRunEvent as appendEvent,
   completeRouteRun as completeRun,

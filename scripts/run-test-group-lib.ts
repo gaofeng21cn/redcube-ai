@@ -45,8 +45,6 @@ const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
   'tests/product-entry-native-ppt-live-proof.test.ts',
   'tests/product-entry-route-integration.test.ts',
   'tests/publication-projection-delivery-contract.test.ts',
-  'tests/reference-quality-os-replacement.test.ts',
-  'tests/reference-regression.test.ts',
   'tests/review-platform.test.ts',
   'tests/runtime-deliverable-route-integration.test.ts',
   'tests/runtime-deliverable-route-recovery.test.ts',

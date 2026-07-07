@@ -20,7 +20,7 @@ import {
   buildHermesAgentLoopExecutionModel,
   failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
-import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
+import { compareFailuresAndDensity, summarizeRelativeQuality } from '../../../relative-quality.js';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
 
 import * as shared from './shared.js';

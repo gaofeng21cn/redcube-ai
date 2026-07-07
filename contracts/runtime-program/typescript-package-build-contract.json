@@ -112,16 +112,6 @@
       ]
     },
     {
-      "directory": "packages/redcube-reference-os",
-      "package_name": "@redcube/reference-os",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-runtime-protocol",
       "package_name": "@redcube/runtime-protocol",
       "exports": [

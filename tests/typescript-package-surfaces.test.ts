@@ -56,13 +56,6 @@ const PACKAGE_SURFACES = Object.freeze([
     typeMatches: [/interface ReviewStateResponse/, /interface PublicationProjectionResponse/, /interface RuntimeWatchResponse/, /interface GovernanceSurfaceContract/],
   },
   {
-    directory: 'packages/redcube-reference-os',
-    expectedTypesEntry: './dist/index.d.ts',
-    requiredFiles: ['src/index.ts', 'src/types.ts'],
-    missingFiles: ['src/index.js', 'src/reference-samples.js', 'src/relative-quality.js'],
-    entryMatches: [/buildReferenceQualityReport/, /buildReferencePromotionReport/, /buildReferenceReplacementReport/, /ReferenceQualityReport/],
-  },
-  {
     directory: 'packages/redcube-overlay-core',
     expectedTypesEntry: './dist/index.d.ts',
     packageTsconfigExtends: '../../tsconfig.package-build.json',

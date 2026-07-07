@@ -2,7 +2,7 @@
 import path from 'node:path';
 
 import { getDeliverablePaths } from '@redcube/runtime-protocol';
-import { compareFailuresAndDensity, summarizeRelativeQuality } from '@redcube/reference-os';
+import { compareFailuresAndDensity, summarizeRelativeQuality } from '../../../relative-quality.js';
 
 export function createPosterOnepagerScreenshotReviewParts(deps) {
   const {

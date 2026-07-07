@@ -137,7 +137,6 @@ test('workspace packages and apps participate in package-level tsconfig layering
     'apps/redcube-cli/tsconfig.json',
     'packages/redcube-domain-entry/tsconfig.json',
     'packages/redcube-governance/tsconfig.json',
-    'packages/redcube-reference-os/tsconfig.json',
     'packages/redcube-runtime-protocol/tsconfig.json',
     'packages/redcube-runtime/tsconfig.json',
   ];

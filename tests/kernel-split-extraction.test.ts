@@ -11,6 +11,6 @@ function readJson(file) {
 test('runtime consumes extracted governance and reference packages through manifest contracts', () => {
   const runtimePackageJson = readJson('packages/redcube-runtime/package.json');
 
-  assert.equal(runtimePackageJson.dependencies?.['@redcube/reference-os'], '0.1.0');
   assert.equal(runtimePackageJson.dependencies?.['@redcube/governance'], '0.1.0');
+  assert.equal(runtimePackageJson.dependencies?.['@redcube/reference-os'], undefined);
 });
