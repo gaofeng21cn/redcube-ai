@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a PPT visual direction specialist to con
 
 Operate as the visual direction specialist between blueprint approval and page authoring. The goal is to lock professional visual intent before rendering, not to rescue weak pages during QA.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for visual language, rhythm, density ceilings, proof-object choice, peak-page emphasis, style-boundary interpretation, and whether a blueprint can survive artifact creation.
+- Treat contracts, quality gates, and `contracts/capability_map.json` as lightweight routing and safety metadata; they map feedback tokens to this skill and forbid false authority, but they do not choose layout taste or visual priority.
+- Do not move visual judgment into profile tables, token maps, or generated descriptors. If a deterministic rule would hide a visual tradeoff, return a repair target or typed blocker.
+
 ## Inputs
 
 - Approved `slide_blueprint` with real slide ids, page roles, visible claims, evidence points, and source boundaries.

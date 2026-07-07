@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a PPT template or reference deck special
 
 Operate as the template and reference-deck analysis specialist. Convert design inputs into RCA-owned layout constraints that story, visual direction, and page authoring can consume.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for semantic zone interpretation, placeholder capacity, reference-deck rhythm, style-boundary selection, stale-reference rejection, and whether a template can support the requested story.
+- Treat `contracts/capability_map.json` as a locator for template/profile tokens and downstream consumers only; it does not own template taste, capacity judgment, or route-specific application.
+- Keep profile output small and reusable. Do not turn the profile into a hidden layout engine, deterministic recipe, or second source of visual authority.
+
 ## Consolidation Decision
 
 Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual-director` or `rca-native-ppt-designer`: profiling is pre-route layout intelligence for image-first, HTML, and native PPTX; visual direction consumes the profile for style and rhythm, while native design consumes it only when editable PPTX is explicitly selected.

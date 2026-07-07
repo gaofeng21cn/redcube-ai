@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a PPT page authoring specialist to creat
 
 Operate as the page-level author inside RCA artifact creation. Produce page plans or artifacts only from approved upstream contracts, one page at a time, with enough detail for later screenshot and export QA.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for page composition, text-budget cuts, structural visual selection, route-specific payload quality, and blocked-page repair scope.
+- Treat helpers, manifests, route policy, and `contracts/capability_map.json` as materialization and locator support only; they do not author the page, rebalance layout, or declare visual readiness.
+- Keep contracts light by returning explicit page payloads, repair targets, or typed blockers instead of adding hidden fallback rules or post-processing heuristics to make weak pages pass.
+
 ## Inputs
 
 - Approved source truth, storyline, detailed outline, slide blueprint, and visual direction.

@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a PPT review specialist to inspect rende
 
 Operate as the RCA visual review specialist. Judge rendered pages and screenshots directly, then return pass/block verdict refs, weak pages, repair targets, or typed blockers. File presence and mechanical metrics are supporting evidence only.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for visual verdicts, source-fidelity review, story-arc-in-pixels assessment, weak-vs-blocking classification, and repair target selection.
+- Treat contracts, screenshot gates, artifact inventories, and `contracts/capability_map.json` as evidence routing and false-authority guards; they can prove what was reviewed, not whether the deck is visually good.
+- Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return a typed blocker.
+
 ## Inputs
 
 - Final rendered page screenshots, contact sheet, source HTML or native shape manifest when available, and artifact inventory refs.

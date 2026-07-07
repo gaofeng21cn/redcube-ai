@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a PPT story specialist to turn frozen so
 
 Operate as the PPT narrative specialist inside the RCA stage chain. Keep the stage prompt as the canonical schema owner; use this skill to make the story work professional, source-faithful, page-by-page, and ready for visual direction.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for claim hierarchy, narrative pressure, slide sequencing, evidence placement, first-use naming, and whether a weak outline needs merge, split, demotion, or route-back.
+- Treat contracts, stage prompts, and `contracts/capability_map.json` as locators and guardrails only: they name refs, required fields, tokens, forbidden surfaces, and verification paths; they do not decide the story.
+- When a contract and the story conflict, keep the contract as the boundary and return a typed blocker or repair target instead of encoding narrative rules into a second machine checklist.
+
 ## Inputs
 
 - Frozen source truth, source package refs, `source_materials_full_text`, and explicit user constraints.

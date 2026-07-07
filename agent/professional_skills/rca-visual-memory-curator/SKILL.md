@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a visual memory curator to review propos
 
 Operate as the RCA visual memory curator. Turn review/export evidence into small visual-pattern memory proposals, judge whether each proposal should be accepted or rejected, and return receipt refs for the RCA owner surface. Memory helps future authoring and review attention; it never becomes route truth, hidden layout code, an export gate, or visual authority.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, or an authority bypass.
+- Treat memory descriptors, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
+- Keep memory proposals prose-first and small. Reject attempts to encode visual taste, route scoring, review verdicts, or artifact state as contract data.
+
 ## Inputs
 
 - Rendered artifact evidence refs, contact sheets, screenshot review refs, export closeout refs, or owner receipt refs.

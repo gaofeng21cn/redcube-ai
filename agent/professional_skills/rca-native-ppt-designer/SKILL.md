@@ -7,6 +7,12 @@ description: "Use when RedCube AI needs a native editable PowerPoint specialist 
 
 Operate as the native editable PPTX design specialist. The AI-authored `editable_shape_plan` is the design authority; Office/Python helpers only materialize, validate, render, export refs, or fail closed.
 
+## AI-First / Contract-Light Boundary
+
+- Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.
+- Treat validators, helper manifests, and `contracts/capability_map.json` as bounds, refs, and failure-token metadata; they do not invent native design, choose which pages need editability, or convert image-first success into native authority.
+- Keep contracts light by making the `editable_shape_plan` explicit. Do not add helper defaults, inference fallbacks, or compatibility rules that hide missing native design decisions.
+
 ## Inputs
 
 - Approved source truth, slide blueprint, visual direction, route policy, and native PPTX selection.
