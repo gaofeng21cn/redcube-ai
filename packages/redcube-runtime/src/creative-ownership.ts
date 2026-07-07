@@ -335,8 +335,8 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     protected_surface: 'page_core_content',
     file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
     evidence_patterns: [
-      'buildXhsPlanSlides',
-      'buildXhsVisualDirection',
+      'function buildXhsPlanSlides(',
+      'function buildXhsVisualDirection(',
     ],
     why_blocked: 'single_note_plan / visual_direction 仍由 pack shell 暴露 creative builder。',
   },
@@ -346,7 +346,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     protected_surface: 'final_html_markup',
     file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
     evidence_patterns: [
-      'compileXhsRenderSlides',
+      'function compileXhsRenderSlides(',
     ],
     why_blocked: 'render_html 仍由 pack shell 暴露 compiler 出口。',
   },
@@ -381,9 +381,9 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     protected_surface: 'blueprint_major_text',
     file: 'packages/redcube-runtime/src/families/ppt/ppt-structured-artifact-builders.ts',
     evidence_patterns: [
-      'buildPptDetailedOutline',
-      'buildPptSlideBlueprint',
-      'buildPptVisualDirection',
+      'function buildPptDetailedOutline(',
+      'function buildPptSlideBlueprint(',
+      'function buildPptVisualDirection(',
     ],
     why_blocked: 'detailed_outline / slide_blueprint / visual_direction 仍由 pack shell 暴露 creative builder。',
   },
@@ -393,7 +393,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     protected_surface: 'final_html_markup',
     file: 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/render.ts',
     evidence_patterns: [
-      'compilePptRenderSlides',
+      'function compilePptRenderSlides(',
     ],
     why_blocked: 'render_html 仍由 pack shell 暴露 compiler 出口。',
   },
