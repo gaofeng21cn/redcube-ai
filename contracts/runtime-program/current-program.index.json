@@ -185,7 +185,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/foundation_milestones.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 100,
-      "sha256": "7047953956be9347e83d5be66266e6ec562d79b2dbc86f99dd86072378c8836e"
+      "sha256": "c7bfa67f8b69baa4d3cd377530c4b0e48628ef235d690becc2d30d9038355e09"
     },
     {
       "json_pointer": "/current_state/green_baseline",
@@ -199,7 +199,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/next_activation_package.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 8,
-      "sha256": "c2907786fa031548024207030c9e356f5475c3eb2be6df3482f655e32b20c9a8"
+      "sha256": "53a044e03c50e619fce2b79e5919e58eb59cb50ad18eb8baa1823867ed07f076"
     },
     {
       "json_pointer": "/current_state/opl_family_scheduler_replacement",
@@ -425,7 +425,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/foundation_milestones.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 100,
-      "sha256": "7047953956be9347e83d5be66266e6ec562d79b2dbc86f99dd86072378c8836e"
+      "sha256": "c7bfa67f8b69baa4d3cd377530c4b0e48628ef235d690becc2d30d9038355e09"
     },
     {
       "json_pointer": "/current_state/green_baseline",
@@ -439,7 +439,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/next_activation_package.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 8,
-      "sha256": "c2907786fa031548024207030c9e356f5475c3eb2be6df3482f655e32b20c9a8"
+      "sha256": "53a044e03c50e619fce2b79e5919e58eb59cb50ad18eb8baa1823867ed07f076"
     },
     {
       "json_pointer": "/current_state/opl_family_scheduler_replacement",

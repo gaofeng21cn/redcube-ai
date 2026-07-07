@@ -13,8 +13,6 @@ import { loadRuntimeFamilyRunner } from '../default-registries.js';
 import type { RuntimeFamilyContract } from '../default-registries.js';
 
 export {
-  OPL_CODEX_EXECUTOR_SURFACE,
-  REDCUBE_CODEX_RUNTIME_OWNER,
   REDCUBE_CREATIVE_GENERATION_META_BEGIN,
   REDCUBE_CREATIVE_GENERATION_META_END,
   REDCUBE_STAGE_JSON_BEGIN,

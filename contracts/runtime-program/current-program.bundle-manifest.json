@@ -10,7 +10,7 @@
   "index_ref": "contracts/runtime-program/current-program.index.json",
   "source_root_ref": "contracts/runtime-program/current-program-parts",
   "source_ref_count": 34,
-  "source_digest": "ffa5b68da93f9cf7ca87641f172871785ab582ee7f45f24491b0b256a14a3854",
+  "source_digest": "1edb75a2e56f3430b07e271ac24d79dd0bba7b48ae64c3655254533d87db9146",
   "aggregate": {
     "ref": "contracts/runtime-program/current-program.json",
     "role": "generated_read_through_snapshot_for_existing_consumers",

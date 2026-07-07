@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { buildCommandHelp, buildHelp, executeCli, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
+import { buildCommandHelp, buildHelp, executeCli, getCliDomainActions } from '../apps/redcube-cli/dist/index.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-domain-entry/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 

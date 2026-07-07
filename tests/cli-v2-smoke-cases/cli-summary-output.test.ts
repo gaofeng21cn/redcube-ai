@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { runCli } from '../../apps/redcube-cli/dist/cli.js';
+import { runCli } from '../../apps/redcube-cli/dist/index.js';
 
 function minimalLongSurface(kind, extra = {}) {
   return {
