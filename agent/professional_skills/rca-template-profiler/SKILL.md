@@ -10,6 +10,7 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for semantic zone interpretation, placeholder capacity, reference-deck rhythm, style-boundary selection, stale-reference rejection, and whether a template can support the requested story or must route back before authoring.
+- Use AI judgment here for route-agnostic visual proof requirements: contact-sheet rhythm, title-safe-zone screenshots, density evidence, native shape-manifest needs, and when template capacity forces image-first, HTML, native PPTX, or route-back.
 - Treat `contracts/capability_map.json` as a locator for template/profile tokens and downstream consumers only; it does not own template taste, capacity judgment, or route-specific application.
 - Treat `visual_pack_compiler_handoff`, `contracts/pack_compiler_input.json`, and stage-control profile refs as handoff surfaces. They may point to profile rows, template refs, route policy, receipt refs, and forbidden-authority flags; they must not embed capacity judgment, template taste, stale-reference decisions, or layout recipes as contract truth.
 - Keep profile output small and reusable. Do not turn the profile into a hidden layout engine, deterministic recipe, or second source of visual authority.
@@ -39,6 +40,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - `reference_deck_analysis`: page rhythm, composition signatures, recurring hierarchy, proof objects, and reusable patterns.
 - `template_layout_grammar` recommendations for native PPTX or template-aware rendering.
 - `visual_proof_requirements`: screenshot/contact-sheet/shape-manifest evidence the downstream reviewer must see to prove the profile was followed.
+- `template_route_caveats`: where the profile supports image-first, HTML, native PPTX, or no safe route without story/direction repair.
 - Typed blockers or repair targets when the template cannot safely support the requested content.
 
 ## Execution Rules
@@ -55,6 +57,8 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 10. Name route-back owner hints when capacity, stale-reference, or semantic-zone risks should return to story, visual direction, page authoring, or native design before artifact creation.
 11. Stop at profile output. Downstream visual direction, page authoring, or native PPT design must own route-specific application and repair.
 12. Keep stage-control light. If stage-control needs template/profile judgment, return profile refs, capacity blockers, route caveats, visual proof requirements, and downstream owner hints; do not move profiling heuristics, layout scoring, or deterministic placement recipes into stage-control contracts.
+13. Preserve the skill split. This skill profiles layout intelligence and capacity; it does not become visual director, native designer, page author, screenshot reviewer, or memory curator.
+14. For repeated visual failures, decide only whether template capacity or stale reference selection is implicated, then route the repair to visual direction, page authoring, native design, or story as appropriate.
 
 ## Contract Foldback Map
 
@@ -79,6 +83,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
 - `current_style_ref_pack`: current source deck/version, representative page refs, allowed reuse, stale refs to reject, and prompt-facing density limits.
 - `visual_proof_requirements`: required evidence refs for profile compliance, such as contact-sheet rhythm, title-safe-zone screenshots, native shape manifest refs, and blocked-zone repair targets.
+- `template_route_caveats`: route, supported layout families, unsupported content types, required evidence, repeated-failure risk, and downstream owner.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

@@ -10,6 +10,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for page composition, text-budget cuts, structural visual selection, route-specific payload quality, and blocked-page repair scope.
+- Use AI judgment here to decide whether repeated visual failure is repairable inside the page payload or must route back to story, visual direction, template profiling, native design, or route selection.
 - Treat helpers, manifests, route policy, and `contracts/capability_map.json` as materialization and locator support only; they do not author the page, rebalance layout, or declare visual readiness.
 - Keep contracts light by returning explicit page payloads, repair targets, or typed blockers instead of adding hidden fallback rules or post-processing heuristics to make weak pages pass.
 
@@ -34,7 +35,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - Page-by-page artifact authoring instructions, route-specific page payloads, or blocked-slide repair plans.
 - For native PPTX: editable shape plan fragments with explicit roles, bounds, typography, fills/lines, zone binding, and manifest-friendly ids.
 - For image-first/HTML: page content and render intent that keeps visible text audience-facing and QA-readable.
-- `page_visual_proof_packet`: rendered-page evidence refs expected for review, route source refs, contact-sheet membership, shape-manifest refs when native, and known QA risks.
+- `page_visual_proof_packet`: rendered-page pixel refs expected for review, route source refs, contact-sheet membership, shape-manifest refs when native, blocked-slide scope, preserved-page hashes when repairing, and known QA risks.
 - Typed blockers or repair targets for missing upstream contracts, capacity failure, route mismatch, or unsafe visible content.
 
 ## Execution Rules
@@ -50,6 +51,8 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 9. Treat helpers as materializers. Python, Office, screenshot, and export helpers execute the RCA plan and return evidence; they do not choose design or declare visual readiness.
 10. Emit the proof packet with the page payload. A page is not reviewable unless the expected screenshot, contact-sheet, route-source, and native-shape evidence can be produced.
 11. Route back when the page failure belongs to story, visual direction, template capacity, or route selection; do not hide it with helper defaults, smaller text, or post-processing.
+12. When the same slide fails after a targeted repair, classify the repeated failure before another redraw: payload text budget, visual direction, story/claim overload, template capacity, native shape plan, helper output, or route mismatch.
+13. Keep route claims honest. Image-first pages need 16:9 image/page refs and contact-sheet membership; native pages need editable shape evidence and render proof; do not mix those evidence types to upgrade the route.
 
 ## Workbench Lessons To Preserve
 
@@ -68,8 +71,9 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
 - `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
 - `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
-- `page_visual_proof_packet`: generated/rendered page ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, and unresolved QA risks.
+- `page_visual_proof_packet`: generated/rendered page ref, pixel screenshot ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, preserved-page hashes for blocked-slide repairs, and unresolved QA risks.
 - `draft_to_review_gate`: generated/rendered page exists, 16:9 normalized page exists, contact sheet reviewed, and blocked pages have named repair targets before package/export stages consume it.
+- `repeated_failure_triage`: slide id, previous repair evidence, current pixel/contact-sheet finding, owner stage, preserve/redraw decision, and whether route arbitration is required.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

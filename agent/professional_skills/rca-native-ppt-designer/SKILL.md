@@ -10,6 +10,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for editable design spec locks, shape grammar, zone binding, coordinate tradeoffs, native repair strategy, and when native editability is genuinely worth the route cost.
+- Use AI judgment here for native-vs-image-first arbitration: native route is justified by editable text/links/charts/shape control, not by a desire to relabel full-page image output.
+- Use AI judgment here when repeated native failures show a design-plan problem rather than a helper problem: zone grammar, coordinates, shape roles, typography, template capacity, or selected slide scope.
 - Treat validators, helper manifests, and `contracts/capability_map.json` as bounds, refs, and failure-token metadata; they do not invent native design, choose which pages need editability, or convert image-first success into native authority.
 - Keep contracts light by making the `editable_shape_plan` explicit. Do not add helper defaults, inference fallbacks, or compatibility rules that hide missing native design decisions.
 
@@ -52,6 +54,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 11. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
 12. Make native QA explicit before materialization: shape manifest, rendered screenshots, editable text/hyperlink checks, and screenshot-review repair targets must be expected outputs.
 13. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
+14. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
+15. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
 
 ## Workbench Lessons To Preserve
 
@@ -69,6 +73,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs or typed blocker.
 - `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
 - `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
+- `native_vs_image_first_arbitration`: editability reason, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner.
+- `repeated_native_failure_triage`: prior render refs, current screenshot/shape-manifest mismatch, owner boundary, preserved slides, and next repair route.
 - `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 

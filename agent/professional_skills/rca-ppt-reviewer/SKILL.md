@@ -10,6 +10,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for visual verdicts, source-fidelity review, story-arc-in-pixels assessment, weak-vs-blocking classification, and repair target selection.
+- Use AI judgment here for repeated visual failure diagnosis and route arbitration: decide whether persistent defects belong to story, direction, page payload, native shape plan, template capacity, helper materialization, or the selected image-first / native route.
 - Treat contracts, screenshot gates, artifact inventories, and `contracts/capability_map.json` as evidence routing and false-authority guards; they can prove what was reviewed, not whether the deck is visually good.
 - Treat `visual_pack_compiler_handoff` and stage-control route decisions as refs-only handoff inputs. They may name route policy, stage ids, screenshot refs, review refs, receipt refs, and forbidden-authority flags; they must not encode the visual pass/block decision, repair route selection, or export/handoff judgment.
 - Do not let provider completion, schema completeness, token routing, or file existence substitute for pixel review. If evidence is insufficient, return a typed blocker.
@@ -35,6 +36,7 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `visual_director_review` or `screenshot_review` style verdict refs with `pass` or `block`.
 - `weak_pages`, `slide_reviews`, visual findings, source-fidelity findings, and concrete repair targets.
 - Blocked-page-only repair scope when applicable.
+- `repeated_visual_failure_diagnosis`: prior repair refs, current pixel/contact-sheet evidence, owner stage, blocked slide ids, and whether route arbitration is required.
 - Route-back decisions for story, visual direction, page authoring, native PPT design, or memory curation when the visible defect belongs outside reviewer repair.
 - Memory proposal candidates for `rca-visual-memory-curator`; reviewer findings are not accepted memory by themselves.
 - Typed blockers when review evidence is missing or invalid.
@@ -52,6 +54,8 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
 10. Route back to the real owner. Story defects go to story architecture, density/style defects to visual direction, page construction defects to page authoring, editable-object defects to native PPT design, and reusable lessons to memory curation.
 11. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
+12. For repeated visual failure, compare the current screenshots/contact sheet with prior repair refs before choosing a rerun. Preserve passed pages, avoid full-deck redraw by default, and escalate only when the selected route or upstream plan is the blocker.
+13. Native-vs-image-first is an evidence question, not a preference toggle: image-first needs strong pixel/contact-sheet proof; native needs editable-object, shape-manifest, render, hyperlink/text-edit evidence. Missing route proof blocks the route claim.
 
 ## Contract Foldback Map
 
@@ -78,6 +82,8 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `draft_label_check`: declare `draft`, `reviewed_draft`, or `handoff_candidate` based on screenshot review and unresolved weak/blocking pages; this is not a production-readiness claim.
 - `route_back_decision`: owner stage, blocked slide ids, evidence refs, required repair, and preserve-or-redraw scope.
 - `memory_proposal_gate`: only propose reusable visual lessons; route every accept/reject decision to `rca-visual-memory-curator`.
+- `repeated_visual_failure_diagnosis`: prior attempt refs, current pixel evidence, unchanged/changed defect, likely owner, route arbitration need, and smallest rerun scope.
+- `route_arbitration_review`: route used, route claimed, required proof evidence, route mismatch if any, and repair owner for image-first, HTML, or native PPTX.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

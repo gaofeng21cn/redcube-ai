@@ -10,6 +10,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, a duplicate, a live defect that should route back, or an authority bypass.
+- Use AI judgment here to accept or reject repeated visual failure lessons only after rendered pixel/contact-sheet evidence and RCA review refs prove the lesson is reusable rather than an unresolved defect.
 - Treat memory descriptors, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
 - Treat `visual_pack_compiler_handoff` as a carrier for memory proposal refs and accept/reject receipt refs only. It may route memory evidence to this skill, but it must not carry reusable lesson text as authority or decide accept/reject through contract fields.
 - Keep memory proposals prose-first and small. Reject attempts to encode visual taste, route scoring, review verdicts, or artifact state as contract data.
@@ -42,7 +43,9 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 5. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL may only transport locator, proposal, receipt, and projection refs.
 6. A missing or stale memory ref is usually non-blocking. It is blocking only when someone tries to use memory as review/export/handoff/production authority or to bypass artifact authority.
 7. Route back unresolved defects instead of storing them. If a proposal says a specific page still needs repair, return the owner stage and evidence refs rather than accepting it as memory.
-8. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
+8. For repeated visual failures, accept only the reusable pattern after the blocked slides have a clear review/repair outcome. Otherwise return `route_back` to story, visual direction, page authoring, native PPT design, template profiling, or reviewer.
+9. Reject route arbitration as memory unless it is a reusable route caveat backed by evidence. Do not store route scores, layout controllers, accepted review verdicts, or hidden template recipes.
+10. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
 
 ## Contract Foldback Map
 
@@ -58,6 +61,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 - `writeback_lifecycle`: propose -> RCA accept/reject -> receipt ref -> OPL locator/projection transport -> stage-scoped retrieval.
 - `reject_reason`: artifact_body, verdict_body, route_logic, hidden_template, stale_evidence, global_rulebook, unsupported_provenance, or authority_bypass.
 - `memory_ai_judgment`: accept, reject, duplicate, stale, route_back, or typed_blocker with evidence refs and owner stage.
+- `repeated_visual_failure_memory_gate`: evidence refs, repair outcome, reusable lesson, unresolved defect check, accept/reject receipt ref, and route-back owner.
 - `route_back_target`: unresolved story, visual direction, page authoring, native PPT, or review defect that must be repaired outside memory.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
@@ -77,3 +81,4 @@ Return `typed_blocker` when:
 - OPL, Agent Lab, product shell, generated wrapper, or external eval output attempts to accept/reject visual memory or write memory body.
 - Memory is being used as a visual route scorer, layout controller, review-pass gate, export gate, artifact-ready signal, or production readiness signal.
 - A proposal tries to store an unresolved visual defect as reusable memory instead of routing it back to the owner stage.
+- Repeated visual failure evidence lacks the final review/repair outcome needed to separate durable lesson from live defect.

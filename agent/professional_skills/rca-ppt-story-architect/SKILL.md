@@ -10,6 +10,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for claim hierarchy, narrative pressure, slide sequencing, evidence placement, first-use naming, layout/story risk, and whether a weak outline needs merge, split, demotion, or route-back.
+- Use AI judgment here when repeated visual failures point back to story: separate true rendering/layout defects from overloaded claims, weak audience motivation, broken sequence, missing first-use naming, or page-budget pressure.
 - Treat contracts, stage prompts, and `contracts/capability_map.json` as locators and guardrails only: they name refs, required fields, tokens, forbidden surfaces, and verification paths; they do not decide the story.
 - When a contract and the story conflict, keep the contract as the boundary and return a typed blocker or repair target instead of encoding narrative rules into a second machine checklist.
 
@@ -32,6 +33,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - A detailed outline that preserves approved source truth and page budget.
 - A slide blueprint with one page goal, one action title, core claim, evidence points, public sources, speaker notes, and transition sentence per slide.
 - `story_risk_map`: pages likely to fail visual proof because the claim, evidence, page role, or transition is overloaded.
+- `repeated_visual_failure_story_triage`: whether repeated pixel/contact-sheet failures should repair source/story, visual direction, page authoring, native design, or route policy.
 - Route-back targets when an apparent visual defect is really a source, story, sequence, or page-budget problem.
 - Typed blockers or repair targets when the source or upstream plan cannot support a professional deck.
 
@@ -47,7 +49,8 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 8. Plan for show-don't-tell. Prefer concrete proof objects, comparisons, timelines, system maps, metrics, and decisions over generic summary bullets.
 9. Plan visual proof intent. Each slide should name what a screenshot reviewer can verify in pixels: proof object, visible claim, evidence source, and transition role.
 10. Route back instead of decorating. If a future layout or review failure is caused by unsupported story logic, return the owner stage and required story repair.
-11. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
+11. For repeated visual failure, check story causes before asking for another redraw: unsupported claim, too many proof objects, unclear necessity/feasibility/landing path, stale first-use naming, or impossible page budget.
+12. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
 
 ## Workbench Lessons To Preserve
 
@@ -65,6 +68,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - `first_use_contract`: full visible name, accepted abbreviation, public link/source ref when allowed, and the slide where abbreviation becomes safe.
 - `necessity_feasibility_landing_check`: the outline names the audience problem, why existing tools fail, what proof makes the proposed route feasible, and what adoption path is credible.
 - `visual_proof_intent`: per slide visible proof object, screenshot-checkable claim, source-fidelity risk, and route-back owner if proof would fail.
+- `repeated_visual_failure_story_triage`: contact-sheet or screenshot evidence, affected slide ids, likely story defect, required blueprint repair, and downstream owner to retry after story repair.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

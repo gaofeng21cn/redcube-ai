@@ -10,6 +10,8 @@ Operate as the visual direction specialist between blueprint approval and page a
 ## AI-First / Contract-Light Boundary
 
 - Use AI judgment here for visual language, rhythm, density ceilings, proof-object choice, peak-page emphasis, style-boundary interpretation, and whether a blueprint can survive artifact creation.
+- Use AI judgment here for route arbitration: keep image-first when fast full-page visual quality is the right route, route to native PPTX only when editability/link/text requirements justify it, and route back when neither route can satisfy the current blueprint.
+- Use AI judgment here when repeated visual failures show a direction problem: contact-sheet sameness, overloaded density, weak peak pages, stale style refs, or a route choice that fights the content.
 - Treat contracts, quality gates, and `contracts/capability_map.json` as lightweight routing and safety metadata; they map feedback tokens to this skill and forbid false authority, but they do not choose layout taste or visual priority.
 - Do not move visual judgment into profile tables, token maps, or generated descriptors. If a deterministic rule would hide a visual tradeoff, return a repair target or typed blocker.
 
@@ -32,6 +34,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `peak_pages`, layout family ceilings, visual density rules, typography plan, spacing rules, and forbidden regressions.
 - Template/profile guidance: layout archetypes, semantic zones, placeholder capacity, and reference-deck discipline when native PPTX or template-aware authoring is selected.
 - `visual_proof_plan`: per-slide screenshot/contact-sheet checks, source-fidelity risks, density proof, and native QA evidence expected from downstream routes.
+- `visual_route_arbitration`: image-first, HTML, or native PPTX recommendation with evidence, route risks, required proof packet, and route-back owner.
 - Typed blockers or repair targets for blueprint, density, template, or visual-risk problems.
 
 ## Execution Rules
@@ -48,6 +51,8 @@ Operate as the visual direction specialist between blueprint approval and page a
 10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
 11. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
 12. For native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
+13. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
+14. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
 
 ## Workbench Lessons To Preserve
 
@@ -68,6 +73,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `style_ref_lock`: approved reference deck/version, representative slide refs, allowed borrowings, forbidden stale refs, and owner approval state.
 - `route_back_decision`: owner stage, reason, evidence ref, affected slide ids, and whether to repair story, template profile, route policy, page payload, or native shape plan.
 - `visual_proof_plan`: required contact-sheet rhythm check, per-slide screenshot target, native QA refs when applicable, and proof that visible claims remain source-faithful.
+- `visual_route_arbitration`: selected route, rejected routes, editability need, pixel/contact-sheet evidence required, native QA required, and owner route-back if evidence is missing.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
