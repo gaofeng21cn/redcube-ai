@@ -78,13 +78,13 @@ export function assertManifestActionAndStageControlPlane({
   assert.equal(manifest.family_action_catalog_parity.surface_kind, 'family_action_catalog_parity');
   assert.equal(manifest.family_action_catalog_parity.status, 'aligned');
   assert.deepEqual(manifest.family_action_catalog_parity.issues, []);
-  assert.equal(manifest.family_stage_control_plane.surface_kind, 'rca_stage_control_refs');
-  assert.equal(manifest.family_stage_control_plane.version, 'rca-stage-control-refs.v1');
+  assert.equal(manifest.family_stage_control_plane.surface_kind, 'family_stage_control_plane');
+  assert.equal(manifest.family_stage_control_plane.version, 'family-stage-control-plane.v1');
   assert.equal(manifest.family_stage_control_plane.plane_id, 'redcube_ai_stage_control_plane');
   assert.equal(manifest.family_stage_control_plane.target_domain_id, 'redcube_ai');
   assert.equal(manifest.family_stage_control_plane.projection_mode, 'rca_refs_only_opl_generated_stage_control');
   assert.equal(manifest.family_stage_control_plane.generated_stage_control_owner, 'one-person-lab');
-  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_role, 'generated_or_hosted_stage_control_owner');
+  assert.equal(manifest.family_stage_control_plane.authority_boundary.opl_role, 'projection_consumer_only');
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_visual_truth, true);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_review_publication_projection, true);
   assert.equal(manifest.family_stage_control_plane.authority_boundary.rca_owns_artifact_authority, true);
@@ -122,6 +122,8 @@ export function assertManifestActionAndStageControlPlane({
     assert.equal(stage.prompt_ref.startsWith('agent/prompts/'), true);
     assert.equal(typeof stage.goal, 'string');
     assert.equal(stage.goal.length > 20, true);
+    assert.equal(stage.stage_kind, 'domain_specific');
+    assert.equal(stage.owner, 'redcube_ai');
     assert.equal(Array.isArray(stage.skill_refs), true);
     assert.equal(Array.isArray(stage.quality_gate_refs), true);
     assert.deepEqual(stage.missing_action_refs, []);

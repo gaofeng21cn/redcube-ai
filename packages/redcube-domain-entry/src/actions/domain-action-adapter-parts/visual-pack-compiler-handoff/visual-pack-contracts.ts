@@ -135,7 +135,7 @@ export const RCA_PACKAGE_DISTRIBUTION_GATE = Object.freeze({
   external_runtime_authority_allowed: false,
 });
 
-const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
+export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'prompt_refs',
   'skill_refs',
   'tool_refs',
@@ -148,7 +148,7 @@ const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'handoff_policy',
 ]);
 
-const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
+export const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
   ref: 'agent/tools/domain_affordances.md',
   ref_kind: 'repo_path',
   role: 'domain_tool_affordance_catalog',

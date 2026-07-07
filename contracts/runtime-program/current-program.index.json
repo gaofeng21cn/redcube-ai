@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "0723bb9bd4cb822df38ff3d67fa7f6ab122f6392b7a7537d826e4c74b7dc4f8f",
+  "source_digest": "85757bd21ecbac380ba1c36c48f89f5b60b007d8a8663c93d66a9c00aa93b4da",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -100,7 +100,7 @@
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata.json",
       "role": "current_program_leaf_source",
       "line_count": 375,
-      "sha256": "bb7cf13454bc90350ca2f2bf846fd1d529184ab4e8e90fc77d754590eabcf42d"
+      "sha256": "20b6fd75ad0f7790ddfdd30d4dac2cbb20a70fbf4e4359eacdeec67660b26454"
     },
     {
       "json_pointer": "/longrun_goal",
@@ -135,7 +135,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "2011b366157fdd2390f3707934e9ad12b39748e773ed34b352b882b292e746be"
+      "sha256": "bc013d9035df44fe7a1653a1d277ef251d83994bd159ec81ed16b09cd45a275b"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -303,7 +303,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 28,
-      "sha256": "715acc0f69c0943ab43eec6b5fe710d4568ad6d0028ff41f3747683691b2f80c"
+      "sha256": "694772adc4968ec6670254cc3bab94780d56d408cfa70e5c65b695d935e5362d"
     },
     {
       "json_pointer": "/current_state/workstream",
@@ -340,7 +340,7 @@
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata.json",
       "role": "current_program_leaf_source",
       "line_count": 375,
-      "sha256": "bb7cf13454bc90350ca2f2bf846fd1d529184ab4e8e90fc77d754590eabcf42d"
+      "sha256": "20b6fd75ad0f7790ddfdd30d4dac2cbb20a70fbf4e4359eacdeec67660b26454"
     },
     {
       "json_pointer": "/longrun_goal",
@@ -375,7 +375,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 898,
-      "sha256": "2011b366157fdd2390f3707934e9ad12b39748e773ed34b352b882b292e746be"
+      "sha256": "bc013d9035df44fe7a1653a1d277ef251d83994bd159ec81ed16b09cd45a275b"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -543,7 +543,7 @@
       "ref": "contracts/runtime-program/current-program-parts/current_state/visual_pack_compiler_handoff.json",
       "role": "active_current_truth_leaf_source",
       "line_count": 28,
-      "sha256": "715acc0f69c0943ab43eec6b5fe710d4568ad6d0028ff41f3747683691b2f80c"
+      "sha256": "694772adc4968ec6670254cc3bab94780d56d408cfa70e5c65b695d935e5362d"
     },
     {
       "json_pointer": "/current_state/workstream",

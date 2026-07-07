@@ -12,8 +12,6 @@ import {
   partitionTestFilesForExecution,
   selectGroupFiles,
   resolveRedCubePythonCommand,
-  ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES,
-  SERIALIZED_ROUTE_HEAVY_TEST_FILES,
   SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.ts';
 import {
@@ -41,12 +39,18 @@ test('run-test-group keeps local codex preflight on integration/e2e/full groups'
 });
 
 test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
-  assert.deepEqual(
-    [...ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES].sort(),
-    ['e2e', 'fast', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining', 'smoke'],
-  );
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
   assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('smoke'), false);
+  assert.deepEqual(
+    partitionTestFilesForExecution({
+      groupName: 'fast',
+      files: ['tests/runtime-deliverable-route.test.ts', 'tests/source-intake.test.ts'],
+    }),
+    {
+      parallel_files: ['tests/source-intake.test.ts'],
+      serialized_files: ['tests/runtime-deliverable-route.test.ts'],
+    },
+  );
 });
 
 test('run-test-group only adds file-level serialization to explicit route-heavy file processes', () => {
@@ -329,7 +333,11 @@ test('deliverable review loop integration stays on the mock Codex runtime instea
 });
 
 test('serialized route-heavy verification files stay on the mock Codex runtime instead of the live CLI', () => {
-  for (const file of [...SERIALIZED_ROUTE_HEAVY_TEST_FILES].sort()) {
+  const serializedFiles = partitionTestFilesForExecution({
+    groupName: 'smoke',
+    files: GROUPS.smoke.files,
+  }).serialized_files;
+  for (const file of serializedFiles.sort()) {
     const content = readSerializedTestFileWithImportedCases(file);
     const helperAwareContent = readTestFileWithStaticRelativeImports(file);
     assert.match(`${content}\n${helperAwareContent}`, /withMockCodexRuntime(?:State)?|REDCUBE_CODEX_COMMAND/);

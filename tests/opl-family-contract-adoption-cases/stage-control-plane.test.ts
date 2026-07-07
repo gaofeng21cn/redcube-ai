@@ -26,10 +26,11 @@ test('RCA stage control projection maps route stages without owning runtime cont
   assert.equal(projection.authority_boundary.opl_role, 'read_only_stage_projection_consumer');
 });
 
-test('RCA stage control contract is refs-only and leaves generic stage plane ownership to OPL', () => {
+test('RCA stage control contract is a standard OPL plane with RCA authority boundaries', () => {
   const plane = stageControlPlane();
 
-  assert.equal(plane.surface_kind, 'rca_stage_control_refs');
+  assert.equal(plane.surface_kind, 'family_stage_control_plane');
+  assert.equal(plane.version, 'family-stage-control-plane.v1');
   assert.equal(plane.projection_mode, 'rca_refs_only_opl_generated_stage_control');
   assert.equal(plane.generated_stage_control_owner, 'one-person-lab');
   assert.equal(plane.stage_descriptor_body_copied, false);

@@ -14,7 +14,7 @@
   "read_only": true,
   "refs_only": true,
   "generated_surface_handoff_ref": "contracts/generated_surface_handoff.json#/",
-  "minimal_authority_function_contract_ref": "contracts/action_catalog.json#/minimal_authority_functions",
+  "minimal_authority_function_contract_ref": "contracts/pack_compiler_input.json#/minimal_authority_surface_ids",
   "current_program_repeated_body_removed": true,
   "not_claims": [
     "domain_ready",

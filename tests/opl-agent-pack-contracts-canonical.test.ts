@@ -25,14 +25,19 @@ test('RCA root contracts are refs-only domain profile surfaces, not OPL generic 
   assert.equal('series_design_profile' in domainDescriptor, false);
   assert.equal(domainDescriptor.domain_specific_profile.stage_pack_role, 'declarative_visual_pack');
 
-  assert.equal(actionTargets.surface_kind, 'rca_action_target_refs');
-  assert.equal(actionTargets.projection_mode, 'minimal_authority_and_domain_handler_targets_only');
-  assert.equal(actionTargets.generated_surface_owner, 'one-person-lab');
-  assert.equal(actionTargets.domain_repo_can_own_generated_surface, false);
-  assert.equal(actionTargets.action_targets.includes('dispatch_domain_handler'), true);
-  assert.equal(actionTargets.minimal_authority_functions.allowed_authority_surface_ids.includes('review_export_verdict'), true);
+  assert.equal(actionTargets.surface_kind, 'family_action_catalog');
+  assert.equal(actionTargets.version, 'family-action-catalog.v1');
+  assert.equal(actionTargets.authority_boundary.opl_role, 'projection_consumer_only');
+  assert.equal(actionTargets.authority_boundary.generated_interface_owner, 'one-person-lab');
+  assert.equal(
+    actionTargets.actions.some((action) => action.action_id === 'dispatch_domain_handler'),
+    true,
+  );
+  assert.equal(packRefs.minimal_authority_surface_ids.includes('review_export_verdict'), true);
 
-  assert.equal(stageRefs.surface_kind, 'rca_stage_control_refs');
+  assert.equal(stageRefs.surface_kind, 'family_stage_control_plane');
+  assert.equal(stageRefs.version, 'family-stage-control-plane.v1');
+  assert.equal(stageRefs.authority_boundary.opl_role, 'projection_consumer_only');
   assert.equal(stageRefs.generated_stage_control_owner, 'one-person-lab');
   assert.equal(stageRefs.stage_descriptor_body_copied, false);
   assert.deepEqual(stageRefs.stage_ids, [

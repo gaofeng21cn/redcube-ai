@@ -40,7 +40,7 @@ export function buildStandardDomainAgentSkeleton({
   workspaceRoot,
   runtime,
   productEntrySessionCommand,
-  familyStageControlPlaneRef = '/rca_stage_control_refs',
+  familyStageControlPlaneRef = '/family_stage_control_plane',
   domainActionAdapterRef = '/product_entry_shell/domain_handler',
   lifecycleAdapterRef = '/opl_family_lifecycle_adapter',
 } = {}) {

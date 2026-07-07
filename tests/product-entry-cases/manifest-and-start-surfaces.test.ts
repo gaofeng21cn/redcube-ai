@@ -431,7 +431,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'lifecycle_guarded_apply_proof',
     ]);
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.domain_handler_target_ref, '/product_entry_shell/domain_handler');
-    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/rca_stage_control_refs');
+    assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
     assert.equal(manifest.standard_domain_agent_skeleton.runtime_declarations.visual_transition_evaluator_ref, '/visual_transition_evaluator');

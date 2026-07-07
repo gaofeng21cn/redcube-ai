@@ -44,7 +44,7 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
     'lifecycle_guarded_apply_proof',
   ]);
   assert.equal(skeleton.runtime_declarations.domain_handler_target_ref, '/product_entry_shell/domain_handler');
-  assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/rca_stage_control_refs');
+  assert.equal(skeleton.runtime_declarations.projection_builder_ref, '/family_stage_control_plane');
   assert.equal(skeleton.runtime_declarations.lifecycle_adapter_ref, '/opl_family_lifecycle_adapter');
   assert.equal(skeleton.runtime_declarations.visual_transition_spec_ref, '/visual_transition_spec');
   assert.equal(skeleton.runtime_declarations.visual_transition_evaluator_ref, '/visual_transition_evaluator');

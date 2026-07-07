@@ -169,7 +169,7 @@ export function buildCanonicalPack() {
   return jsonStable({
     actionCatalog: {
       ...actionCatalog,
-      forbidden_generic_owner_roles: readJson('contracts/action_catalog.json').forbidden_generic_owner_roles,
+      forbidden_generic_owner_roles: readJson('contracts/private_functional_surface_policy.json').forbidden_generic_owner_roles,
       generated_surface_owner: 'one-person-lab',
       domain_repo_can_own_generated_surface: false,
     },
@@ -325,7 +325,7 @@ export function buildCanonicalPack() {
           'success_payload_compatibility_field',
         ],
       },
-      forbidden_generic_owner_roles: readJson('contracts/action_catalog.json').forbidden_generic_owner_roles,
+      forbidden_generic_owner_roles: readJson('contracts/private_functional_surface_policy.json').forbidden_generic_owner_roles,
     },
     physicalSourceMorphologyPolicy: buildPhysicalSourceMorphologyPolicy(),
   });
