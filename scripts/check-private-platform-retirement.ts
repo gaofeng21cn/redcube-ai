@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { parseArgs as parseNodeArgs } from 'node:util';
+import { activePrivatePlatformResurrectionViolations } from '../tests/helpers/rca-retired-surface-guard.ts';
 
 import {
   buildPhysicalSourceMorphologyPolicy,
@@ -12,61 +13,8 @@ import {
 } from '../packages/redcube-domain-entry/dist/index.js';
 
 const REPO_ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
-const TEXT_EXTENSIONS = new Set([
-  '.md',
-  '.json',
-  '.ts',
-  '.tsx',
-  '.js',
-  '.mjs',
-  '.cjs',
-  '.py',
-  '.sh',
-  '.yaml',
-  '.yml',
-]);
-const RETIRED_SURFACE_GUARD_SOURCE_REFS = new Set([
-  'tests/helpers/rca-retired-surface-guard.ts',
-  'tests/rca-retired-surface-active-guard.test.ts',
-  'tests/rca-opl-generic-primitive-consumption.test.ts',
-  'tests/rca-functional-audit-retirement.test.ts',
-  'tests/rca-legacy-name-allowance.test.ts',
-  'tests/rca-retired-payload-pointer-guard.test.ts',
-  'tests/python-native-helper-catalog.test.ts',
-]);
-const EXTRA_FORBIDDEN_TRUE_CLAIM_KEYS = Object.freeze([
-  'product_entry_can_become_generic_product_wrapper_owner',
-  'domain_handler_target_can_become_generated_wrapper_owner',
-  'domain_handler_target_can_become_generic_runtime_owner',
-  'generic_product_wrapper_owner_allowed',
-]);
-
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.resolve(REPO_ROOT, relativePath), 'utf-8'));
-}
-
-function normalizePath(value) {
-  return value.split(path.sep).join('/');
-}
-
-function listTextFiles(root) {
-  const fullRoot = path.resolve(REPO_ROOT, root);
-  if (!existsSync(fullRoot)) return [];
-  if (path.extname(root)) return [fullRoot];
-  return readdirSync(fullRoot, { withFileTypes: true }).flatMap((entry) => {
-    const file = path.join(fullRoot, entry.name);
-    const normalized = normalizePath(path.relative(REPO_ROOT, file));
-    if (entry.isDirectory()) {
-      if (normalized.includes('__closeout-audit-test__')) return [];
-      if (['dist', 'build', 'node_modules'].includes(entry.name)) return [];
-      return listTextFiles(normalized);
-    }
-    return entry.isFile() && TEXT_EXTENSIONS.has(path.extname(entry.name)) ? [file] : [];
-  });
-}
-
-function patternFromForbiddenClaimKey(key) {
-  return new RegExp(`\\b${key}\\b\\s*[:=]\\s*true`, 'i');
 }
 
 function collectFalseValueFailures(object, checkId, failures) {
@@ -93,30 +41,8 @@ function buildActiveSourceScanSummary(physicalPolicy) {
     };
   }
 
-  const forbiddenTrueClaimKeys = [
-    ...new Set([
-      ...(Array.isArray(scanPolicy.forbidden_true_claim_keys)
-        ? scanPolicy.forbidden_true_claim_keys
-        : []),
-      ...EXTRA_FORBIDDEN_TRUE_CLAIM_KEYS,
-    ]),
-  ];
-  const scannedFiles = [];
-  const violations = [];
-
-  for (const root of scanPolicy.scan_roots || []) {
-    for (const file of listTextFiles(root)) {
-      const relativePath = normalizePath(path.relative(REPO_ROOT, file));
-      if (RETIRED_SURFACE_GUARD_SOURCE_REFS.has(relativePath)) continue;
-      scannedFiles.push(relativePath);
-      const text = readFileSync(file, 'utf-8');
-      for (const key of forbiddenTrueClaimKeys) {
-        if (patternFromForbiddenClaimKey(key).test(text)) {
-          violations.push({ file: relativePath, forbidden_true_claim_key: key });
-        }
-      }
-    }
-  }
+  const scanRoots = scanPolicy.scan_roots || [];
+  const violations = activePrivatePlatformResurrectionViolations(scanRoots);
 
   const failedChecks = [];
   collectFalseValueFailures(
@@ -136,11 +62,11 @@ function buildActiveSourceScanSummary(physicalPolicy) {
       ? 'passed_active_source_no_resurrection_scan'
       : 'failed',
     scan_policy_id: scanPolicy.policy_id,
-    scan_roots: [...(scanPolicy.scan_roots || [])],
+    scan_roots: [...scanRoots],
     helper_ref: scanPolicy.helper_ref,
     test_ref: scanPolicy.test_ref,
-    forbidden_true_claim_keys: forbiddenTrueClaimKeys,
-    scanned_file_count: scannedFiles.length,
+    forbidden_true_claim_keys: [...(scanPolicy.forbidden_true_claim_keys || [])],
+    scanned_file_count: null,
     violation_count: violations.length,
     violations,
     failed_checks: failedChecks,

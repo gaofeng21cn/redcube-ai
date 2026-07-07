@@ -12,7 +12,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/candidate-racing.test.ts',
     'tests/codex-plugin.test.ts',
     'tests/creative-ownership-recovery-audit.test.ts',
-    'tests/codex-cli-client.test.ts',
+    'tests/codex-executor-adapter.test.ts',
     'tests/codex-session-pool.test.ts',
     'tests/codex-cli-timeout.test.ts',
     'tests/family-onboarding-standard.test.ts',
@@ -166,7 +166,7 @@ const FAST_FILES = Object.freeze([
   'tests/profile-contract-hydration.test.ts',
   'tests/product-domain-actions.test.ts',
   'tests/worktree-package-resolution.test.ts',
-  'tests/codex-cli-client.test.ts',
+  'tests/codex-executor-adapter.test.ts',
   'tests/codex-session-pool.test.ts',
   'tests/codex-cli-timeout.test.ts',
   'tests/runtime-deliverable-route-recovery.test.ts',
@@ -276,7 +276,7 @@ export function buildTestGroups() {
   const metaCi = excludeCoveredTestFiles(meta, fast);
   const integrationRemaining = excludeCoveredTestFiles(integration, fast);
 
-  const groups = {
+  return {
     smoke: smokeFiles(),
     fast,
     meta,
@@ -288,16 +288,13 @@ export function buildTestGroups() {
     historical,
     full,
     'full:with-historical': [...full, ...historical],
+    'full:remaining': excludeCoveredTestFiles(full, [
+      ...fast,
+      ...family,
+      ...metaCi,
+      ...integrationRemaining,
+    ]),
   };
-
-  groups['full:remaining'] = excludeCoveredTestFiles(full, [
-    ...fast,
-    ...family,
-    ...metaCi,
-    ...integrationRemaining,
-  ]);
-
-  return groups;
 }
 
 export function assertValidTestRegistry({ registry = TEST_REGISTRY } = {}) {

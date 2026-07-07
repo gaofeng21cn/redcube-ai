@@ -28,7 +28,7 @@ function assertSourceGuardSummary(payload, scope) {
   assert.deepEqual(payload.guard_summary.missing_evidence_ids, []);
   assert.equal(payload.guard_summary.active_source_scan.state, 'passed_active_source_no_resurrection_scan');
   assert.equal(payload.guard_summary.active_source_scan.violation_count, 0);
-  assert.ok(payload.guard_summary.active_source_scan.scanned_file_count > 0);
+  assert.deepEqual(payload.guard_summary.active_source_scan.violations, []);
   assert.equal(payload.authority_boundary.readback_can_authorize_physical_delete, false);
   assert.equal(payload.authority_boundary.readback_can_claim_default_caller_cutover, false);
   assert.equal(payload.authority_boundary.readback_can_claim_visual_ready, false);

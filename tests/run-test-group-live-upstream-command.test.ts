@@ -133,10 +133,10 @@ test('run-test-group partitions route-heavy files away from the default parallel
   assert.deepEqual(
     partitionTestFilesForExecution({
       groupName: 'meta',
-      files: ['tests/codex-cli-client.test.ts'],
+      files: ['tests/codex-executor-adapter.test.ts'],
     }),
     {
-      parallel_files: ['tests/codex-cli-client.test.ts'],
+      parallel_files: ['tests/codex-executor-adapter.test.ts'],
       serialized_files: [],
     },
   );
@@ -235,11 +235,11 @@ test('run-test-group supports explicit targeted files inside the selected lane',
   assert.deepEqual(
     parseRunTestGroupArgs([
       'meta',
-      '--files=./tests/codex-cli-client.test.ts',
+      '--files=./tests/codex-executor-adapter.test.ts',
     ]),
     {
       groupName: 'meta',
-      requestedFiles: ['./tests/codex-cli-client.test.ts'],
+      requestedFiles: ['./tests/codex-executor-adapter.test.ts'],
       forwardedArgs: [],
     },
   );
@@ -263,7 +263,7 @@ test('run-test-group supports explicit targeted files inside the selected lane',
   assert.throws(
     () => selectGroupFiles({
       groupName: 'meta',
-      groupFiles: ['tests/codex-cli-client.test.ts'],
+      groupFiles: ['tests/codex-executor-adapter.test.ts'],
       requestedFiles: ['tests/source-intake.test.ts'],
     }),
     /meta 分组不包含请求的测试文件: tests\/source-intake\.test\.ts/,
@@ -272,7 +272,7 @@ test('run-test-group supports explicit targeted files inside the selected lane',
   assert.throws(
     () => selectGroupFiles({
       groupName: 'meta',
-      groupFiles: ['tests/codex-cli-client.test.ts'],
+      groupFiles: ['tests/codex-executor-adapter.test.ts'],
       requestedFiles: ['tests/helpers/test-workspace.ts'],
     }),
     /--files 只接受根级测试文件/,
