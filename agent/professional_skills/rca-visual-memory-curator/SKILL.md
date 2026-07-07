@@ -9,7 +9,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 
 ## AI-First / Contract-Light Boundary
 
-- Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, or an authority bypass.
+- Use AI judgment here for whether a lesson is reusable, stage-scoped, evidence-backed, stale, too broad, a duplicate, a live defect that should route back, or an authority bypass.
 - Treat memory descriptors, locator refs, receipts, and `contracts/capability_map.json` as transport and discovery metadata only; they do not decide accept/reject and never contain memory body authority.
 - Treat `visual_pack_compiler_handoff` as a carrier for memory proposal refs and accept/reject receipt refs only. It may route memory evidence to this skill, but it must not carry reusable lesson text as authority or decide accept/reject through contract fields.
 - Keep memory proposals prose-first and small. Reject attempts to encode visual taste, route scoring, review verdicts, or artifact state as contract data.
@@ -30,6 +30,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 - `visual_memory_writeback_proposal` refs with evidence, scope, provenance, and proposed small-card body.
 - `visual_memory_accept_receipt` or `visual_memory_reject_receipt` refs from the RCA owner surface.
 - Rejection reasons when the proposal is artifact body, review/export verdict, route logic, stale evidence, or hidden template material.
+- `memory_route_back_target` when a proposed lesson is really an unresolved story, visual direction, page authoring, native PPT, or review defect.
 - Locator/projection refs that OPL may transport without reading or owning the memory body.
 
 ## Execution Rules
@@ -40,7 +41,8 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 4. Reject current deliverable body, slide/page text, artifact state, export verdicts, readiness claims, deterministic layout recipes, and hidden templates.
 5. Keep authority explicit. RCA owns memory body, accept/reject judgment, owner receipt, and typed blockers; OPL may only transport locator, proposal, receipt, and projection refs.
 6. A missing or stale memory ref is usually non-blocking. It is blocking only when someone tries to use memory as review/export/handoff/production authority or to bypass artifact authority.
-7. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
+7. Route back unresolved defects instead of storing them. If a proposal says a specific page still needs repair, return the owner stage and evidence refs rather than accepting it as memory.
+8. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
 
 ## Contract Foldback Map
 
@@ -55,6 +57,8 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 - `accept_reject_review`: evidence sufficiency, reusability, authority boundary, stale-risk check, accept/reject verdict ref, and owner receipt ref.
 - `writeback_lifecycle`: propose -> RCA accept/reject -> receipt ref -> OPL locator/projection transport -> stage-scoped retrieval.
 - `reject_reason`: artifact_body, verdict_body, route_logic, hidden_template, stale_evidence, global_rulebook, unsupported_provenance, or authority_bypass.
+- `memory_ai_judgment`: accept, reject, duplicate, stale, route_back, or typed_blocker with evidence refs and owner stage.
+- `route_back_target`: unresolved story, visual direction, page authoring, native PPT, or review defect that must be repaired outside memory.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -72,3 +76,4 @@ Return `typed_blocker` when:
 - A proposal contains current artifact body, visible slide/page copy, route truth, review/export verdict text, owner receipt body, or production-ready claims.
 - OPL, Agent Lab, product shell, generated wrapper, or external eval output attempts to accept/reject visual memory or write memory body.
 - Memory is being used as a visual route scorer, layout controller, review-pass gate, export gate, artifact-ready signal, or production readiness signal.
+- A proposal tries to store an unresolved visual defect as reusable memory instead of routing it back to the owner stage.

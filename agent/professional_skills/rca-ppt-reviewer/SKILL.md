@@ -35,6 +35,8 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `visual_director_review` or `screenshot_review` style verdict refs with `pass` or `block`.
 - `weak_pages`, `slide_reviews`, visual findings, source-fidelity findings, and concrete repair targets.
 - Blocked-page-only repair scope when applicable.
+- Route-back decisions for story, visual direction, page authoring, native PPT design, or memory curation when the visible defect belongs outside reviewer repair.
+- Memory proposal candidates for `rca-visual-memory-curator`; reviewer findings are not accepted memory by themselves.
 - Typed blockers when review evidence is missing or invalid.
 
 ## Execution Rules
@@ -48,18 +50,19 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 7. Preserve passed pages. Do not request full-deck redraw when blocked-slide repair is sufficient.
 8. Do not use provider completion, queue state, file existence, or test pass as a visual-ready claim.
 9. Keep RCA authority clear. Review/export verdicts belong to RCA; OPL may transport refs and repair hints only.
-10. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
+10. Route back to the real owner. Story defects go to story architecture, density/style defects to visual direction, page construction defects to page authoring, editable-object defects to native PPT design, and reusable lessons to memory curation.
+11. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
 
 ## Contract Foldback Map
 
-- `visual_pack_compiler_handoff`: carries review evidence refs, artifact inventory refs, repair target refs, export readiness refs, and forbidden-authority flags only.
+- `visual_pack_compiler_handoff`: carries review evidence refs, artifact inventory refs, repair target refs, handoff candidate refs, and forbidden-authority flags only.
 - Stage-control route decisions: consume this skill's verdict / repair target refs when selecting continue, repair, route-back, human gate, or typed blocker; stage-control does not own the visual reasoning.
 - RCA reviewer method: owns the flexible judgment over pixels, story arc, source fidelity, density, visible leaks, weak-vs-blocking classification, and blocked-page-only repair scope.
-- Contract surfaces may reject missing, stale, mismatched, or authority-violating refs; they may not turn mechanical completeness into `export_ready`.
+- Contract surfaces may reject missing, stale, mismatched, or authority-violating refs; they may not turn mechanical completeness into review pass, handoff approval, or production readiness.
 
 ## Workbench Lessons To Preserve
 
-- A draft can be useful without being export-ready. Label V0/V1 outcomes honestly and record known weak pages instead of calling the deck final because PPTX assembly succeeded.
+- A draft can be useful without being a review-passed handoff candidate. Label V0/V1 outcomes honestly and record known weak pages instead of calling the deck final because PPTX assembly succeeded.
 - Contact-sheet review must include rhythm and density, not only image count and file sizes. Generated image decks commonly pass mechanical checks while still having too much text on selected pages.
 - First-use naming and public link/source treatment are reviewable content quality issues. Block or repair when abbreviations appear before full names, when evidence pages omit available public links, or when visible links crowd the page.
 - Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
@@ -70,9 +73,11 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.
 - `ppt_visual_density`: mark density as `pass`, `weak`, or `block` using screenshot evidence and the approved density band; never infer density from manifest counts alone.
 - `repair_target_row`: `slide_id`, visible problem, source or design contract violated, required change, rerun route, owner stage, preserve-or-redraw scope.
-- `export_gate_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, and forbidden-authority flags before handoff.
+- `handoff_evidence_check`: confirm review refs, screenshot refs, route source, PPTX/PDF refs, artifact gallery ref, unresolved weak/blocking pages, and forbidden-authority flags before package/handoff stages consume the result.
 - `story_arc_visual_check`: pixels and titles prove necessity, feasibility, and landing path in order; product names do not outrun audience motivation.
-- `draft_label_check`: declare `draft`, `reviewed_draft`, or `export_ready` based on screenshot review and unresolved weak/blocking pages.
+- `draft_label_check`: declare `draft`, `reviewed_draft`, or `handoff_candidate` based on screenshot review and unresolved weak/blocking pages; this is not a production-readiness claim.
+- `route_back_decision`: owner stage, blocked slide ids, evidence refs, required repair, and preserve-or-redraw scope.
+- `memory_proposal_gate`: only propose reusable visual lessons; route every accept/reject decision to `rca-visual-memory-curator`.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

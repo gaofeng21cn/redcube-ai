@@ -34,6 +34,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - Page-by-page artifact authoring instructions, route-specific page payloads, or blocked-slide repair plans.
 - For native PPTX: editable shape plan fragments with explicit roles, bounds, typography, fills/lines, zone binding, and manifest-friendly ids.
 - For image-first/HTML: page content and render intent that keeps visible text audience-facing and QA-readable.
+- `page_visual_proof_packet`: rendered-page evidence refs expected for review, route source refs, contact-sheet membership, shape-manifest refs when native, and known QA risks.
 - Typed blockers or repair targets for missing upstream contracts, capacity failure, route mismatch, or unsafe visible content.
 
 ## Execution Rules
@@ -47,6 +48,8 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 7. Size content before committing layout. If text cannot fit at the readability floor, shorten copy, reduce slots, change layout, or return a repair target.
 8. For repair, target only blocked pages when the review surface names them; preserve passed pages and record what feedback was consumed.
 9. Treat helpers as materializers. Python, Office, screenshot, and export helpers execute the RCA plan and return evidence; they do not choose design or declare visual readiness.
+10. Emit the proof packet with the page payload. A page is not reviewable unless the expected screenshot, contact-sheet, route-source, and native-shape evidence can be produced.
+11. Route back when the page failure belongs to story, visual direction, template capacity, or route selection; do not hide it with helper defaults, smaller text, or post-processing.
 
 ## Workbench Lessons To Preserve
 
@@ -55,6 +58,7 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - Keep full-page image PPTX honest. It is acceptable for the image-first route, but it must not be described as native editable PPTX.
 - When a page is text-dense after generation, redraw the page with fewer labels rather than accepting tiny generated text. Preserve unaffected pages and repair only the blocked slide ids when possible.
 - Page authoring must consume the current approved style refs. If the style source changes, regenerate prompts or payloads that cite the old style rather than mixing old and new visual lines.
+- Native PPTX pages must carry shape-manifest and render-proof expectations before reviewer QA; an editable claim without those refs is a route mismatch.
 
 ## Minimal Template Resource
 
@@ -64,7 +68,8 @@ Operate as the page-level author inside RCA artifact creation. Produce page plan
 - `editable_pptx_grammar`: every native shape needs role, zone id, bounds in inches, font size for text, visible fill/line when structural, z-order, and stable manifest id.
 - `progressive_disclosure`: keep page-level hierarchy obvious at first glance; secondary detail moves to notes, appendix, or the next slide.
 - `image_first_page_payload`: `slide_id`, current `style_ref`, prompt text, visible label budget, forbidden text, expected 16:9 output ref, import ref, and contact-sheet ref.
-- `draft_to_export_gate`: generated/rendered page exists, 16:9 normalized page exists, contact sheet reviewed, blocked pages repaired, then PPTX assembly.
+- `page_visual_proof_packet`: generated/rendered page ref, 16:9 normalization ref, contact-sheet ref, route source ref, native shape manifest ref when applicable, and unresolved QA risks.
+- `draft_to_review_gate`: generated/rendered page exists, 16:9 normalized page exists, contact sheet reviewed, and blocked pages have named repair targets before package/export stages consume it.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -90,3 +95,4 @@ Return `repair_target` when:
 - Connectors, rails, labels, or panels collide.
 - The page lacks a real structural visual.
 - A blocked page needs changed archetype, reduced slots, rewritten labels, or updated coordinates.
+- The failure should route back to source/story, visual direction, template profile, or native shape planning instead of being patched inside materialization.

@@ -9,7 +9,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 
 ## AI-First / Contract-Light Boundary
 
-- Use AI judgment here for claim hierarchy, narrative pressure, slide sequencing, evidence placement, first-use naming, and whether a weak outline needs merge, split, demotion, or route-back.
+- Use AI judgment here for claim hierarchy, narrative pressure, slide sequencing, evidence placement, first-use naming, layout/story risk, and whether a weak outline needs merge, split, demotion, or route-back.
 - Treat contracts, stage prompts, and `contracts/capability_map.json` as locators and guardrails only: they name refs, required fields, tokens, forbidden surfaces, and verification paths; they do not decide the story.
 - When a contract and the story conflict, keep the contract as the boundary and return a typed blocker or repair target instead of encoding narrative rules into a second machine checklist.
 
@@ -31,6 +31,8 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - A source-grounded narrative spine: audience problem, claim sequence, evidence placement, and decision path.
 - A detailed outline that preserves approved source truth and page budget.
 - A slide blueprint with one page goal, one action title, core claim, evidence points, public sources, speaker notes, and transition sentence per slide.
+- `story_risk_map`: pages likely to fail visual proof because the claim, evidence, page role, or transition is overloaded.
+- Route-back targets when an apparent visual defect is really a source, story, sequence, or page-budget problem.
 - Typed blockers or repair targets when the source or upstream plan cannot support a professional deck.
 
 ## Execution Rules
@@ -43,7 +45,9 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 6. Preserve hard constraints from the user or approved outline. Treat source suggestions and runtime seeds as references, not approved truth.
 7. Flag overloaded pages early. A page that needs unrelated claims, too many proof objects, or tiny evidence labels should be split, shortened, or blocked before visual direction.
 8. Plan for show-don't-tell. Prefer concrete proof objects, comparisons, timelines, system maps, metrics, and decisions over generic summary bullets.
-9. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
+9. Plan visual proof intent. Each slide should name what a screenshot reviewer can verify in pixels: proof object, visible claim, evidence source, and transition role.
+10. Route back instead of decorating. If a future layout or review failure is caused by unsupported story logic, return the owner stage and required story repair.
+11. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
 
 ## Workbench Lessons To Preserve
 
@@ -60,6 +64,7 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - `blueprint_row`: `slide_id`, `page_role`, `action_title`, `core_claim`, `evidence_refs`, `proof_object`, `visible_text_budget`, `speaker_note_goal`, `transition`.
 - `first_use_contract`: full visible name, accepted abbreviation, public link/source ref when allowed, and the slide where abbreviation becomes safe.
 - `necessity_feasibility_landing_check`: the outline names the audience problem, why existing tools fail, what proof makes the proposed route feasible, and what adoption path is credible.
+- `visual_proof_intent`: per slide visible proof object, screenshot-checkable claim, source-fidelity risk, and route-back owner if proof would fail.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -85,3 +90,4 @@ Return `repair_target` when:
 - Evidence is present in notes but missing from visible slide fields.
 - A page is too dense for later layout or placeholder capacity.
 - Internal RCA/operator wording appears in audience-facing fields.
+- A visual or reviewer finding points back to source truth, claim order, page role, or first-use naming rather than page rendering.

@@ -34,6 +34,7 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `deck_layout_rhythm_plan` with one row per slide.
 - `template_layout_grammar` with semantic archetypes, zones, placeholder capacity, required role groups, and prohibited mistakes.
 - Per-slide `template_layout_binding`, `layout_intent`, and `native_shapes[]` using editable Office objects with explicit bounds, roles, quality roles, font sizes, fills/lines, z-order, and zone ids.
+- `native_ppt_qa_plan`: editable-object proof, rendered screenshot refs, shape manifest refs, hyperlink/text editability checks, and blocked-slide repair scope.
 - Native repair targets or typed blockers.
 
 ## Execution Rules
@@ -49,6 +50,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 9. Plan structural visuals as editable shapes: rail, connector, axis, proof band, gate stack, input hub, metric grid, table, chart, or map.
 10. Repair by changing the AI plan. Do not hide failures in notes, shrink text below floor, mark content decorative, or let helpers rebalance the page.
 11. If a template or reference deck has not been profiled, request `rca-template-profiler` output first; this skill only binds that profile into native editable shapes.
+12. Make native QA explicit before materialization: shape manifest, rendered screenshots, editable text/hyperlink checks, and screenshot-review repair targets must be expected outputs.
+13. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
 
 ## Workbench Lessons To Preserve
 
@@ -65,6 +68,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `shape_row`: `id`, `slide_id`, `role`, `zone_id`, `left_in`, `top_in`, `width_in`, `height_in`, `text`, `font_size_pt`, `fill`, `line`, `z_order`, `quality_role`.
 - `native_repair_loop`: repair the plan, rerender, compare screenshots, update shape manifest refs, then return review/export refs or typed blocker.
 - `image_to_native_followup`: consume approved director notes, source refs, contact-sheet findings, and selected editable targets before writing native shapes.
+- `native_ppt_qa_plan`: shape manifest refs, screenshot refs, editable-object checks, hyperlink/text checks, expected reviewer checks, and blocked-slide-only repair scope.
+- `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -94,3 +99,4 @@ Return `repair_target` when:
 - Structural visual support is missing or only decorative.
 - A selected archetype does not match actual shape roles.
 - A native sample is too dense or uses a generic card grid instead of a proof/decision board.
+- Native QA evidence shows editable object, screenshot, hyperlink, or shape-manifest mismatch that requires plan repair before review can pass.

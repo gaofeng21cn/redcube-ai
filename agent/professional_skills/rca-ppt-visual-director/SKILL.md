@@ -31,6 +31,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `rhythm_curve`: one entry for every real slide id.
 - `peak_pages`, layout family ceilings, visual density rules, typography plan, spacing rules, and forbidden regressions.
 - Template/profile guidance: layout archetypes, semantic zones, placeholder capacity, and reference-deck discipline when native PPTX or template-aware authoring is selected.
+- `visual_proof_plan`: per-slide screenshot/contact-sheet checks, source-fidelity risks, density proof, and native QA evidence expected from downstream routes.
 - Typed blockers or repair targets for blueprint, density, template, or visual-risk problems.
 
 ## Execution Rules
@@ -45,6 +46,8 @@ Operate as the visual direction specialist between blueprint approval and page a
 8. Identify repair risk before artifact creation: overloaded pages, repeated card grids, weak peak pages, text-heavy proof pages, or missing structural visuals.
 9. Keep RCA authority clear. Adopt professional PPT discipline as RCA rules; do not cite external tools as the owner of visual decisions.
 10. If the task requires profiling a template or reference deck, consume `rca-template-profiler` output instead of re-profiling it here.
+11. Route back early when blueprint, source, template capacity, or route selection would make visual proof fail; name the owner stage and the smallest repair.
+12. For native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
 
 ## Workbench Lessons To Preserve
 
@@ -63,6 +66,8 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `progressive_disclosure`: move from overview to proof to decision through visible structure, not by revealing more small text on the same page.
 - `page_visual_direction_row`: `slide_id`, `first_glance_hook`, `composition`, `visible_text_budget`, `style_ref`, `image_prompt_intent`, `density_risk`, and `repair_fallback`.
 - `style_ref_lock`: approved reference deck/version, representative slide refs, allowed borrowings, forbidden stale refs, and owner approval state.
+- `route_back_decision`: owner stage, reason, evidence ref, affected slide ids, and whether to repair story, template profile, route policy, page payload, or native shape plan.
+- `visual_proof_plan`: required contact-sheet rhythm check, per-slide screenshot target, native QA refs when applicable, and proof that visible claims remain source-faithful.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -89,3 +94,4 @@ Return `repair_target` when:
 - Typography, table, or card density cannot pass the readability floor.
 - Visual direction contains internal route/operator wording.
 - Template/profile capacity is too low for planned content.
+- Native PPTX selection would require editable proof that the current visual direction cannot support.

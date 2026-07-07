@@ -9,7 +9,7 @@ Operate as the template and reference-deck analysis specialist. Convert design i
 
 ## AI-First / Contract-Light Boundary
 
-- Use AI judgment here for semantic zone interpretation, placeholder capacity, reference-deck rhythm, style-boundary selection, stale-reference rejection, and whether a template can support the requested story.
+- Use AI judgment here for semantic zone interpretation, placeholder capacity, reference-deck rhythm, style-boundary selection, stale-reference rejection, and whether a template can support the requested story or must route back before authoring.
 - Treat `contracts/capability_map.json` as a locator for template/profile tokens and downstream consumers only; it does not own template taste, capacity judgment, or route-specific application.
 - Treat `visual_pack_compiler_handoff`, `contracts/pack_compiler_input.json`, and stage-control profile refs as handoff surfaces. They may point to profile rows, template refs, route policy, receipt refs, and forbidden-authority flags; they must not embed capacity judgment, template taste, stale-reference decisions, or layout recipes as contract truth.
 - Keep profile output small and reusable. Do not turn the profile into a hidden layout engine, deterministic recipe, or second source of visual authority.
@@ -38,6 +38,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - `placeholder_capacity`: per-zone text capacity, image/chart/table affordance, minimum font floor, and overflow risk.
 - `reference_deck_analysis`: page rhythm, composition signatures, recurring hierarchy, proof objects, and reusable patterns.
 - `template_layout_grammar` recommendations for native PPTX or template-aware rendering.
+- `visual_proof_requirements`: screenshot/contact-sheet/shape-manifest evidence the downstream reviewer must see to prove the profile was followed.
 - Typed blockers or repair targets when the template cannot safely support the requested content.
 
 ## Execution Rules
@@ -51,8 +52,9 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 7. Keep source and artifact boundaries clean. Profiling can inspect templates and screenshots, but it cannot mutate canonical artifacts or sign review/export verdicts.
 8. For native PPTX, produce zones and placeholder rules that the `editable_shape_plan` can bind to directly.
 9. For image-first or HTML routes, still provide semantic layout and capacity guidance, but do not claim native editability.
-10. Stop at profile output. Downstream visual direction, page authoring, or native PPT design must own route-specific application and repair.
-11. Keep stage-control light. If stage-control needs template/profile judgment, return profile refs, capacity blockers, route caveats, and downstream owner hints; do not move profiling heuristics, layout scoring, or deterministic placement recipes into stage-control contracts.
+10. Name route-back owner hints when capacity, stale-reference, or semantic-zone risks should return to story, visual direction, page authoring, or native design before artifact creation.
+11. Stop at profile output. Downstream visual direction, page authoring, or native PPT design must own route-specific application and repair.
+12. Keep stage-control light. If stage-control needs template/profile judgment, return profile refs, capacity blockers, route caveats, visual proof requirements, and downstream owner hints; do not move profiling heuristics, layout scoring, or deterministic placement recipes into stage-control contracts.
 
 ## Contract Foldback Map
 
@@ -76,6 +78,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - `placeholder_capacity`: per zone record max headline/body/label length, object count, image/chart/table affordance, safe inset, and overflow risk.
 - `editable_pptx_grammar`: for native routes, each template zone must expose a stable zone id, allowed shape roles, coordinate bounds, hierarchy, and prohibited mistakes.
 - `current_style_ref_pack`: current source deck/version, representative page refs, allowed reuse, stale refs to reject, and prompt-facing density limits.
+- `visual_proof_requirements`: required evidence refs for profile compliance, such as contact-sheet rhythm, title-safe-zone screenshots, native shape manifest refs, and blocked-zone repair targets.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary
@@ -102,3 +105,4 @@ Return `repair_target` when:
 - Title safe zone, footer, notes, or source labels collide with content.
 - A profile is treated as visual skin instead of semantic layout grammar.
 - Reference-deck rhythm is copied mechanically instead of adapted to the current claim spine.
+- Downstream route-back is required because the template can support only a different page role, density band, or route than the current plan assumes.
