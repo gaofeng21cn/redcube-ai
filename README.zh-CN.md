@@ -103,6 +103,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 ## 当前边界
 
 - `RedCube AI` 是独立的视觉交付 Foundry Agent。它对外第一身份是视觉交付：接收材料、分阶段完成视觉创作、审阅、回修、导出和文件交付。
+- 在 OPL family 中，RCA 是 domain agent package：RCA 保留视觉交付 authority，OPL 持有通用 runtime、package carrier、generated wrapper 和 hosted surface。
 - 对外第一入口是单一 `redcube-ai` 应用技能；`Codex`、`OPL` 和其他通用智能体可以通过这个入口访问稳定能力面。
 - 它可以作为 One Person Lab 里的汇报工坊使用，也可以由 Codex 或其他 Agent 直接调用稳定能力入口。
 - 它负责材料接收、成品生成、审阅回路、导出和文件式交付。

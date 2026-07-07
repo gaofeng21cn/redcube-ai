@@ -106,6 +106,7 @@ You can start with prompts like:
 ## Current Boundary
 
 - `RedCube AI` is an independent visual-deliverable Foundry Agent. Its first public identity is visual delivery: source intake, staged visual authorship, review, repair, export, and file handoff.
+- In the OPL family, RCA is the domain agent package: RCA retains visual-deliverable authority, while OPL owns generic runtime, package carrier, generated wrapper, and hosted surfaces.
 - The first public surface is the single `redcube-ai` app skill; `Codex`, `OPL`, and other general agents can reach stable capabilities through that skill.
 - It can be used as the Presentation Foundry inside One Person Lab, and it can also be called directly by Codex or another agent through stable capability entries.
 - RedCube owns material intake, visual generation, review loops, export, and file handoff.
