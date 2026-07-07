@@ -29,15 +29,6 @@
       "path": "./packages/redcube-codex-cli-client"
     },
     {
-      "path": "./packages/redcube-runtime-family-xiaohongshu"
-    },
-    {
-      "path": "./packages/redcube-runtime-family-ppt"
-    },
-    {
-      "path": "./packages/redcube-runtime-family-poster-onepager"
-    },
-    {
       "path": "./packages/redcube-runtime"
     },
     {
@@ -45,9 +36,6 @@
     },
     {
       "path": "./apps/redcube-cli"
-    },
-    {
-      "path": "./apps/redcube-mcp"
     }
   ]
 }

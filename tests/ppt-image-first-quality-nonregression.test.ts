@@ -13,7 +13,7 @@ import {
   stageFolderOutputPath,
   writeStageFolderArtifact,
 } from '@redcube/runtime-protocol';
-import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
+import { runPptDeckRoute } from '../packages/redcube-runtime/dist/families/ppt/index.js';
 import { readJson, writeJson } from './helpers/json-io.ts';
 
 const CONTRACT_PATH = 'contracts/runtime-program/ppt-image-first-quality-nonregression.json';

@@ -19,8 +19,7 @@
     "package_build_migration_order": [
       "leaf utility packages",
       "contract/governance/overlay packages",
-      "CLI/MCP entry packages",
-      "runtime-family packages",
+      "CLI entry package",
       "domain actions"
     ]
   },
@@ -125,36 +124,6 @@
     {
       "directory": "packages/redcube-reference-os",
       "package_name": "@redcube/reference-os",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-runtime-family-poster-onepager",
-      "package_name": "@redcube/runtime-family-poster-onepager",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-runtime-family-ppt",
-      "package_name": "@redcube/runtime-family-ppt",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-runtime-family-xiaohongshu",
-      "package_name": "@redcube/runtime-family-xiaohongshu",
       "exports": [
         {
           "subpath": ".",

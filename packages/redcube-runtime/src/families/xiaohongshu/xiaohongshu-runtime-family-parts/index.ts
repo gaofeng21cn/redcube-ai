@@ -32,7 +32,7 @@ import { createXiaohongshuReviewParts } from './review.js';
 import { createXiaohongshuDeliveryParts } from './delivery.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
+const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
 const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
 const CANVAS = { ratio: '3:4', width: 1086, height: 1448 };
 
@@ -363,11 +363,7 @@ const renderParts = createXiaohongshuRenderParts(runtimeDeps);
 const reviewParts = createXiaohongshuReviewParts(runtimeDeps);
 const deliveryParts = createXiaohongshuDeliveryParts(runtimeDeps);
 
-export function canRunXiaohongshu(contract) {
-  return contract?.deliverable_kind === 'xiaohongshu_note';
-}
-
-export async function runXiaohongshuRoute({
+export async function runXiaohongshuRouteParts({
   workspaceRoot,
   topicId,
   deliverableId,

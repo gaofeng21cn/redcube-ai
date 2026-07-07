@@ -10,13 +10,13 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 ## 这个 plugin 是什么
 
 - `RedCube AI` 面向 Codex 的单一 app skill 薄入口层
-- 消费 OPL generated descriptors；CLI/MCP/Skill/product/status/session/domain_action_adapter/workbench metadata 的统一 owner 是 `one-person-lab`
-- repo-local `redcube` CLI / `redcube-mcp` / product-entry API 只是 RCA domain handler target 或 direct domain entry，不是 generated surface owner、generic runner、generic session shell 或通用 workbench owner
+- 消费 OPL generated descriptors；MCP/Skill/product/status/session/domain_action_adapter/workbench metadata 的统一 owner 是 `one-person-lab`
+- repo-local `redcube` CLI / product-entry API 只是 RCA domain handler target 或 direct domain entry；MCP 是 OPL generated protocol descriptor，不再由 RCA 维护 repo-local production API app
 
 ## Agent 语言面
 
 - 默认把本仓实现理解为 `TypeScript orchestration + Python native helpers`。
-- 新增 product-entry / domain-handler contract、CLI/MCP、runtime-protocol 或 service-safe boundary 默认使用 TypeScript。
+- 新增 product-entry / domain-handler contract、CLI handler target、runtime-protocol 或 service-safe boundary 默认使用 TypeScript；MCP wrapper/descriptor 归 OPL 生成面。
 - Office/PPT/document automation、截图/导出 helper 与修复循环默认使用 repo-owned Python helper，并继续受 RedCube route/gate 约束。
 - 仓内已跟踪 JavaScript 已退役；新的 product、test 或 script JavaScript 会被 closeout audit 阻断，不得把新 agent 工作写成 JavaScript。
 
@@ -81,7 +81,7 @@ description: Operate RedCube AI as the formal RCA visual-deliverable domain app 
 
 - 任何写操作前，先读取当前 workspace 与 product-entry manifest
 - 把 `product_entry_manifest`、`domain_entry_contract`、`task_lifecycle` 当作正式 contract surface
-- 把 `opl_generated_interface_consumption`、`generated_surface_handoff` 与 `pack_compiler_input` 当作 OPL generated metadata owner 的当前机器合同；repo-local redcube/redcube-mcp 只按 handler target / direct entry 读取
+- 把 `opl_generated_interface_consumption`、`generated_surface_handoff` 与 `pack_compiler_input` 当作 OPL generated metadata owner 的当前机器合同；repo-local redcube 只按 handler target / direct entry 读取，MCP 只读作 OPL generated protocol descriptor
 - 保持 `OPL generated status/session refs -> direct invoke -> session continuation` 同一条 same-session deliverable loop；这里的 status/session 指 OPL generated machine-readable product-entry refs
 - 长 PPT 任务必须先拆成 `source/material intake -> plan -> deliverable -> review`，每段使用同一 session 可恢复推进
 - 不绕开 domain handler / product-entry contract 直接手改运行状态或 artifact state

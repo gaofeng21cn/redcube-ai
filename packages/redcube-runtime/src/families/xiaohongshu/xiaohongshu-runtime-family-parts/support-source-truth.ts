@@ -8,7 +8,7 @@ import { resolveWorkspaceXiaohongshuAuthorProfile } from '@redcube/redcube-confi
 import { safeArray, safeText } from './shared.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
+const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
 const DEFAULT_PROMPT_PACK = {
   research: 'prompts/xiaohongshu/research.md',
   storyline: 'prompts/xiaohongshu/storyline.md',

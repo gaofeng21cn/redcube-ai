@@ -1,6 +1,5 @@
 import { createPosterOnepagerRuntimeCore } from './poster-onepager-runtime-parts/core.js';
 import type {
-  PosterRuntimeCanRunContract,
   PosterRuntimeContract,
   PosterRuntimeRoute,
   PosterRuntimeRouteResult,
@@ -68,10 +67,6 @@ const {
   safeArray,
   sourceLabels,
 } = createPosterOnepagerRuntimeCore() as PosterRuntimeCore;
-
-export function canRunPosterOnepager(contract: PosterRuntimeCanRunContract): boolean {
-  return contract?.deliverable_kind === 'poster_onepager';
-}
 
 export async function runPosterOnepagerRoute({
   workspaceRoot,

@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { createPosterOnepagerReviewHelpers } from '../packages/redcube-runtime-family-poster-onepager/dist/poster-onepager-runtime-parts/review-helpers.js';
+import { createPosterOnepagerReviewHelpers } from '../packages/redcube-runtime/dist/families/poster-onepager/poster-onepager-runtime-parts/review-helpers.js';
 
 const HELPER_NAMES = [
   'safeText',
@@ -25,15 +25,15 @@ const RERUN_HELPER_NAMES = [
 const FAMILY_FILES = [
   {
     label: 'ppt',
-    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
+    file: 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
   },
   {
     label: 'xiaohongshu',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/shared.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/shared.ts',
   },
   {
     label: 'poster_onepager',
-    file: 'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/review-helpers.ts',
+    file: 'packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/review-helpers.ts',
   },
 ];
 
@@ -131,7 +131,7 @@ function loadHelpers(file, extraNames = []) {
     return POSTER_HELPERS;
   }
   const source = file.includes('ppt-deck-runtime-family-parts/core.ts')
-    ? `${readFileSync('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core-constants.ts', 'utf-8')}\n${readFileSync(file, 'utf-8')}`
+    ? `${readFileSync('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core-constants.ts', 'utf-8')}\n${readFileSync(file, 'utf-8')}`
     : readFileSync(file, 'utf-8');
   const extractConstExpression = (name, fallback) => {
     const match = source.match(new RegExp(`const ${name} = ([^;]+);`));

@@ -25,7 +25,6 @@ export const OPL_GENERATED_DESCRIPTOR_SCOPE = Object.freeze([
 
 export const RCA_REPO_LOCAL_HANDLER_TARGETS = Object.freeze([
   'redcube_cli',
-  'redcube_mcp',
   'invokeProductEntry',
   'invokeDomainEntry',
   'domain_handler',

@@ -3,10 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { createPptDeckRenderRevisionParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/render-revision.js';
+import { createPptDeckRenderRevisionParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/render-revision.js';
 
 const CONTRACT_REF = 'contracts/runtime-program/ppt-html-route-quality-nonregression.json';
-const RENDER_SOURCE_REF = 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/render.ts';
+const RENDER_SOURCE_REF = 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/render.ts';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

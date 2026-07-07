@@ -329,10 +329,6 @@ export type PosterRuntimeRoute = PosterOnepagerStageId;
 export type PosterRuntimeMode = 'draft_new' | 'optimize_existing';
 export type PosterRuntimeReviewCheckId = PosterOnepagerReviewCheck;
 
-export interface PosterRuntimeCanRunContract {
-  deliverable_kind?: string;
-}
-
 export interface PosterRuntimeSourceIndexEntry {
   status?: string;
   relative_path?: string;

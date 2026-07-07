@@ -7,7 +7,6 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { buildCommandHelp, buildHelp, executeCli, getCliDomainActions } from '../apps/redcube-cli/dist/cli.js';
-import { getDomainActions as getMcpDomainActions, listDomainTools } from '../apps/redcube-mcp/dist/server.js';
 import { buildRedCubeActionMetadata } from '../packages/redcube-domain-entry/dist/index.js';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 
@@ -85,44 +84,40 @@ test('CLI help keeps deliverable run as the canonical quickstart surface while r
   assert.equal(parsed.commandGroups.managed, undefined);
 });
 
-test('CLI help common tasks stay deduplicated and CLI/MCP share the same quickstart action refs', async () => {
-  const help = await buildHelp();
-  const commands = help.commonTasks.map((item) => item.command);
+test('CLI help common tasks stay deduplicated and CLI actions stay aligned with generated metadata', async () => {
   const cliActions = getCliDomainActions();
-  const mcpActions = getMcpDomainActions();
-  const toolNames = new Set(listDomainTools().map((tool) => tool.name));
+  const help = await buildHelp(cliActions);
+  const commands = help.commonTasks.map((item) => item.command);
+  const metadata = buildRedCubeActionMetadata();
+  const cliActionRefs = new Set(metadata.cli_commands.map((command) => command.action_ref));
 
   assert.equal(new Set(commands).size, commands.length);
   assert.equal(commands.filter((command) => command.includes('deliverable execute')).length, 1);
   assert.equal(commands.some((command) => command.includes('review watch')), false);
   assert.equal(commands.some((command) => command.includes('redcube managed')), false);
 
-  for (const [actionKey, toolName] of [
-    ['doctorWorkspace', 'doctor'],
-    ['intakeSource', 'intake_source'],
-    ['researchSource', 'source_research'],
-    ['createDeliverable', 'create_deliverable'],
-    ['auditDeliverable', 'audit_deliverable'],
-    ['invokeDomainEntry', 'invoke_domain_entry'],
-    ['getReviewState', 'get_review_state'],
-    ['getPublicationProjection', 'get_publication_projection'],
+  for (const actionKey of [
+    'doctorWorkspace',
+    'intakeSource',
+    'researchSource',
+    'createDeliverable',
+    'auditDeliverable',
+    'invokeDomainEntry',
+    'getReviewState',
+    'getPublicationProjection',
   ]) {
     assert.equal(typeof cliActions[actionKey], 'function', `cli:${actionKey}`);
-    assert.equal(typeof mcpActions[actionKey], 'function', `mcp:${actionKey}`);
+  }
+  for (const actionRef of [
+    'invoke_product_entry',
+    'export_domain_handler',
+    'dispatch_domain_handler',
+    'run_image_ppt_proof',
+    'run_native_ppt_proof',
+  ]) {
+    assert.equal(cliActionRefs.has(actionRef), true, `metadata:${actionRef}`);
   }
   assert.equal(cliActions.runtimeWatch, undefined);
-  assert.equal(mcpActions.runtimeWatch, undefined);
-
-  assert.deepEqual(
-    [...toolNames].sort(),
-    [
-      'redcube_deliverable',
-      'redcube_product_entry',
-      'redcube_review',
-      'redcube_sources',
-      'redcube_workspace',
-    ],
-  );
 });
 
 test('CLI managed command is retired from public operator surface', async () => {

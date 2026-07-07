@@ -204,10 +204,6 @@ async function buildRoutePayload(context) {
   return buildPayload(context);
 }
 
-export function canRunPptDeck(contract) {
-  return contract?.deliverable_kind === 'ppt_deck';
-}
-
 /**
  * @param {{
  *   workspaceRoot: string,

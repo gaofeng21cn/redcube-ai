@@ -212,14 +212,14 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
 }
 
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
-  const familyTypes = read('packages/redcube-runtime-family-ppt/src/types.ts');
+  const familyTypes = read('packages/redcube-runtime/src/families/ppt/types.ts');
   const runtime = [
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts'),
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/authoring.ts'),
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts'),
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/render.ts'),
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.ts'),
-    read('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/surface.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/authoring.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/render.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/stages.ts'),
+    read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/surface.ts'),
   ].join('\n');
   const storylinePrompt = read('prompts/ppt_deck/storyline.md');
   const outlinePrompt = read('prompts/ppt_deck/detailed_outline.md');

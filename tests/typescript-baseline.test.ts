@@ -135,7 +135,6 @@ test('root package exposes formal typecheck entrypoint', () => {
 test('workspace packages and apps participate in package-level tsconfig layering', () => {
   const paths = [
     'apps/redcube-cli/tsconfig.json',
-    'apps/redcube-mcp/tsconfig.json',
     'packages/redcube-domain-entry/tsconfig.json',
     'packages/redcube-governance/tsconfig.json',
     'packages/redcube-reference-os/tsconfig.json',

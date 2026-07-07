@@ -157,9 +157,9 @@ test.after(async () => {
 });
 
 test('xiaohongshu Codex-backed mainline owns protected creative outputs instead of JS builders', () => {
-  const familyTypes = read('packages/redcube-runtime-family-xiaohongshu/src/types.ts');
-  const runtimeEntry = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
-  const runtime = read('packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts');
+  const familyTypes = read('packages/redcube-runtime/src/families/xiaohongshu/types.ts');
+  const runtimeEntry = read('packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts');
+  const runtime = read('packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts');
   const storylinePrompt = read('prompts/xiaohongshu/storyline.md');
   const singleNotePlanPrompt = read('prompts/xiaohongshu/single_note_plan.md');
   const renderHtmlPrompt = read('prompts/xiaohongshu/render_html.md');

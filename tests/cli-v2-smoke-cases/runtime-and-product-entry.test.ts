@@ -103,23 +103,23 @@ function createIsolatedCliInstall() {
     path.join(domainEntryNodeModulesDir, 'reference-os'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-ppt'),
+    path.resolve('packages/redcube-runtime/src/families/ppt'),
     path.join(domainEntryNodeModulesDir, 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-ppt'),
+    path.resolve('packages/redcube-runtime/src/families/ppt'),
     path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-ppt'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-xiaohongshu'),
+    path.resolve('packages/redcube-runtime/src/families/xiaohongshu'),
     path.join(domainEntryNodeModulesDir, 'runtime-family-xiaohongshu'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-poster-onepager'),
+    path.resolve('packages/redcube-runtime/src/families/poster-onepager'),
     path.join(domainEntryNodeModulesDir, 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(
-    path.resolve('packages/redcube-runtime-family-poster-onepager'),
+    path.resolve('packages/redcube-runtime/src/families/poster-onepager'),
     path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager'),
   );
   copyPackageIntoInstall(

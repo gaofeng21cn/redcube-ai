@@ -401,10 +401,6 @@ export type XhsRuntimeRoute =
 
 export type XhsRuntimeMode = 'draft_new' | 'optimize_existing';
 
-export interface XhsRuntimeCanRunContract {
-  deliverable_kind?: string;
-}
-
 export interface XhsRuntimeStageDefinition {
   stage_id: XhsRuntimeRoute;
   output_artifact?: string;

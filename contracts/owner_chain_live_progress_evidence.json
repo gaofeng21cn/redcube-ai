@@ -92,7 +92,7 @@
     }
   },
   "producer_surface_refs": {
-    "review_export_closeout_builder": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/review-export-closeout.ts#buildReviewExportCloseout",
+    "review_export_closeout_builder": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/review-export-closeout.ts#buildReviewExportCloseout",
     "domain_handler_owner_receipt_action": "domain-handler:dispatch#emit_domain_owner_receipt",
     "domain_handler_no_regression_action": "domain-handler:dispatch#emit_no_regression_evidence",
     "domain_handler_external_work_order_closeout_action": "domain-handler:dispatch#emit_external_work_order_owner_closeout",

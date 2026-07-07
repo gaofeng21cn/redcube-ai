@@ -4,8 +4,8 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
-import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
-import { createXiaohongshuReviewParts } from '../packages/redcube-runtime-family-xiaohongshu/dist/xiaohongshu-runtime-family-parts/review.js';
+import { createPptDeckStageParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/stages.js';
+import { createXiaohongshuReviewParts } from '../packages/redcube-runtime/dist/families/xiaohongshu/xiaohongshu-runtime-family-parts/review.js';
 import { pptExportHelperFixture, pptReviewHelperFixture, testPythonCommandEnv } from './helpers/python-native-helper-fixtures.ts';
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

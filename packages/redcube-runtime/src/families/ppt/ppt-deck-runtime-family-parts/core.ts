@@ -81,7 +81,7 @@ import {
 
 export function createPptDeckRuntimeCore() {
   const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-  const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
+  const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
   const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
   const PYTHON_EXPORT = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_export');
   const PYTHON_NATIVE = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_native');

@@ -11,8 +11,8 @@ import {
   withMockNativePptRuntime,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
 import { runDeliverableRoute } from './product-domain-action-test-api.ts';
-import { createNativePptPlanPreflightParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-plan-preflight.js';
-import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
+import { createNativePptPlanPreflightParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-plan-preflight.js';
+import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
 
 function assertTemplateLayoutBinding(slide) {
   const grammarBinding = slide.template_layout_binding || {};

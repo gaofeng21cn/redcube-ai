@@ -11,20 +11,18 @@ function readJson(file) {
 test('retired pack workspaces stay out of workspace and package manifests', () => {
   const rootTsconfig = readJson('tsconfig.json');
   const runtimePackageJson = readJson('packages/redcube-runtime/package.json');
-  const pptFamilyPackageJson = readJson('packages/redcube-runtime-family-ppt/package.json');
-  const xhsFamilyPackageJson = readJson('packages/redcube-runtime-family-xiaohongshu/package.json');
-  const posterFamilyPackageJson = readJson('packages/redcube-runtime-family-poster-onepager/package.json');
 
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt')), false);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-xiaohongshu')), false);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-runtime')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-ppt')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-xiaohongshu')), false);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime-family-poster-onepager')), false);
   assert.equal(rootTsconfig.references.some((entry) => entry.path.includes('redcube-pack-')), false);
+  assert.equal(rootTsconfig.references.some((entry) => entry.path.includes('redcube-runtime-family-')), false);
   assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(pptFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(xhsFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(posterFamilyPackageJson.dependencies?.['@redcube/pack-runtime']), false);
-  assert.equal(Boolean(pptFamilyPackageJson.dependencies?.['@redcube/pack-ppt']), false);
-  assert.equal(Boolean(xhsFamilyPackageJson.dependencies?.['@redcube/pack-xiaohongshu']), false);
-  assert.equal(Boolean(posterFamilyPackageJson.dependencies?.['@redcube/pack-poster-onepager']), false);
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-ppt']), false);
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-xiaohongshu']), false);
+  assert.equal(Boolean(runtimePackageJson.dependencies?.['@redcube/runtime-family-poster-onepager']), false);
 });

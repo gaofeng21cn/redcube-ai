@@ -21,12 +21,12 @@ const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-python-nat
 
 const RUNTIME_PYTHON_CALLER_FILES = [
   'packages/redcube-runtime-protocol/src/python-native-helper.ts',
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stages.ts',
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/export.ts',
-  'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts',
-  'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts',
-  'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts',
+  'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
+  'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/stages.ts',
+  'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/export.ts',
+  'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt.ts',
+  'packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/core.ts',
+  'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
 ];
 const TEST_PYTHON_PROOF_CALLER_FILES = [
   'tests/block-content-fit-review-cases/shared.ts',

@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
-import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core-profile-presets.js';
+import { createPptDeckStageParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/stages.js';
+import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/core-profile-presets.js';
 import {
   pptExportHelperFixture,
   pptNativeHelperFixture,

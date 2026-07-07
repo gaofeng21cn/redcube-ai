@@ -1,5 +1,9 @@
 import { createOverlayRegistry } from '@redcube/overlay-core';
 
+import { runPosterOnepagerRoute } from './families/poster-onepager/index.js';
+import { runPptDeckRoute } from './families/ppt/index.js';
+import { runXiaohongshuRoute } from './families/xiaohongshu/index.js';
+
 import type {
   OverlayCatalogEntry,
   OverlayDefinition,
@@ -95,7 +99,7 @@ export interface RuntimeFamilyContract {
 export interface RuntimeFamilyModuleSpec {
   overlay_id: string;
   deliverable_kind: string;
-  module_name: string;
+  runner_id: string;
   export_name: string;
 }
 
@@ -113,35 +117,32 @@ export interface LoadedRuntimeFamilyRunner extends RuntimeFamilyModuleSpec {
 interface RuntimeFamilyModuleManifestSpec {
   overlayId: string;
   deliverableKind: string;
-  module: string;
+  runnerId: string;
   exportName: string;
+  runRoute: (...args: unknown[]) => Promise<unknown>;
 }
 
-interface RuntimeFamilyRegistryEntry extends RuntimeFamilyModuleManifestSpec {
-  load: () => Promise<Record<string, unknown>>;
-}
-
-const defaultRuntimeFamilyModules: RuntimeFamilyRegistryEntry[] = [
+const defaultRuntimeFamilyModules: RuntimeFamilyModuleManifestSpec[] = [
   {
     overlayId: 'ppt_deck',
     deliverableKind: 'ppt_deck',
-    module: '@redcube/runtime-family-ppt',
+    runnerId: 'families/ppt',
     exportName: 'runPptDeckRoute',
-    load: async () => await import('@redcube/runtime-family-ppt') as Record<string, unknown>,
+    runRoute: runPptDeckRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
     overlayId: 'xiaohongshu',
     deliverableKind: 'xiaohongshu_note',
-    module: '@redcube/runtime-family-xiaohongshu',
+    runnerId: 'families/xiaohongshu',
     exportName: 'runXiaohongshuRoute',
-    load: async () => await import('@redcube/runtime-family-xiaohongshu') as Record<string, unknown>,
+    runRoute: runXiaohongshuRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
     overlayId: 'poster_onepager',
     deliverableKind: 'poster_onepager',
-    module: '@redcube/runtime-family-poster-onepager',
+    runnerId: 'families/poster-onepager',
     exportName: 'runPosterOnepagerRoute',
-    load: async () => await import('@redcube/runtime-family-poster-onepager') as Record<string, unknown>,
+    runRoute: runPosterOnepagerRoute as (...args: unknown[]) => Promise<unknown>,
   },
 ];
 
@@ -154,7 +155,7 @@ function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec): RuntimeFamily
   return {
     overlay_id: safeText(spec.overlayId),
     deliverable_kind: safeText(spec.deliverableKind),
-    module_name: safeText(spec.module),
+    runner_id: safeText(spec.runnerId),
     export_name: safeText(spec.exportName),
   };
 }
@@ -188,27 +189,15 @@ export function resolveRuntimeFamilyModule(contract: RuntimeFamilyContract): Run
 }
 
 export async function loadRuntimeFamilyRunner(contract: RuntimeFamilyContract): Promise<LoadedRuntimeFamilyRunner> {
-  const moduleRef = resolveRuntimeFamilyModule(contract);
-  let loaded: Record<string, unknown>;
-  try {
-    const registryEntry = defaultRuntimeFamilyModules.find((entry) => entry.module === moduleRef.module_name);
-    if (!registryEntry) {
-      throw new Error(`Runtime family module is not declared in the default registry: ${moduleRef.module_name}`);
-    }
-    loaded = await registryEntry.load();
-  } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    throw new Error(`Failed to load runtime family package ${moduleRef.module_name}: ${detail}`, { cause: error });
-  }
-
-  const runRoute = loaded[moduleRef.export_name];
-  if (typeof runRoute !== 'function') {
-    throw new Error(`Runtime family export missing: ${moduleRef.module_name}#${moduleRef.export_name}`);
+  const runnerRef = resolveRuntimeFamilyModule(contract);
+  const registryEntry = defaultRuntimeFamilyModules.find((entry) => entry.runnerId === runnerRef.runner_id);
+  if (!registryEntry) {
+    throw new Error(`Runtime family runner is not declared in the default registry: ${runnerRef.runner_id}`);
   }
 
   return {
-    ...moduleRef,
-    runRoute: runRoute as LoadedRuntimeFamilyRunner['runRoute'],
+    ...runnerRef,
+    runRoute: registryEntry.runRoute,
   };
 }
 

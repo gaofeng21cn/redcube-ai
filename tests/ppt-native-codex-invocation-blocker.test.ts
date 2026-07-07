@@ -13,7 +13,7 @@ import {
   withMockNativePptRuntime,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
 import { runDeliverableRoute } from './product-domain-action-test-api.ts';
-import { createNativePptCodexInvocationBlockerParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-codex-invocation-blocker.js';
+import { createNativePptCodexInvocationBlockerParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-codex-invocation-blocker.js';
 
 test('native PPT Codex invocation blockers persist diagnostic refs before materialization', async () => {
   await withMockNativePptRuntime(async () => {

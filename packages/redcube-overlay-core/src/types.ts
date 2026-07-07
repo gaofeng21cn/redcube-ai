@@ -91,8 +91,11 @@ export interface OverlayCatalogEntry {
   prompt_pack_id?: string;
   packages?: {
     overlay?: string;
-    runtime_family?: string;
     pack?: string;
+  };
+  runtime?: {
+    runner_id: string;
+    owner: 'redcube_ai';
   };
 }
 

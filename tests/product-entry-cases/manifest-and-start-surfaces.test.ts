@@ -663,7 +663,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
         generated_interface_owner: 'one-person-lab',
         domain_handler_owner: 'redcube_ai',
         repo_local_redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
-        repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+        opl_generated_mcp_descriptor_role: 'protocol_descriptor_for_domain_handler_targets',
         entry_shell_key: 'direct',
         entry_command: 'redcube product invoke',
         supporting_shell_keys: ['direct', 'native_ppt_proof', 'image_ppt_proof'],

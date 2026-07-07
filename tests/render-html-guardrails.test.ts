@@ -4,24 +4,24 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 
-import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core-profile-presets.ts';
+import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core-profile-presets.ts';
 
 const FAMILY_VALIDATORS = [
   {
     label: 'ppt',
-    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
+    file: 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
     validator: 'validateRenderedSlideContent',
     slideId: 'S01',
   },
   {
     label: 'xiaohongshu',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/support.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/support.ts',
     validator: 'validateRenderedSlideContent',
     slideId: 'P01',
   },
   {
     label: 'poster_onepager',
-    file: 'packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/authoring.ts',
+    file: 'packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/authoring.ts',
     validator: 'validateRenderedPosterHtml',
     slideId: 'P01',
   },
@@ -109,7 +109,7 @@ for (const family of FAMILY_VALIDATORS) {
 
 test('ppt render_html rejects audience-visible authoring metadata and source identifiers', () => {
   const validate = loadValidator(
-    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
+    'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
     'validateRenderedSlideContent',
   );
   const leakedHtml = [
@@ -127,7 +127,7 @@ test('ppt render_html rejects audience-visible authoring metadata and source ide
 
 test('ppt render_html rejects internal paper IDs and talk-track meta-language', () => {
   const validate = loadValidator(
-    'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/core.ts',
+    'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
     'validateRenderedSlideContent',
   );
   const leakedHtml = [

@@ -658,8 +658,11 @@ export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
     },
     packages: {
       overlay: '@redcube/overlay-ppt',
-      runtime_family: '@redcube/runtime-family-ppt',
       pack: '@redcube/pack-ppt',
+    },
+    runtime: {
+      runner_id: 'families/ppt',
+      owner: 'redcube_ai',
     },
   } as unknown as PptDeckOverlayCatalogEntry;
 }

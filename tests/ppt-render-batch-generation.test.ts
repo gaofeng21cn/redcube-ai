@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 
-import { createPptDeckStageParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/stages.js';
+import { createPptDeckStageParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/stages.js';
 import { pptExportHelperFixture, pptReviewHelperFixture } from './helpers/python-native-helper-fixtures.ts';
 
 function makeSlide(slideNo) {

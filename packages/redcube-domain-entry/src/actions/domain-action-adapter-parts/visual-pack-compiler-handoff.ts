@@ -260,7 +260,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         repo_local_handler_targets: [...RCA_REPO_LOCAL_HANDLER_TARGETS],
         repo_local_handlers_are_generated_surface_owners: false,
         redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
-        redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+        opl_generated_mcp_descriptor_role: 'protocol_descriptor_for_domain_handler_targets',
         bridge_exit_gate: { ...OPL_GENERATED_SURFACE_EXIT_GATE },
       },
       repository_boundary: {
@@ -297,7 +297,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         generated_descriptor_owner: 'one-person-lab',
         domain_handler_owner: 'redcube_ai',
         redcube_cli_role: 'domain_handler_target_or_direct_domain_entry_only',
-        redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+        opl_generated_mcp_descriptor_role: 'protocol_descriptor_for_domain_handler_targets',
         domain_handler_role: 'domain_handler_target_with_internal_domain_action_adapter_implementation_refs_only',
         product_entry_continuity_refs_adapter_role: 'entry_session_domain_snapshot_refs_only_adapter',
         cli_mcp_skill_product_status_workbench_metadata_owner: 'one-person-lab',
@@ -305,7 +305,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         default_supervision_owner: 'one-person-lab',
         legacy_supervision_public_surface: 'retired',
         redcube_cli_is_unified_metadata_owner: false,
-        redcube_mcp_is_unified_metadata_owner: false,
+        repo_local_mcp_app_exists: false,
         product_entry_continuity_refs_adapter_is_generic_session_owner: false,
       },
       wrappers: {

@@ -261,14 +261,14 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     audit_readout: 'retain_thin_projection_project_generated_wrappers',
     codePaths: [
       'apps/redcube-cli/src/cli.ts',
-      'apps/redcube-mcp/src/server.ts',
+      'packages/redcube-domain-entry/src/actions/family-action-catalog.ts',
       'packages/redcube-domain-entry/src/actions/family-action-catalog.ts',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts',
     ],
     activeCallers: [
       'OPL generated CLI/MCP wrapper domain handler targets',
       'redcube CLI direct diagnostic entry',
-      'redcube MCP direct protocol adapter',
+      'OPL generated protocol descriptor targeting RCA domain handlers',
       'family action catalog refs',
       'domain-handler guarded action list refs',
     ],

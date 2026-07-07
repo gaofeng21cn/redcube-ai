@@ -382,8 +382,11 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       },
       packages: {
         overlay: '@redcube/overlay-ppt',
-        runtime_family: '@redcube/runtime-family-ppt',
         pack: '@redcube/pack-ppt',
+      },
+      runtime: {
+        runner_id: 'families/ppt',
+        owner: 'redcube_ai',
       },
     },
   );
@@ -405,8 +408,11 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   );
   assert.deepEqual(xiaohongshuCatalog.packages, {
     overlay: '@redcube/overlay-xiaohongshu',
-    runtime_family: '@redcube/runtime-family-xiaohongshu',
     pack: '@redcube/pack-xiaohongshu',
+  });
+  assert.deepEqual(xiaohongshuCatalog.runtime, {
+    runner_id: 'families/xiaohongshu',
+    owner: 'redcube_ai',
   });
   assert.deepEqual(
     poster,
@@ -419,8 +425,11 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       prompt_pack_id: 'poster_onepager_mainline_v1',
       packages: {
         overlay: '@redcube/overlay-poster-onepager',
-        runtime_family: '@redcube/runtime-family-poster-onepager',
         pack: '@redcube/pack-poster-onepager',
+      },
+      runtime: {
+        runner_id: 'families/poster-onepager',
+        owner: 'redcube_ai',
       },
     },
   );
@@ -443,16 +452,12 @@ test('registry source manifests stay aligned with direct package dependencies an
     );
   }
 
-  for (const { module_name } of listDefaultRuntimeFamilyModules()) {
-    assert.equal(
-      runtimePackage.dependencies[module_name],
-      '0.1.0',
-      `${module_name} must be a direct runtime dependency`,
-    );
+  for (const { runner_id } of listDefaultRuntimeFamilyModules()) {
     assert.match(
       runtimeSource,
-      new RegExp(`module:\\s*['"]${module_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"][\\s\\S]*?load:\\s*async`),
-      `${module_name} must have a literal runtime-family loader`,
+      new RegExp(`runnerId:\\s*['"]${runner_id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`),
+      `${runner_id} must have a literal runtime family runner id`,
     );
+    assert.match(runtimeSource, /runRoute:/, `${runner_id} must resolve to an internal runner`);
   }
 });

@@ -12,13 +12,13 @@ import {
   withMockNativePptRuntime,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
 import { invokeProductEntry, runDeliverableRoute } from './product-domain-action-test-api.ts';
-import { createNativePptPlanPreflightParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-plan-preflight.js';
-import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
+import { createNativePptPlanPreflightParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-plan-preflight.js';
+import { createNativePptShapePlanNormalizeParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-normalize.js';
 import {
   createNativePptSampleAuthoringParts,
   nativePptSampleLayoutProfile,
-} from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-sample-authoring.js';
-import { buildNativeSampleShapePlanOutputContract } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/native-ppt-shape-plan-contract.js';
+} from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-sample-authoring.js';
+import { buildNativeSampleShapePlanOutputContract } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-contract.js';
 
 function meaningfulChars(text) {
   return String(text || '').replace(/[\p{P}\p{S}\s_]+/gu, '').length;

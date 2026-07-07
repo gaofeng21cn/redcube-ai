@@ -36,11 +36,11 @@ async function withMockCodexRuntime(testFn) {
 }
 
 test('poster_onepager creative mainline no longer lets runtime artifacts, seeds, or pack compilers author content', () => {
-  const familyTypes = read('packages/redcube-runtime-family-poster-onepager/src/types.ts');
+  const familyTypes = read('packages/redcube-runtime/src/families/poster-onepager/types.ts');
   const runtime = [
-    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime.ts'),
-    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/authoring.ts'),
-    read('packages/redcube-runtime-family-poster-onepager/src/poster-onepager-runtime-parts/core.ts'),
+    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime.ts'),
+    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/authoring.ts'),
+    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/core.ts'),
   ].join('\n');
   const storylinePrompt = read('prompts/poster_onepager/storyline.md');
   const blueprintPrompt = read('prompts/poster_onepager/poster_blueprint.md');

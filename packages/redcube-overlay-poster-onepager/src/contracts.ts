@@ -292,8 +292,11 @@ export function describePosterOnepagerOverlay() {
     prompt_pack_id: PROMPT_PACK.pack_id,
     packages: {
       overlay: '@redcube/overlay-poster-onepager',
-      runtime_family: '@redcube/runtime-family-poster-onepager',
       pack: '@redcube/pack-poster-onepager',
+    },
+    runtime: {
+      runner_id: 'families/poster-onepager',
+      owner: 'redcube_ai',
     },
   };
 }

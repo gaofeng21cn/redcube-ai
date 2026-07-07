@@ -9,7 +9,7 @@ import {
   buildHermesAgentLoopExecutorDescriptor,
   normalizeExecutorBackend,
 } from './package-surfaces.ts';
-import { createStructuredArtifactExecutor } from '../packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/executor-routing.ts';
+import { createStructuredArtifactExecutor } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/executor-routing.ts';
 
 const HERMES_ADAPTER_DELETION_GATE = [
   'opl_agent_executor_adapter_default_caller_parity',

@@ -484,7 +484,6 @@
   "generated_interface_consumption_ref": "/opl_generated_interface_consumption",
   "repo_local_handler_targets": [
     "redcube_cli",
-    "redcube_mcp",
     "invokeProductEntry",
     "invokeDomainEntry",
     "domain_handler",

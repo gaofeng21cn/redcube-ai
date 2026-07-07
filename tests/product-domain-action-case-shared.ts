@@ -16,14 +16,6 @@ import {
 } from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-
-import {
-  callDomainTool,
-  getToolDefinitions,
-  listDomainTools,
-} from '../apps/redcube-mcp/dist/server.js';
 import {
   createDeliverable,
   executeSourceAugmentation,
@@ -271,12 +263,10 @@ function withOperation(operation, args = {}) {
 const SERIAL_ENV_TEST = { concurrency: false };
 
 export {
-  Client,
   DOMAIN_ENTRY_PACKAGE_JSON,
   PRODUCT_ENTRY_COMPANIONS_SPECIFIER,
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
-  StdioClientTransport,
   assert,
   assertFamilyOrchestrationCompanion,
   assertReceiptOnlyHostedAttemptProjection,
@@ -285,7 +275,6 @@ export {
   buildAugmentationResultPayload,
   buildHostedAttemptBridgeFixture,
   buildOplRouteAttemptIndexForTest,
-  callDomainTool,
   chmodSync,
   completeSourceReadiness,
   createDeliverable,
@@ -301,12 +290,10 @@ export {
   getProductPreflight,
   getProductStart,
   getDomainActionAdapterGuardedActionMetadata,
-  getToolDefinitions,
   importDomainEntrySharedModule,
   intakeSource,
   invokeOplHostedProductEntry,
   invokeProductEntry,
-  listDomainTools,
   mkdirSync,
   mkdtempSync,
   os,

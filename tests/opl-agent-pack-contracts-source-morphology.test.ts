@@ -679,9 +679,9 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
   assert.deepEqual(byId.visual_route_runtime_family_implementations.source_refs, [
-    'packages/redcube-runtime-family-ppt/src/',
-    'packages/redcube-runtime-family-xiaohongshu/src/',
-    'packages/redcube-runtime-family-poster-onepager/src/',
+    'packages/redcube-runtime/src/families/ppt/',
+    'packages/redcube-runtime/src/families/xiaohongshu/',
+    'packages/redcube-runtime/src/families/poster-onepager/',
     'packages/redcube-runtime/src/default-registries.ts',
   ]);
   assert.equal(
@@ -752,9 +752,9 @@ test('RCA route attempt and route-run record tails are explicitly classified', (
 test('RCA runtime-family route implementations are classified as visual route implementations only', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
   const runtimeFamilySourceRoots = [
-    'packages/redcube-runtime-family-ppt/src/',
-    'packages/redcube-runtime-family-xiaohongshu/src/',
-    'packages/redcube-runtime-family-poster-onepager/src/',
+    'packages/redcube-runtime/src/families/ppt/',
+    'packages/redcube-runtime/src/families/xiaohongshu/',
+    'packages/redcube-runtime/src/families/poster-onepager/',
     'packages/redcube-runtime/src/default-registries.ts',
   ];
 

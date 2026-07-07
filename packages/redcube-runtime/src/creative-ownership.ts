@@ -152,7 +152,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       runtimeStateDisplayPath('plans', 'spec-redcube-agent-first-execution-and-creative-ownership-recovery.md'),
     ],
     ppt_visual_director_review_contract: [
-      'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
+      'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts',
       'packages/redcube-overlay-ppt/src/profiles.ts',
       'tests/ppt-creative-ownership.test.ts',
     ],
@@ -182,7 +182,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lane_id: 'xiaohongshu_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'delivery_packaging'],
       write_scopes: [
-        'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
+        'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts',
         'packages/redcube-pack-xiaohongshu/src/index.ts',
         'prompts/xiaohongshu/**',
         'tests/xiaohongshu-creative-ownership.test.ts',
@@ -197,8 +197,8 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lane_id: 'ppt_deck_creative_ownership_recovery',
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'review_overlay'],
       write_scopes: [
-        'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
-        'packages/redcube-runtime-family-ppt/src/ppt-structured-artifact-builders.ts',
+        'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts',
+        'packages/redcube-runtime/src/families/ppt/ppt-structured-artifact-builders.ts',
         'packages/redcube-pack-ppt/src/index.ts',
         'prompts/ppt_deck/**',
         'tests/ppt-creative-ownership.test.ts',
@@ -325,7 +325,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.storyline.prompt_seed_authorship',
     stage: 'story_architecture',
     protected_surface: 'story_architecture_seed_authorship',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed(contract, 'storyline');",
       "audience_judgement: safeText(seed?.storyline?.audience_judgement, research?.research?.audience_judgement)",
@@ -357,7 +357,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.publish_copy.seed_authorship',
     stage: 'delivery_packaging',
     protected_surface: 'publish_copy_body',
-    file: 'packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed(contract, 'publish_copy', {",
       'const body = safeText(publishSeed.body);',
@@ -371,7 +371,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     violation_id: 'ppt.storyline.prompt_seed_authorship',
     stage: 'story_architecture',
     protected_surface: 'story_architecture_seed_authorship',
-    file: 'packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts',
+    file: 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts',
     evidence_patterns: [
       "const seed = promptSeed('storyline', {",
       'core_metaphor: safeText(seed?.storyline?.core_metaphor)',
@@ -408,10 +408,10 @@ function buildReviewOverlayStatus() {
     "requires_stages: ['author_image_pages']",
     "stage_id: 'screenshot_review'",
     "requires_stages: ['visual_director_review']",
-  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime.ts', [
+  ]) && matchesAllEvidence('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts', [
     'visual_director_review: ({ contract, deliverablePaths, adapter }) => (',
     'buildDirectorReview(contract, deliverablePaths, adapter)',
-  ]) && matchesAllEvidence('packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/stage-director-review.ts', [
+  ]) && matchesAllEvidence('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/stage-director-review.ts', [
     "review_overlay: 'visual_director_review'",
   ]);
 

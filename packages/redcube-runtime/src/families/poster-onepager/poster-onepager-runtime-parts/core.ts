@@ -42,7 +42,7 @@ import {
 
 export function createPosterOnepagerRuntimeCore() {
   const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
-  const REPO_ROOT = path.resolve(MODULE_DIR, '../../../..');
+  const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
   const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
   const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
   const BANNED_RENDER_TOKENS = Object.freeze(['renderSlide', 'layoutByType', 'cardsGrid', 'pageType']);

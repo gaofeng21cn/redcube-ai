@@ -324,12 +324,12 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
   {
     surface_id: 'mcp_product_entry_domain_entry',
     source_refs: [
-      'apps/redcube-mcp/src/server.ts',
+      'packages/redcube-domain-entry/src/actions/family-action-catalog.ts',
       'packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts',
       'packages/redcube-domain-entry/src/actions/invoke-product-entry.ts',
     ],
     classification: 'service_safe_domain_entry',
-    current_rca_role: 'direct_protocol_adapter_domain_handler_target_not_generated_wrapper_owner',
+    current_rca_role: 'opl_generated_protocol_descriptor_domain_handler_target_not_generated_wrapper_owner',
     allowed_outputs: [
       'service_safe_domain_entry_response',
       'domain_action_metadata_refs',
@@ -712,9 +712,9 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
   {
     surface_id: 'visual_route_runtime_family_implementations',
     source_refs: [
-      'packages/redcube-runtime-family-ppt/src/',
-      'packages/redcube-runtime-family-xiaohongshu/src/',
-      'packages/redcube-runtime-family-poster-onepager/src/',
+      'packages/redcube-runtime/src/families/ppt/',
+      'packages/redcube-runtime/src/families/xiaohongshu/',
+      'packages/redcube-runtime/src/families/poster-onepager/',
       'packages/redcube-runtime/src/default-registries.ts',
     ],
     classification: 'visual_route_runtime_family_implementation',
@@ -729,7 +729,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     legacy_name_allowance: legacyNameAllowance({
       legacy_terms: ['runtime'],
       allowed_as: ['visual_route_runtime_family_implementation', 'package_protocol_boundary'],
-      rationale: 'runtime-family packages implement RCA visual route families and the direct registry for those route handlers; they cannot own generic runtime, session, workbench, attempt ledger, scheduler, review/repair transport, or generated wrapper surfaces.',
+      rationale: 'runtime-local family source roots implement RCA visual route families and the direct registry for those route handlers; they cannot own generic runtime, session, workbench, attempt ledger, scheduler, review/repair transport, or generated wrapper surfaces.',
     }),
     no_resurrection_gate: {
       generic_scheduler_owner_allowed: false,

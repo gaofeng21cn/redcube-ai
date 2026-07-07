@@ -13,12 +13,8 @@ const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies'
 
 const LAYER_BY_PACKAGE = new Map([
   ['@redcube/cli', 'app'],
-  ['@redcube/mcp', 'app'],
   ['@redcube/domain-entry', 'domain-entry'],
   ['@redcube/runtime', 'runtime'],
-  ['@redcube/runtime-family-ppt', 'runtime-family'],
-  ['@redcube/runtime-family-xiaohongshu', 'runtime-family'],
-  ['@redcube/runtime-family-poster-onepager', 'runtime-family'],
   ['@redcube/overlay-core', 'overlay'],
   ['@redcube/overlay-ppt', 'overlay'],
   ['@redcube/overlay-xiaohongshu', 'overlay'],
@@ -33,8 +29,7 @@ const LAYER_BY_PACKAGE = new Map([
 const ALLOWED_DEPENDENCY_LAYERS = new Map([
   ['app', new Set(['domain-entry', 'config'])],
   ['domain-entry', new Set(['overlay', 'runtime', 'protocol'])],
-  ['runtime', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'runtime-family', 'protocol', 'substrate'])],
-  ['runtime-family', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'protocol', 'substrate'])],
+  ['runtime', new Set(['client', 'config', 'governance', 'overlay', 'reference', 'protocol', 'substrate'])],
   ['overlay', new Set(['overlay', 'protocol'])],
   ['protocol', new Set(['protocol'])],
   ['config', new Set(['config', 'protocol'])],

@@ -254,7 +254,7 @@
       "chart_table_metric_grid_review_behavior": "screenshot_review blocks native slides that contain editable chart/table/metric-grid shapes when required manifest metrics are missing"
     },
     "runtime_executor_proof": {
-      "author_executor": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/native-ppt.ts",
+      "author_executor": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt.ts",
       "native_writer_package_module": "redcube_ai.native_helpers.ppt_deck.native",
       "native_writer_module_command": "python -m redcube_ai.native_helpers.ppt_deck.native",
       "engine_contract": "contracts/runtime-program/ppt-native-python-engine-contract.json",

@@ -11,7 +11,7 @@ import {
   intakeSource,
   runDeliverableRoute,
 } from './product-domain-action-test-api.ts';
-import { createPptDeckRuntimeCore } from '../packages/redcube-runtime-family-ppt/dist/ppt-deck-runtime-family-parts/core.js';
+import { createPptDeckRuntimeCore } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/core.js';
 import {
   startMockCodexCli,
   withEnv,

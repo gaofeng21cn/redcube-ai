@@ -13,7 +13,7 @@ import {
   stageFolderOutputPath,
   writeStageFolderArtifact,
 } from '@redcube/runtime-protocol';
-import { runPptDeckRoute } from '../packages/redcube-runtime-family-ppt/dist/index.js';
+import { runPptDeckRoute } from '../packages/redcube-runtime/dist/families/ppt/index.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

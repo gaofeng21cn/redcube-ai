@@ -234,7 +234,7 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
     opl_role: 'generated_interface_metadata_owner',
     generated_interface_owner: 'one-person-lab',
     repo_local_redcube_cli_role: 'domain_handler_target_or_direct_entry_only',
-    repo_local_redcube_mcp_role: 'domain_handler_target_or_direct_protocol_adapter_only',
+    opl_generated_mcp_descriptor_role: 'protocol_descriptor_for_domain_handler_targets',
     domain_handler_role: 'domain_handler_target_or_refs_only_adapter',
     generic_session_shell_owner: 'one-person-lab',
     generic_workbench_owner: 'one-person-lab',
@@ -562,7 +562,6 @@ export function buildRedCubeActionMetadata() {
     owner_model: 'opl_generated_descriptors_with_rca_domain_handler_targets',
     repo_local_handler_targets: [
       'redcube_cli',
-      'redcube_mcp',
       'invokeProductEntry',
       'invokeDomainEntry',
       'domain_handler',

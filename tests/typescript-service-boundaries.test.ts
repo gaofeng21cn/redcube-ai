@@ -36,15 +36,13 @@ test('P16 slice 3: CLI exposes a TypeScript service entrypoint and typed command
   assert.equal(existsSync(path.resolve('apps/redcube-cli/src/cli.js')), false);
 });
 
-test('P16 slice 4: MCP exposes a TypeScript service entrypoint and typed domain tool contracts', () => {
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/index.ts')), true);
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/types.ts')), true);
-
-  const pkg = JSON.parse(readFileSync(path.resolve('apps/redcube-mcp/package.json'), 'utf-8'));
-
-  assert.equal(pkg.types, './dist/index.d.ts');
-  assert.equal(pkg.bin['redcube-mcp'], './dist/server.js');
-  assert.equal(existsSync(path.resolve('apps/redcube-mcp/src/server.js')), false);
+test('P16 slice 4: RCA no longer self-maintains a production MCP API app', () => {
+  assert.equal(existsSync(path.resolve('apps/redcube-mcp')), false);
+  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
+  assert.equal(
+    rootTsconfig.references.some((entrypoint) => entrypoint.path === './apps/redcube-mcp'),
+    false,
+  );
 });
 
 test('P20.B: default registries are package-local runtime contracts, not standalone package facades', () => {
@@ -61,9 +59,21 @@ test('P20.B: default registries are package-local runtime contracts, not standal
     rootTsconfig.references.some((entrypoint) => entrypoint.path === './packages/redcube-overlay-registry'),
     false,
   );
+  for (const retiredFamilyPackage of [
+    './packages/redcube-runtime-family-ppt',
+    './packages/redcube-runtime-family-xiaohongshu',
+    './packages/redcube-runtime-family-poster-onepager',
+  ]) {
+    assert.equal(rootTsconfig.references.some((entrypoint) => entrypoint.path === retiredFamilyPackage), false);
+    assert.equal(existsSync(path.resolve(retiredFamilyPackage)), false);
+  }
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/ppt/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/xiaohongshu/index.ts')), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/poster-onepager/index.ts')), true);
 
   assert.match(runtimeSource, /export function getDefaultOverlayRegistry/);
-  assert.match(runtimeSource, /export async function loadRuntimeFamilyRunner/);
+  assert.match(runtimeSource, /runnerId: 'families\/ppt'/);
+  assert.doesNotMatch(runtimeSource, /@redcube\/runtime-family-/);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/default-registries.js')), false);
 });
 
