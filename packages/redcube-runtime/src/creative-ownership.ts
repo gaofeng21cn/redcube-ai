@@ -183,7 +183,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lifecycle_focus: ['story_architecture', 'visual_authorship', 'delivery_packaging'],
       write_scopes: [
         'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime.ts',
-        'packages/redcube-pack-xiaohongshu/src/index.ts',
+        'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
         'prompts/xiaohongshu/**',
         'tests/xiaohongshu-creative-ownership.test.ts',
         'tests/xiaohongshu-deliverable-e2e.test.ts',
@@ -199,7 +199,6 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       write_scopes: [
         'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts',
         'packages/redcube-runtime/src/families/ppt/ppt-structured-artifact-builders.ts',
-        'packages/redcube-pack-ppt/src/index.ts',
         'prompts/ppt_deck/**',
         'tests/ppt-creative-ownership.test.ts',
         'tests/ppt-deliverable-e2e.test.ts',
@@ -334,7 +333,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.single_note_plan.pack_shell_authorship',
     stage: 'story_architecture',
     protected_surface: 'page_core_content',
-    file: 'packages/redcube-pack-xiaohongshu/src/index.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
     evidence_patterns: [
       'buildXhsPlanSlides',
       'buildXhsVisualDirection',
@@ -345,7 +344,7 @@ const XIAOHONGSHU_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.fre
     violation_id: 'xhs.render_html.template_authorship',
     stage: 'visual_authorship',
     protected_surface: 'final_html_markup',
-    file: 'packages/redcube-pack-xiaohongshu/src/index.ts',
+    file: 'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/index.ts',
     evidence_patterns: [
       'compileXhsRenderSlides',
     ],
@@ -380,7 +379,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     violation_id: 'ppt.slide_blueprint.shaping_authorship',
     stage: 'story_architecture',
     protected_surface: 'blueprint_major_text',
-    file: 'packages/redcube-pack-ppt/src/index.ts',
+    file: 'packages/redcube-runtime/src/families/ppt/ppt-structured-artifact-builders.ts',
     evidence_patterns: [
       'buildPptDetailedOutline',
       'buildPptSlideBlueprint',
@@ -392,7 +391,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
     violation_id: 'ppt.render_html.template_authorship',
     stage: 'visual_authorship',
     protected_surface: 'final_html_markup',
-    file: 'packages/redcube-pack-ppt/src/index.ts',
+    file: 'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/render.ts',
     evidence_patterns: [
       'compilePptRenderSlides',
     ],

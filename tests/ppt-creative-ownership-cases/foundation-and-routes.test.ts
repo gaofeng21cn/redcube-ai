@@ -212,7 +212,7 @@ function getPptDeliverableSurfacePaths(workspaceRoot, topicId = 'topic-a', deliv
 }
 
 test('ppt clears code-authored Story Architecture / Visual Authorship residue and adds explicit visual_director_review', () => {
-  const familyTypes = read('packages/redcube-runtime/src/families/ppt/types.ts');
+  const familyIndex = read('packages/redcube-runtime/src/families/ppt/index.ts');
   const runtime = [
     read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts'),
     read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/authoring.ts'),
@@ -239,11 +239,11 @@ test('ppt clears code-authored Story Architecture / Visual Authorship residue an
   assert.equal(runtime.includes("const seed = promptSeed('storyline', {"), false);
   assert.equal(runtime.includes("core_metaphor: safeText(seed?.storyline?.core_metaphor)"), false);
   assert.equal(existsSync(path.resolve('packages/redcube-pack-ppt')), false);
-  assert.equal(familyTypes.includes('@redcube/pack-ppt'), false);
-  assert.equal(familyTypes.includes('buildPptDetailedOutline'), false);
-  assert.equal(familyTypes.includes('buildPptSlideBlueprint'), false);
-  assert.equal(familyTypes.includes('buildPptVisualDirection'), false);
-  assert.equal(familyTypes.includes('compilePptRenderSlides'), false);
+  assert.equal(familyIndex.includes('@redcube/pack-ppt'), false);
+  assert.equal(familyIndex.includes('buildPptDetailedOutline'), false);
+  assert.equal(familyIndex.includes('buildPptSlideBlueprint'), false);
+  assert.equal(familyIndex.includes('buildPptVisualDirection'), false);
+  assert.equal(familyIndex.includes('compilePptRenderSlides'), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), false);
   assert.equal(runtime.includes("const renderArtifact = deps.promptArtifact('render_html')?.render_markup_artifact || {};"), false);
   assert.equal(runtime.includes('compileRenderSlides({'), false);
