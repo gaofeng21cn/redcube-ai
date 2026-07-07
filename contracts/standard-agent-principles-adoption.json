@@ -94,7 +94,8 @@
       "agent/professional_skills/rca-ppt-page-author/SKILL.md",
       "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
       "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-      "agent/professional_skills/rca-template-profiler/SKILL.md"
+      "agent/professional_skills/rca-template-profiler/SKILL.md",
+      "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
     ],
     "tool_surfaces": [
       "agent/tools/domain_affordances.md"
