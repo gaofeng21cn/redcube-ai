@@ -236,6 +236,14 @@ function physicalDeleteBlockerRef(moduleId) {
   return `rca-typed-blocker:private-platform-retirement:${privatePlatformOwnerEvidenceSegment(moduleId)}:physical-delete-requires-explicit-owner-receipt`;
 }
 
+function ownerEvidenceLaneRef(moduleId) {
+  return `contracts/functional_privatization_audit.json#/owner_evidence_lane_index/${privatePlatformOwnerEvidenceSegment(moduleId)}`;
+}
+
+function ownerEvidenceLaneBuilderRef(moduleId) {
+  return `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${privatePlatformOwnerEvidenceSegment(moduleId)}`;
+}
+
 export function buildPrivatePlatformRetirementOwnerEvidenceLane(target = null) {
   const moduleItems = Array.isArray(target) ? target : null;
   const moduleId = moduleItems ? 'all-retained-private-platform-residue' : target?.module_id;
@@ -334,7 +342,8 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
       keep_as_authority_adapter_ref: keepAsAuthorityAdapterRef(entry.module_id),
       typed_blocker_ref: physicalDeleteBlockerRef(entry.module_id),
       memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-      owner_evidence_lane: buildPrivatePlatformRetirementOwnerEvidenceLane(entry),
+      owner_evidence_lane_ref: ownerEvidenceLaneRef(entry.module_id),
+      owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef(entry.module_id),
     } : {}),
   };
 }
@@ -351,7 +360,8 @@ export function buildFunctionalModulePhysicalDeletionGuard(entry) {
     keep_as_authority_adapter_ref: keepAsAuthorityAdapterRef(entry.module_id),
     typed_blocker_ref: physicalDeleteBlockerRef(entry.module_id),
     memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-    owner_evidence_lane: buildPrivatePlatformRetirementOwnerEvidenceLane(entry),
+    owner_evidence_lane_ref: ownerEvidenceLaneRef(entry.module_id),
+    owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef(entry.module_id),
   };
 }
 
@@ -399,7 +409,8 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
       'real_memory_lifecycle_receipt_instances',
       'cross_family_repeated_no_regression_evidence',
     ],
-    owner_evidence_lane: buildPrivatePlatformRetirementOwnerEvidenceLane(moduleItems),
+    owner_evidence_lane_ref: ownerEvidenceLaneRef('all-retained-private-platform-residue'),
+    owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef('all-retained-private-platform-residue'),
   };
 }
 

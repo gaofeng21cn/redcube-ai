@@ -82,25 +82,12 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       expectedMemoryArtifactLifecycleReceiptRefs,
     );
     assert.equal(
-      surface.physical_deletion_guard.owner_evidence_lane.surface_kind,
-      'rca_private_platform_retirement_owner_evidence_lane',
+      surface.physical_deletion_guard.owner_evidence_lane_ref,
+      'contracts/functional_privatization_audit.json#/owner_evidence_lane_index/all-retained-private-platform-residue',
     );
-    assert.equal(
-      surface.physical_deletion_guard.owner_evidence_lane.evidence_scope,
-      'owner_native_refs_only_no_physical_delete_authorization',
-    );
-    assert.deepEqual(surface.physical_deletion_guard.owner_evidence_lane.physical_delete_authorization_refs, []);
-    assert.deepEqual(
-      surface.physical_deletion_guard.owner_evidence_lane.memory_artifact_lifecycle_receipt_refs,
-      expectedMemoryArtifactLifecycleReceiptRefs,
-    );
-    assert.equal(
-      surface.physical_deletion_guard.owner_evidence_lane.authority_boundary.opl_projection_can_authorize_physical_delete,
-      false,
-    );
-    assert.equal(
-      surface.physical_deletion_guard.owner_evidence_lane.authority_boundary.open_count_zero_can_authorize_physical_delete,
-      false,
+    assert.match(
+      surface.physical_deletion_guard.owner_evidence_lane_builder_ref,
+      /privatized-functional-module-audit\.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue$/,
     );
     assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.equal(surface.retired_no_resurrection_guards, undefined);
@@ -203,9 +190,14 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
           'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
           entry.module_id,
         );
-        assert.deepEqual(
-          entry.physical_deletion_guard.owner_evidence_lane.memory_artifact_lifecycle_receipt_refs,
-          expectedMemoryArtifactLifecycleReceiptRefs,
+        assert.equal(
+          entry.physical_deletion_guard.owner_evidence_lane_ref,
+          `contracts/functional_privatization_audit.json#/owner_evidence_lane_index/${entry.module_id.replaceAll('_', '-')}`,
+          entry.module_id,
+        );
+        assert.match(
+          entry.physical_deletion_guard.owner_evidence_lane_builder_ref,
+          new RegExp(`buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}$`),
           entry.module_id,
         );
         assert.equal(entry.bridge_exit_gate.physical_delete_authorization_ref, null, entry.module_id);
@@ -220,13 +212,13 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
           entry.module_id,
         );
         assert.equal(
-          entry.bridge_exit_gate.owner_evidence_lane.authority_boundary.opl_projection_can_authorize_physical_delete,
-          false,
+          entry.bridge_exit_gate.owner_evidence_lane_ref,
+          entry.physical_deletion_guard.owner_evidence_lane_ref,
           entry.module_id,
         );
-        assert.equal(
-          entry.bridge_exit_gate.owner_evidence_lane.authority_boundary.open_count_zero_can_authorize_physical_delete,
-          false,
+        assert.match(
+          entry.bridge_exit_gate.owner_evidence_lane_builder_ref,
+          new RegExp(`buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}$`),
           entry.module_id,
         );
       }

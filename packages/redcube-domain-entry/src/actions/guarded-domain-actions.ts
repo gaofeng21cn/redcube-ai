@@ -4,7 +4,6 @@ import {
   FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS,
   RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS,
   RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
-  buildPrivatePlatformRetirementOwnerEvidenceLane,
   buildBridgeExitGate,
   buildFunctionalModulePhysicalDeletionGuard,
   buildPrivateGenericResidueBridgeExitGate,
@@ -567,7 +566,10 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         `rca-typed-blocker:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`),
       memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
       memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
-      owner_evidence_lane: buildPrivatePlatformRetirementOwnerEvidenceLane(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
+      owner_evidence_lane_ref:
+        'contracts/functional_privatization_audit.json#/owner_evidence_lane_index/all-retained-private-platform-residue',
+      owner_evidence_lane_builder_ref:
+        'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
     },
     fresh_large_private_surface_scan: RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN,
     bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
