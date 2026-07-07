@@ -1,4 +1,7 @@
-import { buildGovernanceSurfaceContract } from './contracts.js';
+import {
+  buildGovernanceSurfaceContract,
+  validateGovernanceSurfaceContract,
+} from './contracts.js';
 
 export type SurfaceContract = Record<string, any>;
 export type SurfaceArtifactContent = (contract: SurfaceContract) => unknown;
@@ -63,4 +66,86 @@ export function validateSurfaceArtifact({
     throw new Error(`Unknown ${family} surface artifact: ${relativePath}`);
   }
   return Boolean(validator(content as SurfaceContract));
+}
+
+export function validateBaselinePolicySurface(content: SurfaceContract): boolean {
+  return content?.modes?.draft_new?.baseline_required === false
+    && content?.modes?.optimize_existing?.baseline_required === true;
+}
+
+export function validateDeliveryContractSurface(
+  content: SurfaceContract,
+  {
+    requiredExportRoute,
+    requiredExportBundleId,
+    projectionModel,
+    humanGateRequired,
+  }: {
+    requiredExportRoute: string;
+    requiredExportBundleId?: string;
+    projectionModel: 'direct_delivery' | 'human_publication';
+    humanGateRequired: boolean;
+  },
+): boolean {
+  const baseValid = content?.authoritative_projection_surface === 'getPublicationProjection'
+    && content?.authoritative_review_surface === 'getReviewState'
+    && content?.required_export_route === requiredExportRoute
+    && typeof content?.required_export_bundle_id === 'string'
+    && content.required_export_bundle_id.length > 0
+    && (!requiredExportBundleId || content.required_export_bundle_id === requiredExportBundleId)
+    && content?.projection_model === projectionModel
+    && content?.human_gate?.required === humanGateRequired;
+
+  if (!baseValid || humanGateRequired) {
+    return baseValid;
+  }
+
+  return content?.operator_handoff?.owner_surface === 'required_export_artifact.delivery_state'
+    && content?.operator_handoff?.handoff_ready_state === 'output_ready'
+    && Array.isArray(content?.operator_handoff?.gate_surfaces)
+    && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
+    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
+    && content.operator_handoff.reopen_mutation_surface === 'request_changes'
+    && content.operator_handoff.closeout_mutation_surface === 'promote_baseline';
+}
+
+export function validateGovernanceSurfaceArtifact(
+  content: SurfaceContract,
+  {
+    overlay,
+    familyKind,
+  }: {
+    overlay: string;
+    familyKind: string;
+  },
+): boolean {
+  return validateGovernanceSurfaceContract(content)
+    && content?.family_boundary?.family_kind === familyKind
+    && content?.family_boundary?.overlay === overlay;
+}
+
+export function validateHydratedDeliverableSurface(
+  content: SurfaceContract,
+  {
+    overlay,
+    requiredExportRoute,
+  }: {
+    overlay?: string;
+    requiredExportRoute: string;
+  },
+): boolean {
+  return (!overlay || content?.overlay === overlay)
+    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
+    && content?.delivery_contract?.required_export_route === requiredExportRoute;
+}
+
+export function validateDisplayRegistrySurface(
+  content: SurfaceContract,
+  surfaceIds: string[],
+): boolean {
+  return Array.isArray(content?.surfaces)
+    && surfaceIds.every((surfaceId) =>
+      content.surfaces.some((surface: SurfaceContract) => surface?.id === surfaceId),
+    );
 }

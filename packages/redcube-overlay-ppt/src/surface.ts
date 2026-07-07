@@ -4,7 +4,11 @@ import {
   listSurfaceArtifactPaths,
   type SurfaceContract,
   type SurfaceValidator,
-  validateGovernanceSurfaceContract,
+  validateBaselinePolicySurface,
+  validateDeliveryContractSurface,
+  validateDisplayRegistrySurface,
+  validateGovernanceSurfaceArtifact,
+  validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
 } from '@redcube/overlay-core';
 
@@ -169,32 +173,22 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && Array.isArray(content?.structured_families_require_anchor)
     && content.structured_families_require_anchor.length > 0
     && content.evidence_surface_rules?.require_public_source_label === true,
-  'contracts/baseline-policy.json': (content: SurfaceContract) =>
-    content?.modes?.draft_new?.baseline_required === false
-    && content?.modes?.optimize_existing?.baseline_required === true,
+  'contracts/baseline-policy.json': validateBaselinePolicySurface,
   'contracts/export-bundle.json': (content: SurfaceContract) =>
     typeof content?.bundle_id === 'string'
     && content.bundle_id.length > 0
     && typeof content?.include_pptx === 'boolean',
   'contracts/delivery-contract.json': (content: SurfaceContract) =>
-    content?.authoritative_projection_surface === 'getPublicationProjection'
-    && content?.authoritative_review_surface === 'getReviewState'
-    && content?.required_export_route === 'export_pptx'
-    && typeof content?.required_export_bundle_id === 'string'
-    && content.required_export_bundle_id.length > 0
-    && content?.projection_model === 'direct_delivery'
-    && content?.human_gate?.required === false
-    && content?.operator_handoff?.owner_surface === 'required_export_artifact.delivery_state'
-    && content?.operator_handoff?.handoff_ready_state === 'output_ready'
-    && Array.isArray(content?.operator_handoff?.gate_surfaces)
-    && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
-    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
-    && content.operator_handoff.reopen_mutation_surface === 'request_changes'
-    && content.operator_handoff.closeout_mutation_surface === 'promote_baseline',
+    validateDeliveryContractSurface(content, {
+      requiredExportRoute: 'export_pptx',
+      projectionModel: 'direct_delivery',
+      humanGateRequired: false,
+    }),
   'contracts/governance-surface.json': (content: SurfaceContract) =>
-    validateGovernanceSurfaceContract(content)
-    && content?.family_boundary?.family_kind === 'direct_delivery_capable'
-    && content?.family_boundary?.overlay === 'ppt_deck',
+    validateGovernanceSurfaceArtifact(content, {
+      overlay: 'ppt_deck',
+      familyKind: 'direct_delivery_capable',
+    }),
   'contracts/hydrated-deliverable.json': (content: SurfaceContract) =>
     typeof content?.profile_id === 'string'
     && content.profile_id.length > 0
@@ -204,16 +198,15 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && typeof content?.export_bundle?.bundle_id === 'string'
     && content?.lifecycle_stage_contract?.stage_model === 'direct_delivery_human_workline'
     && content?.lifecycle_stage_contract?.route_to_human_stage?.detailed_outline === 'plan'
-    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
-    && content?.delivery_contract?.required_export_route === 'export_pptx',
+    && validateHydratedDeliverableSurface(content, { requiredExportRoute: 'export_pptx' }),
   'views/display-registry.json': (content: SurfaceContract) =>
-    Array.isArray(content?.surfaces)
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'source_index')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'author_image_pages')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'visual_director_review')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'screenshot_review')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'export_pptx'),
+    validateDisplayRegistrySurface(content, [
+      'source_index',
+      'author_image_pages',
+      'visual_director_review',
+      'screenshot_review',
+      'export_pptx',
+    ]),
 };
 
 export function validateDeckSurfaceArtifact(relativePath: string, content: unknown): boolean {

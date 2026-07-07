@@ -4,7 +4,11 @@ import {
   listSurfaceArtifactPaths,
   type SurfaceContract,
   type SurfaceValidator,
-  validateGovernanceSurfaceContract,
+  validateBaselinePolicySurface,
+  validateDeliveryContractSurface,
+  validateDisplayRegistrySurface,
+  validateGovernanceSurfaceArtifact,
+  validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
 } from '@redcube/overlay-core';
 
@@ -51,35 +55,33 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content?.canvas?.width === 1086
     && content?.canvas?.height === 1448
     && Array.isArray(content?.forbidden_template_routes),
-  'contracts/baseline-policy.json': (content: SurfaceContract) =>
-    content?.modes?.draft_new?.baseline_required === false
-    && content?.modes?.optimize_existing?.baseline_required === true,
+  'contracts/baseline-policy.json': validateBaselinePolicySurface,
   'contracts/export-bundle.json': (content: SurfaceContract) =>
     typeof content?.bundle_id === 'string'
     && content?.include_publish_manifest === true,
   'contracts/delivery-contract.json': (content: SurfaceContract) =>
-    content?.authoritative_projection_surface === 'getPublicationProjection'
-    && content?.authoritative_review_surface === 'getReviewState'
-    && content?.required_export_route === 'export_bundle'
-    && content?.required_export_bundle_id === 'xiaohongshu_standard_bundle'
-    && content?.projection_model === 'human_publication'
-    && content?.human_gate?.required === true,
+    validateDeliveryContractSurface(content, {
+      requiredExportRoute: 'export_bundle',
+      requiredExportBundleId: 'xiaohongshu_standard_bundle',
+      projectionModel: 'human_publication',
+      humanGateRequired: true,
+    }),
   'contracts/governance-surface.json': (content: SurfaceContract) =>
-    validateGovernanceSurfaceContract(content)
-    && content?.family_boundary?.family_kind === 'human_publication'
-    && content?.family_boundary?.overlay === 'xiaohongshu',
+    validateGovernanceSurfaceArtifact(content, {
+      overlay: 'xiaohongshu',
+      familyKind: 'human_publication',
+    }),
   'contracts/hydrated-deliverable.json': (content: SurfaceContract) =>
-    content?.overlay === 'xiaohongshu'
+    validateHydratedDeliverableSurface(content, { overlay: 'xiaohongshu', requiredExportRoute: 'export_bundle' })
     && Array.isArray(content?.stage_sequence?.stages)
     && typeof content?.prompt_pack?.root === 'string'
-    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
-    && content?.delivery_contract?.required_export_route === 'export_bundle',
+    && content?.delivery_contract?.required_export_bundle_id === 'xiaohongshu_standard_bundle',
   'views/display-registry.json': (content: SurfaceContract) =>
-    Array.isArray(content?.surfaces)
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'publish_copy')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'visual_director_review')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'series_publish_cadence'),
+    validateDisplayRegistrySurface(content, [
+      'publish_copy',
+      'visual_director_review',
+      'series_publish_cadence',
+    ]),
 };
 
 export function validateXiaohongshuSurfaceArtifact(relativePath: string, content: unknown): boolean {

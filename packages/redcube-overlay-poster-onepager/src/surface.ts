@@ -4,7 +4,11 @@ import {
   listSurfaceArtifactPaths,
   type SurfaceContract,
   type SurfaceValidator,
-  validateGovernanceSurfaceContract,
+  validateBaselinePolicySurface,
+  validateDeliveryContractSurface,
+  validateDisplayRegistrySurface,
+  validateGovernanceSurfaceArtifact,
+  validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
 } from '@redcube/overlay-core';
 
@@ -46,37 +50,34 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
   'contracts/layout-rules.json': (content: SurfaceContract) => content?.canvas?.ratio === '4:5'
     && content?.canvas?.width === 1080
     && Array.isArray(content?.forbidden_template_routes),
-  'contracts/baseline-policy.json': (content: SurfaceContract) => content?.modes?.draft_new?.baseline_required === false
-    && content?.modes?.optimize_existing?.baseline_required === true,
+  'contracts/baseline-policy.json': validateBaselinePolicySurface,
   'contracts/export-bundle.json': (content: SurfaceContract) => content?.bundle_id === 'poster_onepager_bundle'
     && content?.include_html === true,
-  'contracts/delivery-contract.json': (content: SurfaceContract) => content?.authoritative_projection_surface === 'getPublicationProjection'
-    && content?.authoritative_review_surface === 'getReviewState'
-    && content?.required_export_route === 'export_bundle'
-    && content?.required_export_bundle_id === 'poster_onepager_bundle'
-    && content?.projection_model === 'direct_delivery'
-    && content?.human_gate?.required === false
-    && content?.operator_handoff?.owner_surface === 'required_export_artifact.delivery_state'
-    && content?.operator_handoff?.handoff_ready_state === 'output_ready'
-    && Array.isArray(content?.operator_handoff?.gate_surfaces)
-    && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
-    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
-    && content.operator_handoff.reopen_mutation_surface === 'request_changes'
-    && content.operator_handoff.closeout_mutation_surface === 'promote_baseline',
-  'contracts/governance-surface.json': (content: SurfaceContract) => validateGovernanceSurfaceContract(content)
-    && content?.family_boundary?.family_kind === 'guarded_knowledge_poster'
-    && content?.family_boundary?.overlay === 'poster_onepager',
+  'contracts/delivery-contract.json': (content: SurfaceContract) =>
+    validateDeliveryContractSurface(content, {
+      requiredExportRoute: 'export_bundle',
+      requiredExportBundleId: 'poster_onepager_bundle',
+      projectionModel: 'direct_delivery',
+      humanGateRequired: false,
+    }),
+  'contracts/governance-surface.json': (content: SurfaceContract) =>
+    validateGovernanceSurfaceArtifact(content, {
+      overlay: 'poster_onepager',
+      familyKind: 'guarded_knowledge_poster',
+    }),
   'contracts/hydrated-deliverable.json': (content: SurfaceContract) => content?.overlay === 'poster_onepager'
     && content?.prompt_pack?.pack_id === 'poster_onepager_mainline_v1'
     && content?.lifecycle_stage_contract?.stage_model === 'direct_delivery_human_workline'
     && content?.lifecycle_stage_contract?.route_to_human_stage?.poster_blueprint === 'plan'
-    && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
+    && validateHydratedDeliverableSurface(content, { requiredExportRoute: 'export_bundle' })
     && content?.source_truth_contract?.poster_guarded_boundary?.academic_contract_active === false
-    && content?.delivery_contract?.required_export_route === 'export_bundle',
-  'views/display-registry.json': (content: SurfaceContract) => Array.isArray(content?.surfaces)
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'poster_blueprint')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'visual_director_review')
-    && content.surfaces.some((surface: SurfaceContract) => surface?.id === 'export_bundle'),
+    && content?.delivery_contract?.required_export_bundle_id === 'poster_onepager_bundle',
+  'views/display-registry.json': (content: SurfaceContract) =>
+    validateDisplayRegistrySurface(content, [
+      'poster_blueprint',
+      'visual_director_review',
+      'export_bundle',
+    ]),
 };
 
 export function validatePosterSurfaceArtifact(relativePath: string, content: unknown): boolean {

@@ -14,6 +14,11 @@ export {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
   listSurfaceArtifactPaths,
+  validateBaselinePolicySurface,
+  validateDeliveryContractSurface,
+  validateDisplayRegistrySurface,
+  validateGovernanceSurfaceArtifact,
+  validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
 } from './surface.js';
 export type {
