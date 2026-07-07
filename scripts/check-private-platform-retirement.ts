@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { parseArgs as parseNodeArgs } from 'node:util';
-import { activePrivatePlatformResurrectionViolations } from '../tests/helpers/rca-retired-surface-guard.ts';
+import { activePrivatePlatformResurrectionViolations } from './private-platform-source-scan.ts';
 
 import {
   buildPhysicalSourceMorphologyPolicy,

@@ -114,7 +114,6 @@ test('root package exposes formal typecheck entrypoint', () => {
     'npm run typecheck && node --experimental-strip-types scripts/run-test-group.ts fast && node --experimental-strip-types scripts/run-test-group.ts family && node --experimental-strip-types scripts/run-test-group.ts meta:ci',
   );
   assert.equal(pkg.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
-  assert.equal(pkg.scripts['test:meta:ci'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta:ci');
   assert.equal(pkg.scripts['test:integration'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration');
   assert.equal(pkg.scripts['test:integration:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration:remaining');
   assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e');
@@ -122,6 +121,9 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full');
   assert.equal(pkg.scripts['test:full:remaining'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:remaining');
   assert.equal(pkg.scripts['test:full:with-historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:with-historical');
+  assert.equal(pkg.scripts['test:meta:ci'], undefined);
+  assert.equal(pkg.scripts['test:line-budget'], undefined);
+  assert.equal(pkg.scripts['test:line-budget:strict'], undefined);
   assert.equal(pkg.scripts.typecheck, 'npm run --silent build && tsc --noEmit --project tsconfig.typecheck.json --pretty false');
   assert.equal(
     pkg.scripts['audit:typescript-closeout'],

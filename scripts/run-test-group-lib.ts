@@ -13,46 +13,6 @@ import {
 
 const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
 
-export const SERIALIZED_VERIFICATION_GROUP_NAMES = new Set([
-  'integration',
-  'integration:remaining',
-  'e2e',
-  'full',
-  'full:remaining',
-  'full:with-historical',
-]);
-const ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set([
-  'smoke',
-  'fast',
-  'integration',
-  'integration:remaining',
-  'e2e',
-  'full',
-  'full:remaining',
-  'full:with-historical',
-]);
-const SERIALIZED_ROUTE_HEAVY_TEST_FILES = new Set([
-  'tests/deliverable-review-loop.test.ts',
-  'tests/direct-delivery-operator-handoff.test.ts',
-  'tests/family-parity-governance-surface.test.ts',
-  'tests/family-source-truth-consumption.test.ts',
-  'tests/poster-creative-ownership.test.ts',
-  'tests/ppt-creative-ownership.test.ts',
-  'tests/ppt-deliverable-e2e.test.ts',
-  'tests/ppt-deliverable-surface.test.ts',
-  'tests/ppt-native-ppt-repair-runtime.test.ts',
-  'tests/ppt-native-ppt-runtime.test.ts',
-  'tests/product-entry-native-ppt-live-proof.test.ts',
-  'tests/product-entry-route-integration.test.ts',
-  'tests/publication-projection-delivery-contract.test.ts',
-  'tests/review-platform.test.ts',
-  'tests/runtime-deliverable-route-integration.test.ts',
-  'tests/runtime-deliverable-route-recovery.test.ts',
-  'tests/runtime-deliverable-route.test.ts',
-  'tests/workspace-operator-quickstart.test.ts',
-  'tests/xiaohongshu-creative-ownership.test.ts',
-  'tests/xiaohongshu-deliverable-e2e.test.ts',
-]);
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
 const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
@@ -303,21 +263,6 @@ export function assertCurrentRepoSharedPinAlignment(options = {}) {
     );
   }
   return inspection;
-}
-
-export function partitionTestFilesForExecution({ groupName, files = [] }) {
-  const plannedFiles = [...files];
-  if (!ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES.has(groupName)) {
-    return {
-      parallel_files: plannedFiles,
-      serialized_files: [],
-    };
-  }
-
-  return {
-    parallel_files: plannedFiles.filter((file) => !SERIALIZED_ROUTE_HEAVY_TEST_FILES.has(file)),
-    serialized_files: plannedFiles.filter((file) => SERIALIZED_ROUTE_HEAVY_TEST_FILES.has(file)),
-  };
 }
 
 export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {

@@ -297,8 +297,8 @@ test('Native PPT helper catalog check never invokes the real native renderer ent
   assert.doesNotMatch(registrySource, new RegExp(['microsoft', ' powerpoint'].join(''), 'i'));
   assert.match(registrySource, /tests\/ppt-native-ppt-runtime\.test\.ts/);
   assert.match(registrySource, /tests\/product-entry-native-ppt-proof-lane\.test\.ts/);
-  assert.match(runGroupLibSource, /ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES = new Set\(\[[\s\S]*'smoke'[\s\S]*'fast'[\s\S]*'full:with-historical'[\s\S]*\]\)/);
-  assert.doesNotMatch(runGroupLibSource, /SERIALIZED_VERIFICATION_GROUP_NAMES = new Set\(\[[^\]]*'fast'|'meta'/);
+  assert.match(registrySource, /ROUTE_HEAVY_GROUPS = new Set\(\[[\s\S]*'smoke'[\s\S]*'fast'[\s\S]*'full:with-historical'[\s\S]*\]\)/);
+  assert.doesNotMatch(runGroupLibSource, /SERIALIZED_VERIFICATION_GROUP_NAMES|ROUTE_HEAVY_SERIALIZATION_GROUP_NAMES|SERIALIZED_ROUTE_HEAVY_TEST_FILES/);
 });
 
 test('Python native helper doctor runs as a package module and emits fixed JSON diagnostics', () => {

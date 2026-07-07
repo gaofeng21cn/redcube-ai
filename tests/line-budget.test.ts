@@ -75,8 +75,8 @@ test('package scripts expose advisory default and explicit strict line budget en
 
   assert.equal(packageJson.scripts['line-budget'], 'node --experimental-strip-types scripts/line-budget.ts');
   assert.equal(packageJson.scripts['line-budget:strict'], 'node --experimental-strip-types scripts/line-budget.ts --strict');
-  assert.equal(packageJson.scripts['test:line-budget'], 'npm run --silent line-budget');
-  assert.equal(packageJson.scripts['test:line-budget:strict'], 'npm run --silent line-budget:strict');
+  assert.equal(packageJson.scripts['test:line-budget'], undefined);
+  assert.equal(packageJson.scripts['test:line-budget:strict'], undefined);
   assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
 });
 

@@ -9,13 +9,13 @@ import { readCurrentProgramContract } from './helpers/current-program-contract.t
 import {
   buildNodeTestArgs,
   parseRunTestGroupArgs,
-  partitionTestFilesForExecution,
   selectGroupFiles,
   resolveRedCubePythonCommand,
-  SERIALIZED_VERIFICATION_GROUP_NAMES,
 } from '../scripts/run-test-group-lib.ts';
 import {
   buildTestGroups,
+  groupRequiresLiveCodexPreflight,
+  partitionTestFilesForExecution,
 } from '../scripts/test-registry.ts';
 
 const GROUPS = buildTestGroups();
@@ -32,15 +32,13 @@ function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
 }
 
 test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
-  assert.deepEqual(
-    [...SERIALIZED_VERIFICATION_GROUP_NAMES].sort(),
-    ['e2e', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining'],
-  );
+  const liveGroups = Object.keys(GROUPS).filter(groupRequiresLiveCodexPreflight).sort();
+  assert.deepEqual(liveGroups, ['e2e', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining']);
 });
 
 test('run-test-group serializes route-heavy fast files without enabling live Codex preflight', () => {
-  assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('fast'), false);
-  assert.equal(SERIALIZED_VERIFICATION_GROUP_NAMES.has('smoke'), false);
+  assert.equal(groupRequiresLiveCodexPreflight('fast'), false);
+  assert.equal(groupRequiresLiveCodexPreflight('smoke'), false);
   assert.deepEqual(
     partitionTestFilesForExecution({
       groupName: 'fast',

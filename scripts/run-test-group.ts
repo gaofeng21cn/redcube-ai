@@ -13,14 +13,14 @@ import {
   buildNodeTestArgs,
   discoverRootTestFiles,
   parseRunTestGroupArgs,
-  partitionTestFilesForExecution,
   selectGroupFiles,
-  SERIALIZED_VERIFICATION_GROUP_NAMES,
   resolveRedCubePythonCommand,
 } from './run-test-group-lib.ts';
 import {
   assertValidTestRegistry,
   buildTestGroups,
+  groupRequiresLiveCodexPreflight,
+  partitionTestFilesForExecution,
   rootPartitionFiles,
 } from './test-registry.ts';
 import {
@@ -102,7 +102,7 @@ assertCurrentRepoSharedPinAlignment({ repoRoot });
 assertValidTestRegistry();
 const GROUPS = buildTestGroups();
 async function prepareSerializedVerification(groupName) {
-  if (!SERIALIZED_VERIFICATION_GROUP_NAMES.has(groupName)) {
+  if (!groupRequiresLiveCodexPreflight(groupName)) {
     return null;
   }
 
