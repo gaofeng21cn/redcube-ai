@@ -32,14 +32,6 @@ export interface PptDeckExportStageDeps {
   writeText(file: string, content: string): void;
 }
 
-export interface BuildExportArtifactInput {
-  workspaceRoot: string;
-  topicId: string;
-  deliverableId: string;
-  contract: JsonRecord;
-  adapter?: string;
-}
-
 interface NativeExportBundleInput {
   workspaceRoot: string;
   renderArtifact: JsonRecord;
@@ -541,7 +533,13 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     deliverableId,
     contract,
     adapter = CODEX_DEFAULT_ADAPTER,
-  }: BuildExportArtifactInput) {
+  }: {
+    workspaceRoot: string;
+    topicId: string;
+    deliverableId: string;
+    contract: JsonRecord;
+    adapter?: string;
+  }) {
     const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
     const reviewArtifact = readStageArtifact(contract, deliverablePaths, 'screenshot_review');
     const renderArtifact = readCurrentVisualArtifact(contract, deliverablePaths);
