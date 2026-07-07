@@ -1106,8 +1106,8 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/opl_agent_package_manifest.json",
-          "role": "plugin_carrier_boundary"
+          "ref": "plugins/redcube-ai/.codex-plugin/plugin.json",
+          "role": "canonical_plugin_scaffold_source_locator"
         }
       ],
       "sync_policy": "repo_local_standard_primary_skill_with_plugin_carrier_compat",

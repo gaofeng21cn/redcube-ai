@@ -14,7 +14,7 @@ test('product-entry manifest exposes physical skeleton audit and runtime residue
     });
     const skeleton = manifest.standard_domain_agent_skeleton;
 
-    assert.equal(skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+    assert.equal(skeleton.mapping_model, 'rca_refs_only_opl_generated_standard_domain_agent');
     assert.equal(skeleton.repo_source_boundary.physical_relayout_required_now, false);
     assert.equal(skeleton.repo_source_boundary.audit_surface.surface_kind, 'standard_domain_agent_skeleton_repo_source_layout_audit');
     assert.equal(skeleton.repo_source_boundary.audit_surface.status, 'pass');

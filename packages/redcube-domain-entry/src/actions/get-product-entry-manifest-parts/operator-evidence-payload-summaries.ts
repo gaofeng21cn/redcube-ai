@@ -268,8 +268,8 @@ export function buildStageExpectedReceiptPayloadSummary({
     },
     success_ref_models: {
       monitor_freshness_ref_model: '/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>',
-      runtime_event_ref_model: 'family_stage_control_plane.stages[*].stage_contract.runtime_event_refs',
-      source_runtime_event_ref: '/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
+      runtime_event_ref_model: 'opl_generated_stage_control_descriptor.stages[*].stage_contract.runtime_event_refs',
+      source_runtime_event_ref: 'opl_generated:product_entry_manifest#/family_stage_control_plane/stages/<stage-id>/stage_contract/runtime_event_refs',
     },
     stages: stageIds.map((stageId, index) => ({
       stage_id: stageId,

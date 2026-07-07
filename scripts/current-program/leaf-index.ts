@@ -5,11 +5,11 @@ import path from 'node:path';
 export const AGGREGATE_SNAPSHOT_REF = 'contracts/runtime-program/current-program.json';
 export const INDEX_REF = 'contracts/runtime-program/current-program.index.json';
 export const PARTS_ROOT = 'contracts/runtime-program/current-program-parts';
-export const MAX_LEAF_JSON_LINE_COUNT = 1000;
-export const WRITE_COMMAND = 'npm run contracts:current-program:write';
-export const CHECK_COMMAND = 'npm run contracts:current-program:check';
+const MAX_LEAF_JSON_LINE_COUNT = 1000;
+const WRITE_COMMAND = 'npm run contracts:current-program:write';
+const CHECK_COMMAND = 'npm run contracts:current-program:check';
 
-export const FALSE_AUTHORITY_FLAGS = Object.freeze({
+const FALSE_AUTHORITY_FLAGS = Object.freeze({
   aggregate_snapshot_is_canonical_source: false,
   aggregate_snapshot_is_edit_surface: false,
   aggregate_snapshot_is_check_input: false,
@@ -97,7 +97,7 @@ export function stable(value: unknown): string {
   return `${JSON.stringify(value, null, 2)}\n`;
 }
 
-export function sha256(content: string): string {
+function sha256(content: string): string {
   return crypto.createHash('sha256').update(content).digest('hex');
 }
 
@@ -163,7 +163,7 @@ function orderedSourcePartRefs(sourcePartRefs: SourcePartRef[]): SourcePartRef[]
   ));
 }
 
-export function generatedArrayFields(sourcePartRefs: Array<{ json_pointer: string }>): string[] {
+function generatedArrayFields(sourcePartRefs: Array<{ json_pointer: string }>): string[] {
   const children = childSegmentMap(sourcePartRefs);
   return [...children.entries()]
     .filter(([, childSegments]) => childSegments.size > 0 && [...childSegments].every((segment) => /^\d+$/.test(segment)))

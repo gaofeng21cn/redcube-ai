@@ -215,7 +215,7 @@ function sourceOfWork(actionId: string): JsonMap {
     source_catalog_ref: 'family_action_catalog:redcube_product_entry_action_catalog',
     source_action_id: actionId,
     stage_catalog_ref: 'rca_stage_control_refs',
-    derived_surface_policy: 'opl_generates_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_rca_refs',
+    derived_surface_policy: 'derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog',
     domain_repo_wrapper_policy: 'handler_target_refs_only_adapter_or_tombstone_candidate',
   };
 }

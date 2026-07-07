@@ -189,7 +189,7 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     assert.equal(domain_action_adapter.owner_boundary.rca_owns_owner_receipt, true);
     assert.equal(domain_action_adapter.owner_boundary.rca_owns_native_helper_implementation, true);
     assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
-    assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.mapping_model, 'physical_skeleton_repo_source_layout_with_manifest_projection');
+    assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.mapping_model, 'rca_refs_only_opl_generated_standard_domain_agent');
     assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_ref, '/standard_domain_agent_skeleton/repo_source_boundary/audit_surface');
     assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_status, 'pass');
     assert.equal(domain_action_adapter.mapped_surfaces.artifact_locator_contract.ref, '/artifact_locator_contract');
