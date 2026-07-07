@@ -1204,7 +1204,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-ppt-visual-director",
@@ -1340,7 +1350,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-ppt-page-author",
@@ -1466,7 +1486,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-ppt-page-author/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-ppt-reviewer",
@@ -1592,7 +1622,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-visual-memory-curator",
@@ -1706,7 +1746,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-native-ppt-designer",
@@ -1819,7 +1869,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-native-ppt-designer/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-native-ppt-designer/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-template-profiler",
@@ -1931,7 +1991,17 @@
       "resource_refs": [
         "agent/professional_skills/rca-template-profiler/resources/minimal-resource-pack.md"
       ],
-      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack"
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-template-profiler/SKILL.md"
+      ]
     },
     {
       "capability_id": "rca-stage-prompts",
