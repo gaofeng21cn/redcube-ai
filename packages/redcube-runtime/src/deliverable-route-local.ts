@@ -535,6 +535,7 @@ function buildRepeatedBlockFailFastArtifact({
   const targetSlideIds = uniqueStrings(priorSignature?.target_slide_ids);
   const blockingReasons = uniqueStrings(priorSignature?.blocking_reasons);
   const blockedChecks = uniqueStrings(priorSignature?.blocked_checks);
+  const typedBlockerRef = `rca-typed-blocker:repeated-block:${overlay}:${route}:${deliverableId}`;
   const repeatBudget = {
     max_repeats: 2,
     remaining_repeats: 0,
@@ -556,6 +557,14 @@ function buildRepeatedBlockFailFastArtifact({
     ...priorArtifact,
     status: 'failed',
     failure_kind: 'repeated_block_without_input_change',
+    typed_blocker_refs: uniqueStrings([
+      ...safeArray(priorArtifact?.typed_blocker_refs),
+      ...safeArray(priorArtifact?.blocker_refs),
+      safeText(priorArtifact?.blocker_ref),
+      typedBlockerRef,
+    ]),
+    blocker_ref: typedBlockerRef,
+    blocker_kind: 'repeated_block_without_input_change',
     route,
     overlay,
     topic_id: topicId,
@@ -593,6 +602,7 @@ function buildRepeatedBlockFailFastArtifact({
 
 function readRepeatedBlockFailFastArtifact({
   artifactFile,
+  deliverablePaths,
   routeCacheKey,
   requiredArtifactFiles,
   overlay,
@@ -601,13 +611,19 @@ function readRepeatedBlockFailFastArtifact({
   deliverableId,
 }) {
   if (!failFastEnabledForRoute({ overlay, route })) return null;
-  if (!existsSync(artifactFile)) return null;
-  const priorArtifact = JSON.parse(readFileSync(artifactFile, 'utf-8'));
+  const loaded = readStageFolderArtifact({
+    deliverablePaths,
+    routeStageId: route,
+    canonicalStageId: canonicalStageIdForRoute(route),
+  });
+  const priorArtifactFile = loaded?.artifact ? loaded.output_file : artifactFile;
+  if (!existsSync(priorArtifactFile)) return null;
+  const priorArtifact = loaded?.artifact || JSON.parse(readFileSync(priorArtifactFile, 'utf-8'));
   if (priorArtifact?.status !== 'block' && priorArtifact?.status !== 'failed') return null;
   if (priorArtifact?.route_cache?.cache_key !== routeCacheKey) return null;
-  if (dependencyBecameNewerThanArtifact({ artifactFile, requiredArtifactFiles })) return null;
+  if (dependencyBecameNewerThanArtifact({ artifactFile: priorArtifactFile, requiredArtifactFiles })) return null;
   return buildRepeatedBlockFailFastArtifact({
-    artifactFile,
+    artifactFile: priorArtifactFile,
     priorArtifact,
     routeCacheKey,
     route,
@@ -785,6 +801,7 @@ export async function executeDeliverableRouteLocally({
 
   const repeatedBlockArtifact = readRepeatedBlockFailFastArtifact({
     artifactFile,
+    deliverablePaths,
     routeCacheKey,
     requiredArtifactFiles,
     overlay,
