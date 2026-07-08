@@ -21,7 +21,6 @@ export {
   appendRouteRunEvent as appendEvent,
   completeRouteRun as completeRun,
   failRouteRun as failRun,
-  readRouteRunEvents as readEvents,
   startRouteRun as startRun,
 } from '@redcube/runtime-protocol';
 export {

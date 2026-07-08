@@ -312,8 +312,3 @@ export function appendRouteRunEvent(workspaceRoot, runId, event) {
     local_event_log_written: false,
   };
 }
-
-export function readRouteRunEvents(workspaceRoot, runId) {
-  requireSafeSegment('runId', runId);
-  return [];
-}

@@ -14,7 +14,6 @@ import {
 } from './package-surfaces.ts';
 import {
   appendRouteRunEvent,
-  readRouteRunEvents,
 } from '@redcube/runtime-protocol';
 
 function tempWorkspaceRoot() {
@@ -168,7 +167,6 @@ test('route run events stay refs-only and do not create a local event log', () =
 
   assert.equal(eventRef.event_log_owner, 'one-person-lab');
   assert.equal(eventRef.local_event_log_written, false);
-  assert.deepEqual(readRouteRunEvents(workspaceRoot, run.run_id), []);
 });
 
 test('retired Hermes-Agent adapter fails closed at the executor boundary', () => {

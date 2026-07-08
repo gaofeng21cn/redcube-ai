@@ -82,7 +82,6 @@ export {
   failRetiredHermesAgentAdapter,
   hermesAgentAdapterRetirementBoundary,
   normalizeExecutorBackend,
-  readRouteRunEvents,
   startRouteRun,
 } from './executor-runtime.js';
 

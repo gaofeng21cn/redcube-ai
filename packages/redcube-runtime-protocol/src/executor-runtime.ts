@@ -371,7 +371,6 @@ function resolveRuntimeTopologyForExecutor(executor) {
 
 export {
   appendRouteRunEvent,
-  readRouteRunEvents,
 } from './executor-runtime-parts/route-run-records.js';
 
 export function startRouteRun({
