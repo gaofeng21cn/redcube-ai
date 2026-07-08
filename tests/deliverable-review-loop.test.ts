@@ -463,7 +463,7 @@ test('runtimeWatch reports pending review loop state', async () => {
   assert.equal(report.quality_drift_summary.relative_quality_verdict, null);
   assert.equal(report.approval_throughput_summary.pending_review_count, 1);
   assert.equal(report.owner_boundary.surface_kind, 'runtime_watch_boundary');
-  assert.equal(report.owner_boundary.classification, 'refs_only_read_model');
+  assert.equal(report.owner_boundary.classification, 'retained_current_refs_only_boundary');
   assert.equal(report.owner_boundary.role, 'existing_run_locator_refs_only_projection');
   assert.equal(report.owner_boundary.refs_only, true);
   assert.equal(report.owner_boundary.read_only, true);
@@ -490,7 +490,7 @@ test('runtimeWatch reports pending review loop state', async () => {
 });
 
 
-test('runtimeWatch can load a persisted run from the canonical workspace/topic/deliverable/run locator', async () => {
+test('runtimeWatch fails closed when only a workspace/topic/deliverable/run locator is provided', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-'));
 
@@ -519,17 +519,26 @@ test('runtimeWatch can load a persisted run from the canonical workspace/topic/d
       route: 'storyline',
     });
 
-    const report = await runtimeWatch({
-      workspaceRoot,
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      runId: runResult.run.run_id,
-    });
-
-    assert.equal(report.ok, true);
-    assert.equal(report.run_id, runResult.run.run_id);
-    assert.equal(report.current_stage, 'storyline');
-    assert.equal(report.run_telemetry.run_id, runResult.run.run_id);
+    await assert.rejects(
+      () => runtimeWatch({
+        workspaceRoot,
+        topicId: 'topic-a',
+        deliverableId: 'deck-a',
+        runId: runResult.run.run_id,
+      }),
+      (error) => {
+        assert.match(error.message, /runtimeWatch no longer reads RCA-local route-run records/);
+        assert.equal(error.surface_kind, 'typed_blocker');
+        assert.equal(error.blocker_kind, 'rca_local_route_run_lookup_retired');
+        assert.deepEqual(error.typed_blocker.required_refs, [
+          'opl_stage_attempt_ref',
+          'provider_attempt_ref',
+          'provider_attempt_ledger_ref',
+        ]);
+        assert.equal(error.typed_blocker.owner_boundary.rca_owns_generic_runtime_record_store, false);
+        return true;
+      },
+    );
   });
 });
 
@@ -586,7 +595,7 @@ test('runtimeWatch keeps deliverable-level review watch available when no run lo
   });
 });
 
-test('runtimeWatch rejects a persisted run when topic locator does not match the run identity', async () => {
+test('runtimeWatch rejects a preloaded run when topic locator does not match the run identity', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-watch-locator-mismatch-'));
 
@@ -616,20 +625,18 @@ test('runtimeWatch rejects a persisted run when topic locator does not match the
       });
     }
 
-    const runResult = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      route: 'storyline',
-    });
-
     await assert.rejects(
       () => runtimeWatch({
         workspaceRoot,
         topicId: 'topic-b',
         deliverableId: 'deck-a',
-        runId: runResult.run.run_id,
+        run: {
+          run_id: 'run-topic-a-001',
+          topic_id: 'topic-a',
+          deliverable_id: 'deck-a',
+          current_stage: 'storyline',
+          status: 'completed',
+        },
       }),
       /runtimeWatch topicId 与 run\.topic_id 不一致/,
     );

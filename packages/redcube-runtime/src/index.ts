@@ -21,7 +21,6 @@ export {
   appendRouteRunEvent as appendEvent,
   completeRouteRun as completeRun,
   failRouteRun as failRun,
-  loadRouteRun as loadRun,
   readRouteRunEvents as readEvents,
   startRouteRun as startRun,
 } from '@redcube/runtime-protocol';
@@ -117,7 +116,6 @@ export type {
   RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
-  RuntimeRunLookupRequest,
   RuntimeRunRecord,
   RuntimeRunRouteRequest,
   RuntimeRunRouteResponse,

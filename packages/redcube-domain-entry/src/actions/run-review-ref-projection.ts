@@ -1,4 +1,4 @@
-import { loadRun, watchRuntimeReviewLoop } from '@redcube/runtime';
+import { watchRuntimeReviewLoop } from '@redcube/runtime';
 import {
   buildApprovalThroughputSummary,
   buildCostSummary,
@@ -52,9 +52,63 @@ export const RUNTIME_WATCH_BOUNDARY = Object.freeze({
   ],
 });
 
+function requireSafeSegment(name: string, value: unknown): string {
+  const text = String(value || '').trim();
+  if (!text) {
+    throw new Error(`${name} 不能为空`);
+  }
+  if (/[\\/]/.test(text)) {
+    throw new Error(`${name} 不能包含路径分隔符`);
+  }
+  if (text.includes('..')) {
+    throw new Error(`${name} 不能包含父目录引用`);
+  }
+  return text;
+}
+
+function buildRouteRunLookupRetiredBlocker(runId: string) {
+  return {
+    surface_kind: 'typed_blocker',
+    blocker_kind: 'rca_local_route_run_lookup_retired',
+    typed_blocker_ref: `rca-typed-blocker:route-run-lookup-retired:${runId}`,
+    run_id: runId,
+    reason: 'runtimeWatch no longer reads RCA-local route-run records.',
+    accepted_inputs: [
+      'provided_run_record',
+      'deliverable_level_refs_only_projection_without_run',
+    ],
+    required_refs: [
+      'opl_stage_attempt_ref',
+      'provider_attempt_ref',
+      'provider_attempt_ledger_ref',
+    ],
+    owner_boundary: {
+      generic_stage_attempt_owner: 'one-person-lab',
+      generic_provider_attempt_ledger_owner: 'one-person-lab',
+      rca_local_route_run_record_store_retired: true,
+      rca_owns_generic_runtime_record_store: false,
+      rca_owns_generic_attempt_ledger: false,
+    },
+    next_required_owner_action: 'provide_run_record_or_read_opl_provider_ledger_refs',
+  };
+}
+
+function routeRunLookupRetiredError(runId: string): Error {
+  const blocker = buildRouteRunLookupRetiredBlocker(runId);
+  const error = new Error(
+    'runtimeWatch no longer reads RCA-local route-run records; provide run or use OPL stage attempt/provider ledger refs.',
+  ) as Error & Record<string, unknown>;
+  error.surface_kind = 'typed_blocker';
+  error.blocker_kind = blocker.blocker_kind;
+  error.typed_blocker = blocker;
+  error.owner_boundary = blocker.owner_boundary;
+  return error;
+}
+
 function resolveRun(request: AnyRecord): AnyRecord {
   const providedRun = request?.run && typeof request.run === 'object' ? request.run : null;
-  const providedRunId = String(request?.runId || '').trim();
+  const rawRunId = String(request?.runId || '').trim();
+  const providedRunId = rawRunId ? requireSafeSegment('runId', rawRunId) : '';
   const runRecordId = String(providedRun?.run_id || '').trim();
 
   if (providedRun && providedRunId && runRecordId && runRecordId !== providedRunId) {
@@ -65,11 +119,8 @@ function resolveRun(request: AnyRecord): AnyRecord {
     return providedRun;
   }
 
-  if (request?.workspaceRoot && providedRunId) {
-    return loadRun({
-      workspaceRoot: request.workspaceRoot,
-      runId: providedRunId,
-    }) as unknown as AnyRecord;
+  if (providedRunId) {
+    throw routeRunLookupRetiredError(providedRunId);
   }
 
   return {};

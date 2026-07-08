@@ -313,11 +313,6 @@ export interface RuntimeRunRouteResponse {
   error?: unknown;
 }
 
-export interface RuntimeRunLookupRequest {
-  workspaceRoot: string;
-  runId: string;
-}
-
 export interface RuntimeEventRecord extends Record<string, unknown> {}
 
 export interface RuntimeStartRunRequest {

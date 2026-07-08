@@ -35,6 +35,27 @@ test('getRun rejects unsafe run identifiers', async () => {
   );
 });
 
+test('getRun fails closed to OPL stage attempt/provider ledger refs for local lookup', async () => {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-lookup-retired-'));
+
+  await assert.rejects(
+    () => getRun({ workspaceRoot, runId: 'run-a' }),
+    (error) => {
+      assert.match(error.message, /RCA-local route-run lookup is retired/);
+      assert.equal(error.surface_kind, 'typed_blocker');
+      assert.equal(error.blocker_kind, 'rca_local_route_run_lookup_retired');
+      assert.equal(error.typed_blocker.run_id, 'run-a');
+      assert.deepEqual(error.typed_blocker.required_refs, [
+        'opl_stage_attempt_ref',
+        'provider_attempt_ref',
+        'provider_attempt_ledger_ref',
+      ]);
+      assert.equal(error.typed_blocker.owner_boundary.rca_owns_generic_attempt_ledger, false);
+      return true;
+    },
+  );
+});
+
 test('appendEvent rejects unsafe run identifiers', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
 

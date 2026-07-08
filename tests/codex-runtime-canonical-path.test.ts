@@ -112,7 +112,7 @@ test('ppt_deck canonical mainline closes through Codex CLI runtime without drift
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      runId: lastResult.run.run_id,
+      run: lastResult.run,
     });
 
     assert.equal(lastResult.run.current_stage, 'export_pptx');

@@ -302,11 +302,6 @@ export function failRouteRun({
   return failedRun;
 }
 
-export function loadRouteRun({ workspaceRoot, runId }) {
-  requireSafeSegment('runId', runId);
-  throw new Error('RCA-local route-run record store is retired; use OPL stage attempt and provider ledger refs');
-}
-
 export function appendRouteRunEvent(workspaceRoot, runId, event) {
   requireSafeSegment('runId', runId);
   return {
