@@ -97,7 +97,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 
 当前必须继续推进：
 
-- `generated_default_caller_cutover`：OPL generated/hosted CLI/MCP/product-entry/status/session/domain_action_adapter/workbench shell 成为默认 caller，RCA repo-local active/default target 保持 `domain-handler export|dispatch`。
+- `generated_default_caller_cutover`：OPL `opl agents default-callers --agent rca=/Users/gaofeng/workspace/redcube-ai --json` 当前已读到 generated interface / wrapper bundle / active caller cutover proof 为 ready，RCA repo-local active/default target 保持 `domain-handler export|dispatch`。这只是 structural replacement evidence；同一 read model 仍明确 `physical_delete_authorized=false`、`default_caller_delete_ready=false`，physical delete 仍要求 domain owner 选择 delete / keep / typed blocker。
 - `repo_local_adapter_delete_after_cutover`：RCA active source 中的 product-entry/session/internal domain_action_adapter implementation refs/runtimeWatch/operator evidence/stability projection、neutral route-run append-only event refs / route-run refs adapter 和 old compatibility path 在 no-active-caller、owner receipt/typed blocker roundtrip、direct/hosted parity 与 no-forbidden-write proof 成立后删除或收薄到 domain handler target。`loadRouteRun` / runtime `loadRun` lookup public tail 已退役；`readRouteRunEvents` / runtime `readEvents` local event-log read tail 已退役；runId-only lookup fail closed 到 RCA typed blocker / OPL ledger refs 路由。
 - `compatibility_free_retirement`：只保护旧 public path 的测试、alias、facade、gateway/runtime/session/domain_action_adapter compatibility path 直接删除；历史只保留在 history/tombstone/provenance。
 
