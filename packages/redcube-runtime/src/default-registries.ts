@@ -62,8 +62,6 @@ export interface RuntimeFamilyCatalogSurface {
   families: RuntimeFamilyModuleSpec[];
 }
 
-export type DefaultRuntimeFamilyCatalogSurface = RuntimeFamilyCatalogSurface;
-
 export interface LoadedRuntimeFamilyRunner extends RuntimeFamilyModuleSpec {
   runRoute: (...args: unknown[]) => Promise<unknown>;
 }
@@ -113,7 +111,7 @@ export function listDefaultRuntimeFamilyModules(): RuntimeFamilyModuleSpec[] {
   return defaultRuntimeFamilyModules.map((spec) => buildCatalogEntry(spec));
 }
 
-export function getDefaultRuntimeFamilyCatalog(): DefaultRuntimeFamilyCatalogSurface {
+export function getDefaultRuntimeFamilyCatalog(): RuntimeFamilyCatalogSurface {
   return {
     surface_kind: 'runtime_family_catalog',
     owner_boundary: {

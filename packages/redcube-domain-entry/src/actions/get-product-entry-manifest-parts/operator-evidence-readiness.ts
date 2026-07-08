@@ -2,10 +2,16 @@
 
 import {
   buildOplExpectedReceiptMonitorFreshnessHandoff,
+} from './operator-evidence-refs/receipt-monitor-handoff.js';
+import {
   buildProductionEvidenceScaleoutRefs,
+} from './operator-evidence-refs/production-scaleout.js';
+import {
   buildProductionEvidenceTailWorkOrder,
+} from './operator-evidence-refs/production-tail-workorder.js';
+import {
   buildRcaEfficiencyHandoffProjection,
-} from './operator-evidence-refs.js';
+} from './operator-evidence-refs/efficiency-handoff.js';
 import {
   RCA_GOAL_WORKFLOW_AGENT_LAB_SUITE_PROJECTION_REF,
   RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,

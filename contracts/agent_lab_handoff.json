@@ -361,41 +361,11 @@
     ]
   },
   "dry_run_token_mapping_check": {
-    "check_kind": "non_live_feedback_token_to_professional_skill_mapping",
-    "dry_run_only": true,
-    "source_feedback": {
-      "feedback_kind": "ppt_professional_skill_quality_dry_run",
-      "tokens": [
-        "ppt_visual_density",
-        "native_pptx_editability",
-        "serial_pipeline",
-        "spec_lock",
-        "progressive_disclosure",
-        "style_boundary",
-        "visual_qa",
-        "editable_pptx_grammar"
-      ]
-    },
     "capability_map_ref": "contracts/capability_map.json#/dry_run_token_mapping_check",
     "feedback_token_index_ref": "contracts/capability_map.json#/feedback_token_index",
     "token_cases_ref": "contracts/capability_map.json#/dry_run_token_mapping_check/token_cases",
     "token_mappings_in_handoff": false,
     "consumer_rule": "Resolve dry-run token cases from capability_map.dry_run_token_mapping_check; this handoff only records the external dry-run entry ref and forbidden authority boundary.",
-    "forbidden_surfaces": [
-      "visual_truth_artifacts",
-      "artifact_blobs",
-      "owner_receipts",
-      "export_verdicts",
-      "quality_verdicts",
-      "runtime_data",
-      "generated_opl_surfaces_as_visual_authority"
-    ],
-    "required_observations": [
-      "capability_map_token_cases_observed",
-      "primary_skill_refs_resolved_from_capability_map",
-      "minimal_template_resource_anchor_present",
-      "no_live_provider_or_runtime_artifact_write"
-    ],
     "authority_boundary": {
       "refs_only": true,
       "can_write_domain_truth": false,

@@ -10,8 +10,8 @@ import {
 } from '../guarded-domain-actions.js';
 import {
   listDomainActionAdapterBlockedActions,
+  listDomainActionAdapterGuardedActionIds,
   listDomainActionAdapterGuardedActions,
-  domainActionAdapterGuardedActionSet,
 } from './guarded-action-catalog.js';
 import { RUNTIME_WATCH_BOUNDARY } from '../run-review-ref-projection.js';
 import { buildDomainActionAdapterOwnerBoundary } from './owner-boundary.js';
@@ -159,7 +159,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       standardDomainAgentSkeleton: manifest.standard_domain_agent_skeleton,
       runtimeInventory: manifest.runtime_inventory,
       taskLifecycle: manifest.task_lifecycle,
-      domainActionAdapterGuardedActionIds: listDomainActionAdapterGuardedActions().map((entry) => entry.action),
+      domainActionAdapterGuardedActionIds: listDomainActionAdapterGuardedActionIds(),
     })
   );
   const temporalStageRunConsumptionPolicy = (
@@ -549,7 +549,7 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       generic_workbench_owner: 'opl',
       default_supervision_owner: 'opl',
       domain_truth_owner: DOMAIN_ID,
-      guarded_action_count: domainActionAdapterGuardedActionSet().size,
+      guarded_action_count: listDomainActionAdapterGuardedActionIds().length,
     },
   };
 }

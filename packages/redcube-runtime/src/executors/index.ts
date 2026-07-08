@@ -51,64 +51,6 @@ interface ExecutorAdapter extends ExecutorDescriptor {
 }
 
 /**
- * @typedef {{
- *   workspaceRoot: string,
- *   overlay: string,
- *   route: string,
- *   topicId: string,
- *   deliverableId: string,
- *   contract: { overlay?: string, deliverable_kind?: string },
- *   stageContract: { stage_id?: string } | null,
- *   mode?: string,
- *   baselineDeliverableId?: string,
- * }} ExecutorRouteInput
- */
-
-/**
- * @typedef {{
- *   adapter: string,
- *   executor_backend?: "codex_cli" | "hermes_agent",
- *   execution_shape?: "structured_call" | "agent_loop",
- *   primary?: boolean,
- *   execution_surface?: string,
- *   creative_execution?: string,
- *   execution_model?: {
- *     mainline_adapter: "codex_cli",
- *     primary_surface: "codex_cli_runtime",
- *     adapter_role: "primary_creative_executor",
- *     runtime_substrate_owner: "Codex CLI",
- *     deployment_host: "codex_local_operator_host",
- *     deployment_host_status: "active_primary",
- *     freeze_origin_milestone: "P19.A",
- *   },
- *   runRoute(input: ExecutorRouteInput): Promise<{
- *     artifact_refs?: string[],
- *     review_state_patch?: {
- *       current_status?: string,
- *       latest_review_stage?: string,
- *       pending_reviews?: string[],
- *       blocking_reasons?: string[],
- *     },
- *     status?: string,
- *     overlay?: string,
- *     route?: string,
- *     topic_id?: string,
- *     deliverable_id?: string,
- *     execution_model?: {
- *       mainline_adapter: "codex_cli",
- *       primary_surface: "codex_cli_runtime",
- *       adapter_role: "primary_creative_executor",
- *       runtime_substrate_owner: "Codex CLI",
- *       deployment_host: "codex_local_operator_host",
- *       deployment_host_status: "active_primary",
- *       freeze_origin_milestone: "P19.A",
- *     },
- *     produced_at?: string,
- *   }>,
- * }} ExecutorAdapter
- */
-
-/**
  * @param {{ adapter?: string, executorBackend?: "codex_cli" | "hermes_agent", executionShape?: "structured_call" | "agent_loop", hermesProfile?: string | null, executorRouting?: Record<string, unknown> | null }} [options]
  * @returns {ExecutorAdapter}
  */

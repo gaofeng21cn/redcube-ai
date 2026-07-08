@@ -138,10 +138,6 @@ export function listDomainActionAdapterGuardedActionIds() {
   return DOMAIN_ACTION_ADAPTER_GUARDED_ACTIONS.map((entry) => entry.action);
 }
 
-export function domainActionAdapterGuardedActionSet() {
-  return new Set(listDomainActionAdapterGuardedActionIds());
-}
-
 export function listDomainActionAdapterForbiddenWrites() {
   return [...DOMAIN_ACTION_ADAPTER_FORBIDDEN_WRITES];
 }

@@ -179,6 +179,9 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   );
   assert.equal(professionalCapabilityIndex.entries_are_refs_only, true);
   assert.deepEqual(professionalCapabilityIndex.capability_ids, expectedCapabilityIds);
+  for (const capabilityId of expectedCapabilityIds) {
+    assert.equal(professionalCapabilityIndex[capabilityId], undefined, `${capabilityId}.summary_body`);
+  }
   assert.deepEqual(
     map.capabilities
       .filter((entry) => entry.surface_role === 'professional_skill')
@@ -208,51 +211,19 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   );
 
   for (const capabilityId of expectedCapabilityIds) {
-    const capabilitySummary = professionalCapabilityIndex[capabilityId];
     const expectedSkillRef = `agent/professional_skills/${capabilityId}/SKILL.md`;
     const expectedResourceRef = expectedResourceRefs[capabilityId];
-    assert.equal(Boolean(capabilitySummary), true, capabilityId);
-    assert.equal(capabilitySummary.capability_id, capabilityId);
-    assert.equal(capabilitySummary.resolver_ref, `contracts/capability_map.json#/capabilities/${capabilityId}`);
-    assert.equal(capabilitySummary.skill_ref, expectedSkillRef);
-    assert.equal(
-      capabilitySummary.resource_pack_entry_ref,
-      `contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/${capabilityId}`,
-      capabilityId,
-    );
-    assert.equal(
-      capabilitySummary.authority_boundary_ref,
-      `contracts/capability_map.json#/capabilities/${capabilityId}/authority_boundary`,
-      capabilityId,
-    );
-    assert.equal(
-      capabilitySummary.owner_closeout_boundary_ref,
-      'contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary',
-      capabilityId,
-    );
-    for (const field of [
-      'allowed_change_refs',
-      'canonical_paths',
-      'target_repo_file_hints',
-      'resource_refs',
-      'resource_pack_boundary_ref',
-      'verification_refs',
-      'forbidden_surfaces',
-      'authority_boundary',
-    ]) {
-      assert.equal(capabilitySummary[field], undefined, `${capabilityId}.${field}`);
-    }
-    for (const tokenRef of capabilitySummary.primary_feedback_token_refs) {
-      const token = tokenRef.replace('contracts/capability_map.json#/feedback_token_index/', '');
-      assert.equal(Boolean(map.feedback_token_index[token]), true, `${capabilityId}:${token}`);
-    }
-
     const resolverCapability = map.capabilities.find((entry) => entry.capability_id === capabilityId);
     assert.equal(Boolean(resolverCapability), true, capabilityId);
     assert.equal(resolverCapability.surface_role, 'professional_skill', capabilityId);
     assert.equal(resolverCapability.physical_source_ref.ref, expectedSkillRef, capabilityId);
     assert.equal(fs.existsSync(path.join(repoRoot, expectedSkillRef)), true, expectedSkillRef);
-    assert.deepEqual(resolverCapability.stage_refs, capabilitySummary.stage_refs, capabilityId);
+    assert.equal(
+      resolverCapability.runtime_projection_refs.some((entry) => entry.ref === 'contracts/capability_map.json#/professional_capabilities'),
+      true,
+      capabilityId,
+    );
+    assert.equal(resolverCapability.owner_closeout_boundary_ref, 'contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary');
     assert.equal(resolverCapability.canonical_paths.includes(expectedSkillRef), true, capabilityId);
     assert.equal(resolverCapability.canonical_paths.includes(expectedResourceRef), true, capabilityId);
     assert.equal(resolverCapability.target_repo_file_hints.includes(expectedResourceRef), true, capabilityId);
@@ -390,9 +361,9 @@ function assertPptDryRunTokenMapping(map, handoff) {
   assert.equal(map.dry_run_token_mapping_check.writes_visual_truth_or_artifacts, false);
   assert.deepEqual(map.dry_run_token_mapping_check.tokens, dryRunTokens);
   assert.equal(map.dry_run_token_mapping_check.required_observations.includes('handoff_points_to_capability_map_source'), true);
-  assert.equal(handoff.dry_run_token_mapping_check.check_kind, map.dry_run_token_mapping_check.check_kind);
-  assert.equal(handoff.dry_run_token_mapping_check.dry_run_only, true);
-  assert.deepEqual(handoff.dry_run_token_mapping_check.source_feedback.tokens, dryRunTokens);
+  assert.equal(handoff.dry_run_token_mapping_check.check_kind, undefined);
+  assert.equal(handoff.dry_run_token_mapping_check.dry_run_only, undefined);
+  assert.equal(handoff.dry_run_token_mapping_check.source_feedback, undefined);
   assert.equal(
     handoff.external_suite_improvement_policy.dry_run_token_mapping_check_ref,
     'contracts/agent_lab_handoff.json#/dry_run_token_mapping_check',
@@ -401,6 +372,8 @@ function assertPptDryRunTokenMapping(map, handoff) {
   assert.equal(handoff.dry_run_token_mapping_check.feedback_token_index_ref, 'contracts/capability_map.json#/feedback_token_index');
   assert.equal(handoff.dry_run_token_mapping_check.token_cases_ref, 'contracts/capability_map.json#/dry_run_token_mapping_check/token_cases');
   assert.equal(handoff.dry_run_token_mapping_check.token_mappings_in_handoff, false);
+  assert.equal(handoff.dry_run_token_mapping_check.required_observations, undefined);
+  assert.equal(handoff.dry_run_token_mapping_check.forbidden_surfaces, undefined);
   assert.equal(handoff.dry_run_token_mapping_check.token_cases, undefined);
 
   for (const dryRunCase of map.dry_run_token_mapping_check.token_cases) {

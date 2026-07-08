@@ -19,8 +19,6 @@ export {
 } from './relative-quality.js';
 export {
   appendRouteRunEvent as appendEvent,
-  completeRouteRun as completeRun,
-  failRouteRun as failRun,
   startRouteRun as startRun,
 } from '@redcube/runtime-protocol';
 export {
@@ -49,7 +47,6 @@ export {
 } from './default-registries.js';
 export type {
   DefaultOverlayCatalogSurface,
-  DefaultRuntimeFamilyCatalogSurface,
   LoadedRuntimeFamilyRunner,
   OverlayCatalogEntry,
   OverlayCatalogSurface,

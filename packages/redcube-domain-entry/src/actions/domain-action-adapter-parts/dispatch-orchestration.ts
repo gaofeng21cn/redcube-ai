@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { getProductEntryManifest } from '../get-product-entry-manifest.js';
-import { domainActionAdapterGuardedActionSet } from './guarded-action-catalog.js';
+import { listDomainActionAdapterGuardedActionIds } from './guarded-action-catalog.js';
 import { evaluateVisualTransition } from './visual-transition-evaluator.js';
 import { emitWorkspaceReceiptProof as emitWorkspaceReceiptProofPack } from './workspace-receipt-proof.js';
 import {
@@ -24,7 +24,7 @@ import {
   workspaceRootFromTask,
 } from './task-utils.js';
 
-const GUARDED_ACTIONS = domainActionAdapterGuardedActionSet();
+const GUARDED_ACTIONS = new Set(listDomainActionAdapterGuardedActionIds());
 
 export async function dispatchDomainActionAdapter(request) {
   const task = readTaskPayload(request);

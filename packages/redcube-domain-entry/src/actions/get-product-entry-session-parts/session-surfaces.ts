@@ -164,7 +164,6 @@ export function buildProductEntrySessionResponse({
   oplFamilyLifecycleAdapter: Record<string, unknown>;
   familyOrchestration: Record<string, unknown>;
 }): ProductEntrySessionResponse {
-  const deliveryIdentity = buildSessionDeliveryIdentityPayload(session);
   return {
     ok: true,
     surface_kind: 'product_entry_session',

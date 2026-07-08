@@ -167,7 +167,7 @@
     "resolver_policy_ref": "contracts/capability_map.json#/resolver_policy",
     "resource_pack_ref": "contracts/capability_map.json#/skill_local_resource_pack",
     "entries_are_refs_only": true,
-    "entry_body_policy": "Full professional skill resolver bodies live under capabilities; this index only carries ids and refs needed by AgentLab/OMA routing.",
+    "entry_body_policy": "Full professional skill resolver bodies live under capabilities; this index only carries the canonical professional capability id list and resolver refs needed by AgentLab/OMA routing.",
     "capability_ids": [
       "rca-ppt-story-architect",
       "rca-ppt-visual-director",
@@ -176,142 +176,7 @@
       "rca-visual-memory-curator",
       "rca-native-ppt-designer",
       "rca-template-profiler"
-    ],
-    "rca-ppt-story-architect": {
-      "capability_id": "rca-ppt-story-architect",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-ppt-story-architect",
-      "skill_ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
-      "stage_refs": [
-        "communication_strategy"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/storyline",
-        "contracts/capability_map.json#/feedback_token_index/outline",
-        "contracts/capability_map.json#/feedback_token_index/serial_pipeline",
-        "contracts/capability_map.json#/feedback_token_index/progressive_disclosure"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-ppt-story-architect",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-ppt-story-architect/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary"
-    },
-    "rca-ppt-visual-director": {
-      "capability_id": "rca-ppt-visual-director",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-ppt-visual-director",
-      "skill_ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
-      "stage_refs": [
-        "visual_direction",
-        "review_and_revision"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/visual_direction",
-        "contracts/capability_map.json#/feedback_token_index/style",
-        "contracts/capability_map.json#/feedback_token_index/visual_density",
-        "contracts/capability_map.json#/feedback_token_index/layout_quality",
-        "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
-        "contracts/capability_map.json#/feedback_token_index/spec_lock",
-        "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
-        "contracts/capability_map.json#/feedback_token_index/style_boundary",
-        "contracts/capability_map.json#/feedback_token_index/visual_qa"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-ppt-visual-director",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-ppt-visual-director/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
-      "template_profiler_relationship_ref": "contracts/capability_map.json#/capabilities/rca-ppt-visual-director/template_profiler_relationship"
-    },
-    "rca-ppt-page-author": {
-      "capability_id": "rca-ppt-page-author",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-ppt-page-author",
-      "skill_ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
-      "stage_refs": [
-        "artifact_creation"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/page_authoring",
-        "contracts/capability_map.json#/feedback_token_index/layout_quality",
-        "contracts/capability_map.json#/feedback_token_index/visual_density",
-        "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
-        "contracts/capability_map.json#/feedback_token_index/serial_pipeline",
-        "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
-        "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-ppt-page-author",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-ppt-page-author/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary"
-    },
-    "rca-ppt-reviewer": {
-      "capability_id": "rca-ppt-reviewer",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-ppt-reviewer",
-      "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-      "stage_refs": [
-        "review_and_revision",
-        "package_and_handoff"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/visual_review",
-        "contracts/capability_map.json#/feedback_token_index/ppt_review",
-        "contracts/capability_map.json#/feedback_token_index/layout_quality",
-        "contracts/capability_map.json#/feedback_token_index/visual_density",
-        "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
-        "contracts/capability_map.json#/feedback_token_index/visual_qa"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-ppt-reviewer",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-ppt-reviewer/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary"
-    },
-    "rca-visual-memory-curator": {
-      "capability_id": "rca-visual-memory-curator",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-visual-memory-curator",
-      "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
-      "stage_refs": [
-        "review_and_revision",
-        "package_and_handoff"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/visual_memory",
-        "contracts/capability_map.json#/feedback_token_index/memory_writeback",
-        "contracts/capability_map.json#/feedback_token_index/review_export_memory"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-visual-memory-curator",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-visual-memory-curator/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary"
-    },
-    "rca-native-ppt-designer": {
-      "capability_id": "rca-native-ppt-designer",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-native-ppt-designer",
-      "skill_ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-      "stage_refs": [
-        "artifact_creation"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/native_pptx_editability",
-        "contracts/capability_map.json#/feedback_token_index/spec_lock",
-        "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-native-ppt-designer",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-native-ppt-designer/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
-      "template_profiler_relationship_ref": "contracts/capability_map.json#/capabilities/rca-native-ppt-designer/template_profiler_relationship"
-    },
-    "rca-template-profiler": {
-      "capability_id": "rca-template-profiler",
-      "resolver_ref": "contracts/capability_map.json#/capabilities/rca-template-profiler",
-      "skill_ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
-      "stage_refs": [
-        "visual_direction",
-        "artifact_creation"
-      ],
-      "primary_feedback_token_refs": [
-        "contracts/capability_map.json#/feedback_token_index/template_profile",
-        "contracts/capability_map.json#/feedback_token_index/placeholder_capacity",
-        "contracts/capability_map.json#/feedback_token_index/style_boundary",
-        "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar"
-      ],
-      "resource_pack_entry_ref": "contracts/capability_map.json#/skill_local_resource_pack/capability_resource_refs/rca-template-profiler",
-      "authority_boundary_ref": "contracts/capability_map.json#/capabilities/rca-template-profiler/authority_boundary",
-      "owner_closeout_boundary_ref": "contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary",
-      "consolidation_decision_ref": "contracts/capability_map.json#/capabilities/rca-template-profiler/consolidation_decision",
-      "no_merge_rationale_ref": "contracts/capability_map.json#/professional_skill_consolidation"
-    }
+    ]
   },
   "feedback_token_index": {
     "storyline": {

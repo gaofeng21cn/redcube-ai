@@ -356,7 +356,7 @@ function requestHasExplicitAdapter(request) {
     && String(request.adapter || '').trim();
 }
 
-function buildRuntimeDescriptor({ workspaceRoot, selectedExecutor, fallbackExecutor }) {
+function buildRuntimeDescriptor({ selectedExecutor, fallbackExecutor }) {
   if (fallbackExecutor.adapter === HERMES_AGENT_ADAPTER && fallbackExecutor.execution_shape === AGENT_LOOP_EXECUTION_SHAPE) {
     return buildHermesAgentLoopRuntimeDescriptor();
   }
@@ -389,7 +389,6 @@ function resolveRouteExecutor({ workspaceRoot, overlay, topicId, deliverableId, 
     executorRouting,
   });
   const runtimeDescriptor = buildRuntimeDescriptor({
-    workspaceRoot,
     selectedExecutor,
     fallbackExecutor,
   });
