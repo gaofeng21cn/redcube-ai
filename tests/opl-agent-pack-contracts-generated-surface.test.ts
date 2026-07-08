@@ -26,7 +26,7 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.rca_can_own_generated_surface, false);
   assert.equal(generatedSurfaceHandoff.bridge_exit_gate.generated_surface_ready_can_claim_domain_ready, undefined);
 
-  assert.equal(packRefs.surface_kind, 'rca_declarative_visual_pack_refs');
+  assert.equal(packRefs.surface_kind, 'opl_domain_pack_compiler_input');
   assert.equal(packRefs.pack_compiler_owner, 'one-person-lab');
   assert.equal(packRefs.authority_boundary.opl_can_compile_generated_surfaces_from_refs, true);
   assert.equal(packRefs.authority_boundary.opl_can_write_domain_truth, false);
