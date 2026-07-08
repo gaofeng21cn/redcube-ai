@@ -3,12 +3,8 @@ import {
   test,
   assert,
   runReviewWithOverflowingBlock,
-  runReviewWithDecorativeGroundOverlap,
-  runReviewWithInconsistentPageNumbers,
   runReviewWithUnframedHeader,
   runReviewWithOverflowingChildGroup,
-  runReviewWithUntaggedTakeawayText,
-  runReviewWithAdjacentReadableBlocksTooClose,
 } from './shared.ts';
 
 test('shared screenshot review blocks surfaced block content that spills out of its card', () => {

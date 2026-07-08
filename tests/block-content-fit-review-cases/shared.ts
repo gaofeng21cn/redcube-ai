@@ -43,13 +43,39 @@ function runReview(args) {
   );
 }
 
-export function runReviewWithOverflowingBlock() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-'));
+function runReviewFixture({
+  workspacePrefix,
+  html,
+  maxPrimaryPoints,
+  frameWidth,
+  frameHeight,
+}) {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), workspacePrefix));
   const htmlFile = path.join(workspaceRoot, 'deck.html');
   const outputDir = path.join(workspaceRoot, 'screenshots');
   const reviewMarkdown = path.join(workspaceRoot, 'review.md');
   mkdirSync(outputDir, { recursive: true });
+  writeFileSync(htmlFile, html, 'utf-8');
 
+  const result = runReview([
+    '--html',
+    htmlFile,
+    '--output-dir',
+    outputDir,
+    '--review-markdown',
+    reviewMarkdown,
+    '--max-primary-points',
+    maxPrimaryPoints,
+    '--frame-width',
+    frameWidth,
+    '--frame-height',
+    frameHeight,
+  ]);
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  return JSON.parse(result.stdout);
+}
+
+export function runReviewWithOverflowingBlock() {
   const inspection = {
     slideId: 'S06',
     title: '第三步：结果必须回到可审计的真相载体',
@@ -136,7 +162,12 @@ export function runReviewWithOverflowingBlock() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-block-content-review-',
+    maxPrimaryPoints: '5',
+    frameWidth: '1152',
+    frameHeight: '648',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -162,33 +193,11 @@ export function runReviewWithOverflowingBlock() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '5',
-      '--frame-width',
-      '1152',
-      '--frame-height',
-      '648',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithDecorativeGroundOverlap() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-decorative-ground-review-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspection = {
     slideId: 'S05',
     title: '2026 年 AI 能力跃迁',
@@ -260,7 +269,12 @@ export function runReviewWithDecorativeGroundOverlap() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-decorative-ground-review-',
+    maxPrimaryPoints: '5',
+    frameWidth: '1152',
+    frameHeight: '648',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -290,33 +304,11 @@ export function runReviewWithDecorativeGroundOverlap() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '5',
-      '--frame-width',
-      '1152',
-      '--frame-height',
-      '648',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithInconsistentPageNumbers() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-page-number-review-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspections = [
     {
       slideId: 'S01',
@@ -351,7 +343,12 @@ export function runReviewWithInconsistentPageNumbers() {
     },
   ];
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-page-number-review-',
+    maxPrimaryPoints: '5',
+    frameWidth: '1152',
+    frameHeight: '648',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible" data-slide-shell="S01">
@@ -387,33 +384,11 @@ export function runReviewWithInconsistentPageNumbers() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '5',
-      '--frame-width',
-      '1152',
-      '--frame-height',
-      '648',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithUnframedHeader() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-header-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspection = {
     slideId: 'N02',
     title: '为什么很多人一开始就抓错重点',
@@ -457,7 +432,12 @@ export function runReviewWithUnframedHeader() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-block-content-review-header-',
+    maxPrimaryPoints: '4',
+    frameWidth: '448',
+    frameHeight: '597',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -486,33 +466,11 @@ export function runReviewWithUnframedHeader() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '4',
-      '--frame-width',
-      '448',
-      '--frame-height',
-      '597',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithOverflowingChildGroup() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-group-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspection = {
     slideId: 'N06',
     title: '复用模块这件事，它切得很干净',
@@ -576,7 +534,12 @@ export function runReviewWithOverflowingChildGroup() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-block-content-review-group-',
+    maxPrimaryPoints: '4',
+    frameWidth: '448',
+    frameHeight: '597',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -612,33 +575,11 @@ export function runReviewWithOverflowingChildGroup() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '4',
-      '--frame-width',
-      '448',
-      '--frame-height',
-      '597',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithUntaggedTakeawayText() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-untagged-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspection = {
     slideId: 'N03',
     title: 'Med Auto Science 先把自己的位置站稳了',
@@ -682,7 +623,12 @@ export function runReviewWithUntaggedTakeawayText() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-block-content-review-untagged-',
+    maxPrimaryPoints: '4',
+    frameWidth: '448',
+    frameHeight: '597',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -709,33 +655,11 @@ export function runReviewWithUntaggedTakeawayText() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '4',
-      '--frame-width',
-      '448',
-      '--frame-height',
-      '597',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export function runReviewWithAdjacentReadableBlocksTooClose() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-content-review-adjacent-'));
-  const htmlFile = path.join(workspaceRoot, 'deck.html');
-  const outputDir = path.join(workspaceRoot, 'screenshots');
-  const reviewMarkdown = path.join(workspaceRoot, 'review.md');
-  mkdirSync(outputDir, { recursive: true });
-
   const inspection = {
     slideId: 'N01',
     title: '医学自动科研真正拉开差距的是主链',
@@ -779,7 +703,12 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
     },
   };
 
-  writeFileSync(htmlFile, `<!doctype html>
+  return runReviewFixture({
+    workspacePrefix: 'redcube-block-content-review-adjacent-',
+    maxPrimaryPoints: '4',
+    frameWidth: '448',
+    frameHeight: '597',
+    html: `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -805,33 +734,11 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
     };
   </script>
 </body>
-</html>`, 'utf-8');
-
-  const result = runReview([
-      '--html',
-      htmlFile,
-      '--output-dir',
-      outputDir,
-      '--review-markdown',
-      reviewMarkdown,
-      '--max-primary-points',
-      '4',
-      '--frame-width',
-      '448',
-      '--frame-height',
-      '597',
-    ]);
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  return JSON.parse(result.stdout);
+</html>`,
+  });
 }
 
 export {
   test,
   assert,
-  os,
-  path,
-  mkdirSync,
-  mkdtempSync,
-  writeFileSync,
-  spawnSync,
 };
