@@ -53,7 +53,8 @@ case "$lane" in
     npm run test:integration
     ;;
   integration-remaining)
-    npm run test:integration:remaining
+    npm run --silent build
+    node --experimental-strip-types scripts/run-test-group.ts integration:remaining
     ;;
   e2e)
     npm run test:e2e
@@ -65,7 +66,8 @@ case "$lane" in
     npm run test:full
     ;;
   full-remaining)
-    npm run test:full:remaining
+    npm run --silent build
+    node --experimental-strip-types scripts/run-test-group.ts full:remaining
     ;;
   full-with-historical)
     npm run test:full:with-historical
