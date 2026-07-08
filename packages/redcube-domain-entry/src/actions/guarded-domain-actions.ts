@@ -318,7 +318,7 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     audit_readout: 'project_opl_executor_adapter_retain_rca_route_policy',
     codePaths: [
       'packages/redcube-runtime-protocol/src/executor-runtime.ts',
-      'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts',
+      'packages/redcube-runtime/src/deliverable-routes.ts',
       'packages/redcube-runtime/src/executors/index.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts',

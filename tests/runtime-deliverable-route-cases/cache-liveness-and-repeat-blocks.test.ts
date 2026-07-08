@@ -14,8 +14,6 @@ import {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-  appendEvent,
-  startRun,
   startMockCodexCli,
   withEnv,
   completeSourceReadiness,
@@ -24,6 +22,7 @@ import {
   withMockCodexRuntime,
   withMockHermesAgentLoop,
 } from './shared.ts';
+import { runDeliverableRoute as runRawRuntimeDeliverableRoute } from '@redcube/runtime';
 
 test('runDeliverableRoute reuses a fresh gated stage artifact when the route cache key is unchanged', async () => {
   await withMockCodexRuntime(async () => {
@@ -202,7 +201,7 @@ test('image authoring cache survives downstream review and export artifacts', as
   });
 });
 
-test('startRun rejects missing OPL attempt evidence without local diagnostic bypass', async () => {
+test('runDeliverableRoute rejects missing OPL attempt evidence without local diagnostic bypass', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-stale-run-'));
 
   await createDeliverable({
@@ -215,18 +214,15 @@ test('startRun rejects missing OPL attempt evidence without local diagnostic byp
     goal: '验证旧 running run 不会继续被当作活跃事实',
   });
 
-  assert.throws(
-    () => startRun({
-      workspaceRoot,
-      route: 'render_html',
-      overlay: 'ppt_deck',
-      target: 'deck-a',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
-    }),
-    /RCA-local diagnostic route-run records are retired/,
-  );
+  const blocked = await runRawRuntimeDeliverableRoute({
+    workspaceRoot,
+    route: 'render_html',
+    overlay: 'ppt_deck',
+    topicId: 'topic-a',
+    deliverableId: 'deck-a',
+  });
+  assert.equal(blocked.ok, false);
+  assert.equal(blocked.blocker_kind, 'missing_opl_stage_attempt');
   assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
   assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
 });

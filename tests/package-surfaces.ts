@@ -6,7 +6,6 @@ export {
 export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
-  getDefaultRuntimeFamilyCatalog,
   listDefaultRuntimeFamilyModules,
 } from '@redcube/runtime';
 export {
@@ -25,7 +24,6 @@ export {
 } from '@redcube/overlay-ppt';
 export {
   applyReviewMutation,
-  appendEvent,
   buildCreativeOwnershipResidueAudit,
   buildPerformanceReport,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
@@ -38,7 +36,6 @@ export {
   resolveSourceAugmentationAdapter,
   runCandidateRaceRoute,
   selectCandidateRaceWinner,
-  startRun,
 } from '@redcube/runtime';
 export {
   createRunRecord,
@@ -65,12 +62,9 @@ export {
   buildCodexExecutorDescriptor,
   buildExecutorBackendContract,
   buildHermesAgentLoopExecutorDescriptor,
-  completeRouteRun,
   failRetiredHermesAgentAdapter,
-  failRouteRun,
   RUN_LOCATOR_ENVELOPE_BOUNDARY,
   normalizeExecutorBackend,
-  startRouteRun,
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from '@redcube/runtime-protocol';
 export { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';

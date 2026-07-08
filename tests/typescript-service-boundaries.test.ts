@@ -40,7 +40,7 @@ test('P20.B: default registries are package-local runtime contracts, not standal
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/poster-onepager/index.ts')), true);
 
   assert.match(runtimeSource, /export function getDefaultOverlayRegistry/);
-  assert.match(runtimeSource, /runnerId: 'families\/ppt'/);
+  assert.match(runtimeSource, /runner_id: 'families\/ppt'/);
   assert.doesNotMatch(runtimeSource, /@redcube\/runtime-family-/);
   assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/default-registries.js')), false);
 });

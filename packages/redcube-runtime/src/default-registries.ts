@@ -49,47 +49,31 @@ export interface RuntimeFamilyModuleSpec {
   runner_id: string;
 }
 
-export interface RuntimeFamilyCatalogSurface {
-  surface_kind: 'runtime_family_catalog';
-  owner_boundary: {
-    generic_runtime_family_registry_owner: 'one-person-lab';
-    rca_role: 'visual_route_family_handler_refs';
-    rca_owns_generic_runtime: false;
-    rca_owns_generic_registry: false;
-    rca_owns_generic_attempt_ledger: false;
-    retained_authority_refs: string[];
-  };
-  families: RuntimeFamilyModuleSpec[];
-}
-
 export interface LoadedRuntimeFamilyRunner extends RuntimeFamilyModuleSpec {
   runRoute: (...args: unknown[]) => Promise<unknown>;
 }
 
-interface RuntimeFamilyModuleManifestSpec {
-  overlayId: string;
-  deliverableKind: string;
-  runnerId: string;
+interface RuntimeFamilyModuleEntry extends RuntimeFamilyModuleSpec {
   runRoute: (...args: unknown[]) => Promise<unknown>;
 }
 
-const defaultRuntimeFamilyModules: RuntimeFamilyModuleManifestSpec[] = [
+const defaultRuntimeFamilyModules: RuntimeFamilyModuleEntry[] = [
   {
-    overlayId: 'ppt_deck',
-    deliverableKind: 'ppt_deck',
-    runnerId: 'families/ppt',
+    overlay_id: 'ppt_deck',
+    deliverable_kind: 'ppt_deck',
+    runner_id: 'families/ppt',
     runRoute: runPptDeckRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
-    overlayId: 'xiaohongshu',
-    deliverableKind: 'xiaohongshu_note',
-    runnerId: 'families/xiaohongshu',
+    overlay_id: 'xiaohongshu',
+    deliverable_kind: 'xiaohongshu_note',
+    runner_id: 'families/xiaohongshu',
     runRoute: runXiaohongshuRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
-    overlayId: 'poster_onepager',
-    deliverableKind: 'poster_onepager',
-    runnerId: 'families/poster-onepager',
+    overlay_id: 'poster_onepager',
+    deliverable_kind: 'poster_onepager',
+    runner_id: 'families/poster-onepager',
     runRoute: runPosterOnepagerRoute as (...args: unknown[]) => Promise<unknown>,
   },
 ];
@@ -99,42 +83,22 @@ function safeText(value: unknown, fallback = ''): string {
   return text || fallback;
 }
 
-function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec): RuntimeFamilyModuleSpec {
+function publicRuntimeFamilyModule(spec: RuntimeFamilyModuleEntry): RuntimeFamilyModuleSpec {
   return {
-    overlay_id: safeText(spec.overlayId),
-    deliverable_kind: safeText(spec.deliverableKind),
-    runner_id: safeText(spec.runnerId),
+    overlay_id: safeText(spec.overlay_id),
+    deliverable_kind: safeText(spec.deliverable_kind),
+    runner_id: safeText(spec.runner_id),
   };
 }
 
 export function listDefaultRuntimeFamilyModules(): RuntimeFamilyModuleSpec[] {
-  return defaultRuntimeFamilyModules.map((spec) => buildCatalogEntry(spec));
-}
-
-export function getDefaultRuntimeFamilyCatalog(): RuntimeFamilyCatalogSurface {
-  return {
-    surface_kind: 'runtime_family_catalog',
-    owner_boundary: {
-      generic_runtime_family_registry_owner: 'one-person-lab',
-      rca_role: 'visual_route_family_handler_refs',
-      rca_owns_generic_runtime: false,
-      rca_owns_generic_registry: false,
-      rca_owns_generic_attempt_ledger: false,
-      retained_authority_refs: [
-        'visual_route_truth',
-        'route_family_policy_refs',
-        'review_export_gate_refs',
-        'stage_artifact_refs',
-      ],
-    },
-    families: listDefaultRuntimeFamilyModules(),
-  };
+  return defaultRuntimeFamilyModules.map((spec) => publicRuntimeFamilyModule(spec));
 }
 
 export function resolveRuntimeFamilyModule(contract: RuntimeFamilyContract): RuntimeFamilyModuleSpec {
   const overlayId = safeText(contract?.overlay);
   const deliverableKind = safeText(contract?.deliverable_kind);
-  const spec = listDefaultRuntimeFamilyModules().find((entry) => (
+  const spec = defaultRuntimeFamilyModules.find((entry) => (
     (overlayId && entry.overlay_id === overlayId)
     || (deliverableKind && entry.deliverable_kind === deliverableKind)
   ));
@@ -145,18 +109,24 @@ export function resolveRuntimeFamilyModule(contract: RuntimeFamilyContract): Run
     );
   }
 
-  return spec;
+  return publicRuntimeFamilyModule(spec);
 }
 
 export async function loadRuntimeFamilyRunner(contract: RuntimeFamilyContract): Promise<LoadedRuntimeFamilyRunner> {
-  const runnerRef = resolveRuntimeFamilyModule(contract);
-  const registryEntry = defaultRuntimeFamilyModules.find((entry) => entry.runnerId === runnerRef.runner_id);
+  const registryEntry = defaultRuntimeFamilyModules.find((entry) => {
+    const overlayId = safeText(contract?.overlay);
+    const deliverableKind = safeText(contract?.deliverable_kind);
+    return (overlayId && entry.overlay_id === overlayId)
+      || (deliverableKind && entry.deliverable_kind === deliverableKind);
+  });
   if (!registryEntry) {
-    throw new Error(`Runtime family runner is not declared in the default registry: ${runnerRef.runner_id}`);
+    throw new Error(
+      `Unsupported runtime family: overlay=${safeText(contract?.overlay) || '<missing>'}, deliverable_kind=${safeText(contract?.deliverable_kind) || '<missing>'}`,
+    );
   }
 
   return {
-    ...runnerRef,
+    ...publicRuntimeFamilyModule(registryEntry),
     runRoute: registryEntry.runRoute,
   };
 }

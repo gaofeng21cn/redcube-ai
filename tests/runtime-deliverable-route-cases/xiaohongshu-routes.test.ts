@@ -14,8 +14,6 @@ import {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-  appendEvent,
-  startRun,
   startMockCodexCli,
   withEnv,
   completeSourceReadiness,

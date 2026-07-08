@@ -8,7 +8,6 @@ import {
   createOverlayRegistry,
   buildXiaohongshuTopic,
   getDefaultOverlayCatalog,
-  getDefaultRuntimeFamilyCatalog,
   listDefaultRuntimeFamilyModules,
   pptDeckOverlay,
   xiaohongshuOverlay,
@@ -427,12 +426,6 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
 test('registry source manifests stay aligned with direct package dependencies and static declarations', () => {
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const runtimeSource = readText('packages/redcube-runtime/src/default-registries.ts');
-  const runtimeFamilyCatalog = getDefaultRuntimeFamilyCatalog();
-
-  assert.equal(runtimeFamilyCatalog.owner_boundary.generic_runtime_family_registry_owner, 'one-person-lab');
-  assert.equal(runtimeFamilyCatalog.owner_boundary.rca_owns_generic_runtime, false);
-  assert.equal(runtimeFamilyCatalog.owner_boundary.rca_owns_generic_registry, false);
-  assert.equal(runtimeFamilyCatalog.owner_boundary.retained_authority_refs.includes('review_export_gate_refs'), true);
 
   for (const dependency of [
     '@redcube/overlay-ppt',
@@ -447,11 +440,13 @@ test('registry source manifests stay aligned with direct package dependencies an
   }
   assert.equal(runtimeSource.includes("import('@redcube/overlay-"), false);
   assert.equal(runtimeSource.includes('listDefaultOverlayModules'), false);
+  assert.equal(runtimeSource.includes('RuntimeFamilyCatalogSurface'), false);
+  assert.equal(runtimeSource.includes('generic_runtime_family_registry_owner'), false);
 
   for (const { runner_id } of listDefaultRuntimeFamilyModules()) {
     assert.match(
       runtimeSource,
-      new RegExp(`runnerId:\\s*['"]${runner_id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`),
+      new RegExp(`runner_id:\\s*['"]${runner_id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"]`),
       `${runner_id} must have a literal runtime family runner id`,
     );
     assert.match(runtimeSource, /runRoute:/, `${runner_id} must resolve to an internal runner`);

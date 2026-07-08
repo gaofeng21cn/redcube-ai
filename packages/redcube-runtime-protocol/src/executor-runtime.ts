@@ -2,11 +2,6 @@
 import {
   buildCodexRuntimeTopology as buildProtocolCodexRuntimeTopology,
 } from './runtime-topology.js';
-import {
-  completeRouteRun as completeRouteRunFromRouteRunRecords,
-  failRouteRun as failRouteRunFromRouteRunRecords,
-  startRouteRun as startRouteRunFromRouteRunRecords,
-} from './executor-runtime-parts/route-run-records.js';
 
 const HERMES_SUBSTRATE_OWNER = 'Hermes';
 export const HERMES_RUNTIME_SURFACE = 'hermes_agent_api_server';
@@ -76,8 +71,6 @@ export function failRetiredHermesAgentAdapter(options = {}) {
 
 export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
 export type HermesAgentLoopExecutionModel = ReturnType<typeof buildHermesAgentLoopExecutionModel>;
-
-const ROUTE_RUN_RECORD_RUNTIME_DEPS = Object.freeze({ resolveRuntimeTopologyForExecutor });
 
 const HERMES_RUNTIME_TOPOLOGY = Object.freeze({
   schema_version: 1,
@@ -367,85 +360,4 @@ function resolveRuntimeTopologyForExecutor(executor) {
     return buildHermesAgentLoopRuntimeTopology();
   }
   return buildHermesRuntimeTopology();
-}
-
-export {
-  appendRouteRunEvent,
-} from './executor-runtime-parts/route-run-records.js';
-
-export function startRouteRun({
-  workspaceRoot,
-  runId = null,
-  route,
-  overlay,
-  scope = 'deliverable',
-  target,
-  topicId = null,
-  deliverableId = null,
-  baselineDeliverableId = '',
-  executor,
-  crossProviderAttemptIndex = null,
-}) {
-  return startRouteRunFromRouteRunRecords({
-    runId,
-    route,
-    overlay,
-    scope,
-    target,
-    topicId,
-    deliverableId,
-    baselineDeliverableId,
-    executor,
-    crossProviderAttemptIndex,
-  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
-}
-
-export function completeRouteRun({
-  workspaceRoot,
-  runId,
-  run = null,
-  currentStage,
-  stageResults,
-  artifactRefs,
-  executor,
-  telemetry = {},
-  status = 'completed',
-  errorKind = null,
-  crossProviderAttemptIndex = null,
-}) {
-  return completeRouteRunFromRouteRunRecords({
-    runId,
-    run,
-    currentStage,
-    stageResults,
-    artifactRefs,
-    executor,
-    telemetry,
-    status,
-    errorKind,
-    crossProviderAttemptIndex,
-  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
-}
-
-export function failRouteRun({
-  workspaceRoot,
-  runId,
-  run = null,
-  currentStage,
-  error,
-  errorKind = 'execution_error',
-  executor,
-  telemetry = {},
-  status = 'failed',
-}) {
-  return failRouteRunFromRouteRunRecords({
-    runId,
-    run,
-    currentStage,
-    error,
-    errorKind,
-    executor,
-    telemetry,
-    status,
-  }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
 }

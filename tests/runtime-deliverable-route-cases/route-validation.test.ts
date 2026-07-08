@@ -14,8 +14,6 @@ import {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-  appendEvent,
-  startRun,
   startMockCodexCli,
   withEnv,
   completeSourceReadiness,
@@ -53,15 +51,6 @@ test('getRun fails closed to OPL stage attempt/provider ledger refs for local lo
       assert.equal(error.typed_blocker.owner_boundary.rca_owns_generic_attempt_ledger, false);
       return true;
     },
-  );
-});
-
-test('appendEvent rejects unsafe run identifiers', () => {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-'));
-
-  assert.throws(
-    () => appendEvent(workspaceRoot, '../run-a', { type: 'test' }),
-    /runId 不能包含路径分隔符/,
   );
 });
 

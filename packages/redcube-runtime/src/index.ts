@@ -18,10 +18,6 @@ export {
   summarizeRelativeQuality,
 } from './relative-quality.js';
 export {
-  appendRouteRunEvent as appendEvent,
-  startRouteRun as startRun,
-} from '@redcube/runtime-protocol';
-export {
   planCandidateRace,
   runCandidateRaceRoute,
   selectCandidateRaceWinner,
@@ -40,7 +36,6 @@ export {
 export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
-  getDefaultRuntimeFamilyCatalog,
   listDefaultRuntimeFamilyModules,
   loadRuntimeFamilyRunner,
   resolveRuntimeFamilyModule,
@@ -50,7 +45,6 @@ export type {
   LoadedRuntimeFamilyRunner,
   OverlayCatalogEntry,
   OverlayCatalogSurface,
-  RuntimeFamilyCatalogSurface,
   RuntimeFamilyContract,
   RuntimeFamilyModuleSpec,
 } from './default-registries.js';

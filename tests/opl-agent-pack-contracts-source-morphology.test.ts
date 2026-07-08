@@ -38,7 +38,7 @@ const EXPECTED_ROUTE_COVERAGE = {
   'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts': 'deliverable_route_attempt_shell',
   'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/': 'deliverable_route_attempt_shell',
   'packages/redcube-runtime-protocol/src/executor-runtime.ts': 'executor_runtime_route_run_records',
-  'packages/redcube-runtime-protocol/src/executor-runtime-parts/route-run-records.ts': 'executor_runtime_route_run_records',
+  'packages/redcube-runtime/src/deliverable-routes.ts': 'executor_runtime_route_run_records',
 };
 const RUNTIME_FAMILY_SOURCE_ROOTS = [
   'packages/redcube-runtime/src/families/ppt/',

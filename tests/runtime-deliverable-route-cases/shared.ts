@@ -13,7 +13,6 @@ import {
   runtimeWatch,
   runDeliverableRoute,
 } from '../product-domain-action-test-api.ts';
-import { appendEvent, startRun } from '../package-surfaces.ts';
 import {
   startMockCodexCli,
   withEnv,
@@ -61,8 +60,6 @@ export {
   getRun,
   runtimeWatch,
   runDeliverableRoute,
-  appendEvent,
-  startRun,
   startMockCodexCli,
   withEnv,
   completeSourceReadiness,
