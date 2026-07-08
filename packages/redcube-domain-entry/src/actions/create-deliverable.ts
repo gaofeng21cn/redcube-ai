@@ -136,7 +136,7 @@ export async function createDeliverable({
   deliverableId,
   title,
   goal,
-  constraints,
+  constraints = [],
 }) {
   ensureWorkspaceGitBoundary({ workspaceRoot });
   const workspaceAgentsFile = ensureWorkspaceAgentsFile({ workspaceRoot });
