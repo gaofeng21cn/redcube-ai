@@ -529,7 +529,6 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     ],
     replacement_expectation_mode: 'opl_replacement_expectation_or_refs_only_projection',
     generated_interface_consumption_ref: OPL_GENERATED_INTERFACE_CONSUMPTION.ref,
-    generated_interface_consumption: { ...OPL_GENERATED_INTERFACE_CONSUMPTION },
     functional_structure_gap_closure: {
       status: 'functional_structure_gaps_closed_evidence_gates_open',
       closed_at: '2026-05-17',
