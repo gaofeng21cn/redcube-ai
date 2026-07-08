@@ -66,7 +66,7 @@ function isWithinRepoRoot(repoRoot, resolvedPath) {
   return relative === '.' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
-export function inspectWorkspacePackageResolution({
+function inspectWorkspacePackageResolution({
   repoRoot,
   specifiers = WORKSPACE_PACKAGE_SPECIFIERS,
   resolve,
@@ -105,7 +105,7 @@ export function assertWorkspacePackageResolution(options = {}) {
   return inspection;
 }
 
-export function inspectRequiredRuntimeSharedResolution({
+function inspectRequiredRuntimeSharedResolution({
   repoRoot,
   checks = REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS,
   resolve,
@@ -209,7 +209,7 @@ function buildRepoLocalSharedPinFallbackContract({
   };
 }
 
-export function inspectCurrentRepoSharedPinAlignment({
+function inspectCurrentRepoSharedPinAlignment({
   repoRoot,
   consumerRepoId = 'redcube',
   ownerRepoRoot,

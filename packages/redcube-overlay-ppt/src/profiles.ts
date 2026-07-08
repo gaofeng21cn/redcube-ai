@@ -624,10 +624,6 @@ export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
       html_authoring_lane: FAMILY_PROMPT_PACK.render_contract.html_authoring_lane,
       native_ppt_proof_lane: FAMILY_PROMPT_PACK.render_contract.native_ppt_proof_lane, html_design_companion: FAMILY_PROMPT_PACK.render_contract.ui_ux_quality_companion,
     },
-    packages: {
-      overlay: '@redcube/overlay-ppt',
-      pack: '@redcube/pack-ppt',
-    },
     runtime: {
       runner_id: 'families/ppt',
       owner: 'redcube_ai',

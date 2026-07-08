@@ -202,7 +202,7 @@ test('image authoring cache survives downstream review and export artifacts', as
   });
 });
 
-test('startRun rejects local diagnostic records after route-run store retirement', async () => {
+test('startRun rejects missing OPL attempt evidence without local diagnostic bypass', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-stale-run-'));
 
   await createDeliverable({
@@ -224,7 +224,6 @@ test('startRun rejects local diagnostic records after route-run store retirement
       topicId: 'topic-a',
       deliverableId: 'deck-a',
       executor: { adapter: 'codex_cli', execution_surface: 'codex_cli_runtime' },
-      allowLocalDiagnosticRecord: true,
     }),
     /RCA-local diagnostic route-run records are retired/,
   );

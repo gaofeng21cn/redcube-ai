@@ -1,12 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
   "entry": [
-    "scripts/install-codex-plugin.ts",
     "scripts/materialize-rca-workspace-receipt-scaleout-evidence.ts",
     "scripts/p19-creative-ownership-audit-lib.ts",
-    "scripts/real-route-evolution-probe-parts/terminal-evidence.ts",
-    "scripts/real-route-evolution-probe-parts/timeout-blocker.ts",
-    "scripts/run-real-route-evolution-probe.ts",
     "tools/native-ppt-proof/build-fixture-input.ts"
   ],
   "ignoreExports": [
@@ -37,29 +33,9 @@
       ]
     },
     {
-      "file": "packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime-family-parts/index.ts",
-      "exports": [
-        "canRunXiaohongshu",
-        "runXiaohongshuRoute"
-      ]
-    },
-    {
-      "file": "packages/redcube-runtime-family-xiaohongshu/src/xiaohongshu-runtime.ts",
-      "exports": [
-        "canRunXiaohongshu",
-        "runXiaohongshuRoute"
-      ]
-    },
-    {
       "file": "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts",
       "exports": [
         "routeSequenceStageIds"
-      ]
-    },
-    {
-      "file": "packages/redcube-runtime-family-ppt/src/ppt-deck-runtime-family-parts/export.ts",
-      "exports": [
-        "BuildExportArtifactInput"
       ]
     },
     {

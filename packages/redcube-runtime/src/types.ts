@@ -331,7 +331,6 @@ export interface RuntimeStartRunRequest {
   baselineDeliverableId?: string;
   executor: Record<string, unknown>;
   crossProviderAttemptIndex?: Record<string, unknown> | null;
-  allowLocalDiagnosticRecord?: boolean;
 }
 
 export interface RuntimeCompleteRunRequest {

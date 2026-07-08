@@ -3,10 +3,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { inspectCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
+import { assertCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
 
 test('domain entry package and lock stay aligned with the current OPL family shared release pin contract', () => {
-  const inspection = inspectCurrentRepoSharedPinAlignment({
+  const inspection = assertCurrentRepoSharedPinAlignment({
     repoRoot: process.cwd(),
     consumerRepoId: 'redcube',
   });

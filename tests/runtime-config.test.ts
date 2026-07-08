@@ -9,7 +9,7 @@ import {
   loadExecutorRoutingConfig,
   loadRuntimeConfig,
   resolveExecutorRouting,
-} from './package-surfaces.ts';
+} from '../packages/redcube-config/dist/index.js';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
@@ -196,6 +196,42 @@ test('resolveExecutorRouting keeps built-in default on Codex CLI when no config 
   }
 });
 
+test('resolveExecutorRouting only marks domain local default when default_executor is explicit', () => {
+  const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
+  const homeDir = path.join(repoRoot, 'fake-home');
+  const routingFile = path.join(homeDir, '.codex', 'projects', 'redcube-ai', 'runtime-state', 'config', 'executor-routing.json');
+
+  writeJson(routingFile, {
+    schema_version: 1,
+    default_executor: {
+      executor_backend: 'codex_cli',
+      execution_shape: 'structured_call',
+    },
+  });
+
+  try {
+    const loaded = loadExecutorRoutingConfig({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+    });
+    assert.deepEqual(loaded.default_executor_source_files, [routingFile]);
+
+    const resolved = resolveExecutorRouting({
+      cwd: repoRoot,
+      homeDir,
+      env: {},
+      family: 'ppt_deck',
+      profileId: 'lecture_peer',
+      route: 'render_html',
+    });
+    assert.equal(resolved.effective_default_executor.executor_backend, 'codex_cli');
+    assert.equal(resolved.effective_default_executor.source, 'domain_local_user_config');
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
 test('resolveExecutorRouting honors OPL default executor before domain local default', () => {
   const repoRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-executor-routing-'));
   const homeDir = path.join(repoRoot, 'fake-home');
@@ -264,6 +300,7 @@ test('loadExecutorRoutingConfig resolves opt-in structured_call route model prof
       env: {},
     });
     assert.deepEqual(loaded.source_files, [routingFile]);
+    assert.deepEqual(loaded.default_executor_source_files, []);
     assert.equal(loaded.config.structured_call_routing.enabled, true);
 
     const matched = resolveExecutorRouting({
@@ -275,7 +312,7 @@ test('loadExecutorRoutingConfig resolves opt-in structured_call route model prof
       route: 'render_html',
     });
     assert.equal(matched.effective_default_executor.executor_backend, 'codex_cli');
-    assert.equal(matched.effective_default_executor.source, 'domain_local_user_config');
+    assert.equal(matched.effective_default_executor.source, 'domain_builtin_default');
     assert.equal(matched.matched_route_key, 'ppt_deck/lecture_peer/render_html');
     assert.equal(matched.selected_executor.executor_backend, 'hermes_agent');
     assert.equal(matched.selected_executor.execution_shape, 'structured_call');

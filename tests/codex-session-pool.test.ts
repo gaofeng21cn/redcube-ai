@@ -8,9 +8,9 @@ import path from 'node:path';
 import {
   generateStructuredArtifactBatchViaCodexCli,
   readCodexCliContract,
-} from './package-surfaces.ts';
+} from '../packages/redcube-runtime/dist/executors/index.js';
 
-test('Codex batch surface preserves per-stage contracts and records reuse as unsupported for exec-only CLI', async () => {
+test('Codex batch surface preserves per-stage contracts and records exec-only sessions as ephemeral', async () => {
   const promptDir = mkdtempSync(path.join(tmpdir(), 'redcube-codex-session-pool-'));
   const promptPack = 'prompts/0_series_planning.md';
   const calls = [];
@@ -22,10 +22,6 @@ test('Codex batch surface preserves per-stage contracts and records reuse as uns
       REDCUBE_CODEX_REASONING_EFFORT: 'xhigh',
     }),
     cwd: promptDir,
-    sessionPool: {
-      descriptor_id: 'pool-ppt-run',
-      reuse_strategy: 'same_session_if_supported',
-    },
     stages: [
       {
         stage_id: 'outline',
@@ -74,10 +70,12 @@ test('Codex batch surface preserves per-stage contracts and records reuse as uns
   assert.deepEqual(result.data.map((stage) => stage.data.stage), ['outline', 'draft']);
   assert.equal(result.batchRuntime.owner, 'codex_cli');
   assert.equal(result.batchRuntime.batch_descriptor.kind, 'codex_cli_batch_descriptor');
-  assert.equal(result.batchRuntime.session_pool.descriptor_id, 'pool-ppt-run');
   assert.equal(result.batchRuntime.session_pool.reuse_supported, false);
   assert.equal(result.batchRuntime.session_pool.reuse_claimed, false);
   assert.equal(result.batchRuntime.session_pool.reuse_status, 'unsupported_by_exec_surface');
+  assert.equal(result.batchRuntime.session_pool.invocation_surface, 'codex_exec_ephemeral_per_stage');
+  assert.equal('descriptor_id' in result.batchRuntime.session_pool, false);
+  assert.equal('reuse_strategy' in result.batchRuntime.session_pool, false);
   assert.equal(result.batchRuntime.session_pool.invocation_count, 2);
   assert.deepEqual(result.batchRuntime.session_pool.stage_session_ids, [
     result.data[0].generationRuntime.session_id,

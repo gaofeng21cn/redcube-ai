@@ -1,9 +1,8 @@
 // @ts-nocheck
-import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
-export const ACTIVE_ROOTS = [
+const ACTIVE_ROOTS = [
   'agent',
   'apps',
   'packages',
@@ -14,7 +13,7 @@ export const ACTIVE_ROOTS = [
   'tools',
   'python',
 ];
-export const TEXT_EXTENSIONS = new Set([
+const TEXT_EXTENSIONS = new Set([
   '.md',
   '.json',
   '.ts',
@@ -27,21 +26,14 @@ export const TEXT_EXTENSIONS = new Set([
   '.yaml',
   '.yml',
 ]);
-export const RETIRED_CONTRACTS = Object.freeze([
-  'contracts/runtime-program/hermes-runtime-substrate-activation-package.json',
-  'contracts/runtime-program/hermes-runtime-capability-extraction-map.json',
-  'contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json',
-  'contracts/runtime-program/hermes-stable-family-closure-truth.json',
-  'contracts/runtime-program/hermes-managed-family-closure-truth.json',
-]);
-export const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
+const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
   /\bcompatibility_alias(?:es)?_allowed\b\s*[:=]\s*true/i,
   /\bactive_caller_compatibility_alias_restored\b\s*[:=]\s*true/i,
   /\bcompatibility_alias_restored\b\s*[:=]\s*true/i,
   /\b(?:default|active|live|normal)[_-]?(?:compatibility|legacy)[_-]?alias(?:es)?\b/i,
   /\b(?:compatibility|legacy)[_-]?alias(?:es)?[_-]?(?:default|active|live|normal)\b/i,
 ]);
-export const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze([
+const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze([
   ...ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS,
   /\bruntimeWatch_can_return_to_domain_action_adapter_default_dispatch\b\s*[:=]\s*true/i,
   /\bdomain_action_adapter_can_become_generic_dispatch_owner\b\s*[:=]\s*true/i,
@@ -55,7 +47,7 @@ export const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze
   /\bgeneric_runtime_owner_allowed\b\s*[:=]\s*true/i,
 ]);
 
-export const RETIRED_SURFACE_GUARD_EXEMPT_FILES = new Set([
+const RETIRED_SURFACE_GUARD_EXEMPT_FILES = new Set([
   'scripts/private-platform-source-scan.ts',
   'tests/helpers/rca-retired-surface-guard.ts',
   'tests/rca-retired-surface-active-guard.test.ts',
@@ -66,12 +58,11 @@ export const RETIRED_SURFACE_GUARD_EXEMPT_FILES = new Set([
   'tests/python-native-helper-catalog.test.ts',
 ]);
 
-export function listTextFiles(root) {
+function listTextFiles(root) {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(root, entry.name);
-    const normalized = file.split(path.sep).join('/');
     if (entry.isDirectory()) {
-      if (normalized.includes('__closeout-audit-test__')) return [];
+      if (entry.name.startsWith('__closeout-audit-test')) return [];
       if (entry.name === 'dist' || entry.name === 'build' || entry.name === 'node_modules') return [];
       return listTextFiles(file);
     }
@@ -79,19 +70,8 @@ export function listTextFiles(root) {
   });
 }
 
-export function normalizePath(value) {
+function normalizePath(value) {
   return value.split(path.sep).join('/');
-}
-
-export function activeShellScripts() {
-  return ACTIVE_ROOTS.flatMap((root) => {
-    const rootPath = path.resolve(root);
-    if (!existsSync(rootPath)) return [];
-    return path.extname(root) ? [root] : listTextFiles(root);
-  })
-    .filter((file) => path.extname(file) === '.sh')
-    .map(normalizePath)
-    .sort();
 }
 
 export function activePrivatePlatformResurrectionViolations(scanRoots = ACTIVE_ROOTS) {
@@ -110,59 +90,4 @@ export function activePrivatePlatformResurrectionViolations(scanRoots = ACTIVE_R
     }
   }
   return violations;
-}
-
-export function sourceRefPath(sourceRef) {
-  return String(sourceRef).split('#')[0];
-}
-
-export function sourceRefCoversFile(sourceRef, file) {
-  const sourcePath = sourceRefPath(sourceRef);
-  if (sourcePath.endsWith('/')) {
-    return file.startsWith(sourcePath);
-  }
-  return file === sourcePath || file.startsWith(`${sourcePath}/`);
-}
-
-export function assertRepoRefResolves(sourceRef, label) {
-  const [sourcePath, anchor] = String(sourceRef).split('#');
-  assert.equal(
-    sourcePath !== '' && sourcePath === normalizePath(sourcePath) && !path.isAbsolute(sourcePath)
-      && !sourcePath.startsWith('../') && !sourcePath.includes('/../') && !/^[a-z][a-z0-9+.-]*:/i.test(sourcePath),
-    true,
-    `${label}: ${sourceRef}`,
-  );
-  const fullPath = path.resolve(sourcePath);
-  assert.equal(existsSync(fullPath), true, `${label}: ${sourceRef}`);
-  if (!anchor) return;
-  const text = readFileSync(fullPath, 'utf-8');
-  assert.equal(text.includes(anchor), true, `${label}: ${sourceRef}`);
-}
-
-export function listJsonFiles(root) {
-  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
-    const file = path.join(root, entry.name);
-    if (entry.isDirectory()) {
-      return listJsonFiles(file);
-    }
-    return entry.isFile() && entry.name.endsWith('.json') ? [file] : [];
-  });
-}
-
-export function visitJsonPointers(value, pointer, visitor) {
-  visitor(value, pointer);
-  if (Array.isArray(value)) {
-    value.forEach((entry, index) => visitJsonPointers(entry, `${pointer}/${index}`, visitor));
-    return;
-  }
-  if (value && typeof value === 'object') {
-    for (const [key, entry] of Object.entries(value)) {
-      visitJsonPointers(entry, `${pointer}/${key}`, visitor);
-    }
-  }
-}
-
-export function pointerMatchesAllowedSuffix(pointer, suffix) {
-  const pattern = suffix.split('*').map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('[^/]+');
-  return new RegExp(`${pattern}$`).test(pointer);
 }

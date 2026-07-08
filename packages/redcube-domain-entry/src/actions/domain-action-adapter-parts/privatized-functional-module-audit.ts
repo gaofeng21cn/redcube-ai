@@ -244,7 +244,7 @@ function ownerEvidenceLaneBuilderRef(moduleId) {
   return `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${privatePlatformOwnerEvidenceSegment(moduleId)}`;
 }
 
-export function buildPrivatePlatformRetirementOwnerEvidenceLane(target = null) {
+function buildPrivatePlatformRetirementOwnerEvidenceLane(target = null) {
   const moduleItems = Array.isArray(target) ? target : null;
   const moduleId = moduleItems ? 'all-retained-private-platform-residue' : target?.module_id;
   const moduleIds = moduleItems ? moduleItems.map((entry) => entry.module_id) : [moduleId];

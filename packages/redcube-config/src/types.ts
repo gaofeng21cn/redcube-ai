@@ -100,6 +100,7 @@ export interface RedcubeExecutorRoutingConfig {
 export interface RedcubeExecutorRoutingConfigResult {
   config: RedcubeExecutorRoutingConfig;
   source_files: string[];
+  default_executor_source_files: string[];
   checked_files: string[];
   runtime_state_config_file: string;
 }

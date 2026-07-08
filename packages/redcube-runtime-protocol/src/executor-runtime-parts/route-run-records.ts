@@ -128,14 +128,14 @@ function hasOplRouteAttemptEvidence(index) {
     && (stageAttemptRef || attemptLeaseRef || attemptReceiptRef);
 }
 
-function buildRouteRunRecordBoundary({ diagnosticOnly = false } = {}) {
+function buildRouteRunRecordBoundary() {
   return {
     surface_kind: 'route_run_record_boundary',
     generic_attempt_ledger_owner: 'one-person-lab',
     generic_runtime_record_owner: 'one-person-lab',
     generic_event_log_owner: 'one-person-lab',
     rca_role: 'route_executor_policy_refs_only',
-    record_mode: diagnosticOnly ? 'diagnostic_rejected_no_local_store' : 'opl_attempt_ledger_refs_only',
+    record_mode: 'opl_attempt_ledger_refs_only',
     local_record_store_retired: true,
     local_event_log_retired: true,
     rca_owns_generic_attempt_ledger: false,
@@ -162,7 +162,6 @@ export function startRouteRun({
   baselineDeliverableId = '',
   executor,
   crossProviderAttemptIndex = null,
-  allowLocalDiagnosticRecord = false,
 }, deps = {}) {
   const resolveRuntimeTopologyForExecutor = requireRuntimeTopologyResolver(deps);
   const resolvedRunId = String(runId || '').trim() || `run-${randomUUID()}`;
@@ -191,9 +190,7 @@ export function startRouteRun({
     started_at: new Date().toISOString(),
     current_stage: route,
     runtime_topology: resolveRuntimeTopologyForExecutor(executor),
-    route_run_record_boundary: buildRouteRunRecordBoundary({
-      diagnosticOnly: !hasOplRouteAttemptEvidence(normalizedCrossProviderAttemptIndex),
-    }),
+    route_run_record_boundary: buildRouteRunRecordBoundary(),
     executor,
     ...(normalizedCrossProviderAttemptIndex ? {
       cross_provider_attempt_index: normalizedCrossProviderAttemptIndex,

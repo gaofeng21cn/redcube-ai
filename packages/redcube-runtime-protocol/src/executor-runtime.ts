@@ -387,7 +387,6 @@ export function startRouteRun({
   baselineDeliverableId = '',
   executor,
   crossProviderAttemptIndex = null,
-  allowLocalDiagnosticRecord = false,
 }) {
   return startRouteRunFromRouteRunRecords({
     workspaceRoot,
@@ -401,7 +400,6 @@ export function startRouteRun({
     baselineDeliverableId,
     executor,
     crossProviderAttemptIndex,
-    allowLocalDiagnosticRecord,
   }, ROUTE_RUN_RECORD_RUNTIME_DEPS);
 }
 

@@ -45,14 +45,12 @@ export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
   getDefaultRuntimeFamilyCatalog,
-  listDefaultOverlayModules,
   listDefaultRuntimeFamilyModules,
   loadRuntimeFamilyRunner,
   resolveRuntimeFamilyModule,
 } from './default-registries.js';
 export type {
   DefaultOverlayCatalogSurface,
-  DefaultOverlayModuleSpec,
   DefaultRuntimeFamilyCatalogSurface,
   LoadedRuntimeFamilyRunner,
   OverlayCatalogEntry,

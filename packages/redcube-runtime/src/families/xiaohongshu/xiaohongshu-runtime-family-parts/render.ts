@@ -138,10 +138,6 @@ export function createXiaohongshuRenderParts(deps) {
       adapter,
       stages: renderBatchStages,
       cwd: deliverablePaths.deliverableDir,
-      sessionPool: {
-        descriptor_id: `xiaohongshu_render_html_${safeText(contract.deliverable_id || contract.title, 'deliverable')}`,
-        reuse_strategy: 'same_session_if_supported',
-      },
     });
     const batchSlides = safeArray(renderBatchResult?.data)
       .flatMap((result) => safeArray(result?.data?.slides));

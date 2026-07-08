@@ -89,10 +89,6 @@ export interface OverlayCatalogEntry {
   route_sequence?: string[];
   deliverable_kind?: string;
   prompt_pack_id?: string;
-  packages?: {
-    overlay?: string;
-    pack?: string;
-  };
   runtime?: {
     runner_id: string;
     owner: 'redcube_ai';

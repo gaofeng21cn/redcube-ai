@@ -319,10 +319,6 @@ export function describeXiaohongshuOverlay() {
         style_reference_dir_input: PROMPT_PACK.render_contract.image_generation.style_reference_dir_input,
       },
     },
-    packages: {
-      overlay: '@redcube/overlay-xiaohongshu',
-      pack: '@redcube/pack-xiaohongshu',
-    },
     runtime: {
       runner_id: 'families/xiaohongshu',
       owner: 'redcube_ai',

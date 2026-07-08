@@ -436,14 +436,12 @@ export async function generateImageViaCodexNativeImagegen({
 
 export async function generateStructuredArtifactBatchViaCodexCli({
   stages,
-  sessionPool = {},
   contract = readCodexCliContract(),
   cwd = process.cwd(),
   spawnSyncImpl = null,
 } = {}) {
   return generateCodexCliBatch({
     stages,
-    sessionPool,
     contract,
     cwd,
     spawnSyncImpl,

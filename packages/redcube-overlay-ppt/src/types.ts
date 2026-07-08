@@ -766,10 +766,6 @@ export interface PptDeckOverlayCatalogEntry extends OverlayCatalogEntry {
     html_authoring_lane: PptDeckHtmlAuthoringLane;
     native_ppt_proof_lane: PptDeckNativePptProofLane;
   };
-  packages: {
-    overlay: '@redcube/overlay-ppt';
-    pack: '@redcube/pack-ppt';
-  };
   runtime: {
     runner_id: 'families/ppt';
     owner: 'redcube_ai';

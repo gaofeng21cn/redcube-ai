@@ -6,14 +6,14 @@ import os from 'node:os';
 import path from 'node:path';
 
 import {
-  inspectCurrentRepoSharedPinAlignment,
-  inspectRequiredRuntimeSharedResolution,
-  inspectWorkspacePackageResolution,
+  assertCurrentRepoSharedPinAlignment,
+  assertRequiredRuntimeSharedResolution,
+  assertWorkspacePackageResolution,
 } from '../scripts/run-test-group-lib.ts';
 
 test('inspectWorkspacePackageResolution accepts workspace packages resolved inside the current checkout', () => {
   const repoRoot = '/tmp/redcube/.worktrees/codex-pass';
-  const result = inspectWorkspacePackageResolution({
+  const result = assertWorkspacePackageResolution({
     repoRoot,
     resolve(specifier) {
       return path.join(repoRoot, 'packages', specifier.replace('@redcube/', ''), 'src', 'index.js');
@@ -27,22 +27,20 @@ test('inspectWorkspacePackageResolution accepts workspace packages resolved insi
 test('inspectWorkspacePackageResolution fails closed when workspace packages resolve into a sibling checkout', () => {
   const repoRoot = '/tmp/redcube/.worktrees/codex-pass';
   const leakedRoot = '/tmp/redcube';
-  const result = inspectWorkspacePackageResolution({
-    repoRoot,
-    resolve(specifier) {
-      return path.join(leakedRoot, 'packages', specifier.replace('@redcube/', ''), 'src', 'index.js');
-    },
-  });
-
-  assert.equal(result.ok, false);
-  assert.equal(result.leaking_resolutions.length > 0, true);
-  assert.equal(result.leaking_resolutions[0].resolved_path.startsWith(leakedRoot), true);
-  assert.match(result.message, /npm install/);
+  assert.throws(
+    () => assertWorkspacePackageResolution({
+      repoRoot,
+      resolve(specifier) {
+        return path.join(leakedRoot, 'packages', specifier.replace('@redcube/', ''), 'src', 'index.js');
+      },
+    }),
+    /workspace package resolution leaked outside the current checkout/,
+  );
 });
 
 test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared specifiers resolved in checkout', () => {
   const repoRoot = '/tmp/redcube/.worktrees/codex-pass';
-  const result = inspectRequiredRuntimeSharedResolution({
+  const result = assertRequiredRuntimeSharedResolution({
     repoRoot,
     checks: [
       {
@@ -69,45 +67,37 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
 
 test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/shared specifiers are missing', () => {
   const repoRoot = '/tmp/redcube/.worktrees/codex-pass';
-  const result = inspectRequiredRuntimeSharedResolution({
-    repoRoot,
-    checks: [
-      {
-        specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
-        resolve_from: 'packages/redcube-runtime/package.json',
+  assert.throws(
+    () => assertRequiredRuntimeSharedResolution({
+      repoRoot,
+      checks: [
+        {
+          specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
+          resolve_from: 'packages/redcube-runtime/package.json',
+        },
+        {
+          specifier: 'opl-framework-shared/product-entry-program-companions',
+          resolve_from: 'packages/redcube-domain-entry/package.json',
+        },
+        {
+          specifier: 'opl-framework-shared/family-shared-release',
+          resolve_from: 'packages/redcube-domain-entry/package.json',
+        },
+      ],
+      resolve(specifier) {
+        if (
+          specifier === 'opl-framework-shared/product-entry-program-companions'
+          || specifier === 'opl-framework-shared/family-shared-release'
+        ) {
+          const error = new Error('Cannot find module');
+          error.code = 'ERR_MODULE_NOT_FOUND';
+          throw error;
+        }
+        return path.join(repoRoot, 'node_modules', specifier, 'index.js');
       },
-      {
-        specifier: 'opl-framework-shared/product-entry-program-companions',
-        resolve_from: 'packages/redcube-domain-entry/package.json',
-      },
-      {
-        specifier: 'opl-framework-shared/family-shared-release',
-        resolve_from: 'packages/redcube-domain-entry/package.json',
-      },
-    ],
-    resolve(specifier) {
-      if (
-        specifier === 'opl-framework-shared/product-entry-program-companions'
-        || specifier === 'opl-framework-shared/family-shared-release'
-      ) {
-        const error = new Error('Cannot find module');
-        error.code = 'ERR_MODULE_NOT_FOUND';
-        throw error;
-      }
-      return path.join(repoRoot, 'node_modules', specifier, 'index.js');
-    },
-  });
-
-  assert.equal(result.ok, false);
-  assert.equal(result.missing_specifiers.length, 2);
-  assert.deepEqual(
-    result.missing_specifiers.map((entry) => entry.specifier).sort(),
-    [
-      'opl-framework-shared/family-shared-release',
-      'opl-framework-shared/product-entry-program-companions',
-    ],
+    }),
+    /opl-framework-shared\/family-shared-release/,
   );
-  assert.match(result.message, /npm install/);
 });
 
 function withTempRedcubeRepo(buildFiles, run) {
@@ -146,7 +136,7 @@ test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when t
         },
       },
     });
-  }, (repoRoot) => inspectCurrentRepoSharedPinAlignment({
+  }, (repoRoot) => assertCurrentRepoSharedPinAlignment({
     repoRoot,
     ownerRepoRoot: path.join(repoRoot, '..', 'one-person-lab'),
   }));
@@ -166,7 +156,7 @@ test('inspectCurrentRepoSharedPinAlignment falls back to the consumer pin when t
 test('inspectCurrentRepoSharedPinAlignment fallback still reports stale package-lock drift', () => {
   const ownerCommit = '89abcdef0123456789abcdef0123456789abcdef';
   const staleCommit = 'fedcba9876543210fedcba9876543210fedcba98';
-  const result = withTempRedcubeRepo(({ writeJson }) => {
+  assert.throws(() => withTempRedcubeRepo(({ writeJson }) => {
     writeJson('packages/redcube-domain-entry/package.json', {
       dependencies: {
         'opl-framework-shared': `git+https://github.com/gaofeng21cn/one-person-lab.git#${ownerCommit}`,
@@ -181,16 +171,8 @@ test('inspectCurrentRepoSharedPinAlignment fallback still reports stale package-
         },
       },
     });
-  }, (repoRoot) => inspectCurrentRepoSharedPinAlignment({
+  }, (repoRoot) => assertCurrentRepoSharedPinAlignment({
     repoRoot,
     ownerRepoRoot: path.join(repoRoot, '..', 'one-person-lab'),
-  }));
-
-  assert.equal(result.status, 'stale');
-  assert.equal(result.owner_commit, ownerCommit);
-  assert.deepEqual(
-    result.findings.map((entry) => entry.status),
-    ['aligned', 'stale_pin'],
-  );
-  assert.deepEqual(result.findings[1]?.pins, [staleCommit]);
+  })), /stale_pin/);
 });

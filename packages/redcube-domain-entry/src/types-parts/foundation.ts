@@ -28,7 +28,6 @@ export interface OverlayCatalogEntry {
   route_sequence?: string[];
   deliverable_kind?: string;
   prompt_pack_id?: string;
-  packages?: Record<string, string>;
 }
 
 export interface SurfaceBase<TKind extends string> {

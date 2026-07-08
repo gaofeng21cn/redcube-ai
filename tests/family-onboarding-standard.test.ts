@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
 import {
-  listDefaultOverlayModules,
+  getDefaultOverlayCatalog,
 } from './package-surfaces.ts';
 
 function readJson(file) {
@@ -14,28 +14,14 @@ function readJson(file) {
 test('overlay onboarding is runtime-registry driven without standalone package facades', () => {
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const domainEntryPackage = readJson('packages/redcube-domain-entry/package.json');
+  const catalog = getDefaultOverlayCatalog();
 
   assert.equal(Boolean(runtimePackage.dependencies?.['@redcube/overlay-registry']), false);
   assert.deepEqual(
-    listDefaultOverlayModules(),
-    [
-      {
-        overlayId: 'ppt_deck',
-        module: '@redcube/overlay-ppt',
-        exportName: 'pptDeckOverlay',
-      },
-      {
-        overlayId: 'xiaohongshu',
-        module: '@redcube/overlay-xiaohongshu',
-        exportName: 'xiaohongshuOverlay',
-      },
-      {
-        overlayId: 'poster_onepager',
-        module: '@redcube/overlay-poster-onepager',
-        exportName: 'posterOnepagerOverlay',
-      },
-    ],
+    catalog.overlays.map((overlay) => overlay.overlay_id),
+    ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
+  assert.equal(catalog.overlays.every((overlay) => !Object.hasOwn(overlay, 'packages')), true);
   assert.equal(runtimePackage.dependencies?.['@redcube/overlay-ppt'], '0.1.0');
   assert.equal(runtimePackage.dependencies?.['@redcube/overlay-xiaohongshu'], '0.1.0');
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-ppt']), false);

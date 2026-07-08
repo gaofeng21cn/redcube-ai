@@ -8,7 +8,7 @@ import {
   REDCUBE_STAGE_JSON_END,
   generateStructuredArtifactViaCodexCli,
   readCodexCliContract,
-} from './package-surfaces.ts';
+} from '../packages/redcube-runtime/dist/executors/index.js';
 
 async function captureGenerationTimeout(options = {}) {
   const observedTimeouts = [];

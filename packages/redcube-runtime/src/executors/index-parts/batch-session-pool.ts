@@ -1,25 +1,10 @@
 // @ts-nocheck
-import { randomUUID } from 'node:crypto';
-
 import {
   OPL_CODEX_EXECUTOR_SURFACE,
   REDCUBE_CODEX_RUNTIME_OWNER,
 } from './constants.js';
 import { readCodexCliContract } from './command-process.js';
 import { safeText } from './shared.js';
-
-function normalizeSessionPoolDescriptor(sessionPool = {}) {
-  const descriptorId = safeText(sessionPool?.descriptor_id, `codex_batch_${randomUUID()}`);
-  const reuseStrategy = safeText(sessionPool?.reuse_strategy, 'same_session_if_supported');
-  return {
-    descriptor_id: descriptorId,
-    reuse_strategy: reuseStrategy,
-    reuse_supported: false,
-    reuse_claimed: false,
-    reuse_status: 'unsupported_by_exec_surface',
-    invocation_surface: 'codex_exec_ephemeral_per_stage',
-  };
-}
 
 function stageIdForBatchStage(stage, index) {
   if (typeof stage === 'function') {
@@ -54,7 +39,6 @@ function normalizeBatchStages(stages) {
 
 export async function generateCodexCliBatch({
   stages,
-  sessionPool = {},
   contract = readCodexCliContract(),
   cwd = process.cwd(),
   spawnSyncImpl = null,
@@ -65,7 +49,6 @@ export async function generateCodexCliBatch({
   }
 
   const normalizedStages = normalizeBatchStages(stages);
-  const normalizedSessionPool = normalizeSessionPoolDescriptor(sessionPool);
   const data = [];
 
   for (const stage of normalizedStages) {
@@ -111,7 +94,10 @@ export async function generateCodexCliBatch({
         cleanup_policy: 'per_invocation_timeout_cleanup',
       },
       session_pool: {
-        ...normalizedSessionPool,
+        reuse_supported: false,
+        reuse_claimed: false,
+        reuse_status: 'unsupported_by_exec_surface',
+        invocation_surface: 'codex_exec_ephemeral_per_stage',
         invocation_count: data.length,
         stage_session_ids: data.map((stage) => stage.generationRuntime.session_id),
       },

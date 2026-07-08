@@ -12,7 +12,7 @@ import {
   generateStructuredArtifactViaCodexCli,
   probeCodexCli,
   readCodexCliContract,
-} from './package-surfaces.ts';
+} from '../packages/redcube-runtime/dist/executors/index.js';
 import { buildGenerationInput } from '../packages/redcube-runtime/dist/executors/index-parts/prompt-guidance.js';
 
 const ONE_PIXEL_PNG = Buffer.from(

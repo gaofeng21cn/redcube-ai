@@ -79,6 +79,14 @@ function optionalString(value: unknown): string {
   return String(value || '').trim();
 }
 
+function hasExplicitDefaultExecutor(raw: unknown): boolean {
+  if (!isPlainObject(raw)) return false;
+  const defaultExecutor = raw.default_executor;
+  if (!isPlainObject(defaultExecutor)) return false;
+  return ['executor_backend', 'execution_shape', 'hermes_profile']
+    .some((key) => optionalString(defaultExecutor[key]));
+}
+
 function normalizeExecutorBackend(value: unknown, fieldName = 'executor_backend'): RedcubeExecutorBackend {
   const text = optionalString(value);
   if (!text || text === 'codex_cli' || text === CODEX_DEFAULT_BACKEND) return CODEX_DEFAULT_BACKEND;
@@ -297,15 +305,18 @@ export function loadExecutorRoutingConfig(options: RedcubeRuntimeConfigOptions =
   const { checked, runtimeStateFile } = executorRoutingConfigFiles({ cwd, env, homeDir });
   let config: RedcubeExecutorRoutingConfig = BUILTIN_EXECUTOR_ROUTING_CONFIG;
   const sourceFiles: string[] = [];
+  const defaultExecutorSourceFiles: string[] = [];
   for (const filePath of checked) {
     const raw = readJsonIfExists(filePath);
     if (!raw) continue;
+    if (hasExplicitDefaultExecutor(raw)) defaultExecutorSourceFiles.push(filePath);
     config = normalizeExecutorRoutingConfig(deepMerge(config as unknown as JsonObject, raw), filePath);
     sourceFiles.push(filePath);
   }
   return {
     config,
     source_files: sourceFiles,
+    default_executor_source_files: defaultExecutorSourceFiles,
     checked_files: checked,
     runtime_state_config_file: runtimeStateFile,
   };
@@ -342,6 +353,9 @@ export function resolveExecutorRouting(
     ? {
         config: request.config,
         source_files: ['inline.executor_routing_config'],
+        default_executor_source_files: hasExplicitDefaultExecutor(request.config)
+          ? ['inline.executor_routing_config']
+          : [],
       }
     : loadExecutorRoutingConfig({
         cwd: request.cwd,
@@ -349,7 +363,7 @@ export function resolveExecutorRouting(
         homeDir: request.homeDir,
       });
   const config = normalizeExecutorRoutingConfig(loaded.config, 'resolved_executor_routing_config');
-  const hasDomainLocalConfig = (loaded.source_files || []).length > 0;
+  const hasDomainLocalDefault = (loaded.default_executor_source_files || []).length > 0;
   const requestExecutorBackend = optionalString(request.requestExecutorBackend);
   const requestAdapter = optionalString(request.requestAdapter);
   const oplDefault = optionalString(
@@ -377,7 +391,7 @@ export function resolveExecutorRouting(
       executionShape: normalizeExecutionShape(null, backend),
       source: 'opl_runtime_manager_default_executor',
     });
-  } else if (hasDomainLocalConfig && domainDefault.executor_backend) {
+  } else if (hasDomainLocalDefault && domainDefault.executor_backend) {
     const backend = normalizeExecutorBackend(domainDefault.executor_backend, 'domain.default_executor.executor_backend');
     effectiveDefaultExecutor = selectionForBackend({
       backend,

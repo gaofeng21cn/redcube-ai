@@ -261,10 +261,6 @@ export function describePosterOnepagerOverlay() {
     route_sequence: STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
     deliverable_kind: 'poster_onepager',
     prompt_pack_id: PROMPT_PACK.pack_id,
-    packages: {
-      overlay: '@redcube/overlay-poster-onepager',
-      pack: '@redcube/pack-poster-onepager',
-    },
     runtime: {
       runner_id: 'families/poster-onepager',
       owner: 'redcube_ai',

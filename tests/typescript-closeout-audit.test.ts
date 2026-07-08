@@ -13,10 +13,11 @@ import path from 'node:path';
 
 import {
   AUDIT_FILE,
-  JS_RESIDUE_LINE_LOCK_FILE,
   buildCloseoutAudit,
   writeAuditFile,
 } from '../scripts/typescript-closeout-audit-lib.ts';
+
+const JS_RESIDUE_LINE_LOCK_FILE = 'contracts/runtime-program/js-residue-line-lock.json';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));

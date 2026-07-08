@@ -462,10 +462,6 @@ export interface XiaohongshuOverlayCatalogEntry extends OverlayCatalogEntry {
   route_sequence: XiaohongshuStageId[];
   deliverable_kind: XiaohongshuDeliverableKind;
   prompt_pack_id: 'xiaohongshu_mainline_v1';
-  packages: {
-    overlay: '@redcube/overlay-xiaohongshu';
-    pack: '@redcube/pack-xiaohongshu';
-  };
   runtime: {
     runner_id: 'families/xiaohongshu';
     owner: 'redcube_ai';

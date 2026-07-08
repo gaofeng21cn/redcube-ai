@@ -9,7 +9,6 @@ import {
   buildXiaohongshuTopic,
   getDefaultOverlayCatalog,
   getDefaultRuntimeFamilyCatalog,
-  listDefaultOverlayModules,
   listDefaultRuntimeFamilyModules,
   pptDeckOverlay,
   xiaohongshuOverlay,
@@ -107,6 +106,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   delete xiaohongshuCatalog.visual_authoring_policy.html_design_companion;
 
   assert.equal(catalog.surface_kind, 'overlay_catalog');
+  assert.equal(catalog.overlays.every((overlay) => !Object.hasOwn(overlay, 'packages')), true);
   assert.deepEqual(
     pptCatalog,
     {
@@ -381,10 +381,6 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
           },
         },
       },
-      packages: {
-        overlay: '@redcube/overlay-ppt',
-        pack: '@redcube/pack-ppt',
-      },
       runtime: {
         runner_id: 'families/ppt',
         owner: 'redcube_ai',
@@ -407,10 +403,6 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
     xiaohongshuCatalog.visual_authoring_policy.route_selection_policy.explicit_selection_required_for,
     ['render_html', 'fix_html'],
   );
-  assert.deepEqual(xiaohongshuCatalog.packages, {
-    overlay: '@redcube/overlay-xiaohongshu',
-    pack: '@redcube/pack-xiaohongshu',
-  });
   assert.deepEqual(xiaohongshuCatalog.runtime, {
     runner_id: 'families/xiaohongshu',
     owner: 'redcube_ai',
@@ -424,10 +416,6 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
       route_sequence: ['storyline', 'poster_blueprint', 'visual_direction', 'render_html', 'visual_director_review', 'screenshot_review', 'export_bundle'],
       deliverable_kind: 'poster_onepager',
       prompt_pack_id: 'poster_onepager_mainline_v1',
-      packages: {
-        overlay: '@redcube/overlay-poster-onepager',
-        pack: '@redcube/pack-poster-onepager',
-      },
       runtime: {
         runner_id: 'families/poster-onepager',
         owner: 'redcube_ai',
@@ -436,7 +424,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   );
 });
 
-test('registry source manifests stay aligned with direct package dependencies and literal loaders', () => {
+test('registry source manifests stay aligned with direct package dependencies and static declarations', () => {
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const runtimeSource = readText('packages/redcube-runtime/src/default-registries.ts');
   const runtimeFamilyCatalog = getDefaultRuntimeFamilyCatalog();
@@ -446,18 +434,19 @@ test('registry source manifests stay aligned with direct package dependencies an
   assert.equal(runtimeFamilyCatalog.owner_boundary.rca_owns_generic_registry, false);
   assert.equal(runtimeFamilyCatalog.owner_boundary.retained_authority_refs.includes('review_export_gate_refs'), true);
 
-  for (const { module } of listDefaultOverlayModules()) {
+  for (const dependency of [
+    '@redcube/overlay-ppt',
+    '@redcube/overlay-xiaohongshu',
+    '@redcube/overlay-poster-onepager',
+  ]) {
     assert.equal(
-      runtimePackage.dependencies[module],
+      runtimePackage.dependencies[dependency],
       '0.1.0',
-      `${module} must be a direct runtime dependency`,
-    );
-    assert.match(
-      runtimeSource,
-      new RegExp(`module:\\s*['"]${module.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}['"][\\s\\S]*?load:\\s*async`),
-      `${module} must have a literal overlay loader`,
+      `${dependency} must be a direct runtime dependency while overlays remain workspace packages`,
     );
   }
+  assert.equal(runtimeSource.includes("import('@redcube/overlay-"), false);
+  assert.equal(runtimeSource.includes('listDefaultOverlayModules'), false);
 
   for (const { runner_id } of listDefaultRuntimeFamilyModules()) {
     assert.match(
