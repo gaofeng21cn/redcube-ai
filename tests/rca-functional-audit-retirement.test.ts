@@ -9,6 +9,9 @@ import {
   assertRepoRefResolves,
 } from './helpers/rca-retired-surface-guard.ts';
 
+const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
+
 test('RCA functional audit exposes OPL replacement expectations and retired generic domain_action_adapter dispatch', () => {
   const rootAudit = JSON.parse(readFileSync(
     path.resolve('contracts/functional_privatization_audit.json'),
@@ -155,6 +158,8 @@ test('RCA functional audit exposes OPL replacement expectations and retired gene
       assert.notEqual(entry.migration_class, 'opl_owned_replacement', entry.module_id);
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
+      assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
       if (entry.module_id === 'visual_pack_compiler_handoff') {
         assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
           'domain_package_replaced_by_new_rca_pack_contract',

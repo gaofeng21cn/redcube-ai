@@ -1,6 +1,9 @@
 // @ts-nocheck
 import { assert, contract, read, test } from './shared.ts';
 
+const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
+
 test('RCA privatized functional module audit is machine readable for OPL with generic domain_action_adapter dispatch retired', () => {
   const adoption = contract();
   const rootAudit = JSON.parse(read('contracts/functional_privatization_audit.json'));
@@ -182,9 +185,8 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
           'no_regression_proof_recorded',
         ], entry.module_id);
       }
-      for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
-        assert.equal(value, false, entry.module_id);
-      }
+      assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
+      assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
       assert.equal(entry.writes_visual_truth, false, entry.module_id);
       assert.equal(entry.writes_artifact_blob, false, entry.module_id);
       assert.equal(entry.writes_memory_body, false, entry.module_id);

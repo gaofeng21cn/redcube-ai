@@ -469,16 +469,7 @@
         "physical_delete_requires_owner_receipt_ref": "rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt",
         "no_forbidden_write_ref": "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "product_entry_continuity_refs_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -610,16 +601,7 @@
         "source_readiness_verdict_ref",
         "communication_strategy_input_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "workspace_source_intake is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -749,16 +731,7 @@
         "writeback_receipt_refs",
         "accept_reject_receipt_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "memory_writeback_receipt_transport is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -889,16 +862,7 @@
         "export_verdict_refs",
         "lifecycle_receipt_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "artifact_export_lifecycle is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1030,16 +994,7 @@
         "repair_hint_refs",
         "export_verdict_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "review_repair_transport is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1169,16 +1124,7 @@
         "package_module_refs",
         "helper_proof_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "native_helper_envelope is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1313,16 +1259,7 @@
         "typed_blocker_refs",
         "safe_repair_hint_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "operator_projection_shell is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1464,16 +1401,7 @@
         "domain_handler_refs",
         "direct_domain_entry_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "generic_cli_mcp_wrappers is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1628,16 +1556,7 @@
         "executor_receipt_refs",
         "route_policy_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "codex_executor_adapter is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1768,16 +1687,7 @@
         "no_regression_evidence_refs",
         "resource_pressure_signal_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "observability_stability_read_model is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.",
@@ -1843,16 +1753,7 @@
         "visual_transition_refs",
         "receipt_schema_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "Declarative pack input is a required RCA domain package surface, not a generic runtime shell.",
@@ -2339,16 +2240,7 @@
       ],
       "mechanical_decision_forbidden_for_all_authority_surfaces": true,
       "programmatic_verdict_generation_allowed": false,
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_runtime": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_session_shell": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_native_helper_generic_envelope": false,
-        "rca_owns_generic_cli_mcp_wrapper_generator": false,
-        "rca_owns_generic_executor_adapter": false,
-        "rca_owns_observability_exporter": false
-      },
+      "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
         "safe_to_delete_now": false,
         "reason": "Minimal authority functions are the allowed RCA retention surface.",

@@ -2,6 +2,7 @@
 
 import {
   FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS,
+  FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
   RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS,
   RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
   buildBridgeExitGate,
@@ -635,7 +636,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
         default_caller_contract: replacementGuard.default_caller_contract
           ? { ...replacementGuard.default_caller_contract }
           : undefined,
-        forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+        forbidden_generic_owner_flags_ref: FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
         physical_deletion_guard: buildFunctionalModulePhysicalDeletionGuard(entry),
         rca_retains: entry.rcaRetains || [],
         repo_local_handler_target_only: entry.module_id === 'generic_cli_mcp_wrappers' ? true : undefined,

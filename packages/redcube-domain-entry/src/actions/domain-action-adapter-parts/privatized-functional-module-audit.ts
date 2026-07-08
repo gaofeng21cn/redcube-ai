@@ -16,6 +16,9 @@ export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS = Object.freeze({
   rca_owns_observability_exporter: false,
 });
 
+export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
+
 export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
   product_entry_continuity_refs_adapter: {
     expectation_ref: '/opl_generic_primitive_consumption',
@@ -443,7 +446,7 @@ export function buildVisualPackCompilerHandoffAuditModule() {
     cannotAbsorbReason: 'OPL can generate wrappers from this input, but cannot own RCA visual truth, review/export verdicts or artifact authority.',
     rca_projection_mode: 'declarative_pack_refs_only',
     rca_exports_only: ['stage_refs', 'action_metadata_refs', 'visual_transition_refs', 'receipt_schema_refs'],
-    forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+    forbidden_generic_owner_flags_ref: FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
     physical_deletion_guard: {
       safe_to_delete_now: false,
       reason: 'Declarative pack input is a required RCA domain package surface, not a generic runtime shell.',
@@ -514,7 +517,7 @@ export function buildVisualAuthorityFunctionsAuditModule() {
     authority_surface_contracts: buildRcaMinimalAuthoritySurfaceContracts(),
     mechanical_decision_forbidden_for_all_authority_surfaces: true,
     programmatic_verdict_generation_allowed: false,
-    forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
+    forbidden_generic_owner_flags_ref: FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
     physical_deletion_guard: {
       safe_to_delete_now: false,
       reason: 'Minimal authority functions are the allowed RCA retention surface.',

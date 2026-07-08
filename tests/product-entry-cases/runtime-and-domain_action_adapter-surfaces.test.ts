@@ -1,6 +1,8 @@
 // @ts-nocheck
 import { SERIAL_ENV_TEST, assert, getDomainActionAdapterGuardedActionMetadata, exportDomainActionAdapter, dispatchDomainActionAdapter, readJson, test, withMockCodexRuntimeState, prepareProductEntryWorkspace } from '../product-domain-action-case-shared.ts';
 
+const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
 
 test('domain-handler export and dispatch preserve RCA authority while allowing guarded control-plane actions', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
@@ -547,9 +549,8 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
       assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
-      for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
-        assert.equal(value, false, entry.module_id);
-      }
+      assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
+      assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
     }
     assert.equal(domain_action_adapter.source_manifest_refs.standard_domain_agent_skeleton_ref, '/standard_domain_agent_skeleton');
     assert.equal(domain_action_adapter.source_manifest_refs.artifact_locator_contract_ref, '/artifact_locator_contract');
