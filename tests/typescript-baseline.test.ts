@@ -361,8 +361,6 @@ test('test registry is the single source of truth for lane membership and keeps 
     assert.deepEqual(Object.keys(entry), [
       'file',
       'lane',
-      'state',
-      'ci_default',
     ]);
   }
 });

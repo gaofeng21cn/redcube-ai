@@ -1,7 +1,6 @@
 // @ts-nocheck
 
 const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical']);
-const TEST_STATES = Object.freeze(['active', 'historical']);
 
 const PRIMARY_TEST_FILES = Object.freeze({
   meta: Object.freeze([
@@ -249,8 +248,6 @@ export const TEST_REGISTRY = Object.freeze(
   TEST_LANES.flatMap((lane) => PRIMARY_TEST_FILES[lane].map((file) => Object.freeze({
     file,
     lane,
-    state: lane === 'historical' ? 'historical' : 'active',
-    ci_default: lane === 'family' || (lane === 'meta' && !fastFileSet.has(file)) || fastFileSet.has(file),
   }))),
 );
 
@@ -342,19 +339,13 @@ export function assertValidTestRegistry({ registry = TEST_REGISTRY } = {}) {
   }
 
   for (const entry of registry) {
-    for (const field of ['file', 'lane', 'state', 'ci_default']) {
+    for (const field of ['file', 'lane']) {
       if (!Object.hasOwn(entry, field)) {
         throw new Error(`测试注册项缺少字段 ${field}: ${JSON.stringify(entry)}`);
       }
     }
     if (!TEST_LANES.includes(entry.lane)) {
       throw new Error(`测试注册项 lane 无效: ${entry.file} -> ${entry.lane}`);
-    }
-    if (!TEST_STATES.includes(entry.state)) {
-      throw new Error(`测试注册项 state 无效: ${entry.file} -> ${entry.state}`);
-    }
-    if (typeof entry.ci_default !== 'boolean') {
-      throw new Error(`测试注册项 ci_default 必须是 boolean: ${entry.file}`);
     }
     if (!/^tests\/[^/]+\.test\.(?:js|ts)$/.test(entry.file)) {
       throw new Error(`测试注册表只接受根级测试文件: ${entry.file}`);

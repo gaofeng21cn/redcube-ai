@@ -304,8 +304,6 @@ test('historical lane is a compact explicit provenance guard outside the active 
   assert.equal(groups.full.includes('tests/runtime-program-provenance.test.ts'), false);
   assert.equal(groups['full:with-historical'].includes('tests/runtime-program-provenance.test.ts'), true);
   assert.equal(historicalEntry.lane, 'historical');
-  assert.equal(historicalEntry.state, 'historical');
-  assert.equal(historicalEntry.ci_default, false);
 
   for (const retiredFile of [
     'tests/direct-delivery-longrun-target.test.ts',
