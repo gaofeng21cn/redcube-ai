@@ -387,7 +387,6 @@ export function startRouteRun({
   crossProviderAttemptIndex = null,
 }) {
   return startRouteRunFromRouteRunRecords({
-    workspaceRoot,
     runId,
     route,
     overlay,
@@ -415,7 +414,6 @@ export function completeRouteRun({
   crossProviderAttemptIndex = null,
 }) {
   return completeRouteRunFromRouteRunRecords({
-    workspaceRoot,
     runId,
     run,
     currentStage,
@@ -441,7 +439,6 @@ export function failRouteRun({
   status = 'failed',
 }) {
   return failRouteRunFromRouteRunRecords({
-    workspaceRoot,
     runId,
     run,
     currentStage,

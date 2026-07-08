@@ -151,7 +151,6 @@ function buildRouteRunRecordBoundary() {
 }
 
 export function startRouteRun({
-  workspaceRoot,
   runId = null,
   route,
   overlay,
@@ -202,7 +201,6 @@ export function startRouteRun({
 }
 
 export function completeRouteRun({
-  workspaceRoot,
   runId,
   run: startedRun = null,
   currentStage,
@@ -261,7 +259,6 @@ export function completeRouteRun({
 }
 
 export function failRouteRun({
-  workspaceRoot,
   runId,
   run: startedRun = null,
   currentStage,
