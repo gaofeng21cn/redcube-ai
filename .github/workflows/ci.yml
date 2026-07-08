@@ -20,6 +20,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Checkout OPL shared owner contract
+        run: |
+          git clone --no-checkout --filter=blob:none https://github.com/gaofeng21cn/one-person-lab.git ../one-person-lab
+          git -C ../one-person-lab fetch --depth=1 origin ee3829f968c6e055b23cd83f67aac76bace059cb
+          git -C ../one-person-lab checkout --detach ee3829f968c6e055b23cd83f67aac76bace059cb
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
