@@ -227,14 +227,6 @@ export function loadRuntimeConfig(options: RedcubeRuntimeConfigOptions = {}): Re
 }
 
 export type {
-  RedcubeExecutionShape,
-  RedcubeExecutorBackend,
-  RedcubeExecutorResolutionSource,
-  RedcubeExecutorRoutingConfig,
-  RedcubeExecutorRoutingConfigResult,
-  RedcubeExecutorRoutingResolution,
-  RedcubeExecutorRoutingResolutionRequest,
-  RedcubeExecutorSelection,
   RedcubeIdentityConfig,
   RedcubeIdentityProfile,
   RedcubeIdentityRouting,

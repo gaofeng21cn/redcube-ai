@@ -26,12 +26,14 @@ export {
   applyReviewMutation,
   buildCreativeOwnershipResidueAudit,
   buildPerformanceReport,
+  loadExecutorRoutingConfig,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_TEAM_GATE_CONTRACT,
   planCandidateRace,
+  resolveExecutorRouting,
   resolveExecutorAdapter,
   resolveSourceAugmentationAdapter,
   runCandidateRaceRoute,
@@ -49,9 +51,7 @@ export {
   validateSourceAugmentationResultContract,
 } from '@redcube/runtime-protocol';
 export {
-  loadExecutorRoutingConfig,
   loadRuntimeConfig,
-  resolveExecutorRouting,
 } from '@redcube/redcube-config';
 export {
   bootstrapPrivateProfile,

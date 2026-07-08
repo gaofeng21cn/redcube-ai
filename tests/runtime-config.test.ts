@@ -6,10 +6,12 @@ import path from 'node:path';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
 
 import {
-  loadExecutorRoutingConfig,
   loadRuntimeConfig,
-  resolveExecutorRouting,
 } from '../packages/redcube-config/dist/index.js';
+import {
+  loadExecutorRoutingConfig,
+  resolveExecutorRouting,
+} from '../packages/redcube-runtime/dist/index.js';
 
 function writeJson(filePath, value) {
   mkdirSync(path.dirname(filePath), { recursive: true });
