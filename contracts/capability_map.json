@@ -513,7 +513,28 @@
         "quality_verdicts",
         "runtime_data",
         "generated_opl_surfaces_as_visual_authority"
-      ]
+      ],
+      "improvement_tokens": [
+        "primary_skill",
+        "redcube-ai.primary_skill",
+        "standard_agent_capability"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/redcube-ai.primary_skill",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-ppt-story-architect",
@@ -641,7 +662,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-ppt-story-architect/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-ppt-visual-director",
@@ -788,7 +820,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-ppt-visual-director/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-ppt-page-author",
@@ -924,7 +967,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-ppt-page-author/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-ppt-reviewer",
@@ -1060,7 +1114,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-visual-memory-curator",
@@ -1184,7 +1249,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-native-ppt-designer",
@@ -1308,7 +1384,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-native-ppt-designer/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-template-profiler",
@@ -1432,7 +1519,18 @@
       "exposure_owner": "redcube_ai",
       "canonical_target_paths": [
         "agent/professional_skills/rca-template-profiler/SKILL.md"
-      ]
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
     },
     {
       "capability_id": "rca-stage-prompts",
@@ -1485,6 +1583,40 @@
         "can_authorize_quality_or_export": false,
         "can_claim_domain_ready": false,
         "can_claim_production_ready": false
+      },
+      "canonical_target_paths": [
+        "agent/prompts/"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-stage-prompts",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "visual_memory_bodies",
+        "owner_receipt_body",
+        "typed_blocker_body",
+        "human_gate_body",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "runtime_queue",
+        "provider_attempt_ledger",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
       }
     },
     {
@@ -1542,6 +1674,40 @@
         "can_authorize_quality_or_export": false,
         "can_claim_domain_ready": false,
         "can_claim_production_ready": false
+      },
+      "canonical_target_paths": [
+        "agent/tools/domain_affordances.md"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-tool-connector-catalog",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "visual_memory_bodies",
+        "owner_receipt_body",
+        "typed_blocker_body",
+        "human_gate_body",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "runtime_queue",
+        "provider_attempt_ledger",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
       }
     },
     {
@@ -1595,6 +1761,40 @@
         "can_authorize_quality_or_export": false,
         "can_claim_domain_ready": false,
         "can_claim_production_ready": false
+      },
+      "canonical_target_paths": [
+        "agent/knowledge/"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-visual-knowledge-pack",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "visual_memory_bodies",
+        "owner_receipt_body",
+        "typed_blocker_body",
+        "human_gate_body",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "runtime_queue",
+        "provider_attempt_ledger",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
       }
     },
     {
@@ -1648,6 +1848,40 @@
         "can_authorize_quality_or_export": false,
         "can_claim_domain_ready": false,
         "can_claim_production_ready": false
+      },
+      "canonical_target_paths": [
+        "agent/quality_gates/"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-review-quality-gates",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "visual_memory_bodies",
+        "owner_receipt_body",
+        "typed_blocker_body",
+        "human_gate_body",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "runtime_queue",
+        "provider_attempt_ledger",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
       }
     },
     {
@@ -1703,6 +1937,40 @@
         "can_authorize_quality_or_export": false,
         "can_claim_domain_ready": false,
         "can_claim_production_ready": false
+      },
+      "canonical_target_paths": [
+        "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-ppt-agent-lab-eval-suite",
+        "opl:agents-scaffold-validate",
+        "opl:agents-conformance:rca"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "visual_memory_bodies",
+        "owner_receipt_body",
+        "typed_blocker_body",
+        "human_gate_body",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "runtime_queue",
+        "provider_attempt_ledger",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
       }
     }
   ],

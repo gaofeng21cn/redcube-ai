@@ -13,6 +13,35 @@ import {
   PRODUCT_SESSION_COMMAND,
   PRODUCT_STATUS_COMMAND,
 } from './policy.js';
+import type {
+  FamilyOrchestrationCompanion,
+  ProductEntryOverviewCompanion,
+  ProductEntryQuickstartCompanion,
+  ProductEntryReadinessCompanion,
+  ProductEntryStartCompanion,
+} from '../../types.js';
+
+interface ProductEntryManifestEntrySurfacesInput {
+  familyOrchestration: FamilyOrchestrationCompanion;
+  humanGateIds: string[];
+  nativePptOperatorUx: {
+    image_proof_runner: { command_template: string };
+    proof_runner: { command_template: string };
+  };
+  productEntrySessionCommand: string;
+  workspaceRoot: string;
+}
+
+interface ProductEntryManifestEntrySurfaces {
+  productEntryOverview: ProductEntryOverviewCompanion & {
+    entry_status_command: string;
+    entry_status_owner: string;
+    repo_local_entry_status_command_available: boolean;
+  };
+  productEntryQuickstart: ProductEntryQuickstartCompanion;
+  productEntryReadiness: ProductEntryReadinessCompanion;
+  productEntryStart: ProductEntryStartCompanion;
+}
 
 export function buildProductEntryManifestEntrySurfaces({
   familyOrchestration,
@@ -20,7 +49,7 @@ export function buildProductEntryManifestEntrySurfaces({
   nativePptOperatorUx,
   productEntrySessionCommand,
   workspaceRoot,
-}) {
+}: ProductEntryManifestEntrySurfacesInput): ProductEntryManifestEntrySurfaces {
   const productEntryQuickstart = buildProductEntryQuickstart({
     summary: (
       'Start from the RCA direct product-entry domain handler target; OPL-generated status/session shells can inspect overview and progress, but RCA no longer publishes those repo-local default wrappers.'

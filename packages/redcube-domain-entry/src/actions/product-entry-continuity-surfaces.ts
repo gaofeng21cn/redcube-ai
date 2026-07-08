@@ -3,6 +3,7 @@ import {
   buildOplProductEntryLifecycleAdapterSurface,
 } from 'opl-framework-shared/product-entry-companions';
 import { safeText } from './action-utils.js';
+import type { OplFamilyLifecycleAdapterSurface } from '../types.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];
@@ -428,7 +429,7 @@ export function buildOplFamilyLifecycleAdapterSurface({
   source = 'manifest',
   entryMode = 'manifest_projection',
   manifestProjection = false,
-}) {
+}): OplFamilyLifecycleAdapterSurface {
   return buildOplProductEntryLifecycleAdapterSurface({
     domain_id: REDCUBE_LOOP_OWNER,
     domain_owner: REDCUBE_LOOP_OWNER,

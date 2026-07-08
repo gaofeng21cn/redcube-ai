@@ -40,11 +40,11 @@
     "@redcube/domain-entry": "0.1.0",
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
-    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#e8899af43129a786b74603d6ce3beaf90214bdd0"
+    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#ee3829f968c6e055b23cd83f67aac76bace059cb"
   },
   "devDependencies": {
-    "typescript": "^5.9.2",
-    "@types/node": "^24.7.0"
+    "@types/node": "^24.7.0",
+    "typescript": "^5.9.2"
   },
   "license": "Apache-2.0"
 }
