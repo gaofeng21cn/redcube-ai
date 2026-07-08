@@ -17,29 +17,39 @@ import {
   prepareProductEntryWorkspace,
 } from '../product-domain-action-case-shared.ts';
 
+function deckDeliveryRequest(overrides = {}) {
+  return {
+    deliverable_family: 'ppt_deck',
+    topic_id: 'topic-a',
+    profile_id: 'lecture_student',
+    ...overrides,
+  };
+}
+
+function productEntryRequest(workspaceRoot, entrySessionId, deliveryRequest, overrides = {}) {
+  return {
+    ...overrides,
+    workspace_locator: { workspace_root: workspaceRoot },
+    entry_session_contract: { entry_session_id: entrySessionId },
+    delivery_request: deliveryRequest,
+  };
+}
 
 test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const response = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-review-first',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
+    const response = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-review-first',
+      deckDeliveryRequest({
         deliverable_id: 'deck-review-first',
-        profile_id: 'lecture_student',
         title: 'OPL 系列项目介绍',
         goal: '介绍 OPL 系列项目和 Med Auto Science 自动科研，面向医生专家，20 分钟以上',
         user_intent: '不要一次性生成，先做到故事主线给我看看，我审阅之后再继续往下做',
         lifecycle_policy: 'operator_review_after_plan',
-      },
-    });
+      }),
+    ));
 
     assert.equal(response.ok, true);
     assert.equal(response.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
@@ -56,23 +66,16 @@ test('invokeProductEntry treats route as a StageRun stop target unless route han
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const response = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-route-defaults-to-stagerun',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
+    const response = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-route-defaults-to-stagerun',
+      deckDeliveryRequest({
         deliverable_id: 'deck-route-defaults-to-stagerun',
-        profile_id: 'lecture_student',
         title: 'Route defaults to StageRun',
         goal: '验证 route 默认进入 OPL StageRun plan',
         route: 'storyline',
-      },
-    });
+      }),
+    ));
 
     assert.equal(response.ok, true);
     assert.equal(response.summary.task_intent, 'run_opl_stage_execution_plan');
@@ -89,24 +92,17 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const response = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-a',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
+    const response = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-a',
+      deckDeliveryRequest({
         deliverable_id: 'deck-a',
-        profile_id: 'lecture_student',
         title: 'Product entry proof',
         goal: '验证 direct product entry',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
-      },
-    });
+      }),
+    ));
 
     assert.equal(response.ok, true);
     assert.equal(response.surface_kind, 'product_entry');
@@ -247,20 +243,16 @@ test('invokeProductEntry rejects retired deliverable task intent without compati
     const retiredManagedDeliverableIntent = ['run', 'managed', 'deliverable'].join('_');
 
     await assert.rejects(
-      () => invokeProductEntry({
-        task_intent: retiredManagedDeliverableIntent,
-        workspace_locator: {
-          workspace_root: workspaceRoot,
-        },
-        entry_session_contract: {
-          entry_session_id: 'session-retired-managed-intent',
-        },
-        delivery_request: {
+      () => invokeProductEntry(productEntryRequest(
+        workspaceRoot,
+        'session-retired-managed-intent',
+        {
           deliverable_family: 'ppt_deck',
           topic_id: 'topic-a',
           deliverable_id: 'deck-retired-managed-intent',
         },
-      }),
+        { task_intent: retiredManagedDeliverableIntent },
+      )),
       new RegExp(`Unsupported task_intent: ${retiredManagedDeliverableIntent}`),
     );
   });
@@ -271,37 +263,26 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const first = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-a',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
+    const first = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-a',
+      deckDeliveryRequest({
         deliverable_id: 'deck-a',
-        profile_id: 'lecture_student',
         title: 'Product entry proof',
         goal: '验证 session continuity',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
-      },
-    });
+      }),
+    ));
 
-    const continued = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-a',
-      },
-      delivery_request: {
+    const continued = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-a',
+      {
         user_intent: '继续推进到最终 PPT',
         stop_after_stage: 'visual_direction',
       },
-    });
+    ));
 
     assert.equal(first.ok, true);
     assert.equal(continued.ok, true);
@@ -381,6 +362,8 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
       classification: 'refs_only_read_model',
+      generic_session_shell_owner: 'one-person-lab',
+      generic_workbench_owner: 'one-person-lab',
       default_caller_status: 'opl_generated_session_shell_domain_refs',
       rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
       rca_exports_only: [
@@ -481,28 +464,21 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
       target_domain_id: 'redcube_ai',
       task_intent: 'run_opl_stage_execution_plan',
       entry_mode: 'opl_hosted',
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
+      workspace_locator: { workspace_root: workspaceRoot },
       runtime_session_contract: {
         runtime_owner: 'configured_family_runtime_provider',
       },
       return_surface_contract: {
         surface_kind: 'product_entry',
       },
-      entry_session_contract: {
-        entry_session_id: 'session-oplHosted',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
+      entry_session_contract: { entry_session_id: 'session-oplHosted' },
+      delivery_request: deckDeliveryRequest({
         deliverable_id: 'deck-fed',
-        profile_id: 'lecture_student',
         title: 'OplHosted product entry proof',
         goal: '验证 OPL-hosted stage runtime handoff',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
-      },
+      }),
     });
 
     assert.equal(response.ok, true);
