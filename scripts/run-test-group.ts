@@ -124,10 +124,6 @@ async function prepareSerializedVerification(groupName) {
   process.stdout.write(`[run-test-group] local codex command: ${codexProbe.contract.command.join(' ')}\n`);
   process.stdout.write(`[run-test-group] local codex python command: ${pythonCommand.command}\n`);
   process.stdout.write('[run-test-group] local codex exec preflight passed\n');
-  return {
-    codexProbe,
-    pythonCommand,
-  };
 }
 
 function assertTrackedFiles(files, groupName) {
@@ -184,7 +180,7 @@ const selectedFiles = selectGroupFiles({
   groupFiles: GROUPS[groupName],
   requestedFiles,
 });
-const serializedVerificationHandle = await prepareSerializedVerification(groupName);
+await prepareSerializedVerification(groupName);
 const executionPlan = partitionTestFilesForExecution({
   groupName,
   files: selectedFiles,
@@ -235,21 +231,17 @@ function runSerializedNodeTestFiles({ label, files }) {
   return 0;
 }
 
-try {
-  const parallelStatus = runNodeTestBatch({
-    label: 'parallel batch',
-    files: executionPlan.parallel_files,
-    serialized: false,
-  });
-  if (parallelStatus !== 0) {
-    process.exit(parallelStatus);
-  }
-
-  const serializedStatus = runSerializedNodeTestFiles({
-    label: 'serialized route-heavy batch',
-    files: executionPlan.serialized_files,
-  });
-  process.exit(serializedStatus);
-} finally {
-  void serializedVerificationHandle;
+const parallelStatus = runNodeTestBatch({
+  label: 'parallel batch',
+  files: executionPlan.parallel_files,
+  serialized: false,
+});
+if (parallelStatus !== 0) {
+  process.exit(parallelStatus);
 }
+
+const serializedStatus = runSerializedNodeTestFiles({
+  label: 'serialized route-heavy batch',
+  files: executionPlan.serialized_files,
+});
+process.exit(serializedStatus);

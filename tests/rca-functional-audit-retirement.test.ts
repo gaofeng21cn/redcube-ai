@@ -11,6 +11,8 @@ import {
 
 const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
   'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
+const PHYSICAL_SOURCE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags';
 
 test('RCA functional audit exposes OPL replacement expectations and retired generic domain_action_adapter dispatch', () => {
   const rootAudit = JSON.parse(readFileSync(
@@ -402,11 +404,14 @@ test('RCA physical morphology policy keeps active source tails classified and fo
     redcube_cli_domain_entry_adapter: 'service_safe_domain_entry',
   };
 
+  for (const value of Object.values(policy.forbidden_generic_owner_flags)) {
+    assert.equal(value, false);
+  }
+
   for (const [surfaceId, classification] of Object.entries(requiredClassifications)) {
     assert.equal(byId[surfaceId].classification, classification, surfaceId);
-    for (const value of Object.values(byId[surfaceId].forbidden_generic_owner_flags)) {
-      assert.equal(value, false, surfaceId);
-    }
+    assert.equal(byId[surfaceId].forbidden_generic_owner_flags, undefined, surfaceId);
+    assert.equal(byId[surfaceId].forbidden_generic_owner_flags_ref, PHYSICAL_SOURCE_FORBIDDEN_OWNER_FLAGS_REF, surfaceId);
   }
 
   const legacyAllowanceExpectations = {

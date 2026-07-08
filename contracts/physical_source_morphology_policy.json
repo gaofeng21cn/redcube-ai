@@ -62,6 +62,17 @@
     "generic_generated_wrapper_owner",
     "generic_domain_entry_runtime_owner"
   ],
+  "forbidden_generic_owner_flags": {
+    "rca_owns_generic_scheduler": false,
+    "rca_owns_generic_runner": false,
+    "rca_owns_generic_attempt_ledger": false,
+    "rca_owns_generic_workbench": false,
+    "rca_owns_generic_review_repair_transport": false,
+    "rca_owns_generic_session_runtime": false,
+    "rca_owns_generic_artifact_lifecycle": false,
+    "rca_owns_generic_generated_wrapper": false,
+    "rca_owns_generic_domain_entry_runtime": false
+  },
   "active_surface_classifications": [
     {
       "surface_id": "agent_declarative_visual_pack",
@@ -101,17 +112,7 @@
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "runtime_program_machine_contracts",
@@ -148,17 +149,7 @@
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "mcp_product_entry_domain_entry",
@@ -175,17 +166,7 @@
         "typed_blocker",
         "owner_receipt_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "redcube_cli_domain_entry_adapter",
@@ -235,17 +216,7 @@
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "redcube_domain_entry_package_protocol_boundary",
@@ -261,17 +232,7 @@
         "domain_handler_protocol_exports",
         "pack_contract_builder_exports"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "product_entry_continuity_refs_adapter",
@@ -332,17 +293,7 @@
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "workspace_run_envelope_helpers",
@@ -389,17 +340,7 @@
         "generic_attempt_ledger_owner_allowed": false,
         "compatibility_alias_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "runtime_watch_projection",
@@ -444,17 +385,7 @@
         "default_supervision_route_allowed": false,
         "compatibility_alias_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "domain_action_adapter_guarded_actions",
@@ -511,17 +442,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "operator_evidence_stability_projection",
@@ -538,17 +459,7 @@
         "domain_blocker_meaning_refs",
         "safe_repair_hint_refs"
       ],
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "product_entry_manifest_projection",
@@ -603,17 +514,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "deliverable_route_attempt_shell",
@@ -677,17 +578,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "executor_runtime_route_run_records",
@@ -749,17 +640,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "visual_authority_functions",
@@ -805,17 +686,7 @@
         "active_generic_workbench_owner_allowed": false,
         "active_generic_attempt_ledger_owner_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "visual_route_runtime_family_implementations",
@@ -869,17 +740,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "repo_shell_verification_wrappers",
@@ -945,17 +806,7 @@
         "callable_alias_allowed": false,
         "production_readiness_claim_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     },
     {
       "surface_id": "retired_product_entry_contract_tombstone_refs",
@@ -1007,17 +858,7 @@
         "callable_alias_allowed": false,
         "active_caller_allowed": false
       },
-      "forbidden_generic_owner_flags": {
-        "rca_owns_generic_scheduler": false,
-        "rca_owns_generic_runner": false,
-        "rca_owns_generic_attempt_ledger": false,
-        "rca_owns_generic_workbench": false,
-        "rca_owns_generic_review_repair_transport": false,
-        "rca_owns_generic_session_runtime": false,
-        "rca_owns_generic_artifact_lifecycle": false,
-        "rca_owns_generic_generated_wrapper": false,
-        "rca_owns_generic_domain_entry_runtime": false
-      }
+      "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     }
   ],
   "default_caller_tail_thinning_gate": {

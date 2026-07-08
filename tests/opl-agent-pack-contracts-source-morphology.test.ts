@@ -12,6 +12,9 @@ import {
   sourceRefCoversFile,
 } from './helpers/rca-retired-surface-guard.ts';
 
+const PHYSICAL_SOURCE_FORBIDDEN_OWNER_FLAGS_REF =
+  'contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags';
+
 function sourceRefIntegrityViolations(sourceRef) {
   const sourcePath = String(sourceRef).split('#')[0];
   const parts = sourcePath.split('/');
@@ -716,10 +719,13 @@ test('RCA physical source morphology policy classifies active source tails witho
     false,
   );
 
+  for (const value of Object.values(policy.forbidden_generic_owner_flags)) {
+    assert.equal(value, false);
+  }
+
   for (const entry of policy.active_surface_classifications) {
-    for (const value of Object.values(entry.forbidden_generic_owner_flags)) {
-      assert.equal(value, false, entry.surface_id);
-    }
+    assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.surface_id);
+    assert.equal(entry.forbidden_generic_owner_flags_ref, PHYSICAL_SOURCE_FORBIDDEN_OWNER_FLAGS_REF, entry.surface_id);
   }
 });
 

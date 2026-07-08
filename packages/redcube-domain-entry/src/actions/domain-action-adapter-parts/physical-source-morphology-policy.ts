@@ -8,6 +8,7 @@ import {
 } from './physical-source-morphology-policy-parts/source-ref-integrity-gate.js';
 import {
   FORBIDDEN_GENERIC_OWNER_FLAGS,
+  FORBIDDEN_GENERIC_OWNER_FLAGS_REF,
   LEGACY_NAME_GUARD_DEFAULTS,
   POLICY_SOURCE_STRUCTURE,
   RCA_LEGACY_NAME_ALLOWANCE_ROLES,
@@ -846,9 +847,10 @@ export function buildPhysicalSourceMorphologyPolicy() {
     policy_source_structure: POLICY_SOURCE_STRUCTURE,
     allowed_surface_classes: [...RCA_PHYSICAL_MORPHOLOGY_ALLOWED_CLASSES],
     forbidden_generic_owner_classes: [...RCA_PHYSICAL_MORPHOLOGY_FORBIDDEN_OWNER_CLASSES],
+    forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
     active_surface_classifications: ACTIVE_SURFACE_CLASSIFICATIONS.map((entry) => ({
       ...entry,
-      forbidden_generic_owner_flags: { ...FORBIDDEN_GENERIC_OWNER_FLAGS },
+      forbidden_generic_owner_flags_ref: FORBIDDEN_GENERIC_OWNER_FLAGS_REF,
     })),
     default_caller_tail_thinning_gate: SOURCE_THINNING_TAIL_GATE,
     default_caller_tail_readback: defaultCallerTailReadback(ACTIVE_SURFACE_CLASSIFICATIONS),

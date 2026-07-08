@@ -284,7 +284,7 @@ test('run-test-group supports explicit targeted files inside the selected lane',
 test('run-test-group validates requested files before serialized preflight', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const selectIndex = script.indexOf('const selectedFiles = selectGroupFiles({');
-  const preflightIndex = script.indexOf('const serializedVerificationHandle = await prepareSerializedVerification(groupName);');
+  const preflightIndex = script.indexOf('await prepareSerializedVerification(groupName);');
 
   assert.equal(selectIndex > 0, true);
   assert.equal(preflightIndex > 0, true);

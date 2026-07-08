@@ -40,6 +40,9 @@ export const FORBIDDEN_GENERIC_OWNER_FLAGS = Object.freeze({
   rca_owns_generic_domain_entry_runtime: false,
 });
 
+export const FORBIDDEN_GENERIC_OWNER_FLAGS_REF =
+  'contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags';
+
 export const RCA_LEGACY_NAME_ALLOWANCE_ROLES = Object.freeze([
   'machine_contract_ref',
   'package_protocol_boundary',
