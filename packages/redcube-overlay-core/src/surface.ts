@@ -6,6 +6,21 @@ import {
 export type SurfaceContract = Record<string, any>;
 export type SurfaceArtifactContent = (contract: SurfaceContract) => unknown;
 export type SurfaceValidator = (content: SurfaceContract) => boolean;
+export interface SurfaceValidatorSpec {
+  relativePath: string;
+  validate: SurfaceValidator;
+}
+export interface SurfaceRequirement {
+  path: string;
+  equals?: unknown;
+  includes?: unknown;
+  nonEmptyString?: boolean;
+  nonEmptyArray?: boolean;
+  array?: boolean;
+  object?: boolean;
+  boolean?: boolean;
+  truthy?: boolean;
+}
 
 export interface SurfaceArtifactSpec {
   relativePath: string;
@@ -48,6 +63,34 @@ export function buildSurfaceBundle(contract: SurfaceContract, specs: SurfaceArti
 
 export function listSurfaceArtifactPaths(specs: SurfaceArtifactSpec[]) {
   return specs.map((spec) => spec.relativePath);
+}
+
+export function createSurfaceValidators(specs: SurfaceValidatorSpec[]): Record<string, SurfaceValidator> {
+  return Object.fromEntries(specs.map((spec) => [spec.relativePath, spec.validate]));
+}
+
+function valueAtPath(content: SurfaceContract, path: string): unknown {
+  return path.split('.').reduce((current: unknown, key) => (
+    current && typeof current === 'object' ? (current as SurfaceContract)[key] : undefined
+  ), content);
+}
+
+export function validateSurfaceRequirements(
+  content: SurfaceContract,
+  requirements: SurfaceRequirement[],
+): boolean {
+  return requirements.every((requirement) => {
+    const value = valueAtPath(content, requirement.path);
+    if ('equals' in requirement && value !== requirement.equals) return false;
+    if ('includes' in requirement && (!Array.isArray(value) || !value.includes(requirement.includes))) return false;
+    if (requirement.nonEmptyString && (typeof value !== 'string' || value.length === 0)) return false;
+    if (requirement.nonEmptyArray && (!Array.isArray(value) || value.length === 0)) return false;
+    if (requirement.array && !Array.isArray(value)) return false;
+    if (requirement.object && (!value || typeof value !== 'object' || Array.isArray(value))) return false;
+    if (requirement.boolean && typeof value !== 'boolean') return false;
+    if (requirement.truthy && !value) return false;
+    return true;
+  });
 }
 
 export function validateSurfaceArtifact({

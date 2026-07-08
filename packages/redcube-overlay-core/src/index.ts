@@ -13,6 +13,7 @@ export { createOverlayRegistry } from './registry.js';
 export {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
+  createSurfaceValidators,
   listSurfaceArtifactPaths,
   validateBaselinePolicySurface,
   validateDeliveryContractSurface,
@@ -20,12 +21,15 @@ export {
   validateGovernanceSurfaceArtifact,
   validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
+  validateSurfaceRequirements,
 } from './surface.js';
 export type {
   SurfaceArtifactContent,
   SurfaceArtifactSpec,
   SurfaceContract,
+  SurfaceRequirement,
   SurfaceValidator,
+  SurfaceValidatorSpec,
 } from './surface.js';
 
 export type {
