@@ -1,8 +1,6 @@
 // @ts-nocheck
-import path from 'node:path';
 
 const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical']);
-const TEST_SIZES = Object.freeze(['small', 'medium', 'large']);
 const TEST_STATES = Object.freeze(['active', 'historical']);
 
 const PRIMARY_TEST_FILES = Object.freeze({
@@ -247,32 +245,12 @@ const ROUTE_HEAVY_FILES = new Set([
   'tests/xiaohongshu-deliverable-e2e.test.ts',
 ]);
 
-function coverageIdFor(file) {
-  return path.basename(file).replace(/\.(?:test\.)?(?:js|ts)$/, '').replace(/[^a-zA-Z0-9]+/g, '_').replace(/^_|_$/g, '');
-}
-
-function sizeFor({ lane, file }) {
-  if (lane === 'e2e') return 'large';
-  if (smokeFileSet.has(file) || lane === 'meta' || lane === 'family' || lane === 'historical') return 'small';
-  return 'medium';
-}
-
-function layerFor({ lane, file }) {
-  if (smokeFileSet.has(file)) return 'smoke';
-  if (fastFileSet.has(file)) return 'core_regression';
-  if (lane === 'historical') return 'provenance';
-  return lane;
-}
-
 export const TEST_REGISTRY = Object.freeze(
   TEST_LANES.flatMap((lane) => PRIMARY_TEST_FILES[lane].map((file) => Object.freeze({
     file,
     lane,
-    size: sizeFor({ lane, file }),
-    layer: layerFor({ lane, file }),
     state: lane === 'historical' ? 'historical' : 'active',
     ci_default: lane === 'family' || (lane === 'meta' && !fastFileSet.has(file)) || fastFileSet.has(file),
-    coverage_id: coverageIdFor(file),
   }))),
 );
 
@@ -364,16 +342,13 @@ export function assertValidTestRegistry({ registry = TEST_REGISTRY } = {}) {
   }
 
   for (const entry of registry) {
-    for (const field of ['file', 'lane', 'size', 'layer', 'state', 'ci_default', 'coverage_id']) {
+    for (const field of ['file', 'lane', 'state', 'ci_default']) {
       if (!Object.hasOwn(entry, field)) {
         throw new Error(`测试注册项缺少字段 ${field}: ${JSON.stringify(entry)}`);
       }
     }
     if (!TEST_LANES.includes(entry.lane)) {
       throw new Error(`测试注册项 lane 无效: ${entry.file} -> ${entry.lane}`);
-    }
-    if (!TEST_SIZES.includes(entry.size)) {
-      throw new Error(`测试注册项 size 无效: ${entry.file} -> ${entry.size}`);
     }
     if (!TEST_STATES.includes(entry.state)) {
       throw new Error(`测试注册项 state 无效: ${entry.file} -> ${entry.state}`);
