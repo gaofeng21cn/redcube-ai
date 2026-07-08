@@ -16,14 +16,6 @@ export function optionalText(value) {
   return text || null;
 }
 
-async function readJsonResponse(response) {
-  const text = await response.text();
-  if (!text.trim()) {
-    return {};
-  }
-  return JSON.parse(text);
-}
-
 export function compactStringArray(value) {
   return Array.isArray(value)
     ? Array.from(new Set(value.map((item) => String(item || '').trim()).filter(Boolean))).sort()

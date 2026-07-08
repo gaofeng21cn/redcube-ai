@@ -1,18 +1,5 @@
 import type { RunRecordResponse, WorkspaceRootRequest } from '../types.js';
-
-function requireSafeSegment(name: string, value: unknown): string {
-  const text = String(value || '').trim();
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  if (/[\\/]/.test(text)) {
-    throw new Error(`${name} 不能包含路径分隔符`);
-  }
-  if (text.includes('..')) {
-    throw new Error(`${name} 不能包含父目录引用`);
-  }
-  return text;
-}
+import { requireSafeSegment } from './action-utils.js';
 
 function buildRunLookupRetiredBlocker(runId: string) {
   return {

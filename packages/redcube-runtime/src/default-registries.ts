@@ -47,7 +47,6 @@ export interface RuntimeFamilyModuleSpec {
   overlay_id: string;
   deliverable_kind: string;
   runner_id: string;
-  export_name: string;
 }
 
 export interface RuntimeFamilyCatalogSurface {
@@ -73,7 +72,6 @@ interface RuntimeFamilyModuleManifestSpec {
   overlayId: string;
   deliverableKind: string;
   runnerId: string;
-  exportName: string;
   runRoute: (...args: unknown[]) => Promise<unknown>;
 }
 
@@ -82,21 +80,18 @@ const defaultRuntimeFamilyModules: RuntimeFamilyModuleManifestSpec[] = [
     overlayId: 'ppt_deck',
     deliverableKind: 'ppt_deck',
     runnerId: 'families/ppt',
-    exportName: 'runPptDeckRoute',
     runRoute: runPptDeckRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
     overlayId: 'xiaohongshu',
     deliverableKind: 'xiaohongshu_note',
     runnerId: 'families/xiaohongshu',
-    exportName: 'runXiaohongshuRoute',
     runRoute: runXiaohongshuRoute as (...args: unknown[]) => Promise<unknown>,
   },
   {
     overlayId: 'poster_onepager',
     deliverableKind: 'poster_onepager',
     runnerId: 'families/poster-onepager',
-    exportName: 'runPosterOnepagerRoute',
     runRoute: runPosterOnepagerRoute as (...args: unknown[]) => Promise<unknown>,
   },
 ];
@@ -111,7 +106,6 @@ function buildCatalogEntry(spec: RuntimeFamilyModuleManifestSpec): RuntimeFamily
     overlay_id: safeText(spec.overlayId),
     deliverable_kind: safeText(spec.deliverableKind),
     runner_id: safeText(spec.runnerId),
-    export_name: safeText(spec.exportName),
   };
 }
 

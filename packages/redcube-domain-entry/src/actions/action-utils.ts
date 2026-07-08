@@ -13,6 +13,17 @@ export function requireField(name: string, value: unknown): string {
   return text;
 }
 
+export function requireSafeSegment(name: string, value: unknown): string {
+  const text = requireField(name, value);
+  if (/[\\/]/.test(text)) {
+    throw new Error(`${name} 不能包含路径分隔符`);
+  }
+  if (text.includes('..')) {
+    throw new Error(`${name} 不能包含父目录引用`);
+  }
+  return text;
+}
+
 export function readJson<T = unknown>(file: string): T {
   return JSON.parse(readFileSync(file, 'utf-8')) as T;
 }
