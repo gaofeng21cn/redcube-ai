@@ -32,6 +32,21 @@ test('RCA standard domain-agent skeleton keeps repo source and runtime artifacts
       assert.equal(fs.existsSync(path.join(repoRoot, ref)), true, `${root.boundary_id}:${ref}`);
     }
   }
+  const physicalAgentBoundary = skeleton.physical_skeleton_follow_through.physical_roots
+    .find((root) => root.boundary_id === 'agent');
+  assert.deepEqual(physicalAgentBoundary.entrypoint_refs, [
+    'agent/prompts/source_intake.md',
+    'agent/primary_skill/SKILL.md',
+    'plugins/redcube-ai/skills/redcube-ai/SKILL.md',
+  ]);
+  assert.equal(
+    physicalAgentBoundary.entrypoint_refs.some((ref) => ref === 'plugins/rca/skills/rca/SKILL.md'),
+    false,
+  );
+  assert.equal(
+    physicalAgentBoundary.entrypoint_refs.some((ref) => ref === 'plugins/redcube-ai/skills/rca/SKILL.md'),
+    false,
+  );
   assert.ok(skeleton.repo_source_boundary.audit_surface.forbidden_repo_writes.includes('canonical_artifact_blob'));
   assert.deepEqual(skeleton.runtime_declarations.declares_only, [
     'domain_handler_target',

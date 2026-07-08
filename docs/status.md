@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-Last reviewed: `2026-07-07`
+Last reviewed: `2026-07-08`
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
@@ -28,7 +28,7 @@ RCA 的标准 OPL Agent semantic pack 已归位到 `agent/`。`agent/prompts/*.m
 当前 skill model 读法是三层：stage prompt 管 stage 怎么运行和返回哪些 receipts / refs；professional specialist skill 管跨 stage 可复用专业方法，例如 story architecture、visual direction、page authoring、review、visual memory curation、native PPT design 和 template profiling；tool/helper 管 imagegen、screenshot/render、Office/PPT materialization、manifest、validation 和 export refs。RCA professional skills 先 repo-local 化，不新建外部 repo 或外部产品；工具和 helper 只提供 materialization / validation / export evidence，不能变成 skill，也不能替代 RCA visual truth、review/export verdict 或 owner receipt。
 Template profiling 已小幅收敛：`contracts/capability_map.json#/feedback_token_index/template_profile` 与 `placeholder_capacity` 现在只把 canonical capability 指向 `rca-template-profiler`。`rca-ppt-visual-director` 和 `rca-native-ppt-designer` 保留为 profile 消费方，分别负责 visual language / rhythm / density 与显式 native PPTX shape-plan binding；不再读作共同 profiling owner。
 
-RCA rich primary skill 的标准 OPL repo source 是 `agent/primary_skill/SKILL.md`，登记在 `contracts/capability_map.json#/capabilities?surface_role=primary_skill`。旧 `plugins/redcube-ai/skills/redcube-ai/SKILL.md` 保留为 Codex plugin carrier / compat mirror；它不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。
+RCA rich primary skill 的标准 OPL repo source 是 `agent/primary_skill/SKILL.md`，登记在 `contracts/capability_map.json#/capabilities?surface_role=primary_skill`。`plugins/redcube-ai/skills/redcube-ai/SKILL.md` 保留为 Codex plugin carrier mirror / 安装发现面；它与 repo-local primary skill 不是两套业务能力，也不持有 visual truth、artifact body、review/export verdict、owner receipt、typed blocker 或 runtime data。职责区别读 [Primary Skill 与 Plugin Carrier 边界](./references/primary-skill-plugin-carrier-boundary.md)。
 
 `agent/skills/visual_memory_policy.md` 当前只读为 Declarative Visual Pack 的 stage skill policy ref，不是 standalone professional skill。Visual memory proposal、accept/reject review 和 writeback lifecycle 的可复用方法入口是 `agent/professional_skills/rca-visual-memory-curator/SKILL.md`；`contracts/capability_map.json` 只把 `visual_memory`、`memory_writeback`、`review_export_memory` 等反馈 token 路由到该 refs-only 方法层，不授权 OPL 写 memory body、artifact body、review/export verdict、owner receipt 或 runtime data。
 

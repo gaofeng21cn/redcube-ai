@@ -491,7 +491,11 @@ export function buildPhysicalSkeletonFollowThrough() {
       {
         boundary_id: 'agent',
         status: 'present_with_repo_source_entrypoint',
-        entrypoint_refs: ['agent/prompts/source_intake.md', 'plugins/rca/skills/rca/SKILL.md'],
+        entrypoint_refs: [
+          'agent/prompts/source_intake.md',
+          'agent/primary_skill/SKILL.md',
+          'plugins/redcube-ai/skills/redcube-ai/SKILL.md',
+        ],
       },
       {
         boundary_id: 'contracts',
