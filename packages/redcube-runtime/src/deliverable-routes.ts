@@ -15,7 +15,6 @@ import {
 } from '@redcube/runtime-protocol';
 
 import { readCodexCliContract } from './executors/codex-caller.js';
-import { resolveExecutorRouting } from '@redcube/redcube-config';
 import { createRunRecord, getDeliverablePaths } from '@redcube/runtime-protocol';
 import { runCandidateRaceRoute } from './candidate-racing.js';
 import {
@@ -23,6 +22,7 @@ import {
   refreshStageFolderRouteArtifact,
   validateDeliverableRouteInput,
 } from './deliverable-route-local.js';
+import { resolveExecutorRouting } from './executor-routing.js';
 import { resolveExecutorAdapter } from './executors/index.js';
 
 function requireSafeSegment(name, value) {
