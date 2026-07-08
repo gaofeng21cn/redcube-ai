@@ -106,7 +106,6 @@ export function checkCurrentProgramLeafIndex() {
     ok: mismatches.length === 0,
     mismatches,
     source_part_ref_count: index.source_part_refs.length,
-    leaf_ref_count: index.source_part_refs.length,
   };
 }
 
@@ -120,6 +119,5 @@ export function syncCurrentProgramLeafIndex() {
   const index = readJson(INDEX_REF);
   return {
     source_part_ref_count: index.source_part_refs.length,
-    leaf_ref_count: index.source_part_refs.length,
   };
 }

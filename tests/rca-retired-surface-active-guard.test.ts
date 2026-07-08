@@ -4,9 +4,13 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync } from 'node:fs';
 
-import {
-  RETIRED_CONTRACTS,
-} from './helpers/rca-retired-surface-guard.ts';
+const RETIRED_CONTRACTS = Object.freeze([
+  'contracts/runtime-program/hermes-runtime-substrate-activation-package.json',
+  'contracts/runtime-program/hermes-runtime-capability-extraction-map.json',
+  'contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json',
+  'contracts/runtime-program/hermes-stable-family-closure-truth.json',
+  'contracts/runtime-program/hermes-managed-family-closure-truth.json',
+]);
 
 test('RCA retired runtime substrate contract files stay absent from active repo surfaces', () => {
   for (const contractFile of RETIRED_CONTRACTS) {

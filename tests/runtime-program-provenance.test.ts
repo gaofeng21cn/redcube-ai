@@ -101,6 +101,7 @@ const CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS = Object.freeze([
   '/current_state/visual_pack_compiler_handoff',
   '/current_state/active_baton/scope/opl_generic_primitive_consumption',
   '/current_state/active_baton/scope/opl_stability_read_model_consumption',
+  '/current_state/active_baton/scope/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
   '/current_state/active_baton/scope/privatized_functional_module_audit',
   '/current_state/active_baton/scope/visual_pack_compiler_handoff',
   '/product_release_metadata/opl_generic_primitive_consumption',
@@ -152,7 +153,7 @@ test('current runtime program is backed by source parts and one source index loc
 
   assert.equal(index.source_part_refs.length > index.section_roots.length, true);
   assert.equal(index.source_part_refs.length <= 100, true);
-  assert.deepEqual(index.leaf_refs, index.source_part_refs);
+  assert.equal(Object.prototype.hasOwnProperty.call(index, 'leaf_refs'), false);
   assert.deepEqual(syncCheck.mismatches, []);
   assert.equal(syncCheck.source_part_ref_count, index.source_part_refs.length);
   for (const section of index.section_roots) {

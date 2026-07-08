@@ -561,155 +561,27 @@
         "review_export_verdict"
       ],
       "production_evidence_scaleout_refs": {
-        "surface_kind": "rca_visual_production_evidence_scaleout_refs",
+        "surface_kind": "rca_current_program_canonical_projection_ref",
+        "schema_version": 1,
+        "surface_id": "production_evidence_scaleout_refs",
+        "projection_mode": "canonical_ref_only_no_body_copy",
+        "canonical_contract_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
+        "canonical_json_pointer": "/production_evidence_scaleout_refs",
         "owner": "redcube_ai",
+        "consumer": "opl_app_operator",
         "status": "refs_landed_scaleout_runtime_evidence_pending",
-        "evidence_model": "refs_only_no_visual_truth_artifact_blob_or_memory_body",
+        "body_copy_in_current_program": false,
+        "duplicate_entity_policy": "reference_canonical_contract_instead_of_repeating_machine_snapshot_body",
+        "source_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
         "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
-        "owner_receipt_refs": {
-          "status": "artifact_producing_owner_receipt_ref_closed",
-          "contract_ref": "/domain_owner_receipt_contract",
-          "receipt_ref": "rca-owner-receipt:visual-stage:transition-hosted-domain-receipt",
-          "opl_can_store_receipt_refs": true,
-          "visual_readiness_claimed": false,
-          "export_readiness_claimed": false
-        },
-        "workspace_receipt_scaleout_refs": {
-          "status": "workspace_receipt_scaleout_ref_model_ready_more_workspaces_pending",
-          "workspace_receipt_inventory_ref": "/workspace_receipt_inventory_projection",
-          "workspace_receipt_proof_action": "emit_workspace_receipt_proof",
-          "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
-          "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
-          "required_workspace_count_for_scaleout": 2,
-          "workspace_receipt_scaleout_claimed": false
-        },
-        "visual_memory_body_reuse_refs": {
-          "status": "body_external_reuse_ref_landed",
-          "memory_locator_ref": "/domain_memory_descriptor_locator/memory_locator",
-          "controlled_apply_proof_ref": "/controlled_memory_apply_proof",
-          "consumed_memory_ref": "rca-memory:visual-pattern:<memory-id>",
-          "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
-          "body_owner": "redcube_ai",
-          "projected_body_to_opl": false,
-          "contains_memory_body": false
-        },
-        "repeated_no_regression_evidence_refs": {
-          "status": "repeated_refs_available_not_production_soak",
-          "generator_action": "emit_no_regression_evidence",
-          "proof_contract_ref": "/no_regression_owner_receipt_opl_consumption_proof",
-          "evidence_refs": [
-            "rca-no-regression:visual-stage:transition-hosted-no-regression",
-            "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
-            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-            "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-            "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-            "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-            "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-            "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
-          ],
-          "deliverable_family_refs": [
-            "ppt_deck",
-            "xiaohongshu"
-          ],
-          "required_minimum_evidence_ref_count": 6,
-          "repeated_no_regression_claimed_as_soak": false,
-          "real_runtime_evidence_refs": [
-            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-            "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-            "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-            "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-            "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-            "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-            "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
-          ],
-          "real_runtime_evidence_ref_count": 7,
-          "real_runtime_evidence_provenance": [
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-a",
-              "sha256": "411f05e8b9cd07f8e6789c23dbeae050d9d0f20666d5a78a1370ccba8886e8dd"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260527-rca-no-regression-evidence/workspace-b",
-              "sha256": "668ef07b2adff4aee95dda660915eb2b85347fc689c6cdfd0b437ef7b864595a"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-ppt-window2",
-              "sha256": "e0e965fa14c15c9b6d6b076d4ed1d45b9872fb82dafcdfb8b415426ca4c08acd"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-no-regression-evidence/workspace-xhs-window2",
-              "sha256": "d476325dfa59bf8f6443a46882630be60001f6b0197f91d71ecf58e3a65d4744"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-native-repeat",
-              "sha256": "59a03cd84db896dd0511d0dce5f9069e82faf00875f94b2698a064f708b232f3"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-              "workspace_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260530-rca-no-regression-evidence/workspace-xhs-repeat",
-              "sha256": "7a3e68a06ef30ccab5620b9013815831d7f2de6bfca3ee716120f45036f1f7f4"
-            },
-            {
-              "evidence_ref": "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat",
-              "workspace_ref": "user-runtime-state:redcube-ai/rca-native-live-20260531-tranche1/workspace",
-              "sha256": "7f05bc52871961dff4fbce1acee32b276ccbc51f376a8fa6e31caa845ccd38cc"
-            }
-          ],
-          "opl_external_evidence_receipt_ref": "opl://external-evidence/redcube_ai/rca-cross-family-repeated-no-regression-20260530-6-refs",
-          "evidence_cadence": "cross_route_cross_window_repeated_refs_only"
-        },
-        "naming_tombstone_follow_through_refs": {
-          "status": "tombstone_follow_through_refs_landed_no_compatibility_alias",
-          "active_caller_compatibility_alias_restored": false,
-          "tombstone_refs": [
-            "human_doc:retired_route_narratives_tombstone"
-          ],
-          "retained_provenance_refs": [
-            "contracts/runtime-program/managed-product-entry-hardening.json",
-            "human_doc:retired_managed_product_entry_contract_tombstone"
-          ],
-          "forbidden_active_occurrence_classes": [
-            "compatibility_alias",
-            "default_runtime_owner",
-            "public_action_key",
-            "domain_action_adapter_template"
-          ]
-        },
-        "authority_boundary": {
-          "opl_can_store_projection_refs": true,
-          "opl_can_write_rca_visual_truth": false,
-          "opl_can_store_artifact_blob": false,
-          "opl_can_store_memory_body": false,
-          "opl_can_authorize_review_export_verdict": false,
-          "opl_can_claim_production_soak_complete": false
-        },
-        "no_regression_evidence_refs": [
-          "rca-no-regression:visual-stage:transition-hosted-no-regression",
-          "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
-        ],
-        "no_regression_refs": [
-          "rca-no-regression:visual-stage:transition-hosted-no-regression",
-          "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-a",
-          "rca-no-regression:visual-stage:2026-05-27-opl-family-cross-family-repeat-b",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-ppt-deck-window2",
-          "rca-no-regression:visual-stage:2026-05-28-opl-family-xiaohongshu-window2",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-native-repeat",
-          "rca-no-regression:visual-stage:2026-05-30-opl-family-xiaohongshu-repeat",
-          "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
+        "not_claims": [
+          "domain_ready",
+          "production_ready",
+          "visual_ready",
+          "quality_or_export_verdict",
+          "owner_receipt",
+          "typed_blocker",
+          "artifact_authority"
         ]
       }
     },

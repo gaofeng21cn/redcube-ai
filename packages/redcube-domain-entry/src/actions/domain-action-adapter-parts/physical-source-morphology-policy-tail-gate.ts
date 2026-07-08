@@ -67,7 +67,7 @@ export const SOURCE_THINNING_TAIL_GATE = Object.freeze({
       'tools',
       'python',
     ],
-    helper_ref: 'tests/helpers/rca-retired-surface-guard.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS',
+    helper_ref: 'scripts/private-platform-source-scan.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS',
     test_ref: 'tests/rca-legacy-name-allowance.test.ts#RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection',
     forbidden_true_claim_keys: [
       'runtimeWatch_can_return_to_domain_action_adapter_default_dispatch',

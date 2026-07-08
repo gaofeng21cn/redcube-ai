@@ -217,7 +217,6 @@ export function buildCurrentProgramSourceIndexFromParts() {
       sha256: sourcePart.sha256,
     })))),
     source_part_refs: sourcePartRefs,
-    leaf_refs: sourcePartRefs,
     source_ref_count: sourcePartRefs.length,
     commands: {
       write: WRITE_COMMAND,

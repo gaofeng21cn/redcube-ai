@@ -20,17 +20,6 @@ import {
 
 const GROUPS = buildTestGroups();
 
-function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
-  const covered = new Set(coveredFiles);
-  const selected = [];
-  for (const file of baseFiles) {
-    if (!covered.has(file) && !selected.includes(file)) {
-      selected.push(file);
-    }
-  }
-  return selected;
-}
-
 test('run-test-group keeps local codex preflight on integration/e2e/full groups', () => {
   const liveGroups = Object.keys(GROUPS).filter(groupRequiresLiveCodexPreflight).sort();
   assert.deepEqual(liveGroups, ['e2e', 'full', 'full:remaining', 'full:with-historical', 'integration', 'integration:remaining']);
@@ -177,25 +166,15 @@ test('run-test-group exposes a CI meta remainder lane without repeating fast met
   );
 });
 
-test('run-test-group remainder helper removes covered files and duplicate remainder entries', () => {
-  assert.deepEqual(
-    excludeCoveredTestFiles(
-      ['tests/a.test.ts', 'tests/b.test.ts', 'tests/a.test.ts', 'tests/c.test.ts'],
-      ['tests/b.test.ts'],
-    ),
-    ['tests/a.test.ts', 'tests/c.test.ts'],
-  );
-});
-
 test('run-test-group exposes an integration remainder lane for local fast-then-integration verification', () => {
   const integration = GROUPS.integration;
   const fast = GROUPS.fast;
+  const integrationRemaining = GROUPS['integration:remaining'];
 
   assert.equal(fast.some((file) => integration.includes(file)), true);
-  assert.equal(
-    GROUPS['integration:remaining'].length,
-    excludeCoveredTestFiles(integration, fast).length,
-  );
+  assert.equal(new Set(integrationRemaining).size, integrationRemaining.length);
+  assert.equal(integrationRemaining.every((file) => integration.includes(file)), true);
+  assert.equal(integrationRemaining.some((file) => fast.includes(file)), false);
 });
 
 test('run-test-group exposes a full remainder lane without repeating prior local verification coverage', () => {
@@ -209,7 +188,8 @@ test('run-test-group exposes a full remainder lane without repeating prior local
     ...GROUPS['integration:remaining'],
   ];
 
-  assert.deepEqual(excludeCoveredTestFiles(full, covered), e2e);
+  assert.deepEqual(GROUPS['full:remaining'], e2e);
+  assert.equal(GROUPS['full:remaining'].some((file) => covered.includes(file)), false);
   for (const historicalFile of historical) {
     assert.equal(full.includes(historicalFile), false, historicalFile);
     assert.equal(GROUPS['full:with-historical'].includes(historicalFile), true, historicalFile);
@@ -333,7 +313,7 @@ test('deliverable review loop integration stays on the mock Codex runtime instea
 test('serialized route-heavy verification files stay on the mock Codex runtime instead of the live CLI', () => {
   const serializedFiles = partitionTestFilesForExecution({
     groupName: 'smoke',
-    files: GROUPS.smoke.files,
+    files: GROUPS.smoke,
   }).serialized_files;
   for (const file of serializedFiles.sort()) {
     const content = readSerializedTestFileWithImportedCases(file);

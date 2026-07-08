@@ -27,45 +27,6 @@ export const TEXT_EXTENSIONS = new Set([
   '.yaml',
   '.yml',
 ]);
-export const RETIRED_CONTRACTS = Object.freeze([
-  'contracts/runtime-program/hermes-runtime-substrate-activation-package.json',
-  'contracts/runtime-program/hermes-runtime-capability-extraction-map.json',
-  'contracts/runtime-program/hermes-runtime-substrate-canonical-closure.json',
-  'contracts/runtime-program/hermes-stable-family-closure-truth.json',
-  'contracts/runtime-program/hermes-managed-family-closure-truth.json',
-]);
-const ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS = Object.freeze([
-  /\bcompatibility_alias(?:es)?_allowed\b\s*[:=]\s*true/i,
-  /\bactive_caller_compatibility_alias_restored\b\s*[:=]\s*true/i,
-  /\bcompatibility_alias_restored\b\s*[:=]\s*true/i,
-  /\b(?:default|active|live|normal)[_-]?(?:compatibility|legacy)[_-]?alias(?:es)?\b/i,
-  /\b(?:compatibility|legacy)[_-]?alias(?:es)?[_-]?(?:default|active|live|normal)\b/i,
-]);
-export const ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS = Object.freeze([
-  ...ACTIVE_COMPATIBILITY_ALIAS_CLAIM_PATTERNS,
-  /\bruntimeWatch_can_return_to_domain_action_adapter_default_dispatch\b\s*[:=]\s*true/i,
-  /\bdomain_action_adapter_can_become_generic_dispatch_owner\b\s*[:=]\s*true/i,
-  /\bdomain_action_adapter_can_become_generated_wrapper_owner\b\s*[:=]\s*true/i,
-  /\bdefault_runtime_watch_dispatch_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_dispatch_owner_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_domain_action_adapter_owner_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_generated_wrapper_owner_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_session_runtime_owner_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_workbench_owner_allowed\b\s*[:=]\s*true/i,
-  /\bgeneric_runtime_owner_allowed\b\s*[:=]\s*true/i,
-]);
-
-const RETIRED_SURFACE_GUARD_EXEMPT_FILES = new Set([
-  'scripts/private-platform-source-scan.ts',
-  'tests/helpers/rca-retired-surface-guard.ts',
-  'tests/rca-retired-surface-active-guard.test.ts',
-  'tests/rca-opl-generic-primitive-consumption.test.ts',
-  'tests/rca-functional-audit-retirement.test.ts',
-  'tests/rca-legacy-name-allowance.test.ts',
-  'tests/rca-retired-payload-pointer-guard.test.ts',
-  'tests/python-native-helper-catalog.test.ts',
-]);
-
 export function listTextFiles(root) {
   return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
     const file = path.join(root, entry.name);
@@ -93,24 +54,6 @@ export function activeShellScripts() {
     .sort();
 }
 
-export function activePrivatePlatformResurrectionViolations(scanRoots = ACTIVE_ROOTS) {
-  const violations = [];
-  for (const file of scanRoots.flatMap((root) => {
-    if (!existsSync(path.resolve(root))) return [];
-    return path.extname(root) ? [root] : listTextFiles(root);
-  })) {
-    const normalized = normalizePath(file);
-    if (RETIRED_SURFACE_GUARD_EXEMPT_FILES.has(normalized)) continue;
-    const text = readFileSync(file, 'utf-8');
-    for (const pattern of ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS) {
-      if (pattern.test(text)) {
-        violations.push(`${normalized}: ${pattern}`);
-      }
-    }
-  }
-  return violations;
-}
-
 export function sourceRefPath(sourceRef) {
   return String(sourceRef).split('#')[0];
 }
@@ -136,27 +79,4 @@ export function assertRepoRefResolves(sourceRef, label) {
   if (!anchor) return;
   const text = readFileSync(fullPath, 'utf-8');
   assert.equal(text.includes(anchor), true, `${label}: ${sourceRef}`);
-}
-
-export function listJsonFiles(root) {
-  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
-    const file = path.join(root, entry.name);
-    if (entry.isDirectory()) {
-      return listJsonFiles(file);
-    }
-    return entry.isFile() && entry.name.endsWith('.json') ? [file] : [];
-  });
-}
-
-export function visitJsonPointers(value, pointer, visitor) {
-  visitor(value, pointer);
-  if (Array.isArray(value)) {
-    value.forEach((entry, index) => visitJsonPointers(entry, `${pointer}/${index}`, visitor));
-    return;
-  }
-  if (value && typeof value === 'object') {
-    for (const [key, entry] of Object.entries(value)) {
-      visitJsonPointers(entry, `${pointer}/${key}`, visitor);
-    }
-  }
 }

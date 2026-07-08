@@ -2,13 +2,34 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 
 import {
-  listJsonFiles,
   normalizePath,
-  visitJsonPointers,
 } from './helpers/rca-retired-surface-guard.ts';
+
+function listJsonFiles(root) {
+  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(root, entry.name);
+    if (entry.isDirectory()) {
+      return listJsonFiles(file);
+    }
+    return entry.isFile() && entry.name.endsWith('.json') ? [file] : [];
+  });
+}
+
+function visitJsonPointers(value, pointer, visitor) {
+  visitor(value, pointer);
+  if (Array.isArray(value)) {
+    value.forEach((entry, index) => visitJsonPointers(entry, `${pointer}/${index}`, visitor));
+    return;
+  }
+  if (value && typeof value === 'object') {
+    for (const [key, entry] of Object.entries(value)) {
+      visitJsonPointers(entry, `${pointer}/${key}`, visitor);
+    }
+  }
+}
 
 test('current role guard replaces retired legacy surface id pointer allowances', () => {
   const policy = JSON.parse(readFileSync(
