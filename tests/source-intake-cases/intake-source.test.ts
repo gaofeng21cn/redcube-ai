@@ -18,6 +18,39 @@ import {
   writeSourceAugmentationResult,
 } from '../product-domain-action-case-shared.ts';
 
+const resultFileAugmentEnv = {
+  REDCUBE_SOURCE_AUGMENT_CMD: undefined,
+  REDCUBE_SOURCE_AUGMENT_ADAPTER: 'result_file',
+  REDCUBE_SOURCE_AUGMENT_RESULT_FILE: undefined,
+};
+
+async function withEnv(overrides, run) {
+  const previous = new Map(Object.keys(overrides).map((name) => [name, process.env[name]]));
+
+  for (const [name, value] of Object.entries(overrides)) {
+    if (value === undefined) delete process.env[name];
+    else process.env[name] = value;
+  }
+
+  try {
+    return await run();
+  } finally {
+    for (const [name, value] of previous.entries()) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+}
+
+function runCli(args) {
+  return JSON.parse(
+    execFileSync('node', [path.resolve('apps/redcube-cli/dist/cli.js'), ...args], {
+      encoding: 'utf-8',
+      cwd: path.resolve('.'),
+    }),
+  );
+}
+
 test('intakeSource creates canonical source truth from brief and keywords', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
 
@@ -373,12 +406,7 @@ test('intakeSource blocks pdf extraction explicitly when mineru is unavailable',
   const pdfFile = path.join(workspaceRoot, 'mock.pdf');
   writeFileSync(pdfFile, '%PDF-1.4 mock', 'utf-8');
 
-  const previousToken = process.env.MINERU_TOKEN;
-  const previousCmd = process.env.MINERU_EXTRACTOR_CMD;
-  delete process.env.MINERU_TOKEN;
-  delete process.env.MINERU_EXTRACTOR_CMD;
-
-  try {
+  await withEnv({ MINERU_TOKEN: undefined, MINERU_EXTRACTOR_CMD: undefined }, async () => {
     const result = await intakeSource({
       workspaceRoot,
       topicId: 'topic-pdf',
@@ -399,38 +427,26 @@ test('intakeSource blocks pdf extraction explicitly when mineru is unavailable',
     assert.equal(index.sources[0].kind, 'pdf');
     assert.equal(index.sources[0].status, 'blocked');
     assert.match(index.sources[0].blocking_reason, /mineru/i);
-  } finally {
-    if (previousToken === undefined) delete process.env.MINERU_TOKEN;
-    else process.env.MINERU_TOKEN = previousToken;
-    if (previousCmd === undefined) delete process.env.MINERU_EXTRACTOR_CMD;
-    else process.env.MINERU_EXTRACTOR_CMD = previousCmd;
-  }
+  });
 });
 
 test('CLI source intake proxies domain action', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
 
-  const output = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/dist/cli.js'),
-      'source',
-      'intake',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-cli',
-      '--title',
-      'CLI intake',
-      '--brief',
-      '从 CLI 进入 shared source intake',
-      '--keywords',
-      '甲状腺,门诊',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const parsed = JSON.parse(output);
+  const parsed = runCli([
+    'source',
+    'intake',
+    '--workspace-root',
+    workspaceRoot,
+    '--topic-id',
+    'topic-cli',
+    '--title',
+    'CLI intake',
+    '--brief',
+    '从 CLI 进入 shared source intake',
+    '--keywords',
+    '甲状腺,门诊',
+  ]);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'source_intake');
   assert.equal(parsed.recommended_action, 'prepare_source_augmentation');
@@ -440,14 +456,8 @@ test('CLI source intake proxies domain action', () => {
 
 test('researchSource stops at canonical result scaffold when result_file route needs agent-authored payload', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-'));
-  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
-  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
 
-  try {
+  await withEnv(resultFileAugmentEnv, async () => {
     const result = await researchSource({
       workspaceRoot,
       topicId: 'topic-research-awaiting-payload',
@@ -471,26 +481,13 @@ test('researchSource stops at canonical result scaffold when result_file route n
     assert.equal(report.planning_ready, false);
     assert.equal(report.readiness_target, 'planning_ready');
     assert.equal(report.recommended_action, 'write_source_augmentation_result');
-  } finally {
-    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
-    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
-    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
-  }
+  });
 });
 
 test('researchSource can complete Source Readiness end-to-end on result_file route when payload is supplied', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-complete-'));
-  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
-  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
 
-  try {
+  await withEnv(resultFileAugmentEnv, async () => {
     const result = await researchSource({
       workspaceRoot,
       topicId: 'topic-research-complete',
@@ -520,54 +517,35 @@ test('researchSource can complete Source Readiness end-to-end on result_file rou
     assert.equal(pack.readiness.sufficiency_status, 'planning_ready');
     assert.equal(pack.readiness.deep_research_state, 'completed');
     assert.equal(pack.readiness.planning_ready, true);
-  } finally {
-    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
-    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
-    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
-  }
+  });
 });
 
 test('CLI source augment prepares canonical augmentation contract from source readiness', () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
 
-  execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/dist/cli.js'),
-      'source',
-      'intake',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-cli-augment',
-      '--title',
-      'CLI augment',
-      '--brief',
-      '仅有主题和关键词，需要准备后续 Deep Research 补料合同。',
-      '--keywords',
-      '甲状腺,门诊',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+  runCli([
+    'source',
+    'intake',
+    '--workspace-root',
+    workspaceRoot,
+    '--topic-id',
+    'topic-cli-augment',
+    '--title',
+    'CLI augment',
+    '--brief',
+    '仅有主题和关键词，需要准备后续 Deep Research 补料合同。',
+    '--keywords',
+    '甲状腺,门诊',
+  ]);
 
-  const output = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/dist/cli.js'),
-      'source',
-      'augment',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-cli-augment',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const parsed = JSON.parse(output);
+  const parsed = runCli([
+    'source',
+    'augment',
+    '--workspace-root',
+    workspaceRoot,
+    '--topic-id',
+    'topic-cli-augment',
+  ]);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'source_augmentation');
   assert.equal(parsed.summary.topic_id, 'topic-cli-augment');
@@ -578,56 +556,36 @@ test('CLI source augment prepares canonical augmentation contract from source re
   assert.equal(existsSync(parsed.artifactFiles.sourceAugmentationRequestFile), true);
 });
 
-test('CLI source research can finish Source Readiness end-to-end on result_file route', () => {
+test('CLI source research can finish Source Readiness end-to-end on result_file route', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-research-cli-'));
   const payloadFile = path.join(workspaceRoot, 'research-result-payload.json');
-  const previousCmd = process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  const previousAdapter = process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-  const previousResultFile = process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-  delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-  process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = 'result_file';
-  delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
 
   writeFileSync(payloadFile, JSON.stringify(buildAugmentationResultPayload(), null, 2), 'utf-8');
 
-  try {
-    const output = execFileSync(
-      'node',
-      [
-        path.resolve('apps/redcube-cli/dist/cli.js'),
-        'source',
-        'research',
-        '--workspace-root',
-        workspaceRoot,
-        '--topic-id',
-        'topic-cli-research',
-        '--title',
-        'CLI research',
-        '--brief',
-        '只有主题和关键词，需要一条命令把 Step 1 跑到 planning_ready。',
-        '--keywords',
-        '甲状腺,门诊',
-        '--payload-file',
-        payloadFile,
-      ],
-      { encoding: 'utf-8', cwd: path.resolve('.') },
-    );
-
-    const parsed = JSON.parse(output);
+  await withEnv(resultFileAugmentEnv, async () => {
+    const parsed = runCli([
+      'source',
+      'research',
+      '--workspace-root',
+      workspaceRoot,
+      '--topic-id',
+      'topic-cli-research',
+      '--title',
+      'CLI research',
+      '--brief',
+      '只有主题和关键词，需要一条命令把 Step 1 跑到 planning_ready。',
+      '--keywords',
+      '甲状腺,门诊',
+      '--payload-file',
+      payloadFile,
+    ]);
     assert.equal(parsed.ok, true);
     assert.equal(parsed.surface_kind, 'source_research');
     assert.equal(parsed.stage, 'source_augmentation_execution');
     assert.equal(parsed.planningReady, true);
     assert.equal(parsed.recommended_action, 'create_deliverable');
     assert.equal(existsSync(parsed.artifactFiles.sourceResearchReportFile), true);
-  } finally {
-    if (previousCmd === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_CMD;
-    else process.env.REDCUBE_SOURCE_AUGMENT_CMD = previousCmd;
-    if (previousAdapter === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER;
-    else process.env.REDCUBE_SOURCE_AUGMENT_ADAPTER = previousAdapter;
-    if (previousResultFile === undefined) delete process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE;
-    else process.env.REDCUBE_SOURCE_AUGMENT_RESULT_FILE = previousResultFile;
-  }
+  });
 });
 
 test('prepareSourceAugmentationResult exposes canonical result scaffold for agent-native research route', async () => {
@@ -693,45 +651,33 @@ test('CLI source write-augmentation-result stages canonical result artifact from
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-intake-'));
   const payloadFile = path.join(workspaceRoot, 'augmentation-result-payload.json');
 
-  execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/dist/cli.js'),
-      'source',
-      'intake',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-cli-write',
-      '--title',
-      'CLI write augment result',
-      '--brief',
-      '只有主题和关键词，需要先补齐事实材料。',
-      '--keywords',
-      '甲状腺,门诊',
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
+  runCli([
+    'source',
+    'intake',
+    '--workspace-root',
+    workspaceRoot,
+    '--topic-id',
+    'topic-cli-write',
+    '--title',
+    'CLI write augment result',
+    '--brief',
+    '只有主题和关键词，需要先补齐事实材料。',
+    '--keywords',
+    '甲状腺,门诊',
+  ]);
 
   writeFileSync(payloadFile, JSON.stringify(buildAugmentationResultPayload(), null, 2), 'utf-8');
 
-  const output = execFileSync(
-    'node',
-    [
-      path.resolve('apps/redcube-cli/dist/cli.js'),
-      'source',
-      'write-augmentation-result',
-      '--workspace-root',
-      workspaceRoot,
-      '--topic-id',
-      'topic-cli-write',
-      '--payload-file',
-      payloadFile,
-    ],
-    { encoding: 'utf-8', cwd: path.resolve('.') },
-  );
-
-  const parsed = JSON.parse(output);
+  const parsed = runCli([
+    'source',
+    'write-augmentation-result',
+    '--workspace-root',
+    workspaceRoot,
+    '--topic-id',
+    'topic-cli-write',
+    '--payload-file',
+    payloadFile,
+  ]);
   assert.equal(parsed.ok, true);
   assert.equal(parsed.surface_kind, 'source_augmentation_result_write');
   assert.equal(parsed.recommended_action, 'execute_source_augmentation');
