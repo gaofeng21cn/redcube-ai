@@ -52,7 +52,7 @@ interface DomainEntryRequest extends Record<string, unknown> {
   };
 }
 
-export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
+interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
   entry_contract_id: string;
   target_domain_id: string;
   task_intent: string;
@@ -68,7 +68,7 @@ export interface DomainEntryResponse extends SurfaceBase<'domain_entry'> {
   };
 }
 
-export interface ProductEntryRequest extends Record<string, unknown> {
+interface ProductEntryRequest extends Record<string, unknown> {
   workspace_locator: {
     workspace_root: string;
   };
@@ -341,7 +341,7 @@ export interface OplFamilyLifecycleAdapterSurface {
   non_goals: string[];
 }
 
-export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
+interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
   entry_session: {
     entry_session_id: string;

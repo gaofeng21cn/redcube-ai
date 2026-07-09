@@ -98,14 +98,10 @@ export {
 } from './actions/get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
 
 export type {
-  DeliverableCreateResponse,
   DeliverableRecordResponse,
-  DomainEntryResponse,
   FamilyOrchestrationCompanion,
   FamilyOrchestrationResumeContract,
   DeliverableRequest,
-  ProductEntryRequest,
-  ProductEntryResponse,
   ProductEntryManifestResponse,
   ProductEntryStartCompanion,
   ProductStatusResponse,
@@ -117,7 +113,6 @@ export type {
   RunDeliverableRouteRequest,
   RunRecordResponse,
   SourceIntakeResponse,
-  SourceResearchResponse,
   SourceAugmentationResponse,
   SourceAugmentationResultPreparationResponse,
   SourceAugmentationResultWriteResponse,

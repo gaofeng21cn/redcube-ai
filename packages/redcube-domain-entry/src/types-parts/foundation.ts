@@ -93,7 +93,7 @@ interface CreateDeliverableRequest extends DeliverableRequest, OverlayRequest {
   goal: string;
 }
 
-export interface DeliverableCreateResponse extends SurfaceBase<'deliverable_create'> {
+interface DeliverableCreateResponse extends SurfaceBase<'deliverable_create'> {
   deliverableFile: string;
   deliverable: Record<string, unknown>;
   surfaceFiles: string[];
@@ -448,7 +448,7 @@ export interface SourceIntakeResponse extends SurfaceBase<'source_intake'> {
   };
 }
 
-export interface SourceResearchResponse extends SurfaceBase<'source_research'> {
+interface SourceResearchResponse extends SurfaceBase<'source_research'> {
   artifactFiles: Record<string, string>;
   stage: string;
   planningReady: boolean;
@@ -507,7 +507,7 @@ export interface SourceAugmentationExecutionResponse extends SurfaceBase<'source
   };
 }
 
-export interface SourceFirstFanoutDeliverableRequest extends OverlayRequest {
+interface SourceFirstFanoutDeliverableRequest extends OverlayRequest {
   deliverableId: string;
   profileId: string;
   title: string;

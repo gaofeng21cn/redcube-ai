@@ -65,7 +65,7 @@ const PACKAGE_SURFACES = Object.freeze([
       /\bRuntimeWatchResponse\b/,
     ],
     typeFiles: ['src/types.ts', 'src/types-parts/foundation.ts', 'src/types-parts/product-entry.ts'],
-    typeMatches: [/export interface WorkspaceDoctorResponse/, /export interface DeliverableCreateResponse/, /export interface RouteRunResponse/],
+    typeMatches: [/export interface WorkspaceDoctorResponse/, /export interface RouteRunResponse/],
   },
   {
     directory: 'packages/redcube-governance',
