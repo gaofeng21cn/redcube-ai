@@ -1,7 +1,6 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
@@ -35,74 +34,36 @@ function assertSourceGuardSummary(payload, scope) {
   assert.equal(payload.authority_boundary.readback_can_claim_production_ready, false);
 }
 
-test('RCA private platform readback is a compact source guard summary', () => {
-  const payload = buildPrivatePlatformSourceGuardReadback('private-platform');
+for (const scope of ['private-platform', 'default-caller-tail']) {
+  test(`RCA ${scope} readback is a compact source guard summary`, () => {
+    const payload = buildPrivatePlatformSourceGuardReadback(scope);
 
-  assertSourceGuardSummary(payload, 'private-platform');
-  assert.equal(
-    payload.source_refs.active_source_scan_policy,
-    'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
-  );
-});
-
-test('RCA default-caller tail readback reuses the same compact summary surface', () => {
-  const payload = buildPrivatePlatformSourceGuardReadback('default-caller-tail');
-
-  assertSourceGuardSummary(payload, 'default-caller-tail');
-});
-
-test('RCA private platform script emits compact parseable JSON', () => {
-  const directReadbackPath = `/tmp/redcube-ai-private-platform-direct-readback-${process.pid}.json`;
-  const readbackResult = spawnSync(
-    'sh',
-    ['-c', `npm run --silent private-platform:readback > "${directReadbackPath}"`],
-    {
-      cwd: process.cwd(),
-      encoding: 'utf8',
-    },
-  );
-
-  assert.equal(readbackResult.status, 0, readbackResult.stderr || readbackResult.stdout);
-  const directReadbackText = readFileSync(directReadbackPath, 'utf-8');
-  assert.ok(directReadbackText.length < 20000);
-  assertSourceGuardSummary(JSON.parse(directReadbackText), 'private-platform');
-
-  const result = spawnSync('npm', ['run', '--silent', 'test:private-platform:strict'], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
+    assertSourceGuardSummary(payload, scope);
+    assert.equal(
+      payload.source_refs.active_source_scan_policy,
+      'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
+    );
   });
 
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  assertSourceGuardSummary(
-    JSON.parse(readFileSync('/tmp/redcube-ai-private-platform-retirement.json', 'utf-8')),
-    'private-platform',
-  );
-});
+  test(`RCA ${scope} script emits compact parseable JSON`, () => {
+    const result = spawnSync(
+      process.execPath,
+      [
+        '--experimental-strip-types',
+        'scripts/check-private-platform-retirement.ts',
+        '--format',
+        'json',
+        '--scope',
+        scope,
+      ],
+      {
+        cwd: process.cwd(),
+        encoding: 'utf8',
+      },
+    );
 
-test('RCA default-caller tail script emits compact parseable JSON', () => {
-  const directReadbackPath = `/tmp/redcube-ai-default-caller-tail-direct-readback-${process.pid}.json`;
-  const readbackResult = spawnSync(
-    'sh',
-    ['-c', `npm run --silent default-caller-tail:readback > "${directReadbackPath}"`],
-    {
-      cwd: process.cwd(),
-      encoding: 'utf8',
-    },
-  );
-
-  assert.equal(readbackResult.status, 0, readbackResult.stderr || readbackResult.stdout);
-  const directReadbackText = readFileSync(directReadbackPath, 'utf-8');
-  assert.ok(directReadbackText.length < 20000);
-  assertSourceGuardSummary(JSON.parse(directReadbackText), 'default-caller-tail');
-
-  const result = spawnSync('npm', ['run', '--silent', 'test:default-caller-tail:strict'], {
-    cwd: process.cwd(),
-    encoding: 'utf8',
+    assert.equal(result.status, 0, result.stderr || result.stdout);
+    assert.ok(result.stdout.length < 20000);
+    assertSourceGuardSummary(JSON.parse(result.stdout), scope);
   });
-
-  assert.equal(result.status, 0, result.stderr || result.stdout);
-  assertSourceGuardSummary(
-    JSON.parse(readFileSync('/tmp/redcube-ai-default-caller-tail-readback.json', 'utf-8')),
-    'default-caller-tail',
-  );
-});
+}

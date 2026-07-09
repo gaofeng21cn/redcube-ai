@@ -66,6 +66,8 @@ Product-entry manifest、session snapshot、runtimeWatch、operator evidence/sta
 
 仍有 active caller 的 repo-local product/session/domain_action_adapter/runtimeWatch/operator projection/executor route-run record adapter 只能按 private inventory 和 source morphology policy 读取为 retained tail、refs-only adapter、domain handler target、native helper implementation 或 migration input；物理删除还需要 replacement owner、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write proof 和 tombstone/provenance pointer。
 
+对应 guard 的机器正文归 `contracts/physical_source_morphology_policy.json` 与 `contracts/functional_privatization_audit.json`。TS builder / readback 只能读合同、做 schema/scan/false-claim 检查和 compact summary；不得重新复制逐字段文案、typed-blocker 字符串或 retired/default-caller 实现细节作为第二真相源。
+
 ### External work order closeout 只返回 no-regression 或 typed blocker refs
 
 `emit_external_work_order_owner_closeout` 这类 RCA-owned guarded action 只接受 OPL execution receipt、absorbed head、target verification refs、patch absorption / cleanup refs、Agent Lab re-evaluation ref 与 no-forbidden-write refs。输出只允许 RCA-owned `no_regression_evidence` 或 `typed_blocker`。

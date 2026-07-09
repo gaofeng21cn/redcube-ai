@@ -269,7 +269,6 @@ test('RCA physical morphology policy keeps active source tails classified and fo
   const allSourceRefs = [...new Set([
     ...policy.active_surface_classifications.flatMap((entry) => entry.source_refs ?? []),
     policy.policy_source_structure.builder_ref,
-    ...policy.policy_source_structure.extracted_gate_refs,
   ])].sort();
   const allMachineBoundaryRefs = [...new Set(policy.active_surface_classifications.flatMap(
     (entry) => entry.machine_boundary_refs ?? [],
@@ -281,7 +280,6 @@ test('RCA physical morphology policy keeps active source tails classified and fo
       'active_surface_classifications[*].source_refs',
       'active_surface_classifications[*].machine_boundary_refs',
       'policy_source_structure.builder_ref',
-      'policy_source_structure.extracted_gate_refs',
       'legacy_name_policy.current_role_guard_policy',
       'legacy_name_policy.forbidden_payload_role_policy',
     ],

@@ -6,7 +6,6 @@ import { parseArgs as parseNodeArgs } from 'node:util';
 
 import {
   buildPhysicalSourceMorphologyPolicy,
-  buildPrivatizedFunctionalModuleAuditProjection,
   listDomainActionAdapterBlockedActions,
   listDomainActionAdapterForbiddenWrites,
 } from '../packages/redcube-domain-entry/dist/index.js';
@@ -150,17 +149,12 @@ function buildActiveSourceScanSummary(physicalPolicy) {
 
 function collectSummaryFailures({
   audit,
-  contractAudit,
   physicalPolicy,
   activeSourceScan,
   blockedActions,
   forbiddenWrites,
 }) {
   const failures = [];
-  if (JSON.stringify(contractAudit) !== JSON.stringify(audit)) {
-    failures.push({ check_id: 'functional_privatization_audit_source_sync', state: 'failed' });
-  }
-
   const closure = audit.functional_structure_gap_closure || {};
   if (closure.functional_structure_gap_count !== 0 || closure.remaining_gap_class !== 'none') {
     failures.push({
@@ -281,8 +275,7 @@ function collectSummaryFailures({
 }
 
 export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platform') {
-  const audit = buildPrivatizedFunctionalModuleAuditProjection();
-  const contractAudit = readJson('contracts/functional_privatization_audit.json');
+  const audit = readJson('contracts/functional_privatization_audit.json');
   const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
   const activeSourceScan = buildActiveSourceScanSummary(physicalPolicy);
   const blockedActions = listDomainActionAdapterBlockedActions();
@@ -291,7 +284,6 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
   const compactSummary = tailReadback.compact_retirement_summary || {};
   const failures = collectSummaryFailures({
     audit,
-    contractAudit,
     physicalPolicy,
     activeSourceScan,
     blockedActions,

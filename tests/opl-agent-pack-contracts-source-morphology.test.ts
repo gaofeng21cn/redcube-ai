@@ -133,14 +133,14 @@ test('RCA physical source morphology policy classifies active source tails witho
     policy.policy_source_structure.builder_ref,
     'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy.ts#buildPhysicalSourceMorphologyPolicy',
   );
-  assert.deepEqual(policy.policy_source_structure.extracted_gate_refs, [
-    'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy-tail-gate.ts#SOURCE_THINNING_TAIL_GATE',
-  ]);
+  assert.equal(policy.policy_source_structure.state, 'json_contract_is_ssot_builder_reads_contract');
+  assert.deepEqual(policy.policy_source_structure.extracted_gate_refs, []);
+  assert.equal(
+    policy.policy_source_structure.retained_builder_role,
+    'read_physical_source_morphology_policy_json_without_field_reconstruction',
+  );
   assertAllBooleans(policy.policy_source_structure.authority_boundary, false, 'policy_source_structure.authority_boundary');
   assertRepoRefResolves(policy.policy_source_structure.builder_ref, 'policy_source_structure.builder_ref');
-  for (const sourceRef of policy.policy_source_structure.extracted_gate_refs) {
-    assertRepoRefResolves(sourceRef, 'policy_source_structure.extracted_gate_refs');
-  }
 
   assert.deepEqual(
     policy.active_surface_classifications.map((entry) => entry.surface_id),
@@ -295,7 +295,6 @@ test('RCA physical source morphology source refs resolve under source_ref_integr
   const allSourceRefs = [...new Set([
     ...policy.active_surface_classifications.flatMap((entry) => entry.source_refs ?? []),
     policy.policy_source_structure.builder_ref,
-    ...policy.policy_source_structure.extracted_gate_refs,
   ])].sort();
   const allMachineBoundaryRefs = [...new Set(policy.active_surface_classifications.flatMap(
     (entry) => entry.machine_boundary_refs ?? [],
