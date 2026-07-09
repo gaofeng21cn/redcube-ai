@@ -42,6 +42,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/opl-agent-pack-contracts-generated-surface.test.ts',
     'tests/opl-agent-pack-contracts-semantic-pack.test.ts',
     'tests/opl-agent-pack-contracts-source-morphology.test.ts',
+    'tests/opl-agent-package-manifest.test.ts',
     'tests/opl-cognitive-kernel-adoption.test.ts',
     'tests/opl-family-contract-adoption.test.ts',
     'tests/opl-family-contract-runtime-manager.test.ts',
