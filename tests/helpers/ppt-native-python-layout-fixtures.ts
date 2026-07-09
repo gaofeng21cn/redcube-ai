@@ -118,59 +118,26 @@ print(json.dumps(result, ensure_ascii=False))
 }
 
 export function runNativeMaterializer(payload, workspacePrefix = 'redcube-native-materializer-') {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), workspacePrefix));
-  const inputFile = path.join(workspaceRoot, 'input.json');
+  const { workspaceRoot, inputFile } = writeNativeInput(payload, workspacePrefix);
   const outputPptx = path.join(workspaceRoot, 'native.pptx');
   const svgDir = path.join(workspaceRoot, 'svg-ir');
-  writeJson(inputFile, payload);
-  const python = resolveTestPythonCommand();
-  const stdout = execFileSync(
-    python.command,
-    [...(python.args || []), '-c', nativeMaterializerScript(inputFile, outputPptx, svgDir)],
-    {
-      cwd: path.resolve('.'),
-      env: pythonTestEnv(),
-      encoding: 'utf-8',
-    },
-  );
+  const stdout = execNativePython(nativeMaterializerScript(inputFile, outputPptx, svgDir));
   return { workspaceRoot, outputPptx, ...JSON.parse(stdout) };
 }
 
 export function runNativePlanValidation(payload, workspacePrefix = 'redcube-native-plan-validation-') {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), workspacePrefix));
-  const inputFile = path.join(workspaceRoot, 'input.json');
-  writeJson(inputFile, payload);
-  const python = resolveTestPythonCommand();
-  const stdout = execFileSync(
-    python.command,
-    [...(python.args || []), '-c', nativePlanValidationScript(inputFile)],
-    {
-      cwd: path.resolve('.'),
-      env: pythonTestEnv(),
-      encoding: 'utf-8',
-    },
-  );
-  return JSON.parse(stdout);
+  const { inputFile } = writeNativeInput(payload, workspacePrefix);
+  return JSON.parse(execNativePython(nativePlanValidationScript(inputFile)));
 }
 
 export function runNativeMaterializerFailure(payload, workspacePrefix = 'redcube-native-materializer-fail-') {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), workspacePrefix));
-  const inputFile = path.join(workspaceRoot, 'input.json');
+  const { workspaceRoot, inputFile } = writeNativeInput(payload, workspacePrefix);
   const outputPptx = path.join(workspaceRoot, 'native.pptx');
   const svgDir = path.join(workspaceRoot, 'svg-ir');
-  writeJson(inputFile, payload);
-  const python = resolveTestPythonCommand();
   try {
-    execFileSync(
-      python.command,
-      [...(python.args || []), '-c', nativeMaterializerScript(inputFile, outputPptx, svgDir)],
-      {
-        cwd: path.resolve('.'),
-        env: pythonTestEnv(),
-        encoding: 'utf-8',
-        stdio: ['ignore', 'pipe', 'pipe'],
-      },
-    );
+    execNativePython(nativeMaterializerScript(inputFile, outputPptx, svgDir), {
+      stdio: ['ignore', 'pipe', 'pipe'],
+    });
   } catch (error) {
     return {
       workspaceRoot,
@@ -180,6 +147,23 @@ export function runNativeMaterializerFailure(payload, workspacePrefix = 'redcube
     };
   }
   throw new Error('native materializer unexpectedly accepted invalid AI shape plan');
+}
+
+function writeNativeInput(payload, workspacePrefix) {
+  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), workspacePrefix));
+  const inputFile = path.join(workspaceRoot, 'input.json');
+  writeJson(inputFile, payload);
+  return { workspaceRoot, inputFile };
+}
+
+function execNativePython(script, options = {}) {
+  const python = resolveTestPythonCommand();
+  return execFileSync(python.command, [...(python.args || []), '-c', script], {
+    cwd: path.resolve('.'),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+    ...options,
+  });
 }
 
 export function stableHash(data) {
@@ -259,6 +243,25 @@ function panelRole(layoutFamily) {
   }[layoutFamily] || 'compare_panel';
 }
 
+function inBox(left_in, top_in, width_in, height_in) { return { left_in, top_in, width_in, height_in }; }
+
+function shape(shape_id, kind, role, bounds, extra = {}) { return { shape_id, kind, role, bounds, ...extra }; }
+
+function slideShape(slideId, suffix, kind, role, bounds, extra = {}) { return shape(`${slideId}-${suffix}`, kind, role, bounds, extra); }
+
+function slideText(slideId, suffix, role, editable_text, bounds, extra = {}) {
+  return slideShape(slideId, suffix, 'text_box', role, bounds, {
+    editable_text,
+    fill: 'none',
+    line: 'none',
+    ...extra,
+  });
+}
+
+function decorative(slideId, suffix, kind, role, bounds, extra = {}) {
+  return slideShape(slideId, suffix, kind, role, bounds, { quality_role: 'decorative', ...extra });
+}
+
 function slotGeometry(slotCount, index) {
   const gap = slotCount === 2 ? 0.72 : 0.48;
   const width = slotCount === 2 ? 6.15 : slotCount === 3 ? 3.95 : 2.9;
@@ -324,88 +327,32 @@ function layoutVisualIntent(layoutFamily) {
   };
 }
 
+const STRUCTURAL_VISUAL_SPECS = {
+  cover_signal: [
+    ['ai-signal-hub', 'oval', 'signal_hub', inBox(14.26, 2.7, 0.72, 0.72), { fill: '#B94624', line: 'none' }],
+    ['ai-signal-connector', 'line', 'signal_connector', inBox(14.6, 3.44, 0.06, 2.05), { line: '#B94624' }],
+  ],
+  timeline_band: [
+    ['ai-timeline-rail', 'line', 'timeline_rail', inBox(1.1, 2.98, 13.3, 0.06), { line: '#B94624' }],
+  ],
+  judgement_ladder: [
+    ['ai-gate-ladder-spine', 'line', 'gate_ladder_spine', inBox(7.58, 2.7, 0.08, 4.92), { line: '#B94624' }],
+  ],
+  ring_cross: [
+    ['ai-center-hub', 'oval', 'center_hub', inBox(7.28, 4.1, 1.0, 1.0), { fill: '#B94624', line: 'none' }],
+    ['ai-axis-cross-horizontal', 'line', 'axis_connector', inBox(7.31, 4.58, 0.32, 0.05), { line: '#B94624' }],
+  ],
+  summary_peak: [
+    ['ai-takeaway-band', 'rect', 'takeaway_band', inBox(0.92, 4.52, 13.6, 0.18), { fill: '#B94624', line: 'none' }],
+  ],
+  multi_zone_compare: [
+    ['ai-bridge-rail', 'line', 'bridge_connector_rail', inBox(1.1, 6.18, 13.15, 0.06), { line: '#B94624' }],
+  ],
+};
+
 function structuralShapes(layoutFamily, slideId) {
-  if (layoutFamily === 'cover_signal') {
-    return [
-      {
-        shape_id: `${slideId}-ai-signal-hub`,
-        kind: 'oval',
-        role: 'signal_hub',
-        quality_role: 'decorative',
-        bounds: { left_in: 14.26, top_in: 2.7, width_in: 0.72, height_in: 0.72 },
-        fill: '#B94624',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-ai-signal-connector`,
-        kind: 'line',
-        role: 'signal_connector',
-        quality_role: 'decorative',
-        bounds: { left_in: 14.6, top_in: 3.44, width_in: 0.06, height_in: 2.05 },
-        line: '#B94624',
-      },
-    ];
-  }
-  if (layoutFamily === 'timeline_band') {
-    return [{
-      shape_id: `${slideId}-ai-timeline-rail`,
-      kind: 'line',
-      role: 'timeline_rail',
-      quality_role: 'decorative',
-      bounds: { left_in: 1.1, top_in: 2.98, width_in: 13.3, height_in: 0.06 },
-      line: '#B94624',
-    }];
-  }
-  if (layoutFamily === 'judgement_ladder') {
-    return [{
-      shape_id: `${slideId}-ai-gate-ladder-spine`,
-      kind: 'line',
-      role: 'gate_ladder_spine',
-      quality_role: 'decorative',
-      bounds: { left_in: 7.58, top_in: 2.7, width_in: 0.08, height_in: 4.92 },
-      line: '#B94624',
-    }];
-  }
-  if (layoutFamily === 'ring_cross') {
-    return [
-      {
-        shape_id: `${slideId}-ai-center-hub`,
-        kind: 'oval',
-        role: 'center_hub',
-        quality_role: 'decorative',
-        bounds: { left_in: 7.28, top_in: 4.1, width_in: 1.0, height_in: 1.0 },
-        fill: '#B94624',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-ai-axis-cross-horizontal`,
-        kind: 'line',
-        role: 'axis_connector',
-        quality_role: 'decorative',
-        bounds: { left_in: 7.31, top_in: 4.58, width_in: 0.32, height_in: 0.05 },
-        line: '#B94624',
-      },
-    ];
-  }
-  if (layoutFamily === 'summary_peak') {
-    return [{
-      shape_id: `${slideId}-ai-takeaway-band`,
-      kind: 'rect',
-      role: 'takeaway_band',
-      quality_role: 'decorative',
-      bounds: { left_in: 0.92, top_in: 4.52, width_in: 13.6, height_in: 0.18 },
-      fill: '#B94624',
-      line: 'none',
-    }];
-  }
-  return [{
-    shape_id: `${slideId}-ai-bridge-rail`,
-    kind: 'line',
-    role: 'bridge_connector_rail',
-    quality_role: 'decorative',
-    bounds: { left_in: 1.1, top_in: 6.18, width_in: 13.15, height_in: 0.06 },
-    line: '#B94624',
-  }];
+  return (STRUCTURAL_VISUAL_SPECS[layoutFamily] || STRUCTURAL_VISUAL_SPECS.multi_zone_compare)
+    .map(([suffix, kind, role, bounds, extra]) => decorative(slideId, suffix, kind, role, bounds, extra));
 }
 
 function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
@@ -475,125 +422,86 @@ export function createAiSlide({
 } = {}) {
   const primaryPoints = slidePoints({ page_core_content: points || [] }, slotCount);
   const desiredSlots = slotCount || Math.max(2, Math.min(primaryPoints.length, 4));
-  const actualPanelCount = desiredSlots;
   const shapes = [
-    {
-      shape_id: `${slideId}-top-band`,
-      kind: 'rect',
-      role: 'background_accent',
-      quality_role: 'decorative',
-      bounds: { left_in: 0, top_in: 0, width_in: 16, height_in: 0.22 },
+    decorative(slideId, 'top-band', 'rect', 'background_accent', inBox(0, 0, 16, 0.22), {
       fill: '#B94624',
       line: 'none',
-    },
-    {
-      shape_id: `${slideId}-title`,
-      kind: 'text_box',
-      role: 'title',
-      editable_text: title,
-      bounds: { left_in: 0.9, top_in: 0.54, width_in: 12.7, height_in: layoutFamily === 'cover_signal' ? 1.12 : 1.02 },
+    }),
+    slideText(slideId, 'title', 'title', title, inBox(0.9, 0.54, 12.7, layoutFamily === 'cover_signal' ? 1.12 : 1.02), {
       font_size: layoutFamily === 'cover_signal' ? 56 : 44,
       color: '#171C24',
-      fill: 'none',
-      line: 'none',
       bold: true,
-    },
-    {
-      shape_id: `${slideId}-core`,
-      kind: 'text_box',
-      role: 'core_sentence',
-      editable_text: core,
-      bounds: { left_in: 0.95, top_in: 1.78, width_in: 12.3, height_in: 0.98 },
+    }),
+    slideText(slideId, 'core', 'core_sentence', core, inBox(0.95, 1.78, 12.3, 0.98), {
       font_size: 20,
       color: '#5B6570',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: `${slideId}-side-anchor`,
-      kind: 'rect',
-      role: 'accent_anchor',
-      quality_role: 'decorative',
-      bounds: { left_in: 0.52, top_in: 0.72, width_in: 0.1, height_in: 2.3 },
+    }),
+    decorative(slideId, 'side-anchor', 'rect', 'accent_anchor', inBox(0.52, 0.72, 0.1, 2.3), {
       fill: '#B94624',
       line: 'none',
-    },
-    {
-      shape_id: `${slideId}-dot`,
-      kind: 'oval',
-      role: 'accent_dot',
-      quality_role: 'decorative',
-      bounds: { left_in: 14.25, top_in: 0.68, width_in: 0.32, height_in: 0.32 },
+    }),
+    decorative(slideId, 'dot', 'oval', 'accent_dot', inBox(14.25, 0.68, 0.32, 0.32), {
       fill: '#B94624',
       line: 'none',
-    },
-    {
-      shape_id: `${slideId}-page`,
-      kind: 'text_box',
-      role: 'page_number',
-      editable_text: slideId.replace(/^S/, '').padStart(2, '0'),
-      bounds: { left_in: 14.05, top_in: 7.95, width_in: 0.9, height_in: 0.44 },
-      font_size: 18,
-      color: '#5B6570',
-      fill: 'none',
-      line: 'none',
-      align: 'right',
-    },
+    }),
+    slideText(
+      slideId,
+      'page',
+      'page_number',
+      slideId.replace(/^S/, '').padStart(2, '0'),
+      inBox(14.05, 7.95, 0.9, 0.44),
+      { font_size: 18, color: '#5B6570', align: 'right' },
+    ),
   ];
   if (includeStructuralVisual) {
     shapes.push(...structuralShapes(layoutFamily, slideId));
   }
   shapes.push(...archetypeSupportShapes(layoutFamily, slideId));
-  for (let index = 0; index < actualPanelCount; index += 1) {
-    const basePanel = {
-      shape_id: `${slideId}-slot-${index + 1}-panel`,
-      kind: 'rounded_rect',
-      role: panelRole(layoutFamily),
+  for (let index = 0; index < desiredSlots; index += 1) {
+    const basePanel = slideShape(slideId, `slot-${index + 1}-panel`, 'rounded_rect', panelRole(layoutFamily), slotGeometry(desiredSlots, index), {
       quality_role: 'content',
-      bounds: slotGeometry(actualPanelCount, index),
       fill: '#EFE6D6',
       line: '#D8C8B2',
-    };
+    });
     shapes.push(panelMutator ? panelMutator(basePanel, index) : basePanel);
   }
   for (let index = 0; index < desiredSlots; index += 1) {
-    const overflowSummaryText = false;
-    const base = slotGeometry(Math.max(actualPanelCount, desiredSlots), Math.min(index, actualPanelCount - 1));
+    const base = slotGeometry(desiredSlots, index);
     const pointNumber = index + 1;
-    const ladderSlot = layoutFamily === 'judgement_ladder' && !overflowSummaryText;
-    shapes.push({
-      shape_id: `${slideId}-slot-${pointNumber}-index`,
-      kind: 'text_box',
-      role: 'point_index',
-      editable_text: String(pointNumber).padStart(2, '0'),
-      bounds: {
+    const ladderSlot = layoutFamily === 'judgement_ladder';
+    shapes.push(slideText(
+      slideId,
+      `slot-${pointNumber}-index`,
+      'point_index',
+      String(pointNumber).padStart(2, '0'),
+      {
         left_in: base.left_in + 0.24,
-        top_in: base.top_in + (overflowSummaryText ? 0.02 : ladderSlot ? 0.24 : 0.25),
+        top_in: base.top_in + (ladderSlot ? 0.24 : 0.25),
         width_in: 0.78,
         height_in: 0.52,
       },
+      {
       font_size: indexFontSize,
       color: '#B94624',
-      fill: 'none',
-      line: 'none',
       bold: true,
-    });
-    const baseText = {
-      shape_id: `${slideId}-slot-${pointNumber}-text`,
-      kind: 'text_box',
-      role: 'point_text',
-      editable_text: primaryPoints[index] || `Point ${pointNumber} carries complete audience evidence.`,
-      bounds: {
-        left_in: base.left_in + (overflowSummaryText ? 1.05 : ladderSlot ? 1.08 : 0.28),
-        top_in: base.top_in + (overflowSummaryText ? 0.02 : ladderSlot ? 0.22 : 0.82),
-        width_in: base.width_in - (overflowSummaryText ? 1.4 : ladderSlot ? 1.34 : 0.56),
-        height_in: overflowSummaryText ? 0.92 : ladderSlot ? Math.max(0.84, base.height_in - 0.44) : 1.44,
       },
+    ));
+    const baseText = slideText(
+      slideId,
+      `slot-${pointNumber}-text`,
+      'point_text',
+      primaryPoints[index] || `Point ${pointNumber} carries complete audience evidence.`,
+      {
+        left_in: base.left_in + (ladderSlot ? 1.08 : 0.28),
+        top_in: base.top_in + (ladderSlot ? 0.22 : 0.82),
+        width_in: base.width_in - (ladderSlot ? 1.34 : 0.56),
+        height_in: ladderSlot ? Math.max(0.84, base.height_in - 0.44) : 1.44,
+      },
+      {
       font_size: pointFontSize,
       color: '#171C24',
-      fill: 'none',
-      line: 'none',
-    };
+      },
+    );
     shapes.push(textMutator ? textMutator(baseText, index) : baseText);
   }
   shapes.push(...supplementalContractShapes(layoutFamily, slideId));
@@ -630,26 +538,10 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
         spec_id: 'native_pptx_test_spec_lock_v1',
         owner: 'llm_agent',
         motif: 'accent rail with structural connector system',
-        palette: {
-          canvas: '#F6F2EA',
-          ink: '#171C24',
-          muted: '#5B6570',
-          accent: '#B94624',
-          panel: '#EFE6D6',
-        },
-        typography: {
-          title_pt_min: 36,
-          body_pt_min: 18,
-          point_index_pt_min: 16,
-        },
-        grid: {
-          edge_margin_in_min: 0.6,
-          inter_block_gap_in_min: 0.32,
-        },
-        layout_rhythm: {
-          repeated_concrete_composition_limit: 2,
-          required_distinct_composition_share: 0.75,
-        },
+        palette: { canvas: '#F6F2EA', ink: '#171C24', muted: '#5B6570', accent: '#B94624', panel: '#EFE6D6' },
+        typography: { title_pt_min: 36, body_pt_min: 18, point_index_pt_min: 16 },
+        grid: { edge_margin_in_min: 0.6, inter_block_gap_in_min: 0.32 },
+        layout_rhythm: { repeated_concrete_composition_limit: 2, required_distinct_composition_share: 0.75 },
         professional_design_brief: {
           design_register: 'executive proof deck',
           reference_style_family: 'template-profiled multi-zone board',
@@ -658,26 +550,8 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
           capacity_strategy: 'fit text into selected zones at native PPT font floors before coordinates',
           forbidden_amateur_patterns: ['generic equal-card grid', 'decorative title underline', 'overfilled receipt ledger'],
         },
-        borrowed_principles: [
-          'ppt_master_style_spec_lock',
-          'template_layout_grammar',
-          'template_profile',
-          'semantic_layout_selection',
-          'reference_deck_analysis',
-          'per_page_visual_plan',
-          'explicit_grid',
-          'font_floor',
-          'layout_rhythm',
-          'rendered_quality_gate',
-        ],
-        layout_archetypes: [
-          'cover_signal',
-          'multi_zone_compare',
-          'timeline_band',
-          'judgement_ladder',
-          'ring_cross',
-          'summary_peak',
-        ],
+        borrowed_principles: ['ppt_master_style_spec_lock', 'template_layout_grammar', 'template_profile', 'semantic_layout_selection', 'reference_deck_analysis', 'per_page_visual_plan', 'explicit_grid', 'font_floor', 'layout_rhythm', 'rendered_quality_gate'],
+        layout_archetypes: ['cover_signal', 'multi_zone_compare', 'timeline_band', 'judgement_ladder', 'ring_cross', 'summary_peak'],
         qa_gates: ['bounds', 'font_floor', 'text_fit', 'structural_visual', 'slot_fill', 'layout_variety', 'true_render_screenshot'],
       },
       template_layout_grammar: templateLayoutGrammar(),
@@ -722,6 +596,10 @@ function repeatedCompositionSignatures(slides) {
     .filter((signature, index, all) => all.indexOf(signature) !== index);
 }
 
+function assertEvery(items, predicate, message = undefined) {
+  assert.equal(items.every(predicate), true, message);
+}
+
 function buildRenderProvenance({ result, rendererKind, fixtureId }) {
   const pages = result.slides.map((slide, index) => ({
     slide_id: slide.slide_id,
@@ -760,41 +638,45 @@ export function assertMaterializedQuality({ fixture, suite, result, previewMetri
   assert.equal(compositionSignatures.length, slides.length);
   assert.equal(new Set(compositionSignatures).size >= Math.ceil(slides.length * 0.75), true);
   assert.deepEqual(repeatedCompositionSignatures(slides), []);
-  assert.equal(slides.every((slide) => slide.layout_writer === 'officecli_pptx_materializer'), true);
-  assert.equal(slides.every((slide) => slide.ai_first_spatial_plan.helper_template_layout_used === false), true);
-  assert.equal(slides.every((slide) => slide.ai_first_spatial_plan.materializer === 'officecli_pptx_materializer'), true);
-  assert.equal(slides.every((slide) => slide.shape_count >= 12), true);
-  assert.equal(slides.every((slide) => slide.text_box_count >= 6), true);
-  assert.equal(slides.every((slide) => slide.redcube_svg_ir_preflight.status === 'pass'), true);
-  assert.equal(slides.every((slide) => /^[a-f0-9]{64}$/.test(slide.redcube_svg_ir_sha256)), true);
-  assert.equal(slides.every((slide) => slide.checks.slot_fill_ok), true, JSON.stringify(slides.map((slide) => ({
+  assertEvery(slides, (slide) => slide.layout_writer === 'officecli_pptx_materializer');
+  assertEvery(slides, (slide) => slide.ai_first_spatial_plan.helper_template_layout_used === false);
+  assertEvery(slides, (slide) => slide.ai_first_spatial_plan.materializer === 'officecli_pptx_materializer');
+  assertEvery(slides, (slide) => slide.shape_count >= 12);
+  assertEvery(slides, (slide) => slide.text_box_count >= 6);
+  assertEvery(slides, (slide) => slide.redcube_svg_ir_preflight.status === 'pass');
+  assertEvery(slides, (slide) => /^[a-f0-9]{64}$/.test(slide.redcube_svg_ir_sha256));
+  assertEvery(slides, (slide) => slide.checks.slot_fill_ok, JSON.stringify(slides.map((slide) => ({
     slide_id: slide.slide_id,
     layout_variant: slide.metrics.layout_variant,
     slot_fill_ok: slide.checks.slot_fill_ok,
     slot_fill_failures: slide.metrics.slot_fill_failures,
   })), null, 2));
-  assert.equal(slides.every((slide) => slide.checks.audience_label_readability_ok), true);
-  assert.equal(slides.every((slide) => slide.checks.content_depth_ok), true);
-  assert.equal(slides.every((slide) => slide.checks.grid_balance_ok), true);
-  assert.equal(slides.every((slide) => slide.checks.occlusion_free), true);
-  assert.equal(slides.every((slide) => slide.metrics.overlap_pairs === 0), true);
-  assert.equal(slides.every((slide) => slide.metrics.structural_text_collision_count === 0), true);
-  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio > fixture.suite_defaults.min_density), true);
-  assert.equal(slides.every((slide) => slide.metrics.occupied_ratio < fixture.suite_defaults.max_density), true);
-  assert.equal(slides.every((slide) => slide.checks.visual_structure_present), true);
-  assert.equal(slides.every((slide) => slide.checks.non_text_visual_specific_ok), true);
-  assert.equal(slides.every((slide) => slide.checks.mechanical_card_template_absent), true);
-  assert.equal(slides.every((slide) => slide.metrics.structural_visual_count >= 1), true);
+  for (const check of [
+    'audience_label_readability_ok',
+    'content_depth_ok',
+    'grid_balance_ok',
+    'occlusion_free',
+    'visual_structure_present',
+    'non_text_visual_specific_ok',
+    'mechanical_card_template_absent',
+  ]) {
+    assertEvery(slides, (slide) => slide.checks[check], check);
+  }
+  for (const metric of ['overlap_pairs', 'structural_text_collision_count']) {
+    assertEvery(slides, (slide) => slide.metrics[metric] === 0, metric);
+  }
+  assertEvery(slides, (slide) => slide.metrics.occupied_ratio > fixture.suite_defaults.min_density);
+  assertEvery(slides, (slide) => slide.metrics.occupied_ratio < fixture.suite_defaults.max_density);
+  assertEvery(slides, (slide) => slide.metrics.structural_visual_count >= 1);
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
   assert.equal(result.officecli_gate.save_before_close, true);
   assert.equal(result.officecli_gate.command_count >= slides.length * 12, true);
   assert.equal(result.officecli_gate.geometry_audit.ok, true);
-  assert.equal(result.officecli_gate.geometry_audit.slide_width_in, 16);
-  assert.equal(result.officecli_gate.geometry_audit.slide_height_in, 9);
-  assert.equal(result.officecli_gate.geometry_audit.overflow_count, 0);
-  assert.equal(result.pptx_geometry.slide_width_in, 16);
-  assert.equal(result.pptx_geometry.slide_height_in, 9);
-  assert.equal(result.pptx_geometry.overflow_count, 0);
+  for (const geometry of [result.officecli_gate.geometry_audit, result.pptx_geometry]) {
+    assert.equal(geometry.slide_width_in, 16);
+    assert.equal(geometry.slide_height_in, 9);
+    assert.equal(geometry.overflow_count, 0);
+  }
 
   const shapeNames = result.pptx_slides.flatMap((pptxSlide) => pptxSlide.map((shape) => shape.name));
   for (const legacyAnchor of suite.expected_anchor_shapes) {
@@ -813,8 +695,8 @@ export function assertMaterializedQuality({ fixture, suite, result, previewMetri
   }
   if (previewMetrics.length) {
     assert.equal(previewMetrics.length, suite.expected_page_count);
-    assert.equal(previewMetrics.every((item) => item.sha256 && item.sha256 !== sha256Hex(Buffer.alloc(0))), true);
-    assert.equal(previewMetrics.every((item) => item.dimensions.width > 0 && item.dimensions.height > 0), true);
+    assertEvery(previewMetrics, (item) => item.sha256 && item.sha256 !== sha256Hex(Buffer.alloc(0)));
+    assertEvery(previewMetrics, (item) => item.dimensions.width > 0 && item.dimensions.height > 0);
   }
   const renderProvenance = buildRenderProvenance({
     result,
@@ -822,8 +704,8 @@ export function assertMaterializedQuality({ fixture, suite, result, previewMetri
     fixtureId: `${fixture.fixture_id}:${suite.suite_id}`,
   });
   assert.equal(renderProvenance.page_count, suite.expected_page_count);
-  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.svg_ir_sha256)), true);
-  assert.equal(renderProvenance.pages.every((page) => /^[a-f0-9]{64}$/.test(page.materialized_shape_hash)), true);
+  assertEvery(renderProvenance.pages, (page) => /^[a-f0-9]{64}$/.test(page.svg_ir_sha256));
+  assertEvery(renderProvenance.pages, (page) => /^[a-f0-9]{64}$/.test(page.materialized_shape_hash));
   assert.match(renderProvenance.render_hash, /^[a-f0-9]{64}$/);
   return {
     suite_id: suite.suite_id,
