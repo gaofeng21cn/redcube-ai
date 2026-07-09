@@ -15,43 +15,6 @@ const PNG_1X1 = Buffer.from(
   'base64',
 );
 
-const NATIVE_ENGINE_CAPABILITIES = {
-  authoring_ir: 'redcube_svg_ir',
-  authoring_ir_version: 1,
-  pptx_writer: 'officecli_pptx_materializer',
-  editable_pptx: true,
-  strict_svg_preflight: true,
-  true_render_proof_required: true,
-  true_render_proof_renderer: 'libreoffice_headless',
-  cross_platform_render_required: true,
-  screenshot_packaging: false,
-};
-
-const OFFICECLI_MATERIALIZER_POLICY = {
-  policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
-  adoption_status: 'qa_materializer_discipline_only',
-  rca_main_workflow_owner: 'redcube_stage_review_export',
-  skill_authoring_loop_adopted: false,
-  materializer_role: 'default_editable_pptx_materializer_and_qa_gate',
-  current_pptx_writer: 'officecli_pptx_materializer',
-  officecli_writer_adapter_default_enabled: true,
-  required_gate_refs: [
-    'officecli_save_before_close',
-    'officecli_validate',
-    'officecli_view_issues',
-    'officecli_view_text',
-  ],
-  save_before_close_required: true,
-  validate_required: true,
-  view_issues_required: true,
-  view_text_required: true,
-  true_render_proof_required_after_officecli_gate: true,
-  true_render_proof_substitute_allowed: false,
-  deterministic_cjk_font_family: 'Noto Sans CJK SC',
-  default_visual_route_changed: false,
-  default_executor_changed: false,
-};
-
 const SCREENSHOT_DIMENSIONS = Object.freeze({ width: 2304, height: 1296 });
 
 function words(value) {
@@ -65,6 +28,33 @@ function trueFlags(keys) {
 function emptyLists(keys) {
   return Object.freeze(Object.fromEntries(words(keys).map((key) => [key, []])));
 }
+
+const NATIVE_ENGINE_CAPABILITIES = {
+  authoring_ir: 'redcube_svg_ir',
+  authoring_ir_version: 1,
+  pptx_writer: 'officecli_pptx_materializer',
+  true_render_proof_renderer: 'libreoffice_headless',
+  ...trueFlags('editable_pptx strict_svg_preflight true_render_proof_required cross_platform_render_required'),
+  screenshot_packaging: false,
+};
+
+const OFFICECLI_MATERIALIZER_POLICY = {
+  policy_id: 'ppt_native_officecli_materializer_quality_gate_v1',
+  adoption_status: 'qa_materializer_discipline_only',
+  rca_main_workflow_owner: 'redcube_stage_review_export',
+  skill_authoring_loop_adopted: false,
+  materializer_role: 'default_editable_pptx_materializer_and_qa_gate',
+  current_pptx_writer: 'officecli_pptx_materializer',
+  required_gate_refs: words('officecli_save_before_close officecli_validate officecli_view_issues officecli_view_text'),
+  ...trueFlags(`
+    officecli_writer_adapter_default_enabled save_before_close_required validate_required view_issues_required view_text_required
+    true_render_proof_required_after_officecli_gate
+  `),
+  true_render_proof_substitute_allowed: false,
+  deterministic_cjk_font_family: 'Noto Sans CJK SC',
+  default_visual_route_changed: false,
+  default_executor_changed: false,
+};
 
 const REVIEW_CHECKS = trueFlags(`
   overflow_free occlusion_free visual_density_ok speaker_fit_ok edge_clearance_ok block_content_fit_ok title_typography_ok
@@ -333,6 +323,8 @@ function buildNativePayload(args) {
   const input = readJsonFile(inputJson);
   const engineContract = readJsonFile(engineContractFile);
   const rendererKind = mockNativeRendererKind();
+  const rendererPipeline = mockNativeRendererPipeline(rendererKind);
+  const isLibreOfficeRenderer = rendererKind === 'libreoffice_headless';
   const blueprintSlides = Array.isArray(input?.blueprint?.slides) && input.blueprint.slides.length > 0
     ? input.blueprint.slides
     : Array.from({ length: 6 }, (_, index) => ({
@@ -344,11 +336,8 @@ function buildNativePayload(args) {
       ? input.editable_shape_plan.slides.map((slide) => [String(slide?.slide_id || ''), slide])
       : [],
   );
-  const repairFeedbackSlideIds = new Set(
-    Array.isArray(input?.repair_feedback)
-      ? input.repair_feedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean)
-      : [],
-  );
+  const repairFeedback = safeArray(input?.repair_feedback);
+  const repairFeedbackSlideIds = new Set(repairFeedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean));
   const slides = blueprintSlides.map((slide, index) => {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
     const planSlide = planSlidesById.get(slideId) || {};
@@ -396,7 +385,7 @@ function buildNativePayload(args) {
       preview_screenshot_dimensions: SCREENSHOT_DIMENSIONS,
       render_proof_source: rendererKind,
       renderer_kind: rendererKind,
-      renderer_pipeline: mockNativeRendererPipeline(rendererKind),
+      renderer_pipeline: rendererPipeline,
       synthetic_preview: false,
       repaired: repairFeedbackSlideIds.has(slideId),
       native_shapes: [
@@ -420,26 +409,34 @@ function buildNativePayload(args) {
   if (outputPdf) {
     writeBinary(outputPdf, Buffer.from('%PDF-1.4\n%mock-native\n'));
   }
+  const previewScreenshots = slides.map((slide) => slide.preview_screenshot_file);
+  const redcubeSvgIr = {
+    kind: 'redcube_svg_ir',
+    version: 1,
+    strict_preflight: true,
+    dir: previewDir,
+    files: slides.map((slide) => slide.redcube_svg_ir_file),
+  };
   const renderProof = {
     source_surface_kind: 'native_pptx',
     renderer_kind: rendererKind,
-    renderer_pipeline: mockNativeRendererPipeline(rendererKind),
+    renderer_pipeline: rendererPipeline,
     runtime: rendererKind,
     synthetic_preview: false,
     required: true,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,
-    command_family: rendererKind === 'libreoffice_headless' ? 'soffice --headless' : 'legacy desktop renderer',
-    cross_platform_render_required: rendererKind === 'libreoffice_headless',
-    libreoffice_version: rendererKind === 'libreoffice_headless' ? 'LibreOffice mock 24.2.0' : 'unknown',
-    poppler_version: rendererKind === 'libreoffice_headless' ? 'pdftoppm mock 24.02.0' : 'unknown',
+    command_family: isLibreOfficeRenderer ? 'soffice --headless' : 'legacy desktop renderer',
+    cross_platform_render_required: isLibreOfficeRenderer,
+    libreoffice_version: isLibreOfficeRenderer ? 'LibreOffice mock 24.2.0' : 'unknown',
+    poppler_version: isLibreOfficeRenderer ? 'pdftoppm mock 24.02.0' : 'unknown',
     source_pptx_sha256: fileSha256(outputPptx),
     pdf_sha256: fileSha256(outputPdf),
     preview_png_hashes: slides.map((slide) => ({
       file: slide.preview_screenshot_file,
       sha256: slide.preview_screenshot_sha256,
     })),
-    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
+    preview_screenshots: previewScreenshots,
   };
   const shapeManifest = {
     schema_version: 1,
@@ -456,22 +453,14 @@ function buildNativePayload(args) {
       fail_closed_when_missing: true,
     },
     render_proof: renderProof,
-    redcube_svg_ir: {
-      kind: 'redcube_svg_ir',
-      version: 1,
-      strict_preflight: true,
-      dir: previewDir,
-      files: slides.map((slide) => slide.redcube_svg_ir_file),
-    },
+    redcube_svg_ir: redcubeSvgIr,
     screenshot_dimensions: SCREENSHOT_DIMENSIONS,
-    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
+    preview_screenshots: previewScreenshots,
     slides,
   };
   writeText(shapeManifestFile, JSON.stringify(shapeManifest, null, 2));
   const repairLog = {
-    target_slide_ids: Array.isArray(input?.repair_feedback)
-      ? input.repair_feedback.map((item) => item?.slide_id).filter(Boolean)
-      : [],
+    target_slide_ids: repairFeedback.map((item) => item?.slide_id).filter(Boolean),
     preserved_slide_ids: slides
       .map((slide) => slide.slide_id)
       .filter((slideId) => !repairFeedbackSlideIds.has(slideId)),
@@ -480,7 +469,7 @@ function buildNativePayload(args) {
       : null,
     scope: args.mode === 'repair' ? 'page' : 'deck',
     consumed_review_stage: args.mode === 'repair' ? 'screenshot_review' : null,
-    feedback_count: Array.isArray(input?.repair_feedback) ? input.repair_feedback.length : 0,
+    feedback_count: repairFeedback.length,
     repair_log_file: repairLogFile || null,
   };
   if (repairLogFile) {
@@ -496,11 +485,7 @@ function buildNativePayload(args) {
     },
     capability: {
       kind: 'officecli materializer adapter',
-      editable_artifact: true,
-      native_shapes: true,
-      redcube_svg_ir: true,
-      strict_svg_preflight: true,
-      render_proof_required: true,
+      ...trueFlags('editable_artifact native_shapes redcube_svg_ir strict_svg_preflight render_proof_required'),
     },
     engine_capabilities: NATIVE_ENGINE_CAPABILITIES,
     officecli_materializer_policy: OFFICECLI_MATERIALIZER_POLICY,
@@ -512,8 +497,8 @@ function buildNativePayload(args) {
     page_count: slides.length,
     screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     render_proof: renderProof,
-    redcube_svg_ir: shapeManifest.redcube_svg_ir,
-    preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
+    redcube_svg_ir: redcubeSvgIr,
+    preview_screenshots: previewScreenshots,
     slides,
     repair_log: repairLog,
     engine_contract: engineContract,
