@@ -15,6 +15,10 @@ import {
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
+import { assertPathValues, list } from './surface-fixture-assertions.ts';
+
+const RUNTIME_OWNER = 'configured_family_runtime_provider';
+const EXECUTOR_OWNER = 'configured_by_opl_runtime_provider';
 
 test('default product-entry path returns an OPL stage execution plan without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
@@ -23,39 +27,30 @@ test('default product-entry path returns an OPL stage execution plan without req
     assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL), false);
     assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND), false);
 
-    const manifest = await getProductEntryManifest({
-      workspace_root: workspaceRoot,
+    const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
+    assertPathValues(manifest, {
+      'runtime.runtime_owner': RUNTIME_OWNER,
+      'runtime_inventory.executor_owner': EXECUTOR_OWNER,
+      'opl_provider_runtime_contract.runtime_owner': RUNTIME_OWNER,
+      'opl_provider_runtime_contract.executor_owner': EXECUTOR_OWNER,
+      'route_equivalence.downstream_runtime_truth.runtime_owner': RUNTIME_OWNER,
+      'route_equivalence.downstream_runtime_truth.executor_owner': EXECUTOR_OWNER,
+      'runtime_inventory.substrate': 'opl_provider_backed_stage_attempt_runtime',
+      'skill_catalog.skills.0.domain_projection.runtime_continuity.runtime_owner': RUNTIME_OWNER,
     });
-    assert.equal(manifest.runtime.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.runtime_inventory.executor_owner, 'configured_by_opl_runtime_provider');
-    assert.equal(manifest.opl_provider_runtime_contract.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.opl_provider_runtime_contract.executor_owner, 'configured_by_opl_runtime_provider');
-    assert.equal(manifest.route_equivalence.downstream_runtime_truth.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(manifest.route_equivalence.downstream_runtime_truth.executor_owner, 'configured_by_opl_runtime_provider');
-    assert.equal(manifest.runtime_inventory.substrate, 'opl_provider_backed_stage_attempt_runtime');
-    assert.equal(
-      manifest.skill_catalog.skills[0].domain_projection.runtime_continuity.runtime_owner,
-      'configured_family_runtime_provider',
-    );
 
-    const status = await getProductStatus({
-      workspace_root: workspaceRoot,
+    const status = await getProductStatus({ workspace_root: workspaceRoot });
+    assertPathValues(status, {
+      'runtime.runtime_owner': RUNTIME_OWNER,
+      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
     });
-    assert.equal(status.runtime.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(status.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
 
-    const start = await getProductStart({
-      workspace_root: workspaceRoot,
-    });
-    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
+    const start = await getProductStart({ workspace_root: workspaceRoot });
+    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, RUNTIME_OWNER);
 
     const invoked = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-codex-default',
-      },
+      workspace_locator: { workspace_root: workspaceRoot },
+      entry_session_contract: { entry_session_id: 'session-codex-default' },
       delivery_request: {
         deliverable_family: 'ppt_deck',
         topic_id: 'topic-a',
@@ -67,70 +62,43 @@ test('default product-entry path returns an OPL stage execution plan without req
         stop_after_stage: 'storyline',
       },
     });
-    assert.equal(invoked.entry_session.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(invoked.session_continuity.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(invoked.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(invoked.domain_entry_surface.runtime_session_contract.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(invoked.domain_entry_surface.runtime_session_contract.adapter_surface, 'opl_codex_executor');
-    assert.equal(invoked.domain_entry_surface.result_surface.surface_kind, 'opl_stage_execution_plan');
-    assert.equal(invoked.domain_entry_surface.result_surface.owner, 'one-person-lab');
-    assert.equal(invoked.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
-    assert.equal(invoked.domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner, 'one-person-lab');
-
-    const session = await getProductEntrySession({
-      entry_session_id: 'session-codex-default',
+    assertPathValues(invoked, {
+      'entry_session.runtime_owner': RUNTIME_OWNER,
+      'session_continuity.runtime_owner': RUNTIME_OWNER,
+      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      'domain_entry_surface.runtime_session_contract.runtime_owner': RUNTIME_OWNER,
+      'domain_entry_surface.runtime_session_contract.adapter_surface': 'opl_codex_executor',
+      'domain_entry_surface.result_surface.surface_kind': 'opl_stage_execution_plan',
+      'domain_entry_surface.result_surface.owner': 'one-person-lab',
+      'domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller': false,
+      'domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner': 'one-person-lab',
     });
-    assert.equal(session.entry_session.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(session.session_continuity.runtime_owner, 'configured_family_runtime_provider');
-    assert.equal(session.runtime_loop_closure.loop_owner.runtime_owner, 'configured_family_runtime_provider');
+
+    const session = await getProductEntrySession({ entry_session_id: 'session-codex-default' });
+    assertPathValues(session, {
+      'entry_session.runtime_owner': RUNTIME_OWNER,
+      'session_continuity.runtime_owner': RUNTIME_OWNER,
+      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+    });
   });
 });
 
 test('product status exposes overlay stage sequence for ppt_deck callers', async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const status = await getProductStatus({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-    });
+    const status = await getProductStatus({ workspace_locator: { workspace_root: workspaceRoot } });
 
-    assert.deepEqual(
-      status.overlay_stage_sequences.ppt_deck.protected_stage_sequence,
-      [
-        'storyline',
-        'detailed_outline',
-        'slide_blueprint',
-        'visual_direction',
-        'author_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'repair_image_pages',
-        'export_pptx',
-      ],
-    );
-    assert.equal(status.overlay_stage_sequences.ppt_deck.default_visual_route, 'author_image_pages');
-    assert.equal(status.overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
-    assert.equal(status.ppt_deck_visual_route_truth.default_visual_route, 'author_image_pages');
-    assert.equal(status.overlay_stage_sequences.ppt_deck.route_gate_policy, 'fail_closed_against_overlay_stage_sequence');
-    assert.deepEqual(
-      status.overlay_stage_sequences.xiaohongshu.protected_stage_sequence,
-      [
-        'research',
-        'storyline',
-        'single_note_plan',
-        'visual_direction',
-        'author_image_pages',
-        'visual_director_review',
-        'screenshot_review',
-        'repair_image_pages',
-        'publish_copy',
-        'export_bundle',
-      ],
-    );
-    assert.equal(status.overlay_stage_sequences.xiaohongshu.default_visual_route, 'author_image_pages');
-    assert.equal(status.overlay_stage_sequences.xiaohongshu.default_visual_policy, 'image_first');
-    assert.equal(status.overlay_stage_sequences.xiaohongshu.route_selection_policy.style_reference_dir_input, 'delivery_request.style_reference_dir');
+    assertPathValues(status, {
+      'overlay_stage_sequences.ppt_deck.protected_stage_sequence': list('storyline detailed_outline slide_blueprint visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages export_pptx'),
+      'overlay_stage_sequences.ppt_deck.default_visual_route': 'author_image_pages',
+      'overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
+      'ppt_deck_visual_route_truth.default_visual_route': 'author_image_pages',
+      'overlay_stage_sequences.ppt_deck.route_gate_policy': 'fail_closed_against_overlay_stage_sequence',
+      'overlay_stage_sequences.xiaohongshu.protected_stage_sequence': list('research storyline single_note_plan visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages publish_copy export_bundle'),
+      'overlay_stage_sequences.xiaohongshu.default_visual_route': 'author_image_pages',
+      'overlay_stage_sequences.xiaohongshu.default_visual_policy': 'image_first',
+      'overlay_stage_sequences.xiaohongshu.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
+    });
   });
 });
 
@@ -140,12 +108,8 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
 
     await assert.rejects(
       () => invokeProductEntry({
-        workspace_locator: {
-          workspace_root: workspaceRoot,
-        },
-        entry_session_contract: {
-          entry_session_id: 'session-invalid-stage',
-        },
+        workspace_locator: { workspace_root: workspaceRoot },
+        entry_session_contract: { entry_session_id: 'session-invalid-stage' },
         delivery_request: {
           deliverable_family: 'ppt_deck',
           topic_id: 'topic-invalid-stage',
@@ -164,24 +128,22 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
 test('getProductStart exposes the same direct-entry start companion as the manifest', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
+    const start = await getProductStart({ workspace_root: workspaceRoot });
 
-    const start = await getProductStart({
-      workspace_root: workspaceRoot,
+    assertPathValues(start, {
+      ok: true,
+      surface_kind: 'product_entry_start',
+      recommended_mode_id: 'start_direct_session',
+      'modes.0.mode_id': 'start_direct_session',
+      'modes.1.mode_id': 'opl_hosted_handoff',
+      'modes.2.mode_id': 'resume_session',
+      'runtime_loop_closure.surface_kind': 'runtime_loop_closure',
+      'runtime_loop_closure.source_linkage.current_source': 'start',
+      'runtime_loop_closure.source_linkage.entry_mode': 'start_projection',
+      'resume_surface.surface_kind': 'product_entry_session',
+      human_gate_ids: ['redcube_operator_review_gate'],
     });
-
-    assert.equal(start.ok, true);
-    assert.equal(start.surface_kind, 'product_entry_start');
-    assert.equal(start.recommended_mode_id, 'start_direct_session');
-    assert.deepEqual(
-      start.modes.map((mode) => mode.mode_id),
-      ['start_direct_session', 'opl_hosted_handoff', 'resume_session'],
-    );
     assert.match(start.modes[0].command, /redcube product invoke/);
-    assert.equal(start.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(start.runtime_loop_closure.source_linkage.current_source, 'start');
-    assert.equal(start.runtime_loop_closure.source_linkage.entry_mode, 'start_projection');
-    assert.equal(start.resume_surface.surface_kind, 'product_entry_session');
-    assert.deepEqual(start.human_gate_ids, ['redcube_operator_review_gate']);
   });
 });
 
