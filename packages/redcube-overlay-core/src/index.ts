@@ -29,7 +29,6 @@ export type {
   SurfaceContract,
   SurfaceRequirement,
   SurfaceValidator,
-  SurfaceValidatorSpec,
 } from './surface.js';
 
 export type {

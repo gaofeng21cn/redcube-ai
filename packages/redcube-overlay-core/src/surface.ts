@@ -6,10 +6,6 @@ import {
 export type SurfaceContract = Record<string, any>;
 export type SurfaceArtifactContent = (contract: SurfaceContract) => unknown;
 export type SurfaceValidator = (content: SurfaceContract) => boolean;
-export interface SurfaceValidatorSpec {
-  relativePath: string;
-  validate: SurfaceValidator;
-}
 export interface SurfaceRequirement {
   path: string;
   equals?: unknown;
@@ -65,8 +61,8 @@ export function listSurfaceArtifactPaths(specs: SurfaceArtifactSpec[]) {
   return specs.map((spec) => spec.relativePath);
 }
 
-export function createSurfaceValidators(specs: SurfaceValidatorSpec[]): Record<string, SurfaceValidator> {
-  return Object.fromEntries(specs.map((spec) => [spec.relativePath, spec.validate]));
+export function createSurfaceValidators(specs: Record<string, SurfaceValidator>): Record<string, SurfaceValidator> {
+  return { ...specs };
 }
 
 function valueAtPath(content: SurfaceContract, path: string): unknown {

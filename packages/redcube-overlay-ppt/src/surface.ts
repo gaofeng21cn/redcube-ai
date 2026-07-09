@@ -4,7 +4,6 @@ import {
   createSurfaceValidators,
   listSurfaceArtifactPaths,
   type SurfaceContract,
-  type SurfaceValidator,
   validateBaselinePolicySurface,
   validateDeliveryContractSurface,
   validateDisplayRegistrySurface,
@@ -48,7 +47,7 @@ export function listDeckSurfaceArtifactPaths() {
   return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
 }
 
-const SURFACE_VALIDATORS = createSurfaceValidators(Object.entries({
+const SURFACE_VALIDATORS = createSurfaceValidators({
   'contracts/stage-sequence.json': (content: SurfaceContract) =>
     Array.isArray(content?.stages)
     && content.stages.length > 0
@@ -208,10 +207,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators(Object.entries({
       'screenshot_review',
       'export_pptx',
     ]),
-} satisfies Record<string, SurfaceValidator>).map(([relativePath, validate]) => ({
-  relativePath,
-  validate,
-})));
+});
 
 export function validateDeckSurfaceArtifact(relativePath: string, content: unknown): boolean {
   return validateSurfaceArtifact({
