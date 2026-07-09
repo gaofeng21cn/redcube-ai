@@ -304,11 +304,12 @@ const LIFECYCLE_MODEL = {
 
 export function describeXiaohongshuOverlay() {
   return {
-    overlay_id: 'xiaohongshu',
-    default_profile_id: 'standard_note',
-    profiles: ['standard_note'],
-    deliverable_kind: 'xiaohongshu_note', prompt_pack_id: PROMPT_PACK.pack_id,
-    route_sequence: STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
+    overlay_id: 'xiaohongshu' as const,
+    default_profile_id: 'standard_note' as const,
+    profiles: ['standard_note' as const],
+    deliverable_kind: 'xiaohongshu_note' as const,
+    prompt_pack_id: PROMPT_PACK.pack_id as 'xiaohongshu_mainline_v1',
+    route_sequence: (STAGE_SEQUENCE.stages as XiaohongshuStageDefinition[]).map((stage) => stage.stage_id),
     visual_authoring_policy: {
       default_visual_route: 'author_image_pages',
       default_visual_policy: 'image_first',
@@ -320,8 +321,8 @@ export function describeXiaohongshuOverlay() {
       },
     },
     runtime: {
-      runner_id: 'families/xiaohongshu',
-      owner: 'redcube_ai',
+      runner_id: 'families/xiaohongshu' as const,
+      owner: 'redcube_ai' as const,
     },
   };
 }

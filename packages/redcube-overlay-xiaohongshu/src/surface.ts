@@ -13,14 +13,23 @@ import {
   validateSurfaceRequirements,
 } from '@redcube/overlay-core';
 
+import type {
+  XiaohongshuSurfaceArtifact,
+  XiaohongshuSurfaceArtifactContent,
+  XiaohongshuSurfaceArtifactPath,
+  XiaohongshuSurfaceBundleRequest,
+} from './types.js';
+
 const SURFACE_ARTIFACTS = buildSurfaceArtifactSpecs();
 
-export function buildXiaohongshuSurfaceBundle({ contract }: { contract: SurfaceContract }) {
-  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS);
+export function buildXiaohongshuSurfaceBundle(
+  { contract }: XiaohongshuSurfaceBundleRequest,
+): XiaohongshuSurfaceArtifact[] {
+  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS) as XiaohongshuSurfaceArtifact[];
 }
 
-export function listXiaohongshuSurfaceArtifactPaths() {
-  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
+export function listXiaohongshuSurfaceArtifactPaths(): XiaohongshuSurfaceArtifactPath[] {
+  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS) as XiaohongshuSurfaceArtifactPath[];
 }
 
 const SURFACE_VALIDATORS = createSurfaceValidators({
@@ -88,7 +97,10 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
     ]),
 });
 
-export function validateXiaohongshuSurfaceArtifact(relativePath: string, content: unknown): boolean {
+export function validateXiaohongshuSurfaceArtifact(
+  relativePath: XiaohongshuSurfaceArtifactPath,
+  content: XiaohongshuSurfaceArtifactContent | null | undefined,
+): boolean {
   return validateSurfaceArtifact({
     family: 'xiaohongshu',
     validators: SURFACE_VALIDATORS,

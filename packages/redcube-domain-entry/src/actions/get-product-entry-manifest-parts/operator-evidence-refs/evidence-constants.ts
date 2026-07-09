@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 export const RCA_EFFICIENCY_WORK_ORDER_ID = 'oma_developer_patch_work_order_5a1b68cacbd4';
 
 export const RCA_EFFICIENCY_TARGET_VERIFICATION_REFS = Object.freeze([
@@ -166,7 +164,7 @@ export const RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_REF = '/ppt_three_route_agent_l
 export const RCA_PPT_THREE_ROUTE_AGENT_LAB_SUITE_PROJECTION_REF =
   `${RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF}/ppt_three_route_agent_lab_suite`;
 
-export function buildOperatorEvidenceTailWorkorderItemRef(index) {
+export function buildOperatorEvidenceTailWorkorderItemRef(index: number): string {
   return `${RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF}/work_items/${index}`;
 }
 
@@ -180,6 +178,6 @@ export const RCA_OWNER_PAYLOAD_REQUIRED_RETURN_SHAPES = Object.freeze([
 export const RCA_OWNER_PAYLOAD_PATH_POLICY =
   'operator_must_choose_success_refs_path_or_domain_owned_typed_blocker_path_empty_template_blocks';
 
-export function uniqueRefs(values) {
-  return [...new Set(values.filter((value) => typeof value === 'string' && value.trim().length > 0))];
+export function uniqueRefs(values: unknown[]): string[] {
+  return [...new Set(values.filter((value): value is string => typeof value === 'string' && value.trim().length > 0))];
 }

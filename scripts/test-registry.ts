@@ -1,6 +1,24 @@
-// @ts-nocheck
+type TestFile = `tests/${string}.test.${'js' | 'ts'}`;
 
-const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical']);
+const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical'] as const);
+type TestLane = (typeof TEST_LANES)[number];
+type TestRegistryEntry = Readonly<{
+  file: TestFile;
+  lane: TestLane;
+}>;
+type TestGroups = Record<string, TestFile[]>;
+export type VerifyStep = Readonly<
+  | { kind: 'build' }
+  | { kind: 'typecheck' }
+  | { kind: 'test-group'; group: string }
+  | { kind: 'private-platform-readback'; scope: 'private-platform' | 'default-caller-tail'; output: string }
+  | { kind: 'line-budget'; strict: boolean }
+  | { kind: 'structure'; strict: boolean }
+>;
+export type VerifyLanePlan = Readonly<{
+  lane: string;
+  steps: readonly VerifyStep[];
+}>;
 
 const PRIMARY_TEST_FILES = Object.freeze({
   meta: Object.freeze([
@@ -144,7 +162,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
   historical: Object.freeze([
     'tests/runtime-program-provenance.test.ts',
   ]),
-});
+} satisfies Record<TestLane, readonly TestFile[]>);
 
 const SMOKE_FILES = Object.freeze([
   'tests/typescript-baseline.test.ts',
@@ -152,7 +170,7 @@ const SMOKE_FILES = Object.freeze([
   'tests/overlay-registry.test.ts',
   'tests/product-domain-actions.test.ts',
   'tests/product-entry.test.ts',
-]);
+]) satisfies readonly TestFile[];
 
 const FAST_FILES = Object.freeze([
   'tests/ai-first-authoring-boundary.test.ts',
@@ -199,7 +217,7 @@ const FAST_FILES = Object.freeze([
   'tests/source-augmentation-provider.test.ts',
   'tests/stage-folder-contract.test.ts',
   'tests/stage-run-kernel-profile.test.ts',
-]);
+]) satisfies readonly TestFile[];
 
 const smokeFileSet = new Set(SMOKE_FILES);
 const fastFileSet = new Set(FAST_FILES);
@@ -210,7 +228,7 @@ const LIVE_CODEX_PREFLIGHT_GROUPS = new Set([
   'full',
   'full:remaining',
   'full:with-historical',
-]);
+]) satisfies ReadonlySet<string>;
 const ROUTE_HEAVY_GROUPS = new Set([
   'smoke',
   'fast',
@@ -220,7 +238,7 @@ const ROUTE_HEAVY_GROUPS = new Set([
   'full',
   'full:remaining',
   'full:with-historical',
-]);
+]) satisfies ReadonlySet<string>;
 const ROUTE_HEAVY_FILES = new Set([
   'tests/deliverable-review-loop.test.ts',
   'tests/direct-delivery-operator-handoff.test.ts',
@@ -242,36 +260,39 @@ const ROUTE_HEAVY_FILES = new Set([
   'tests/workspace-operator-quickstart.test.ts',
   'tests/xiaohongshu-creative-ownership.test.ts',
   'tests/xiaohongshu-deliverable-e2e.test.ts',
-]);
+]) satisfies ReadonlySet<string>;
 
 export const TEST_REGISTRY = Object.freeze(
   TEST_LANES.flatMap((lane) => PRIMARY_TEST_FILES[lane].map((file) => Object.freeze({
     file,
     lane,
   }))),
-);
+) satisfies readonly TestRegistryEntry[];
 
-export function rootPartitionFiles() {
+export function rootPartitionFiles(): TestFile[] {
   return TEST_REGISTRY.map((entry) => entry.file);
 }
 
-function primaryLaneFiles(lane) {
+function primaryLaneFiles(lane: TestLane): TestFile[] {
   return TEST_REGISTRY
     .filter((entry) => entry.lane === lane)
     .map((entry) => entry.file);
 }
 
-function fastFiles() {
+function fastFiles(): TestFile[] {
   return FAST_FILES.filter((file) => TEST_REGISTRY.some((entry) => entry.file === file));
 }
 
-function smokeFiles() {
+function smokeFiles(): TestFile[] {
   return SMOKE_FILES.filter((file) => TEST_REGISTRY.some((entry) => entry.file === file));
 }
 
-function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
+function excludeCoveredTestFiles(
+  baseFiles: readonly TestFile[] = [],
+  coveredFiles: readonly TestFile[] = [],
+): TestFile[] {
   const covered = new Set(coveredFiles);
-  const selected = [];
+  const selected: TestFile[] = [];
   for (const file of baseFiles) {
     if (!covered.has(file) && !selected.includes(file)) {
       selected.push(file);
@@ -280,7 +301,7 @@ function excludeCoveredTestFiles(baseFiles = [], coveredFiles = []) {
   return selected;
 }
 
-export function buildTestGroups() {
+export function buildTestGroups(): TestGroups {
   const meta = primaryLaneFiles('meta');
   const family = primaryLaneFiles('family');
   const integration = primaryLaneFiles('integration');
@@ -312,7 +333,7 @@ export function buildTestGroups() {
   };
 }
 
-const VERIFY_LANE_ALIASES = Object.freeze({
+const VERIFY_LANE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   'private-platform': 'private-platform:strict',
   'private-platform-strict': 'private-platform:strict',
   'default-caller-tail': 'default-caller-tail:strict',
@@ -334,12 +355,12 @@ const SPECIAL_VERIFY_LANES = Object.freeze([
   'structure-strict',
 ]);
 
-export function normalizeVerifyLane(lane = 'smoke') {
+export function normalizeVerifyLane(lane: string = 'smoke'): string {
   const requested = String(lane || 'smoke').trim() || 'smoke';
   return VERIFY_LANE_ALIASES[requested] || requested;
 }
 
-export function listVerifyLanes() {
+export function listVerifyLanes(): string[] {
   return [
     ...Object.keys(buildTestGroups()),
     ...SPECIAL_VERIFY_LANES,
@@ -347,7 +368,7 @@ export function listVerifyLanes() {
   ];
 }
 
-export function buildVerifyLanePlan(lane = 'smoke') {
+export function buildVerifyLanePlan(lane: string = 'smoke'): VerifyLanePlan {
   const normalizedLane = normalizeVerifyLane(lane);
   const groups = buildTestGroups();
 
@@ -361,7 +382,7 @@ export function buildVerifyLanePlan(lane = 'smoke') {
     };
   }
 
-  const specialPlans = {
+  const specialPlans: Readonly<Record<string, readonly VerifyStep[]>> = {
     ci: [
       { kind: 'typecheck' },
       { kind: 'test-group', group: 'fast' },
@@ -388,11 +409,17 @@ export function buildVerifyLanePlan(lane = 'smoke') {
   throw new Error(`Unknown lane: ${lane}`);
 }
 
-export function groupRequiresLiveCodexPreflight(groupName) {
+export function groupRequiresLiveCodexPreflight(groupName: string): boolean {
   return LIVE_CODEX_PREFLIGHT_GROUPS.has(groupName);
 }
 
-export function partitionTestFilesForExecution({ groupName, files = [] }) {
+export function partitionTestFilesForExecution({
+  groupName,
+  files = [],
+}: {
+  groupName: string;
+  files?: readonly TestFile[];
+}): { parallel_files: TestFile[]; serialized_files: TestFile[] } {
   const plannedFiles = [...files];
   if (!ROUTE_HEAVY_GROUPS.has(groupName)) {
     return {
@@ -407,7 +434,11 @@ export function partitionTestFilesForExecution({ groupName, files = [] }) {
   };
 }
 
-export function assertValidTestRegistry({ registry = TEST_REGISTRY } = {}) {
+export function assertValidTestRegistry({
+  registry = TEST_REGISTRY,
+}: {
+  registry?: readonly TestRegistryEntry[];
+} = {}): void {
   const files = registry.map((entry) => entry.file);
   const duplicateFiles = files.filter((file, index) => files.indexOf(file) !== index);
   if (duplicateFiles.length > 0) {

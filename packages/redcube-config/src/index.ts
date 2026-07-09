@@ -10,7 +10,7 @@ import type {
   RedcubeRuntimeConfigSources,
 } from './types.js';
 
-type JsonObject = Record<string, unknown>;
+export type RedcubeInternalJsonObject = Record<string, unknown>;
 type RuntimeKey = keyof RedcubeRuntimeConfigSources;
 type RuntimeState = {
   values: RedcubeRuntimeConfigSources;
@@ -21,20 +21,20 @@ const RUNTIME_KEYS: RuntimeKey[] = ['rootDir', 'workspaceRoot', 'promptsDir'];
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_REPO_ROOT = path.resolve(MODULE_DIR, '../../../');
 
-function isPlainObject(value: unknown): value is JsonObject {
+export function isRedcubeInternalJsonObject(value: unknown): value is RedcubeInternalJsonObject {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
-function deepMerge<T extends JsonObject>(base: T, extra: unknown): T;
-function deepMerge(base: unknown, extra: unknown): unknown;
-function deepMerge(base: unknown, extra: unknown): unknown {
-  if (!isPlainObject(base)) return isPlainObject(extra) ? { ...extra } : extra;
-  if (!isPlainObject(extra)) return { ...base };
+export function mergeRedcubeInternalJson<T extends RedcubeInternalJsonObject>(base: T, extra: unknown): T;
+export function mergeRedcubeInternalJson(base: unknown, extra: unknown): unknown;
+export function mergeRedcubeInternalJson(base: unknown, extra: unknown): unknown {
+  if (!isRedcubeInternalJsonObject(base)) return isRedcubeInternalJsonObject(extra) ? { ...extra } : extra;
+  if (!isRedcubeInternalJsonObject(extra)) return { ...base };
 
-  const merged: JsonObject = { ...base };
+  const merged: RedcubeInternalJsonObject = { ...base };
   for (const [key, value] of Object.entries(extra)) {
-    if (isPlainObject(value) && isPlainObject(merged[key])) {
-      merged[key] = deepMerge(merged[key], value);
+    if (isRedcubeInternalJsonObject(value) && isRedcubeInternalJsonObject(merged[key])) {
+      merged[key] = mergeRedcubeInternalJson(merged[key], value);
     } else {
       merged[key] = value;
     }
@@ -42,9 +42,9 @@ function deepMerge(base: unknown, extra: unknown): unknown {
   return merged;
 }
 
-function readJsonIfExists(filePath: string): JsonObject | null {
+export function readRedcubeInternalJsonIfExists(filePath: string): RedcubeInternalJsonObject | null {
   if (!filePath || !existsSync(filePath)) return null;
-  return JSON.parse(readFileSync(filePath, 'utf-8')) as JsonObject;
+  return JSON.parse(readFileSync(filePath, 'utf-8')) as RedcubeInternalJsonObject;
 }
 
 function normalizeDirValue(value: unknown, baseDir: string): string {
@@ -64,7 +64,7 @@ function applyRuntimePatch(
   sourceTag: string,
   baseDir: string,
 ): RuntimeState {
-  if (!isPlainObject(patch)) return state;
+  if (!isRedcubeInternalJsonObject(patch)) return state;
 
   const next: RuntimeState = {
     values: { ...state.values },
@@ -91,18 +91,18 @@ function loadConfigFilePair(dirPath: string): { runtimeFile: string; identityFil
 
 function loadLayer(
   state: RuntimeState,
-  identity: JsonObject,
+  identity: RedcubeInternalJsonObject,
   dirPath: string,
   sourceTag: string,
-): { state: RuntimeState; identity: JsonObject } {
+): { state: RuntimeState; identity: RedcubeInternalJsonObject } {
   const { runtimeFile, identityFile } = loadConfigFilePair(dirPath);
-  const runtimePatch = readJsonIfExists(runtimeFile);
-  const identityPatch = readJsonIfExists(identityFile);
+  const runtimePatch = readRedcubeInternalJsonIfExists(runtimeFile);
+  const identityPatch = readRedcubeInternalJsonIfExists(identityFile);
 
   const nextState = runtimePatch
     ? applyRuntimePatch(state, runtimePatch, sourceTag, path.dirname(runtimeFile))
     : state;
-  const nextIdentity = identityPatch ? deepMerge(identity, identityPatch) : identity;
+  const nextIdentity = identityPatch ? mergeRedcubeInternalJson(identity, identityPatch) : identity;
 
   return {
     state: nextState,
@@ -168,7 +168,7 @@ export function loadRuntimeConfig(options: RedcubeRuntimeConfigOptions = {}): Re
       promptsDir: '',
     },
   };
-  let identity: JsonObject = {};
+  let identity: RedcubeInternalJsonObject = {};
 
   const defaultsDir = path.join(cwd, 'config', 'defaults');
   ({ state: runtimeState, identity } = loadLayer(runtimeState, identity, defaultsDir, path.join(defaultsDir, 'runtime.json')));
@@ -196,7 +196,7 @@ export function loadRuntimeConfig(options: RedcubeRuntimeConfigOptions = {}): Re
     rootDir: path.resolve(rootDir),
     workspaceRoot: path.resolve(finalWorkspaceRoot),
     promptsDir: path.resolve(promptsDir),
-    identity: deepMerge({
+    identity: mergeRedcubeInternalJson({
       defaultProfileId: 'general_public',
       routing: {
         medicalProfileId: 'medical_public',

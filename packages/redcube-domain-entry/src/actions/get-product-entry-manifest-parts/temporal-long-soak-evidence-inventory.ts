@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
@@ -26,7 +25,36 @@ const FORBIDDEN_PAYLOAD_FIELDS = Object.freeze([
   'generic_runtime_state',
 ]);
 
-function listJsonFiles(root) {
+type LongSoakEvidencePayload = Record<string, unknown> & {
+  evidence_id?: unknown;
+  id?: unknown;
+  evidence_ref?: unknown;
+  runtime_locator_ref?: unknown;
+  generated_by_action?: unknown;
+  return_shape?: unknown;
+  sha256?: unknown;
+  surface_kind?: unknown;
+};
+
+type ExportedEvidenceRef = {
+  evidence_id: string;
+  evidence_ref: string;
+  runtime_locator_ref: string;
+  generated_by_action: string;
+  return_shape: string;
+  relative_path: string;
+  evidence_file_ref: string;
+  sha256: string;
+  mtime_ms: number;
+};
+
+function toPayloadRecord(value: unknown): LongSoakEvidencePayload {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as LongSoakEvidencePayload
+    : {};
+}
+
+function listJsonFiles(root: string): string[] {
   if (!existsSync(root)) return [];
   return readdirSync(root, { withFileTypes: true })
     .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
@@ -34,7 +62,7 @@ function listJsonFiles(root) {
     .sort();
 }
 
-function findForbiddenPayloadFields(value, found = new Set()) {
+function findForbiddenPayloadFields(value: unknown, found = new Set<string>()): Set<string> {
   if (!value || typeof value !== 'object') return found;
   if (Array.isArray(value)) {
     for (const item of value) findForbiddenPayloadFields(item, found);
@@ -47,7 +75,15 @@ function findForbiddenPayloadFields(value, found = new Set()) {
   return found;
 }
 
-function exportedEvidenceRef({ file, root, payload }) {
+function exportedEvidenceRef({
+  file,
+  root,
+  payload,
+}: {
+  file: string;
+  root: string;
+  payload: LongSoakEvidencePayload;
+}): ExportedEvidenceRef {
   const relativePath = path.relative(root, file).split(path.sep).join('/');
   const stat = statSync(file);
   return {
@@ -63,7 +99,7 @@ function exportedEvidenceRef({ file, root, payload }) {
   };
 }
 
-export function buildTemporalLongSoakEvidenceInventory({ workspaceRoot }) {
+export function buildTemporalLongSoakEvidenceInventory({ workspaceRoot }: { workspaceRoot: string }) {
   const evidenceRoot = path.join(
     workspaceRoot,
     '.redcube',
@@ -71,13 +107,13 @@ export function buildTemporalLongSoakEvidenceInventory({ workspaceRoot }) {
     'evidence',
     'temporal-controlled-visual-stage-long-soak',
   );
-  const evidenceRefs = [];
-  const invalidEvidenceRefs = [];
-  const forbiddenPayloadFields = new Set();
+  const evidenceRefs: ExportedEvidenceRef[] = [];
+  const invalidEvidenceRefs: Array<Record<string, unknown>> = [];
+  const forbiddenPayloadFields = new Set<string>();
 
   for (const file of listJsonFiles(evidenceRoot)) {
     const relativePath = path.relative(evidenceRoot, file).split(path.sep).join('/');
-    let payload;
+    let payload: unknown;
     try {
       payload = JSON.parse(readFileSync(file, 'utf-8'));
     } catch {
@@ -91,8 +127,9 @@ export function buildTemporalLongSoakEvidenceInventory({ workspaceRoot }) {
     for (const field of findForbiddenPayloadFields(payload)) {
       forbiddenPayloadFields.add(field);
     }
-    if (payload?.surface_kind === 'temporal_controlled_visual_stage_long_soak_evidence') {
-      evidenceRefs.push(exportedEvidenceRef({ file, root: evidenceRoot, payload }));
+    const payloadRecord = toPayloadRecord(payload);
+    if (payloadRecord.surface_kind === 'temporal_controlled_visual_stage_long_soak_evidence') {
+      evidenceRefs.push(exportedEvidenceRef({ file, root: evidenceRoot, payload: payloadRecord }));
     }
   }
 

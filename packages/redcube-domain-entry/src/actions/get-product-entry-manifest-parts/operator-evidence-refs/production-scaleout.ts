@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import { buildOwnerPayloadItemSummaries } from '../operator-evidence-payload-summaries.js';
 import {
   RCA_OWNER_PAYLOAD_PATH_POLICY,
@@ -12,9 +10,50 @@ import {
   uniqueRefs,
 } from './evidence-constants.js';
 
+type RefGroup = Record<string, unknown>;
+
+type ReceiptContractRefs = RefGroup & {
+  allowed_return_shapes?: unknown[];
+  opl_consumption_policy?: {
+    opl_can_store_receipt_refs?: boolean;
+  };
+};
+
+type MemoryApplyProofRefs = RefGroup & {
+  consumed_visual_pattern_memory_refs?: Array<{
+    memory_ref?: unknown;
+    content_ref?: unknown;
+  }>;
+};
+
+type DomainAuthorityRefs = RefGroup & {
+  domain_owner_receipt_contract?: ReceiptContractRefs;
+  controlled_memory_apply_proof?: MemoryApplyProofRefs;
+  no_regression_owner_receipt_opl_consumption_proof?: RefGroup & {
+    status?: unknown;
+  };
+};
+
+type WorkspaceReceiptInventoryProjection = RefGroup & {
+  actual_workspace_receipt_refs?: RefGroup & {
+    artifact_producing_owner_receipt_refs?: unknown[];
+    memory_lifecycle_receipt_refs?: unknown[];
+    required_owner_receipt_visible?: boolean;
+  };
+  scaleout_projection?: {
+    status?: unknown;
+    observed_workspace_count?: number;
+    observed_receipt_count?: number;
+    receipt_kind_coverage_ready?: boolean;
+  };
+};
+
 export function buildProductionEvidenceScaleoutRefs({
   domainAuthorityRefs,
   workspaceReceiptInventoryProjection,
+}: {
+  domainAuthorityRefs: DomainAuthorityRefs;
+  workspaceReceiptInventoryProjection: WorkspaceReceiptInventoryProjection;
 }) {
   const receiptContract = domainAuthorityRefs.domain_owner_receipt_contract || {};
   const memoryApplyProof = domainAuthorityRefs.controlled_memory_apply_proof || {};

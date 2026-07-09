@@ -1,8 +1,18 @@
-// @ts-nocheck
 import {
   PRODUCT_MANIFEST_COMMAND,
   PRODUCT_STATUS_COMMAND,
 } from './policy.js';
+
+type ProductEntryPreflightProjection = Record<string, unknown> & {
+  surface_kind?: unknown;
+  summary?: unknown;
+  ready_to_try_now?: unknown;
+  recommended_check_command?: unknown;
+  recommended_start_command?: unknown;
+  blocking_check_ids?: unknown;
+  checks?: unknown;
+  runtime_loop_closure?: unknown;
+};
 
 export function buildFormalEntryPolicy() {
   return {
@@ -95,7 +105,7 @@ export function buildSourceProvenanceSection() {
   };
 }
 
-export function projectProductEntryPreflight(productEntryPreflight) {
+export function projectProductEntryPreflight(productEntryPreflight: ProductEntryPreflightProjection) {
   return {
     surface_kind: productEntryPreflight.surface_kind,
     summary: productEntryPreflight.summary,

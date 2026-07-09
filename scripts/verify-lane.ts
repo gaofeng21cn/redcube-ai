@@ -1,7 +1,8 @@
-// @ts-nocheck
 import { closeSync, openSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import type { SpawnSyncOptions } from 'node:child_process';
 import process from 'node:process';
+import type { VerifyStep } from './test-registry.ts';
 
 import {
   buildVerifyLanePlan,
@@ -9,7 +10,13 @@ import {
   normalizeVerifyLane,
 } from './test-registry.ts';
 
-function run(command, args = [], options = {}) {
+type PrivatePlatformReadbackStep = Extract<VerifyStep, { kind: 'private-platform-readback' }>;
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
+}
+
+function run(command: string, args: readonly string[] = [], options: SpawnSyncOptions = {}): void {
   const result = spawnSync(command, args, {
     cwd: process.cwd(),
     env: process.env,
@@ -22,11 +29,11 @@ function run(command, args = [], options = {}) {
   }
 }
 
-function npmRun(script, args = [], options = {}) {
+function npmRun(script: string, args: readonly string[] = [], options: SpawnSyncOptions = {}): void {
   run('npm', ['run', '--silent', script, ...args], options);
 }
 
-function runBuildToLog(logFile) {
+function runBuildToLog(logFile: string): void {
   const stdoutFd = openSync(logFile, 'w');
   try {
     npmRun('build', [], {
@@ -37,7 +44,7 @@ function runBuildToLog(logFile) {
   }
 }
 
-async function runPrivatePlatformReadback({ scope, output }) {
+async function runPrivatePlatformReadback({ scope, output }: PrivatePlatformReadbackStep): Promise<void> {
   const logFile = scope === 'default-caller-tail'
     ? '/tmp/redcube-ai-default-caller-tail-readback-build.log'
     : '/tmp/redcube-ai-private-platform-readback-build.log';
@@ -53,11 +60,11 @@ async function runPrivatePlatformReadback({ scope, output }) {
   writeFileSync(output, payload);
 }
 
-function runLineBudget(strict) {
+function runLineBudget(strict: boolean): void {
   npmRun(strict ? 'line-budget:strict' : 'line-budget');
 }
 
-function runStructure(strict) {
+function runStructure(strict: boolean): void {
   if (strict) {
     run('scripts/run-structural-quality-gate.sh', ['--strict'], {
       env: {
@@ -70,7 +77,7 @@ function runStructure(strict) {
   run('scripts/run-structural-quality-gate.sh');
 }
 
-async function runStep(step, forwardedArgs) {
+async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Promise<void> {
   if (step.kind === 'build') {
     npmRun('build');
     return;
@@ -103,10 +110,11 @@ async function runStep(step, forwardedArgs) {
     runStructure(step.strict);
     return;
   }
-  throw new Error(`Unsupported verification step: ${JSON.stringify(step)}`);
+  const unsupportedStep: never = step;
+  throw new Error(`Unsupported verification step: ${JSON.stringify(unsupportedStep)}`);
 }
 
-function printUsage() {
+function printUsage(): void {
   process.stderr.write(`Usage: node --experimental-strip-types scripts/verify-lane.ts <${listVerifyLanes().join('|')}> [node --test args]\n`);
 }
 
@@ -130,7 +138,7 @@ try {
     await runStep(step, forwardedArgs);
   }
 } catch (error) {
-  process.stderr.write(`${error.message}\n`);
+  process.stderr.write(`${errorMessage(error)}\n`);
   printUsage();
   process.exit(1);
 }

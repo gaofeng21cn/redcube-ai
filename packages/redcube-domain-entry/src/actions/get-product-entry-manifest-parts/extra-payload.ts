@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { buildRuntimeLoopClosureManifestSurface } from '../product-entry-continuity-surfaces.js';
 import {
   DEFAULT_RUNTIME_OWNER,
@@ -7,6 +6,17 @@ import {
   PRODUCT_ENTRY_CONTRACT_REF,
 } from './policy.js';
 
+type ManifestExtraPayloadInput = {
+  deliverableFacade: unknown;
+  nativePptOperatorUx: unknown;
+  oplLedgerArtifactRegistration?: {
+    contract_id?: unknown;
+  };
+  productEntrySessionCommand: string;
+  routeEquivalence: unknown;
+  sourceProvenance: unknown;
+};
+
 export function buildManifestExtraPayload({
   deliverableFacade,
   nativePptOperatorUx,
@@ -14,7 +24,7 @@ export function buildManifestExtraPayload({
   productEntrySessionCommand,
   routeEquivalence,
   sourceProvenance,
-}) {
+}: ManifestExtraPayloadInput) {
   return {
     ok: true,
     recommended_action: 'invoke_product_entry',

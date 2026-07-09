@@ -13,6 +13,13 @@ import {
   validateSurfaceRequirements,
 } from '@redcube/overlay-core';
 
+import type {
+  PptDeckSurfaceArtifact,
+  PptDeckSurfaceArtifactContent,
+  PptDeckSurfaceArtifactPath,
+  PptDeckSurfaceBundleRequest,
+} from './types.js';
+
 function deriveStageRequirements(contract: SurfaceContract) {
   if (contract?.stage_requirements) {
     return contract.stage_requirements;
@@ -39,12 +46,12 @@ const SURFACE_ARTIFACTS = buildSurfaceArtifactSpecs({
   stageRequirements: deriveStageRequirements,
 });
 
-export function buildDeckSurfaceBundle({ contract }: { contract: SurfaceContract }) {
-  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS);
+export function buildDeckSurfaceBundle({ contract }: PptDeckSurfaceBundleRequest): PptDeckSurfaceArtifact[] {
+  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS) as PptDeckSurfaceArtifact[];
 }
 
-export function listDeckSurfaceArtifactPaths() {
-  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
+export function listDeckSurfaceArtifactPaths(): PptDeckSurfaceArtifactPath[] {
+  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS) as PptDeckSurfaceArtifactPath[];
 }
 
 const SURFACE_VALIDATORS = createSurfaceValidators({
@@ -209,7 +216,10 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
     ]),
 });
 
-export function validateDeckSurfaceArtifact(relativePath: string, content: unknown): boolean {
+export function validateDeckSurfaceArtifact(
+  relativePath: PptDeckSurfaceArtifactPath,
+  content: PptDeckSurfaceArtifactContent | null | undefined,
+): boolean {
   return validateSurfaceArtifact({
     family: 'deck',
     validators: SURFACE_VALIDATORS,

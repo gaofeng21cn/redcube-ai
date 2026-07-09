@@ -13,14 +13,21 @@ import {
   validateSurfaceRequirements,
 } from '@redcube/overlay-core';
 
+import type {
+  PosterSurfaceArtifact,
+  PosterSurfaceArtifactContent,
+  PosterSurfaceArtifactPath,
+  PosterSurfaceBundleRequest,
+} from './types.js';
+
 const SURFACE_ARTIFACTS = buildSurfaceArtifactSpecs({ includeLifecycleStageContract: true });
 
-export function buildPosterSurfaceBundle({ contract }: { contract: SurfaceContract }) {
-  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS);
+export function buildPosterSurfaceBundle({ contract }: PosterSurfaceBundleRequest): PosterSurfaceArtifact[] {
+  return buildSurfaceBundle(contract, SURFACE_ARTIFACTS) as PosterSurfaceArtifact[];
 }
 
-export function listPosterSurfaceArtifactPaths() {
-  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
+export function listPosterSurfaceArtifactPaths(): PosterSurfaceArtifactPath[] {
+  return listSurfaceArtifactPaths(SURFACE_ARTIFACTS) as PosterSurfaceArtifactPath[];
 }
 
 const SURFACE_VALIDATORS = createSurfaceValidators({
@@ -93,7 +100,10 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
     ]),
 });
 
-export function validatePosterSurfaceArtifact(relativePath: string, content: unknown): boolean {
+export function validatePosterSurfaceArtifact(
+  relativePath: PosterSurfaceArtifactPath,
+  content: PosterSurfaceArtifactContent | null | undefined,
+): boolean {
   return validateSurfaceArtifact({
     family: 'poster',
     validators: SURFACE_VALIDATORS,

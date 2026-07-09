@@ -1,4 +1,3 @@
-// @ts-nocheck
 import path from 'node:path';
 import { readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -8,6 +7,48 @@ import {
 } from 'opl-framework-shared/family-shared-release';
 
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
+
+type Resolver = (specifier: string) => string;
+type RuntimeSharedResolutionCheck = Readonly<{
+  specifier: string;
+  resolve_from?: string;
+}>;
+type WorkspacePackageResolutionOptions = Readonly<{
+  repoRoot?: string;
+  specifiers?: readonly string[];
+  resolve?: Resolver;
+}>;
+type RuntimeSharedResolutionOptions = Readonly<{
+  repoRoot?: string;
+  checks?: readonly RuntimeSharedResolutionCheck[];
+  resolve?: (specifier: string, check: RuntimeSharedResolutionCheck) => string;
+}>;
+type SharedPinAlignmentOptions = Readonly<{
+  repoRoot?: string;
+  consumerRepoId?: string;
+  ownerRepoRoot?: string;
+  ownerRepo?: string;
+}>;
+type SharedPinAlignmentInspection = Readonly<{
+  status: string;
+  owner_commit: string;
+  repo_root: string;
+  findings: readonly Readonly<{
+    file?: string;
+    kind: string;
+    status: string;
+    pins: readonly string[];
+  }>[];
+}>;
+type BuildNodeTestArgsOptions = Readonly<{
+  forwardedArgs?: readonly string[];
+  serialized?: boolean;
+}>;
+type ParseRunTestGroupArgsResult = Readonly<{
+  groupName?: string;
+  forwardedArgs: string[];
+  requestedFiles: string[];
+}>;
 
 const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
   '@redcube/runtime',
@@ -33,7 +74,14 @@ const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   },
 ]);
 
-function isWithinRepoRoot(repoRoot, resolvedPath) {
+function nodeErrorCode(error: unknown, fallback: string): string {
+  if (typeof error === 'object' && error !== null && 'code' in error) {
+    return String((error as { code?: unknown }).code ?? fallback);
+  }
+  return fallback;
+}
+
+function isWithinRepoRoot(repoRoot: string, resolvedPath: string): boolean {
   const relative = path.relative(repoRoot, resolvedPath);
   return relative === '.' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
@@ -42,7 +90,7 @@ function inspectWorkspacePackageResolution({
   repoRoot,
   specifiers = WORKSPACE_PACKAGE_SPECIFIERS,
   resolve,
-} = {}) {
+}: WorkspacePackageResolutionOptions = {}) {
   const resolvedRepoRoot = path.resolve(String(repoRoot || process.cwd()));
   const resolver = resolve || createRequire(path.join(resolvedRepoRoot, 'package.json')).resolve;
   const resolvedPackages = specifiers.map((specifier) => ({
@@ -64,7 +112,7 @@ function inspectWorkspacePackageResolution({
   };
 }
 
-export function assertWorkspacePackageResolution(options = {}) {
+export function assertWorkspacePackageResolution(options: WorkspacePackageResolutionOptions = {}) {
   const inspection = inspectWorkspacePackageResolution(options);
   if (!inspection.ok) {
     const leaked = inspection.leaking_resolutions
@@ -81,17 +129,25 @@ function inspectRequiredRuntimeSharedResolution({
   repoRoot,
   checks = REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS,
   resolve,
-} = {}) {
+}: RuntimeSharedResolutionOptions = {}) {
   const resolvedRepoRoot = path.resolve(String(repoRoot || process.cwd()));
-  const resolvedSpecifiers = [];
-  const missingSpecifiers = [];
+  const resolvedSpecifiers: Array<{
+    specifier: string;
+    resolve_from: string;
+    resolved_path: string;
+  }> = [];
+  const missingSpecifiers: Array<{
+    specifier: string;
+    resolve_from: string;
+    error_code: string;
+  }> = [];
 
   for (const check of checks) {
     const specifier = check.specifier;
     const resolveFrom = check.resolve_from || 'package.json';
     try {
       const resolver = resolve
-        ? (targetSpecifier) => resolve(targetSpecifier, check)
+        ? (targetSpecifier: string) => resolve(targetSpecifier, check)
         : createRequire(path.join(resolvedRepoRoot, resolveFrom)).resolve;
       resolvedSpecifiers.push({
         specifier,
@@ -102,7 +158,7 @@ function inspectRequiredRuntimeSharedResolution({
       missingSpecifiers.push({
         specifier,
         resolve_from: resolveFrom,
-        error_code: error?.code || 'ERR_MODULE_NOT_FOUND',
+        error_code: nodeErrorCode(error, 'ERR_MODULE_NOT_FOUND'),
       });
     }
   }
@@ -118,7 +174,7 @@ function inspectRequiredRuntimeSharedResolution({
   };
 }
 
-export function assertRequiredRuntimeSharedResolution(options = {}) {
+export function assertRequiredRuntimeSharedResolution(options: RuntimeSharedResolutionOptions = {}) {
   const inspection = inspectRequiredRuntimeSharedResolution(options);
   if (!inspection.ok) {
     const missing = inspection.missing_specifiers
@@ -136,16 +192,16 @@ function inspectCurrentRepoSharedPinAlignment({
   consumerRepoId = 'redcube',
   ownerRepoRoot,
   ownerRepo = 'one-person-lab',
-} = {}) {
+}: SharedPinAlignmentOptions = {}): SharedPinAlignmentInspection {
   return inspectCurrentRepoFamilySharedAlignment({
     repoRoot,
     consumerRepoId,
     ownerRepoRoot,
     ownerRepo,
-  });
+  }) as SharedPinAlignmentInspection;
 }
 
-export function assertCurrentRepoSharedPinAlignment(options = {}) {
+export function assertCurrentRepoSharedPinAlignment(options: SharedPinAlignmentOptions = {}) {
   const inspection = inspectCurrentRepoSharedPinAlignment(options);
   if (inspection.status !== 'aligned') {
     const findings = inspection.findings
@@ -163,7 +219,10 @@ export function assertCurrentRepoSharedPinAlignment(options = {}) {
   return inspection;
 }
 
-export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
+export function buildNodeTestArgs({
+  forwardedArgs = [],
+  serialized = false,
+}: BuildNodeTestArgsOptions = {}): string[] {
   const args = ['--experimental-strip-types', '--test'];
   if (serialized) {
     // Browser / screenshot / local-exec heavy files can still oversubscribe the host;
@@ -173,17 +232,17 @@ export function buildNodeTestArgs({ forwardedArgs = [], serialized = false }) {
   return [...args, ...forwardedArgs];
 }
 
-function parseRequestedFileList(value) {
+function parseRequestedFileList(value: unknown): string[] {
   return String(value || '')
     .split(',')
     .map((entry) => entry.trim())
     .filter(Boolean);
 }
 
-export function parseRunTestGroupArgs(argv = []) {
+export function parseRunTestGroupArgs(argv: readonly string[] = []): ParseRunTestGroupArgsResult {
   const [groupName, ...args] = argv;
-  const forwardedArgs = [];
-  const requestedFiles = [];
+  const forwardedArgs: string[] = [];
+  const requestedFiles: string[] = [];
 
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
@@ -210,7 +269,7 @@ export function parseRunTestGroupArgs(argv = []) {
   };
 }
 
-function normalizeRequestedTestFiles(files = []) {
+function normalizeRequestedTestFiles(files: readonly string[] = []): string[] {
   const normalized = files.map((file) => String(file).trim().replaceAll(path.sep, '/').replace(/^\.\//, ''));
   const invalid = normalized.filter((file) => !/^tests\/[^/]+\.test\.(?:js|ts)$/.test(file));
   if (invalid.length > 0) {
@@ -219,7 +278,15 @@ function normalizeRequestedTestFiles(files = []) {
   return [...new Set(normalized)];
 }
 
-export function selectGroupFiles({ groupName, groupFiles = [], requestedFiles = [] } = {}) {
+export function selectGroupFiles({
+  groupName = '(unknown)',
+  groupFiles = [],
+  requestedFiles = [],
+}: {
+  groupName?: string;
+  groupFiles?: readonly string[];
+  requestedFiles?: readonly string[];
+} = {}): string[] {
   if (requestedFiles.length === 0) {
     return [...groupFiles];
   }
@@ -232,7 +299,13 @@ export function selectGroupFiles({ groupName, groupFiles = [], requestedFiles = 
   return groupFiles.filter((file) => normalized.includes(file));
 }
 
-export function discoverRootTestFiles({ testsDir = 'tests', entries } = {}) {
+export function discoverRootTestFiles({
+  testsDir = 'tests',
+  entries,
+}: {
+  testsDir?: string;
+  entries?: readonly string[];
+} = {}): string[] {
   const directoryEntries = entries ?? readdirSync(path.resolve(testsDir));
   return directoryEntries
     .filter((entry) => entry.endsWith('.test.js') || entry.endsWith('.test.ts'))
@@ -241,10 +314,14 @@ export function discoverRootTestFiles({ testsDir = 'tests', entries } = {}) {
 }
 
 export function assertRootTestPartition({
-  discoveredFiles,
-  partitionFiles,
+  discoveredFiles = [],
+  partitionFiles = [],
   partitionName = 'meta/family/integration/e2e/historical',
-} = {}) {
+}: {
+  discoveredFiles?: readonly string[];
+  partitionFiles?: readonly string[];
+  partitionName?: string;
+} = {}): void {
   const discovered = [...discoveredFiles].sort();
   const base = [...partitionFiles];
   const duplicates = base.filter((file, index) => base.indexOf(file) !== index);

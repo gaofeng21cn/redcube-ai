@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   buildProductEntryStart,
   buildProductEntryOverview,
@@ -41,6 +40,43 @@ interface ProductEntryManifestEntrySurfaces {
   productEntryQuickstart: ProductEntryQuickstartCompanion;
   productEntryReadiness: ProductEntryReadinessCompanion;
   productEntryStart: ProductEntryStartCompanion;
+}
+
+function projectResumeSurface(
+  resumeSurface: {
+    surface_kind: string;
+    command?: string | null;
+    session_locator_field?: string | null;
+    checkpoint_locator_field?: string | null;
+  },
+): ProductEntryStartCompanion['resume_surface'] {
+  if (!resumeSurface.command) {
+    throw new Error('product entry resume surface command is required');
+  }
+  const projected: ProductEntryStartCompanion['resume_surface'] = {
+    surface_kind: resumeSurface.surface_kind,
+    command: resumeSurface.command,
+  };
+  if (resumeSurface.session_locator_field) {
+    projected.session_locator_field = resumeSurface.session_locator_field;
+  }
+  if (resumeSurface.checkpoint_locator_field) {
+    projected.checkpoint_locator_field = resumeSurface.checkpoint_locator_field;
+  }
+  return projected;
+}
+
+function projectOverviewProgressSurface(
+  progressSurface: ReturnType<typeof buildProductEntryOverview>['progress_surface'],
+): NonNullable<ProductEntryOverviewCompanion['progress_surface']> {
+  const projected: NonNullable<ProductEntryOverviewCompanion['progress_surface']> = {
+    surface_kind: progressSurface.surface_kind,
+    command: progressSurface.command,
+  };
+  if (progressSurface.step_id) {
+    projected.step_id = progressSurface.step_id;
+  }
+  return projected;
 }
 
 export function buildProductEntryManifestEntrySurfaces({
@@ -146,7 +182,6 @@ export function buildProductEntryManifestEntrySurfaces({
         mode_id: 'opl_hosted_handoff',
         title: 'OPL-hosted stage runtime handoff',
         command: OPL_HOSTED_HANDOFF_REF,
-        action_ref: OPL_HOSTED_HANDOFF_REF,
         surface_kind: 'opl_hosted_product_entry',
         summary: 'Reserved for OPL framework callers while preserving the same downstream product entry contract.',
         requires: ['entry_session_id', 'overlay', 'topic_id', 'deliverable_id'],
@@ -166,6 +201,18 @@ export function buildProductEntryManifestEntrySurfaces({
     ),
     human_gate_ids: humanGateIds,
   });
+  const productEntryStartCompanion: ProductEntryStartCompanion = {
+    ...productEntryStart,
+    ok: true,
+    resume_surface: projectResumeSurface(productEntryStart.resume_surface),
+  };
+  const productEntryOverviewCompanion: ProductEntryManifestEntrySurfaces['productEntryOverview'] = {
+    ...productEntryOverview,
+    progress_surface: projectOverviewProgressSurface(productEntryOverview.progress_surface),
+    resume_surface: productEntryOverview.resume_surface
+      ? projectResumeSurface(productEntryOverview.resume_surface)
+      : undefined,
+  };
   const productEntryReadiness = buildProductEntryReadiness({
     verdict: 'service_surface_ready_not_end_user_shell',
     usable_now: true,
@@ -185,9 +232,9 @@ export function buildProductEntryManifestEntrySurfaces({
     ],
   });
   return {
-    productEntryOverview,
+    productEntryOverview: productEntryOverviewCompanion,
     productEntryQuickstart,
     productEntryReadiness,
-    productEntryStart,
+    productEntryStart: productEntryStartCompanion,
   };
 }

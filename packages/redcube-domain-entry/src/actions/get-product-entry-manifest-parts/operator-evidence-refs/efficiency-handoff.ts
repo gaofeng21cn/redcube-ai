@@ -1,12 +1,22 @@
-// @ts-nocheck
-
 import {
   RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX,
   RCA_EFFICIENCY_TARGET_VERIFICATION_REFS,
   RCA_EFFICIENCY_WORK_ORDER_ID,
 } from './evidence-constants.js';
 
-export function buildRcaEfficiencyHandoffProjection({ productionEvidenceScaleoutRefs } = {}) {
+type RefGroup = Record<string, unknown>;
+
+type ProductionEvidenceScaleoutRefs = RefGroup & {
+  review_export_verdict_refs?: RefGroup;
+  owner_receipt_refs?: RefGroup;
+  visual_memory_body_reuse_refs?: RefGroup;
+};
+
+export function buildRcaEfficiencyHandoffProjection({
+  productionEvidenceScaleoutRefs,
+}: {
+  productionEvidenceScaleoutRefs?: ProductionEvidenceScaleoutRefs;
+} = {}) {
   const reviewExportRefs = productionEvidenceScaleoutRefs?.review_export_verdict_refs || {};
   const ownerReceiptRefs = productionEvidenceScaleoutRefs?.owner_receipt_refs || {};
   const memoryReuseRefs = productionEvidenceScaleoutRefs?.visual_memory_body_reuse_refs || {};

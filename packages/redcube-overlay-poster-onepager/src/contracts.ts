@@ -255,15 +255,15 @@ const LIFECYCLE_STAGE_CONTRACT = {
 
 export function describePosterOnepagerOverlay() {
   return {
-    overlay_id: 'poster_onepager',
-    default_profile_id: 'knowledge_poster',
-    profiles: ['knowledge_poster'],
-    route_sequence: STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
-    deliverable_kind: 'poster_onepager',
-    prompt_pack_id: PROMPT_PACK.pack_id,
+    overlay_id: 'poster_onepager' as const,
+    default_profile_id: 'knowledge_poster' as const,
+    profiles: ['knowledge_poster' as const],
+    route_sequence: (STAGE_SEQUENCE.stages as PosterOnepagerStageDefinition[]).map((stage) => stage.stage_id),
+    deliverable_kind: 'poster_onepager' as const,
+    prompt_pack_id: PROMPT_PACK.pack_id as 'poster_onepager_mainline_v1',
     runtime: {
-      runner_id: 'families/poster-onepager',
-      owner: 'redcube_ai',
+      runner_id: 'families/poster-onepager' as const,
+      owner: 'redcube_ai' as const,
     },
   };
 }

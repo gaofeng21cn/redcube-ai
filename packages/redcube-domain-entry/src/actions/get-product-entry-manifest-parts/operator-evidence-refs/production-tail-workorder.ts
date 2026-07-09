@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import {
   RCA_OPERATOR_EVIDENCE_READINESS_PROJECTION_REF,
   RCA_OPL_EXPECTED_RECEIPT_MONITOR_FRESHNESS_HANDOFF_REF,
@@ -8,12 +6,55 @@ import {
   RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS,
 } from './evidence-constants.js';
 
+type RefGroup = Record<string, unknown>;
+
+type ProductionEvidenceScaleoutRefs = RefGroup & {
+  typed_blocker_refs?: unknown[];
+  repeated_no_regression_evidence_refs?: {
+    evidence_refs?: unknown[];
+    deliverable_family_refs?: unknown[];
+  };
+};
+
+type WorkspaceReceiptInventoryProjection = RefGroup & {
+  gap_projection?: {
+    status?: unknown;
+  };
+  receipt_counts?: {
+    total?: number;
+  };
+  coverage?: {
+    required_memory_lifecycle_receipts_visible?: boolean;
+  };
+};
+
+type TemporalReadiness = RefGroup & {
+  status?: unknown;
+  provider_kind_required_for_production?: unknown;
+  default_opl_temporal_hosted_autonomy_enabled?: boolean;
+};
+
+type TemporalLongSoakEvidenceInventory = RefGroup & {
+  evidence_count?: number;
+  latest_evidence_ref?: unknown;
+  latest_runtime_locator_ref?: unknown;
+  coverage?: {
+    long_soak_evidence_refs_visible?: boolean;
+  };
+};
+
 export function buildProductionEvidenceTailWorkOrder({
   productionEvidenceScaleoutRefs,
   oplExpectedReceiptMonitorFreshnessHandoff,
   workspaceReceiptInventoryProjection,
   temporalLongSoakEvidenceInventory,
   temporalAutonomyReadiness,
+}: {
+  productionEvidenceScaleoutRefs?: ProductionEvidenceScaleoutRefs;
+  oplExpectedReceiptMonitorFreshnessHandoff?: RefGroup;
+  workspaceReceiptInventoryProjection?: WorkspaceReceiptInventoryProjection;
+  temporalLongSoakEvidenceInventory?: TemporalLongSoakEvidenceInventory;
+  temporalAutonomyReadiness?: TemporalReadiness;
 } = {}) {
   const typedBlockerRefs = productionEvidenceScaleoutRefs?.typed_blocker_refs || [
     ...RCA_PRODUCTION_EVIDENCE_TYPED_BLOCKER_REFS,

@@ -1,4 +1,3 @@
-// @ts-nocheck
 export const DEFAULT_RUNTIME_OWNER = 'configured_family_runtime_provider';
 export const PRODUCT_INVOKE_COMMAND = 'redcube product invoke';
 export const PRODUCT_MANIFEST_COMMAND = 'opl_generated:product_entry_manifest';

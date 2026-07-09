@@ -1,9 +1,14 @@
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-type JsonObject = Record<string, unknown>;
+import {
+  type RedcubeInternalJsonObject as JsonObject,
+  isRedcubeInternalJsonObject,
+  mergeRedcubeInternalJson,
+  readRedcubeInternalJsonIfExists,
+} from '@redcube/redcube-config';
+
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const DEFAULT_REPO_ROOT = path.resolve(MODULE_DIR, '../../../');
 const EXECUTOR_ROUTING_FILE = 'executor-routing.json';
@@ -118,40 +123,14 @@ const BUILTIN_EXECUTOR_ROUTING_CONFIG: RedcubeExecutorRoutingConfig = {
   },
 };
 
-function isPlainObject(value: unknown): value is JsonObject {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
-
-function deepMerge<T extends JsonObject>(base: T, extra: unknown): T;
-function deepMerge(base: unknown, extra: unknown): unknown;
-function deepMerge(base: unknown, extra: unknown): unknown {
-  if (!isPlainObject(base)) return isPlainObject(extra) ? { ...extra } : extra;
-  if (!isPlainObject(extra)) return { ...base };
-
-  const merged: JsonObject = { ...base };
-  for (const [key, value] of Object.entries(extra)) {
-    if (isPlainObject(value) && isPlainObject(merged[key])) {
-      merged[key] = deepMerge(merged[key], value);
-    } else {
-      merged[key] = value;
-    }
-  }
-  return merged;
-}
-
-function readJsonIfExists(filePath: string): JsonObject | null {
-  if (!filePath || !existsSync(filePath)) return null;
-  return JSON.parse(readFileSync(filePath, 'utf-8')) as JsonObject;
-}
-
 function optionalString(value: unknown): string {
   return String(value || '').trim();
 }
 
 function hasExplicitDefaultExecutor(raw: unknown): boolean {
-  if (!isPlainObject(raw)) return false;
+  if (!isRedcubeInternalJsonObject(raw)) return false;
   const defaultExecutor = raw.default_executor;
-  if (!isPlainObject(defaultExecutor)) return false;
+  if (!isRedcubeInternalJsonObject(defaultExecutor)) return false;
   return ['executor_backend', 'execution_shape', 'hermes_profile']
     .some((key) => optionalString(defaultExecutor[key]));
 }
@@ -242,7 +221,7 @@ function runtimeStateExecutorRoutingFile({
 }
 
 function normalizeExecutorRoutingConfig(raw: unknown, sourceFile: string): RedcubeExecutorRoutingConfig {
-  if (!isPlainObject(raw)) {
+  if (!isRedcubeInternalJsonObject(raw)) {
     throw new Error(`RCA executor routing config must be a JSON object: ${sourceFile}`);
   }
   const schemaVersion = Number(raw.schema_version ?? 1);
@@ -250,7 +229,7 @@ function normalizeExecutorRoutingConfig(raw: unknown, sourceFile: string): Redcu
     throw new Error(`Unsupported RCA executor routing config schema_version in ${sourceFile}: ${schemaVersion}`);
   }
   const config = raw as JsonObject;
-  const defaultExecutor = isPlainObject(config.default_executor) ? config.default_executor : {};
+  const defaultExecutor = isRedcubeInternalJsonObject(config.default_executor) ? config.default_executor : {};
   const defaultBackend = normalizeExecutorBackend(
     defaultExecutor.executor_backend,
     `${sourceFile}.default_executor.executor_backend`,
@@ -260,13 +239,13 @@ function normalizeExecutorRoutingConfig(raw: unknown, sourceFile: string): Redcu
     defaultBackend,
     `${sourceFile}.default_executor.execution_shape`,
   );
-  const structuredCallRouting = isPlainObject(config.structured_call_routing)
+  const structuredCallRouting = isRedcubeInternalJsonObject(config.structured_call_routing)
     ? config.structured_call_routing
     : {};
-  const routes = isPlainObject(structuredCallRouting.routes) ? structuredCallRouting.routes : {};
+  const routes = isRedcubeInternalJsonObject(structuredCallRouting.routes) ? structuredCallRouting.routes : {};
   const normalizedRoutes: Record<string, RedcubeStructuredCallRoutePolicy> = {};
   for (const [routeKey, routePolicy] of Object.entries(routes)) {
-    if (!isPlainObject(routePolicy)) {
+    if (!isRedcubeInternalJsonObject(routePolicy)) {
       throw new Error(`RCA structured_call route policy must be an object: ${sourceFile}:${routeKey}`);
     }
     const routeBackend = normalizeExecutorBackend(
@@ -281,10 +260,10 @@ function normalizeExecutorRoutingConfig(raw: unknown, sourceFile: string): Redcu
     if (routeShape !== STRUCTURED_CALL_SHAPE) {
       throw new Error(`RCA structured_call route policy cannot use execution_shape=${routeShape}: ${sourceFile}:${routeKey}`);
     }
-    const oplExecutorAdapterReceipt = isPlainObject(routePolicy.opl_executor_adapter_receipt)
+    const oplExecutorAdapterReceipt = isRedcubeInternalJsonObject(routePolicy.opl_executor_adapter_receipt)
       ? routePolicy.opl_executor_adapter_receipt
       : undefined;
-    const oplHostedExecutorRequirement = isPlainObject(routePolicy.opl_hosted_executor_requirement)
+    const oplHostedExecutorRequirement = isRedcubeInternalJsonObject(routePolicy.opl_hosted_executor_requirement)
       ? routePolicy.opl_hosted_executor_requirement
       : undefined;
     if (
@@ -376,10 +355,10 @@ export function loadExecutorRoutingConfig(options: RedcubeExecutorRoutingOptions
   const sourceFiles: string[] = [];
   const defaultExecutorSourceFiles: string[] = [];
   for (const filePath of checked) {
-    const raw = readJsonIfExists(filePath);
+    const raw = readRedcubeInternalJsonIfExists(filePath);
     if (!raw) continue;
     if (hasExplicitDefaultExecutor(raw)) defaultExecutorSourceFiles.push(filePath);
-    config = normalizeExecutorRoutingConfig(deepMerge(config as unknown as JsonObject, raw), filePath);
+    config = normalizeExecutorRoutingConfig(mergeRedcubeInternalJson(config as unknown as JsonObject, raw), filePath);
     sourceFiles.push(filePath);
   }
   return {

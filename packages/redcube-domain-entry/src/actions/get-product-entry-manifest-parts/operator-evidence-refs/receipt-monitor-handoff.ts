@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 import {
   buildStageExpectedReceiptPayloadSummary,
   buildStageReplayHumanGateBlockerSummary,
@@ -11,10 +9,34 @@ import {
   RCA_REAL_NO_REGRESSION_EVIDENCE_CADENCE,
 } from './evidence-constants.js';
 
+type RefGroup = Record<string, unknown>;
+
+type ProductionEvidenceScaleoutRefs = RefGroup & {
+  owner_receipt_refs?: RefGroup;
+  workspace_receipt_scaleout_refs?: RefGroup;
+  visual_memory_body_reuse_refs?: RefGroup;
+  repeated_no_regression_evidence_refs?: RefGroup;
+  evidence_receipt_fixture_ref?: unknown;
+  typed_blocker_refs?: unknown[];
+};
+
+type WorkspaceReceiptInventoryProjection = RefGroup & {
+  status?: unknown;
+  scaleout_projection?: {
+    observed_workspace_count?: number;
+    observed_receipt_count?: number;
+    receipt_kind_coverage_ready?: boolean;
+  };
+};
+
 export function buildOplExpectedReceiptMonitorFreshnessHandoff({
   familyStageControlPlane,
   productionEvidenceScaleoutRefs,
   workspaceReceiptInventoryProjection,
+}: {
+  familyStageControlPlane: RefGroup;
+  productionEvidenceScaleoutRefs: ProductionEvidenceScaleoutRefs;
+  workspaceReceiptInventoryProjection: WorkspaceReceiptInventoryProjection;
 }) {
   const ownerReceiptRefs = productionEvidenceScaleoutRefs.owner_receipt_refs || {};
   const workspaceReceiptRefs = productionEvidenceScaleoutRefs.workspace_receipt_scaleout_refs || {};

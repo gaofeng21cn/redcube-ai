@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { getDefaultOverlayRegistry } from '@redcube/runtime';
 
 import {
@@ -11,6 +10,34 @@ import {
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
+type RuntimeContractInput = {
+  runtime_owner?: unknown;
+  session_continuity_root?: unknown;
+};
+
+type ManifestOverlayVisualPolicy = Record<string, unknown> & {
+  default_visual_route?: string;
+  default_visual_policy?: string;
+  image_page_authoring_lane?: unknown;
+  html_authoring_lane?: unknown;
+  native_ppt_proof_lane?: unknown;
+  html_design_companion?: unknown;
+  image_generation?: unknown;
+  route_selection_policy?: {
+    explicit_selection_required_for?: string[];
+    style_reference_dir_input?: string;
+  };
+};
+
+type ManifestOverlayDescription = Record<string, unknown> & {
+  route_sequence?: unknown[];
+  visual_authoring_policy?: ManifestOverlayVisualPolicy;
+};
+
+function describeManifestOverlay(overlayId: string): ManifestOverlayDescription {
+  return (overlayRegistry.getOverlay(overlayId)?.describeOverlay?.() || {}) as ManifestOverlayDescription;
+}
+
 export const OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT = Object.freeze({
   contract_ref: 'contracts/opl-framework/runtime-manager-contract.json',
   canonical_fail_closed_rules: [
@@ -20,7 +47,13 @@ export const OPL_FRAMEWORK_PROVIDER_RUNTIME_CONTRACT = Object.freeze({
   ],
 });
 
-export function buildRouteEquivalenceContract({ runtime, productEntrySessionCommand }) {
+export function buildRouteEquivalenceContract({
+  runtime,
+  productEntrySessionCommand,
+}: {
+  runtime: RuntimeContractInput;
+  productEntrySessionCommand: string;
+}) {
   return {
     surface_kind: 'route_equivalence_contract',
     owner: 'redcube_ai',
@@ -76,9 +109,9 @@ export function buildRouteEquivalenceContract({ runtime, productEntrySessionComm
 }
 
 export function buildDeliverableFacadeContract() {
-  const pptDeckDescription = overlayRegistry.getOverlay('ppt_deck')?.describeOverlay?.() || {};
-  const xiaohongshuVisualPolicy = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.().visual_authoring_policy || {};
-  const xiaohongshuDescription = overlayRegistry.getOverlay('xiaohongshu')?.describeOverlay?.() || {};
+  const pptDeckDescription = describeManifestOverlay('ppt_deck');
+  const xiaohongshuDescription = describeManifestOverlay('xiaohongshu');
+  const xiaohongshuVisualPolicy = xiaohongshuDescription.visual_authoring_policy || {};
   const pptDeckVisualPolicy = pptDeckDescription.visual_authoring_policy || {};
   const pptDefaultVisualRoute = pptDeckVisualPolicy.default_visual_route || 'author_image_pages';
   const xhsDefaultVisualRoute = xiaohongshuVisualPolicy.default_visual_route || 'author_image_pages';

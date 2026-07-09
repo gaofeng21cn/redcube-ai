@@ -1,50 +1,28 @@
-import { buildDeckRecord as buildDeckRecordJs } from './contracts.js';
+import { buildDeckRecord } from './contracts.js';
 import {
-  PPT_DECK_PROFILES as PPT_DECK_PROFILES_JS,
-  describePptDeckOverlay as describePptDeckOverlayJs,
-  hydratePptDeckContract as hydratePptDeckContractJs,
+  PPT_DECK_PROFILES,
+  describePptDeckOverlay,
+  hydratePptDeckContract,
 } from './profiles.js';
 import {
-  buildDeckSurfaceBundle as buildDeckSurfaceBundleJs,
-  listDeckSurfaceArtifactPaths as listDeckSurfaceArtifactPathsJs,
-  validateDeckSurfaceArtifact as validateDeckSurfaceArtifactJs,
+  buildDeckSurfaceBundle,
+  listDeckSurfaceArtifactPaths,
+  validateDeckSurfaceArtifact,
 } from './surface.js';
 
 import type {
-  PptDeckHydrateContractRequest,
-  PptDeckHydratedContract,
-  PptDeckOverlayCatalogEntry,
   PptDeckOverlayDefinition,
-  PptDeckOverlayProfiles,
-  PptDeckRecord,
-  PptDeckRecordInput,
   PptDeckStoryboardGateInput,
   PptDeckStoryboardGateReport,
-  PptDeckSurfaceArtifact,
-  PptDeckSurfaceArtifactContent,
-  PptDeckSurfaceArtifactPath,
-  PptDeckSurfaceBundleRequest,
 } from './types.js';
 
-export function buildDeckRecord(input: PptDeckRecordInput): PptDeckRecord {
-  return buildDeckRecordJs(
-    input as Parameters<typeof buildDeckRecordJs>[0],
-  ) as PptDeckRecord;
-}
-
-export const PPT_DECK_PROFILES: PptDeckOverlayProfiles = PPT_DECK_PROFILES_JS as PptDeckOverlayProfiles;
-
-export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
-  return describePptDeckOverlayJs() as PptDeckOverlayCatalogEntry;
-}
-
-export function hydratePptDeckContract(
-  request: PptDeckHydrateContractRequest,
-): PptDeckHydratedContract {
-  return hydratePptDeckContractJs(
-    request as Parameters<typeof hydratePptDeckContractJs>[0],
-  ) as unknown as PptDeckHydratedContract;
-}
+export { buildDeckRecord } from './contracts.js';
+export { PPT_DECK_PROFILES, describePptDeckOverlay, hydratePptDeckContract } from './profiles.js';
+export {
+  buildDeckSurfaceBundle,
+  listDeckSurfaceArtifactPaths,
+  validateDeckSurfaceArtifact,
+} from './surface.js';
 
 export function evaluateStoryboardGate(
   input: PptDeckStoryboardGateInput,
@@ -87,25 +65,6 @@ export function evaluateStoryboardGate(
     metrics: { slide_count: validSlides.length },
     next_action: 'continue',
   };
-}
-
-export function buildDeckSurfaceBundle(
-  request: PptDeckSurfaceBundleRequest,
-): PptDeckSurfaceArtifact[] {
-  return buildDeckSurfaceBundleJs(
-    request as Parameters<typeof buildDeckSurfaceBundleJs>[0],
-  ) as PptDeckSurfaceArtifact[];
-}
-
-export function listDeckSurfaceArtifactPaths(): PptDeckSurfaceArtifactPath[] {
-  return listDeckSurfaceArtifactPathsJs() as PptDeckSurfaceArtifactPath[];
-}
-
-export function validateDeckSurfaceArtifact(
-  relativePath: PptDeckSurfaceArtifactPath,
-  content: PptDeckSurfaceArtifactContent | null | undefined,
-): boolean {
-  return validateDeckSurfaceArtifactJs(relativePath, content) as boolean;
 }
 
 export const pptDeckOverlay: PptDeckOverlayDefinition = {

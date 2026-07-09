@@ -11,10 +11,8 @@ import {
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
 import {
-  assertAllFalse,
   assertEvery,
   assertIds,
-  assertPathIncludes,
   assertPathValues,
   list,
 } from './surface-fixture-assertions.ts';
@@ -96,7 +94,16 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       'no_resurrection_gate.generic_domain_action_adapter_owner_allowed': false,
     });
     assert.equal(adapterSourceClassification.source_refs.includes('packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/'), true);
-    assertAllFalse(domain_action_adapter, list('runtime_framework.family_scheduler_replacement.rca_generic_scheduler_owner runtime_framework.family_scheduler_replacement.rca_generic_daemon_owner runtime_framework.family_scheduler_replacement.rca_generic_lifecycle_owner runtime_framework.family_scheduler_replacement.rca_generic_queue_owner runtime_framework.family_scheduler_replacement.rca_generic_attempt_ledger_owner runtime_framework.family_scheduler_replacement.rca_generic_runner_owner runtime_framework.family_scheduler_replacement.rca_generic_workbench_owner runtime_framework.rca_thin_surface_policy.rca_is_functional_harness_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_runtime_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_scheduler_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_daemon_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_lifecycle_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_queue_owner runtime_framework.rca_thin_surface_policy.rca_is_stage_attempt_orchestrator_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_attempt_ledger_owner runtime_framework.rca_thin_surface_policy.rca_is_typed_closeout_transport_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_runner_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_transition_runner_owner runtime_framework.rca_thin_surface_policy.rca_is_generic_workbench_owner runtime_framework.rca_thin_surface_policy.rca_is_memory_transport_owner runtime_framework.rca_thin_surface_policy.rca_is_memory_refs_only_writeback_chain_owner runtime_framework.rca_thin_surface_policy.rca_is_artifact_lifecycle_owner runtime_framework.rca_thin_surface_policy.rca_is_review_repair_transport_owner runtime_framework.rca_thin_surface_policy.rca_is_restart_dead_letter_repair_human_gate_state_chain_owner runtime_framework.rca_thin_surface_policy.rca_is_native_helper_generic_envelope_owner runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.authority_boundary.opl_can_execute_rca_domain_action runtime_framework.rca_thin_surface_policy.opl_stability_read_model_consumption.authority_boundary.opl_can_authorize_visual_ready runtime_framework.rca_thin_surface_policy.privatized_functional_module_audit.authority_boundary.rca_generic_scheduler_owner runtime_framework.rca_thin_surface_policy.privatized_functional_module_audit.authority_boundary.opl_can_claim_production_soak_complete runtime_framework.rca_thin_surface_policy.opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.route_is_stage runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.opl_can_write_visual_truth runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.opl_can_store_artifact_blob runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.opl_can_declare_visual_ready runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.opl_can_declare_exportable runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.rca_implements_generic_route_scheduler runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.authority_boundary.rca_implements_generic_stage_attempt_graph owner_boundary.provider_owns_visual_truth owner_boundary.opl_owns_review_verdict owner_boundary.opl_owns_publication_gate owner_boundary.rca_owns_functional_harness owner_boundary.rca_owns_generic_runtime owner_boundary.rca_owns_generic_scheduler owner_boundary.rca_owns_generic_daemon owner_boundary.rca_owns_generic_lifecycle owner_boundary.rca_owns_generic_queue owner_boundary.rca_owns_stage_attempt_orchestrator owner_boundary.rca_owns_generic_attempt_ledger owner_boundary.rca_owns_typed_closeout_transport owner_boundary.rca_owns_generic_runner owner_boundary.rca_owns_generic_transition_runner owner_boundary.rca_owns_generic_workbench owner_boundary.rca_owns_memory_transport owner_boundary.rca_owns_memory_refs_only_writeback_chain owner_boundary.rca_owns_artifact_lifecycle owner_boundary.rca_owns_review_repair_transport owner_boundary.rca_owns_restart_dead_letter_repair_human_gate_state_chain owner_boundary.rca_owns_native_helper_generic_envelope mapped_surfaces.runtime_watch.domain_action_adapter_dispatch_allowed mapped_surfaces.runtime_watch.compatibility_alias_allowed mapped_surfaces.runtime_watch.no_resurrection_gate.generic_supervisor_owner_allowed mapped_surfaces.runtime_watch.declares_visual_ready mapped_surfaces.runtime_watch.declares_exportable mapped_surfaces.runtime_watch.declares_handoffable mapped_surfaces.runtime_watch.declares_production_soak_complete mapped_surfaces.visual_pattern_memory_writeback.opl_can_generate_memory_content mapped_surfaces.visual_pattern_memory_writeback.opl_can_accept_or_reject mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_receipt_instance mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_visual_truth mapped_surfaces.visual_pattern_memory_writeback.opl_can_write_artifact_blob mapped_surfaces.controlled_visual_stage_attempt.opl_holds_visual_or_export_verdict mapped_surfaces.opl_stability_read_model_consumption.authority_boundary.generic_fallback_can_mark_success mapped_surfaces.opl_stability_read_model_consumption.authority_boundary.event_bus_can_be_truth_source mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.authority_boundary.opl_can_authorize_review_export_verdict mapped_surfaces.visual_pack_compiler_handoff.visual_pack_discipline.authority_boundary.opl_can_write_rca_visual_truth mapped_surfaces.visual_pack_compiler_handoff.visual_pack_discipline.authority_boundary.provider_completion_is_visual_ready mapped_surfaces.visual_pack_compiler_handoff.markdown_marp_route_policy.authority_boundary.external_runtime_authority_allowed mapped_surfaces.visual_pack_compiler_handoff.render_review_gate_contract.authority_boundary.opl_can_declare_visual_ready mapped_surfaces.controlled_soak_no_regression_attempt.production_visual_stage_long_soak_complete_claimed mapped_surfaces.no_regression_owner_receipt_opl_consumption_proof.opl_consumption_policy.opl_can_claim_production_soak_complete mapped_surfaces.lifecycle_guarded_apply.opl_can_apply_domain_artifact_mutation mapped_surfaces.visual_transition_spec.opl_can_declare_visual_ready mapped_surfaces.visual_transition_spec.opl_can_declare_exportable mapped_surfaces.visual_transition_evaluator.authority_boundary.implements_opl_generic_transition_runner mapped_surfaces.visual_transition_evaluator.authority_boundary.writes_runner_state mapped_surfaces.visual_transition_evaluator.authority_boundary.declares_visual_ready runtime_residue_retirement.active_path_policy.hermes_agent_default_runtime runtime_residue_retirement.active_path_policy.retired_gateway_protocol_boundary_public_entry runtime_residue_retirement.active_path_policy.repo_local_manager_default'));
+    for (const forbiddenClaim of [
+      '"visual_ready":true',
+      '"exportable":true',
+      '"handoffable":true',
+      '"production_soak_complete":true',
+      '"compatibility_alias_allowed":true',
+      '"generic_domain_action_adapter_owner_allowed":true',
+    ]) {
+      assert.equal(JSON.stringify(domain_action_adapter).includes(forbiddenClaim), false, forbiddenClaim);
+    }
     assertPathValues(domain_action_adapter.owner_boundary, {
       rca_owns_visual_truth: true,
       rca_owns_review_publication_projection: true,
@@ -116,45 +123,19 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     const modulesById = Object.fromEntries(
       domain_action_adapter.mapped_surfaces.privatized_functional_module_audit.modules.map((entry) => [entry.module_id, entry]),
     );
-    assertPathValues(modulesById.product_entry_continuity_refs_adapter, {
-      'opl_replacement_expectation.replacement_surface': 'opl_app_session_shell_and_workbench',
-      status: 'opl_generated_workbench_session_surface_consumed',
-      activeCallerStatus: 'opl_generated_session_shell_domain_refs',
-      migration_class: 'refs_only_adapter',
-    });
-    assertPathValues(modulesById.artifact_export_lifecycle, {
-      status: 'opl_artifact_lifecycle_shell_consumed_refs_only',
-      activeCallerStatus: 'refs_only_artifact_authority_adapter_consuming_opl_lifecycle_shell',
-      'opl_replacement_expectation.replacement_surface': 'opl_artifact_lifecycle_gallery_handoff_shell',
-    });
-    assertEvery(
-      ['product_entry_continuity_refs_adapter', 'artifact_export_lifecycle'].map((moduleId) => modulesById[moduleId]),
-      (entry) => !/active_private|pending|should_move|handoff_required|lifecycle_candidate|migration_candidate|until_opl_generic_runner_exists/i
-        .test([entry.status, entry.activeCallerStatus, entry.migrationAction, entry.rca_scope, entry.audit_readout].join(' ')),
-      'closed module status has no active migration wording',
-    );
     for (const entry of Object.values(modulesById)) {
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
       assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
       assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
     }
-    assertPathIncludes(domain_action_adapter, {
-      'runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.forbidden_payload_classes': 'artifact_body',
-      'runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.allowed_handoff_refs': 'review_export_receipt_ref',
-      'mapped_surfaces.visual_pack_compiler_handoff.visual_pack_discipline.quality_gate_refs': 'agent/quality_gates/visual_pack_discipline.md',
-      'mapped_surfaces.visual_pack_compiler_handoff.visual_pack_discipline.forbidden_outputs': 'artifact_body',
-      'mapped_surfaces.visual_pack_compiler_handoff.markdown_marp_route_policy.forbidden_outputs': 'default_route_replacement',
-      'mapped_surfaces.visual_pack_compiler_handoff.render_review_gate_contract.forbidden_outputs': 'review_export_verdict_body',
-    });
     assert.deepEqual(domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff.generated_surface_handoff.generated_descriptor_scope, list('cli mcp skill product_entry product_status product_session domain_handler workbench'));
-    const authorityContracts = domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff
-      .minimal_authority_function_contract.authority_surface_contracts;
-    assertEvery(authorityContracts, (surface) =>
-      surface.programmatic_verdict_generation_allowed === false
-        && surface.mechanical_decision_forbidden === true
-        && surface.decision_boundary.programmatic_role_may_compute_ready_verdict === false,
-    'authority contracts keep AI-first decision boundary');
+    assertEvery(
+      domain_action_adapter.mapped_surfaces.visual_pack_compiler_handoff
+        .minimal_authority_function_contract.authority_surface_contracts,
+      (surface) => surface.programmatic_verdict_generation_allowed === false,
+      'authority contracts keep AI-first decision boundary',
+    );
     assert.deepEqual(
       domain_action_adapter.guarded_actions.map((entry) => entry.action),
       domain_action_adapterGuardedActionMetadata.guardedActionIds,

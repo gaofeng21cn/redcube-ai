@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 const OPL_LEDGER_ARTIFACT_REGISTRATION_POINTER = '/opl_ledger_artifact_registration';
 
 export function buildOplLedgerArtifactRegistrationContract() {

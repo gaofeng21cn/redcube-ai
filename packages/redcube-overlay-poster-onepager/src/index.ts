@@ -1,56 +1,29 @@
 import {
-  buildPosterOnepagerDeliverableRecord as buildPosterOnepagerDeliverableRecordJs,
-  describePosterOnepagerOverlay as describePosterOnepagerOverlayJs,
-  hydratePosterOnepagerContract as hydratePosterOnepagerContractJs,
+  buildPosterOnepagerDeliverableRecord,
+  describePosterOnepagerOverlay,
+  hydratePosterOnepagerContract,
 } from './contracts.js';
 import {
-  buildPosterSurfaceBundle as buildPosterSurfaceBundleJs,
-  listPosterSurfaceArtifactPaths as listPosterSurfaceArtifactPathsJs,
-  validatePosterSurfaceArtifact as validatePosterSurfaceArtifactJs,
+  buildPosterSurfaceBundle,
+  listPosterSurfaceArtifactPaths,
+  validatePosterSurfaceArtifact,
 } from './surface.js';
 
 import type {
-  PosterOnepagerDeliverableRecord,
-  PosterOnepagerDeliverableRecordInput,
-  PosterOnepagerHydrateContractRequest,
-  PosterOnepagerHydratedContract,
-  PosterOnepagerOverlayCatalogEntry,
   PosterOnepagerOverlayDefinition,
   PosterOnepagerStorylineGateReport,
-  PosterSurfaceArtifact,
-  PosterSurfaceArtifactContent,
-  PosterSurfaceArtifactPath,
-  PosterSurfaceBundleRequest,
 } from './types.js';
 
-export function buildPosterOnepagerDeliverableRecord(
-  input: PosterOnepagerDeliverableRecordInput,
-): PosterOnepagerDeliverableRecord {
-  return buildPosterOnepagerDeliverableRecordJs({
-    topicId: input.topicId,
-    deliverableId: input.deliverableId,
-    title: input.title,
-    goal: input.goal,
-    profileId: input.profileId,
-    hydratedContract: input.hydratedContract,
-  }) as PosterOnepagerDeliverableRecord;
-}
-
-export function describePosterOnepagerOverlay(): PosterOnepagerOverlayCatalogEntry {
-  return describePosterOnepagerOverlayJs() as PosterOnepagerOverlayCatalogEntry;
-}
-
-export function hydratePosterOnepagerContract(
-  request: PosterOnepagerHydrateContractRequest,
-): PosterOnepagerHydratedContract {
-  return hydratePosterOnepagerContractJs({
-    topicId: request.topicId,
-    deliverableId: request.deliverableId,
-    title: request.title,
-    goal: request.goal,
-    profileId: request.profileId,
-  }) as PosterOnepagerHydratedContract;
-}
+export {
+  buildPosterOnepagerDeliverableRecord,
+  describePosterOnepagerOverlay,
+  hydratePosterOnepagerContract,
+} from './contracts.js';
+export {
+  buildPosterSurfaceBundle,
+  listPosterSurfaceArtifactPaths,
+  validatePosterSurfaceArtifact,
+} from './surface.js';
 
 export function evaluatePosterStorylineGate(input: { headline?: string }): PosterOnepagerStorylineGateReport {
   const text = String(input.headline || '').trim();
@@ -59,21 +32,6 @@ export function evaluatePosterStorylineGate(input: { headline?: string }): Poste
     blocker: text.length > 0 ? null : 'headline_missing',
     next_action: text.length > 0 ? 'continue' : 'rerun_storyline',
   };
-}
-
-export function buildPosterSurfaceBundle(request: PosterSurfaceBundleRequest): PosterSurfaceArtifact[] {
-  return buildPosterSurfaceBundleJs(request) as PosterSurfaceArtifact[];
-}
-
-export function listPosterSurfaceArtifactPaths(): PosterSurfaceArtifactPath[] {
-  return listPosterSurfaceArtifactPathsJs() as PosterSurfaceArtifactPath[];
-}
-
-export function validatePosterSurfaceArtifact(
-  relativePath: PosterSurfaceArtifactPath,
-  content: PosterSurfaceArtifactContent | null | undefined,
-): boolean {
-  return validatePosterSurfaceArtifactJs(relativePath, content) as boolean;
 }
 
 export const posterOnepagerOverlay: PosterOnepagerOverlayDefinition = {

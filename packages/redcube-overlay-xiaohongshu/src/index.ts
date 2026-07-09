@@ -1,58 +1,31 @@
 import {
-  buildTopicRecord as buildTopicRecordJs,
-  buildXiaohongshuDeliverableRecord as buildXiaohongshuDeliverableRecordJs,
-  describeXiaohongshuOverlay as describeXiaohongshuOverlayJs,
-  hydrateXiaohongshuContract as hydrateXiaohongshuContractJs,
+  buildXiaohongshuDeliverableRecord,
+  describeXiaohongshuOverlay,
+  hydrateXiaohongshuContract,
 } from './contracts.js';
 import {
-  buildXiaohongshuSurfaceBundle as buildXiaohongshuSurfaceBundleJs,
-  listXiaohongshuSurfaceArtifactPaths as listXiaohongshuSurfaceArtifactPathsJs,
-  validateXiaohongshuSurfaceArtifact as validateXiaohongshuSurfaceArtifactJs,
+  buildXiaohongshuSurfaceBundle,
+  listXiaohongshuSurfaceArtifactPaths,
+  validateXiaohongshuSurfaceArtifact,
 } from './surface.js';
 
 import type {
-  XiaohongshuDeliverableRecord,
-  XiaohongshuDeliverableRecordInput,
-  XiaohongshuHydrateContractRequest,
-  XiaohongshuHydratedContract,
-  XiaohongshuOverlayCatalogEntry,
   XiaohongshuOverlayDefinition,
   XiaohongshuStorylineGateInput,
   XiaohongshuStorylineGateReport,
-  XiaohongshuSurfaceArtifact,
-  XiaohongshuSurfaceArtifactContent,
-  XiaohongshuSurfaceArtifactPath,
-  XiaohongshuSurfaceBundleRequest,
-  XiaohongshuTopicRecord,
-  XiaohongshuTopicRecordInput,
 } from './types.js';
 
-export function buildTopicRecord(input: XiaohongshuTopicRecordInput): XiaohongshuTopicRecord {
-  return buildTopicRecordJs(input) as XiaohongshuTopicRecord;
-}
-
-export function describeXiaohongshuOverlay(): XiaohongshuOverlayCatalogEntry {
-  return describeXiaohongshuOverlayJs() as XiaohongshuOverlayCatalogEntry;
-}
-
-export function hydrateXiaohongshuContract(
-  request: XiaohongshuHydrateContractRequest,
-): XiaohongshuHydratedContract {
-  return hydrateXiaohongshuContractJs(request) as XiaohongshuHydratedContract;
-}
-
-export function buildXiaohongshuDeliverableRecord(
-  input: XiaohongshuDeliverableRecordInput,
-): XiaohongshuDeliverableRecord {
-  return buildXiaohongshuDeliverableRecordJs({
-    topicId: input.topicId,
-    deliverableId: input.deliverableId,
-    title: input.title,
-    goal: input.goal,
-    profileId: input.profileId,
-    hydratedContract: input.hydratedContract,
-  }) as XiaohongshuDeliverableRecord;
-}
+export {
+  buildTopicRecord,
+  buildXiaohongshuDeliverableRecord,
+  describeXiaohongshuOverlay,
+  hydrateXiaohongshuContract,
+} from './contracts.js';
+export {
+  buildXiaohongshuSurfaceBundle,
+  listXiaohongshuSurfaceArtifactPaths,
+  validateXiaohongshuSurfaceArtifact,
+} from './surface.js';
 
 export function evaluateStorylineGate(input: XiaohongshuStorylineGateInput): XiaohongshuStorylineGateReport {
   const text = String(input.storylineText || '').trim();
@@ -73,23 +46,6 @@ export function evaluateStorylineGate(input: XiaohongshuStorylineGateInput): Xia
     metrics: { char_count: text.length },
     next_action: 'continue',
   };
-}
-
-export function buildXiaohongshuSurfaceBundle(
-  request: XiaohongshuSurfaceBundleRequest,
-): XiaohongshuSurfaceArtifact[] {
-  return buildXiaohongshuSurfaceBundleJs(request) as XiaohongshuSurfaceArtifact[];
-}
-
-export function listXiaohongshuSurfaceArtifactPaths(): XiaohongshuSurfaceArtifactPath[] {
-  return listXiaohongshuSurfaceArtifactPathsJs() as XiaohongshuSurfaceArtifactPath[];
-}
-
-export function validateXiaohongshuSurfaceArtifact(
-  relativePath: XiaohongshuSurfaceArtifactPath,
-  content: XiaohongshuSurfaceArtifactContent | null | undefined,
-): boolean {
-  return validateXiaohongshuSurfaceArtifactJs(relativePath, content) as boolean;
 }
 
 export const xiaohongshuOverlay: XiaohongshuOverlayDefinition = {
