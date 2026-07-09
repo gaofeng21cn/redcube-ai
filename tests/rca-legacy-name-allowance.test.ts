@@ -6,7 +6,7 @@ import { existsSync, readFileSync } from 'node:fs';
 
 import {
   activePrivatePlatformResurrectionViolations,
-} from '../scripts/private-platform-source-scan.ts';
+} from '../scripts/check-private-platform-retirement.ts';
 import {
   TEXT_EXTENSIONS,
   listTextFiles,
@@ -121,7 +121,7 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
 
   const scanPolicy = gate.active_source_resurrection_scan_policy;
   assert.equal(scanPolicy.policy_id, 'rca.source_morphology.active_source_no_resurrection_scan.v1');
-  assert.equal(scanPolicy.helper_ref, 'scripts/private-platform-source-scan.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS');
+  assert.equal(scanPolicy.helper_ref, 'scripts/check-private-platform-retirement.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS');
   assert.equal(scanPolicy.scan_roots.includes('packages'), true);
   assert.equal(scanPolicy.scan_roots.includes('contracts'), true);
   for (const key of [
