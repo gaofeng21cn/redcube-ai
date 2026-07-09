@@ -4,7 +4,6 @@ Owner: `RedCube AI`
 Purpose: `opl_private_implementation_migration_inventory`
 State: `active_inventory`
 Machine boundary: 本文是人读迁移治理台账。机器真相继续归 `contracts/private_functional_surface_policy.json`、`contracts/physical_source_morphology_policy.json`、runtime-program leaf contracts、CLI/MCP/API 行为、product-entry manifest、RCA domain handler projection、OPL-generated `domain_action_adapter` descriptor refs、workspace/runtime receipt、artifact locator、review/export gate 和 RCA owner receipt。
-Last reviewed: `2026-07-08`
 
 ## 当前 clean truth
 
@@ -14,7 +13,7 @@ OPL Framework 持有 generated/hosted wrappers、generic supervision/session/wor
 
 Product-entry manifest 当前只按 RCA domain refs、manifest assembly、visual route truth refs、authority refs、OPL shell projection 和 refs-only operator evidence 子投影读取。相关 source split 已作为 landed source shape 管理；剩余只是不改变 RCA owner 边界的 generated/default caller thinning tail。
 
-Deliverable route runner 入口也已做源码责任拆分：`run-deliverable-route.ts` 收薄为 `runDeliverableRoute` 调度入口，route dependency recovery、`stop_after_stage` continuation、`fix_html` agent-loop escalation proof、stage artifact / hydrated contract access 和 domain-entry response assembly 分别进入 `run-deliverable-route-parts/`。2026-07-05 进一步把 `runWithRecoverableDependencies + continueToStopAfterStage` 这段共同行为收进 `recovery.ts::runRouteWithRecoveryAndContinuation()`，让主 route 入口和 `fix_html` escalation 共用同一条 recovery/continuation 薄入口。这条 source shape 已 landed；剩余是 OPL generic route attempt shell / retry-dead-letter / attempt ledger 的 default caller tail，RCA 只保留 route policy、precondition / repair target refs 与 visual route handlers。
+Deliverable route runner 入口也已做源码责任拆分：`run-deliverable-route.ts` 收薄为 `runDeliverableRoute` 调度入口，route dependency recovery、`stop_after_stage` continuation、`fix_html` agent-loop escalation proof、stage artifact / hydrated contract access 和 domain-entry response assembly 分别进入 `run-deliverable-route-parts/`。`runWithRecoverableDependencies + continueToStopAfterStage` 这段共同行为收进 `recovery.ts::runRouteWithRecoveryAndContinuation()`，让主 route 入口和 `fix_html` escalation 共用同一条 recovery/continuation 薄入口。这条 source shape 已 landed；剩余是 OPL generic route attempt shell / retry-dead-letter / attempt ledger 的 default caller tail，RCA 只保留 route policy、precondition / repair target refs 与 visual route handlers。
 
 Executor runtime protocol 当前只保留 route-level executor policy、topology descriptor 和 receipt refs；refs-only route execution materialization 下沉到 runtime 内部 `route-execution-refs.ts`。RCA-local route-run JSON record store、event JSONL store、public `startRouteRun` / `completeRouteRun` / `failRouteRun` / event lifecycle API 已物理退役；route handler 只消费 OPL-bound caller 持有的 attempt refs，不再写 `runtime/runs/*.json` 或 `runtime/events/*.jsonl`。旧 `startHermesRun` / `completeHermesRun` / event API 已退役，Hermes-Agent 只保留为显式 opt-in executor/proof backend 语境。OPL attempt ledger / runtime record primitive 是 generic 运行事实 owner；RCA 只保留 route executor policy、telemetry projection、typed blocker / receipt refs 与 visual route handler。
 
@@ -22,7 +21,7 @@ Executor runtime protocol 当前只保留 route-level executor policy、topology
 
 本台账只维护当前 active surface 的分类、保留 authority、可上收 generic 子域和退役门。dated scan、line-count 变化、拆分过程、proof 命令和 closeout receipt 进入 contracts 或 `docs/history/**`，不在本文继续追加流水。
 
-本轮 currentness refresh 以 `contracts/physical_source_morphology_policy.json#/active_surface_classifications` 和 `contracts/private_functional_surface_policy.json#/repo_local_owner_delta_surface_policy` 为 per-surface SSOT。下方 path-level checkpoints 只作维护者定位和 focused verification 指针；若 path rows 与 surface-id contract 冲突，先更新 contract/source/tests 或重新生成 runtime-program leaf，再折回本文。
+Currentness readback 以 `contracts/physical_source_morphology_policy.json#/active_surface_classifications` 和 `contracts/private_functional_surface_policy.json#/repo_local_owner_delta_surface_policy` 为 per-surface SSOT。下方 path-level checkpoints 只作维护者定位和 focused verification 指针；若 path rows 与 surface-id contract 冲突，先更新 contract/source/tests 或重新生成 runtime-program leaf，再折回本文。
 
 ## Classification
 
