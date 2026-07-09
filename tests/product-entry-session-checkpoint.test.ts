@@ -33,6 +33,77 @@ function writeJson(file, value) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
 }
 
+const PROVIDER_LEDGER_DELTA = {
+  domain_alias: 'provider_ledger_closeout_binding_delta',
+  delta_kind: 'provider_ledger_closeout_binding',
+  required_output_kind: 'provider_attempt_ledger_binding',
+  owner: 'one-person-lab',
+  next_required_owner_action: 'resolve_provider_attempt_ledger',
+};
+
+const OPERATOR_TYPED_BLOCKER_DELTA = {
+  domain_alias: 'operator_typed_blocker_delta',
+  delta_kind: 'operator_typed_blocker',
+  required_output_kind: 'typed_blocker_resolution',
+  owner: 'redcube_ai',
+  next_required_owner_action: 'consume_route_closeout_before_new_plan',
+};
+
+const VISUAL_DELIVERABLE_DELTA = {
+  domain_alias: 'visual_deliverable_delta',
+  delta_kind: 'visual_deliverable_delta',
+  required_output_kind: 'visual_deliverable_delta',
+  owner: 'redcube_ai',
+  next_required_owner_action: 'pick_up_artifacts',
+};
+
+function readSessionUpdatedAt(first) {
+  const updatedAt = Date.parse(readJson(first.entry_session.session_file).updated_at);
+  assert.equal(Number.isFinite(updatedAt), true);
+  return updatedAt;
+}
+
+function writeRouteRun(workspaceRoot, routeRun) {
+  const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${routeRun.run_id}.json`);
+  writeJson(routeRunFile, routeRun);
+  return routeRunFile;
+}
+
+function invokeSessionProductEntry({ workspaceRoot, entrySessionId, deliveryRequest }) {
+  return invokeProductEntry({
+    workspace_locator: {
+      workspace_root: workspaceRoot,
+    },
+    entry_session_contract: {
+      entry_session_id: entrySessionId,
+    },
+    delivery_request: deliveryRequest,
+  });
+}
+
+function startProductEntry({
+  workspaceRoot,
+  entrySessionId,
+  deliverableId,
+  title,
+  goal,
+}) {
+  return invokeSessionProductEntry({
+    workspaceRoot,
+    entrySessionId,
+    deliveryRequest: {
+      deliverable_family: 'ppt_deck',
+      topic_id: 'topic-a',
+      deliverable_id: deliverableId,
+      profile_id: 'lecture_student',
+      title,
+      goal,
+      user_intent: '先做到故事主线',
+      stop_after_stage: 'storyline',
+    },
+  });
+}
+
 function buildProviderCurrentnessRun({
   first,
   runId,
@@ -41,9 +112,7 @@ function buildProviderCurrentnessRun({
   providerAttemptLedgerRef = undefined,
   localSessionRef = undefined,
 }) {
-  const firstSessionRecord = readJson(first.entry_session.session_file);
-  const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
-  assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+  const firstSessionUpdatedAt = readSessionUpdatedAt(first);
   const crossProviderAttemptIndex = {
     surface_kind: 'cross_provider_attempt_index',
     local_session_ref: localSessionRef ?? `product-entry-session:${first.entry_session.entry_session_id}`,
@@ -136,33 +205,18 @@ test('getProductEntrySession projects the OPL stage execution plan checkpoint wi
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const first = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-stale-checkpoint',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-stale-checkpoint',
-        profile_id: 'lecture_student',
-        title: 'Product entry stale checkpoint proof',
-        goal: '验证 product session 能吸收最新 OPL stage execution plan checkpoint',
-        user_intent: '先做到故事主线',
-        stop_after_stage: 'storyline',
-      },
+    const first = await startProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-stale-checkpoint',
+      deliverableId: 'deck-stale-checkpoint',
+      title: 'Product entry stale checkpoint proof',
+      goal: '验证 product session 能吸收最新 OPL stage execution plan checkpoint',
     });
 
-    const continued = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-stale-checkpoint',
-      },
-      delivery_request: {
+    const continued = await invokeSessionProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-stale-checkpoint',
+      deliveryRequest: {
         user_intent: '继续推进',
         stop_after_stage: 'detailed_outline',
       },
@@ -200,34 +254,20 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const first = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-closeout-first',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-closeout-first',
-        profile_id: 'lecture_student',
-        title: 'Product entry closeout-first proof',
-        goal: '验证 continuation 先消费同 deliverable 最新 closeout',
-        user_intent: '先做到故事主线',
-        stop_after_stage: 'storyline',
-      },
+    const first = await startProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-closeout-first',
+      deliverableId: 'deck-closeout-first',
+      title: 'Product entry closeout-first proof',
+      goal: '验证 continuation 先消费同 deliverable 最新 closeout',
     });
 
     const runId = 'run-closeout-first-latest';
     const closeoutRef = 'rca-closeout:deck-closeout-first/visual-director-block';
-    const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
-    const firstSessionRecord = readJson(first.entry_session.session_file);
-    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
-    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
+    const firstSessionUpdatedAt = readSessionUpdatedAt(first);
     const routeStartedAt = new Date(firstSessionUpdatedAt + 1000).toISOString();
     const routeFinishedAt = new Date(firstSessionUpdatedAt + 2000).toISOString();
-    writeJson(routeRunFile, {
+    const routeRunFile = writeRouteRun(workspaceRoot, {
       run_id: runId,
       route: 'visual_director_review',
       scope: 'deliverable',
@@ -307,22 +347,10 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
       refs: ['route_closeout_unconsumed'],
       domain_alias: 'platform_interface_repair_delta',
     });
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
-      domain_alias: 'operator_typed_blocker_delta',
-      delta_kind: 'operator_typed_blocker',
-      required_output_kind: 'typed_blocker_resolution',
-      owner: 'redcube_ai',
-      next_required_owner_action: 'consume_route_closeout_before_new_plan',
-    });
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, OPERATOR_TYPED_BLOCKER_DELTA);
     assert.equal(session.progress_projection.progress_delta_classification, 'platform_repair');
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
-      domain_alias: 'operator_typed_blocker_delta',
-      delta_kind: 'operator_typed_blocker',
-      required_output_kind: 'typed_blocker_resolution',
-      owner: 'redcube_ai',
-      next_required_owner_action: 'consume_route_closeout_before_new_plan',
-    });
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, OPERATOR_TYPED_BLOCKER_DELTA);
     assert.equal(
       session.runtime_loop_closure.control_policy.recommended_action,
       'consume_route_closeout_before_new_plan',
@@ -333,14 +361,10 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
       budget_exhausted: true,
     });
 
-    const blockedContinuation = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-closeout-first',
-      },
-      delivery_request: {
+    const blockedContinuation = await invokeSessionProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-closeout-first',
+      deliveryRequest: {
         user_intent: '继续推进到最终 PPT',
         stop_after_stage: 'visual_direction',
       },
@@ -366,31 +390,17 @@ test('getProductEntrySession fails closed when a newer route run lacks OPL provi
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const first = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-provider-currentness',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-provider-currentness',
-        profile_id: 'lecture_student',
-        title: 'Product entry provider currentness proof',
-        goal: '验证 currentness 必须区分本地 session ref 与 OPL provider attempt ledger ref',
-        user_intent: '先做到故事主线',
-        stop_after_stage: 'storyline',
-      },
+    const first = await startProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-provider-currentness',
+      deliverableId: 'deck-provider-currentness',
+      title: 'Product entry provider currentness proof',
+      goal: '验证 currentness 必须区分本地 session ref 与 OPL provider attempt ledger ref',
     });
 
     const runId = 'run-provider-currentness-local-only';
-    const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
-    const firstSessionRecord = readJson(first.entry_session.session_file);
-    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
-    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
-    writeJson(routeRunFile, {
+    const firstSessionUpdatedAt = readSessionUpdatedAt(first);
+    writeRouteRun(workspaceRoot, {
       run_id: runId,
       route: 'storyline',
       scope: 'deliverable',
@@ -454,21 +464,9 @@ test('getProductEntrySession fails closed when a newer route run lacks OPL provi
     );
     assert.equal(session.progress_projection.summary.content_status, 'blocked_missing_provider_attempt_ledger');
     assert.equal(session.progress_projection.typed_blocker.blocker_kind, 'missing_provider_attempt_ledger');
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
-      domain_alias: 'provider_ledger_closeout_binding_delta',
-      delta_kind: 'provider_ledger_closeout_binding',
-      required_output_kind: 'provider_attempt_ledger_binding',
-      owner: 'one-person-lab',
-      next_required_owner_action: 'resolve_provider_attempt_ledger',
-    });
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, PROVIDER_LEDGER_DELTA);
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
-      domain_alias: 'provider_ledger_closeout_binding_delta',
-      delta_kind: 'provider_ledger_closeout_binding',
-      required_output_kind: 'provider_attempt_ledger_binding',
-      owner: 'one-person-lab',
-      next_required_owner_action: 'resolve_provider_attempt_ledger',
-    });
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, PROVIDER_LEDGER_DELTA);
     assert.equal(session.runtime_loop_closure.control_policy.recommended_action, 'resolve_provider_attempt_ledger');
   });
 });
@@ -501,35 +499,21 @@ test('getProductEntrySession fails closed when provider attempt binding is parti
   for (const currentnessCase of cases) {
     await withMockCodexRuntimeState(async () => {
       const workspaceRoot = await prepareProductEntryWorkspace();
-      const first = await invokeProductEntry({
-        workspace_locator: {
-          workspace_root: workspaceRoot,
-        },
-        entry_session_contract: {
-          entry_session_id: currentnessCase.entrySessionId,
-        },
-        delivery_request: {
-          deliverable_family: 'ppt_deck',
-          topic_id: 'topic-a',
-          deliverable_id: currentnessCase.deliverableId,
-          profile_id: 'lecture_student',
-          title: 'Product entry provider binding fail-closed proof',
-          goal: '验证 provider attempt 与 ledger binding 不完整时不能 claim current',
-          user_intent: '先做到故事主线',
-          stop_after_stage: 'storyline',
-        },
+      const first = await startProductEntry({
+        workspaceRoot,
+        entrySessionId: currentnessCase.entrySessionId,
+        deliverableId: currentnessCase.deliverableId,
+        title: 'Product entry provider binding fail-closed proof',
+        goal: '验证 provider attempt 与 ledger binding 不完整时不能 claim current',
       });
 
-      writeJson(
-        path.join(workspaceRoot, 'runtime', 'runs', `${currentnessCase.runId}.json`),
-        buildProviderCurrentnessRun({
-          first,
-          runId: currentnessCase.runId,
-          deliverableId: currentnessCase.deliverableId,
-          providerAttemptRef: currentnessCase.providerAttemptRef,
-          providerAttemptLedgerRef: currentnessCase.providerAttemptLedgerRef,
-        }),
-      );
+      writeRouteRun(workspaceRoot, buildProviderCurrentnessRun({
+        first,
+        runId: currentnessCase.runId,
+        deliverableId: currentnessCase.deliverableId,
+        providerAttemptRef: currentnessCase.providerAttemptRef,
+        providerAttemptLedgerRef: currentnessCase.providerAttemptLedgerRef,
+      }));
 
       const session = await getProductEntrySession({
         entry_session_id: currentnessCase.entrySessionId,
@@ -546,20 +530,8 @@ test('getProductEntrySession fails closed when provider attempt binding is parti
         session.continuation_snapshot.closeout_first_blocker.blocker_kind,
         'missing_provider_attempt_ledger',
       );
-      assertNextForcedDelta(session.progress_projection.next_forced_delta, {
-        domain_alias: 'provider_ledger_closeout_binding_delta',
-        delta_kind: 'provider_ledger_closeout_binding',
-        required_output_kind: 'provider_attempt_ledger_binding',
-        owner: 'one-person-lab',
-        next_required_owner_action: 'resolve_provider_attempt_ledger',
-      });
-      assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
-        domain_alias: 'provider_ledger_closeout_binding_delta',
-        delta_kind: 'provider_ledger_closeout_binding',
-        required_output_kind: 'provider_attempt_ledger_binding',
-        owner: 'one-person-lab',
-        next_required_owner_action: 'resolve_provider_attempt_ledger',
-      });
+      assertNextForcedDelta(session.progress_projection.next_forced_delta, PROVIDER_LEDGER_DELTA);
+      assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, PROVIDER_LEDGER_DELTA);
     });
   }
 });
@@ -568,74 +540,24 @@ test('getProductEntrySession records provider attempt ledger refs when a newer r
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const first = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-provider-currentness-ready',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-provider-currentness-ready',
-        profile_id: 'lecture_student',
-        title: 'Product entry provider currentness ready proof',
-        goal: '验证 provider attempt ledger evidence 能随 currentness 投影',
-        user_intent: '先做到故事主线',
-        stop_after_stage: 'storyline',
-      },
+    const first = await startProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-provider-currentness-ready',
+      deliverableId: 'deck-provider-currentness-ready',
+      title: 'Product entry provider currentness ready proof',
+      goal: '验证 provider attempt ledger evidence 能随 currentness 投影',
     });
 
     const runId = 'run-provider-currentness-indexed';
     const providerAttemptRef = 'opl-provider-attempt:redcube_ai/storyline/attempt-001';
     const providerAttemptLedgerRef = 'attempt-ledger:opl/redcube_ai/storyline';
-    const routeRunFile = path.join(workspaceRoot, 'runtime', 'runs', `${runId}.json`);
-    const firstSessionRecord = readJson(first.entry_session.session_file);
-    const firstSessionUpdatedAt = Date.parse(firstSessionRecord.updated_at);
-    assert.equal(Number.isFinite(firstSessionUpdatedAt), true);
-    writeJson(routeRunFile, {
-      run_id: runId,
-      route: 'storyline',
-      scope: 'deliverable',
-      target: 'deck-provider-currentness-ready',
-      overlay: 'ppt_deck',
-      topic_id: 'topic-a',
-      deliverable_id: 'deck-provider-currentness-ready',
-      status: 'completed',
-      started_at: new Date(firstSessionUpdatedAt + 1000).toISOString(),
-      finished_at: new Date(firstSessionUpdatedAt + 2000).toISOString(),
-      current_stage: 'storyline',
-      stage_results: [{ stage: 'storyline', status: 'completed' }],
-      artifact_refs: ['artifact:indexed-storyline'],
-      closeout: {
-        closeout_ref: 'rca-closeout:deck-provider-currentness-ready/storyline',
-        consumed: true,
-        owner: 'redcube_ai',
-        route: 'storyline',
-      },
-      cross_provider_attempt_index: {
-        surface_kind: 'cross_provider_attempt_index',
-        local_session_ref: 'product-entry-session:session-provider-currentness-ready',
-        local_route_run_ref: `route-run:${runId}`,
-        provider_attempt_ref: providerAttemptRef,
-        provider_attempt_ledger_ref: providerAttemptLedgerRef,
-        provider_attempt_owner: 'one-person-lab',
-      },
-      progress_delta: {
-        deliverable_progress_delta: {
-          count: 1,
-          refs: ['artifact:indexed-storyline'],
-          domain_alias: 'visual_deliverable_delta',
-        },
-        platform_repair_delta: {
-          count: 0,
-          refs: [],
-          domain_alias: 'platform_interface_repair_delta',
-        },
-        progress_delta_classification: 'deliverable_progress',
-      },
-    });
+    writeRouteRun(workspaceRoot, buildProviderCurrentnessRun({
+      first,
+      runId,
+      deliverableId: 'deck-provider-currentness-ready',
+      providerAttemptRef,
+      providerAttemptLedgerRef,
+    }));
 
     const session = await getProductEntrySession({
       entry_session_id: 'session-provider-currentness-ready',
@@ -662,22 +584,10 @@ test('getProductEntrySession records provider attempt ledger refs when a newer r
       providerAttemptLedgerRef,
     );
     assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, true);
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, {
-      domain_alias: 'visual_deliverable_delta',
-      delta_kind: 'visual_deliverable_delta',
-      required_output_kind: 'visual_deliverable_delta',
-      owner: 'redcube_ai',
-      next_required_owner_action: 'pick_up_artifacts',
-    });
+    assertNextForcedDelta(session.progress_projection.next_forced_delta, VISUAL_DELIVERABLE_DELTA);
     assert.equal(session.progress_projection.summary.content_status, 'completed');
     assert.equal(session.runtime_loop_closure.control_policy.approval_required, false);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, {
-      domain_alias: 'visual_deliverable_delta',
-      delta_kind: 'visual_deliverable_delta',
-      required_output_kind: 'visual_deliverable_delta',
-      owner: 'redcube_ai',
-      next_required_owner_action: 'pick_up_artifacts',
-    });
+    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, VISUAL_DELIVERABLE_DELTA);
   });
 });
 
@@ -685,33 +595,18 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale l
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-route-checkpoint',
-      },
-      delivery_request: {
-        deliverable_family: 'ppt_deck',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-route-checkpoint',
-        profile_id: 'lecture_student',
-        title: 'Product entry route checkpoint proof',
-        goal: '验证 route-run checkpoint 不被旧 checkpoint projection 覆盖',
-        user_intent: '先做到故事主线',
-        stop_after_stage: 'storyline',
-      },
+    await startProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-route-checkpoint',
+      deliverableId: 'deck-route-checkpoint',
+      title: 'Product entry route checkpoint proof',
+      goal: '验证 route-run checkpoint 不被旧 checkpoint projection 覆盖',
     });
 
-    const routeRun = await invokeProductEntry({
-      workspace_locator: {
-        workspace_root: workspaceRoot,
-      },
-      entry_session_contract: {
-        entry_session_id: 'session-route-checkpoint',
-      },
-      delivery_request: {
+    const routeRun = await invokeSessionProductEntry({
+      workspaceRoot,
+      entrySessionId: 'session-route-checkpoint',
+      deliveryRequest: {
         route: 'storyline',
         user_intent: '直接重跑故事主线',
         cross_provider_attempt_index: buildOplRouteAttemptIndexForTest({
