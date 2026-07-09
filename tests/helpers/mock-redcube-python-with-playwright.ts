@@ -200,10 +200,6 @@ function parseArgs(argv) {
   return parsed;
 }
 
-function readText(file) {
-  return readFileSync(file, 'utf-8');
-}
-
 function fileSha256(file) {
   if (!file) return '';
   try {
@@ -215,7 +211,6 @@ function fileSha256(file) {
 
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
-  return dir;
 }
 
 function writeText(file, value) {
@@ -243,7 +238,7 @@ function incrementMockCallCount() {
 }
 
 function extractSlidesFromHtml(htmlFile) {
-  const html = readText(htmlFile);
+  const html = readFileSync(htmlFile, 'utf-8');
   const slideRoots = [...html.matchAll(/<[a-z][^>]*data-slide-root=(["'])true\1[^>]*data-slide-id=(["'])[^"']+\2[^>]*>/gi)]
     .map((match) => match[0]);
   if (slideRoots.length === 0) {
@@ -267,7 +262,6 @@ function buildPassReviewPayload(args) {
   if (!reviewMarkdown) fail('mock review requires --review-markdown');
 
   const slides = extractSlidesFromHtml(htmlFile);
-  ensureDir(outputDir);
   writeText(
     reviewMarkdown,
     [
@@ -365,8 +359,8 @@ function buildNativePayload(args) {
   if (!shapeManifestFile) fail('mock native requires --shape-manifest');
   if (!previewDir) fail('mock native requires --preview-dir');
 
-  const input = JSON.parse(readText(inputJson));
-  const engineContract = engineContractFile ? JSON.parse(readText(engineContractFile)) : {};
+  const input = JSON.parse(readFileSync(inputJson, 'utf-8'));
+  const engineContract = engineContractFile ? JSON.parse(readFileSync(engineContractFile, 'utf-8')) : {};
   const rendererKind = mockNativeRendererKind();
   const blueprintSlides = Array.isArray(input?.blueprint?.slides) && input.blueprint.slides.length > 0
     ? input.blueprint.slides
@@ -384,7 +378,6 @@ function buildNativePayload(args) {
       ? input.repair_feedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean)
       : [],
   );
-  ensureDir(previewDir);
   const slides = blueprintSlides.map((slide, index) => {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
     const planSlide = planSlidesById.get(slideId) || {};
@@ -774,7 +767,7 @@ function nativePlanTextCapacityFailure(shape, bounds) {
 function buildNativePlanValidationPayload(args) {
   const inputJson = args['input-json'];
   if (!inputJson) fail('mock native validation requires --input-json');
-  const input = JSON.parse(readText(inputJson));
+  const input = JSON.parse(readFileSync(inputJson, 'utf-8'));
   const plan = input?.editable_shape_plan || {};
   const designSpecLock = plan?.design_spec_lock && typeof plan.design_spec_lock === 'object'
     ? plan.design_spec_lock
