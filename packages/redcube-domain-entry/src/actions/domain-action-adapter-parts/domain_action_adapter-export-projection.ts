@@ -150,13 +150,18 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
   const productionEvidenceTailWorkOrder = (
     manifest.operator_evidence_readiness_projection?.production_evidence_tail_workorder || {}
   );
+  const domainAuthorityRefs = {
+    controlled_soak_no_regression_attempt: manifest.controlled_soak_no_regression_attempt,
+    domain_owner_receipt_contract: manifest.domain_owner_receipt_contract,
+    no_regression_owner_receipt_opl_consumption_proof: manifest.no_regression_owner_receipt_opl_consumption_proof,
+  };
   const temporalAutonomyReadiness = (
     manifest.temporal_autonomy_readiness
     || buildTemporalAutonomyReadinessProjection({
       familySchedulerReplacement,
       oplGenericPrimitiveConsumption,
       oplStabilityReadModelConsumption,
-      standardDomainAgentSkeleton: manifest.standard_domain_agent_skeleton,
+      domainAuthorityRefs,
       runtimeInventory: manifest.runtime_inventory,
       taskLifecycle: manifest.task_lifecycle,
       domainActionAdapterGuardedActionIds: listDomainActionAdapterGuardedActionIds(),
@@ -283,13 +288,6 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         ],
         owner: DOMAIN_ID,
         writable_by_domain_action_adapter: false,
-      },
-      standard_domain_agent_skeleton: {
-        ref: '/standard_domain_agent_skeleton',
-        owner: DOMAIN_ID,
-        mapping_model: manifest.standard_domain_agent_skeleton?.mapping_model || 'manifest_descriptor_mapping_only',
-        repo_source_layout_audit_ref: '/standard_domain_agent_skeleton/repo_source_boundary/audit_surface',
-        repo_source_layout_audit_status: manifest.standard_domain_agent_skeleton?.repo_source_boundary?.audit_surface?.status || 'unknown',
       },
       artifact_locator_contract: {
         ref: '/artifact_locator_contract',
@@ -510,11 +508,14 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       product_entry_manifest_ref: '/product_entry_manifest',
       opl_family_lifecycle_adapter_ref: '/opl_family_lifecycle_adapter',
       family_action_catalog_ref: '/family_action_catalog',
-      standard_domain_agent_skeleton_ref: '/standard_domain_agent_skeleton',
       artifact_locator_contract_ref: '/artifact_locator_contract',
       opl_ledger_artifact_registration_ref: '/opl_ledger_artifact_registration',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       domain_action_adapter_receipt_refs_ref: '/domain_action_adapter_receipt_refs',
+      domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+      lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
+      visual_transition_spec_ref: '/visual_transition_spec',
+      visual_transition_evaluator_ref: '/visual_transition_evaluator',
       workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
       controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
       controlled_memory_apply_proof_ref: '/controlled_memory_apply_proof',

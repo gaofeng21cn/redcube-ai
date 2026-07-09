@@ -19,7 +19,6 @@ import {
 
 function compactManifestNoRegressionSources(manifest) {
   const controlledSoak = manifest.controlled_soak_no_regression_attempt || {};
-  const skeletonAudit = manifest.standard_domain_agent_skeleton?.repo_source_boundary?.audit_surface || {};
   const runtimeResidue = manifest.runtime_residue_retirement || {};
   return {
     controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
@@ -28,10 +27,9 @@ function compactManifestNoRegressionSources(manifest) {
     runtime_residue_retirement_ref: '/runtime_residue_retirement',
     domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
     lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
-    physical_skeleton_follow_through_ref: '/physical_skeleton_follow_through',
-    review_helper_baseline_follow_through_ref: '/review_helper_baseline_follow_through',
+    visual_transition_spec_ref: '/visual_transition_spec',
+    visual_transition_evaluator_ref: '/visual_transition_evaluator',
     controlled_soak_state: controlledSoak.state || 'deferred_typed_blocker',
-    skeleton_repo_source_layout_audit_status: skeletonAudit.status || 'unknown',
     runtime_residue_retirement_status: runtimeResidue.status || 'unknown',
   };
 }
@@ -75,9 +73,8 @@ export async function emitNoRegressionEvidence(task) {
     source_manifest_refs: sourceRefs,
     coverage: {
       verifies_descriptor_and_runtime_refs: true,
-      verifies_standard_skeleton_physical_anchor: true,
+      verifies_explicit_domain_authority_refs: true,
       verifies_legacy_default_active_path_retired: sourceRefs.runtime_residue_retirement_status === 'active_path_retired',
-      verifies_review_helper_line_budget_guard: true,
       long_visual_soak_claimed: false,
       visual_artifact_blob_written: false,
       review_export_verdict_written: false,

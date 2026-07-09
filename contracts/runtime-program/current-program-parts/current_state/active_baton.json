@@ -162,7 +162,7 @@
       "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
       "descriptor_id": "rca.visual_pattern_memory.descriptor.v1",
       "locator_id": "rca.visual_pattern_memory.locator.v1",
-      "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+      "source_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_memory_descriptor_locator",
       "policy_ref": "human_doc:visual_pattern_memory_policy",
       "human_doc_ref": "human_doc:domain_memory_descriptor_locator",
       "migration_plan_id": "rca.visual_pattern_memory.migration_plan.v1",
@@ -252,10 +252,10 @@
         "rejected"
       ]
     },
-    "standard_domain_agent_skeleton_repo_source_layout": {
+    "repo_source_layout_authority_refs": {
       "status": "audit_surface_landed",
-      "mapping_model": "rca_refs_only_opl_generated_standard_domain_agent",
-      "audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+      "mapping_model": "explicit_domain_authority_refs_no_private_standard_skeleton",
+      "audit_surface": "contracts/pack_compiler_input.json#/required_domain_pack_paths",
       "expected_roots": [
         "agent",
         "contracts",
@@ -395,42 +395,6 @@
       "rca_can_evaluate_guard_refs": true,
       "rca_implements_opl_generic_transition_runner": false,
       "repo_tracks_evaluator_contract": true
-    },
-    "physical_skeleton_follow_through": {
-      "status": "low_risk_repo_source_follow_through_landed",
-      "source_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
-      "physical_roots": [
-        "agent",
-        "contracts",
-        "runtime",
-        "docs"
-      ],
-      "forbidden_moves": [
-        "workspace_runtime_artifacts",
-        "receipt_instances",
-        "memory_content_body",
-        "png_pptx_pdf_exports",
-        "review_export_verdicts"
-      ]
-    },
-    "review_helper_baseline_follow_through": {
-      "status": "summary_and_geometry_split_landed_baseline_removed",
-      "source_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
-      "helper_path": "python/redcube_ai/native_helpers/ppt_deck/review.py",
-      "current_line_budget_baseline": null,
-      "current_helper_line_budget_state": "within_budget_after_summary_and_geometry_split",
-      "growth_guard": "default_1000_line_budget",
-      "split_plan_module_boundaries": [
-        "screenshot_capture_remaining",
-        "geometry_audit_landed",
-        "markdown_report_landed",
-        "summary_projection_landed"
-      ],
-      "landed_modules": [
-        "python/redcube_ai/native_helpers/ppt_deck/review_geometry.py",
-        "python/redcube_ai/native_helpers/ppt_deck/review_summary.py"
-      ],
-      "remaining_split_target": "screenshot_capture"
     },
     "opl_generic_primitive_consumption": {
       "surface_kind": "rca_current_program_canonical_projection_ref",
@@ -735,20 +699,18 @@
     "route_equivalence_manifest_surface": "opl_generated:product_entry_manifest#/route_equivalence",
     "deliverable_facade_manifest_surface": "opl_generated:product_entry_manifest#/deliverable_facade",
     "stage_control_projection_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/stage_control_projection",
-    "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+    "domain_memory_descriptor_locator_contract": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_memory_descriptor_locator",
     "visual_pattern_memory_writeback_manifest_surface": "opl_generated:product_entry_manifest#/visual_pattern_memory_writeback",
     "controlled_visual_stage_attempt_manifest_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt",
     "controlled_consumed_memory_writeback_receipt_proof_surface": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt/writeback_proof_contract",
     "controlled_memory_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
-    "standard_domain_agent_skeleton_layout_audit_surface": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton/repo_source_boundary/audit_surface",
+    "repo_source_layout_authority_manifest_surface": "contracts/pack_compiler_input.json#/required_domain_pack_paths",
     "runtime_residue_retirement_manifest_surface": "opl_generated:product_entry_manifest#/runtime_residue_retirement",
     "controlled_memory_runtime_receipt_instances_surface": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
     "domain_owner_receipt_contract_manifest_surface": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
     "lifecycle_guarded_apply_proof_manifest_surface": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
     "workspace_receipt_inventory_projection_manifest_surface": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
     "visual_transition_spec_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_spec",
-    "physical_skeleton_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/physical_skeleton_follow_through",
-    "review_helper_baseline_follow_through_manifest_surface": "opl_generated:product_entry_manifest#/review_helper_baseline_follow_through",
     "opl_stability_read_model_consumption_manifest_surface": "opl_generated:product_entry_manifest#/opl_stability_read_model_consumption",
     "operator_evidence_readiness_projection_manifest_surface": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
     "visual_transition_evaluator_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_evaluator"

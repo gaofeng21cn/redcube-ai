@@ -60,8 +60,8 @@ export async function getOverlayCatalog(request?: unknown): Promise<OverlayCatal
 
 export {
   buildFamilyDomainMemoryDescriptor,
-  buildStandardDomainAgentSkeleton,
-} from './actions/standard-domain-agent-skeleton.js';
+  buildRedCubeDomainAuthorityRefs,
+} from './actions/domain-authority-refs.js';
 
 export {
   buildRedCubeActionMetadata,

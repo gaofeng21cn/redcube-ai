@@ -94,7 +94,6 @@ test('RCA standard OPL primitive consumption is complete as a functional consume
   assert.deepEqual(
     payload.opl_generic_primitive_consumption.consumed_projection_surfaces.map((entry) => entry.primitive),
     [
-      'standard_domain_agent_scaffold',
       'generic_scheduler',
       'memory_transport',
       'artifact_lifecycle',

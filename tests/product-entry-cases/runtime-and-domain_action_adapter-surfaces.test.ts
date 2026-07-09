@@ -50,8 +50,6 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       'runtime_framework.rca_thin_surface_policy.route_stage_handoff_boundary.stage_graph_owner': 'one-person-lab',
       'source_manifest_refs.route_stage_handoff_boundary_ref': '/route_stage_handoff_boundary',
       'owner_boundary.rca_surface_role': 'visual_domain_authority_pack_plus_thin_program_surface',
-      'mapped_surfaces.standard_domain_agent_skeleton.ref': '/standard_domain_agent_skeleton',
-      'mapped_surfaces.standard_domain_agent_skeleton.repo_source_layout_audit_status': 'pass',
       'mapped_surfaces.artifact_locator_contract.ref': '/artifact_locator_contract',
       'mapped_surfaces.artifact_locator_contract.locator_model': 'opl_stage_folder_contract_refs_only',
       'mapped_surfaces.receipt_refs.ref': '/domain_action_adapter_receipt_refs',
@@ -90,6 +88,7 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       'mapped_surfaces.visual_transition_evaluator.callable_action': 'evaluate_visual_transition',
       'runtime_residue_retirement.status': 'active_path_retired',
     });
+    assert.equal(domain_action_adapter.mapped_surfaces.standard_domain_agent_skeleton, undefined);
     assertPathValues(adapterSourceClassification, {
       classification: 'domain_handler_target',
       current_rca_role: 'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner',

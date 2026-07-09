@@ -75,8 +75,16 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'task_lifecycle.checkpoint_summary.status': 'operator_review_required',
       'persistence_policy.policy_id': 'redcube_product_entry_persistence_policy',
       'owner_route.next_owner': 'redcube_ai',
-      'standard_domain_agent_skeleton.mapping_model': 'rca_refs_only_opl_generated_standard_domain_agent',
       'artifact_locator_contract.locator_model': 'opl_stage_folder_contract_refs_only',
+      'domain_memory_descriptor_locator.descriptor_id': 'rca.visual_pattern_memory.descriptor.v1',
+      'domain_owner_receipt_contract.contract_id': 'rca.domain_owner_receipt.v1',
+      'lifecycle_guarded_apply_proof.proof_id': 'rca.lifecycle_guarded_apply_proof.v1',
+      'visual_transition_spec.spec_id': 'rca.visual_transition_spec.v1',
+      'visual_transition_evaluator.evaluator_id': 'rca.visual_transition_evaluator.v1',
+      'controlled_visual_stage_attempt.fixture_id': 'rca.controlled_visual_stage_attempt.fixture.v1',
+      'controlled_memory_apply_proof.proof_id': 'rca.visual_pattern_memory.controlled_apply_proof.v1',
+      'controlled_soak_no_regression_attempt.attempt_id': 'rca.controlled_soak.no_regression_attempt.v1',
+      'domain_action_adapter_receipt_refs.receipt_contract_id': 'rca.domain_action_adapter.receipt_refs.v1',
       'opl_generic_primitive_consumption.status': 'functional_consumer_follow_through_landed',
       'opl_stability_read_model_consumption.status': 'refs_only_consumer_projection_landed',
       'skill_catalog.surface_kind': 'skill_catalog',
@@ -132,10 +140,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'production evidence tail 仍需 Temporal long soak、真实 memory/lifecycle receipt scaleout 与跨 family no-regression evidence。',
     ]);
     assert.deepEqual(manifest.opl_provider_runtime_contract.fail_closed_rules, list('domain_supervision_cannot_bypass_runtime executor_cannot_declare_global_gate_clear runtime_cannot_invent_domain_publishability_truth'));
-    assert.deepEqual(
-      manifest.standard_domain_agent_skeleton.repo_source_boundary.allowed_roots.map((root) => root.boundary_id),
-      ['agent', 'contracts', 'runtime', 'docs'],
-    );
+    assert.equal(manifest.standard_domain_agent_skeleton, undefined);
+    assert.equal(manifest.physical_skeleton_follow_through, undefined);
+    assert.equal(manifest.review_helper_baseline_follow_through, undefined);
     assert.deepEqual(manifest.opl_ledger_artifact_registration, readJson('contracts/opl_ledger_artifact_registration.json'));
     assertPathIncludes(manifest, {
       'artifact_locator_contract.opl_consumption_policy.forbidden': 'declare_visual_export_verdict',

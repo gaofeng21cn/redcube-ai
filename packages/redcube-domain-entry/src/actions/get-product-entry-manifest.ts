@@ -24,9 +24,9 @@ import { buildRedCubeFamilyStageControlPlane } from './family-stage-control-plan
 import {
   buildFamilyDomainMemoryDescriptor,
   buildRuntimeResidueRetirementAudit,
-  buildStandardDomainAgentSkeleton,
+  buildRedCubeDomainAuthorityRefs,
   buildVisualPatternMemoryWritebackProjection,
-} from './standard-domain-agent-skeleton.js';
+} from './domain-authority-refs.js';
 import {
   OPL_GENERATED_INTERFACE_CONSUMPTION,
 } from './guarded-domain-actions.js';
@@ -127,16 +127,15 @@ export async function getProductEntryManifest(request) {
     runtime_state_root: path.dirname(sessionContinuityRoot),
     session_continuity_root: sessionContinuityRoot,
   };
-  const standardDomainAgentSkeleton = buildStandardDomainAgentSkeleton({
+  const domainAuthorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot,
     runtime,
-    productEntrySessionCommand,
   });
   const visualTransitionEvaluator = buildVisualTransitionEvaluatorProjection({
-    visualTransitionSpec: standardDomainAgentSkeleton.visual_transition_spec,
+    visualTransitionSpec: domainAuthorityRefs.visual_transition_spec,
   });
-  const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: standardDomainAgentSkeleton.domain_memory_descriptor_locator });
-  const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton });
+  const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: domainAuthorityRefs.domain_memory_descriptor_locator });
+  const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ domainAuthorityRefs });
   const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({
     workspaceRoot,
     workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
@@ -166,7 +165,7 @@ export async function getProductEntryManifest(request) {
     runtimeLoopClosure: manifestRuntimeLoopClosure,
     reviewState: manifestReviewState,
     publicationProjection: manifestPublicationProjection,
-    artifactLocatorContract: standardDomainAgentSkeleton.artifact_locator_contract,
+    artifactLocatorContract: domainAuthorityRefs.artifact_locator_contract,
     source: 'manifest',
     entryMode: 'manifest_projection',
     manifestProjection: true,
@@ -242,7 +241,7 @@ export async function getProductEntryManifest(request) {
     pptRoutePolicy,
     pptRouteSelection,
     runtime,
-    standardDomainAgentSkeleton,
+    domainAuthorityRefs,
     workspaceRoot,
   });
 
@@ -309,23 +308,22 @@ export async function getProductEntryManifest(request) {
     family_action_catalog: actionMetadata.family_action_catalog,
     family_action_catalog_parity: actionMetadata.parity,
     family_stage_control_plane: familyStageControlPlane,
-    standard_domain_agent_skeleton: standardDomainAgentSkeleton,
-    artifact_locator_contract: standardDomainAgentSkeleton.artifact_locator_contract,
-    domain_memory_descriptor_locator: standardDomainAgentSkeleton.domain_memory_descriptor_locator,
+    artifact_locator_contract: domainAuthorityRefs.artifact_locator_contract,
+    domain_memory_descriptor_locator: domainAuthorityRefs.domain_memory_descriptor_locator,
     visual_pattern_memory_writeback: visualPatternMemoryWriteback,
-    domain_action_adapter_receipt_refs: standardDomainAgentSkeleton.domain_action_adapter_receipt_refs,
-    controlled_visual_stage_attempt: standardDomainAgentSkeleton.controlled_visual_stage_attempt,
-    controlled_memory_apply_proof: standardDomainAgentSkeleton.controlled_memory_apply_proof,
+    domain_action_adapter_receipt_refs: domainAuthorityRefs.domain_action_adapter_receipt_refs,
+    controlled_visual_stage_attempt: domainAuthorityRefs.controlled_visual_stage_attempt,
+    controlled_memory_apply_proof: domainAuthorityRefs.controlled_memory_apply_proof,
     workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
     opl_ledger_artifact_registration: oplLedgerArtifactRegistration,
     temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
     temporal_autonomy_readiness: temporalAutonomyReadiness,
     temporal_stage_run_consumption_policy: temporalStageRunConsumptionPolicy,
-    controlled_soak_no_regression_attempt: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt,
-    domain_owner_receipt_contract: standardDomainAgentSkeleton.domain_owner_receipt_contract,
-    no_regression_owner_receipt_opl_consumption_proof: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof,
-    lifecycle_guarded_apply_proof: standardDomainAgentSkeleton.lifecycle_guarded_apply_proof,
-    visual_transition_spec: standardDomainAgentSkeleton.visual_transition_spec,
+    controlled_soak_no_regression_attempt: domainAuthorityRefs.controlled_soak_no_regression_attempt,
+    domain_owner_receipt_contract: domainAuthorityRefs.domain_owner_receipt_contract,
+    no_regression_owner_receipt_opl_consumption_proof: domainAuthorityRefs.no_regression_owner_receipt_opl_consumption_proof,
+    lifecycle_guarded_apply_proof: domainAuthorityRefs.lifecycle_guarded_apply_proof,
+    visual_transition_spec: domainAuthorityRefs.visual_transition_spec,
     visual_transition_evaluator: visualTransitionEvaluator,
     family_scheduler_replacement: familySchedulerReplacement,
     opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
@@ -334,8 +332,6 @@ export async function getProductEntryManifest(request) {
     opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
     privatized_functional_module_audit: privatizedFunctionalModuleAudit,
     opl_substrate_adapter_export: oplSubstrateAdapterExport,
-    physical_skeleton_follow_through: standardDomainAgentSkeleton.physical_skeleton_follow_through,
-    review_helper_baseline_follow_through: standardDomainAgentSkeleton.review_helper_baseline_follow_through,
     runtime_residue_retirement: runtimeResidueRetirement,
     action_metadata: buildActionMetadataProjection(actionMetadata),
     skill_catalog: skillCatalog,
@@ -412,7 +408,7 @@ export async function getProductEntryManifest(request) {
     lifecycleLedger,
     ownerRoute,
     runtimeResidueRetirement,
-    standardDomainAgentSkeleton,
+    domainAuthorityRefs,
     visualTransitionEvaluator,
     visualPatternMemoryWriteback,
     workspaceReceiptInventoryProjection,

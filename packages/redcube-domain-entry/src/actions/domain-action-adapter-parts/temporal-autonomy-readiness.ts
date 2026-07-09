@@ -13,14 +13,14 @@ export function buildTemporalAutonomyReadinessProjection({
   familySchedulerReplacement,
   oplGenericPrimitiveConsumption,
   oplStabilityReadModelConsumption,
-  standardDomainAgentSkeleton,
+  domainAuthorityRefs,
   runtimeInventory,
   taskLifecycle,
   domainActionAdapterGuardedActionIds = [],
 } = {}) {
-  const controlledSoak = standardDomainAgentSkeleton?.controlled_soak_no_regression_attempt || {};
-  const domainOwnerReceiptContract = standardDomainAgentSkeleton?.domain_owner_receipt_contract || {};
-  const noRegressionProof = standardDomainAgentSkeleton?.no_regression_owner_receipt_opl_consumption_proof || {};
+  const controlledSoak = domainAuthorityRefs?.controlled_soak_no_regression_attempt || {};
+  const domainOwnerReceiptContract = domainAuthorityRefs?.domain_owner_receipt_contract || {};
+  const noRegressionProof = domainAuthorityRefs?.no_regression_owner_receipt_opl_consumption_proof || {};
 
   return {
     surface_kind: 'temporal_autonomy_readiness',

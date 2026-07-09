@@ -290,12 +290,6 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
     ],
     consumed_projection_surfaces: [
       {
-        primitive: 'standard_domain_agent_scaffold',
-        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton',
-        manifest_ref: '/standard_domain_agent_skeleton',
-        domain_action_adapter_ref: '/mapped_surfaces/standard_domain_agent_skeleton',
-      },
-      {
         primitive: 'generic_scheduler',
         contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement',
         manifest_ref: '/family_scheduler_replacement',
@@ -303,13 +297,13 @@ export function buildOplGenericPrimitiveConsumptionProjection() {
       },
       {
         primitive: 'memory_transport',
-        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/domain_authority_refs/domain_memory_descriptor_locator',
         manifest_ref: '/domain_memory_descriptor_locator',
         domain_action_adapter_ref: '/mapped_surfaces/visual_pattern_memory_writeback',
       },
       {
         primitive: 'artifact_lifecycle',
-        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof',
+        contract_ref: 'contracts/runtime-program/opl-family-contract-adoption.json#/domain_authority_refs/lifecycle_guarded_apply_proof',
         manifest_ref: '/lifecycle_guarded_apply_proof',
         domain_action_adapter_ref: '/mapped_surfaces/lifecycle_guarded_apply',
       },

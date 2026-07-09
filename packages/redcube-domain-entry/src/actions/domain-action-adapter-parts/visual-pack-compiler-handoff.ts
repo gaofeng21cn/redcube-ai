@@ -210,7 +210,7 @@ export function buildVisualPackCompilerHandoffProjection() {
       input_mode: 'domain_descriptor_refs_only',
       generated_surface_mode: 'opl_generated_surface_consumed_domain_handlers_only',
       source_refs: [
-        { source_id: 'domain_descriptor', ref: '/standard_domain_agent_skeleton' },
+        { source_id: 'domain_descriptor', ref: 'contracts/domain_descriptor.json' },
         { source_id: 'deliverable_family_graph', ref: '/family_stage_control_plane' },
         { source_id: 'action_metadata', ref: '/family_action_catalog' },
         { source_id: 'visual_transition_spec', ref: '/visual_transition_spec' },

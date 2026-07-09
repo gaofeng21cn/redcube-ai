@@ -11,7 +11,7 @@ import {
   buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
   buildRedCubeFamilyStageControlPlaneContract,
-  buildStandardDomainAgentSkeleton,
+  buildRedCubeDomainAuthorityRefs,
   buildVisualPackCompilerHandoffProjection,
 } from '../../packages/redcube-domain-entry/dist/index.js';
 import {
@@ -150,14 +150,13 @@ export function buildCanonicalPack() {
   const stageControlPlane = buildRedCubeFamilyStageControlPlaneContract({
     familyActionCatalog: actionCatalog,
   });
-  const skeleton = buildStandardDomainAgentSkeleton({
+  const authorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot: '<workspace_root>',
     runtime: {
       runtime_owner: 'codex_cli',
       runtime_state_root: '<runtime_state_root>',
       session_continuity_root: '<session_continuity_root>',
     },
-    productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
   });
   const visualPackCompilerHandoff = buildVisualPackCompilerHandoffProjection();
   const functionalAudit = buildPrivatizedFunctionalModuleAuditProjection();
@@ -176,15 +175,15 @@ export function buildCanonicalPack() {
     stageControlPlane,
     memoryDescriptor: {
       ...buildFamilyDomainMemoryDescriptor({
-        domainMemoryDescriptorLocator: skeleton.domain_memory_descriptor_locator,
+        domainMemoryDescriptorLocator: authorityRefs.domain_memory_descriptor_locator,
       }),
       root_contract_role: 'opl_standard_domain_agent_memory_descriptor',
       memory_body_owner: 'redcube_ai',
       opl_projection_policy: 'locator_and_receipt_refs_only',
     },
-    artifactLocatorContract: skeleton.artifact_locator_contract,
+    artifactLocatorContract: authorityRefs.artifact_locator_contract,
     ownerReceiptContract: {
-      ...skeleton.domain_owner_receipt_contract,
+      ...authorityRefs.domain_owner_receipt_contract,
       stage_folder_writer_policy: readJson('contracts/owner_receipt_contract.json').stage_folder_writer_policy,
     },
     packCompilerInput: {
@@ -223,7 +222,7 @@ export function buildCanonicalPack() {
         canonical_semantic_pack: 'agent/',
         action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
         stage_control_plane: 'packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
-        memory_descriptor: 'packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts::buildFamilyDomainMemoryDescriptor',
+        memory_descriptor: 'packages/redcube-domain-entry/src/actions/domain-authority-refs.ts::buildFamilyDomainMemoryDescriptor',
         functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
       },
       authority_boundary: {

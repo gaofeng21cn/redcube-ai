@@ -189,12 +189,6 @@
     ],
     "consumed_projection_surfaces": [
       {
-        "primitive": "standard_domain_agent_scaffold",
-        "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton",
-        "manifest_ref": "/standard_domain_agent_skeleton",
-        "domain_action_adapter_ref": "/mapped_surfaces/standard_domain_agent_skeleton"
-      },
-      {
         "primitive": "generic_scheduler",
         "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/family_scheduler_replacement",
         "manifest_ref": "/family_scheduler_replacement",
@@ -202,13 +196,13 @@
       },
       {
         "primitive": "memory_transport",
-        "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/domain_memory_descriptor_locator",
+        "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/domain_memory_descriptor_locator",
         "manifest_ref": "/domain_memory_descriptor_locator",
         "domain_action_adapter_ref": "/mapped_surfaces/visual_pattern_memory_writeback"
       },
       {
         "primitive": "artifact_lifecycle",
-        "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/standard_domain_agent_skeleton/lifecycle_guarded_apply_proof",
+        "contract_ref": "contracts/runtime-program/opl-family-contract-adoption.json#/lifecycle_guarded_apply_proof",
         "manifest_ref": "/lifecycle_guarded_apply_proof",
         "domain_action_adapter_ref": "/mapped_surfaces/lifecycle_guarded_apply"
       },
@@ -603,20 +597,139 @@
       "can_issue_review_or_export_verdict": false
     }
   },
-  "standard_domain_agent_skeleton": {
-    "surface_kind": "standard_domain_agent_skeleton_projection_ref",
-    "surface_id": "standard_domain_agent_skeleton",
+  "artifact_locator_contract": {
+    "surface_kind": "artifact_locator_contract_projection_ref",
+    "surface_id": "artifact_locator_contract",
     "projection_mode": "canonical_ref_only_no_body_copy",
     "body_copy_in_adoption": false,
-    "duplicate_body_policy": "canonical body stays in the referenced contract or generated product-entry readback; adoption records refs only",
-    "generated_readback_ref": "opl_generated:product_entry_manifest#/standard_domain_agent_skeleton",
-    "descriptor_builder_ref": "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts#buildStandardDomainAgentSkeleton",
-    "skeleton_id": "rca.standard_domain_agent_skeleton.v1",
-    "canonical_source_refs": [
-      "agent/",
-      "contracts/artifact_locator_contract.json",
-      "contracts/owner_receipt_contract.json",
-      "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton.ts"
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/artifact_locator_contract",
+    "manifest_ref": "/artifact_locator_contract",
+    "authority_role": "workspace_runtime_artifact_locator_refs",
+    "forbidden_body_fields": [
+      "canonical_artifact_blob",
+      "artifact_blob",
+      "visual_truth",
+      "review_export_verdict"
+    ]
+  },
+  "domain_memory_descriptor_locator": {
+    "surface_kind": "domain_memory_descriptor_locator_projection_ref",
+    "surface_id": "domain_memory_descriptor_locator",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/domain_memory_descriptor_locator",
+    "manifest_ref": "/domain_memory_descriptor_locator",
+    "status": "descriptor_proof_contract_landed_runtime_writeback_pending",
+    "authority_role": "locator_ref_receipt_consumer_only",
+    "subrefs": {
+      "memory_locator": "/domain_memory_descriptor_locator/memory_locator",
+      "writeback_proposal_generator": "/domain_memory_descriptor_locator/writeback_proposal_generator",
+      "writeback_receipt_contract": "/domain_memory_descriptor_locator/writeback_receipt_contract",
+      "operator_receipt_projection": "/domain_memory_descriptor_locator/operator_receipt_projection",
+      "migration_plan": "/domain_memory_descriptor_locator/migration_plan",
+      "seed_fixture_locator": "/domain_memory_descriptor_locator/seed_fixture_locator",
+      "writeback_receipt_locator": "/domain_memory_descriptor_locator/writeback_receipt_locator"
+    },
+    "forbidden_body_fields": [
+      "memory_content_body",
+      "slide_or_page_content",
+      "visual_truth",
+      "visual_verdict",
+      "export_verdict",
+      "review_export_verdict",
+      "canonical_artifact_blob",
+      "receipt_instance"
+    ]
+  },
+  "domain_owner_receipt_contract": {
+    "surface_kind": "domain_owner_receipt_contract_projection_ref",
+    "surface_id": "domain_owner_receipt_contract",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract",
+    "manifest_ref": "/domain_owner_receipt_contract",
+    "authority_role": "domain_receipt_typed_blocker_no_regression_refs"
+  },
+  "lifecycle_guarded_apply_proof": {
+    "surface_kind": "lifecycle_guarded_apply_proof_projection_ref",
+    "surface_id": "lifecycle_guarded_apply_proof",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof",
+    "manifest_ref": "/lifecycle_guarded_apply_proof",
+    "authority_role": "guarded_workspace_artifact_lifecycle_apply_refs"
+  },
+  "visual_transition_spec": {
+    "surface_kind": "visual_transition_spec_projection_ref",
+    "surface_id": "visual_transition_spec",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/visual_transition_spec",
+    "manifest_ref": "/visual_transition_spec",
+    "authority_role": "rca_visual_transition_table_and_guard_refs"
+  },
+  "visual_transition_evaluator": {
+    "surface_kind": "visual_transition_evaluator_projection_ref",
+    "surface_id": "visual_transition_evaluator",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/visual_transition_evaluator",
+    "manifest_ref": "/visual_transition_evaluator",
+    "authority_role": "guard_ref_evaluator_action"
+  },
+  "controlled_visual_stage_attempt": {
+    "surface_kind": "controlled_visual_stage_attempt_projection_ref",
+    "surface_id": "controlled_visual_stage_attempt",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/controlled_visual_stage_attempt",
+    "manifest_ref": "/controlled_visual_stage_attempt",
+    "authority_role": "controlled_memory_writeback_stage_attempt_refs"
+  },
+  "controlled_memory_apply_proof": {
+    "surface_kind": "controlled_memory_apply_proof_projection_ref",
+    "surface_id": "controlled_memory_apply_proof",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+    "manifest_ref": "/controlled_memory_apply_proof",
+    "authority_role": "controlled_memory_apply_no_forbidden_write_refs"
+  },
+  "controlled_soak_no_regression_attempt": {
+    "surface_kind": "controlled_soak_no_regression_attempt_projection_ref",
+    "surface_id": "controlled_soak_no_regression_attempt",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/controlled_soak_no_regression_attempt",
+    "manifest_ref": "/controlled_soak_no_regression_attempt",
+    "authority_role": "controlled_long_soak_or_typed_blocker_refs",
+    "no_regression_surface_refs": [
+      "/controlled_visual_stage_attempt",
+      "/controlled_memory_apply_proof",
+      "/artifact_locator_contract",
+      "/runtime_residue_retirement"
+    ]
+  },
+  "domain_action_adapter_receipt_refs": {
+    "surface_kind": "domain_action_adapter_receipt_refs_projection_ref",
+    "surface_id": "domain_action_adapter_receipt_refs",
+    "projection_mode": "canonical_ref_only_no_body_copy",
+    "body_copy_in_adoption": false,
+    "generated_readback_ref": "opl_generated:product_entry_manifest#/domain_action_adapter_receipt_refs",
+    "manifest_ref": "/domain_action_adapter_receipt_refs",
+    "authority_role": "guarded_domain_action_receipt_refs",
+    "forbidden_receipt_fields": [
+      "visual_verdict",
+      "visual_truth_body",
+      "export_verdict",
+      "review_verdict",
+      "review_export_verdict_body",
+      "publication_gate_verdict",
+      "canonical_artifact_blob",
+      "artifact_blob",
+      "artifact_body",
+      "memory_content_body",
+      "generic_runtime_state"
     ]
   },
   "non_goals": [

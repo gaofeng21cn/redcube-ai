@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  buildStandardDomainAgentSkeleton,
   buildVisualPackCompilerHandoffProjection,
 } from '../../packages/redcube-domain-entry/dist/index.js';
 import { readCurrentProgramContract } from '../helpers/current-program-contract.ts';
@@ -48,17 +47,6 @@ function hydrateAdoptionContract(payload) {
     physical_source_morphology_policy: isRefProjection(payload.physical_source_morphology_policy)
       ? JSON.parse(read('contracts/physical_source_morphology_policy.json'))
       : payload.physical_source_morphology_policy,
-    standard_domain_agent_skeleton: isRefProjection(payload.standard_domain_agent_skeleton)
-      ? buildStandardDomainAgentSkeleton({
-        workspaceRoot: '<workspace_root>',
-        runtime: {
-          runtime_owner: 'codex_cli',
-          runtime_state_root: '<runtime_state_root>',
-          session_continuity_root: '<session_continuity_root>',
-        },
-        productEntrySessionCommand: 'opl_generated:product_session --entry-session-id <entry-session-id>',
-      })
-      : payload.standard_domain_agent_skeleton,
     visual_pack_compiler_handoff: isRefProjection(payload.visual_pack_compiler_handoff)
       ? buildVisualPackCompilerHandoffProjection()
       : payload.visual_pack_compiler_handoff,

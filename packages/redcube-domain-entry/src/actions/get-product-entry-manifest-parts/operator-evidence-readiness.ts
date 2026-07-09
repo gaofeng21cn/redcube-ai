@@ -28,7 +28,7 @@ export function buildOperatorEvidenceReadinessProjection({
   oplGenericPrimitiveConsumption,
   oplGeneratedInterfaceConsumption,
   oplStabilityReadModelConsumption,
-  standardDomainAgentSkeleton,
+  domainAuthorityRefs,
   visualTransitionEvaluator,
   workspaceReceiptInventoryProjection,
   temporalLongSoakEvidenceInventory,
@@ -36,7 +36,7 @@ export function buildOperatorEvidenceReadinessProjection({
 }) {
   const receiptInventoryGapProjection = workspaceReceiptInventoryProjection?.gap_projection || {};
   const productionEvidenceScaleoutRefs = buildProductionEvidenceScaleoutRefs({
-    standardDomainAgentSkeleton,
+    domainAuthorityRefs,
     workspaceReceiptInventoryProjection,
   });
   const oplExpectedReceiptMonitorFreshnessHandoff = buildOplExpectedReceiptMonitorFreshnessHandoff({
@@ -79,12 +79,12 @@ export function buildOperatorEvidenceReadinessProjection({
       {
         source_id: 'no_regression_owner_receipt_opl_consumption_proof',
         ref: '/no_regression_owner_receipt_opl_consumption_proof',
-        status: standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof?.status || 'unknown',
+        status: domainAuthorityRefs.no_regression_owner_receipt_opl_consumption_proof?.status || 'unknown',
       },
       {
         source_id: 'domain_owner_receipt_contract',
         ref: '/domain_owner_receipt_contract',
-        allowed_return_shapes: standardDomainAgentSkeleton.domain_owner_receipt_contract?.allowed_return_shapes || [],
+        allowed_return_shapes: domainAuthorityRefs.domain_owner_receipt_contract?.allowed_return_shapes || [],
       },
       {
         source_id: 'production_evidence_scaleout_refs',
@@ -128,17 +128,17 @@ export function buildOperatorEvidenceReadinessProjection({
       {
         source_id: 'controlled_memory_apply_runtime_receipt_refs',
         ref: '/controlled_memory_apply_proof/runtime_receipt_instances',
-        instance_model: standardDomainAgentSkeleton.controlled_memory_apply_proof?.runtime_receipt_instances?.instance_model || 'runtime_locator_refs_only',
+        instance_model: domainAuthorityRefs.controlled_memory_apply_proof?.runtime_receipt_instances?.instance_model || 'runtime_locator_refs_only',
       },
       {
         source_id: 'lifecycle_guarded_apply_proof',
         ref: '/lifecycle_guarded_apply_proof',
-        operations: (standardDomainAgentSkeleton.lifecycle_guarded_apply_proof?.operations || []).map((operation) => operation.operation),
+        operations: (domainAuthorityRefs.lifecycle_guarded_apply_proof?.operations || []).map((operation) => operation.operation),
       },
       {
         source_id: 'controlled_soak_no_regression_attempt',
         ref: '/controlled_soak_no_regression_attempt',
-        state: standardDomainAgentSkeleton.controlled_soak_no_regression_attempt?.state || 'unknown',
+        state: domainAuthorityRefs.controlled_soak_no_regression_attempt?.state || 'unknown',
       },
       {
         source_id: 'workspace_receipt_inventory_projection',

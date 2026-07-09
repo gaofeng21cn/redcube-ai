@@ -153,7 +153,9 @@ test('domain-handler receipt actions emit refs-only workspace proof without prom
       surface_kind: 'no_regression_evidence',
       evidence_ref: evidence.result_surface.evidence_ref,
       'source_manifest_refs.runtime_residue_retirement_status': 'active_path_retired',
-      'source_manifest_refs.skeleton_repo_source_layout_audit_status': 'pass',
+      'source_manifest_refs.visual_transition_spec_ref': '/visual_transition_spec',
+      'source_manifest_refs.visual_transition_evaluator_ref': '/visual_transition_evaluator',
+      'coverage.verifies_explicit_domain_authority_refs': true,
       'coverage.verifies_legacy_default_active_path_retired': true,
       'coverage.long_visual_soak_claimed': false,
     });

@@ -12,34 +12,6 @@ export function buildControlledMemoryApplyProofRef() {
     label: 'RCA controlled visual-stage memory apply proof',
   };
 }
-export function buildSkeletonRepoSourceLayoutAudit({ repoSourceBoundaries }) {
-  const rootStatus = new Map([
-    ['agent', 'present'],
-    ['contracts', 'present'],
-    ['runtime', 'present'],
-    ['docs', 'present'],
-  ]);
-  return {
-    surface_kind: 'standard_domain_agent_skeleton_repo_source_layout_audit',
-    audit_id: 'rca.standard_domain_agent_skeleton.repo_source_layout_audit.v1',
-    status: 'pass',
-    audit_model: 'repo_source_boundary_mapping_with_runtime_artifact_exclusion',
-    expected_roots: repoSourceBoundaries.map((root) => root.boundary_id),
-    repo_source_layout: repoSourceBoundaries.map((root) => ({
-      boundary_id: root.boundary_id,
-      status: rootStatus.get(root.boundary_id) || 'missing',
-      repo_refs: root.repo_refs,
-    })),
-    missing_roots: [],
-    forbidden_repo_writes: [
-      'visual_truth',
-      'review_export_verdict',
-      'canonical_artifact_blob',
-      'memory_content_body',
-      'receipt_instance',
-    ],
-  };
-}
 
 export function buildRuntimeResidueRetirementAudit({ runtime } = {}) {
   return {
@@ -148,9 +120,9 @@ export function buildControlledMemoryApplyProof() {
   };
 }
 
-export function buildVisualPatternMemoryWritebackProjection({ standardDomainAgentSkeleton }) {
-  const locator = standardDomainAgentSkeleton.domain_memory_descriptor_locator;
-  const attempt = standardDomainAgentSkeleton.controlled_visual_stage_attempt;
+export function buildVisualPatternMemoryWritebackProjection({ domainAuthorityRefs }) {
+  const locator = domainAuthorityRefs.domain_memory_descriptor_locator;
+  const attempt = domainAuthorityRefs.controlled_visual_stage_attempt;
   return {
     surface_kind: 'visual_pattern_memory_writeback_projection',
     status: locator.status,

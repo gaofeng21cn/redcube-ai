@@ -13,13 +13,12 @@ import {
 } from './evidence-constants.js';
 
 export function buildProductionEvidenceScaleoutRefs({
-  standardDomainAgentSkeleton,
+  domainAuthorityRefs,
   workspaceReceiptInventoryProjection,
 }) {
-  const receiptContract = standardDomainAgentSkeleton.domain_owner_receipt_contract || {};
-  const memoryApplyProof = standardDomainAgentSkeleton.controlled_memory_apply_proof || {};
-  const noRegressionProof = standardDomainAgentSkeleton.no_regression_owner_receipt_opl_consumption_proof || {};
-  const physicalSkeleton = standardDomainAgentSkeleton.physical_skeleton_follow_through || {};
+  const receiptContract = domainAuthorityRefs.domain_owner_receipt_contract || {};
+  const memoryApplyProof = domainAuthorityRefs.controlled_memory_apply_proof || {};
+  const noRegressionProof = domainAuthorityRefs.no_regression_owner_receipt_opl_consumption_proof || {};
   const actualWorkspaceReceiptRefs =
     workspaceReceiptInventoryProjection?.actual_workspace_receipt_refs?.artifact_producing_owner_receipt_refs || [];
   const domainOwnerReceiptRefs = uniqueRefs([
@@ -175,7 +174,9 @@ export function buildProductionEvidenceScaleoutRefs({
     naming_tombstone_follow_through_refs: {
       status: 'tombstone_follow_through_refs_landed_no_compatibility_alias',
       active_caller_compatibility_alias_restored: false,
-      tombstone_refs: physicalSkeleton.tombstone_refs || [],
+      tombstone_refs: [
+        'human_doc:retired_route_narratives_tombstone',
+      ],
       retained_provenance_refs: [
         'contracts/runtime-program/managed-product-entry-hardening.json',
         'human_doc:retired_managed_product_entry_contract_tombstone',

@@ -9,7 +9,7 @@ import {
   DOMAIN_MEMORY_PROOF_CONTRACT_STATE,
   DOMAIN_MEMORY_RUNTIME_WRITEBACK_STATE,
   DOMAIN_OWNER,
-} from './skeleton-constants.js';
+} from './constants.js';
 
 export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, sessionContinuityRoot }) {
   return {

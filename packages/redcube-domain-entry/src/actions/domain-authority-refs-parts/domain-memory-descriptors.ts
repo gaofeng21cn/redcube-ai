@@ -8,7 +8,7 @@ import {
   FAMILY_MEMORY_FORBIDDEN_OPL_AUTHORITY,
   FAMILY_MEMORY_STAGE_APPLICABILITY,
   ref,
-} from './skeleton-constants.js';
+} from './constants.js';
 
 export function buildDomainMemoryDescriptorLocator() {
   const writebackProposalGenerator = {

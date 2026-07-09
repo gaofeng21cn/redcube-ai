@@ -645,7 +645,7 @@
       "rca_scope": "visual_memory_accept_reject_and_receipt_refs",
       "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
       "codePaths": [
-        "packages/redcube-domain-entry/src/actions/standard-domain-agent-skeleton-parts/memory-apply-proof.ts",
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/memory-apply-proof.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
         "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
       ],

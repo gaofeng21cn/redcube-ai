@@ -48,7 +48,7 @@ export function buildProductEntryManifestShellProjections({
   pptRoutePolicy,
   pptRouteSelection,
   runtime,
-  standardDomainAgentSkeleton,
+  domainAuthorityRefs,
   workspaceRoot,
 }) {
   const oplProviderRuntimeContract = buildOplProviderRuntimeContract({
@@ -172,7 +172,7 @@ export function buildProductEntryManifestShellProjections({
   const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({
     runtimeContinuityEnvelope,
     productEntrySessionCommand,
-    standardDomainAgentSkeleton,
+    domainAuthorityRefs,
   });
   const automation = buildAutomationCatalog({
     summary: 'RedCube automation companions expose continuation board tracking with operator review-gated continuation truth.',
@@ -235,7 +235,7 @@ export function buildProductEntryManifestShellProjections({
     familySchedulerReplacement,
     oplGenericPrimitiveConsumption,
     oplStabilityReadModelConsumption,
-    standardDomainAgentSkeleton,
+    domainAuthorityRefs,
     runtimeInventory,
     taskLifecycle,
     domainActionAdapterGuardedActionIds,

@@ -107,28 +107,35 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'runtime_health',
         'review_publication_projection_refs',
         'opl_family_lifecycle_adapter',
-        'standard_domain_agent_skeleton',
         'artifact_locator_contract',
         'domain_memory_descriptor_locator',
+        'domain_owner_receipt_contract',
+        'lifecycle_guarded_apply_proof',
+        'visual_transition_spec',
+        'visual_transition_evaluator',
+        'controlled_visual_stage_attempt',
+        'controlled_memory_apply_proof',
+        'controlled_soak_no_regression_attempt',
         'domain_action_adapter_receipt_refs',
       ],
     );
     assert.deepEqual(
-      registration.consumable_projection_refs.slice(-4),
-      ['/standard_domain_agent_skeleton', '/artifact_locator_contract', '/domain_memory_descriptor_locator', '/domain_action_adapter_receipt_refs'],
+      registration.consumable_projection_refs.slice(-10),
+      [
+        '/artifact_locator_contract',
+        '/domain_memory_descriptor_locator',
+        '/domain_owner_receipt_contract',
+        '/lifecycle_guarded_apply_proof',
+        '/visual_transition_spec',
+        '/visual_transition_evaluator',
+        '/controlled_visual_stage_attempt',
+        '/controlled_memory_apply_proof',
+        '/controlled_soak_no_regression_attempt',
+        '/domain_action_adapter_receipt_refs',
+      ],
     );
-    assert.equal(registration.standard_domain_agent_skeleton.ref, '/standard_domain_agent_skeleton');
-    assert.equal(registration.standard_domain_agent_skeleton.skeleton_id, 'rca.standard_domain_agent_skeleton.v1');
-    assert.deepEqual(registration.standard_domain_agent_skeleton.runtime_declares_only, [
-      'domain_handler_target',
-      'projection_builder',
-      'lifecycle_adapter',
-      'visual_transition_spec',
-      'visual_transition_evaluator',
-      'domain_memory_descriptor_locator',
-      'domain_owner_receipt_contract',
-      'lifecycle_guarded_apply_proof',
-    ]);
+    assert.equal(registration.standard_domain_agent_skeleton, undefined);
+    assert.equal(registration.artifact_locator_contract.ref, '/artifact_locator_contract');
     assert.equal(registration.domain_memory_descriptor_locator.ref, '/domain_memory_descriptor_locator');
     assert.equal(registration.domain_memory_descriptor_locator.descriptor_id, 'rca.visual_pattern_memory.descriptor.v1');
     assert.equal(registration.domain_memory_descriptor_locator.locator_id, 'rca.visual_pattern_memory.locator.v1');
@@ -136,6 +143,14 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     assert.equal(registration.domain_memory_descriptor_locator.opl_role, 'locator_ref_receipt_consumer_only');
     assert.equal(registration.domain_memory_descriptor_locator.opl_can_hold_memory_content, false);
     assert.equal(registration.domain_memory_descriptor_locator.opl_can_issue_review_or_export_verdict, false);
+    assert.equal(registration.domain_owner_receipt_contract.ref, '/domain_owner_receipt_contract');
+    assert.equal(registration.lifecycle_guarded_apply_proof.ref, '/lifecycle_guarded_apply_proof');
+    assert.equal(registration.visual_transition_spec.ref, '/visual_transition_spec');
+    assert.equal(registration.visual_transition_evaluator.ref, '/visual_transition_evaluator');
+    assert.equal(registration.controlled_visual_stage_attempt.ref, '/controlled_visual_stage_attempt');
+    assert.equal(registration.controlled_memory_apply_proof.ref, '/controlled_memory_apply_proof');
+    assert.equal(registration.controlled_soak_no_regression_attempt.ref, '/controlled_soak_no_regression_attempt');
+    assert.equal(registration.domain_action_adapter_receipt_refs.ref, '/domain_action_adapter_receipt_refs');
     assert.equal(
       registration.review_publication_truth.route_rule,
       'must_use_redcube_product_entry_and_review_export_gates',

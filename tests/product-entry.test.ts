@@ -4,7 +4,7 @@ await import('./product-entry-cases/manifest-status-preflight-surfaces.test.ts')
 await import('./product-entry-cases/evidence-scaleout-surfaces.test.ts');
 await import('./product-entry-cases/domain-memory-ref-adapter.test.ts');
 await import('./product-entry-cases/manifest-memory-and-attempt-surfaces.test.ts');
-await import('./product-entry-cases/memory-skeleton-retirement-proof.test.ts');
+await import('./product-entry-cases/domain-authority-refs-retirement-proof.test.ts');
 await import('./product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts');
 await import('./product-entry-cases/opl-ledger-artifact-registration.test.ts');
 await import('./product-entry-cases/runtime-default-product-entry.test.ts');

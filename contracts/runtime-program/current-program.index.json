@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "b1bd54740f438ae453b7b0bb0c7f556777f010b0c63f1d6059300ff91390545a",
+  "source_digest": "f3db39af1d7d50126f25d7b5a3a4c9b64650e7880112e7a8a6a99f139358b29c",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -134,8 +134,8 @@
       "json_pointer": "/current_state/active_baton",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 770,
-      "sha256": "2e5dfeb924d590eecfe0d185365300528e40a8ba990e038c56522f8b8ddf7028"
+      "line_count": 732,
+      "sha256": "b5b3047a86d53683ffbb2cb0ef9e3bd383da9f190250acb4da24e2b74c86be22"
     },
     {
       "json_pointer": "/current_state/active_mainline",

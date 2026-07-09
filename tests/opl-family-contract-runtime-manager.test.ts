@@ -22,7 +22,7 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   const stageProjection = payload.current_state.active_baton.scope.opl_family_stage_control_projection;
   const memory = payload.current_state.active_baton.scope.domain_memory_descriptor_locator;
   const applyProof = payload.current_state.active_baton.scope.controlled_memory_apply_proof;
-  const skeletonLayout = payload.current_state.active_baton.scope.standard_domain_agent_skeleton_repo_source_layout;
+  const repoSourceLayout = payload.current_state.active_baton.scope.repo_source_layout_authority_refs;
   const residueRetirement = payload.current_state.active_baton.scope.runtime_residue_retirement;
 
   assert.ok(managerBoundary.consumes_redcube_surfaces.includes('opl_family_lifecycle_adapter'));
@@ -124,11 +124,12 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(applyProof.repo_tracks_memory_content_body, false);
   assert.equal(applyProof.repo_tracks_receipt_instances, false);
 
-  assert.equal(skeletonLayout.status, 'audit_surface_landed');
-  assert.equal(skeletonLayout.mapping_model, 'rca_refs_only_opl_generated_standard_domain_agent');
-  assert.deepEqual(skeletonLayout.expected_roots, ['agent', 'contracts', 'runtime', 'docs']);
-  assert.deepEqual(skeletonLayout.missing_roots, []);
-  assert.ok(skeletonLayout.forbidden_repo_writes.includes('memory_content_body'));
+  assert.equal(repoSourceLayout.status, 'audit_surface_landed');
+  assert.equal(repoSourceLayout.mapping_model, 'explicit_domain_authority_refs_no_private_standard_skeleton');
+  assert.equal(repoSourceLayout.audit_surface, 'contracts/pack_compiler_input.json#/required_domain_pack_paths');
+  assert.deepEqual(repoSourceLayout.expected_roots, ['agent', 'contracts', 'runtime', 'docs']);
+  assert.deepEqual(repoSourceLayout.missing_roots, []);
+  assert.ok(repoSourceLayout.forbidden_repo_writes.includes('memory_content_body'));
 
   const ownerReceipt = payload.current_state.active_baton.scope.domain_owner_receipt_contract;
   assert.equal(ownerReceipt.status, 'contract_landed_runtime_no_regression_evidence_ref_available');
@@ -157,23 +158,8 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.equal(transitionSpec.family_transition_spec_descriptor_ref, '/visual_transition_spec/family_transition_spec_descriptor');
   assert.equal(transitionSpec.repo_tracks_runner_state, false);
 
-  const physicalFollowThrough = payload.current_state.active_baton.scope.physical_skeleton_follow_through;
-  assert.equal(physicalFollowThrough.status, 'low_risk_repo_source_follow_through_landed');
-  assert.deepEqual(physicalFollowThrough.physical_roots, ['agent', 'contracts', 'runtime', 'docs']);
-
-  const reviewHelper = payload.current_state.active_baton.scope.review_helper_baseline_follow_through;
-  assert.equal(reviewHelper.status, 'summary_and_geometry_split_landed_baseline_removed');
-  assert.equal(reviewHelper.helper_path, 'python/redcube_ai/native_helpers/ppt_deck/review.py');
-  assert.deepEqual(reviewHelper.split_plan_module_boundaries, [
-    'screenshot_capture_remaining',
-    'geometry_audit_landed',
-    'markdown_report_landed',
-    'summary_projection_landed',
-  ]);
-  assert.deepEqual(reviewHelper.landed_modules, [
-    'python/redcube_ai/native_helpers/ppt_deck/review_geometry.py',
-    'python/redcube_ai/native_helpers/ppt_deck/review_summary.py',
-  ]);
+  assert.equal(payload.current_state.active_baton.scope.physical_skeleton_follow_through, undefined);
+  assert.equal(payload.current_state.active_baton.scope.review_helper_baseline_follow_through, undefined);
 
   assert.equal(residueRetirement.status, 'active_path_retired');
   assert.deepEqual(residueRetirement.retired_default_surfaces, [
