@@ -1,7 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { createPptDeckProfilePresetParts } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core-profile-presets.ts';
@@ -81,6 +81,13 @@ function readImplementation(file) {
   return shell ? readFileSync(path.join(path.dirname(file), shell[1]), 'utf-8') : source;
 }
 
+function listFiles(root) {
+  return readdirSync(root, { withFileTypes: true }).flatMap((entry) => {
+    const file = path.join(root, entry.name);
+    return entry.isDirectory() ? listFiles(file) : [file];
+  });
+}
+
 function buildMinimalSlideHtml(slideId, withStyleTag = false) {
   return [
     `<div data-slide-root="true" data-slide-id="${slideId}">`,
@@ -141,6 +148,19 @@ test('ppt render_html rejects internal paper IDs and talk-track meta-language', 
     () => validate(leakedHtml, 'S01'),
     /authoring metadata/i,
   );
+});
+
+test('prompt render artifacts are not tracked as source templates', () => {
+  const promptHtmlFiles = listFiles('prompts').filter((file) => file.endsWith('.html'));
+  const generatedArtifacts = promptHtmlFiles
+    .filter((file) => file.includes(`${path.sep}render-artifacts${path.sep}`))
+    .sort();
+  const sourceTemplates = promptHtmlFiles
+    .filter((file) => file.includes(`${path.sep}render-templates${path.sep}`))
+    .sort();
+
+  assert.deepEqual(generatedArtifacts, []);
+  assert.ok(sourceTemplates.length > 0);
 });
 
 test('ppt authoring page budget keeps source page ranges as AI planning signals', () => {
