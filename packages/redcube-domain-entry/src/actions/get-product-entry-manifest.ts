@@ -39,6 +39,14 @@ import {
   buildDeliverableFacadeContract,
 } from './get-product-entry-manifest-parts/contracts.js';
 import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
+import {
+  buildFormalEntryPolicy,
+  buildManifestNotes,
+  buildManifestProjectionRefs,
+  buildProductEntryStatusSection,
+  buildSourceProvenanceSection,
+  projectProductEntryPreflight,
+} from './get-product-entry-manifest-parts/manifest-sections.js';
 import { buildReturnedManifestProjection } from './get-product-entry-manifest-parts/manifest-return.js';
 import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
 import { buildOplLedgerArtifactRegistrationContract } from './get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
@@ -150,16 +158,10 @@ export async function getProductEntryManifest(request) {
   const manifestRuntimeLoopClosure = buildRuntimeLoopClosureManifestSurface({
     runtimeOwner: runtime.runtime_owner,
   });
-  const manifestReviewState = {
-    surface_kind: 'review_state',
-    owner: 'redcube_ai',
-    status: 'runtime_projection_ref',
-  };
-  const manifestPublicationProjection = {
-    surface_kind: 'publication_projection',
-    owner: 'redcube_ai',
-    status: 'runtime_projection_ref',
-  };
+  const {
+    reviewState: manifestReviewState,
+    publicationProjection: manifestPublicationProjection,
+  } = buildManifestProjectionRefs();
   const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
     runtimeOwner: runtime.runtime_owner,
     runtimeLoopClosure: manifestRuntimeLoopClosure,
@@ -170,40 +172,7 @@ export async function getProductEntryManifest(request) {
     entryMode: 'manifest_projection',
     manifestProjection: true,
   });
-  const sourceProvenance = {
-    surface_kind: 'source_provenance',
-    summary: (
-      'RCA exposes visual-deliverable source provenance as OPL-indexable body-free refs only; '
-      + 'source truth, visual route judgment, artifact authority, review/export verdicts, and memory bodies remain RCA-owned.'
-    ),
-    source_provenance_ref: {
-      surface_kind: 'rca_visual_source_provenance',
-      ref: 'docs/source/source_augmentation_executor_contract.md',
-    },
-    historical_fixture_ref: {
-      surface_kind: 'rca_visual_source_fixture_ref',
-      ref: 'tests/fixtures/ppt-image-first-benchmark/manifest.json',
-    },
-    explicit_archive_import_ref: {
-      surface_kind: 'rca_explicit_source_intake_ref',
-      command: `${PRODUCT_STATUS_COMMAND} --workspace-root <workspace-root>`,
-    },
-    parity_oracle_ref: {
-      surface_kind: 'rca_visual_pack_parity_oracle_ref',
-      ref: '/visual_pack_compiler_handoff',
-    },
-    authority_boundary: [
-      'source_refs_do_not_contain_source_body',
-      'opl_projection_reads_refs_only',
-      'workspace_source_intake_shell_owner_is_one_person_lab',
-      'visual_source_truth_owner_is_redcube_ai',
-      'review_export_verdict_owner_is_redcube_ai',
-      'artifact_authority_owner_is_redcube_ai',
-      'no_runtime_workbench_ledger_or_scheduler_authority_transferred',
-    ],
-    capability_classification: 'source_provenance_only',
-    recommended_audit_command: PRODUCT_MANIFEST_COMMAND,
-  };
+  const sourceProvenance = buildSourceProvenanceSection();
   const actionMetadata = buildRedCubeActionMetadata();
   const familyStageControlPlane = buildRedCubeFamilyStageControlPlane({
     familyActionCatalog: actionMetadata.family_action_catalog,
@@ -248,31 +217,7 @@ export async function getProductEntryManifest(request) {
   const manifest = buildFamilyProductEntryManifest({
     manifest_kind: 'redcube_product_entry_manifest',
     target_domain_id: 'redcube_ai',
-    formal_entry: {
-      default: 'CLI',
-      supported_protocols: ['MCP'],
-      internal_surface: 'domain_entry_protocol_boundary',
-      internal_surface_role: 'service_safe_domain_entry_and_protocol_adapter',
-      retired_internal_surface_ids: ['retired_gateway_protocol_boundary_public_entry'],
-      retired_internal_surface_policy: {
-        surface_kind: 'retired_internal_surface_policy',
-        semantic_id_required: true,
-        required_id_prefix: 'retired_',
-        legacy_raw_surface_ids_forbidden: [
-          'managed',
-          'runtime',
-          'gateway',
-          'session',
-          'domain_action_adapter',
-        ],
-        legacy_terms_allowed_only_inside_retired_semantic_ids: true,
-        compatibility_alias_allowed: false,
-        callable_alias_allowed: false,
-        active_caller_allowed: false,
-        production_readiness_claim_allowed: false,
-      },
-      compatibility_alias_allowed: false,
-    },
+    formal_entry: buildFormalEntryPolicy(),
     workspace_locator: {
       workspace_surface_kind: 'redcube_workspace',
       workspace_root: workspaceRoot,
@@ -290,14 +235,7 @@ export async function getProductEntryManifest(request) {
       active_baton_role: 'session_continuity_provenance',
       active_baton_status: safeText(activeBaton.status, 'unknown'),
     },
-    product_entry_status: {
-      summary: 'Repo-verified product-entry overview/intake surface 已 landed；direct invoke 默认 auto_to_terminal；`status` 是当前 product overview 命令，成熟终端用户前台壳仍未 landed。',
-      next_focus: [
-        '继续把 mature end-user shell 建在已 landed 的 RedCube product-entry overview/intake service surface 之上。',
-        '继续把 OPL-hosted stage runtime handoff 与同一 downstream product-entry contract 对齐。',
-      ],
-      remaining_gaps_count: 2,
-    },
+    product_entry_status: buildProductEntryStatusSection(),
     runtime,
     opl_provider_runtime_contract: oplProviderRuntimeContract,
     runtime_inventory: runtimeInventory,
@@ -340,42 +278,16 @@ export async function getProductEntryManifest(request) {
     shared_handoff: buildRedCubeSharedHandoff(),
     product_entry_start: productEntryStart,
     product_entry_overview: productEntryOverview,
-    product_entry_preflight: {
-      surface_kind: productEntryPreflight.surface_kind,
-      summary: productEntryPreflight.summary,
-      ready_to_try_now: productEntryPreflight.ready_to_try_now,
-      recommended_check_command: productEntryPreflight.recommended_check_command,
-      recommended_start_command: productEntryPreflight.recommended_start_command,
-      blocking_check_ids: productEntryPreflight.blocking_check_ids,
-      checks: productEntryPreflight.checks,
-      runtime_loop_closure: productEntryPreflight.runtime_loop_closure,
-	    },
+    product_entry_preflight: projectProductEntryPreflight(productEntryPreflight),
     native_ppt_operator_ux: nativePptOperatorUx,
     opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
-    ppt_deck_visual_route_truth: {
-      surface_kind: 'ppt_deck_visual_route_truth',
-      default_visual_route: pptRoutePolicy.default_visual_route,
-      default_visual_policy: pptRoutePolicy.default_visual_policy,
-      protected_stage_sequence: pptRoutePolicy.protected_stage_sequence,
-      route_selection_policy: pptRoutePolicy.route_selection_policy,
-      image_provider_diagnostics: nativePptOperatorUx.image_provider_diagnostics,
-      image_first_proof_readiness: nativePptOperatorUx.image_first_proof_readiness,
-      style_reference_summary: nativePptOperatorUx.style_reference_summary,
-      cache_status: nativePptOperatorUx.cache_status,
-      artifact_inventory: nativePptOperatorUx.artifact_inventory,
-    },
-	    product_entry_readiness: productEntryReadiness,
+    product_entry_readiness: productEntryReadiness,
     product_entry_quickstart: productEntryQuickstart,
     family_orchestration: familyOrchestration,
-    notes: [
-      'This manifest freezes the current repo-verified RedCube product-entry overview/intake service surface; `status` is the current product overview command.',
-      'OPL generated descriptors own CLI/MCP/Skill/product/status/session/workbench metadata; repo-local redcube CLI/MCP are RCA domain handler targets and direct diagnostic entries.',
-      'The OPL-hosted handoff stays available as an internal integration contract instead of a first-read user entry shell.',
-      'It does not claim that a mature end-user shell, RCA-owned generic runtime, or production visual-stage soak is already landed.',
-    ],
+    notes: buildManifestNotes(),
     domain_entry_contract: domainEntryContract,
-	    user_interaction_contract: userInteractionContract,
-	    extra_payload: buildManifestExtraPayload({
+    user_interaction_contract: userInteractionContract,
+    extra_payload: buildManifestExtraPayload({
       routeEquivalence,
       deliverableFacade,
       nativePptOperatorUx,
@@ -383,7 +295,7 @@ export async function getProductEntryManifest(request) {
       productEntrySessionCommand,
       sourceProvenance,
     }),
-	  });
+  });
   return buildReturnedManifestProjection({
     actionMetadata,
     domainMemoryDescriptor,
@@ -417,4 +329,4 @@ export async function getProductEntryManifest(request) {
     temporalAutonomyReadiness,
     temporalStageRunConsumptionPolicy,
   });
-		}
+}
