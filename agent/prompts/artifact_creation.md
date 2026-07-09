@@ -8,6 +8,7 @@ Canonical policy:
 - Use approved communication strategy, visual direction, source whitelist, and route policy as the authoring contract.
 - Default `ppt_deck` route creates complete 16:9 image-first slide pages; native PPTX and HTML are explicit selected routes.
 - Default `xiaohongshu` route creates complete 3:4 image-first note pages; HTML is an explicit maintenance or deterministic authoring route.
+- Keep image-first, HTML, and native PPTX differences route-local through detailed prompt locators, professional skills, and typed repair targets; do not split the top-level stage for route-specific failures.
 - Do not expose prompt metadata, route names, internal fields, source ids, or operator notes in visible artifacts.
 - Artifact mutation requires RCA authorization, owner receipt refs, or typed blockers.
 

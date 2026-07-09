@@ -8,6 +8,7 @@ Canonical policy:
 - Review final rendered pages or screenshots directly; summaries and mechanical metrics are supporting evidence only.
 - Judge director intent, anti-template quality, spacing, text fit, visible metadata leaks, source fidelity, and route-specific export readiness.
 - Return pass/block verdict refs, weak pages, repair targets, memory writeback proposals, typed blockers, and owner receipt refs.
+- Keep screenshot, HTML, native PPTX, and image-page repair differences route-local through detailed prompt locators, professional skills, and typed repair targets; do not split the top-level stage for route-specific failures.
 - Do not let deterministic geometry checks, provider completion, file presence, or queue state become visual-ready verdicts.
 
 Professional skill routing:

@@ -92,6 +92,12 @@ Route-local repeated block 进入 OPL stall lineage；连续无 deliverable delt
 
 用户明确要求 HTML/CSS/网页时走 `render_html / fix_html`；用户明确要求可编辑、原生 PPTX 或 DrawingML 时走 `author_pptx_native / repair_pptx_native`。Native helper 继续受 RCA route、visual director review、screenshot review 和 export gate 约束，不能绕过 product-entry/runtime-family mainline。
 
+### RCA 6-stage 主链不因其他 agent 的问题反向拆分
+
+RCA 当前 6 个 top-level stage 已接近“一个 stage 一个主要开放判断”：`source_intake` 冻结 source truth 与缺口，`communication_strategy` 决定叙事 / 大纲 / 页面角色，`visual_direction` 决定视觉语言 / 节奏 / 密度，`artifact_creation` 在已选 route 内生成候选 artifact，`review_and_revision` 判断渲染结果并给出 repair target，`package_and_handoff` 只在 review gate 后导出、打包和交接。
+
+OMA、OBF 或其他 family agent 暴露的 stage 粒度问题不能反向驱动 RCA 把主链拆碎。RCA 的 `artifact_creation` 与 `review_and_revision` 内部确实存在 image-first、HTML、native PPTX 等 route 差异，但这些差异应留在 route-local detailed prompt locator、repo-local professional specialist skill、quality gate 和 typed repair target 内处理；只有出现新的 RCA-owned durable owner boundary，且需要同步修改 `contracts/stage_control_plane.json`、`agent/stages/*`、prompt refs 和 contract tests 时，才评估 top-level stage 拆分。
+
 ### SQLite 只作为未来 OPL-owned sidecar index 选项
 
 RCA 当前 file authority、artifact index 和 Git source control 足以承载 canonical artifacts、review state、export bundle、gallery manifest 与 product-entry/session truth。SQLite 只有在实测 artifact/session 文件数量、跨 deliverable 查询或 operator 全局 artifact inventory 压力明确时才进入评估。
