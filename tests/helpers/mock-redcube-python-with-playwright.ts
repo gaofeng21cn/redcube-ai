@@ -52,6 +52,120 @@ const OFFICECLI_MATERIALIZER_POLICY = {
   default_executor_changed: false,
 };
 
+const SCREENSHOT_DIMENSIONS = Object.freeze({ width: 2304, height: 1296 });
+
+function trueFlags(keys) {
+  return Object.fromEntries(keys.map((key) => [key, true]));
+}
+
+function emptyLists(keys) {
+  return Object.fromEntries(keys.map((key) => [key, []]));
+}
+
+const REVIEW_CHECKS = Object.freeze(trueFlags([
+  'overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok',
+  'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok',
+  'external_audience_language_ok', 'title_safe_zone_clear', 'table_legibility_ok',
+  'layout_density_ok',
+]));
+
+const NATIVE_SLIDE_CHECKS = Object.freeze(trueFlags([
+  'overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok',
+  'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok',
+  'body_text_readability_ok', 'typography_hierarchy_ok', 'title_core_overlap_ok',
+  'page_number_consistency_ok', 'external_audience_language_ok', 'title_safe_zone_clear',
+  'table_legibility_ok', 'layout_density_ok', 'slot_fill_ok',
+  'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
+  'visual_structure_present', 'non_text_visual_specific_ok',
+  'mechanical_card_template_absent', 'panel_text_safe_area_ok',
+  'text_card_internal_padding_ok', 'short_label_wrap_ok', 'title_underline_absent_ok',
+]));
+
+const NATIVE_METRIC_TRUE_FLAGS = Object.freeze(trueFlags([
+  'body_text_readability_ok', 'typography_hierarchy_ok', 'slot_fill_ok',
+  'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
+  'visual_structure_present', 'non_text_visual_specific_ok',
+  'mechanical_card_template_absent', 'panel_text_safe_area_ok',
+  'text_card_internal_padding_ok', 'short_label_wrap_ok', 'title_underline_absent_ok',
+  'title_safe_zone_clearance_ok', 'table_cell_fit_ok',
+]));
+
+const NATIVE_METRIC_EMPTY_LISTS = Object.freeze(emptyLists([
+  'body_text_font_failures', 'title_core_overlap_failures', 'slot_fill_failures',
+  'audience_label_readability_failures', 'content_depth_failures', 'grid_balance_failures',
+  'panel_text_safe_area_failures', 'text_card_internal_padding_failures',
+  'short_label_wrap_failures', 'title_underline_failures', 'overlaps',
+  'structural_text_collisions', 'block_content_failures', 'operator_language_fragments',
+  'chart_bounds', 'table_bounds', 'metric_grid_bounds', 'chart_metrics',
+  'table_metrics', 'metric_grid_metrics', 'table_cell_fit_failures',
+  'numeric_label_overflows',
+]));
+
+const NATIVE_FIXED_METRICS = Object.freeze({
+  min_body_font_pt: 18,
+  body_text_readability_floor_pt: 18,
+  title_core_overlap_count: 0,
+  expected_slot_count: 2,
+  filled_slot_count: 2,
+  audience_label_font_floor_pt: 16,
+  content_depth_floor_chars: 12,
+  grid_balance_ratio: 1,
+  mechanical_card_template_detected: false,
+  structural_visual_count: 1,
+  card_panel_count: 2,
+  text_char_count: 72,
+  block_count: 3,
+  decorative_shape_count: 2,
+  shape_count: 5,
+  shape_kind_count: 3,
+  role_count: 5,
+  layout_richness_score: 0.72,
+  overlap_pairs: 0,
+  clipped_nodes: 0,
+  occupied_ratio: 0.31,
+  primary_points: 3,
+  edge_clearance: { left: 72, top: 64, right: 72, bottom: 300 },
+  table_min_font_pt: 11,
+  card_blank_ratio: 0.24,
+  axis_label_count: 0,
+  legend_label_count: 0,
+  numeric_label_overflow_count: 0,
+});
+
+const NATIVE_QUALITY_REQUIRED_PER_SLIDE_METRICS = Object.freeze([
+  'bounds', 'text_char_count', 'primary_points', 'min_body_font_pt',
+  'body_text_readability_ok', 'typography_hierarchy_ratio', 'typography_hierarchy_ok',
+  'title_core_overlap_count', 'layout_variant', 'expected_slot_count', 'filled_slot_count',
+  'slot_fill_ok', 'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
+  'visual_structure_present', 'non_text_visual_specific_ok', 'mechanical_card_template_absent',
+  'panel_text_safe_area_ok', 'text_card_internal_padding_ok', 'short_label_wrap_ok',
+  'composition_signature', 'title_underline_absent_ok', 'occupied_ratio', 'edge_clearance',
+  'overlap_pairs', 'structural_text_collision_count', 'structural_text_collisions',
+  'preview_screenshot_sha256', 'preview_screenshot_dimensions',
+]);
+
+function buildNativeSlideMetrics({ slideId, layoutFamily, compositionSignature, bounds }) {
+  return {
+    ...NATIVE_METRIC_TRUE_FLAGS,
+    ...NATIVE_METRIC_EMPTY_LISTS,
+    ...NATIVE_FIXED_METRICS,
+    title_font_size: layoutFamily === 'cover_signal' ? 56 : 44,
+    typography_hierarchy_ratio: layoutFamily === 'cover_signal' ? 3.1111 : 2.4444,
+    layout_variant: layoutFamily,
+    structural_visual_roles: [`${layoutFamily}_rail`],
+    composition_signature: compositionSignature,
+    structural_text_collision_count: 0,
+    coordinate_determinism_hash: createHash('sha256')
+      .update(JSON.stringify({ slideId, layoutFamily, compositionSignature }))
+      .digest('hex'),
+    bounds,
+  };
+}
+
+function nativeTextBox(shapeId, role, text, fontSize, bounds) {
+  return { shape_id: shapeId, kind: 'text_box', role, quality_role: 'content', text, font_size: fontSize, bounds };
+}
+
 function mockNativeRendererKind() {
   return String(process.env.REDCUBE_MOCK_NATIVE_RENDERER_KIND || 'libreoffice_headless').trim();
 }
@@ -114,6 +228,8 @@ function writeBinary(file, value) {
   writeFileSync(file, value);
 }
 
+function writePayload(payload) { process.stdout.write(`${JSON.stringify(payload)}\n`); }
+
 function incrementMockCallCount() {
   const callCountFile = String(process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE || '').trim();
   if (!callCountFile) return;
@@ -172,17 +288,8 @@ function buildPassReviewPayload(args) {
       layout_family: slide.layout_family,
       screenshot_file,
       checks: {
-        overflow_free: true,
-        occlusion_free: true,
-        visual_density_ok: true,
+        ...REVIEW_CHECKS,
         speaker_fit_ok: speakerFitOk,
-        edge_clearance_ok: true,
-        block_content_fit_ok: true,
-        title_typography_ok: true,
-        external_audience_language_ok: true,
-        title_safe_zone_clear: true,
-        table_legibility_ok: true,
-        layout_density_ok: true,
       },
       metrics: {
         occupied_ratio: 0.52,
@@ -200,10 +307,7 @@ function buildPassReviewPayload(args) {
       },
       issues: speakerFitOk ? [] : ['speaker_fit_out_of_range'],
       device_scale_factor: Number(args['device-scale-factor'] || 2),
-      screenshot_dimensions: {
-        width: 2304,
-        height: 1296,
-      },
+      screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     };
   });
   const speakerFitOk = slide_reviews.every((slide) => slide.checks.speaker_fit_ok);
@@ -212,26 +316,14 @@ function buildPassReviewPayload(args) {
     status: speakerFitOk ? 'pass' : 'block',
     slide_reviews,
     checks: {
-      overflow_free: true,
-      occlusion_free: true,
-      visual_density_ok: true,
+      ...REVIEW_CHECKS,
       speaker_fit_ok: speakerFitOk,
-      edge_clearance_ok: true,
-      block_content_fit_ok: true,
-      title_typography_ok: true,
-      external_audience_language_ok: true,
-      title_safe_zone_clear: true,
-      table_legibility_ok: true,
-      layout_density_ok: true,
     },
     metrics: {
       slide_count: slide_reviews.length,
       blocked_slide_count: 0,
     },
-    screenshot_dimensions: {
-      width: 2304,
-      height: 1296,
-    },
+    screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     device_scale_factor: Number(args['device-scale-factor'] || 2),
   };
 }
@@ -257,20 +349,6 @@ function buildExportPayload(args) {
     page_count: slideCount,
     pptx_file: outputPptx,
     pdf_file: outputPdf || null,
-  };
-}
-
-function normalizeHelperInvocation(argv) {
-  if (argv[0] === '-m') {
-    return {
-      helper: String(argv[1] || '').trim(),
-      args: argv.slice(2),
-    };
-  }
-  const script = String(argv[0] || '').trim();
-  return {
-    helper: path.basename(script),
-    args: argv.slice(1),
   };
 }
 
@@ -306,7 +384,6 @@ function buildNativePayload(args) {
       ? input.repair_feedback.map((item) => String(item?.slide_id || '').trim()).filter(Boolean)
       : [],
   );
-  const layoutWriterFor = () => 'officecli_pptx_materializer';
   ensureDir(previewDir);
   const slides = blueprintSlides.map((slide, index) => {
     const slideId = String(slide?.slide_id || `S${String(index + 1).padStart(2, '0')}`);
@@ -339,7 +416,7 @@ function buildNativePayload(args) {
       slide_id: slideId,
       title: String(slide?.title || `Slide ${index + 1}`),
       layout_family: layoutFamily,
-      layout_writer: layoutWriterFor(layoutFamily),
+      layout_writer: 'officecli_pptx_materializer',
       ai_first_spatial_plan: {
         required: true,
         materialized: true,
@@ -352,146 +429,19 @@ function buildNativePayload(args) {
       screenshot_file: screenshotFile,
       preview_screenshot_file: screenshotFile,
       preview_screenshot_sha256: fileSha256(screenshotFile),
-      preview_screenshot_dimensions: { width: 2304, height: 1296 },
+      preview_screenshot_dimensions: SCREENSHOT_DIMENSIONS,
       render_proof_source: rendererKind,
       renderer_kind: rendererKind,
       renderer_pipeline: mockNativeRendererPipeline(rendererKind),
       synthetic_preview: false,
       repaired: repairFeedbackSlideIds.has(slideId),
       native_shapes: [
-        {
-          shape_id: `${slideId}-title`,
-          kind: 'text_box',
-          role: 'title',
-          quality_role: 'content',
-          text: String(slide?.title || `Slide ${index + 1}`),
-          font_size: layoutFamily === 'cover_signal' ? 56 : 44,
-          bounds: bounds[0],
-        },
-        {
-          shape_id: `${slideId}-body`,
-          kind: 'text_box',
-          role: 'body',
-          quality_role: 'content',
-          text: bodyText,
-          font_size: 18,
-          bounds: bounds[1],
-        },
-        {
-          shape_id: `${slideId}-support`,
-          kind: 'text_box',
-          role: 'support',
-          quality_role: 'content',
-          text: `${layoutFamily} proof`,
-          font_size: 18,
-          bounds: bounds[2],
-        },
+        nativeTextBox(`${slideId}-title`, 'title', String(slide?.title || `Slide ${index + 1}`), layoutFamily === 'cover_signal' ? 56 : 44, bounds[0]),
+        nativeTextBox(`${slideId}-body`, 'body', bodyText, 18, bounds[1]),
+        nativeTextBox(`${slideId}-support`, 'support', `${layoutFamily} proof`, 18, bounds[2]),
       ],
-      checks: {
-        overflow_free: true,
-        occlusion_free: true,
-        visual_density_ok: true,
-        speaker_fit_ok: true,
-        edge_clearance_ok: true,
-        block_content_fit_ok: true,
-        title_typography_ok: true,
-        body_text_readability_ok: true,
-        typography_hierarchy_ok: true,
-        title_core_overlap_ok: true,
-        page_number_consistency_ok: true,
-        external_audience_language_ok: true,
-        title_safe_zone_clear: true,
-        table_legibility_ok: true,
-        layout_density_ok: true,
-        slot_fill_ok: true,
-        audience_label_readability_ok: true,
-        content_depth_ok: true,
-        grid_balance_ok: true,
-        visual_structure_present: true,
-        non_text_visual_specific_ok: true,
-        mechanical_card_template_absent: true,
-        panel_text_safe_area_ok: true,
-        text_card_internal_padding_ok: true,
-        short_label_wrap_ok: true,
-        title_underline_absent_ok: true,
-      },
-      metrics: {
-        title_font_size: layoutFamily === 'cover_signal' ? 56 : 44,
-        min_body_font_pt: 18,
-        body_text_readability_floor_pt: 18,
-        body_text_readability_ok: true,
-        body_text_font_failures: [],
-        typography_hierarchy_ratio: layoutFamily === 'cover_signal' ? 3.1111 : 2.4444,
-        typography_hierarchy_ok: true,
-        title_core_overlap_count: 0,
-        title_core_overlap_failures: [],
-        layout_variant: layoutFamily,
-        expected_slot_count: 2,
-        filled_slot_count: 2,
-        slot_fill_ok: true,
-        slot_fill_failures: [],
-        audience_label_readability_ok: true,
-        audience_label_font_floor_pt: 16,
-        audience_label_readability_failures: [],
-        content_depth_ok: true,
-        content_depth_floor_chars: 12,
-        content_depth_failures: [],
-        grid_balance_ok: true,
-        grid_balance_ratio: 1,
-        grid_balance_failures: [],
-        visual_structure_present: true,
-        non_text_visual_specific_ok: true,
-        mechanical_card_template_absent: true,
-        mechanical_card_template_detected: false,
-        panel_text_safe_area_ok: true,
-        panel_text_safe_area_failures: [],
-        text_card_internal_padding_ok: true,
-        text_card_internal_padding_failures: [],
-        short_label_wrap_ok: true,
-        short_label_wrap_failures: [],
-        structural_visual_count: 1,
-        structural_visual_roles: [`${layoutFamily}_rail`],
-        card_panel_count: 2,
-        composition_signature: compositionSignature,
-        title_underline_absent_ok: true,
-        title_underline_failures: [],
-        text_char_count: 72,
-        block_count: 3,
-        decorative_shape_count: 2,
-        shape_count: 5,
-        shape_kind_count: 3,
-        role_count: 5,
-        layout_richness_score: 0.72,
-        overlap_pairs: 0,
-        overlaps: [],
-        structural_text_collision_count: 0,
-        structural_text_collisions: [],
-        clipped_nodes: 0,
-        occupied_ratio: 0.31,
-        primary_points: 3,
-        edge_clearance: { left: 72, top: 64, right: 72, bottom: 300 },
-        block_content_failures: [],
-        operator_language_fragments: [],
-        title_safe_zone_clearance_ok: true,
-        table_min_font_pt: 11,
-        card_blank_ratio: 0.24,
-        chart_bounds: [],
-        table_bounds: [],
-        metric_grid_bounds: [],
-        chart_metrics: [],
-        table_metrics: [],
-        metric_grid_metrics: [],
-        axis_label_count: 0,
-        legend_label_count: 0,
-        table_cell_fit_ok: true,
-        table_cell_fit_failures: [],
-        numeric_label_overflow_count: 0,
-        numeric_label_overflows: [],
-        coordinate_determinism_hash: createHash('sha256')
-          .update(JSON.stringify({ slideId, layoutFamily, compositionSignature }))
-          .digest('hex'),
-        bounds,
-      },
+      checks: NATIVE_SLIDE_CHECKS,
+      metrics: buildNativeSlideMetrics({ slideId, layoutFamily, compositionSignature, bounds }),
       redcube_svg_ir_file: path.join(previewDir, `${slideId}.svg`),
       redcube_svg_ir_sha256: 'mock-svg-sha256',
       redcube_svg_ir_preflight: {
@@ -538,38 +488,7 @@ function buildNativePayload(args) {
     native_quality_surface: {
       quality_model: 'shape_manifest_layout_metrics_v1',
       source_surface_kind: 'native_pptx',
-      required_per_slide_metrics: [
-        'bounds',
-        'text_char_count',
-        'primary_points',
-        'min_body_font_pt',
-        'body_text_readability_ok',
-        'typography_hierarchy_ratio',
-        'typography_hierarchy_ok',
-        'title_core_overlap_count',
-        'layout_variant',
-        'expected_slot_count',
-        'filled_slot_count',
-        'slot_fill_ok',
-        'audience_label_readability_ok',
-        'content_depth_ok',
-        'grid_balance_ok',
-        'visual_structure_present',
-        'non_text_visual_specific_ok',
-        'mechanical_card_template_absent',
-        'panel_text_safe_area_ok',
-        'text_card_internal_padding_ok',
-        'short_label_wrap_ok',
-        'composition_signature',
-        'title_underline_absent_ok',
-        'occupied_ratio',
-        'edge_clearance',
-        'overlap_pairs',
-        'structural_text_collision_count',
-        'structural_text_collisions',
-        'preview_screenshot_sha256',
-        'preview_screenshot_dimensions',
-      ],
+      required_per_slide_metrics: NATIVE_QUALITY_REQUIRED_PER_SLIDE_METRICS,
       fail_closed_when_missing: true,
     },
     render_proof: renderProof,
@@ -580,7 +499,7 @@ function buildNativePayload(args) {
       dir: previewDir,
       files: slides.map((slide) => slide.redcube_svg_ir_file),
     },
-    screenshot_dimensions: { width: 2304, height: 1296 },
+    screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
     slides,
   };
@@ -627,7 +546,7 @@ function buildNativePayload(args) {
     shape_manifest_file: shapeManifestFile,
     repair_log_file: repairLogFile || null,
     page_count: slides.length,
-    screenshot_dimensions: { width: 2304, height: 1296 },
+    screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     render_proof: renderProof,
     redcube_svg_ir: shapeManifest.redcube_svg_ir,
     preview_screenshots: slides.map((slide) => slide.preview_screenshot_file),
@@ -946,44 +865,23 @@ function buildNativePlanValidationPayload(args) {
 
 function main() {
   incrementMockCallCount();
-  const invocation = normalizeHelperInvocation(process.argv.slice(2));
-  const basename = path.basename(invocation.helper);
-  const args = parseArgs(invocation.args);
+  const [flag, helper = '', ...rawArgs] = process.argv.slice(2);
+  if (flag !== '-m') fail('mock helper requires -m <package_module>');
+  const args = parseArgs(rawArgs);
 
-  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.review') {
-    process.stdout.write(`${JSON.stringify(buildPassReviewPayload(args))}\n`);
+  if (helper === 'redcube_ai.native_helpers.ppt_deck.review') {
+    writePayload(buildPassReviewPayload(args));
     return;
   }
-  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.export') {
-    process.stdout.write(`${JSON.stringify(buildExportPayload(args))}\n`);
+  if (helper === 'redcube_ai.native_helpers.ppt_deck.export') {
+    writePayload(buildExportPayload(args));
     return;
   }
-  if (invocation.helper === 'redcube_ai.native_helpers.ppt_deck.native') {
-    if (args.mode === 'validate_plan') {
-      process.stdout.write(`${JSON.stringify(buildNativePlanValidationPayload(args))}\n`);
-      return;
-    }
-    process.stdout.write(`${JSON.stringify(buildNativePayload(args))}\n`);
+  if (helper === 'redcube_ai.native_helpers.ppt_deck.native') {
+    writePayload(args.mode === 'validate_plan' ? buildNativePlanValidationPayload(args) : buildNativePayload(args));
     return;
   }
-
-  if (basename.endsWith('_review.py')) {
-    process.stdout.write(`${JSON.stringify(buildPassReviewPayload(args))}\n`);
-    return;
-  }
-  if (basename.endsWith('_export.py')) {
-    process.stdout.write(`${JSON.stringify(buildExportPayload(args))}\n`);
-    return;
-  }
-  if (basename.endsWith('_native.py')) {
-    if (args.mode === 'validate_plan') {
-      process.stdout.write(`${JSON.stringify(buildNativePlanValidationPayload(args))}\n`);
-      return;
-    }
-    process.stdout.write(`${JSON.stringify(buildNativePayload(args))}\n`);
-    return;
-  }
-  fail(`unsupported mock redcube python helper: ${invocation.helper || '(missing)'}`);
+  fail(`unsupported mock redcube python helper: ${helper || '(missing)'}`);
 }
 
 main();
