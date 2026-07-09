@@ -11,6 +11,8 @@ import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts
 let cachedPythonCommand = null;
 const PPT_DECK_REVIEW_MODULE = 'redcube_ai.native_helpers.ppt_deck.review';
 const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-block-review-python-cache-'));
+const DESKTOP_REVIEW_FRAME = Object.freeze({ maxPrimaryPoints: '5', frameWidth: '1152', frameHeight: '648' });
+const MOBILE_REVIEW_FRAME = Object.freeze({ maxPrimaryPoints: '4', frameWidth: '448', frameHeight: '597' });
 
 function resolveTestPythonCommand() {
   if (cachedPythonCommand) {
@@ -73,6 +75,21 @@ function runReviewFixture({
   ]);
   assert.equal(result.status, 0, result.stderr || result.stdout);
   return JSON.parse(result.stdout);
+}
+
+function runReviewFrame(frame, workspacePrefix, html) {
+  return runReviewFixture({ workspacePrefix, ...frame, html });
+}
+
+function singleSlideReviewScript(inspection) {
+  return `<script>
+    const inspection = ${JSON.stringify(inspection)};
+    window.redcubeDeckReview = {
+      totalSlides: 1,
+      showSlide() { return inspection; },
+      inspectCurrentSlide() { return inspection; }
+    };
+  </script>`;
 }
 
 export function runReviewWithOverflowingBlock() {
@@ -162,12 +179,7 @@ export function runReviewWithOverflowingBlock() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-block-content-review-',
-    maxPrimaryPoints: '5',
-    frameWidth: '1152',
-    frameHeight: '648',
-    html: `<!doctype html>
+  return runReviewFrame(DESKTOP_REVIEW_FRAME, 'redcube-block-content-review-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -184,17 +196,9 @@ export function runReviewWithOverflowingBlock() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export function runReviewWithDecorativeGroundOverlap() {
@@ -269,12 +273,7 @@ export function runReviewWithDecorativeGroundOverlap() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-decorative-ground-review-',
-    maxPrimaryPoints: '5',
-    frameWidth: '1152',
-    frameHeight: '648',
-    html: `<!doctype html>
+  return runReviewFrame(DESKTOP_REVIEW_FRAME, 'redcube-decorative-ground-review-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -295,17 +294,9 @@ export function runReviewWithDecorativeGroundOverlap() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export function runReviewWithInconsistentPageNumbers() {
@@ -432,12 +423,7 @@ export function runReviewWithUnframedHeader() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-block-content-review-header-',
-    maxPrimaryPoints: '4',
-    frameWidth: '448',
-    frameHeight: '597',
-    html: `<!doctype html>
+  return runReviewFrame(MOBILE_REVIEW_FRAME, 'redcube-block-content-review-header-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -457,17 +443,9 @@ export function runReviewWithUnframedHeader() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export function runReviewWithOverflowingChildGroup() {
@@ -534,12 +512,7 @@ export function runReviewWithOverflowingChildGroup() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-block-content-review-group-',
-    maxPrimaryPoints: '4',
-    frameWidth: '448',
-    frameHeight: '597',
-    html: `<!doctype html>
+  return runReviewFrame(MOBILE_REVIEW_FRAME, 'redcube-block-content-review-group-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -566,17 +539,9 @@ export function runReviewWithOverflowingChildGroup() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export function runReviewWithUntaggedTakeawayText() {
@@ -623,12 +588,7 @@ export function runReviewWithUntaggedTakeawayText() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-block-content-review-untagged-',
-    maxPrimaryPoints: '4',
-    frameWidth: '448',
-    frameHeight: '597',
-    html: `<!doctype html>
+  return runReviewFrame(MOBILE_REVIEW_FRAME, 'redcube-block-content-review-untagged-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -646,17 +606,9 @@ export function runReviewWithUntaggedTakeawayText() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export function runReviewWithAdjacentReadableBlocksTooClose() {
@@ -703,12 +655,7 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
     },
   };
 
-  return runReviewFixture({
-    workspacePrefix: 'redcube-block-content-review-adjacent-',
-    maxPrimaryPoints: '4',
-    frameWidth: '448',
-    frameHeight: '597',
-    html: `<!doctype html>
+  return runReviewFrame(MOBILE_REVIEW_FRAME, 'redcube-block-content-review-adjacent-', `<!doctype html>
 <html>
 <body>
   <div class="slide visible">
@@ -725,17 +672,9 @@ export function runReviewWithAdjacentReadableBlocksTooClose() {
       </div>
     </div>
   </div>
-  <script>
-    const inspection = ${JSON.stringify(inspection)};
-    window.redcubeDeckReview = {
-      totalSlides: 1,
-      showSlide() { return inspection; },
-      inspectCurrentSlide() { return inspection; }
-    };
-  </script>
+  ${singleSlideReviewScript(inspection)}
 </body>
-</html>`,
-  });
+</html>`);
 }
 
 export {

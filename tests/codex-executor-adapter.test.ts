@@ -62,6 +62,44 @@ function codexGeneratedImagesStdout({ generatedDir, generatedFile, outputFile, t
   ].join('\n');
 }
 
+function mockCodexContract(env = {}) {
+  return readCodexCliContract({
+    REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
+    ...env,
+  });
+}
+
+function writeCodexLastMessage(args, payload) {
+  const outputFlagIndex = args.indexOf('--output-last-message');
+  writeFileSync(
+    args[outputFlagIndex + 1],
+    typeof payload === 'string' ? payload : JSON.stringify(payload),
+    'utf-8',
+  );
+}
+
+function generateMockImage({
+  family = 'ppt_deck',
+  route = 'author_image_pages',
+  slideId = 'S01',
+  prompt = '生成一张 16:9 中文 PPT 页面。',
+  outputFile,
+  toolOptions = { type: 'image_generation', size: '1536x864' },
+  contractEnv = {},
+  spawnSyncImpl,
+}) {
+  return generateImageViaCodexNativeImagegen({
+    family,
+    route,
+    slideId,
+    prompt,
+    outputFile,
+    toolOptions,
+    contract: mockCodexContract(contractEnv),
+    spawnSyncImpl,
+  });
+}
+
 function withTemporaryProfessionalSkillFile(relativePath, content, callback) {
   const absolutePath = path.resolve(relativePath);
   const parentDir = path.dirname(absolutePath);
@@ -310,17 +348,14 @@ test('generateStructuredArtifactViaCodexCli records deterministic prompt telemet
 test('generateImageViaCodexNativeImagegen delegates raster output to Codex native imagegen without provider tokens', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-imagegen-'));
   const outputFile = path.join(workspaceRoot, 'N01.png');
-  const result = await generateImageViaCodexNativeImagegen({
+  const result = await generateMockImage({
     family: 'xiaohongshu',
     route: 'author_image_pages',
     slideId: 'N01',
     prompt: '生成一张 3:4 中文医学科普小红书封面。',
     outputFile,
     toolOptions: { type: 'image_generation', size: '1086x1448' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-      REDCUBE_CODEX_MODEL: 'gpt-5.4',
-    }),
+    contractEnv: { REDCUBE_CODEX_MODEL: 'gpt-5.4' },
     spawnSyncImpl(_command, args, options) {
       assert.equal(args.includes('--enable'), true);
       assert.equal(args.includes('image_generation'), true);
@@ -328,12 +363,7 @@ test('generateImageViaCodexNativeImagegen delegates raster output to Codex nativ
       assert.match(String(options.input), /Codex 原生 imagegen|built-in|内置 imagegen|image_generation/);
       assert.match(String(options.input), /不要使用.*OPENAI_API_KEY|不要使用.*REDCUBE_IMAGE_GENERATION_TOKEN/s);
       writeFileSync(outputFile, ONE_PIXEL_PNG);
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
       return {
         status: 0,
         stdout: codexImagegenStdout(),
@@ -362,25 +392,12 @@ test('generateImageViaCodexNativeImagegen defaults Codex cwd to the artifact out
   const outputDir = path.join(workspaceRoot, 'artifacts', 'image_pages', 'author_image_pages');
   const outputFile = path.join(outputDir, 'S01.png');
 
-  const result = await generateImageViaCodexNativeImagegen({
-    family: 'ppt_deck',
-    route: 'author_image_pages',
-    slideId: 'S01',
-    prompt: '生成一张 16:9 中文 PPT 页面。',
+  const result = await generateMockImage({
     outputFile,
-    toolOptions: { type: 'image_generation', size: '1536x864' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-    }),
     spawnSyncImpl(_command, args, options) {
       assert.equal(options.cwd, outputDir);
       writeFileSync(outputFile, ONE_PIXEL_PNG);
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
       return {
         status: 0,
         stdout: codexImagegenStdout(),
@@ -405,28 +422,16 @@ test('generateImageViaCodexNativeImagegen materializes Codex generated image whe
   const outputFile = path.join(workspaceRoot, 'artifacts', 'N01.png');
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
-  const result = await generateImageViaCodexNativeImagegen({
-    family: 'ppt_deck',
-    route: 'author_image_pages',
+  const result = await generateMockImage({
     slideId: 'N01',
-    prompt: '生成一张 16:9 中文 PPT 页面。',
     outputFile,
-    toolOptions: { type: 'image_generation', size: '1536x864' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-    }),
     spawnSyncImpl(_command, args) {
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({
-          ok: false,
-          image_file: generatedFile,
-          mode: 'codex_native_imagegen',
-          error: 'sandbox_denied_target_write',
-        }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, {
+        ok: false,
+        image_file: generatedFile,
+        mode: 'codex_native_imagegen',
+        error: 'sandbox_denied_target_write',
+      });
       return {
         status: 0,
         stdout: codexImagegenStdout(),
@@ -456,29 +461,16 @@ test('generateImageViaCodexNativeImagegen accepts generated_image_file from Code
   const outputFile = path.join(workspaceRoot, 'artifacts', 'S01.png');
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
-  const result = await generateImageViaCodexNativeImagegen({
-    family: 'ppt_deck',
-    route: 'author_image_pages',
-    slideId: 'S01',
-    prompt: '生成一张 16:9 中文 PPT 页面。',
+  const result = await generateMockImage({
     outputFile,
-    toolOptions: { type: 'image_generation', size: '1536x864' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-    }),
     spawnSyncImpl(_command, args) {
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({
-          ok: false,
-          image_file: outputFile,
-          generated_image_file: generatedFile,
-          mode: 'codex_native_imagegen',
-          error: 'native imagegen succeeded, but sandbox denied writing to the requested output_file outside writable roots',
-        }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, {
+        ok: false,
+        image_file: outputFile,
+        generated_image_file: generatedFile,
+        mode: 'codex_native_imagegen',
+        error: 'native imagegen succeeded, but sandbox denied writing to the requested output_file outside writable roots',
+      });
       return {
         status: 0,
         stdout: codexImagegenStdout(),
@@ -507,28 +499,15 @@ test('generateImageViaCodexNativeImagegen accepts sandbox-denied image_file when
   const outputFile = path.join(workspaceRoot, 'artifacts', 'S01.png');
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
-  const result = await generateImageViaCodexNativeImagegen({
-    family: 'ppt_deck',
-    route: 'author_image_pages',
-    slideId: 'S01',
-    prompt: '生成一张 16:9 中文 PPT 页面。',
+  const result = await generateMockImage({
     outputFile,
-    toolOptions: { type: 'image_generation', size: '1536x864' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-    }),
     spawnSyncImpl(_command, args) {
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({
-          ok: false,
-          image_file: generatedFile,
-          mode: 'codex_native_imagegen',
-          error: 'sandbox_denied_copy_to_output_file',
-        }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, {
+        ok: false,
+        image_file: generatedFile,
+        mode: 'codex_native_imagegen',
+        error: 'sandbox_denied_copy_to_output_file',
+      });
       return {
         status: 0,
         stdout: codexImagegenStdout(),
@@ -559,25 +538,12 @@ test('generateImageViaCodexNativeImagegen accepts current Codex generated_images
   mkdirSync(generatedDir, { recursive: true });
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
-  const result = await generateImageViaCodexNativeImagegen({
-    family: 'ppt_deck',
-    route: 'author_image_pages',
-    slideId: 'S01',
-    prompt: '生成一张 16:9 中文 PPT 页面。',
+  const result = await generateMockImage({
     outputFile,
-    toolOptions: { type: 'image_generation', size: '1536x864' },
-    contract: readCodexCliContract({
-      REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-    }),
     spawnSyncImpl(_command, args) {
       mkdirSync(path.dirname(outputFile), { recursive: true });
       writeFileSync(outputFile, ONE_PIXEL_PNG);
-      const outputFlagIndex = args.indexOf('--output-last-message');
-      writeFileSync(
-        args[outputFlagIndex + 1],
-        JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-        'utf-8',
-      );
+      writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
       return {
         status: 0,
         stdout: codexGeneratedImagesStdout({ generatedDir, generatedFile, outputFile, threadId }),
@@ -601,24 +567,11 @@ test('generateImageViaCodexNativeImagegen rejects command-rendered PNGs that onl
   const outputFile = path.join(workspaceRoot, 'S01.png');
 
   await assert.rejects(
-    generateImageViaCodexNativeImagegen({
-      family: 'ppt_deck',
-      route: 'author_image_pages',
-      slideId: 'S01',
-      prompt: '生成一张 16:9 中文 PPT 页面。',
+    generateMockImage({
       outputFile,
-      toolOptions: { type: 'image_generation', size: '1536x864' },
-      contract: readCodexCliContract({
-        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-      }),
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
-        const outputFlagIndex = args.indexOf('--output-last-message');
-        writeFileSync(
-          args[outputFlagIndex + 1],
-          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-          'utf-8',
-        );
+        writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
         return {
           status: 0,
           stdout: JSON.stringify({
@@ -651,24 +604,11 @@ test('generateImageViaCodexNativeImagegen rejects generated_images probes withou
   writeFileSync(generatedFile, ONE_PIXEL_PNG);
 
   await assert.rejects(
-    generateImageViaCodexNativeImagegen({
-      family: 'ppt_deck',
-      route: 'author_image_pages',
-      slideId: 'S01',
-      prompt: '生成一张 16:9 中文 PPT 页面。',
+    generateMockImage({
       outputFile,
-      toolOptions: { type: 'image_generation', size: '1536x864' },
-      contract: readCodexCliContract({
-        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-      }),
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
-        const outputFlagIndex = args.indexOf('--output-last-message');
-        writeFileSync(
-          args[outputFlagIndex + 1],
-          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-          'utf-8',
-        );
+        writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
         return {
           status: 0,
           stdout: [
@@ -709,24 +649,11 @@ test('generateImageViaCodexNativeImagegen rejects PNGs created without native im
   const outputFile = path.join(workspaceRoot, 'S01.png');
 
   await assert.rejects(
-    generateImageViaCodexNativeImagegen({
-      family: 'ppt_deck',
-      route: 'author_image_pages',
-      slideId: 'S01',
-      prompt: '生成一张 16:9 中文 PPT 页面。',
+    generateMockImage({
       outputFile,
-      toolOptions: { type: 'image_generation', size: '1536x864' },
-      contract: readCodexCliContract({
-        REDCUBE_CODEX_COMMAND: '["node","/tmp/mock-codex.mjs"]',
-      }),
       spawnSyncImpl(_command, args) {
         writeFileSync(outputFile, ONE_PIXEL_PNG);
-        const outputFlagIndex = args.indexOf('--output-last-message');
-        writeFileSync(
-          args[outputFlagIndex + 1],
-          JSON.stringify({ ok: true, image_file: outputFile, mode: 'codex_native_imagegen' }),
-          'utf-8',
-        );
+        writeCodexLastMessage(args, { ok: true, image_file: outputFile, mode: 'codex_native_imagegen' });
         return {
           status: 0,
           stdout: JSON.stringify({ type: 'item.completed', item: { type: 'command_execution' } }),
