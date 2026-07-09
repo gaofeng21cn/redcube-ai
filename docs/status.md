@@ -163,6 +163,8 @@ blocker roundtrip、no-forbidden-write proof 与 tombstone/provenance pointer
 同时成立后，repo-local wrapper、facade、alias、lookup surface、compatibility path 和只保护旧
 public path 的测试直接删除或 tombstone，不新增兼容面。
 
+2026-07-09 retained helper / thin adapter deletion gate fresh readback 结论是 `no_safe_delete`：`npm run private-platform:readback` 与 `npm run default-caller-tail:readback` 均只证明 repo source guard 通过，`cleanup_candidate_count=0`、`active_source_no_resurrection_violation_count=0`，但 readback 仍明确 `readback_can_authorize_physical_delete=false`、`readback_can_create_typed_blocker_instance=false`、`readback_can_claim_default_caller_cutover=false`。因此本轮没有 source physical delete；保留项继续按 refs-only / authority adapter 读取，下一次删除必须新增 explicit physical-delete authorization、no-active repo-local default caller、owner receipt 或 typed blocker roundtrip instance，以及 tombstone/provenance pointer。
+
 2026-07-06 line-budget strict closure 曾只做源码结构拆分：`family-stage-control-plane.ts`
 把 user-stage-log contract 移入 `family-stage-control-plane-parts/`。后续 guard
 SSOT 收缩已把 `physical-source-morphology-policy.ts` 改为 JSON readback adapter，

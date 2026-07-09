@@ -85,6 +85,29 @@
     "closed_default_caller_retirement_count": 5,
     "surface_id_policy": "current_role_guard_with_count_only_closed_retirement_summary",
     "deletion_status": "closed_retirements_counted_current_roles_guarded",
+    "latest_cleanup_gate_readback": {
+      "checked_at": "2026-07-09",
+      "commands": [
+        "npm run private-platform:readback",
+        "npm run default-caller-tail:readback"
+      ],
+      "state": "no_safe_delete_blocked_by_physical_delete_authority",
+      "cleanup_candidate_count": 0,
+      "tail_surface_count": 0,
+      "retained_current_refs_only_boundary_count": 3,
+      "blocked_action_count": 6,
+      "forbidden_write_count": 4,
+      "active_source_no_resurrection_violation_count": 0,
+      "physical_delete_authorized": false,
+      "default_caller_cutover_claim_authorized": false,
+      "typed_blocker_roundtrip_state": "typed_blocker_ref_shape_only_no_instance_created",
+      "next_delete_evidence_required": [
+        "explicit_physical_delete_authorization_ref",
+        "no_active_repo_local_default_caller",
+        "owner_receipt_or_typed_blocker_roundtrip_instance",
+        "tombstone_or_provenance_pointer"
+      ]
+    },
     "current_role_guard": {
       "guard_id": "rca.private_platform.current_role_guard.v1",
       "allowed_roles": [

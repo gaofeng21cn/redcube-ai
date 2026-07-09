@@ -23,6 +23,8 @@ Executor runtime protocol 当前只保留 route-level executor policy、topology
 
 Currentness readback 以 `contracts/physical_source_morphology_policy.json#/active_surface_classifications` 和 `contracts/private_functional_surface_policy.json#/repo_local_owner_delta_surface_policy` 为 per-surface SSOT。下方 path-level checkpoints 只作维护者定位和 focused verification 指针；若 path rows 与 surface-id contract 冲突，先更新 contract/source/tests 或重新生成 runtime-program leaf，再折回本文。
 
+2026-07-09 retained helper / thin adapter deletion gate：fresh `private-platform:readback` 与 `default-caller-tail:readback` 均为 `passed_repo_source_guard_only`，`cleanup_candidate_count=0`、`tail_surface_count=0`、no-resurrection violation 为 0，但仍无 physical delete authorization、typed blocker / owner receipt instance roundtrip 或 default-caller cutover authority。本轮保留 `product-entry` / `session` / `domain_action_adapter` / `runtimeWatch` / operator projection / route-run refs 等 retained surfaces 为 refs-only / authority adapter；不做 source physical delete，也不新增 alias / facade。
+
 ## Classification
 
 | class | 含义 |
