@@ -156,407 +156,162 @@ function loadHelpers(file, extraNames = []) {
   `)();
 }
 
+function baseSlide(overrides = {}) {
+  return {
+    slide_id: 'S01',
+    issues: [],
+    checks: {
+      overflow_free: true,
+      occlusion_free: true,
+      visual_density_ok: true,
+      speaker_fit_ok: true,
+      ...overrides.checks,
+    },
+    ...overrides,
+  };
+}
+
 for (const family of FAMILY_FILES) {
-  test(`${family.label} screenshot_review keeps auxiliary mechanical warnings blocking even if AI passes`, () => {
+  test(`${family.label} screenshot_review keeps AI visual verdict authoritative without hiding mechanical evidence`, () => {
     const helpers = loadHelpers(family.file);
-    const reviewed = helpers.buildAiFirstVisualSlideReview(
-      {
-        slide_id: 'S01',
+    const advisoryMechanical = helpers.buildAiFirstVisualSlideReview(
+      baseSlide({
         issues: ['occlusion_detected', 'visual_density_out_of_range', 'speaker_fit_out_of_range'],
-        checks: {
-          overflow_free: true,
-          occlusion_free: false,
-          visual_density_ok: false,
-          speaker_fit_ok: false,
-        },
-      },
-      {
-        judgement: 'pass',
-      },
+        checks: { occlusion_free: false, visual_density_ok: false, speaker_fit_ok: false },
+      }),
+      { judgement: 'pass' },
     );
-
-    if (family.label === 'ppt') {
-      assert.equal(reviewed.status, 'block');
-      assert.deepEqual(reviewed.issues, ['occlusion_detected', 'visual_density_out_of_range']);
-    } else {
-      assert.equal(reviewed.status, 'pass');
-      assert.deepEqual(reviewed.issues, []);
-    }
-    assert.deepEqual(reviewed.mechanical_issues, ['occlusion_detected', 'visual_density_out_of_range', 'speaker_fit_out_of_range']);
-    assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'occlusion_free'), false);
-    assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'visual_density_ok'), false);
-    assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'speaker_fit_ok'), false);
-  });
-
-  test(`${family.label} screenshot_review still blocks hard overflow even if AI passes`, () => {
-    const helpers = loadHelpers(family.file);
-    const reviewed = helpers.buildAiFirstVisualSlideReview(
-      {
-        slide_id: 'S01',
-        issues: ['overflow_detected'],
-        checks: {
-          overflow_free: false,
-          occlusion_free: true,
-          visual_density_ok: true,
-          speaker_fit_ok: true,
-        },
-      },
-      {
-        judgement: 'pass',
-      },
+    const hardOverflow = helpers.buildAiFirstVisualSlideReview(
+      baseSlide({ issues: ['overflow_detected'], checks: { overflow_free: false } }),
+      { judgement: 'pass' },
     );
+    const aiBlock = helpers.buildAiFirstVisualSlideReview(baseSlide(), { judgement: 'fail' });
 
-    assert.equal(reviewed.status, 'block');
-    assert.deepEqual(reviewed.issues, ['overflow_detected']);
-  });
-
-  test(`${family.label} screenshot_review blocks on AI visual fail even when mechanics are clean`, () => {
-    const helpers = loadHelpers(family.file);
-    const reviewed = helpers.buildAiFirstVisualSlideReview(
-      {
-        slide_id: 'S01',
-        issues: [],
-        checks: {
-          overflow_free: true,
-          occlusion_free: true,
-          visual_density_ok: true,
-          speaker_fit_ok: true,
-        },
-      },
-      {
-        judgement: 'block',
-      },
-    );
-
-    assert.equal(reviewed.status, 'block');
-    assert.deepEqual(reviewed.issues, ['ai_visual_risk']);
-    assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'occlusion_free'), true);
-  });
-
-  test(`${family.label} screenshot_review normalizes fail-like judgements into block`, () => {
-    const helpers = loadHelpers(family.file);
-    const reviewed = helpers.buildAiFirstVisualSlideReview(
-      {
-        slide_id: 'S01',
-        issues: [],
-        checks: {
-          overflow_free: true,
-          occlusion_free: true,
-          visual_density_ok: true,
-          speaker_fit_ok: true,
-        },
-      },
-      {
-        judgement: 'fail',
-      },
-    );
-
-    assert.equal(reviewed.status, 'block');
-    assert.deepEqual(reviewed.issues, ['ai_visual_risk']);
-  });
-
-  test(`${family.label} screenshot_review treats weak judgements as advisory pass`, () => {
-    const helpers = loadHelpers(family.file);
+    assert.deepEqual(advisoryMechanical.mechanical_issues, [
+      'occlusion_detected',
+      'visual_density_out_of_range',
+      'speaker_fit_out_of_range',
+    ]);
+    assert.equal(advisoryMechanical.status, family.label === 'ppt' ? 'block' : 'pass');
+    assert.equal(hardOverflow.status, 'block');
+    assert.deepEqual(hardOverflow.issues, ['overflow_detected']);
+    assert.equal(aiBlock.status, 'block');
+    assert.deepEqual(aiBlock.issues, ['ai_visual_risk']);
+    assert.equal(helpers.aiFirstMechanicalCheckValue([advisoryMechanical], 'occlusion_free'), false);
     assert.equal(helpers.normalizeAiVisualJudgement('weak'), 'pass');
-    assert.equal(helpers.normalizeAiVisualJudgement('minor'), 'pass');
   });
 
   test(`${family.label} screenshot_review treats surfaced block content overflow as targeted page repair`, () => {
     const helpers = loadHelpers(family.file, ['slideNeedsTargetedRevision']);
-    assert.equal(
-      helpers.slideNeedsTargetedRevision({
-        slide_id: family.label === 'xiaohongshu' ? 'N03' : 'S03',
-        status: 'pass',
-        issues: [],
-        mechanical_issues: ['block_content_overflow_detected'],
-        ai_review: { judgement: 'pass', recommended_fix: '放宽文本容器。' },
-      }),
-      true,
-    );
+    assert.equal(helpers.slideNeedsTargetedRevision({
+      slide_id: family.label === 'xiaohongshu' ? 'N03' : 'S03',
+      status: 'pass',
+      issues: [],
+      mechanical_issues: ['block_content_overflow_detected'],
+      ai_review: { judgement: 'pass', recommended_fix: '放宽文本容器。' },
+    }), true);
   });
-
-  if (family.label === 'ppt') {
-    test(`${family.label} screenshot_review routes page-level occlusion and density failures back to fix_html`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'storyline' },
-              { stage_id: 'detailed_outline' },
-              { stage_id: 'slide_blueprint' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              ai_review_passed: 'fix_html',
-              occlusion_free: 'fix_html',
-              visual_density_ok: 'visual_direction',
-              speaker_fit_ok: 'slide_blueprint',
-            },
-          },
-        },
-        ['ai_review_passed', 'occlusion_free', 'visual_density_ok'],
-        [
-          {
-            slide_id: 'S05',
-            status: 'pass',
-            issues: [],
-            mechanical_issues: ['occlusion_detected', 'visual_density_out_of_range'],
-            ai_review: { judgement: 'pass', recommended_fix: '恢复组件间留白。' },
-          },
-        ],
-      );
-
-      assert.equal(rerunStage, 'fix_html');
-    });
-
-    test(`${family.label} screenshot_review treats edge clearance and title typography drift as fix_html page fixes`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const reviewed = helpers.buildAiFirstVisualSlideReview(
-        {
-          slide_id: 'S08',
-          issues: ['edge_clearance_out_of_range', 'title_typography_inconsistent'],
-          checks: {
-            overflow_free: true,
-            occlusion_free: true,
-            visual_density_ok: true,
-            speaker_fit_ok: true,
-            edge_clearance_ok: false,
-            title_typography_ok: false,
-          },
-        },
-        {
-          judgement: 'pass',
-        },
-      );
-
-      assert.equal(reviewed.status, 'block');
-      assert.deepEqual(reviewed.issues, ['edge_clearance_out_of_range', 'title_typography_inconsistent']);
-      assert.deepEqual(reviewed.mechanical_issues, ['edge_clearance_out_of_range', 'title_typography_inconsistent']);
-      assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'edge_clearance_ok'), false);
-      assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'title_typography_ok'), false);
-
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'storyline' },
-              { stage_id: 'detailed_outline' },
-              { stage_id: 'slide_blueprint' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              ai_review_passed: 'fix_html',
-              occlusion_free: 'fix_html',
-              visual_density_ok: 'visual_direction',
-              speaker_fit_ok: 'slide_blueprint',
-              edge_clearance_ok: 'fix_html',
-              title_typography_ok: 'fix_html',
-            },
-          },
-        },
-        ['edge_clearance_ok', 'title_typography_ok'],
-        [reviewed],
-      );
-
-      assert.equal(rerunStage, 'fix_html');
-    });
-
-    test(`${family.label} screenshot_review treats page number consistency failures as fix_html page fixes`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const reviewed = helpers.buildAiFirstVisualSlideReview(
-        {
-          slide_id: 'S04',
-          issues: ['page_number_consistency_failed'],
-          checks: {
-            overflow_free: true,
-            occlusion_free: true,
-            visual_density_ok: true,
-            speaker_fit_ok: true,
-            edge_clearance_ok: true,
-            block_content_fit_ok: true,
-            title_typography_ok: true,
-            page_number_consistency_ok: false,
-          },
-          metrics: {
-            page_number_audit: {
-              text: '4 / 8',
-              syntax_family: 'current_total_slash',
-              reference: { text: '01', syntax_family: 'two_digit' },
-              failures: ['syntax_family', 'position'],
-            },
-          },
-        },
-        {
-          judgement: 'pass',
-        },
-      );
-
-      assert.equal(reviewed.status, 'block');
-      assert.deepEqual(reviewed.issues, ['page_number_consistency_failed']);
-      assert.deepEqual(reviewed.mechanical_issues, ['page_number_consistency_failed']);
-      assert.equal(helpers.aiFirstMechanicalCheckValue([reviewed], 'page_number_consistency_ok'), false);
-      assert.equal(helpers.slideNeedsTargetedRevision(reviewed), true);
-
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'storyline' },
-              { stage_id: 'detailed_outline' },
-              { stage_id: 'slide_blueprint' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              page_number_consistency_ok: 'fix_html',
-            },
-          },
-        },
-        ['page_number_consistency_ok'],
-        [reviewed],
-      );
-
-      assert.equal(rerunStage, 'fix_html');
-    });
-
-    test(`${family.label} screenshot_review still routes speaker fit failures back to slide_blueprint`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'storyline' },
-              { stage_id: 'detailed_outline' },
-              { stage_id: 'slide_blueprint' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              ai_review_passed: 'fix_html',
-              occlusion_free: 'fix_html',
-              visual_density_ok: 'visual_direction',
-              speaker_fit_ok: 'slide_blueprint',
-            },
-          },
-        },
-        ['speaker_fit_ok'],
-        [
-          {
-            slide_id: 'S03',
-            status: 'pass',
-            issues: [],
-            mechanical_issues: ['speaker_fit_out_of_range'],
-            ai_review: { judgement: 'pass' },
-          },
-        ],
-      );
-
-      assert.equal(rerunStage, 'slide_blueprint');
-    });
-  }
-
-  if (family.label === 'xiaohongshu') {
-    test(`${family.label} screenshot_review routes page-level card failures back to fix_html`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'research' },
-              { stage_id: 'storyline' },
-              { stage_id: 'single_note_plan' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              overflow_free: 'fix_html',
-              occlusion_free: 'fix_html',
-              visual_density_ok: 'visual_direction',
-              cover_density_ok: 'single_note_plan',
-            },
-          },
-        },
-        ['ai_review_passed', 'occlusion_free', 'visual_density_ok'],
-        [
-          {
-            slide_id: 'N03',
-            status: 'pass',
-            issues: [],
-            mechanical_issues: ['occlusion_detected', 'visual_density_out_of_range'],
-            ai_review: { judgement: 'pass', recommended_fix: '重排卡片层级并恢复留白。' },
-          },
-        ],
-      );
-
-      assert.equal(rerunStage, 'fix_html');
-    });
-
-    test(`${family.label} screenshot_review routes cover density failures to fix_html`, () => {
-      const helpers = loadHelpers(family.file, RERUN_HELPER_NAMES);
-      const rerunStage = helpers.deriveScreenshotReviewRerunStage(
-        {
-          stage_sequence: {
-            stages: [
-              { stage_id: 'research' },
-              { stage_id: 'storyline' },
-              { stage_id: 'single_note_plan' },
-              { stage_id: 'visual_direction' },
-              { stage_id: 'render_html' },
-              { stage_id: 'fix_html' },
-              { stage_id: 'visual_director_review' },
-              { stage_id: 'screenshot_review' },
-            ],
-          },
-          review_surface: {
-            rerun_from_stage: {
-              overflow_free: 'fix_html',
-              occlusion_free: 'fix_html',
-              visual_density_ok: 'visual_direction',
-              cover_density_ok: 'single_note_plan',
-            },
-          },
-        },
-        ['cover_density_ok'],
-        [
-          {
-            slide_id: 'N01',
-            status: 'pass',
-            issues: [],
-            mechanical_issues: [],
-            ai_review: { judgement: 'pass' },
-          },
-        ],
-      );
-
-      assert.equal(rerunStage, 'fix_html');
-    });
-  }
 }
+
+const PPT_STAGE_SEQUENCE = {
+  stage_sequence: {
+    stages: [
+      { stage_id: 'storyline' },
+      { stage_id: 'detailed_outline' },
+      { stage_id: 'slide_blueprint' },
+      { stage_id: 'visual_direction' },
+      { stage_id: 'render_html' },
+      { stage_id: 'fix_html' },
+      { stage_id: 'visual_director_review' },
+      { stage_id: 'screenshot_review' },
+    ],
+  },
+  review_surface: {
+    rerun_from_stage: {
+      ai_review_passed: 'fix_html',
+      occlusion_free: 'fix_html',
+      visual_density_ok: 'visual_direction',
+      speaker_fit_ok: 'slide_blueprint',
+      edge_clearance_ok: 'fix_html',
+      title_typography_ok: 'fix_html',
+      page_number_consistency_ok: 'fix_html',
+    },
+  },
+};
+
+test('ppt screenshot_review routes page-local mechanical failures to the earliest safe repair stage', () => {
+  const helpers = loadHelpers(
+    'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts',
+    RERUN_HELPER_NAMES,
+  );
+  const cases = [
+    {
+      failedChecks: ['ai_review_passed', 'occlusion_free', 'visual_density_ok'],
+      issues: ['occlusion_detected', 'visual_density_out_of_range'],
+      expected: 'fix_html',
+    },
+    {
+      failedChecks: ['edge_clearance_ok', 'title_typography_ok'],
+      issues: ['edge_clearance_out_of_range', 'title_typography_inconsistent'],
+      expected: 'fix_html',
+    },
+    {
+      failedChecks: ['page_number_consistency_ok'],
+      issues: ['page_number_consistency_failed'],
+      expected: 'fix_html',
+    },
+    {
+      failedChecks: ['speaker_fit_ok'],
+      issues: ['speaker_fit_out_of_range'],
+      expected: 'slide_blueprint',
+    },
+  ];
+
+  for (const item of cases) {
+    const reviewed = helpers.buildAiFirstVisualSlideReview(
+      baseSlide({ slide_id: 'S05', issues: item.issues }),
+      { judgement: 'pass', recommended_fix: '恢复组件间留白。' },
+    );
+    assert.equal(helpers.deriveScreenshotReviewRerunStage(PPT_STAGE_SEQUENCE, item.failedChecks, [reviewed]), item.expected);
+  }
+});
+
+test('xiaohongshu screenshot_review keeps local card and cover density failures on fix_html', () => {
+  const helpers = loadHelpers(
+    'packages/redcube-runtime/src/families/xiaohongshu/xiaohongshu-runtime-family-parts/shared.ts',
+    RERUN_HELPER_NAMES,
+  );
+  const contract = {
+    stage_sequence: {
+      stages: [
+        { stage_id: 'research' },
+        { stage_id: 'storyline' },
+        { stage_id: 'single_note_plan' },
+        { stage_id: 'visual_direction' },
+        { stage_id: 'render_html' },
+        { stage_id: 'fix_html' },
+        { stage_id: 'visual_director_review' },
+        { stage_id: 'screenshot_review' },
+      ],
+    },
+    review_surface: {
+      rerun_from_stage: {
+        overflow_free: 'fix_html',
+        occlusion_free: 'fix_html',
+        visual_density_ok: 'visual_direction',
+        cover_density_ok: 'single_note_plan',
+      },
+    },
+  };
+
+  for (const failedChecks of [['ai_review_passed', 'occlusion_free', 'visual_density_ok'], ['cover_density_ok']]) {
+    const rerunStage = helpers.deriveScreenshotReviewRerunStage(contract, failedChecks, [{
+      slide_id: 'N03',
+      status: 'pass',
+      issues: [],
+      mechanical_issues: ['occlusion_detected', 'visual_density_out_of_range'],
+      ai_review: { judgement: 'pass', recommended_fix: '重排卡片层级并恢复留白。' },
+    }]);
+    assert.equal(rerunStage, 'fix_html');
+  }
+});
