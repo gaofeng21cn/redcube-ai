@@ -15,6 +15,7 @@ import {
   withMockCodexRuntime,
   withMockCodexRuntimeState,
 } from './product-domain-action-case-shared.ts';
+import { readJson } from './helpers/json-io.ts';
 import { withEnv } from './helpers/mock-codex-cli.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 
@@ -29,10 +30,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
-
-function readJson(file) {
-  return JSON.parse(fs.readFileSync(file, 'utf8'));
-}
 
 function readRepoJson(relativePath) {
   return readJson(path.join(repoRoot, relativePath));

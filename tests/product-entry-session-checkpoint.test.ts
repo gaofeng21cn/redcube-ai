@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 import {
@@ -16,6 +16,7 @@ import {
   startMockCodexCli,
   withEnv,
 } from './mock-codex-cli.ts';
+import { readJson, writeJson } from './helpers/json-io.ts';
 
 const SERIAL_ENV_TEST = { concurrency: false };
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
@@ -23,15 +24,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, value) {
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`, 'utf-8');
-}
 
 const PROVIDER_LEDGER_DELTA = {
   domain_alias: 'provider_ledger_closeout_binding_delta',

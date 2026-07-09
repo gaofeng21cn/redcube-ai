@@ -16,17 +16,9 @@ import {
   createDeliverable,
   runDeliverableRoute,
 } from './product-domain-action-test-api.ts';
+import { readJson, writeJson } from './helpers/json-io.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 import { refreshStageFolderRouteArtifact } from '../packages/redcube-runtime/dist/deliverable-route-local.js';
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, data) {
-  mkdirSync(path.dirname(file), { recursive: true });
-  writeFileSync(file, `${JSON.stringify(data, null, 2)}\n`, 'utf-8');
-}
 
 function writeStageFolderOutputFixture(input, artifact) {
   const outputName = input.outputName || `${input.routeStageId}.json`;
