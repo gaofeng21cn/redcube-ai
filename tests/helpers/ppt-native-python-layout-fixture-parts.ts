@@ -1,256 +1,102 @@
 // @ts-nocheck
 
-export function archetypeSupportShapes(layoutFamily, slideId) {
-  const supportQualityRole = 'content';
-  const supportText = {
-    evidence: '证据链可复核。',
-    takeaway: '自主链路已经闭合且证据可复核。',
-    metric: '0 溢出。',
-    gate: '出口 gate：审查通过后才导出。',
-  };
-  if (layoutFamily === 'cover_signal') {
-    return [
-      {
-        shape_id: `${slideId}-evidence-note`,
-        kind: 'text_box',
-        role: 'evidence_item',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'evidence_zone',
-        editable_text: supportText.evidence,
-        bounds: { left_in: 0.95, top_in: 7.45, width_in: 7.4, height_in: 0.86 },
-        font_size: 18,
-        color: '#5B6570',
-        fill: 'none',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-takeaway-note`,
-        kind: 'text_box',
-        role: 'takeaway',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'takeaway_zone',
-        editable_text: supportText.takeaway,
-        bounds: { left_in: 8.75, top_in: 7.45, width_in: 5.75, height_in: 0.86 },
-        font_size: 18,
-        color: '#171C24',
-        fill: 'none',
-        line: 'none',
-      },
-    ];
-  }
-  if (layoutFamily === 'timeline_band') {
-    return [
-      {
-        shape_id: `${slideId}-timeline-evidence`,
-        kind: 'text_box',
-        role: 'evidence_item',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'evidence_zone',
-        editable_text: supportText.evidence,
-        bounds: { left_in: 0.95, top_in: 7.45, width_in: 7.4, height_in: 0.86 },
-        font_size: 18,
-        color: '#5B6570',
-        fill: 'none',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-timeline-takeaway`,
-        kind: 'text_box',
-        role: 'takeaway',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'takeaway_zone',
-        editable_text: supportText.takeaway,
-        bounds: { left_in: 8.75, top_in: 7.45, width_in: 5.75, height_in: 0.86 },
-        font_size: 18,
-        color: '#171C24',
-        fill: 'none',
-        line: 'none',
-      },
-    ];
-  }
-  if (layoutFamily === 'judgement_ladder') {
-    return [
-      {
-        shape_id: `${slideId}-gate-label`,
-        kind: 'text_box',
-        role: 'gate_card',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'gate_zone',
-        editable_text: supportText.gate,
-        bounds: { left_in: 8.0, top_in: 6.65, width_in: 5.0, height_in: 0.86 },
-        font_size: 18,
-        color: '#171C24',
-        fill: 'none',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-ladder-evidence`,
-        kind: 'text_box',
-        role: 'evidence_item',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'evidence_zone',
-        editable_text: supportText.evidence,
-        bounds: { left_in: 0.95, top_in: 7.5, width_in: 6.2, height_in: 0.86 },
-        font_size: 18,
-        color: '#5B6570',
-        fill: 'none',
-        line: 'none',
-      },
-    ];
-  }
-  if (layoutFamily === 'ring_cross' || layoutFamily === 'workflow_map') {
-    return [
-      {
-        shape_id: `${slideId}-system-gate`,
-        kind: 'text_box',
-        role: 'route_label',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'gate_zone',
-        editable_text: supportText.gate,
-        bounds: { left_in: 10.35, top_in: 2.78, width_in: 3.95, height_in: 0.86 },
-        font_size: 18,
-        color: '#171C24',
-        fill: 'none',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-system-evidence`,
-        kind: 'text_box',
-        role: 'evidence_item',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'evidence_zone',
-        editable_text: supportText.evidence,
-        bounds: { left_in: 1.0, top_in: 7.45, width_in: 7.4, height_in: 0.86 },
-        font_size: 18,
-        color: '#5B6570',
-        fill: 'none',
-        line: 'none',
-      },
-    ];
-  }
-  if (layoutFamily === 'summary_peak') {
-    return [
-      {
-        shape_id: `${slideId}-proof-metric`,
-        kind: 'text_box',
-        role: 'metric',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'proof_zone',
-        editable_text: supportText.metric,
-        bounds: { left_in: 0.95, top_in: 7.5, width_in: 6.0, height_in: 0.86 },
-        font_size: 18,
-        color: '#5B6570',
-        fill: 'none',
-        line: 'none',
-      },
-      {
-        shape_id: `${slideId}-final-takeaway`,
-        kind: 'text_box',
-        role: 'takeaway',
-        quality_role: supportQualityRole,
-        layout_zone_id: 'takeaway_zone',
-        editable_text: supportText.takeaway,
-        bounds: { left_in: 7.35, top_in: 7.5, width_in: 6.8, height_in: 0.86 },
-        font_size: 18,
-        color: '#171C24',
-        fill: 'none',
-        line: 'none',
-      },
-    ];
-  }
-  return [
-    {
-      shape_id: `${slideId}-signal-metric`,
-      kind: 'text_box',
-      role: 'metric',
-      quality_role: supportQualityRole,
-      layout_zone_id: 'signal_zone',
-      editable_text: supportText.metric,
-      bounds: { left_in: 0.95, top_in: 7.5, width_in: 6.0, height_in: 0.86 },
-      font_size: 18,
-      color: '#5B6570',
-      fill: 'none',
-      line: 'none',
-    },
-    {
-      shape_id: `${slideId}-matrix-takeaway`,
-      kind: 'text_box',
-      role: 'takeaway',
-      quality_role: supportQualityRole,
-      layout_zone_id: 'takeaway_zone',
-      editable_text: supportText.takeaway,
-      bounds: { left_in: 7.35, top_in: 7.5, width_in: 6.8, height_in: 0.86 },
-      font_size: 18,
-      color: '#171C24',
-      fill: 'none',
-      line: 'none',
-    },
-  ];
+const SUPPORT_TEXT = Object.freeze({
+  evidence: '证据链可复核。',
+  takeaway: '自主链路已经闭合且证据可复核。',
+  metric: '0 溢出。',
+  gate: '出口 gate：审查通过后才导出。',
+});
+
+const SUPPORT_SHAPES = Object.freeze({
+  cover_signal: [
+    ['evidence-note', 'evidence_item', 'evidence_zone', 'evidence', { left_in: 0.95, top_in: 7.45, width_in: 7.4, height_in: 0.86 }, '#5B6570'],
+    ['takeaway-note', 'takeaway', 'takeaway_zone', 'takeaway', { left_in: 8.75, top_in: 7.45, width_in: 5.75, height_in: 0.86 }, '#171C24'],
+  ],
+  timeline_band: [
+    ['timeline-evidence', 'evidence_item', 'evidence_zone', 'evidence', { left_in: 0.95, top_in: 7.45, width_in: 7.4, height_in: 0.86 }, '#5B6570'],
+    ['timeline-takeaway', 'takeaway', 'takeaway_zone', 'takeaway', { left_in: 8.75, top_in: 7.45, width_in: 5.75, height_in: 0.86 }, '#171C24'],
+  ],
+  judgement_ladder: [
+    ['gate-label', 'gate_card', 'gate_zone', 'gate', { left_in: 8.0, top_in: 6.65, width_in: 5.0, height_in: 0.86 }, '#171C24'],
+    ['ladder-evidence', 'evidence_item', 'evidence_zone', 'evidence', { left_in: 0.95, top_in: 7.5, width_in: 6.2, height_in: 0.86 }, '#5B6570'],
+  ],
+  ring_cross: [
+    ['system-gate', 'route_label', 'gate_zone', 'gate', { left_in: 10.35, top_in: 2.78, width_in: 3.95, height_in: 0.86 }, '#171C24'],
+    ['system-evidence', 'evidence_item', 'evidence_zone', 'evidence', { left_in: 1.0, top_in: 7.45, width_in: 7.4, height_in: 0.86 }, '#5B6570'],
+  ],
+  summary_peak: [
+    ['proof-metric', 'metric', 'proof_zone', 'metric', { left_in: 0.95, top_in: 7.5, width_in: 6.0, height_in: 0.86 }, '#5B6570'],
+    ['final-takeaway', 'takeaway', 'takeaway_zone', 'takeaway', { left_in: 7.35, top_in: 7.5, width_in: 6.8, height_in: 0.86 }, '#171C24'],
+  ],
+  default: [
+    ['signal-metric', 'metric', 'signal_zone', 'metric', { left_in: 0.95, top_in: 7.5, width_in: 6.0, height_in: 0.86 }, '#5B6570'],
+    ['matrix-takeaway', 'takeaway', 'takeaway_zone', 'takeaway', { left_in: 7.35, top_in: 7.5, width_in: 6.8, height_in: 0.86 }, '#171C24'],
+  ],
+});
+
+const SUPPLEMENTAL_SHAPES = Object.freeze({
+  cover_signal: [
+    ['evidence-summary', 'evidence_item', 'evidence_zone', '关键证据已经落盘，可按文件清单复核。', { left_in: 1.0, top_in: 6.52, width_in: 6.25, height_in: 0.86 }],
+    ['takeaway-summary', 'takeaway', 'takeaway_zone', '下一步按同一口径进入审查。', { left_in: 8.1, top_in: 6.52, width_in: 5.8, height_in: 0.86 }],
+  ],
+  timeline_band: [
+    ['timeline-evidence', 'evidence_item', 'evidence_zone', '每个里程碑都保留可复核证据。', { left_in: 1.0, top_in: 6.52, width_in: 7.2, height_in: 0.86 }],
+  ],
+  judgement_ladder: [],
+  ring_cross: [
+    ['system-evidence', 'evidence_item', 'evidence_zone', '证据区记录导出、截图和清单。', { left_in: 1.0, top_in: 6.52, width_in: 7.2, height_in: 0.86 }],
+  ],
+  summary_peak: [],
+  default: [
+    ['matrix-evidence', 'metric', 'signal_zone', '证据区给出可复核交付信号。', { left_in: 4.75, top_in: 6.52, width_in: 4.8, height_in: 0.86 }],
+  ],
+});
+
+function layoutSpecs(specs, layoutFamily) {
+  if (layoutFamily === 'workflow_map') return specs.ring_cross;
+  return specs[layoutFamily] || specs.default;
 }
 
-export function supplementalContractShapes(layoutFamily, slideId) {
-  const textBase = {
+function supportTextShape(slideId, [suffix, role, layoutZoneId, text, bounds, color]) {
+  return {
+    shape_id: `${slideId}-${suffix}`,
+    kind: 'text_box',
+    role,
+    quality_role: 'content',
+    layout_zone_id: layoutZoneId,
+    editable_text: text,
+    bounds,
+    font_size: 18,
+    color,
+    fill: 'none',
+    line: 'none',
+  };
+}
+
+function supplementalTextShape(slideId, [suffix, role, layoutZoneId, text, bounds]) {
+  return {
     kind: 'text_box',
     quality_role: 'content',
     font_size: 18,
     color: '#171C24',
     fill: 'none',
     line: 'none',
+    shape_id: `${slideId}-${suffix}`,
+    role,
+    layout_zone_id: layoutZoneId,
+    editable_text: text,
+    bounds,
   };
-  if (layoutFamily === 'cover_signal') {
-    return [
-      {
-        ...textBase,
-        shape_id: `${slideId}-evidence-summary`,
-        role: 'evidence_item',
-        layout_zone_id: 'evidence_zone',
-        editable_text: '关键证据已经落盘，可按文件清单复核。',
-        bounds: { left_in: 1.0, top_in: 6.52, width_in: 6.25, height_in: 0.86 },
-      },
-      {
-        ...textBase,
-        shape_id: `${slideId}-takeaway-summary`,
-        role: 'takeaway',
-        layout_zone_id: 'takeaway_zone',
-        editable_text: '下一步按同一口径进入审查。',
-        bounds: { left_in: 8.1, top_in: 6.52, width_in: 5.8, height_in: 0.86 },
-      },
-    ];
-  }
-  if (layoutFamily === 'timeline_band') {
-    return [{
-      ...textBase,
-      shape_id: `${slideId}-timeline-evidence`,
-      role: 'evidence_item',
-      layout_zone_id: 'evidence_zone',
-      editable_text: '每个里程碑都保留可复核证据。',
-      bounds: { left_in: 1.0, top_in: 6.52, width_in: 7.2, height_in: 0.86 },
-    }];
-  }
-  if (layoutFamily === 'judgement_ladder') {
-    return [];
-  }
-  if (['ring_cross', 'workflow_map'].includes(layoutFamily)) {
-    return [{
-      ...textBase,
-      shape_id: `${slideId}-system-evidence`,
-      role: 'evidence_item',
-      layout_zone_id: 'evidence_zone',
-      editable_text: '证据区记录导出、截图和清单。',
-      bounds: { left_in: 1.0, top_in: 6.52, width_in: 7.2, height_in: 0.86 },
-    }];
-  }
-  if (layoutFamily === 'summary_peak') {
-    return [];
-  }
-  return [{
-    ...textBase,
-    shape_id: `${slideId}-matrix-evidence`,
-    role: 'metric',
-    layout_zone_id: 'signal_zone',
-    editable_text: '证据区给出可复核交付信号。',
-    bounds: { left_in: 4.75, top_in: 6.52, width_in: 4.8, height_in: 0.86 },
-  }];
+}
+
+export function archetypeSupportShapes(layoutFamily, slideId) {
+  return layoutSpecs(SUPPORT_SHAPES, layoutFamily).map((spec) => (
+    supportTextShape(slideId, [spec[0], spec[1], spec[2], SUPPORT_TEXT[spec[3]], spec[4], spec[5]])
+  ));
+}
+
+export function supplementalContractShapes(layoutFamily, slideId) {
+  return layoutSpecs(SUPPLEMENTAL_SHAPES, layoutFamily).map((spec) => supplementalTextShape(slideId, spec));
 }
 
 export function templateLayoutGrammar() {
