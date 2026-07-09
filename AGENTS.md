@@ -11,6 +11,7 @@
 - 项目知识默认从 `README*`、`docs/README*`、`docs/project.md`、`docs/status.md`、`docs/architecture.md`、`docs/invariants.md`、`docs/decisions.md` 读取。
 - `RedCube AI` 是独立 visual-deliverable domain agent，也可以作为 `OPL` stage-led 智能体运行框架中的 admitted domain agent 被托管。`Stage` 表示大型视觉交付步骤，Agent executor 是 stage 内最小执行单位；`Codex CLI` 是当前第一公民 executor，其他 executor adapter 只能显式接入且不承诺行为效果等价。RCA 持有 visual truth、layout/review/export verdict、route owner、artifact authority、visual memory accept/reject authority 和 owner receipt；通用 runtime、queue、attempt ledger、state-machine runner、workspace/source intake shell、artifact gallery/handoff shell、review/repair transport、native-helper envelope、memory locator 与 App/workbench shell 归 OPL Framework / shared family layer。
 - RCA 的理想形态是标准 OPL Agent：`Declarative Visual Pack + OPL generated/hosted surfaces + minimal authority functions`。当前仓内已存在的 managed DAG、attempt/state-machine runner、session store、workspace/source intake、memory/artifact lifecycle、review/repair transport、operator projection、CLI/MCP/product-entry/domain_action_adapter/status wrapper 只能作为迁移输入；不能因为已有 active caller 就写成长期合理私有平台。
+- `agent/primary_skill/SKILL.md` 是标准 OPL Agent 的 canonical rich primary skill；`plugins/<agent>/skills/<agent>/SKILL.md` 是 Codex plugin 安装要求的 materialized full-skill carrier mirror。该关系以 `contracts/capability_map.json` 中的 `carrier_projection_contract` 为机器权威；两者字节相同表示同步健康，不表示应删除重复，mirror 漂移才是问题。
 - 文档和开发计划先设理想态，再找差距；差距不是妥协清单。为了标准 OPL Agent 目标态，可以革命式重构 RCA 并完全抛弃旧模块、旧接口、旧测试、旧目录和旧文案，不以兼容为理由保留历史污染面。
 - `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
@@ -74,7 +75,7 @@
 - 叙述性 `README*`、`docs/**` 和参考文档不作为脚本/测试的断言对象；可以测试 machine-readable contract、schema、CLI/API 行为、生成产物结构与路径，但不要用测试固定文档措辞、章节或状态文案。
 - 默认最小验证入口是 `scripts/verify.sh`。
 - 默认 smoke 是 `npm test` / `npm run test:smoke`；`npm run test:fast` 是显式标准本地入口，不作为裸 `npm test` 的默认成本。
-- `npm run test:meta`、`npm run test:integration`、`npm run test:e2e`、`npm run test:historical` 是显式 lane。
+- `meta`、`integration`、`e2e` 是 `scripts/verify.sh <lane>` / `scripts/verify-lane.ts <lane>` 显式 lane，不再额外暴露 npm alias；`npm run test:historical` 保留为 contract-bound 显式 lane。
 - `npm run test:full` 是 clean-clone 基线。
 - `scripts/run-test-group.ts` 是默认 Node 测试分组入口；它必须给所有 Python native helper 子进程注入仓外 cache 环境。新增直接启动 Python 的测试或脚本时，必须显式继承 `PYTHONDONTWRITEBYTECODE`、`PYTHONPYCACHEPREFIX`、pytest 仓外 `cache_dir` 和仓外 project venv 路径，不得把 `.venv`、`__pycache__`、`.pytest_cache` 或 `*.egg-info` 写回开发 checkout。
 - plan-closeout 必须显式列出 `planned`、`done`、`deferred`、`skipped`、`verification`、`commit-push state`；任何 `deferred` 项都要写成可检索 backlog，不得让计划项静默消失。
