@@ -1,6 +1,7 @@
 import {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
+  createSurfaceValidators,
   listSurfaceArtifactPaths,
   type SurfaceContract,
   type SurfaceValidator,
@@ -10,6 +11,7 @@ import {
   validateGovernanceSurfaceArtifact,
   validateHydratedDeliverableSurface,
   validateSurfaceArtifact,
+  validateSurfaceRequirements,
 } from '@redcube/overlay-core';
 
 function deriveStageRequirements(contract: SurfaceContract) {
@@ -46,21 +48,20 @@ export function listDeckSurfaceArtifactPaths() {
   return listSurfaceArtifactPaths(SURFACE_ARTIFACTS);
 }
 
-const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
+const SURFACE_VALIDATORS = createSurfaceValidators(Object.entries({
   'contracts/stage-sequence.json': (content: SurfaceContract) =>
     Array.isArray(content?.stages)
     && content.stages.length > 0
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'storyline')
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review'),
   'contracts/stage-requirements.json': (content: SurfaceContract) =>
-    Array.isArray(content?.author_image_pages?.requires_artifacts)
-    && content.author_image_pages.requires_artifacts.includes('slide_blueprint')
-    && content.author_image_pages.requires_artifacts.includes('visual_direction')
-    && Array.isArray(content?.repair_image_pages?.requires_artifacts)
-    && content.repair_image_pages.requires_artifacts.includes('author_image_pages')
-    && Array.isArray(content?.screenshot_review?.requires_artifacts)
-    && content.screenshot_review.requires_artifacts.includes('visual_director_review')
-    && content.export_pptx?.requires_review_pass === true,
+    validateSurfaceRequirements(content, [
+      { path: 'author_image_pages.requires_artifacts', includes: 'slide_blueprint' },
+      { path: 'author_image_pages.requires_artifacts', includes: 'visual_direction' },
+      { path: 'repair_image_pages.requires_artifacts', includes: 'author_image_pages' },
+      { path: 'screenshot_review.requires_artifacts', includes: 'visual_director_review' },
+      { path: 'export_pptx.requires_review_pass', equals: true },
+    ]),
   'contracts/lifecycle-stage-contract.json': (content: SurfaceContract) =>
     content?.stage_model === 'direct_delivery_human_workline'
     && Array.isArray(content?.human_workline)
@@ -154,25 +155,25 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
     && content?.render_contract?.shell_file === 'render_shell.html'
     && typeof content?.render_contract?.recipe_registry?.default === 'string',
   'contracts/review-surface.json': (content: SurfaceContract) =>
-    Array.isArray(content?.required_checks)
-    && content.required_checks.length > 0
-    && content.required_checks.includes('director_intent_landed')
-    && content.required_checks.includes('anti_template_ok')
-    && content.required_checks.includes('external_audience_language_ok')
-    && content.required_checks.includes('title_safe_zone_clear')
-    && content.required_checks.includes('table_legibility_ok')
-    && content.required_checks.includes('layout_density_ok')
-    && content.rerun_from_stage
-    && typeof content.rerun_from_stage === 'object'
-    && content.rerun_from_stage.overflow_free === 'repair_image_pages'
-    && content.rerun_from_stage.director_intent_landed === 'visual_director_review'
-    && content.rerun_from_stage.anti_template_ok === 'visual_director_review',
+    validateSurfaceRequirements(content, [
+      { path: 'required_checks', nonEmptyArray: true },
+      { path: 'required_checks', includes: 'director_intent_landed' },
+      { path: 'required_checks', includes: 'anti_template_ok' },
+      { path: 'required_checks', includes: 'external_audience_language_ok' },
+      { path: 'required_checks', includes: 'title_safe_zone_clear' },
+      { path: 'required_checks', includes: 'table_legibility_ok' },
+      { path: 'required_checks', includes: 'layout_density_ok' },
+      { path: 'rerun_from_stage', object: true },
+      { path: 'rerun_from_stage.overflow_free', equals: 'repair_image_pages' },
+      { path: 'rerun_from_stage.director_intent_landed', equals: 'visual_director_review' },
+      { path: 'rerun_from_stage.anti_template_ok', equals: 'visual_director_review' },
+    ]),
   'contracts/layout-rules.json': (content: SurfaceContract) =>
-    typeof content?.density_mode === 'string'
-    && content.density_mode.length > 0
-    && Array.isArray(content?.structured_families_require_anchor)
-    && content.structured_families_require_anchor.length > 0
-    && content.evidence_surface_rules?.require_public_source_label === true,
+    validateSurfaceRequirements(content, [
+      { path: 'density_mode', nonEmptyString: true },
+      { path: 'structured_families_require_anchor', nonEmptyArray: true },
+      { path: 'evidence_surface_rules.require_public_source_label', equals: true },
+    ]),
   'contracts/baseline-policy.json': validateBaselinePolicySurface,
   'contracts/export-bundle.json': (content: SurfaceContract) =>
     typeof content?.bundle_id === 'string'
@@ -207,7 +208,10 @@ const SURFACE_VALIDATORS: Record<string, SurfaceValidator> = {
       'screenshot_review',
       'export_pptx',
     ]),
-};
+} satisfies Record<string, SurfaceValidator>).map(([relativePath, validate]) => ({
+  relativePath,
+  validate,
+})));
 
 export function validateDeckSurfaceArtifact(relativePath: string, content: unknown): boolean {
   return validateSurfaceArtifact({
