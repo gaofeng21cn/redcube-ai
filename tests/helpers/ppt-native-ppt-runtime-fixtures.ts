@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import {
   canonicalStageForRoute,
@@ -18,6 +18,7 @@ import {
   runDeliverableRoute,
 } from '../product-domain-action-test-api.ts';
 import { withEnv, withMockCodexRuntime } from '../mock-codex-cli.ts';
+import { readJson, writeJson } from './json-io.ts';
 import { mkUserScopedTestWorkspace } from './test-workspace.ts';
 import { buildMockPptNativeShapePlan } from './mock-codex-cli-parts/ppt-builders/native.ts';
 
@@ -26,14 +27,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   '--experimental-strip-types',
   fileURLToPath(new URL('./mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-function writeJson(file, data) {
-  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
 
 function readRouteStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) {
   const canonicalStageId = canonicalStageForRoute(routeStageId);

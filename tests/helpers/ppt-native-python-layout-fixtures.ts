@@ -4,8 +4,9 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { resolveRedCubePythonCommand } from '../../scripts/run-test-group-lib.ts';
+import { readJson, writeJson } from './json-io.ts';
 import {
   archetypeForLayout,
   archetypeSupportShapes,
@@ -18,13 +19,7 @@ import {
 
 const PYTHON_CACHE_ROOT = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-layouts-python-cache-'));
 
-export function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
-}
-
-export function writeJson(file, data) {
-  writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
-}
+export { readJson, writeJson };
 
 export function resolveTestPythonCommand() {
   const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
