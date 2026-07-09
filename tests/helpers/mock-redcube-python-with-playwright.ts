@@ -54,95 +54,65 @@ const OFFICECLI_MATERIALIZER_POLICY = {
 
 const SCREENSHOT_DIMENSIONS = Object.freeze({ width: 2304, height: 1296 });
 
+function words(value) {
+  return String(value).trim().split(/\s+/).filter(Boolean);
+}
+
 function trueFlags(keys) {
-  return Object.fromEntries(keys.map((key) => [key, true]));
+  return Object.freeze(Object.fromEntries(words(keys).map((key) => [key, true])));
 }
 
 function emptyLists(keys) {
-  return Object.fromEntries(keys.map((key) => [key, []]));
+  return Object.freeze(Object.fromEntries(words(keys).map((key) => [key, []])));
 }
 
-const REVIEW_CHECKS = Object.freeze(trueFlags([
-  'overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok',
-  'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok',
-  'external_audience_language_ok', 'title_safe_zone_clear', 'table_legibility_ok',
-  'layout_density_ok',
-]));
+const REVIEW_CHECKS = trueFlags(`
+  overflow_free occlusion_free visual_density_ok speaker_fit_ok edge_clearance_ok block_content_fit_ok title_typography_ok
+  external_audience_language_ok title_safe_zone_clear table_legibility_ok layout_density_ok
+`);
 
-const NATIVE_SLIDE_CHECKS = Object.freeze(trueFlags([
-  'overflow_free', 'occlusion_free', 'visual_density_ok', 'speaker_fit_ok',
-  'edge_clearance_ok', 'block_content_fit_ok', 'title_typography_ok',
-  'body_text_readability_ok', 'typography_hierarchy_ok', 'title_core_overlap_ok',
-  'page_number_consistency_ok', 'external_audience_language_ok', 'title_safe_zone_clear',
-  'table_legibility_ok', 'layout_density_ok', 'slot_fill_ok',
-  'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
-  'visual_structure_present', 'non_text_visual_specific_ok',
-  'mechanical_card_template_absent', 'panel_text_safe_area_ok',
-  'text_card_internal_padding_ok', 'short_label_wrap_ok', 'title_underline_absent_ok',
-]));
+const NATIVE_SLIDE_CHECKS = trueFlags(`
+  overflow_free occlusion_free visual_density_ok speaker_fit_ok edge_clearance_ok block_content_fit_ok title_typography_ok
+  body_text_readability_ok typography_hierarchy_ok title_core_overlap_ok page_number_consistency_ok external_audience_language_ok
+  title_safe_zone_clear table_legibility_ok layout_density_ok slot_fill_ok audience_label_readability_ok content_depth_ok
+  grid_balance_ok visual_structure_present non_text_visual_specific_ok mechanical_card_template_absent panel_text_safe_area_ok
+  text_card_internal_padding_ok short_label_wrap_ok title_underline_absent_ok
+`);
 
-const NATIVE_METRIC_TRUE_FLAGS = Object.freeze(trueFlags([
-  'body_text_readability_ok', 'typography_hierarchy_ok', 'slot_fill_ok',
-  'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
-  'visual_structure_present', 'non_text_visual_specific_ok',
-  'mechanical_card_template_absent', 'panel_text_safe_area_ok',
-  'text_card_internal_padding_ok', 'short_label_wrap_ok', 'title_underline_absent_ok',
-  'title_safe_zone_clearance_ok', 'table_cell_fit_ok',
-]));
+const NATIVE_METRIC_TRUE_FLAGS = trueFlags(`
+  body_text_readability_ok typography_hierarchy_ok slot_fill_ok audience_label_readability_ok content_depth_ok grid_balance_ok
+  visual_structure_present non_text_visual_specific_ok mechanical_card_template_absent panel_text_safe_area_ok
+  text_card_internal_padding_ok short_label_wrap_ok title_underline_absent_ok title_safe_zone_clearance_ok table_cell_fit_ok
+`);
 
-const NATIVE_METRIC_EMPTY_LISTS = Object.freeze(emptyLists([
-  'body_text_font_failures', 'title_core_overlap_failures', 'slot_fill_failures',
-  'audience_label_readability_failures', 'content_depth_failures', 'grid_balance_failures',
-  'panel_text_safe_area_failures', 'text_card_internal_padding_failures',
-  'short_label_wrap_failures', 'title_underline_failures', 'overlaps',
-  'structural_text_collisions', 'block_content_failures', 'operator_language_fragments',
-  'chart_bounds', 'table_bounds', 'metric_grid_bounds', 'chart_metrics',
-  'table_metrics', 'metric_grid_metrics', 'table_cell_fit_failures',
-  'numeric_label_overflows',
-]));
+const NATIVE_METRIC_EMPTY_LISTS = emptyLists(`
+  body_text_font_failures title_core_overlap_failures slot_fill_failures audience_label_readability_failures content_depth_failures
+  grid_balance_failures panel_text_safe_area_failures text_card_internal_padding_failures short_label_wrap_failures
+  title_underline_failures overlaps structural_text_collisions block_content_failures operator_language_fragments chart_bounds
+  table_bounds metric_grid_bounds chart_metrics table_metrics metric_grid_metrics table_cell_fit_failures numeric_label_overflows
+`);
 
 const NATIVE_FIXED_METRICS = Object.freeze({
-  min_body_font_pt: 18,
-  body_text_readability_floor_pt: 18,
-  title_core_overlap_count: 0,
-  expected_slot_count: 2,
-  filled_slot_count: 2,
-  audience_label_font_floor_pt: 16,
-  content_depth_floor_chars: 12,
-  grid_balance_ratio: 1,
-  mechanical_card_template_detected: false,
-  structural_visual_count: 1,
-  card_panel_count: 2,
-  text_char_count: 72,
-  block_count: 3,
-  decorative_shape_count: 2,
-  shape_count: 5,
-  shape_kind_count: 3,
-  role_count: 5,
-  layout_richness_score: 0.72,
-  overlap_pairs: 0,
-  clipped_nodes: 0,
-  occupied_ratio: 0.31,
+  min_body_font_pt: 18, body_text_readability_floor_pt: 18, title_core_overlap_count: 0,
+  expected_slot_count: 2, filled_slot_count: 2, audience_label_font_floor_pt: 16,
+  content_depth_floor_chars: 12, grid_balance_ratio: 1, mechanical_card_template_detected: false,
+  structural_visual_count: 1, card_panel_count: 2, text_char_count: 72, block_count: 3,
+  decorative_shape_count: 2, shape_count: 5, shape_kind_count: 3, role_count: 5,
+  layout_richness_score: 0.72, overlap_pairs: 0, clipped_nodes: 0, occupied_ratio: 0.31,
   primary_points: 3,
   edge_clearance: { left: 72, top: 64, right: 72, bottom: 300 },
-  table_min_font_pt: 11,
-  card_blank_ratio: 0.24,
-  axis_label_count: 0,
-  legend_label_count: 0,
-  numeric_label_overflow_count: 0,
+  table_min_font_pt: 11, card_blank_ratio: 0.24, axis_label_count: 0,
+  legend_label_count: 0, numeric_label_overflow_count: 0,
 });
 
-const NATIVE_QUALITY_REQUIRED_PER_SLIDE_METRICS = Object.freeze([
-  'bounds', 'text_char_count', 'primary_points', 'min_body_font_pt',
-  'body_text_readability_ok', 'typography_hierarchy_ratio', 'typography_hierarchy_ok',
-  'title_core_overlap_count', 'layout_variant', 'expected_slot_count', 'filled_slot_count',
-  'slot_fill_ok', 'audience_label_readability_ok', 'content_depth_ok', 'grid_balance_ok',
-  'visual_structure_present', 'non_text_visual_specific_ok', 'mechanical_card_template_absent',
-  'panel_text_safe_area_ok', 'text_card_internal_padding_ok', 'short_label_wrap_ok',
-  'composition_signature', 'title_underline_absent_ok', 'occupied_ratio', 'edge_clearance',
-  'overlap_pairs', 'structural_text_collision_count', 'structural_text_collisions',
-  'preview_screenshot_sha256', 'preview_screenshot_dimensions',
-]);
+const NATIVE_QUALITY_REQUIRED_PER_SLIDE_METRICS = Object.freeze(words(`
+  bounds text_char_count primary_points min_body_font_pt body_text_readability_ok typography_hierarchy_ratio
+  typography_hierarchy_ok title_core_overlap_count layout_variant expected_slot_count filled_slot_count slot_fill_ok
+  audience_label_readability_ok content_depth_ok grid_balance_ok visual_structure_present non_text_visual_specific_ok
+  mechanical_card_template_absent panel_text_safe_area_ok text_card_internal_padding_ok short_label_wrap_ok
+  composition_signature title_underline_absent_ok occupied_ratio edge_clearance overlap_pairs structural_text_collision_count
+  structural_text_collisions preview_screenshot_sha256 preview_screenshot_dimensions
+`));
 
 function buildNativeSlideMetrics({ slideId, layoutFamily, compositionSignature, bounds }) {
   return {
@@ -200,6 +170,16 @@ function parseArgs(argv) {
   return parsed;
 }
 
+function requireArg(args, key, message) {
+  const value = args[key];
+  if (!value) fail(message);
+  return value;
+}
+
+function readJsonFile(file, fallback = {}) {
+  return file ? JSON.parse(readFileSync(file, 'utf-8')) : fallback;
+}
+
 function fileSha256(file) {
   if (!file) return '';
   try {
@@ -254,12 +234,9 @@ function extractSlidesFromHtml(htmlFile) {
 }
 
 function buildPassReviewPayload(args) {
-  const htmlFile = args.html;
-  const outputDir = args['output-dir'];
-  const reviewMarkdown = args['review-markdown'];
-  if (!htmlFile) fail('mock review requires --html');
-  if (!outputDir) fail('mock review requires --output-dir');
-  if (!reviewMarkdown) fail('mock review requires --review-markdown');
+  const htmlFile = requireArg(args, 'html', 'mock review requires --html');
+  const outputDir = requireArg(args, 'output-dir', 'mock review requires --output-dir');
+  const reviewMarkdown = requireArg(args, 'review-markdown', 'mock review requires --review-markdown');
 
   const slides = extractSlidesFromHtml(htmlFile);
   writeText(
@@ -323,11 +300,9 @@ function buildPassReviewPayload(args) {
 }
 
 function buildExportPayload(args) {
-  const screenshotsDir = args['screenshots-dir'];
-  const outputPptx = args['output-pptx'];
+  const screenshotsDir = requireArg(args, 'screenshots-dir', 'mock export requires --screenshots-dir');
+  const outputPptx = requireArg(args, 'output-pptx', 'mock export requires --output-pptx');
   const outputPdf = args['output-pdf'];
-  if (!screenshotsDir) fail('mock export requires --screenshots-dir');
-  if (!outputPptx) fail('mock export requires --output-pptx');
 
   const slideCount = readdirSync(screenshotsDir).filter((entry) => entry.endsWith('.png')).length;
   writeBinary(outputPptx, Buffer.from('mock-pptx'));
@@ -347,20 +322,16 @@ function buildExportPayload(args) {
 }
 
 function buildNativePayload(args) {
-  const inputJson = args['input-json'];
-  const outputPptx = args['output-pptx'];
+  const inputJson = requireArg(args, 'input-json', 'mock native requires --input-json');
+  const outputPptx = requireArg(args, 'output-pptx', 'mock native requires --output-pptx');
   const outputPdf = args['output-pdf'];
-  const shapeManifestFile = args['shape-manifest'];
-  const previewDir = args['preview-dir'];
+  const shapeManifestFile = requireArg(args, 'shape-manifest', 'mock native requires --shape-manifest');
+  const previewDir = requireArg(args, 'preview-dir', 'mock native requires --preview-dir');
   const repairLogFile = args['repair-log'];
   const engineContractFile = args['engine-contract'];
-  if (!inputJson) fail('mock native requires --input-json');
-  if (!outputPptx) fail('mock native requires --output-pptx');
-  if (!shapeManifestFile) fail('mock native requires --shape-manifest');
-  if (!previewDir) fail('mock native requires --preview-dir');
 
-  const input = JSON.parse(readFileSync(inputJson, 'utf-8'));
-  const engineContract = engineContractFile ? JSON.parse(readFileSync(engineContractFile, 'utf-8')) : {};
+  const input = readJsonFile(inputJson);
+  const engineContract = readJsonFile(engineContractFile);
   const rendererKind = mockNativeRendererKind();
   const blueprintSlides = Array.isArray(input?.blueprint?.slides) && input.blueprint.slides.length > 0
     ? input.blueprint.slides
@@ -559,22 +530,31 @@ function safeText(value, fallback = '') {
   return text || fallback;
 }
 
+const NATIVE_BOUND_KEYS = [
+  ['left_in', 'x_in'],
+  ['top_in', 'y_in'],
+  ['width_in', 'w_in'],
+  ['height_in', 'h_in'],
+];
+const NATIVE_TEXT_KINDS = new Set(['text', 'text_box']);
+const NATIVE_ROLE_FONT_SIZE = { title: 44, point_index: 16, subtitle: 24, core_sentence: 24 };
+const CONTENT_DEPTH_EXCLUDED_ROLES = new Set(words(`
+  title subtitle core_sentence evidence_item metric metric_label panel_title speaker_identity route_label point_text_short
+  boundary_note page_number page_no cover_meta footer meta point_index caption date page source_note
+`));
+const TEXT_CAPACITY_EXCLUDED_ROLES = new Set(words('title subtitle page_number page_no meta cover_meta footer point_index'));
+const LEAD_SENTENCE_ROLES = new Set(words('lead intro thesis takeaway core_sentence'));
+
+function nativePlanKind(shape) {
+  return safeText(shape?.kind || shape?.type || shape?.role).toLowerCase();
+}
+
 function nativePlanBounds(shape) {
   const bounds = shape?.bounds && typeof shape.bounds === 'object' ? shape.bounds : {};
-  const values = {};
-  for (const [key, alternate] of [
-    ['left_in', 'x_in'],
-    ['top_in', 'y_in'],
-    ['width_in', 'w_in'],
-    ['height_in', 'h_in'],
-  ]) {
-    const raw = bounds[key] ?? bounds[alternate];
-    const value = Number(raw);
-    if (!Number.isFinite(value)) return null;
-    values[key] = value;
-  }
+  const values = Object.fromEntries(NATIVE_BOUND_KEYS.map(([key, alternate]) => [key, Number(bounds[key] ?? bounds[alternate])]));
   if (
-    values.left_in < 0
+    NATIVE_BOUND_KEYS.some(([key]) => !Number.isFinite(values[key]))
+    || values.left_in < 0
     || values.top_in < 0
     || values.width_in <= 0
     || values.height_in <= 0
@@ -593,21 +573,18 @@ function nativePlanShapeText(shape) {
 function nativePlanFontSize(shape) {
   const explicit = Number(shape?.font_size || shape?.size_pt || shape?.size || 0);
   if (Number.isFinite(explicit) && explicit > 0) return explicit;
-  const role = safeText(shape?.role);
-  if (role === 'title') return 44;
-  if (role === 'point_index') return 16;
-  if (['subtitle', 'core_sentence'].includes(role)) return 24;
-  return 18;
+  return NATIVE_ROLE_FONT_SIZE[safeText(shape?.role)] || 18;
+}
+
+function charWidthFactor(char) {
+  if (/\s/.test(char)) return 0.32;
+  if (char.codePointAt(0) > 127) return 0.95;
+  if (/[A-Z]/.test(char)) return 0.68;
+  return ['-', '/', ':'].includes(char) ? 0.38 : 0.56;
 }
 
 function weightedTextWidthPt(text, fontSize) {
-  return [...String(text || '')].reduce((width, char) => {
-    if (/\s/.test(char)) return width + fontSize * 0.32;
-    if (char.codePointAt(0) > 127) return width + fontSize * 0.95;
-    if (/[A-Z]/.test(char)) return width + fontSize * 0.68;
-    if (['-', '/', ':'].includes(char)) return width + fontSize * 0.38;
-    return width + fontSize * 0.56;
-  }, 0);
+  return [...String(text || '')].reduce((width, char) => width + fontSize * charWidthFactor(char), 0);
 }
 
 function estimatedTextHeightIn(shape, bounds) {
@@ -620,63 +597,58 @@ function estimatedTextHeightIn(shape, bounds) {
 }
 
 function nativePlanLineBoundsFailure(shape, bounds) {
-  const kind = safeText(shape?.kind || shape?.type || shape?.role).toLowerCase();
+  const kind = nativePlanKind(shape);
   if (!['line', 'connector'].includes(kind)) return null;
-  if (!bounds || bounds.width_in < 0.03 || bounds.height_in < 0.03) {
-    return {
-      reason: bounds ? 'ai_first_connector_thickness_too_small' : 'ai_first_connector_bounds_not_numeric',
-      shape_id: safeText(shape?.shape_id, '<missing-shape-id>'),
-      kind,
-      width_in: bounds?.width_in ?? null,
-      height_in: bounds?.height_in ?? null,
-      minimum_thickness_in: 0.03,
-    };
-  }
-  return null;
+  if (bounds && bounds.width_in >= 0.03 && bounds.height_in >= 0.03) return null;
+  return {
+    reason: bounds ? 'ai_first_connector_thickness_too_small' : 'ai_first_connector_bounds_not_numeric',
+    shape_id: safeText(shape?.shape_id, '<missing-shape-id>'),
+    kind,
+    width_in: bounds?.width_in ?? null,
+    height_in: bounds?.height_in ?? null,
+    minimum_thickness_in: 0.03,
+  };
+}
+
+function isNativePlanTextShape(shape) {
+  return (
+    safeText(shape?.quality_role || 'content') === 'content'
+    && NATIVE_TEXT_KINDS.has(nativePlanKind(shape))
+    && nativePlanShapeText(shape)
+    && nativePlanBounds(shape)
+  );
+}
+
+function nativePlanVisibleTextBounds(shape) {
+  const bounds = nativePlanBounds(shape);
+  return bounds
+    ? { ...bounds, height_in: Math.min(bounds.height_in, estimatedTextHeightIn(shape, bounds)) }
+    : null;
+}
+
+function nativePlanOverlapArea(left, right) {
+  const overlapW = Math.max(0, Math.min(left.left_in + left.width_in, right.left_in + right.width_in) - Math.max(left.left_in, right.left_in));
+  const overlapH = Math.max(0, Math.min(left.top_in + left.height_in, right.top_in + right.height_in) - Math.max(left.top_in, right.top_in));
+  return overlapW * overlapH;
 }
 
 function nativePlanTextOverlapFailures(shapes) {
-  const textShapes = shapes.filter((shape) => (
-    safeText(shape?.quality_role || 'content') === 'content'
-    && ['text', 'text_box'].includes(safeText(shape?.kind || shape?.type || shape?.role).toLowerCase())
-    && nativePlanShapeText(shape)
-    && nativePlanBounds(shape)
-  ));
-  const failures = [];
-  for (let leftIndex = 0; leftIndex < textShapes.length; leftIndex += 1) {
-    const leftShape = textShapes[leftIndex];
-    const leftBounds = nativePlanBounds(leftShape);
-    const leftVisibleBounds = leftBounds
-      ? { ...leftBounds, height_in: Math.min(leftBounds.height_in, estimatedTextHeightIn(leftShape, leftBounds)) }
-      : null;
-    for (const rightShape of textShapes.slice(leftIndex + 1)) {
-      const rightBounds = nativePlanBounds(rightShape);
-      const rightVisibleBounds = rightBounds
-        ? { ...rightBounds, height_in: Math.min(rightBounds.height_in, estimatedTextHeightIn(rightShape, rightBounds)) }
-        : null;
-      if (!leftVisibleBounds || !rightVisibleBounds) continue;
-      const overlapW = Math.max(
-        0,
-        Math.min(leftVisibleBounds.left_in + leftVisibleBounds.width_in, rightVisibleBounds.left_in + rightVisibleBounds.width_in)
-          - Math.max(leftVisibleBounds.left_in, rightVisibleBounds.left_in),
-      );
-      const overlapH = Math.max(
-        0,
-        Math.min(leftVisibleBounds.top_in + leftVisibleBounds.height_in, rightVisibleBounds.top_in + rightVisibleBounds.height_in)
-          - Math.max(leftVisibleBounds.top_in, rightVisibleBounds.top_in),
-      );
-      const overlapArea = overlapW * overlapH;
-      if (overlapArea > 0.0024) {
-        failures.push({
-          reason: 'ai_first_text_box_overlap',
-          shape_id: safeText(leftShape?.shape_id, '<missing-shape-id>'),
-          other_shape_id: safeText(rightShape?.shape_id, '<missing-shape-id>'),
-          overlap_area_in2: Number(overlapArea.toFixed(4)),
-        });
-      }
-    }
-  }
-  return failures;
+  const textShapes = shapes.filter(isNativePlanTextShape);
+  return textShapes.flatMap((leftShape, leftIndex) => {
+    const leftBounds = nativePlanVisibleTextBounds(leftShape);
+    return textShapes.slice(leftIndex + 1).flatMap((rightShape) => {
+      const rightBounds = nativePlanVisibleTextBounds(rightShape);
+      const overlapArea = leftBounds && rightBounds ? nativePlanOverlapArea(leftBounds, rightBounds) : 0;
+      return overlapArea > 0.0024
+        ? [{
+            reason: 'ai_first_text_box_overlap',
+            shape_id: safeText(leftShape?.shape_id, '<missing-shape-id>'),
+            other_shape_id: safeText(rightShape?.shape_id, '<missing-shape-id>'),
+            overlap_area_in2: Number(overlapArea.toFixed(4)),
+          }]
+        : [];
+    });
+  });
 }
 
 function normalizedContentCharCount(text) {
@@ -686,45 +658,25 @@ function normalizedContentCharCount(text) {
 }
 
 function nativePlanContentDepthFailures(shapes) {
-  const excludedRoles = new Set([
-    'title',
-    'subtitle',
-    'core_sentence',
-    'evidence_item',
-    'metric',
-    'metric_label',
-    'panel_title',
-    'speaker_identity',
-    'route_label',
-    'point_text_short',
-    'boundary_note',
-    'page_number',
-    'page_no',
-    'cover_meta',
-    'footer',
-    'meta',
-    'point_index',
-    'caption',
-    'date',
-    'page',
-    'source_note',
-  ]);
-  return shapes
-    .filter((shape) => safeText(shape?.quality_role || 'content') === 'content')
-    .filter((shape) => !excludedRoles.has(safeText(shape?.role)))
-    .filter((shape) => nativePlanShapeText(shape))
-    .map((shape) => ({
-      shape,
-      charCount: normalizedContentCharCount(nativePlanShapeText(shape)),
-    }))
-    .filter(({ charCount }) => charCount < 12)
-    .map(({ shape, charCount }) => ({
-      reason: 'ai_first_content_depth_too_low',
-      shape_id: safeText(shape?.shape_id, '<missing-shape-id>'),
-      role: safeText(shape?.role),
-      text_char_count: charCount,
-      threshold: 12,
-    }));
+  return shapes.flatMap((shape) => {
+    if (
+      safeText(shape?.quality_role || 'content') !== 'content'
+      || CONTENT_DEPTH_EXCLUDED_ROLES.has(safeText(shape?.role))
+      || !nativePlanShapeText(shape)
+    ) {
+      return [];
+    }
+    const charCount = normalizedContentCharCount(nativePlanShapeText(shape));
+    return charCount < 12
+      ? [{
+          reason: 'ai_first_content_depth_too_low',
+          shape_id: safeText(shape?.shape_id, '<missing-shape-id>'),
+          role: safeText(shape?.role),
+          text_char_count: charCount,
+          threshold: 12,
+        }]
+      : [];
+  });
 }
 
 function nativePlanPageNumberFailures(shapes) {
@@ -737,17 +689,13 @@ function nativePlanPageNumberFailures(shapes) {
 }
 
 function nativePlanTextCapacityFailure(shape, bounds) {
-  const kind = safeText(shape?.kind || shape?.type || shape?.role).toLowerCase();
-  if (!['text', 'text_box'].includes(kind) || !bounds) return null;
+  if (!NATIVE_TEXT_KINDS.has(nativePlanKind(shape)) || !bounds) return null;
   const text = nativePlanShapeText(shape);
   if (!text) return null;
   const role = safeText(shape?.role);
-  if (['title', 'subtitle', 'page_number', 'page_no', 'meta', 'cover_meta', 'footer', 'point_index'].includes(role)) {
-    return null;
-  }
+  if (TEXT_CAPACITY_EXCLUDED_ROLES.has(role)) return null;
   const fontSize = nativePlanFontSize(shape);
-  const leadSentenceRoles = ['lead', 'intro', 'thesis', 'takeaway', 'core_sentence'];
-  const compactMinimum = leadSentenceRoles.includes(role) && fontSize >= 20 && text.length >= 12
+  const compactMinimum = LEAD_SENTENCE_ROLES.has(role) && fontSize >= 20 && text.length >= 12
     ? 0.95
     : text.length >= 18 ? 0.84 : 0.54;
   if (fontSize >= 18 && bounds.height_in < compactMinimum) {
