@@ -312,6 +312,82 @@ export function buildTestGroups() {
   };
 }
 
+const VERIFY_LANE_ALIASES = Object.freeze({
+  'private-platform': 'private-platform:strict',
+  'private-platform-strict': 'private-platform:strict',
+  'default-caller-tail': 'default-caller-tail:strict',
+  'default-caller-tail-strict': 'default-caller-tail:strict',
+  'integration-remaining': 'integration:remaining',
+  'full-remaining': 'full:remaining',
+  'full-with-historical': 'full:with-historical',
+});
+
+const SPECIAL_VERIFY_LANES = Object.freeze([
+  'ci',
+  'line-budget',
+  'line-budget-strict',
+  'private-platform:readback',
+  'private-platform:strict',
+  'default-caller-tail:readback',
+  'default-caller-tail:strict',
+  'structure',
+  'structure-strict',
+]);
+
+export function normalizeVerifyLane(lane = 'smoke') {
+  const requested = String(lane || 'smoke').trim() || 'smoke';
+  return VERIFY_LANE_ALIASES[requested] || requested;
+}
+
+export function listVerifyLanes() {
+  return [
+    ...Object.keys(buildTestGroups()),
+    ...SPECIAL_VERIFY_LANES,
+    ...Object.keys(VERIFY_LANE_ALIASES),
+  ];
+}
+
+export function buildVerifyLanePlan(lane = 'smoke') {
+  const normalizedLane = normalizeVerifyLane(lane);
+  const groups = buildTestGroups();
+
+  if (Object.hasOwn(groups, normalizedLane)) {
+    return {
+      lane: normalizedLane,
+      steps: [
+        { kind: 'build' },
+        { kind: 'test-group', group: normalizedLane },
+      ],
+    };
+  }
+
+  const specialPlans = {
+    ci: [
+      { kind: 'typecheck' },
+      { kind: 'test-group', group: 'fast' },
+      { kind: 'test-group', group: 'family' },
+      { kind: 'test-group', group: 'meta:ci' },
+    ],
+    'line-budget': [{ kind: 'line-budget', strict: false }],
+    'line-budget-strict': [{ kind: 'line-budget', strict: true }],
+    'private-platform:readback': [{ kind: 'private-platform-readback', scope: 'private-platform', output: 'stdout' }],
+    'private-platform:strict': [{ kind: 'private-platform-readback', scope: 'private-platform', output: '/tmp/redcube-ai-private-platform-retirement.json' }],
+    'default-caller-tail:readback': [{ kind: 'private-platform-readback', scope: 'default-caller-tail', output: 'stdout' }],
+    'default-caller-tail:strict': [{ kind: 'private-platform-readback', scope: 'default-caller-tail', output: '/tmp/redcube-ai-default-caller-tail-readback.json' }],
+    structure: [{ kind: 'structure', strict: false }],
+    'structure-strict': [{ kind: 'structure', strict: true }],
+  };
+
+  if (Object.hasOwn(specialPlans, normalizedLane)) {
+    return {
+      lane: normalizedLane,
+      steps: specialPlans[normalizedLane],
+    };
+  }
+
+  throw new Error(`Unknown lane: ${lane}`);
+}
+
 export function groupRequiresLiveCodexPreflight(groupName) {
   return LIVE_CODEX_PREFLIGHT_GROUPS.has(groupName);
 }

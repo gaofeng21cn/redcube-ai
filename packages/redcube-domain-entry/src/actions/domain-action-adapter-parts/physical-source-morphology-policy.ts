@@ -635,7 +635,7 @@ const ACTIVE_SURFACE_CLASSIFICATIONS = Object.freeze([
     surface_id: 'executor_runtime_route_run_records',
     source_refs: [
       'packages/redcube-runtime-protocol/src/executor-runtime.ts',
-      'packages/redcube-runtime/src/deliverable-routes.ts',
+      'packages/redcube-runtime/src/route-execution-refs.ts',
     ],
     classification: 'retained_current_refs_only_boundary',
     current_rca_role: 'executor_policy_and_route_run_record_refs_adapter_not_attempt_ledger',

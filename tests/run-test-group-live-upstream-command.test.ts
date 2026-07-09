@@ -13,8 +13,10 @@ import {
   resolveRedCubePythonCommand,
 } from '../scripts/run-test-group-lib.ts';
 import {
+  buildVerifyLanePlan,
   buildTestGroups,
   groupRequiresLiveCodexPreflight,
+  listVerifyLanes,
   partitionTestFilesForExecution,
 } from '../scripts/test-registry.ts';
 
@@ -85,12 +87,15 @@ test('run-test-group routes Python cache outside the checkout', () => {
 
 test('verification scripts expose repo temp hygiene entrypoints', () => {
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
+  const verifyLaneScript = readFileSync('scripts/verify-lane.ts', 'utf-8');
   const hygieneScript = readFileSync('scripts/repo-hygiene.sh', 'utf-8');
   const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
 
   assert.match(verifyScript, /run-with-repo-temp-env\.sh/);
   assert.match(verifyScript, /OPL_REPO_TEMP_ENV_ACTIVE/);
-  assert.match(verifyScript, /scripts\/repo-hygiene\.sh --fix/);
+  assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
+  assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
+  assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh'\)/);
   assert.match(hygieneScript, /scripts\/repo-hygiene\.sh \[--fix\]/);
   assert.match(hygieneScript, /git ls-files --others --exclude-standard/);
   assert.match(hygieneScript, /Route the producer to OPL_REPO_TEMP_ROOT/);
@@ -286,20 +291,27 @@ test('default lanes keep historical provenance compact and explicit', () => {
   assert.deepEqual(historical, ['tests/runtime-program-provenance.test.ts']);
 });
 
-test('run-test-group usage and verify shim include the family verification lane', () => {
+test('run-test-group usage and verify lane registry include the family verification lane', () => {
   const script = readFileSync('scripts/run-test-group.ts', 'utf-8');
   const verifyScript = readFileSync('scripts/verify.sh', 'utf-8');
+  const verifyLaneScript = readFileSync('scripts/verify-lane.ts', 'utf-8');
 
   assert.match(script, /const groupNames = Object\.keys\(GROUPS\)\.join\('\|'\)/);
   assert.match(script, /\[--files tests\/a\.test\.ts,tests\/b\.test\.ts\]/);
-  assert.match(verifyScript, /smoke\)/);
-  assert.match(verifyScript, /family\)/);
-  assert.match(verifyScript, /default-caller-tail\|default-caller-tail-strict\|default-caller-tail:strict\)/);
-  assert.match(verifyScript, /ci\)/);
-  assert.match(verifyScript, /integration-remaining\)/);
-  assert.match(verifyScript, /full-remaining\)/);
-  assert.match(verifyScript, /full-with-historical\)/);
-  assert.match(verifyScript, /\[smoke\|fast\|ci\|line-budget\|line-budget-strict\|private-platform\|private-platform-strict\|private-platform:strict\|default-caller-tail\|default-caller-tail-strict\|default-caller-tail:strict\|structure\|structure-strict\|meta\|family\|integration\|integration-remaining\|e2e\|historical\|full\|full-remaining\|full-with-historical\]/);
+  assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
+  assert.match(verifyLaneScript, /buildVerifyLanePlan/);
+  assert.equal(listVerifyLanes().includes('family'), true);
+  assert.equal(listVerifyLanes().includes('default-caller-tail:strict'), true);
+  assert.deepEqual(
+    buildVerifyLanePlan('family').steps,
+    [
+      { kind: 'build' },
+      { kind: 'test-group', group: 'family' },
+    ],
+  );
+  assert.equal(buildVerifyLanePlan('integration-remaining').lane, 'integration:remaining');
+  assert.equal(buildVerifyLanePlan('full-remaining').lane, 'full:remaining');
+  assert.equal(buildVerifyLanePlan('full-with-historical').lane, 'full:with-historical');
 });
 
 test('deliverable review loop integration stays on the mock Codex runtime instead of the live CLI', () => {

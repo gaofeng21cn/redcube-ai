@@ -73,7 +73,7 @@ function listTextFiles(root) {
   });
 }
 
-export function activePrivatePlatformResurrectionViolations(scanRoots) {
+function activePrivatePlatformResurrectionViolations(scanRoots) {
   const violations = [];
   for (const file of scanRoots.flatMap((root) => {
     const resolved = path.resolve(REPO_ROOT, root);
@@ -348,14 +348,6 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
       readback_can_claim_production_ready: false,
     },
   };
-}
-
-export function buildPrivatePlatformRetirementReadback() {
-  return buildPrivatePlatformSourceGuardReadback('private-platform');
-}
-
-export function buildDefaultCallerTailOwnerDeltaReadback() {
-  return buildPrivatePlatformSourceGuardReadback('default-caller-tail');
 }
 
 function parseArgs(argv) {

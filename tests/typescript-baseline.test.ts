@@ -107,18 +107,16 @@ test('typescript baseline defines root tsconfig with NodeNext/ESM policy', () =>
 test('root package exposes formal typecheck entrypoint', () => {
   const pkg = readJson('package.json');
   assert.equal(pkg.scripts.test, 'npm run test:smoke');
-  assert.equal(pkg.scripts['test:smoke'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts smoke');
-  assert.equal(pkg.scripts['test:fast'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts fast');
-  assert.equal(
-    pkg.scripts['test:ci'],
-    'npm run typecheck && node --experimental-strip-types scripts/run-test-group.ts fast && node --experimental-strip-types scripts/run-test-group.ts family && node --experimental-strip-types scripts/run-test-group.ts meta:ci',
-  );
-  assert.equal(pkg.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
-  assert.equal(pkg.scripts['test:integration'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts integration');
-  assert.equal(pkg.scripts['test:e2e'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts e2e');
-  assert.equal(pkg.scripts['test:historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts historical');
-  assert.equal(pkg.scripts['test:full'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full');
-  assert.equal(pkg.scripts['test:full:with-historical'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts full:with-historical');
+  assert.equal(pkg.scripts['test:smoke'], 'node --experimental-strip-types scripts/verify-lane.ts smoke');
+  assert.equal(pkg.scripts['test:fast'], 'node --experimental-strip-types scripts/verify-lane.ts fast');
+  assert.equal(pkg.scripts['test:ci'], 'node --experimental-strip-types scripts/verify-lane.ts ci');
+  assert.equal(pkg.scripts['test:meta'], 'node --experimental-strip-types scripts/verify-lane.ts meta');
+  assert.equal(pkg.scripts['test:family'], 'node --experimental-strip-types scripts/verify-lane.ts family');
+  assert.equal(pkg.scripts['test:integration'], 'node --experimental-strip-types scripts/verify-lane.ts integration');
+  assert.equal(pkg.scripts['test:e2e'], 'node --experimental-strip-types scripts/verify-lane.ts e2e');
+  assert.equal(pkg.scripts['test:historical'], 'node --experimental-strip-types scripts/verify-lane.ts historical');
+  assert.equal(pkg.scripts['test:full'], 'node --experimental-strip-types scripts/verify-lane.ts full');
+  assert.equal(pkg.scripts['test:full:with-historical'], 'node --experimental-strip-types scripts/verify-lane.ts full:with-historical');
   assert.equal(pkg.scripts['test:meta:ci'], undefined);
   assert.equal(pkg.scripts['test:integration:remaining'], undefined);
   assert.equal(pkg.scripts['test:full:remaining'], undefined);

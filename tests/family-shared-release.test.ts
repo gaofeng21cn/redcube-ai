@@ -49,5 +49,5 @@ test('family shared release check fails closed without the OPL owner contract', 
 test('package scripts expose a dedicated family verify lane', () => {
   const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
 
-  assert.equal(packageJson.scripts?.['test:family'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts family');
+  assert.equal(packageJson.scripts?.['test:family'], 'node --experimental-strip-types scripts/verify-lane.ts family');
 });

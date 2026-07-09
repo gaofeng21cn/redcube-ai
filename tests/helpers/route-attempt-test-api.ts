@@ -28,7 +28,7 @@ export function buildOplRouteAttemptIndexForTest(request) {
   };
 }
 
-export function runDeliverableRoute(request) {
+export async function runDeliverableRoute(request): Promise<any> {
   return runDomainDeliverableRoute({
     ...request,
     crossProviderAttemptIndex: request?.crossProviderAttemptIndex

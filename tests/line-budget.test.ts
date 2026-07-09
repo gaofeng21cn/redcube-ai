@@ -77,7 +77,7 @@ test('package scripts expose advisory default and explicit strict line budget en
   assert.equal(packageJson.scripts['line-budget:strict'], 'node --experimental-strip-types scripts/line-budget.ts --strict');
   assert.equal(packageJson.scripts['test:line-budget'], undefined);
   assert.equal(packageJson.scripts['test:line-budget:strict'], undefined);
-  assert.equal(packageJson.scripts['test:meta'], 'npm run --silent build && node --experimental-strip-types scripts/run-test-group.ts meta');
+  assert.equal(packageJson.scripts['test:meta'], 'node --experimental-strip-types scripts/verify-lane.ts meta');
 });
 
 test('retired check-line-budget script does not remain as a second gate implementation', () => {
@@ -86,15 +86,18 @@ test('retired check-line-budget script does not remain as a second gate implemen
 
 test('verify runs exactly one line budget gate before lane dispatch and keeps explicit strict lanes', () => {
   const verifyScript = fs.readFileSync(path.join(repoRoot, 'scripts/verify.sh'), 'utf8');
-  const verifyLines = verifyScript.split('\n').map((line) => line.trim());
+  const verifyLane = fs.readFileSync(path.join(repoRoot, 'scripts/verify-lane.ts'), 'utf8');
 
-  assert.equal(verifyLines.filter((line) => line === 'npm run --silent line-budget').length, 1);
-  assert.equal(verifyLines.filter((line) => line === 'npm run --silent line-budget:strict').length, 1);
+  assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
+  assert.equal((verifyLane.match(/runLineBudget\(/g) || []).length, 3);
+  assert.match(verifyLane, /runLineBudget\(lane === 'line-budget-strict' \|\| lane === 'structure-strict'\)/);
+  assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
+  assert.match(verifyLane, /run\('scripts\/repo-hygiene\.sh'\)/);
   assert.ok(
-    verifyScript.indexOf('npm run --silent line-budget') < verifyScript.indexOf('scripts/repo-hygiene.sh --fix'),
+    verifyLane.indexOf('runLineBudget(lane ===') < verifyLane.indexOf("run('scripts/repo-hygiene.sh', ['--fix'])"),
   );
-  assert.match(verifyScript, /line-budget\|line-budget-strict\)\n\s+;;/);
-  assert.match(verifyScript, /structure-strict\)\n\s+OPL_LINE_BUDGET_STRICT=1 scripts\/run-structural-quality-gate\.sh --strict/);
+  assert.match(verifyLane, /lane === 'line-budget' \|\| lane === 'line-budget-strict'/);
+  assert.match(verifyLane, /OPL_LINE_BUDGET_STRICT: '1'/);
   assert.doesNotMatch(verifyScript, /test:line-budget/);
 });
 

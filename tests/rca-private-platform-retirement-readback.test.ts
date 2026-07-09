@@ -5,8 +5,7 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
-  buildDefaultCallerTailOwnerDeltaReadback,
-  buildPrivatePlatformRetirementReadback,
+  buildPrivatePlatformSourceGuardReadback,
 } from '../scripts/check-private-platform-retirement.ts';
 
 function assertSourceGuardSummary(payload, scope) {
@@ -37,7 +36,7 @@ function assertSourceGuardSummary(payload, scope) {
 }
 
 test('RCA private platform readback is a compact source guard summary', () => {
-  const payload = buildPrivatePlatformRetirementReadback();
+  const payload = buildPrivatePlatformSourceGuardReadback('private-platform');
 
   assertSourceGuardSummary(payload, 'private-platform');
   assert.equal(
@@ -47,7 +46,7 @@ test('RCA private platform readback is a compact source guard summary', () => {
 });
 
 test('RCA default-caller tail readback reuses the same compact summary surface', () => {
-  const payload = buildDefaultCallerTailOwnerDeltaReadback();
+  const payload = buildPrivatePlatformSourceGuardReadback('default-caller-tail');
 
   assertSourceGuardSummary(payload, 'default-caller-tail');
 });

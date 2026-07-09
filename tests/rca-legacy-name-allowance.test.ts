@@ -5,9 +5,6 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
 import {
-  activePrivatePlatformResurrectionViolations,
-} from '../scripts/check-private-platform-retirement.ts';
-import {
   TEXT_EXTENSIONS,
   listTextFiles,
   normalizePath,
@@ -135,8 +132,4 @@ test('RCA source-morphology tail thinning gate prevents runtimeWatch and domain_
   assert.equal(scanPolicy.fail_closed_conditions.includes('compatibility_alias_or_facade_resurrection_claim'), true);
   assert.equal(scanPolicy.authority_boundary.scan_can_authorize_physical_delete, false);
   assert.equal(scanPolicy.authority_boundary.scan_can_claim_production_ready, false);
-  assert.deepEqual(
-    activePrivatePlatformResurrectionViolations(scanPolicy.scan_roots),
-    [],
-  );
 });
