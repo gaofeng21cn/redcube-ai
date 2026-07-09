@@ -1,11 +1,12 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
 import { assertCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
+import { buildVerifyLanePlan } from '../scripts/test-registry.ts';
 
 test('domain entry package and lock stay aligned with the current OPL family shared release pin contract', () => {
   const inspection = assertCurrentRepoSharedPinAlignment({
@@ -46,8 +47,11 @@ test('family shared release check fails closed without the OPL owner contract', 
   }
 });
 
-test('package scripts expose a dedicated family verify lane', () => {
-  const packageJson = JSON.parse(readFileSync('package.json', 'utf8'));
+test('family verification is owned by the registry lane dispatcher', () => {
+  const plan = buildVerifyLanePlan('family');
 
-  assert.equal(packageJson.scripts?.['test:family'], 'node --experimental-strip-types scripts/verify-lane.ts family');
+  assert.deepEqual(plan.steps, [
+    { kind: 'build' },
+    { kind: 'test-group', group: 'family' },
+  ]);
 });

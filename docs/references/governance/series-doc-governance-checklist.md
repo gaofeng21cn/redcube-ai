@@ -49,7 +49,7 @@ Machine boundary: 人读治理清单。机器真相继续归各 repo 的 contrac
 ## 五、默认验证
 
 - 默认 docs 审计入口：`scripts/verify.sh meta`
-- 同义验证入口：`npm run test:meta`
-- 历史 provenance 审计入口：`scripts/verify.sh historical` / `npm run test:historical`
+- 同义验证入口：`scripts/verify.sh meta`
+- 历史 provenance 审计入口：`scripts/verify.sh historical`
 - 默认 smoke：`scripts/verify.sh`
 - 若验证命令、docs index、program pointer、typed boundary 或 contract surface 有变化，继续同步 `scripts/run-test-group.ts`、`package.json`、`README*` 与 `tests/*.test.ts`

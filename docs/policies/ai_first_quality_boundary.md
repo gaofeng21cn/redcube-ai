@@ -46,5 +46,5 @@ Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、
 - `tests/xiaohongshu-creative-ownership.test.ts`
 - `tests/poster-creative-ownership.test.ts`
 - `tests/review-platform.test.ts`
-- `npm run test:meta`
+- `scripts/verify.sh meta`
 - `npm run test:fast`

@@ -5,6 +5,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { BASELINE_ENTRIES, DEFAULT_LIMIT, evaluateLineBudget, isStrictLineBudgetMode, lineBudgetExitCode } from '../scripts/line-budget.ts';
+import { buildVerifyLanePlan } from '../scripts/test-registry.ts';
+import { readJson } from './helpers/json-io.ts';
 
 const repoRoot = path.resolve(import.meta.dirname, '..');
 
@@ -71,13 +73,14 @@ test('default baseline entries are explicit numeric ratchets when present', () =
 });
 
 test('package scripts expose advisory default and explicit strict line budget entries', () => {
-  const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+  const packageJson = readJson(path.join(repoRoot, 'package.json'));
 
   assert.equal(packageJson.scripts['line-budget'], 'node --experimental-strip-types scripts/line-budget.ts');
   assert.equal(packageJson.scripts['line-budget:strict'], 'node --experimental-strip-types scripts/line-budget.ts --strict');
   assert.equal(packageJson.scripts['test:line-budget'], undefined);
   assert.equal(packageJson.scripts['test:line-budget:strict'], undefined);
-  assert.equal(packageJson.scripts['test:meta'], 'node --experimental-strip-types scripts/verify-lane.ts meta');
+  assert.equal(packageJson.scripts['test:meta'], undefined);
+  assert.equal(buildVerifyLanePlan('meta').lane, 'meta');
 });
 
 test('retired check-line-budget script does not remain as a second gate implementation', () => {

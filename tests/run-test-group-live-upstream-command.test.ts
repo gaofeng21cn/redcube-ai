@@ -420,7 +420,7 @@ test('serialized verification rule is documented in current program contract', (
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
-    /historical stays explicit through test:historical or full:with-historical/i,
+    /historical stays explicit through .*full:with-historical/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,

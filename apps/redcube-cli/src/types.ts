@@ -1,25 +1,10 @@
-import type {
-  CreateDeliverableRequest,
-  DeliverableAuditRequest,
-  DeliverableAuditResponse,
-  DeliverableCreateResponse,
-  DeliverableRecordResponse,
-  DomainEntryRequest,
-  DomainEntryResponse,
-  OverlayCatalogResponse,
-  ProductEntryRequest,
-  ProductEntryResponse,
-  PublicationProjectionResponse,
-  ReviewMutationRequest,
-  ReviewMutationResponse,
-  ReviewStateResponse,
-  RunRecordResponse,
-  SourceAugmentationResponse,
-  SourceAugmentationExecutionResponse,
-  SourceIntakeResponse,
-  TopicCatalogResponse,
-  WorkspaceDoctorResponse,
-} from '@redcube/domain-entry';
+type JsonSurface = Record<string, unknown>;
+
+type OverlayCatalogResponse = JsonSurface & {
+  overlays: Array<JsonSurface & {
+    profiles: JsonSurface[];
+  }>;
+};
 
 export interface CliOptions extends Record<string, string | boolean> {}
 
@@ -55,24 +40,24 @@ export interface CliPrivateProfileModule {
 }
 
 export interface CliDomainActions {
-  doctorWorkspace(request: { workspaceRoot: string }): Promise<WorkspaceDoctorResponse>;
-  listTopics(request: { workspaceRoot: string }): Promise<TopicCatalogResponse>;
+  doctorWorkspace(request: { workspaceRoot: string }): Promise<JsonSurface>;
+  listTopics(request: { workspaceRoot: string }): Promise<JsonSurface>;
   getOverlayCatalog(request?: unknown): Promise<OverlayCatalogResponse>;
-  exportDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>>;
-  dispatchDomainHandler(request: Record<string, unknown>): Promise<Record<string, unknown>>;
-  invokeDomainEntry(request: DomainEntryRequest): Promise<DomainEntryResponse>;
-  invokeProductEntry(request: ProductEntryRequest): Promise<ProductEntryResponse>;
-  runNativePptProductEntryProof(request: Record<string, unknown>): Promise<Record<string, unknown>>;
-  intakeSource(request: Record<string, unknown>): Promise<SourceIntakeResponse>;
-  prepareSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationResponse>;
-  executeSourceAugmentation(request: Record<string, unknown>): Promise<SourceAugmentationExecutionResponse>;
-  createDeliverable(request: CreateDeliverableRequest): Promise<DeliverableCreateResponse>;
-  getDeliverable(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<DeliverableRecordResponse>;
-  getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<PublicationProjectionResponse>;
-  getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<ReviewStateResponse>;
-  getRun(request: { workspaceRoot: string; runId: string }): Promise<RunRecordResponse>;
-  auditDeliverable(request: DeliverableAuditRequest): Promise<DeliverableAuditResponse>;
-  applyReviewMutation(request: ReviewMutationRequest): Promise<ReviewMutationResponse>;
+  exportDomainHandler(request: JsonSurface): Promise<JsonSurface>;
+  dispatchDomainHandler(request: JsonSurface): Promise<JsonSurface>;
+  invokeDomainEntry(request: JsonSurface): Promise<JsonSurface>;
+  invokeProductEntry(request: JsonSurface): Promise<JsonSurface>;
+  runNativePptProductEntryProof(request: JsonSurface): Promise<JsonSurface>;
+  intakeSource(request: JsonSurface): Promise<JsonSurface>;
+  prepareSourceAugmentation(request: JsonSurface): Promise<JsonSurface>;
+  executeSourceAugmentation(request: JsonSurface): Promise<JsonSurface>;
+  createDeliverable(request: JsonSurface): Promise<JsonSurface>;
+  getDeliverable(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<JsonSurface>;
+  getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<JsonSurface>;
+  getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<JsonSurface>;
+  getRun(request: { workspaceRoot: string; runId: string }): Promise<JsonSurface>;
+  auditDeliverable(request: JsonSurface): Promise<JsonSurface>;
+  applyReviewMutation(request: JsonSurface): Promise<JsonSurface>;
 }
 
 export interface CliDependencies {
@@ -82,25 +67,7 @@ export interface CliDependencies {
   printJson?: (data: CliRunSurface) => void;
 }
 
-export type CliRunSurface =
-  | CliHelpSurface
-  | WorkspaceDoctorResponse
-  | TopicCatalogResponse
-  | OverlayCatalogResponse
-  | SourceIntakeResponse
-  | SourceAugmentationResponse
-  | SourceAugmentationExecutionResponse
-  | DeliverableCreateResponse
-  | DeliverableRecordResponse
-  | DomainEntryResponse
-  | DeliverableAuditResponse
-  | ProductEntryResponse
-  | RunRecordResponse
-  | PublicationProjectionResponse
-  | ReviewStateResponse
-  | ReviewMutationResponse
-  | CliPrivateProfileResult
-  | Record<string, unknown>;
+export type CliRunSurface = JsonSurface;
 
 export interface CliRunResult extends Record<string, unknown> {
   ok?: boolean;

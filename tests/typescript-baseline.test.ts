@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
+import { readJson } from './helpers/json-io.ts';
 
 import {
   assertRootTestPartition,
@@ -12,13 +13,11 @@ import {
 } from '../scripts/run-test-group-lib.ts';
 import {
   assertValidTestRegistry,
+  buildVerifyLanePlan,
   buildTestGroups,
+  listVerifyLanes,
   TEST_REGISTRY,
 } from '../scripts/test-registry.ts';
-
-function readJson(file) {
-  return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
-}
 
 function workspacePackageFiles() {
   return ['apps', 'packages'].flatMap((root) => (
@@ -110,13 +109,13 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:smoke'], 'node --experimental-strip-types scripts/verify-lane.ts smoke');
   assert.equal(pkg.scripts['test:fast'], 'node --experimental-strip-types scripts/verify-lane.ts fast');
   assert.equal(pkg.scripts['test:ci'], 'node --experimental-strip-types scripts/verify-lane.ts ci');
-  assert.equal(pkg.scripts['test:meta'], 'node --experimental-strip-types scripts/verify-lane.ts meta');
-  assert.equal(pkg.scripts['test:family'], 'node --experimental-strip-types scripts/verify-lane.ts family');
-  assert.equal(pkg.scripts['test:integration'], 'node --experimental-strip-types scripts/verify-lane.ts integration');
-  assert.equal(pkg.scripts['test:e2e'], 'node --experimental-strip-types scripts/verify-lane.ts e2e');
-  assert.equal(pkg.scripts['test:historical'], 'node --experimental-strip-types scripts/verify-lane.ts historical');
   assert.equal(pkg.scripts['test:full'], 'node --experimental-strip-types scripts/verify-lane.ts full');
+  assert.equal(pkg.scripts['test:family'], 'node --experimental-strip-types scripts/verify-lane.ts family');
+  assert.equal(pkg.scripts['test:historical'], 'node --experimental-strip-types scripts/verify-lane.ts historical');
   assert.equal(pkg.scripts['test:full:with-historical'], 'node --experimental-strip-types scripts/verify-lane.ts full:with-historical');
+  for (const script of ['test:meta', 'test:integration', 'test:e2e']) {
+    assert.equal(pkg.scripts[script], undefined);
+  }
   assert.equal(pkg.scripts['test:meta:ci'], undefined);
   assert.equal(pkg.scripts['test:integration:remaining'], undefined);
   assert.equal(pkg.scripts['test:full:remaining'], undefined);
@@ -131,6 +130,13 @@ test('root package exposes formal typecheck entrypoint', () => {
     pkg.scripts.build,
     'tsc --build tsconfig.json --pretty false --force && node --experimental-strip-types scripts/sync-package-runtime-exports.ts',
   );
+});
+
+test('registry and verify dispatcher own non-package test lanes', () => {
+  for (const lane of ['meta', 'family', 'integration', 'e2e', 'historical', 'full:with-historical']) {
+    assert.equal(listVerifyLanes().includes(lane), true, lane);
+    assert.equal(buildVerifyLanePlan(lane).lane, lane, lane);
+  }
 });
 
 test('workspace packages and apps participate in package-level tsconfig layering', () => {

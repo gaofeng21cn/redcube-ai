@@ -22,7 +22,6 @@ import {
   executeSourceAugmentation,
   listTopics as listTopicsDomainEntry,
 } from '@redcube/domain-entry';
-import type { DomainEntryRequest } from '@redcube/domain-entry';
 
 import { buildCommandHelp, buildHelp } from './help.js';
 import { buildCliJsonSummary } from './json-summary.js';
@@ -138,7 +137,7 @@ function deliverableStagePlanRequest(
   options: JsonMap,
   cwd: () => string,
   useRouteAsStopAfterStage = false,
-): DomainEntryRequest {
+): JsonMap {
   return {
     target_domain_id: 'redcube_ai',
     task_intent: 'run_opl_stage_execution_plan',
