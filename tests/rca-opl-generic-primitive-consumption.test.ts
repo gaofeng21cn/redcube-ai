@@ -80,7 +80,6 @@ test('RCA consumes OPL generic primitives as projections while retaining only vi
   assert.deepEqual(
     adoption.opl_generic_primitive_consumption.consumed_projection_surfaces.map((surface) => surface.primitive),
     [
-      'standard_domain_agent_scaffold',
       'generic_scheduler',
       'memory_transport',
       'artifact_lifecycle',
