@@ -423,7 +423,7 @@ test('getDefaultOverlayCatalog exposes canonical overlay metadata for onboarding
   );
 });
 
-test('registry source manifests stay aligned with direct package dependencies and static declarations', () => {
+test('registry source is internal to runtime without standalone overlay package dependencies', () => {
   const runtimePackage = readJson('packages/redcube-runtime/package.json');
   const runtimeSource = readText('packages/redcube-runtime/src/default-registries.ts');
 
@@ -433,11 +433,13 @@ test('registry source manifests stay aligned with direct package dependencies an
     '@redcube/overlay-poster-onepager',
   ]) {
     assert.equal(
-      runtimePackage.dependencies[dependency],
-      '0.1.0',
-      `${dependency} must be a direct runtime dependency while overlays remain workspace packages`,
+      Boolean(runtimePackage.dependencies?.[dependency]),
+      false,
+      `${dependency} must not remain a runtime dependency after overlay package ABI contraction`,
     );
+    assert.equal(runtimeSource.includes(dependency), false);
   }
+  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-core'], '0.1.0');
   assert.equal(runtimeSource.includes("import('@redcube/overlay-"), false);
   assert.equal(runtimeSource.includes('listDefaultOverlayModules'), false);
   assert.equal(runtimeSource.includes('RuntimeFamilyCatalogSurface'), false);

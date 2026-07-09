@@ -11,10 +11,7 @@
     "@redcube/redcube-config": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
     "@redcube/governance": "0.1.0",
-    "@redcube/overlay-core": "0.1.0",
-    "@redcube/overlay-poster-onepager": "0.1.0",
-    "@redcube/overlay-ppt": "0.1.0",
-    "@redcube/overlay-xiaohongshu": "0.1.0"
+    "@redcube/overlay-core": "0.1.0"
   },
   "license": "Apache-2.0"
 }

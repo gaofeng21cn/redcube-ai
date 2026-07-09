@@ -22,9 +22,12 @@ test('overlay onboarding is runtime-registry driven without standalone package f
     ['ppt_deck', 'xiaohongshu', 'poster_onepager'],
   );
   assert.equal(catalog.overlays.every((overlay) => !Object.hasOwn(overlay, 'packages')), true);
-  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-ppt'], '0.1.0');
-  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-xiaohongshu'], '0.1.0');
+  assert.equal(Boolean(runtimePackage.dependencies?.['@redcube/overlay-ppt']), false);
+  assert.equal(Boolean(runtimePackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
+  assert.equal(Boolean(runtimePackage.dependencies?.['@redcube/overlay-poster-onepager']), false);
+  assert.equal(runtimePackage.dependencies?.['@redcube/overlay-core'], '0.1.0');
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-ppt']), false);
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-xiaohongshu']), false);
+  assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-poster-onepager']), false);
   assert.equal(Boolean(domainEntryPackage.dependencies?.['@redcube/overlay-registry']), false);
 });

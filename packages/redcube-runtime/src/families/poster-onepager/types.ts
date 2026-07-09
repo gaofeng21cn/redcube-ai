@@ -2,7 +2,7 @@ import type {
   PosterOnepagerHydratedContract,
   PosterOnepagerReviewCheck,
   PosterOnepagerStageId,
-} from '@redcube/overlay-poster-onepager';
+} from './overlay/index.js';
 import type {
   CodexExecutionModel,
   HermesAgentLoopExecutionModel,

@@ -80,9 +80,6 @@ export function createIsolatedCliInstall() {
     ['packages/redcube-runtime/src/families/poster-onepager', path.join(domainEntryPackagePath, 'node_modules', '@redcube', 'runtime-family-poster-onepager')],
     ['packages/redcube-overlay-core', path.join(domainEntryNodeModulesDir, 'overlay-core')],
     ['prompts', path.join(domainEntryPackagePath, 'node_modules', 'prompts')],
-    ['packages/redcube-overlay-ppt', path.join(domainEntryNodeModulesDir, 'overlay-ppt')],
-    ['packages/redcube-overlay-xiaohongshu', path.join(domainEntryNodeModulesDir, 'overlay-xiaohongshu')],
-    ['packages/redcube-overlay-poster-onepager', path.join(domainEntryNodeModulesDir, 'overlay-poster-onepager')],
     ['contracts', path.join(installRoot, 'node_modules', 'contracts')],
     ['contracts', path.join(domainEntryPackagePath, 'node_modules', 'contracts')],
   ]) {

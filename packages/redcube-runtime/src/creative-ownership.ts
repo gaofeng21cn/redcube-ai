@@ -153,7 +153,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
     ],
     ppt_visual_director_review_contract: [
       'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts',
-      'packages/redcube-overlay-ppt/src/profiles.ts',
+      'packages/redcube-runtime/src/families/ppt/overlay/profiles.ts',
       'tests/ppt-creative-ownership.test.ts',
     ],
   },
@@ -400,7 +400,7 @@ const PPT_RESIDUE_DEFINITIONS: readonly ResidueDefinition[] = Object.freeze([
 ]);
 
 function buildReviewOverlayStatus() {
-  const pptReviewActive = matchesAllEvidence('packages/redcube-overlay-ppt/src/profiles.ts', [
+  const pptReviewActive = matchesAllEvidence('packages/redcube-runtime/src/families/ppt/overlay/profiles.ts', [
     "stage_id: 'visual_director_review'",
     "requires_stages: ['author_image_pages']",
     "stage_id: 'screenshot_review'",

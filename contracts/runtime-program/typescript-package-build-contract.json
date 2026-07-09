@@ -82,36 +82,6 @@
       ]
     },
     {
-      "directory": "packages/redcube-overlay-poster-onepager",
-      "package_name": "@redcube/overlay-poster-onepager",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-overlay-ppt",
-      "package_name": "@redcube/overlay-ppt",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
-      "directory": "packages/redcube-overlay-xiaohongshu",
-      "package_name": "@redcube/overlay-xiaohongshu",
-      "exports": [
-        {
-          "subpath": ".",
-          "target": "./dist/index.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-runtime-protocol",
       "package_name": "@redcube/runtime-protocol",
       "exports": [

@@ -15,13 +15,13 @@ export {
   evaluateStorylineGate,
   hydrateXiaohongshuContract,
   xiaohongshuOverlay,
-} from '@redcube/overlay-xiaohongshu';
+} from '@redcube/runtime';
 export {
   buildDeckRecord,
   evaluateStoryboardGate,
   hydratePptDeckContract,
   pptDeckOverlay,
-} from '@redcube/overlay-ppt';
+} from '@redcube/runtime';
 export {
   applyReviewMutation,
   buildCreativeOwnershipResidueAudit,

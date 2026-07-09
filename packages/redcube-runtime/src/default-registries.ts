@@ -1,10 +1,10 @@
 import { createOverlayRegistry } from '@redcube/overlay-core';
-import { posterOnepagerOverlay } from '@redcube/overlay-poster-onepager';
-import { pptDeckOverlay } from '@redcube/overlay-ppt';
-import { xiaohongshuOverlay } from '@redcube/overlay-xiaohongshu';
 
+import { posterOnepagerOverlay } from './families/poster-onepager/overlay/index.js';
 import { runPosterOnepagerRoute } from './families/poster-onepager/index.js';
+import { pptDeckOverlay } from './families/ppt/overlay/index.js';
 import { runPptDeckRoute } from './families/ppt/index.js';
+import { xiaohongshuOverlay } from './families/xiaohongshu/overlay/index.js';
 import { runXiaohongshuRoute } from './families/xiaohongshu/index.js';
 
 import type {

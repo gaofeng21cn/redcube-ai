@@ -88,29 +88,97 @@ const PACKAGE_SURFACES = Object.freeze([
     tsOnlyFiles: ['src/index.ts', 'src/contracts.ts', 'src/registry.ts'],
   },
   {
-    directory: 'packages/redcube-overlay-xiaohongshu',
+    directory: 'packages/redcube-runtime',
     expectedTypesEntry: './dist/index.d.ts',
     packageTsconfigExtends: '../../tsconfig.package-build.json',
     rootReference: true,
-    requiredFiles: ['src/index.ts', 'src/types.ts', 'tsconfig.json'],
-    missingFiles: ['src/gates.js'],
-    entryMatches: [/buildTopicRecord/, /buildXiaohongshuDeliverableRecord/, /hydrateXiaohongshuContract/, /evaluateStorylineGate/, /buildXiaohongshuSurfaceBundle/, /xiaohongshuOverlay/],
-    typeMatches: [/interface XiaohongshuTopicRecord/, /interface XiaohongshuDeliverableRecord/, /interface XiaohongshuHydratedContract/, /interface XiaohongshuStorylineGateReport/, /interface XiaohongshuSurfaceArtifact/, /interface XiaohongshuOverlayDefinition/],
-    typeNoAny: true,
-    tsOnlyFiles: ['src/index.ts', 'src/contracts.ts', 'src/surface.ts'],
+    requiredFiles: [
+      'src/index.ts',
+      'src/types.ts',
+      'src/families/ppt/overlay/index.ts',
+      'src/families/ppt/overlay/types.ts',
+      'src/families/xiaohongshu/overlay/index.ts',
+      'src/families/xiaohongshu/overlay/types.ts',
+      'src/families/poster-onepager/overlay/index.ts',
+      'src/families/poster-onepager/overlay/types.ts',
+      'tsconfig.json',
+    ],
+    dependencies: {
+      '@redcube/redcube-config': '0.1.0',
+      '@redcube/runtime-protocol': '0.1.0',
+      '@redcube/governance': '0.1.0',
+      '@redcube/overlay-core': '0.1.0',
+    },
+    entryMatches: [
+      /buildTopicRecord/,
+      /buildXiaohongshuDeliverableRecord/,
+      /buildXiaohongshuSurfaceBundle/,
+      /describeXiaohongshuOverlay/,
+      /hydrateXiaohongshuContract/,
+      /evaluateStorylineGate/,
+      /listXiaohongshuSurfaceArtifactPaths/,
+      /validateXiaohongshuSurfaceArtifact/,
+      /xiaohongshuOverlay/,
+      /buildDeckSurfaceBundle/,
+      /buildDeckRecord/,
+      /PPT_DECK_PROFILES/,
+      /describePptDeckOverlay/,
+      /hydratePptDeckContract/,
+      /evaluateStoryboardGate/,
+      /listDeckSurfaceArtifactPaths/,
+      /pptDeckOverlay/,
+      /validateDeckSurfaceArtifact/,
+      /buildPosterOnepagerDeliverableRecord/,
+      /buildPosterSurfaceBundle/,
+      /describePosterOnepagerOverlay/,
+      /evaluatePosterStorylineGate/,
+      /hydratePosterOnepagerContract/,
+      /listPosterSurfaceArtifactPaths/,
+      /posterOnepagerOverlay/,
+      /validatePosterSurfaceArtifact/,
+    ],
+    entryDoesNotMatch: [
+      /@redcube\/overlay-ppt/,
+      /@redcube\/overlay-xiaohongshu/,
+      /@redcube\/overlay-poster-onepager/,
+    ],
+    typeFiles: [
+      'src/types.ts',
+      'src/families/ppt/overlay/types.ts',
+      'src/families/xiaohongshu/overlay/types.ts',
+      'src/families/poster-onepager/overlay/types.ts',
+    ],
+    typeMatches: [
+      /interface RuntimeRunRecord/,
+      /interface XiaohongshuTopicRecord/,
+      /interface XiaohongshuDeliverableRecord/,
+      /interface XiaohongshuHydratedContract/,
+      /interface PptDeckRecord/,
+      /interface PptDeckHydratedContract/,
+      /interface PptDeckStoryboardGateReport/,
+      /interface PosterOnepagerHydratedContract/,
+      /interface PosterOnepagerOverlayDefinition/,
+    ],
+    tsOnlyFiles: [
+      'src/index.ts',
+      'src/families/ppt/overlay/index.ts',
+      'src/families/ppt/overlay/contracts.ts',
+      'src/families/ppt/overlay/profiles.ts',
+      'src/families/ppt/overlay/surface.ts',
+      'src/families/xiaohongshu/overlay/index.ts',
+      'src/families/xiaohongshu/overlay/contracts.ts',
+      'src/families/xiaohongshu/overlay/surface.ts',
+      'src/families/poster-onepager/overlay/index.ts',
+      'src/families/poster-onepager/overlay/contracts.ts',
+      'src/families/poster-onepager/overlay/surface.ts',
+    ],
   },
-  {
-    directory: 'packages/redcube-overlay-ppt',
-    expectedTypesEntry: './dist/index.d.ts',
-    packageTsconfigExtends: '../../tsconfig.package-build.json',
-    rootReference: true,
-    requiredFiles: ['src/index.ts', 'src/types.ts', 'tsconfig.json'],
-    missingFiles: ['src/gates.js'],
-    entryMatches: [/buildDeckRecord/, /PPT_DECK_PROFILES/, /describePptDeckOverlay/, /hydratePptDeckContract/, /evaluateStoryboardGate/, /buildDeckSurfaceBundle/, /pptDeckOverlay/],
-    typeMatches: [/interface PptDeckRecord/, /interface PptDeckHydratedContract/, /interface PptDeckStoryboardGateReport/, /interface PptDeckSurfaceArtifact/, /interface PptDeckOverlayDefinition/],
-    typeNoAny: true,
-    tsOnlyFiles: ['src/index.ts', 'src/contracts.ts', 'src/profiles.ts', 'src/surface.ts'],
-  },
+]);
+
+const RETIRED_OVERLAY_PACKAGE_DIRS = Object.freeze([
+  'packages/redcube-overlay-ppt',
+  'packages/redcube-overlay-xiaohongshu',
+  'packages/redcube-overlay-poster-onepager',
 ]);
 
 function assertPackageMetadata(spec, rootTsconfig, pkg) {
@@ -176,6 +244,15 @@ test('TypeScript package surface guard keeps package entrypoints, typed contract
 
   for (const spec of PACKAGE_SURFACES) {
     assertPackageSurface(spec, rootTsconfig);
+  }
+
+  for (const directory of RETIRED_OVERLAY_PACKAGE_DIRS) {
+    assertFileMissing(directory);
+    assert.equal(
+      rootTsconfig.references.some((entrypoint) => entrypoint.path === `./${directory}`),
+      false,
+      `${directory} must not stay a root TypeScript project reference`,
+    );
   }
 });
 

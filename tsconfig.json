@@ -11,15 +11,6 @@
       "path": "./packages/redcube-governance"
     },
     {
-      "path": "./packages/redcube-overlay-xiaohongshu"
-    },
-    {
-      "path": "./packages/redcube-overlay-ppt"
-    },
-    {
-      "path": "./packages/redcube-overlay-poster-onepager"
-    },
-    {
       "path": "./packages/redcube-config"
     },
     {

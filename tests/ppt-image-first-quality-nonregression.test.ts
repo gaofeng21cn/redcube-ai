@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync } from 'node:fs';
 
-import { buildDeckRecord, hydratePptDeckContract } from '@redcube/overlay-ppt';
+import { buildDeckRecord, hydratePptDeckContract } from '@redcube/runtime';
 import {
   canonicalStageForRoute,
   getDeliverablePaths,

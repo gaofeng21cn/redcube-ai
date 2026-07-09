@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { hydratePptDeckContract } from '@redcube/overlay-ppt';
+import { hydratePptDeckContract } from '@redcube/runtime';
 
 function stageIds(contract) {
   return contract.stage_sequence.stages.map((stage) => stage.stage_id);
