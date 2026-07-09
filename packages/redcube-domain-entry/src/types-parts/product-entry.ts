@@ -22,7 +22,7 @@ import type {
   SurfaceSummary,
 } from './foundation.js';
 
-export interface DomainEntryRequest extends Record<string, unknown> {
+interface DomainEntryRequest extends Record<string, unknown> {
   target_domain_id: string;
   task_intent: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode: string;
@@ -95,9 +95,9 @@ export interface ProductEntryRequest extends Record<string, unknown> {
   };
 }
 
-export type FamilyOrchestrationReferenceRef = SharedFamilyOrchestrationReferenceRef;
+type FamilyOrchestrationReferenceRef = SharedFamilyOrchestrationReferenceRef;
 
-export type FamilyOrchestrationGatePreview = SharedFamilyOrchestrationGatePreview;
+type FamilyOrchestrationGatePreview = SharedFamilyOrchestrationGatePreview;
 
 export type FamilyOrchestrationResumeContract = SharedProductEntryResumeContract;
 
@@ -379,7 +379,7 @@ export interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   };
 }
 
-export interface OplHostedProductEntryRequest extends Record<string, unknown> {
+interface OplHostedProductEntryRequest extends Record<string, unknown> {
   target_domain_id: string;
   task_intent: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode: string;
@@ -396,7 +396,7 @@ export interface OplHostedProductEntryRequest extends Record<string, unknown> {
   delivery_request: ProductEntryRequest['delivery_request'];
 }
 
-export interface OplHostedProductEntryResponse extends SurfaceBase<'opl_hosted_product_entry'> {
+interface OplHostedProductEntryResponse extends SurfaceBase<'opl_hosted_product_entry'> {
   opl_hosted_product_entry_contract_id: string;
   target_domain_id: string;
   entry_mode: string;
@@ -733,7 +733,7 @@ export interface ProductStatusResponse extends SurfaceBase<'product_status'> {
   notes: string[];
 }
 
-export interface ProductPreflightResponse extends SurfaceBase<'product_entry_preflight'>, ProductEntryPreflightCompanion {
+interface ProductPreflightResponse extends SurfaceBase<'product_entry_preflight'>, ProductEntryPreflightCompanion {
   target_domain_id: string;
   workspace_locator: ProductEntryManifestResponse['workspace_locator'];
 }

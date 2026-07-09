@@ -70,7 +70,7 @@ export interface WorkspaceDoctorResponse extends SurfaceBase<'workspace_doctor'>
   };
 }
 
-export interface TopicCatalogResponse extends SurfaceBase<'topic_catalog'> {
+interface TopicCatalogResponse extends SurfaceBase<'topic_catalog'> {
   workspaceRoot: string;
   total: number;
   topics: Array<Record<string, unknown>>;
@@ -87,7 +87,7 @@ export interface OverlayCatalogResponse extends SurfaceBase<'overlay_catalog'> {
   };
 }
 
-export interface CreateDeliverableRequest extends DeliverableRequest, OverlayRequest {
+interface CreateDeliverableRequest extends DeliverableRequest, OverlayRequest {
   profileId: string;
   title: string;
   goal: string;
@@ -363,7 +363,7 @@ export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
   governance_surface: GovernanceSurfaceContract;
 }
 
-export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
+interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   owner_boundary: Record<string, unknown>;
   run_id: string;
   current_stage: string | null;
@@ -390,11 +390,11 @@ export interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
   metric_extensions: MetricExtensionSummary[];
 }
 
-export interface ReviewMutationRequest extends DeliverableRequest {
+interface ReviewMutationRequest extends DeliverableRequest {
   mutation: Record<string, unknown>;
 }
 
-export interface ReviewMutationResponse {
+interface ReviewMutationResponse {
   ok: boolean;
   state: Record<string, unknown>;
   quality_summary?: Record<string, unknown>;
@@ -403,11 +403,11 @@ export interface ReviewMutationResponse {
   publication_state_file?: string | null;
 }
 
-export interface ReviewRenderOutputRequest extends Partial<DeliverableRequest>, Partial<OverlayRequest> {
+interface ReviewRenderOutputRequest extends Partial<DeliverableRequest>, Partial<OverlayRequest> {
   checks: Record<string, unknown>;
 }
 
-export interface ReviewRenderOutputResponse {
+interface ReviewRenderOutputResponse {
   ok: boolean;
   status: string;
   issues?: string[];
@@ -415,12 +415,12 @@ export interface ReviewRenderOutputResponse {
   recommended_action?: string;
 }
 
-export interface DeliverableAuditRequest extends Partial<DeliverableRequest>, OverlayRequest {
+interface DeliverableAuditRequest extends Partial<DeliverableRequest>, OverlayRequest {
   mode: string;
   baselineDeliverableId?: string;
 }
 
-export interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
+interface DeliverableAuditResponse extends SurfaceBase<'audit'> {
   status: string;
   issues: string[];
   rerun_from_stage: string | null;
@@ -519,7 +519,7 @@ export interface SourceFirstFanoutDeliverableRequest extends OverlayRequest {
   baselineDeliverableId?: string;
 }
 
-export interface RunSourceFirstFanoutRequest extends TopicRequest {
+interface RunSourceFirstFanoutRequest extends TopicRequest {
   title?: string;
   brief?: string;
   keywords?: string[];
@@ -528,7 +528,7 @@ export interface RunSourceFirstFanoutRequest extends TopicRequest {
   deliverables: SourceFirstFanoutDeliverableRequest[];
 }
 
-export interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
+interface SourceFirstFanoutResponse extends SurfaceBase<'source_first_fanout'> {
   source_barrier: SourceResearchResponse;
   source_pack_fanout?: Record<string, unknown>;
   source_pack_manifest?: Record<string, unknown>;
