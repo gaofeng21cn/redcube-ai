@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+import { readJson } from '../json-file.js';
+
 const DOMAIN_OWNER = 'redcube_ai';
 
 export function buildDomainOwnerReceiptContract() {
@@ -480,4 +482,11 @@ export function buildVisualTransitionSpec() {
       repo_tracks_receipt_instances: false,
     },
   };
+}
+
+export function buildVisualTransitionAdapterProfileRegistry() {
+  return readJson(new URL(
+    '../../../../../contracts/visual_transition_adapter_profile.json',
+    import.meta.url,
+  ));
 }

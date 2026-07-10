@@ -3,6 +3,7 @@ import {
   assert,
   getProductEntryManifest,
   prepareProductEntryWorkspace,
+  readJson,
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
@@ -86,5 +87,31 @@ test('product-entry manifest exposes owner receipt, lifecycle apply, and transit
     assert.equal(transitionSpec.runner_boundary.opl_can_declare_visual_ready, false);
     assert.equal(transitionSpec.runner_boundary.opl_can_mutate_artifacts, false);
     assert.equal(transitionSpec.evaluator_descriptor.domain_action_adapter_action, 'evaluate_visual_transition');
+
+    const expectedRegistry = readJson('contracts/visual_transition_adapter_profile.json');
+    const registry = manifest.visual_transition_adapter_profile_registry;
+    assert.deepEqual(registry, expectedRegistry);
+    assert.equal(registry.authority_boundary.refs_only, true);
+    for (const field of [
+      'domain_transition_profile_extension_is_core_ontology',
+      'can_execute_domain_action',
+      'can_write_domain_truth',
+      'can_create_owner_receipt',
+      'can_create_typed_blocker',
+      'can_claim_domain_ready',
+      'can_claim_visual_ready',
+      'can_claim_exportable',
+      'can_mutate_artifacts',
+    ]) {
+      assert.equal(registry.authority_boundary[field], false, field);
+    }
+
+    const { buildRedCubeDomainAuthorityRefs } = await import('../../packages/redcube-domain-entry/dist/index.js');
+    const authorityRefs = buildRedCubeDomainAuthorityRefs();
+    assert.deepEqual(authorityRefs.visual_transition_adapter_profile_registry, expectedRegistry);
+    assert.equal(
+      authorityRefs.source_refs.visual_transition_adapter_profile_registry_ref,
+      '/visual_transition_adapter_profile_registry',
+    );
   });
 });
