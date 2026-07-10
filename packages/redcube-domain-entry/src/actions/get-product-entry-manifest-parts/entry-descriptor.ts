@@ -1,15 +1,26 @@
-// @ts-nocheck
-
 import {
   OPL_HOSTED_HANDOFF_REF,
   PRODUCT_INVOKE_COMMAND,
 } from './policy.js';
 
+type ProductEntryDescriptorInput = {
+  humanGateIds: string[];
+  nativePptOperatorUx: {
+    image_proof_runner: {
+      command_template: string;
+    };
+    proof_runner: {
+      command_template: string;
+    };
+  };
+  productEntrySessionCommand: string;
+};
+
 export function buildRedCubeProductEntryDescriptor({
   humanGateIds,
   nativePptOperatorUx,
   productEntrySessionCommand,
-}) {
+}: ProductEntryDescriptorInput) {
   const sessionLocatorField = 'entry_session_contract.entry_session_id';
   const checkpointLocatorField = 'continuation_snapshot.latest_stage_execution_plan_ref';
   return {
