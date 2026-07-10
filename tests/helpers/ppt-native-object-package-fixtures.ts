@@ -53,9 +53,9 @@ print(json.dumps(result, ensure_ascii=False))
   return { outputPptx, ...JSON.parse(stdout) };
 }
 
-export function runNativeObjectMaterializerFailure({ workspaceRoot, payload }) {
+export function runNativeObjectMaterializerFailure({ workspaceRoot, payload, outputPptx: requestedOutputPptx = null }) {
   const inputFile = writeObjectPayload(workspaceRoot, payload);
-  const outputPptx = path.join(workspaceRoot, 'invalid-native-objects.pptx');
+  const outputPptx = requestedOutputPptx || path.join(workspaceRoot, 'invalid-native-objects.pptx');
   const python = resolveTestPythonCommand();
   const script = `
 import json
@@ -64,7 +64,11 @@ from pathlib import Path
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import materialize_native_pptx
 
 payload = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-materialize_native_pptx(payload['slides'], Path(sys.argv[2]))
+materialize_native_pptx(
+    payload['slides'],
+    Path(sys.argv[2]),
+    template_intake=payload.get('template_intake'),
+)
 `;
   return spawnSync(python.command, [...(python.args || []), '-c', script, inputFile, outputPptx], {
     cwd: path.resolve('.'),
@@ -183,23 +187,26 @@ export function validatePptx(pptxFile) {
   return JSON.parse(execFileSync(officecli, ['validate', pptxFile, '--json'], { encoding: 'utf-8' }));
 }
 
-export function createTemplatePptx(workspaceRoot) {
+export function createTemplatePptx(workspaceRoot, slideCount = 1) {
   const templateFile = path.join(workspaceRoot, 'template.pptx');
   const officecli = process.env.OFFICECLI || 'officecli';
   const run = (args) => execFileSync(officecli, args, { encoding: 'utf-8' });
   run(['create', templateFile]);
   run(['open', templateFile]);
   try {
-    run(['add', templateFile, '/', '--type', 'slide', '--prop', 'layout=blank', '--prop', 'background=F4F7FB']);
-    run([
-      'add', templateFile, '/slide[1]', '--type', 'placeholder',
-      '--prop', 'phType=title', '--prop', 'name=TemplateTitle', '--prop', 'text=Template title placeholder',
-    ]);
-    run([
-      'add', templateFile, '/slide[1]', '--type', 'shape',
-      '--prop', 'name=TemplateAnchor', '--prop', 'preset=roundRect', '--prop', 'fill=E2E8F0',
-      '--prop', 'x=0.7in', '--prop', 'y=6.7in', '--prop', 'width=2.2in', '--prop', 'height=0.35in',
-    ]);
+    for (let slideIndex = 1; slideIndex <= slideCount; slideIndex += 1) {
+      run(['add', templateFile, '/', '--type', 'slide', '--prop', 'layout=blank', '--prop', 'background=F4F7FB']);
+      run([
+        'add', templateFile, `/slide[${slideIndex}]`, '--type', 'placeholder',
+        '--prop', 'phType=title', '--prop', `name=TemplateTitle${slideIndex === 1 ? '' : slideIndex}`,
+        '--prop', `text=Template title placeholder ${slideIndex}`,
+      ]);
+      run([
+        'add', templateFile, `/slide[${slideIndex}]`, '--type', 'shape',
+        '--prop', `name=TemplateAnchor${slideIndex === 1 ? '' : slideIndex}`, '--prop', 'preset=roundRect', '--prop', 'fill=E2E8F0',
+        '--prop', 'x=0.7in', '--prop', 'y=6.7in', '--prop', 'width=2.2in', '--prop', 'height=0.35in',
+      ]);
+    }
     run(['save', templateFile]);
   } finally {
     run(['close', templateFile]);

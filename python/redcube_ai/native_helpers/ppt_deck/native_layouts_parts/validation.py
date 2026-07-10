@@ -125,7 +125,8 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
                     failures.append(capacity_failure)
         native_content_visible = (
             (kind == 'picture' and bool(safe_text(
-                shape.get('src') or shape.get('source') or shape.get('file') or shape.get('source_data_uri')
+                shape.get('source_file') or shape.get('src') or shape.get('source')
+                or shape.get('file') or shape.get('source_data_uri')
             )))
             or (kind == 'chart' and bool(shape.get('categories')) and bool(shape.get('series')))
             or (kind in {'table', 'metric_grid'} and bool(shape.get('data')))

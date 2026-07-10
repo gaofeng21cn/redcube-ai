@@ -448,6 +448,14 @@ function buildNativePayload(args) {
     })),
     preview_screenshots: previewScreenshots,
   };
+  const packageReadback = {
+    schema_version: 1,
+    evidence_source: 'pptx_package_readback',
+    pptx_file: outputPptx,
+    pptx_sha256: renderProof.source_pptx_sha256,
+    slide_count: slides.length,
+    slides: [],
+  };
   const shapeManifest = {
     schema_version: 1,
     artifact_kind: 'ppt_deck_native_shape_manifest',
@@ -463,6 +471,7 @@ function buildNativePayload(args) {
       fail_closed_when_missing: true,
     },
     render_proof: renderProof,
+    package_readback: packageReadback,
     redcube_svg_ir: redcubeSvgIr,
     screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     preview_screenshots: previewScreenshots,
@@ -507,6 +516,7 @@ function buildNativePayload(args) {
     page_count: slides.length,
     screenshot_dimensions: SCREENSHOT_DIMENSIONS,
     render_proof: renderProof,
+    package_readback: packageReadback,
     redcube_svg_ir: redcubeSvgIr,
     preview_screenshots: previewScreenshots,
     slides,
