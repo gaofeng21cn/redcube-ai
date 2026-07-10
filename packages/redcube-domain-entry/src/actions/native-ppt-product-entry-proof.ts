@@ -1,7 +1,8 @@
 // @ts-nocheck
 import { invokeProductEntry } from './invoke-product-entry.js';
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
-import { readJson, requireField, safeText } from './action-utils.js';
+import { requireField, safeText } from './action-utils.js';
+import { readJson } from './json-file.js';
 
 const NATIVE_PPT_ROUTES = ['author_pptx_native', 'repair_pptx_native'];
 

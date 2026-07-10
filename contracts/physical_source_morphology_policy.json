@@ -915,15 +915,11 @@
         "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
       ],
       "allowed_filesystem_source_refs": [
-        "packages/redcube-domain-entry/src/actions/action-utils.ts",
         "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
       "traversal_stop_source_refs": [
-        "packages/redcube-domain-entry/src/actions/action-utils.ts",
         "packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts",
-        "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts",
-        "packages/redcube-domain-entry/src/types.ts",
-        "packages/redcube-domain-entry/src/types-parts/foundation.ts"
+        "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
       "required_absent_source_refs": [
         "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
@@ -939,15 +935,20 @@
       ],
       "forbidden_property_names": [
         "runtime_state_path",
-        "session_file",
         "session_file_ref",
-        "session_store_root",
-        "resumed_from_session"
+        "session_store_root"
       ],
       "fail_closed_conditions": [
         "owner_source_missing",
         "required_absent_source_present",
         "local_import_closure_violation",
+        "local_import_unresolved",
+        "local_import_traversal_outside_repo",
+        "non_literal_dynamic_import",
+        "non_literal_require",
+        "policy_source_missing",
+        "allowed_filesystem_source_not_in_closure",
+        "traversal_stop_source_not_in_closure",
         "forbidden_module_import",
         "forbidden_property"
       ]

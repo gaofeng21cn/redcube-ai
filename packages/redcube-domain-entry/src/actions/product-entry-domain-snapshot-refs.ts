@@ -32,6 +32,24 @@ function stringRefs(value, field) {
   return [...new Set(value.map((entry) => requiredText(entry, field)))];
 }
 
+function isStageFolderLocatorRef(value) {
+  const segments = value.replaceAll('\\', '/').split('/').filter(Boolean);
+  const stagesIndex = segments.lastIndexOf('stages');
+  if (stagesIndex >= 0) {
+    const stageTail = segments.slice(stagesIndex + 1);
+    if (stageTail.length === 2) {
+      return ['stage.json', 'current.json', 'latest'].includes(stageTail[1]);
+    }
+    return stageTail.length === 4
+      && stageTail[1] === 'attempts'
+      && ['attempt.json', 'manifest.json'].includes(stageTail[3]);
+  }
+  const deliverablesIndex = segments.lastIndexOf('deliverables');
+  const deliverableTail = deliverablesIndex >= 0 ? segments.slice(deliverablesIndex + 1) : [];
+  return deliverableTail.length === 4
+    && ['deliverable.json', 'current.json', 'latest.json'].includes(deliverableTail[3]);
+}
+
 function currentnessRefs(value, field = 'domain_projection.currentness_refs') {
   const refs = record(value, field);
   const crossProviderAttemptIndex = refs.cross_provider_attempt_index == null
@@ -136,6 +154,19 @@ export function normalizeOplGeneratedProductSessionSurface(
       'opl_generated_session_surface.entry_session.entry_session_id does not match entry_session_contract',
     );
   }
+  const generatedSessionFile = requiredText(
+    generatedEntrySession.session_file,
+    'opl_generated_session_surface.entry_session.session_file',
+  );
+  requireExactValue(
+    generatedEntrySession.runtime_owner,
+    OPL_RUNTIME_OWNER,
+    'opl_generated_session_surface.entry_session.runtime_owner',
+  );
+  if (generatedEntrySession.resumed_from_session != null
+    && typeof generatedEntrySession.resumed_from_session !== 'boolean') {
+    throw new Error('opl_generated_session_surface.entry_session.resumed_from_session must be boolean');
+  }
   const sessionContinuity = record(
     generated.session_continuity,
     'opl_generated_session_surface.session_continuity',
@@ -166,8 +197,12 @@ export function normalizeOplGeneratedProductSessionSurface(
     'opl_generated_session_surface.session_continuity.entry_session_id',
   );
   requireExactValue(
+    sessionContinuity.session_file,
+    generatedSessionFile,
+    'opl_generated_session_surface.session_continuity.session_file',
+  );
+  requiredText(
     sessionContinuity.status,
-    'session_projection_available',
     'opl_generated_session_surface.session_continuity.status',
   );
   const artifactInventory = record(
@@ -303,9 +338,13 @@ export function buildProductEntrySessionHandoffRefs({
     encodeURIComponent(entrySession.entrySessionId),
     encodeURIComponent(current.targetHandle || resultSurface.surface_kind || 'result'),
   ].join('/');
+  const runtimeArtifactRefs = stringRefs(
+    resultSurface.run?.artifact_refs,
+    'result_surface.run.artifact_refs',
+  );
   const resultArtifactRefs = stringRefs([
     ...(Array.isArray(resultSurface.artifact_refs) ? resultSurface.artifact_refs : []),
-    ...(Array.isArray(resultSurface.run?.artifact_refs) ? resultSurface.run.artifact_refs : []),
+    ...runtimeArtifactRefs,
     ...(Array.isArray(resultSurface.runtime_progress_projection?.final_artifact_refs)
       ? resultSurface.runtime_progress_projection.final_artifact_refs
       : []),
@@ -315,16 +354,16 @@ export function buildProductEntrySessionHandoffRefs({
     ...(Array.isArray(resultSurface.stage_folder_locator_refs)
       ? resultSurface.stage_folder_locator_refs
       : []),
-    ...resultArtifactRefs.filter((ref) => /\/stages\/[^/]+\/attempts\//.test(ref)),
+    ...runtimeArtifactRefs.filter(isStageFolderLocatorRef),
   ], 'result_surface.stage_folder_locator_refs');
   const resultAttemptIndex = resultSurface.run?.cross_provider_attempt_index || null;
-  const providerAttemptRef = entrySession.providerAttemptRef
-    || safeText(resultAttemptIndex?.provider_attempt_ref)
+  const providerAttemptRef = safeText(resultAttemptIndex?.provider_attempt_ref)
     || previous?.currentness_refs.provider_attempt_ref
+    || entrySession.providerAttemptRef
     || null;
-  const providerAttemptLedgerRef = entrySession.providerAttemptLedgerRef
-    || safeText(resultAttemptIndex?.provider_attempt_ledger_ref)
+  const providerAttemptLedgerRef = safeText(resultAttemptIndex?.provider_attempt_ledger_ref)
     || previous?.currentness_refs.provider_attempt_ledger_ref
+    || entrySession.providerAttemptLedgerRef
     || null;
   const crossProviderAttemptIndex = resultAttemptIndex
     || previous?.currentness_refs.cross_provider_attempt_index

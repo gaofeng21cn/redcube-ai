@@ -190,6 +190,7 @@ export function buildCanonicalPack() {
       surface_kind: 'opl_domain_pack_compiler_input',
       schema_version: 1,
       domain_id: 'redcube_ai',
+      canonical_agent_id: 'rca',
       domain_pack_owner: 'redcube_ai',
       generated_surface_owner: 'one-person-lab',
       declarative_domain_pack: visualPackCompilerHandoff.declarative_visual_pack_input.required_input_families,

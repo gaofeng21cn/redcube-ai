@@ -1,6 +1,9 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 
 import {
@@ -57,10 +60,8 @@ const AST_POLICY = {
   forbiddenModuleSpecifiers: ['fs', 'fs/promises', 'node:fs', 'node:fs/promises'],
   forbiddenPropertyNames: [
     'runtime_state_path',
-    'session_file',
     'session_file_ref',
     'session_store_root',
-    'resumed_from_session',
   ],
 };
 
@@ -90,10 +91,8 @@ test('RCA product-session AST guard catches property syntax variants without sca
       const runtime_state_path = 'state.json';
       const payload = {
         runtime_state_path,
-        'session_file': 'session.json',
         ['session_file_ref']: 'session-ref',
         session_store_root: 'sessions',
-        resumed_from_session: true,
       };
       export function renamedAssembler() { return payload['session_file_ref']; }
     `,
@@ -102,9 +101,7 @@ test('RCA product-session AST guard catches property syntax variants without sca
   assert.deepEqual(
     [...new Set(violations.map((entry) => entry.split(':').at(-1)))].sort(),
     [
-      'resumed_from_session',
       'runtime_state_path',
-      'session_file',
       'session_file_ref',
       'session_store_root',
     ],
@@ -127,7 +124,122 @@ test('RCA product-session AST guard follows local helper imports recursively', (
   )), true);
 });
 
-test('RCA product-session AST guard does not treat OPL input type fields as RCA persistence', () => {
+test('RCA product-session AST guard follows every runtime import form but skips type-only imports', () => {
+  const violations = analyzeTypeScriptOwnerBoundaryClosure({
+    entrySourceRefs: ['owner/entry.ts'],
+    allowedFilesystemSourceRefs: [],
+    traversalStopSourceRefs: [],
+    sourceFiles: {
+      'owner/entry.ts': `
+        import './static.js';
+        export { exported } from './exported.js';
+        export async function dynamic() { return import('./dynamic.js'); }
+        export const required = require('./required.js');
+        import type { TypeOnly } from './type-only.js';
+      `,
+      'owner/static.ts': "import 'node:fs';",
+      'owner/exported.ts': "import 'node:fs'; export const exported = true;",
+      'owner/dynamic.ts': "import 'node:fs';",
+      'owner/required.ts': "import 'node:fs';",
+    },
+    ...AST_POLICY,
+  });
+  assert.deepEqual(
+    violations.filter((entry) => entry.endsWith('forbidden_module_import:node:fs')).map((entry) => (
+      entry.split(':typescript_ast_owner_boundary:')[0].split(':')[0]
+    )).sort(),
+    ['owner/dynamic.ts', 'owner/exported.ts', 'owner/required.ts', 'owner/static.ts'],
+  );
+  assert.equal(violations.some((entry) => entry.includes('type-only')), false);
+});
+
+test('RCA product-session AST guard applies exact filesystem allow and stops traversal after scanning the boundary', () => {
+  const violations = analyzeTypeScriptOwnerBoundaryClosure({
+    entrySourceRefs: ['owner/entry.ts'],
+    allowedFilesystemSourceRefs: ['owner/allowed.ts'],
+    traversalStopSourceRefs: ['owner/stop.ts'],
+    sourceFiles: {
+      'owner/entry.ts': "import './allowed.js'; import './stop.js';",
+      'owner/allowed.ts': "import 'node:fs'; export const payload = { runtime_state_path: 'forbidden' };",
+      'owner/stop.ts': "import 'node:fs'; import './hidden.js';",
+    },
+    ...AST_POLICY,
+  });
+  assert.equal(
+    violations.some((entry) => entry.includes('owner/allowed.ts') && entry.endsWith('forbidden_module_import:node:fs')),
+    false,
+  );
+  assert.equal(
+    violations.some((entry) => entry.includes('owner/allowed.ts') && entry.endsWith('forbidden_property:runtime_state_path')),
+    true,
+  );
+  assert.equal(
+    violations.some((entry) => entry.includes('owner/stop.ts') && entry.endsWith('forbidden_module_import:node:fs')),
+    true,
+  );
+  assert.equal(violations.some((entry) => entry.includes('hidden')), false);
+});
+
+test('RCA product-session AST guard fails closed for unresolved, nonliteral, and out-of-repo imports', () => {
+  const violations = analyzeTypeScriptOwnerBoundaryClosure({
+    entrySourceRefs: ['owner/entry.ts'],
+    allowedFilesystemSourceRefs: [],
+    traversalStopSourceRefs: [],
+    sourceFiles: {
+      'owner/entry.ts': `
+        import './missing.js';
+        import '../../../outside.js';
+        const target = './hidden.js';
+        export const dynamic = import(target);
+        export const required = require(target);
+      `,
+    },
+    ...AST_POLICY,
+  });
+  for (const failureKind of [
+    'local_import_unresolved:./missing.js',
+    'local_import_traversal_outside_repo:../../../outside.js',
+    'non_literal_dynamic_import',
+    'non_literal_require',
+  ]) {
+    assert.equal(violations.some((entry) => entry.includes(failureKind)), true, failureKind);
+  }
+});
+
+test('RCA product-session AST guard rejects a repo-local symlink that resolves outside the source root', (t) => {
+  const sourceRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-owner-ast-root-'));
+  const outsideRoot = mkdtempSync(path.join(os.tmpdir(), 'rca-owner-ast-outside-'));
+  try {
+    mkdirSync(path.join(sourceRoot, 'owner'), { recursive: true });
+    writeFileSync(path.join(sourceRoot, 'owner', 'entry.ts'), "import './escape.js';", 'utf-8');
+    writeFileSync(path.join(outsideRoot, 'escape.ts'), "import 'node:fs';", 'utf-8');
+    try {
+      symlinkSync(path.join(outsideRoot, 'escape.ts'), path.join(sourceRoot, 'owner', 'escape.ts'));
+    } catch (error) {
+      if (error?.code === 'EPERM' || error?.code === 'EACCES') {
+        t.skip(`symlink unavailable: ${error.code}`);
+        return;
+      }
+      throw error;
+    }
+    const violations = analyzeTypeScriptOwnerBoundaryClosure({
+      entrySourceRefs: ['owner/entry.ts'],
+      allowedFilesystemSourceRefs: [],
+      traversalStopSourceRefs: [],
+      sourceRoot,
+      ...AST_POLICY,
+    });
+    assert.equal(
+      violations.some((entry) => entry.includes('local_import_traversal_outside_repo:./escape.js')),
+      true,
+    );
+  } finally {
+    rmSync(sourceRoot, { recursive: true, force: true });
+    rmSync(outsideRoot, { recursive: true, force: true });
+  }
+});
+
+test('RCA product-session AST guard accepts canonical OPL session fields in runtime objects', () => {
   const violations = analyzeTypeScriptOwnerBoundarySource({
     sourceRef: 'owner/generated-session-input.ts',
     sourceText: `
@@ -136,7 +248,11 @@ test('RCA product-session AST guard does not treat OPL input type fields as RCA 
         session_store_root?: string;
       }
       export function projectDomainRefs(input: OplGeneratedSessionInput) {
-        return { domain_snapshot_ref: 'domain-snapshot:rca/example' };
+        return {
+          session_file: input.session_file,
+          resumed_from_session: true,
+          domain_snapshot_ref: 'domain-snapshot:rca/example',
+        };
       }
     `,
     ...AST_POLICY,

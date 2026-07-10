@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { isDeepStrictEqual } from 'node:util';
+
 import {
   getPublicationProjection,
   getReviewState,
@@ -16,6 +18,19 @@ const PRODUCT_ENTRY_ID = 'redcube_product_entry';
 const RUNTIME_OWNER = 'configured_family_runtime_provider';
 const DEFAULT_EXECUTOR_ADAPTER_SURFACE = 'opl_codex_executor';
 const SUPPORTED_TASK_INTENTS = new Set(['run_opl_stage_execution_plan', 'run_deliverable_route']);
+const TRUSTED_PROVIDER_ATTEMPT_FIELDS = [
+  'surface_kind',
+  'version',
+  'owner',
+  'provider_attempt_owner',
+  'domain_adapter_owner',
+  'provider_attempt_ref',
+  'provider_attempt_ledger_ref',
+  'stage_attempt_ref',
+  'attempt_lease_ref',
+  'attempt_receipt_ref',
+  'execution_owner',
+];
 
 function normalizeWorkspaceRoot(request) {
   return requireField(
@@ -162,14 +177,21 @@ function resolveCrossProviderAttemptIndex(delivery, entrySession) {
       'delivery_request.cross_provider_attempt_index does not match the OPL generated session currentness',
     );
   }
-  for (const field of ['provider_attempt_ref', 'provider_attempt_ledger_ref']) {
-    const requestedRef = safeText(requested?.[field]);
-    const generatedRef = safeText(generated?.[field]);
-    if (requestedRef && generatedRef && requestedRef !== generatedRef) {
+  if (requested && generated) {
+    for (const field of TRUSTED_PROVIDER_ATTEMPT_FIELDS) {
+      if (Object.prototype.hasOwnProperty.call(requested, field)
+        && requested[field] !== generated[field]) {
+        throw new Error(
+          `delivery_request.cross_provider_attempt_index.${field} does not match the OPL generated session`,
+        );
+      }
+    }
+    if (!isDeepStrictEqual(requested, generated)) {
       throw new Error(
-        `delivery_request.cross_provider_attempt_index.${field} does not match the OPL generated session`,
+        'delivery_request.cross_provider_attempt_index does not match the OPL generated session currentness',
       );
     }
+    return generated;
   }
   if (requested) return requested;
   if (generated) return generated;

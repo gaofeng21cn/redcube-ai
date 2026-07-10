@@ -298,10 +298,27 @@ test('route-run handoff preserves real Stage Folder and artifact authority refs'
     assert.equal(route.surface_kind, 'route_run');
     assert.equal(route.ok, true);
     assert.equal(route.run.artifact_refs.includes(route.artifactFile), true);
-    assert.equal(response.session_handoff_refs.artifact_authority_refs.includes(route.artifactFile), true);
+    assert.deepEqual(response.session_handoff_refs.artifact_authority_refs, route.run.artifact_refs);
+    for (const suffix of [
+      '/deliverable.json',
+      '/stage.json',
+      '/attempt.json',
+      '/manifest.json',
+      '/current.json',
+      '/latest.json',
+      '/latest',
+    ]) {
+      assert.equal(
+        response.session_handoff_refs.stage_folder_locator_refs.some((ref) => ref.endsWith(suffix)),
+        true,
+        suffix,
+      );
+    }
     assert.equal(
-      response.session_handoff_refs.stage_folder_locator_refs.some((ref) => /\/stages\//.test(ref)),
-      true,
+      response.session_handoff_refs.stage_folder_locator_refs.some((ref) => (
+        ref.includes('/outputs/') || ref.includes('/receipts/')
+      )),
+      false,
     );
     assert.deepEqual(
       response.session_handoff_refs.currentness_refs.cross_provider_attempt_index,
@@ -344,6 +361,24 @@ test('route-run handoff preserves real Stage Folder and artifact authority refs'
         },
       }),
       /cross_provider_attempt_index\.provider_attempt_ref does not match the OPL generated session/,
+    );
+    await assert.rejects(
+      () => invokeProductEntry({
+        workspace_locator: { workspace_root: workspaceRoot },
+        entry_session_contract: {
+          entry_session_id: 'session-route-refs',
+          opl_generated_session_surface: generatedSession,
+        },
+        task_intent: 'run_deliverable_route',
+        delivery_request: {
+          route: 'storyline',
+          cross_provider_attempt_index: {
+            ...generatedSession.domain_projection.currentness_refs.cross_provider_attempt_index,
+            stage_attempt_ref: 'opl-stage-attempt:spoofed',
+          },
+        },
+      }),
+      /cross_provider_attempt_index\.stage_attempt_ref does not match the OPL generated session/,
     );
   });
 });

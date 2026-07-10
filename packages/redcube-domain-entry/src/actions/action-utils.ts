@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-
 export function safeText(value: unknown, fallback = ''): string {
   const text = String(value || '').trim();
   return text || fallback;
@@ -22,8 +20,4 @@ export function requireSafeSegment(name: string, value: unknown): string {
     throw new Error(`${name} 不能包含父目录引用`);
   }
   return text;
-}
-
-export function readJson<T = unknown>(file: string): T {
-  return JSON.parse(readFileSync(file, 'utf-8')) as T;
 }

@@ -12,7 +12,8 @@ import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { createDeliverable } from './create-deliverable.js';
 import { getDeliverable } from './get-deliverable.js';
-import { readJson, requireField, safeText } from './action-utils.js';
+import { requireField, safeText } from './action-utils.js';
+import { readJson } from './json-file.js';
 
 const overlayRegistry = getDefaultOverlayRegistry();
 
