@@ -8,6 +8,7 @@ import {
   buildDomainOwnerReceiptContract,
   buildLifecycleGuardedApplyProof,
   buildNoRegressionOwnerReceiptOplConsumptionProof,
+  buildVisualTransitionAdapterProfileRegistry,
   buildVisualTransitionSpec,
 } from './domain-authority-refs-parts/functional-closure.js';
 import {
@@ -43,6 +44,7 @@ export function buildRedCubeDomainAuthorityRefs({
   const noRegressionOwnerReceiptOplConsumptionProof = buildNoRegressionOwnerReceiptOplConsumptionProof();
   const lifecycleGuardedApplyProof = buildLifecycleGuardedApplyProof();
   const visualTransitionSpec = buildVisualTransitionSpec();
+  const visualTransitionAdapterProfileRegistry = buildVisualTransitionAdapterProfileRegistry();
   const domainMemoryDescriptorLocator = buildDomainMemoryDescriptorLocator();
   return {
     surface_kind: 'rca_domain_authority_refs',
@@ -60,6 +62,7 @@ export function buildRedCubeDomainAuthorityRefs({
     no_regression_owner_receipt_opl_consumption_proof: noRegressionOwnerReceiptOplConsumptionProof,
     lifecycle_guarded_apply_proof: lifecycleGuardedApplyProof,
     visual_transition_spec: visualTransitionSpec,
+    visual_transition_adapter_profile_registry: visualTransitionAdapterProfileRegistry,
     source_refs: {
       artifact_locator_contract_ref: '/artifact_locator_contract',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
@@ -71,6 +74,7 @@ export function buildRedCubeDomainAuthorityRefs({
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
+      visual_transition_adapter_profile_registry_ref: '/visual_transition_adapter_profile_registry',
     },
   };
 }

@@ -271,14 +271,17 @@ export async function getProductEntryManifest(request) {
     notes: buildManifestNotes(),
     domain_entry_contract: domainEntryContract,
     user_interaction_contract: userInteractionContract,
-    extra_payload: buildManifestExtraPayload({
-      routeEquivalence,
-      deliverableFacade,
-      productEntryDescriptor,
-      nativePptOperatorUx,
-      productEntrySessionCommand,
-      sourceProvenance,
-    }),
+    extra_payload: {
+      ...buildManifestExtraPayload({
+        routeEquivalence,
+        deliverableFacade,
+        productEntryDescriptor,
+        nativePptOperatorUx,
+        productEntrySessionCommand,
+        sourceProvenance,
+      }),
+      visual_transition_adapter_profile_registry: domainAuthorityRefs.visual_transition_adapter_profile_registry,
+    },
   });
   return buildReturnedManifestProjection({
     actionMetadata,
