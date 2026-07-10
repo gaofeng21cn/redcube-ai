@@ -208,7 +208,7 @@ export interface ProductEntryPreflightCompanion {
   checks: ProductEntryPreflightCheck[];
 }
 
-export interface ProductEntryDeliveryLocatorRefs {
+interface ProductEntryDeliveryLocatorRefs {
   workspace_ref: string;
   deliverable_family: string;
   topic_id: string;
@@ -216,7 +216,7 @@ export interface ProductEntryDeliveryLocatorRefs {
   profile_id: string | null;
 }
 
-export interface ProductEntryCurrentnessRefs {
+interface ProductEntryCurrentnessRefs {
   domain_snapshot_ref: string;
   latest_surface_kind: string | null;
   latest_stage_execution_plan_ref: string | null;
@@ -228,7 +228,7 @@ export interface ProductEntryCurrentnessRefs {
   next_forced_delta_refs: string[];
 }
 
-export interface ProductEntrySessionHandoffRefs extends Record<string, unknown> {
+interface ProductEntrySessionHandoffRefs extends Record<string, unknown> {
   surface_kind: 'rca_product_entry_session_handoff_refs';
   entry_session_id: string;
   previous_domain_snapshot_ref: string | null;

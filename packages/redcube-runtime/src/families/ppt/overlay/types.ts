@@ -16,7 +16,7 @@ type PptDeckCanonicalHardStop = PptDeckCanonicalStageSequence['hard_stops'][numb
 type PptDeckCanonicalStageRequirements = PptProfileModule['FAMILY_STAGE_REQUIREMENTS'];
 
 export type PptDeckOverlayProfiles = PptProfileModule['PPT_DECK_PROFILES'];
-export type PptDeckOverlayProfileDefinition = PptDeckOverlayProfiles[keyof PptDeckOverlayProfiles];
+type PptDeckOverlayProfileDefinition = PptDeckOverlayProfiles[keyof PptDeckOverlayProfiles];
 export type PptDeckProfileId = keyof PptDeckOverlayProfiles;
 export type PptDeckOverlayCatalogEntry = ReturnType<PptProfileModule['describePptDeckOverlay']>;
 export type PptDeckOverlayId = PptDeckOverlayCatalogEntry['overlay_id'];
@@ -93,8 +93,8 @@ type PptDeckFamilyLayoutRules = PptProfileModule['FAMILY_LAYOUT_RULES'];
 export type PptDeckDensityMode =
   | PptDeckFamilyLayoutRules['density_mode']
   | PptProfileOverride['layout_rules']['density_mode'];
-export type PptDeckCanvasRules = PptDeckFamilyLayoutRules['canvas'];
-export type PptDeckEvidenceSurfaceRules = PptDeckFamilyLayoutRules['evidence_surface_rules'];
+type PptDeckCanvasRules = PptDeckFamilyLayoutRules['canvas'];
+type PptDeckEvidenceSurfaceRules = PptDeckFamilyLayoutRules['evidence_surface_rules'];
 export type PptDeckLayoutRules = Omit<
   PptDeckFamilyLayoutRules,
   'density_mode' | 'max_primary_points_per_slide'
@@ -104,8 +104,8 @@ export type PptDeckLayoutRules = Omit<
 };
 
 export type PptDeckBaselinePolicy = PptProfileModule['FAMILY_BASELINE_POLICY'];
-export type PptDeckDraftBaselineMode = PptDeckBaselinePolicy['modes']['draft_new'];
-export type PptDeckOptimizeBaselineMode = PptDeckBaselinePolicy['modes']['optimize_existing'];
+type PptDeckDraftBaselineMode = PptDeckBaselinePolicy['modes']['draft_new'];
+type PptDeckOptimizeBaselineMode = PptDeckBaselinePolicy['modes']['optimize_existing'];
 type PptDeckCanonicalPromptPack = PptProfileModule['FAMILY_PROMPT_PACK'];
 type PptDeckMutableNativePptProofLane = MutableRoutes<
   typeof import('./profile-parts/authoring-lanes.js').NATIVE_PPT_PROOF_LANE
@@ -132,11 +132,11 @@ export type PptDeckPromptPack = Omit<PptDeckCanonicalPromptPack, 'render_contrac
     image_page_authoring_lane: PptDeckImagePageAuthoringLane;
   };
 };
-export type PptDeckPromptRoutes = PptDeckPromptPack['routes'];
-export type PptDeckPromptStages = PptDeckPromptPack['stages'];
-export type PptDeckPromptStageFile = PptDeckPromptStages[keyof PptDeckPromptStages];
-export type PptDeckRenderContract = PptDeckPromptPack['render_contract'];
-export type PptDeckRecipeRegistry = PptDeckRenderContract['recipe_registry'];
+type PptDeckPromptRoutes = PptDeckPromptPack['routes'];
+type PptDeckPromptStages = PptDeckPromptPack['stages'];
+type PptDeckPromptStageFile = PptDeckPromptStages[keyof PptDeckPromptStages];
+type PptDeckRenderContract = PptDeckPromptPack['render_contract'];
+type PptDeckRecipeRegistry = PptDeckRenderContract['recipe_registry'];
 
 type PptDeckFamilyExportBundle = PptProfileModule['FAMILY_EXPORT_BUNDLE'];
 export type PptDeckBundleId =
@@ -152,10 +152,10 @@ export type PptDeckExportBundle = Omit<
 };
 
 export type PptDeckDisplayRegistry = PptProfileModule['FAMILY_DISPLAY_REGISTRY'];
-export type PptDeckDisplaySurface = PptDeckDisplayRegistry['surfaces'][number];
-export type PptDeckDisplaySurfaceId = PptDeckDisplaySurface['id'];
-export type PptDeckDisplaySurfaceKind = PptDeckDisplaySurface['kind'];
-export type PptDeckDisplaySurfaceCondition = PptDeckDisplaySurface['required_when'];
+type PptDeckDisplaySurface = PptDeckDisplayRegistry['surfaces'][number];
+type PptDeckDisplaySurfaceId = PptDeckDisplaySurface['id'];
+type PptDeckDisplaySurfaceKind = PptDeckDisplaySurface['kind'];
+type PptDeckDisplaySurfaceCondition = PptDeckDisplaySurface['required_when'];
 export type PptDeckLifecycleModel = PptProfileModule['FAMILY_LIFECYCLE_MODEL'];
 export type PptDeckSourceTruthContract = PptProfileModule['PPT_SOURCE_TRUTH_CONTRACT'];
 export type PptDeckDeliveryContract = PptProfileModule['PPT_DELIVERY_CONTRACT_BASE'] & {

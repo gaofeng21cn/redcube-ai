@@ -150,7 +150,7 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
 }
 
 // Telemetry summaries
-export type PosterMetricId =
+type PosterMetricId =
   | 'far_view_readability'
   | 'scan_path_clarity'
   | 'figure_claim_alignment'
@@ -159,13 +159,13 @@ export type PosterMetricId =
   | 'venue_metadata_complete'
   | 'print_export_safe';
 
-export interface MetricExtensionMetricSummary {
+interface MetricExtensionMetricSummary {
   metric_id: PosterMetricId | string;
   value: number | string | boolean | null;
   status: 'not_evaluated' | 'captured';
 }
 
-export interface MetricExtensionSummary {
+interface MetricExtensionSummary {
   extension_id: string;
   overlay_scope: string[];
   profile_scope: string[];
@@ -173,7 +173,7 @@ export interface MetricExtensionSummary {
   metrics: MetricExtensionMetricSummary[];
 }
 
-export interface RunTelemetrySummary {
+interface RunTelemetrySummary {
   run_id: string | null;
   route: string | null;
   overlay: string | null;
@@ -190,14 +190,14 @@ export interface RunTelemetrySummary {
   estimated_cost: number | null;
 }
 
-export interface ErrorTaxonomySummary {
+interface ErrorTaxonomySummary {
   error_kind: string | null;
   error_message: string | null;
   current_stage: string | null;
   failed: boolean;
 }
 
-export interface RerunAnalyticsSummary {
+interface RerunAnalyticsSummary {
   rerun_count: number;
   previous_run_id: string | null;
   source_stage: string | null;
@@ -205,7 +205,7 @@ export interface RerunAnalyticsSummary {
   baseline_deliverable_id: string | null;
 }
 
-export interface CostSummary {
+interface CostSummary {
   executor_identity: string | null;
   executor_kind: string | null;
   latency_ms: number | null;
@@ -214,7 +214,7 @@ export interface CostSummary {
   estimated_cost: number | null;
 }
 
-export interface QualityDriftSummary {
+interface QualityDriftSummary {
   relative_quality_verdict: string | null;
   degradation_count: number;
   improvement_count: number;
@@ -223,7 +223,7 @@ export interface QualityDriftSummary {
   promoted_reference_id: string | null;
 }
 
-export interface ApprovalThroughputSummary {
+interface ApprovalThroughputSummary {
   publish_state: string | null;
   pending_review_count: number;
   approval_pending: boolean;

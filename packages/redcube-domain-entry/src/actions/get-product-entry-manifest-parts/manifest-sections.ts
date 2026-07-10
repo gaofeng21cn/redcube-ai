@@ -53,21 +53,6 @@ export function buildProductEntryStatusSection() {
   };
 }
 
-export function buildManifestProjectionRefs() {
-  return {
-    reviewState: {
-      surface_kind: 'review_state',
-      owner: 'redcube_ai',
-      status: 'runtime_projection_ref',
-    },
-    publicationProjection: {
-      surface_kind: 'publication_projection',
-      owner: 'redcube_ai',
-      status: 'runtime_projection_ref',
-    },
-  };
-}
-
 export function buildSourceProvenanceSection() {
   return {
     surface_kind: 'source_provenance',

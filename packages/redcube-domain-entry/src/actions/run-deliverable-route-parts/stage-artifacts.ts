@@ -93,7 +93,7 @@ export function routeSequenceStageIds(contract: JsonObject): string[] {
     .filter(Boolean);
 }
 
-export function stageArtifactFileForRequest(request: RunDeliverableRouteRequest, stageId: string): string {
+function stageArtifactFileForRequest(request: RunDeliverableRouteRequest, stageId: string): string {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
     request.topicId,

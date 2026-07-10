@@ -3,7 +3,9 @@
   "entry": [
     "scripts/materialize-rca-workspace-receipt-scaleout-evidence.ts",
     "scripts/p19-creative-ownership-audit-lib.ts",
-    "tools/native-ppt-proof/build-fixture-input.ts"
+    "tools/native-ppt-proof/build-fixture-input.ts",
+    "tools/native-ppt-proof/evaluate-quality.ts",
+    "tools/native-ppt-proof/ppt-master-parity.ts"
   ],
   "ignoreExports": [
     {
@@ -42,6 +44,70 @@
       "file": "scripts/test-registry.ts",
       "exports": [
         "TEST_REGISTRY"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime/src/families/poster-onepager/overlay/contracts.ts",
+      "exports": [
+        "POSTER_SOURCE_TRUTH_CONTRACT",
+        "POSTER_DELIVERY_CONTRACT",
+        "POSTER_STAGE_SEQUENCE",
+        "POSTER_STAGE_REQUIREMENTS",
+        "POSTER_REVIEW_SURFACE",
+        "POSTER_LAYOUT_RULES",
+        "POSTER_BASELINE_POLICY",
+        "POSTER_PROMPT_PACK",
+        "POSTER_EXPORT_BUNDLE",
+        "POSTER_DISPLAY_REGISTRY",
+        "POSTER_LIFECYCLE_MODEL",
+        "POSTER_LIFECYCLE_STAGE_CONTRACT"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime/src/families/ppt/overlay/profiles.ts",
+      "exports": [
+        "PPT_SOURCE_TRUTH_CONTRACT",
+        "PPT_DELIVERY_CONTRACT_BASE",
+        "FAMILY_STAGE_SEQUENCE",
+        "FAMILY_REVIEW_SURFACE",
+        "FAMILY_LAYOUT_RULES",
+        "FAMILY_BASELINE_POLICY",
+        "FAMILY_STAGE_REQUIREMENTS",
+        "FAMILY_PROMPT_PACK",
+        "FAMILY_EXPORT_BUNDLE",
+        "FAMILY_DISPLAY_REGISTRY",
+        "FAMILY_LIFECYCLE_MODEL",
+        "DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT",
+        "PPT_DECK_PROFILE_OVERRIDES"
+      ]
+    },
+    {
+      "file": "packages/redcube-runtime/src/families/xiaohongshu/overlay/contracts.ts",
+      "exports": [
+        "XIAOHONGSHU_SOURCE_TRUTH_CONTRACT",
+        "XIAOHONGSHU_DELIVERY_CONTRACT",
+        "XIAOHONGSHU_STAGE_SEQUENCE",
+        "XIAOHONGSHU_STAGE_REQUIREMENTS",
+        "XIAOHONGSHU_REVIEW_SURFACE",
+        "XIAOHONGSHU_LAYOUT_RULES",
+        "XIAOHONGSHU_BASELINE_POLICY",
+        "XIAOHONGSHU_PROMPT_PACK",
+        "XIAOHONGSHU_EXPORT_BUNDLE",
+        "XIAOHONGSHU_DISPLAY_REGISTRY",
+        "XIAOHONGSHU_LIFECYCLE_MODEL"
+      ]
+    },
+    {
+      "file": "scripts/check-private-platform-retirement.ts",
+      "exports": [
+        "analyzeTypeScriptOwnerBoundarySource",
+        "analyzeTypeScriptOwnerBoundaryClosure"
+      ]
+    },
+    {
+      "file": "packages/redcube-domain-entry/src/types-parts/product-entry.ts",
+      "exports": [
+        "ProductStatusResponse"
       ]
     }
   ]

@@ -35,7 +35,6 @@ export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summar
   };
 };
 
-export const CODEX_STRUCTURED_ADAPTER = 'codex_cli';
 export function readJsonRecord(file: string): JsonObject {
   return JSON.parse(readFileSync(file, 'utf-8')) as JsonObject;
 }
@@ -66,18 +65,6 @@ export function summarizeDependencyRoute(route: string, result: RuntimeRouteResu
     run_id: safeText(run?.run_id) || null,
     status: safeText(run?.status) || null,
   };
-}
-
-export function uniqueDependencyRouteRuns(entries: DependencyRouteRun[]): DependencyRouteRun[] {
-  const seen = new Set<string>();
-  const unique: DependencyRouteRun[] = [];
-  for (const entry of entries) {
-    const route = safeText(entry?.route);
-    if (!route || seen.has(route)) continue;
-    seen.add(route);
-    unique.push(entry);
-  }
-  return unique;
 }
 
 export function runCurrentStage(result: RuntimeRouteResult): string | null {
