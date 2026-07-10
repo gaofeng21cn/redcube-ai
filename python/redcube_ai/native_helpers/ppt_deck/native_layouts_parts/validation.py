@@ -123,10 +123,24 @@ def validate_ai_first_design_plan(slide_data: dict) -> list[dict]:
                 capacity_failure = ai_text_capacity_failure(shape)
                 if capacity_failure:
                     failures.append(capacity_failure)
-        if not text and resolve_color(shape.get('fill') or shape.get('fill_color'), 'none') == 'none' and resolve_color(shape.get('line') or shape.get('line_color') or shape.get('stroke'), 'none') == 'none':
+        native_content_visible = (
+            (kind == 'picture' and bool(safe_text(
+                shape.get('src') or shape.get('source') or shape.get('file') or shape.get('source_data_uri')
+            )))
+            or (kind == 'chart' and bool(shape.get('categories')) and bool(shape.get('series')))
+            or (kind in {'table', 'metric_grid'} and bool(shape.get('data')))
+            or (kind == 'group' and bool(shape.get('children')))
+            or (
+                kind in {'chart', 'table', 'metric_grid'}
+                and safe_text(shape.get('materialization_intent')) == 'stable_drawingml'
+                and bool(shape.get('drawingml_shapes') or shape.get('children'))
+            )
+        )
+        if not text and not native_content_visible and resolve_color(shape.get('fill') or shape.get('fill_color'), 'none') == 'none' and resolve_color(shape.get('line') or shape.get('line_color') or shape.get('stroke'), 'none') == 'none':
             failures.append({'reason': 'ai_first_non_text_shape_invisible', 'shape_id': shape_id})
         if (
             not text
+            and not native_content_visible
             and explicit_quality_role in {'content', 'structural'}
             and resolve_color(shape.get('fill') or shape.get('fill_color'), 'none') == 'none'
             and resolve_color(shape.get('line') or shape.get('line_color') or shape.get('stroke'), 'none') == 'none'

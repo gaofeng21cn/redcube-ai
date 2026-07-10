@@ -18,7 +18,66 @@
     "true_render_proof_required": true,
     "true_render_proof_renderer": "libreoffice_headless",
     "cross_platform_render_required": true,
-    "screenshot_packaging": false
+    "screenshot_packaging": false,
+    "native_object_families": [
+      "text_box",
+      "shape",
+      "connector",
+      "picture",
+      "group",
+      "path",
+      "chart",
+      "table"
+    ],
+    "package_readback": true,
+    "template_intake": true,
+    "speaker_notes": true,
+    "slide_transitions": true,
+    "timing_and_animation": true
+  },
+  "native_object_model": {
+    "unknown_kind_policy": "fail_fast",
+    "manifest_kind_source": "materialized_pptx_package_readback",
+    "stable_drawingml_intent": "grouped_editable_drawingml_children",
+    "native_data_object_intent": [
+      "chart",
+      "table"
+    ],
+    "path_geometry": "drawingml_custom_geometry",
+    "package_readback_required": true,
+    "package_readback_schema_version": 1,
+    "package_readback_evidence_source": "pptx_package_readback",
+    "pptx_sha256_required": true,
+    "relationship_type_counts_required": true
+  },
+  "template_intake": {
+    "supported_modes": [
+      "replace_slides",
+      "fill_existing"
+    ],
+    "preserved_parts": [
+      "slide_master",
+      "slide_layout",
+      "theme"
+    ],
+    "fill_existing_preserves": [
+      "placeholder",
+      "editable_source_object"
+    ],
+    "part_hash_readback_required": true
+  },
+  "presentation_semantics": {
+    "speaker_notes": true,
+    "slide_transition": true,
+    "timing_tree": true,
+    "optional_animation": true,
+    "static_slide_must_remain_readable": true,
+    "package_readback_count_fields": [
+      "notes_slide_count",
+      "transition_count",
+      "timing_node_count",
+      "animation_count"
+    ]
   },
   "officecli_materializer_policy": {
     "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",

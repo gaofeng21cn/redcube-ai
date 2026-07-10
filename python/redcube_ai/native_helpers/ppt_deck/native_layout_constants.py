@@ -25,6 +25,8 @@ PALETTE = {
     'none': 'none',
 }
 OFFICECLI_SHAPE_KINDS = {
+    'shape',
+    'preset_shape',
     'rect',
     'rectangle',
     'rounded_rect',
@@ -35,6 +37,13 @@ OFFICECLI_SHAPE_KINDS = {
     'circle',
     'line',
     'connector',
+    'picture',
+    'image',
+    'group',
+    'path',
+    'chart',
+    'table',
+    'metric_grid',
 }
 CONTENT_ROLES = {
     'title',

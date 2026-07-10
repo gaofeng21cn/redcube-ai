@@ -38,6 +38,21 @@ ENGINE_CAPABILITIES = {
     'true_render_proof_renderer': 'libreoffice_headless',
     'cross_platform_render_required': True,
     'screenshot_packaging': False,
+    'native_object_families': [
+        'text_box',
+        'shape',
+        'connector',
+        'picture',
+        'group',
+        'path',
+        'chart',
+        'table',
+    ],
+    'package_readback': True,
+    'template_intake': True,
+    'speaker_notes': True,
+    'slide_transitions': True,
+    'timing_and_animation': True,
 }
 OFFICECLI_MATERIALIZER_POLICY = {
     'policy_id': 'ppt_native_officecli_materializer_quality_gate_v1',
@@ -702,11 +717,28 @@ def main() -> None:
     preview_dir = Path(args.preview_dir).resolve()
     svg_ir_dir = preview_dir.parent / f'{preview_dir.name}-redcube-svg-ir'
     try:
-        deck_build = build_deck(slides, output_pptx, svg_ir_dir, repaired_slide_ids, evaluate_native_slide_quality)
-    except RuntimeError as exc:
+        editable_shape_plan = payload.get('editable_shape_plan') if isinstance(payload.get('editable_shape_plan'), dict) else {}
+        template_intake = (
+            payload.get('template_intake')
+            if isinstance(payload.get('template_intake'), dict)
+            else editable_shape_plan.get('template_intake')
+            if isinstance(editable_shape_plan.get('template_intake'), dict)
+            else None
+        )
+        deck_build = build_deck(
+            slides,
+            output_pptx,
+            svg_ir_dir,
+            repaired_slide_ids,
+            evaluate_native_slide_quality,
+            template_intake=template_intake,
+        )
+    except (RuntimeError, ValueError) as exc:
         fail(str(exc))
     manifest_slides = deck_build['slides']
     officecli_gate = deck_build['officecli_gate']
+    package_readback = deck_build['package_readback']
+    template_preservation = deck_build['template_preservation']
     output_pdf = Path(args.output_pdf).resolve() if args.output_pdf else None
     render_proof = render_pptx(output_pptx, preview_dir, output_pdf, renderer_name=args.renderer)
     manifest_slides = attach_rendered_previews(manifest_slides, render_proof)
@@ -810,6 +842,8 @@ def main() -> None:
         'engine_capabilities': ENGINE_CAPABILITIES,
         'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
         'officecli_gate': officecli_gate,
+        'package_readback': package_readback,
+        'template_preservation': template_preservation,
         'render_proof': render_proof,
         'redcube_svg_ir': {
             'kind': 'redcube_svg_ir',
@@ -822,7 +856,7 @@ def main() -> None:
         'editable_artifact': True,
         'pptx_file': str(output_pptx),
         'pdf_file': str(output_pdf) if output_pdf else None,
-        'page_count': len(slides),
+        'page_count': int(package_readback.get('slide_count') or len(slides)),
         'screenshot_dimensions': image_dimensions(Path(preview_files[0])) if preview_files else None,
         'preview_screenshots': preview_files,
         'slides': manifest_slides,
@@ -839,9 +873,11 @@ def main() -> None:
         'engine_capabilities': ENGINE_CAPABILITIES,
         'officecli_materializer_policy': OFFICECLI_MATERIALIZER_POLICY,
         'officecli_gate': officecli_gate,
+        'package_readback': package_readback,
+        'template_preservation': template_preservation,
         'shape_manifest_schema_version': manifest['schema_version'],
         'mode': args.mode,
-        'page_count': len(slides),
+        'page_count': int(package_readback.get('slide_count') or len(slides)),
         'pptx_file': str(output_pptx),
         'pdf_file': str(output_pdf) if output_pdf else None,
         'shape_manifest_file': str(shape_manifest),

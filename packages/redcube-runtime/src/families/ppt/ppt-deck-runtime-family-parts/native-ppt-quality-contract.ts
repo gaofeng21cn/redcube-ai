@@ -8,6 +8,21 @@ export const REQUIRED_ENGINE_CAPABILITIES = Object.freeze({
   true_render_proof_renderer: 'libreoffice_headless',
   cross_platform_render_required: true,
   screenshot_packaging: false,
+  native_object_families: Object.freeze([
+    'text_box',
+    'shape',
+    'connector',
+    'picture',
+    'group',
+    'path',
+    'chart',
+    'table',
+  ]),
+  package_readback: true,
+  template_intake: true,
+  speaker_notes: true,
+  slide_transitions: true,
+  timing_and_animation: true,
 });
 
 export const NATIVE_PPT_AGGREGATED_CHECK_KEYS = Object.freeze([

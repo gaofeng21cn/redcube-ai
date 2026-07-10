@@ -658,7 +658,11 @@ export function createNativePptShapePlanNormalizeParts({
     const role = safeText(shape?.role);
     const qualityRole = safeText(shape?.quality_role);
     const layoutZoneId = safeText(shape?.layout_zone_id);
-    const text = safeText(shape?.editable_text || shape?.text || shape?.label);
+    const paragraphText = safeArray(shape?.paragraphs)
+      .map((paragraph) => safeText(paragraph?.text || paragraph?.editable_text))
+      .filter(Boolean)
+      .join('\n');
+    const text = safeText(shape?.editable_text || shape?.text || shape?.label || paragraphText);
     const textShape = ['text_box', 'text'].includes(kind)
       || ['title', 'core_sentence', 'point_text', 'body', 'content', 'point_index'].includes(role);
     const missingText = textShape && !text;

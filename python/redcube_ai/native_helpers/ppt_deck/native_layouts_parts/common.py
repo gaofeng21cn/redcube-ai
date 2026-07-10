@@ -40,7 +40,15 @@ def shape_kind(shape: dict) -> str:
 
 
 def ai_shape_text(shape_spec: dict) -> str:
-    return visible_text(shape_spec.get('editable_text') or shape_spec.get('text') or shape_spec.get('label'))
+    direct = visible_text(shape_spec.get('editable_text') or shape_spec.get('text') or shape_spec.get('label'))
+    if direct:
+        return direct
+    paragraphs = safe_list(shape_spec.get('paragraphs'))
+    return '\n'.join(
+        visible_text(paragraph)
+        for paragraph in paragraphs
+        if isinstance(paragraph, dict) and visible_text(paragraph)
+    )
 
 
 def native_ai_design_shapes(slide_data: dict) -> list[dict]:
