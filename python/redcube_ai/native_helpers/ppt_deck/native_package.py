@@ -130,6 +130,29 @@ def _solid_fill(element: ET.Element | None) -> str:
     return scheme.get('val', '') if scheme is not None else ''
 
 
+def _shape_bounds_emu(element: ET.Element) -> dict[str, int]:
+    transform = element.find('./p:spPr/a:xfrm', NS)
+    if transform is None:
+        transform = element.find('./p:xfrm', NS)
+    if transform is None:
+        transform = element.find('./p:grpSpPr/a:xfrm', NS)
+    if transform is None:
+        return {}
+    offset = transform.find('./a:off', NS)
+    extent = transform.find('./a:ext', NS)
+    if offset is None or extent is None:
+        return {}
+    try:
+        return {
+            'left': int(offset.get('x', '')),
+            'top': int(offset.get('y', '')),
+            'width': int(extent.get('cx', '')),
+            'height': int(extent.get('cy', '')),
+        }
+    except ValueError:
+        return {}
+
+
 def _crop_percent(value: str | None) -> int | float:
     try:
         percent = int(value or 0) / 1000
@@ -276,6 +299,8 @@ def _shape_record(element: ET.Element, relationships: dict[str, dict]) -> dict:
         for properties in paragraph.findall('./a:pPr', NS)
         if any(_local_name(child.tag) in {'buChar', 'buAutoNum', 'buBlip'} for child in list(properties))
     )
+    record['fill'] = _solid_fill(element.find('./p:spPr', NS))
+    record['bounds_emu'] = _shape_bounds_emu(element)
     record['placeholder'] = element.find('.//p:ph', NS) is not None
     return record
 
