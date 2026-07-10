@@ -30,7 +30,7 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
   assert.equal(packRefs.canonical_agent_id, 'rca');
   assert.equal(packRefs.domain_id, 'redcube_ai');
   assert.equal(packRefs.pack_compiler_owner, 'one-person-lab');
-  assert.equal(packRefs.authority_boundary.opl_can_compile_generated_surfaces_from_refs, true);
+  assert.equal('opl_can_compile_generated_surfaces_from_refs' in packRefs.authority_boundary, false);
   assert.equal(packRefs.authority_boundary.opl_can_write_domain_truth, false);
   assert.equal(packRefs.authority_boundary.opl_can_authorize_quality_or_export, false);
   assert.equal(packRefs.required_domain_pack_paths.every((entry) => entry.startsWith('agent/')), true);

@@ -70,6 +70,7 @@ export function buildVisualPackCompilerHandoffProjection() {
         'agent/stages/artifact_creation.md',
         'agent/stages/review_and_revision.md',
         'agent/stages/package_and_handoff.md',
+        'agent/stages/manifest.json',
       ],
       quality_gate_refs: [
         'agent/quality_gates/visual_authority_boundaries.md',

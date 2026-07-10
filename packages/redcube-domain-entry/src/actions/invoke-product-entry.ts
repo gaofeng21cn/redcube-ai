@@ -117,7 +117,6 @@ function normalizeDeliveryRequest(request) {
 
 function resolveLifecycleStopAfterStage({ delivery, taskIntent, hasOplGeneratedSessionSurface }) {
   if (delivery.stopAfterStage || taskIntent !== 'run_opl_stage_execution_plan') return delivery.stopAfterStage;
-  if (delivery.route) return delivery.route;
   if (hasOplGeneratedSessionSurface) return '';
   if (delivery.lifecyclePolicy === 'operator_review_after_plan') return 'detailed_outline';
   if (delivery.lifecyclePolicy && delivery.lifecyclePolicy !== 'auto_to_terminal') {
