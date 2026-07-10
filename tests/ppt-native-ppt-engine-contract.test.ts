@@ -253,6 +253,27 @@ test('native PPT professional registries land ppt-master learning without import
   ));
   assert.equal(templateCreation.classification, 'watch_only');
   assert.match(templateCreation.authority_boundary, /do not infer template creation/);
+  const brandCreation = workflowCoverage.find((entry: any) => (
+    entry.workflow_refs.includes('skills/ppt-master/workflows/create-brand.md')
+  ));
+  assert.equal(brandCreation.classification, 'adapt');
+  assert.match(brandCreation.authority_boundary, /does not extract or publish a reusable identity package/);
+  assert.equal(brandCreation.excluded_watch_only_capability.classification, 'watch_only');
+  const beautify = workflowCoverage.find((entry: any) => (
+    entry.workflow_refs.includes('skills/ppt-master/workflows/beautify-pptx.md')
+  ));
+  assert.equal(beautify.classification, 'adapt');
+  assert.match(beautify.authority_boundary, /does not cover arbitrary imported PPTX/);
+  assert.equal(beautify.excluded_watch_only_capability.classification, 'watch_only');
+  const chartVerification = workflowCoverage.find((entry: any) => (
+    entry.workflow_refs.includes('skills/ppt-master/workflows/verify-charts.md')
+  ));
+  assert.equal(chartVerification.classification, 'adapt');
+  assert.deepEqual(chartVerification.acceptance_evidence, [
+    'test:ppt-native-object-package',
+    'test:ppt-native-quality-package-readback',
+  ]);
+  assert.match(chartVerification.authority_boundary, /do not copy the upstream SVG coordinate calculator/);
   const browserPreview = workflowCoverage.find((entry: any) => (
     entry.workflow_refs.includes('skills/ppt-master/workflows/live-preview.md')
   ));
@@ -296,4 +317,16 @@ test('native PPT professional registries land ppt-master learning without import
     assert.ok(binding.emits.length > 0);
     assert.ok(binding.stop_condition.length > 0);
   }
+
+  const completionAudit = readJson(path.resolve(
+    'contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json',
+  ));
+  const nonLiveBasis = completionAudit.scope.native_ppt_non_live_implementation.completion_basis;
+  assert.equal(nonLiveBasis.included_items_count, 9);
+  assert.ok(nonLiveBasis.excluded_capabilities_not_counted_as_implemented.length >= 6);
+  const parityBasis = completionAudit.scope.native_ppt_full_parity_spec.completion_basis;
+  assert.deepEqual(
+    [parityBasis.completed_units, parityBasis.total_units, completionAudit.scope.native_ppt_full_parity_spec.completion_percent],
+    [8, 10, 80],
+  );
 });

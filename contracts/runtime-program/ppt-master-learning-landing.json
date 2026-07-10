@@ -201,11 +201,21 @@
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/create-brand.md"],
-      "classification": "no_code_needed",
-      "reason": "brand constraints already enter the professional design brief and quality evidence without a global brand library",
-      "local_owner_surface": "rca-ppt-visual-director + existing source intake",
+      "classification": "adapt",
+      "reason": "consume source-backed brand constraints in the professional design brief without claiming reusable brand-package authoring",
+      "local_owner_surface": "rca-ppt-visual-director + rca-template-profiler",
       "acceptance_evidence": ["test:ppt-native-quality-package-gates", "skill_resource_pack_readback"],
-      "authority_boundary": "brand facts remain source constraints; no copied brand corpus or second asset authority"
+      "authority_boundary": "the adaptation consumes supplied brand constraints only; it does not extract or publish a reusable identity package",
+      "stop_condition": "current source-backed brand constraints are missing or cannot be bound to the design brief",
+      "excluded_watch_only_capability": {
+        "capability_id": "reusable_brand_identity_package_authoring",
+        "classification": "watch_only",
+        "source_behavior": "extract identity from a logo, site, PPTX, or PDF and generate a reusable brand package",
+        "local_owner_surface": "future Template Profiler + Visual Memory proposal + OPL asset surface",
+        "acceptance_evidence": ["typed_future_requirement"],
+        "authority_boundary": "do not infer reusable brand authoring from brand-constraint consumption",
+        "stop_condition": "remain watch-only until an explicit reusable-brand requirement and admitted asset owner exist"
+      }
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/create-template.md"],
@@ -233,11 +243,20 @@
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/beautify-pptx.md"],
-      "classification": "no_code_needed",
-      "reason": "optimize_existing and repair_pptx_native already preserve source identity and untouched slide hashes while repairing selected pages",
-      "local_owner_surface": "existing PPT optimize and native repair Stage routes",
-      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime", "test:ppt-native-editability-regression"],
-      "authority_boundary": "repair remains source- and review-bound; no parallel beautify pipeline is introduced"
+      "classification": "adapt",
+      "reason": "adapt only page-scoped targeted repair for an RCA-generated native deck, with blocked-page scope and preserved-slide hashes",
+      "local_owner_surface": "existing repair_pptx_native Stage route",
+      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime"],
+      "authority_boundary": "this does not cover arbitrary imported PPTX, verbatim 1:1 content preservation, or full-deck re-layout",
+      "stop_condition": "a current RCA native artifact, blocked slide ids, review evidence, or preserved-slide hash proof is missing",
+      "excluded_watch_only_capability": {
+        "capability_id": "arbitrary_imported_pptx_verbatim_full_deck_beautify",
+        "classification": "watch_only",
+        "local_owner_surface": "future explicit imported-deck workflow under RCA review/export authority",
+        "acceptance_evidence": ["typed_future_requirement"],
+        "authority_boundary": "do not infer arbitrary source-deck beautification from targeted RCA repair",
+        "stop_condition": "remain watch-only until an explicit imported-deck requirement and end-to-end fidelity evidence exist"
+      }
     },
     {
       "workflow_refs": [
@@ -276,11 +295,12 @@
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/verify-charts.md"],
-      "classification": "no_code_needed",
-      "reason": "chart data fidelity, native package readback, coordinate determinism, and screenshot hashes are already required",
+      "classification": "adapt",
+      "reason": "Office native chart geometry remains engine-owned while RCA validates chart type, categories, series, relationships, package readback, and true render fail-closed",
       "local_owner_surface": "native helper + RCA PPT quality evaluator",
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates"],
-      "authority_boundary": "coordinate checks support evaluation but cannot issue a visual_ready verdict"
+      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-quality-package-readback"],
+      "authority_boundary": "do not copy the upstream SVG coordinate calculator or manual receipt workflow, and do not claim coverage of hand-authored data-driven SVG geometry",
+      "stop_condition": "chart type, categories, series, relationship binding, package readback, or true-render evidence is missing or drifts"
     },
     {
       "workflow_refs": ["skills/ppt-master/workflows/live-preview.md", "skills/ppt-master/workflows/visual-review.md"],

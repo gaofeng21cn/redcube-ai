@@ -20,7 +20,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 ## Native PPT `ppt-master` 非劣效一体化工作单
 
-2026-07-10 fresh audit 证明，RCA 的 Stage prompt / professional specialist skill / tool-helper 三层结构已经成立，Codex executor 也会按 route 注入专业 Skill；但过去对 `ppt-master` 的学习先落到 docs、contract、gate 和 helper，专业 Skill 后补后没有反向完成 capability closure。当前 native writer 会把除 connector 外的对象普遍物化为普通 shape，benchmark helper 会丢弃 fixture 原始 `native_shapes` 重建通用卡片，quality evaluator 又允许单一 structural shape 同时满足 non-text visual 和 anti-card gate。该状态不能继续读作 editable chart/table writer、专业性或视觉质量已经 landed。
+2026-07-10 修复前基线显示，RCA 虽已有 Stage prompt / professional specialist skill / tool-helper 三层结构和按 route 注入的专业 Skill，但 native writer 曾把多类对象退化为普通 shape，benchmark helper 曾丢弃 fixture 原始 `native_shapes`，quality evaluator 也曾允许单一 structural shape 同时满足 non-text visual 和 anti-card gate。本轮已分别从 typed object fidelity、fixture preservation 和 evaluator fail-closed 三处修复这些根因；下表只把 fresh executable evidence 支撑的范围标为 done。
 
 本轮唯一目标态规格是 [RCA 原生 PPT 非劣效目标态规格](../specs/native-ppt-ppt-master-parity.md)。所有并行 lane 都服务同一完成条件，不形成第二 active plan，不把单个 commit、focused tests、mock proof 或 refs-only contract 当成阶段完成。
 

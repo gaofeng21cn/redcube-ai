@@ -32,11 +32,34 @@
         "optional_animation_and_timing_package_materialization",
         "blind_parity_candidate_harness",
         "progress_first_route_nonregression"
-      ]
+      ],
+      "completion_basis": {
+        "method": "included_non_live_acceptance_scope",
+        "included_items_count": 9,
+        "excluded_capabilities_not_counted_as_implemented": [
+          {"capability_id":"reusable_template_package_authoring","classification":"watch_only"},
+          {"capability_id":"reusable_brand_identity_package_authoring","classification":"watch_only"},
+          {"capability_id":"arbitrary_imported_pptx_verbatim_full_deck_beautify","classification":"watch_only"},
+          {"capability_id":"provider_backed_audio_generation","classification":"watch_only"},
+          {"capability_id":"interactive_private_browser_editor_and_annotation_ui","classification":"reject"},
+          {"capability_id":"manual_svg_chart_coordinate_calculator_and_receipt","classification":"reject"}
+        ],
+        "rule": "100 percent applies only to the listed non-live RCA implementation scope; excluded capabilities are not claimed as implemented"
+      }
     },
     "native_ppt_full_parity_spec": {
       "status": "partial",
       "completion_percent": 80,
+      "completion_basis": {
+        "method": "weighted_acceptance_units",
+        "completed_units": 8,
+        "total_units": 10,
+        "percentage_formula": "8 / 10 * 100 = 80",
+        "open_units": [
+          "live_same_source_five_reviewer_blind_parity_and_owner_receipt",
+          "cross_viewer_human_readback"
+        ]
+      },
       "done": [
         "typed_native_object_fidelity",
         "template_preservation",
