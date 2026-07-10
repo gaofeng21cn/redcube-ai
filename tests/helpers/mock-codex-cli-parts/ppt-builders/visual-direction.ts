@@ -3,6 +3,10 @@ import { safeArray } from '../shared.ts';
 
 export function buildMockVisualDirection(meta) {
   const slides = safeArray(meta?.context?.blueprint?.slides);
+  const claimSpineLock = safeArray(meta?.context?.blueprint?.claim_spine_lock);
+  if (process.env.REDCUBE_MOCK_REQUIRE_CLAIM_SPINE_LOCK_CONTEXT === '1' && claimSpineLock.length === 0) {
+    throw new Error('mock visual_direction requires blueprint.claim_spine_lock context');
+  }
   const peakPages = slides.filter((_, index) => index === 0 || index === 3 || index === slides.length - 1).map((slide) => slide.slide_id);
   return {
     visual_manifest: '浅底高对比、结构显式、关键页拉节奏的正式讲台感',

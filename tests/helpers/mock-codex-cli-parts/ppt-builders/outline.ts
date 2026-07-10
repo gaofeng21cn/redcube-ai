@@ -46,6 +46,14 @@ function manuscriptEvidencePoint(row) {
   return [label, numeric || conclusion].filter(Boolean).join('：');
 }
 
+function claimSpineLockFromStoryline(meta) {
+  const claimSpineLock = structuredClone(safeArray(meta?.context?.storyline?.claim_spine_lock));
+  if (process.env.REDCUBE_MOCK_PPT_CLAIM_SPINE_DRIFT === '1' && claimSpineLock[0]) {
+    claimSpineLock[0].claim_text = `${safeText(claimSpineLock[0].claim_text)}（已被下游改写）`;
+  }
+  return claimSpineLock;
+}
+
 function hardExactOneSlide(meta, sourceSlides) {
   const title = safeText(meta?.context?.title) || safeText(sourceSlides?.[0]?.title) || '路线证据闭环';
   const sources = readySources(meta);
@@ -258,6 +266,7 @@ export function buildMockOutline(meta) {
     const slides = applyHardExactSlides(meta, manuscriptSlides);
     return {
       chapter_structure: chapterStructureForSlides(slides),
+      claim_spine_lock: claimSpineLockFromStoryline(meta),
       slides,
     };
   }
@@ -440,6 +449,7 @@ export function buildMockOutline(meta) {
   const slides = applyHardExactSlides(meta, defaultSlides);
   return {
     chapter_structure: chapterStructureForSlides(slides),
+    claim_spine_lock: claimSpineLockFromStoryline(meta),
     slides,
   };
 }

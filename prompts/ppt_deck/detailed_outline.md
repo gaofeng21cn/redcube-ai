@@ -19,6 +19,7 @@
 - 听众可见字段只允许承载标题、结论、证据摘要、边界和必要数字；`speaker_notes`、`transition_sentence`、`page_goal`、`page_objective`、`visual_anchor_tracks` 是讲者/作者工作面，不得复制或改写成页面正文。
 - 如果源材料、题目或管理上下文里存在内部编号、项目编号、source_id、material_id，且用户给出了对外称呼或序号，所有听众可见标题和正文必须使用对外称呼；内部编号只留在 provenance 或 notes，不作为论文标题。
 - 不得直接跳到 HTML；必须为后续逐页设计保留讲授推进关系与证据落点。
+- 必须从 `storyline.claim_spine_lock` 原样回显 `claim_spine_lock`，并让其中 first-use / introduction / proof / resolution 映射全部指向本 stage 的真实 `slide_id`；不得更改 `claim_id`、`claim_text`、`source_refs`、首次具名规则或 `forbidden_drift`。
 
 ## AI-first output schema
 
@@ -26,6 +27,22 @@
 
 ```json
 {
+  "claim_spine_lock": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "<unchanged claim_text from storyline.claim_spine_lock>",
+      "source_refs": ["<unchanged source ref>"],
+      "first_use_naming": {
+        "full_visible_name": "<unchanged full audience-facing name>",
+        "accepted_abbreviation": null,
+        "first_use_slide_id": "S01"
+      },
+      "introduction_slide_id": "S01",
+      "proof_slide_ids": ["S02"],
+      "resolution_slide_id": "S03",
+      "forbidden_drift": ["<unchanged forbidden drift>"]
+    }
+  ],
   "chapter_structure": [
     {
       "chapter_id": "C1",

@@ -212,6 +212,108 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
   });
 });
 
+test('ppt claim spine lock remains canonical across story stages and reaches visual direction', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-lock-'));
+    const runRoute = (deliverableId, route) => runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-claim-lock',
+      deliverableId,
+      route,
+    });
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-claim-lock',
+      deliverableId: 'deck-claim-lock',
+      title: 'MedAutoScience 证据主线',
+      goal: '面向医学人工智能同行讲清同一条来源可追溯的核心判断。',
+    });
+
+    const storylineResult = await runRoute('deck-claim-lock', 'storyline');
+    assert.equal(storylineResult.ok, true);
+    const storyline = readJson(routeArtifactFile(storylineResult));
+    const claimSpineLock = storyline.storyline?.claim_spine_lock;
+    assert.equal(claimSpineLock?.length, 1);
+    assert.deepEqual(claimSpineLock[0], {
+      claim_id: 'CLM-001',
+      claim_text: 'MedAutoScience 证据主线 必须沿同一条事实主线推进到可复述结论',
+      source_refs: [
+        '公开来源：临床指南 / 系统综述 / 监管原则',
+        '公开来源：同行评议论文 / 真实世界研究',
+      ],
+      first_use_naming: {
+        full_visible_name: 'MedAutoScience 证据主线',
+        accepted_abbreviation: null,
+        first_use_slide_id: 'S01',
+      },
+      introduction_slide_id: 'S01',
+      proof_slide_ids: ['S01'],
+      resolution_slide_id: 'S01',
+      forbidden_drift: ['不得把事实主线改写成无来源的宣传结论'],
+    });
+
+    const outlineResult = await runRoute('deck-claim-lock', 'detailed_outline');
+    assert.equal(outlineResult.ok, true);
+    const outline = readJson(routeArtifactFile(outlineResult));
+    assert.deepEqual(outline.detailed_outline?.claim_spine_lock, claimSpineLock);
+
+    const blueprintResult = await runRoute('deck-claim-lock', 'slide_blueprint');
+    assert.equal(blueprintResult.ok, true);
+    const blueprint = readJson(routeArtifactFile(blueprintResult));
+    assert.deepEqual(blueprint.slide_blueprint?.claim_spine_lock, claimSpineLock);
+
+    const restoreClaimLockRequirement = withEnv({
+      REDCUBE_MOCK_REQUIRE_CLAIM_SPINE_LOCK_CONTEXT: '1',
+    });
+    let visualResult;
+    try {
+      visualResult = await runRoute('deck-claim-lock', 'visual_direction');
+    } finally {
+      restoreClaimLockRequirement();
+    }
+    assert.equal(visualResult.ok, true);
+    const visual = readJson(routeArtifactFile(visualResult));
+    assert.deepEqual(visual.visual_direction?.claim_spine_lock, claimSpineLock);
+
+    for (const artifact of [outline.detailed_outline, blueprint.slide_blueprint]) {
+      const slideIds = new Set((artifact?.slides || []).map((slide) => slide.slide_id));
+      assert.equal(slideIds.has(claimSpineLock[0].introduction_slide_id), true);
+      assert.equal(claimSpineLock[0].proof_slide_ids.every((slideId) => slideIds.has(slideId)), true);
+      assert.equal(slideIds.has(claimSpineLock[0].resolution_slide_id), true);
+    }
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-claim-lock',
+      deliverableId: 'deck-claim-drift',
+      title: 'MedAutoScience 证据主线',
+      goal: '面向医学人工智能同行讲清同一条来源可追溯的核心判断。',
+    });
+    assert.equal((await runRoute('deck-claim-drift', 'storyline')).ok, true);
+
+    const restoreClaimDrift = withEnv({
+      REDCUBE_MOCK_PPT_CLAIM_SPINE_DRIFT: '1',
+    });
+    let driftedOutlineResult;
+    try {
+      driftedOutlineResult = await runRoute('deck-claim-drift', 'detailed_outline');
+    } finally {
+      restoreClaimDrift();
+    }
+    assert.equal(driftedOutlineResult.ok, false);
+    assert.match(
+      driftedOutlineResult.run?.error?.message || '',
+      /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+    );
+  });
+});
+
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));

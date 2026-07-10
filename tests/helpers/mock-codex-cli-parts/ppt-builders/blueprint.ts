@@ -5,6 +5,7 @@ export function buildMockBlueprint(meta) {
   const slides = safeArray(meta?.context?.outline?.slides);
   return {
     chapter_goal: '逐页落实讲授逻辑、证据口径与讲者动作',
+    claim_spine_lock: safeArray(meta?.context?.outline?.claim_spine_lock),
     slides: slides.map((slide) => ({
       slide_id: slide.slide_id,
       slide_no: slide.slide_no,

@@ -30,6 +30,82 @@ export function createPptDeckAuthoringNormalizers(deps) {
     return items;
   }
 
+  function normalizeClaimSpineLock(value, label = 'claim_spine_lock') {
+    const claimIds = new Set();
+    const claims = safeArray(value).map((claim, index) => {
+      const claimLabel = `${label}[${index}]`;
+      const claimId = requireText(claim?.claim_id, `${claimLabel}.claim_id`);
+      if (claimIds.has(claimId)) {
+        throw new Error(`Duplicate ${label} claim_id in upstream ppt generation output: ${claimId}`);
+      }
+      claimIds.add(claimId);
+      const acceptedAbbreviation = safeText(claim?.first_use_naming?.accepted_abbreviation);
+      return {
+        claim_id: claimId,
+        claim_text: requireText(claim?.claim_text, `${claimLabel}.claim_text`),
+        source_refs: normalizeStringList(claim?.source_refs, `${claimLabel}.source_refs`, { min: 1, max: 12 }),
+        first_use_naming: {
+          full_visible_name: requireText(
+            claim?.first_use_naming?.full_visible_name,
+            `${claimLabel}.first_use_naming.full_visible_name`,
+          ),
+          accepted_abbreviation: acceptedAbbreviation || null,
+          first_use_slide_id: requireText(
+            claim?.first_use_naming?.first_use_slide_id,
+            `${claimLabel}.first_use_naming.first_use_slide_id`,
+          ),
+        },
+        introduction_slide_id: requireText(
+          claim?.introduction_slide_id,
+          `${claimLabel}.introduction_slide_id`,
+        ),
+        proof_slide_ids: normalizeStringList(
+          claim?.proof_slide_ids,
+          `${claimLabel}.proof_slide_ids`,
+          { min: 1, max: 12 },
+        ),
+        resolution_slide_id: requireText(
+          claim?.resolution_slide_id,
+          `${claimLabel}.resolution_slide_id`,
+        ),
+        forbidden_drift: normalizeStringList(
+          claim?.forbidden_drift,
+          `${claimLabel}.forbidden_drift`,
+          { min: 1, max: 8 },
+        ),
+      };
+    });
+    if (claims.length === 0) {
+      throw new Error(`Missing ${label} in upstream ppt generation output`);
+    }
+    return claims;
+  }
+
+  function preserveClaimSpineLock(value, canonicalValue, label) {
+    const canonical = normalizeClaimSpineLock(canonicalValue, 'storyline.claim_spine_lock');
+    const candidate = normalizeClaimSpineLock(value, label);
+    if (JSON.stringify(candidate) !== JSON.stringify(canonical)) {
+      throw new Error(`${label} must preserve the canonical storyline claim_spine_lock without semantic drift`);
+    }
+    return canonical;
+  }
+
+  function assertClaimSpineSlideMapping(claimSpineLock, slides, label) {
+    const slideIds = new Set(safeArray(slides).map((slide) => safeText(slide?.slide_id)).filter(Boolean));
+    for (const claim of claimSpineLock) {
+      const mappedSlideIds = [
+        claim.first_use_naming.first_use_slide_id,
+        claim.introduction_slide_id,
+        ...claim.proof_slide_ids,
+        claim.resolution_slide_id,
+      ];
+      const missingSlideIds = [...new Set(mappedSlideIds)].filter((slideId) => !slideIds.has(slideId));
+      if (missingSlideIds.length > 0) {
+        throw new Error(`${label} claim ${claim.claim_id} references missing slide ids: ${missingSlideIds.join(', ')}`);
+      }
+    }
+  }
+
   function normalizeOutlineSlide(slide, index, defaultPublicSources) {
     const slideNo = Number(slide?.slide_no || index + 1);
     const renderRecipeId = requireText(slide?.render_recipe_id, `slides[${index}].render_recipe_id`);
@@ -230,10 +306,13 @@ export function createPptDeckAuthoringNormalizers(deps) {
   }
 
   return {
+    assertClaimSpineSlideMapping,
     normalizeBlueprintDraft,
+    normalizeClaimSpineLock,
     normalizeOutlineDraft,
     normalizeTypographyPlan,
     normalizeVisualDirectionDraft,
+    preserveClaimSpineLock,
     summarizeBlueprintSlides,
     summarizeOutlineSlides,
   };

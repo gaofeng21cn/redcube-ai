@@ -51,6 +51,7 @@ export function buildMockStoryline(meta) {
   const title = safeText(meta?.context?.title) || '未命名课件';
   const audience = safeText(meta?.context?.audience) || '专业听众';
   const speaker = safeText(meta?.context?.speaker) || '正式讲者';
+  const sourceRefs = readySources(meta).slice(0, 2);
   return {
     speaker,
     audience,
@@ -64,5 +65,21 @@ export function buildMockStoryline(meta) {
     ],
     resolution: ['听众带走一条可复述的系统主线，而不是一堆内部流程术语'],
     manuscript_evidence_table: buildMockManuscriptEvidenceTable(meta),
+    claim_spine_lock: [
+      {
+        claim_id: 'CLM-001',
+        claim_text: `${title} 必须沿同一条事实主线推进到可复述结论`,
+        source_refs: sourceRefs,
+        first_use_naming: {
+          full_visible_name: title,
+          accepted_abbreviation: null,
+          first_use_slide_id: 'S01',
+        },
+        introduction_slide_id: 'S01',
+        proof_slide_ids: ['S01'],
+        resolution_slide_id: 'S01',
+        forbidden_drift: ['不得把事实主线改写成无来源的宣传结论'],
+      },
+    ],
   };
 }

@@ -83,10 +83,13 @@ export function createPptDeckAuthoringParts(deps) {
     sharedSourceLabels,
   });
   const {
+    assertClaimSpineSlideMapping,
     normalizeBlueprintDraft,
+    normalizeClaimSpineLock,
     normalizeOutlineDraft,
     normalizeTypographyPlan,
     normalizeVisualDirectionDraft,
+    preserveClaimSpineLock,
     summarizeBlueprintSlides,
     summarizeOutlineSlides,
   } = normalizers;
@@ -109,6 +112,7 @@ export function createPptDeckAuthoringParts(deps) {
         hook: normalizeStringList(data?.hook, 'storyline.hook', { min: 1, max: 3 }),
         journey: normalizeStringList(data?.journey, 'storyline.journey', { min: 3, max: 5 }),
         resolution: normalizeStringList(data?.resolution, 'storyline.resolution', { min: 1, max: 3 }),
+        claim_spine_lock: normalizeClaimSpineLock(data?.claim_spine_lock, 'storyline.claim_spine_lock'),
         manuscript_evidence_table: normalizeManuscriptEvidenceTable(
           data?.manuscript_evidence_table,
           contract,
@@ -130,6 +134,7 @@ export function createPptDeckAuthoringParts(deps) {
         hook: safeArray(storylineArtifact?.storyline?.narrative_arc?.hook),
         journey: safeArray(storylineArtifact?.storyline?.narrative_arc?.journey),
         resolution: safeArray(storylineArtifact?.storyline?.narrative_arc?.resolution),
+        claim_spine_lock: safeArray(storylineArtifact?.storyline?.claim_spine_lock),
         manuscript_evidence_table: safeArray(storylineArtifact?.storyline?.manuscript_evidence_table),
       },
       manuscript_evidence_table: safeArray(storylineArtifact?.storyline?.manuscript_evidence_table),
@@ -145,9 +150,17 @@ export function createPptDeckAuthoringParts(deps) {
       context: buildOutlineContext(contract, storylineArtifact),
       outputContract: detailedOutlineOutputContract(),
     });
+    const authoredOutline = normalizeOutlineDraft(data, contract);
+    const claimSpineLock = preserveClaimSpineLock(
+      data?.claim_spine_lock,
+      storylineArtifact?.storyline?.claim_spine_lock,
+      'detailed_outline.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(claimSpineLock, authoredOutline.slides, 'detailed_outline.claim_spine_lock');
     return {
       authoredOutline: {
-        ...normalizeOutlineDraft(data, contract),
+        ...authoredOutline,
+        claim_spine_lock: claimSpineLock,
         manuscript_evidence_table: normalizeManuscriptEvidenceTable(
           storylineArtifact?.storyline?.manuscript_evidence_table,
           contract,
@@ -169,18 +182,38 @@ export function createPptDeckAuthoringParts(deps) {
         manuscript_evidence_table: safeArray(outlineArtifact?.detailed_outline?.manuscript_evidence_table),
         outline: {
           chapter_structure: safeArray(outlineArtifact?.detailed_outline?.chapter_structure),
+          claim_spine_lock: safeArray(outlineArtifact?.detailed_outline?.claim_spine_lock),
           slides: summarizeOutlineSlides(outlineArtifact),
         },
       },
       outputContract: slideBlueprintOutputContract(),
     });
+    const authoredBlueprint = normalizeBlueprintDraft(data, contract);
+    const claimSpineLock = preserveClaimSpineLock(
+      data?.claim_spine_lock,
+      outlineArtifact?.detailed_outline?.claim_spine_lock,
+      'slide_blueprint.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(claimSpineLock, authoredBlueprint.slides, 'slide_blueprint.claim_spine_lock');
     return {
-      authoredBlueprint: normalizeBlueprintDraft(data, contract),
+      authoredBlueprint: {
+        ...authoredBlueprint,
+        claim_spine_lock: claimSpineLock,
+      },
       generationRuntime,
     };
   }
 
   async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, baselineDeliverableId, adapter) {
+    const claimSpineLock = normalizeClaimSpineLock(
+      blueprintArtifact?.slide_blueprint?.claim_spine_lock,
+      'slide_blueprint.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(
+      claimSpineLock,
+      blueprintArtifact?.slide_blueprint?.slides,
+      'slide_blueprint.claim_spine_lock',
+    );
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -191,6 +224,7 @@ export function createPptDeckAuthoringParts(deps) {
         mode,
         baseline_deliverable_id: safeText(baselineDeliverableId) || null,
         blueprint: {
+          claim_spine_lock: claimSpineLock,
           slides: summarizeBlueprintSlides(blueprintArtifact),
         },
       },
@@ -221,6 +255,7 @@ export function createPptDeckAuthoringParts(deps) {
           journey: safeArray(authoredStoryline.journey),
           resolution: safeArray(authoredStoryline.resolution),
         },
+        claim_spine_lock: safeArray(authoredStoryline.claim_spine_lock),
         source_truth_input_mode: sharedSourceInputMode(contract) || 'seed_only',
         source_truth_confidence: sharedSourceConfidence(contract) || 'low',
         source_truth_material_ids: sharedSourceMaterialIds(contract),
@@ -231,6 +266,7 @@ export function createPptDeckAuthoringParts(deps) {
         creative_sources: {
           core_metaphor: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
           narrative_arc: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
+          claim_spine_lock: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
           manuscript_evidence_table: runtimeCreativeSource('outline_major_text', CREATIVE_MATERIALIZED_FROM, generationRuntime, adapter),
         },
       },

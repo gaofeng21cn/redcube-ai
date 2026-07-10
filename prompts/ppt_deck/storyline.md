@@ -12,7 +12,7 @@
 - AI 必须自行产出 speaker / audience / style / core_metaphor / hook / journey / resolution；不要复制 prompt 中的字段占位或默认句式。
 - 关键转折必须由事实资产支撑，不做口号堆砌。
 - 明确哪些判断必须在后续详细大纲与证据页展开。
-- 为核心判断保持稳定 claim identity：在 `journey` 中明确判断如何被引入、由哪类证据证明、最终如何收束；后续 stage 不得静默改写其含义。
+- 为核心判断建立 `claim_spine_lock`：每个 claim 使用稳定 `claim_id` 和 `claim_text`，绑定 `source_refs`、首次具名规则、引入/证明/收束页与 `forbidden_drift`；后续 stage 不得静默改写其含义。
 - 输入充分时一次完成当前 stage，让 runtime 自动进入下一 stage；只有真实 source/scope/approval 边界改变故事结构时才返回人工决策需求。
 
 ## runtime_artifact
@@ -36,6 +36,22 @@
     ],
     "resolution": [
       "<AI-authored closeout statement grounded in the full source context>"
+    ],
+    "claim_spine_lock": [
+      {
+        "claim_id": "CLM-001",
+        "claim_text": "<stable source-backed claim>",
+        "source_refs": ["<source ref>"],
+        "first_use_naming": {
+          "full_visible_name": "<full audience-facing name>",
+          "accepted_abbreviation": null,
+          "first_use_slide_id": "S01"
+        },
+        "introduction_slide_id": "S01",
+        "proof_slide_ids": ["S02"],
+        "resolution_slide_id": "S03",
+        "forbidden_drift": ["<meaning or wording drift that later stages must not introduce>"]
+      }
     ],
     "manuscript_evidence_table": [
       {

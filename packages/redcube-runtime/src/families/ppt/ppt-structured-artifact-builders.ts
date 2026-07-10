@@ -137,6 +137,7 @@ export function buildPptDetailedOutlineArtifact({
     lifecycle_stage: lifecycleStage,
     detailed_outline: {
       chapter_structure: safeArray(authoredOutline?.chapter_structure),
+      claim_spine_lock: safeArray(authoredOutline?.claim_spine_lock),
       page_budget: { total_slides: safeArray(authoredOutline?.slides).length },
       manuscript_evidence_table: safeArray(authoredOutline?.manuscript_evidence_table).map((row) => ({ manuscript_label: safeText(row?.manuscript_label), research_question: safeText(row?.research_question), primary_endpoint: safeText(row?.primary_endpoint), method_or_model: safeText(row?.method_or_model), key_numeric_results: safeArray(row?.key_numeric_results).map((item) => safeText(item)).filter(Boolean), main_conclusion: safeText(row?.main_conclusion), boundary: safeText(row?.boundary) })).filter((row) => row.manuscript_label && row.key_numeric_results.length > 0),
       slides: safeArray(authoredOutline?.slides).map((slide) => ({
@@ -183,6 +184,7 @@ export function buildPptSlideBlueprintArtifact({
     lifecycle_stage: lifecycleStage,
     slide_blueprint: {
       chapter_goal: safeText(authoredBlueprint?.chapter_goal),
+      claim_spine_lock: safeArray(authoredBlueprint?.claim_spine_lock),
       slides: safeArray(authoredBlueprint?.slides).map((slide) => normalizeBlueprintSlide(
         slide,
         contract,
@@ -226,6 +228,7 @@ export function buildPptVisualDirectionArtifact({
     creative_execution: creativeExecution(lifecycleStage, generationRuntime),
     lifecycle_stage: lifecycleStage,
     visual_direction: {
+      claim_spine_lock: safeArray(blueprintArtifact?.slide_blueprint?.claim_spine_lock),
       visual_manifest: safeText(authoredVisualDirection?.visual_manifest),
       what_it_is: safeArray(authoredVisualDirection?.what_it_is),
       what_it_is_not: safeArray(authoredVisualDirection?.what_it_is_not),

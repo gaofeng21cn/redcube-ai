@@ -49,12 +49,17 @@ necessity_feasibility_landing_check:
   credible_landing_path:
 
 claim_spine_lock:
-  claim_id:
-  source_refs:
-  introduction_slide_id:
-  proof_slide_ids:
-  resolution_slide_id:
-  forbidden_drift:
+  - claim_id:
+    claim_text:
+    source_refs:
+    first_use_naming:
+      full_visible_name:
+      accepted_abbreviation:
+      first_use_slide_id:
+    introduction_slide_id:
+    proof_slide_ids:
+    resolution_slide_id:
+    forbidden_drift:
 ```
 
 ## Example

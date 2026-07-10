@@ -27,6 +27,8 @@
 
 `evidence_points` 是后续 HTML 的读者可见证据层，不是内部来源说明；主要结果页中的 AUROC、Brier、校准、事件率、风险梯度、Knosp 分布等数字必须保留在 `evidence_points` 或 `page_core_content`。
 
+必须从 `outline.claim_spine_lock` 原样回显 `claim_spine_lock`，并保持其 first-use / introduction / proof / resolution 映射落在本 stage 的真实 `slide_id`；不得改写稳定 claim、来源引用、首次具名规则或 `forbidden_drift`。
+
 ## 听众可见边界
 
 - `title`、`core_sentence`、`evidence_points`、`page_core_content`、关键图示标签和底部边界条是听众可见面，只能写研究内容、证据结果、边界和团队需要知道的决策信息。
@@ -44,6 +46,22 @@
 ```json
 {
   "chapter_goal": "<AI-authored goal for this outline chapter or deck section>",
+  "claim_spine_lock": [
+    {
+      "claim_id": "CLM-001",
+      "claim_text": "<unchanged claim_text from outline.claim_spine_lock>",
+      "source_refs": ["<unchanged source ref>"],
+      "first_use_naming": {
+        "full_visible_name": "<unchanged full audience-facing name>",
+        "accepted_abbreviation": null,
+        "first_use_slide_id": "S01"
+      },
+      "introduction_slide_id": "S01",
+      "proof_slide_ids": ["S02"],
+      "resolution_slide_id": "S03",
+      "forbidden_drift": ["<unchanged forbidden drift>"]
+    }
+  ],
   "slides": [
     {
       "slide_id": "S01",

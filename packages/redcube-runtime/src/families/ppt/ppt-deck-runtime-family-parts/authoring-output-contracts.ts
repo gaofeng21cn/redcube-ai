@@ -1,4 +1,23 @@
 // @ts-nocheck
+function claimSpineLockOutputContract() {
+  return [
+    {
+      claim_id: 'CLM-001',
+      claim_text: '<stable source-backed claim>',
+      source_refs: ['<source ref>'],
+      first_use_naming: {
+        full_visible_name: '<full audience-facing name>',
+        accepted_abbreviation: '<accepted abbreviation or null>',
+        first_use_slide_id: '<slide id>',
+      },
+      introduction_slide_id: '<slide id>',
+      proof_slide_ids: ['<slide id>'],
+      resolution_slide_id: '<slide id>',
+      forbidden_drift: ['<meaning or wording drift that later stages must not introduce>'],
+    },
+  ];
+}
+
 export function storylineOutputContract() {
   return {
     speaker: '<string>',
@@ -8,6 +27,7 @@ export function storylineOutputContract() {
     hook: ['<string>'],
     journey: ['<string>', '<string>', '<string>'],
     resolution: ['<string>'],
+    claim_spine_lock: claimSpineLockOutputContract(),
     manuscript_evidence_table: [
       {
         manuscript_label: '第一篇',
@@ -24,6 +44,7 @@ export function storylineOutputContract() {
 
 export function detailedOutlineOutputContract() {
   return {
+    claim_spine_lock: claimSpineLockOutputContract(),
     chapter_structure: [
       { chapter_id: 'C1', title: '<string>', slide_range: '01-03' },
     ],
@@ -53,6 +74,7 @@ export function detailedOutlineOutputContract() {
 export function slideBlueprintOutputContract() {
   return {
     chapter_goal: '<string>',
+    claim_spine_lock: claimSpineLockOutputContract(),
     slides: detailedOutlineOutputContract().slides,
   };
 }

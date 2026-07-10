@@ -7,6 +7,7 @@
 - `rhythm_curve` 必须覆盖当前 blueprint 中的每一页；不得照抄示例 slide_id，也不得把长 deck 压成固定 8 页节奏。
 - `peak_pages` 必须从当前 blueprint 的真实 `slide_id` 中选择，数量由内容峰值决定；不要默认使用 S01/S04/S06/S08。
 - `page_family_ceiling` 由 AI 根据当前 deck 的页面数量、layout family 分布与叙事重复风险自行设定；它是视觉多样性约束，不是页数预算。
+- `blueprint.claim_spine_lock` 是不可改写的叙事合同：视觉编码必须让 claim 的首次具名、引入、证明和收束页角色可观察，并遵守 `source_refs` 与 `forbidden_drift`；不得在视觉导演阶段重命名或改写 claim。
 - 不得把 `runtime_seed` 或输出 schema 中的占位值当成默认视觉方向。
 
 要求：
