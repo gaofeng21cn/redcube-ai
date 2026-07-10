@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import {
   NATIVE_PPT_AGGREGATED_CHECK_KEYS,
@@ -29,6 +30,23 @@ export function createNativePptProofReviewParts({
       && expected.every((value, index) => actual[index] === value);
   }
 
+  function requireNativePptShaBinding(bundle: JsonRecord, shapeManifest: JsonRecord): void {
+    const renderProof = shapeManifest?.render_proof || bundle?.render_proof || {};
+    const packageReadback = shapeManifest?.package_readback
+      || shapeManifest?.officecli_gate?.package_readback
+      || bundle?.package_readback
+      || {};
+    const pptxFile = safeText(bundle?.pptx_file || shapeManifest?.pptx_file || renderProof?.pptx_file);
+    const currentSha = pptxFile && existsSync(pptxFile)
+      ? createHash('sha256').update(readFileSync(pptxFile)).digest('hex')
+      : '';
+    const packageSha = safeText(packageReadback?.pptx_sha256);
+    const renderSha = safeText(renderProof?.source_pptx_sha256);
+    if (!currentSha || !packageSha || !renderSha || currentSha !== packageSha || currentSha !== renderSha) {
+      throw new Error('Native PPTX SHA mismatch: current file, package readback, and render proof must identify the same PPTX');
+    }
+  }
+
   function requireNativeEngineContract(payload: JsonRecord): JsonRecord {
     const contract = payload?.engine_contract || {};
     const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
@@ -57,6 +75,7 @@ export function createNativePptProofReviewParts({
   function requireTrueRenderProof(payload: JsonRecord, shapeManifest: JsonRecord): JsonRecord {
     const expected = expectedNativeEngineContract()?.true_render_proof || {};
     const proof = payload?.render_proof || shapeManifest?.render_proof || {};
+    requireNativePptShaBinding(payload, shapeManifest);
     const previewScreenshots = safeArray(proof?.preview_screenshots || payload?.preview_screenshots);
     const valid = safeText(proof?.source_surface_kind) === 'native_pptx'
       && safeText(proof?.renderer_kind) === safeText(expected?.renderer_kind)
@@ -135,11 +154,11 @@ export function createNativePptProofReviewParts({
     }
     const nativeShapes = safeArray(manifestSlide?.native_shapes);
     const hasChartShape = nativeShapes.some((shape) => {
-      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
+      const text = `${safeText(shape?.kind)} ${safeText(shape?.semantic_kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
       return text.includes('chart');
     });
     const hasTableShape = nativeShapes.some((shape) => {
-      const text = `${safeText(shape?.kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
+      const text = `${safeText(shape?.kind)} ${safeText(shape?.semantic_kind)} ${safeText(shape?.role)} ${safeText(shape?.quality_role)}`.toLowerCase();
       return text.includes('table');
     });
     if (hasChartShape && (!Array.isArray(metrics.chart_metrics) || metrics.chart_metrics.length === 0)) {
@@ -166,6 +185,7 @@ export function createNativePptProofReviewParts({
   function nativeMechanicalReviewPayload(nativeArtifact: JsonRecord | null) {
     const bundle = nativeArtifact?.native_ppt_bundle || {};
     const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
+    requireNativePptShaBinding(bundle, shapeManifest);
     const expectedProof = expectedNativeEngineContract()?.true_render_proof || {};
     const renderProof = shapeManifest?.render_proof || {};
     const renderProofScreenshots = safeArray(renderProof?.preview_screenshots);
@@ -316,7 +336,9 @@ export function createNativePptProofReviewParts({
   }
 
   function summarizeNativeSlides(nativeArtifact: JsonRecord | null): JsonRecord[] {
-    const shapeManifest = readNativeShapeManifest(safeText(nativeArtifact?.native_ppt_bundle?.shape_manifest_file));
+    const bundle = nativeArtifact?.native_ppt_bundle || {};
+    const shapeManifest = readNativeShapeManifest(safeText(bundle?.shape_manifest_file));
+    requireNativePptShaBinding(bundle, shapeManifest);
     const manifestSlidesById = new Map(
       safeArray(shapeManifest?.slides).map((slide) => [safeText(slide?.slide_id), slide]),
     );

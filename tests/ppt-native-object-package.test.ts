@@ -1,7 +1,8 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import path from 'node:path';
 import { buildNativeShapePlanOutputContract } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-contract.ts';
 import {
   createAiSlide,
@@ -31,8 +32,47 @@ test('native PPT shape-plan contract exposes typed object, template, and present
     assert.equal(objectContract.allowed_kind_values.includes(kind), true, kind);
   }
   assert.equal(objectContract.unknown_kind_policy, 'fail_fast_before_materialization');
+  assert.equal(objectContract.object_specific_fields.picture[0], 'source_file | source_data_uri');
   assert.deepEqual(contract.template_intake_contract.supported_modes, ['replace_slides', 'fill_existing']);
+  assert.equal(contract.template_intake_contract.source_canvas_must_be_preserved, true);
+  assert.equal(contract.template_intake_contract.fill_existing_requires_complete_target_coverage, true);
   assert.equal(contract.presentation_semantics_contract.package_readback_required, true);
+});
+
+test('native PPT materializer rejects malformed OfficeCLI JSON instead of treating it as zero issues', () => {
+  const python = resolveTestPythonCommand();
+  const result = spawnSync(python.command, [...(python.args || []), '-c', `
+import subprocess
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import parse_json_output
+
+completed = subprocess.CompletedProcess(['officecli'], 0, stdout='{not-json', stderr='')
+parse_json_output(completed)
+`], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}\n${result.stderr}`, /invalid JSON/);
+});
+
+test('native PPT materializer rejects empty OfficeCLI JSON output', () => {
+  const python = resolveTestPythonCommand();
+  const result = spawnSync(python.command, [...(python.args || []), '-c', `
+import subprocess
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import parse_json_output
+
+completed = subprocess.CompletedProcess(['officecli'], 0, stdout='', stderr='')
+parse_json_output(completed)
+`], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+
+  assert.notEqual(result.status, 0);
+  assert.match(`${result.stdout}\n${result.stderr}`, /empty JSON/);
 });
 
 test('typed native pictures are structural visuals without role-name disguise', () => {
@@ -74,8 +114,9 @@ test('real build_deck preserves native table metrics and body font size in the m
   assert.deepEqual(table.data, [['Metric', 'Value'], ['Quality', 'Pass']]);
 });
 
-test('native PPT materializer writes distinct editable objects and motion parts', () => {
-  const { workspaceRoot, pictureDataUri } = createNativeObjectWorkspace();
+test('native PPT materializer writes distinct editable objects and semantic package readback', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace();
+  const pictureFile = path.resolve('assets/branding/redcube-ai-logo.png');
   const result = runNativeObjectMaterializer({
     workspaceRoot,
     payload: {
@@ -84,7 +125,8 @@ test('native PPT materializer writes distinct editable objects and motion parts'
         background: '#FFFFFF',
         speaker_notes: 'Explain the object families, then reveal the data chart.',
         transition: {
-          type: 'fade',
+          type: 'push',
+          direction: 'left',
           duration_ms: 650,
           advance_time_ms: 4000,
           advance_click: false,
@@ -119,13 +161,13 @@ test('native PPT materializer writes distinct editable objects and motion parts'
             preset: 'diamond', fill: '#D7E8F5', line: '#17324D',
           }),
           shape('S01-picture', 'picture', bounds(3.8, 1.65, 1.6, 1.25), {
-            source_data_uri: pictureDataUri, alt: 'Two pixel proof image', crop: '0,0,0,0',
+            source_file: pictureFile, alt: 'RedCube AI logo', crop: '0,0,0,0',
           }),
           shape('S01-chart', 'chart', bounds(0.8, 3.0, 4.8, 2.6), {
             materialization_intent: 'native_data_object',
             chart_type: 'column',
-            categories: ['Q1', 'Q2', 'Q3'],
-            series: [{ name: 'Actual', values: [3, 5, 8], color: '#2563EB' }],
+            categories: ['North, East', 'South'],
+            series: [{ name: 'Actual', values: [3, 8], color: '#2563EB' }],
             title: 'Quarterly result',
           }),
           shape('S01-table', 'table', bounds(6.0, 3.0, 3.3, 2.4), {
@@ -133,6 +175,10 @@ test('native PPT materializer writes distinct editable objects and motion parts'
             data: [['Metric', 'Value'], ['Quality', 'Pass'], ['Objects', '8']],
             first_row: true,
             header_fill: '#17324D',
+            header_color: '#FFFFFF',
+            header_font: 'Aptos Display',
+            header_font_size: 15,
+            body_font_size: 13,
           }),
           shape('S01-group', 'group', bounds(6.0, 1.65, 3.3, 1.1), {
             children: [
@@ -170,18 +216,48 @@ test('native PPT materializer writes distinct editable objects and motion parts'
   assert.ok(result.package_readback.part_counts.media >= 1);
   assert.ok(result.package_readback.part_counts.notes >= 1);
   assert.equal(result.package_readback.slides[0].speaker_notes.includes('object families'), true);
-  assert.equal(result.package_readback.slides[0].transition.type, 'fade');
+  assert.equal(result.package_readback.slides[0].transition.type, 'push');
+  assert.equal(result.package_readback.slides[0].transition.direction, 'left');
+  assert.equal(result.package_readback.slides[0].transition.duration_ms, 650);
   assert.equal(result.package_readback.slides[0].animation_targets.includes('S01-title'), true);
   const titleObject = result.package_readback.slides[0].objects.find((item) => item.name === 'S01-title');
+  assert.deepEqual(result.package_readback.slides[0].animations, [{
+    target_object_id: titleObject.object_id,
+    target_shape_name: 'S01-title',
+    effect: 'fade',
+    class: 'entrance',
+    trigger: 'afterPrevious',
+    duration_ms: 450,
+    delay_ms: 100,
+    preset_id: 10,
+  }]);
   assert.ok(titleObject.paragraph_count >= 2);
   assert.ok(titleObject.run_count >= 2);
   assert.equal(titleObject.bullet_count, 1);
   const byName = Object.fromEntries(result.package_readback.slides[0].objects.map((item) => [item.name, item]));
   assert.equal(byName['S01-chart'].series_count, 1);
-  assert.equal(byName['S01-chart'].category_count, 3);
+  assert.equal(byName['S01-chart'].category_count, 2);
+  assert.deepEqual(byName['S01-chart'].categories, ['North, East', 'South']);
+  assert.deepEqual(byName['S01-chart'].series, [{ name: 'Actual', values: [3, 8] }]);
   assert.equal(byName['S01-table'].row_count, 3);
   assert.equal(byName['S01-table'].column_count, 2);
+  assert.deepEqual(byName['S01-table'].data, [['Metric', 'Value'], ['Quality', 'Pass'], ['Objects', '8']]);
+  assert.deepEqual(byName['S01-table'].cells[0], {
+    row: 1,
+    column: 1,
+    text: 'Metric',
+    font: 'Aptos Display',
+    font_size_pt: 15,
+    bold: true,
+    color: '#FFFFFF',
+    fill: '#17324D',
+  });
+  assert.equal(byName['S01-table'].cells[2].font_size_pt, 13);
   assert.ok(byName['S01-picture'].embedded_size_bytes > 0);
+  assert.equal(byName['S01-picture'].alt, 'RedCube AI logo');
+  assert.equal(byName['S01-picture'].alt_text, 'RedCube AI logo');
+  assert.equal(byName['S01-picture'].has_alt, true);
+  assert.deepEqual(byName['S01-picture'].crop, { left: 0, top: 0, right: 0, bottom: 0 });
   assert.equal(byName['S01-group'].child_object_count, 2);
   assert.ok(byName['S01-path'].path_segment_count >= 5);
   assert.equal(byName['S01-connector'].tail_end, 'triangle');
@@ -216,6 +292,26 @@ test('native PPT materializer writes distinct editable objects and motion parts'
   for (const kind of ['text_box', 'shape', 'connector', 'picture', 'chart', 'table', 'group', 'path']) {
     assert.ok(relocated.object_type_counts[kind] >= 1, `relocated ${kind} missing`);
   }
+});
+
+test('native PPT charts reject series whose value count does not match categories', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-chart-length-');
+  const failure = runNativeObjectMaterializerFailure({
+    workspaceRoot,
+    payload: {
+      slides: [{
+        slide_id: 'S01',
+        _editable_native_shapes: [shape('S01-chart', 'chart', bounds(1, 1, 8, 4), {
+          materialization_intent: 'native_data_object',
+          categories: ['A', 'B'],
+          series: [{ name: 'Actual', values: [1] }],
+        })],
+      }],
+    },
+  });
+
+  assert.notEqual(failure.status, 0);
+  assert.match(`${failure.stdout}\n${failure.stderr}`, /series 1 value count must match categories/);
 });
 
 test('native PPT materializer fails fast instead of degrading unknown kinds to rectangles', () => {

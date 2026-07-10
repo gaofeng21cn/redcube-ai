@@ -7,6 +7,7 @@ from redcube_ai.native_helpers.ppt_deck.native_layout_constants import SLIDE_HEI
 from redcube_ai.native_helpers.ppt_deck.native_manifest_qa import fail_closed_on_manifest_qa
 from redcube_ai.native_helpers.ppt_deck.native_package import (
     copy_template_source,
+    patch_chart_data,
     patch_custom_paths,
     read_pptx_package,
     template_preservation,
@@ -31,14 +32,17 @@ __all__ = [
 ]
 
 
-def parse_json_output(completed: subprocess.CompletedProcess, fallback):
+def parse_json_output(completed: subprocess.CompletedProcess):
     text = safe_text(completed.stdout)
     if not text:
-        return fallback
+        raise RuntimeError('officecli returned empty JSON output')
     try:
         return json.loads(text)
-    except json.JSONDecodeError:
-        return {'raw_stdout': text}
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(
+            'officecli returned invalid JSON: '
+            + json.dumps({'stdout': text, 'stderr': safe_text(completed.stderr)}, ensure_ascii=False)
+        ) from exc
 
 
 def issue_count(payload: dict) -> int:
@@ -110,6 +114,7 @@ def _collect_object_commands(slide_data: dict, slide_index: int):
     commands = []
     groups = []
     path_specs = []
+    chart_specs = []
     flattened = []
 
     def collect(shape_spec: dict) -> None:
@@ -136,11 +141,13 @@ def _collect_object_commands(slide_data: dict, slide_index: int):
         flattened.append(shape_spec)
         if kind == 'path':
             path_specs.append({'slide_index': slide_index, 'shape_spec': shape_spec})
+        if kind == 'chart':
+            chart_specs.append({'slide_index': slide_index, 'shape_spec': shape_spec})
 
     for shape_spec in native_ai_design_shapes(slide_data):
         collect(shape_spec)
     commands.sort(key=lambda command: command.get('type') == 'connector')
-    return commands, groups, path_specs, flattened
+    return commands, groups, path_specs, chart_specs, flattened
 
 
 def _apply_paragraph_and_run_formatting(officecli: str, output_pptx: Path, slide_index: int, shape_spec: dict) -> int:
@@ -176,6 +183,50 @@ def _apply_paragraph_and_run_formatting(officecli: str, output_pptx: Path, slide
                 _run_officecli(officecli, ['set', str(output_pptx), paragraph_path, *_prop_args(run_props)])
                 command_count += 1
             offset = end
+    return command_count
+
+
+def _apply_table_formatting(officecli: str, output_pptx: Path, slide_index: int, shape_spec: dict) -> int:
+    if canonical_object_kind(shape_spec) not in {'table', 'metric_grid'}:
+        return 0
+    data = safe_list(shape_spec.get('data'))
+    if not data:
+        return 0
+    body_props = {}
+    for source_key, target_key in [
+        ('body_font', 'font'),
+        ('body_font_size', 'size'),
+        ('body_color', 'color'),
+    ]:
+        if shape_spec.get(source_key) not in (None, ''):
+            body_props[target_key] = shape_spec[source_key]
+    header_props = dict(body_props)
+    for source_key, target_key in [
+        ('header_font', 'font'),
+        ('header_font_size', 'size'),
+        ('header_color', 'color'),
+    ]:
+        if shape_spec.get(source_key) not in (None, ''):
+            header_props[target_key] = shape_spec[source_key]
+    if any(shape_spec.get(key) not in (None, '') for key in ('header_font', 'header_font_size', 'header_color')):
+        header_props['bold'] = bool(shape_spec.get('header_bold', True))
+    command_count = 0
+    table_path = _object_path(slide_index, shape_spec)
+    for row_index, row in enumerate(data, 1):
+        props = header_props if row_index == 1 and shape_spec.get('first_row', True) else body_props
+        if not props:
+            continue
+        for column_index in range(1, len(row) + 1):
+            _run_officecli(
+                officecli,
+                [
+                    'set',
+                    str(output_pptx),
+                    f'{table_path}/tr[{row_index}]/tc[{column_index}]',
+                    *_prop_args(props),
+                ],
+            )
+            command_count += 1
     return command_count
 
 
@@ -288,45 +339,75 @@ def _template_mode(template_intake: dict | None) -> str:
     return mode
 
 
+def _fill_existing_slide_indices(slides: list[dict], slide_count: int) -> list[int]:
+    indices = []
+    for index, slide_data in enumerate(slides, 1):
+        binding = slide_data.get('template_layout_binding') if isinstance(slide_data.get('template_layout_binding'), dict) else {}
+        target_slide_index = binding.get('target_slide_index')
+        if target_slide_index in (None, ''):
+            target_slide_index = index
+        try:
+            indices.append(int(target_slide_index))
+        except (TypeError, ValueError) as exc:
+            raise ValueError('native PPT fill_existing target_slide_index must be an integer') from exc
+    expected = list(range(1, slide_count + 1))
+    if sorted(indices) != expected:
+        raise ValueError(
+            'native PPT fill_existing requires unique complete target_slide_index coverage: '
+            f'expected {expected}, got {indices}'
+        )
+    return indices
+
+
 def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | None = None) -> dict:
     officecli = shutil.which('officecli')
     if not officecli:
         raise RuntimeError('native PPT officecli materializer requires officecli on PATH')
     output_pptx = Path(output_pptx)
     output_pptx.parent.mkdir(parents=True, exist_ok=True)
-    output_pptx.unlink(missing_ok=True)
     mode = _template_mode(template_intake)
     template_before = None
+    fill_existing_indices = []
     if mode == 'none':
+        output_pptx.unlink(missing_ok=True)
         _run_officecli(officecli, ['create', str(output_pptx)])
     else:
         source_pptx = safe_text((template_intake or {}).get('source_pptx'))
         if not source_pptx:
             raise ValueError('native PPT template intake requires source_pptx')
+        source_path = Path(source_pptx).resolve()
+        if source_path == output_pptx.resolve():
+            raise ValueError('native PPT template source_pptx and output_pptx must be different files')
+        source_readback = read_pptx_package(source_path)
+        if mode == 'fill_existing':
+            fill_existing_indices = _fill_existing_slide_indices(
+                slides,
+                int(source_readback.get('slide_count') or 0),
+            )
+        output_pptx.unlink(missing_ok=True)
         template_before = copy_template_source(Path(source_pptx), output_pptx)
-        if mode == 'fill_existing' and len(slides) != int(template_before.get('slide_count') or 0):
-            raise ValueError('native PPT fill_existing requires one plan slide for every source slide')
 
     commands = []
     groups = []
     path_specs = []
+    chart_specs = []
     flattened = {}
     text_probe = []
     slide_indices = []
     _run_officecli(officecli, ['open', str(output_pptx)])
     try:
-        _run_officecli(officecli, [
-            'set', str(output_pptx), '/',
-            '--prop', f'slideWidth={SLIDE_WIDTH_IN:g}in',
-            '--prop', f'slideHeight={SLIDE_HEIGHT_IN:g}in',
-        ])
+        if mode == 'none':
+            _run_officecli(officecli, [
+                'set', str(output_pptx), '/',
+                '--prop', f'slideWidth={SLIDE_WIDTH_IN:g}in',
+                '--prop', f'slideHeight={SLIDE_HEIGHT_IN:g}in',
+            ])
         if mode == 'replace_slides':
             for slide_index in range(int(template_before.get('slide_count') or 0), 0, -1):
                 _run_officecli(officecli, ['remove', str(output_pptx), f'/slide[{slide_index}]'])
         for index, slide_data in enumerate(slides, 1):
             if mode == 'fill_existing':
-                binding = slide_data.get('template_layout_binding') if isinstance(slide_data.get('template_layout_binding'), dict) else {}
-                slide_index = int(binding.get('target_slide_index') or index)
+                slide_index = fill_existing_indices[index - 1]
                 background = safe_text(slide_data.get('background'))
                 if background:
                     commands.append({
@@ -348,10 +429,11 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
                     },
                 })
             slide_indices.append(slide_index)
-            object_commands, object_groups, object_paths, object_specs = _collect_object_commands(slide_data, slide_index)
+            object_commands, object_groups, object_paths, object_charts, object_specs = _collect_object_commands(slide_data, slide_index)
             commands.extend(object_commands)
             groups.extend(object_groups)
             path_specs.extend(object_paths)
+            chart_specs.extend(object_charts)
             flattened[slide_index] = object_specs
             text_probe.extend(
                 safe_text(record.get('text'))
@@ -363,6 +445,7 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
         for slide_index, object_specs in flattened.items():
             for shape_spec in object_specs:
                 post_command_count += _apply_paragraph_and_run_formatting(officecli, output_pptx, slide_index, shape_spec)
+                post_command_count += _apply_table_formatting(officecli, output_pptx, slide_index, shape_spec)
         post_command_count += _apply_groups(officecli, output_pptx, groups)
         post_command_count += _apply_notes_and_motion(officecli, output_pptx, slides, slide_indices, flattened)
         _run_officecli(officecli, ['save', str(output_pptx)])
@@ -370,6 +453,7 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
         _run_officecli(officecli, ['close', str(output_pptx)])
 
     patch_custom_paths(output_pptx, path_specs)
+    patch_chart_data(output_pptx, chart_specs)
     _run_officecli(officecli, ['open', str(output_pptx)])
     try:
         validate = _run_officecli(officecli, ['validate', str(output_pptx), '--json'])
@@ -377,9 +461,9 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
         text = _run_officecli(officecli, ['view', str(output_pptx), 'text', '--json'])
     finally:
         _run_officecli(officecli, ['close', str(output_pptx)])
-    validate_payload = parse_json_output(validate, {})
-    issues_payload = parse_json_output(issues, {})
-    text_payload = parse_json_output(text, {})
+    validate_payload = parse_json_output(validate)
+    issues_payload = parse_json_output(issues)
+    text_payload = parse_json_output(text)
     validate_count = issue_count(validate_payload)
     issues_count = issue_count(issues_payload)
     if validate_count > 0 or issues_count > 0:
@@ -393,7 +477,15 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
             }, ensure_ascii=False, sort_keys=True)
         )
     package_readback = read_pptx_package(output_pptx)
-    geometry_audit = pptx_geometry_audit(output_pptx)
+    expected_canvas = (template_before or {}).get('canvas_in') or {
+        'width': SLIDE_WIDTH_IN,
+        'height': SLIDE_HEIGHT_IN,
+    }
+    geometry_audit = pptx_geometry_audit(
+        output_pptx,
+        expected_width_in=float(expected_canvas.get('width') or SLIDE_WIDTH_IN),
+        expected_height_in=float(expected_canvas.get('height') or SLIDE_HEIGHT_IN),
+    )
     if not geometry_audit['ok']:
         raise RuntimeError(
             'native PPTX geometry audit failed: '

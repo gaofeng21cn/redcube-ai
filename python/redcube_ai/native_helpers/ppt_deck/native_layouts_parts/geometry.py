@@ -91,7 +91,11 @@ def shape_rect_from_ai_bounds(shape_spec: dict) -> dict:
     }
 
 
-def pptx_geometry_audit(pptx_file: Path) -> dict:
+def pptx_geometry_audit(
+    pptx_file: Path,
+    expected_width_in: float = SLIDE_WIDTH_IN,
+    expected_height_in: float = SLIDE_HEIGHT_IN,
+) -> dict:
     overflows = []
     with ZipFile(pptx_file) as package:
         presentation = ElementTree.fromstring(package.read('ppt/presentation.xml'))
@@ -142,12 +146,12 @@ def pptx_geometry_audit(pptx_file: Path) -> dict:
                         'right_in': round(right / EMU_PER_INCH, 4),
                         'bottom_in': round(bottom / EMU_PER_INCH, 4),
                     })
-    size_ok = abs(slide_width_in - SLIDE_WIDTH_IN) < 0.001 and abs(slide_height_in - SLIDE_HEIGHT_IN) < 0.001
+    size_ok = abs(slide_width_in - expected_width_in) < 0.001 and abs(slide_height_in - expected_height_in) < 0.001
     return {
         'slide_width_in': round(slide_width_in, 4),
         'slide_height_in': round(slide_height_in, 4),
-        'expected_slide_width_in': SLIDE_WIDTH_IN,
-        'expected_slide_height_in': SLIDE_HEIGHT_IN,
+        'expected_slide_width_in': round(expected_width_in, 4),
+        'expected_slide_height_in': round(expected_height_in, 4),
         'slide_size_ok': size_ok,
         'overflow_count': len(overflows),
         'overflows': overflows,

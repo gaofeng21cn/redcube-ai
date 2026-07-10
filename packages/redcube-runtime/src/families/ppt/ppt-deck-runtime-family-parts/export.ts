@@ -363,6 +363,19 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       || rendererProof?.synthetic_preview !== false) {
       throw new Error('Route export_pptx requires native renderer proof from libreoffice_headless_pdf_png_v1 before native export');
     }
+    const currentPptxSha = fileSha256(sourcePptx);
+    const packagePptxSha = safeText(
+      shapeManifest?.package_readback?.pptx_sha256
+      || shapeManifest?.officecli_gate?.package_readback?.pptx_sha256,
+    );
+    const renderedPptxSha = safeText(rendererProof?.source_pptx_sha256);
+    if (!currentPptxSha
+      || !packagePptxSha
+      || !renderedPptxSha
+      || currentPptxSha !== packagePptxSha
+      || currentPptxSha !== renderedPptxSha) {
+      throw new Error('Native PPTX SHA mismatch: current file, package readback, and render proof must identify the same PPTX');
+    }
     copyFileSync(sourcePptx, pptxFile);
     copyFileSync(sourcePdf, pdfFile);
     const pageCount = Number(bundle.page_count || safeArray(bundle.slides).length);

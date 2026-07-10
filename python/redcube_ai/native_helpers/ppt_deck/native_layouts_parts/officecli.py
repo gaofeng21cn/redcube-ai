@@ -125,7 +125,8 @@ def _connector_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> d
 
 def _picture_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> dict:
     source = safe_text(
-        shape_spec.get('src')
+        shape_spec.get('source_file')
+        or shape_spec.get('src')
         or shape_spec.get('source')
         or shape_spec.get('file')
         or shape_spec.get('source_data_uri')
@@ -168,8 +169,14 @@ def _chart_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> dict:
     for index, item in enumerate(series, 1):
         if not isinstance(item, dict) or not safe_list(item.get('values')):
             raise ValueError(f'native PPT chart series {index} requires values')
+        values = safe_list(item.get('values'))
+        if len(values) != len(categories):
+            raise ValueError(
+                f'native PPT chart series {index} value count must match categories: '
+                f'{len(values)} != {len(categories)}'
+            )
         props[f'series{index}.name'] = safe_text(item.get('name'), f'Series {index}')
-        props[f'series{index}.values'] = ','.join(str(value) for value in safe_list(item.get('values')))
+        props[f'series{index}.values'] = ','.join(str(value) for value in values)
         color = safe_text(item.get('color'))
         if color:
             props[f'series{index}.color'] = color
