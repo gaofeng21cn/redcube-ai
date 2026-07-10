@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, globSync, readFileSync, readdirSync } from 'node:fs';
 
 import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
@@ -49,18 +49,8 @@ function readJsonFile(file: string): JsonRecord | null {
   }
 }
 
-function walkFiles(root: string, predicate: (file: string) => boolean): string[] {
-  if (!existsSync(root)) return [];
-  const files: string[] = [];
-  for (const entry of readdirSync(root, { withFileTypes: true })) {
-    const entryPath = path.join(root, entry.name);
-    if (entry.isDirectory()) {
-      files.push(...walkFiles(entryPath, predicate));
-    } else if (entry.isFile() && predicate(entryPath)) {
-      files.push(entryPath);
-    }
-  }
-  return files.sort();
+function globFiles(root: string, pattern: string): string[] {
+  return globSync(pattern, { cwd: root }).map((file) => path.join(root, file)).sort();
 }
 
 function childCallsFromTelemetry(telemetry: JsonRecord): JsonRecord[] {
@@ -284,7 +274,7 @@ export function buildPerformanceReport({
     },
   };
 
-  for (const file of walkFiles(path.join(workspace.runtimeDir, 'runs'), (entry) => entry.endsWith('.json'))) {
+  for (const file of globFiles(path.join(workspace.runtimeDir, 'runs'), '**/*.json')) {
     const run = readJsonFile(file);
     if (run && runMatchesFilters(run, topicFilter, deliverableFilter)) {
       addRun(report, run);
@@ -292,10 +282,10 @@ export function buildPerformanceReport({
   }
 
   for (const deliverableRoot of deliverableRoots(workspace.workspaceRoot, topicFilter, deliverableFilter)) {
-    for (const file of walkFiles(path.join(deliverableRoot, 'artifacts', 'render_batches'), (entry) => entry.endsWith('.json'))) {
+    for (const file of globFiles(path.join(deliverableRoot, 'artifacts', 'render_batches'), '**/*.json')) {
       addRenderBatch(report, file);
     }
-    for (const file of walkFiles(path.join(deliverableRoot, 'reports', 'screenshots'), (entry) => path.basename(entry) === 'capture-manifest.json')) {
+    for (const file of globFiles(path.join(deliverableRoot, 'reports', 'screenshots'), '**/capture-manifest.json')) {
       addCaptureManifest(report, file);
     }
     addReviewHistory(report, path.join(deliverableRoot, 'reports', 'review-history.jsonl'));

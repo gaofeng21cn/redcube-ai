@@ -1,6 +1,11 @@
 import type { ValidationResult } from './types.js';
-
-type JsonRecord = Record<string, unknown>;
+import {
+  buildValidation,
+  isNonEmptyString,
+  isPlainObject,
+  pushArrayStringErrors,
+} from './protocol-utils.js';
+import type { JsonRecord } from './protocol-utils.js';
 
 const REQUIRED_FOCUS_OUTPUTS = [
   'topic_summary',
@@ -9,49 +14,6 @@ const REQUIRED_FOCUS_OUTPUTS = [
   'source_quality_notes',
   'evidence_gap_resolution',
 ];
-
-function isPlainObject(value: unknown): value is JsonRecord {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function isNonEmptyString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
-}
-
-function safeArray(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : [];
-}
-
-function uniqueStrings(values: unknown): string[] {
-  return [...new Set(safeArray(values).map((item) => String(item || '').trim()).filter(Boolean))];
-}
-
-function pushArrayStringErrors(
-  errors: string[],
-  value: unknown,
-  label: string,
-  { allowEmpty = true }: { allowEmpty?: boolean } = {},
-): string[] {
-  if (!Array.isArray(value)) {
-    errors.push(`${label} 必须是数组`);
-    return [];
-  }
-  if (!allowEmpty && value.length === 0) {
-    errors.push(`${label} 不能为空数组`);
-  }
-  if (!value.every(isNonEmptyString)) {
-    errors.push(`${label} 必须是非空字符串数组`);
-    return [];
-  }
-  return uniqueStrings(value);
-}
-
-function buildValidation(errors: string[]): ValidationResult {
-  return {
-    ok: errors.length === 0,
-    errors,
-  };
-}
 
 function validateRequestEnvelope(errors: string[], contract: JsonRecord): void {
   if (contract.schema_version !== 1) {
