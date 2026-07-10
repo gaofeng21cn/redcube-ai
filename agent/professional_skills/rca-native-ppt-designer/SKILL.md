@@ -36,6 +36,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `deck_layout_rhythm_plan` with one row per slide.
 - `template_layout_grammar` with semantic archetypes, zones, placeholder capacity, required role groups, and prohibited mistakes.
 - Per-slide `template_layout_binding`, `layout_intent`, and `native_shapes[]` using editable Office objects with explicit bounds, roles, quality roles, font sizes, fills/lines, z-order, and zone ids.
+- A typed native object plan covering `text_box`, paragraph/run/native bullet, preset shape, line, connector, picture, group, path, chart, table, and metric-grid semantics without unknown-kind fallback.
+- `presentation_semantics`: speaker notes, transition, timing, and optional animation timeline; every animated page must remain understandable as a static slide.
 - `native_ppt_qa_plan`: editable-object proof, rendered screenshot refs, shape manifest refs, hyperlink/text editability checks, and blocked-slide repair scope.
 - Native repair targets or typed blockers.
 
@@ -56,6 +58,10 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 13. Route back when a native failure belongs to source/story, visual direction, or template profile rather than coordinates; do not make helpers infer missing design decisions.
 14. When converting from image-first, consume approved director notes, contact-sheet findings, source refs, and explicit editable targets. Do not trace pixels blindly or claim native readiness without native QA evidence.
 15. For repeated native repair failure, preserve passing slides and classify the failing boundary before rerender: shape grammar, zone capacity, text fit, helper materialization, review expectation, or route mismatch.
+16. Declare object kind and materialization intent explicitly. Use `stable_drawingml` for shape-built visuals where viewer consistency dominates and `native_data_object` for charts/tables where editable data semantics dominate.
+17. Use real connectors, pictures, groups, paths, charts, and tables when declared. Never permit the helper to convert an unknown or unsupported kind into a rectangle; return a typed blocker or repair target instead.
+18. Keep notes and motion authored, not inferred. Bind notes to slide ids, choose transitions deliberately, keep timing optional, and use animation only when it strengthens the spoken sequence without making the static page incomplete.
+19. Make targeted repair stable-id based. Preserve passing slide/object hashes and rerender only blocked objects or slides unless an upstream design lock changed.
 
 ## Workbench Lessons To Preserve
 
@@ -76,6 +82,8 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - `native_vs_image_first_arbitration`: editability reason, selected slides, rejected image-first/native alternatives, contact-sheet evidence, required native QA refs, and route-back owner.
 - `repeated_native_failure_triage`: prior render refs, current screenshot/shape-manifest mismatch, owner boundary, preserved slides, and next repair route.
 - `native_route_back`: owner stage, affected slide ids, failed evidence, and whether the fix belongs to template profile, visual direction, page authoring, or native shape plan.
+- `typed_native_object`: stable id, object kind, semantic role, materialization intent, editable payload, relationships, bounds/z-order, and package readback expectation.
+- `presentation_semantics`: slide id, speaker notes, transition, timing, optional animation timeline, and static-readability assertion.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

@@ -21,6 +21,8 @@
 - 禁止把孤立单字贴纸、随机装饰符号或疑似内部标签当成视觉锚点
 - 禁止把整章退化成统一安全模板页
 - optimize_existing 时必须补 keep_old_strengths / forbidden_regressions
+- 每页的 action-title promise 必须对应可观察的语义构图：dependency map 有关系边，timeline 有顺序节点，decision ladder 有门/分支，数据判断有诚实 chart/table encoding；一条装饰线、圆点或等宽卡片不能替代语义关系。
+- `rhythm_curve.role` 和下游指令必须明确每页的 proof object 与首眼关系，确保 native/image/HTML author 都能消费同一导演意图。
 
 ## runtime_seed
 

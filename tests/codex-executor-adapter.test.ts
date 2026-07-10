@@ -243,6 +243,22 @@ test('buildGenerationInput does not require professional specialist guidance for
   assert.doesNotMatch(input, /## RCA Professional Specialist Skill Guidance/);
 });
 
+test('buildGenerationInput injects review and non-blocking memory guidance into ppt export', () => {
+  const input = buildGenerationInput({
+    family: 'ppt_deck',
+    route: 'export_pptx',
+    promptRelativePath: 'prompts/ppt_deck/export_pptx.md',
+    context: { goal: 'export reviewed native deck' },
+    outputContract: { type: 'object' },
+  });
+
+  assert.match(input, /### Reviewer/);
+  assert.match(input, /agent\/professional_skills\/rca-ppt-reviewer\/SKILL\.md/);
+  assert.match(input, /### Visual Memory Curator/);
+  assert.match(input, /agent\/professional_skills\/rca-visual-memory-curator\/SKILL\.md/);
+  assert.doesNotMatch(input, /### Native PPT Designer/);
+});
+
 test('buildGenerationInput fail-closes mapped ppt routes when declared specialist guidance is missing', () => {
   const nativeDesigner = path.resolve('agent/professional_skills/rca-native-ppt-designer/SKILL.md');
   const templateProfiler = path.resolve('agent/professional_skills/rca-template-profiler/SKILL.md');

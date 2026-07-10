@@ -42,6 +42,22 @@ draft_label_check:
   label:
   unresolved_weak_pages:
   unresolved_blocked_pages:
+
+native_package_review:
+  planned_object_kinds:
+  readback_object_kinds:
+  relationship_and_part_refs:
+  notes_motion_refs:
+  declared_readback_mismatches:
+  stable_id_repair_targets:
+
+blind_comparison_candidate:
+  anonymized_pair_refs:
+  professionality_findings:
+  aesthetics_findings:
+  stability_findings:
+  edit_task_findings:
+  owner_receipt_forbidden: true
 ```
 
 ## Example
@@ -65,3 +81,6 @@ preserve_or_redraw: redraw S07 only
 - Export can proceed only with required review, screenshot, PPTX/PDF, and gallery refs.
 - Contact sheets are checked for rhythm and density, not only file count.
 - Drafts with known weak pages stay labeled as drafts until repaired.
+- Native labels are reconciled with package object/part/relationship readback.
+- Title promises are rejected when the promised relation is absent from pixels and object structure.
+- Same-source parity comparisons stay anonymized and do not self-sign an RCA owner receipt.

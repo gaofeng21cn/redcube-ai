@@ -38,6 +38,10 @@ const PROFESSIONAL_SPECIALIST_SKILL_FILES = Object.freeze({
     title: 'Reviewer',
     path: 'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
   },
+  visual_memory_curator: {
+    title: 'Visual Memory Curator',
+    path: 'agent/professional_skills/rca-visual-memory-curator/SKILL.md',
+  },
 });
 
 const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
@@ -54,6 +58,7 @@ const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
   'ppt_deck:screenshot_review': ['reviewer'],
   'ppt_deck:repair_image_pages': ['reviewer'],
   'ppt_deck:fix_html': ['reviewer'],
+  'ppt_deck:export_pptx': ['reviewer', 'visual_memory_curator'],
 });
 
 function readPromptGuidance(relativePath) {

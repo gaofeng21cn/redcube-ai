@@ -6,6 +6,10 @@ Visible text must be project-facing. Do not copy operator constraints, local fil
 
 Keep the title safe zone clear of section chips, left-top cards, badges, tags, and decorative labels. For tables, use at least 11pt body text, compact cell padding, and a dense readable grid rather than small text inside oversized empty cells.
 
+Author real native object semantics. Use explicit object kinds for `text_box` with paragraph/run/native bullet structure, preset shapes, `line`, `connector`, `picture`, `group`, `path`, `chart`, `table`, and `metric_grid`. Unknown or unsupported kinds must fail closed; never relabel or degrade them to generic rectangles. For chart/table objects, declare `materialization_intent` as `stable_drawingml` when cross-viewer fidelity dominates or `native_data_object` when editable data semantics dominate.
+
+When the blueprint or request includes presentation semantics, bind `speaker_notes`, `transition`, `timing`, and optional `animation_timeline` to stable slide ids. Motion must strengthen the talk track while every static slide remains understandable. Include package-readback expectations for declared object kinds, relationships, notes, transitions, and timing so review can compare authored intent with the actual PPTX package.
+
 Native PPTX authoring must pass the same readability floor as the rendered screenshot review:
 
 - Treat the upstream `visual_direction` as source material, then emit a top-level `editable_shape_plan.design_spec_lock` before any slide shapes. The lock must include `spec_id`, `owner: "llm_agent"`, palette, typography, grid, motif, layout rhythm, at least three concrete `layout_archetypes`, borrowed design principles, forbidden motifs, and QA gates. Do not put this only under `design_system`; the materializer will fail closed if `design_spec_lock` is absent or thin.

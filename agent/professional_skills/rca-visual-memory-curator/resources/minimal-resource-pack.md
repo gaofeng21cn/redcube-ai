@@ -62,3 +62,4 @@ caveat: do not turn this into a fixed two-column layout recipe
 - Accept/reject decision returns an RCA owner receipt ref.
 - OPL transport carries locator/proposal/receipt/projection refs only.
 - Memory never replaces screenshot review, review/export verdict, artifact authority, or owner receipt.
+- Native PPT lessons require both rendered evidence and package readback; unresolved degeneration or viewer drift routes back to repair.

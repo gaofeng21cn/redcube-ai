@@ -12,6 +12,7 @@ Canonical policy:
 
 Professional skill routing:
 - Route export-readiness review evidence, weak page carryover, package blockers, and handoff repair targets to `agent/professional_skills/rca-ppt-reviewer/SKILL.md`.
+- Route only evidence-backed, non-blocking visual-memory proposal refs to `agent/professional_skills/rca-visual-memory-curator/SKILL.md`; package completion never waits for optional memory and cannot self-sign accept/reject authority.
 - Keep native/Office/PPT helpers limited to export, validation, package manifests, and evidence refs; helpers do not authorize review/export verdicts.
 
 Detailed prompt locators:

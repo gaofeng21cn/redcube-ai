@@ -37,6 +37,8 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `weak_pages`, `slide_reviews`, visual findings, source-fidelity findings, and concrete repair targets.
 - Blocked-page-only repair scope when applicable.
 - `repeated_visual_failure_diagnosis`: prior repair refs, current pixel/contact-sheet evidence, owner stage, blocked slide ids, and whether route arbitration is required.
+- `native_package_review`: materialized object-kind counts, relationships, notes/transition/timing evidence, declared-vs-readback mismatches, and stable-id repair targets.
+- `blind_comparison_candidate`: anonymized professional-quality and aesthetics observations for parity evaluation; this is evidence for RCA authority, not an owner receipt.
 - Route-back decisions for story, visual direction, page authoring, native PPT design, or memory curation when the visible defect belongs outside reviewer repair.
 - Memory proposal candidates for `rca-visual-memory-curator`; reviewer findings are not accepted memory by themselves.
 - Typed blockers when review evidence is missing or invalid.
@@ -56,6 +58,10 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 11. Keep stage-control light. When stage-control or `visual_pack_compiler_handoff` needs a route decision, return the smallest RCA review result it can carry: verdict ref, blocked page ids, repair route target, owner stage, and evidence refs. Do not move reviewer heuristics, scoring tables, or fallback chains into stage-control contracts.
 12. For repeated visual failure, compare the current screenshots/contact sheet with prior repair refs before choosing a rerun. Preserve passed pages, avoid full-deck redraw by default, and escalate only when the selected route or upstream plan is the blocker.
 13. Native-vs-image-first is an evidence question, not a preference toggle: image-first needs strong pixel/contact-sheet proof; native needs editable-object, shape-manifest, render, hyperlink/text-edit evidence. Missing route proof blocks the route claim.
+14. For native PPTX, reconcile the authored plan with package readback. A label that says chart, table, picture, connector, notes, or transition is not evidence unless the corresponding package object/part/relationship exists.
+15. Review semantic composition, not decoration counts. Reject a dependency map without edges, a timeline without ordered events, a decision ladder without gates, or a chart page whose data relationship was reduced to prose cards.
+16. Use targeted repair by default. Return stable slide/object ids, preserve passing hashes, and route only the smallest blocking unit unless the story or design lock changed.
+17. When parity is evaluated, use same-source anonymized outputs and separate professionality, aesthetics, stability, and editability. Do not let the reviewer sign the final parity owner receipt.
 
 ## Contract Foldback Map
 
@@ -84,6 +90,8 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - `memory_proposal_gate`: only propose reusable visual lessons; route every accept/reject decision to `rca-visual-memory-curator`.
 - `repeated_visual_failure_diagnosis`: prior attempt refs, current pixel evidence, unchanged/changed defect, likely owner, route arbitration need, and smallest rerun scope.
 - `route_arbitration_review`: route used, route claimed, required proof evidence, route mismatch if any, and repair owner for image-first, HTML, or native PPTX.
+- `native_package_review`: planned kinds, readback kinds, relationship/part refs, notes/motion refs, mismatches, and stable-id repair targets.
+- `blind_comparison_candidate`: anonymized pair refs, professionality findings, aesthetics findings, stability findings, edit-task findings, and forbidden authority claim.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

@@ -35,6 +35,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 ## Outputs
 
 - `template_profile`: canvas, margins, grid, typography, palette, motif, spacing, page furniture, title safe zone, and forbidden uses.
+- `native_template_inventory`: package-level theme, master, layout, placeholder, relationship, chart/table, notes, transition, and timing inventory with stable source refs.
 - `layout_inventory`: named semantic layouts with use cases, zones, required roles, capacity, and content limits.
 - `placeholder_capacity`: per-zone text capacity, image/chart/table affordance, minimum font floor, and overflow risk.
 - `reference_deck_analysis`: page rhythm, composition signatures, recurring hierarchy, proof objects, and reusable patterns.
@@ -59,6 +60,9 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 12. Keep stage-control light. If stage-control needs template/profile judgment, return profile refs, capacity blockers, route caveats, visual proof requirements, and downstream owner hints; do not move profiling heuristics, layout scoring, or deterministic placement recipes into stage-control contracts.
 13. Preserve the skill split. This skill profiles layout intelligence and capacity; it does not become visual director, native designer, page author, screenshot reviewer, or memory curator.
 14. For repeated visual failures, decide only whether template capacity or stale reference selection is implicated, then route the repair to visual direction, page authoring, native design, or story as appropriate.
+15. Inspect an available PPTX as a package, not only as screenshots. Preserve the distinction between theme, master, layout, placeholder, slide object, notes, and presentation timing so downstream native authoring can reuse the actual editable structure.
+16. Record what can be inherited, filled, or must be recreated. Never claim template fidelity when only colors and background images were observed.
+17. Treat chart/table inventory as semantic capacity. Record whether a layout supports a real data object, a stable DrawingML reconstruction, or neither without redesign.
 
 ## Contract Foldback Map
 
@@ -84,6 +88,7 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - `current_style_ref_pack`: current source deck/version, representative page refs, allowed reuse, stale refs to reject, and prompt-facing density limits.
 - `visual_proof_requirements`: required evidence refs for profile compliance, such as contact-sheet rhythm, title-safe-zone screenshots, native shape manifest refs, and blocked-zone repair targets.
 - `template_route_caveats`: route, supported layout families, unsupported content types, required evidence, repeated-failure risk, and downstream owner.
+- `native_template_inventory`: theme/master/layout ids, placeholder roles, editable object inventory, chart/table affordances, notes/motion inventory, inheritance policy, and package refs.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

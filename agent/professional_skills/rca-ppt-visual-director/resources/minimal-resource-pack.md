@@ -54,6 +54,14 @@ style_ref_lock:
   allowed_borrowings:
   forbidden_stale_refs:
   approval_state:
+
+semantic_composition_map:
+  slide_id:
+  action_title_promise:
+  required_visual_relation:
+  accepted_object_families:
+  materialization_tradeoff:
+  reviewer_observation:
 ```
 
 ## Example
@@ -79,3 +87,5 @@ repair_risk: avoid repeated card grid from S04-S05
 - Reference decks contribute layout intelligence, not visual authority.
 - Image-first visual direction is page-by-page before prompts are written.
 - Current approved style refs override older familiar archive refs.
+- Dependency, time, decision, and quantitative promises have visible relational encodings rather than decorative card grids.
+- Native chart/table pages declare the fidelity-versus-data-editability tradeoff before authoring.

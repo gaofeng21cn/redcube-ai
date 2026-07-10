@@ -23,3 +23,5 @@ When screenshot review reports `native_slot_fill_failed`, `native_content_depth_
 - Increase card geometry or reduce slot count before lowering text size. Body text stays at or above 18pt and step labels stay at or above 16pt.
 - If the blocked slide is part of a repeated layout run, change its concrete layout variant so the sequence has a different rhythm.
 - Preserve unblocked slides, but the targeted blocked slide may change layout family when that is necessary to pass RCA review/export gates.
+- If review reports a declared-versus-readback mismatch for chart, table, picture, connector, group, path, notes, transition, timing, or animation, repair the same stable slide/object id and rerun package readback. Do not replace the missing object with a rectangle, screenshot, hidden note, or metadata label.
+- Preserve passing slide/object hashes unless the upstream design lock changed; targeted repair must not redraw the whole deck by default.

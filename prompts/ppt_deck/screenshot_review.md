@@ -31,6 +31,8 @@
 - 若表格正文低于 11pt、表格单元格 padding/行高造成明显空白、或卡片内容与容器尺寸不匹配导致“字小但框大”，必须判 block；推荐修复必须要求提高字号、收紧单元格与容器，而不是继续缩字
 - 若怀疑截图裁切错误、下一页串入或非当前页内容可见，必须基于当前页截图中的明确可见文字/位置下判定，并在 `visual_findings` 写出该可见证据；不得仅凭相邻页标题、整套 deck 顺序或 `source_html` 上下文推断为 block
 - 必须保存逐页截图与 review 记录
+- native PPTX route 还必须对照 package/object readback：计划中的 chart/table/picture/connector/group/path、notes、transition、timing 只有在真实 object/part/relationship 中存在才算落地；输入标签或 shape count 不能替代读回证据
+- native PPTX repair 默认返回最小 blocked slide/object stable ids 并保留通过项；只有 story、design lock 或 template profile 改变时才允许扩大重做范围
 - optimize_existing 必须做 baseline relative review，输出 baseline_comparison_passed
 - `slide_reviews[].judgement` 只能输出 `"pass"` 或 `"block"`；若页面只是轻微观察项或需后续关注，仍输出 `"pass"`，并把页码放入 `weak_pages`、把观察写进 `visual_findings`，禁止输出 `pass_with_minor_watch`、`soft_pass`、`warning` 等扩展枚举
 

@@ -34,6 +34,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `peak_pages`, layout family ceilings, visual density rules, typography plan, spacing rules, and forbidden regressions.
 - Template/profile guidance: layout archetypes, semantic zones, placeholder capacity, and reference-deck discipline when native PPTX or template-aware authoring is selected.
 - `visual_proof_plan`: per-slide screenshot/contact-sheet checks, source-fidelity risks, density proof, and native QA evidence expected from downstream routes.
+- `semantic_composition_map`: bind each action-title promise and page role to an observable visual encoding such as dependency edges, time order, decision gates, quantitative axes, table hierarchy, or image evidence.
 - `visual_route_arbitration`: image-first, HTML, or native PPTX recommendation with evidence, route risks, required proof packet, and route-back owner.
 - Typed blockers or repair targets for blueprint, density, template, or visual-risk problems.
 
@@ -53,6 +54,9 @@ Operate as the visual direction specialist between blueprint approval and page a
 12. For native PPTX, name the QA evidence expected later: editable shape manifest, rendered screenshots, hyperlink/text editability checks, and blocked-slide repair scope.
 13. Use contact sheets as direction evidence: repeated layout families, flat rhythm, title-safe-zone pressure, or density overload are visual-direction repairs, not page-helper failures.
 14. Do not convert image-first success into a native claim. A later native route must consume approved direction, contact-sheet findings, and explicit editability targets.
+15. Make title promises visible. A dependency map needs relationships, a timeline needs ordered events, a decision ladder needs gates or branches, and a data claim needs an honest chart/table encoding; decorative lines, dots, or equal cards do not satisfy these roles.
+16. Choose chart/table materialization intent with the native designer: use stable DrawingML when cross-render fidelity dominates, and native data objects when editable data semantics dominate. Record the tradeoff instead of letting the helper infer it.
+17. Keep review internal to the stage chain. Emit complete direction and route-specific proof expectations in one pass when inputs are sufficient; do not add user-by-user layout confirmations.
 
 ## Workbench Lessons To Preserve
 
@@ -74,6 +78,7 @@ Operate as the visual direction specialist between blueprint approval and page a
 - `route_back_decision`: owner stage, reason, evidence ref, affected slide ids, and whether to repair story, template profile, route policy, page payload, or native shape plan.
 - `visual_proof_plan`: required contact-sheet rhythm check, per-slide screenshot target, native QA refs when applicable, and proof that visible claims remain source-faithful.
 - `visual_route_arbitration`: selected route, rejected routes, editability need, pixel/contact-sheet evidence required, native QA required, and owner route-back if evidence is missing.
+- `semantic_composition_map`: action-title promise, page role, required visual relation, accepted object families, and evidence a reviewer can observe.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 
 ## Stage Prompt Boundary

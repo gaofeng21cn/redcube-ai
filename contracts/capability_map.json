@@ -584,7 +584,9 @@
         "rca-ppt-story-architect",
         "serial_pipeline",
         "progressive_disclosure",
-        "story_spec_lock"
+        "story_spec_lock",
+        "claim_spine_lock",
+        "progress_baton"
       ],
       "failure_tokens": [
         "storyline",
@@ -598,7 +600,9 @@
         "rca-ppt-story-architect",
         "serial_pipeline",
         "progressive_disclosure",
-        "story_spec_lock"
+        "story_spec_lock",
+        "claim_spine_lock",
+        "progress_baton"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
@@ -727,7 +731,8 @@
         "spec_lock",
         "progressive_disclosure",
         "style_boundary",
-        "visual_qa"
+        "visual_qa",
+        "semantic_composition"
       ],
       "template_profiler_relationship": "Consumes template_profile and placeholder_capacity from rca-template-profiler; does not own reference deck profiling or placeholder measurement.",
       "failure_tokens": [
@@ -746,7 +751,8 @@
         "spec_lock",
         "progressive_disclosure",
         "style_boundary",
-        "visual_qa"
+        "visual_qa",
+        "semantic_composition"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
@@ -1029,7 +1035,12 @@
         "review_export_gate_evidence",
         "rca-ppt-reviewer",
         "ppt_visual_density",
-        "visual_qa"
+        "visual_qa",
+        "semantic_composition",
+        "native_object_semantics",
+        "presentation_semantics",
+        "blind_comparison_review",
+        "progress_baton"
       ],
       "failure_tokens": [
         "visual_review",
@@ -1044,7 +1055,12 @@
         "review_export_gate_evidence",
         "rca-ppt-reviewer",
         "ppt_visual_density",
-        "visual_qa"
+        "visual_qa",
+        "semantic_composition",
+        "native_object_semantics",
+        "presentation_semantics",
+        "blind_comparison_review",
+        "progress_baton"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
@@ -1308,7 +1324,11 @@
         "native_repair_targets",
         "rca-native-ppt-designer",
         "spec_lock",
-        "editable_pptx_grammar"
+        "editable_pptx_grammar",
+        "semantic_composition",
+        "template_package_intake",
+        "native_object_semantics",
+        "presentation_semantics"
       ],
       "template_profiler_relationship": "Consumes template_profile and placeholder_capacity when binding editable_shape_plan to native zones; does not own route-agnostic template profiling.",
       "failure_tokens": [
@@ -1321,7 +1341,11 @@
         "native_repair_targets",
         "rca-native-ppt-designer",
         "spec_lock",
-        "editable_pptx_grammar"
+        "editable_pptx_grammar",
+        "semantic_composition",
+        "template_package_intake",
+        "native_object_semantics",
+        "presentation_semantics"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
@@ -1442,7 +1466,8 @@
         "title_safe_zone",
         "rca-template-profiler",
         "style_boundary",
-        "editable_pptx_grammar"
+        "editable_pptx_grammar",
+        "template_package_intake"
       ],
       "consolidation_decision": "retained_as_pre_route_template_profile_owner",
       "no_merge_rationale_ref": "contracts/capability_map.json#/professional_skill_consolidation",
@@ -1455,7 +1480,8 @@
         "title_safe_zone",
         "rca-template-profiler",
         "style_boundary",
-        "editable_pptx_grammar"
+        "editable_pptx_grammar",
+        "template_package_intake"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-template-profiler/SKILL.md",

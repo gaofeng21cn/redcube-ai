@@ -47,6 +47,25 @@ image_to_native_followup:
   selected_editable_targets:
   source_refs:
   native_shape_plan_ref:
+
+typed_native_object:
+  stable_id:
+  object_kind:
+  semantic_role:
+  materialization_intent:
+  editable_payload:
+  relationship_refs:
+  bounds:
+  z_order:
+  package_readback_expectation:
+
+presentation_semantics:
+  slide_id:
+  speaker_notes:
+  transition:
+  timing:
+  animation_timeline:
+  static_readability_assertion:
 ```
 
 ## Example
@@ -75,3 +94,6 @@ native_shapes:
 - Repair changes the AI-authored plan, then rerenders and reviews screenshots.
 - Full-page PNG decks are image-first artifacts, not native editable evidence.
 - Native follow-up starts from director notes and review findings, not blind pixel tracing.
+- Unknown object kinds fail closed; they never become generic rectangles.
+- Chart/table intent is explicitly `stable_drawingml` or `native_data_object`.
+- Notes, transition, timing, and optional animation are tied to stable slide ids and remain statically readable.

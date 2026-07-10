@@ -32,6 +32,8 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - A source-grounded narrative spine: audience problem, claim sequence, evidence placement, and decision path.
 - A detailed outline that preserves approved source truth and page budget.
 - A slide blueprint with one page goal, one action title, core claim, evidence points, public sources, speaker notes, and transition sentence per slide.
+- `claim_spine_lock`: a stable claim id, supporting evidence refs, first-use naming, and the exact slides that introduce, prove, and resolve each claim.
+- `progress_baton`: accepted upstream refs, completed slide ids, remaining slide ids, next owner stage, and the smallest route-back target; this is carried inside the stage result and never becomes an extra user confirmation step.
 - `story_risk_map`: pages likely to fail visual proof because the claim, evidence, page role, or transition is overloaded.
 - `repeated_visual_failure_story_triage`: whether repeated pixel/contact-sheet failures should repair source/story, visual direction, page authoring, native design, or route policy.
 - Route-back targets when an apparent visual defect is really a source, story, sequence, or page-budget problem.
@@ -51,6 +53,8 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 10. Route back instead of decorating. If a future layout or review failure is caused by unsupported story logic, return the owner stage and required story repair.
 11. For repeated visual failure, check story causes before asking for another redraw: unsupported claim, too many proof objects, unclear necessity/feasibility/landing path, stale first-use naming, or impossible page budget.
 12. Keep RCA authority clear. External PPT practice is design discipline only; RCA source truth and stage prompts remain the owner surface.
+13. Keep claim identity stable across outline, blueprint, speaker notes, and transitions. A claim may be split across pages, but it must not silently change meaning between stages.
+14. Keep the route moving. When inputs are sufficient, emit the complete stage artifact and progress baton so the runtime can continue automatically; request a human decision only when a real source, scope, or approval boundary changes the story.
 
 ## Workbench Lessons To Preserve
 
@@ -68,6 +72,8 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - `first_use_contract`: full visible name, accepted abbreviation, public link/source ref when allowed, and the slide where abbreviation becomes safe.
 - `necessity_feasibility_landing_check`: the outline names the audience problem, why existing tools fail, what proof makes the proposed route feasible, and what adoption path is credible.
 - `visual_proof_intent`: per slide visible proof object, screenshot-checkable claim, source-fidelity risk, and route-back owner if proof would fail.
+- `claim_spine_lock`: claim id, source refs, introduction slide, proof slide, resolution slide, and forbidden drift.
+- `progress_baton`: accepted refs, completed slide ids, remaining slide ids, next stage, repair owner, and stop reason only when a real gate exists.
 - `repeated_visual_failure_story_triage`: contact-sheet or screenshot evidence, affected slide ids, likely story defect, required blueprint repair, and downstream owner to retry after story repair.
 - Skill-local examples and checklist: `resources/minimal-resource-pack.md`.
 

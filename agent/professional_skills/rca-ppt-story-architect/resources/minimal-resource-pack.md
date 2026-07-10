@@ -47,6 +47,22 @@ necessity_feasibility_landing_check:
   why_existing_tools_fail:
   feasibility_proof:
   credible_landing_path:
+
+claim_spine_lock:
+  claim_id:
+  source_refs:
+  introduction_slide_id:
+  proof_slide_ids:
+  resolution_slide_id:
+  forbidden_drift:
+
+progress_baton:
+  accepted_refs:
+  completed_slide_ids:
+  remaining_slide_ids:
+  next_stage:
+  repair_owner:
+  stop_reason:
 ```
 
 ## Example
@@ -73,3 +89,5 @@ transition: This makes owner-route clarity the next design constraint.
 - Visible text contains no local paths, prompt names, route names, or operator wording.
 - Product/platform decks motivate necessity before naming the product family.
 - First-use project names include full names and source/link refs when allowed.
+- Claim ids remain stable across outline, blueprint, notes, and transitions.
+- A complete stage result carries its progress baton forward without creating an artificial user gate.

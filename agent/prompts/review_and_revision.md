@@ -14,6 +14,7 @@ Canonical policy:
 Professional skill routing:
 - Route rendered page review, screenshot review, source fidelity, weak pages, and concrete repair targets to `agent/professional_skills/rca-ppt-reviewer/SKILL.md`.
 - Route deck-level rhythm, visual intent, layout variety, and visual-direction regression review to `agent/professional_skills/rca-ppt-visual-director/SKILL.md`.
+- Route reusable, evidence-backed visual-pattern proposals to `agent/professional_skills/rca-visual-memory-curator/SKILL.md`; unresolved defects remain repair targets and memory absence never becomes a review bypass.
 - Keep `agent/skills/*.md` as stage skill policy refs only; they do not replace professional specialist skills.
 
 Detailed prompt locators:

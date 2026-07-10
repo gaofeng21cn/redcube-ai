@@ -46,6 +46,7 @@ Operate as the RCA visual memory curator. Turn review/export evidence into small
 8. For repeated visual failures, accept only the reusable pattern after the blocked slides have a clear review/repair outcome. Otherwise return `route_back` to story, visual direction, page authoring, native PPT design, template profiling, or reviewer.
 9. Reject route arbitration as memory unless it is a reusable route caveat backed by evidence. Do not store route scores, layout controllers, accepted review verdicts, or hidden template recipes.
 10. Return typed blockers when evidence is missing, proposal provenance is unverifiable, or accepting the proposal would write visual truth, artifact body, review/export verdict, owner receipt body, or runtime data.
+11. Accept reusable native-PPT lessons only when both pixels and package readback support them. Viewer-specific drift, object-kind degeneration, notes/motion loss, and semantic-composition failures remain live repair evidence until resolved.
 
 ## Contract Foldback Map
 

@@ -1974,7 +1974,8 @@
       ],
       "professional_skill_refs": [
         "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-        "agent/professional_skills/rca-ppt-visual-director/SKILL.md"
+        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
       ],
       "stage_kind": "domain_specific",
       "owner": "redcube_ai",
@@ -2430,7 +2431,8 @@
         "agent/quality_gates/package_distribution.md"
       ],
       "professional_skill_refs": [
-        "agent/professional_skills/rca-ppt-reviewer/SKILL.md"
+        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
+        "agent/professional_skills/rca-visual-memory-curator/SKILL.md"
       ],
       "stage_kind": "domain_specific",
       "owner": "redcube_ai",

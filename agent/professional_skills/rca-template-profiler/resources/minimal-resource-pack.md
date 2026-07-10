@@ -40,6 +40,17 @@ current_style_ref_pack:
   allowed_reuse:
   stale_refs_to_reject:
   prompt_facing_density_limits:
+
+native_template_inventory:
+  source_pptx_ref:
+  theme_ids:
+  master_ids:
+  layout_ids:
+  placeholder_roles:
+  editable_object_kinds:
+  chart_table_affordances:
+  notes_motion_inventory:
+  inheritance_policy:
 ```
 
 ## Example
@@ -63,3 +74,5 @@ reuse_ceiling: no more than 2 consecutive pages
 - Native routes receive stable zone ids and prohibited mistakes.
 - The latest approved visual line is profiled before older archive decks.
 - Representative refs cover cover, roadmap, proof, system map, dense evidence, and closing behavior.
+- PPTX profiling distinguishes package theme, master, layout, placeholder, slide objects, notes, and timing.
+- Inherited, fillable, and recreate-only structures are identified explicitly.
