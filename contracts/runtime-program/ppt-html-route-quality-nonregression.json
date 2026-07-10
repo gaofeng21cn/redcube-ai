@@ -16,7 +16,9 @@
       "default_backend": "codex_cli",
       "render_html_execution_shape": "structured_call",
       "fix_html_default_execution_shape": "structured_call",
-      "hermes_agent_allowed_only_when_explicit_or_fix_escalation_policy_requires": true,
+      "rca_local_executor_routing_allowed": false,
+      "fix_html_second_executor_pass_allowed": false,
+      "opl_executor_policy_ref": "contracts/stage_control_plane.json#/stages/*/selected_executor",
       "silent_executor_fallback_allowed": false
     }
   },

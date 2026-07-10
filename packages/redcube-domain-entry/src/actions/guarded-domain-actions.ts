@@ -304,7 +304,6 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'packages/redcube-runtime/src/executors/index.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/recovery.ts',
-      'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/fix-html-escalation.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/domain-entry-response.ts',
       'packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/stage-artifacts.ts',
       'packages/redcube-domain-entry/src/actions/domain-entry-contract.ts',

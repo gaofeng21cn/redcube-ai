@@ -102,7 +102,6 @@ export function buildCreativeOwnershipAudit(): any {
       mainline_adapter: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter,
       primary_surface: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime,
       adapter_role: 'primary_creative_executor',
-      proof_executor: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.adapter,
       freeze_origin_milestone: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.milestone,
     },
     unified_lifecycle: {

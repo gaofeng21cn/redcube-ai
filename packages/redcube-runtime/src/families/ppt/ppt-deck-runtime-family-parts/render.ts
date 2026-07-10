@@ -109,9 +109,6 @@ export function createPptDeckRenderStageParts(deps) {
     route = 'render_html',
     requireTargetedRevision = false,
     adapter = CODEX_DEFAULT_ADAPTER,
-    executionShape = null,
-    hermesProfile = null,
-    executorRouting = null,
   }) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const detailedOutlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
@@ -297,9 +294,6 @@ export function createPptDeckRenderStageParts(deps) {
     }
     const renderBatchResult = await executeRenderBatchStagesDurably({
       adapter,
-      executionShape,
-      hermesProfile,
-      executorRouting,
       deliverablePaths,
       route,
       stages: renderBatchStages,
@@ -355,9 +349,6 @@ export function createPptDeckRenderStageParts(deps) {
       },
       outputContract: renderHtmlSummaryOutputContract(),
       cwd: deliverablePaths.deliverableDir,
-      executionShape,
-      hermesProfile,
-      executorRouting,
     });
     return {
       data: {
@@ -388,9 +379,6 @@ export function createPptDeckRenderStageParts(deps) {
     deliverablePaths,
     route = 'render_html',
     adapter = CODEX_DEFAULT_ADAPTER,
-    executionShape = null,
-    hermesProfile = null,
-    executorRouting = null,
   }) {
     const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
     const visualArtifact = readStageArtifact(contract, deliverablePaths, 'visual_direction');
@@ -402,9 +390,6 @@ export function createPptDeckRenderStageParts(deps) {
       route,
       requireTargetedRevision: route === PAGE_FIX_ROUTE,
       adapter,
-      executionShape,
-      hermesProfile,
-      executorRouting,
     });
     const slideHtmlList = safeArray(data?.slides).filter((item) => item && typeof item === 'object');
     if (slideHtmlList.length === 0) {

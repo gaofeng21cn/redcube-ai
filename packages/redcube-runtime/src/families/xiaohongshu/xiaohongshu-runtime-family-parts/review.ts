@@ -410,7 +410,7 @@ export function createXiaohongshuReviewParts(deps) {
     }
     writeText(
       reviewMarkdown,
-      buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime, adapter)),
+      buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime)),
     );
     if (artifact.status === 'pass') {
       artifact.artifact_refs = [
@@ -538,7 +538,7 @@ export function createXiaohongshuReviewParts(deps) {
     const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
     const status = directorIntentLanded && antiTemplateOk && memoryHookPresent ? 'pass' : 'block';
     const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
-    const reviewOwner = primarySurface(generationRuntime, adapter);
+    const reviewOwner = primarySurface(generationRuntime);
     writeText(reviewFile, [
       '# 视觉总监复盘',
       '',

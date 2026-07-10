@@ -257,6 +257,7 @@ test('poster_onepager export_bundle records the stable reviewed HTML instead of 
       goal: '验证 export_bundle 记录的 source_html 指向稳定通过版',
     });
 
+    let exportResult = null;
     for (const route of [
       'storyline',
       'poster_blueprint',
@@ -274,10 +275,11 @@ test('poster_onepager export_bundle records the stable reviewed HTML instead of 
         route,
       });
       assert.equal(result.ok, true, route);
+      if (route === 'export_bundle') exportResult = result;
     }
 
     const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'poster-a');
-    const exportArtifact = readJson(path.join(deliverableDir, 'artifacts', 'publish_bundle.json'));
+    const exportArtifact = readJson(exportResult.artifactFile);
     assert.equal(exportArtifact.export_bundle.source_html, path.join(deliverableDir, 'views', 'poster-a.html'));
   });
 });

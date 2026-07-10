@@ -17,9 +17,7 @@ import {
   withEnv,
   completeSourceReadiness,
   MODULE_DIR,
-  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   withMockCodexRuntime,
-  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute supports xiaohongshu routes on shared runtime', async () => {

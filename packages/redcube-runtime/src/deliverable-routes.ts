@@ -3,13 +3,7 @@ import path from 'node:path';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
-  AGENT_LOOP_EXECUTION_SHAPE,
   CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_AGENT_ADAPTER,
-  STRUCTURED_CALL_EXECUTION_SHAPE,
-  failRetiredHermesAgentAdapter,
-  hermesAgentAdapterRetirementBoundary,
   getDeliverablePaths,
 } from '@redcube/runtime-protocol';
 
@@ -20,7 +14,6 @@ import {
   refreshStageFolderRouteArtifact,
   validateDeliverableRouteInput,
 } from './deliverable-route-local.js';
-import { resolveExecutorRouting } from './executor-routing.js';
 import { resolveExecutorAdapter } from './executors/index.js';
 import {
   completeRouteExecutionRef,
@@ -50,87 +43,6 @@ function buildCodexRuntimeDescriptor(codexContract) {
     reasoning_selection: codexContract.reasoning_selection,
     sandbox: codexContract.sandbox,
     command: [...codexContract.command],
-  };
-}
-
-function buildHermesAgentLoopRuntimeDescriptor(hermesContract = {}) {
-  const defaultOplExecutorAdapterReceipt = {
-    source: 'opl_executor_adapter_receipt',
-    owner: 'opl_runtime_manager',
-    hosted_adapter_reference: 'opl_hosted:hermes_agent_loop',
-    adapter: HERMES_AGENT_ADAPTER,
-    selected_executor_backend: HERMES_AGENT_ADAPTER,
-    runtime_surface: 'hermes_agent_loop',
-    ...hermesAgentAdapterRetirementBoundary(),
-    domain_truth_owner: 'redcube_ai_visual_deliverable_runtime',
-    review_export_gate_owner: 'redcube_ai',
-    activation: 'explicit_opt_in_only',
-    auditability: 'receipt_backed',
-    failure_mode: 'fail_closed',
-    effect_equivalence_guaranteed: false,
-  };
-  const oplExecutorAdapterReceipt = {
-    ...defaultOplExecutorAdapterReceipt,
-    ...(hermesContract.opl_executor_adapter_receipt || {}),
-  };
-  return {
-    owner: 'opl_runtime_manager',
-    adapter_surface: '@redcube/runtime-protocol',
-    model_selection: hermesContract.model_selection,
-    reasoning_selection: hermesContract.reasoning_selection,
-    model: hermesContract.model,
-    provider: hermesContract.provider,
-    base_url: hermesContract.base_url,
-    api_mode: hermesContract.api_mode,
-    reasoning_effort: hermesContract.reasoning_effort,
-    entrypoint: hermesContract.entrypoint,
-    source: oplExecutorAdapterReceipt.source,
-    hosted_adapter_reference: oplExecutorAdapterReceipt.hosted_adapter_reference,
-    selected_executor_backend: oplExecutorAdapterReceipt.selected_executor_backend,
-    backend_lifecycle: oplExecutorAdapterReceipt.backend_lifecycle,
-    rca_default_backend: oplExecutorAdapterReceipt.rca_default_backend,
-    adapter_deletion_gate_owner: oplExecutorAdapterReceipt.adapter_deletion_gate_owner,
-    adapter_deletion_gate: oplExecutorAdapterReceipt.adapter_deletion_gate,
-    domain_truth_owner: oplExecutorAdapterReceipt.domain_truth_owner,
-    review_export_gate_owner: oplExecutorAdapterReceipt.review_export_gate_owner,
-    activation: oplExecutorAdapterReceipt.activation,
-    auditability: oplExecutorAdapterReceipt.auditability,
-    failure_mode: oplExecutorAdapterReceipt.failure_mode,
-    effect_equivalence_guaranteed: oplExecutorAdapterReceipt.effect_equivalence_guaranteed,
-    opl_executor_adapter_receipt: oplExecutorAdapterReceipt,
-  };
-}
-
-function buildHermesAgentRuntimeDescriptor(env = process.env, executionShape = 'agent_loop', hermesProfile = null) {
-  return {
-    owner: HERMES_AGENT_EXECUTOR_BACKEND,
-    adapter_surface: '@redcube/runtime-protocol',
-    api_surface: 'hermes_agent_api_server',
-    model_selection: 'hermes_agent_server_runtime',
-    reasoning_selection: 'hermes_agent_server_runtime',
-    model: String(env.REDCUBE_HERMES_AGENT_API_COMPAT_MODEL || 'redcube-api-compat').trim(),
-    base_url: String(env.REDCUBE_HERMES_AGENT_API_BASE_URL || '').trim() || null,
-    hermes_profile: String(hermesProfile || '').trim() || null,
-    api_mode: executionShape === 'structured_call' ? 'structured_call' : 'agent_loop',
-  };
-}
-
-function buildExecutorDescriptor(executor, runtimeDescriptor) {
-  if (executor?.adapter === HERMES_AGENT_ADAPTER && executor?.execution_shape === AGENT_LOOP_EXECUTION_SHAPE) {
-    return {
-      ...(executor || {}),
-      hermes_agent_loop_runtime: runtimeDescriptor,
-    };
-  }
-  if (executor?.adapter === HERMES_AGENT_EXECUTOR_BACKEND) {
-    return {
-      ...(executor || {}),
-      hermes_agent_runtime: runtimeDescriptor,
-    };
-  }
-  return {
-    ...(executor || {}),
-    codex_cli_runtime: runtimeDescriptor,
   };
 }
 
@@ -352,88 +264,33 @@ function parseRouteRequest(request) {
   };
 }
 
-function requestHasExplicitAdapter(request) {
-  return Object.prototype.hasOwnProperty.call(request, 'adapter')
-    && String(request.adapter || '').trim();
-}
-
-function buildRuntimeDescriptor({ selectedExecutor, fallbackExecutor }) {
-  if (fallbackExecutor.adapter === HERMES_AGENT_ADAPTER && fallbackExecutor.execution_shape === AGENT_LOOP_EXECUTION_SHAPE) {
-    return buildHermesAgentLoopRuntimeDescriptor();
+function resolveRouteExecutor({ request, adapter }) {
+  const requestedBackends = [
+    request.executorBackend,
+    request.executor_backend,
+    request.oplDefaultExecutorBackend,
+    request.opl_default_executor_backend,
+  ].map((value) => String(value || '').trim()).filter(Boolean);
+  const unsupportedBackend = requestedBackends.find((value) => value !== CODEX_DEFAULT_ADAPTER);
+  if (unsupportedBackend) {
+    throw new Error(`Unsupported executor backend: ${unsupportedBackend}`);
   }
-  if (fallbackExecutor.adapter === HERMES_AGENT_EXECUTOR_BACKEND) {
-    return buildHermesAgentRuntimeDescriptor(
-      process.env,
-      selectedExecutor.execution_shape,
-      selectedExecutor.hermes_profile,
-    );
-  }
-  return buildCodexRuntimeDescriptor(readCodexCliContract());
-}
-
-function resolveRouteExecutor({ workspaceRoot, overlay, topicId, deliverableId, safeRoute, request, adapter }) {
-  const profileId = readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId });
-  const executorRouting = resolveExecutorRouting({
-    family: overlay,
-    profileId,
-    route: safeRoute,
-    requestAdapter: requestHasExplicitAdapter(request) ? adapter : null,
-    requestExecutorBackend: request.executorBackend || request.executor_backend || null,
-    oplDefaultExecutorBackend: request.oplDefaultExecutorBackend || request.opl_default_executor_backend || null,
-  });
-  const selectedExecutor = executorRouting.selected_executor;
-  const fallbackExecutor = resolveExecutorAdapter({
-    adapter: selectedExecutor.adapter,
-    executorBackend: selectedExecutor.executor_backend,
-    executionShape: selectedExecutor.execution_shape,
-    hermesProfile: selectedExecutor.hermes_profile,
-    executorRouting,
-  });
-  const runtimeDescriptor = buildRuntimeDescriptor({
-    selectedExecutor,
-    fallbackExecutor,
-  });
-  const executor = buildExecutorDescriptor(
-    {
-      adapter: fallbackExecutor.adapter,
-      executor_backend: fallbackExecutor.executor_backend,
-      execution_shape: fallbackExecutor.execution_shape,
-      primary: fallbackExecutor.primary,
-      execution_surface: fallbackExecutor.execution_surface,
-      creative_execution: fallbackExecutor.creative_execution,
-      execution_model: fallbackExecutor.execution_model,
-    },
-    runtimeDescriptor,
-  );
+  const resolved = resolveExecutorAdapter({ adapter });
   return {
-    executorRouting,
-    selectedExecutor,
-    executor,
+    ...resolved,
+    codex_cli_runtime: buildCodexRuntimeDescriptor(readCodexCliContract()),
   };
 }
 
 function buildRouteStartedEvent({ executor, safeRoute, overlay, deliverableId }) {
-  const isHermesAgent = executor.adapter === HERMES_AGENT_ADAPTER;
   return {
-    type: isHermesAgent && executor.execution_shape === AGENT_LOOP_EXECUTION_SHAPE
-      ? 'hermes_agent_loop_route_started'
-      : (isHermesAgent ? 'hermes_agent_route_started' : 'codex_route_started'),
+    type: 'codex_route_started',
     route: safeRoute,
     overlay,
     deliverable_id: deliverableId,
     ...(executor.codex_cli_runtime
       ? {
           codex_cli_runtime: executor.codex_cli_runtime,
-        }
-      : {}),
-    ...(executor.hermes_agent_loop_runtime
-      ? {
-          hermes_agent_loop_runtime: executor.hermes_agent_loop_runtime,
-        }
-      : {}),
-    ...(executor.hermes_agent_runtime
-      ? {
-          hermes_agent_runtime: executor.hermes_agent_runtime,
         }
       : {}),
   };
@@ -448,16 +305,6 @@ function patchArtifactExecutionModel(artifactFile, executor) {
           codex_cli_runtime: executor.codex_cli_runtime,
         }
       : {}),
-    ...(executor?.hermes_agent_loop_runtime
-      ? {
-          hermes_agent_loop_runtime: executor.hermes_agent_loop_runtime,
-        }
-      : {}),
-    ...(executor?.hermes_agent_runtime
-      ? {
-          hermes_agent_runtime: executor.hermes_agent_runtime,
-        }
-      : {}),
   };
   writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
 }
@@ -468,14 +315,6 @@ function candidateCountForRoute({ route, candidateCount }) {
   return route === 'visual_direction' && process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES
     ? Math.max(1, Number(process.env.REDCUBE_VISUAL_DIRECTION_CANDIDATES) || 1)
     : 1;
-}
-
-function readHydratedContractProfileId({ workspaceRoot, topicId, deliverableId }) {
-  const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
-  const deliverable = JSON.parse(readFileSync(deliverablePaths.deliverableFile, 'utf-8'));
-  const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
-  const hydratedContract = JSON.parse(readFileSync(path.join(deliverablePaths.deliverableDir, contractRef), 'utf-8'));
-  return String(hydratedContract.profile_id || deliverable.profile_id || '').trim() || null;
 }
 
 function compactArray(value) {
@@ -654,8 +493,6 @@ async function executeRouteCandidateRace({
   topicId,
   deliverableId,
   safeRoute,
-  selectedExecutor,
-  executorRouting,
   userIntent,
   mode,
   baselineDeliverableId,
@@ -676,10 +513,7 @@ async function executeRouteCandidateRace({
       topicId,
       deliverableId,
       route: safeRoute,
-      adapter: selectedExecutor.adapter,
-      executionShape: selectedExecutor.execution_shape,
-      hermesProfile: selectedExecutor.hermes_profile,
-      executorRouting,
+      adapter: executor.adapter,
       userIntent,
       mode,
       baselineDeliverableId,
@@ -843,22 +677,10 @@ export async function runDeliverableRoute(request) {
   crossProviderAttemptIndex = null,
     safeRoute,
   } = routeRequest;
-  const { executorRouting, selectedExecutor, executor } = resolveRouteExecutor({
-    workspaceRoot,
-    overlay,
-    topicId,
-    deliverableId,
-    safeRoute,
+  const executor = resolveRouteExecutor({
     request,
     adapter,
   });
-  if (selectedExecutor.executor_backend === HERMES_AGENT_EXECUTOR_BACKEND) {
-    return failRetiredHermesAgentAdapter({
-      surface: selectedExecutor.execution_shape === STRUCTURED_CALL_EXECUTION_SHAPE
-        ? 'hermes_agent_api_server'
-        : 'hermes_agent_loop',
-    });
-  }
   const effectiveCrossProviderAttemptIndex = crossProviderAttemptIndex && typeof crossProviderAttemptIndex === 'object'
     ? crossProviderAttemptIndex
     : null;
@@ -900,8 +722,6 @@ export async function runDeliverableRoute(request) {
       topicId,
       deliverableId,
       safeRoute,
-      selectedExecutor,
-      executorRouting,
       userIntent,
       mode,
       baselineDeliverableId,

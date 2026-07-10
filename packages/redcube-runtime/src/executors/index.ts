@@ -1,13 +1,6 @@
 import {
-  AGENT_LOOP_EXECUTION_SHAPE,
   CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_AGENT_ADAPTER,
-  STRUCTURED_CALL_EXECUTION_SHAPE,
   buildCodexExecutorDescriptor,
-  buildHermesExecutorDescriptor,
-  buildHermesAgentLoopExecutorDescriptor,
-  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 import { loadRuntimeFamilyRunner } from '../default-registries.js';
 import type { RuntimeFamilyContract } from '../default-registries.js';
@@ -34,83 +27,22 @@ interface ExecutorRouteInput {
   stageContract: { stage_id?: string } | null;
   mode?: string;
   baselineDeliverableId?: string;
-  executionShape?: 'structured_call' | 'agent_loop';
-  hermesProfile?: string | null;
-  executorRouting?: Record<string, unknown> | null;
 }
 
-interface ExecutorDescriptor extends Record<string, unknown> {
-  adapter: string;
-  executor_backend?: 'codex_cli' | 'hermes_agent';
-  execution_shape?: 'structured_call' | 'agent_loop';
-  execution_model?: Record<string, unknown>;
-}
-
-interface ExecutorAdapter extends ExecutorDescriptor {
+interface ExecutorAdapter extends Record<string, unknown> {
+  adapter: 'codex_cli';
+  executor_backend: 'codex_cli';
+  execution_shape: 'structured_call';
+  execution_model: Record<string, unknown>;
   runRoute(input: ExecutorRouteInput): Promise<Record<string, unknown>>;
 }
 
-/**
- * @param {{ adapter?: string, executorBackend?: "codex_cli" | "hermes_agent", executionShape?: "structured_call" | "agent_loop", hermesProfile?: string | null, executorRouting?: Record<string, unknown> | null }} [options]
- * @returns {ExecutorAdapter}
- */
 export function resolveExecutorAdapter({
   adapter = CODEX_DEFAULT_ADAPTER,
-  executorBackend = undefined,
-  executionShape = undefined,
-  hermesProfile = null,
-  executorRouting = null,
 }: {
   adapter?: string;
-  executorBackend?: 'codex_cli' | 'hermes_agent';
-  executionShape?: 'structured_call' | 'agent_loop';
-  hermesProfile?: string | null;
-  executorRouting?: Record<string, unknown> | null;
 } = {}): ExecutorAdapter {
-  const requestedAdapter = String(adapter || '').trim();
-  const requestedBackend = executorBackend || (
-    requestedAdapter === HERMES_AGENT_EXECUTOR_BACKEND || requestedAdapter === HERMES_AGENT_ADAPTER
-      ? HERMES_AGENT_EXECUTOR_BACKEND
-      : 'codex_cli'
-  );
-  const requestedShape = executionShape || (
-    requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
-      ? AGENT_LOOP_EXECUTION_SHAPE
-      : STRUCTURED_CALL_EXECUTION_SHAPE
-  );
-  const descriptorBase = (
-    requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedShape === AGENT_LOOP_EXECUTION_SHAPE
-      ? buildHermesAgentLoopExecutorDescriptor({ adapter })
-      : (
-          requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
-            ? buildHermesExecutorDescriptor({ adapter })
-            : buildCodexExecutorDescriptor({ adapter })
-        )
-  ) as unknown as ExecutorDescriptor;
-  const descriptor = {
-    ...descriptorBase,
-    adapter: requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND && requestedAdapter !== HERMES_AGENT_ADAPTER
-      ? HERMES_AGENT_EXECUTOR_BACKEND
-      : descriptorBase.adapter,
-    ...(executionShape
-      ? {
-          execution_shape: requestedShape,
-          execution_model: {
-            ...(descriptorBase.execution_model || {}),
-            execution_shape: requestedShape,
-            ...(requestedShape === STRUCTURED_CALL_EXECUTION_SHAPE && requestedBackend === HERMES_AGENT_EXECUTOR_BACKEND
-              ? {
-                  mainline_adapter: HERMES_AGENT_EXECUTOR_BACKEND,
-                  primary_surface: 'hermes_agent_api_server',
-                  requested_adapter: HERMES_AGENT_EXECUTOR_BACKEND,
-                }
-              : {}),
-          },
-        }
-      : {}),
-    ...(hermesProfile ? { hermes_profile: hermesProfile } : {}),
-    ...(executorRouting ? { executor_routing: executorRouting } : {}),
-  } as ExecutorDescriptor;
+  const descriptor = buildCodexExecutorDescriptor({ adapter });
 
   return {
     ...descriptor,
@@ -124,22 +56,12 @@ export function resolveExecutorAdapter({
       stageContract,
       mode = 'draft_new',
       baselineDeliverableId = '',
-      executionShape = descriptor.execution_shape,
-      hermesProfile = String(descriptor.hermes_profile || '').trim() || null,
-      executorRouting = descriptor.executor_routing as Record<string, unknown> | null,
     }) {
       if (!stageContract?.stage_id) {
         throw new Error(`Missing stage contract for route: ${route}`);
       }
       if (stageContract.stage_id !== route) {
         throw new Error(`Stage contract mismatch: expected ${route}, got ${stageContract.stage_id}`);
-      }
-      if (descriptor.executor_backend === HERMES_AGENT_EXECUTOR_BACKEND) {
-        return failRetiredHermesAgentAdapter({
-          surface: descriptor.execution_shape === STRUCTURED_CALL_EXECUTION_SHAPE
-            ? 'hermes_agent_api_server'
-            : 'hermes_agent_loop',
-        }) as never;
       }
 
       const familyRunner = await loadRuntimeFamilyRunner(contract);
@@ -153,9 +75,6 @@ export function resolveExecutorAdapter({
         baselineDeliverableId,
         adapter: descriptor.adapter,
         executor: descriptor,
-        executionShape,
-        hermesProfile,
-        executorRouting,
       }) as Record<string, unknown>;
       return {
         overlay,

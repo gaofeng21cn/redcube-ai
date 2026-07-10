@@ -10,9 +10,6 @@ import {
   runDeliverableRoute,
   withMockCodexRuntime,
 } from './runtime-deliverable-route-cases/shared.ts';
-import {
-  failRetiredHermesAgentAdapter,
-} from './package-surfaces.ts';
 
 test('completed deliverable routes keep Codex runtime topology and OPL attempt refs', async () => {
   await withMockCodexRuntime(async () => {
@@ -56,11 +53,4 @@ test('completed deliverable routes keep Codex runtime topology and OPL attempt r
     assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'runs')), false);
     assert.equal(existsSync(path.join(workspaceRoot, 'runtime', 'events')), false);
   });
-});
-
-test('retired Hermes-Agent adapter fails closed at the executor boundary', () => {
-  assert.throws(
-    () => failRetiredHermesAgentAdapter({ surface: 'hermes_agent_api_server' }),
-    /RCA-owned Hermes-Agent adapter has been retired.*adapter_deletion_gate_owner=opl_agent_executor_adapter/,
-  );
 });

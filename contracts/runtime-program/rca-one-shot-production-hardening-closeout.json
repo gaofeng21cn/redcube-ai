@@ -80,20 +80,19 @@
     },
     {
       "lane_id": "B",
-      "status": "absorbed_to_main_before_closeout_lane",
+      "status": "superseded_by_opl_executor_owner_cutover",
       "evidence_refs": [
-        "contracts/runtime-program/rca-executor-routing-config.schema.json",
-        "config/examples/executor-routing.example.json",
-        "human_doc:rca_executor_routing_config_reference",
-        "packages/redcube-config/src/index.ts",
-        "tests/runtime-config.test.ts",
+        "contracts/pack_compiler_input.json#/source_refs/executor_policy_source_ref",
+        "contracts/stage_control_plane.json#/stages/*/selected_executor",
+        "packages/redcube-domain-entry/src/actions/opl-stage-execution-plan.ts",
+        "packages/redcube-runtime/src/executors/index.ts",
         "tests/rca-executor-backend-contract.test.ts"
       ],
       "landed_truth": [
-        "codex_cli remains the production default executor",
-        "production structured-call route failure policy defaults to fail_closed",
-        "fallback_with_proof is valid only when lane is experimental_proof and fallback is inherit_effective_default_executor",
-        "hermes_agent remains explicit proof backend without behavior or quality equivalence claims"
+        "RCA materializes only the codex_cli executor descriptor",
+        "OPL owns generic executor selection and attempt-ledger truth through opaque stage-control refs",
+        "RCA direct runtime rejects non-codex executor adapters without silent fallback",
+        "fix_html remains a single Codex pass with targeted repair, recovery and screenshot_review continuation"
       ]
     },
     {

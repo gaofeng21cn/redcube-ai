@@ -25,9 +25,6 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
-type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
-type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
-
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
   story_architecture: string[];
@@ -69,11 +66,6 @@ export interface RuntimeCreativeOwnershipExecutionContract {
   };
   adapter_roles: {
     codex_cli: 'formal_primary_executor';
-  };
-  proof_executor: {
-    adapter: 'hermes_agent';
-    runtime: 'hermes_agent_loop';
-    status: 'opt_in_proof_executor';
   };
   protected_creative_routes: {
     xiaohongshu: RuntimeCreativeOwnershipLifecycleFamilyMapping;
@@ -140,8 +132,6 @@ export interface RuntimeCreativeOwnershipAudit {
   shared_execution_contract: {
     primary_adapter: 'codex_cli';
     primary_runtime: 'codex_cli_runtime';
-    proof_executor: 'hermes_agent';
-    proof_runtime: 'hermes_agent_loop';
     freeze_origin_milestone: 'P19.A';
     mainline_topology: string[];
   };
@@ -202,7 +192,6 @@ export interface RuntimeCreativeOwnershipCloseoutAudit {
     mainline_adapter: 'codex_cli';
     primary_surface: 'codex_cli_runtime';
     adapter_role: 'primary_creative_executor';
-    proof_executor: 'hermes_agent';
     freeze_origin_milestone: 'P19.A';
   };
   unified_lifecycle: {
@@ -296,10 +285,6 @@ export interface RuntimeRunRouteRequest {
   route: string;
   runId?: string | null;
   adapter?: string;
-  executorBackend?: 'codex_cli' | 'hermes_agent';
-  executor_backend?: 'codex_cli' | 'hermes_agent';
-  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
-  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   mode?: string;
   baselineDeliverableId?: string;

@@ -1,36 +1,31 @@
 import type { RunDeliverableRouteRequest } from '../types.js';
 import type { RouteRunDomainEntryResponse } from './run-deliverable-route-parts/shared.js';
 
-import { runFixHtmlWithAgenticEscalation } from './run-deliverable-route-parts/fix-html-escalation.js';
 import { buildRouteRunDomainEntryResponse } from './run-deliverable-route-parts/domain-entry-response.js';
 import {
   runRouteWithRecoveryAndContinuation,
 } from './run-deliverable-route-parts/recovery.js';
 import { safeText } from './run-deliverable-route-parts/shared.js';
+import { hydrateResultArtifactFromStage } from './run-deliverable-route-parts/stage-artifacts.js';
 
 export async function runDeliverableRoute(request: RunDeliverableRouteRequest): Promise<RouteRunDomainEntryResponse> {
+  const routedRequest = request.route === 'fix_html' && !safeText(request.stopAfterStage)
+    ? { ...request, stopAfterStage: 'screenshot_review' }
+    : request;
+  const routed = await runRouteWithRecoveryAndContinuation(routedRequest);
+  let result = routed.result;
   if (request.route === 'fix_html') {
-    const escalated = await runFixHtmlWithAgenticEscalation(request);
-    return buildRouteRunDomainEntryResponse({
-      request: {
-        ...request,
-        stopAfterStage: safeText(request.stopAfterStage, escalated.executionProof.stop_after_stage),
-      },
-      result: escalated.result,
-      dependencyRouteRuns: escalated.dependencyRouteRuns,
-      continuationRouteRuns: escalated.continuationRouteRuns,
-      recoveryTerminalReason: escalated.recoveryTerminalReason,
-      executionProof: escalated.executionProof,
-    });
+    const qualityBlocked = safeText(result.run?.status) === 'quality_blocked';
+    if (qualityBlocked || !safeText(request.stopAfterStage)) {
+      result = hydrateResultArtifactFromStage(request, result, 'fix_html');
+    }
+    if (qualityBlocked) result = { ...result, ok: true };
   }
-
-  const routed = await runRouteWithRecoveryAndContinuation(request);
   return buildRouteRunDomainEntryResponse({
-    request,
-    result: routed.result,
+    request: routedRequest,
+    result,
     dependencyRouteRuns: routed.dependencyRouteRuns,
     continuationRouteRuns: routed.continuationRouteRuns,
     recoveryTerminalReason: routed.recoveryTerminalReason,
-    executionProof: null,
   });
 }

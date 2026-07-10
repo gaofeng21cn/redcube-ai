@@ -471,7 +471,7 @@ test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings',
 
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-generation-'));
 
     await createDeliverable({
       workspaceRoot,

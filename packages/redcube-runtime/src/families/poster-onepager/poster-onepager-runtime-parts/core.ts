@@ -469,7 +469,7 @@ export function createPosterOnepagerRuntimeCore() {
     }
     writeText(
       reviewMarkdown,
-      buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime, adapter)),
+      buildScreenshotReviewMarkdown(contract, artifact, primarySurface(generationRuntime)),
     );
     if (artifact.status === 'pass') {
       artifact.artifact_refs = [

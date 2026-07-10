@@ -66,7 +66,7 @@ RCA 继续持有 visual truth、review/publication projection 与 artifact autho
 - `OPL` 不拥有 canonical artifacts、review truth、publication projection 或 concrete executor。
 - RCA 不引入 MAS 的 medical publication gate。
 - RCA 不引入 MAG 的 grant fundability gate。
-- `Hermes-Agent` 只保留显式 hosted/proof backend，不成为 OPL 或 RCA 的默认 owner。
+- 非 Codex executor 的 hosted selection、attempt ledger 与 receipt 归 OPL owner surface；RCA 不保留本地 adapter/proof backend。
 
 ## Domain Memory Index Status
 

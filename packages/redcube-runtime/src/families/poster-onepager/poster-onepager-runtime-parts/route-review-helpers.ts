@@ -2,16 +2,12 @@
 import { generateStructuredArtifactViaCodexCli } from '../../../executors/codex-caller.js';
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
-  buildHermesAgentLoopExecutionModel,
-  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 
 export { CODEX_DEFAULT_ADAPTER };
 
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 
 export function lifecycleStageForRoute(contract, route) {
   return contract?.lifecycle_model?.route_to_stage?.[route] || null;
@@ -25,33 +21,32 @@ export async function generateStructuredArtifact({
   adapter = CODEX_DEFAULT_ADAPTER,
   ...input
 }) {
-  if (adapter === HERMES_AGENT_ADAPTER) {
-    return failRetiredHermesAgentAdapter();
+  if (adapter !== CODEX_DEFAULT_ADAPTER) {
+    throw new Error(`Unsupported executor adapter: ${adapter}`);
   }
   return generateStructuredArtifactViaCodexCli(input);
 }
 
 export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText }) {
   function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    return adapter === HERMES_AGENT_ADAPTER
-      ? HERMES_AGENT_LOOP_EXECUTION_MODEL
-      : CODEX_EXECUTION_MODEL;
+    if (adapter !== CODEX_DEFAULT_ADAPTER) {
+      throw new Error(`Unsupported executor adapter: ${adapter}`);
+    }
+    return CODEX_EXECUTION_MODEL;
   }
 
-  function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  function creativeOwner(generationRuntime = null) {
     if (safeText(generationRuntime?.creative_owner)) {
       return safeText(generationRuntime.creative_owner);
     }
-    return adapter === HERMES_AGENT_ADAPTER ? HERMES_AGENT_ADAPTER : 'codex_cli';
+    return CODEX_DEFAULT_ADAPTER;
   }
 
-  function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  function primarySurface(generationRuntime = null) {
     if (safeText(generationRuntime?.primary_surface)) {
       return safeText(generationRuntime.primary_surface);
     }
-    return adapter === HERMES_AGENT_ADAPTER
-      ? 'hermes_agent_loop'
-      : 'codex_cli_runtime';
+    return 'codex_cli_runtime';
   }
 
   function creativeExecution(
@@ -60,8 +55,8 @@ export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText })
     adapter = CODEX_DEFAULT_ADAPTER,
   ) {
     return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
+      owner: creativeOwner(generationRuntime),
+      primary_surface: primarySurface(generationRuntime),
       lifecycle_stage: lifecycleStage,
       ownership_model: 'director_first',
       ...(generationRuntime
@@ -81,9 +76,9 @@ export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText })
     adapter = CODEX_DEFAULT_ADAPTER,
   }) {
     return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      stage_owner: primarySurface(generationRuntime, adapter),
+      owner: creativeOwner(generationRuntime),
+      primary_surface: primarySurface(generationRuntime),
+      stage_owner: primarySurface(generationRuntime),
       route,
       lifecycle_stage: lifecycleStage,
       authored_surface: authoredSurface,
@@ -94,7 +89,7 @@ export function createPosterOnepagerRouteReviewHelpers({ promptMeta, safeText })
   function reviewAuthorship(overlay, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
     return {
       overlay,
-      primary_surface: primarySurface(generationRuntime, adapter),
+      primary_surface: primarySurface(generationRuntime),
       contract_asset: 'prompt_pack_seed',
     };
   }

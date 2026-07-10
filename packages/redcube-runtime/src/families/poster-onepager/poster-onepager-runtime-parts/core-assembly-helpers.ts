@@ -309,7 +309,7 @@ export function createPosterOnepagerCoreAssemblyHelpers(deps) {
     const reviewSummary = requireText(data?.review_summary, 'visual_director_review.review_summary');
     const status = failedChecks.length === 0 ? 'pass' : 'block';
     const reviewFile = path.join(deliverablePaths.reportsDir, `${deliverablePaths.deliverableId}_视觉总监复盘.md`);
-    const reviewOwner = primarySurface(generationRuntime, adapter);
+    const reviewOwner = primarySurface(generationRuntime);
     writeText(reviewFile, [
       '# 视觉总监复盘',
       '',

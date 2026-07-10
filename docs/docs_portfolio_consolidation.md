@@ -50,7 +50,7 @@ RCA 文档只维护 visual-deliverable domain agent 的目标、差距、visual 
 | --- | --- |
 | Public/spec thin indexes | `docs/public/` 和 `docs/specs/` 只保持薄索引职责，不承接旧 program、capabilities 或 reference 正文。 |
 | Human-doc inventory | [文档索引](./README.md) 持有 repo-tracked `README*` 与 `docs/**/*.md` 的路径组级 lifecycle role；它只导航，不替代核心五件套、contracts/source/tests 或 runtime evidence。 |
-| Product-entry / OPL handoff support | `docs/references/product-entry/` 三个 contract-linked brief、`docs/references/integration/opl-family-contract-adoption.md`、memory locator 与 opt-in executor routing refs 是 support SSOT；重复 handoff overview、managed product-entry hardening 和 path compatibility 只保留在 history/tombstone。 |
+| Product-entry / OPL handoff support | `docs/references/product-entry/` 三个 contract-linked brief、`docs/references/integration/opl-family-contract-adoption.md`、memory locator 与 OPL executor policy refs 是 support SSOT；重复 handoff overview、managed product-entry hardening、RCA-local executor routing 和 path compatibility 只保留在 history/tombstone。 |
 | Runtime / delivery / source historical freezes | 旧 OPL managed runtime 三层讨论、route evolution probe、direct-delivery/source future freeze、Deep Research auto-first product semantics 和 creative-stage audit 只作为 history/provenance 读取；当前 truth 回到 owner docs、active gap plan、machine-readable contracts、source 和 tests。 |
 | Old route vocabulary | `docs/history/phase-2/`、`docs/history/hermes/`、`docs/history/plans/`、`docs/history/positioning/` 和 `docs/history/tombstones/` 只保留 provenance/tombstone；Gateway、Hermes-first、frontdoor、federation、source-pack-federation、old workbench 或 Phase 2 词汇不得回流 active/current。 |
 | Capability-like material | 不恢复 `docs/capabilities/`；新增 capability-like 内容先进入 contracts、manifest、domain action catalog 或对应 owner doc。 |

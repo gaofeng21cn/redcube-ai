@@ -130,7 +130,6 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
   run: Record<string, unknown>;
   events: unknown[];
   artifactFile?: string;
-  execution_proof?: Record<string, unknown>;
   error?: unknown;
   error_kind: string | null;
   governance_surface: GovernanceSurfaceContract;
@@ -144,10 +143,6 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {
   route: string;
   adapter?: string;
-  executorBackend?: 'codex_cli' | 'hermes_agent';
-  executor_backend?: 'codex_cli' | 'hermes_agent';
-  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
-  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   stopAfterStage?: string;
   crossProviderAttemptIndex?: Record<string, unknown>;

@@ -241,11 +241,6 @@ export const P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT = Object.freeze({
   adapter_roles: {
     codex_cli: 'formal_primary_executor',
   },
-  proof_executor: {
-    adapter: 'hermes_agent',
-    runtime: 'hermes_agent_loop',
-    status: 'opt_in_proof_executor',
-  },
   protected_creative_routes: P19_UNIFIED_LIFECYCLE_CONTRACT.family_mapping,
   primary_creative_routes: {
     xiaohongshu: ['storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'repair_image_pages', 'render_html', 'fix_html', 'publish_copy'],
@@ -439,8 +434,6 @@ export function buildCreativeOwnershipResidueAudit() {
     shared_execution_contract: {
       primary_adapter: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.adapter,
       primary_runtime: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.primary_executor.runtime,
-      proof_executor: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.adapter,
-      proof_runtime: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.proof_executor.runtime,
       freeze_origin_milestone: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.milestone,
       mainline_topology: P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT.mainline_topology,
     },

@@ -5,7 +5,6 @@ import type {
 } from './overlay/index.js';
 import type {
   CodexExecutionModel,
-  HermesAgentLoopExecutionModel,
 } from '@redcube/runtime-protocol';
 
 export type PosterProfileId = 'knowledge_poster';
@@ -323,7 +322,7 @@ interface CompilePosterRenderSlidesInput {
   recipeMarkupArtifacts: Record<string, string>;
 }
 
-export type PosterRuntimeExecutionModel = CodexExecutionModel | HermesAgentLoopExecutionModel;
+export type PosterRuntimeExecutionModel = CodexExecutionModel;
 
 export type PosterRuntimeRoute = PosterOnepagerStageId;
 export type PosterRuntimeMode = 'draft_new' | 'optimize_existing';

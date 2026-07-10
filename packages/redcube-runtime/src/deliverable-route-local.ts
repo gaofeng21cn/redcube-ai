@@ -285,9 +285,6 @@ function buildRouteCacheKey({
   mode,
   baselineDeliverableId,
   adapter,
-  executionShape,
-  hermesProfile,
-  executorRouting,
   requiredArtifactFiles = [],
 }) {
   return createHash('sha256').update(stableJson({
@@ -308,9 +305,6 @@ function buildRouteCacheKey({
     mode,
     baselineDeliverableId,
     adapter,
-    executionShape: safeText(executionShape),
-    hermesProfile: safeText(hermesProfile),
-    executorRouting: executorRouting || null,
     input_fingerprints: routeInputFingerprints(requiredArtifactFiles),
   })).digest('hex');
 }
@@ -689,9 +683,6 @@ export async function executeDeliverableRouteLocally({
   deliverableId,
   route,
   adapter = CODEX_DEFAULT_ADAPTER, userIntent = '',
-  executionShape = undefined,
-  hermesProfile = null,
-  executorRouting = null,
   mode = 'draft_new',
   baselineDeliverableId = '',
   oplRouteAttemptIndex = null,
@@ -707,9 +698,6 @@ export async function executeDeliverableRouteLocally({
   });
   const executor = resolveExecutorAdapter({
     adapter,
-    executionShape,
-    hermesProfile,
-    executorRouting,
   });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   const storedDeliverable = JSON.parse(
@@ -763,9 +751,6 @@ export async function executeDeliverableRouteLocally({
     mode,
     baselineDeliverableId,
     adapter: executor.adapter,
-    executionShape: executor.execution_shape,
-    hermesProfile: executor.hermes_profile,
-    executorRouting,
     requiredArtifactFiles,
   });
 
@@ -858,9 +843,6 @@ export async function executeDeliverableRouteLocally({
     deliverablePaths,
     mode,
     baselineDeliverableId,
-    executionShape,
-    hermesProfile,
-    executorRouting,
   }), routeCacheKey);
   const artifact = attachRouteArtifactCloseoutRefs({
     overlay,

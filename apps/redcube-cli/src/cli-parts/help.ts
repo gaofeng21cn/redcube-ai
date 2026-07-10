@@ -85,7 +85,7 @@ export function buildCommandHelp(commandKey: string): JsonMap | null {
     },
     'deliverable run': {
       summary: '生成按指定 stage 截止的 OPL stage execution plan，由 OPL provider 接管 StageRun。',
-      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
+      usage: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <opl-executor-ref>]',
       action_ref: 'invokeDomainEntry',
       boundary_fields: ['workspaceRoot', 'topicId', 'deliverableId'],
     },
@@ -188,7 +188,7 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       },
       {
         task: '按声明的 route 生成 OPL StageRun 执行计划',
-        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
+        command: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <opl-executor-ref>]',
       },
       {
         task: '生成 OPL stage execution plan 并交给 OPL provider 执行',
@@ -247,8 +247,8 @@ export async function buildHelp(domainActions: DomainActionMap): Promise<JsonMap
       deliverableCreate: 'redcube deliverable create --workspace-root <dir> --overlay <overlay-id> --profile-id <profile-id> --topic-id <id> --deliverable-id <id> --title <text> --goal <text>',
       deliverableGet: 'redcube deliverable get --workspace-root <dir> --topic-id <id> --deliverable-id <id>',
       deliverableAudit: 'redcube deliverable audit --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --mode <draft_new|optimize_existing> [--baseline-deliverable-id <id>]',
-      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <codex_cli|hermes_agent>]',
-      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <codex_cli|hermes_agent>]',
+      deliverableExecute: 'redcube deliverable execute --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> [--user-intent <text>] [--stop-after-stage <stage>] [--adapter <opl-executor-ref>]',
+      deliverableRun: 'redcube deliverable run --workspace-root <dir> --overlay <id> --topic-id <id> --deliverable-id <id> --route <stage> [--adapter <opl-executor-ref>]',
       productInvoke: 'redcube product invoke --workspace-root <dir> --entry-session-id <id> --overlay <overlay-id> --topic-id <id> --deliverable-id <id> [--profile-id <profile-id>] [--title <text>] [--goal <text>] [--task-intent <run_opl_stage_execution_plan|run_deliverable_route>] [--route <stage>] [--user-intent <text>] [--lifecycle-policy <policy>] [--stop-after-stage <stage>] [--constraints-json <json>] [--constraints-file <json>] [--native-sample-slide-count <n>]',
       domainHandlerExport: 'redcube domain-handler export --workspace-root <dir> [--workspace-receipt-scaleout-root <dir>[,<dir>...]] --format json',
       domainHandlerDispatch: 'redcube domain-handler dispatch --task <task.json> --format json',

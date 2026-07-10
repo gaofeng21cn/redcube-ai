@@ -28,7 +28,7 @@ OPL 是 stage-led family runtime、generated/default caller、projection、opera
 
 任务启动后，持久在线调度、唤醒、restart/resume/re-query、retry/dead-letter、StageRun、provider attempt、attempt ledger、lease 和 receipt residency 归 OPL/Temporal。RCA 不实现 repo-owned generic daemon、scheduler、attempt loop、attempt ledger、generic session/workbench shell 或 App/runtime owner。
 
-`Codex CLI` 是当前第一公民 concrete stage executor。`Hermes-Agent`、Claude Code 等其他 executor 只能作为显式 opt-in adapter / proof backend 接入，必须可回执、可审计、fail closed，但不承诺视觉质量、tool semantics、resume 或 artifact 结果与 Codex CLI 等价。
+`Codex CLI` 是 RCA 当前唯一物化的 concrete stage executor。其他 executor 的选择、托管与 attempt ledger 归 OPL owner surface；RCA 只消费 `stage_control_plane` 中的 opaque executor refs，不维护本地 adapter、routing config、fallback 或 proof backend。
 
 ### RCA authority kernel 保留 visual judgment 和 artifact authority
 

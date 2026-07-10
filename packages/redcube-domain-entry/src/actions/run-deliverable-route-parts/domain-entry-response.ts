@@ -5,7 +5,6 @@ import path from 'node:path';
 import type { RunDeliverableRouteRequest } from '../../types.js';
 import type {
   DependencyRouteRun,
-  FixHtmlExecutionProof,
   RouteRunDomainEntryResponse,
   RuntimeRouteResult,
 } from './shared.js';
@@ -22,14 +21,12 @@ export function buildRouteRunDomainEntryResponse({
   dependencyRouteRuns,
   continuationRouteRuns,
   recoveryTerminalReason,
-  executionProof = null,
 }: {
   request: RunDeliverableRouteRequest;
   result: RuntimeRouteResult;
   dependencyRouteRuns: DependencyRouteRun[];
   continuationRouteRuns: DependencyRouteRun[];
   recoveryTerminalReason: string | null;
-  executionProof?: FixHtmlExecutionProof | null;
 }): RouteRunDomainEntryResponse {
   const deliverablePaths = getDeliverablePaths(
     request.workspaceRoot,
@@ -66,11 +63,9 @@ export function buildRouteRunDomainEntryResponse({
       continued_route_sequence: continuationRouteRuns.map((entry) => entry.route),
       stop_after_stage: safeText(request.stopAfterStage) || null,
       recovery_terminal_reason: recoveryTerminalReason,
-      fix_html_escalation_status: executionProof?.escalation_status || null,
     },
     dependency_route_runs: dependencyRouteRuns,
     continuation_route_runs: continuationRouteRuns,
-    ...(executionProof ? { execution_proof: executionProof } : {}),
     artifactFile: routeResultArtifactFile(result) || undefined,
     artifact: result.artifact || null,
     governance_surface: buildGovernanceSurfaceContract(hydratedContract),

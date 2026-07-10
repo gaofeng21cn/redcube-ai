@@ -24,7 +24,7 @@ function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
-test('current runtime defaults to Codex substrate while Hermes hosted proof stays opt-in', async () => {
+test('current runtime materializes only the Codex substrate', async () => {
   const upstream = await startMockCodexCli();
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
@@ -45,14 +45,10 @@ test('current runtime defaults to Codex substrate while Hermes hosted proof stay
       /Unsupported executor adapter: external_llm/,
     );
 
-    const hermesNativeProof = resolveExecutorAdapter({ adapter: 'hermes_agent' });
-    assert.equal(hermesNativeProof.adapter, 'hermes_agent');
-    assert.equal(hermesNativeProof.primary, false);
-    assert.equal(hermesNativeProof.execution_model.mainline_adapter, 'hermes_agent');
-    assert.equal(hermesNativeProof.execution_model.primary_surface, 'hermes_agent_loop');
-    assert.equal(hermesNativeProof.execution_model.adapter_role, 'opl_hosted_executor_adapter_proof');
-    assert.equal(hermesNativeProof.execution_model.default_model_selection, 'inherit_local_hermes_default');
-    assert.equal(hermesNativeProof.execution_model.default_reasoning_effort, 'inherit_local_hermes_default');
+    assert.throws(
+      () => resolveExecutorAdapter({ adapter: 'hermes_agent' }),
+      /Unsupported executor adapter: hermes_agent/,
+    );
 
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-p19-executor-'));
     await createDeliverable({
@@ -100,7 +96,7 @@ test('P19 audit freezes unified lifecycle, shared review overlay, and current op
   assert.equal(audit.closeout_ready, true);
   assert.equal(audit.execution_model.mainline_adapter, 'codex_cli');
   assert.equal(audit.execution_model.primary_surface, 'codex_cli_runtime');
-  assert.equal(audit.execution_model.proof_executor, 'hermes_agent');
+  assert.equal('proof_executor' in audit.execution_model, false);
   assert.equal(audit.execution_model.freeze_origin_milestone, 'P19.A');
   assert.deepEqual(audit.unified_lifecycle.stages, [
     'source_readiness',
@@ -160,7 +156,7 @@ test('P19 audit emits a machine-readable closeout report artifact', () => {
   assert.equal(stored.milestone, 'P19.D');
   assert.equal(stored.phase, 'shared_execution_and_audit_closeout');
   assert.equal(stored.closeout_ready, true);
-  assert.equal(stored.execution_model.proof_executor, 'hermes_agent');
+  assert.equal('proof_executor' in stored.execution_model, false);
   assert.equal(stored.residue.xiaohongshu.status, 'cleared');
   assert.equal(stored.residue.ppt_deck.status, 'cleared');
   assert.equal(stored.review_overlay.ppt_deck.status, 'active');

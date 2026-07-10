@@ -17,9 +17,7 @@ import {
   withEnv,
   completeSourceReadiness,
   MODULE_DIR,
-  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   withMockCodexRuntime,
-  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute uses Codex-backed executor by default', async () => {
@@ -121,7 +119,7 @@ test('runDeliverableRoute executes other declared stages through Codex-backed ex
   });
 });
 
-test('runDeliverableRoute fails closed for explicit retired hermes_agent adapter without changing the default executor', async () => {
+test('runDeliverableRoute rejects explicit hermes_agent without changing the default executor', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-hermes-retired-'));
 
@@ -144,7 +142,42 @@ test('runDeliverableRoute fails closed for explicit retired hermes_agent adapter
         route: 'storyline',
         adapter: 'hermes_agent',
       }),
-      /RCA-owned Hermes-Agent adapter has been retired/,
+      /Unsupported executor adapter: hermes_agent/,
     );
+  });
+});
+
+test('runDeliverableRoute rejects retired executor backend request fields', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-backend-retired-'));
+
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_student',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      title: 'Hermes-Agent retired backend fields',
+      goal: '验证旧 backend request 字段不能静默回落到 Codex',
+    });
+
+    for (const field of [
+      'executorBackend',
+      'executor_backend',
+      'oplDefaultExecutorBackend',
+      'opl_default_executor_backend',
+    ]) {
+      await assert.rejects(
+        () => runDeliverableRoute({
+          workspaceRoot,
+          overlay: 'ppt_deck',
+          topicId: 'topic-a',
+          deliverableId: 'deck-a',
+          route: 'storyline',
+          [field]: 'hermes_agent',
+        }),
+        /Unsupported executor backend: hermes_agent/,
+      );
+    }
   });
 });

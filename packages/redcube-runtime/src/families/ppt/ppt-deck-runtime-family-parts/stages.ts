@@ -795,7 +795,7 @@ export function createPptDeckStageParts(deps) {
     const renderedReviewMarkdown = buildReviewMarkdown(
       contract,
       artifact,
-      primarySurface(generationRuntime, adapter),
+      primarySurface(generationRuntime),
     );
     writeText(reviewCapture.reviewMarkdownFile, renderedReviewMarkdown);
     writeText(reviewMarkdown, renderedReviewMarkdown);
