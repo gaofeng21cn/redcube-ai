@@ -9,7 +9,6 @@ import { fileURLToPath } from 'node:url';
 import {
   createDeliverable,
   getDeliverable,
-  getRun,
   runtimeWatch,
   runDeliverableRoute,
 } from '../product-domain-action-test-api.ts';
@@ -57,7 +56,6 @@ export {
   writeFileSync,
   createDeliverable,
   getDeliverable,
-  getRun,
   runtimeWatch,
   runDeliverableRoute,
   startMockCodexCli,

@@ -14,7 +14,6 @@ export { writeSourceAugmentationResult } from './actions/write-source-augmentati
 export { executeSourceAugmentation } from './actions/execute-source-augmentation.js';
 export { createDeliverable } from './actions/create-deliverable.js';
 export { getDeliverable } from './actions/get-deliverable.js';
-export { getRun } from './actions/get-run.js';
 export { runDeliverableRoute } from './actions/run-deliverable-route.js';
 export { runSourceFirstFanout } from './actions/run-source-first-fanout.js';
 export { invokeDomainEntry } from './actions/invoke-domain-entry.js';
@@ -111,7 +110,6 @@ export type {
   ReviewStateResponse,
   RouteRunResponse,
   RunDeliverableRouteRequest,
-  RunRecordResponse,
   SourceIntakeResponse,
   SourceAugmentationResponse,
   SourceAugmentationResultPreparationResponse,
