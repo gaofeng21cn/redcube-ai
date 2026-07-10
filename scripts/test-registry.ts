@@ -122,6 +122,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/ppt-native-template-layout-grammar.test.ts',
     'tests/ppt-native-plan-preflight-panel-safe-area.test.ts',
     'tests/ppt-native-ppt-repair-runtime.test.ts',
+    'tests/ppt-native-editability-regression.test.ts',
     'tests/ppt-native-object-package.test.ts',
     'tests/ppt-native-benchmark-fixture-preservation.test.ts',
     'tests/ppt-native-quality-package-gates.test.ts',

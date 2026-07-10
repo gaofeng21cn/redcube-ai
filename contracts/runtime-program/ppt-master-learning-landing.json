@@ -20,7 +20,24 @@
       "skills/ppt-master/references/modes/_index.md",
       "skills/ppt-master/references/visual-styles/_index.md",
       "skills/ppt-master/templates/charts/charts_index.json",
-      "skills/ppt-master/templates/charts/README.md"
+      "skills/ppt-master/templates/charts/README.md",
+      "skills/ppt-master/workflows/index.md",
+      "skills/ppt-master/workflows/topic-research.md",
+      "skills/ppt-master/workflows/template-fill-pptx.md",
+      "skills/ppt-master/workflows/beautify-pptx.md",
+      "skills/ppt-master/workflows/create-template.md",
+      "skills/ppt-master/workflows/create-brand.md",
+      "skills/ppt-master/workflows/resume-execute.md",
+      "skills/ppt-master/workflows/refine-spec.md",
+      "skills/ppt-master/workflows/verify-charts.md",
+      "skills/ppt-master/workflows/customize-animations.md",
+      "skills/ppt-master/workflows/native-enhance-pptx.md",
+      "skills/ppt-master/workflows/native-narration-pptx.md",
+      "skills/ppt-master/workflows/live-preview.md",
+      "skills/ppt-master/workflows/visual-review.md",
+      "skills/ppt-master/workflows/failure-recovery.md",
+      "skills/ppt-master/workflows/routing.md",
+      "skills/ppt-master/workflows/generate-audio.md"
     ]
   },
   "local_destination": {
@@ -165,6 +182,124 @@
       ]
     }
   },
+  "workflow_coverage": [
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/index.md"],
+      "classification": "no_code_needed",
+      "reason": "the upstream registry is provenance inventory; this landing contract owns local discoverability",
+      "local_owner_surface": "contracts/runtime-program/ppt-master-learning-landing.json",
+      "acceptance_evidence": ["contract:all_pinned_workflows_classified"],
+      "authority_boundary": "the external registry cannot become an RCA route authority"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/topic-research.md"],
+      "classification": "no_code_needed",
+      "reason": "shared Source Readiness already owns research triggers, augmentation, source audit, and planning readiness",
+      "local_owner_surface": "OPL shared Source Readiness; RCA consumes the canonical source readiness pack",
+      "acceptance_evidence": ["test:source-readiness-deep-research-gate", "test:source-augmentation-provider"],
+      "authority_boundary": "research cannot move into Storyline or create an RCA-private acquisition workflow"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/create-brand.md"],
+      "classification": "no_code_needed",
+      "reason": "brand constraints already enter the professional design brief and quality evidence without a global brand library",
+      "local_owner_surface": "rca-ppt-visual-director + existing source intake",
+      "acceptance_evidence": ["test:ppt-native-quality-package-gates", "skill_resource_pack_readback"],
+      "authority_boundary": "brand facts remain source constraints; no copied brand corpus or second asset authority"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/create-template.md"],
+      "classification": "watch_only",
+      "reason": "Template Profiler covers intake and preservation, but RCA does not currently author a reusable global template package",
+      "local_owner_surface": "future Template Profiler + Visual Memory proposal + OPL asset surface",
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "do not infer template creation from template profiling or create an RCA-private template library",
+      "stop_condition": "remain watch-only until an explicit reusable-template authoring requirement and admitted asset owner exist"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/refine-spec.md"],
+      "classification": "no_code_needed",
+      "reason": "explicit user revisions already update Stage artifacts; a second blocking confirmation plane is unnecessary",
+      "local_owner_surface": "existing Storyline, outline, blueprint, and visual Stage artifacts",
+      "acceptance_evidence": ["test:ppt-generation-claim-lock", "test:product-entry-session-checkpoint"],
+      "authority_boundary": "progress-first execution stops only for a real source, scope, approval, or authority decision"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/template-fill-pptx.md"],
+      "classification": "adapt",
+      "candidate_ref": "template_profile_and_fill",
+      "local_owner_surface": "rca-template-profiler + native helper",
+      "acceptance_evidence": ["test:ppt-native-template-preservation"]
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/beautify-pptx.md"],
+      "classification": "no_code_needed",
+      "reason": "optimize_existing and repair_pptx_native already preserve source identity and untouched slide hashes while repairing selected pages",
+      "local_owner_surface": "existing PPT optimize and native repair Stage routes",
+      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime", "test:ppt-native-editability-regression"],
+      "authority_boundary": "repair remains source- and review-bound; no parallel beautify pipeline is introduced"
+    },
+    {
+      "workflow_refs": [
+        "skills/ppt-master/workflows/native-enhance-pptx.md",
+        "skills/ppt-master/workflows/native-narration-pptx.md",
+        "skills/ppt-master/workflows/customize-animations.md"
+      ],
+      "classification": "adapt",
+      "candidate_ref": "notes_transition_timing_animation",
+      "local_owner_surface": "rca-native-ppt-designer + native helper",
+      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-ppt-engine-contract"]
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/failure-recovery.md"],
+      "classification": "no_code_needed",
+      "reason": "typed blockers, route-back receipts, and page-scoped repair already resume from the owning failed Stage",
+      "local_owner_surface": "existing Stage route-back, repair, and artifact refs",
+      "acceptance_evidence": ["test:ppt-native-ppt-repair-runtime", "test:ppt-native-quality-package-gates"],
+      "authority_boundary": "required evidence never silently downgrades to a convenience path"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/resume-execute.md"],
+      "classification": "no_code_needed",
+      "reason": "Stage Folder artifacts, current stage pointers, and product-session checkpoints already provide continuation",
+      "local_owner_surface": "OPL Stage Folder and product-entry session continuity",
+      "acceptance_evidence": ["test:stage-folder-contract", "test:product-entry-session-checkpoint"],
+      "authority_boundary": "no custom baton, project-local session runtime, or duplicate progress ledger"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/routing.md"],
+      "classification": "reject",
+      "reason": "the upstream route matrix would duplicate the admitted domain-entry, family, profile, and Stage chain",
+      "local_owner_surface": "OPL domain entry + existing RCA PPT family profile",
+      "acceptance_evidence": ["test:ppt-native-ppt-engine-contract", "test:product-entry-route-integration"],
+      "authority_boundary": "external workflow routing remains provenance only"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/verify-charts.md"],
+      "classification": "no_code_needed",
+      "reason": "chart data fidelity, native package readback, coordinate determinism, and screenshot hashes are already required",
+      "local_owner_surface": "native helper + RCA PPT quality evaluator",
+      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates"],
+      "authority_boundary": "coordinate checks support evaluation but cannot issue a visual_ready verdict"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/live-preview.md", "skills/ppt-master/workflows/visual-review.md"],
+      "classification": "adapt",
+      "candidate_ref": "existing_preview_review_calibration_reexport",
+      "local_owner_surface": "true-render proof + rca-ppt-reviewer + export Stage artifacts",
+      "acceptance_evidence": ["test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates", "test:deliverable-review-loop"],
+      "authority_boundary": "adopt render-backed preview and review evidence only; do not copy the interactive private editor or annotation UI"
+    },
+    {
+      "workflow_refs": ["skills/ppt-master/workflows/generate-audio.md"],
+      "classification": "watch_only",
+      "reason": "speaker notes are landed, but provider-backed audio generation is outside the current visual-deliverable requirement",
+      "local_owner_surface": "future OPL generated media surface if a measured product requirement is admitted",
+      "acceptance_evidence": ["typed_future_requirement"],
+      "authority_boundary": "no provider keys, audio runtime, or narration authority is imported into RCA",
+      "stop_condition": "remain watch-only until an explicit audio deliverable and supported owner slot exist"
+    }
+  ],
   "skill_consumption_bindings": [
     {
       "skill_id": "rca-ppt-story-architect",
@@ -270,7 +405,7 @@
       "reason": "presentation semantics belong to stable slide and object ids",
       "local_owner_surface": "rca-native-ppt-designer + native helper",
       "consumer_fields": ["speaker_notes", "transition", "timing", "animation_timeline"],
-      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-animation-semantics"],
+      "acceptance_evidence": ["test:ppt-native-object-package", "test:ppt-native-ppt-engine-contract"],
       "authority_boundary": "optional motion cannot make a statically unreadable slide acceptable",
       "stop_condition": "the animation target is unstable, unsupported, or missing from package readback"
     },
@@ -284,6 +419,17 @@
       "acceptance_evidence": ["test:ppt-native-quality-semantic-gates", "skill_resource_pack_readback"],
       "authority_boundary": "only RCA review/export authority may issue fresh verdict receipts",
       "stop_condition": "screenshots, package readback, or source truth is missing or stale"
+    },
+    {
+      "candidate_id": "existing_preview_review_calibration_reexport",
+      "source_ref": "skills/ppt-master/workflows/live-preview.md + visual-review.md + verify-charts.md + failure-recovery.md",
+      "classification": "adapt",
+      "reason": "adapt the useful render-backed preview, per-page review, coordinate calibration, SHA-bound repair/export, and backup-slide behavior without copying the interactive browser editor",
+      "local_owner_surface": "native helper + rca-ppt-reviewer + repair/export Stage artifacts",
+      "consumer_fields": ["preview_screenshot_sha256", "coordinate_determinism_hash", "source_pptx_sha256", "export_artifact_refs", "include_backup_slides"],
+      "acceptance_evidence": ["test:ppt-native-python-render-preview", "test:ppt-native-quality-package-gates", "test:ppt-native-ppt-repair-runtime", "test:deliverable-review-loop"],
+      "authority_boundary": "the interactive private editor and annotation UI are rejected; these executable surfaces do not claim fresh cross-viewer parity, visual_ready, or owner receipt",
+      "stop_condition": "a current source SHA, rendered preview, package readback, or review/export artifact ref is missing"
     },
     {
       "candidate_id": "strict_per_page_serial_authoring",
@@ -364,11 +510,11 @@
     }
   ],
   "closeout": {
-    "planned": ["source catalogs mapped", "local registries landed", "five Skill consumers bound", "runtime and asset imports rejected"],
-    "done": ["5 modes plus custom escape mapped", "18 style ids mapped", "76 visualization ids mapped", "adopt/adapt/watch_only/reject audit recorded"],
+    "planned": ["source catalogs mapped", "all pinned workflows classified", "local registries landed", "five Skill consumers bound", "runtime and asset imports rejected"],
+    "done": ["5 modes plus custom escape mapped", "18 style ids mapped", "76 visualization ids mapped", "17 workflow files inspected and classified", "existing preview review calibration and re-export behavior bound", "adopt/adapt/watch_only/reject/no_code_needed audit recorded"],
     "deferred": ["live same-source blind comparison", "cross-render application readback", "fresh RCA visual_ready receipt"],
     "skipped": ["upstream runtime", "upstream template and icon assets", "upstream SVG bodies"],
     "verification": ["focused contract test", "TypeScript typecheck", "JSON parse", "resource pack readback", "git diff check"],
-    "commit_push_state": "candidate_lane_only_until_integration_absorbs"
+    "commit_push_state": "integration_absorbed_main_push_pending"
   }
 }

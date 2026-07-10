@@ -24,20 +24,39 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 本轮唯一目标态规格是 [RCA 原生 PPT 非劣效目标态规格](../specs/native-ppt-ppt-master-parity.md)。所有并行 lane 都服务同一完成条件，不形成第二 active plan，不把单个 commit、focused tests、mock proof 或 refs-only contract 当成阶段完成。
 
-| Work item | Owner surface | Initial status | Completion gate |
+| Work item | Owner surface | Current status | Completion gate |
 | --- | --- | --- | --- |
-| Existing owner-closure absorption | domain entry / native route owner boundary | `in_progress` | 已有 dirty worktree 完成验证、提交、吸收，不覆盖并行 cleanup 写集 |
-| Typed native object materializer | Python native helper / OfficeCLI / OOXML | `in_progress` | text/shape/connector/picture/group/path/chart/table/metric-grid materialized readback；unknown kind fail-fast |
-| Native presentation semantics | Native PPT Designer + helper | `in_progress` | notes、transition、timing、optional animation 有真实 package/readback 和静态降级可读性 |
-| Template intelligence and fill | Template Profiler + helper | `in_progress` | theme/master/layout/placeholder/chart/table intake；克隆/替换保持原 template relationships |
-| Visual semantic evaluator | PPT Reviewer + screenshot/contact-sheet review | `in_progress` | dependency/timeline/ladder/chart/matrix 语义与构图一致；单装饰物不能绕过 mechanical-card gate |
-| Professional method corpus | Story Architect / Visual Director / Native PPT Designer / Reviewer | `in_progress` | 上游 communication/style/visualization pattern 全量映射为 adopt/adapt/watch/reject，并由 resource pack/contract 消费 |
-| Real benchmark and proof | tests/fixtures + native proof + RCA authority | `in_progress` | 同源 4x6 benchmark、真实复杂 PPTX、package assertions、LibreOffice true render、独立视觉复核 |
-| Progress-first no-regression | product entry / stage loop | `in_progress` | 无人工 gate 时仍 auto-to-terminal；失败返回 unit repair target/typed blocker，不增加外层逐 stage 操作 |
-| Truth/docs/current-program foldback | contracts / current-program / core docs | `in_progress` | `landed` 状态只保留 fresh executable evidence 支撑项；其余按真实状态更新 |
-| Absorb and cleanup | main session | `in_progress` | 所有 lane 主会话复核、吸收、验证、删除 worktree/branch；根 checkout 干净 |
+| Existing owner-closure absorption | domain entry / native route owner boundary | `done` | owner series 与 follow-up 已吸收；generated session currentness、Stage Folder locator 与 AST import closure 在目标侧验证。 |
+| Typed native object materializer | Python native helper / OfficeCLI / OOXML | `done` | text/shape/connector/picture/group/path/chart/table/metric-grid package fidelity、unknown kind fail-fast 与 zero-write preflight 已落地。 |
+| Native presentation semantics | Native PPT Designer + helper | `done` | notes、transition、timing、optional animation 已由真实 OfficeCLI/OOXML package materialization 与 readback 验证；静态页仍独立可读。 |
+| Template intelligence and fill | Template Profiler + helper | `done` | theme/master/layout/placeholder/chart/table preservation 与 template-focused tests 已落地。 |
+| Visual semantic evaluator | PPT Reviewer + screenshot/contact-sheet review | `done` | dependency/timeline/ladder/chart/matrix 语义、connector endpoint、anti-decoration/card gate 与 package SHA binding 已落地。 |
+| Professional method corpus | Story Architect / Visual Director / Native PPT Designer / Reviewer | `done` | pinned `ppt-master` communication/style/76 visualization source catalog 已全量映射到本地 registries 和 5 个 professional skill/resource consumer；17 个 workflow 均有 provenance 与 adopt/adapt/watch/reject/no-code-needed 分类。 |
+| Real benchmark and proof | tests/fixtures + native proof + RCA authority | `partial` | 真实 6 页 native PPT proof、package/OfficeCLI/LibreOffice true render 与独立 visual review 已有证据；同源双跑五人盲评、跨 viewer fresh human readback 和 parity owner receipt 未完成。 |
+| Progress-first no-regression | product entry / stage loop | `done` | route auto-continuation、targeted repair、typed blocker 与无第二 executor pass 的回归均保留。 |
+| Truth/docs/current-program foldback | contracts / current-program / core docs | `done` | 本文、status/architecture/spec、learning/parity contracts 与 current-program completion audit 已对齐。 |
+| Absorb and cleanup | main session | `in_progress` | 候选均已吸收；最终 main fast-forward、push/readback 与 cleanup-safe worktree/branch 清理仍待 closeout。 |
 
 风险档为 `L3/L4`，验证预算为 `full`。TDD 仅用于已确认的对象退化、fixture 丢失和 evaluator 假阳性回归；最终完成证据必须包含真实 PPTX package/readback、render artifact、visual review 和 mainline completion audit。
+
+### 2026-07-10 Plan Completion Audit
+
+非 Live 功能/结构范围已全部落地。完整 native parity 目标仍是 `partial`，因为以下证据不能由合同、focused tests 或单套真实样片替代：
+
+| 审计项 | 状态 | 完成度 | Fresh / machine evidence | 缺口与 owner 路径 |
+| --- | --- | ---: | --- | --- |
+| 八项 overdesign thinning | `done` | 100% | [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md#2026-07-10-完成度审计)、machine completion audit、repo verification | 无结构缺口；只保留 live/authority 边界。 |
+| Professional Learning Landing | `done` | 100% | `ppt-master-learning-landing.json`、design registry、professional skill/resource bindings、engine contract tests | 不包含 upstream runtime、asset/SVG body 或 authority。 |
+| Native object fidelity | `done` | 100% | object package 48/48、chart/picture/group/connector package readback、unknown-kind fail-fast | 无已知非 Live 缺口。 |
+| Editability round trip | `done` | 100% | 独立 editability regression 1/1；chart/text/fill/position/notes edit -> save -> OOXML readback -> LibreOffice render | 缺 renderer 时继续 `missing_renderer_dependency` fail closed。 |
+| Blind parity harness | `done` | 100% | same-source lock、anonymous packet、review-set hash、Student-t lower bound、critical defect/edit-task gates、unknown metadata fail-closed | 只产生 candidate，不签 owner receipt。 |
+| Live same-source parity verdict | `blocked` | 0% | `ppt-master-parity-benchmark.json` 明确 `non_live_harness_landed_live_evidence_pending` | RCA owner 需真实双跑、5 名独立盲评、完整 edit evidence、private binding 和 fresh owner review。 |
+| Native presentation semantics | `done` | 100% | notes、transition、timing、animation target/effect/trigger/duration 均有真实 package materialization 与 OOXML readback | 无已知非 Live 实现缺口。 |
+| Cross-viewer human readback | `blocked` | 0% | LibreOffice true render 已有单套 proof；当前无 fresh PowerPoint/Keynote/Google Slides 对照验收 | 需 PowerPoint、LibreOffice，加 Keynote 或 Google Slides 的 fresh same-source human/cross-viewer evidence。 |
+| OPL canonical agent id consumption | `blocked` | 0% | RCA contract/manifest 固定 `canonical_agent_id=rca`；当前 OPL repo-dir generator 仍输出 domain id `redcube_ai` | owner 为 `one-person-lab/OPL`；应在 OPL repo-contract descriptor 消费 canonical id，RCA 不复制生成器。 |
+| Visual/production authority | `blocked` | 0% | 现有 contracts/readbacks 均保持 false-ready boundary | 仍需真实 parity owner receipt、visual ready/export/handoff owner verdict、Temporal long-soak 和 production-like no-regression evidence。 |
+
+机器可读对应面是 `contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json`。任何 blocked 项都不得从本文的结构完成度推导为 ready、current、accepted 或 production complete。
 
 2026-07-09 retained helper / thin adapter cleanup gate fresh readback 继续落在上述边界内：`private-platform:readback` 与 `default-caller-tail:readback` 都只证明 source guard clean，未产生 physical delete authorization、default-caller cutover authority、owner receipt 或 typed blocker instance roundtrip。因此当前执行动作是保留为 refs-only / authority adapter 并记录 no-safe-delete blocker，不删除源码、不新增 alias / facade。
 

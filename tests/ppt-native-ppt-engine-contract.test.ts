@@ -232,11 +232,43 @@ test('native PPT professional registries land ppt-master learning without import
     assert.equal(typeof entry.consumer_field, 'string');
   }
 
+  const inspectedWorkflowPaths = landing.external_source.inspected_paths
+    .filter((entry: string) => entry.startsWith('skills/ppt-master/workflows/'));
+  assert.equal(inspectedWorkflowPaths.length, 17);
+  const workflowCoverage = landing.workflow_coverage;
+  const classifiedWorkflowPaths = workflowCoverage
+    .flatMap((entry: any) => entry.workflow_refs);
+  assert.deepEqual(
+    [...classifiedWorkflowPaths].sort(),
+    [...inspectedWorkflowPaths].sort(),
+  );
+  assert.equal(new Set(classifiedWorkflowPaths).size, 17);
+  for (const entry of workflowCoverage) {
+    assert.ok(['adopt', 'adapt', 'watch_only', 'reject', 'no_code_needed'].includes(entry.classification));
+    assert.ok(entry.local_owner_surface.length > 0);
+    assert.ok(entry.acceptance_evidence.length > 0);
+  }
+  const templateCreation = workflowCoverage.find((entry: any) => (
+    entry.workflow_refs.includes('skills/ppt-master/workflows/create-template.md')
+  ));
+  assert.equal(templateCreation.classification, 'watch_only');
+  assert.match(templateCreation.authority_boundary, /do not infer template creation/);
+  const browserPreview = workflowCoverage.find((entry: any) => (
+    entry.workflow_refs.includes('skills/ppt-master/workflows/live-preview.md')
+  ));
+  assert.equal(browserPreview.classification, 'adapt');
+  assert.match(browserPreview.authority_boundary, /do not copy the interactive private editor or annotation UI/);
+
   const candidates = landing.learning_candidates;
   assert.deepEqual(
     [...new Set(candidates.map((entry: any) => entry.classification))].sort(),
     ['adapt', 'adopt', 'reject', 'watch_only'],
   );
+  const previewCandidate = candidates.find((entry: any) => (
+    entry.candidate_id === 'existing_preview_review_calibration_reexport'
+  ));
+  assert.equal(previewCandidate.classification, 'adapt');
+  assert.match(previewCandidate.authority_boundary, /interactive private editor and annotation UI are rejected/);
   for (const candidate of candidates) {
     assert.ok(candidate.source_ref.length > 0);
     assert.ok(candidate.local_owner_surface.length > 0);

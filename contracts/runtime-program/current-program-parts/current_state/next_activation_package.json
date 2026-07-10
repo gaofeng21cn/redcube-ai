@@ -4,5 +4,7 @@
   "contract": "contracts/runtime-program/product-entry-session-continuity.json",
   "brief": "human_doc:program_product_entry_session_continuity",
   "adapter_surface": "opl_codex_executor",
-  "probe_script": "redcube product invoke"
+  "probe_script": "redcube product invoke",
+  "plan_completion_audit_ref": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
+  "next_activation_kind": "typed_live_evidence_backlog"
 }

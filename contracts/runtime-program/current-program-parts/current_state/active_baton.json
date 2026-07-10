@@ -693,6 +693,9 @@
     }
   },
   "artifacts": {
+    "plan_completion_audit_contract": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
+    "ppt_professional_learning_landing_contract": "contracts/runtime-program/ppt-master-learning-landing.json",
+    "ppt_blind_parity_benchmark_contract": "contracts/runtime-program/ppt-master-parity-benchmark.json",
     "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",
     "opl_hosted_product_entry_contract": "contracts/runtime-program/opl-framework-hosted-product-entry.json",
     "session_continuity_provenance_contract": "contracts/runtime-program/product-entry-session-continuity.json",
@@ -719,6 +722,8 @@
     "visual_transition_evaluator_manifest_surface": "opl_generated:product_entry_manifest#/visual_transition_evaluator"
   },
   "closeout": {
+    "current_plan_completion_audit_ref": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
+    "current_plan_completion_status": "non_live_scope_complete_live_evidence_open",
     "closeout_id": "rca_one_shot_production_hardening_closeout",
     "closeout_ref": "contracts/runtime-program/rca-one-shot-production-hardening-closeout.json",
     "status": "closed_with_typed_production_evidence_blockers",

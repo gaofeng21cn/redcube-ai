@@ -17,6 +17,12 @@ Machine boundary: 本文定义目标接口、owner、数据流和验收口径；
 
 该目标不改变 `author_image_pages` 的默认视觉路线。`author_pptx_native` / `repair_pptx_native` 继续是用户明确要求 editable / DrawingML 时选择的路线，并继续受 RCA `visual_director_review -> screenshot_review -> export_pptx` authority gate 约束。
 
+## 2026-07-10 实现读回
+
+非 Live 实现已落地：typed native object fidelity、template preservation、package/relationship readback、真实 edit/save/readback/render 回归、semantic quality gates、professional method registry、Learning Landing Audit 和 blind parity evaluator 均已进入现有 RCA stage/skill/helper/contract 边界。该实现没有引入第二 runtime、第二 skill、上游模板资产或 owner authority。
+
+完整规格仍为 `partial`。Notes、transition、timing 和 optional animation 已有真实 package materialization 与 OOXML readback；未关闭项是 PowerPoint/LibreOffice/Keynote 或 Google Slides fresh cross-viewer human readback、同源 RCA 与 pinned `ppt-master` 双跑、5 名独立盲评、完整 edit evidence、exact private identity binding 和 RCA parity owner receipt。机器状态读 `contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json`；这些缺口不得由测试绿、catalog coverage 或单套真实 proof 替代。
+
 ## 外部模式分类
 
 | 模式 | 分类 | RCA 落点 |

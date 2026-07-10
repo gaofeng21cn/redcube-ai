@@ -1,0 +1,153 @@
+{
+  "surface_kind": "rca_plan_completion_audit",
+  "schema_version": 1,
+  "audit_id": "rca_plan_completion_audit_20260710",
+  "date_anchor": "2026-07-10",
+  "status": "non_live_scope_complete_live_evidence_open",
+  "scope": {
+    "overdesign_thinning": {
+      "status": "done",
+      "completion_percent": 100,
+      "items": [
+        "node_stdlib_walker",
+        "single_family_registry",
+        "protocol_validator_utility",
+        "retired_get_run_surface",
+        "single_consumer_parts_flattening",
+        "overlay_value_first",
+        "rca_owned_hermes_execution_retirement",
+        "private_platform_guard_thinning"
+      ]
+    },
+    "native_ppt_non_live_implementation": {
+      "status": "done",
+      "completion_percent": 100,
+      "items": [
+        "typed_native_object_fidelity",
+        "template_preservation",
+        "semantic_quality_gates",
+        "professional_method_registry",
+        "pinned_workflow_provenance_and_classification",
+        "editability_round_trip",
+        "optional_animation_and_timing_package_materialization",
+        "blind_parity_candidate_harness",
+        "progress_first_route_nonregression"
+      ]
+    },
+    "native_ppt_full_parity_spec": {
+      "status": "partial",
+      "completion_percent": 80,
+      "done": [
+        "typed_native_object_fidelity",
+        "template_preservation",
+        "semantic_quality_gates",
+        "professional_method_registry",
+        "editability_round_trip",
+        "optional_animation_and_timing_package_materialization",
+        "real_native_ppt_package_and_render_proof",
+        "blind_parity_candidate_harness"
+      ],
+      "blocked": [
+        "live_same_source_five_reviewer_blind_parity",
+        "parity_owner_receipt",
+        "cross_viewer_human_readback"
+      ],
+      "partial": []
+    }
+  },
+  "evidence_refs": {
+    "professional_learning_landing": "contracts/runtime-program/ppt-master-learning-landing.json",
+    "design_registry": "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
+    "blind_parity_contract": "contracts/runtime-program/ppt-master-parity-benchmark.json",
+    "editability_runner": "tools/native-ppt-proof/run-editability-regression.py",
+    "editability_tests": "tests/ppt-native-editability-regression.test.ts",
+    "native_object_tests": "tests/ppt-native-object-package.test.ts",
+    "quality_gate_tests": "tests/ppt-native-quality-package-gates.test.ts",
+    "active_plan": "human_doc:rca_ideal_state_gap_plan",
+    "overdesign_closeout": "human_doc:rca_overdesign_thinning_completion_audit"
+  },
+  "open_typed_blockers": [
+    {
+      "blocker_id": "rca-typed-blocker:ppt-parity:live-five-reviewer-pair-pending",
+      "owner": "redcube_ai",
+      "required_output": "same-source RCA and pinned ppt-master pair, five independent blind reviews, complete edit evidence, exact private binding, fresh owner review"
+    },
+    {
+      "blocker_id": "rca-typed-blocker:ppt-parity:cross-viewer-human-readback-pending",
+      "owner": "redcube_ai",
+      "required_output": "fresh PowerPoint and LibreOffice plus Keynote or Google Slides same-source cross-viewer human readback"
+    },
+    {
+      "blocker_id": "rca-typed-blocker:opl-canonical-agent-id:repo-descriptor-consumption-pending",
+      "owner": "one-person-lab/OPL",
+      "required_output": "OPL repo-contract descriptor consumes RCA canonical_agent_id=rca without changing target_domain_id=redcube_ai"
+    },
+    {
+      "blocker_id": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
+      "owner": "redcube_ai_and_one-person-lab/OPL",
+      "required_output": "real Temporal visual-stage long-soak and owner acceptance evidence"
+    }
+  ],
+  "closeout_accounting": {
+    "planned": [
+      "overdesign_thinning",
+      "owner_closure_absorption",
+      "native_object_fidelity",
+      "quality_benchmark",
+      "professional_learning_landing",
+      "editability_regression",
+      "blind_parity_harness",
+      "docs_contracts_current_program_foldback",
+      "main_push_readback_cleanup"
+    ],
+    "done": [
+      "overdesign_thinning",
+      "owner_closure_absorption",
+      "native_object_fidelity",
+      "quality_benchmark",
+      "professional_learning_landing",
+      "editability_regression",
+      "blind_parity_harness",
+      "docs_contracts_current_program_foldback"
+    ],
+    "deferred": [
+      "live_same_source_parity_owner_evidence",
+      "cross_viewer_human_readback",
+      "opl_canonical_agent_id_consumption",
+      "temporal_visual_stage_long_soak"
+    ],
+    "skipped": [],
+    "verification": {
+      "state": "pending_final_target_gate",
+      "required": [
+        "scripts/verify.sh",
+        "test:fast",
+        "test:family",
+        "test:full",
+        "test:historical",
+        "current-program-check",
+        "private-platform-readback",
+        "default-caller-tail-readback",
+        "fallow-production",
+        "no-resurrection-scan",
+        "remote-443-readback"
+      ]
+    },
+    "commit_push_state": {
+      "integration_commits": "committed",
+      "root_main_fast_forward": "pending",
+      "remote_push": "pending",
+      "remote_readback": "pending",
+      "cleanup_safe_worktrees": "pending"
+    }
+  },
+  "authority_boundary": {
+    "claims_live_parity_complete": false,
+    "claims_visual_ready": false,
+    "claims_exportable": false,
+    "claims_handoffable": false,
+    "claims_owner_receipt": false,
+    "claims_temporal_long_soak_complete": false,
+    "claims_production_ready": false
+  }
+}

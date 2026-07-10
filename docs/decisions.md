@@ -54,6 +54,12 @@ Visual pattern memory、tool affordances、examples、route precedents 和 scree
 
 缺少 visual memory 默认不阻断 source intake、communication strategy、visual direction exploration 或 candidate generation。只有输出试图声明 review/export/handoff/production readiness，或越过 artifact authority、owner receipt、source boundary、review/export gate 时，才 fail closed。
 
+### PPT external learning 只落 declarative registry，parity 只出 candidate
+
+Pinned `ppt-master` 的 communication mode、style 和 visualization pattern 只允许映射到 RCA 已有 declarative design pack、professional skill/resource 和 reviewer contract。RCA 不导入其 runtime、Claude-specific protocol、template/icon/SVG body，也不新建第二 PPT skill、runtime 或 authority surface。
+
+Typed native object fidelity、edit/save/package readback、true render 与 blind parity evaluator 可以作为 non-live implementation evidence。完整 parity 结论仍必须由真实 same-source 双跑、至少 5 名独立盲评、exact private binding、完整 edit evidence、PowerPoint/LibreOffice/Keynote 或 Google Slides 跨 viewer 人工读回和 RCA fresh owner review共同形成；harness 不能签 owner receipt。
+
 ### Product-entry、domain handler 和 generated descriptor 由 canonical metadata 派生
 
 RCA domain handler guarded actions、forbidden writes、manifest generated descriptor refs、family action catalog、CLI help 和 MCP product-entry routes 从 RCA-owned canonical action/status metadata 派生。OPL 侧 generated descriptor id 可以继续是 `domain_action_adapter`；RCA repo-local active/default command 是 `domain-handler export|dispatch`。
