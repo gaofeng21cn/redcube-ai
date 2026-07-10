@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdtempSync, readFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 
 import {
   canonicalStageForRoute,
@@ -16,19 +16,32 @@ import { createDeliverable, runDeliverableRoute } from './product-domain-action-
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 import { readJson, writeJson } from './helpers/json-io.ts';
 
+function hydratedContractFile(paths) {
+  const deliverable = readJson(paths.deliverableFile);
+  const contractRef = String(deliverable.hydrated_contract_ref || 'contracts/hydrated-deliverable.json').trim();
+  return path.join(paths.deliverableDir, contractRef);
+}
+
 function writeBlockedScreenshotReview({ workspaceRoot, deliverableId, slides, blockedSlideId }) {
   const paths = getDeliverablePaths(workspaceRoot, 'topic-a', deliverableId);
   const stageId = 'screenshot_review';
   const canonicalStageId = canonicalStageForRoute(stageId);
   const stageOrder = stageOrderForCanonicalStage(canonicalStageId);
   const attemptId = `seed-${stageId}`;
+  const contract = readJson(hydratedContractFile(paths));
+  const stages = [
+    ...(Array.isArray(contract.stage_sequence?.stages) ? contract.stage_sequence.stages : []),
+    ...(Array.isArray(contract.stage_sequence?.alternate_stages) ? contract.stage_sequence.alternate_stages : []),
+  ];
+  const outputName = stages.find((stage) => stage.stage_id === stageId)?.output_artifact;
+  assert.equal(outputName, 'quality_gate.json');
   const artifactFile = stageFolderOutputPath({
     deliverablePaths: paths,
     routeStageId: stageId,
     canonicalStageId,
     stageOrder,
     attemptId,
-    outputName: 'screenshot-review.json',
+    outputName,
   });
   const artifact = {
     route: stageId,
@@ -56,25 +69,14 @@ function writeBlockedScreenshotReview({ workspaceRoot, deliverableId, slides, bl
     stageOrder,
     attemptId,
     artifactFile,
-    outputName: 'screenshot-review.json',
+    outputName,
     status: 'blocked',
     typedBlockerRefs: [`rca-typed-blocker:test-seed:${stageId}:${deliverableId}`],
     blockingReasons: ['block_content_overflow_detected'],
   });
 }
 
-async function runXhsChain({ workspaceRoot, deliverableId, visualRoute = 'author_image_pages' }) {
-  process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
-  const routes = [
-    'research',
-    'storyline',
-    'single_note_plan',
-    'visual_direction',
-    visualRoute,
-    'visual_director_review',
-    'screenshot_review',
-    'publish_copy',
-  ];
+async function runXhsRoutes({ workspaceRoot, deliverableId, routes }) {
   const results = [];
   for (const route of routes) {
     results.push({
@@ -89,6 +91,24 @@ async function runXhsChain({ workspaceRoot, deliverableId, visualRoute = 'author
     });
   }
   return results;
+}
+
+async function runXhsChain({ workspaceRoot, deliverableId, visualRoute = 'author_image_pages' }) {
+  process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+  return runXhsRoutes({
+    workspaceRoot,
+    deliverableId,
+    routes: [
+      'research',
+      'storyline',
+      'single_note_plan',
+      'visual_direction',
+      visualRoute,
+      'visual_director_review',
+      'screenshot_review',
+      'publish_copy',
+    ],
+  });
 }
 
 function routeArtifact(results, route) {
@@ -150,6 +170,49 @@ test('xiaohongshu image author-repair regenerates only blocked pages', async () 
   });
 });
 
+test('xiaohongshu style_reference_dir replaces built-in references for image authoring', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-style-ref-'));
+    const deliverableId = 'note-style-ref';
+    const styleRefDir = path.join(workspaceRoot, 'operator-style-ref');
+    mkdirSync(styleRefDir, { recursive: true });
+    writeFileSync(
+      path.join(styleRefDir, 'operator-style.png'),
+      Buffer.from('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000000020001e221bc330000000049454e44ae426082', 'hex'),
+    );
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId,
+      title: '甲状腺门诊小红书科普',
+      goal: '为门诊患者生成可发布的科普图文',
+    });
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', deliverableId);
+    const contractFile = hydratedContractFile(paths);
+    const contract = readJson(contractFile);
+    contract.delivery_request = { ...(contract.delivery_request || {}), style_reference_dir: styleRefDir };
+    writeJson(contractFile, contract);
+
+    process.env.REDCUBE_IMAGE_GENERATION_MOCK = '1';
+    const results = await runXhsRoutes({
+      workspaceRoot,
+      deliverableId,
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages'],
+    });
+    assert.equal(results.every(({ result }) => result.ok), true);
+    const authored = routeArtifact(results, 'author_image_pages');
+    const styleManifest = readJson(authored.image_page_manifest.style_manifest);
+    assert.equal(styleManifest.style_reference.mode, 'user_style_reference_dir');
+    assert.equal(styleManifest.style_reference.artifact_materialization, 'copied_operator_references');
+    assert.deepEqual(styleManifest.style_reference.built_in_reference_files, []);
+    assert.equal(styleManifest.style_reference.copied_files[0].file_name, 'operator-style.png');
+    assert.equal(existsSync(styleManifest.style_reference.copied_files[0].copied_file), true);
+    assert.equal(styleManifest.fact_copy_guard.reference_images_style_only, true);
+  });
+});
+
 test('xiaohongshu render_html fails closed without planning artifacts', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-fail-closed-'));
@@ -171,6 +234,43 @@ test('xiaohongshu render_html fails closed without planning artifacts', async ()
     });
     assert.equal(result.ok, false);
     assert.match(result.run.error.message, /render_html.*single_note_plan.*visual_direction/i);
+  });
+});
+
+test('xiaohongshu render_html fails closed when the hydrated shell asset is missing', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-missing-shell-'));
+    const deliverableId = 'note-missing-shell';
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      profileId: 'standard_note',
+      topicId: 'topic-a',
+      deliverableId,
+      title: '甲状腺门诊小红书科普',
+      goal: '为门诊患者生成可发布的科普图文',
+    });
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', deliverableId);
+    const contractFile = hydratedContractFile(paths);
+    const contract = readJson(contractFile);
+    contract.prompt_pack.render_contract.shell_file = 'missing-shell.html';
+    writeJson(contractFile, contract);
+
+    const planning = await runXhsRoutes({
+      workspaceRoot,
+      deliverableId,
+      routes: ['research', 'storyline', 'single_note_plan', 'visual_direction'],
+    });
+    assert.equal(planning.every(({ result }) => result.ok), true);
+    const result = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId,
+      route: 'render_html',
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });
 
