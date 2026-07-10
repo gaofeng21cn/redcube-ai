@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
 
 import {
   applyReviewMutation,
@@ -21,7 +21,6 @@ const ROUTES_BY_OVERLAY = {
   ppt_deck: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review'],
   xiaohongshu: ['research', 'storyline', 'single_note_plan', 'visual_direction', 'author_image_pages', 'visual_director_review', 'screenshot_review', 'publish_copy'],
 };
-const FIXTURE_PROMISES = new Map();
 
 function createWorkspaceRoot(prefix = 'redcube-review-platform-') {
   return mkdtempSync(path.join(os.tmpdir(), prefix));
@@ -133,27 +132,15 @@ async function buildPptBaselineCandidateFixture(workspaceRoot) {
   });
 }
 
-async function clonePreparedWorkspace(name, buildFixture) {
-  let fixturePromise = FIXTURE_PROMISES.get(name);
-  if (!fixturePromise) {
-    fixturePromise = (async () => {
-      const fixtureRoot = createWorkspaceRoot(`redcube-review-platform-${name}-fixture-`);
-      await buildFixture(fixtureRoot);
-      return fixtureRoot;
-    })();
-    FIXTURE_PROMISES.set(name, fixturePromise);
-  }
-  const fixtureRoot = await fixturePromise;
-  const workspaceRoot = createWorkspaceRoot(`redcube-review-platform-${name}-clone-`);
-  for (const entry of readdirSync(fixtureRoot)) {
-    cpSync(path.join(fixtureRoot, entry), path.join(workspaceRoot, entry), { recursive: true });
-  }
+async function createPreparedWorkspace(name, buildFixture) {
+  const workspaceRoot = createWorkspaceRoot(`redcube-review-platform-${name}-`);
+  await buildFixture(workspaceRoot);
   return workspaceRoot;
 }
 
 test('platform review state tracks pending revisions and rerun loop for ppt_deck', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = await clonePreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
+    const workspaceRoot = await createPreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
 
     const readyState = await getReviewState({ workspaceRoot, topicId: TOPIC_ID, deliverableId: 'deck-candidate' });
     assert.equal(readyState.surface_kind, 'review_state');
@@ -186,7 +173,14 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
     assert.equal(watchBlocked.review_state.current_status, 'blocked_for_revision');
     assert.equal(watchBlocked.review_state.rerun_from_stage, 'author_image_pages');
 
-    assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'author_image_pages' })).ok, true);
+    const authorImagePages = await runDeliverableRoute({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: TOPIC_ID,
+      deliverableId: 'deck-candidate',
+      route: 'author_image_pages',
+    });
+    assert.equal(authorImagePages.ok, true, JSON.stringify(authorImagePages));
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'visual_director_review' })).ok, true);
     assert.equal((await runDeliverableRoute({ workspaceRoot, overlay: 'ppt_deck', topicId: TOPIC_ID, deliverableId: 'deck-candidate', route: 'screenshot_review' })).ok, true);
 
@@ -201,7 +195,7 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
 
 test('platform review state is shared by xiaohongshu and supports baseline binding metadata', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = await clonePreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
+    const workspaceRoot = await createPreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
 
     const state = await getReviewState({ workspaceRoot, topicId: XHS_SHARED_STATE_TOPIC_ID, deliverableId: 'note-a' });
     assert.equal(state.state_type, 'canonical');
@@ -238,7 +232,7 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
     assert.equal(mutation.state.baseline.baseline_deliverable_id, 'note-baseline');
     assert.equal(mutation.state.mutation_count >= 1, true);
 
-    await assert.rejects(
+    assert.throws(
       () => applyReviewMutation({
         workspaceRoot,
         topicId: XHS_SHARED_STATE_TOPIC_ID,
@@ -292,9 +286,9 @@ test('platform review state is shared by xiaohongshu and supports baseline bindi
 
 test('promote_baseline requires structured relative quality and approval gates, then records promotion state', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = await clonePreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
+    const workspaceRoot = await createPreparedWorkspace('xhs-baseline-candidate', buildXhsBaselineCandidateFixture);
 
-    await assert.rejects(
+    assert.throws(
       () => applyReviewMutation({
         workspaceRoot,
         topicId: 'topic-a',
@@ -360,7 +354,7 @@ test('approve_publish rejects xiaohongshu deliverable before publish_ready', asy
     goal: '为门诊患者生成可发布的科普图文',
   });
 
-  await assert.rejects(
+  assert.throws(
     () => applyReviewMutation({
       workspaceRoot,
       topicId: 'topic-a',
@@ -376,7 +370,7 @@ test('approve_publish rejects xiaohongshu deliverable before publish_ready', asy
 
 test('promote_baseline works for ppt_deck without human approval gate once relative quality exists', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = await clonePreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
+    const workspaceRoot = await createPreparedWorkspace('ppt-baseline-candidate', buildPptBaselineCandidateFixture);
 
     const promoted = await applyReviewMutation({
       workspaceRoot,
