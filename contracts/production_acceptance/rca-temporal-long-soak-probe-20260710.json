@@ -1,0 +1,163 @@
+{
+  "surface_kind": "rca_temporal_long_soak_probe_closeout",
+  "contract_id": "rca.temporal_long_soak_probe_closeout.20260710",
+  "version": "rca-temporal-long-soak-probe-closeout.v1",
+  "target_domain_id": "redcube_ai",
+  "owner": "redcube_ai",
+  "state": "blocked_live_gate",
+  "observed_at": "2026-07-10T13:03:35Z",
+  "purpose": "Bind the fresh OPL Temporal production-residency probe, actual managed-worker restart readback, and the remaining RCA visual-stage long-soak blockers without upgrading provider transport evidence into domain or production readiness.",
+  "machine_boundary": "This closeout records exact external runtime refs and fail-closed blockers. It does not track Temporal lifecycle truth in the repo, create OPL stage attempts, create a domain owner receipt, write visual truth or artifact bodies, authorize review/export, or declare RCA production visual-stage long-soak complete.",
+  "runtime_probe": {
+    "legal_entry": "opl family-runtime residency proof --provider temporal --production",
+    "executed_command": "OPL_TEMPORAL_CLIENT_RPC_TIMEOUT_MS=600000 opl family-runtime residency proof --provider temporal --production --json",
+    "provider_kind": "temporal",
+    "address": "127.0.0.1:7233",
+    "namespace": "default",
+    "task_queue": "opl-stage-attempts",
+    "proof_environment": "local_temporal_service_and_managed_worker",
+    "production_like_local_probe_only": true,
+    "persisted_proof": {
+      "runtime_path": "/Users/gaofeng/Library/Application Support/OPL/state/family-runtime/proofs/latest-temporal-production-proof.json",
+      "sha256": "6f835be22ee8c68fc797f34f718446c46e897cc20fd1847ef1f5d36f8dabac96",
+      "closeout_status": "production_residency_failed",
+      "receipt_status": "failed"
+    },
+    "completed_path_probe": {
+      "workflow_id": "wf-temporal-production-complete-1783688157471_423aee4dd2ece",
+      "run_id": "019f4c19-5927-70da-aff7-cb7b09bca4ae",
+      "temporal_history_sha256": "3f0e5d01cdd68db266032130fb57a95d05fa80dcb486132c988a3920b5ff6e3a",
+      "history_event_count": 37,
+      "operator_update_count": 3,
+      "workflow_terminal_status": "completed",
+      "attempt_status": "blocked",
+      "closeout_refs": [
+        "opl://stage-attempts/sat_temporal_production_complete/runtime-blockers/codex_cli_provider_unavailable"
+      ],
+      "domain_owner_receipt_ref": null,
+      "review_export_ref": null
+    },
+    "missing_closeout_path_probe": {
+      "workflow_id": "wf-temporal-production-blocked-1783688157471_423aee4dd2ece",
+      "run_id": "019f4c1b-d7b0-700b-b2f5-913a575b00ae",
+      "temporal_history_sha256": "9b33555138b5e2b8dfceed0ad57a8b27d03969c2b9bf6cda017dda5255d1f10c",
+      "history_event_count": 22,
+      "workflow_terminal_status": "completed",
+      "attempt_status": "blocked",
+      "provider_completion": "not_completed",
+      "blocked_reason": "codex_cli_provider_unavailable",
+      "closeout_refs": [
+        "opl://stage-attempts/sat_temporal_production_blocked/runtime-blockers/codex_cli_provider_unavailable"
+      ]
+    },
+    "actual_worker_restart_readback": {
+      "stop_command": "opl family-runtime worker stop --provider temporal --json",
+      "start_command": "opl family-runtime worker start --provider temporal --json",
+      "stopped_pid": 56256,
+      "restarted_pid": 70753,
+      "pid_changed": true,
+      "worker_ready_after_restart": true,
+      "completed_workflow_history_readable_after_restart": true,
+      "completed_workflow_history_sha256_after_restart": "3f0e5d01cdd68db266032130fb57a95d05fa80dcb486132c988a3920b5ff6e3a",
+      "proves_only": "temporal_history_survives_real_managed_worker_restart_and_remains_requeryable"
+    },
+    "opl_proof_check_summary": {
+      "proven_check_count": 6,
+      "required_check_count": 9,
+      "checks": {
+        "external_temporal_server_reachable": true,
+        "managed_worker_ready": true,
+        "worker_completed_attempt": false,
+        "worker_restart_requery": true,
+        "signal_history_preserved": true,
+        "typed_closeout_required_for_completed": false,
+        "missing_closeout_blocks_completion": true,
+        "retry_or_dead_letter_boundary_observed": false,
+        "domain_truth_boundary_preserved": true
+      },
+      "failed_check_ids": [
+        "worker_completed_attempt",
+        "typed_closeout_required_for_completed",
+        "retry_or_dead_letter_boundary_observed"
+      ]
+    },
+    "runner_findings": [
+      {
+        "finding_id": "temporal_proof_workspace_precondition_missing",
+        "owner": "one-person-lab/OPL Runway",
+        "observed_error": "spawn codex ENOENT because /tmp/opl-temporal-production-residency-proof did not exist",
+        "temporary_probe_precondition": "mkdir -p /tmp/opl-temporal-production-residency-proof/artifacts",
+        "required_owner_fix": "The OPL residency proof must materialize or validate its declared workspace before starting CodexStageActivity."
+      },
+      {
+        "finding_id": "temporal_proof_default_rpc_budget_shorter_than_real_codex_stage",
+        "owner": "one-person-lab/OPL Runway",
+        "observed_error": "Failed to get Workflow execution history while the activity remained healthy and later completed",
+        "temporary_probe_precondition": "OPL_TEMPORAL_CLIENT_RPC_TIMEOUT_MS=600000",
+        "required_owner_fix": "The production proof must use a result wait budget compatible with the declared 3900 second activity window or poll terminal state without abandoning a healthy workflow."
+      }
+    ]
+  },
+  "typed_blockers": [
+    {
+      "blocker_ref": "rca-typed-blocker:controlled-soak:codex-cli-provider-unavailable-20260710",
+      "blocker_kind": "provider_hosted_codex_stage_cannot_produce_domain_typed_closeout",
+      "owner": "one-person-lab/OPL Runway and Codex CLI provider configuration",
+      "evidence_refs": [
+        "runtime-proof:sha256:6f835be22ee8c68fc797f34f718446c46e897cc20fd1847ef1f5d36f8dabac96",
+        "temporal-workflow:wf-temporal-production-complete-1783688157471_423aee4dd2ece",
+        "temporal-workflow:wf-temporal-production-blocked-1783688157471_423aee4dd2ece",
+        "opl://stage-attempts/sat_temporal_production_complete/runtime-blockers/codex_cli_provider_unavailable"
+      ],
+      "legal_entry": "OPL_TEMPORAL_CLIENT_RPC_TIMEOUT_MS=600000 opl family-runtime residency proof --provider temporal --production --json",
+      "expected_output": "A fresh 9/9 OPL production capability receipt with a completed typed-closeout attempt and an observed retry/dead-letter boundary.",
+      "verification": "Read the exact persisted proof SHA, both Temporal workflow histories, managed-worker PID change, and post-restart history requery.",
+      "stop_condition": "worker_completed_attempt, typed_closeout_required_for_completed, and retry_or_dead_letter_boundary_observed are all true on the same fresh proof."
+    },
+    {
+      "blocker_ref": "rca-typed-blocker:controlled-soak:real-rca-visual-stage-long-soak-pending-20260710",
+      "blocker_kind": "real_rca_visual_stage_owner_acceptance_not_executed",
+      "owner": "redcube_ai with one-person-lab/OPL Temporal transport",
+      "evidence_refs": [
+        "contracts/temporal_stage_run_consumption_policy.json",
+        "contracts/owner_receipt_contract.json",
+        "contracts/production_acceptance/rca-production-acceptance.json"
+      ],
+      "legal_entry": "OPL Temporal StageRun into the RCA domain handler, followed by RCA emit_temporal_controlled_visual_stage_long_soak_evidence with refs from the same visual-stage run.",
+      "expected_output": "Repeated real RCA visual-stage route attempts with artifact locators, review/export acceptance, retry/dead-letter/requery/resume refs, independent AI execution and quality refs, forbidden-write proof, and an RCA domain owner receipt or stable typed blocker.",
+      "verification": "Query Temporal history and OPL attempt ledger, then validate the RCA runtime evidence instance and owner/review/export refs against the exact artifact-producing run.",
+      "stop_condition": "A fresh same-run RCA long-soak evidence ref and runtime locator are visible, owner acceptance is valid, and no provider-only completion is used as domain completion."
+    }
+  ],
+  "landed_live_evidence": {
+    "temporal_service_reachable": true,
+    "managed_worker_ready": true,
+    "operator_updates_preserved": true,
+    "missing_closeout_fail_closed": true,
+    "actual_worker_restart_completed": true,
+    "temporal_history_requery_after_restart": true,
+    "domain_truth_boundary_preserved": true
+  },
+  "claim_boundary": {
+    "provider_transport_probe_complete": true,
+    "opl_production_residency_proven": false,
+    "real_rca_visual_stage_executed": false,
+    "artifact_producing_owner_receipt_present": false,
+    "review_export_acceptance_present": false,
+    "retry_dead_letter_boundary_proven_for_same_run": false,
+    "production_visual_stage_long_soak_complete": false,
+    "visual_ready": false,
+    "exportable": false,
+    "handoffable": false,
+    "domain_ready": false,
+    "production_ready": false
+  },
+  "repository_boundary": {
+    "repo_tracks_probe_closeout_and_blocker_refs": true,
+    "repo_tracks_temporal_history_body": false,
+    "repo_tracks_live_attempt_ledger": false,
+    "repo_tracks_visual_artifact_body": false,
+    "repo_tracks_owner_receipt_body": false,
+    "runtime_proof_remains_external": true
+  }
+}

@@ -217,3 +217,36 @@ test('RCA exposes Temporal autonomy as the default OPL-hosted runtime contract w
     );
   });
 });
+
+test('fresh Temporal probe closeout preserves the blocked RCA visual-stage authority boundary', () => {
+  const policy = readRepoJson('contracts/temporal_stage_run_consumption_policy.json');
+  const closeout = readRepoJson(policy.source_refs.latest_temporal_long_soak_probe_closeout_ref);
+
+  assert.equal(closeout.state, 'blocked_live_gate');
+  assert.equal(closeout.runtime_probe.provider_kind, 'temporal');
+  assert.equal(closeout.runtime_probe.persisted_proof.closeout_status, 'production_residency_failed');
+  assert.equal(closeout.runtime_probe.opl_proof_check_summary.proven_check_count, 6);
+  assert.equal(closeout.runtime_probe.opl_proof_check_summary.required_check_count, 9);
+  assert.deepEqual(closeout.runtime_probe.opl_proof_check_summary.failed_check_ids, [
+    'worker_completed_attempt',
+    'typed_closeout_required_for_completed',
+    'retry_or_dead_letter_boundary_observed',
+  ]);
+  assert.equal(closeout.runtime_probe.actual_worker_restart_readback.pid_changed, true);
+  assert.equal(closeout.runtime_probe.actual_worker_restart_readback.worker_ready_after_restart, true);
+  assert.equal(
+    closeout.runtime_probe.actual_worker_restart_readback.completed_workflow_history_readable_after_restart,
+    true,
+  );
+  assert.equal(closeout.typed_blockers.length, 2);
+  assert.equal(closeout.claim_boundary.provider_transport_probe_complete, true);
+  assert.equal(closeout.claim_boundary.opl_production_residency_proven, false);
+  assert.equal(closeout.claim_boundary.real_rca_visual_stage_executed, false);
+  assert.equal(closeout.claim_boundary.artifact_producing_owner_receipt_present, false);
+  assert.equal(closeout.claim_boundary.retry_dead_letter_boundary_proven_for_same_run, false);
+  assert.equal(closeout.claim_boundary.production_visual_stage_long_soak_complete, false);
+  assert.equal(closeout.claim_boundary.visual_ready, false);
+  assert.equal(closeout.claim_boundary.domain_ready, false);
+  assert.equal(closeout.claim_boundary.production_ready, false);
+  assert.equal(closeout.repository_boundary.runtime_proof_remains_external, true);
+});
