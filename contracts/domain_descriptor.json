@@ -28,8 +28,10 @@
     "stage_refs": "contracts/stage_control_plane.json",
     "pack_refs": "contracts/pack_compiler_input.json",
     "agent_lab_handoff": "contracts/agent_lab_handoff.json",
+    "agent_lab_cost_profile": "contracts/agent_lab_cost_profile.json",
     "generated_surface_handoff": "contracts/generated_surface_handoff.json",
     "opl_ledger_artifact_registration": "contracts/opl_ledger_artifact_registration.json",
+    "visual_transition_adapter_profile": "contracts/visual_transition_adapter_profile.json",
     "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json"
   },
   "authority_boundary": {

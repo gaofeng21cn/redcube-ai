@@ -219,3 +219,63 @@ test('RCA physical morphology policy keeps active source tails classified and so
     false,
   );
 });
+
+test('RCA owns declarative visual transition and Agent Lab cost profiles', () => {
+  const descriptor = readJson('contracts/domain_descriptor.json');
+  const pack = readJson('contracts/pack_compiler_input.json');
+  const transitionRegistry = readJson('contracts/visual_transition_adapter_profile.json');
+  const costProfile = readJson('contracts/agent_lab_cost_profile.json');
+
+  assert.equal(
+    descriptor.standard_contract_refs.visual_transition_adapter_profile,
+    'contracts/visual_transition_adapter_profile.json',
+  );
+  assert.equal(
+    descriptor.standard_contract_refs.agent_lab_cost_profile,
+    'contracts/agent_lab_cost_profile.json',
+  );
+  assert.equal(
+    pack.source_refs.visual_transition_adapter_profile_source_ref,
+    'contracts/visual_transition_adapter_profile.json',
+  );
+  assert.equal(
+    pack.source_refs.agent_lab_cost_profile_source_ref,
+    'contracts/agent_lab_cost_profile.json',
+  );
+
+  assert.equal(transitionRegistry.surface_kind, 'opl_domain_transition_adapter_profile_registry');
+  assert.equal(transitionRegistry.profile_count, 1);
+  assert.equal(transitionRegistry.compatibility_profile_count, 1);
+  const transitionEntry = transitionRegistry.registry_entries[0];
+  assert.equal(transitionEntry.profile_id, 'redcube-ai.visual_transition.compatibility.v1');
+  assert.ok(transitionEntry.target_domain_ids.includes('rca'));
+  assert.equal(transitionEntry.adapter_profile.profile_role, 'compatibility_projection');
+  assert.equal(transitionEntry.adapter_profile.compatibility_surface_kind, 'visual_transition_spec');
+  assert.equal(transitionEntry.adapter_profile.owner_route_ref_prefix, 'rca-visual-transition');
+  const {
+    refs_only: transitionRefsOnly,
+    ...transitionForbiddenAuthority
+  } = transitionRegistry.authority_boundary;
+  assert.equal(transitionRefsOnly, true);
+  assertAllFalse(
+    transitionForbiddenAuthority,
+    'visual_transition_adapter_profile.authority_boundary',
+  );
+
+  assert.equal(costProfile.surface_kind, 'opl_agent_lab_cost_estimate_profile');
+  assert.equal(costProfile.profile_id, 'rca-ppt-40');
+  assert.equal(costProfile.artifact_profile.slide_count, 40);
+  assert.deepEqual(
+    costProfile.stages.map((stage) => stage.stage_id),
+    ['intake', 'outline', 'slide_generation', 'image_generation', 'render_review', 'revision'],
+  );
+  assert.equal(costProfile.pricing_boundary.pricing_snapshot_owned_by_profile, false);
+  assert.equal(costProfile.pricing_boundary.pricing_calculation_owned_by_profile, false);
+  assert.equal(costProfile.pricing_boundary.profile_supplies_workload_assumptions_only, true);
+  const {
+    refs_only: costRefsOnly,
+    ...costForbiddenAuthority
+  } = costProfile.authority_boundary;
+  assert.equal(costRefsOnly, true);
+  assertAllFalse(costForbiddenAuthority, 'agent_lab_cost_profile.authority_boundary');
+});
