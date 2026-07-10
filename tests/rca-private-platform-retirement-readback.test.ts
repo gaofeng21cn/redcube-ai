@@ -4,6 +4,7 @@ import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
 import {
+  analyzeTypeScriptOwnerBoundaryClosure,
   analyzeTypeScriptOwnerBoundarySource,
   buildPrivatePlatformSourceGuardReadback,
 } from '../scripts/check-private-platform-retirement.ts';
@@ -108,6 +109,39 @@ test('RCA product-session AST guard catches property syntax variants without sca
       'session_store_root',
     ],
   );
+});
+
+test('RCA product-session AST guard follows local helper imports recursively', () => {
+  const violations = analyzeTypeScriptOwnerBoundaryClosure({
+    entrySourceRefs: ['owner/entry.ts'],
+    allowedFilesystemSourceRefs: [],
+    traversalStopSourceRefs: [],
+    sourceFiles: {
+      'owner/entry.ts': "import { loadSession } from './helper.js'; export { loadSession };",
+      'owner/helper.ts': "import { readFileSync } from 'node:fs'; export const loadSession = readFileSync;",
+    },
+    ...AST_POLICY,
+  });
+  assert.equal(violations.some((entry) => (
+    entry.includes('owner/helper.ts') && entry.endsWith('forbidden_module_import:node:fs')
+  )), true);
+});
+
+test('RCA product-session AST guard does not treat OPL input type fields as RCA persistence', () => {
+  const violations = analyzeTypeScriptOwnerBoundarySource({
+    sourceRef: 'owner/generated-session-input.ts',
+    sourceText: `
+      export interface OplGeneratedSessionInput {
+        session_file: string;
+        session_store_root?: string;
+      }
+      export function projectDomainRefs(input: OplGeneratedSessionInput) {
+        return { domain_snapshot_ref: 'domain-snapshot:rca/example' };
+      }
+    `,
+    ...AST_POLICY,
+  });
+  assert.deepEqual(violations, []);
 });
 
 for (const scope of ['private-platform', 'default-caller-tail']) {

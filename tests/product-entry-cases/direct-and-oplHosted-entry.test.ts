@@ -2,6 +2,7 @@
 import {
   SERIAL_ENV_TEST,
   assert,
+  buildOplGeneratedProductSessionForTest,
   getProductEntrySession,
   importDomainEntrySharedModule,
   invokeOplHostedProductEntry,
@@ -58,21 +59,6 @@ function assertProductEntryProjection(surface, {
   ]) {
     assert.equal(retiredField in surface, false, retiredField);
   }
-}
-
-function oplSessionEnvelope(entrySessionId, handoffRefs) {
-  return {
-    surface_kind: 'opl_product_session_envelope',
-    owner: 'one-person-lab',
-    runtime_owner: 'configured_family_runtime_provider',
-    session_ref: `opl-session:${entrySessionId}`,
-    entry_session_id: entrySessionId,
-    domain_snapshot_ref: handoffRefs.domain_snapshot_ref,
-    delivery_locator_refs: handoffRefs.delivery_locator_refs,
-    currentness_refs: handoffRefs.currentness_refs,
-    stage_folder_locator_refs: handoffRefs.stage_folder_locator_refs,
-    artifact_authority_refs: handoffRefs.artifact_authority_refs,
-  };
 }
 
 test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {
@@ -168,7 +154,7 @@ test('invokeProductEntry rejects retired deliverable task intent without compati
   });
 });
 
-test('invokeProductEntry continues only from an OPL-owned session envelope', SERIAL_ENV_TEST, async () => {
+test('invokeProductEntry continues only from the OPL generated session surface', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -184,12 +170,15 @@ test('invokeProductEntry continues only from an OPL-owned session envelope', SER
       }),
     ));
 
-    const firstEnvelope = oplSessionEnvelope('session-a', first.session_handoff_refs);
+    const firstGeneratedSession = buildOplGeneratedProductSessionForTest({
+      entrySessionId: 'session-a',
+      handoffRefs: first.session_handoff_refs,
+    });
     const continued = await invokeProductEntry({
       workspace_locator: { workspace_root: workspaceRoot },
       entry_session_contract: {
         entry_session_id: 'session-a',
-        opl_session_envelope: firstEnvelope,
+        opl_generated_session_surface: firstGeneratedSession,
       },
       delivery_request: {
         user_intent: '继续推进到最终 PPT',
@@ -201,7 +190,10 @@ test('invokeProductEntry continues only from an OPL-owned session envelope', SER
       entrySessionId: 'session-a',
       deliverableId: 'deck-a',
     });
-    assert.equal(continued.session_handoff_refs.previous_domain_snapshot_ref, firstEnvelope.domain_snapshot_ref);
+    assert.equal(
+      continued.session_handoff_refs.previous_domain_snapshot_ref,
+      first.session_handoff_refs.domain_snapshot_ref,
+    );
     assert.notEqual(
       continued.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
       first.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
@@ -209,10 +201,10 @@ test('invokeProductEntry continues only from an OPL-owned session envelope', SER
 
     const session = await getProductEntrySession({
       entry_session_id: 'session-a',
-      opl_session_envelope: oplSessionEnvelope(
-        'session-a',
-        continued.session_handoff_refs,
-      ),
+      opl_generated_session_surface: buildOplGeneratedProductSessionForTest({
+        entrySessionId: 'session-a',
+        handoffRefs: continued.session_handoff_refs,
+      }),
     });
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');

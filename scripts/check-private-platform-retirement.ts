@@ -161,9 +161,7 @@ function accessedPropertyText(node) {
   if (ts.isPropertyAssignment(node)
     || ts.isShorthandPropertyAssignment(node)
     || ts.isPropertyDeclaration(node)
-    || ts.isPropertySignature(node)
     || ts.isMethodDeclaration(node)
-    || ts.isMethodSignature(node)
     || ts.isGetAccessorDeclaration(node)
     || ts.isSetAccessorDeclaration(node)) {
     return propertyNameText(node.name);
@@ -207,6 +205,96 @@ export function analyzeTypeScriptOwnerBoundarySource({
   return violations;
 }
 
+function sourceTextForOwnerBoundary(sourceRef, sourceFiles) {
+  if (sourceFiles && Object.prototype.hasOwnProperty.call(sourceFiles, sourceRef)) {
+    return String(sourceFiles[sourceRef]);
+  }
+  const file = path.resolve(REPO_ROOT, sourceRef);
+  return existsSync(file) ? readFileSync(file, 'utf-8') : null;
+}
+
+function resolveRelativeTypeScriptImport(sourceRef, moduleName, sourceFiles) {
+  if (!moduleName.startsWith('.')) return null;
+  const joined = normalizePath(path.posix.normalize(path.posix.join(
+    path.posix.dirname(sourceRef),
+    moduleName,
+  )));
+  const withoutRuntimeExtension = joined.replace(/\.(?:c|m)?js$/u, '');
+  const candidates = [
+    joined,
+    `${withoutRuntimeExtension}.ts`,
+    `${withoutRuntimeExtension}.tsx`,
+    `${withoutRuntimeExtension}/index.ts`,
+    `${withoutRuntimeExtension}/index.tsx`,
+  ];
+  return candidates.find((candidate) => (
+    sourceFiles && Object.prototype.hasOwnProperty.call(sourceFiles, candidate)
+      ? true
+      : existsSync(path.resolve(REPO_ROOT, candidate))
+  )) || null;
+}
+
+function relativeTypeScriptImports(sourceRef, sourceText, sourceFiles) {
+  const sourceFile = ts.createSourceFile(
+    sourceRef,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    sourceRef.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const imports = [];
+  function visit(node) {
+    const moduleName = importedModuleText(node);
+    if (moduleName?.startsWith('.')) {
+      const resolved = resolveRelativeTypeScriptImport(sourceRef, moduleName, sourceFiles);
+      if (resolved) imports.push(resolved);
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  return [...new Set(imports)];
+}
+
+export function analyzeTypeScriptOwnerBoundaryClosure({
+  entrySourceRefs = [],
+  allowedFilesystemSourceRefs = [],
+  traversalStopSourceRefs = [],
+  sourceFiles = null,
+  forbiddenModuleSpecifiers = [],
+  forbiddenPropertyNames = [],
+}) {
+  const allowedFilesystem = new Set(allowedFilesystemSourceRefs);
+  const traversalStops = new Set(traversalStopSourceRefs);
+  const visited = new Set();
+  const pending = [...entrySourceRefs];
+  const violations = [];
+
+  while (pending.length > 0) {
+    const sourceRef = pending.shift();
+    if (!sourceRef || visited.has(sourceRef)) continue;
+    visited.add(sourceRef);
+    const sourceText = sourceTextForOwnerBoundary(sourceRef, sourceFiles);
+    if (sourceText === null) {
+      violations.push(`${sourceRef}:typescript_ast_owner_boundary:owner_source_missing`);
+      continue;
+    }
+    const sourceViolations = analyzeTypeScriptOwnerBoundarySource({
+      sourceRef,
+      sourceText,
+      forbiddenModuleSpecifiers,
+      forbiddenPropertyNames,
+    });
+    violations.push(...sourceViolations.filter((entry) => (
+      !allowedFilesystem.has(sourceRef)
+      || !entry.includes(':typescript_ast_owner_boundary:forbidden_module_import:')
+    )));
+    if (traversalStops.has(sourceRef)) continue;
+    pending.push(...relativeTypeScriptImports(sourceRef, sourceText, sourceFiles));
+  }
+
+  return violations;
+}
+
 function activePrivatePlatformTypeScriptAstViolations(scanPolicy) {
   const violations = [];
   for (const sourceRef of scanPolicy?.required_absent_source_refs || []) {
@@ -214,19 +302,13 @@ function activePrivatePlatformTypeScriptAstViolations(scanPolicy) {
       violations.push(`${sourceRef}:typescript_ast_owner_boundary:required_absent_source_present`);
     }
   }
-  for (const sourceRef of scanPolicy?.owner_source_refs || []) {
-    const file = path.resolve(REPO_ROOT, sourceRef);
-    if (!existsSync(file)) {
-      violations.push(`${sourceRef}:typescript_ast_owner_boundary:owner_source_missing`);
-      continue;
-    }
-    violations.push(...analyzeTypeScriptOwnerBoundarySource({
-      sourceRef,
-      sourceText: readFileSync(file, 'utf-8'),
-      forbiddenModuleSpecifiers: scanPolicy.forbidden_module_specifiers,
-      forbiddenPropertyNames: scanPolicy.forbidden_property_names,
-    }));
-  }
+  violations.push(...analyzeTypeScriptOwnerBoundaryClosure({
+    entrySourceRefs: scanPolicy?.owner_source_refs || [],
+    allowedFilesystemSourceRefs: scanPolicy?.allowed_filesystem_source_refs || [],
+    traversalStopSourceRefs: scanPolicy?.traversal_stop_source_refs || [],
+    forbiddenModuleSpecifiers: scanPolicy?.forbidden_module_specifiers || [],
+    forbiddenPropertyNames: scanPolicy?.forbidden_property_names || [],
+  }));
   return violations;
 }
 
@@ -287,6 +369,8 @@ function buildActiveSourceScanSummary(physicalPolicy) {
   } else {
     for (const [field, values] of Object.entries({
       owner_source_refs: astScanPolicy.owner_source_refs,
+      allowed_filesystem_source_refs: astScanPolicy.allowed_filesystem_source_refs,
+      traversal_stop_source_refs: astScanPolicy.traversal_stop_source_refs,
       required_absent_source_refs: astScanPolicy.required_absent_source_refs,
       forbidden_module_specifiers: astScanPolicy.forbidden_module_specifiers,
       forbidden_property_names: astScanPolicy.forbidden_property_names,

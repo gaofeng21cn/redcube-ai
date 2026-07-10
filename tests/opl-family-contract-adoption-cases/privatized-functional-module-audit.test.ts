@@ -245,7 +245,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(defaultCallerContract.generated_session_shell_owner, 'one-person-lab');
   assert.equal(defaultCallerContract.generated_session_command, 'opl_generated:product_session');
   assert.equal(defaultCallerContract.rca_role, 'entry_session_domain_snapshot_refs_only_adapter');
-  assert.equal(defaultCallerContract.default_caller_status, 'generic_session_sources_retired_opl_envelope_required');
+  assert.equal(defaultCallerContract.default_caller_status, 'generic_session_sources_retired_opl_generated_surface_required');
   assert.equal(defaultCallerContract.rca_owns_generic_session_shell, false);
   assert.equal(defaultCallerContract.generic_session_source_retirement, 'completed');
   assert.equal(

@@ -14,7 +14,7 @@ test('RCA runtime projection maps to visual deliverable runtime surfaces', () =>
   const attempt = payload.attempt_projection;
 
   for (const surface of [
-    'OPL-owned product session envelope refs',
+    'OPL generated product-entry session surface refs',
     'RCA product-entry domain snapshot refs',
     'runtimeWatch',
     'artifact authority refs',
@@ -96,7 +96,7 @@ test('RCA exposes refs-only lifecycle adoption while OPL owns session and runtim
     sqlite_can_store_review_export_judgment: false,
   });
   for (const surface of [
-    'OPL-owned product session envelope refs',
+    'OPL generated product-entry session surface refs',
     'RCA product-entry domain snapshot refs',
     'review state',
     'publication projection',

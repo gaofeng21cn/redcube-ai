@@ -254,7 +254,7 @@
         "generated_session_shell_owner": "one-person-lab",
         "generated_session_command": "opl_generated:product_session",
         "generated_session_command_template": "opl_generated:product_session --entry-session-id <entry-session-id>",
-        "current_status": "generic_session_sources_retired_opl_envelope_required",
+        "current_status": "generic_session_sources_retired_opl_generated_surface_required",
         "rca_role_after_cutover": "domain_session_snapshot_refs_only",
         "rca_owns_generic_session_shell": false,
         "rca_owns_generic_workbench": false,
@@ -906,13 +906,24 @@
     ],
     "typescript_ast_owner_boundary": {
       "policy_id": "rca.source_morphology.product_session_owner_ast_boundary.v1",
-      "purpose": "fail closed when RCA product-session owner sources regain local persistence imports or generic session persistence properties",
+      "purpose": "fail closed when RCA product-session owner import closure regains local persistence modules or runtime persistence properties while allowing OPL-owned input type declarations",
       "owner_source_refs": [
         "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
         "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
         "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",
         "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
         "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
+      ],
+      "allowed_filesystem_source_refs": [
+        "packages/redcube-domain-entry/src/actions/action-utils.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
+      ],
+      "traversal_stop_source_refs": [
+        "packages/redcube-domain-entry/src/actions/action-utils.ts",
+        "packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts",
+        "packages/redcube-domain-entry/src/types.ts",
+        "packages/redcube-domain-entry/src/types-parts/foundation.ts"
       ],
       "required_absent_source_refs": [
         "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
@@ -936,6 +947,7 @@
       "fail_closed_conditions": [
         "owner_source_missing",
         "required_absent_source_present",
+        "local_import_closure_violation",
         "forbidden_module_import",
         "forbidden_property"
       ]

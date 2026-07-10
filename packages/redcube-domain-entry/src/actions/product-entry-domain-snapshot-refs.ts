@@ -2,15 +2,10 @@
 import { safeText } from './action-utils.js';
 import type { ProductEntrySessionResponse } from '../types.js';
 
-const OPL_SESSION_OWNER = 'one-person-lab';
+const OPL_DOMAIN_ID = 'rca';
+const OPL_DOMAIN_OWNER = 'redcube_ai';
 const OPL_RUNTIME_OWNER = 'configured_family_runtime_provider';
-const FORBIDDEN_PERSISTENCE_FIELDS = new Set([
-  'resumed_from_session',
-  'runtime_state_path',
-  'session_file',
-  'session_file_ref',
-  'session_store_root',
-]);
+const OPL_GENERATED_SESSION_VERSION = 'opl-generated-product-entry-session.v1';
 
 function record(value, field) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
@@ -25,32 +20,45 @@ function requiredText(value, field) {
   return text;
 }
 
+function requireExactValue(value, expected, field) {
+  if (value !== expected) {
+    throw new Error(`${field} must be ${String(expected)}`);
+  }
+}
+
 function stringRefs(value, field) {
   if (value === undefined || value === null) return [];
   if (!Array.isArray(value)) throw new Error(`${field} must be string[]`);
   return [...new Set(value.map((entry) => requiredText(entry, field)))];
 }
 
-function rejectPersistenceFields(value, field) {
-  if (Array.isArray(value)) {
-    value.forEach((entry, index) => rejectPersistenceFields(entry, `${field}[${index}]`));
-    return;
-  }
-  if (!value || typeof value !== 'object') return;
-  for (const [key, entry] of Object.entries(value)) {
-    if (FORBIDDEN_PERSISTENCE_FIELDS.has(key)) {
-      throw new Error(`${field}.${key} is not accepted by the RCA refs adapter`);
-    }
-    rejectPersistenceFields(entry, `${field}.${key}`);
-  }
-}
-
-function currentnessRefs(value) {
-  const refs = record(value, 'opl_session_envelope.currentness_refs');
-  const providerAttemptRef = safeText(refs.provider_attempt_ref) || null;
-  const providerAttemptLedgerRef = safeText(refs.provider_attempt_ledger_ref) || null;
+function currentnessRefs(value, field = 'domain_projection.currentness_refs') {
+  const refs = record(value, field);
+  const crossProviderAttemptIndex = refs.cross_provider_attempt_index == null
+    ? null
+    : record(refs.cross_provider_attempt_index, `${field}.cross_provider_attempt_index`);
+  const providerAttemptRef = safeText(
+    refs.provider_attempt_ref || crossProviderAttemptIndex?.provider_attempt_ref,
+  ) || null;
+  const providerAttemptLedgerRef = safeText(
+    refs.provider_attempt_ledger_ref || crossProviderAttemptIndex?.provider_attempt_ledger_ref,
+  ) || null;
   if (Boolean(providerAttemptRef) !== Boolean(providerAttemptLedgerRef)) {
     throw new Error('OPL provider attempt currentness requires both provider refs');
+  }
+  if (crossProviderAttemptIndex) {
+    if (requiredText(
+      crossProviderAttemptIndex.surface_kind,
+      `${field}.cross_provider_attempt_index.surface_kind`,
+    ) !== 'cross_provider_attempt_index') {
+      throw new Error(`${field}.cross_provider_attempt_index.surface_kind must be cross_provider_attempt_index`);
+    }
+    if (safeText(crossProviderAttemptIndex.provider_attempt_ref) !== providerAttemptRef) {
+      throw new Error(`${field}.cross_provider_attempt_index.provider_attempt_ref does not match currentness`);
+    }
+    if (safeText(crossProviderAttemptIndex.provider_attempt_ledger_ref) !== providerAttemptLedgerRef) {
+      throw new Error(`${field}.cross_provider_attempt_index.provider_attempt_ledger_ref does not match currentness`);
+    }
   }
   return {
     latest_surface_kind: safeText(refs.latest_surface_kind) || null,
@@ -58,44 +66,195 @@ function currentnessRefs(value) {
     latest_visual_run_ref: safeText(refs.latest_visual_run_ref) || null,
     provider_attempt_ref: providerAttemptRef,
     provider_attempt_ledger_ref: providerAttemptLedgerRef,
+    cross_provider_attempt_index: crossProviderAttemptIndex
+      ? { ...crossProviderAttemptIndex }
+      : null,
     typed_blocker_ref: safeText(refs.typed_blocker_ref) || null,
-    next_forced_delta_refs: stringRefs(refs.next_forced_delta_refs, 'currentness_refs.next_forced_delta_refs'),
+    next_forced_delta_refs: stringRefs(refs.next_forced_delta_refs, `${field}.next_forced_delta_refs`),
   };
 }
 
-export function normalizeOplProductSessionEnvelope(value, entrySessionId, { required = false } = {}) {
+function assertSameLocator(generatedDelivery, domainDelivery, field) {
+  const generated = safeText(generatedDelivery[field]);
+  const domain = safeText(domainDelivery[field]);
+  if (generated && domain && generated !== domain) {
+    throw new Error(`opl_generated_session_surface.delivery_identity.${field} does not match domain_projection`);
+  }
+}
+
+export function normalizeOplGeneratedProductSessionSurface(
+  value,
+  entrySessionId,
+  { required = false } = {},
+) {
   if (value === undefined || value === null) {
-    if (required) throw new Error('opl_session_envelope is required');
+    if (required) throw new Error('opl_generated_session_surface is required');
     return null;
   }
-  const envelope = record(value, 'opl_session_envelope');
-  rejectPersistenceFields(envelope, 'opl_session_envelope');
-  if (requiredText(envelope.surface_kind, 'opl_session_envelope.surface_kind') !== 'opl_product_session_envelope') {
-    throw new Error('opl_session_envelope.surface_kind must be opl_product_session_envelope');
+  const generated = record(value, 'opl_generated_session_surface');
+  if (requiredText(
+    generated.surface_kind,
+    'opl_generated_session_surface.surface_kind',
+  ) !== 'opl_generated_product_entry_session_surface') {
+    throw new Error(
+      'opl_generated_session_surface.surface_kind must be opl_generated_product_entry_session_surface',
+    );
   }
-  if (requiredText(envelope.owner, 'opl_session_envelope.owner') !== OPL_SESSION_OWNER) {
-    throw new Error(`opl_session_envelope.owner must be ${OPL_SESSION_OWNER}`);
+  if (requiredText(
+    generated.version,
+    'opl_generated_session_surface.version',
+  ) !== OPL_GENERATED_SESSION_VERSION) {
+    throw new Error(
+      `opl_generated_session_surface.version must be ${OPL_GENERATED_SESSION_VERSION}`,
+    );
   }
-  if (requiredText(envelope.runtime_owner, 'opl_session_envelope.runtime_owner') !== OPL_RUNTIME_OWNER) {
-    throw new Error(`opl_session_envelope.runtime_owner must be ${OPL_RUNTIME_OWNER}`);
+  if (requiredText(generated.domain_id, 'opl_generated_session_surface.domain_id') !== OPL_DOMAIN_ID) {
+    throw new Error(`opl_generated_session_surface.domain_id must be ${OPL_DOMAIN_ID}`);
   }
-  const envelopeEntrySessionId = requiredText(
-    envelope.entry_session_id,
-    'opl_session_envelope.entry_session_id',
+  if (requiredText(
+    generated.domain_owner,
+    'opl_generated_session_surface.domain_owner',
+  ) !== OPL_DOMAIN_OWNER) {
+    throw new Error(`opl_generated_session_surface.domain_owner must be ${OPL_DOMAIN_OWNER}`);
+  }
+  if (requiredText(
+    generated.runtime_owner,
+    'opl_generated_session_surface.runtime_owner',
+  ) !== OPL_RUNTIME_OWNER) {
+    throw new Error(`opl_generated_session_surface.runtime_owner must be ${OPL_RUNTIME_OWNER}`);
+  }
+  const generatedEntrySession = record(
+    generated.entry_session,
+    'opl_generated_session_surface.entry_session',
   );
-  if (envelopeEntrySessionId !== entrySessionId) {
-    throw new Error('opl_session_envelope.entry_session_id does not match entry_session_contract');
+  const generatedEntrySessionId = requiredText(
+    generatedEntrySession.entry_session_id,
+    'opl_generated_session_surface.entry_session.entry_session_id',
+  );
+  if (generatedEntrySessionId !== entrySessionId) {
+    throw new Error(
+      'opl_generated_session_surface.entry_session.entry_session_id does not match entry_session_contract',
+    );
   }
-  const delivery = record(envelope.delivery_locator_refs, 'opl_session_envelope.delivery_locator_refs');
+  const sessionContinuity = record(
+    generated.session_continuity,
+    'opl_generated_session_surface.session_continuity',
+  );
+  requireExactValue(
+    sessionContinuity.surface_kind,
+    'opl_generated_session_continuity',
+    'opl_generated_session_surface.session_continuity.surface_kind',
+  );
+  requireExactValue(
+    sessionContinuity.domain_agent_id,
+    OPL_DOMAIN_ID,
+    'opl_generated_session_surface.session_continuity.domain_agent_id',
+  );
+  requireExactValue(
+    sessionContinuity.domain_owner,
+    OPL_DOMAIN_OWNER,
+    'opl_generated_session_surface.session_continuity.domain_owner',
+  );
+  requireExactValue(
+    sessionContinuity.runtime_owner,
+    OPL_RUNTIME_OWNER,
+    'opl_generated_session_surface.session_continuity.runtime_owner',
+  );
+  requireExactValue(
+    sessionContinuity.entry_session_id,
+    entrySessionId,
+    'opl_generated_session_surface.session_continuity.entry_session_id',
+  );
+  requireExactValue(
+    sessionContinuity.status,
+    'session_projection_available',
+    'opl_generated_session_surface.session_continuity.status',
+  );
+  const artifactInventory = record(
+    generated.artifact_inventory,
+    'opl_generated_session_surface.artifact_inventory',
+  );
+  requireExactValue(
+    artifactInventory.surface_kind,
+    'opl_generated_artifact_locator_projection',
+    'opl_generated_session_surface.artifact_inventory.surface_kind',
+  );
+  requireExactValue(
+    artifactInventory.body_included,
+    false,
+    'opl_generated_session_surface.artifact_inventory.body_included',
+  );
+  requireExactValue(
+    artifactInventory.write_permitted,
+    false,
+    'opl_generated_session_surface.artifact_inventory.write_permitted',
+  );
+  const authorityBoundary = record(
+    generated.authority_boundary,
+    'opl_generated_session_surface.authority_boundary',
+  );
+  for (const [field, expected] of Object.entries({
+    generated_surface_only: true,
+    diagnostic_and_refs_only: true,
+    can_write_domain_truth: false,
+    can_write_artifact_body: false,
+    can_write_memory_body: false,
+    can_sign_owner_receipt: false,
+    can_create_typed_blocker: false,
+    can_issue_domain_or_quality_or_export_verdict: false,
+  })) {
+    requireExactValue(
+      authorityBoundary[field],
+      expected,
+      `opl_generated_session_surface.authority_boundary.${field}`,
+    );
+  }
+  requiredText(generated.source, 'opl_generated_session_surface.source');
+  requiredText(generated.entry_mode, 'opl_generated_session_surface.entry_mode');
+  const projection = record(
+    generated.domain_projection,
+    'opl_generated_session_surface.domain_projection',
+  );
+  if (requiredText(
+    projection.surface_kind,
+    'opl_generated_session_surface.domain_projection.surface_kind',
+  ) !== 'rca_product_entry_session_handoff_refs') {
+    throw new Error(
+      'opl_generated_session_surface.domain_projection.surface_kind must be rca_product_entry_session_handoff_refs',
+    );
+  }
+  if (requiredText(
+    projection.entry_session_id,
+    'opl_generated_session_surface.domain_projection.entry_session_id',
+  ) !== entrySessionId) {
+    throw new Error(
+      'opl_generated_session_surface.domain_projection.entry_session_id does not match entry_session_contract',
+    );
+  }
+  const delivery = record(
+    projection.delivery_locator_refs,
+    'opl_generated_session_surface.domain_projection.delivery_locator_refs',
+  );
+  const generatedDelivery = record(
+    generated.delivery_identity,
+    'opl_generated_session_surface.delivery_identity',
+  );
+  for (const field of ['workspace_ref', 'deliverable_family', 'topic_id', 'deliverable_id', 'profile_id']) {
+    assertSameLocator(generatedDelivery, delivery, field);
+  }
+  const currentness = currentnessRefs(
+    projection.currentness_refs,
+    'opl_generated_session_surface.domain_projection.currentness_refs',
+  );
   return {
-    surface_kind: 'opl_product_session_envelope',
-    owner: OPL_SESSION_OWNER,
+    surface_kind: 'opl_generated_product_entry_session_surface',
+    domain_id: OPL_DOMAIN_ID,
+    domain_owner: OPL_DOMAIN_OWNER,
     runtime_owner: OPL_RUNTIME_OWNER,
-    session_ref: requiredText(envelope.session_ref, 'opl_session_envelope.session_ref'),
-    entry_session_id: envelopeEntrySessionId,
+    entry_session_id: generatedEntrySessionId,
     domain_snapshot_ref: requiredText(
-      envelope.domain_snapshot_ref,
-      'opl_session_envelope.domain_snapshot_ref',
+      projection.domain_snapshot_ref,
+      'opl_generated_session_surface.domain_projection.domain_snapshot_ref',
     ),
     delivery_locator_refs: {
       workspace_ref: requiredText(delivery.workspace_ref, 'delivery_locator_refs.workspace_ref'),
@@ -104,14 +263,14 @@ export function normalizeOplProductSessionEnvelope(value, entrySessionId, { requ
       deliverable_id: requiredText(delivery.deliverable_id, 'delivery_locator_refs.deliverable_id'),
       profile_id: safeText(delivery.profile_id) || null,
     },
-    currentness_refs: currentnessRefs(envelope.currentness_refs),
+    currentness_refs: currentness,
     stage_folder_locator_refs: stringRefs(
-      envelope.stage_folder_locator_refs,
-      'opl_session_envelope.stage_folder_locator_refs',
+      projection.stage_folder_locator_refs,
+      'opl_generated_session_surface.domain_projection.stage_folder_locator_refs',
     ),
     artifact_authority_refs: stringRefs(
-      envelope.artifact_authority_refs,
-      'opl_session_envelope.artifact_authority_refs',
+      projection.artifact_authority_refs,
+      'opl_generated_session_surface.domain_projection.artifact_authority_refs',
     ),
   };
 }
@@ -138,31 +297,42 @@ export function buildProductEntrySessionHandoffRefs({
 }) {
   const resultSurface = domainEntrySurface?.result_surface || {};
   const current = resultCurrentness(resultSurface);
-  const previous = entrySession.oplSessionEnvelope;
+  const previous = entrySession.oplGeneratedSessionSurface;
   const domainSnapshotRef = [
     'domain-snapshot:rca/product-entry',
     encodeURIComponent(entrySession.entrySessionId),
     encodeURIComponent(current.targetHandle || resultSurface.surface_kind || 'result'),
   ].join('/');
-  const resultArtifactRefs = stringRefs(
-    resultSurface.artifact_refs || resultSurface.runtime_progress_projection?.final_artifact_refs,
-    'result_surface.artifact_refs',
-  );
-  const resultStageFolderRefs = stringRefs(
-    resultSurface.stage_folder_locator_refs,
-    'result_surface.stage_folder_locator_refs',
-  );
+  const resultArtifactRefs = stringRefs([
+    ...(Array.isArray(resultSurface.artifact_refs) ? resultSurface.artifact_refs : []),
+    ...(Array.isArray(resultSurface.run?.artifact_refs) ? resultSurface.run.artifact_refs : []),
+    ...(Array.isArray(resultSurface.runtime_progress_projection?.final_artifact_refs)
+      ? resultSurface.runtime_progress_projection.final_artifact_refs
+      : []),
+    safeText(resultSurface.artifactFile),
+  ].filter(Boolean), 'result_surface.artifact_refs');
+  const resultStageFolderRefs = stringRefs([
+    ...(Array.isArray(resultSurface.stage_folder_locator_refs)
+      ? resultSurface.stage_folder_locator_refs
+      : []),
+    ...resultArtifactRefs.filter((ref) => /\/stages\/[^/]+\/attempts\//.test(ref)),
+  ], 'result_surface.stage_folder_locator_refs');
+  const resultAttemptIndex = resultSurface.run?.cross_provider_attempt_index || null;
   const providerAttemptRef = entrySession.providerAttemptRef
+    || safeText(resultAttemptIndex?.provider_attempt_ref)
     || previous?.currentness_refs.provider_attempt_ref
     || null;
   const providerAttemptLedgerRef = entrySession.providerAttemptLedgerRef
+    || safeText(resultAttemptIndex?.provider_attempt_ledger_ref)
     || previous?.currentness_refs.provider_attempt_ledger_ref
+    || null;
+  const crossProviderAttemptIndex = resultAttemptIndex
+    || previous?.currentness_refs.cross_provider_attempt_index
     || null;
 
   return {
     surface_kind: 'rca_product_entry_session_handoff_refs',
     entry_session_id: entrySession.entrySessionId,
-    opl_session_ref: previous?.session_ref || null,
     previous_domain_snapshot_ref: previous?.domain_snapshot_ref || null,
     domain_snapshot_ref: domainSnapshotRef,
     delivery_locator_refs: {
@@ -179,6 +349,7 @@ export function buildProductEntrySessionHandoffRefs({
       latest_visual_run_ref: current.latestRunId ? `route-run:${current.latestRunId}` : null,
       provider_attempt_ref: providerAttemptRef,
       provider_attempt_ledger_ref: providerAttemptLedgerRef,
+      cross_provider_attempt_index: crossProviderAttemptIndex,
       typed_blocker_ref: safeText(resultSurface.blocker_ref || resultSurface.typed_blocker_ref) || null,
       next_forced_delta_refs: previous?.currentness_refs.next_forced_delta_refs || [],
     },
@@ -194,7 +365,9 @@ export function buildProductEntrySessionHandoffRefs({
   };
 }
 
-export function buildProductEntrySessionDomainSnapshotRefs(envelope): ProductEntrySessionResponse {
+export function buildProductEntrySessionDomainSnapshotRefs(
+  generatedSession,
+): ProductEntrySessionResponse {
   return {
     ok: true,
     surface_kind: 'product_entry_session',
@@ -202,18 +375,18 @@ export function buildProductEntrySessionDomainSnapshotRefs(envelope): ProductEnt
     recommended_action: 'consume_with_opl_generated_product_session',
     owner: 'redcube_ai',
     entry_session_ref: {
-      entry_session_id: envelope.entry_session_id,
-      opl_session_ref: envelope.session_ref,
-      domain_snapshot_ref: envelope.domain_snapshot_ref,
-      runtime_owner: envelope.runtime_owner,
+      entry_session_id: generatedSession.entry_session_id,
+      generated_session_surface_kind: generatedSession.surface_kind,
+      domain_snapshot_ref: generatedSession.domain_snapshot_ref,
+      runtime_owner: generatedSession.runtime_owner,
     },
-    delivery_locator_refs: envelope.delivery_locator_refs,
+    delivery_locator_refs: generatedSession.delivery_locator_refs,
     currentness_refs: {
-      domain_snapshot_ref: envelope.domain_snapshot_ref,
-      ...envelope.currentness_refs,
+      domain_snapshot_ref: generatedSession.domain_snapshot_ref,
+      ...generatedSession.currentness_refs,
     },
-    stage_folder_locator_refs: envelope.stage_folder_locator_refs,
-    artifact_authority_refs: envelope.artifact_authority_refs,
+    stage_folder_locator_refs: generatedSession.stage_folder_locator_refs,
+    artifact_authority_refs: generatedSession.artifact_authority_refs,
     authority_refs: {
       review_state_ref: 'domain-handler:getReviewState',
       publication_projection_ref: 'domain-handler:getPublicationProjection',
@@ -243,10 +416,10 @@ export function buildProductEntrySessionDomainSnapshotRefs(envelope): ProductEnt
       creates_typed_blocker: false,
     },
     summary: {
-      entry_session_id: envelope.entry_session_id,
-      deliverable_id: envelope.delivery_locator_refs.deliverable_id,
-      latest_visual_run_ref: envelope.currentness_refs.latest_visual_run_ref,
-      typed_blocker_ref: envelope.currentness_refs.typed_blocker_ref,
+      entry_session_id: generatedSession.entry_session_id,
+      deliverable_id: generatedSession.delivery_locator_refs.deliverable_id,
+      latest_visual_run_ref: generatedSession.currentness_refs.latest_visual_run_ref,
+      typed_blocker_ref: generatedSession.currentness_refs.typed_blocker_ref,
     },
   };
 }

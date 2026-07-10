@@ -31,7 +31,7 @@ const PRODUCT_ENTRY_FAMILY_ORCHESTRATION_SPEC = Object.freeze({
   review_gate_id: 'redcube_operator_review_gate',
   review_gate_title: 'RedCube operator review gate',
   resume_surface_kind: 'product_entry_session',
-  checkpoint_locator_field: 'entry_session_contract.opl_session_envelope.domain_snapshot_ref',
+  checkpoint_locator_field: 'entry_session_contract.opl_generated_session_surface.domain_projection.domain_snapshot_ref',
 });
 
 export function buildFamilyOrchestrationCompanion({
