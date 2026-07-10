@@ -558,6 +558,11 @@ test('artifact-producing PPT workflow reaches export_pptx through image-first, H
 
         assert.equal(screenshot.status, 'pass');
         assert.equal(screenshot.review_capture.source_visual_route, routeCase.visualRoute);
+        assert.equal(screenshot.visual_memory_proposal.status, 'skip');
+        assert.equal(screenshot.visual_memory_proposal.non_blocking, true);
+        assert.equal(screenshot.visual_memory_proposal.proposal_candidate, null);
+        assert.equal(exported.export_bundle.visual_memory_proposal.status, 'skip');
+        assert.equal(exported.status, 'completed');
         assert.equal(
           screenshot.slide_reviews.every((slide) => fs.existsSync(slide.screenshot_file)),
           true,
@@ -616,6 +621,46 @@ test('artifact-producing PPT workflow reaches export_pptx through image-first, H
           assert.equal(fs.existsSync(exported.export_bundle.artifact_gallery.index_file), true);
         }
       }
+    });
+  } finally {
+    restoreEnv();
+  }
+});
+
+test('screenshot summary creates one non-authority memory candidate that export preserves without signing', SERIAL_ENV_TEST, async () => {
+  const restoreEnv = withEnv({
+    REDCUBE_PYTHON_COMMAND: MOCK_REDCUBE_PYTHON_COMMAND,
+    REDCUBE_IMAGE_GENERATION_MOCK: '1',
+    REDCUBE_MOCK_PPT_SCREENSHOT_REVIEW_VARIANT: 'visual_memory_candidate',
+  });
+  try {
+    await withMockCodexRuntime(async () => {
+      const workspaceRoot = mkUserScopedTestWorkspace('redcube-ppt-memory-proposal-');
+      const results = await runPptVisualRoute({
+        workspaceRoot,
+        deliverableId: 'deck-memory-candidate',
+        visualRoute: 'author_pptx_native',
+      });
+      const screenshot = artifactFor(results, 'screenshot_review');
+      const exported = artifactFor(results, 'export_pptx');
+      const proposal = screenshot.visual_memory_proposal;
+      const forwarded = exported.export_bundle.visual_memory_proposal;
+
+      assert.equal(proposal.status, 'proposal_candidate');
+      assert.equal(proposal.non_authority, true);
+      assert.equal(proposal.non_blocking, true);
+      assert.equal(proposal.accept_reject_status, 'pending_rca_memory_owner');
+      assert.deepEqual(proposal.accept_reject_receipt_refs, []);
+      assert.equal(proposal.proposal_candidate.evidence_slide_ids.length, 1);
+      assert.equal(
+        proposal.proposal_candidate.evidence_refs.includes(screenshot.review_export_refs[0]),
+        true,
+      );
+      assert.deepEqual(forwarded.proposal_candidate, proposal.proposal_candidate);
+      assert.equal(forwarded.terminal_binding.review_export_refs.includes(screenshot.review_export_refs[0]), true);
+      assert.equal(forwarded.terminal_binding.review_export_refs.includes(exported.review_export_refs[0]), true);
+      assert.equal(exported.owner_receipt_refs.includes(proposal.proposal_candidate.proposal_ref), false);
+      assert.deepEqual(forwarded.accept_reject_receipt_refs, []);
     });
   } finally {
     restoreEnv();

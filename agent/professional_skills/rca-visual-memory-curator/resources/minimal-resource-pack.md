@@ -7,7 +7,13 @@ Boundary: refs-only professional method resource. This file is not visual truth,
 ## Template
 
 ```text
-memory_proposal_card:
+proposal_generation:
+  status: skip | proposal_candidate
+  reason:
+  non_authority: true
+  non_blocking: true
+
+memory_proposal_candidate:
   deliverable_family:
   stage:
   audience:
@@ -20,6 +26,7 @@ memory_proposal_card:
 
 accept_reject_review:
   proposal_ref:
+  terminal_export_refs:
   evidence_sufficient:
   reusable_beyond_current_artifact:
   authority_boundary_clear:
@@ -55,7 +62,9 @@ caveat: do not turn this into a fixed two-column layout recipe
 
 ## Checklist
 
-- Proposal links to rendered artifact evidence and RCA review/export refs.
+- Proposal generation links to rendered artifact evidence and RCA review refs; owner accept/reject additionally requires terminal export refs.
+- Screenshot-review summary may generate a proposal from review evidence alone; no candidate returns `skip` without blocking.
+- Package/export only preserves an existing candidate and binds terminal refs; it does not rerun curation.
 - Lesson is reusable visual-pattern memory, not current artifact body or slide copy.
 - Accepted memory stays prose-first, small, stage-scoped, and provenance-linked.
 - Reject deterministic layout recipes, hidden templates, route scorers, and readiness claims.
@@ -63,3 +72,4 @@ caveat: do not turn this into a fixed two-column layout recipe
 - OPL transport carries locator/proposal/receipt/projection refs only.
 - Memory never replaces screenshot review, review/export verdict, artifact authority, or owner receipt.
 - Native PPT lessons require both rendered evidence and package readback; unresolved degeneration or viewer drift routes back to repair.
+- Accept/reject runs only at the RCA memory-owner surface after terminal export closeout; export never self-signs the receipt.

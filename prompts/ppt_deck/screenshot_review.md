@@ -8,6 +8,7 @@
 - review_summary
 - weak_pages
 - slide_reviews
+- visual_memory_proposal (`summary` only: `skip` or one non-authority `proposal_candidate`)
 
 硬约束：
 - 这是 export 前硬闸门，不是软建议
@@ -33,6 +34,9 @@
 - 必须保存逐页截图与 review 记录
 - native PPTX route 还必须对照 package/object readback：计划中的 chart/table/picture/connector/group/path、notes、transition、timing 只有在真实 object/part/relationship 中存在才算落地；输入标签或 shape count 不能替代读回证据
 - native PPTX repair 默认返回最小 blocked slide/object stable ids 并保留通过项；只有 story、design lock 或 template profile 改变时才允许扩大重做范围
+- 只有 `review_scope=summary` 的整套复核可判断 visual memory proposal；逐页 batch 不得重复生成 memory
+- 没有独立于当前成品的可复用 visual pattern 时必须输出 `visual_memory_proposal.status=skip`，且不得阻断 review/export
+- 有候选时只输出 evidence-backed、stage-scoped、non-authority proposal candidate；不得在本 route accept/reject、签 receipt 或把未修 defect 存成 memory
 - optimize_existing 必须做 baseline relative review，输出 baseline_comparison_passed
 - `slide_reviews[].judgement` 只能输出 `"pass"` 或 `"block"`；若页面只是轻微观察项或需后续关注，仍输出 `"pass"`，并把页码放入 `weak_pages`、把观察写进 `visual_findings`，禁止输出 `pass_with_minor_watch`、`soft_pass`、`warning` 等扩展枚举
 
@@ -43,6 +47,11 @@
   "anti_template_ok": true,
   "weak_pages": [],
   "review_summary": "封面署名、机制主线与逐页讲课节奏都已经在最终截图里成立，可以进入导出。",
+  "visual_memory_proposal": {
+    "status": "skip",
+    "reason": "没有发现独立于当前成品的可复用视觉模式。",
+    "candidate": null
+  },
   "slide_reviews": [
     {
       "slide_id": "S01",

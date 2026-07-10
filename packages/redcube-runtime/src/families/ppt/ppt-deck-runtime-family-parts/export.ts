@@ -278,6 +278,47 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     writeText(file, `${JSON.stringify(data, null, 2)}\n`);
   }
 
+  function buildExportVisualMemoryProposal(
+    reviewArtifact: JsonRecord,
+    closeout: JsonRecord,
+    artifactRefs: unknown[],
+  ): JsonRecord {
+    const proposal = reviewArtifact?.visual_memory_proposal;
+    if (safeText(proposal?.status) !== 'proposal_candidate'
+      || !proposal?.proposal_candidate
+      || typeof proposal.proposal_candidate !== 'object'
+      || Array.isArray(proposal.proposal_candidate)) {
+      return {
+        status: 'skip',
+        skip_reason: 'no_screenshot_review_proposal',
+        non_authority: true,
+        non_blocking: true,
+        proposal_candidate: null,
+        terminal_binding: null,
+        accept_reject_status: 'not_requested',
+        accept_reject_receipt_refs: [],
+      };
+    }
+    return {
+      status: 'proposal_candidate',
+      skip_reason: null,
+      non_authority: true,
+      non_blocking: true,
+      proposal_candidate: proposal.proposal_candidate,
+      terminal_binding: {
+        review_export_refs: [...new Set([
+          ...safeArray(reviewArtifact?.review_export_refs),
+          ...safeArray(closeout?.review_export_refs),
+        ].map((ref) => safeText(ref)).filter(Boolean))],
+        export_artifact_refs: [...new Set(
+          safeArray(artifactRefs).map((ref) => safeText(ref)).filter(Boolean),
+        )],
+      },
+      accept_reject_status: 'pending_rca_memory_owner',
+      accept_reject_receipt_refs: [],
+    };
+  }
+
   const {
     buildImagePagesArtifactGallery,
     imagePagesSourceRefs,
@@ -475,6 +516,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       export_bundle: {
         export_ref: closeout.review_export_refs[0],
         review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
+        visual_memory_proposal: buildExportVisualMemoryProposal(reviewArtifact, closeout, artifactRefs),
         source_visual_route: safeText(renderArtifact.route),
         source_pptx: sourcePptx,
         source_html: null,
@@ -648,6 +690,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
       export_bundle: {
         export_ref: closeout.review_export_refs[0],
         review_receipt_refs: safeArray(reviewArtifact?.owner_receipt_refs),
+        visual_memory_proposal: buildExportVisualMemoryProposal(reviewArtifact, closeout, artifactRefs),
         source_visual_route: imagePagesExportInput ? safeText(renderArtifact?.route) : undefined,
         editable: imagePagesExportInput ? false : undefined,
         source_html: stableViewHtmlFile,

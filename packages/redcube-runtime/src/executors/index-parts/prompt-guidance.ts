@@ -58,7 +58,6 @@ const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
   'ppt_deck:screenshot_review': ['reviewer'],
   'ppt_deck:repair_image_pages': ['reviewer'],
   'ppt_deck:fix_html': ['reviewer'],
-  'ppt_deck:export_pptx': ['reviewer', 'visual_memory_curator'],
 });
 
 function readPromptGuidance(relativePath) {
@@ -88,9 +87,13 @@ function readProfessionalSkillGuidance(skill, routeKey) {
   return readFileSync(absolutePath, 'utf-8').trim();
 }
 
-function buildProfessionalSkillGuidanceSection(family, route) {
+function buildProfessionalSkillGuidanceSection(family, route, context = {}) {
   const routeKey = routeKeyFor(family, route);
-  const skillIds = Array.from(new Set((PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE[routeKey] || [])
+  const routeSkillIds = [...(PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE[routeKey] || [])];
+  if (routeKey === 'ppt_deck:screenshot_review' && safeText(context?.review_scope) === 'summary') {
+    routeSkillIds.push('visual_memory_curator');
+  }
+  const skillIds = Array.from(new Set(routeSkillIds
     .map((skillId) => safeText(skillId))
     .filter(Boolean)));
   if (skillIds.length === 0) {
@@ -217,7 +220,7 @@ export function resolveGenerationTimeoutMs(timeoutMs, localFileInspection = [], 
 
 export function buildGenerationInput({ family, route, promptRelativePath, context, outputContract, localFileInspection = [] }) {
   const guidance = readPromptGuidance(promptRelativePath);
-  const professionalSkillSection = buildProfessionalSkillGuidanceSection(family, route);
+  const professionalSkillSection = buildProfessionalSkillGuidanceSection(family, route, context);
   const localFileSection = buildLocalFileInspectionSection(localFileInspection);
   return [
     '# RedCube Structured Generation',

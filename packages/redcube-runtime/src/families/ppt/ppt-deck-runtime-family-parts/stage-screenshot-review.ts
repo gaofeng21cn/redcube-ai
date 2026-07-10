@@ -150,6 +150,79 @@ export function createPptDeckScreenshotReviewParts(deps) {
     };
   }
 
+  function normalizeVisualMemoryProposal({ data, status, deliverableId, slideReviews, closeout, captureManifest, reviewMarkdown }) {
+    const rawProposal = data?.visual_memory_proposal || {};
+    const rawCandidate = rawProposal?.candidate || {};
+    const reviewedSlideIds = new Set(
+      safeArray(slideReviews).map((slide) => safeText(slide?.slide_id)).filter(Boolean),
+    );
+    const evidenceSlideIds = [...new Set(
+      safeArray(rawCandidate?.evidence_slide_ids)
+        .map((slideId) => safeText(slideId))
+        .filter((slideId) => reviewedSlideIds.has(slideId)),
+    )];
+    const evidenceFindings = [...new Set(
+      safeArray(rawCandidate?.evidence_findings).map((finding) => safeText(finding)).filter(Boolean),
+    )];
+    const reusablePattern = safeText(rawCandidate?.reusable_pattern);
+    const stageScope = safeText(rawCandidate?.stage_scope);
+    const applicability = safeText(rawCandidate?.applicability);
+    const caveat = safeText(rawCandidate?.caveat);
+    const candidateComplete = safeText(rawProposal?.status) === 'proposal_candidate'
+      && reusablePattern
+      && stageScope
+      && applicability
+      && caveat
+      && evidenceSlideIds.length > 0
+      && evidenceFindings.length > 0;
+
+    if (status !== 'pass' || !candidateComplete) {
+      return {
+        status: 'skip',
+        skip_reason: status !== 'pass'
+          ? 'review_not_passed'
+          : safeText(rawProposal?.status) === 'skip'
+            ? safeText(rawProposal?.reason, 'no_reusable_pattern')
+            : 'invalid_or_incomplete_proposal_candidate',
+        non_authority: true,
+        non_blocking: true,
+        proposal_candidate: null,
+        accept_reject_status: 'not_requested',
+        accept_reject_receipt_refs: [],
+      };
+    }
+
+    const evidenceSlideIdSet = new Set(evidenceSlideIds);
+    const evidenceRefs = [...new Set([
+      ...safeArray(closeout?.review_export_refs).map((ref) => safeText(ref)),
+      safeText(captureManifest?.manifest_file),
+      safeText(reviewMarkdown),
+      ...safeArray(slideReviews)
+        .filter((slide) => evidenceSlideIdSet.has(safeText(slide?.slide_id)))
+        .map((slide) => safeText(slide?.screenshot_file)),
+    ].filter(Boolean))];
+    return {
+      status: 'proposal_candidate',
+      skip_reason: null,
+      non_authority: true,
+      non_blocking: true,
+      proposal_candidate: {
+        proposal_ref: `rca-visual-memory-proposal-candidate:ppt_deck:screenshot_review:${safeText(deliverableId)}`,
+        deliverable_family: 'ppt_deck',
+        source_stage: 'screenshot_review',
+        reusable_pattern: reusablePattern,
+        stage_scope: stageScope,
+        applicability,
+        caveat,
+        evidence_slide_ids: evidenceSlideIds,
+        evidence_findings: evidenceFindings,
+        evidence_refs: evidenceRefs,
+      },
+      accept_reject_status: 'pending_rca_memory_owner',
+      accept_reject_receipt_refs: [],
+    };
+  }
+
   async function baselineComparison({ workspaceRoot, topicId, baselineDeliverableId, slideReviews }) {
     const baselinePaths = getDeliverablePaths(workspaceRoot, topicId, baselineDeliverableId);
     const baselineContract = readJson(path.join(baselinePaths.deliverableDir, 'contracts', 'hydrated-deliverable.json'));
@@ -508,6 +581,15 @@ export function createPptDeckScreenshotReviewParts(deps) {
       nextRequiredOwnerAction: rerunFromStage,
       artifactRefs,
     });
+    const visualMemoryProposal = normalizeVisualMemoryProposal({
+      data,
+      status,
+      deliverableId,
+      slideReviews,
+      closeout,
+      captureManifest,
+      reviewMarkdown,
+    });
     const artifact = {
       ...attachCommon('screenshot_review', contract, generationRuntime, adapter),
       ...closeout,
@@ -562,6 +644,7 @@ export function createPptDeckScreenshotReviewParts(deps) {
         rerunFromStage,
       }),
       slide_reviews: slideReviews,
+      visual_memory_proposal: visualMemoryProposal,
       ai_review: {
         review_model: 'screenshot_director_first_visual_judgement',
         director_intent_landed: Boolean(data?.director_intent_landed),

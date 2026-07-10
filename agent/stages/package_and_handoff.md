@@ -2,7 +2,7 @@
 
 Prompt policy: `agent/prompts/package_and_handoff.md`
 Required skills: `agent/skills/native_helper_policy.md`
-Professional skills: `agent/professional_skills/rca-ppt-reviewer/SKILL.md`, `agent/professional_skills/rca-visual-memory-curator/SKILL.md` for non-blocking evidence-backed proposal refs.
+Professional skills: `agent/professional_skills/rca-ppt-reviewer/SKILL.md`. Existing non-authority visual-memory proposals are conditionally transported by deterministic export, not regenerated or accepted/rejected in this stage.
 Quality gates: `agent/quality_gates/visual_authority_boundaries.md`, `agent/quality_gates/artifact_authority.md`, `agent/quality_gates/review_export_memory.md`
 Knowledge refs: `agent/knowledge/artifact_and_export_authority.md`, `agent/knowledge/owner_receipt_policy.md`
 

@@ -55,14 +55,6 @@ claim_spine_lock:
   proof_slide_ids:
   resolution_slide_id:
   forbidden_drift:
-
-progress_baton:
-  accepted_refs:
-  completed_slide_ids:
-  remaining_slide_ids:
-  next_stage:
-  repair_owner:
-  stop_reason:
 ```
 
 ## Example
@@ -90,4 +82,4 @@ transition: This makes owner-route clarity the next design constraint.
 - Product/platform decks motivate necessity before naming the product family.
 - First-use project names include full names and source/link refs when allowed.
 - Claim ids remain stable across outline, blueprint, notes, and transitions.
-- A complete stage result carries its progress baton forward without creating an artificial user gate.
+- Progress continuity reuses Stage Folder upstream artifact refs, the current stage artifact, RCA receipt refs, and the existing current pointer; no custom baton payload is created.

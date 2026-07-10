@@ -50,6 +50,7 @@ function makePptExportParts() {
   const artifacts = new Map([
     ['screenshot_review', {
       status: 'pass',
+      review_export_refs: ['rca-review-export:ppt_deck:screenshot_review:deck-a'],
       review_capture: { screenshots_dir: screenshotsDir, capture_id: 'capture-a' },
       slide_reviews: [{ slide_id: 'S01', screenshot_file: screenshotFile, metrics: { occupied_ratio: 0.42 } }],
       checks: { ai_review_passed: true },
@@ -151,6 +152,17 @@ test('ppt export_pptx reuses deterministic preview metrics when reviewed stable 
     assert.equal(second.export_bundle.page_count_match, true);
     assert.equal(second.review_state_patch.latest_review_stage, 'export_pptx');
     assert.ok(second.export_bundle.pptx_file.endsWith('deck-a.pptx'));
+    assert.deepEqual(first.export_bundle.visual_memory_proposal, {
+      status: 'skip',
+      skip_reason: 'no_screenshot_review_proposal',
+      non_authority: true,
+      non_blocking: true,
+      proposal_candidate: null,
+      terminal_binding: null,
+      accept_reject_status: 'not_requested',
+      accept_reject_receipt_refs: [],
+    });
+    assert.deepEqual(second.export_bundle.visual_memory_proposal, first.export_bundle.visual_memory_proposal);
   } finally {
     if (previousPythonCommand === undefined) {
       delete process.env.REDCUBE_PYTHON_COMMAND;
@@ -161,6 +173,62 @@ test('ppt export_pptx reuses deterministic preview metrics when reviewed stable 
       delete process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE;
     } else {
       process.env.REDCUBE_MOCK_PYTHON_CALL_COUNT_FILE = previousCallCountFile;
+    }
+  }
+});
+
+test('ppt export_pptx preserves an existing visual-memory proposal candidate and only binds terminal refs', () => {
+  const previousPythonCommand = process.env.REDCUBE_PYTHON_COMMAND;
+  process.env.REDCUBE_PYTHON_COMMAND = testPythonCommandEnv();
+  const { workspaceRoot, contract, stageParts, artifacts } = makePptExportParts();
+  const proposalCandidate = {
+    proposal_ref: 'rca-visual-memory-proposal-candidate:ppt_deck:screenshot_review:deck-a',
+    deliverable_family: 'ppt_deck',
+    source_stage: 'screenshot_review',
+    reusable_pattern: 'Decision pages are clearer when the proof object precedes feature naming.',
+    stage_scope: 'review_and_revision',
+    applicability: 'future evidence-led decision decks',
+    caveat: 'Do not turn this into a fixed layout recipe.',
+    evidence_slide_ids: ['S01'],
+    evidence_findings: ['S01 shows the decision path and proof object in one first-glance hierarchy.'],
+    evidence_refs: ['rca-review-export:ppt_deck:screenshot_review:deck-a'],
+  };
+  artifacts.get('screenshot_review').visual_memory_proposal = {
+    status: 'proposal_candidate',
+    skip_reason: null,
+    non_authority: true,
+    non_blocking: true,
+    proposal_candidate: proposalCandidate,
+    accept_reject_status: 'pending_rca_memory_owner',
+    accept_reject_receipt_refs: [],
+  };
+
+  try {
+    const exported = stageParts.buildExportArtifact({
+      workspaceRoot,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      contract,
+    });
+    const forwarded = exported.export_bundle.visual_memory_proposal;
+
+    assert.equal(exported.status, 'completed');
+    assert.equal(forwarded.status, 'proposal_candidate');
+    assert.deepEqual(forwarded.proposal_candidate, proposalCandidate);
+    assert.equal(forwarded.terminal_binding.review_export_refs.includes(
+      'rca-review-export:ppt_deck:screenshot_review:deck-a',
+    ), true);
+    assert.equal(forwarded.terminal_binding.review_export_refs.includes(
+      'rca-review-export:ppt_deck:export_pptx:deck-a',
+    ), true);
+    assert.equal(forwarded.terminal_binding.export_artifact_refs.includes(exported.export_bundle.pptx_file), true);
+    assert.deepEqual(forwarded.accept_reject_receipt_refs, []);
+    assert.equal(exported.owner_receipt_refs.includes(proposalCandidate.proposal_ref), false);
+  } finally {
+    if (previousPythonCommand === undefined) {
+      delete process.env.REDCUBE_PYTHON_COMMAND;
+    } else {
+      process.env.REDCUBE_PYTHON_COMMAND = previousPythonCommand;
     }
   }
 });

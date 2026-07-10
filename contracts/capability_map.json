@@ -585,8 +585,7 @@
         "serial_pipeline",
         "progressive_disclosure",
         "story_spec_lock",
-        "claim_spine_lock",
-        "progress_baton"
+        "claim_spine_lock"
       ],
       "failure_tokens": [
         "storyline",
@@ -601,8 +600,7 @@
         "serial_pipeline",
         "progressive_disclosure",
         "story_spec_lock",
-        "claim_spine_lock",
-        "progress_baton"
+        "claim_spine_lock"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
@@ -1039,8 +1037,7 @@
         "semantic_composition",
         "native_object_semantics",
         "presentation_semantics",
-        "blind_comparison_review",
-        "progress_baton"
+        "blind_comparison_review"
       ],
       "failure_tokens": [
         "visual_review",
@@ -1059,8 +1056,7 @@
         "semantic_composition",
         "native_object_semantics",
         "presentation_semantics",
-        "blind_comparison_review",
-        "progress_baton"
+        "blind_comparison_review"
       ],
       "canonical_paths": [
         "agent/professional_skills/rca-ppt-reviewer/SKILL.md",

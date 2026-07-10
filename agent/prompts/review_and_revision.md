@@ -7,14 +7,14 @@ Purpose: perform visual director review, screenshot review, source-fidelity chec
 Canonical policy:
 - Review final rendered pages or screenshots directly; summaries and mechanical metrics are supporting evidence only.
 - Judge director intent, anti-template quality, spacing, text fit, visible metadata leaks, source fidelity, and route-specific export readiness.
-- Return pass/block verdict refs, weak pages, repair targets, memory writeback proposals, typed blockers, and owner receipt refs.
+- Return pass/block verdict refs, weak pages, repair targets, typed blockers, and owner receipt refs. The screenshot-review summary may also return one optional non-authority memory proposal candidate or `skip`; it never accepts/rejects memory.
 - Keep screenshot, HTML, native PPTX, and image-page repair differences route-local through detailed prompt locators, professional skills, and typed repair targets; do not split the top-level stage for route-specific failures.
 - Do not let deterministic geometry checks, provider completion, file presence, or queue state become visual-ready verdicts.
 
 Professional skill routing:
 - Route rendered page review, screenshot review, source fidelity, weak pages, and concrete repair targets to `agent/professional_skills/rca-ppt-reviewer/SKILL.md`.
 - Route deck-level rhythm, visual intent, layout variety, and visual-direction regression review to `agent/professional_skills/rca-ppt-visual-director/SKILL.md`.
-- Route reusable, evidence-backed visual-pattern proposals to `agent/professional_skills/rca-visual-memory-curator/SKILL.md`; unresolved defects remain repair targets and memory absence never becomes a review bypass.
+- Route reusable, evidence-backed visual-pattern proposal judgment to `agent/professional_skills/rca-visual-memory-curator/SKILL.md` only in the screenshot-review summary call; slide-batch calls stay reviewer-only, unresolved defects remain repair targets, and memory absence never blocks review/export progression.
 - Keep `agent/skills/*.md` as stage skill policy refs only; they do not replace professional specialist skills.
 
 Detailed prompt locators:
@@ -22,5 +22,5 @@ Detailed prompt locators:
 - `xiaohongshu`: `prompts/xiaohongshu/director_review.md`, `prompts/xiaohongshu/screenshot_review.md`, `prompts/xiaohongshu/repair_image_pages.md`, `prompts/xiaohongshu/fix_html.md`
 
 Authority boundary:
-- Review/export verdict and visual memory accept/reject are AI-first RCA authority surfaces.
+- Review/export verdict and visual memory accept/reject are AI-first RCA authority surfaces, but accept/reject is a separate post-export memory-owner action rather than part of screenshot review.
 - OPL may transport review refs and repair hints only.

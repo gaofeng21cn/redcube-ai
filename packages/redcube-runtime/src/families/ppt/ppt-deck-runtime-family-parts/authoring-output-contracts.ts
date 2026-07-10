@@ -139,5 +139,17 @@ export function screenshotReviewSummaryOutputContract() {
     anti_template_ok: true,
     weak_pages: ['S06'],
     review_summary: '<string>',
+    visual_memory_proposal: {
+      status: 'skip | proposal_candidate',
+      reason: '<string>',
+      candidate: {
+        reusable_pattern: '<string; required only for proposal_candidate>',
+        stage_scope: '<string; required only for proposal_candidate>',
+        applicability: '<string; required only for proposal_candidate>',
+        caveat: '<string; required only for proposal_candidate>',
+        evidence_slide_ids: ['<reviewed slide id>'],
+        evidence_findings: ['<visible review finding supporting the reusable pattern>'],
+      },
+    },
   };
 }

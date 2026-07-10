@@ -7,4 +7,4 @@
 - 真实生成 pptx 文件，不得用 metadata 冒充
 - 必须记录 source_html / source_review / real_conversion_invocation / page_count_match
 - native PPTX 必须携带最终 package/object readback、notes/transition/timing evidence refs，并证明声明对象没有退化为 generic rectangles
-- visual memory 仅在已有 review/export evidence 时生成 proposal ref；缺少可复用 memory 不得阻断已通过 review 的导出，也不得由本 route 自签 accept/reject receipt
+- visual memory 只条件式透传 screenshot_review 已有的 non-authority proposal candidate，并绑定终态 review/export refs；没有 candidate 直接记录 `skip`，不得新生成 proposal、阻断导出或自签 accept/reject receipt

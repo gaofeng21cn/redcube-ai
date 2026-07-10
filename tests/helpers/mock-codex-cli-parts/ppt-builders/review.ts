@@ -160,6 +160,26 @@ export function buildMockPptScreenshotReview(meta) {
   const forcedBlockSlideId = variants.has('force_block')
     ? safeText(slides.find((slide) => safeText(slide?.slide_id) === 'S02')?.slide_id, safeText(slides[0]?.slide_id))
     : '';
+  const visualMemoryProposal = reviewScope === 'summary' && variants.has('visual_memory_candidate')
+    ? {
+        status: 'proposal_candidate',
+        reason: 'The reviewed deck demonstrates a reusable evidence-first decision-page pattern.',
+        candidate: {
+          reusable_pattern: 'Decision pages are clearer when the proof object precedes feature naming.',
+          stage_scope: 'review_and_revision',
+          applicability: 'future evidence-led decision decks',
+          caveat: 'Do not turn this into a fixed layout recipe.',
+          evidence_slide_ids: [safeText(slides[0]?.slide_id, 'S01')],
+          evidence_findings: ['The decision path and proof object form one first-glance hierarchy.'],
+        },
+      }
+    : reviewScope === 'summary'
+      ? {
+          status: 'skip',
+          reason: 'No reusable visual pattern is distinct from the current artifact.',
+          candidate: null,
+        }
+      : undefined;
   return {
     director_intent_landed: true,
     anti_template_ok: true,
@@ -179,5 +199,6 @@ export function buildMockPptScreenshotReview(meta) {
         ? '上移并压缩底部文案，恢复卡内底部留白。'
         : 'none',
     })),
+    ...(visualMemoryProposal ? { visual_memory_proposal: visualMemoryProposal } : {}),
   };
 }

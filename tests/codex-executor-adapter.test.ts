@@ -243,20 +243,45 @@ test('buildGenerationInput does not require professional specialist guidance for
   assert.doesNotMatch(input, /## RCA Professional Specialist Skill Guidance/);
 });
 
-test('buildGenerationInput injects review and non-blocking memory guidance into ppt export', () => {
-  const input = buildGenerationInput({
+test('screenshot review summary gets Reviewer and Curator guidance while slide batches stay review-only', async () => {
+  let summaryPrompt = '';
+  await generateStructuredArtifactViaCodexCli({
     family: 'ppt_deck',
-    route: 'export_pptx',
-    promptRelativePath: 'prompts/ppt_deck/export_pptx.md',
-    context: { goal: 'export reviewed native deck' },
-    outputContract: { type: 'object' },
+    route: 'screenshot_review',
+    promptRelativePath: 'prompts/ppt_deck/screenshot_review.md',
+    context: { review_scope: 'summary', ai_slide_reviews: [] },
+    outputContract: { director_intent_landed: true },
+    contract: mockCodexContract(),
+    spawnSyncImpl(_command, args, options) {
+      summaryPrompt = String(options.input);
+      writeCodexLastMessage(args, [
+        REDCUBE_STAGE_JSON_BEGIN,
+        JSON.stringify({ director_intent_landed: true }),
+        REDCUBE_STAGE_JSON_END,
+      ].join('\n'));
+      return {
+        status: 0,
+        stdout: JSON.stringify({ event: 'run.completed', run_id: 'mock-run', usage: { total_tokens: 1 } }),
+        stderr: '',
+        error: null,
+      };
+    },
   });
 
-  assert.match(input, /### Reviewer/);
-  assert.match(input, /agent\/professional_skills\/rca-ppt-reviewer\/SKILL\.md/);
-  assert.match(input, /### Visual Memory Curator/);
-  assert.match(input, /agent\/professional_skills\/rca-visual-memory-curator\/SKILL\.md/);
-  assert.doesNotMatch(input, /### Native PPT Designer/);
+  assert.match(summaryPrompt, /### Reviewer/);
+  assert.match(summaryPrompt, /agent\/professional_skills\/rca-ppt-reviewer\/SKILL\.md/);
+  assert.match(summaryPrompt, /### Visual Memory Curator/);
+  assert.match(summaryPrompt, /agent\/professional_skills\/rca-visual-memory-curator\/SKILL\.md/);
+
+  const batchInput = buildGenerationInput({
+    family: 'ppt_deck',
+    route: 'screenshot_review',
+    promptRelativePath: 'prompts/ppt_deck/screenshot_review.md',
+    context: { review_scope: 'slide_batch' },
+    outputContract: { slide_reviews: [] },
+  });
+  assert.match(batchInput, /### Reviewer/);
+  assert.doesNotMatch(batchInput, /### Visual Memory Curator/);
 });
 
 test('buildGenerationInput fail-closes mapped ppt routes when declared specialist guidance is missing', () => {
