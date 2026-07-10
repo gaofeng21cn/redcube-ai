@@ -666,7 +666,7 @@ def template_preservation(before: dict | None, after: dict, mode: str) -> dict:
         expected = {part: value for part, value in before_hashes.items() if part.startswith(prefix)}
         return bool(expected) and all(after_hashes.get(part) == value for part, value in expected.items())
 
-    return {
+    result = {
         'mode': mode,
         'source_pptx': before.get('pptx_file', ''),
         'canvas_preserved': bool(before.get('canvas_emu')) and before.get('canvas_emu') == after.get('canvas_emu'),
@@ -679,6 +679,26 @@ def template_preservation(before: dict | None, after: dict, mode: str) -> dict:
         'source_part_counts': before.get('part_counts') or {},
         'output_part_counts': after.get('part_counts') or {},
     }
+    failed = [
+        field for field in (
+            'canvas_preserved',
+            'master_parts_preserved',
+            'layout_parts_preserved',
+            'theme_parts_preserved',
+        )
+        if result[field] is not True
+    ]
+    if failed:
+        raise RuntimeError(
+            'native PPT template preservation failed: '
+            + json.dumps({
+                'failed_fields': failed,
+                'changed_template_parts': changed,
+                'source_canvas_emu': result['source_canvas_emu'],
+                'output_canvas_emu': result['output_canvas_emu'],
+            }, ensure_ascii=False, sort_keys=True)
+        )
+    return result
 
 
 def copy_template_source(source_pptx: Path, output_pptx: Path) -> dict:

@@ -55,6 +55,35 @@ export function createNativePptShapePlanNormalizeParts({
   safeArray,
   safeText,
 }: NativePptShapePlanNormalizeDeps) {
+  function stableDrawingAnimationTargetFailures(slides: JsonRecord[]): JsonRecord[] {
+    return slides.flatMap((slide, index) => {
+      const shapesById = new Map(
+        safeArray(slide?.native_shapes)
+          .map((shape) => [safeText(shape?.shape_id), shape] as const)
+          .filter(([shapeId]) => Boolean(shapeId)),
+      );
+      return safeArray(slide?.animation_timeline).flatMap((animation) => {
+        const targetShapeId = safeText(animation?.target_shape_id || animation?.target_id);
+        const targetShape = shapesById.get(targetShapeId);
+        const kind = safeText(targetShape?.kind || targetShape?.type);
+        if (
+          !targetShape
+          || !['chart', 'table', 'metric_grid'].includes(kind)
+          || safeText(targetShape?.materialization_intent) !== 'stable_drawingml'
+        ) {
+          return [];
+        }
+        return [{
+          slide_id: safeText(slide?.slide_id, `slide-${index + 1}`),
+          shape_id: targetShapeId,
+          kind,
+          materialization_intent: 'stable_drawingml',
+          reason: 'officecli_animation_parent_excludes_group',
+        }];
+      });
+    });
+  }
+
   function missingDesignSpecLockFields(designSpecLock: JsonRecord, minimumLayoutArchetypes = 3): string[] {
     const missing: string[] = [];
     const palette = designSpecLock?.palette && typeof designSpecLock.palette === 'object' ? designSpecLock.palette : {};
@@ -113,6 +142,42 @@ export function createNativePptShapePlanNormalizeParts({
     previousValidationFeedback?: JsonRecord | null;
   }): JsonRecord | null {
     const message = error instanceof Error ? error.message : String(error);
+    const stableDrawingAnimationMarker = 'does not support stable_drawingml group animation targets: ';
+    const stableDrawingAnimationMarkerIndex = message.indexOf(stableDrawingAnimationMarker);
+    if (stableDrawingAnimationMarkerIndex >= 0) {
+      let failures: JsonRecord[] = [];
+      try {
+        failures = safeArray(JSON.parse(message.slice(
+          stableDrawingAnimationMarkerIndex + stableDrawingAnimationMarker.length,
+        )));
+      } catch {
+        failures = [];
+      }
+      return {
+        repair_request: [
+          `Regenerate editable_shape_plan for ${route} and repair unsupported stable_drawingml animation targets before materialization.`,
+          'Keep the grouped editable DrawingML object, but remove its animation_timeline entry or target a top-level native shape or native_data_object chart.',
+          'Do not retarget the animation to a child inside the group; OfficeCLI animations accept only top-level shape or chart parents.',
+        ].join(' '),
+        previous_attempt: attemptIndex,
+        required_shape_fixes: safeArray(previousValidationFeedback?.required_shape_fixes),
+        global_shape_class_fixes: safeArray(previousValidationFeedback?.global_shape_class_fixes),
+        passed_structure_preservation_contract: previousValidationFeedback?.passed_structure_preservation_contract || null,
+        required_structural_fixes: failures.map((failure) => ({
+          scope: 'shape',
+          slide_id: safeText(failure?.slide_id),
+          shape_id: safeText(failure?.shape_id),
+          reason: 'native_shape_plan_stable_drawingml_animation_target_unsupported',
+          repair_instruction: 'Remove this shape from animation_timeline or change the visual to a top-level native shape/native_data_object chart when animation is required.',
+        })),
+        validator: {
+          ok: false,
+          reason: 'native_shape_plan_stable_drawingml_animation_target_unsupported',
+          failures,
+        },
+        attempt_artifact_refs: [...attemptArtifactRefs],
+      };
+    }
     const designSpecLockMarker = 'requires editable_shape_plan.design_spec_lock with AI-authored design system, grid, typography, palette, layout rhythm, borrowed design discipline, and QA gates before shape coordinates: ';
     const designSpecLockMarkerIndex = message.indexOf(designSpecLockMarker);
     if (designSpecLockMarkerIndex >= 0) {
@@ -385,6 +450,10 @@ export function createNativePptShapePlanNormalizeParts({
     const slides = safeArray(plan?.slides);
     if (slides.length === 0) {
       throw new Error(`Native PPT ${route} requires an AI-authored editable_shape_plan.slides array`);
+    }
+    const unsupportedAnimationTargets = stableDrawingAnimationTargetFailures(slides);
+    if (unsupportedAnimationTargets.length > 0) {
+      throw new Error(`Native PPT ${route} does not support stable_drawingml group animation targets: ${JSON.stringify(unsupportedAnimationTargets)}`);
     }
     const planAuthoringMode = safeText(plan?.authoring_mode);
     const sampleCompactPlan = planAuthoringMode === 'native_visual_sample_compact';

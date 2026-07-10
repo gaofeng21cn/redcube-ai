@@ -1,6 +1,7 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync } from 'node:fs';
 import {
   bounds,
@@ -10,6 +11,57 @@ import {
   runNativeObjectMaterializerFailure,
   shape,
 } from './helpers/ppt-native-object-package-fixtures.ts';
+import { pythonTestEnv, resolveTestPythonCommand } from './helpers/ppt-native-python-layout-fixtures.ts';
+
+test('native PPT template preservation fails closed when any required surface changes', () => {
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', `
+import copy
+import json
+from redcube_ai.native_helpers.ppt_deck.native_package import template_preservation
+
+before = {
+    'pptx_file': 'template.pptx',
+    'canvas_emu': {'width': 12192000, 'height': 6858000},
+    'template_part_hashes': {
+        'ppt/slideMasters/slideMaster1.xml': 'master-hash',
+        'ppt/slideLayouts/slideLayout1.xml': 'layout-hash',
+        'ppt/theme/theme1.xml': 'theme-hash',
+    },
+    'part_counts': {'master': 1, 'layout': 1, 'theme': 1},
+}
+base_after = copy.deepcopy(before)
+cases = {
+    'canvas_preserved': lambda after: after.update(canvas_emu={'width': 12192001, 'height': 6858000}),
+    'master_parts_preserved': lambda after: after['template_part_hashes'].update({'ppt/slideMasters/slideMaster1.xml': 'changed'}),
+    'layout_parts_preserved': lambda after: after['template_part_hashes'].update({'ppt/slideLayouts/slideLayout1.xml': 'changed'}),
+    'theme_parts_preserved': lambda after: after['template_part_hashes'].update({'ppt/theme/theme1.xml': 'changed'}),
+}
+rejected = {}
+for label, mutate in cases.items():
+    after = copy.deepcopy(base_after)
+    mutate(after)
+    try:
+        template_preservation(before, after, 'fill_existing')
+    except RuntimeError as exc:
+        rejected[label] = str(exc)
+print(json.dumps(rejected, sort_keys=True))
+`], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+  const rejected = JSON.parse(stdout);
+  assert.deepEqual(Object.keys(rejected).sort(), [
+    'canvas_preserved',
+    'layout_parts_preserved',
+    'master_parts_preserved',
+    'theme_parts_preserved',
+  ]);
+  for (const [label, message] of Object.entries(rejected)) {
+    assert.match(message, new RegExp(label));
+  }
+});
 
 test('native PPT template fill preserves masters, layouts, theme, placeholders, and editable source objects', () => {
   const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-template-fill-');

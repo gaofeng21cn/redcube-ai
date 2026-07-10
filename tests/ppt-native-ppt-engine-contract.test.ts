@@ -81,6 +81,10 @@ test('native PPT proof lane records the Python engine contract as the single own
     'timing_node_count',
     'animation_count',
   ]);
+  assert.equal(
+    engineContract.presentation_semantics.animation_target_policy.stable_drawingml_group_target,
+    'reject_before_materialization',
+  );
   assert.equal(engineContract.officecli_materializer_policy.skill_authoring_loop_adopted, false);
   assert.equal(engineContract.officecli_materializer_policy.view_issues_required, true);
   assert.equal(engineContract.officecli_materializer_policy.true_render_proof_substitute_allowed, false);

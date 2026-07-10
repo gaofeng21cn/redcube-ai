@@ -46,6 +46,35 @@ SUPPORTED_OBJECT_KINDS = {
 }
 
 
+def _number_or_text(value):
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return value
+    return int(number) if number.is_integer() else number
+
+
+def _picture_crop(shape_spec: dict) -> dict | None:
+    raw = shape_spec.get('crop')
+    if raw not in (None, ''):
+        if isinstance(raw, dict):
+            values = [raw.get(key, 0) for key in ('left', 'top', 'right', 'bottom')]
+        elif isinstance(raw, (list, tuple)):
+            values = list(raw)
+        else:
+            values = [value.strip() for value in str(raw).split(',')]
+        if len(values) != 4:
+            raise ValueError('native PPT picture crop must contain left, top, right, and bottom')
+        return dict(zip(('left', 'top', 'right', 'bottom'), (_number_or_text(value) for value in values)))
+    explicit = [shape_spec.get(f'crop_{key}') for key in ('left', 'top', 'right', 'bottom')]
+    if all(value in (None, '') for value in explicit):
+        return None
+    return dict(zip(
+        ('left', 'top', 'right', 'bottom'),
+        (_number_or_text(value if value not in (None, '') else 0) for value in explicit),
+    ))
+
+
 def canonical_object_kind(shape_spec: dict) -> str:
     raw = shape_kind(shape_spec)
     kind = OBJECT_KIND_ALIASES.get(raw, raw)
@@ -257,7 +286,32 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
             metrics.setdefault('min_font_pt', body_font_size)
         record.update({
             'data': safe_list(shape_spec.get('data')),
+            'first_row': shape_spec.get('first_row', True) is not False,
             'body_font_size': body_font_size,
             'metrics': metrics,
         })
+        for key in (
+            'header_fill',
+            'header_color',
+            'header_font',
+            'header_font_size',
+            'body_font',
+            'body_color',
+        ):
+            if shape_spec.get(key) not in (None, ''):
+                record[key] = shape_spec[key]
+    if kind == 'picture':
+        record['alt'] = safe_text(shape_spec.get('alt'))
+        record['crop'] = _picture_crop(shape_spec) or {
+            'left': 0,
+            'top': 0,
+            'right': 0,
+            'bottom': 0,
+        }
+    if kind == 'group' or (
+        kind in {'chart', 'table', 'metric_grid'}
+        and safe_text(shape_spec.get('materialization_intent')) == 'stable_drawingml'
+    ):
+        children = safe_list(shape_spec.get('drawingml_shapes') or shape_spec.get('children'))
+        record['child_object_count'] = len([item for item in children if isinstance(item, dict)])
     return record

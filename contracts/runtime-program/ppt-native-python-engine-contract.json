@@ -71,6 +71,10 @@
     "slide_transition": true,
     "timing_tree": true,
     "optional_animation": true,
+    "animation_target_policy": {
+      "stable_drawingml_group_target": "reject_before_materialization",
+      "supported_target_rule": "top_level_officecli_shape_or_native_data_object_chart"
+    },
     "static_slide_must_remain_readable": true,
     "package_readback_count_fields": [
       "notes_slide_count",

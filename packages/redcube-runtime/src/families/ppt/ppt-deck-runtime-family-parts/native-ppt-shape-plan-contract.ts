@@ -698,6 +698,10 @@ export function buildNativeShapePlanOutputContract({
           optional_per_slide_fields: ['speaker_notes', 'transition', 'animation_timeline'],
           transition_fields: ['type', 'direction', 'duration_ms', 'speed', 'advance_time_ms', 'advance_click'],
           animation_fields: ['target_shape_id', 'effect', 'class', 'trigger', 'duration_ms', 'delay_ms'],
+          animation_target_policy: {
+            stable_drawingml_group_target: 'reject_before_materialization',
+            supported_target_rule: 'animation_timeline targets must materialize as a top-level OfficeCLI shape or native_data_object chart',
+          },
           static_slide_must_remain_readable: true,
           package_readback_required: true,
         },

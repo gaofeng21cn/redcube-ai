@@ -1,13 +1,13 @@
 // @ts-nocheck
 import { execFileSync, spawnSync } from 'node:child_process';
-import os from 'node:os';
 import path from 'node:path';
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import {
   pythonTestEnv,
   resolveTestPythonCommand,
   writeTinyPng,
 } from './ppt-native-python-layout-fixtures.ts';
+import { mkUserScopedTestWorkspace } from './test-workspace.ts';
 
 function runPython(script, args = []) {
   const python = resolveTestPythonCommand();
@@ -19,7 +19,7 @@ function runPython(script, args = []) {
 }
 
 export function createNativeObjectWorkspace(prefix = 'redcube-native-object-package-') {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), prefix));
+  const workspaceRoot = mkUserScopedTestWorkspace(prefix);
   const pictureFile = path.join(workspaceRoot, 'picture.png');
   writeTinyPng(pictureFile);
   const pictureDataUri = `data:image/png;base64,${readFileSync(pictureFile).toString('base64')}`;

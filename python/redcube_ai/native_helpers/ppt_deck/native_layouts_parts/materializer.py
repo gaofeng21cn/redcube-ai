@@ -37,22 +37,41 @@ def parse_json_output(completed: subprocess.CompletedProcess):
     if not text:
         raise RuntimeError('officecli returned empty JSON output')
     try:
-        return json.loads(text)
+        payload = json.loads(text)
     except json.JSONDecodeError as exc:
         raise RuntimeError(
             'officecli returned invalid JSON: '
             + json.dumps({'stdout': text, 'stderr': safe_text(completed.stderr)}, ensure_ascii=False)
         ) from exc
+    if not isinstance(payload, dict):
+        raise RuntimeError(f'officecli returned invalid JSON envelope: expected object, got {type(payload).__name__}')
+    if payload.get('success') is not True:
+        raise RuntimeError(
+            'officecli returned unsuccessful JSON envelope: '
+            + json.dumps(payload, ensure_ascii=False, sort_keys=True)
+        )
+    args = [safe_text(value) for value in completed.args] if isinstance(completed.args, (list, tuple)) else []
+    verb = args[1] if len(args) > 1 else ''
+    view_mode = args[3] if verb == 'view' and len(args) > 3 else ''
+    data = payload.get('data')
+    if verb == 'view' and view_mode in {'issues', 'text'}:
+        if not isinstance(data, dict):
+            raise RuntimeError(f'officecli view {view_mode} JSON data must be an object')
+    if verb == 'view' and view_mode == 'issues':
+        issue_count(payload)
+    if verb == 'validate' and data is None:
+        raise RuntimeError('officecli validate JSON data is required')
+    return payload
 
 
 def issue_count(payload: dict) -> int:
-    raw = (payload.get('data') or {}).get('count') if isinstance(payload.get('data'), dict) else None
-    if raw is None:
-        raw = payload.get('count')
-    try:
-        return int(raw or 0)
-    except (TypeError, ValueError):
-        return 0
+    data = payload.get('data')
+    if not isinstance(data, dict) or 'count' not in data:
+        raise RuntimeError('officecli view issues JSON data.count is required')
+    raw = data['count']
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw < 0:
+        raise RuntimeError(f'officecli view issues JSON data.count must be a non-negative integer: {raw!r}')
+    return raw
 
 
 def _run_officecli(officecli: str, args, *, input_text: str | None = None) -> subprocess.CompletedProcess:
@@ -100,6 +119,33 @@ def _object_path(slide_index: int, shape_spec: dict) -> str:
         'group': 'group',
     }.get(kind, 'shape')
     return f'/slide[{slide_index}]/{element}[@name={name}]'
+
+
+def _stable_drawing_animation_failures(slides: list[dict]) -> list[dict]:
+    failures = []
+    for slide_index, slide_data in enumerate(slides, 1):
+        shapes_by_id = {
+            safe_text(shape.get('shape_id')): shape
+            for shape in native_ai_design_shapes(slide_data)
+            if safe_text(shape.get('shape_id'))
+        }
+        for animation in [item for item in safe_list(slide_data.get('animation_timeline')) if isinstance(item, dict)]:
+            target_id = safe_text(animation.get('target_shape_id') or animation.get('target_id'))
+            target = shapes_by_id.get(target_id)
+            if target is None:
+                continue
+            kind = canonical_object_kind(target)
+            if kind in {'chart', 'table', 'metric_grid'} and safe_text(
+                target.get('materialization_intent')
+            ) == 'stable_drawingml':
+                failures.append({
+                    'slide_index': slide_index,
+                    'slide_id': safe_text(slide_data.get('slide_id'), f'S{slide_index:02d}'),
+                    'shape_id': target_id,
+                    'kind': kind,
+                    'materialization_intent': 'stable_drawingml',
+                })
+    return failures
 
 
 def _children_for_group(shape_spec: dict, kind: str) -> list[dict]:
@@ -363,6 +409,12 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
     officecli = shutil.which('officecli')
     if not officecli:
         raise RuntimeError('native PPT officecli materializer requires officecli on PATH')
+    stable_drawing_animation_failures = _stable_drawing_animation_failures(slides)
+    if stable_drawing_animation_failures:
+        raise ValueError(
+            'native PPT stable_drawingml group animation targets are unsupported before materialization: '
+            + json.dumps(stable_drawing_animation_failures, ensure_ascii=False, sort_keys=True)
+        )
     output_pptx = Path(output_pptx)
     output_pptx.parent.mkdir(parents=True, exist_ok=True)
     mode = _template_mode(template_intake)
@@ -464,7 +516,7 @@ def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | N
     validate_payload = parse_json_output(validate)
     issues_payload = parse_json_output(issues)
     text_payload = parse_json_output(text)
-    validate_count = issue_count(validate_payload)
+    validate_count = 0
     issues_count = issue_count(issues_payload)
     if validate_count > 0 or issues_count > 0:
         raise RuntimeError(
@@ -544,6 +596,93 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
             or not safe_text(materialized.get('content_type')).startswith('image/')
         ):
             raise RuntimeError(f'native PPT picture package relationship/content type missing: {shape_id}')
+    if actual_kind == 'chart':
+        expected_categories = [str(value) for value in safe_list(native_shape.get('categories'))]
+        actual_categories = [str(value) for value in safe_list(materialized.get('categories'))]
+        if actual_categories != expected_categories:
+            raise RuntimeError(
+                f'native PPT chart categories mismatch for {shape_id}: '
+                f'expected {expected_categories!r}, got {actual_categories!r}'
+            )
+        expected_series = [
+            {
+                'name': safe_text(item.get('name'), f'Series {index}'),
+                'values': safe_list(item.get('values')),
+            }
+            for index, item in enumerate(safe_list(native_shape.get('series')), 1)
+            if isinstance(item, dict)
+        ]
+        actual_series = [
+            {
+                'name': safe_text(item.get('name')),
+                'values': safe_list(item.get('values')),
+            }
+            for item in safe_list(materialized.get('series'))
+            if isinstance(item, dict)
+        ]
+        if actual_series != expected_series:
+            raise RuntimeError(
+                f'native PPT chart series mismatch for {shape_id}: '
+                f'expected {expected_series!r}, got {actual_series!r}'
+            )
+    if actual_kind == 'table':
+        expected_data = [
+            [str(value) for value in row]
+            for row in safe_list(native_shape.get('data'))
+            if isinstance(row, list)
+        ]
+        actual_data = [
+            [str(value) for value in row]
+            for row in safe_list(materialized.get('data'))
+            if isinstance(row, list)
+        ]
+        if actual_data != expected_data:
+            raise RuntimeError(
+                f'native PPT table data mismatch for {shape_id}: '
+                f'expected {expected_data!r}, got {actual_data!r}'
+            )
+        cells = [cell for cell in safe_list(materialized.get('cells')) if isinstance(cell, dict)]
+        first_row = native_shape.get('first_row', True) is not False
+        header_cells = [cell for cell in cells if int(cell.get('row') or 0) == 1] if first_row else []
+        body_cells = [cell for cell in cells if not first_row or int(cell.get('row') or 0) > 1]
+        style_checks = [
+            ('header_fill', 'table header fill', header_cells, 'fill'),
+            ('header_color', 'table header color', header_cells, 'color'),
+            ('header_font', 'table header font', header_cells, 'font'),
+            ('header_font_size', 'table header font size', header_cells, 'font_size_pt'),
+            ('body_font', 'table body font', body_cells, 'font'),
+            ('body_font_size', 'table body font size', body_cells, 'font_size_pt'),
+            ('body_color', 'table body color', body_cells, 'color'),
+        ]
+        for source_key, label, selected_cells, target_key in style_checks:
+            expected = native_shape.get(source_key)
+            if expected in (None, ''):
+                continue
+            actual = [cell.get(target_key) for cell in selected_cells]
+            if not selected_cells or any(value != expected for value in actual):
+                raise RuntimeError(
+                    f'native PPT {label} mismatch for {shape_id}: expected {expected!r}, got {actual!r}'
+                )
+    if actual_kind == 'picture':
+        expected_alt = safe_text(native_shape.get('alt'))
+        actual_alt = safe_text(materialized.get('alt'))
+        if actual_alt != expected_alt:
+            raise RuntimeError(
+                f'native PPT picture alt mismatch for {shape_id}: expected {expected_alt!r}, got {actual_alt!r}'
+            )
+        expected_crop = native_shape.get('crop')
+        if isinstance(expected_crop, dict) and materialized.get('crop') != expected_crop:
+            raise RuntimeError(
+                f'native PPT picture crop mismatch for {shape_id}: '
+                f'expected {expected_crop!r}, got {materialized.get("crop")!r}'
+            )
+    expected_child_count = native_shape.get('child_object_count')
+    if actual_kind == 'group' and expected_child_count not in (None, ''):
+        if int(materialized.get('child_object_count') or 0) != int(expected_child_count):
+            raise RuntimeError(
+                f'native PPT group child count mismatch for {shape_id}: '
+                f'expected {expected_child_count}, got {materialized.get("child_object_count") or 0}'
+            )
 
 
 def _bind_manifest_to_package(manifest_slides: list[dict], package_readback: dict, slide_indices: list[int]) -> None:
