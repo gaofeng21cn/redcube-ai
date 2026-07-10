@@ -85,6 +85,22 @@ test('native PPT proof lane records the Python engine contract as the single own
     engineContract.presentation_semantics.animation_target_policy.stable_drawingml_group_target,
     'reject_before_materialization',
   );
+  assert.deepEqual(
+    engineContract.presentation_semantics.animation_target_policy.supported_top_level_kinds,
+    ['text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path'],
+  );
+  assert.equal(
+    engineContract.presentation_semantics.animation_target_policy.native_data_object_chart,
+    'supported',
+  );
+  assert.deepEqual(
+    engineContract.presentation_semantics.animation_target_policy.rejected_targets,
+    ['missing', 'group_child', 'group', 'table', 'metric_grid', 'picture', 'line', 'connector'],
+  );
+  assert.equal(
+    engineContract.presentation_semantics.animation_target_policy.zero_write_preflight_required,
+    true,
+  );
   assert.equal(engineContract.officecli_materializer_policy.skill_authoring_loop_adopted, false);
   assert.equal(engineContract.officecli_materializer_policy.view_issues_required, true);
   assert.equal(engineContract.officecli_materializer_policy.true_render_proof_substitute_allowed, false);

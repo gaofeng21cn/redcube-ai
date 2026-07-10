@@ -55,30 +55,71 @@ export function createNativePptShapePlanNormalizeParts({
   safeArray,
   safeText,
 }: NativePptShapePlanNormalizeDeps) {
-  function stableDrawingAnimationTargetFailures(slides: JsonRecord[]): JsonRecord[] {
+  function animationTargetFailures(slides: JsonRecord[]): JsonRecord[] {
+    const supportedShapeKinds = new Set(['text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path']);
+    const kindAliases = new Map([
+      ['text', 'text_box'],
+      ['textbox', 'text_box'],
+      ['preset_shape', 'shape'],
+      ['rectangle', 'rect'],
+      ['panel', 'rounded_rect'],
+      ['circle', 'oval'],
+      ['image', 'picture'],
+    ]);
+    const canonicalKind = (shape: JsonRecord | undefined): string => {
+      const kind = safeText(shape?.kind || shape?.type);
+      return kindAliases.get(kind) || kind;
+    };
     return slides.flatMap((slide, index) => {
-      const shapesById = new Map(
+      const topLevelById = new Map(
         safeArray(slide?.native_shapes)
           .map((shape) => [safeText(shape?.shape_id), shape] as const)
           .filter(([shapeId]) => Boolean(shapeId)),
       );
+      const groupChildrenById = new Map<string, JsonRecord>();
+      const collectGroupChildren = (shape: JsonRecord): void => {
+        const kind = canonicalKind(shape);
+        const intent = safeText(
+          shape?.materialization_intent,
+          kind === 'chart' ? 'native_data_object' : '',
+        );
+        const groupBacked = kind === 'group'
+          || (['chart', 'table', 'metric_grid'].includes(kind) && intent === 'stable_drawingml');
+        if (!groupBacked) return;
+        for (const child of safeArray(shape?.drawingml_shapes || shape?.children)) {
+          const childId = safeText(child?.shape_id);
+          if (childId) groupChildrenById.set(childId, child);
+          collectGroupChildren(child);
+        }
+      };
+      for (const shape of safeArray(slide?.native_shapes)) collectGroupChildren(shape);
       return safeArray(slide?.animation_timeline).flatMap((animation) => {
         const targetShapeId = safeText(animation?.target_shape_id || animation?.target_id);
-        const targetShape = shapesById.get(targetShapeId);
-        const kind = safeText(targetShape?.kind || targetShape?.type);
-        if (
-          !targetShape
-          || !['chart', 'table', 'metric_grid'].includes(kind)
-          || safeText(targetShape?.materialization_intent) !== 'stable_drawingml'
-        ) {
-          return [];
+        const targetShape = topLevelById.get(targetShapeId);
+        const groupChild = groupChildrenById.get(targetShapeId);
+        if (!targetShape) {
+          return [{
+            slide_id: safeText(slide?.slide_id, `slide-${index + 1}`),
+            shape_id: targetShapeId,
+            kind: canonicalKind(groupChild),
+            materialization_intent: safeText(groupChild?.materialization_intent),
+            reason: groupChild ? 'animation_target_group_child' : 'animation_target_missing',
+          }];
         }
+        const kind = canonicalKind(targetShape);
+        const intent = safeText(
+          targetShape?.materialization_intent,
+          kind === 'chart' ? 'native_data_object' : '',
+        );
+        if (supportedShapeKinds.has(kind) || (kind === 'chart' && intent === 'native_data_object')) return [];
         return [{
           slide_id: safeText(slide?.slide_id, `slide-${index + 1}`),
           shape_id: targetShapeId,
           kind,
-          materialization_intent: 'stable_drawingml',
-          reason: 'officecli_animation_parent_excludes_group',
+          materialization_intent: intent,
+          reason: ['chart', 'table', 'metric_grid'].includes(kind) && intent === 'stable_drawingml'
+            ? 'animation_target_stable_drawingml_group_unsupported'
+            : 'animation_target_kind_unsupported',
         }];
       });
     });
@@ -142,21 +183,21 @@ export function createNativePptShapePlanNormalizeParts({
     previousValidationFeedback?: JsonRecord | null;
   }): JsonRecord | null {
     const message = error instanceof Error ? error.message : String(error);
-    const stableDrawingAnimationMarker = 'does not support stable_drawingml group animation targets: ';
-    const stableDrawingAnimationMarkerIndex = message.indexOf(stableDrawingAnimationMarker);
-    if (stableDrawingAnimationMarkerIndex >= 0) {
+    const animationTargetMarker = 'animation target preflight failed: ';
+    const animationTargetMarkerIndex = message.indexOf(animationTargetMarker);
+    if (animationTargetMarkerIndex >= 0) {
       let failures: JsonRecord[] = [];
       try {
         failures = safeArray(JSON.parse(message.slice(
-          stableDrawingAnimationMarkerIndex + stableDrawingAnimationMarker.length,
+          animationTargetMarkerIndex + animationTargetMarker.length,
         )));
       } catch {
         failures = [];
       }
       return {
         repair_request: [
-          `Regenerate editable_shape_plan for ${route} and repair unsupported stable_drawingml animation targets before materialization.`,
-          'Keep the grouped editable DrawingML object, but remove its animation_timeline entry or target a top-level native shape or native_data_object chart.',
+          `Regenerate editable_shape_plan for ${route} and repair unsupported animation targets before materialization.`,
+          'Remove invalid animation_timeline entries or target a top-level native shape or native_data_object chart.',
           'Do not retarget the animation to a child inside the group; OfficeCLI animations accept only top-level shape or chart parents.',
         ].join(' '),
         previous_attempt: attemptIndex,
@@ -167,12 +208,12 @@ export function createNativePptShapePlanNormalizeParts({
           scope: 'shape',
           slide_id: safeText(failure?.slide_id),
           shape_id: safeText(failure?.shape_id),
-          reason: 'native_shape_plan_stable_drawingml_animation_target_unsupported',
+          reason: 'native_shape_plan_animation_target_unsupported',
           repair_instruction: 'Remove this shape from animation_timeline or change the visual to a top-level native shape/native_data_object chart when animation is required.',
         })),
         validator: {
           ok: false,
-          reason: 'native_shape_plan_stable_drawingml_animation_target_unsupported',
+          reason: 'native_shape_plan_animation_target_unsupported',
           failures,
         },
         attempt_artifact_refs: [...attemptArtifactRefs],
@@ -451,9 +492,9 @@ export function createNativePptShapePlanNormalizeParts({
     if (slides.length === 0) {
       throw new Error(`Native PPT ${route} requires an AI-authored editable_shape_plan.slides array`);
     }
-    const unsupportedAnimationTargets = stableDrawingAnimationTargetFailures(slides);
+    const unsupportedAnimationTargets = animationTargetFailures(slides);
     if (unsupportedAnimationTargets.length > 0) {
-      throw new Error(`Native PPT ${route} does not support stable_drawingml group animation targets: ${JSON.stringify(unsupportedAnimationTargets)}`);
+      throw new Error(`Native PPT ${route} animation target preflight failed: ${JSON.stringify(unsupportedAnimationTargets)}`);
     }
     const planAuthoringMode = safeText(plan?.authoring_mode);
     const sampleCompactPlan = planAuthoringMode === 'native_visual_sample_compact';

@@ -18,6 +18,40 @@ function runPython(script, args = []) {
   });
 }
 
+export function packageBindingResult(plannedShape, materializedObject) {
+  const python = resolveTestPythonCommand();
+  return spawnSync(python.command, [...(python.args || []), '-c', `
+import json
+import sys
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _bind_manifest_to_package
+
+fixture = json.loads(sys.argv[1])
+manifest_slides = [{'native_shapes': [fixture['planned']]}]
+package_readback = {'slides': [{'slide_index': 1, 'objects': [fixture['materialized']]}]}
+_bind_manifest_to_package(manifest_slides, package_readback, [1])
+`, JSON.stringify({ planned: plannedShape, materialized: materializedObject })], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+}
+
+export function pythonAnimationFailures(shapes) {
+  return JSON.parse(runPython(`
+import json
+import sys
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _animation_target_failures
+
+shapes = json.loads(sys.argv[1])
+slides = [{
+    'slide_id': f'S{index:02d}',
+    '_editable_native_shapes': [shape],
+    'animation_timeline': [{'target_shape_id': shape['shape_id'], 'effect': 'fade'}],
+} for index, shape in enumerate(shapes, 1)]
+print(json.dumps(_animation_target_failures(slides)))
+`, [JSON.stringify(shapes)]));
+}
+
 export function createNativeObjectWorkspace(prefix = 'redcube-native-object-package-') {
   const workspaceRoot = mkUserScopedTestWorkspace(prefix);
   const pictureFile = path.join(workspaceRoot, 'picture.png');

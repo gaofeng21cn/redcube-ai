@@ -700,6 +700,10 @@ export function buildNativeShapePlanOutputContract({
           animation_fields: ['target_shape_id', 'effect', 'class', 'trigger', 'duration_ms', 'delay_ms'],
           animation_target_policy: {
             stable_drawingml_group_target: 'reject_before_materialization',
+            supported_top_level_kinds: ['text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path'],
+            native_data_object_chart: 'supported',
+            rejected_targets: ['missing', 'group_child', 'group', 'table', 'metric_grid', 'picture', 'line', 'connector'],
+            zero_write_preflight_required: true,
             supported_target_rule: 'animation_timeline targets must materialize as a top-level OfficeCLI shape or native_data_object chart',
           },
           static_slide_must_remain_readable: true,

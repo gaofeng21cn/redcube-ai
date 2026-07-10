@@ -12,7 +12,7 @@ from redcube_ai.native_helpers.ppt_deck.native_package import (
     read_pptx_package,
     template_preservation,
 )
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import native_ai_design_shapes, safe_list, safe_text
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import native_ai_design_shapes, safe_list, safe_text, shape_kind
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.geometry import ai_shape_bounds_in, pptx_geometry_audit, shape_rect_from_ai_bounds
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.officecli import (
     canonical_object_kind,
@@ -121,31 +121,89 @@ def _object_path(slide_index: int, shape_spec: dict) -> str:
     return f'/slide[{slide_index}]/{element}[@name={name}]'
 
 
-def _stable_drawing_animation_failures(slides: list[dict]) -> list[dict]:
+SUPPORTED_ANIMATION_TARGET_KINDS = {'text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path'}
+
+
+def _animation_object_kind(shape: dict) -> str:
+    try:
+        return canonical_object_kind(shape)
+    except ValueError:
+        return shape_kind(shape)
+
+
+def _animation_target_failures(slides: list[dict]) -> list[dict]:
     failures = []
     for slide_index, slide_data in enumerate(slides, 1):
-        shapes_by_id = {
+        animations = [
+            item for item in safe_list(slide_data.get('animation_timeline'))
+            if isinstance(item, dict)
+        ]
+        if not animations:
+            continue
+        top_level_by_id = {
             safe_text(shape.get('shape_id')): shape
             for shape in native_ai_design_shapes(slide_data)
             if safe_text(shape.get('shape_id'))
         }
-        for animation in [item for item in safe_list(slide_data.get('animation_timeline')) if isinstance(item, dict)]:
+        group_children_by_id = {}
+
+        def collect_group_children(shape: dict) -> None:
+            kind = _animation_object_kind(shape)
+            stable_drawing = kind in {'chart', 'table', 'metric_grid'} and safe_text(
+                shape.get('materialization_intent'), 'native_data_object'
+            ) == 'stable_drawingml'
+            if kind != 'group' and not stable_drawing:
+                return
+            children = safe_list(shape.get('drawingml_shapes') or shape.get('children'))
+            for child in [item for item in children if isinstance(item, dict)]:
+                child_id = safe_text(child.get('shape_id'))
+                if child_id:
+                    group_children_by_id[child_id] = child
+                collect_group_children(child)
+
+        for shape in native_ai_design_shapes(slide_data):
+            collect_group_children(shape)
+        for animation in animations:
             target_id = safe_text(animation.get('target_shape_id') or animation.get('target_id'))
-            target = shapes_by_id.get(target_id)
+            target = top_level_by_id.get(target_id)
             if target is None:
-                continue
-            kind = canonical_object_kind(target)
-            if kind in {'chart', 'table', 'metric_grid'} and safe_text(
-                target.get('materialization_intent')
-            ) == 'stable_drawingml':
+                child = group_children_by_id.get(target_id)
                 failures.append({
                     'slide_index': slide_index,
                     'slide_id': safe_text(slide_data.get('slide_id'), f'S{slide_index:02d}'),
                     'shape_id': target_id,
-                    'kind': kind,
-                    'materialization_intent': 'stable_drawingml',
+                    'kind': _animation_object_kind(child) if child is not None else '',
+                    'materialization_intent': safe_text((child or {}).get('materialization_intent')),
+                    'reason': 'animation_target_group_child' if child is not None else 'animation_target_missing',
                 })
+                continue
+            kind = _animation_object_kind(target)
+            intent = safe_text(target.get('materialization_intent'), 'native_data_object' if kind == 'chart' else '')
+            if kind in SUPPORTED_ANIMATION_TARGET_KINDS or (kind == 'chart' and intent == 'native_data_object'):
+                continue
+            reason = (
+                'animation_target_stable_drawingml_group_unsupported'
+                if kind in {'chart', 'table', 'metric_grid'} and intent == 'stable_drawingml'
+                else 'animation_target_kind_unsupported'
+            )
+            failures.append({
+                'slide_index': slide_index,
+                'slide_id': safe_text(slide_data.get('slide_id'), f'S{slide_index:02d}'),
+                'shape_id': target_id,
+                'kind': kind,
+                'materialization_intent': intent,
+                'reason': reason,
+            })
     return failures
+
+
+def _assert_animation_targets(slides: list[dict]) -> None:
+    failures = _animation_target_failures(slides)
+    if failures:
+        raise ValueError(
+            'native PPT animation target preflight failed: '
+            + json.dumps(failures, ensure_ascii=False, sort_keys=True)
+        )
 
 
 def _children_for_group(shape_spec: dict, kind: str) -> list[dict]:
@@ -406,15 +464,10 @@ def _fill_existing_slide_indices(slides: list[dict], slide_count: int) -> list[i
 
 
 def materialize_native_pptx(slides, output_pptx: Path, template_intake: dict | None = None) -> dict:
+    _assert_animation_targets(slides)
     officecli = shutil.which('officecli')
     if not officecli:
         raise RuntimeError('native PPT officecli materializer requires officecli on PATH')
-    stable_drawing_animation_failures = _stable_drawing_animation_failures(slides)
-    if stable_drawing_animation_failures:
-        raise ValueError(
-            'native PPT stable_drawingml group animation targets are unsupported before materialization: '
-            + json.dumps(stable_drawing_animation_failures, ensure_ascii=False, sort_keys=True)
-        )
     output_pptx = Path(output_pptx)
     output_pptx.parent.mkdir(parents=True, exist_ok=True)
     mode = _template_mode(template_intake)
@@ -597,6 +650,15 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
         ):
             raise RuntimeError(f'native PPT picture package relationship/content type missing: {shape_id}')
     if actual_kind == 'chart':
+        expected_chart_type = safe_text(native_shape.get('chart_type') or native_shape.get('chartType'))
+        if not expected_chart_type:
+            raise RuntimeError(f'native PPT chart type evidence missing for {shape_id}')
+        actual_chart_type = safe_text(materialized.get('chart_type'))
+        if actual_chart_type != expected_chart_type:
+            raise RuntimeError(
+                f'native PPT chart type mismatch for {shape_id}: '
+                f'expected {expected_chart_type!r}, got {actual_chart_type!r}'
+            )
         expected_categories = [str(value) for value in safe_list(native_shape.get('categories'))]
         actual_categories = [str(value) for value in safe_list(materialized.get('categories'))]
         if actual_categories != expected_categories:
@@ -664,6 +726,15 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
                     f'native PPT {label} mismatch for {shape_id}: expected {expected!r}, got {actual!r}'
                 )
     if actual_kind == 'picture':
+        expected_payload_sha = safe_text(native_shape.get('source_payload_sha256'))
+        if not expected_payload_sha:
+            raise RuntimeError(f'native PPT picture source payload SHA evidence missing for {shape_id}')
+        actual_payload_sha = safe_text(materialized.get('embedded_sha256'))
+        if actual_payload_sha != expected_payload_sha:
+            raise RuntimeError(
+                f'native PPT picture source payload SHA mismatch for {shape_id}: '
+                f'expected {expected_payload_sha!r}, got {actual_payload_sha!r}'
+            )
         expected_alt = safe_text(native_shape.get('alt'))
         actual_alt = safe_text(materialized.get('alt'))
         if actual_alt != expected_alt:
@@ -676,13 +747,40 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
                 f'native PPT picture crop mismatch for {shape_id}: '
                 f'expected {expected_crop!r}, got {materialized.get("crop")!r}'
             )
-    expected_child_count = native_shape.get('child_object_count')
-    if actual_kind == 'group' and expected_child_count not in (None, ''):
-        if int(materialized.get('child_object_count') or 0) != int(expected_child_count):
+    if actual_kind == 'group':
+        expected_children = [item for item in safe_list(native_shape.get('children')) if isinstance(item, dict)]
+        actual_children = [item for item in safe_list(materialized.get('children')) if isinstance(item, dict)]
+        if not expected_children:
+            raise RuntimeError(f'native PPT group child semantic records missing for {shape_id}')
+        if len(actual_children) != len(expected_children):
             raise RuntimeError(
                 f'native PPT group child count mismatch for {shape_id}: '
-                f'expected {expected_child_count}, got {materialized.get("child_object_count") or 0}'
+                f'expected {len(expected_children)}, got {len(actual_children)}'
             )
+        for index, (expected_child, actual_child) in enumerate(zip(expected_children, actual_children), 1):
+            expected_child_id = safe_text(expected_child.get('shape_id'))
+            actual_child_id = safe_text(actual_child.get('name'))
+            if actual_child_id != expected_child_id:
+                raise RuntimeError(
+                    f'native PPT group child identity mismatch for {shape_id} at position {index}: '
+                    f'expected {expected_child_id!r}, got {actual_child_id!r}'
+                )
+            expected_child_kinds = _expected_materialized_kinds(expected_child)
+            actual_child_kind = safe_text(actual_child.get('kind'))
+            if actual_child_kind not in expected_child_kinds:
+                raise RuntimeError(
+                    f'native PPT group child kind mismatch for {shape_id}/{expected_child_id}: '
+                    f'expected {sorted(expected_child_kinds)}, got {actual_child_kind or "<missing>"}'
+                )
+            if actual_child_kind != 'group':
+                expected_child_text = safe_text(expected_child.get('text'))
+                actual_child_text = safe_text(actual_child.get('text'))
+                if actual_child_text != expected_child_text:
+                    raise RuntimeError(
+                        f'native PPT group child text semantic mismatch for {shape_id}/{expected_child_id}: '
+                        f'expected {expected_child_text!r}, got {actual_child_text!r}'
+                    )
+            _assert_package_object_evidence(expected_child, actual_child)
 
 
 def _bind_manifest_to_package(manifest_slides: list[dict], package_readback: dict, slide_indices: list[int]) -> None:
@@ -722,6 +820,7 @@ def _bind_manifest_to_package(manifest_slides: list[dict], package_readback: dic
 
 
 def build_deck(slides, output_pptx: Path, svg_ir_dir: Path, repaired_slide_ids, evaluate_native_slide_quality, template_intake=None):
+    _assert_animation_targets(slides)
     manifest_slides = []
     for index, slide_data in enumerate(slides, 1):
         slide_id = safe_text(slide_data.get('slide_id'), f'S{index:02d}')

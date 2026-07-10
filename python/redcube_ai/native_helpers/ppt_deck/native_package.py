@@ -1,4 +1,5 @@
 import argparse
+import base64
 import hashlib
 import json
 import posixpath
@@ -7,6 +8,7 @@ import tempfile
 import zipfile
 from collections import Counter
 from pathlib import Path
+from urllib.parse import unquote_to_bytes
 from xml.etree import ElementTree as ET
 
 
@@ -25,6 +27,7 @@ __all__ = [
     'patch_chart_data',
     'patch_custom_paths',
     'read_pptx_package',
+    'source_payload_sha256',
     'template_preservation',
 ]
 
@@ -50,6 +53,21 @@ def _file_sha256(file: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b''):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def source_payload_sha256(source: str) -> str:
+    if not source.startswith('data:'):
+        return _file_sha256(Path(source).expanduser())
+    metadata, separator, encoded = source[5:].partition(',')
+    if not separator:
+        raise ValueError('native PPT picture data URI must contain a payload separator')
+    payload = unquote_to_bytes(encoded)
+    if 'base64' in {token.lower() for token in metadata.split(';')[1:]}:
+        try:
+            payload = base64.b64decode(payload, validate=True)
+        except ValueError as exc:
+            raise ValueError('native PPT picture data URI contains invalid base64') from exc
+    return _part_sha256(payload)
 
 
 def _relationship_part(source_part: str) -> str:
@@ -221,10 +239,6 @@ def _shape_record(element: ET.Element, relationships: dict[str, dict]) -> dict:
             record['kind'] = 'graphic_frame'
     elif local == 'grpSp':
         record['kind'] = 'group'
-        record['child_object_count'] = sum(
-            1 for child in list(element)
-            if _local_name(child.tag) in {'sp', 'cxnSp', 'pic', 'graphicFrame', 'grpSp'}
-        )
     elif local == 'sp':
         sp_pr = element.find('./p:spPr', NS)
         custom_geometry = sp_pr.find('./a:custGeom', NS) if sp_pr is not None else None
@@ -289,6 +303,20 @@ def _chart_point_values(element: ET.Element | None, *, numeric: bool = False) ->
     return values
 
 
+def _chart_type(plot_area: ET.Element | None) -> str:
+    if plot_area is None:
+        return ''
+    chart = next((child for child in list(plot_area) if _local_name(child.tag).endswith('Chart')), None)
+    if chart is None:
+        return ''
+    local = _local_name(chart.tag)
+    if local in {'barChart', 'bar3DChart'}:
+        direction = chart.find('./c:barDir', NS)
+        base = 'column' if direction is not None and direction.get('val') == 'col' else 'bar'
+        return f'{base}3d' if local == 'bar3DChart' else base
+    return local.removesuffix('Chart')
+
+
 def _enrich_related_object(record: dict, archive: zipfile.ZipFile, content_types: dict[str, str]) -> None:
     target = record.get('relationship_target')
     if not target or target not in archive.namelist():
@@ -320,11 +348,7 @@ def _enrich_related_object(record: dict, archive: zipfile.ZipFile, content_types
     record['categories'] = categories
     record['series'] = series
     plot_area = root.find('.//c:plotArea', NS)
-    record['chart_type'] = next((
-        _local_name(child.tag).removesuffix('Chart')
-        for child in list(plot_area) if plot_area is not None
-        if _local_name(child.tag).endswith('Chart')
-    ), '')
+    record['chart_type'] = _chart_type(plot_area)
 
 
 def _slide_objects(root: ET.Element, relationships: dict[str, dict]) -> list[dict]:
@@ -333,17 +357,24 @@ def _slide_objects(root: ET.Element, relationships: dict[str, dict]) -> list[dic
         return []
     records = []
 
-    def walk(element: ET.Element, group_name: str = '') -> None:
+    def walk(element: ET.Element, group_name: str = '') -> dict | None:
         local = _local_name(element.tag)
-        if local in {'sp', 'cxnSp', 'pic', 'graphicFrame', 'grpSp'}:
-            record = _shape_record(element, relationships)
-            if group_name:
-                record['group_name'] = group_name
-            records.append(record)
-            if local == 'grpSp':
-                child_group = record['name'] or group_name
-                for child in list(element):
-                    walk(child, child_group)
+        if local not in {'sp', 'cxnSp', 'pic', 'graphicFrame', 'grpSp'}:
+            return None
+        record = _shape_record(element, relationships)
+        if group_name:
+            record['group_name'] = group_name
+        records.append(record)
+        if local == 'grpSp':
+            child_group = record['name'] or group_name
+            children = [
+                child_record
+                for child in list(element)
+                if (child_record := walk(child, child_group)) is not None
+            ]
+            record['children'] = children
+            record['child_object_count'] = len(children)
+        return record
 
     for child in list(shape_tree):
         walk(child)

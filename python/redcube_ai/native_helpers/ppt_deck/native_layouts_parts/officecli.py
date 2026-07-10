@@ -1,5 +1,6 @@
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.common import ai_shape_text, safe_list, safe_text, shape_kind
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.geometry import shape_rect_from_ai_bounds
+from redcube_ai.native_helpers.ppt_deck.native_package import source_payload_sha256
 from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.style import (
     ai_shape_color,
     ai_shape_fill,
@@ -153,13 +154,7 @@ def _connector_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> d
 
 
 def _picture_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> dict:
-    source = safe_text(
-        shape_spec.get('source_file')
-        or shape_spec.get('src')
-        or shape_spec.get('source')
-        or shape_spec.get('file')
-        or shape_spec.get('source_data_uri')
-    )
+    source = _picture_source(shape_spec)
     if not source:
         raise ValueError(f"native PPT picture requires src: {safe_text(shape_spec.get('shape_id'), '<missing>')}")
     props = {**_base_bounds_props(shape_spec, bounds_in), 'src': source}
@@ -177,6 +172,16 @@ def _picture_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> dic
         if value not in (None, ''):
             props[target_key] = value
     return {'command': 'add', 'parent': f'/slide[{slide_index}]', 'type': 'picture', 'props': props}
+
+
+def _picture_source(shape_spec: dict) -> str:
+    return safe_text(
+        shape_spec.get('source_file')
+        or shape_spec.get('src')
+        or shape_spec.get('source')
+        or shape_spec.get('file')
+        or shape_spec.get('source_data_uri')
+    )
 
 
 def _chart_command(shape_spec: dict, slide_index: int, bounds_in: dict) -> dict:
@@ -275,6 +280,7 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
     }
     if kind == 'chart':
         record.update({
+            'chart_type': safe_text(shape_spec.get('chart_type') or shape_spec.get('chartType'), 'column'),
             'categories': safe_list(shape_spec.get('categories')),
             'series': safe_list(shape_spec.get('series')),
             'metrics': dict(shape_spec.get('metrics')) if isinstance(shape_spec.get('metrics'), dict) else {},
@@ -301,6 +307,7 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
             if shape_spec.get(key) not in (None, ''):
                 record[key] = shape_spec[key]
     if kind == 'picture':
+        record['source_payload_sha256'] = source_payload_sha256(_picture_source(shape_spec))
         record['alt'] = safe_text(shape_spec.get('alt'))
         record['crop'] = _picture_crop(shape_spec) or {
             'left': 0,
@@ -313,5 +320,6 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
         and safe_text(shape_spec.get('materialization_intent')) == 'stable_drawingml'
     ):
         children = safe_list(shape_spec.get('drawingml_shapes') or shape_spec.get('children'))
-        record['child_object_count'] = len([item for item in children if isinstance(item, dict)])
+        record['children'] = [native_shape_manifest_record(item) for item in children if isinstance(item, dict)]
+        record['child_object_count'] = len(record['children'])
     return record

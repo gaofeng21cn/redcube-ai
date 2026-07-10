@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { buildNativeShapePlanOutputContract } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-contract.ts';
@@ -16,6 +17,8 @@ import {
 import {
   bounds,
   createNativeObjectWorkspace,
+  packageBindingResult,
+  pythonAnimationFailures,
   relocateRelationshipBackedParts,
   runPackageReadback,
   runNativeObjectMaterializer,
@@ -23,24 +26,6 @@ import {
   shape,
   validatePptx,
 } from './helpers/ppt-native-object-package-fixtures.ts';
-
-function packageBindingResult(plannedShape, materializedObject) {
-  const python = resolveTestPythonCommand();
-  return spawnSync(python.command, [...(python.args || []), '-c', `
-import json
-import sys
-from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import _bind_manifest_to_package
-
-fixture = json.loads(sys.argv[1])
-manifest_slides = [{'native_shapes': [fixture['planned']]}]
-package_readback = {'slides': [{'slide_index': 1, 'objects': [fixture['materialized']]}]}
-_bind_manifest_to_package(manifest_slides, package_readback, [1])
-`, JSON.stringify({ planned: plannedShape, materialized: materializedObject })], {
-    cwd: process.cwd(),
-    env: pythonTestEnv(),
-    encoding: 'utf-8',
-  });
-}
 
 function officecliJsonParseResult(args, payload) {
   const python = resolveTestPythonCommand();
@@ -79,6 +64,16 @@ test('native PPT shape-plan contract exposes typed object, template, and present
     contract.presentation_semantics_contract.animation_target_policy.stable_drawingml_group_target,
     'reject_before_materialization',
   );
+  assert.deepEqual(
+    contract.presentation_semantics_contract.animation_target_policy.supported_top_level_kinds,
+    ['text_box', 'shape', 'rect', 'rounded_rect', 'oval', 'path'],
+  );
+  assert.equal(contract.presentation_semantics_contract.animation_target_policy.native_data_object_chart, 'supported');
+  assert.deepEqual(
+    contract.presentation_semantics_contract.animation_target_policy.rejected_targets,
+    ['missing', 'group_child', 'group', 'table', 'metric_grid', 'picture', 'line', 'connector'],
+  );
+  assert.equal(contract.presentation_semantics_contract.animation_target_policy.zero_write_preflight_required, true);
 });
 
 test('native PPT plan preflight rejects stable DrawingML animation targets with repair feedback', () => {
@@ -101,7 +96,7 @@ test('native PPT plan preflight rejects stable DrawingML animation targets with 
     },
   }, 'author_pptx_native'), (error) => {
     planError = error;
-    return /stable_drawingml group animation targets/.test(String(error?.message));
+    return /animation target preflight failed/.test(String(error?.message));
   });
   const feedback = parts.structuralFeedbackFromPlanError({
     route: 'author_pptx_native',
@@ -109,9 +104,87 @@ test('native PPT plan preflight rejects stable DrawingML animation targets with 
     attemptIndex: 1,
     attemptArtifactRefs: [],
   });
-  assert.equal(feedback.validator.reason, 'native_shape_plan_stable_drawingml_animation_target_unsupported');
+  assert.equal(feedback.validator.reason, 'native_shape_plan_animation_target_unsupported');
+  assert.equal(feedback.validator.failures[0].reason, 'animation_target_stable_drawingml_group_unsupported');
   assert.equal(feedback.required_structural_fixes[0].shape_id, 'S01-stable-chart');
   assert.match(feedback.repair_request, /target a top-level native shape or native_data_object chart/);
+});
+
+for (const fixture of [
+  { label: 'missing target', targetShape: null, targetId: 'S01-missing', expectedReason: 'animation_target_missing' },
+  {
+    label: 'group child target',
+    targetShape: {
+      shape_id: 'S01-group',
+      kind: 'group',
+      children: [{ shape_id: 'S01-target', kind: 'rect' }],
+    },
+    targetId: 'S01-target',
+    expectedReason: 'animation_target_group_child',
+  },
+  { label: 'group target', targetShape: { shape_id: 'S01-target', kind: 'group', children: [] }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+  { label: 'native table target', targetShape: { shape_id: 'S01-target', kind: 'table', materialization_intent: 'native_data_object' }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+  { label: 'native metric grid target', targetShape: { shape_id: 'S01-target', kind: 'metric_grid', materialization_intent: 'native_data_object' }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+  { label: 'picture target', targetShape: { shape_id: 'S01-target', kind: 'picture' }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+  { label: 'line target', targetShape: { shape_id: 'S01-target', kind: 'line' }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+  { label: 'connector target', targetShape: { shape_id: 'S01-target', kind: 'connector' }, targetId: 'S01-target', expectedReason: 'animation_target_kind_unsupported' },
+]) {
+  test(`native PPT plan preflight rejects ${fixture.label} with typed repair feedback`, () => {
+    const parts = createNativePptShapePlanNormalizeParts({
+      safeArray: (value) => Array.isArray(value) ? value : [],
+      safeText: (value, fallback = '') => String(value ?? fallback).trim(),
+    });
+    let planError;
+    assert.throws(() => parts.normalizeEditableShapePlan({
+      editable_shape_plan: {
+        slides: [{
+          slide_id: 'S01',
+          native_shapes: fixture.targetShape ? [fixture.targetShape] : [],
+          animation_timeline: [{ target_shape_id: fixture.targetId, effect: 'fade' }],
+        }],
+      },
+    }, 'author_pptx_native'), (error) => {
+      planError = error;
+      return /animation target preflight failed/.test(String(error?.message));
+    });
+    const feedback = parts.structuralFeedbackFromPlanError({
+      route: 'author_pptx_native',
+      error: planError,
+      attemptIndex: 1,
+      attemptArtifactRefs: [],
+    });
+    assert.equal(feedback.validator.reason, 'native_shape_plan_animation_target_unsupported');
+    assert.equal(feedback.validator.failures[0].reason, fixture.expectedReason);
+    assert.equal(feedback.required_structural_fixes[0].shape_id, fixture.targetId);
+  });
+}
+
+test('native PPT TS and Python animation preflight accept canonical top-level shapes, aliases, and native charts', () => {
+  const supportedTargets = [
+    'text_box', 'text', 'shape', 'preset_shape', 'rect', 'rectangle',
+    'rounded_rect', 'panel', 'oval', 'circle', 'path',
+  ].map((kind, index) => ({ shape_id: `S${index + 1}-target`, kind }));
+  supportedTargets.push({
+    shape_id: 'S-chart-target',
+    kind: 'chart',
+    materialization_intent: 'native_data_object',
+  });
+  const parts = createNativePptShapePlanNormalizeParts({
+    safeArray: (value) => Array.isArray(value) ? value : [],
+    safeText: (value, fallback = '') => String(value ?? fallback).trim(),
+  });
+  for (const target of supportedTargets) {
+    assert.throws(() => parts.normalizeEditableShapePlan({
+      editable_shape_plan: {
+        slides: [{
+          slide_id: 'S01',
+          native_shapes: [target],
+          animation_timeline: [{ target_shape_id: target.shape_id, effect: 'fade' }],
+        }],
+      },
+    }, 'author_pptx_native'), /requires editable_shape_plan\.design_spec_lock/);
+  }
+  assert.deepEqual(pythonAnimationFailures(supportedTargets), []);
 });
 
 test('native PPT materializer rejects malformed OfficeCLI JSON instead of treating it as zero issues', () => {
@@ -193,11 +266,13 @@ test('native PPT package binding rejects chart category drift', () => {
     kind: 'chart',
     semantic_kind: 'chart',
     materialization_intent: 'native_data_object',
+    chart_type: 'column',
     categories: ['A', 'B'],
     series: [{ name: 'Actual', values: [1, 2] }],
   }, {
     name: 'S01-chart',
     kind: 'chart',
+    chart_type: 'column',
     categories: ['A', 'C'],
     series: [{ name: 'Actual', values: [1, 2] }],
     relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
@@ -214,11 +289,13 @@ test('native PPT package binding rejects chart series drift', () => {
     kind: 'chart',
     semantic_kind: 'chart',
     materialization_intent: 'native_data_object',
+    chart_type: 'column',
     categories: ['A', 'B'],
     series: [{ name: 'Actual', values: [1, 2] }],
   }, {
     name: 'S01-chart',
     kind: 'chart',
+    chart_type: 'column',
     categories: ['A', 'B'],
     series: [{ name: 'Actual', values: [1, 3] }],
     relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
@@ -227,6 +304,51 @@ test('native PPT package binding rejects chart series drift', () => {
   });
   assert.notEqual(result.status, 0, 'chart series drift was accepted');
   assert.match(`${result.stdout}\n${result.stderr}`, /chart series/);
+});
+
+test('native PPT package binding rejects chart type drift', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-chart',
+    kind: 'chart',
+    semantic_kind: 'chart',
+    materialization_intent: 'native_data_object',
+    chart_type: 'column',
+    categories: ['A', 'B'],
+    series: [{ name: 'Actual', values: [1, 2] }],
+  }, {
+    name: 'S01-chart',
+    kind: 'chart',
+    chart_type: 'line',
+    categories: ['A', 'B'],
+    series: [{ name: 'Actual', values: [1, 2] }],
+    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
+    relationship_resolved: true,
+    content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
+  });
+  assert.notEqual(result.status, 0, 'chart type drift was accepted');
+  assert.match(`${result.stdout}\n${result.stderr}`, /chart type/);
+});
+
+test('native PPT package binding rejects missing chart type evidence', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-chart',
+    kind: 'chart',
+    semantic_kind: 'chart',
+    materialization_intent: 'native_data_object',
+    categories: ['A'],
+    series: [{ name: 'Actual', values: [1] }],
+  }, {
+    name: 'S01-chart',
+    kind: 'chart',
+    chart_type: 'column',
+    categories: ['A'],
+    series: [{ name: 'Actual', values: [1] }],
+    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/chart',
+    relationship_resolved: true,
+    content_type: 'application/vnd.openxmlformats-officedocument.drawingml.chart+xml',
+  });
+  assert.notEqual(result.status, 0, 'missing chart type evidence was accepted');
+  assert.match(`${result.stdout}\n${result.stderr}`, /chart type evidence missing/);
 });
 
 test('native PPT package binding rejects table data drift', () => {
@@ -280,11 +402,13 @@ test('native PPT package binding rejects picture alt drift', () => {
     semantic_kind: 'picture',
     alt: 'Expected description',
     crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    source_payload_sha256: 'a'.repeat(64),
   }, {
     name: 'S01-picture',
     kind: 'picture',
     alt: 'Wrong description',
     crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    embedded_sha256: 'a'.repeat(64),
     relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
     relationship_resolved: true,
     content_type: 'image/png',
@@ -300,17 +424,131 @@ test('native PPT package binding rejects picture crop drift', () => {
     semantic_kind: 'picture',
     alt: 'Expected description',
     crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    source_payload_sha256: 'a'.repeat(64),
   }, {
     name: 'S01-picture',
     kind: 'picture',
     alt: 'Expected description',
     crop: { left: 5, top: 0, right: 0, bottom: 0 },
+    embedded_sha256: 'a'.repeat(64),
     relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
     relationship_resolved: true,
     content_type: 'image/png',
   });
   assert.notEqual(result.status, 0, 'picture crop drift was accepted');
   assert.match(`${result.stdout}\n${result.stderr}`, /picture crop/);
+});
+
+test('native PPT package binding rejects picture source payload substitution', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-picture',
+    kind: 'picture',
+    semantic_kind: 'picture',
+    alt: 'Expected description',
+    crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    source_payload_sha256: 'a'.repeat(64),
+  }, {
+    name: 'S01-picture',
+    kind: 'picture',
+    alt: 'Expected description',
+    crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    embedded_sha256: 'b'.repeat(64),
+    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+    relationship_resolved: true,
+    content_type: 'image/png',
+  });
+  assert.notEqual(result.status, 0, 'picture source payload substitution was accepted');
+  assert.match(`${result.stdout}\n${result.stderr}`, /picture source payload SHA/);
+});
+
+test('native PPT package binding rejects missing picture source payload SHA evidence', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-picture',
+    kind: 'picture',
+    semantic_kind: 'picture',
+    alt: 'Expected description',
+    crop: { left: 0, top: 0, right: 0, bottom: 0 },
+  }, {
+    name: 'S01-picture',
+    kind: 'picture',
+    alt: 'Expected description',
+    crop: { left: 0, top: 0, right: 0, bottom: 0 },
+    embedded_sha256: 'a'.repeat(64),
+    relationship_type: 'http://schemas.openxmlformats.org/officeDocument/2006/relationships/image',
+    relationship_resolved: true,
+    content_type: 'image/png',
+  });
+  assert.notEqual(result.status, 0, 'missing picture source payload SHA evidence was accepted');
+  assert.match(`${result.stdout}\n${result.stderr}`, /picture source payload SHA evidence missing/);
+});
+
+test('native PPT picture source payload hashing canonicalizes files and data URIs', () => {
+  const { pictureFile, pictureDataUri } = createNativeObjectWorkspace('redcube-native-picture-digest-');
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', `
+import json
+import sys
+from redcube_ai.native_helpers.ppt_deck.native_package import source_payload_sha256
+
+print(json.dumps([source_payload_sha256(value) for value in sys.argv[1:]]))
+`, pictureFile, pictureDataUri, 'data:text/plain,RedCube%20AI%21'], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+  const [fileDigest, base64Digest, percentDigest] = JSON.parse(stdout);
+  assert.equal(fileDigest, base64Digest);
+  assert.equal(fileDigest, createHash('sha256').update(readFileSync(pictureFile)).digest('hex'));
+  assert.equal(percentDigest, createHash('sha256').update('RedCube AI!').digest('hex'));
+});
+
+test('native PPT package binding rejects ordered group child substitution with the same count', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-group',
+    kind: 'group',
+    semantic_kind: 'group',
+    child_object_count: 2,
+    children: [
+      { shape_id: 'S01-group-a', kind: 'rect', semantic_kind: 'rect', text: '' },
+      { shape_id: 'S01-group-b', kind: 'oval', semantic_kind: 'oval', text: '' },
+    ],
+  }, {
+    name: 'S01-group',
+    kind: 'group',
+    child_object_count: 2,
+    children: [
+      { name: 'S01-group-a', kind: 'rect', text: '' },
+      { name: 'S01-group-substitute', kind: 'oval', text: '' },
+    ],
+  });
+  assert.notEqual(result.status, 0, 'same-count group child substitution was accepted');
+  assert.match(`${result.stdout}\n${result.stderr}`, /group child identity/);
+});
+
+test('native PPT package binding accepts nested group descendant text without comparing aggregate group text', () => {
+  const result = packageBindingResult({
+    shape_id: 'S01-outer',
+    kind: 'group',
+    semantic_kind: 'group',
+    children: [{
+      shape_id: 'S01-inner',
+      kind: 'group',
+      semantic_kind: 'group',
+      text: '',
+      children: [{ shape_id: 'S01-label', kind: 'text_box', semantic_kind: 'text_box', text: 'Hello' }],
+    }],
+  }, {
+    name: 'S01-outer',
+    kind: 'group',
+    text: 'Hello',
+    children: [{
+      name: 'S01-inner',
+      kind: 'group',
+      text: 'Hello',
+      children: [{ name: 'S01-label', kind: 'text_box', text: 'Hello' }],
+    }],
+  });
+  assert.equal(result.status, 0, `${result.stdout}\n${result.stderr}`);
 });
 
 test('native PPT object fixtures use marked user-scoped test workspaces', () => {
@@ -485,6 +723,7 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   const byName = Object.fromEntries(result.package_readback.slides[0].objects.map((item) => [item.name, item]));
   assert.equal(byName['S01-chart'].series_count, 1);
   assert.equal(byName['S01-chart'].category_count, 2);
+  assert.equal(byName['S01-chart'].chart_type, 'column');
   assert.deepEqual(byName['S01-chart'].categories, ['North, East', 'South']);
   assert.deepEqual(byName['S01-chart'].series, [{ name: 'Actual', values: [3, 8] }]);
   assert.equal(byName['S01-table'].row_count, 3);
@@ -502,11 +741,22 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   });
   assert.equal(byName['S01-table'].cells[2].font_size_pt, 13);
   assert.ok(byName['S01-picture'].embedded_size_bytes > 0);
+  assert.equal(
+    byName['S01-picture'].embedded_sha256,
+    createHash('sha256').update(readFileSync(pictureFile)).digest('hex'),
+  );
   assert.equal(byName['S01-picture'].alt, 'RedCube AI logo');
   assert.equal(byName['S01-picture'].alt_text, 'RedCube AI logo');
   assert.equal(byName['S01-picture'].has_alt, true);
   assert.deepEqual(byName['S01-picture'].crop, { left: 0, top: 0, right: 0, bottom: 0 });
   assert.equal(byName['S01-group'].child_object_count, 2);
+  assert.deepEqual(
+    byName['S01-group'].children.map((child) => ({ name: child.name, kind: child.kind, text: child.text })),
+    [
+      { name: 'S01-group-a', kind: 'rect', text: '' },
+      { name: 'S01-group-b', kind: 'oval', text: '' },
+    ],
+  );
   assert.ok(byName['S01-path'].path_segment_count >= 5);
   assert.equal(byName['S01-connector'].tail_end, 'triangle');
   assert.equal(byName['S01-connector'].from_shape_name, 'S01-diamond');
@@ -575,9 +825,127 @@ test('stable DrawingML chart and table animations fail before PPTX materializati
     },
   });
   assert.notEqual(failure.status, 0);
-  assert.match(`${failure.stdout}\n${failure.stderr}`, /stable_drawingml group animation targets are unsupported/);
+  assert.match(`${failure.stdout}\n${failure.stderr}`, /animation target preflight failed/);
   assert.equal(existsSync(outputPptx), false);
 });
+
+test('native PPT build_deck rejects animation targets before writing SVG IR or PPTX output', () => {
+  const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-build-deck-animation-');
+  const outputPptx = path.join(workspaceRoot, 'build-deck-animation.pptx');
+  const svgIrDir = path.join(workspaceRoot, 'svg-ir');
+  const slide = createAiSlide();
+  slide.animation_timeline = [{ target_shape_id: 'S01-missing', effect: 'fade' }];
+  const payload = materializerPayload([slide]);
+  const python = resolveTestPythonCommand();
+  const failure = spawnSync(python.command, [...(python.args || []), '-c', `
+import json
+import sys
+from pathlib import Path
+from redcube_ai.native_helpers.ppt_deck.native import evaluate_native_slide_quality, normalize_slide_data
+from redcube_ai.native_helpers.ppt_deck.native_layouts_parts.materializer import build_deck
+
+slides = normalize_slide_data(json.loads(sys.argv[1]))
+build_deck(slides, Path(sys.argv[2]), Path(sys.argv[3]), set(), evaluate_native_slide_quality)
+`, JSON.stringify(payload), outputPptx, svgIrDir], {
+    cwd: process.cwd(),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+  assert.notEqual(failure.status, 0);
+  assert.match(`${failure.stdout}\n${failure.stderr}`, /animation target preflight failed/);
+  assert.equal(existsSync(outputPptx), false);
+  assert.equal(existsSync(svgIrDir), false);
+});
+
+for (const fixture of [
+  {
+    label: 'missing',
+    targetId: 'S01-missing',
+    buildShapes: () => [],
+    expectedReason: 'animation_target_missing',
+  },
+  {
+    label: 'group child',
+    targetId: 'S01-group-child',
+    buildShapes: () => [shape('S01-group', 'group', bounds(1, 1, 3, 2), {
+      children: [shape('S01-group-child', 'rect', bounds(1, 1, 2, 1), { fill: '#E2E8F0', line: 'none' })],
+    })],
+    expectedReason: 'animation_target_group_child',
+  },
+  {
+    label: 'group',
+    targetId: 'S01-target',
+    buildShapes: () => [shape('S01-target', 'group', bounds(1, 1, 3, 2), {
+      children: [shape('S01-group-child', 'rect', bounds(1, 1, 2, 1), { fill: '#E2E8F0', line: 'none' })],
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+  {
+    label: 'native table',
+    targetId: 'S01-target',
+    buildShapes: () => [shape('S01-target', 'table', bounds(1, 1, 4, 2), {
+      materialization_intent: 'native_data_object',
+      data: [['Metric', 'Value'], ['Quality', 'Pass']],
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+  {
+    label: 'native metric grid',
+    targetId: 'S01-target',
+    buildShapes: () => [shape('S01-target', 'metric_grid', bounds(1, 1, 4, 2), {
+      materialization_intent: 'native_data_object',
+      data: [['Metric', 'Value'], ['Quality', 'Pass']],
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+  {
+    label: 'picture',
+    targetId: 'S01-target',
+    buildShapes: (pictureFile) => [shape('S01-target', 'picture', bounds(1, 1, 3, 2), {
+      source_file: pictureFile,
+      alt: 'Target picture',
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+  {
+    label: 'line',
+    targetId: 'S01-target',
+    buildShapes: () => [shape('S01-target', 'line', bounds(1, 1, 3, 0.08), {
+      line: '#17324D',
+      tail_end: 'triangle',
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+  {
+    label: 'connector',
+    targetId: 'S01-target',
+    buildShapes: () => [shape('S01-target', 'connector', bounds(1, 1, 3, 0.08), {
+      line: '#17324D',
+      tail_end: 'triangle',
+    })],
+    expectedReason: 'animation_target_kind_unsupported',
+  },
+]) {
+  test(`native PPT ${fixture.label} animation target fails before creating an output`, () => {
+    const { workspaceRoot, pictureFile } = createNativeObjectWorkspace(`redcube-native-animation-${fixture.label.replaceAll(' ', '-')}-`);
+    const outputPptx = path.join(workspaceRoot, 'animation-target.pptx');
+    const failure = runNativeObjectMaterializerFailure({
+      workspaceRoot,
+      outputPptx,
+      payload: {
+        slides: [{
+          slide_id: 'S01',
+          animation_timeline: [{ target_shape_id: fixture.targetId, effect: 'fade' }],
+          _editable_native_shapes: fixture.buildShapes(pictureFile),
+        }],
+      },
+    });
+    assert.notEqual(failure.status, 0);
+    assert.match(`${failure.stdout}\n${failure.stderr}`, /animation target preflight failed/);
+    assert.match(`${failure.stdout}\n${failure.stderr}`, new RegExp(fixture.expectedReason));
+    assert.equal(existsSync(outputPptx), false);
+  });
+}
 
 test('native PPT charts reject series whose value count does not match categories', () => {
   const { workspaceRoot } = createNativeObjectWorkspace('redcube-native-chart-length-');
