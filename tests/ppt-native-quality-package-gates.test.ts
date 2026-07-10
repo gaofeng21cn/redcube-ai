@@ -310,6 +310,43 @@ test('provider identity in reviewer-visible output metadata is rejected', async 
   );
 });
 
+test('provider identity in the reviewer-visible source lock is rejected', async () => {
+  const { buildBlindParityReviewPacket } = await parityEvaluator();
+  const pairManifest = anonymousPairManifest();
+  pairManifest.source_lock.provider_identity = 'vendor-alpha';
+
+  assert.throws(
+    () => buildBlindParityReviewPacket({ contract: parityContract(), pairManifest }),
+    /source_lock field provider_identity is not allowed/,
+  );
+});
+
+test('blind review records reject undeclared provider metadata', async () => {
+  const {
+    buildBlindParityReviewPacket,
+    evaluateBlindPptParity,
+    hashBlindParityReviewSet,
+  } = await parityEvaluator();
+  const contract = parityContract();
+  const pairManifest = anonymousPairManifest();
+  const packet = buildBlindParityReviewPacket({ contract, pairManifest });
+  const reviews = blindReviews(packet, 5);
+  reviews[0].provider_identity = 'vendor-alpha';
+
+  const verdict = evaluateBlindPptParity({
+    contract,
+    pairManifest,
+    identityBinding: parityIdentityBinding(packet, reviews, hashBlindParityReviewSet),
+    reviews,
+    editTaskResults: editResults(),
+  });
+
+  assert.equal(verdict.status, 'blocked');
+  assert.equal(verdict.evidence_state, 'invalid_blind_review_evidence');
+  assert.equal(verdict.blockers.some((item) => item.code === 'invalid_or_identity_exposing_review_record'), true);
+  assert.equal(verdict.authority.owner_receipt_ref, null);
+});
+
 test('private provider mapping must bind the exact completed blind review set', async () => {
   const {
     buildBlindParityReviewPacket,

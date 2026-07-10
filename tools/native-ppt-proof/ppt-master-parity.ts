@@ -6,6 +6,13 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
+function hasExactKeys(value, expectedKeys) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const actual = Object.keys(value).sort();
+  const expected = [...expectedKeys].sort();
+  return actual.length === expected.length && actual.every((key, index) => key === expected[index]);
+}
+
 function requireValue(condition, message) {
   if (!condition) throw new Error(`Invalid blind parity manifest: ${message}`);
 }
@@ -32,7 +39,11 @@ function canonicalJson(value) {
 }
 
 function assertSameSourceLock(contract, sourceLock) {
-  for (const field of safeArray(contract?.benchmark_protocol?.same_source_lock?.required_fields)) {
+  const requiredFields = safeArray(contract?.benchmark_protocol?.same_source_lock?.required_fields);
+  for (const field of Object.keys(sourceLock || {})) {
+    requireValue(requiredFields.includes(field), `source_lock field ${field} is not allowed`);
+  }
+  for (const field of requiredFields) {
     requireValue(sourceLock?.[field] !== undefined && sourceLock?.[field] !== null, `source_lock.${field} is required`);
   }
   requireValue(String(sourceLock.material_bundle_ref || '').trim(), 'material_bundle_ref must be non-empty');
@@ -153,13 +164,25 @@ function validBlindReview(contract, packet, review) {
   const exposesIdentity = safeArray(contract?.benchmark_protocol?.forbidden_reviewer_identity_tokens)
     .some((token) => serialized.includes(String(token).toLowerCase()));
   if (exposesIdentity
+      || !hasExactKeys(review, [
+        'review_id',
+        'reviewer_id',
+        'review_packet_sha256',
+        'attestations',
+        'scores',
+        'critical_defects',
+      ])
+      || !hasExactKeys(review?.attestations, ['independent', 'provider_identity_unseen'])
+      || !hasExactKeys(review?.scores, outputSlots)
+      || !hasExactKeys(review?.critical_defects, outputSlots)
       || !String(review?.review_id || '').trim()
       || !String(review?.reviewer_id || '').trim()
       || review?.review_packet_sha256 !== packet.review_packet_sha256
       || review?.attestations?.independent !== true
       || review?.attestations?.provider_identity_unseen !== true) return false;
   return outputSlots.every((slotId) => (
-    dimensions.every((dimension) => {
+    hasExactKeys(review?.scores?.[slotId], dimensions)
+    && dimensions.every((dimension) => {
       const score = review?.scores?.[slotId]?.[dimension];
       return Number.isFinite(score) && score >= Number(scale.minimum) && score <= Number(scale.maximum);
     })
