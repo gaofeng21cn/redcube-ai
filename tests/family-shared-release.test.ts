@@ -8,7 +8,7 @@ import path from 'node:path';
 import { assertCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
 import { buildVerifyLanePlan } from '../scripts/test-registry.ts';
 
-test('domain entry package and lock stay aligned with the current OPL family shared release pin contract', () => {
+test('root and domain manifests plus lock stay aligned with the current OPL family shared release contract', () => {
   const inspection = assertCurrentRepoSharedPinAlignment({
     repoRoot: process.cwd(),
     consumerRepoId: 'redcube',
@@ -18,15 +18,15 @@ test('domain entry package and lock stay aligned with the current OPL family sha
   assert.equal(inspection.status, 'aligned');
   assert.deepEqual(
     inspection.findings.map((entry) => entry.file),
-    ['packages/redcube-domain-entry/package.json', 'package-lock.json'],
+    ['package.json', 'packages/redcube-domain-entry/package.json', 'package-lock.json'],
   );
   assert.deepEqual(
     inspection.findings.map((entry) => entry.status),
-    ['aligned', 'aligned'],
+    ['aligned', 'aligned', 'aligned'],
   );
   assert.deepEqual(
     inspection.findings.map((entry) => entry.pins),
-    [[inspection.owner_commit], [inspection.owner_commit]],
+    [['latest-stable'], ['latest-stable'], [inspection.owner_commit]],
   );
 });
 
