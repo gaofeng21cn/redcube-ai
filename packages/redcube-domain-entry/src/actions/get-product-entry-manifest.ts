@@ -1,5 +1,4 @@
 // @ts-nocheck
-import path from 'node:path';
 
 import {
   buildFamilyProductEntryManifest,
@@ -14,10 +13,6 @@ import {
 } from './domain-entry-contract.js';
 import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
 import { getProductPreflight } from './get-product-preflight.js';
-import {
-  buildOplFamilyLifecycleAdapterSurface,
-  buildRuntimeLoopClosureManifestSurface,
-} from './product-entry-continuity-surfaces.js';
 import {
   buildRedCubeActionMetadata,
 } from './family-action-catalog.js';
@@ -43,7 +38,6 @@ import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/ex
 import {
   buildFormalEntryPolicy,
   buildManifestNotes,
-  buildManifestProjectionRefs,
   buildProductEntryStatusSection,
   buildSourceProvenanceSection,
   projectProductEntryPreflight,
@@ -74,11 +68,9 @@ import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-ma
 import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
 import { buildRedCubeProductEntryDescriptor } from './get-product-entry-manifest-parts/entry-descriptor.js';
-import { productEntrySessionDir } from './product-entry-session-refs.js';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
-  const sessionContinuityRoot = productEntrySessionDir();
   const productEntrySessionCommand = `${PRODUCT_SESSION_COMMAND} --entry-session-id <entry-session-id>`;
   const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
   const currentProgram = readCurrentProgramContract();
@@ -135,8 +127,8 @@ export async function getProductEntryManifest(request) {
   });
   const runtime = {
     runtime_owner: DEFAULT_RUNTIME_OWNER,
-    runtime_state_root: path.dirname(sessionContinuityRoot),
-    session_continuity_root: sessionContinuityRoot,
+    product_session_surface_ref: 'opl_generated:product_session',
+    stage_folder_locator_contract_ref: 'contracts/artifact_locator_contract.json',
   };
   const domainAuthorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot,
@@ -158,23 +150,12 @@ export async function getProductEntryManifest(request) {
     runtime,
     productEntrySessionCommand,
   });
-  const manifestRuntimeLoopClosure = buildRuntimeLoopClosureManifestSurface({
-    runtimeOwner: runtime.runtime_owner,
-  });
-  const {
-    reviewState: manifestReviewState,
-    publicationProjection: manifestPublicationProjection,
-  } = buildManifestProjectionRefs();
-  const oplFamilyLifecycleAdapter = buildOplFamilyLifecycleAdapterSurface({
-    runtimeOwner: runtime.runtime_owner,
-    runtimeLoopClosure: manifestRuntimeLoopClosure,
-    reviewState: manifestReviewState,
-    publicationProjection: manifestPublicationProjection,
-    artifactLocatorContract: domainAuthorityRefs.artifact_locator_contract,
-    source: 'manifest',
-    entryMode: 'manifest_projection',
-    manifestProjection: true,
-  });
+  const oplFamilyLifecycleAdapter = {
+    surface_kind: 'opl_generated_product_session_ref',
+    owner: 'one-person-lab',
+    ref: runtime.product_session_surface_ref,
+    rca_role: 'domain_result_and_currentness_refs_provider',
+  };
   const sourceProvenance = buildSourceProvenanceSection();
   const actionMetadata = buildRedCubeActionMetadata();
   const familyStageControlPlane = buildRedCubeFamilyStageControlPlane({

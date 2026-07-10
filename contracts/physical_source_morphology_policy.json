@@ -236,10 +236,11 @@
     {
       "surface_id": "product_entry_continuity_refs_adapter",
       "source_refs": [
-        "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-        "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
+        "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",
+        "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
+        "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
       ],
       "classification": "refs_only_read_model",
       "current_rca_role": "entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell",
@@ -253,21 +254,20 @@
         "generated_session_shell_owner": "one-person-lab",
         "generated_session_command": "opl_generated:product_session",
         "generated_session_command_template": "opl_generated:product_session --entry-session-id <entry-session-id>",
-        "current_status": "opl_generated_session_shell_domain_refs",
+        "current_status": "generic_session_sources_retired_opl_envelope_required",
         "rca_role_after_cutover": "domain_session_snapshot_refs_only",
         "rca_owns_generic_session_shell": false,
         "rca_owns_generic_workbench": false,
         "rca_owns_generated_wrapper": false,
-        "physical_delete_authorized_now": false,
-        "physical_delete_requires_owner_receipt_ref": "rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt",
-        "no_forbidden_write_ref": "no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary"
+        "generic_session_source_retirement": "completed",
+        "required_absent_source_refs_policy": "contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy/typescript_ast_owner_boundary/required_absent_source_refs"
       },
       "no_resurrection_gate": {
         "generic_session_runtime_owner_allowed": false,
         "generic_workbench_owner_allowed": false,
         "generated_wrapper_owner_allowed": false,
         "compatibility_alias_allowed": false,
-        "physical_delete_without_owner_receipt_allowed": false
+        "repo_local_session_store_allowed": false
       },
       "legacy_name_allowance": {
         "legacy_terms": [
@@ -887,44 +887,6 @@
       "missing_source_allowed": false
     },
     {
-      "construct_id": "repo_local_product_entry_session_shell_assembly",
-      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-      "forbidden_tokens": [
-        "buildProductEntryContinuationSnapshot",
-        "buildSessionContinuationFamilyOrchestration",
-        "buildWorkspaceReceiptInventoryProjection",
-        "getReviewState",
-        "getPublicationProjection",
-        "buildSessionContinuitySurface",
-        "buildProgressProjectionSurface",
-        "buildArtifactInventorySurface",
-        "buildRuntimeLoopClosureSurface",
-        "buildOplFamilyLifecycleAdapterSurface"
-      ],
-      "missing_source_allowed": false
-    },
-    {
-      "construct_id": "repo_local_product_entry_session_surface_assembly",
-      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-      "forbidden_tokens": [
-        "entry_session:",
-        "delivery_identity:",
-        "continuation_snapshot:",
-        "session_continuity:",
-        "progress_projection:",
-        "artifact_inventory:",
-        "workspace_receipt_inventory_projection:",
-        "native_proof_artifact_inventory:",
-        "ppt_deck_visual_route_session:",
-        "runtime_loop_closure:",
-        "review_state:",
-        "publication_projection:",
-        "opl_family_lifecycle_adapter:",
-        "family_orchestration:"
-      ],
-      "missing_source_allowed": false
-    },
-    {
       "construct_id": "retired_get_product_start_wrapper",
       "source_ref": "packages/redcube-domain-entry/src/actions/get-product-start.ts",
       "forbidden_tokens": [
@@ -942,6 +904,42 @@
       "missing_source_allowed": false
     }
     ],
+    "typescript_ast_owner_boundary": {
+      "policy_id": "rca.source_morphology.product_session_owner_ast_boundary.v1",
+      "purpose": "fail closed when RCA product-session owner sources regain local persistence imports or generic session persistence properties",
+      "owner_source_refs": [
+        "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+        "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
+        "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
+        "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
+      ],
+      "required_absent_source_refs": [
+        "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-currentness-resolver.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+        "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
+      ],
+      "forbidden_module_specifiers": [
+        "fs",
+        "fs/promises",
+        "node:fs",
+        "node:fs/promises"
+      ],
+      "forbidden_property_names": [
+        "runtime_state_path",
+        "session_file",
+        "session_file_ref",
+        "session_store_root",
+        "resumed_from_session"
+      ],
+      "fail_closed_conditions": [
+        "owner_source_missing",
+        "required_absent_source_present",
+        "forbidden_module_import",
+        "forbidden_property"
+      ]
+    },
     "authority_boundary": {
       "scan_can_write_visual_truth": false,
       "scan_can_write_artifact_body": false,
@@ -1264,10 +1262,11 @@
         "classification": "refs_only_read_model",
         "current_rca_role": "entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell",
         "source_refs": [
-          "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-          "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
-          "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
+          "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",
+          "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
+          "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
+          "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
         ],
         "current_role_guard": {
           "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
@@ -1598,18 +1597,18 @@
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
-      "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
       "packages/redcube-domain-entry/src/actions/get-product-status.ts",
       "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
       "packages/redcube-domain-entry/src/actions/invoke-domain-entry.ts",
+      "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
       "packages/redcube-domain-entry/src/actions/invoke-product-entry.ts",
-      "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts",
-      "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
+      "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
       "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/",
       "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
       "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts",
       "packages/redcube-domain-entry/src/index.ts",
+      "packages/redcube-domain-entry/src/types-parts/product-entry.ts",
       "packages/redcube-runtime-protocol/src/executor-runtime.ts",
       "packages/redcube-runtime-protocol/src/runs.ts",
       "packages/redcube-runtime-protocol/src/workspace.ts",

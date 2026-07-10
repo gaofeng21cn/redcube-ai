@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 
 import {
   getProductEntrySession,
@@ -49,14 +49,7 @@ function resolveManagedPythonCommand() {
 
 async function withLiveNativePptProductEntryRuntime(testFn) {
   const upstream = await startMockCodexCli();
-  const runtimeStateRoot = path.join(
-    resolveCodexHome(),
-    'projects',
-    'redcube-ai',
-    'runtime-state',
-    'native-ppt-live-product-proof',
-  );
-  mkdirSync(runtimeStateRoot, { recursive: true });
+  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-live-runtime-'));
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
     REDCUBE_PYTHON_COMMAND: resolveManagedPythonCommand(),
@@ -67,6 +60,7 @@ async function withLiveNativePptProductEntryRuntime(testFn) {
   } finally {
     restoreEnv();
     await upstream.close();
+    rmSync(runtimeStateRoot, { recursive: true, force: true });
   }
 }
 
@@ -153,8 +147,9 @@ test('live product-entry native PPT proof reaches review and export gates with r
     });
     assert.equal(planned.ok, true);
     assert.equal(routeSurface(planned).summary.executed_route, 'visual_direction');
-    assert.equal(planned.entry_session.created_deliverable, true);
-    assert.equal(existsSync(planned.entry_session.session_file), true);
+    assert.equal(planned.summary.created_deliverable, true);
+    assert.equal(planned.session_handoff_refs.entry_session_id, entrySessionId);
+    assert.equal(existsSync(path.join(runtimeStateRoot, 'product-entry-sessions')), false);
 
     const authored = await invokeRoute({
       workspaceRoot,
@@ -222,14 +217,28 @@ test('live product-entry native PPT proof reaches review and export gates with r
     assert.equal(existsSync(exportArtifact.export_bundle.pptx_file), true);
     assert.equal(existsSync(exportArtifact.export_bundle.pdf_file), true);
 
+    const handoff = exported.session_handoff_refs;
     const session = await getProductEntrySession({
       entrySessionId,
+      oplSessionEnvelope: {
+        surface_kind: 'opl_product_session_envelope',
+        owner: 'one-person-lab',
+        runtime_owner: 'configured_family_runtime_provider',
+        session_ref: `opl-session:${entrySessionId}`,
+        entry_session_id: entrySessionId,
+        domain_snapshot_ref: handoff.domain_snapshot_ref,
+        delivery_locator_refs: handoff.delivery_locator_refs,
+        currentness_refs: handoff.currentness_refs,
+        stage_folder_locator_refs: handoff.stage_folder_locator_refs,
+        artifact_authority_refs: handoff.artifact_authority_refs,
+      },
     });
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
     assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
     assert.equal(session.entry_session_ref.entry_session_id, entrySessionId);
-    assert.equal(session.entry_session_ref.session_file_ref.ref.startsWith(runtimeStateRoot), true);
+    assert.equal(session.entry_session_ref.opl_session_ref, `opl-session:${entrySessionId}`);
+    assert.equal(session.entry_session_ref.domain_snapshot_ref, handoff.domain_snapshot_ref);
     assert.equal(session.delivery_locator_refs.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.summary.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.currentness_refs.latest_visual_run_ref, session.summary.latest_visual_run_ref);

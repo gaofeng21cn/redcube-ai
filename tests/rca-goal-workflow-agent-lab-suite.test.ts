@@ -374,17 +374,15 @@ test('OPL-hosted /goal workflow starts one-shot RCA product entry without stop-a
     assert.equal(plan.control_policy.requested_stop_after_stage, null);
     assert.equal(plan.control_policy.approval_required, false);
     assert.equal(plan.control_policy.gate_status, 'approved');
-    assert.equal(response.runtime_loop_closure.control_policy.default_run_mode, 'auto_to_terminal');
-    assert.equal(
-      response.runtime_loop_closure.control_policy.stop_policy,
-      'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
-    );
-    assert.equal(response.runtime_loop_closure.source_linkage.entry_mode, 'opl_hosted');
     assert.equal(response.product_entry_surface.domain_entry_surface.task_intent, 'run_opl_stage_execution_plan');
-    assert.equal(response.product_entry_surface.summary.approval_required, false);
     assert.equal(
-      response.product_entry_surface.continuation_snapshot.stage_execution_plan.control_policy.requested_stop_after_stage,
-      null,
+      response.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
+      response.product_entry_surface.summary.target_handle,
     );
+    assert.equal(response.session_handoff_refs.entry_session_id, 'session-goal-workflow');
+    assert.equal(response.authority_boundary.generic_session_runtime_owner, 'one-person-lab');
+    assert.equal(response.authority_boundary.rca_owns_generic_session_runtime, false);
+    assert.equal('runtime_loop_closure' in response, false);
+    assert.equal('continuation_snapshot' in response.product_entry_surface, false);
   });
 });

@@ -79,16 +79,19 @@ const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
 ]);
 
 function ownerEvidenceLaneIndexFor(moduleItems) {
+  const pendingDeleteItems = moduleItems.filter(
+    (entry) => entry.module_id !== 'product_entry_continuity_refs_adapter',
+  );
   return {
     'all-retained-private-platform-residue': {
       source_ref: 'contracts/functional_privatization_audit.json#/physical_deletion_guard',
       builder_ref:
         'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
     },
-    ...Object.fromEntries(moduleItems.map((entry, index) => [
+    ...Object.fromEntries(pendingDeleteItems.map((entry) => [
       entry.module_id.replaceAll('_', '-'),
       {
-        source_ref: `contracts/functional_privatization_audit.json#/modules/${index}/physical_deletion_guard`,
+        source_ref: `contracts/functional_privatization_audit.json#/modules/${moduleItems.indexOf(entry)}/physical_deletion_guard`,
         builder_ref:
           `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}`,
       },
@@ -100,7 +103,7 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
     module_id: 'product_entry_continuity_refs_adapter',
     surface_ref: 'domain-handler:getProductEntrySession',
-    status: 'opl_generated_workbench_session_surface_consumed',
+    status: 'generic_session_sources_retired_domain_snapshot_refs_retained',
     classification: 'refs_only_adapter',
     opl_generic_primitive: 'workbench_shell',
     oplAbsorbCandidate: true,
@@ -110,19 +113,20 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     rca_scope: 'product_entry_session_domain_snapshot_refs',
     audit_readout: 'project_opl_session_shell_retain_domain_snapshot_refs',
     codePaths: [
-      'packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session.ts',
-      'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts',
-      'packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts',
+      'packages/redcube-domain-entry/src/actions/invoke-product-entry.ts',
+      'packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts',
+      'packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts',
+      'packages/redcube-domain-entry/src/types-parts/product-entry.ts',
     ],
     activeCallers: [
       'OPL generated product session domain snapshot refs',
       'OPL generated session shell continuation target',
       'operator loop domain locator refs',
     ],
-    activeCallerStatus: 'opl_generated_session_shell_domain_refs',
-    migrationAction: 'Use OPL/App generic session shell, resume token, operator navigation and workbench state as the default shell; RCA returns entry-session domain snapshot refs only.',
-    retentionReason: 'RCA retains entry-session, deliverable/topic/run locator, currentness and domain authority refs.',
+    activeCallerStatus: 'opl_generated_session_shell_consumes_rca_domain_snapshot_refs',
+    migrationAction: 'Generic session persistence/currentness sources are retired; keep only the RCA domain snapshot refs handler consumed by the OPL session envelope.',
+    retentionReason: 'RCA retains domain snapshot, deliverable locator, currentness and domain authority refs without a repo-local session store.',
     cannotAbsorbReason: 'OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.',
     tombstone_required: false,
   },
@@ -506,7 +510,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     refs_only: true,
     audit_scope: [
       'OPL stage execution plan route handler refs',
-      'product-entry session snapshot refs adapter',
+      'product-entry domain snapshot refs adapter',
       'workspace/source intake',
       'memory/writeback receipt transport',
       'artifact export lifecycle',
@@ -580,7 +584,9 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       physical_delete_authorization_refs: [],
       keep_as_authority_adapter_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) =>
         `rca-keep-authority-adapter:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}`),
-      typed_blocker_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) =>
+      typed_blocker_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS
+        .filter((entry) => entry.module_id !== 'product_entry_continuity_refs_adapter')
+        .map((entry) =>
         `rca-typed-blocker:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`),
       memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
       memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
@@ -591,7 +597,11 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
     },
     owner_evidence_lane_index: ownerEvidenceLaneIndexFor(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     fresh_large_private_surface_scan: RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN,
-    bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
+    bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(
+      RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.filter(
+        (entry) => entry.module_id !== 'product_entry_continuity_refs_adapter',
+      ),
+    ),
     forbidden_generic_owner_flags: { ...FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS },
     rca_visual_authority_allowlist: [
       'source_readiness_verdict',

@@ -11,7 +11,7 @@ import {
   DOMAIN_OWNER,
 } from './constants.js';
 
-export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, sessionContinuityRoot }) {
+export function buildArtifactLocatorContract({ workspaceRoot, productSessionSurfaceRef }) {
   return {
     surface_kind: 'artifact_locator_contract',
     contract_id: 'rca.workspace_runtime_artifact_locator.v1',
@@ -45,8 +45,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, 
       ref_kind: 'runtime_path',
       root_id: 'workspace_runtime_artifact_root',
       workspace_root: workspaceRoot || null,
-      runtime_state_root: runtimeStateRoot || null,
-      session_continuity_root: sessionContinuityRoot || null,
+      product_session_surface_ref: productSessionSurfaceRef || 'opl_generated:product_session',
       path_template: '<workspace-root>/.redcube/runtime/artifacts/<topic_id>/<deliverable_id>/<run_id>',
       status: 'legacy_auxiliary_or_native_helper_output_root_not_completion_truth',
     },
@@ -78,7 +77,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, 
         'opl_stage_folder_receipt',
         'opl_stage_folder_blocker_evidence',
         'workspace_runtime_artifact',
-        'product_entry_session_ref',
+        'product_entry_domain_snapshot_ref',
         'stage_run_artifact_ref',
       ],
     },
@@ -99,7 +98,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, runtimeStateRoot, 
         'read_hash_and_locator',
         'rebuild_stage_artifact_index_from_physical_folders',
         'read_orphan_broken_stale_artifact_projection',
-        'pickup_via_redcube_session_surface',
+        'pickup_via_opl_product_session_and_rca_artifact_refs',
       ],
       forbidden: [
         'store_png_pptx_pdf_blob',

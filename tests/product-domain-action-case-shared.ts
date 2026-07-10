@@ -176,53 +176,8 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.resume_contract.session_locator_field, sessionLocatorField);
   assert.equal(
     surface.family_orchestration.resume_contract.checkpoint_locator_field,
-    'continuation_snapshot.latest_stage_execution_plan_ref',
+    'entry_session_contract.opl_session_envelope.domain_snapshot_ref',
   );
-}
-
-function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwner = 'configured_family_runtime_provider' }) {
-  assert.equal(surface.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-  assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, runtimeOwner);
-  assert.equal(surface.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
-  assert.equal(surface.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
-  assert.equal(surface.runtime_loop_closure.resume_point.entry_session_id, surface.entry_session?.entry_session_id ?? null);
-  assert.equal(
-    surface.runtime_loop_closure.resume_point.latest_handle,
-    surface.summary?.target_handle ?? surface.summary?.latest_handle ?? null,
-  );
-  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_kind, 'session_continuity');
-  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_ref, '/session_continuity');
-  assert.equal(
-    surface.runtime_loop_closure.continuity_cursor.entry_session_id,
-    surface.entry_session?.entry_session_id ?? null,
-  );
-  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_kind, 'progress_projection');
-  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
-  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_kind, 'artifact_inventory');
-  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
-  assert.equal(surface.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
-  assert.equal(surface.runtime_loop_closure.control_policy.default_run_mode, 'auto_to_terminal');
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.stop_policy,
-    'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
-  );
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.gate_status,
-    surface.runtime_loop_closure.control_policy.approval_required ? 'requested' : 'approved',
-  );
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.interrupt_policy,
-    surface.runtime_loop_closure.control_policy.approval_required
-      ? 'human_gate_required_before_continuation'
-      : 'continue_autonomously_until_runtime_gate',
-  );
-  assert.equal(surface.runtime_loop_closure.control_policy.continue_action.surface_kind, 'product_entry_session');
-  assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
-  assert.equal(surface.runtime_loop_closure.source_linkage.entry_mode, entryMode);
-  assert.equal(surface.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
-  assert.equal(surface.runtime_loop_closure.source_linkage.opl_hosted_surface_kind, 'opl_hosted_product_entry');
-  assert.equal(surface.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
-  assert.equal(surface.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
 }
 
 function buildAugmentationResultPayload(overrides = {}) {
@@ -269,7 +224,6 @@ export {
   assert,
   assertFamilyOrchestrationCompanion,
   assertReceiptOnlyHostedAttemptProjection,
-  assertRuntimeLoopClosureShape,
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
   buildHostedAttemptBridgeFixture,

@@ -22,7 +22,7 @@ export function buildRedCubeProductEntryDescriptor({
   productEntrySessionCommand,
 }: ProductEntryDescriptorInput) {
   const sessionLocatorField = 'entry_session_contract.entry_session_id';
-  const checkpointLocatorField = 'continuation_snapshot.latest_stage_execution_plan_ref';
+  const checkpointLocatorField = 'entry_session_contract.opl_session_envelope.domain_snapshot_ref';
   return {
     direct: {
       command: PRODUCT_INVOKE_COMMAND,

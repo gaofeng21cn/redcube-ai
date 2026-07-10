@@ -24,7 +24,7 @@ import {
 } from './surface-fixture-assertions.ts';
 
 test('getProductEntryManifest projects the current direct-entry shell and shared OPL handoff truth', SERIAL_ENV_TEST, async () => {
-  await withMockCodexRuntimeState(async ({ runtimeStateRoot }) => {
+  await withMockCodexRuntimeState(async () => {
     const sharedCompanions = await importDomainEntrySharedModule(PRODUCT_ENTRY_COMPANIONS_SPECIFIER);
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
@@ -68,9 +68,9 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
       'product_entry_readiness.good_to_use_now': false,
       'product_entry_readiness.recommended_start_command': 'redcube product invoke',
       'runtime.runtime_owner': 'configured_family_runtime_provider',
-      'runtime.runtime_state_root': runtimeStateRoot,
+      'runtime.product_session_surface_ref': 'opl_generated:product_session',
       'runtime_inventory.workspace_binding.workspace_root': workspaceRoot,
-      'runtime_inventory.workspace_binding.runtime_state_root': runtimeStateRoot,
+      'runtime_inventory.workspace_binding.product_session_surface_ref': 'opl_generated:product_session',
       'task_lifecycle.status': 'resumable',
       'task_lifecycle.checkpoint_summary.status': 'operator_review_required',
       'persistence_policy.policy_id': 'redcube_product_entry_persistence_policy',
@@ -126,7 +126,7 @@ test('getProductEntryManifest projects the current direct-entry shell and shared
     );
     assertIds(manifest.product_entry_quickstart.steps, 'step_id', list('continue_current_loop inspect_current_progress open_opl_hosted_entry default_image_ppt_proof optional_native_ppt_proof'));
     assertIds(manifest.product_entry_start.modes, 'mode_id', list('direct opl_hosted session'));
-    assertIds(manifest.product_entry_preflight.checks, 'check_id', list('workspace_root_resolved workspace_contract_present runtime_state_root_ready product_entry_overview_contract_landed'));
+    assertIds(manifest.product_entry_preflight.checks, 'check_id', list('workspace_root_resolved workspace_contract_present product_entry_overview_contract_landed'));
     assertEvery(manifest.product_entry_preflight.checks, (check) => check.status === 'pass', 'preflight checks pass');
     assertAllFalse(manifest, list('operator_evidence_readiness_projection.declares_visual_ready operator_evidence_readiness_projection.declares_exportable operator_evidence_readiness_projection.declares_handoffable operator_evidence_readiness_projection.declares_domain_ready operator_evidence_readiness_projection.production_evidence_scaleout_refs.workspace_receipt_scaleout_refs.workspace_receipt_scaleout_claimed operator_evidence_readiness_projection.production_evidence_scaleout_refs.visual_memory_body_reuse_refs.projected_body_to_opl operator_evidence_readiness_projection.production_evidence_scaleout_refs.naming_tombstone_follow_through_refs.active_caller_compatibility_alias_restored operator_evidence_readiness_projection.production_evidence_scaleout_refs.authority_boundary.opl_can_store_memory_body operator_evidence_readiness_projection.production_evidence_tail_workorder.payload_body_allowed operator_evidence_readiness_projection.production_evidence_tail_workorder.success_boundary.production_soak_complete_claimed operator_evidence_readiness_projection.temporal_controlled_visual_stage_long_soak_evidence_inventory.declares_production_soak_complete operator_evidence_readiness_projection.authority_boundary.opl_app_can_declare_domain_ready product_entry_readiness.fully_automatic artifact_locator_contract.repo_source_boundary.repo_tracks_visual_or_export_artifact_blobs opl_generic_primitive_consumption.live_soak_claimed opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_visual_ready opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_exportable opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_handoffable opl_generic_primitive_consumption.functional_harness_consumer_coverage.opl_harness_pass_is_artifact_producing_owner_receipt opl_stability_read_model_consumption.live_soak_claimed opl_stability_read_model_consumption.authority_boundary.opl_can_write_rca_domain_truth opl_stability_read_model_consumption.authority_boundary.opl_can_authorize_visual_ready opl_stability_read_model_consumption.authority_boundary.generic_fallback_can_mark_success skill_catalog.skills.0.domain_projection.skill_activation.shell_commands.status.repo_local_command_available skill_catalog.skills.0.domain_projection.skill_activation.shell_commands.session.repo_local_command_available'));
     assert.equal(

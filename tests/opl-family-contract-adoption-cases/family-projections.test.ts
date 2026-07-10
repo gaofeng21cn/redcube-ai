@@ -13,11 +13,18 @@ test('RCA runtime projection maps to visual deliverable runtime surfaces', () =>
   const payload = contract();
   const attempt = payload.attempt_projection;
 
-  for (const surface of ['product-entry session', 'runtimeWatch', 'artifact inventory', 'runtime health']) {
+  for (const surface of [
+    'OPL-owned product session envelope refs',
+    'RCA product-entry domain snapshot refs',
+    'runtimeWatch',
+    'artifact authority refs',
+    'OPL provider attempt currentness refs',
+  ]) {
     assert.ok(attempt.source_surfaces.includes(surface));
   }
   assert.equal(attempt.maps_to_opl_contract, 'opl_family_runtime_attempt_contract.v1');
-  assert.match(attempt.owner_boundary, /RCA owns visual deliverable runtime/);
+  assert.match(attempt.owner_boundary, /OPL owns generic stage-attempt runtime/);
+  assert.match(attempt.owner_boundary, /RCA owns visual route truth/);
 });
 
 test('RCA quality projection keeps visual proof owner and excludes other domain gates', () => {
@@ -60,14 +67,21 @@ test('RCA operator and incident projection require source refs and RCA closure',
   }
 });
 
-test('RCA exposes a thick OPL family lifecycle adapter while keeping SQLite deferred', () => {
+test('RCA exposes refs-only lifecycle adoption while OPL owns session and runtime state', () => {
   const payload = contract();
   const adapter = payload.lifecycle_adapter_surface;
 
   assert.equal(adapter.surface_kind, 'opl_family_lifecycle_adapter');
   assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
+  assert.equal(adapter.projection_mode, 'rca_domain_snapshot_and_authority_refs_only');
   assert.equal(adapter.sqlite_status, 'deferred_for_rca_opl_state_index_kernel_sidecar');
-  assert.equal(adapter.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
+  assert.equal(
+    adapter.authority_model,
+    'rca_file_domain_authority_plus_opl_owned_session_and_rebuildable_ref_indexes',
+  );
+  assert.equal(adapter.rca_owns_generic_lifecycle_adapter, false);
+  assert.equal(adapter.rca_owns_generic_session_shell, false);
+  assert.equal(adapter.rca_owns_runtime_loop, false);
   assert.equal(adapter.state_index_kernel_adoption_ref, `${STAGE_ARTIFACT_KERNEL_ADOPTION_PATH}#/opl_state_index_kernel_adoption`);
   assert.deepEqual(adapter.state_index_kernel_adoption, {
     owner: 'one-person-lab',
@@ -82,10 +96,12 @@ test('RCA exposes a thick OPL family lifecycle adapter while keeping SQLite defe
     sqlite_can_store_review_export_judgment: false,
   });
   for (const surface of [
-    'session-continuity run envelopes',
-    'product-entry sessions',
+    'OPL-owned product session envelope refs',
+    'RCA product-entry domain snapshot refs',
     'review state',
     'publication projection',
+    'artifact authority refs',
+    'OPL provider attempt currentness refs',
   ]) {
     assert.ok(adapter.source_surfaces.includes(surface));
   }

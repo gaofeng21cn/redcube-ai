@@ -247,13 +247,14 @@
   },
   "attempt_projection": {
     "source_surfaces": [
-      "product-entry session",
+      "OPL-owned product session envelope refs",
+      "RCA product-entry domain snapshot refs",
       "runtimeWatch",
-      "artifact inventory",
-      "runtime health"
+      "artifact authority refs",
+      "OPL provider attempt currentness refs"
     ],
     "maps_to_opl_contract": "opl_family_runtime_attempt_contract.v1",
-    "owner_boundary": "RCA owns visual deliverable runtime and route truth"
+    "owner_boundary": "OPL owns generic stage-attempt runtime and session currentness; RCA owns visual route truth, domain results and authority refs"
   },
   "quality_projection": {
     "source_surfaces": [
@@ -282,9 +283,9 @@
   "operator_projection": {
     "source_surfaces": [
       "product entry",
-      "product session",
+      "OPL-owned product session envelope and RCA domain snapshot refs",
       "OPL-hosted stage runtime handoff",
-      "artifact inventory",
+      "artifact authority refs",
       "review/publication projection refs"
     ],
     "maps_to_opl_contract": "opl_family_product_operator_projection.v1",
@@ -299,13 +300,14 @@
   "lifecycle_adapter_surface": {
     "surface_kind": "opl_family_lifecycle_adapter",
     "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
+    "projection_mode": "rca_domain_snapshot_and_authority_refs_only",
     "source_surfaces": [
-      "session-continuity run envelopes",
-      "product-entry sessions",
+      "OPL-owned product session envelope refs",
+      "RCA product-entry domain snapshot refs",
       "review state",
       "publication projection",
-      "artifact inventory",
-      "runtime loop closure"
+      "artifact authority refs",
+      "OPL provider attempt currentness refs"
     ],
     "exposed_on": [
       "product-entry manifest",
@@ -323,7 +325,10 @@
       "hydrated_session_projection"
     ],
     "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
-    "authority_model": "file_authority_plus_rebuildable_artifact_indexes",
+    "authority_model": "rca_file_domain_authority_plus_opl_owned_session_and_rebuildable_ref_indexes",
+    "rca_owns_generic_lifecycle_adapter": false,
+    "rca_owns_generic_session_shell": false,
+    "rca_owns_runtime_loop": false,
     "state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
     "state_index_kernel_adoption": {
       "owner": "one-person-lab",
@@ -345,7 +350,7 @@
     "maps_to_opl_contract": "opl_family_stage_control_plane.v1",
     "source_surfaces": [
       "hydrated overlay stage_sequence",
-      "session-continuity run envelopes",
+      "OPL product session envelope currentness refs",
       "runtimeWatch",
       "getReviewState",
       "getPublicationProjection",

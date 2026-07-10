@@ -32,8 +32,11 @@ test('current runtime program points OPL Runtime Manager at the RCA lifecycle ad
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('opl_family_lifecycle_adapter projection'));
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('opl_family_stage_control_projection projection'));
   assert.ok(persistence.canonical_truth_surfaces_remain_files.includes('domain_memory_descriptor_locator projection'));
-  assert.equal(adapter.status, 'repo_tracked_projection_contract');
+  assert.equal(adapter.status, 'repo_tracked_refs_only_projection_contract');
   assert.equal(adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
+  assert.equal(adapter.rca_owns_generic_lifecycle_adapter, false);
+  assert.equal(adapter.rca_owns_generic_session_shell, false);
+  assert.equal(adapter.rca_owns_runtime_loop, false);
   assert.equal(adapter.sqlite_status, 'deferred_for_rca_opl_state_index_kernel_sidecar');
   assert.equal(
     adapter.state_index_kernel_adoption_ref,

@@ -1,8 +1,8 @@
 {
   "product_entry_session_continuity_id": "product_entry_session_continuity",
-  "date_anchor": "2026-04-12",
-  "status": "closeout_completed",
-  "goal": "Persist product-entry session continuity under user-level runtime-state and expose a repo-verified continuation surface.",
+  "date_anchor": "2026-07-10",
+  "status": "generic_session_source_retired_domain_snapshot_projection_current",
+  "goal": "Consume an explicit OPL-owned product-session envelope and project RCA domain snapshot refs without repo-local session persistence.",
   "callable_surface": {
     "action_ref": "get_product_entry_session",
     "api_surface": "getProductEntrySession",
@@ -11,70 +11,54 @@
     "repo_local_command_available": false,
     "repo_local_cli_entry_retired": true
   },
-  "session_continuity_contract": {
-    "root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
-    "required_fields": [
-      "entry_session_id",
-      "workspace_root",
-      "deliverable_family",
-      "topic_id",
-      "deliverable_id",
-      "runtime_owner",
-      "last_task_intent",
-      "updated_at"
-    ],
-    "latest_handle_fields": [
-      "latest_stage_execution_plan_ref",
-      "latest_run_id"
-    ],
-    "continuation_surfaces": [
-      "session_continuity",
-      "progress_projection",
-      "artifact_inventory",
-      "stage_execution_plan_projection",
-      "runtime_loop_closure",
-      "review_state",
-      "publication_projection"
-    ],
-    "continuity_truth": {
-      "restore_point_fields": [
-        "continuation_snapshot.latest_stage_execution_plan_ref",
-        "continuation_snapshot.latest_run_id",
-        "session_continuity.restore_point.latest_handle"
-      ],
-      "artifact_ref_fields": [
-        "continuation_snapshot.runtime_progress_projection.final_artifact_refs",
-        "continuation_snapshot.stage_execution_plan.stage_attempts",
-        "artifact_inventory.artifact_refs"
-      ],
-      "session_file_field": "entry_session.session_file"
-    }
+  "ownership_contract": {
+    "generic_session_owner": "one-person-lab",
+    "runtime_owner": "configured_family_runtime_provider",
+    "domain_snapshot_owner": "redcube_ai",
+    "rca_role": "domain_snapshot_refs_projection",
+    "repo_local_session_store_allowed": false,
+    "workspace_run_scan_for_session_currentness_allowed": false
   },
-  "behavior_contract": {
-    "session_identity_scope": "one durable deliverable per entry_session_id",
-    "direct_and_opl_hosted_entry_share_same_continuity_root": true,
-    "fail_closed_on": [
-      "missing_entry_session_id",
-      "session_not_found",
-      "session_runtime_owner_drift"
+  "opl_session_envelope_contract": {
+    "surface_kind": "opl_product_session_envelope",
+    "owner": "one-person-lab",
+    "required_fields": [
+      "session_ref",
+      "entry_session_id",
+      "domain_snapshot_ref",
+      "delivery_locator_refs",
+      "currentness_refs",
+      "stage_folder_locator_refs",
+      "artifact_authority_refs"
+    ],
+    "provider_currentness_requires_both": [
+      "currentness_refs.provider_attempt_ref",
+      "currentness_refs.provider_attempt_ledger_ref"
     ]
   },
   "response_contract": {
     "surface_kind": "product_entry_session",
+    "projection_kind": "rca_product_entry_session_domain_snapshot_refs",
     "must_include": [
-      "entry_session",
+      "entry_session_ref",
+      "delivery_locator_refs",
+      "currentness_refs",
+      "stage_folder_locator_refs",
+      "artifact_authority_refs",
+      "authority_refs",
+      "operator_navigation_refs",
+      "authority_boundary"
+    ],
+    "must_not_include": [
       "continuation_snapshot",
       "session_continuity",
       "progress_projection",
       "artifact_inventory",
-      "review_state",
-      "publication_projection"
+      "runtime_loop_closure",
+      "family_orchestration"
     ]
   },
-  "legacy_tombstone_refs": [
-    "contracts/runtime-program/managed-product-entry-hardening.json",
-    "human_doc:retired_managed_product_entry_contract_tombstone"
-  ],
+  "source_retirement_policy_ref": "contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy/typescript_ast_owner_boundary",
   "compatibility_alias_allowed": false,
   "active_generic_runtime_owner_allowed": false
 }
