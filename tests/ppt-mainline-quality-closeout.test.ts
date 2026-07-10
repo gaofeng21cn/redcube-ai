@@ -45,6 +45,9 @@ test('ppt mainline quality closeout freezes planned done deferred skipped and ve
   assert.equal(closeout.closeout.skipped.includes('native PPT promotion or fallback wiring'), true);
   assert.equal(closeout.closeout.skipped.includes('current image-first route proof rerun inside this historical HTML closeout'), true);
   assert.equal(closeout.closeout.verification.targeted_ppt_quality_tests.status, 'pass');
+  assert.equal(closeout.closeout.verification.final_smoke.status, 'pass');
+  assert.equal(closeout.closeout.verification.final_smoke.git_diff_check, 'pass');
+  assert.equal(Object.hasOwn(closeout.closeout.verification.final_smoke, 'pending_final_command'), false);
   assert.equal(closeout.closeout.commit_push_state.expected, 'commit_and_push_after_fresh_verification');
 });
 

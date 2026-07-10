@@ -694,6 +694,8 @@
   },
   "artifacts": {
     "plan_completion_audit_contract": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
+    "latest_temporal_long_soak_probe_closeout": "contracts/production_acceptance/rca-temporal-long-soak-probe-20260710.json",
+    "opl_canonical_identity_owner_ref": "external_owner_repo:one-person-lab@4f12827a06dc81d42dc859cbddee4c9650f67062",
     "ppt_professional_learning_landing_contract": "contracts/runtime-program/ppt-master-learning-landing.json",
     "ppt_blind_parity_benchmark_contract": "contracts/runtime-program/ppt-master-parity-benchmark.json",
     "product_entry_contract": "contracts/runtime-program/redcube-product-entry-mvp.json",

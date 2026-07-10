@@ -91,7 +91,7 @@
           "npm run test:fast: 152 pass, 0 fail",
           "npm run test:meta: 194 pass, 0 fail"
         ],
-        "pending_final_command": "git diff --check"
+        "git_diff_check": "pass"
       }
     },
     "commit_push_state": {

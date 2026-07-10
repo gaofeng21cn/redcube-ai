@@ -76,6 +76,40 @@
         "cross_viewer_human_readback"
       ],
       "partial": []
+    },
+    "opl_canonical_identity_consumption": {
+      "status": "done",
+      "completion_percent": 100,
+      "canonical_agent_id": "rca",
+      "target_domain_id": "redcube_ai",
+      "owner_repo_commit": "4f12827a06dc81d42dc859cbddee4c9650f67062",
+      "owner_latest_stable_commit": "ae122533e11d8504248c82f6c450df31fdb5e12c"
+    },
+    "opl_temporal_transport_probe": {
+      "status": "partial",
+      "completion_percent": 67,
+      "completion_basis": {
+        "method": "fresh_probe_checks",
+        "completed_checks": 6,
+        "required_checks": 9,
+        "percentage_formula": "6 / 9 * 100 rounded = 67",
+        "open_checks": [
+          "worker_completed_attempt",
+          "typed_closeout_required_for_completed",
+          "retry_or_dead_letter_boundary_observed"
+        ]
+      },
+      "claims_real_rca_visual_stage_executed": false
+    },
+    "fallow_production_gate": {
+      "status": "done",
+      "completion_percent": 100,
+      "target_commit": "f07d2e0e",
+      "analyzer_version": "3.3.0",
+      "entry_point_count": 30,
+      "issue_count": 0,
+      "uses_global_public_packages_suppression": false,
+      "uses_ignore_exports_used_in_file_suppression": false
     }
   },
   "evidence_refs": {
@@ -86,6 +120,9 @@
     "editability_tests": "tests/ppt-native-editability-regression.test.ts",
     "native_object_tests": "tests/ppt-native-object-package.test.ts",
     "quality_gate_tests": "tests/ppt-native-quality-package-gates.test.ts",
+    "temporal_probe_closeout": "contracts/production_acceptance/rca-temporal-long-soak-probe-20260710.json",
+    "opl_canonical_identity_owner_commit": "external_owner_repo:one-person-lab@4f12827a06dc81d42dc859cbddee4c9650f67062",
+    "fallow_target_commit": "f07d2e0e",
     "active_plan": "human_doc:rca_ideal_state_gap_plan",
     "overdesign_closeout": "human_doc:rca_overdesign_thinning_completion_audit"
   },
@@ -101,14 +138,16 @@
       "required_output": "fresh PowerPoint and LibreOffice plus Keynote or Google Slides same-source cross-viewer human readback"
     },
     {
-      "blocker_id": "rca-typed-blocker:opl-canonical-agent-id:repo-descriptor-consumption-pending",
-      "owner": "one-person-lab/OPL",
-      "required_output": "OPL repo-contract descriptor consumes RCA canonical_agent_id=rca without changing target_domain_id=redcube_ai"
+      "blocker_id": "rca-typed-blocker:controlled-soak:codex-cli-provider-unavailable-20260710",
+      "owner": "one-person-lab/OPL Runway and Codex CLI provider configuration",
+      "required_output": "fresh 9/9 OPL production capability receipt with a completed typed-closeout attempt and an observed retry/dead-letter boundary",
+      "stop_condition": "worker_completed_attempt, typed_closeout_required_for_completed, and retry_or_dead_letter_boundary_observed are all true on the same fresh proof"
     },
     {
-      "blocker_id": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
-      "owner": "redcube_ai_and_one-person-lab/OPL",
-      "required_output": "real Temporal visual-stage long-soak and owner acceptance evidence"
+      "blocker_id": "rca-typed-blocker:controlled-soak:real-rca-visual-stage-long-soak-pending-20260710",
+      "owner": "redcube_ai with one-person-lab/OPL Temporal transport",
+      "required_output": "same-run RCA visual-stage evidence with artifact locators, review/export acceptance, retry/dead-letter/requery/resume refs, and an RCA owner receipt or stable typed blocker",
+      "stop_condition": "a fresh same-run RCA long-soak evidence ref is visible and provider-only completion is not used as domain completion"
     }
   ],
   "closeout_accounting": {
@@ -120,6 +159,9 @@
       "professional_learning_landing",
       "editability_regression",
       "blind_parity_harness",
+      "opl_canonical_agent_id_consumption",
+      "temporal_transport_restart_probe",
+      "fallow_production_gate",
       "docs_contracts_current_program_foldback",
       "main_push_readback_cleanup"
     ],
@@ -131,15 +173,22 @@
       "professional_learning_landing",
       "editability_regression",
       "blind_parity_harness",
+      "opl_canonical_agent_id_consumption",
+      "temporal_transport_restart_probe",
+      "fallow_production_gate",
       "docs_contracts_current_program_foldback"
     ],
     "deferred": [
       "live_same_source_parity_owner_evidence",
       "cross_viewer_human_readback",
-      "opl_canonical_agent_id_consumption",
       "temporal_visual_stage_long_soak"
     ],
-    "skipped": [],
+    "skipped": [
+      "upstream_ppt_master_runtime_and_claude_protocol",
+      "upstream_template_icon_and_svg_bodies",
+      "interactive_private_browser_editor_and_annotation_ui",
+      "manual_svg_chart_coordinate_calculator_and_receipt"
+    ],
     "verification": {
       "state": "pending_final_target_gate",
       "required": [
