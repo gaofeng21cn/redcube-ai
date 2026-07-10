@@ -81,6 +81,10 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
       profile_id: 'lecture_student',
       title: '可编辑演示交付闭环验证',
       goal: '证明从目标到可编辑演示文件的交付链路可以自动推进，并保留可复核的审查与导出证据。',
+      constraints: {
+        native_visual_sample: true,
+        expected_slide_count: 1,
+      },
       route,
       stop_after_stage: stopAfterStage,
       user_intent: userIntent,
@@ -101,7 +105,12 @@ function routeSurface(response) {
 function artifactFor(response) {
   const surface = routeSurface(response);
   assert.equal(surface.surface_kind, 'route_run');
-  assert.equal(surface.ok, true);
+  assert.equal(surface.ok, true, JSON.stringify({
+    status: surface.status,
+    error_kind: surface.error_kind,
+    error: surface.error,
+    summary: surface.summary,
+  }));
   assert.equal(existsSync(surface.artifactFile), true);
   return readJson(surface.artifactFile);
 }

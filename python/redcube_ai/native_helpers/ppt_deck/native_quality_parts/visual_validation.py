@@ -340,6 +340,31 @@ def semantic_visual_evidence(native_shapes: list[dict]) -> list[dict]:
             'reason': 'signal_hub_panel_connector_composition_present',
         })
 
+    status_hubs = nodes('input_hub')
+    status_panels = nodes('content_panel')
+    status_nodes = [*status_hubs, *status_panels]
+    status_edges = directional_edges(status_nodes, 'flow_connector')
+    if len(status_hubs) == 1 and len(status_panels) == 3 and len(status_edges) >= 3:
+        hub_id = status_hubs[0]['shape_id']
+        panel_ids = {shape['shape_id'] for shape in status_panels}
+        hub_panel_edges = [
+            edge for edge in status_edges
+            if edge['from_shape_id'] == hub_id and edge['to_shape_id'] in panel_ids
+        ]
+        pointed_panel_ids = [edge['to_shape_id'] for edge in hub_panel_edges]
+        if (
+            len(hub_panel_edges) == 3
+            and set(pointed_panel_ids) == panel_ids
+            and len(pointed_panel_ids) == len(set(pointed_panel_ids))
+        ):
+            evidence.append({
+                'family': 'status_flow',
+                'object_ids': [shape['shape_id'] for shape in [*status_nodes, *hub_panel_edges]],
+                'node_count': len(status_nodes),
+                'edge_count': len(hub_panel_edges),
+                'reason': 'input_hub_to_three_status_panels_present',
+            })
+
     synthesis_nodes = nodes('takeaway_panel')
     synthesis_bands = matching('takeaway_band', 'synthesis_peak')
     if len(synthesis_nodes) >= 2 and synthesis_bands:

@@ -225,9 +225,11 @@ export function buildSampleStatusSlide(slide, index, stableCompositionSignature)
         role: 'flow_connector',
         quality_role: 'structural',
         layout_zone_id: 'status_zone',
+        from_shape_id: `${slideId}-input-hub`,
+        to_shape_id: `${slideId}-status-${pointIndex + 1}-panel`,
         bounds: { left_in: (left + 2.15) - 0.015, top_in: 3.94, width_in: 0.03, height_in: 0.74 },
         line: { color: '#2563EB', width_pt: 2, end_arrow: true },
-        tailEnd: 'triangle',
+        tail_end: 'triangle',
       },
     );
   }

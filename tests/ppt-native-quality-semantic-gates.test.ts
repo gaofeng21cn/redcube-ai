@@ -331,6 +331,83 @@ test('a relationship graph with directed connectors carries specific semantic ev
   assert.deepEqual(result.metrics.semantic_visual_families, ['relationship_graph']);
 });
 
+function statusFlowShapes() {
+  const hubId = 'status-input-hub';
+  const panelIds = ['status-panel-a', 'status-panel-b', 'status-panel-c'];
+  return [
+    {
+      shape_id: 'title',
+      kind: 'text_box',
+      role: 'title',
+      quality_role: 'content',
+      text: 'One input reaches three verified outcomes',
+      font_size: 44,
+      bounds: bounds(80, 40, 1000, 80),
+    },
+    {
+      shape_id: hubId,
+      kind: 'rounded_rect',
+      role: 'input_hub',
+      quality_role: 'structural',
+      bounds: bounds(250, 180, 650, 90),
+    },
+    ...panelIds.map((shapeId, index) => ({
+      shape_id: shapeId,
+      kind: 'rounded_rect',
+      role: 'content_panel',
+      quality_role: 'content',
+      bounds: bounds(80 + (index * 360), 420, 300, 150),
+    })),
+    ...panelIds.map((shapeId, index) => ({
+      shape_id: `status-text-${index + 1}`,
+      kind: 'text_box',
+      role: 'point_text',
+      quality_role: 'content',
+      text: `Outcome ${index + 1} carries concrete audience evidence.`,
+      font_size: 18,
+      bounds: bounds(110 + (index * 360), 455, 240, 70),
+    })),
+    ...panelIds.map((shapeId, index) => ({
+      shape_id: `status-flow-${index + 1}`,
+      kind: 'connector',
+      role: 'flow_connector',
+      quality_role: 'structural',
+      from_shape_id: hubId,
+      to_shape_id: shapeId,
+      tail_end: 'triangle',
+      bounds: bounds(300 + (index * 250), 280, 10, 130),
+    })),
+    {
+      shape_id: 'page',
+      kind: 'text_box',
+      role: 'page_number',
+      quality_role: 'auxiliary',
+      text: '01',
+      font_size: 12,
+      bounds: bounds(1100, 650, 40, 20),
+    },
+  ];
+}
+
+test('canonical three-branch status flow carries endpoint-bound semantic evidence', () => {
+  const result = evaluate(statusFlowShapes(), 3);
+
+  assert.equal(result.checks.visual_structure_present, true);
+  assert.equal(result.checks.non_text_visual_specific_ok, true);
+  assert.equal(result.checks.mechanical_card_template_absent, true);
+  assert.deepEqual(result.metrics.semantic_visual_families, ['status_flow']);
+});
+
+test('status flow without every endpoint-bound branch remains a mechanical card template', () => {
+  const shapes = statusFlowShapes();
+  delete shapes.find((shape) => shape.shape_id === 'status-flow-3').to_shape_id;
+  const result = evaluate(shapes, 3);
+
+  assert.equal(result.checks.visual_structure_present, false);
+  assert.equal(result.checks.non_text_visual_specific_ok, false);
+  assert.equal(result.checks.mechanical_card_template_absent, false);
+});
+
 test('timeline short labels satisfy semantic layout slots without legacy point text cards', () => {
   const result = evaluate([
     {

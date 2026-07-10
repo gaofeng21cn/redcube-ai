@@ -75,6 +75,7 @@ export function buildMockPptNativeShapePlan(meta) {
     },
     editable_shape_plan: {
       contract_kind: 'redcube_ai_first_native_ppt_shape_plan',
+      ...(isNativeSample ? { authoring_mode: 'native_visual_sample_compact' } : {}),
       route,
       scope: route === 'repair_pptx_native' ? 'page_repair' : 'deck_authoring',
       target_slide_ids: [...targetSlideIds],
