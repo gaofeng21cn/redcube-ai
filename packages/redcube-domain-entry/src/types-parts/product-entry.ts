@@ -417,36 +417,67 @@ interface OplHostedProductEntryResponse extends SurfaceBase<'opl_hosted_product_
 }
 
 export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_session'> {
-  product_entry_contract_id: string;
-  entry_session: {
+  projection_kind: 'rca_product_entry_session_domain_snapshot_refs';
+  owner: 'redcube_ai';
+  entry_session_ref: {
     entry_session_id: string;
-    session_file: string;
+    domain_snapshot_ref: string;
+    session_file_ref: {
+      ref_kind: 'runtime_state_path';
+      ref: string;
+    };
     runtime_owner: string;
   };
-  delivery_identity: {
+  delivery_locator_refs: {
+    workspace_ref: string | null;
     deliverable_family: string;
     topic_id: string;
     deliverable_id: string;
     profile_id: string | null;
   };
-  continuation_snapshot: {
+  currentness_refs: {
+    domain_snapshot_ref: string;
+    latest_surface_kind: string | null;
     latest_stage_execution_plan_ref: string | null;
-    latest_run_id: string | null;
-    runtime_progress_projection: RuntimeProgressProjection | null;
-    runtime_projection: RuntimeProjection | null;
+    latest_visual_run_ref: string | null;
+    provider_attempt_ref: string | null;
+    provider_attempt_ledger_ref: string | null;
+    typed_blocker_ref: string | null;
+    next_forced_delta_refs: string[];
   };
-  session_continuity: SessionContinuitySurface;
-  progress_projection: ProgressProjectionSurface | null;
-  artifact_inventory: ArtifactInventorySurface;
-  runtime_loop_closure: RuntimeLoopClosureSurface;
-  review_state: ReviewStateResponse;
-  publication_projection: PublicationProjectionResponse;
-  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
-  family_orchestration: FamilyOrchestrationCompanion;
+  authority_refs: {
+    review_state_ref: string;
+    publication_projection_ref: string;
+    artifact_locator_contract_ref: string;
+    owner_receipt_contract_ref: string;
+  };
+  operator_navigation_refs: {
+    generated_session_surface_ref: string;
+    domain_snapshot_action_ref: string;
+    direct_entry_action_ref: string;
+  };
+  authority_boundary: {
+    refs_only: true;
+    domain_snapshot_owner: 'redcube_ai';
+    visual_truth_owner: 'redcube_ai';
+    review_export_verdict_owner: 'redcube_ai';
+    artifact_authority_owner: 'redcube_ai';
+    visual_memory_owner: 'redcube_ai';
+    owner_receipt_owner: 'redcube_ai';
+    rca_owns_generic_session_shell: false;
+    rca_owns_generic_workbench: false;
+    writes_visual_truth: false;
+    writes_artifact_body: false;
+    writes_memory_body: false;
+    issues_review_or_export_verdict: false;
+    creates_owner_receipt: false;
+    creates_typed_blocker: false;
+  };
   summary: {
     entry_session_id: string;
     deliverable_id: string;
-    latest_handle: string | null;
+    latest_visual_run_ref: string | null;
+    typed_blocker_ref: string | null;
   };
 }
 

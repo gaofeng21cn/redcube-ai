@@ -6,7 +6,6 @@ import {
   assert,
   getProductEntryManifest,
   getProductEntrySession,
-  getProductStart,
   getProductStatus,
   importDomainEntrySharedModule,
   invokeProductEntry,
@@ -48,10 +47,6 @@ test('default product-entry path returns an OPL stage execution plan without req
     });
     assert.equal(status.runtime_loop_closure, undefined);
 
-    const start = await getProductStart({ workspace_root: workspaceRoot });
-    assert.equal(start.recommended_mode_id, 'direct');
-    assert.equal(start.runtime_loop_closure, undefined);
-
     const invoked = await invokeProductEntry({
       workspace_locator: { workspace_root: workspaceRoot },
       entry_session_contract: { entry_session_id: 'session-codex-default' },
@@ -80,10 +75,16 @@ test('default product-entry path returns an OPL stage execution plan without req
 
     const session = await getProductEntrySession({ entry_session_id: 'session-codex-default' });
     assertPathValues(session, {
-      'entry_session.runtime_owner': RUNTIME_OWNER,
-      'session_continuity.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      projection_kind: 'rca_product_entry_session_domain_snapshot_refs',
+      'entry_session_ref.runtime_owner': RUNTIME_OWNER,
+      'entry_session_ref.entry_session_id': 'session-codex-default',
+      'operator_navigation_refs.generated_session_surface_ref': 'opl_generated:product_session',
+      'authority_boundary.refs_only': true,
+      'authority_boundary.rca_owns_generic_session_shell': false,
     });
+    assert.equal(session.session_continuity, undefined);
+    assert.equal(session.runtime_loop_closure, undefined);
+    assert.equal(session.artifact_inventory, undefined);
   });
 });
 
@@ -124,26 +125,6 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
       }),
       /delivery_request\.stop_after_stage=native_pptx is not allowed by the hydrated overlay stage_sequence/,
     );
-  });
-});
-
-test('getProductStart exposes the same direct-entry start companion as the manifest', SERIAL_ENV_TEST, async () => {
-  await withMockCodexRuntimeState(async () => {
-    const workspaceRoot = await prepareProductEntryWorkspace();
-    const start = await getProductStart({ workspace_root: workspaceRoot });
-
-    assertPathValues(start, {
-      ok: undefined,
-      surface_kind: 'product_entry_start',
-      recommended_mode_id: 'direct',
-      'modes.0.mode_id': 'direct',
-      'modes.1.mode_id': 'opl_hosted',
-      'modes.2.mode_id': 'session',
-      runtime_loop_closure: undefined,
-      'resume_surface.surface_kind': 'product_entry_session',
-      human_gate_ids: ['redcube_operator_review_gate'],
-    });
-    assert.match(start.modes[0].command, /redcube product invoke/);
   });
 });
 

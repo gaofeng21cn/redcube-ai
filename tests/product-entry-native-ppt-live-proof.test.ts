@@ -9,6 +9,7 @@ import {
   getProductEntrySession,
   invokeProductEntry,
 } from './product-domain-action-test-api.ts';
+import { buildOplRouteAttemptIndexForTest } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 import {
@@ -76,8 +77,6 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
     },
     entry_session_contract: {
       entry_session_id: entrySessionId,
-      provider_attempt_ref: `opl-provider-attempt:${entrySessionId}:${route}`,
-      provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/native-ppt-live-proof:${entrySessionId}`,
     },
     task_intent: 'run_deliverable_route',
     delivery_request: {
@@ -90,6 +89,12 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
       route,
       stop_after_stage: stopAfterStage,
       user_intent: userIntent,
+      cross_provider_attempt_index: buildOplRouteAttemptIndexForTest({
+        route,
+        runId: `${entrySessionId}/${route}`,
+        topicId: TOPIC_ID,
+        deliverableId: DELIVERABLE_ID,
+      }),
     },
   });
 }
@@ -222,15 +227,13 @@ test('live product-entry native PPT proof reaches review and export gates with r
     });
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
-    assert.equal(session.entry_session.entry_session_id, entrySessionId);
-    assert.equal(session.entry_session.session_file.startsWith(runtimeStateRoot), true);
-    assert.equal(session.delivery_identity.deliverable_id, DELIVERABLE_ID);
+    assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
+    assert.equal(session.entry_session_ref.entry_session_id, entrySessionId);
+    assert.equal(session.entry_session_ref.session_file_ref.ref.startsWith(runtimeStateRoot), true);
+    assert.equal(session.delivery_locator_refs.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.summary.deliverable_id, DELIVERABLE_ID);
-    assert.equal(session.session_continuity.restore_point.latest_handle, session.continuation_snapshot.latest_run_id);
-    assert.equal(session.native_proof_artifact_inventory.surface_kind, 'native_ppt_proof_artifact_inventory');
-    assert.equal(session.native_proof_artifact_inventory.summary.has_pptx, true);
-    assert.equal(session.native_proof_artifact_inventory.summary.has_pdf, true);
-    assert.equal(session.native_proof_artifact_inventory.summary.has_shape_manifest, true);
-    assert.equal(session.summary.native_proof_artifact_ref_count > 0, true);
+    assert.equal(session.currentness_refs.latest_visual_run_ref, session.summary.latest_visual_run_ref);
+    assert.equal(session.authority_boundary.refs_only, true);
+    assert.equal(session.authority_boundary.rca_owns_generic_session_shell, false);
   });
 });

@@ -146,6 +146,35 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
   });
 });
 
+test('RCA stage folder keeps long OPL attempt ref normalization stable across write and read', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-long-attempt-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const written = writeStageFolderOutputFixture({
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'storyline',
+      canonicalStageId: 'source_intake',
+      stageOrder: 1,
+      attemptId: `${'a'.repeat(95)}/suffix`,
+      requiredOutputs: ['storyline.json'],
+      ownerReceiptRefs: ['rca-owner-receipt:visual-stage:deck-a'],
+    }, { route: 'storyline', status: 'completed' });
+
+    const loaded = readStageFolderArtifact({
+      deliverablePaths: paths,
+      canonicalStageId: 'source_intake',
+      routeStageId: 'storyline',
+    });
+
+    assert.equal(written.manifest.attempt_id, path.basename(written.attempt_dir));
+    assert.equal(loaded?.status, 'success');
+    assert.equal(loaded?.artifact.route, 'storyline');
+  });
+});
+
 test('RCA stage folder success closeout fails closed without explicit owner receipt refs', () => {
   withTempOplState((stateRoot) => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-owner-ref-'));

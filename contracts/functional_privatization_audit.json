@@ -373,7 +373,7 @@
   "modules": [
     {
       "module_id": "product_entry_continuity_refs_adapter",
-      "surface_ref": "/session_continuity",
+      "surface_ref": "domain-handler:getProductEntrySession",
       "status": "opl_generated_workbench_session_surface_consumed",
       "classification": "refs_only_adapter",
       "opl_generic_primitive": "workbench_shell",
@@ -390,7 +390,6 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
         "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/entry-descriptor.ts",
@@ -412,7 +411,7 @@
       ],
       "activeCallerStatus": "opl_generated_session_shell_domain_refs",
       "migrationAction": "Use OPL/App generic session shell, resume token, operator navigation and workbench state as the default shell; RCA returns entry-session domain snapshot refs only.",
-      "retentionReason": "RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.",
+      "retentionReason": "RCA retains entry-session, deliverable/topic/run locator, currentness and domain authority refs.",
       "cannotAbsorbReason": "OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.",
       "tombstone_required": false,
       "migration_class": "refs_only_adapter",
@@ -480,14 +479,17 @@
       },
       "current_surface_refs": [
         "product_session",
-        "/session_continuity"
+        "domain-handler:getProductEntrySession",
+        "projection:rca_product_entry_session_domain_snapshot_refs"
       ],
       "rca_projection_mode": "entry_session_domain_snapshot_refs_only",
       "rca_exports_only": [
-        "entry_session_id",
-        "topic_deliverable_run_locator_refs",
-        "latest_visual_run_ref",
-        "domain_snapshot_ref"
+        "entry_session_ref",
+        "delivery_locator_refs",
+        "currentness_refs",
+        "authority_refs",
+        "operator_navigation_refs",
+        "authority_boundary"
       ],
       "default_caller_contract": {
         "surface_kind": "generated_session_shell_boundary",

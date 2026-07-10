@@ -65,38 +65,6 @@
       "authority_boundary": {}
     },
     {
-      "action_id": "get_product_start",
-      "title": "Read RedCube product start surface",
-      "summary": "读取 OPL generated product-entry start shell 所需的 RCA refs；RCA repo-local public caller 只保留 direct invoke target。",
-      "owner": "redcube_ai",
-      "effect": "read_only",
-      "source_command": {
-        "command": "opl_generated:product_start",
-        "surface_kind": "product_entry_start"
-      },
-      "source_of_work": {
-        "source_catalog": "family_action_catalog",
-        "source_catalog_ref": "family_action_catalog:redcube_product_entry_action_catalog",
-        "source_action_id": "get_product_start",
-        "stage_catalog_ref": "family_stage_control_plane:redcube_ai_stage_control_plane",
-        "derived_surface_policy": "derive_cli_mcp_openai_ai_sdk_skill_app_status_workbench_from_single_catalog",
-        "domain_repo_wrapper_policy": "handler_target_refs_only_adapter_or_tombstone_candidate"
-      },
-      "input_schema_ref": "schema:redcube.product_start.request.v1",
-      "output_schema_ref": "schema:redcube.product_start.response.v1",
-      "workspace_locator_fields": [],
-      "human_gate_ids": [],
-      "supported_surfaces": {
-        "cli": null,
-        "mcp": null,
-        "skill": null,
-        "product_entry": null,
-        "openai": null,
-        "ai_sdk": null
-      },
-      "authority_boundary": {}
-    },
-    {
       "action_id": "get_product_preflight",
       "title": "Read RedCube product preflight",
       "summary": "读取 OPL generated preflight shell 所需的 RCA workspace/runtime refs；RCA 不持有通用 preflight wrapper owner。",

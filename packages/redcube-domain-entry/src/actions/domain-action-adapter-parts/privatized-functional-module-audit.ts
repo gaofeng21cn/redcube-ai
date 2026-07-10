@@ -25,10 +25,12 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     opl_replacement_surface: 'opl_app_session_shell_and_workbench',
     rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
     rca_exports_only: [
-      'entry_session_id',
-      'topic_deliverable_run_locator_refs',
-      'latest_visual_run_ref',
-      'domain_snapshot_ref',
+      'entry_session_ref',
+      'delivery_locator_refs',
+      'currentness_refs',
+      'authority_refs',
+      'operator_navigation_refs',
+      'authority_boundary',
     ],
     default_caller_contract: {
       surface_kind: 'generated_session_shell_boundary',

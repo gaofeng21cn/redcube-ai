@@ -112,7 +112,7 @@ function safeSegmentFromText(value, fallback) {
   if (!text) return safeSegment(fallback, fallback);
   const normalized = text.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
   const compact = normalized || createHash('sha256').update(text).digest('hex').slice(0, 16);
-  return safeSegment(compact.slice(0, 96), fallback);
+  return safeSegment(compact.slice(0, 96).replace(/-+$/g, ''), fallback);
 }
 
 function writeTextAtomic(file, payload) {
