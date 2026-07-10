@@ -2,7 +2,7 @@
   "product_entry_session_continuity_id": "product_entry_session_continuity",
   "date_anchor": "2026-07-10",
   "status": "generic_session_source_retired_domain_snapshot_projection_current",
-  "goal": "Consume an explicit OPL-owned product-session envelope and project RCA domain snapshot refs without repo-local session persistence.",
+  "goal": "Consume the pinned OPL generated product-entry session surface and project RCA domain snapshot refs without repo-local session persistence.",
   "callable_surface": {
     "action_ref": "get_product_entry_session",
     "api_surface": "getProductEntrySession",
@@ -19,21 +19,21 @@
     "repo_local_session_store_allowed": false,
     "workspace_run_scan_for_session_currentness_allowed": false
   },
-  "opl_session_envelope_contract": {
-    "surface_kind": "opl_product_session_envelope",
-    "owner": "one-person-lab",
+  "opl_generated_session_surface_contract": {
+    "surface_kind": "opl_generated_product_entry_session_surface",
+    "generated_interface_owner": "one-person-lab",
     "required_fields": [
-      "session_ref",
-      "entry_session_id",
-      "domain_snapshot_ref",
-      "delivery_locator_refs",
-      "currentness_refs",
-      "stage_folder_locator_refs",
-      "artifact_authority_refs"
+      "domain_id",
+      "domain_owner",
+      "runtime_owner",
+      "entry_session.entry_session_id",
+      "delivery_identity",
+      "domain_projection"
     ],
+    "domain_projection_surface_kind": "rca_product_entry_session_handoff_refs",
     "provider_currentness_requires_both": [
-      "currentness_refs.provider_attempt_ref",
-      "currentness_refs.provider_attempt_ledger_ref"
+      "domain_projection.currentness_refs.provider_attempt_ref",
+      "domain_projection.currentness_refs.provider_attempt_ledger_ref"
     ]
   },
   "response_contract": {

@@ -8,7 +8,7 @@ import { invokeDomainEntry } from './invoke-domain-entry.js';
 import { ensureProductEntryDeliverable } from './product-entry-deliverable.js';
 import {
   buildProductEntrySessionHandoffRefs,
-  normalizeOplProductSessionEnvelope,
+  normalizeOplGeneratedProductSessionSurface,
 } from './product-entry-domain-snapshot-refs.js';
 import { requireField, safeText } from './action-utils.js';
 
@@ -30,25 +30,41 @@ function normalizeEntrySessionContract(request) {
     'entry_session_contract.entry_session_id',
     contract.entry_session_id || contract.entrySessionId || request?.entrySessionId,
   );
-  const oplSessionEnvelope = normalizeOplProductSessionEnvelope(
-    contract.opl_session_envelope
-      || contract.oplSessionEnvelope
-      || request?.opl_session_envelope
-      || request?.oplSessionEnvelope,
+  const oplGeneratedSessionSurface = normalizeOplGeneratedProductSessionSurface(
+    contract.opl_generated_session_surface
+      || contract.oplGeneratedSessionSurface
+      || request?.opl_generated_session_surface
+      || request?.oplGeneratedSessionSurface,
     entrySessionId,
   );
-  const providerAttemptRef = safeText(
+  const requestedProviderAttemptRef = safeText(
     contract.provider_attempt_ref
       || contract.providerAttemptRef
-      || request?.providerAttemptRef
-      || oplSessionEnvelope?.currentness_refs.provider_attempt_ref,
+      || request?.providerAttemptRef,
   ) || null;
-  const providerAttemptLedgerRef = safeText(
+  const requestedProviderAttemptLedgerRef = safeText(
     contract.provider_attempt_ledger_ref
       || contract.providerAttemptLedgerRef
-      || request?.providerAttemptLedgerRef
-      || oplSessionEnvelope?.currentness_refs.provider_attempt_ledger_ref,
+      || request?.providerAttemptLedgerRef,
   ) || null;
+  const generatedProviderAttemptRef = oplGeneratedSessionSurface
+    ?.currentness_refs.provider_attempt_ref || null;
+  const generatedProviderAttemptLedgerRef = oplGeneratedSessionSurface
+    ?.currentness_refs.provider_attempt_ledger_ref || null;
+  if (oplGeneratedSessionSurface && requestedProviderAttemptRef
+    && requestedProviderAttemptRef !== generatedProviderAttemptRef) {
+    throw new Error(
+      'entry_session_contract.provider_attempt_ref does not match the OPL generated session',
+    );
+  }
+  if (oplGeneratedSessionSurface && requestedProviderAttemptLedgerRef
+    && requestedProviderAttemptLedgerRef !== generatedProviderAttemptLedgerRef) {
+    throw new Error(
+      'entry_session_contract.provider_attempt_ledger_ref does not match the OPL generated session',
+    );
+  }
+  const providerAttemptRef = requestedProviderAttemptRef || generatedProviderAttemptRef;
+  const providerAttemptLedgerRef = requestedProviderAttemptLedgerRef || generatedProviderAttemptLedgerRef;
   if (Boolean(providerAttemptRef) !== Boolean(providerAttemptLedgerRef)) {
     throw new Error('entry_session_contract provider attempt currentness requires both provider refs');
   }
@@ -56,7 +72,7 @@ function normalizeEntrySessionContract(request) {
     entrySessionId,
     providerAttemptRef,
     providerAttemptLedgerRef,
-    oplSessionEnvelope,
+    oplGeneratedSessionSurface,
   };
 }
 
@@ -84,10 +100,10 @@ function normalizeDeliveryRequest(request) {
   };
 }
 
-function resolveLifecycleStopAfterStage({ delivery, taskIntent, hasOplSessionEnvelope }) {
+function resolveLifecycleStopAfterStage({ delivery, taskIntent, hasOplGeneratedSessionSurface }) {
   if (delivery.stopAfterStage || taskIntent !== 'run_opl_stage_execution_plan') return delivery.stopAfterStage;
   if (delivery.route) return delivery.route;
-  if (hasOplSessionEnvelope) return '';
+  if (hasOplGeneratedSessionSurface) return '';
   if (delivery.lifecyclePolicy === 'operator_review_after_plan') return 'detailed_outline';
   if (delivery.lifecyclePolicy && delivery.lifecyclePolicy !== 'auto_to_terminal') {
     throw new Error(`Unsupported delivery_request.lifecycle_policy: ${delivery.lifecyclePolicy}`);
@@ -95,25 +111,27 @@ function resolveLifecycleStopAfterStage({ delivery, taskIntent, hasOplSessionEnv
   return '';
 }
 
-function resolveTaskIntent(request, delivery, hasOplSessionEnvelope) {
+function resolveTaskIntent(request, delivery, hasOplGeneratedSessionSurface) {
   const explicitTaskIntent = safeText(request?.task_intent || request?.taskIntent || delivery.taskIntent);
   const taskIntent = explicitTaskIntent
-    || (hasOplSessionEnvelope && delivery.route ? 'run_deliverable_route' : 'run_opl_stage_execution_plan');
+    || (hasOplGeneratedSessionSurface && delivery.route
+      ? 'run_deliverable_route'
+      : 'run_opl_stage_execution_plan');
   if (!SUPPORTED_TASK_INTENTS.has(taskIntent)) throw new Error(`Unsupported task_intent: ${taskIntent}`);
   return taskIntent;
 }
 
-function resolveBoundValue(fieldName, requestedValue, envelopeValue) {
+function resolveBoundValue(fieldName, requestedValue, generatedValue) {
   const requested = safeText(requestedValue);
-  const fromEnvelope = safeText(envelopeValue);
-  if (requested && fromEnvelope && requested !== fromEnvelope) {
-    throw new Error(`${fieldName} does not match the OPL session envelope`);
+  const fromGenerated = safeText(generatedValue);
+  if (requested && fromGenerated && requested !== fromGenerated) {
+    throw new Error(`${fieldName} does not match the OPL generated session`);
   }
-  return requested || fromEnvelope;
+  return requested || fromGenerated;
 }
 
-function resolveDeliveryIdentity(delivery, oplSessionEnvelope) {
-  const locator = oplSessionEnvelope?.delivery_locator_refs || {};
+function resolveDeliveryIdentity(delivery, oplGeneratedSessionSurface) {
+  const locator = oplGeneratedSessionSurface?.delivery_locator_refs || {};
   return {
     deliverableFamily: resolveBoundValue(
       'delivery_request.deliverable_family',
@@ -132,6 +150,39 @@ function resolveDeliveryIdentity(delivery, oplSessionEnvelope) {
   };
 }
 
+function resolveCrossProviderAttemptIndex(delivery, entrySession) {
+  const requested = delivery.crossProviderAttemptIndex;
+  const generated = entrySession.oplGeneratedSessionSurface
+    ?.currentness_refs.cross_provider_attempt_index || null;
+  if (requested && (typeof requested !== 'object' || Array.isArray(requested))) {
+    throw new Error('delivery_request.cross_provider_attempt_index must be an object');
+  }
+  if (requested && entrySession.oplGeneratedSessionSurface && !generated) {
+    throw new Error(
+      'delivery_request.cross_provider_attempt_index does not match the OPL generated session currentness',
+    );
+  }
+  for (const field of ['provider_attempt_ref', 'provider_attempt_ledger_ref']) {
+    const requestedRef = safeText(requested?.[field]);
+    const generatedRef = safeText(generated?.[field]);
+    if (requestedRef && generatedRef && requestedRef !== generatedRef) {
+      throw new Error(
+        `delivery_request.cross_provider_attempt_index.${field} does not match the OPL generated session`,
+      );
+    }
+  }
+  if (requested) return requested;
+  if (generated) return generated;
+  return entrySession.providerAttemptRef && entrySession.providerAttemptLedgerRef
+    ? {
+        surface_kind: 'cross_provider_attempt_index',
+        provider_attempt_owner: 'one-person-lab',
+        provider_attempt_ref: entrySession.providerAttemptRef,
+        provider_attempt_ledger_ref: entrySession.providerAttemptLedgerRef,
+      }
+    : undefined;
+}
+
 function buildDomainEntryRequest({
   workspaceRoot,
   entrySession,
@@ -140,16 +191,7 @@ function buildDomainEntryRequest({
   delivery,
   resolvedIdentity,
 }) {
-  const providerAttemptIndex = delivery.crossProviderAttemptIndex
-    || (entrySession.providerAttemptRef && entrySession.providerAttemptLedgerRef
-      ? {
-          surface_kind: 'cross_provider_attempt_index',
-          opl_session_ref: entrySession.oplSessionEnvelope?.session_ref || null,
-          provider_attempt_owner: 'one-person-lab',
-          provider_attempt_ref: entrySession.providerAttemptRef,
-          provider_attempt_ledger_ref: entrySession.providerAttemptLedgerRef,
-        }
-      : undefined);
+  const providerAttemptIndex = resolveCrossProviderAttemptIndex(delivery, entrySession);
   return {
     target_domain_id: 'redcube_ai',
     task_intent: taskIntent,
@@ -158,7 +200,7 @@ function buildDomainEntryRequest({
     runtime_session_contract: {
       runtime_owner: RUNTIME_OWNER,
       adapter_surface: DEFAULT_EXECUTOR_ADAPTER_SURFACE,
-      session_mode: 'opl_owned_session_envelope',
+      session_mode: 'opl_generated_product_entry_session_surface',
     },
     return_surface_contract: {
       surface_kind: taskIntent === 'run_deliverable_route' ? 'route_run' : 'opl_stage_execution_plan',
@@ -202,17 +244,17 @@ export async function invokeProductEntry(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const entrySession = normalizeEntrySessionContract(request);
   const delivery = normalizeDeliveryRequest(request);
-  const envelope = entrySession.oplSessionEnvelope;
-  if (envelope && envelope.delivery_locator_refs.workspace_ref !== workspaceRoot) {
-    throw new Error('workspace_locator.workspace_root does not match the OPL session envelope');
+  const generatedSession = entrySession.oplGeneratedSessionSurface;
+  if (generatedSession && generatedSession.delivery_locator_refs.workspace_ref !== workspaceRoot) {
+    throw new Error('workspace_locator.workspace_root does not match the OPL generated session');
   }
-  const taskIntent = resolveTaskIntent(request, delivery, Boolean(envelope));
+  const taskIntent = resolveTaskIntent(request, delivery, Boolean(generatedSession));
   const entryMode = safeText(request?.entry_mode || request?.entryMode, 'redcube_product_entry');
-  const deliveryIdentity = resolveDeliveryIdentity(delivery, envelope);
+  const deliveryIdentity = resolveDeliveryIdentity(delivery, generatedSession);
   delivery.stopAfterStage = resolveLifecycleStopAfterStage({
     delivery,
     taskIntent,
-    hasOplSessionEnvelope: Boolean(envelope),
+    hasOplGeneratedSessionSurface: Boolean(generatedSession),
   });
   const { createdDeliverable, resolvedIdentity } = await ensureProductEntryDeliverable({
     workspaceRoot,

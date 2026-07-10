@@ -28,6 +28,9 @@ import {
   writeSourceAugmentationResult,
 } from '@redcube/domain-entry';
 import {
+  buildGeneratedProductEntrySessionSurface,
+} from 'opl-framework-shared/product-entry-companions';
+import {
   buildOplRouteAttemptIndexForTest,
   runDeliverableRoute,
 } from './helpers/route-attempt-test-api.ts';
@@ -153,6 +156,52 @@ async function prepareProductEntryWorkspace() {
   return workspaceRoot;
 }
 
+function buildOplGeneratedProductSessionForTest({
+  entrySessionId,
+  handoffRefs,
+  entryMode = 'direct',
+}): ReturnType<typeof buildGeneratedProductEntrySessionSurface> {
+  const currentness = handoffRefs.currentness_refs || {};
+  const crossProviderAttemptIndex = currentness.cross_provider_attempt_index || null;
+  return buildGeneratedProductEntrySessionSurface({
+    domain_id: 'rca',
+    domain_owner: 'redcube_ai',
+    runtime_owner: 'configured_family_runtime_provider',
+    entry_session_id: entrySessionId,
+    session_file: `/opl-owned/product-sessions/${entrySessionId}.json`,
+    delivery_identity: handoffRefs.delivery_locator_refs,
+    continuation_snapshot: {
+      domain_snapshot_ref: handoffRefs.domain_snapshot_ref,
+      latest_surface_kind: currentness.latest_surface_kind || null,
+      latest_stage_execution_plan_ref: currentness.latest_stage_execution_plan_ref || null,
+      latest_run_id: currentness.latest_visual_run_ref || null,
+      provider_attempt_ref: currentness.provider_attempt_ref || null,
+      provider_attempt_ledger_ref: currentness.provider_attempt_ledger_ref || null,
+      cross_provider_attempt_index: crossProviderAttemptIndex,
+      typed_blocker_ref: currentness.typed_blocker_ref || null,
+      next_forced_delta_refs: currentness.next_forced_delta_refs || [],
+    },
+    family_orchestration: {
+      action_graph_ref: 'opl-generated:family-orchestration/rca',
+    },
+    review_projection: {
+      review_state_ref: 'domain-handler:getReviewState',
+    },
+    publication_projection: {
+      publication_projection_ref: 'domain-handler:getPublicationProjection',
+    },
+    artifact_locator_contract: {
+      contract_ref: 'contracts/artifact_locator_contract.json',
+    },
+    artifact_refs: (handoffRefs.artifact_authority_refs || []).map((ref) => ({ ref })),
+    direct_product_entry_command: 'redcube product invoke',
+    opl_hosted_handoff_ref: 'opl_framework:hosted_product_entry',
+    source: 'product_entry',
+    entry_mode: entryMode,
+    domain_projection: handoffRefs,
+  });
+}
+
 function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'json_pointer');
   assert.equal(surface.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
@@ -176,7 +225,7 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.resume_contract.session_locator_field, sessionLocatorField);
   assert.equal(
     surface.family_orchestration.resume_contract.checkpoint_locator_field,
-    'entry_session_contract.opl_session_envelope.domain_snapshot_ref',
+    'entry_session_contract.opl_generated_session_surface.domain_projection.domain_snapshot_ref',
   );
 }
 
@@ -227,6 +276,7 @@ export {
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
   buildHostedAttemptBridgeFixture,
+  buildOplGeneratedProductSessionForTest,
   buildOplRouteAttemptIndexForTest,
   chmodSync,
   completeSourceReadiness,

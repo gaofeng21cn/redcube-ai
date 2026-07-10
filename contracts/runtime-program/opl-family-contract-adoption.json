@@ -247,7 +247,7 @@
   },
   "attempt_projection": {
     "source_surfaces": [
-      "OPL-owned product session envelope refs",
+      "OPL generated product-entry session surface refs",
       "RCA product-entry domain snapshot refs",
       "runtimeWatch",
       "artifact authority refs",
@@ -283,7 +283,7 @@
   "operator_projection": {
     "source_surfaces": [
       "product entry",
-      "OPL-owned product session envelope and RCA domain snapshot refs",
+      "OPL generated product-entry session surface and RCA domain snapshot refs",
       "OPL-hosted stage runtime handoff",
       "artifact authority refs",
       "review/publication projection refs"
@@ -302,7 +302,7 @@
     "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
     "projection_mode": "rca_domain_snapshot_and_authority_refs_only",
     "source_surfaces": [
-      "OPL-owned product session envelope refs",
+      "OPL generated product-entry session surface refs",
       "RCA product-entry domain snapshot refs",
       "review state",
       "publication projection",
@@ -350,7 +350,7 @@
     "maps_to_opl_contract": "opl_family_stage_control_plane.v1",
     "source_surfaces": [
       "hydrated overlay stage_sequence",
-      "OPL product session envelope currentness refs",
+      "OPL generated product-entry session currentness refs",
       "runtimeWatch",
       "getReviewState",
       "getPublicationProjection",

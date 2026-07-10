@@ -74,7 +74,7 @@ interface ProductEntryRequest extends Record<string, unknown> {
     entry_session_id: string;
     provider_attempt_ref?: string;
     provider_attempt_ledger_ref?: string;
-    opl_session_envelope?: OplProductSessionEnvelope;
+    opl_generated_session_surface?: OplGeneratedProductEntrySessionSurface;
   };
   task_intent?: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode?: string;
@@ -208,17 +208,16 @@ export interface ProductEntryPreflightCompanion {
   checks: ProductEntryPreflightCheck[];
 }
 
-export interface OplProductSessionEnvelope extends Record<string, unknown> {
-  surface_kind: 'opl_product_session_envelope';
-  owner: 'one-person-lab';
+export interface OplGeneratedProductEntrySessionSurface extends Record<string, unknown> {
+  surface_kind: 'opl_generated_product_entry_session_surface';
+  domain_id: 'rca';
+  domain_owner: 'redcube_ai';
   runtime_owner: string;
-  session_ref: string;
-  entry_session_id: string;
-  domain_snapshot_ref: string;
-  delivery_locator_refs: ProductEntryDeliveryLocatorRefs;
-  currentness_refs: Omit<ProductEntryCurrentnessRefs, 'domain_snapshot_ref'>;
-  stage_folder_locator_refs: string[];
-  artifact_authority_refs: string[];
+  entry_session: {
+    entry_session_id: string;
+  } & Record<string, unknown>;
+  delivery_identity: ProductEntryDeliveryLocatorRefs;
+  domain_projection: ProductEntrySessionHandoffRefs;
 }
 
 export interface ProductEntryDeliveryLocatorRefs {
@@ -236,6 +235,7 @@ export interface ProductEntryCurrentnessRefs {
   latest_visual_run_ref: string | null;
   provider_attempt_ref: string | null;
   provider_attempt_ledger_ref: string | null;
+  cross_provider_attempt_index: Record<string, unknown> | null;
   typed_blocker_ref: string | null;
   next_forced_delta_refs: string[];
 }
@@ -243,7 +243,6 @@ export interface ProductEntryCurrentnessRefs {
 export interface ProductEntrySessionHandoffRefs extends Record<string, unknown> {
   surface_kind: 'rca_product_entry_session_handoff_refs';
   entry_session_id: string;
-  opl_session_ref: string | null;
   previous_domain_snapshot_ref: string | null;
   domain_snapshot_ref: string;
   delivery_locator_refs: ProductEntryDeliveryLocatorRefs;
@@ -313,7 +312,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   owner: 'redcube_ai';
   entry_session_ref: {
     entry_session_id: string;
-    opl_session_ref: string;
+    generated_session_surface_kind: 'opl_generated_product_entry_session_surface';
     domain_snapshot_ref: string;
     runtime_owner: string;
   };
@@ -331,6 +330,7 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
     latest_visual_run_ref: string | null;
     provider_attempt_ref: string | null;
     provider_attempt_ledger_ref: string | null;
+    cross_provider_attempt_index: Record<string, unknown> | null;
     typed_blocker_ref: string | null;
     next_forced_delta_refs: string[];
   };

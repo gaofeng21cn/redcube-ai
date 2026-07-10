@@ -40,7 +40,7 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
       generated_session_command: 'opl_generated:product_session',
       generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
-      default_caller_status: 'generic_session_sources_retired_opl_envelope_required',
+      default_caller_status: 'generic_session_sources_retired_opl_generated_surface_required',
       rca_owns_generic_session_shell: false,
       generic_session_source_retirement: 'completed',
       required_absent_source_refs_policy:

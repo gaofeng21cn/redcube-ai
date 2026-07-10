@@ -14,7 +14,7 @@
       "workspace_locator.workspace_root",
       "entry_session_contract.entry_session_id"
     ],
-    "continuation_envelope_field": "entry_session_contract.opl_session_envelope",
+    "continuation_surface_field": "entry_session_contract.opl_generated_session_surface",
     "delivery_identity_fields": [
       "delivery_request.deliverable_family",
       "delivery_request.topic_id",
@@ -43,8 +43,9 @@
     "fail_closed_on": [
       "missing_workspace_root",
       "missing_entry_session_id",
-      "missing_delivery_identity_without_opl_session_envelope",
-      "delivery_identity_mismatch_with_opl_session_envelope",
+      "missing_delivery_identity_without_opl_generated_session_surface",
+      "delivery_identity_mismatch_with_opl_generated_session_surface",
+      "provider_currentness_mismatch_with_opl_generated_session_surface",
       "delivery_identity_mismatch_with_rca_deliverable_record",
       "missing_profile_or_title_or_goal_when_deliverable_creation_is_required",
       "unsupported_task_intent",

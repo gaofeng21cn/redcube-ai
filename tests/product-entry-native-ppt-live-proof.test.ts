@@ -9,6 +9,7 @@ import {
   getProductEntrySession,
   invokeProductEntry,
 } from './product-domain-action-test-api.ts';
+import { buildOplGeneratedProductSessionForTest } from './product-domain-action-case-shared.ts';
 import { buildOplRouteAttemptIndexForTest } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
@@ -220,24 +221,19 @@ test('live product-entry native PPT proof reaches review and export gates with r
     const handoff = exported.session_handoff_refs;
     const session = await getProductEntrySession({
       entrySessionId,
-      oplSessionEnvelope: {
-        surface_kind: 'opl_product_session_envelope',
-        owner: 'one-person-lab',
-        runtime_owner: 'configured_family_runtime_provider',
-        session_ref: `opl-session:${entrySessionId}`,
-        entry_session_id: entrySessionId,
-        domain_snapshot_ref: handoff.domain_snapshot_ref,
-        delivery_locator_refs: handoff.delivery_locator_refs,
-        currentness_refs: handoff.currentness_refs,
-        stage_folder_locator_refs: handoff.stage_folder_locator_refs,
-        artifact_authority_refs: handoff.artifact_authority_refs,
-      },
+      oplGeneratedSessionSurface: buildOplGeneratedProductSessionForTest({
+        entrySessionId,
+        handoffRefs: handoff,
+      }),
     });
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
     assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
     assert.equal(session.entry_session_ref.entry_session_id, entrySessionId);
-    assert.equal(session.entry_session_ref.opl_session_ref, `opl-session:${entrySessionId}`);
+    assert.equal(
+      session.entry_session_ref.generated_session_surface_kind,
+      'opl_generated_product_entry_session_surface',
+    );
     assert.equal(session.entry_session_ref.domain_snapshot_ref, handoff.domain_snapshot_ref);
     assert.equal(session.delivery_locator_refs.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.summary.deliverable_id, DELIVERABLE_ID);

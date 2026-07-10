@@ -4,6 +4,7 @@ import {
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
   assert,
+  buildOplGeneratedProductSessionForTest,
   getProductEntryManifest,
   getProductEntrySession,
   getProductStatus,
@@ -77,18 +78,10 @@ test('default product-entry path returns an OPL stage execution plan without req
     const handoff = invoked.session_handoff_refs;
     const session = await getProductEntrySession({
       entry_session_id: 'session-codex-default',
-      opl_session_envelope: {
-        surface_kind: 'opl_product_session_envelope',
-        owner: 'one-person-lab',
-        runtime_owner: RUNTIME_OWNER,
-        session_ref: 'opl-session:session-codex-default',
-        entry_session_id: 'session-codex-default',
-        domain_snapshot_ref: handoff.domain_snapshot_ref,
-        delivery_locator_refs: handoff.delivery_locator_refs,
-        currentness_refs: handoff.currentness_refs,
-        stage_folder_locator_refs: handoff.stage_folder_locator_refs,
-        artifact_authority_refs: handoff.artifact_authority_refs,
-      },
+      opl_generated_session_surface: buildOplGeneratedProductSessionForTest({
+        entrySessionId: 'session-codex-default',
+        handoffRefs: handoff,
+      }),
     });
     assertPathValues(session, {
       projection_kind: 'rca_product_entry_session_domain_snapshot_refs',

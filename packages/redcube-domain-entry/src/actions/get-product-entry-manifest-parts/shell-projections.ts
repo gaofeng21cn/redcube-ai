@@ -113,7 +113,7 @@ export function buildProductEntryManifestShellProjections({
     task_kind: 'visual_deliverable_loop',
     task_id: 'redcube_opl_stage_execution_plan_loop',
     status: 'resumable',
-    summary: 'Continue the same RedCube deliverable loop through an OPL-owned session envelope and RCA domain refs.',
+    summary: 'Continue the same RedCube deliverable loop through the OPL generated product-entry session surface and RCA domain refs.',
     progress_surface: {
       surface_kind: 'product_entry_session',
       summary: 'Inspect current same-session progress for the active deliverable loop.',

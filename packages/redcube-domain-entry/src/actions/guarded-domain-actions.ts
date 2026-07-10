@@ -125,7 +125,7 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'operator loop domain locator refs',
     ],
     activeCallerStatus: 'opl_generated_session_shell_consumes_rca_domain_snapshot_refs',
-    migrationAction: 'Generic session persistence/currentness sources are retired; keep only the RCA domain snapshot refs handler consumed by the OPL session envelope.',
+    migrationAction: 'Generic session persistence/currentness sources are retired; keep only the RCA domain snapshot refs handler consumed through the OPL generated product-entry session surface.',
     retentionReason: 'RCA retains domain snapshot, deliverable locator, currentness and domain authority refs without a repo-local session store.',
     cannotAbsorbReason: 'OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.',
     tombstone_required: false,

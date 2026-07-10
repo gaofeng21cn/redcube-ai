@@ -4,7 +4,7 @@
   "review_status": "verified",
   "program_mode": "opl_owned_product_session_rca_domain_snapshot_refs",
   "scope": {
-    "hardening_axis": "opl_session_envelope_and_rca_domain_snapshot_refs_boundary",
+    "hardening_axis": "opl_generated_session_surface_and_rca_domain_snapshot_refs_boundary",
     "implementation_in_scope": true,
     "runtime_substrate_owner": "configured_family_runtime_provider",
     "default_runtime_owner": "configured_family_runtime_provider",
@@ -105,7 +105,7 @@
       "status": "repo_tracked_refs_only_projection_contract",
       "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
       "source_surfaces": [
-        "OPL-owned product session envelope refs",
+        "OPL generated product-entry session surface refs",
         "RCA product-entry domain snapshot refs",
         "review/publication projections",
         "artifact authority refs",
