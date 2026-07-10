@@ -28,7 +28,7 @@ export function createNativePptArtifactInputParts({ ensureDir }: NativePptArtifa
       shapeManifestFile: path.join(nativeDir, `${basename}-shape-manifest.json`),
       repairLogFile: path.join(nativeDir, `${basename}-repair-log.json`),
       planValidationFile: path.join(nativeDir, `${basename}-plan-validation-input.json`),
-      codexInvocationBlockerFile: path.join(nativeDir, `${basename}-codex-invocation-blocker.json`),
+      executorAttemptDiagnosticFile: path.join(nativeDir, `${basename}-executor-attempt-diagnostic.json`),
       previewDir: ensureDir(path.join(reportDir, `${basename}-screenshots`)),
     };
   }

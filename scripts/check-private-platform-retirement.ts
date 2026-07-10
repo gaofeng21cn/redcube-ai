@@ -91,6 +91,39 @@ function activePrivatePlatformResurrectionViolations(scanRoots) {
   return violations;
 }
 
+function activePrivatePlatformBehaviorViolations(scanPolicy) {
+  const violations = [];
+  for (const construct of scanPolicy?.forbidden_constructs || []) {
+    const sourceRef = String(construct.source_ref || '');
+    const constructId = String(construct.construct_id || '<missing construct_id>');
+    const forbiddenTokens = Array.isArray(construct.forbidden_tokens)
+      ? construct.forbidden_tokens.filter((token) => String(token))
+      : [];
+    if (!sourceRef) {
+      violations.push(`<missing source_ref>: ${constructId}:missing_source_ref`);
+      continue;
+    }
+    if (forbiddenTokens.length === 0) {
+      violations.push(`${sourceRef}: ${constructId}:missing_forbidden_tokens`);
+      continue;
+    }
+    const file = path.resolve(REPO_ROOT, sourceRef);
+    if (!existsSync(file)) {
+      if (construct.missing_source_allowed !== true) {
+        violations.push(`${sourceRef}: ${constructId}:missing_source`);
+      }
+      continue;
+    }
+    const text = readFileSync(file, 'utf-8');
+    for (const token of forbiddenTokens) {
+      if (text.includes(token)) {
+        violations.push(`${sourceRef}: ${constructId}:${token}`);
+      }
+    }
+  }
+  return violations;
+}
+
 function collectFalseValueFailures(object, checkId, failures) {
   for (const [key, value] of Object.entries(object || {})) {
     if (value !== false) {
@@ -116,7 +149,10 @@ function buildActiveSourceScanSummary(physicalPolicy) {
   }
 
   const scanRoots = scanPolicy.scan_roots || [];
-  const violations = activePrivatePlatformResurrectionViolations(scanRoots);
+  const behaviorScanPolicy = physicalPolicy.behavioral_source_scan_policy ?? null;
+  const resurrectionViolations = activePrivatePlatformResurrectionViolations(scanRoots);
+  const behaviorViolations = activePrivatePlatformBehaviorViolations(behaviorScanPolicy);
+  const violations = [...resurrectionViolations, ...behaviorViolations];
 
   const failedChecks = [];
   collectFalseValueFailures(
@@ -124,6 +160,18 @@ function buildActiveSourceScanSummary(physicalPolicy) {
     'active_source_scan_authority_boundary',
     failedChecks,
   );
+  if (!behaviorScanPolicy || typeof behaviorScanPolicy !== 'object') {
+    failedChecks.push({ check_id: 'behavioral_source_scan_policy', state: 'missing' });
+  } else if (!Array.isArray(behaviorScanPolicy.forbidden_constructs)
+    || behaviorScanPolicy.forbidden_constructs.length === 0) {
+    failedChecks.push({ check_id: 'behavioral_source_scan_forbidden_constructs', state: 'missing' });
+  } else {
+    collectFalseValueFailures(
+      behaviorScanPolicy.authority_boundary,
+      'behavioral_source_scan_authority_boundary',
+      failedChecks,
+    );
+  }
   if (violations.length > 0) {
     failedChecks.push({
       check_id: 'active_source_resurrection_violations',
@@ -139,8 +187,13 @@ function buildActiveSourceScanSummary(physicalPolicy) {
     scan_roots: [...scanRoots],
     helper_ref: scanPolicy.helper_ref,
     test_ref: scanPolicy.test_ref,
+    behavioral_scan_policy_id: behaviorScanPolicy?.policy_id ?? null,
     forbidden_true_claim_keys: [...(scanPolicy.forbidden_true_claim_keys || [])],
+    forbidden_construct_ids: (behaviorScanPolicy?.forbidden_constructs || [])
+      .map((entry) => entry.construct_id),
     scanned_file_count: null,
+    resurrection_violation_count: resurrectionViolations.length,
+    behavior_violation_count: behaviorViolations.length,
     violation_count: violations.length,
     violations,
     failed_checks: failedChecks,
@@ -302,6 +355,8 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
       physical_source_policy: 'contracts/physical_source_morphology_policy.json',
       active_source_scan_policy:
         'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
+      behavioral_source_scan_policy:
+        'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy',
     },
     guard_summary: {
       functional_structure_gap_count:
@@ -319,7 +374,11 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
       active_source_scan: {
         state: activeSourceScan.state,
         scan_policy_id: activeSourceScan.scan_policy_id,
+        behavioral_scan_policy_id: activeSourceScan.behavioral_scan_policy_id,
+        forbidden_construct_ids: activeSourceScan.forbidden_construct_ids,
         scanned_file_count: activeSourceScan.scanned_file_count,
+        resurrection_violation_count: activeSourceScan.resurrection_violation_count,
+        behavior_violation_count: activeSourceScan.behavior_violation_count,
         violation_count: activeSourceScan.violation_count,
         violations: activeSourceScan.violations,
       },

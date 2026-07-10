@@ -75,27 +75,17 @@ export function assertManifestSubstrateAdapterExport(manifest) {
     manifest.source_provenance.authority_boundary.includes('artifact_authority_owner_is_redcube_ai'),
     true,
   );
-  assert.equal(manifest.artifact_inventory.surface_kind, 'artifact_inventory');
+  assert.equal(manifest.artifact_inventory, undefined);
+  assert.equal(manifest.authority_boundary.refs_only, true);
+  assert.equal(manifest.authority_boundary.writes_artifact_body, false);
+  assert.equal(manifest.artifact_locator_contract.locator_model, 'opl_stage_folder_contract_refs_only');
   assert.equal(
-    manifest.artifact_inventory.supporting_files.some(
-      (entry) => entry.file_id === 'artifact_locator_contract' && entry.ref.ref === '/artifact_locator_contract',
-    ),
-    true,
+    manifest.opl_substrate_adapter_export.source_manifest_refs.artifact_locator_contract_ref,
+    '/artifact_locator_contract',
   );
   assert.equal(
-    manifest.artifact_inventory.supporting_files.some(
-      (entry) => entry.file_id === 'operator_evidence_readiness_projection'
-        && entry.ref.ref === '/operator_evidence_readiness_projection',
-    ),
-    true,
-  );
-  assert.equal(
-    manifest.artifact_inventory.supporting_files.every((entry) => entry.kind === 'supporting'),
-    true,
-  );
-  assert.equal(
-    JSON.stringify(manifest.artifact_inventory.supporting_files).includes('artifact_blob'),
-    false,
+    manifest.opl_substrate_adapter_export.source_manifest_refs.operator_evidence_readiness_projection_ref,
+    '/operator_evidence_readiness_projection',
   );
 }
 

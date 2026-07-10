@@ -25,6 +25,16 @@ function assertSourceGuardSummary(payload, scope) {
   assert.equal(payload.guard_summary.owner_delta_required, false);
   assert.deepEqual(payload.guard_summary.missing_evidence_ids, []);
   assert.equal(payload.guard_summary.active_source_scan.state, 'passed_active_source_no_resurrection_scan');
+  assert.equal(
+    payload.guard_summary.active_source_scan.behavioral_scan_policy_id,
+    'rca.source_morphology.behavioral_owner_boundary_scan.v1',
+  );
+  assert.equal(payload.guard_summary.active_source_scan.resurrection_violation_count, 0);
+  assert.equal(payload.guard_summary.active_source_scan.behavior_violation_count, 0);
+  assert.deepEqual(payload.guard_summary.active_source_scan.forbidden_construct_ids, [
+    'repo_local_product_entry_companion_assembly',
+    'repo_local_executor_attempt_blocker_envelope',
+  ]);
   assert.equal(payload.guard_summary.active_source_scan.violation_count, 0);
   assert.deepEqual(payload.guard_summary.active_source_scan.violations, []);
   assert.equal(payload.authority_boundary.readback_can_authorize_physical_delete, false);
@@ -42,6 +52,10 @@ for (const scope of ['private-platform', 'default-caller-tail']) {
     assert.equal(
       payload.source_refs.active_source_scan_policy,
       'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
+    );
+    assert.equal(
+      payload.source_refs.behavioral_source_scan_policy,
+      'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy',
     );
   });
 

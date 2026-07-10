@@ -7,11 +7,8 @@ import {
 } from 'opl-framework-shared/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
-import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
 import { productEntrySessionDir } from './product-entry-session-refs.js';
 import { requireField } from './action-utils.js';
-
-const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type ProductPreflightRequest = Record<string, any>;
 
@@ -87,11 +84,6 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       workspace_surface_kind: 'redcube_workspace',
       workspace_root: doctor.workspaceRoot,
     },
-    runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: DEFAULT_RUNTIME_OWNER,
-      source: 'preflight',
-      entryMode: 'preflight_projection',
-    }),
     ...productEntryPreflight,
   };
 }
