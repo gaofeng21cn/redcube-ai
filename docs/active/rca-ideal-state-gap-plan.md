@@ -4,13 +4,15 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Last reviewed: `2026-07-09`
+Last reviewed: `2026-07-10`
 
 Dated native proof、workspace path、attempt id、screenshot path、no-regression ref 流水和 proof 命令摘要不再追加到本文；这些过程证据进入 `docs/history/process/` 或 runtime/evidence ledger。本文只保留 current readout、open gates、owner delta 和完成顺序。
 
 ## 当前唯一真相
 
 RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [RedCube AI 理想目标态](../references/rca-visual-deliverable-agent-ideal-state.md)；项目当前角色、架构、硬约束和决策读核心五件套；过程性 dated follow-through、closeout tranche、proof 命令流水、run/probe id 和旧路线读 `docs/history/**`、runtime evidence 或提交历史。
+
+2026-07-10 结构收薄目标：本轮按 [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md) 一次性关闭 stdlib walker、default registry、validator utility、退役 `getRun` / Hermes public surface、单消费者 Parts factory、overlay value/type/validator 重复和 private-platform retirement guard 密度八项候选。该 reference 只定义本轮设计、lane 写集和验收；本文继续是唯一 active completion plan，最终状态必须逐项折回本文、核心 docs、contracts、source 和 tests。
 
 2026-06-30 SSOT refresh：本文的默认 active gap 只维护功能面落地、结构收薄、source hygiene、generated/default caller thinning、repo-local adapter retirement、compatibility-free retirement 和 legacy naming guard。真实 Temporal controlled visual-stage long-soak、production-like repeated no-regression、visual ready、exportable、handoffable、human approval、App/operator sustained consumption 和 production-ready 不再混入功能/结构 gap。RCA 当前仍需关注的缺口是 generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene；这些只在 OPL default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance 成立后关闭。
 
