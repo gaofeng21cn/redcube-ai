@@ -3,8 +3,8 @@ function claimSpineLockOutputContract() {
   return [
     {
       claim_id: 'CLM-001',
-      claim_text: '<stable source-backed claim>',
-      source_refs: ['<source ref>'],
+      claim_text: '<stable claim carrying declared source refs>',
+      source_refs: ['<declared source ref>'],
       first_use_naming: {
         full_visible_name: '<full audience-facing name>',
         accepted_abbreviation: '<accepted abbreviation or null>',

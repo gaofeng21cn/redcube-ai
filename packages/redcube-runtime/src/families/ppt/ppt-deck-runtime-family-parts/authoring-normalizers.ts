@@ -166,7 +166,6 @@ export function createPptDeckAuthoringNormalizers(deps) {
       storylineLock,
       'visual_direction.claim_spine_lock',
     );
-    return storylineLock;
   }
 
   function normalizeOutlineSlide(slide, index, defaultPublicSources) {

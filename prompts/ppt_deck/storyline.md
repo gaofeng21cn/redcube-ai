@@ -12,7 +12,7 @@
 - AI 必须自行产出 speaker / audience / style / core_metaphor / hook / journey / resolution；不要复制 prompt 中的字段占位或默认句式。
 - 关键转折必须由事实资产支撑，不做口号堆砌。
 - 明确哪些判断必须在后续详细大纲与证据页展开。
-- 为核心判断建立 `claim_spine_lock`：每个 claim 使用稳定 `claim_id` 和 `claim_text`，绑定 `source_refs`、首次具名规则、引入/证明/收束页与 `forbidden_drift`；后续 stage 不得静默改写其含义。
+- 为核心判断建立 `claim_spine_lock`：每个 claim 使用稳定 `claim_id` 和 `claim_text`，声明 `source_refs`、首次具名规则、引入/证明/收束页与 `forbidden_drift`；后续 stage 必须原样保留这些 declared refs，不得静默改写其含义。该 continuity gate 不替代上游 source-truth 或 evidence-binding 校验。
 - 输入充分时一次完成当前 stage，让 runtime 自动进入下一 stage；只有真实 source/scope/approval 边界改变故事结构时才返回人工决策需求。
 
 ## runtime_artifact
@@ -40,8 +40,8 @@
     "claim_spine_lock": [
       {
         "claim_id": "CLM-001",
-        "claim_text": "<stable source-backed claim>",
-        "source_refs": ["<source ref>"],
+        "claim_text": "<stable claim carrying declared source refs>",
+        "source_refs": ["<declared source ref>"],
         "first_use_naming": {
           "full_visible_name": "<full audience-facing name>",
           "accepted_abbreviation": null,

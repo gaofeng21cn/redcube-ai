@@ -212,7 +212,7 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
   });
 });
 
-test('ppt claim spine lock remains canonical across story stages and reaches visual direction', { concurrency: false }, async () => {
+test('ppt claim spine lock preserves declared source refs across story stages and reaches visual direction', { concurrency: false }, async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-lock-'));
     const runRoute = (deliverableId, route) => runDeliverableRoute({
@@ -230,7 +230,7 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
       topicId: 'topic-claim-lock',
       deliverableId: 'deck-claim-lock',
       title: 'MedAutoScience 证据主线',
-      goal: '面向医学人工智能同行讲清同一条来源可追溯的核心判断。',
+      goal: '面向医学人工智能同行验证同一组 declared source refs 的逐阶段连续性。',
     });
 
     const storylineResult = await runRoute('deck-claim-lock', 'storyline');
@@ -335,7 +335,7 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
       topicId: 'topic-claim-lock',
       deliverableId: 'deck-claim-drift',
       title: 'MedAutoScience 证据主线',
-      goal: '面向医学人工智能同行讲清同一条来源可追溯的核心判断。',
+      goal: '面向医学人工智能同行验证 declared source refs 不能被下游静默改写。',
     });
     assert.equal((await runRoute('deck-claim-drift', 'storyline')).ok, true);
 
