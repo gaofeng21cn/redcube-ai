@@ -1,6 +1,6 @@
 {
   "id": "product_entry_session_continuity",
-  "status": "closeout_completed",
+  "status": "generic_session_sources_retired_domain_snapshot_projection_verified",
   "contract": "contracts/runtime-program/product-entry-session-continuity.json",
   "brief": "human_doc:program_product_entry_session_continuity",
   "adapter_surface": "opl_codex_executor",

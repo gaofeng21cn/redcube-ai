@@ -1,9 +1,8 @@
-import { resolveProductEntryCurrentness } from './product-entry-currentness-resolver.js';
 import type { ProductEntrySessionResponse } from '../types.js';
-import { buildProductEntrySessionDomainSnapshotRefs } from './get-product-entry-session-parts/session-surfaces.js';
 import {
-  loadProductEntrySessionRef,
-} from './product-entry-session-refs.js';
+  buildProductEntrySessionDomainSnapshotRefs,
+  normalizeOplProductSessionEnvelope,
+} from './product-entry-domain-snapshot-refs.js';
 import { requireField } from './action-utils.js';
 
 export async function getProductEntrySession(
@@ -13,10 +12,10 @@ export async function getProductEntrySession(
     'entry_session_id',
     request.entry_session_id || request.entrySessionId,
   );
-  const storedSession = loadProductEntrySessionRef({ entrySessionId });
-  if (!storedSession) {
-    throw new Error(`product entry session 不存在: ${entrySessionId}`);
-  }
-  const { session } = resolveProductEntryCurrentness({ session: storedSession, persist: false });
-  return buildProductEntrySessionDomainSnapshotRefs({ entrySessionId, session });
+  const envelope = normalizeOplProductSessionEnvelope(
+    request.opl_session_envelope || request.oplSessionEnvelope,
+    entrySessionId,
+    { required: true },
+  );
+  return buildProductEntrySessionDomainSnapshotRefs(envelope);
 }

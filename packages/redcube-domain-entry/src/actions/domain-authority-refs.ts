@@ -33,8 +33,7 @@ export function buildRedCubeDomainAuthorityRefs({
 } = {}) {
   const artifactLocatorContract = buildArtifactLocatorContract({
     workspaceRoot,
-    runtimeStateRoot: runtime?.runtime_state_root,
-    sessionContinuityRoot: runtime?.session_continuity_root,
+    productSessionSurfaceRef: runtime?.product_session_surface_ref,
   });
   const receiptRefs = buildDomainActionAdapterReceiptRefs();
   const controlledAttemptFixture = buildControlledVisualStageAttemptFixture();

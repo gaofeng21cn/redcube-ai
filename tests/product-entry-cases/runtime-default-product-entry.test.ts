@@ -62,9 +62,10 @@ test('default product-entry path returns an OPL stage execution plan without req
       },
     });
     assertPathValues(invoked, {
-      'entry_session.runtime_owner': RUNTIME_OWNER,
-      'session_continuity.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      'session_handoff_refs.entry_session_id': 'session-codex-default',
+      'session_handoff_refs.delivery_locator_refs.deliverable_id': 'deck-codex-default',
+      'authority_boundary.generic_session_runtime_owner': 'one-person-lab',
+      'authority_boundary.rca_owns_generic_session_runtime': false,
       'domain_entry_surface.runtime_session_contract.runtime_owner': RUNTIME_OWNER,
       'domain_entry_surface.runtime_session_contract.adapter_surface': 'opl_codex_executor',
       'domain_entry_surface.result_surface.surface_kind': 'opl_stage_execution_plan',
@@ -73,7 +74,22 @@ test('default product-entry path returns an OPL stage execution plan without req
       'domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner': 'one-person-lab',
     });
 
-    const session = await getProductEntrySession({ entry_session_id: 'session-codex-default' });
+    const handoff = invoked.session_handoff_refs;
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-codex-default',
+      opl_session_envelope: {
+        surface_kind: 'opl_product_session_envelope',
+        owner: 'one-person-lab',
+        runtime_owner: RUNTIME_OWNER,
+        session_ref: 'opl-session:session-codex-default',
+        entry_session_id: 'session-codex-default',
+        domain_snapshot_ref: handoff.domain_snapshot_ref,
+        delivery_locator_refs: handoff.delivery_locator_refs,
+        currentness_refs: handoff.currentness_refs,
+        stage_folder_locator_refs: handoff.stage_folder_locator_refs,
+        artifact_authority_refs: handoff.artifact_authority_refs,
+      },
+    });
     assertPathValues(session, {
       projection_kind: 'rca_product_entry_session_domain_snapshot_refs',
       'entry_session_ref.runtime_owner': RUNTIME_OWNER,

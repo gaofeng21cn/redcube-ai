@@ -122,6 +122,15 @@ test('RCA functional audit keeps generic runtime ownership retired without copyi
       assert.equal(entry.mechanical_decision_forbidden_for_all_authority_surfaces, true);
       continue;
     }
+    if (moduleId === 'product_entry_continuity_refs_adapter') {
+      assert.match(entry.physical_deletion_guard.reason, /generic session sources are retired/i);
+      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+        'replacement_rca_domain_snapshot_refs_handler',
+      ]);
+      assert.equal(entry.physical_deletion_guard.generic_session_source_retirement, 'completed');
+      assert.equal(audit.owner_evidence_lane_index['product-entry-continuity-refs-adapter'], undefined);
+      continue;
+    }
 
     const segment = moduleId.replaceAll('_', '-');
     assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [

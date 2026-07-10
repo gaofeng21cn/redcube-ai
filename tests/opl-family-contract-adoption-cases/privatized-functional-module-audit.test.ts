@@ -175,15 +175,23 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       } else {
         assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
-        assert.match(
-          entry.physical_deletion_guard.reason,
-          /retained RCA domain authority or refs-only projection/,
-          entry.module_id,
-        );
-        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-          'domain_authority_refs_preserved',
-          'no_regression_proof_recorded',
-        ], entry.module_id);
+        if (entry.module_id === 'product_entry_continuity_refs_adapter') {
+          assert.match(entry.physical_deletion_guard.reason, /generic session sources are retired/i);
+          assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+            'replacement_rca_domain_snapshot_refs_handler',
+          ]);
+          assert.equal(entry.physical_deletion_guard.generic_session_source_retirement, 'completed');
+        } else {
+          assert.match(
+            entry.physical_deletion_guard.reason,
+            /retained RCA domain authority or refs-only projection/,
+            entry.module_id,
+          );
+          assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
+            'domain_authority_refs_preserved',
+            'no_regression_proof_recorded',
+          ], entry.module_id);
+        }
       }
       assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
       assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
@@ -222,8 +230,14 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.equal(entry.opl_replacement_expectation.rca_consumes_as, 'consumer_projection_only', moduleId);
     assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, moduleId);
   }
-  assert.equal(byId.product_entry_continuity_refs_adapter.status, 'opl_generated_workbench_session_surface_consumed');
-  assert.equal(byId.product_entry_continuity_refs_adapter.activeCallerStatus, 'opl_generated_session_shell_domain_refs');
+  assert.equal(
+    byId.product_entry_continuity_refs_adapter.status,
+    'generic_session_sources_retired_domain_snapshot_refs_retained',
+  );
+  assert.equal(
+    byId.product_entry_continuity_refs_adapter.activeCallerStatus,
+    'opl_generated_session_shell_consumes_rca_domain_snapshot_refs',
+  );
   assert.equal(byId.product_entry_continuity_refs_adapter.opl_generic_primitive, 'workbench_shell');
   assert.equal(byId.product_entry_continuity_refs_adapter.migration_class, 'refs_only_adapter');
   const defaultCallerContract = byId.product_entry_continuity_refs_adapter.default_caller_contract;
@@ -231,16 +245,12 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   assert.equal(defaultCallerContract.generated_session_shell_owner, 'one-person-lab');
   assert.equal(defaultCallerContract.generated_session_command, 'opl_generated:product_session');
   assert.equal(defaultCallerContract.rca_role, 'entry_session_domain_snapshot_refs_only_adapter');
-  assert.equal(defaultCallerContract.default_caller_status, 'opl_generated_session_shell_domain_refs');
+  assert.equal(defaultCallerContract.default_caller_status, 'generic_session_sources_retired_opl_envelope_required');
   assert.equal(defaultCallerContract.rca_owns_generic_session_shell, false);
-  assert.equal(defaultCallerContract.physical_delete_authorized_now, false);
+  assert.equal(defaultCallerContract.generic_session_source_retirement, 'completed');
   assert.equal(
-    defaultCallerContract.physical_delete_requires_owner_receipt_ref,
-    'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
-  );
-  assert.equal(
-    defaultCallerContract.no_forbidden_write_ref,
-    'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+    defaultCallerContract.required_absent_source_refs_policy,
+    'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy/typescript_ast_owner_boundary/required_absent_source_refs',
   );
   assert.equal(byId.workspace_source_intake.opl_generic_primitive, 'workspace_source_intake_shell');
   assert.equal(byId.workspace_source_intake.activeCallerStatus, 'opl_workspace_source_shell_domain_handler_refs');

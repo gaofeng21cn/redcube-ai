@@ -1,13 +1,15 @@
 {
   "opl_hosted_product_entry_id": "opl_framework_hosted_product_entry",
-  "date_anchor": "2026-04-12",
-  "status": "closeout_completed",
-  "goal": "Land a repo-verified OPL-hosted stage runtime handoff surface that converges onto the same RedCube product-entry downstream contract.",
+  "date_anchor": "2026-07-10",
+  "status": "hosted_domain_entry_with_opl_session_handoff_refs_current",
+  "goal": "Validate the OPL-hosted envelope and delegate to the same RCA domain entry without reconstructing a session shell.",
   "current_facing_boundary": {
     "manager": "OPL stage-led hosted integration",
     "entry_mode": "opl_hosted",
-    "layer_role": "thin product-managed adapter/projection layer over the configured family runtime provider",
+    "layer_role": "thin validation and delegation adapter over the configured family runtime provider",
     "does_not_own": [
+      "OPL product-session persistence",
+      "OPL provider currentness",
       "RedCube visual-domain truth",
       "canonical artifacts",
       "review-state truth",
@@ -40,6 +42,7 @@
   "behavior_contract": {
     "delegate_to": "@redcube/domain-entry invokeProductEntry",
     "preserve_visual_domain_boundary": true,
+    "reconstruct_generic_session_shell": false,
     "fail_closed_on": [
       "unsupported_target_domain_id",
       "unsupported_entry_mode",
@@ -55,17 +58,12 @@
       "entry_mode",
       "runtime_session_contract",
       "return_surface_contract",
-      "entry_session",
-      "delivery_identity",
-      "continuation_snapshot",
-      "session_continuity",
-      "progress_projection",
-      "artifact_inventory",
+      "product_entry_surface",
+      "session_handoff_refs",
       "review_state",
       "publication_projection",
-      "runtime_loop_closure",
-      "summary",
-      "product_entry_surface"
+      "authority_boundary",
+      "summary"
     ]
   }
 }

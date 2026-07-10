@@ -1,54 +1,48 @@
-# Product Entry Session Continuity
+# Product Entry Session Domain Snapshot Boundary
 
 Owner: `RedCube AI`
-Purpose: `product_entry_session_continuity_support`
+Purpose: `product_entry_session_domain_snapshot_support`
 State: `contract_linked_support`
-Machine boundary: 人读 product-entry support。机器真相继续归 `contracts/runtime-program/product-entry-session-continuity.json`、product-entry manifest、CLI/MCP/API behavior、source、runtime artifacts 和 owner receipts。
+Machine boundary: 人读 product-entry support。机器真相归 `contracts/runtime-program/product-entry-session-continuity.json`、`contracts/physical_source_morphology_policy.json`、API behavior、source 和 OPL-owned session envelope。
 
-状态锚点：`2026-04-12`
-当前治理复核：`2026-05-26`
-
-生命周期说明：本文解释 product-entry session continuity 与用户级 runtime-state 行为。旧 `managed_product_entry_hardening` 语义 ID 和 `managed-product-entry-hardening.json` 文件只作为 tombstone/provenance 保留，不作为 callable contract、alias、facade 或 compatibility wrapper。
+状态锚点：`2026-07-10`
 
 ## 一句话结论
 
-`product entry` 具备用户级 runtime-state session continuity；该能力不表示 RCA 仓承担 generic framework/runtime。
+Product session 的持久化、continuation identity 与 provider currentness 归 OPL；RCA 不再持有本地 session store，也不扫描 workspace runs 推导 session currentness。RCA 只消费显式 OPL session envelope，并返回 domain snapshot、deliverable locator、currentness、Stage Folder locator 与 artifact authority refs。
 
-当前 source / CLI 读法是：`getProductEntrySession` 仍是 RCA direct API 和 OPL generated session shell continuation target；repo-local `redcube product session` 不再作为当前 CLI wrapper surface 保留。session continuity 是 refs-only entry-session domain snapshot adapter，不写 visual truth、artifact body、memory body、review/export verdict，也不把 RCA 变成 generic session runtime owner。
+## 当前调用边界
 
-## 这一步解决什么
+- `invokeProductEntry`：执行 RCA domain entry，并返回 `session_handoff_refs` 给 OPL 持久化。
+- `invokeOplHostedProductEntry`：校验 hosted envelope 后复用同一 domain entry，不组装 session/workbench shell。
+- `getProductEntrySession`：必须接收 `opl_session_envelope`，只投影 RCA domain refs。
+- `opl_generated:product_session`：generic product-session shell 与 continuation 的 owner surface。
 
-direct / OPL-hosted 两条入口共享一个用户级 session-continuity root：
+OPL envelope 必须提供：
 
-`$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/`
+- `session_ref` 与 `entry_session_id`
+- `domain_snapshot_ref`
+- `delivery_locator_refs`
+- `currentness_refs`
+- `stage_folder_locator_refs`
+- `artifact_authority_refs`
 
-同一个 `entry_session_id` 可以稳定回到同一个 deliverable，并读回：
+provider attempt currentness 必须同时提供 `provider_attempt_ref` 与 `provider_attempt_ledger_ref`；只提供其中一个会 fail closed。
 
-- latest OPL stage-plan / route-run checkpoint
-- runtime projection
-- review state
-- publication projection
+## 已物理退役
 
-## 合同与调用面
+RCA source tree 不再包含：
 
-- contract：`contracts/runtime-program/product-entry-session-continuity.json`
-- action ref：`get_product_entry_session`
-- API surface：`getProductEntrySession`
-- CLI：OPL generated/default product session shell target；repo-local `redcube product` 当前只保留 `invoke`
-- MCP：`get_product_entry_session`
+- `product-entry-session-refs.ts`
+- `product-entry-currentness-resolver.ts`
+- `get-product-entry-session-parts/session-surfaces.ts`
+- `product-entry-continuity-surfaces.ts`
 
-## 最小行为
-
-1. `invokeProductEntry` 与 `invokeOplHostedProductEntry` 都写入同一个 session-continuity root
-2. `entry_session_id` 绑定同一 deliverable identity
-3. continuation surface 必须显式返回 latest handles
-4. 用户级 runtime-state 继续只落在 `$CODEX_HOME/projects/redcube-ai/runtime-state/`
+`scripts/check-private-platform-retirement.ts` 通过 TypeScript AST hard gate 保证这些文件不得复活，并禁止 product-session owner source 导入 `node:fs` / `node:fs/promises` 或重新输出本地 session persistence 字段。
 
 ## 明确不做
 
-- 不伪造跨 deliverable 的 session continuity
-- 不把 session continuity state 写回 repo-tracked 目录
-- 不用 fallback 掩盖 session drift
-- 不把 direct `getProductEntrySession` refs adapter 写成 RCA-owned generic session shell
-- 不把 session continuity 写成旧 workbench、repo-local Hermes runtime 或 managed web runtime 已落地
-- 不为退役 session / gateway / frontdoor alias 保留兼容入口
+- 不保留旧 store compatibility、fallback restore 或 local-currentness wrapper。
+- 不把 `entry_session_id` 当成 RCA 本地持久化 key。
+- 不返回 continuity、progress、artifact inventory、runtime-loop、family orchestration 或 workbench body。
+- 不把 docs、focused tests 或 refs-only projection 写成 OPL runtime readiness 证据。

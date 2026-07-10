@@ -15,8 +15,6 @@ import type {
   PublicationProjectionResponse,
   ReviewStateResponse,
   RouteRunResponse,
-  RuntimeProgressProjection,
-  RuntimeProjection,
   StageExecutionResponse,
   SurfaceBase,
   SurfaceSummary,
@@ -74,6 +72,9 @@ interface ProductEntryRequest extends Record<string, unknown> {
   };
   entry_session_contract: {
     entry_session_id: string;
+    provider_attempt_ref?: string;
+    provider_attempt_ledger_ref?: string;
+    opl_session_envelope?: OplProductSessionEnvelope;
   };
   task_intent?: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode?: string;
@@ -207,175 +208,65 @@ export interface ProductEntryPreflightCompanion {
   checks: ProductEntryPreflightCheck[];
 }
 
-export interface ProductEntryRestorePoint {
-  latest_handle: string | null;
-  latest_stage_execution_plan_ref: string | null;
-  latest_run_id: string | null;
-}
-
-export interface SessionContinuitySurface {
-  surface_kind: 'session_continuity';
-  entry_session_id: string;
-  session_file: string;
+export interface OplProductSessionEnvelope extends Record<string, unknown> {
+  surface_kind: 'opl_product_session_envelope';
+  owner: 'one-person-lab';
   runtime_owner: string;
-  delivery_identity: {
-    deliverable_family: string;
-    topic_id: string;
-    deliverable_id: string;
-    profile_id: string | null;
-  };
-  restore_point: ProductEntryRestorePoint;
-  summary: {
-    entry_session_id: string;
-    latest_handle: string | null;
-  };
-}
-
-export interface ProgressProjectionSurface {
-  surface_kind: 'progress_projection';
-  stage_execution_plan_ref: string | null;
-  projection: RuntimeProgressProjection;
-  refs: RuntimeProjection['refs'] | null;
-  summary: {
-    current_stage: string | null;
-    content_status: RuntimeProgressProjection['content_status'] | null;
-    needs_user_decision: boolean;
-  };
-}
-
-export interface ArtifactInventorySurface {
-  surface_kind: 'artifact_inventory';
+  session_ref: string;
   entry_session_id: string;
-  session_file: string;
-  restore_point: ProductEntryRestorePoint;
-  artifact_refs: string[];
-  refs: RuntimeProjection['refs'] | null;
-  summary: {
-    latest_handle: string | null;
-    artifact_ref_count: number;
-  };
+  domain_snapshot_ref: string;
+  delivery_locator_refs: ProductEntryDeliveryLocatorRefs;
+  currentness_refs: Omit<ProductEntryCurrentnessRefs, 'domain_snapshot_ref'>;
+  stage_folder_locator_refs: string[];
+  artifact_authority_refs: string[];
 }
 
-export interface RuntimeLoopClosureSurface {
-  surface_kind: 'runtime_loop_closure';
-  loop_owner: {
-    runtime_owner: string;
-    domain_owner: string;
-    product_entry_owner: string;
-  };
-  resume_point: {
-    entry_session_id: string | null;
-    session_file: string | null;
-    latest_stage_execution_plan_ref: string | null;
-    latest_run_id: string | null;
-    latest_handle: string | null;
-    resume_command_template: string;
-    checkpoint_locator_field: string;
-  };
-  progress_cursor: {
-    surface_kind: 'progress_projection';
-    surface_ref: string;
-    stage_execution_plan_ref: string | null;
-    current_stage: string | null;
-    content_status: RuntimeProgressProjection['content_status'] | null;
-    needs_user_decision: boolean;
-  };
-  artifact_pickup: {
-    surface_kind: 'artifact_inventory';
-    surface_ref: string;
-    deliverable_family: string | null;
-    topic_id: string | null;
-    deliverable_id: string | null;
-    artifact_refs: string[];
-    artifact_ref_count: number;
-  };
-  control_policy: {
-    approval_gate_id: string;
-    approval_required: boolean;
-    interrupt_policy: string;
-    continue_action: {
-      command: string;
-      surface_kind: 'product_entry_session';
-    };
-    human_gate_ids: string[];
-  };
-  source_linkage: {
-    current_source: string;
-    entry_mode: string | null;
-    direct_surface_kind: 'product_entry';
-    opl_hosted_surface_kind: 'opl_hosted_product_entry';
-    session_surface_kind: 'product_entry_session';
-    downstream_entry_surface_kind: 'domain_entry';
-  };
+export interface ProductEntryDeliveryLocatorRefs {
+  workspace_ref: string;
+  deliverable_family: string;
+  topic_id: string;
+  deliverable_id: string;
+  profile_id: string | null;
 }
 
-export interface OplFamilyLifecycleAdapterSurface {
-  surface_kind: 'opl_family_lifecycle_adapter';
-  adapter_id: string;
-  version: string;
-  domain_id: string;
-  domain_owner: string;
-  discovery: {
-    adoption_state: string;
-    owner_split: Record<string, string>;
-    route_surfaces: Array<Record<string, unknown>>;
-    delivery_identity: {
-      deliverable_family: string | null;
-      topic_id: string | null;
-      deliverable_id: string | null;
-      profile_id: string | null;
-    };
-  };
-  persistence: Record<string, unknown>;
-  lifecycle: Record<string, unknown>;
-  owner_route_discovery: Record<string, unknown>;
-  adoption: Record<string, unknown>;
-  authority_boundary: {
-    owns_domain_truth: boolean;
-    owns_canonical_artifacts: boolean;
-    owns_review_truth: boolean;
-    owns_publication_projection: boolean;
-    owns_concrete_executor: boolean;
-    allowed_authority: string[];
-  };
-  non_goals: string[];
+export interface ProductEntryCurrentnessRefs {
+  domain_snapshot_ref: string;
+  latest_surface_kind: string | null;
+  latest_stage_execution_plan_ref: string | null;
+  latest_visual_run_ref: string | null;
+  provider_attempt_ref: string | null;
+  provider_attempt_ledger_ref: string | null;
+  typed_blocker_ref: string | null;
+  next_forced_delta_refs: string[];
+}
+
+export interface ProductEntrySessionHandoffRefs extends Record<string, unknown> {
+  surface_kind: 'rca_product_entry_session_handoff_refs';
+  entry_session_id: string;
+  opl_session_ref: string | null;
+  previous_domain_snapshot_ref: string | null;
+  domain_snapshot_ref: string;
+  delivery_locator_refs: ProductEntryDeliveryLocatorRefs;
+  currentness_refs: ProductEntryCurrentnessRefs;
+  stage_folder_locator_refs: string[];
+  artifact_authority_refs: string[];
+  authority_refs: Record<string, unknown>;
 }
 
 interface ProductEntryResponse extends SurfaceBase<'product_entry'> {
   product_entry_contract_id: string;
-  entry_session: {
-    entry_session_id: string;
-    session_file: string;
-    resumed_from_session: boolean;
-    created_deliverable: boolean;
-    runtime_owner: string;
-  };
-  delivery_identity: {
-    deliverable_family: string;
-    topic_id: string;
-    deliverable_id: string;
-    profile_id: string | null;
-  };
   domain_entry_surface: DomainEntryResponse;
-  continuation_snapshot: {
-    latest_stage_execution_plan_ref: string | null;
-    latest_run_id: string | null;
-    runtime_progress_projection: RuntimeProgressProjection | null;
-    runtime_projection: RuntimeProjection | null;
-  };
-  session_continuity: SessionContinuitySurface;
-  progress_projection: ProgressProjectionSurface | null;
-  artifact_inventory: ArtifactInventorySurface;
-  runtime_loop_closure: RuntimeLoopClosureSurface;
+  session_handoff_refs: ProductEntrySessionHandoffRefs;
   review_state: ReviewStateResponse;
   publication_projection: PublicationProjectionResponse;
-  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
-  family_orchestration: FamilyOrchestrationCompanion;
+  authority_boundary: Record<string, unknown>;
   summary: {
     entry_session_id: string;
     task_intent: string;
     actual_surface_kind: string | null;
     target_handle: string | null;
+    latest_handle: string | null;
+    created_deliverable: boolean;
   };
 }
 
@@ -405,10 +296,11 @@ interface OplHostedProductEntryResponse extends SurfaceBase<'opl_hosted_product_
     requested_surface_kind: string;
     actual_surface_kind: string;
   };
-  family_orchestration: FamilyOrchestrationCompanion;
   product_entry_surface: ProductEntryResponse;
-  runtime_loop_closure: RuntimeLoopClosureSurface;
-  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
+  session_handoff_refs: ProductEntrySessionHandoffRefs;
+  review_state: ReviewStateResponse;
+  publication_projection: PublicationProjectionResponse;
+  authority_boundary: Record<string, unknown>;
   summary: {
     entry_session_id: string | null;
     actual_surface_kind: string;
@@ -421,11 +313,8 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
   owner: 'redcube_ai';
   entry_session_ref: {
     entry_session_id: string;
+    opl_session_ref: string;
     domain_snapshot_ref: string;
-    session_file_ref: {
-      ref_kind: 'runtime_state_path';
-      ref: string;
-    };
     runtime_owner: string;
   };
   delivery_locator_refs: {
@@ -445,6 +334,8 @@ export interface ProductEntrySessionResponse extends SurfaceBase<'product_entry_
     typed_blocker_ref: string | null;
     next_forced_delta_refs: string[];
   };
+  stage_folder_locator_refs: string[];
+  artifact_authority_refs: string[];
   authority_refs: {
     review_state_ref: string;
     publication_projection_ref: string;
@@ -543,8 +434,8 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
   };
   runtime: {
     runtime_owner: string;
-    runtime_state_root: string;
-    session_continuity_root: string;
+    product_session_surface_ref: string;
+    stage_folder_locator_contract_ref: string;
   };
   opl_provider_runtime_contract: {
     shared_contract_ref: string;
@@ -614,121 +505,7 @@ export interface ProductEntryManifestResponse extends SurfaceBase<'product_entry
     opl_hosted_product_entry_contract: string;
     session_continuity_provenance_contract: string;
   };
-  session_continuity: {
-    surface_kind: 'session_continuity';
-    owner: string;
-    status: string;
-    summary: string;
-    progress_surface_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    artifact_surface_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    restore_point_surface_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    restore_point_field_refs: Array<{
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    }>;
-    session_surface_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    session_file_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    session_command_template: string;
-    truth_surfaces: Array<{
-      surface_kind: string;
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    }>;
-  };
-  progress_projection: {
-    surface_kind: 'progress_projection';
-    owner: string;
-    status: string;
-    summary: string;
-    projection_field_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    runtime_refs_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    fallback_projection_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    fallback_runtime_refs_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    truth_surfaces: Array<{
-      surface_kind: string;
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    }>;
-  };
-  artifact_inventory: {
-    surface_kind: 'artifact_inventory';
-    owner: string;
-    status: string;
-    summary: string;
-    artifact_refs_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    artifact_ref_count_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    restore_point_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    artifact_refs_fallback_ref: {
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    };
-    restore_point_field_refs: Array<{
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    }>;
-    session_command_template: string;
-    truth_surfaces: Array<{
-      surface_kind: string;
-      ref_kind: string;
-      ref: string;
-      label?: string;
-    }>;
-  };
-  runtime_loop_closure: RuntimeLoopClosureSurface;
-  opl_family_lifecycle_adapter: OplFamilyLifecycleAdapterSurface;
+  opl_family_lifecycle_adapter: Record<string, unknown>;
   notes: string[];
 }
 

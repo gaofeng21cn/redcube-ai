@@ -3,6 +3,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
 import { parseArgs as parseNodeArgs } from 'node:util';
+import * as ts from 'typescript';
 
 import {
   buildPhysicalSourceMorphologyPolicy,
@@ -124,6 +125,111 @@ function activePrivatePlatformBehaviorViolations(scanPolicy) {
   return violations;
 }
 
+function propertyNameText(name) {
+  if (!name) return null;
+  if (ts.isIdentifier(name) || ts.isStringLiteralLike(name) || ts.isNumericLiteral(name)) {
+    return name.text;
+  }
+  if (ts.isComputedPropertyName(name) && ts.isStringLiteralLike(name.expression)) {
+    return name.expression.text;
+  }
+  return null;
+}
+
+function importedModuleText(node) {
+  if ((ts.isImportDeclaration(node) || ts.isExportDeclaration(node))
+    && node.moduleSpecifier && ts.isStringLiteralLike(node.moduleSpecifier)) {
+    return node.moduleSpecifier.text;
+  }
+  if (ts.isCallExpression(node) && node.arguments.length > 0
+    && ts.isStringLiteralLike(node.arguments[0])) {
+    if (node.expression.kind === ts.SyntaxKind.ImportKeyword) return node.arguments[0].text;
+    if (ts.isIdentifier(node.expression) && node.expression.text === 'require') {
+      return node.arguments[0].text;
+    }
+  }
+  return null;
+}
+
+function accessedPropertyText(node) {
+  if (ts.isPropertyAccessExpression(node)) return node.name.text;
+  if (ts.isElementAccessExpression(node) && node.argumentExpression
+    && ts.isStringLiteralLike(node.argumentExpression)) {
+    return node.argumentExpression.text;
+  }
+  if (ts.isBindingElement(node)) return propertyNameText(node.propertyName || node.name);
+  if (ts.isPropertyAssignment(node)
+    || ts.isShorthandPropertyAssignment(node)
+    || ts.isPropertyDeclaration(node)
+    || ts.isPropertySignature(node)
+    || ts.isMethodDeclaration(node)
+    || ts.isMethodSignature(node)
+    || ts.isGetAccessorDeclaration(node)
+    || ts.isSetAccessorDeclaration(node)) {
+    return propertyNameText(node.name);
+  }
+  return null;
+}
+
+export function analyzeTypeScriptOwnerBoundarySource({
+  sourceRef,
+  sourceText,
+  forbiddenModuleSpecifiers = [],
+  forbiddenPropertyNames = [],
+}) {
+  const forbiddenModules = new Set(forbiddenModuleSpecifiers);
+  const forbiddenProperties = new Set(forbiddenPropertyNames);
+  const sourceFile = ts.createSourceFile(
+    sourceRef,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    sourceRef.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const violations = [];
+  function visit(node) {
+    const moduleName = importedModuleText(node);
+    const propertyName = accessedPropertyText(node);
+    const position = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+    if (moduleName && forbiddenModules.has(moduleName)) {
+      violations.push(
+        `${sourceRef}:${position.line + 1}:${position.character + 1}:typescript_ast_owner_boundary:forbidden_module_import:${moduleName}`,
+      );
+    }
+    if (propertyName && forbiddenProperties.has(propertyName)) {
+      violations.push(
+        `${sourceRef}:${position.line + 1}:${position.character + 1}:typescript_ast_owner_boundary:forbidden_property:${propertyName}`,
+      );
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(sourceFile);
+  return violations;
+}
+
+function activePrivatePlatformTypeScriptAstViolations(scanPolicy) {
+  const violations = [];
+  for (const sourceRef of scanPolicy?.required_absent_source_refs || []) {
+    if (existsSync(path.resolve(REPO_ROOT, sourceRef))) {
+      violations.push(`${sourceRef}:typescript_ast_owner_boundary:required_absent_source_present`);
+    }
+  }
+  for (const sourceRef of scanPolicy?.owner_source_refs || []) {
+    const file = path.resolve(REPO_ROOT, sourceRef);
+    if (!existsSync(file)) {
+      violations.push(`${sourceRef}:typescript_ast_owner_boundary:owner_source_missing`);
+      continue;
+    }
+    violations.push(...analyzeTypeScriptOwnerBoundarySource({
+      sourceRef,
+      sourceText: readFileSync(file, 'utf-8'),
+      forbiddenModuleSpecifiers: scanPolicy.forbidden_module_specifiers,
+      forbiddenPropertyNames: scanPolicy.forbidden_property_names,
+    }));
+  }
+  return violations;
+}
+
 function collectFalseValueFailures(object, checkId, failures) {
   for (const [key, value] of Object.entries(object || {})) {
     if (value !== false) {
@@ -150,9 +256,13 @@ function buildActiveSourceScanSummary(physicalPolicy) {
 
   const scanRoots = scanPolicy.scan_roots || [];
   const behaviorScanPolicy = physicalPolicy.behavioral_source_scan_policy ?? null;
+  const astScanPolicy = behaviorScanPolicy?.typescript_ast_owner_boundary ?? null;
   const resurrectionViolations = activePrivatePlatformResurrectionViolations(scanRoots);
   const behaviorViolations = activePrivatePlatformBehaviorViolations(behaviorScanPolicy);
-  const violations = [...resurrectionViolations, ...behaviorViolations];
+  const astViolations = astScanPolicy
+    ? activePrivatePlatformTypeScriptAstViolations(astScanPolicy)
+    : [];
+  const violations = [...resurrectionViolations, ...behaviorViolations, ...astViolations];
 
   const failedChecks = [];
   collectFalseValueFailures(
@@ -172,6 +282,20 @@ function buildActiveSourceScanSummary(physicalPolicy) {
       failedChecks,
     );
   }
+  if (!astScanPolicy || typeof astScanPolicy !== 'object') {
+    failedChecks.push({ check_id: 'typescript_ast_owner_boundary', state: 'missing' });
+  } else {
+    for (const [field, values] of Object.entries({
+      owner_source_refs: astScanPolicy.owner_source_refs,
+      required_absent_source_refs: astScanPolicy.required_absent_source_refs,
+      forbidden_module_specifiers: astScanPolicy.forbidden_module_specifiers,
+      forbidden_property_names: astScanPolicy.forbidden_property_names,
+    })) {
+      if (!Array.isArray(values) || values.length === 0) {
+        failedChecks.push({ check_id: 'typescript_ast_owner_boundary', field, state: 'missing' });
+      }
+    }
+  }
   if (violations.length > 0) {
     failedChecks.push({
       check_id: 'active_source_resurrection_violations',
@@ -188,12 +312,14 @@ function buildActiveSourceScanSummary(physicalPolicy) {
     helper_ref: scanPolicy.helper_ref,
     test_ref: scanPolicy.test_ref,
     behavioral_scan_policy_id: behaviorScanPolicy?.policy_id ?? null,
+    typescript_ast_policy_id: astScanPolicy?.policy_id ?? null,
     forbidden_true_claim_keys: [...(scanPolicy.forbidden_true_claim_keys || [])],
     forbidden_construct_ids: (behaviorScanPolicy?.forbidden_constructs || [])
       .map((entry) => entry.construct_id),
     scanned_file_count: null,
     resurrection_violation_count: resurrectionViolations.length,
     behavior_violation_count: behaviorViolations.length,
+    typescript_ast_violation_count: astViolations.length,
     violation_count: violations.length,
     violations,
     failed_checks: failedChecks,
@@ -357,6 +483,8 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
         'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
       behavioral_source_scan_policy:
         'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy',
+      typescript_ast_owner_boundary_policy:
+        'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy/typescript_ast_owner_boundary',
     },
     guard_summary: {
       functional_structure_gap_count:
@@ -375,10 +503,12 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
         state: activeSourceScan.state,
         scan_policy_id: activeSourceScan.scan_policy_id,
         behavioral_scan_policy_id: activeSourceScan.behavioral_scan_policy_id,
+        typescript_ast_policy_id: activeSourceScan.typescript_ast_policy_id,
         forbidden_construct_ids: activeSourceScan.forbidden_construct_ids,
         scanned_file_count: activeSourceScan.scanned_file_count,
         resurrection_violation_count: activeSourceScan.resurrection_violation_count,
         behavior_violation_count: activeSourceScan.behavior_violation_count,
+        typescript_ast_violation_count: activeSourceScan.typescript_ast_violation_count,
         violation_count: activeSourceScan.violation_count,
         violations: activeSourceScan.violations,
       },

@@ -17,44 +17,12 @@ export function assertManifestRuntimeLoopAndLifecycle({ manifest, sharedCompanio
   assert.equal(manifest.authority_boundary.refs_only, true);
   assert.equal(manifest.authority_boundary.creates_owner_receipt, false);
   assert.equal(manifest.authority_boundary.creates_typed_blocker, false);
-  assert.equal(manifest.opl_family_lifecycle_adapter.surface_kind, 'opl_family_lifecycle_adapter');
-  assert.equal(manifest.opl_family_lifecycle_adapter.adapter_id, 'rca.opl.family.lifecycle.adapter.v1');
-  assert.equal(manifest.opl_family_lifecycle_adapter.discovery.adoption_state, 'discoverable_manifest_projection');
-  assert.equal(manifest.opl_family_lifecycle_adapter.persistence.sqlite.status, 'not_domain_owned_generic_persistence');
-  assert.equal(manifest.opl_family_lifecycle_adapter.persistence.authority_model, 'file_authority_plus_rebuildable_artifact_indexes');
-  assert.deepEqual(
-    manifest.opl_family_lifecycle_adapter.discovery.owner_split,
-    {
-      family_persistence_owner: 'one-person-lab',
-      session_shell_owner: 'one-person-lab',
-      stage_attempt_owner: 'one-person-lab',
-      attempt_ledger_owner: 'one-person-lab',
-      lifecycle_projection_owner: 'redcube_ai',
-      domain_truth_owner: 'redcube_ai',
-      review_publication_owner: 'redcube_ai',
-      runtime_manager_consumer: 'opl_runtime_manager',
-      executor_owner: 'configured_by_opl_runtime_provider',
-    },
-  );
-  assert.deepEqual(
-    manifest.opl_family_lifecycle_adapter.discovery.route_surfaces.map((surface) => surface.surface_id),
-    [
-      'product_entry_registration',
-      'opl_hosted_stage_runtime',
-      'product_entry_session',
-      'opl_stage_execution_plan',
-      'review_state',
-      'publication_projection',
-    ],
-  );
-  assert.equal(
-    manifest.opl_family_lifecycle_adapter.adoption.required_input_fields.includes('entry_session_id'),
-    true,
-  );
-  assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_domain_truth, false);
-  assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_canonical_artifacts, false);
-  assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_review_truth, false);
-  assert.equal(manifest.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
+  assert.deepEqual(manifest.opl_family_lifecycle_adapter, {
+    surface_kind: 'opl_generated_product_session_ref',
+    owner: 'one-person-lab',
+    ref: 'opl_generated:product_session',
+    rca_role: 'domain_result_and_currentness_refs_provider',
+  });
   const validatedManifest = sharedCompanions.validateFamilyProductEntryManifest(manifest);
   assert.equal(validatedManifest.domain_entry_contract.entry_adapter, 'RedCubeDomainEntry');
   assert.equal(validatedManifest.user_interaction_contract.entry_owner, 'redcube_agent_entry_shell');
