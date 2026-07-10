@@ -24,6 +24,7 @@ export function createPptDeckStageParts(deps) {
     SCREENSHOT_REVIEW_BATCH_SIZE,
     TARGETED_RENDER_HTML_BATCH_SIZE,
     aiFirstMechanicalCheckValue,
+    assertClaimSpineArtifactContinuity,
     attachCommon,
     buildAiFirstVisualSlideReview,
     buildAuthoringContext,
@@ -164,6 +165,13 @@ export function createPptDeckStageParts(deps) {
       .filter((stageId) => !readStageArtifact(contract, deliverablePaths, stageId));
     if (missing.length > 0) {
       throw new Error(`Route ${route} requires completed stage artifacts: ${missing.join(', ')}`);
+    }
+    if (deps.STAGE_REQUIREMENTS?.[route]
+      && !['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'].includes(route)) {
+      assertClaimSpineArtifactContinuity(
+        readStageArtifact(contract, deliverablePaths, 'slide_blueprint'),
+        readStageArtifact(contract, deliverablePaths, 'visual_direction'),
+      );
     }
     if (route === 'screenshot_review' && mode === 'optimize_existing' && !safeText(baselineDeliverableId)) {
       throw new Error('screenshot_review requires baselineDeliverableId in optimize_existing mode');

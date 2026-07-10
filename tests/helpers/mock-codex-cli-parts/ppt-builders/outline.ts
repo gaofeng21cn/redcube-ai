@@ -18,11 +18,15 @@ function hardExactSlideCount(meta) {
 }
 
 function renumberSlides(slides) {
-  return safeArray(slides).map((slide, index) => ({
+  const numbered = safeArray(slides).map((slide, index) => ({
     ...slide,
     slide_no: index + 1,
     slide_id: `S${String(index + 1).padStart(2, '0')}`,
   }));
+  if (process.env.REDCUBE_MOCK_PPT_CLAIM_SPINE_INVALID === 'duplicate_slide' && numbered.length > 1) {
+    numbered[1].slide_id = numbered[0].slide_id;
+  }
+  return numbered;
 }
 
 function chapterStructureForSlides(slides) {

@@ -30,6 +30,17 @@ export function createPptDeckAuthoringNormalizers(deps) {
     return items;
   }
 
+  function normalizeUniqueClaimStringList(value, label, { min, max }) {
+    const items = safeArray(value).map((item) => safeText(item)).filter(Boolean);
+    if (items.length > max) {
+      throw new Error(`${label} must contain at most ${max} entries in upstream ppt generation output`);
+    }
+    if (new Set(items).size !== items.length) {
+      throw new Error(`Duplicate ${label} entry in upstream ppt generation output`);
+    }
+    return normalizeStringList(items, label, { min, max });
+  }
+
   function normalizeClaimSpineLock(value, label = 'claim_spine_lock') {
     const claimIds = new Set();
     const claims = safeArray(value).map((claim, index) => {
@@ -43,7 +54,11 @@ export function createPptDeckAuthoringNormalizers(deps) {
       return {
         claim_id: claimId,
         claim_text: requireText(claim?.claim_text, `${claimLabel}.claim_text`),
-        source_refs: normalizeStringList(claim?.source_refs, `${claimLabel}.source_refs`, { min: 1, max: 12 }),
+        source_refs: normalizeUniqueClaimStringList(
+          claim?.source_refs,
+          `${claimLabel}.source_refs`,
+          { min: 1, max: 12 },
+        ),
         first_use_naming: {
           full_visible_name: requireText(
             claim?.first_use_naming?.full_visible_name,
@@ -59,7 +74,7 @@ export function createPptDeckAuthoringNormalizers(deps) {
           claim?.introduction_slide_id,
           `${claimLabel}.introduction_slide_id`,
         ),
-        proof_slide_ids: normalizeStringList(
+        proof_slide_ids: normalizeUniqueClaimStringList(
           claim?.proof_slide_ids,
           `${claimLabel}.proof_slide_ids`,
           { min: 1, max: 12 },
@@ -68,7 +83,7 @@ export function createPptDeckAuthoringNormalizers(deps) {
           claim?.resolution_slide_id,
           `${claimLabel}.resolution_slide_id`,
         ),
-        forbidden_drift: normalizeStringList(
+        forbidden_drift: normalizeUniqueClaimStringList(
           claim?.forbidden_drift,
           `${claimLabel}.forbidden_drift`,
           { min: 1, max: 8 },
@@ -91,7 +106,13 @@ export function createPptDeckAuthoringNormalizers(deps) {
   }
 
   function assertClaimSpineSlideMapping(claimSpineLock, slides, label) {
-    const slideIds = new Set(safeArray(slides).map((slide) => safeText(slide?.slide_id)).filter(Boolean));
+    const orderedSlideIds = safeArray(slides).map((slide, index) => (
+      requireText(slide?.slide_id, `${label}.slides[${index}].slide_id`)
+    ));
+    if (new Set(orderedSlideIds).size !== orderedSlideIds.length) {
+      throw new Error(`${label} contains duplicate slide_id values`);
+    }
+    const slidePositions = new Map(orderedSlideIds.map((slideId, index) => [slideId, index]));
     for (const claim of claimSpineLock) {
       const mappedSlideIds = [
         claim.first_use_naming.first_use_slide_id,
@@ -99,11 +120,33 @@ export function createPptDeckAuthoringNormalizers(deps) {
         ...claim.proof_slide_ids,
         claim.resolution_slide_id,
       ];
-      const missingSlideIds = [...new Set(mappedSlideIds)].filter((slideId) => !slideIds.has(slideId));
+      const missingSlideIds = [...new Set(mappedSlideIds)].filter((slideId) => !slidePositions.has(slideId));
       if (missingSlideIds.length > 0) {
         throw new Error(`${label} claim ${claim.claim_id} references missing slide ids: ${missingSlideIds.join(', ')}`);
       }
+      const mappedPositions = mappedSlideIds.map((slideId) => slidePositions.get(slideId));
+      if (mappedPositions.some((position, index) => index > 0 && position < mappedPositions[index - 1])) {
+        throw new Error(`${label} claim ${claim.claim_id} must use non-decreasing slide order for first-use, introduction, proof, and resolution`);
+      }
     }
+  }
+
+  function assertClaimSpineArtifactContinuity(blueprintArtifact, visualArtifact) {
+    const blueprintLock = normalizeClaimSpineLock(
+      blueprintArtifact?.slide_blueprint?.claim_spine_lock,
+      'slide_blueprint.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(
+      blueprintLock,
+      blueprintArtifact?.slide_blueprint?.slides,
+      'slide_blueprint.claim_spine_lock',
+    );
+    preserveClaimSpineLock(
+      visualArtifact?.visual_direction?.claim_spine_lock,
+      blueprintLock,
+      'visual_direction.claim_spine_lock',
+    );
+    return blueprintLock;
   }
 
   function normalizeOutlineSlide(slide, index, defaultPublicSources) {
@@ -306,6 +349,7 @@ export function createPptDeckAuthoringNormalizers(deps) {
   }
 
   return {
+    assertClaimSpineArtifactContinuity,
     assertClaimSpineSlideMapping,
     normalizeBlueprintDraft,
     normalizeClaimSpineLock,

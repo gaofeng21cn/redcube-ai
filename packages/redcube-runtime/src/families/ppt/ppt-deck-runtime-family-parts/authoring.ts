@@ -83,6 +83,7 @@ export function createPptDeckAuthoringParts(deps) {
     sharedSourceLabels,
   });
   const {
+    assertClaimSpineArtifactContinuity,
     assertClaimSpineSlideMapping,
     normalizeBlueprintDraft,
     normalizeClaimSpineLock,
@@ -274,6 +275,7 @@ export function createPptDeckAuthoringParts(deps) {
   }
 
   return {
+    assertClaimSpineArtifactContinuity,
     buildAuthoringContext,
     buildStoryline,
     directorReviewOutputContract,

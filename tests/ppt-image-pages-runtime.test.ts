@@ -114,9 +114,26 @@ function seedWorkspace() {
   const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   writeJson(paths.deliverableFile, { ...record, hydrated_contract_ref: 'contracts/hydrated-deliverable.json' });
   writeJson(path.join(paths.deliverableDir, 'contracts/hydrated-deliverable.json'), contract);
+  const claimSpineLock = [
+    {
+      claim_id: 'CLM-001',
+      claim_text: 'Image page authoring must preserve the same reviewed claim',
+      source_refs: ['source:test:image-pages'],
+      first_use_naming: {
+        full_visible_name: 'Image page route',
+        accepted_abbreviation: null,
+        first_use_slide_id: 'S01',
+      },
+      introduction_slide_id: 'S01',
+      proof_slide_ids: ['S02'],
+      resolution_slide_id: 'S02',
+      forbidden_drift: ['Do not replace the claim with route metadata'],
+    },
+  ];
   writeStageArtifact(paths, contract, 'slide_blueprint', {
     route: 'slide_blueprint',
     slide_blueprint: {
+      claim_spine_lock: claimSpineLock,
       slides: [
         {
           slide_id: 'S01',
@@ -136,6 +153,7 @@ function seedWorkspace() {
   writeStageArtifact(paths, contract, 'visual_direction', {
     route: 'visual_direction',
     visual_direction: {
+      claim_spine_lock: claimSpineLock,
       palette: ['ink', 'red', 'white'],
       visual_rules: ['image-first page', 'readable large type'],
     },

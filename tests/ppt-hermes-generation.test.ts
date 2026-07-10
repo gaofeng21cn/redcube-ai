@@ -286,6 +286,29 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
       assert.equal(slideIds.has(claimSpineLock[0].resolution_slide_id), true);
     }
 
+    const blueprintFile = routeArtifactFile(blueprintResult);
+    const visualFile = routeArtifactFile(visualResult);
+    const blueprintWithoutLock = readJson(blueprintFile);
+    const visualWithoutLock = readJson(visualFile);
+    delete blueprintWithoutLock.slide_blueprint.claim_spine_lock;
+    delete visualWithoutLock.visual_direction.claim_spine_lock;
+    writeFileSync(blueprintFile, `${JSON.stringify(blueprintWithoutLock, null, 2)}\n`);
+    writeFileSync(visualFile, `${JSON.stringify(visualWithoutLock, null, 2)}\n`);
+
+    const { stageParts } = createPptDeckRuntimeCore();
+    for (const route of ['author_image_pages', 'author_pptx_native']) {
+      assert.throws(
+        () => stageParts.ensurePrerequisites({
+          workspaceRoot,
+          topicId: 'topic-claim-lock',
+          deliverableId: 'deck-claim-lock',
+          route,
+          mode: 'draft_new',
+        }),
+        /claim_spine_lock/,
+      );
+    }
+
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -311,6 +334,62 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
       driftedOutlineResult.run?.error?.message || '',
       /must preserve the canonical storyline claim_spine_lock without semantic drift/,
     );
+  });
+});
+
+test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings', async () => {
+  await withMockCodexRuntime(async () => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-invalid-'));
+    const variants = [
+      ['duplicate_source', 'storyline', /duplicate.*source_refs/i],
+      ['oversized_source', 'storyline', /source_refs.*at most 12/i],
+      ['duplicate_proof', 'storyline', /duplicate.*proof_slide_ids/i],
+      ['oversized_proof', 'storyline', /proof_slide_ids.*at most 12/i],
+      ['duplicate_forbidden', 'storyline', /duplicate.*forbidden_drift/i],
+      ['oversized_forbidden', 'storyline', /forbidden_drift.*at most 8/i],
+      ['reversed_mapping', 'detailed_outline', /non-decreasing slide order/i],
+      ['duplicate_slide', 'detailed_outline', /duplicate slide_id/i],
+    ];
+
+    for (const [variant, failingRoute, messagePattern] of variants) {
+      const deliverableId = `deck-claim-${variant}`;
+      await createDeliverable({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        profileId: 'lecture_peer',
+        topicId: 'topic-claim-invalid',
+        deliverableId,
+        title: 'Claim spine validation',
+        goal: '验证 claim spine 非法输入必须 fail closed。',
+      });
+      const restoreInvalid = withEnv({
+        REDCUBE_MOCK_PPT_CLAIM_SPINE_INVALID: variant,
+      });
+      let result;
+      try {
+        if (failingRoute !== 'storyline') {
+          const storylineResult = await runDeliverableRoute({
+            workspaceRoot,
+            overlay: 'ppt_deck',
+            topicId: 'topic-claim-invalid',
+            deliverableId,
+            route: 'storyline',
+          });
+          assert.equal(storylineResult.ok, true, `${variant}:storyline`);
+        }
+        result = await runDeliverableRoute({
+          workspaceRoot,
+          overlay: 'ppt_deck',
+          topicId: 'topic-claim-invalid',
+          deliverableId,
+          route: failingRoute,
+        });
+      } finally {
+        restoreInvalid();
+      }
+      assert.equal(result.ok, false, variant);
+      assert.match(result.run?.error?.message || '', messagePattern, variant);
+    }
   });
 });
 
