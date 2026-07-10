@@ -188,7 +188,12 @@ export const FAMILY_STAGE_SEQUENCE = {
       rerun_from_stage: 'screenshot_review',
     },
   ],
-} as const;
+} as const satisfies {
+  flow_id: string;
+  stages: readonly Record<string, unknown>[];
+  alternate_stages: readonly Record<string, unknown>[];
+  hard_stops: readonly Record<string, unknown>[];
+};
 
 export const FAMILY_REVIEW_SURFACE = {
   required_checks: [
@@ -313,7 +318,11 @@ export const FAMILY_STAGE_REQUIREMENTS = {
     requires_artifacts: ['screenshot_review'],
     requires_review_pass: true,
   },
-} as const;
+} as const satisfies Record<string, {
+  requires_artifacts: readonly string[];
+  requires_review_pass?: true;
+  requires_review_from_any?: readonly string[];
+}>;
 
 export const FAMILY_PROMPT_PACK = {
   pack_id: 'ppt_deck_mainline_v1',
@@ -611,10 +620,10 @@ function isPptDeckProfileId(value: string): value is PptDeckProfileId {
 
 export function describePptDeckOverlay() {
   return {
-    overlay_id: 'ppt_deck',
+    overlay_id: 'ppt_deck' as const,
     default_profile_id: 'lecture_student',
     profiles: Object.keys(PPT_DECK_PROFILES) as PptDeckProfileId[],
-    deliverable_kind: 'ppt_deck',
+    deliverable_kind: 'ppt_deck' as const,
     prompt_pack_id: FAMILY_PROMPT_PACK.pack_id,
     route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
     visual_authoring_policy: {

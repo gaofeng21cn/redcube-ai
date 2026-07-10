@@ -1,29 +1,60 @@
 import type { OverlayProfileDefinition } from '@redcube/overlay-core';
 
-type PosterCatalog = ReturnType<typeof import('./contracts.js').describePosterOnepagerOverlay>;
+type PosterContractModule = typeof import('./contracts.js');
+type PosterCatalog = ReturnType<PosterContractModule['describePosterOnepagerOverlay']>;
+
+type PosterCanonicalStageSequence = PosterContractModule['POSTER_STAGE_SEQUENCE'];
+type PosterCanonicalStageDefinition = PosterCanonicalStageSequence['stages'][number];
+type PosterCanonicalStageHardStop = PosterCanonicalStageSequence['hard_stops'][number];
+type PosterCanonicalStageRequirements = PosterContractModule['POSTER_STAGE_REQUIREMENTS'];
 
 export type PosterOnepagerOverlayId = PosterCatalog['overlay_id'];
 export type PosterOnepagerProfileId = PosterCatalog['profiles'][number];
 export type PosterOnepagerDeliverableKind = PosterCatalog['deliverable_kind'];
-export type PosterOnepagerStageSequence = typeof import('./contracts.js').POSTER_STAGE_SEQUENCE;
-export type PosterOnepagerStageDefinition = PosterOnepagerStageSequence['stages'][number];
-export type PosterOnepagerStageHardStop = PosterOnepagerStageSequence['hard_stops'][number];
-export type PosterOnepagerStageId = PosterOnepagerStageDefinition['stage_id'];
-export type PosterOnepagerPromptFile = PosterOnepagerStageDefinition['prompt_file'];
-export type PosterOnepagerOutputArtifactFile = PosterOnepagerStageDefinition['output_artifact'];
-export type PosterOnepagerStageRequirements = typeof import('./contracts.js').POSTER_STAGE_REQUIREMENTS;
-export type PosterOnepagerStageRequirement = PosterOnepagerStageRequirements[keyof PosterOnepagerStageRequirements];
-export type PosterOnepagerReviewSurface = typeof import('./contracts.js').POSTER_REVIEW_SURFACE;
+export type PosterOnepagerStageId = PosterCanonicalStageDefinition['stage_id'];
+export type PosterOnepagerPromptFile = PosterCanonicalStageDefinition['prompt_file'];
+export type PosterOnepagerOutputArtifactFile = PosterCanonicalStageDefinition['output_artifact'];
+
+export interface PosterOnepagerStageDefinition {
+  stage_id: PosterOnepagerStageId;
+  prompt_file: PosterOnepagerPromptFile;
+  output_artifact: PosterOnepagerOutputArtifactFile;
+  requires_stages: PosterOnepagerStageId[];
+}
+
+export interface PosterOnepagerStageHardStop {
+  stage_id: PosterOnepagerStageId;
+  rerun_from_stage: PosterCanonicalStageHardStop['rerun_from_stage'];
+  requires_stage_outputs?: PosterOnepagerStageId[];
+  requires_review?: PosterOnepagerStageId[];
+}
+
+export interface PosterOnepagerStageSequence {
+  flow_id: PosterCanonicalStageSequence['flow_id'];
+  stages: PosterOnepagerStageDefinition[];
+  hard_stops: PosterOnepagerStageHardStop[];
+}
+
+export interface PosterOnepagerStageRequirement {
+  requires_artifacts: PosterOnepagerStageId[];
+  requires_review_pass?: true;
+}
+
+export type PosterOnepagerStageRequirements = Record<
+  keyof PosterCanonicalStageRequirements,
+  PosterOnepagerStageRequirement
+>;
+export type PosterOnepagerReviewSurface = PosterContractModule['POSTER_REVIEW_SURFACE'];
 export type PosterOnepagerReviewCheck = keyof PosterOnepagerReviewSurface['rerun_from_stage'];
-export type PosterOnepagerLayoutRules = typeof import('./contracts.js').POSTER_LAYOUT_RULES;
-export type PosterOnepagerBaselinePolicy = typeof import('./contracts.js').POSTER_BASELINE_POLICY;
-export type PosterOnepagerPromptPack = typeof import('./contracts.js').POSTER_PROMPT_PACK;
-export type PosterOnepagerDisplayRegistry = typeof import('./contracts.js').POSTER_DISPLAY_REGISTRY;
-export type PosterOnepagerLifecycleModel = typeof import('./contracts.js').POSTER_LIFECYCLE_MODEL;
-export type PosterOnepagerSourceTruthContract = typeof import('./contracts.js').POSTER_SOURCE_TRUTH_CONTRACT;
-export type PosterOnepagerDeliveryContract = typeof import('./contracts.js').POSTER_DELIVERY_CONTRACT;
-export type PosterOnepagerLifecycleStageContract = typeof import('./contracts.js').POSTER_LIFECYCLE_STAGE_CONTRACT;
-export type PosterOnepagerExportBundle = typeof import('./contracts.js').POSTER_EXPORT_BUNDLE;
+export type PosterOnepagerLayoutRules = PosterContractModule['POSTER_LAYOUT_RULES'];
+export type PosterOnepagerBaselinePolicy = PosterContractModule['POSTER_BASELINE_POLICY'];
+export type PosterOnepagerPromptPack = PosterContractModule['POSTER_PROMPT_PACK'];
+export type PosterOnepagerDisplayRegistry = PosterContractModule['POSTER_DISPLAY_REGISTRY'];
+export type PosterOnepagerLifecycleModel = PosterContractModule['POSTER_LIFECYCLE_MODEL'];
+export type PosterOnepagerSourceTruthContract = PosterContractModule['POSTER_SOURCE_TRUTH_CONTRACT'];
+export type PosterOnepagerDeliveryContract = PosterContractModule['POSTER_DELIVERY_CONTRACT'];
+export type PosterOnepagerLifecycleStageContract = PosterContractModule['POSTER_LIFECYCLE_STAGE_CONTRACT'];
+export type PosterOnepagerExportBundle = PosterContractModule['POSTER_EXPORT_BUNDLE'];
 export type PosterOnepagerOverlayCatalogEntry = PosterCatalog;
 
 export type PosterSurfaceArtifactPath =

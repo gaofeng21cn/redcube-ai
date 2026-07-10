@@ -232,7 +232,7 @@ export const NATIVE_PPT_PROOF_LANE = Object.freeze({
     shape_manifest_field: 'export_bundle.native_ppt_shape_manifest',
     repair_log_field: 'export_bundle.native_ppt_repair_log',
   },
-});
+} as const satisfies AuthoringLaneValue);
 
 export const HTML_AUTHORING_LANE = Object.freeze({
   lane_id: 'ppt_deck_html_authoring_v0',
@@ -244,7 +244,7 @@ export const HTML_AUTHORING_LANE = Object.freeze({
   preserved_upstream_routes: ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
   preserved_gates: ['visual_director_review', 'screenshot_review', 'export_pptx'],
   explicit_selection_required: true,
-});
+} as const satisfies AuthoringLaneValue);
 
 export const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   lane_id: 'ppt_deck_image_page_authoring_v0',
@@ -265,4 +265,15 @@ export const IMAGE_PAGE_AUTHORING_LANE = Object.freeze({
   long_deck_production_contract: IMAGE_PAGE_LONG_DECK_CONTRACT,
   audience_language_policy: IMAGE_PAGE_AUDIENCE_LANGUAGE_POLICY,
   layout_legibility_policy: IMAGE_PAGE_LAYOUT_LEGIBILITY_POLICY,
-});
+} as const satisfies AuthoringLaneValue);
+interface AuthoringLaneValue {
+  lane_id: string;
+  status: string;
+  default_enabled: boolean;
+  production_selectable: boolean;
+  runnable_routes: readonly string[];
+  replaces_routes: readonly string[];
+  preserved_upstream_routes: readonly string[];
+  preserved_gates: readonly string[];
+  [key: string]: unknown;
+}

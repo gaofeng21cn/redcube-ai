@@ -95,7 +95,12 @@ export const XIAOHONGSHU_STAGE_SEQUENCE = {
       rerun_from_stage: 'screenshot_review',
     },
   ],
-} as const;
+} as const satisfies {
+  flow_id: string;
+  stages: readonly Record<string, unknown>[];
+  alternate_stages: readonly Record<string, unknown>[];
+  hard_stops: readonly Record<string, unknown>[];
+};
 
 export const XIAOHONGSHU_STAGE_REQUIREMENTS = {
   research: { requires_artifacts: [] },
@@ -110,7 +115,10 @@ export const XIAOHONGSHU_STAGE_REQUIREMENTS = {
   screenshot_review: { requires_artifacts: ['visual_director_review'] },
   publish_copy: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
   export_bundle: { requires_artifacts: ['publish_copy'], requires_review_pass: true },
-} as const;
+} as const satisfies Record<string, {
+  requires_artifacts: readonly string[];
+  requires_review_pass?: true;
+}>;
 
 export const XIAOHONGSHU_REVIEW_SURFACE = {
   required_checks: [
@@ -363,7 +371,7 @@ export function hydrateXiaohongshuContract({
     lifecycle_model: XIAOHONGSHU_LIFECYCLE_MODEL,
     source_truth_contract: XIAOHONGSHU_SOURCE_TRUTH_CONTRACT,
     delivery_contract: XIAOHONGSHU_DELIVERY_CONTRACT,
-  } as XiaohongshuHydratedContract;
+  } as unknown as XiaohongshuHydratedContract;
 }
 
 export function buildXiaohongshuDeliverableRecord({

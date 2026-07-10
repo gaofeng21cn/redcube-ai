@@ -1,35 +1,69 @@
 import type { OverlayProfileDefinition } from '@redcube/overlay-core';
 
-type XiaohongshuCatalog = ReturnType<typeof import('./contracts.js').describeXiaohongshuOverlay>;
+type XiaohongshuContractModule = typeof import('./contracts.js');
+type XiaohongshuCatalog = ReturnType<XiaohongshuContractModule['describeXiaohongshuOverlay']>;
+
+type XiaohongshuCanonicalStageSequence = XiaohongshuContractModule['XIAOHONGSHU_STAGE_SEQUENCE'];
+type XiaohongshuCanonicalStageDefinition =
+  | XiaohongshuCanonicalStageSequence['stages'][number]
+  | XiaohongshuCanonicalStageSequence['alternate_stages'][number];
+type XiaohongshuCanonicalStageHardStop = XiaohongshuCanonicalStageSequence['hard_stops'][number];
+type XiaohongshuCanonicalStageRequirements = XiaohongshuContractModule['XIAOHONGSHU_STAGE_REQUIREMENTS'];
 
 export type XiaohongshuOverlayId = XiaohongshuCatalog['overlay_id'];
 export type XiaohongshuProfileId = XiaohongshuCatalog['profiles'][number];
 export type XiaohongshuDeliverableKind = XiaohongshuCatalog['deliverable_kind'];
-export type XiaohongshuStageSequence = typeof import('./contracts.js').XIAOHONGSHU_STAGE_SEQUENCE;
-export type XiaohongshuStageDefinition =
-  | XiaohongshuStageSequence['stages'][number]
-  | XiaohongshuStageSequence['alternate_stages'][number];
-export type XiaohongshuStageHardStop = XiaohongshuStageSequence['hard_stops'][number];
-export type XiaohongshuStageId = XiaohongshuStageDefinition['stage_id'];
-export type XiaohongshuPromptFile = XiaohongshuStageDefinition['prompt_file'];
-export type XiaohongshuOutputArtifactFile = XiaohongshuStageDefinition['output_artifact'];
-export type XiaohongshuStageRequirements = typeof import('./contracts.js').XIAOHONGSHU_STAGE_REQUIREMENTS;
-export type XiaohongshuStageRequirement = XiaohongshuStageRequirements[keyof XiaohongshuStageRequirements];
-export type XiaohongshuReviewSurface = typeof import('./contracts.js').XIAOHONGSHU_REVIEW_SURFACE;
+export type XiaohongshuStageId = XiaohongshuCanonicalStageDefinition['stage_id'];
+export type XiaohongshuPromptFile = XiaohongshuCanonicalStageDefinition['prompt_file'];
+export type XiaohongshuOutputArtifactFile = XiaohongshuCanonicalStageDefinition['output_artifact'];
+
+export interface XiaohongshuStageDefinition {
+  stage_id: XiaohongshuStageId;
+  prompt_file: XiaohongshuPromptFile;
+  output_artifact: XiaohongshuOutputArtifactFile;
+  requires_stages: XiaohongshuStageId[];
+  lane_id?: string;
+  replaces_stage?: XiaohongshuStageId;
+}
+
+export interface XiaohongshuStageHardStop {
+  stage_id: XiaohongshuStageId;
+  rerun_from_stage: XiaohongshuCanonicalStageHardStop['rerun_from_stage'];
+  requires_stage_outputs?: XiaohongshuStageId[];
+  requires_review?: XiaohongshuStageId[];
+}
+
+export interface XiaohongshuStageSequence {
+  flow_id: XiaohongshuCanonicalStageSequence['flow_id'];
+  stages: XiaohongshuStageDefinition[];
+  alternate_stages?: XiaohongshuStageDefinition[];
+  hard_stops: XiaohongshuStageHardStop[];
+}
+
+export interface XiaohongshuStageRequirement {
+  requires_artifacts: XiaohongshuStageId[];
+  requires_review_pass?: true;
+}
+
+export type XiaohongshuStageRequirements = Record<
+  keyof XiaohongshuCanonicalStageRequirements,
+  XiaohongshuStageRequirement
+>;
+export type XiaohongshuReviewSurface = XiaohongshuContractModule['XIAOHONGSHU_REVIEW_SURFACE'];
 export type XiaohongshuReviewCheck = keyof XiaohongshuReviewSurface['rerun_from_stage'];
-export type XiaohongshuLayoutRules = typeof import('./contracts.js').XIAOHONGSHU_LAYOUT_RULES;
+export type XiaohongshuLayoutRules = XiaohongshuContractModule['XIAOHONGSHU_LAYOUT_RULES'];
 export type XiaohongshuForbiddenTemplateRoute = XiaohongshuLayoutRules['forbidden_template_routes'][number];
-export type XiaohongshuBaselinePolicy = typeof import('./contracts.js').XIAOHONGSHU_BASELINE_POLICY;
-export type XiaohongshuPromptPack = typeof import('./contracts.js').XIAOHONGSHU_PROMPT_PACK;
-export type XiaohongshuExportBundle = typeof import('./contracts.js').XIAOHONGSHU_EXPORT_BUNDLE;
-export type XiaohongshuDisplayRegistry = typeof import('./contracts.js').XIAOHONGSHU_DISPLAY_REGISTRY;
+export type XiaohongshuBaselinePolicy = XiaohongshuContractModule['XIAOHONGSHU_BASELINE_POLICY'];
+export type XiaohongshuPromptPack = XiaohongshuContractModule['XIAOHONGSHU_PROMPT_PACK'];
+export type XiaohongshuExportBundle = XiaohongshuContractModule['XIAOHONGSHU_EXPORT_BUNDLE'];
+export type XiaohongshuDisplayRegistry = XiaohongshuContractModule['XIAOHONGSHU_DISPLAY_REGISTRY'];
 export type XiaohongshuDisplaySurface = XiaohongshuDisplayRegistry['surfaces'][number];
 export type XiaohongshuDisplaySurfaceId = XiaohongshuDisplaySurface['id'];
 export type XiaohongshuDisplaySurfaceKind = XiaohongshuDisplaySurface['kind'];
 export type XiaohongshuDisplaySurfaceCondition = XiaohongshuDisplaySurface['required_when'];
-export type XiaohongshuLifecycleModel = typeof import('./contracts.js').XIAOHONGSHU_LIFECYCLE_MODEL;
-export type XiaohongshuSourceTruthContract = typeof import('./contracts.js').XIAOHONGSHU_SOURCE_TRUTH_CONTRACT;
-export type XiaohongshuDeliveryContract = typeof import('./contracts.js').XIAOHONGSHU_DELIVERY_CONTRACT;
+export type XiaohongshuLifecycleModel = XiaohongshuContractModule['XIAOHONGSHU_LIFECYCLE_MODEL'];
+export type XiaohongshuSourceTruthContract = XiaohongshuContractModule['XIAOHONGSHU_SOURCE_TRUTH_CONTRACT'];
+export type XiaohongshuDeliveryContract = XiaohongshuContractModule['XIAOHONGSHU_DELIVERY_CONTRACT'];
 export type XiaohongshuOverlayCatalogEntry = XiaohongshuCatalog;
 
 export type XiaohongshuSurfaceArtifactPath =

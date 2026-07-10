@@ -75,7 +75,11 @@ export const POSTER_STAGE_SEQUENCE = {
       rerun_from_stage: 'screenshot_review'
     }
   ]
-} as const;
+} as const satisfies {
+  flow_id: string;
+  stages: readonly Record<string, unknown>[];
+  hard_stops: readonly Record<string, unknown>[];
+};
 
 export const POSTER_STAGE_REQUIREMENTS = {
   storyline: { requires_artifacts: [] },
@@ -85,7 +89,10 @@ export const POSTER_STAGE_REQUIREMENTS = {
   visual_director_review: { requires_artifacts: ['render_html'] },
   screenshot_review: { requires_artifacts: ['visual_director_review'] },
   export_bundle: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
-} as const;
+} as const satisfies Record<string, {
+  requires_artifacts: readonly string[];
+  requires_review_pass?: true;
+}>;
 
 export const POSTER_REVIEW_SURFACE = {
   required_checks: [
@@ -294,7 +301,7 @@ export function hydratePosterOnepagerContract({
     lifecycle_stage_contract: POSTER_LIFECYCLE_STAGE_CONTRACT,
     source_truth_contract: POSTER_SOURCE_TRUTH_CONTRACT,
     delivery_contract: POSTER_DELIVERY_CONTRACT,
-  } as PosterOnepagerHydratedContract;
+  } as unknown as PosterOnepagerHydratedContract;
 }
 
 export function buildPosterOnepagerDeliverableRecord({

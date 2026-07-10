@@ -1,34 +1,93 @@
 type PptProfileModule = typeof import('./profiles.js');
 type PptProfileOverrides = PptProfileModule['PPT_DECK_PROFILE_OVERRIDES'];
 type PptProfileOverride = PptProfileOverrides[keyof PptProfileOverrides];
+type MutableRoutes<Value extends { readonly runnable_routes: readonly unknown[] }> = Omit<
+  Value,
+  'runnable_routes'
+> & {
+  runnable_routes: Value['runnable_routes'][number][];
+};
 
-export type PptDeckOverlayId = ReturnType<PptProfileModule['describePptDeckOverlay']>['overlay_id'];
+type PptDeckCanonicalStageSequence = PptProfileModule['FAMILY_STAGE_SEQUENCE'];
+type PptDeckCanonicalStageDefinition =
+  | PptDeckCanonicalStageSequence['stages'][number]
+  | PptDeckCanonicalStageSequence['alternate_stages'][number];
+type PptDeckCanonicalHardStop = PptDeckCanonicalStageSequence['hard_stops'][number];
+type PptDeckCanonicalStageRequirements = PptProfileModule['FAMILY_STAGE_REQUIREMENTS'];
+
 export type PptDeckOverlayProfiles = PptProfileModule['PPT_DECK_PROFILES'];
 export type PptDeckOverlayProfileDefinition = PptDeckOverlayProfiles[keyof PptDeckOverlayProfiles];
 export type PptDeckProfileId = keyof PptDeckOverlayProfiles;
-export type PptDeckDeliverableKind = ReturnType<PptProfileModule['describePptDeckOverlay']>['deliverable_kind'];
-export type PptDeckStageSequence = PptProfileModule['FAMILY_STAGE_SEQUENCE'];
-export type PptDeckStageDefinition =
-  | PptDeckStageSequence['stages'][number]
-  | PptDeckStageSequence['alternate_stages'][number];
-export type PptDeckHardStop = PptDeckStageSequence['hard_stops'][number];
-export type PptDeckStageId = PptDeckStageDefinition['stage_id'];
-export type PptDeckPromptFile = PptDeckStageDefinition['prompt_file'];
-export type PptDeckOutputArtifactFile = PptDeckStageDefinition['output_artifact'];
-export type PptDeckStageRequirements = PptProfileModule['FAMILY_STAGE_REQUIREMENTS'];
-export type PptDeckStageRequirement = PptDeckStageRequirements[keyof PptDeckStageRequirements];
+export type PptDeckOverlayCatalogEntry = ReturnType<PptProfileModule['describePptDeckOverlay']>;
+export type PptDeckOverlayId = PptDeckOverlayCatalogEntry['overlay_id'];
+export type PptDeckDeliverableKind = PptDeckOverlayCatalogEntry['deliverable_kind'];
+export type PptDeckStageId = PptDeckCanonicalStageDefinition['stage_id'];
+export type PptDeckPromptFile = PptDeckCanonicalStageDefinition['prompt_file'];
+export type PptDeckOutputArtifactFile = PptDeckCanonicalStageDefinition['output_artifact'];
+
+export interface PptDeckStageDefinition {
+  stage_id: PptDeckStageId;
+  prompt_file: PptDeckPromptFile;
+  output_artifact: PptDeckOutputArtifactFile;
+  requires_stages: PptDeckStageId[];
+  requires_review_from_any?: PptDeckStageId[];
+  lane_id?: string;
+  replaces_stage?: PptDeckStageId;
+}
+
+export interface PptDeckHardStop {
+  stage_id: PptDeckStageId;
+  requires_stage_outputs?: PptDeckStageId[];
+  requires_review?: PptDeckStageId[];
+  requires_review_from_any?: PptDeckStageId[];
+  rerun_from_stage: PptDeckCanonicalHardStop['rerun_from_stage'];
+}
+
+export interface PptDeckStageSequence {
+  flow_id: PptDeckCanonicalStageSequence['flow_id'];
+  stages: PptDeckStageDefinition[];
+  alternate_stages?: PptDeckStageDefinition[];
+  hard_stops: PptDeckHardStop[];
+}
+
+export interface PptDeckStageRequirement {
+  requires_artifacts: PptDeckStageId[];
+  requires_review_pass?: true;
+  requires_review_from_any?: PptDeckStageId[];
+}
+
+export type PptDeckStageRequirements = Record<
+  keyof PptDeckCanonicalStageRequirements,
+  PptDeckStageRequirement
+>;
 
 type PptDeckFamilyReviewSurface = PptProfileModule['FAMILY_REVIEW_SURFACE'];
-export type PptDeckReviewCheck = PptProfileOverride['review_surface']['required_checks'][number];
-export type PptDeckReviewConditionalChecks = PptDeckFamilyReviewSurface['conditional_checks'];
-export type PptDeckReviewRerunMap = Partial<Record<PptDeckReviewCheck, PptDeckStageId>>;
-export type PptDeckReviewSurface = Omit<
-  PptDeckFamilyReviewSurface,
-  'required_checks' | 'rerun_from_stage'
-> & {
-  required_checks: PptDeckReviewCheck[];
-  rerun_from_stage: PptDeckReviewRerunMap;
+export type PptDeckReviewCheck =
+  | keyof PptDeckFamilyReviewSurface['rerun_from_stage']
+  | PptProfileOverride['review_surface']['required_checks'][number];
+export interface PptDeckReviewConditionalChecks {
+  optimize_existing: 'baseline_comparison_passed'[];
+}
+export type PptDeckReviewRerunMap = {
+  -readonly [Key in keyof PptDeckFamilyReviewSurface['rerun_from_stage']]:
+    PptDeckFamilyReviewSurface['rerun_from_stage'][Key];
+} & {
+  term_explained_on_first_use?: 'storyline';
+  teaching_progression_clear?: 'detailed_outline';
+  novelty_position_clear?: 'storyline';
+  method_boundary_explicit?: 'detailed_outline';
+  decision_implication_clear?: 'storyline';
+  conclusion_up_front?: 'storyline';
+  claim_evidence_traceable?: 'detailed_outline';
+  backup_qa_ready?: 'slide_blueprint';
 };
+export interface PptDeckReviewSurface {
+  required_checks: PptDeckReviewCheck[];
+  artifact_stage: PptDeckFamilyReviewSurface['artifact_stage'];
+  artifact_file: PptDeckFamilyReviewSurface['artifact_file'];
+  conditional_checks: PptDeckReviewConditionalChecks;
+  rerun_from_stage: PptDeckReviewRerunMap;
+}
 
 type PptDeckFamilyLayoutRules = PptProfileModule['FAMILY_LAYOUT_RULES'];
 export type PptDeckDensityMode =
@@ -47,15 +106,37 @@ export type PptDeckLayoutRules = Omit<
 export type PptDeckBaselinePolicy = PptProfileModule['FAMILY_BASELINE_POLICY'];
 export type PptDeckDraftBaselineMode = PptDeckBaselinePolicy['modes']['draft_new'];
 export type PptDeckOptimizeBaselineMode = PptDeckBaselinePolicy['modes']['optimize_existing'];
-export type PptDeckPromptPack = PptProfileModule['FAMILY_PROMPT_PACK'];
+type PptDeckCanonicalPromptPack = PptProfileModule['FAMILY_PROMPT_PACK'];
+type PptDeckMutableNativePptProofLane = MutableRoutes<
+  typeof import('./profile-parts/authoring-lanes.js').NATIVE_PPT_PROOF_LANE
+>;
+export type PptDeckNativePptProofLane = Omit<
+  PptDeckMutableNativePptProofLane,
+  'unit_repair_scope'
+> & {
+  unit_repair_scope?: PptDeckMutableNativePptProofLane['unit_repair_scope'];
+};
+export type PptDeckHtmlAuthoringLane = MutableRoutes<
+  typeof import('./profile-parts/authoring-lanes.js').HTML_AUTHORING_LANE
+>;
+export type PptDeckImagePageAuthoringLane = MutableRoutes<
+  typeof import('./profile-parts/authoring-lanes.js').IMAGE_PAGE_AUTHORING_LANE
+>;
+export type PptDeckPromptPack = Omit<PptDeckCanonicalPromptPack, 'render_contract'> & {
+  render_contract: Omit<
+    PptDeckCanonicalPromptPack['render_contract'],
+    'native_ppt_proof_lane' | 'html_authoring_lane' | 'image_page_authoring_lane'
+  > & {
+    native_ppt_proof_lane: PptDeckNativePptProofLane;
+    html_authoring_lane: PptDeckHtmlAuthoringLane;
+    image_page_authoring_lane: PptDeckImagePageAuthoringLane;
+  };
+};
 export type PptDeckPromptRoutes = PptDeckPromptPack['routes'];
 export type PptDeckPromptStages = PptDeckPromptPack['stages'];
 export type PptDeckPromptStageFile = PptDeckPromptStages[keyof PptDeckPromptStages];
 export type PptDeckRenderContract = PptDeckPromptPack['render_contract'];
 export type PptDeckRecipeRegistry = PptDeckRenderContract['recipe_registry'];
-export type PptDeckNativePptProofLane = typeof import('./profile-parts/authoring-lanes.js').NATIVE_PPT_PROOF_LANE;
-export type PptDeckHtmlAuthoringLane = typeof import('./profile-parts/authoring-lanes.js').HTML_AUTHORING_LANE;
-export type PptDeckImagePageAuthoringLane = typeof import('./profile-parts/authoring-lanes.js').IMAGE_PAGE_AUTHORING_LANE;
 
 type PptDeckFamilyExportBundle = PptProfileModule['FAMILY_EXPORT_BUNDLE'];
 export type PptDeckBundleId =
@@ -81,7 +162,6 @@ export type PptDeckDeliveryContract = PptProfileModule['PPT_DELIVERY_CONTRACT_BA
   required_export_bundle_id: string;
 };
 export type PptDeckLifecycleStageContract = PptProfileModule['DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT'];
-export type PptDeckOverlayCatalogEntry = ReturnType<PptProfileModule['describePptDeckOverlay']>;
 
 export type PptDeckStoryboardBlocker = 'slides_empty' | 'slides_invalid';
 export type PptDeckStoryboardNextAction = 'rerun_storyboard' | 'continue';
