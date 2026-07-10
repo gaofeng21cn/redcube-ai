@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Last reviewed: `2026-07-09`
+Last reviewed: `2026-07-10`
 
 Dated native proof、workspace path、attempt id、screenshot path、no-regression ref 流水和 proof 命令摘要不再追加到本文；这些过程证据进入 `docs/history/process/` 或 runtime/evidence ledger。本文只保留 current readout、open gates、owner delta 和完成顺序。
 
@@ -15,6 +15,27 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 2026-06-30 SSOT refresh：本文的默认 active gap 只维护功能面落地、结构收薄、source hygiene、generated/default caller thinning、repo-local adapter retirement、compatibility-free retirement 和 legacy naming guard。真实 Temporal controlled visual-stage long-soak、production-like repeated no-regression、visual ready、exportable、handoffable、human approval、App/operator sustained consumption 和 production-ready 不再混入功能/结构 gap。RCA 当前仍需关注的缺口是 generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene；这些只在 OPL default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance 成立后关闭。
 
 2026-06-30 functional closure gate：`contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary/retained_default_caller_boundary_gate` 已把 default-caller tail readback 的 retained boundaries 显式化。当前 `tail_surface_count=0` 只表示没有可立即执行的 tail cleanup candidate；`product_entry_continuity_refs_adapter`、`domain_action_adapter_guarded_actions`、`product_entry_manifest_projection`、`deliverable_route_attempt_shell`、`repo_shell_verification_wrappers`、`runtime_watch_projection`、`operator_evidence_stability_projection`、`executor_runtime_route_run_records` 仍必须等 OPL generated/default caller parity、no-active repo-local default caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write、retired alias no-resurrection 和 tombstone/provenance pointer 齐备后，才能删除或进一步收薄。该 gate 禁止把 empty tail worklist、`cleanup_candidate_count=0`、source guard clean 或 focused tests 写成 physical delete、default-caller cutover、visual-ready、domain-ready 或 production-ready。
+
+## Native PPT `ppt-master` 非劣效一体化工作单
+
+2026-07-10 fresh audit 证明，RCA 的 Stage prompt / professional specialist skill / tool-helper 三层结构已经成立，Codex executor 也会按 route 注入专业 Skill；但过去对 `ppt-master` 的学习先落到 docs、contract、gate 和 helper，专业 Skill 后补后没有反向完成 capability closure。当前 native writer 会把除 connector 外的对象普遍物化为普通 shape，benchmark helper 会丢弃 fixture 原始 `native_shapes` 重建通用卡片，quality evaluator 又允许单一 structural shape 同时满足 non-text visual 和 anti-card gate。该状态不能继续读作 editable chart/table writer、专业性或视觉质量已经 landed。
+
+本轮唯一目标态规格是 [RCA 原生 PPT 非劣效目标态规格](../specs/native-ppt-ppt-master-parity.md)。所有并行 lane 都服务同一完成条件，不形成第二 active plan，不把单个 commit、focused tests、mock proof 或 refs-only contract 当成阶段完成。
+
+| Work item | Owner surface | Initial status | Completion gate |
+| --- | --- | --- | --- |
+| Existing owner-closure absorption | domain entry / native route owner boundary | `in_progress` | 已有 dirty worktree 完成验证、提交、吸收，不覆盖并行 cleanup 写集 |
+| Typed native object materializer | Python native helper / OfficeCLI / OOXML | `in_progress` | text/shape/connector/picture/group/path/chart/table/metric-grid materialized readback；unknown kind fail-fast |
+| Native presentation semantics | Native PPT Designer + helper | `in_progress` | notes、transition、timing、optional animation 有真实 package/readback 和静态降级可读性 |
+| Template intelligence and fill | Template Profiler + helper | `in_progress` | theme/master/layout/placeholder/chart/table intake；克隆/替换保持原 template relationships |
+| Visual semantic evaluator | PPT Reviewer + screenshot/contact-sheet review | `in_progress` | dependency/timeline/ladder/chart/matrix 语义与构图一致；单装饰物不能绕过 mechanical-card gate |
+| Professional method corpus | Story Architect / Visual Director / Native PPT Designer / Reviewer | `in_progress` | 上游 communication/style/visualization pattern 全量映射为 adopt/adapt/watch/reject，并由 resource pack/contract 消费 |
+| Real benchmark and proof | tests/fixtures + native proof + RCA authority | `in_progress` | 同源 4x6 benchmark、真实复杂 PPTX、package assertions、LibreOffice true render、独立视觉复核 |
+| Progress-first no-regression | product entry / stage loop | `in_progress` | 无人工 gate 时仍 auto-to-terminal；失败返回 unit repair target/typed blocker，不增加外层逐 stage 操作 |
+| Truth/docs/current-program foldback | contracts / current-program / core docs | `in_progress` | `landed` 状态只保留 fresh executable evidence 支撑项；其余按真实状态更新 |
+| Absorb and cleanup | main session | `in_progress` | 所有 lane 主会话复核、吸收、验证、删除 worktree/branch；根 checkout 干净 |
+
+风险档为 `L3/L4`，验证预算为 `full`。TDD 仅用于已确认的对象退化、fixture 丢失和 evaluator 假阳性回归；最终完成证据必须包含真实 PPTX package/readback、render artifact、visual review 和 mainline completion audit。
 
 2026-07-09 retained helper / thin adapter cleanup gate fresh readback 继续落在上述边界内：`private-platform:readback` 与 `default-caller-tail:readback` 都只证明 source guard clean，未产生 physical delete authorization、default-caller cutover authority、owner receipt 或 typed blocker instance roundtrip。因此当前执行动作是保留为 refs-only / authority adapter 并记录 no-safe-delete blocker，不删除源码、不新增 alias / facade。
 
