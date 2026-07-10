@@ -860,6 +860,47 @@
       "forbidden_generic_owner_flags_ref": "contracts/physical_source_morphology_policy.json#/forbidden_generic_owner_flags"
     }
   ],
+  "behavioral_source_scan_policy": {
+    "policy_id": "rca.source_morphology.behavioral_owner_boundary_scan.v1",
+    "purpose": "fail closed when the selected RCA owner-closure sources reconstruct OPL-owned product-entry companions or executor-attempt blocker envelopes",
+    "forbidden_constructs": [
+      {
+        "construct_id": "repo_local_product_entry_companion_assembly",
+        "source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/entry-surfaces.ts",
+        "forbidden_tokens": [
+          "buildProductEntryManifestEntrySurfaces",
+          "buildProductEntryQuickstart",
+          "buildProductEntryOverview",
+          "buildProductEntryReadiness",
+          "buildProductEntryStart"
+        ],
+        "missing_source_allowed": true
+      },
+      {
+        "construct_id": "repo_local_executor_attempt_blocker_envelope",
+        "source_ref": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-executor-attempt-diagnostic.ts",
+        "forbidden_tokens": [
+          "redcube_native_ppt_codex_invocation_blocker",
+          "typed_blocker: {",
+          "prompt_telemetry: {",
+          "surface_kind: 'opl_executor_attempt_diagnostic'"
+        ],
+        "missing_source_allowed": false
+      }
+    ],
+    "authority_boundary": {
+      "scan_can_write_visual_truth": false,
+      "scan_can_write_artifact_body": false,
+      "scan_can_write_memory_body": false,
+      "scan_can_issue_owner_receipt": false,
+      "scan_can_create_typed_blocker": false,
+      "scan_can_authorize_physical_delete": false,
+      "scan_can_claim_default_caller_cutover": false,
+      "scan_can_claim_visual_ready": false,
+      "scan_can_claim_domain_ready": false,
+      "scan_can_claim_production_ready": false
+    }
+  },
   "default_caller_tail_thinning_gate": {
     "gate_id": "rca.source_morphology.default_caller_tail_thinning.v1",
     "state": "non_live_functional_structure_gate_landed",

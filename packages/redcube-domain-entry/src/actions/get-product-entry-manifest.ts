@@ -3,6 +3,7 @@ import path from 'node:path';
 
 import {
   buildFamilyProductEntryManifest,
+  buildGeneratedProductEntryManifestCompanions,
   collectFamilyHumanGateIds,
 } from 'opl-framework-shared/product-entry-companions';
 
@@ -72,7 +73,7 @@ import {
 import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
 import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
 import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
-import { buildProductEntryManifestEntrySurfaces } from './get-product-entry-manifest-parts/entry-surfaces.js';
+import { buildRedCubeProductEntryDescriptor } from './get-product-entry-manifest-parts/entry-descriptor.js';
 import { productEntrySessionDir } from './product-entry-session-refs.js';
 
 export async function getProductEntryManifest(request) {
@@ -118,17 +119,19 @@ export async function getProductEntryManifest(request) {
     },
   });
   const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
-  const {
-    productEntryOverview,
-    productEntryQuickstart,
-    productEntryReadiness,
-    productEntryStart,
-  } = buildProductEntryManifestEntrySurfaces({
-    familyOrchestration,
+  const productEntryDescriptor = buildRedCubeProductEntryDescriptor({
     humanGateIds,
     nativePptOperatorUx,
     productEntrySessionCommand,
-    workspaceRoot,
+  });
+  const {
+    product_entry_overview: productEntryOverview,
+    product_entry_quickstart: productEntryQuickstart,
+    product_entry_readiness: productEntryReadiness,
+    product_entry_start: productEntryStart,
+  } = buildGeneratedProductEntryManifestCompanions({
+    entry_descriptor: productEntryDescriptor,
+    family_orchestration: familyOrchestration,
   });
   const runtime = {
     runtime_owner: DEFAULT_RUNTIME_OWNER,
@@ -290,8 +293,8 @@ export async function getProductEntryManifest(request) {
     extra_payload: buildManifestExtraPayload({
       routeEquivalence,
       deliverableFacade,
+      productEntryDescriptor,
       nativePptOperatorUx,
-      oplLedgerArtifactRegistration,
       productEntrySessionCommand,
       sourceProvenance,
     }),

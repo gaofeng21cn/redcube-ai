@@ -13,9 +13,9 @@ import {
   withMockNativePptRuntime,
 } from './helpers/ppt-native-ppt-runtime-fixtures.ts';
 import { runDeliverableRoute } from './product-domain-action-test-api.ts';
-import { createNativePptCodexInvocationBlockerParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-codex-invocation-blocker.js';
+import { createNativePptExecutorAttemptDiagnosticParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/native-ppt-executor-attempt-diagnostic.js';
 
-test('native PPT Codex invocation blockers persist diagnostic refs before materialization', async () => {
+test('native PPT Codex failures persist OPL attempt diagnostics without creating typed blockers', async () => {
   await withMockNativePptRuntime(async () => {
     const workspaceRoot = mkUserScopedTestWorkspace('redcube-native-ppt-codex-blocker-');
     await runNativePlanningChain({ workspaceRoot, deliverableId: 'deck-codex-blocker' });
@@ -28,7 +28,7 @@ test('native PPT Codex invocation blockers persist diagnostic refs before materi
       'deck-codex-blocker',
       'artifacts',
       'native_ppt',
-      'deck-codex-blocker-author_pptx_native-codex-invocation-blocker.json',
+      'deck-codex-blocker-author_pptx_native-executor-attempt-diagnostic.json',
     );
     const restoreRoute = withEnv({
       REDCUBE_MOCK_FAIL_ROUTE: 'author_pptx_native',
@@ -54,26 +54,31 @@ test('native PPT Codex invocation blockers persist diagnostic refs before materi
     assert.equal(nativeResult.run.artifact_refs.includes(blockerFile), true);
     assert.equal(existsSync(blockerFile), true);
 
-    const blocker = readJson(blockerFile);
-    assert.equal(blocker.surface_kind, 'redcube_native_ppt_codex_invocation_blocker');
-    assert.equal(blocker.status, 'blocked');
-    assert.equal(blocker.typed_blocker.blocker_kind, 'codex_cli_execution_blocked');
-    assert.equal(blocker.no_artifact_body_written, true);
-    assert.equal(blocker.helper_fallback_used, false);
-    assert.equal(blocker.visual_ready_claimed, false);
-    assert.equal(blocker.exportable_claimed, false);
-    assert.equal(blocker.prompt_telemetry.timeout_ms, 600000);
-    assert.equal(blocker.prompt_telemetry.prompt_bytes > 0, true);
-    assert.equal(blocker.prompt_telemetry.context_bytes > 0, true);
-    assert.equal(blocker.prompt_telemetry.estimated_prompt_tokens > 0, true);
-    assert.equal(blocker.stage_input_refs.unit_repair_scope.scope, 'deck');
+    const diagnostic = readJson(blockerFile);
+    assert.equal(diagnostic.surface_kind, 'opl_executor_attempt_diagnostic');
+    assert.equal(diagnostic.contract_id, 'opl_family_runtime_attempt_contract.v1');
+    assert.equal(diagnostic.status, 'failed');
+    assert.equal(diagnostic.route_ref, 'author_pptx_native');
+    assert.equal(diagnostic.error.failure_kind, 'codex_cli_execution_blocked');
+    assert.equal(diagnostic.typed_blocker_ref, undefined);
+    assert.equal(diagnostic.typed_blocker, undefined);
+    assert.equal(diagnostic.authority_boundary.diagnostic_only, true);
+    assert.equal(diagnostic.authority_boundary.typed_blocker_created, false);
+    assert.equal(diagnostic.authority_boundary.owner_receipt_created, false);
+    assert.equal(diagnostic.authority_boundary.domain_truth_written, false);
+    assert.equal(diagnostic.authority_boundary.artifact_body_written, false);
+    assert.equal(diagnostic.runtime_projection.timeout_ms, 600000);
+    assert.equal(diagnostic.runtime_projection.prompt_bytes > 0, true);
+    assert.equal(diagnostic.runtime_projection.context_bytes > 0, true);
+    assert.equal(diagnostic.runtime_projection.estimated_prompt_tokens > 0, true);
+    assert.equal(diagnostic.domain_projection.stage_input_refs.unit_repair_scope.scope, 'deck');
   });
 });
 
-test('native PPT Codex invocation blocker exposes latest validation refs without claiming visual readiness', () => {
+test('native PPT Codex attempt diagnostic exposes visual validation refs without claiming readiness', () => {
   const tempRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-codex-blocker-summary-'));
   const blockerFile = path.join(tempRoot, 'native-codex-blocker.json');
-  const parts = createNativePptCodexInvocationBlockerParts({
+  const parts = createNativePptExecutorAttemptDiagnosticParts({
     PROMPT_PACK: {
       author_pptx_native: 'prompts/ppt_deck/author_pptx_native_sample.md',
     },
@@ -92,10 +97,9 @@ test('native PPT Codex invocation blocker exposes latest validation refs without
     estimated_prompt_tokens: 18149,
     timeout_ms: 600000,
   };
-  parts.writeCodexInvocationBlocker({
+  parts.writeExecutorAttemptDiagnostic({
     file: blockerFile,
     route: 'author_pptx_native',
-    contract: {},
     deliverablePaths: { deliverableDir: tempRoot },
     blueprintArtifact: { status: 'completed' },
     visualArtifact: { status: 'completed' },
@@ -127,21 +131,21 @@ test('native PPT Codex invocation blocker exposes latest validation refs without
     adapter: 'codex_cli',
     error,
   });
-  const blocker = readJson(blockerFile);
-  assert.deepEqual(blocker.attempt_artifact_refs, [
+  const diagnostic = readJson(blockerFile);
+  assert.deepEqual(diagnostic.artifact_refs.map((entry) => entry.ref), [
     '/tmp/attempt-01.json',
     '/tmp/attempt-01-validation.json',
   ]);
-  assert.equal(blocker.latest_validation_summary.previous_attempt, 1);
-  assert.equal(blocker.latest_validation_summary.ok, false);
-  assert.equal(blocker.latest_validation_summary.stage, 'ai_first_shape_plan_preflight');
-  assert.deepEqual(blocker.latest_validation_summary.failure_reasons, [
+  assert.equal(diagnostic.domain_projection.latest_validation_summary.previous_attempt, 1);
+  assert.equal(diagnostic.domain_projection.latest_validation_summary.ok, false);
+  assert.equal(diagnostic.domain_projection.latest_validation_summary.stage, 'ai_first_shape_plan_preflight');
+  assert.deepEqual(diagnostic.domain_projection.latest_validation_summary.failure_reasons, [
     'ai_first_page_number_missing',
     'ai_first_text_box_height_below_readability_floor',
   ]);
-  assert.deepEqual(blocker.latest_validation_summary.failed_shape_ids, ['S01_input_label']);
-  assert.equal(blocker.latest_validation_summary.refs_only, true);
-  assert.equal(blocker.latest_validation_summary.can_claim_visual_ready, false);
-  assert.equal(blocker.visual_ready_claimed, false);
-  assert.equal(blocker.exportable_claimed, false);
+  assert.deepEqual(diagnostic.domain_projection.latest_validation_summary.failed_shape_ids, ['S01_input_label']);
+  assert.equal(diagnostic.domain_projection.latest_validation_summary.refs_only, true);
+  assert.equal(diagnostic.domain_projection.latest_validation_summary.can_claim_visual_ready, false);
+  assert.equal(diagnostic.authority_boundary.domain_verdict_issued, false);
+  assert.equal(diagnostic.typed_blocker, undefined);
 });

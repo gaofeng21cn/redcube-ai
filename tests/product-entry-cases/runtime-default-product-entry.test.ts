@@ -42,11 +42,15 @@ test('default product-entry path returns an OPL stage execution plan without req
     const status = await getProductStatus({ workspace_root: workspaceRoot });
     assertPathValues(status, {
       'runtime.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      surface_kind: 'opl_generated_product_entry_domain_surface',
+      generated_interface_owner: 'one-person-lab',
+      'authority_boundary.generated_surface_only': true,
     });
+    assert.equal(status.runtime_loop_closure, undefined);
 
     const start = await getProductStart({ workspace_root: workspaceRoot });
-    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, RUNTIME_OWNER);
+    assert.equal(start.recommended_mode_id, 'direct');
+    assert.equal(start.runtime_loop_closure, undefined);
 
     const invoked = await invokeProductEntry({
       workspace_locator: { workspace_root: workspaceRoot },
@@ -83,22 +87,20 @@ test('default product-entry path returns an OPL stage execution plan without req
   });
 });
 
-test('product status exposes overlay stage sequence for ppt_deck callers', async () => {
+test('product status keeps overlay stage sequences behind the generated manifest and domain ref', async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const status = await getProductStatus({ workspace_locator: { workspace_root: workspaceRoot } });
 
     assertPathValues(status, {
-      'overlay_stage_sequences.ppt_deck.protected_stage_sequence': list('storyline detailed_outline slide_blueprint visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages export_pptx'),
-      'overlay_stage_sequences.ppt_deck.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
-      'ppt_deck_visual_route_truth.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.ppt_deck.route_gate_policy': 'fail_closed_against_overlay_stage_sequence',
-      'overlay_stage_sequences.xiaohongshu.protected_stage_sequence': list('research storyline single_note_plan visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages publish_copy export_bundle'),
-      'overlay_stage_sequences.xiaohongshu.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.xiaohongshu.default_visual_policy': 'image_first',
-      'overlay_stage_sequences.xiaohongshu.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
+      'domain_projection.overlay_stage_sequences_ref': '/deliverable_facade/family_route_policy',
+      'domain_projection.ppt_deck_visual_route_truth_ref': '/ppt_deck_visual_route_truth',
+      'product_entry_manifest.deliverable_facade.family_route_policy.ppt_deck.protected_stage_sequence': list('storyline detailed_outline slide_blueprint visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages export_pptx'),
+      'product_entry_manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route': 'author_image_pages',
+      'product_entry_manifest.deliverable_facade.family_route_policy.xiaohongshu.protected_stage_sequence': list('research storyline single_note_plan visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages publish_copy export_bundle'),
     });
+    assert.equal(status.overlay_stage_sequences, undefined);
+    assert.equal(status.ppt_deck_visual_route_truth, undefined);
   });
 });
 
@@ -131,15 +133,13 @@ test('getProductStart exposes the same direct-entry start companion as the manif
     const start = await getProductStart({ workspace_root: workspaceRoot });
 
     assertPathValues(start, {
-      ok: true,
+      ok: undefined,
       surface_kind: 'product_entry_start',
-      recommended_mode_id: 'start_direct_session',
-      'modes.0.mode_id': 'start_direct_session',
-      'modes.1.mode_id': 'opl_hosted_handoff',
-      'modes.2.mode_id': 'resume_session',
-      'runtime_loop_closure.surface_kind': 'runtime_loop_closure',
-      'runtime_loop_closure.source_linkage.current_source': 'start',
-      'runtime_loop_closure.source_linkage.entry_mode': 'start_projection',
+      recommended_mode_id: 'direct',
+      'modes.0.mode_id': 'direct',
+      'modes.1.mode_id': 'opl_hosted',
+      'modes.2.mode_id': 'session',
+      runtime_loop_closure: undefined,
       'resume_surface.surface_kind': 'product_entry_session',
       human_gate_ids: ['redcube_operator_review_gate'],
     });

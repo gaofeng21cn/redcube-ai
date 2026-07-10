@@ -95,15 +95,18 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
     assert.equal(registration.domain_owner, 'redcube_ai');
     assert.equal(registration.registration_surface.command, 'opl_generated:product_entry_manifest');
     assert.equal(registration.opl_hosted_handoff_surface.action_ref, 'opl_framework:hosted_product_entry');
-    assert.equal(registration.state_index_inputs.artifact_projection_index, '/artifact_inventory');
+    assert.equal(
+      registration.state_index_inputs.session_continuity_ledger_index,
+      '/generated_session_surface_ref',
+    );
+    assert.equal(registration.state_index_inputs.artifact_projection_index, '/artifact_locator_contract');
     assert.equal(registration.state_index_inputs.runtime_health_snapshot_index, '/runtime_inventory');
     assert.deepEqual(
       registration.indexable_surfaces.map((surface) => surface.surface_id),
       [
         'product_entry_registration',
         'opl_hosted_stage_runtime',
-        'session_continuity',
-        'artifact_inventory',
+        'generated_session_surface',
         'runtime_health',
         'review_publication_projection_refs',
         'opl_family_lifecycle_adapter',
@@ -119,21 +122,10 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
         'domain_action_adapter_receipt_refs',
       ],
     );
-    assert.deepEqual(
-      registration.consumable_projection_refs.slice(-10),
-      [
-        '/artifact_locator_contract',
-        '/domain_memory_descriptor_locator',
-        '/domain_owner_receipt_contract',
-        '/lifecycle_guarded_apply_proof',
-        '/visual_transition_spec',
-        '/visual_transition_evaluator',
-        '/controlled_visual_stage_attempt',
-        '/controlled_memory_apply_proof',
-        '/controlled_soak_no_regression_attempt',
-        '/domain_action_adapter_receipt_refs',
-      ],
-    );
+    assert.equal(registration.consumable_projection_refs.includes('/generated_session_surface_ref'), true);
+    assert.equal(registration.consumable_projection_refs.includes('/artifact_locator_contract'), true);
+    assert.equal(registration.consumable_projection_refs.includes('/session_continuity'), false);
+    assert.equal(registration.consumable_projection_refs.includes('/artifact_inventory'), false);
     assert.equal(registration.standard_domain_agent_skeleton, undefined);
     assert.equal(registration.artifact_locator_contract.ref, '/artifact_locator_contract');
     assert.equal(registration.domain_memory_descriptor_locator.ref, '/domain_memory_descriptor_locator');
@@ -169,11 +161,11 @@ test('product-entry manifest exposes OPL Runtime Manager registration projection
       allowed_authority: [
         'read_product_entry_registration_index',
         'read_opl_hosted_stage_runtime_index',
-        'read_session_continuity_index',
-        'read_artifact_inventory_index',
         'read_runtime_health_index',
         'read_review_publication_projection_refs',
         'read_domain_memory_locator_refs',
+        'read_generated_session_surface_ref',
+        'read_artifact_locator_contract',
       ],
     });
     assert.equal(

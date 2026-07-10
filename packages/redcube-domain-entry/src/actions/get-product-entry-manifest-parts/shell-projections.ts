@@ -169,11 +169,43 @@ export function buildProductEntryManifestShellProjections({
     recommended_progress_command: productEntrySessionCommand,
     recommended_artifact_command: productEntrySessionCommand,
   };
-  const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({
+  const runtimeManagerRegistration = buildOplRuntimeManagerRegistration({
     runtimeContinuityEnvelope,
     productEntrySessionCommand,
     domainAuthorityRefs,
   });
+  const oplRuntimeManagerRegistration = {
+    ...runtimeManagerRegistration,
+    indexable_surfaces: runtimeManagerRegistration.indexable_surfaces
+      .filter((surface) => surface.surface_id !== 'artifact_inventory')
+      .map((surface) => surface.surface_id === 'session_continuity'
+        ? {
+            surface_id: 'generated_session_surface',
+            surface_kind: 'opl_generated_product_entry_session_surface',
+            ref: '/generated_session_surface_ref',
+          }
+        : surface),
+    consumable_projection_refs: runtimeManagerRegistration.consumable_projection_refs
+      .filter((ref) => ref !== '/session_continuity' && ref !== '/artifact_inventory')
+      .concat('/generated_session_surface_ref'),
+    state_index_inputs: {
+      ...runtimeManagerRegistration.state_index_inputs,
+      session_continuity_ledger_index: '/generated_session_surface_ref',
+      artifact_projection_index: '/artifact_locator_contract',
+    },
+    native_helper_index_consumption: {
+      ...runtimeManagerRegistration.native_helper_index_consumption,
+      input_refs: runtimeManagerRegistration.native_helper_index_consumption.input_refs
+        .map((ref) => ref === '/artifact_inventory' ? '/artifact_locator_contract' : ref),
+    },
+    authority_boundary: {
+      ...runtimeManagerRegistration.authority_boundary,
+      allowed_authority: runtimeManagerRegistration.authority_boundary.allowed_authority
+        .filter((authority) => authority !== 'read_session_continuity_index'
+          && authority !== 'read_artifact_inventory_index')
+        .concat('read_generated_session_surface_ref', 'read_artifact_locator_contract'),
+    },
+  };
   const automation = buildAutomationCatalog({
     summary: 'RedCube automation companions expose continuation board tracking with operator review-gated continuation truth.',
     automations: [

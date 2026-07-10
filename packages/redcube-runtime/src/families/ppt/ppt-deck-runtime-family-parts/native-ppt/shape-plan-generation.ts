@@ -1,4 +1,4 @@
-import type { NativeShapePlanInvocationFailure } from '../native-ppt-codex-invocation-blocker.js';
+import type { NativeShapePlanInvocationFailure } from '../native-ppt-executor-attempt-diagnostic.js';
 import { AI_FIRST_EDITING_CONTRACT } from '../native-ppt-authoring-policies.js';
 
 type JsonRecord = Record<string, any>;
@@ -36,7 +36,7 @@ interface NativePptShapePlanGenerationDeps {
   safeText(value: unknown, fallback?: string): string;
   structuralFeedbackFromPlanError(input: JsonRecord): JsonRecord | null;
   summarizeNativeSlides(nativeArtifact: JsonRecord | null): JsonRecord[];
-  writeCodexInvocationBlocker(input: JsonRecord): string;
+  writeExecutorAttemptDiagnostic(input: JsonRecord): string;
   writeJson(file: string, data: unknown): void;
 }
 
@@ -61,7 +61,7 @@ export function createNativePptShapePlanGenerationParts({
   safeText,
   structuralFeedbackFromPlanError,
   summarizeNativeSlides,
-  writeCodexInvocationBlocker,
+  writeExecutorAttemptDiagnostic,
   writeJson,
 }: NativePptShapePlanGenerationDeps) {
   async function generateEditableShapePlan({
@@ -75,7 +75,7 @@ export function createNativePptShapePlanGenerationParts({
     adapter,
     validationFeedback = null,
     attemptIndex = 1,
-    codexInvocationBlockerFile = '',
+    executorAttemptDiagnosticFile = '',
   }: {
     route: NativePptRoute;
     contract: JsonRecord;
@@ -87,7 +87,7 @@ export function createNativePptShapePlanGenerationParts({
     adapter: string;
     validationFeedback?: JsonRecord | null;
     attemptIndex?: number;
-    codexInvocationBlockerFile?: string;
+    executorAttemptDiagnosticFile?: string;
   }) {
     if (typeof generateStructuredArtifact !== 'function') {
       throw new Error('Native PPT proof lane requires generateStructuredArtifact for AI-first shape planning');
@@ -188,11 +188,10 @@ export function createNativePptShapePlanGenerationParts({
         lastExecutorError = error;
         const message = error instanceof Error ? error.message : String(error);
         if (!/structured generation returned invalid JSON/i.test(message)) {
-          if (codexInvocationBlockerFile && isCodexInvocationFailure(error)) {
-            const diagnosticFile = writeCodexInvocationBlocker({
-              file: codexInvocationBlockerFile,
+          if (executorAttemptDiagnosticFile && isCodexInvocationFailure(error)) {
+            const diagnosticFile = writeExecutorAttemptDiagnostic({
+              file: executorAttemptDiagnosticFile,
               route,
-              contract,
               deliverablePaths,
               blueprintArtifact,
               visualArtifact,
@@ -229,7 +228,7 @@ export function createNativePptShapePlanGenerationParts({
     adapter,
     validationInputFile,
     editableShapePlanFile,
-    codexInvocationBlockerFile,
+    executorAttemptDiagnosticFile,
   }: {
     route: NativePptRoute;
     contract: JsonRecord;
@@ -241,7 +240,7 @@ export function createNativePptShapePlanGenerationParts({
     adapter: string;
     validationInputFile: string;
     editableShapePlanFile: string;
-    codexInvocationBlockerFile: string;
+    executorAttemptDiagnosticFile: string;
   }): Promise<NativePlanAttempt> {
     const maxAttempts = Math.max(1, Number(process.env.REDCUBE_NATIVE_PPT_PLAN_MAX_ATTEMPTS || 4));
     let validationFeedback: JsonRecord | null = null;
@@ -261,7 +260,7 @@ export function createNativePptShapePlanGenerationParts({
           adapter,
           validationFeedback,
           attemptIndex,
-          codexInvocationBlockerFile,
+          executorAttemptDiagnosticFile,
         });
       } catch (error) {
         const candidate = (error as Error & { nativeShapePlanCandidate?: JsonRecord })?.nativeShapePlanCandidate;
