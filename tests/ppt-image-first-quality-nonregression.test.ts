@@ -130,9 +130,42 @@ function seedWorkspace() {
   const paths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
   writeJson(paths.deliverableFile, { ...record, hydrated_contract_ref: 'contracts/hydrated-deliverable.json' });
   writeJson(path.join(paths.deliverableDir, 'contracts/hydrated-deliverable.json'), contract);
+  const claimSpineLock = [
+    {
+      claim_id: 'CLM-001',
+      claim_text: 'Blocked-page repair must preserve every reviewed unblocked page',
+      source_refs: ['source:test:image-quality'],
+      first_use_naming: {
+        full_visible_name: 'Image quality non-regression',
+        accepted_abbreviation: null,
+        first_use_slide_id: 'S01',
+      },
+      introduction_slide_id: 'S01',
+      proof_slide_ids: ['S02'],
+      resolution_slide_id: 'S02',
+      forbidden_drift: ['Do not replace the quality claim with route metadata'],
+    },
+  ];
+  writeStageArtifact(paths, contract, 'storyline', {
+    route: 'storyline',
+    storyline: {
+      claim_spine_lock: claimSpineLock,
+    },
+  });
+  writeStageArtifact(paths, contract, 'detailed_outline', {
+    route: 'detailed_outline',
+    detailed_outline: {
+      claim_spine_lock: claimSpineLock,
+      slides: [
+        { slide_id: 'S01' },
+        { slide_id: 'S02' },
+      ],
+    },
+  });
   writeStageArtifact(paths, contract, 'slide_blueprint', {
     route: 'slide_blueprint',
     slide_blueprint: {
+      claim_spine_lock: claimSpineLock,
       slides: [
         {
           slide_id: 'S01',
@@ -152,6 +185,7 @@ function seedWorkspace() {
   writeStageArtifact(paths, contract, 'visual_direction', {
     route: 'visual_direction',
     visual_direction: {
+      claim_spine_lock: claimSpineLock,
       palette: ['ink', 'red', 'white'],
       visual_rules: ['image-first page', 'audience-facing language', 'clear title safe zone'],
     },
