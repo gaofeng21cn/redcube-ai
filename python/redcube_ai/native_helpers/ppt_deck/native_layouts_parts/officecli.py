@@ -222,7 +222,7 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
     kind = canonical_object_kind(shape_spec)
     role = safe_text(shape_spec.get('role'), 'shape')
     text = ai_shape_text(shape_spec)
-    return {
+    record = {
         'shape_id': safe_text(shape_spec.get('shape_id')),
         'kind': kind,
         'semantic_kind': kind,
@@ -237,3 +237,20 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
         'materialization_intent': safe_text(shape_spec.get('materialization_intent'), 'native_data_object' if kind in {'chart', 'table', 'metric_grid'} else 'native_object'),
         'officecli_materialized': True,
     }
+    if kind == 'chart':
+        record.update({
+            'categories': safe_list(shape_spec.get('categories')),
+            'series': safe_list(shape_spec.get('series')),
+            'metrics': dict(shape_spec.get('metrics')) if isinstance(shape_spec.get('metrics'), dict) else {},
+        })
+    if kind in {'table', 'metric_grid'}:
+        metrics = dict(shape_spec.get('metrics')) if isinstance(shape_spec.get('metrics'), dict) else {}
+        body_font_size = shape_spec.get('body_font_size')
+        if body_font_size not in (None, ''):
+            metrics.setdefault('min_font_pt', body_font_size)
+        record.update({
+            'data': safe_list(shape_spec.get('data')),
+            'body_font_size': body_font_size,
+            'metrics': metrics,
+        })
+    return record
