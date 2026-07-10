@@ -74,7 +74,7 @@ interface ProductEntryRequest extends Record<string, unknown> {
     entry_session_id: string;
     provider_attempt_ref?: string;
     provider_attempt_ledger_ref?: string;
-    opl_generated_session_surface?: OplGeneratedProductEntrySessionSurface;
+    opl_generated_session_surface?: Record<string, unknown>;
   };
   task_intent?: 'run_opl_stage_execution_plan' | 'run_deliverable_route' | string;
   entry_mode?: string;
@@ -206,18 +206,6 @@ export interface ProductEntryPreflightCompanion {
   recommended_start_command: string;
   blocking_check_ids: string[];
   checks: ProductEntryPreflightCheck[];
-}
-
-export interface OplGeneratedProductEntrySessionSurface extends Record<string, unknown> {
-  surface_kind: 'opl_generated_product_entry_session_surface';
-  domain_id: 'rca';
-  domain_owner: 'redcube_ai';
-  runtime_owner: string;
-  entry_session: {
-    entry_session_id: string;
-  } & Record<string, unknown>;
-  delivery_identity: ProductEntryDeliveryLocatorRefs;
-  domain_projection: ProductEntrySessionHandoffRefs;
 }
 
 export interface ProductEntryDeliveryLocatorRefs {

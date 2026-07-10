@@ -6,7 +6,8 @@ import { getSourceArtifactPaths } from '@redcube/runtime-protocol';
 import { createDeliverable } from './create-deliverable.js';
 import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';
 import { researchSource } from './source-research.js';
-import { readJson, safeText } from './action-utils.js';
+import { safeText } from './action-utils.js';
+import { readJson } from './json-file.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

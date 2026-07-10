@@ -3,6 +3,7 @@
   "schema_version": 2,
   "lifecycle_state": "refs_only_anchor_after_private_pack_compiler_input_retirement",
   "domain_id": "redcube_ai",
+  "canonical_agent_id": "rca",
   "domain_pack_owner": "redcube_ai",
   "pack_compiler_owner": "one-person-lab",
   "projection_mode": "repo_source_refs_only",

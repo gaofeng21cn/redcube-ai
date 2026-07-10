@@ -116,6 +116,8 @@ test('OPL generated interfaces are ready from RCA root contracts when OPL checko
   assert.equal(bundle.source_kind, 'standard_agent_repo_contracts');
   assert.equal(bundle.status, 'ready');
   assert.equal(bundle.owner, 'one-person-lab');
+  assert.equal(bundle.agent_id, 'rca');
+  assert.equal(bundle.target_domain_id, 'redcube_ai');
   assert.equal(bundle.domain_repo_can_own_generated_surface, false);
   assert.deepEqual(bundle.blocker_reasons, []);
   assert.equal(bundle.cli.status, 'ready');
