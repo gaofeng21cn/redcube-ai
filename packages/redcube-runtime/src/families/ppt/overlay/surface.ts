@@ -15,7 +15,6 @@ import {
 
 import type {
   PptDeckSurfaceArtifact,
-  PptDeckSurfaceArtifactContent,
   PptDeckSurfaceArtifactPath,
   PptDeckSurfaceBundleRequest,
 } from './types.js';
@@ -218,7 +217,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
 
 export function validateDeckSurfaceArtifact(
   relativePath: PptDeckSurfaceArtifactPath,
-  content: PptDeckSurfaceArtifactContent | null | undefined,
+  content: unknown,
 ): boolean {
   return validateSurfaceArtifact({
     family: 'deck',

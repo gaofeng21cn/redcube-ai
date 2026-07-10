@@ -7,16 +7,15 @@ import {
 
 import type {
   JsonObject,
+  OverlayProfileDefinition,
 } from '@redcube/overlay-core';
 import type {
   PptDeckHydrateContractRequest,
   PptDeckHydratedContract,
-  PptDeckOverlayCatalogEntry,
-  PptDeckOverlayProfiles,
   PptDeckProfileId,
 } from './types.js';
 
-const PPT_SOURCE_TRUTH_CONTRACT = buildSharedSourceTruthContract({
+export const PPT_SOURCE_TRUTH_CONTRACT = buildSharedSourceTruthContract({
   routeToConsumptionRole: {
     storyline: 'story_architecture',
     detailed_outline: 'story_architecture',
@@ -29,7 +28,7 @@ const PPT_SOURCE_TRUTH_CONTRACT = buildSharedSourceTruthContract({
   requiredHydratedExportSurface: 'export_pptx',
 });
 
-const PPT_DELIVERY_CONTRACT_BASE = Object.freeze({
+export const PPT_DELIVERY_CONTRACT_BASE = Object.freeze({
   authoritative_projection_surface: 'getPublicationProjection',
   authoritative_review_surface: 'getReviewState',
   required_export_route: 'export_pptx',
@@ -51,9 +50,9 @@ const PPT_DELIVERY_CONTRACT_BASE = Object.freeze({
     ready_for_export: 'export_ready',
     output_ready: 'output_ready',
   },
-});
+} as const);
 
-const FAMILY_STAGE_SEQUENCE = {
+export const FAMILY_STAGE_SEQUENCE = {
   flow_id: 'ppt_deck_standard_flow',
   stages: [
     {
@@ -189,9 +188,9 @@ const FAMILY_STAGE_SEQUENCE = {
       rerun_from_stage: 'screenshot_review',
     },
   ],
-};
+} as const;
 
-const FAMILY_REVIEW_SURFACE = {
+export const FAMILY_REVIEW_SURFACE = {
   required_checks: [
     'overflow_free',
     'occlusion_free',
@@ -228,9 +227,9 @@ const FAMILY_REVIEW_SURFACE = {
     anti_template_ok: 'visual_director_review',
     baseline_comparison_passed: 'visual_direction',
   },
-};
+} as const;
 
-const FAMILY_LAYOUT_RULES = {
+export const FAMILY_LAYOUT_RULES = {
   density_mode: 'balanced_deck',
   max_primary_points_per_slide: 5,
   canvas: {
@@ -257,9 +256,9 @@ const FAMILY_LAYOUT_RULES = {
     ],
     separate_fact_from_interpretation: true,
   },
-};
+} as const;
 
-const FAMILY_BASELINE_POLICY = {
+export const FAMILY_BASELINE_POLICY = {
   modes: {
     draft_new: {
       baseline_required: false,
@@ -270,9 +269,9 @@ const FAMILY_BASELINE_POLICY = {
       required_review: 'baseline_comparison_passed',
     },
   },
-};
+} as const;
 
-const FAMILY_STAGE_REQUIREMENTS = {
+export const FAMILY_STAGE_REQUIREMENTS = {
   storyline: {
     requires_artifacts: [],
   },
@@ -314,9 +313,9 @@ const FAMILY_STAGE_REQUIREMENTS = {
     requires_artifacts: ['screenshot_review'],
     requires_review_pass: true,
   },
-};
+} as const;
 
-const FAMILY_PROMPT_PACK = {
+export const FAMILY_PROMPT_PACK = {
   pack_id: 'ppt_deck_mainline_v1',
   root: 'prompts/ppt_deck',
   routes: {
@@ -369,18 +368,18 @@ const FAMILY_PROMPT_PACK = {
       default: 'ppt.compare_zones',
     },
   },
-};
+} as const;
 
-const FAMILY_EXPORT_BUNDLE = {
+export const FAMILY_EXPORT_BUNDLE = {
   bundle_id: 'ppt_deck_bundle',
   include_pptx: true,
   include_pdf: true,
   include_presenter_notes: true,
   include_backup_slides: false,
   review_required_before_export: true,
-};
+} as const;
 
-const FAMILY_DISPLAY_REGISTRY = {
+export const FAMILY_DISPLAY_REGISTRY = {
   surfaces: [
     {
       id: 'source_index',
@@ -428,9 +427,9 @@ const FAMILY_DISPLAY_REGISTRY = {
       required_when: 'approved_for_export',
     },
   ],
-};
+} as const;
 
-const FAMILY_LIFECYCLE_MODEL = {
+export const FAMILY_LIFECYCLE_MODEL = {
   macro_lifecycle: [
     'source_readiness',
     'story_architecture',
@@ -463,9 +462,9 @@ const FAMILY_LIFECYCLE_MODEL = {
       'current_source_truth_cannot_support_story_or_visual_judgement',
     ],
   },
-};
+} as const;
 
-const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
+export const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
   stage_model: 'direct_delivery_human_workline',
   human_workline: [
     'source_readiness',
@@ -506,9 +505,9 @@ const DIRECT_DELIVERY_LIFECYCLE_STAGE_CONTRACT = {
     screenshot_review: 'visual',
     export_pptx: 'delivery',
   },
-};
+} as const;
 
-const PPT_DECK_PROFILE_OVERRIDES = {
+export const PPT_DECK_PROFILE_OVERRIDES = {
   lecture_student: {
     review_surface: {
       required_checks: [
@@ -597,24 +596,24 @@ const PPT_DECK_PROFILE_OVERRIDES = {
       include_backup_slides: true,
     },
   },
-};
+} as const;
 
 export const PPT_DECK_PROFILES = Object.freeze({
   lecture_student: { profile_id: 'lecture_student' },
   lecture_peer: { profile_id: 'lecture_peer' },
   executive_briefing: { profile_id: 'executive_briefing' },
   defense_deck: { profile_id: 'defense_deck' },
-}) as PptDeckOverlayProfiles;
+} as const satisfies Record<string, OverlayProfileDefinition>);
 
 function isPptDeckProfileId(value: string): value is PptDeckProfileId {
   return Object.hasOwn(PPT_DECK_PROFILE_OVERRIDES, value);
 }
 
-export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
+export function describePptDeckOverlay() {
   return {
     overlay_id: 'ppt_deck',
     default_profile_id: 'lecture_student',
-    profiles: Object.keys(PPT_DECK_PROFILES),
+    profiles: Object.keys(PPT_DECK_PROFILES) as PptDeckProfileId[],
     deliverable_kind: 'ppt_deck',
     prompt_pack_id: FAMILY_PROMPT_PACK.pack_id,
     route_sequence: FAMILY_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
@@ -628,7 +627,7 @@ export function describePptDeckOverlay(): PptDeckOverlayCatalogEntry {
       runner_id: 'families/ppt',
       owner: 'redcube_ai',
     },
-  } as unknown as PptDeckOverlayCatalogEntry;
+  };
 }
 
 export function hydratePptDeckContract({

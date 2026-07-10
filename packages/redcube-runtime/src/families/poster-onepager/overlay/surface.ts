@@ -15,7 +15,6 @@ import {
 
 import type {
   PosterSurfaceArtifact,
-  PosterSurfaceArtifactContent,
   PosterSurfaceArtifactPath,
   PosterSurfaceBundleRequest,
 } from './types.js';
@@ -102,7 +101,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
 
 export function validatePosterSurfaceArtifact(
   relativePath: PosterSurfaceArtifactPath,
-  content: PosterSurfaceArtifactContent | null | undefined,
+  content: unknown,
 ): boolean {
   return validateSurfaceArtifact({
     family: 'poster',

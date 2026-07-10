@@ -1,99 +1,37 @@
-import type {
-  OverlayCatalogEntry,
-  OverlayProfileDefinition,
-} from '@redcube/overlay-core';
+import type { OverlayProfileDefinition } from '@redcube/overlay-core';
 
-export type XiaohongshuOverlayId = 'xiaohongshu';
-export type XiaohongshuProfileId = 'standard_note';
-export type XiaohongshuDeliverableKind = 'xiaohongshu_note';
-export type XiaohongshuStageId =
-  | 'research'
-  | 'storyline'
-  | 'single_note_plan'
-  | 'visual_direction'
-  | 'author_image_pages'
-  | 'repair_image_pages'
-  | 'render_html'
-  | 'fix_html'
-  | 'visual_director_review'
-  | 'screenshot_review'
-  | 'publish_copy'
-  | 'export_bundle';
-export type XiaohongshuPromptFile =
-  | 'research.md'
-  | 'storyline.md'
-  | 'single_note_plan.md'
-  | 'visual_direction.md'
-  | 'author_image_pages.md'
-  | 'repair_image_pages.md'
-  | 'render_html.md'
-  | 'fix_html.md'
-  | 'director_review.md'
-  | 'screenshot_review.md'
-  | 'publish_copy.md'
-  | 'export_bundle.md';
-export type XiaohongshuOutputArtifactFile =
-  | 'research.json'
-  | 'storyline.json'
-  | 'single_note_plan.json'
-  | 'visual_direction.json'
-  | 'image_pages_bundle.json'
-  | 'image_pages_repair_bundle.json'
-  | 'render_bundle.json'
-  | 'fix_bundle.json'
-  | 'director_review.json'
-  | 'quality_gate.json'
-  | 'publish_copy.json'
-  | 'publish_bundle.json';
-export type XiaohongshuReviewCheck =
-  | 'overflow_free'
-  | 'occlusion_free'
-  | 'visual_density_ok'
-  | 'block_content_fit_ok'
-  | 'cover_density_ok'
-  | 'director_intent_landed'
-  | 'anti_template_ok'
-  | 'platform_copy_complete'
-  | 'cta_clear'
-  | 'baseline_comparison_passed';
-export type XiaohongshuForbiddenTemplateRoute =
-  | 'renderSlide'
-  | 'layoutByType'
-  | 'cardsGrid'
-  | 'pageType';
-type XiaohongshuRecipeId =
-  | 'xhs.hero_note'
-  | 'xhs.split_contrast'
-  | 'xhs.staggered_steps'
-  | 'xhs.track_rail'
-  | 'xhs.evidence_bands'
-  | 'xhs.checklist_close'
-  | 'xhs.annotated_cards';
-export type XiaohongshuDisplaySurfaceId =
-  | 'source_index'
-  | 'storyline'
-  | 'single_note_plan'
-  | 'visual_direction'
-  | 'author_image_pages'
-  | 'repair_image_pages'
-  | 'render_html'
-  | 'fix_html'
-  | 'visual_director_review'
-  | 'screenshot_review'
-  | 'publish_copy'
-  | 'export_bundle'
-  | 'series_publish_cadence'
-  | 'path_mapping'
-  | 'delivery_overview';
-export type XiaohongshuDisplaySurfaceKind =
-  | 'research_surface'
-  | 'stage_artifact'
-  | 'render_output'
-  | 'review_output'
-  | 'publish_copy'
-  | 'delivery_bundle'
-  | 'series_surface';
-export type XiaohongshuDisplaySurfaceCondition = 'always' | 'approved_for_export' | 'series_mode' | 'review_rerun_required' | 'explicit_html_route';
+type XiaohongshuCatalog = ReturnType<typeof import('./contracts.js').describeXiaohongshuOverlay>;
+
+export type XiaohongshuOverlayId = XiaohongshuCatalog['overlay_id'];
+export type XiaohongshuProfileId = XiaohongshuCatalog['profiles'][number];
+export type XiaohongshuDeliverableKind = XiaohongshuCatalog['deliverable_kind'];
+export type XiaohongshuStageSequence = typeof import('./contracts.js').XIAOHONGSHU_STAGE_SEQUENCE;
+export type XiaohongshuStageDefinition =
+  | XiaohongshuStageSequence['stages'][number]
+  | XiaohongshuStageSequence['alternate_stages'][number];
+export type XiaohongshuStageHardStop = XiaohongshuStageSequence['hard_stops'][number];
+export type XiaohongshuStageId = XiaohongshuStageDefinition['stage_id'];
+export type XiaohongshuPromptFile = XiaohongshuStageDefinition['prompt_file'];
+export type XiaohongshuOutputArtifactFile = XiaohongshuStageDefinition['output_artifact'];
+export type XiaohongshuStageRequirements = typeof import('./contracts.js').XIAOHONGSHU_STAGE_REQUIREMENTS;
+export type XiaohongshuStageRequirement = XiaohongshuStageRequirements[keyof XiaohongshuStageRequirements];
+export type XiaohongshuReviewSurface = typeof import('./contracts.js').XIAOHONGSHU_REVIEW_SURFACE;
+export type XiaohongshuReviewCheck = keyof XiaohongshuReviewSurface['rerun_from_stage'];
+export type XiaohongshuLayoutRules = typeof import('./contracts.js').XIAOHONGSHU_LAYOUT_RULES;
+export type XiaohongshuForbiddenTemplateRoute = XiaohongshuLayoutRules['forbidden_template_routes'][number];
+export type XiaohongshuBaselinePolicy = typeof import('./contracts.js').XIAOHONGSHU_BASELINE_POLICY;
+export type XiaohongshuPromptPack = typeof import('./contracts.js').XIAOHONGSHU_PROMPT_PACK;
+export type XiaohongshuExportBundle = typeof import('./contracts.js').XIAOHONGSHU_EXPORT_BUNDLE;
+export type XiaohongshuDisplayRegistry = typeof import('./contracts.js').XIAOHONGSHU_DISPLAY_REGISTRY;
+export type XiaohongshuDisplaySurface = XiaohongshuDisplayRegistry['surfaces'][number];
+export type XiaohongshuDisplaySurfaceId = XiaohongshuDisplaySurface['id'];
+export type XiaohongshuDisplaySurfaceKind = XiaohongshuDisplaySurface['kind'];
+export type XiaohongshuDisplaySurfaceCondition = XiaohongshuDisplaySurface['required_when'];
+export type XiaohongshuLifecycleModel = typeof import('./contracts.js').XIAOHONGSHU_LIFECYCLE_MODEL;
+export type XiaohongshuSourceTruthContract = typeof import('./contracts.js').XIAOHONGSHU_SOURCE_TRUTH_CONTRACT;
+export type XiaohongshuDeliveryContract = typeof import('./contracts.js').XIAOHONGSHU_DELIVERY_CONTRACT;
+export type XiaohongshuOverlayCatalogEntry = XiaohongshuCatalog;
+
 export type XiaohongshuSurfaceArtifactPath =
   | 'contracts/stage-sequence.json'
   | 'contracts/stage-requirements.json'
@@ -119,248 +57,6 @@ export interface XiaohongshuTopicRecord {
   deliverable_kind: XiaohongshuDeliverableKind;
   status: 'draft';
   routes: XiaohongshuStageId[];
-}
-
-export interface XiaohongshuStageDefinition {
-  stage_id: XiaohongshuStageId;
-  prompt_file: XiaohongshuPromptFile;
-  output_artifact: XiaohongshuOutputArtifactFile;
-  requires_stages: XiaohongshuStageId[];
-}
-
-export interface XiaohongshuStageHardStop {
-  stage_id: XiaohongshuStageId;
-  rerun_from_stage: XiaohongshuStageId;
-  requires_stage_outputs?: XiaohongshuStageId[];
-  requires_review?: XiaohongshuStageId[];
-}
-
-export interface XiaohongshuStageSequence {
-  flow_id: 'xiaohongshu_official_flow';
-  stages: XiaohongshuStageDefinition[];
-  alternate_stages?: XiaohongshuStageDefinition[];
-  hard_stops: XiaohongshuStageHardStop[];
-}
-
-export interface XiaohongshuStageRequirement {
-  requires_artifacts: XiaohongshuStageId[];
-  requires_review_pass?: true;
-}
-
-export interface XiaohongshuStageRequirements {
-  research: XiaohongshuStageRequirement;
-  storyline: XiaohongshuStageRequirement;
-  single_note_plan: XiaohongshuStageRequirement;
-  visual_direction: XiaohongshuStageRequirement;
-  author_image_pages: XiaohongshuStageRequirement;
-  repair_image_pages: XiaohongshuStageRequirement;
-  render_html: XiaohongshuStageRequirement;
-  fix_html: XiaohongshuStageRequirement;
-  visual_director_review: XiaohongshuStageRequirement;
-  screenshot_review: XiaohongshuStageRequirement;
-  publish_copy: XiaohongshuStageRequirement;
-  export_bundle: XiaohongshuStageRequirement;
-}
-
-export interface XiaohongshuReviewSurface {
-  required_checks: XiaohongshuReviewCheck[];
-  artifact_stage: 'screenshot_review';
-  artifact_file: 'quality_gate.json';
-  conditional_checks: {
-    optimize_existing: XiaohongshuReviewCheck[];
-  };
-  rerun_from_stage: {
-    overflow_free: XiaohongshuStageId;
-    occlusion_free: XiaohongshuStageId;
-    visual_density_ok: XiaohongshuStageId;
-    block_content_fit_ok: XiaohongshuStageId;
-    cover_density_ok: XiaohongshuStageId;
-    director_intent_landed: XiaohongshuStageId;
-    anti_template_ok: XiaohongshuStageId;
-    platform_copy_complete: XiaohongshuStageId;
-    cta_clear: XiaohongshuStageId;
-    baseline_comparison_passed: XiaohongshuStageId;
-  };
-}
-
-export interface XiaohongshuLayoutRules {
-  density_mode: 'mobile_note_stack';
-  canvas: {
-    ratio: '3:4';
-    width: 1086;
-    height: 1448;
-    scrollbars_forbidden: true;
-  };
-  max_primary_points_per_slide: 4;
-  slides_data_rule: 'independent_content';
-  forbidden_template_routes: XiaohongshuForbiddenTemplateRoute[];
-  forbid_external_images: true;
-  forbid_left_right_compare: true;
-  require_cover_hook: true;
-  require_public_source_label: true;
-}
-
-export interface XiaohongshuBaselinePolicy {
-  modes: {
-    draft_new: {
-      baseline_required: false;
-    };
-    optimize_existing: {
-      baseline_required: true;
-      approved_baseline_only: true;
-      required_review: 'baseline_comparison_passed';
-    };
-  };
-}
-
-export interface XiaohongshuPromptPack {
-  pack_id: 'xiaohongshu_mainline_v1';
-  root: 'prompts/xiaohongshu';
-  routes: {
-    research: 'prompts/xiaohongshu/research.md';
-    storyline: 'prompts/xiaohongshu/storyline.md';
-    single_note_plan: 'prompts/xiaohongshu/single_note_plan.md';
-    visual_direction: 'prompts/xiaohongshu/visual_direction.md';
-    author_image_pages: 'prompts/xiaohongshu/author_image_pages.md';
-    repair_image_pages: 'prompts/xiaohongshu/repair_image_pages.md';
-    render_html: 'prompts/xiaohongshu/render_html.md';
-    fix_html: 'prompts/xiaohongshu/fix_html.md';
-    visual_director_review: 'prompts/xiaohongshu/director_review.md';
-    screenshot_review: 'prompts/xiaohongshu/screenshot_review.md';
-    publish_copy: 'prompts/xiaohongshu/publish_copy.md';
-    export_bundle: 'prompts/xiaohongshu/export_bundle.md';
-  };
-  stages: {
-    research: { file: 'research.md' };
-    storyline: { file: 'storyline.md' };
-    single_note_plan: { file: 'single_note_plan.md' };
-    visual_direction: { file: 'visual_direction.md' };
-    author_image_pages: { file: 'author_image_pages.md' };
-    repair_image_pages: { file: 'repair_image_pages.md' };
-    render_html: { file: 'render_html.md' };
-    fix_html: { file: 'fix_html.md' };
-    visual_director_review: { file: 'director_review.md' };
-    screenshot_review: { file: 'screenshot_review.md' };
-    publish_copy: { file: 'publish_copy.md' };
-    export_bundle: { file: 'export_bundle.md' };
-  };
-  render_contract: {
-    render_strategy: 'image_first_page_authoring';
-    default_visual_route: 'author_image_pages';
-    image_generation: {
-      default_model: 'gpt-image-2';
-      size: '1086x1448';
-      output_mode: 'full_page_png';
-      canvas: {
-        ratio: '3:4';
-        width: 1086;
-        height: 1448;
-        scrollbars_forbidden: true;
-      };
-      page_image_artifacts_required: true;
-      default_style_profile: string;
-      built_in_style_reference_dir: string;
-      style_reference_dir_input: 'delivery_request.style_reference_dir';
-      style_reference_override_semantics: string;
-      review_input_surface: 'image_page_png_manifest';
-    };
-    selectable_explicit_routes: ReadonlyArray<'render_html' | 'fix_html'>;
-    explicit_route_policy: 'html_routes_require_operator_selection';
-    shell_file: 'render_shell.html';
-    recipe_registry: {
-      cover_note: 'xhs.hero_note';
-      myth_compare: 'xhs.split_contrast';
-      sequence_stack: 'xhs.staggered_steps';
-      process_track: 'xhs.track_rail';
-      evidence_strip: 'xhs.evidence_bands';
-      action_checklist: 'xhs.checklist_close';
-      default: 'xhs.annotated_cards';
-    };
-  };
-}
-
-export interface XiaohongshuExportBundle {
-  bundle_id: 'xiaohongshu_standard_bundle';
-  include_cover_assets: true;
-  include_caption: true;
-  include_publish_manifest: true;
-  review_required_before_export: true;
-}
-
-export interface XiaohongshuDisplaySurface {
-  id: XiaohongshuDisplaySurfaceId;
-  kind: XiaohongshuDisplaySurfaceKind;
-  required_when: XiaohongshuDisplaySurfaceCondition;
-}
-
-export interface XiaohongshuDisplayRegistry {
-  surfaces: XiaohongshuDisplaySurface[];
-}
-
-export interface XiaohongshuLifecycleModel {
-  macro_lifecycle: Array<
-    'source_readiness'
-    | 'story_architecture'
-    | 'visual_authorship'
-    | 'delivery_packaging'
-  >;
-  route_to_stage: Partial<Record<Exclude<XiaohongshuStageId, 'visual_director_review' | 'screenshot_review'>, string>>;
-  review_overlay_routes: {
-    visual_director_review: 'visual_director_review';
-    screenshot_review: 'screenshot_review';
-  };
-  research_ownership: {
-    semantic_role: 'shared_source_readiness_augmentation';
-    trigger_conditions: string[];
-  };
-}
-
-export interface XiaohongshuSourceTruthContract {
-  authoritative_surface: 'shared_source_truth';
-  authoritative_gate: 'topics/<topic>/canonical/source-readiness-pack.json';
-  authoritative_gate_inputs: ReadonlyArray<'source_audit' | 'source_readiness_pack'>;
-  authoritative_artifacts: ReadonlyArray<'source_index' | 'extracted_materials' | 'source_audit' | 'source_brief' | 'source_readiness_pack'>;
-  readiness_target: 'planning_ready';
-  pass_condition: 'source_audit.status=pass && source_readiness_pack.readiness.planning_ready=true';
-  route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch';
-  hydration_model: {
-    hydrated_contract_surface: 'contracts/hydrated-deliverable.json';
-    runtime_injection_surface: 'shared_source_truth';
-    static_contract_written_at_create_deliverable: true;
-  };
-  readable_shared_source_truth_fields: {
-    source_index: ReadonlyArray<string>;
-    extracted_materials: ReadonlyArray<string>;
-    source_brief: ReadonlyArray<string>;
-  };
-  consumption_summary_fields: ReadonlyArray<string>;
-  route_to_consumption_role: {
-    research: 'source_readiness';
-    storyline: 'story_architecture';
-    single_note_plan: 'story_architecture';
-    visual_direction: 'visual_authorship';
-  };
-  required_hydrated_export_surface: 'export_bundle';
-}
-
-export interface XiaohongshuDeliveryContract {
-  authoritative_projection_surface: 'getPublicationProjection';
-  authoritative_review_surface: 'getReviewState';
-  required_export_route: 'export_bundle';
-  required_export_bundle_id: 'xiaohongshu_standard_bundle';
-  export_artifact_field: 'export_bundle';
-  delivery_state_field: 'export_bundle.delivery_state';
-  projection_model: 'human_publication';
-  human_gate: {
-    required: true;
-    mutation_surfaces: ReadonlyArray<'approve_publish' | 'promote_publish'>;
-  };
-  projection_states: {
-    ready_for_export: 'approval_pending';
-    output_ready: 'approval_pending';
-    approved: 'approved_pending_publish';
-    published: 'published';
-  };
 }
 
 export interface XiaohongshuHydrateContractRequest {
@@ -451,35 +147,20 @@ export interface XiaohongshuSurfaceArtifact {
   content: XiaohongshuSurfaceArtifactContent;
 }
 
-export interface XiaohongshuOverlayProfileDefinition extends OverlayProfileDefinition {
+export type XiaohongshuOverlayProfileDefinition = OverlayProfileDefinition & {
   profile_id: XiaohongshuProfileId;
-}
-
-export interface XiaohongshuOverlayCatalogEntry extends OverlayCatalogEntry {
-  overlay_id: XiaohongshuOverlayId;
-  default_profile_id: XiaohongshuProfileId;
-  profiles: XiaohongshuProfileId[];
-  route_sequence: XiaohongshuStageId[];
-  deliverable_kind: XiaohongshuDeliverableKind;
-  prompt_pack_id: 'xiaohongshu_mainline_v1';
-  runtime: {
-    runner_id: 'families/xiaohongshu';
-    owner: 'redcube_ai';
-  };
-}
+};
 
 export interface XiaohongshuOverlayDefinition {
   overlayId: XiaohongshuOverlayId;
   defaultProfileId: XiaohongshuProfileId;
-  profiles: {
-    standard_note: XiaohongshuOverlayProfileDefinition;
-  };
+  profiles: Record<XiaohongshuProfileId, XiaohongshuOverlayProfileDefinition>;
   buildDeliverableRecord: (input: XiaohongshuDeliverableRecordInput) => XiaohongshuDeliverableRecord;
   buildSurfaceBundle: (request: XiaohongshuSurfaceBundleRequest) => XiaohongshuSurfaceArtifact[];
   listSurfaceArtifactPaths: () => XiaohongshuSurfaceArtifactPath[];
   validateSurfaceArtifact: (
     relativePath: XiaohongshuSurfaceArtifactPath,
-    content: XiaohongshuSurfaceArtifactContent | null | undefined,
+    content: unknown,
   ) => boolean;
   hydrateDeliverableContract: (request: XiaohongshuHydrateContractRequest) => XiaohongshuHydratedContract;
   describeOverlay: () => XiaohongshuOverlayCatalogEntry;

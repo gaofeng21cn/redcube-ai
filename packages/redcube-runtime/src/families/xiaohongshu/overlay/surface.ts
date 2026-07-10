@@ -15,7 +15,6 @@ import {
 
 import type {
   XiaohongshuSurfaceArtifact,
-  XiaohongshuSurfaceArtifactContent,
   XiaohongshuSurfaceArtifactPath,
   XiaohongshuSurfaceBundleRequest,
 } from './types.js';
@@ -99,7 +98,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
 
 export function validateXiaohongshuSurfaceArtifact(
   relativePath: XiaohongshuSurfaceArtifactPath,
-  content: XiaohongshuSurfaceArtifactContent | null | undefined,
+  content: unknown,
 ): boolean {
   return validateSurfaceArtifact({
     family: 'xiaohongshu',

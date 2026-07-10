@@ -5,11 +5,9 @@ import type {
   PosterOnepagerDeliverableRecordInput,
   PosterOnepagerHydrateContractRequest,
   PosterOnepagerHydratedContract,
-  PosterOnepagerSourceTruthContract,
-  PosterOnepagerStageDefinition,
 } from './types.js';
 
-const POSTER_SOURCE_TRUTH_CONTRACT = Object.freeze({
+export const POSTER_SOURCE_TRUTH_CONTRACT = Object.freeze({
   ...buildSharedSourceTruthContract({
     routeToConsumptionRole: {
       storyline: 'story_architecture',
@@ -22,9 +20,9 @@ const POSTER_SOURCE_TRUTH_CONTRACT = Object.freeze({
     profile_id: 'knowledge_poster',
     academic_contract_active: false,
   },
-}) as unknown as PosterOnepagerSourceTruthContract;
+} as const);
 
-const POSTER_DELIVERY_CONTRACT = Object.freeze({
+export const POSTER_DELIVERY_CONTRACT = Object.freeze({
   authoritative_projection_surface: 'getPublicationProjection',
   authoritative_review_surface: 'getReviewState',
   required_export_route: 'export_bundle',
@@ -47,9 +45,9 @@ const POSTER_DELIVERY_CONTRACT = Object.freeze({
     ready_for_export: 'export_ready',
     output_ready: 'output_ready',
   },
-});
+} as const);
 
-const STAGE_SEQUENCE = {
+export const POSTER_STAGE_SEQUENCE = {
   flow_id: 'poster_onepager_mainline_flow',
   stages: [
     { stage_id: 'storyline', prompt_file: 'storyline.md', output_artifact: 'storyline.json', requires_stages: [] },
@@ -77,9 +75,9 @@ const STAGE_SEQUENCE = {
       rerun_from_stage: 'screenshot_review'
     }
   ]
-};
+} as const;
 
-const STAGE_REQUIREMENTS = {
+export const POSTER_STAGE_REQUIREMENTS = {
   storyline: { requires_artifacts: [] },
   poster_blueprint: { requires_artifacts: ['storyline'] },
   visual_direction: { requires_artifacts: ['poster_blueprint'] },
@@ -87,9 +85,9 @@ const STAGE_REQUIREMENTS = {
   visual_director_review: { requires_artifacts: ['render_html'] },
   screenshot_review: { requires_artifacts: ['visual_director_review'] },
   export_bundle: { requires_artifacts: ['screenshot_review'], requires_review_pass: true },
-};
+} as const;
 
-const REVIEW_SURFACE = {
+export const POSTER_REVIEW_SURFACE = {
   required_checks: [
     'overflow_free',
     'occlusion_free',
@@ -114,9 +112,9 @@ const REVIEW_SURFACE = {
     message_hierarchy_clear: 'poster_blueprint',
     baseline_comparison_passed: 'visual_direction',
   },
-};
+} as const;
 
-const LAYOUT_RULES = {
+export const POSTER_LAYOUT_RULES = {
   density_mode: 'single_page_poster',
   canvas: {
     ratio: '4:5',
@@ -129,9 +127,9 @@ const LAYOUT_RULES = {
   forbidden_template_routes: ['renderSlide', 'layoutByType', 'cardsGrid', 'pageType'],
   require_public_source_label: true,
   require_single_primary_headline: true,
-};
+} as const;
 
-const BASELINE_POLICY = {
+export const POSTER_BASELINE_POLICY = {
   modes: {
     draft_new: { baseline_required: false },
     optimize_existing: {
@@ -140,9 +138,9 @@ const BASELINE_POLICY = {
       required_review: 'baseline_comparison_passed',
     },
   },
-};
+} as const;
 
-const PROMPT_PACK = {
+export const POSTER_PROMPT_PACK = {
   pack_id: 'poster_onepager_mainline_v1',
   root: 'prompts/poster_onepager',
   routes: {
@@ -174,17 +172,17 @@ const PROMPT_PACK = {
       default: 'poster.evidence_columns',
     },
   },
-};
+} as const;
 
-const EXPORT_BUNDLE = {
+export const POSTER_EXPORT_BUNDLE = {
   bundle_id: 'poster_onepager_bundle',
   include_html: true,
   include_png: true,
   include_manifest: true,
   review_required_before_export: true,
-};
+} as const;
 
-const DISPLAY_REGISTRY = {
+export const POSTER_DISPLAY_REGISTRY = {
   surfaces: [
     { id: 'storyline', kind: 'stage_artifact', required_when: 'always' },
     { id: 'poster_blueprint', kind: 'stage_artifact', required_when: 'always' },
@@ -194,9 +192,9 @@ const DISPLAY_REGISTRY = {
     { id: 'screenshot_review', kind: 'review_output', required_when: 'always' },
     { id: 'export_bundle', kind: 'delivery_bundle', required_when: 'approved_for_export' },
   ],
-};
+} as const;
 
-const LIFECYCLE_MODEL = {
+export const POSTER_LIFECYCLE_MODEL = {
   macro_lifecycle: [
     'source_readiness',
     'story_architecture',
@@ -214,9 +212,9 @@ const LIFECYCLE_MODEL = {
     visual_director_review: 'visual_director_review',
     screenshot_review: 'screenshot_review',
   },
-};
+} as const;
 
-const LIFECYCLE_STAGE_CONTRACT = {
+export const POSTER_LIFECYCLE_STAGE_CONTRACT = {
   stage_model: 'direct_delivery_human_workline',
   human_workline: [
     'source_readiness',
@@ -225,7 +223,7 @@ const LIFECYCLE_STAGE_CONTRACT = {
     'visual',
     'delivery',
   ],
-  macro_lifecycle: LIFECYCLE_MODEL.macro_lifecycle,
+  macro_lifecycle: POSTER_LIFECYCLE_MODEL.macro_lifecycle,
   human_to_macro_stage: {
     source_readiness: 'source_readiness',
     storyline: 'story_architecture',
@@ -251,16 +249,16 @@ const LIFECYCLE_STAGE_CONTRACT = {
     screenshot_review: 'visual',
     export_bundle: 'delivery',
   },
-};
+} as const;
 
 export function describePosterOnepagerOverlay() {
   return {
     overlay_id: 'poster_onepager' as const,
     default_profile_id: 'knowledge_poster' as const,
     profiles: ['knowledge_poster' as const],
-    route_sequence: (STAGE_SEQUENCE.stages as PosterOnepagerStageDefinition[]).map((stage) => stage.stage_id),
+    route_sequence: POSTER_STAGE_SEQUENCE.stages.map((stage) => stage.stage_id),
     deliverable_kind: 'poster_onepager' as const,
-    prompt_pack_id: PROMPT_PACK.pack_id as 'poster_onepager_mainline_v1',
+    prompt_pack_id: POSTER_PROMPT_PACK.pack_id,
     runtime: {
       runner_id: 'families/poster-onepager' as const,
       owner: 'redcube_ai' as const,
@@ -284,16 +282,16 @@ export function hydratePosterOnepagerContract({
     deliverable_id: String(deliverableId || '').trim(),
     title: String(title || '').trim(),
     goal: String(goal || '').trim(),
-    stage_sequence: STAGE_SEQUENCE,
-    stage_requirements: STAGE_REQUIREMENTS,
-    review_surface: REVIEW_SURFACE,
-    layout_rules: LAYOUT_RULES,
-    baseline_policy: BASELINE_POLICY,
-    prompt_pack: PROMPT_PACK,
-    export_bundle: EXPORT_BUNDLE,
-    display_registry: DISPLAY_REGISTRY,
-    lifecycle_model: LIFECYCLE_MODEL,
-    lifecycle_stage_contract: LIFECYCLE_STAGE_CONTRACT,
+    stage_sequence: POSTER_STAGE_SEQUENCE,
+    stage_requirements: POSTER_STAGE_REQUIREMENTS,
+    review_surface: POSTER_REVIEW_SURFACE,
+    layout_rules: POSTER_LAYOUT_RULES,
+    baseline_policy: POSTER_BASELINE_POLICY,
+    prompt_pack: POSTER_PROMPT_PACK,
+    export_bundle: POSTER_EXPORT_BUNDLE,
+    display_registry: POSTER_DISPLAY_REGISTRY,
+    lifecycle_model: POSTER_LIFECYCLE_MODEL,
+    lifecycle_stage_contract: POSTER_LIFECYCLE_STAGE_CONTRACT,
     source_truth_contract: POSTER_SOURCE_TRUTH_CONTRACT,
     delivery_contract: POSTER_DELIVERY_CONTRACT,
   } as PosterOnepagerHydratedContract;
@@ -328,6 +326,6 @@ export function buildPosterOnepagerDeliverableRecord({
     goal: String(goal || contract.goal || '').trim(),
     hydrated_contract_ref: 'contracts/hydrated-deliverable.json',
     poster_ratio: '4:5',
-    routes: contract.stage_sequence.stages.map((stage: PosterOnepagerStageDefinition) => stage.stage_id),
+    routes: contract.stage_sequence.stages.map((stage) => stage.stage_id),
   } as PosterOnepagerDeliverableRecord;
 }
