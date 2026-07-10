@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-Last reviewed: `2026-07-09`
+Last reviewed: `2026-07-10`
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
@@ -43,6 +43,8 @@ OPL family `Foundry Agent OS` 目标下，RCA 的 target delta 读 [RCA Foundry 
 `Codex CLI` 是 RCA 当前唯一物化的 executor。generic executor selection、hosted adapter、attempt ledger 与 receipt residency 归 OPL owner surface；RCA 只消费 `contracts/stage_control_plane.json#/stages/*/selected_executor` 等 opaque refs，不保留本地 routing config、Hermes adapter/proof、fallback 或第二 executor pass。历史 Hermes contracts/docs 只按 provenance / external reference 读取。
 
 2026-07-10 overdesign thinning 已关闭八项结构候选：stdlib walker、single family registry、protocol validator utility、`getRun` public surface、single-consumer Parts plumbing、overlay value-first、RCA-owned Hermes execution 与 private-platform retirement guard density。该关闭只证明源码/合同/测试边界已收薄，不授权 physical delete、default-caller cutover、visual ready、exportable、handoffable、domain ready 或 production ready。
+
+2026-07-10 Plan Completion closeout 已完成非 Live 功能/结构范围、main 吸收、远端读回与 cleanup-safe lane 清理。Fresh target evidence 为 full 715/715、historical 5/5、smoke 55/55、fast 245/245、family 4/4、typecheck、current-program 35 refs、两组 strict/readback、line-budget strict、Fallow production 30 entry points / 0 issues 与 diff-check。完整 native parity 仍为 80%：same-source 五人盲评和 owner receipt、PowerPoint/LibreOffice 加 Keynote 或 Google Slides 的 fresh human readback、真实 RCA visual-stage long-soak/production authority 继续保持 typed blocker；本 closeout 不声明 visual ready、exportable、handoffable、owner receipt 或 production ready。
 
 当前 acceptance / readiness 口径是 AI-first / executor-first：OPL 搭建 stage-led runtime、queue、receipt ledger、replay / recovery shell 与 operator projection；Codex/default executor 执行视觉阶段；RCA 持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt。合同只固定边界、安全、receipt、replay 和恢复语义，不能把机械 conformance 或 provider completion 升级成视觉判断。
 

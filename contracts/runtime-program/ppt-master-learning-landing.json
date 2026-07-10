@@ -535,6 +535,6 @@
     "deferred": ["live same-source blind comparison", "cross-render application readback", "fresh RCA visual_ready receipt"],
     "skipped": ["upstream runtime", "upstream template and icon assets", "upstream SVG bodies"],
     "verification": ["focused contract test", "TypeScript typecheck", "JSON parse", "resource pack readback", "git diff check"],
-    "commit_push_state": "integration_absorbed_main_push_pending"
+    "commit_push_state": "main_absorbed_remote_readback_verified"
   }
 }

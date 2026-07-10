@@ -737,6 +737,8 @@
       "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
       "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
     ],
-    "latest_closeout_lane": "codex/rca-doc-contract-closeout"
+    "latest_closeout_lane": "main",
+    "mainline_sync_state": "main_origin_remote_readback_aligned",
+    "cleanup_state": "15_absorbed_lanes_removed_dirty_retired_lane_preserved"
   }
 }

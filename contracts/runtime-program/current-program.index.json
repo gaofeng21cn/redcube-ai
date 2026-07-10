@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "57db5e5b066f3251ec999e2a213452938abdabab0e891fc628d5d0ef122b5100",
+  "source_digest": "67dae76313a35568ef1324d5ecaee1596c6eaed656d1544c235c578d131a82c4",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -134,8 +134,8 @@
       "json_pointer": "/current_state/active_baton",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 742,
-      "sha256": "e0d635635973baa846ad092595b4a309536764ec74a48a43790cd12bb0ed925d"
+      "line_count": 744,
+      "sha256": "b225221bee82b0cb92a3ad7acfe0cad0e9def85d65b314247fc0875294f61915"
     },
     {
       "json_pointer": "/current_state/active_mainline",
@@ -239,8 +239,8 @@
       "json_pointer": "/current_state/plan_completion_audit",
       "ref": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 243,
-      "sha256": "8308598d80bf2b86715423e0a9b407154eca1278a2a6ebdfb9412fbfc015ec69"
+      "line_count": 266,
+      "sha256": "50aac6812c3b7fdd8c8ddc83e1d6a6c945a36bd99675a4c389dd2417f06e1ba1"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit",

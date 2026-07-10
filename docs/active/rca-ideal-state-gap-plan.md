@@ -35,7 +35,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | Real benchmark and proof | tests/fixtures + native proof + RCA authority | `partial` | 真实 6 页 native PPT proof、package/OfficeCLI/LibreOffice true render 与独立 visual review 已有证据；同源双跑五人盲评、跨 viewer fresh human readback 和 parity owner receipt 未完成。 |
 | Progress-first no-regression | product entry / stage loop | `done` | route auto-continuation、targeted repair、typed blocker 与无第二 executor pass 的回归均保留。 |
 | Truth/docs/current-program foldback | contracts / current-program / core docs | `done` | 本文、status/architecture/spec、learning/parity contracts 与 current-program completion audit 已对齐。 |
-| Absorb and cleanup | main session | `in_progress` | owner/PPT/Temporal/Fallow 候选均已吸收；最终 target verification、main fast-forward、push/readback 与 cleanup-safe worktree/branch 清理仍待 closeout。 |
+| Absorb and cleanup | main session | `done` | 固定 integration target 完成 full 715/715、historical 5/5、smoke 55/55、fast 245/245、family 4/4、typecheck、strict readback、current-program 35 refs、Fallow 0 issues 与 diff-check；main 已 fast-forward、push/remote readback，15 条 exact/patch-equivalent worktree/branch 已清理。dirty retired-surfaces 与 pinned ppt-master proof worktree按 owner gate 保留。 |
 
 风险档为 `L3/L4`，验证预算为 `full`。TDD 仅用于已确认的对象退化、fixture 丢失和 evaluator 假阳性回归；最终完成证据必须包含真实 PPTX package/readback、render artifact、visual review 和 mainline completion audit。
 

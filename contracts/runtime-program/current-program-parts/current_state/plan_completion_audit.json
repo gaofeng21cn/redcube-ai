@@ -176,7 +176,8 @@
       "opl_canonical_agent_id_consumption",
       "temporal_transport_restart_probe",
       "fallow_production_gate",
-      "docs_contracts_current_program_foldback"
+      "docs_contracts_current_program_foldback",
+      "main_push_readback_cleanup"
     ],
     "deferred": [
       "live_same_source_parity_owner_evidence",
@@ -190,7 +191,8 @@
       "manual_svg_chart_coordinate_calculator_and_receipt"
     ],
     "verification": {
-      "state": "pending_final_target_gate",
+      "state": "passed_final_target_gate",
+      "verified_code_commit": "9e33c9c70c2eb6c7e520b4a1660568646a0cb130",
       "required": [
         "scripts/verify.sh",
         "test:fast",
@@ -203,14 +205,35 @@
         "fallow-production",
         "no-resurrection-scan",
         "remote-443-readback"
-      ]
+      ],
+      "results": {
+        "test_full": "715 pass, 0 fail",
+        "test_historical": "5 pass, 0 fail",
+        "test_smoke": "55 pass, 0 fail",
+        "test_fast": "245 pass, 0 fail",
+        "test_family": "4 pass, 0 fail",
+        "typecheck": "pass",
+        "current_program_source_index": "35 refs in sync",
+        "private_platform_readback": "passed_repo_source_guard_only",
+        "private_platform_strict": "pass",
+        "default_caller_tail_readback": "passed_repo_source_guard_only",
+        "default_caller_tail_strict": "pass",
+        "line_budget_strict": "pass",
+        "fallow_production": "30 entry points, 0 issues",
+        "git_diff_check": "pass",
+        "remote_443_readback": "main ref matched pushed HEAD"
+      }
     },
     "commit_push_state": {
       "integration_commits": "committed",
-      "root_main_fast_forward": "pending",
-      "remote_push": "pending",
-      "remote_readback": "pending",
-      "cleanup_safe_worktrees": "pending"
+      "root_main_fast_forward": "completed",
+      "remote_push": "completed",
+      "remote_readback": "completed",
+      "cleanup_safe_worktrees": "completed_15_removed",
+      "preserved_worktrees": [
+        "dirty:codex/rca-overdesign-retired-surfaces-20260710",
+        "pinned_external:ppt-master@b0beba5"
+      ]
     }
   },
   "authority_boundary": {
