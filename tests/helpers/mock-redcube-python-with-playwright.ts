@@ -31,7 +31,20 @@ const NATIVE_ENGINE_CAPABILITIES = {
   authoring_ir_version: 1,
   pptx_writer: 'officecli_pptx_materializer',
   true_render_proof_renderer: 'libreoffice_headless',
-  ...trueFlags('editable_pptx strict_svg_preflight true_render_proof_required cross_platform_render_required'),
+  native_object_families: [
+    'text_box',
+    'shape',
+    'connector',
+    'picture',
+    'group',
+    'path',
+    'chart',
+    'table',
+  ],
+  ...trueFlags(`
+    editable_pptx strict_svg_preflight true_render_proof_required cross_platform_render_required package_readback
+    template_intake speaker_notes slide_transitions timing_and_animation
+  `),
   screenshot_packaging: false,
 };
 

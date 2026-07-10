@@ -67,7 +67,7 @@ def layout_intent_has_structural_hint(non_text_visual: str) -> bool:
 def structural_visual_shape(shape_spec: dict) -> bool:
     role = safe_text(shape_spec.get('role')).lower()
     kind = shape_kind(shape_spec)
-    if kind in {'chart', 'table', 'metric_grid'}:
+    if kind in {'chart', 'table', 'metric_grid', 'picture', 'image'}:
         return True
     if kind in {'line', 'connector', 'oval', 'circle'} and role not in {'accent_dot', 'page_number'}:
         return True

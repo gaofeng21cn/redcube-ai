@@ -22,6 +22,13 @@ export function createNativePptProofReviewParts({
   safeArray,
   safeText,
 }: NativePptProofReviewDeps) {
+  function engineCapabilityMatches(actual: unknown, expected: unknown): boolean {
+    if (!Array.isArray(expected)) return actual === expected;
+    return Array.isArray(actual)
+      && actual.length === expected.length
+      && expected.every((value, index) => actual[index] === value);
+  }
+
   function requireNativeEngineContract(payload: JsonRecord): JsonRecord {
     const contract = payload?.engine_contract || {};
     const ownedRoutes = safeArray(contract?.owned_routes).map((route) => safeText(route)).filter(Boolean);
@@ -34,7 +41,8 @@ export function createNativePptProofReviewParts({
       && expectedRoutes.every((route) => ownedRoutes.includes(route))
       && safeText(contract?.input_boundary) === safeText(expected?.input_boundary)
       && safeText(contract?.review_boundary) === safeText(expected?.review_boundary)
-      && Object.entries(REQUIRED_ENGINE_CAPABILITIES).every(([key, value]) => capabilities?.[key] === value)
+      && Object.entries(REQUIRED_ENGINE_CAPABILITIES)
+        .every(([key, value]) => engineCapabilityMatches(capabilities?.[key], value))
       && contract?.true_render_proof?.required === true
       && contract?.true_render_proof?.renderer_kind === safeText(expected?.true_render_proof?.renderer_kind)
       && contract?.true_render_proof?.renderer_pipeline === safeText(expected?.true_render_proof?.renderer_pipeline)

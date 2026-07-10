@@ -117,7 +117,22 @@
       "true_render_proof_required": true,
       "true_render_proof_renderer": "libreoffice_headless",
       "cross_platform_render_required": true,
-      "screenshot_packaging": false
+      "screenshot_packaging": false,
+      "native_object_families": [
+        "text_box",
+        "shape",
+        "connector",
+        "picture",
+        "group",
+        "path",
+        "chart",
+        "table"
+      ],
+      "package_readback": true,
+      "template_intake": true,
+      "speaker_notes": true,
+      "slide_transitions": true,
+      "timing_and_animation": true
     },
     "officecli_materializer_policy": {
       "policy_id": "ppt_native_officecli_materializer_quality_gate_v1",
@@ -266,7 +281,10 @@
         "pptx_writer": "officecli_pptx_materializer",
         "true_render_proof_required": true,
         "true_render_proof_renderer": "libreoffice_headless",
-        "cross_platform_render_required": true
+        "cross_platform_render_required": true,
+        "native_object_model_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/native_object_model",
+        "template_intake_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/template_intake",
+        "presentation_semantics_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/presentation_semantics"
       },
       "officecli_materializer_policy_ref": "contracts/runtime-program/ppt-native-python-engine-contract.json#/officecli_materializer_policy",
       "officecli_skill_authoring_loop_adopted": false,
