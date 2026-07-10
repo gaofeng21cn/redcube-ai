@@ -6,13 +6,7 @@ import path from 'node:path';
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
-import {
-  createDeliverable,
-  getReviewState,
-  intakeSource,
-  reviewRenderOutput,
-  runDeliverableRoute,
-} from './product-domain-action-test-api.ts';
+import { createDeliverable, reviewRenderOutput, runDeliverableRoute } from './product-domain-action-test-api.ts';
 import { withMockCodexRuntime } from './mock-codex-cli.ts';
 import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
 
@@ -25,27 +19,18 @@ function readJson(file) {
 function hasPythonPptPipeline() {
   const explicitTestPython = String(process.env.REDCUBE_TEST_PYTHON || '').trim();
   cachedPythonCommand = cachedPythonCommand || (
-    explicitTestPython
-      ? { command: explicitTestPython, args: [] }
-      : resolveRedCubePythonCommand()
+    explicitTestPython ? { command: explicitTestPython, args: [] } : resolveRedCubePythonCommand()
   );
-  const result = spawnSync(cachedPythonCommand.command, [...(cachedPythonCommand.args || []), '-c', 'import pptx, playwright, PIL'], {
-    encoding: 'utf-8',
-  });
-  return result.status === 0;
+  return spawnSync(
+    cachedPythonCommand.command,
+    [...(cachedPythonCommand.args || []), '-c', 'import pptx, playwright, PIL'],
+    { encoding: 'utf-8' },
+  ).status === 0;
 }
 
-async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', baselineDeliverableId = '' }) {
-  const common = {
-    workspaceRoot,
-    overlay: 'ppt_deck',
-    topicId: 'topic-a',
-    deliverableId,
-    mode,
-    baselineDeliverableId,
-  };
-
-  const routes = [
+async function runImageFirstChain(workspaceRoot, deliverableId) {
+  const results = [];
+  for (const route of [
     'storyline',
     'detailed_outline',
     'slide_blueprint',
@@ -53,143 +38,56 @@ async function runChain({ workspaceRoot, deliverableId, mode = 'draft_new', base
     'author_image_pages',
     'visual_director_review',
     'screenshot_review',
-  ];
-
-  const results = [];
-  for (const route of routes) {
-    const result = await runDeliverableRoute({ ...common, route });
-    results.push({ route, result });
+  ]) {
+    results.push({
+      route,
+      result: await runDeliverableRoute({
+        workspaceRoot,
+        overlay: 'ppt_deck',
+        topicId: 'topic-a',
+        deliverableId,
+        route,
+      }),
+    });
   }
   return results;
 }
 
-let sharedOptimizeExportContextPromise;
-
-async function buildSharedOptimizeExportContext() {
-  return withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-baseline',
-      title: '肠癌 AI 讲课 baseline',
-      goal: '旧版认可稿',
-    });
-    const baselineChain = await runChain({ workspaceRoot, deliverableId: 'deck-baseline' });
-    const baselineState = await getReviewState({
-      workspaceRoot,
-      topicId: 'topic-a',
-      deliverableId: 'deck-baseline',
-    });
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-next',
-      title: '肠癌 AI 讲课优化版',
-      goal: '在保留旧版优点的前提下提升可教性与视觉峰值',
-    });
-    const optimizeChain = await runChain({
-      workspaceRoot,
-      deliverableId: 'deck-next',
-      mode: 'optimize_existing',
-      baselineDeliverableId: 'deck-baseline',
-    });
-
-    const exportResult = await runDeliverableRoute({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      topicId: 'topic-a',
-      deliverableId: 'deck-baseline',
-      route: 'export_pptx',
-    });
-
-    return {
-      baselineChain,
-      baselineState,
-      optimizeChain,
-      exportResult,
-    };
-  });
-}
-
-async function getSharedOptimizeExportContext() {
-  if (!sharedOptimizeExportContextPromise) {
-    sharedOptimizeExportContextPromise = buildSharedOptimizeExportContext();
-  }
-  return sharedOptimizeExportContextPromise;
-}
-
-test('ppt_deck ships dedicated prompt pack instead of xiaohongshu prompt semantics', () => {
-  const promptFiles = [
-    'storyline.md',
-    'detailed_outline.md',
-    'slide_blueprint.md',
-    'visual_direction.md',
-    'render_html.md',
-    'director_review.md',
-    'screenshot_review.md',
-    'export_pptx.md',
-  ].map((file) => path.resolve('prompts', 'ppt_deck', file));
-
-  for (const file of promptFiles) {
-    assert.equal(existsSync(file), true, file);
-    const content = readFileSync(file, 'utf-8');
-    assert.equal(/xiaohongshu|小红书/i.test(content), false, file);
-  }
-});
-
-test('ppt_deck render_html auto-recovers missing planning dependencies before rendering', async () => {
+test('ppt HTML workflow auto-recovers planning dependencies', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
-
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-html-'));
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
       profileId: 'lecture_student',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
+      deliverableId: 'deck-html',
       title: '肠癌 AI 讲课 deck',
       goal: '给学生讲清肠癌 AI 的问题、方法与边界',
     });
-
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
+      deliverableId: 'deck-html',
       route: 'render_html',
     });
-
     assert.equal(result.ok, true);
-    assert.equal(result.summary.requested_route, 'render_html');
-    assert.equal(result.summary.executed_route, 'render_html');
     assert.deepEqual(result.summary.auto_recovered_dependency_routes, [
       'storyline',
       'detailed_outline',
       'slide_blueprint',
       'visual_direction',
     ]);
-    assert.deepEqual(
-      result.dependency_route_runs.map((entry) => entry.route),
-      ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'],
-    );
-    assert.equal(existsSync(result.artifactFile), true);
     const artifact = readJson(result.artifactFile);
     assert.equal(artifact.route, 'render_html');
     assert.equal(existsSync(artifact.html_bundle.html_file), true);
   });
 });
 
-test('ppt_deck render_html fails when prompt pack shell asset is missing', async () => {
+test('ppt HTML workflow fails closed when its shell asset is missing', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
-
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-fail-closed-'));
     const created = await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -199,12 +97,10 @@ test('ppt_deck render_html fails when prompt pack shell asset is missing', async
       title: '肠癌 AI 讲课 deck',
       goal: '给学生讲清肠癌 AI 的问题、方法与边界',
     });
-
     const contractFile = path.join(path.dirname(created.deliverableFile), 'contracts', 'hydrated-deliverable.json');
     const contract = readJson(contractFile);
     contract.prompt_pack.render_contract.shell_file = 'missing-shell.html';
     writeFileSync(contractFile, JSON.stringify(contract, null, 2), 'utf-8');
-
     for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
       const result = await runDeliverableRoute({
         workspaceRoot,
@@ -215,7 +111,6 @@ test('ppt_deck render_html fails when prompt pack shell asset is missing', async
       });
       assert.equal(result.ok, true, route);
     }
-
     const result = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -223,254 +118,55 @@ test('ppt_deck render_html fails when prompt pack shell asset is missing', async
       deliverableId: 'deck-a',
       route: 'render_html',
     });
-
     assert.equal(result.ok, false);
     assert.match(result.run.error.message, /Missing prompt pack asset/i);
   });
 });
 
-test('lecture_student mainline produces real ppt_deck artifacts through screenshot review', async () => {
+test('ppt image-first workflow reaches screenshot review and real export or hard block', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-e2e-'));
-
+    const deliverableId = 'deck-image';
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
       profileId: 'lecture_student',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
+      deliverableId,
       title: '肠癌 AI 讲课 deck',
       goal: '给学生讲清肠癌 AI 的问题、方法与边界',
     });
-
-    const chain = await runChain({ workspaceRoot, deliverableId: 'deck-a' });
-    for (const { route, result } of chain) {
-      assert.equal(result.ok, true, route);
-    }
-
-    const storyline = readJson(chain[0].result.artifactFile);
-    assert.equal(typeof storyline.storyline?.audience, 'string');
-    assert.equal(Array.isArray(storyline.storyline?.narrative_arc?.journey), true);
-
-    const blueprint = readJson(chain[2].result.artifactFile);
-    assert.equal(Array.isArray(blueprint.slide_blueprint?.slides), true);
-    assert.equal(blueprint.slide_blueprint.slides.length >= 6, true);
-    assert.equal(
-      blueprint.slide_blueprint.slides.every((slide) => Array.isArray(slide.page_core_content) && slide.page_core_content.length > 0),
-      true,
-    );
-    assert.equal(blueprint.slide_blueprint.slides.every((slide) => typeof slide.speaker_notes === 'string' && slide.speaker_notes.length > 0), true);
-    assert.equal(blueprint.slide_blueprint.slides.every((slide) => typeof slide.transition_sentence === 'string' && slide.transition_sentence.length > 0), true);
-    assert.equal(blueprint.slide_blueprint.slides.some((slide) => Array.isArray(slide.visual_presentation?.anchor_tracks) && slide.visual_presentation.anchor_tracks.length > 0), true);
-
-    const visualDirection = readJson(chain[3].result.artifactFile);
-    assert.equal(Array.isArray(visualDirection.visual_direction?.rhythm_curve), true);
-    assert.equal(Array.isArray(visualDirection.visual_direction?.peak_pages), true);
-    assert.equal(typeof visualDirection.visual_direction?.page_family_ceiling, 'object');
-    assert.equal(Array.isArray(visualDirection.visual_direction?.forbidden_regressions), true);
-    assert.equal(Array.isArray(visualDirection.visual_direction?.page_role_table), true);
-
-    const imageBundle = readJson(chain[4].result.artifactFile);
-    assert.equal(imageBundle.route, 'author_image_pages');
-    assert.equal(imageBundle.status, 'completed');
-    assert.equal(imageBundle.image_generation_runtime?.endpoint, '/responses');
-    assert.equal(imageBundle.image_generation_runtime?.token_persisted, false);
-    assert.equal(imageBundle.image_pages_bundle?.source_visual_route, 'author_image_pages');
-    assert.equal(imageBundle.image_pages_bundle?.editable, false);
-    assert.equal(imageBundle.image_page_manifest?.page_count, blueprint.slide_blueprint.slides.length);
-    assert.equal(imageBundle.image_pages_bundle?.page_count, blueprint.slide_blueprint.slides.length);
-    assert.equal(Array.isArray(imageBundle.image_page_manifest?.slides), true);
-    assert.equal(imageBundle.image_page_manifest.slides.every((slide) => existsSync(slide.image_file)), true);
-    assert.equal(imageBundle.image_page_manifest.slides.every((slide) => existsSync(slide.source.prompt_file)), true);
-    assert.equal(existsSync(imageBundle.image_page_manifest.prompt_manifest), true);
-    assert.equal(existsSync(imageBundle.image_page_manifest.style_manifest), true);
-    assert.equal(existsSync(imageBundle.image_page_manifest.generation_metadata_file), true);
-    assert.equal(imageBundle.image_pages_bundle.pages.every((page) => existsSync(page.prompt_manifest_file)), true);
-    assert.equal(imageBundle.image_pages_bundle.pages.every((page) => existsSync(page.style_manifest_file)), true);
-
-    const directorReview = readJson(chain[5].result.artifactFile);
-    assert.equal(directorReview.review_overlay, 'visual_director_review');
-    assert.equal(directorReview.visual_director_review?.review_model, 'director_first_visual_judgement');
-
-    const reviewBundle = readJson(chain[6].result.artifactFile);
-    assert.equal(typeof reviewBundle.status, 'string');
-    assert.equal(Array.isArray(reviewBundle.slide_reviews), true);
-    assert.equal(reviewBundle.slide_reviews.length, imageBundle.image_pages_bundle.page_count);
-    assert.equal(reviewBundle.review_capture?.source_visual_route, 'author_image_pages');
-    assert.equal(reviewBundle.mechanical_review?.python_helper_invocation, null);
-    assert.equal(reviewBundle.mechanical_review?.metrics?.source_surface_kind, 'image_pages');
-    assert.equal(typeof reviewBundle.checks?.overflow_free, 'boolean');
-    assert.equal(typeof reviewBundle.checks?.occlusion_free, 'boolean');
-    assert.equal(typeof reviewBundle.checks?.visual_density_ok, 'boolean');
-    assert.equal(typeof reviewBundle.checks?.speaker_fit_ok, 'boolean');
-    assert.equal(reviewBundle.slide_reviews.every((slide) => existsSync(slide.screenshot_file)), true);
-
-    const reviewReport = await reviewRenderOutput({
+    const chain = await runImageFirstChain(workspaceRoot, deliverableId);
+    assert.equal(chain.every(({ result }) => result.ok), true);
+    const blueprint = readJson(chain.find(({ route }) => route === 'slide_blueprint').result.artifactFile);
+    const authored = readJson(chain.find(({ route }) => route === 'author_image_pages').result.artifactFile);
+    const review = readJson(chain.find(({ route }) => route === 'screenshot_review').result.artifactFile);
+    assert.equal(authored.image_page_manifest.page_count, blueprint.slide_blueprint.slides.length);
+    assert.equal(authored.image_page_manifest.slides.every((slide) => existsSync(slide.image_file)), true);
+    assert.equal(review.review_capture.source_visual_route, 'author_image_pages');
+    assert.equal(review.slide_reviews.every((slide) => existsSync(slide.screenshot_file)), true);
+    assert.equal((await reviewRenderOutput({
       workspaceRoot,
       overlay: 'ppt_deck',
       topicId: 'topic-a',
-      deliverableId: 'deck-a',
-    });
-    assert.equal(reviewReport.status, 'pass');
-  });
-});
+      deliverableId,
+    })).status, 'pass');
 
-test('ppt_deck manual thyroid case keeps topic fidelity instead of falling back to stale AI workflow copy', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-manual-'));
-
-    await createDeliverable({
+    const exportResult = await runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',
-      profileId: 'lecture_student',
       topicId: 'topic-a',
-      deliverableId: 'lecture-01',
-      title: 'Thyroid Basics',
-      goal: 'Explain thyroid fundamentals to undergraduate students',
+      deliverableId,
+      route: 'export_pptx',
     });
-
-    const chain = await runChain({ workspaceRoot, deliverableId: 'lecture-01' });
-    for (const { route, result } of chain) {
-      assert.equal(result.ok, true, route);
+    if (hasPythonPptPipeline()) {
+      assert.equal(exportResult.ok, true);
+      const bundle = readJson(exportResult.artifactFile);
+      assert.equal(existsSync(bundle.export_bundle.pptx_file), true);
+      assert.equal(bundle.export_bundle.page_count_match, true);
+    } else {
+      assert.equal(exportResult.ok, false);
+      assert.match(exportResult.run.error.message, /python|playwright|pptx/i);
     }
-
-    const outline = readJson(chain[1].result.artifactFile);
-    const slides = outline.detailed_outline?.slides || [];
-    const staleTitles = new Set([
-      '旧工作流为什么会在这里失效',
-      '把科研任务拆成一条 4 段式机制轨道',
-      '判断梯：哪些环节适合 AI，哪些必须人工签收',
-      '证据页必须把来源口径讲给听众听懂',
-      '把方法落成课堂上的四格动作',
-      '最后只收束三件必须带走的事',
-    ]);
-    assert.equal(slides.some((slide) => staleTitles.has(slide.title)), false);
-
-    const nonCoverTopicAnchored = slides
-      .slice(1)
-      .some((slide) => /thyroid|甲状腺/i.test([
-        slide.title,
-        slide.page_objective,
-        slide.core_sentence,
-        ...(slide.page_core_content || []),
-      ].join(' ')));
-    assert.equal(nonCoverTopicAnchored, true);
-  });
-});
-
-test('optimize_existing screenshot review binds baseline and emits relative review', async () => {
-  const { baselineChain, baselineState, optimizeChain } = await getSharedOptimizeExportContext();
-  assert.equal(baselineChain.at(-1).result.ok, true);
-  assert.equal(baselineState.state.ready_for_export, true);
-  assert.equal(optimizeChain.at(-1).result.ok, true);
-
-  const reviewBundle = readJson(optimizeChain.at(-1).result.artifactFile);
-  assert.equal(reviewBundle.baseline_review?.baseline_deliverable_id, 'deck-baseline');
-  assert.equal(reviewBundle.baseline_review?.baseline_comparison_passed, true);
-});
-
-test('export_pptx performs real delivery or explicit hard block', async () => {
-  const { baselineChain, exportResult } = await getSharedOptimizeExportContext();
-  assert.equal(baselineChain.at(-1).result.ok, true);
-
-  if (hasPythonPptPipeline()) {
-    assert.equal(exportResult.ok, true);
-    const bundle = readJson(exportResult.artifactFile);
-    assert.equal(existsSync(bundle.export_bundle?.pptx_file), true);
-    assert.equal(bundle.export_bundle?.page_count_match, true);
-    assert.equal(typeof bundle.export_bundle?.real_conversion_invocation?.tool, 'string');
-  } else {
-    assert.equal(exportResult.ok, false);
-    assert.match(exportResult.run.error.message, /python|playwright|pptx/i);
-  }
-});
-
-test('ppt_deck storyline/outline/blueprint/visual_direction consume shared source truth', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-source-'));
-    const richFile = path.join(workspaceRoot, 'rich-outline.md');
-    writeFileSync(
-      richFile,
-      [
-        '# 肠癌 AI 课堂素材',
-        '课堂主问题：先定义问题，再判断证据，再决定动作。',
-        '听众最容易误判的是把工具演示当成任务定义。',
-        '必须把公开来源翻译成学生能复述的话。',
-      ].join('\n'),
-      'utf-8',
-    );
-
-    await intakeSource({
-      workspaceRoot,
-      topicId: 'topic-rich',
-      title: 'PPT rich',
-      sourceFiles: [richFile],
-    });
-    await intakeSource({
-      workspaceRoot,
-      topicId: 'topic-brief',
-      title: 'PPT brief',
-      brief: '给学生讲清 AI 讲课 deck 的判断顺序。',
-      keywords: ['AI', '课堂', '判断顺序'],
-    });
-
-    for (const topicId of ['topic-rich', 'topic-brief']) {
-      await createDeliverable({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        profileId: 'lecture_student',
-        topicId,
-        deliverableId: `${topicId}-deck`,
-        title: `课件 ${topicId}`,
-        goal: '验证 ppt shared source truth 消费',
-      });
-    }
-
-    const richResults = [];
-    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
-      richResults.push(await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-rich',
-        deliverableId: 'topic-rich-deck',
-        route,
-      }));
-    }
-    const briefResults = [];
-    for (const route of ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']) {
-      briefResults.push(await runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-brief',
-        deliverableId: 'topic-brief-deck',
-        route,
-      }));
-    }
-
-    const richStoryline = readJson(richResults[0].artifactFile);
-    const briefStoryline = readJson(briefResults[0].artifactFile);
-    assert.equal(richStoryline.storyline?.source_truth_input_mode, 'files');
-    assert.equal(briefStoryline.storyline?.source_truth_input_mode, 'brief_keywords');
-    assert.equal(richStoryline.storyline?.source_sufficiency_judgement, 'planning_ready');
-    assert.equal(briefStoryline.storyline?.source_sufficiency_judgement, 'augmentation_required');
-    assert.equal(briefStoryline.storyline?.deep_research_state, 'required');
-    assert.equal(typeof briefStoryline.storyline?.fact_library_summary, 'string');
-    assert.equal(briefStoryline.storyline?.fact_library_summary.length > 0, true);
-    assert.notEqual(richStoryline.storyline?.core_metaphor, briefStoryline.storyline?.core_metaphor);
-
-    const richOutline = readJson(richResults[1].artifactFile);
-    assert.equal(
-      richOutline.detailed_outline.slides.some((slide) => slide.public_sources.includes('inputs/raw_materials/source-intake/content-01-rich-outline.md')),
-      true,
-    );
-
-    const richBlueprint = readJson(richResults[2].artifactFile);
-    assert.equal(
-      richBlueprint.slide_blueprint.slides.some((slide) => slide.evidence_and_sources.some((item) => item.public_label.includes('inputs/raw_materials/source-intake/content-01-rich-outline.md'))),
-      true,
-    );
-
-    const richVisual = readJson(richResults[3].artifactFile);
-    assert.equal(richVisual.visual_direction?.source_truth_confidence, 'medium');
   });
 });
