@@ -200,18 +200,24 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
     );
 
     const session = await getProductEntrySession({ entry_session_id: 'session-a' });
-    assertProductEntryProjection(session, {
-      surfaceKind: 'product_entry_session',
-      entrySessionId: 'session-a',
-      deliverableId: 'deck-a',
-      source: 'session',
-    });
-    assert.equal(session.ppt_deck_visual_route_session.default_visual_route, 'author_image_pages');
-    assert.equal(session.opl_family_lifecycle_adapter.owner_route_discovery.candidate_routes[0].route_id, 'product_entry_session');
-    assert.equal(session.opl_family_lifecycle_adapter.persistence.sqlite.status, 'not_domain_owned_generic_persistence');
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_exports_only.includes('domain_snapshot_ref'), true);
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_owns_generic_session_shell, false);
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_owns_generic_workbench, false);
+    assert.equal(session.ok, true);
+    assert.equal(session.surface_kind, 'product_entry_session');
+    assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
+    assert.equal(session.entry_session_ref.entry_session_id, 'session-a');
+    assert.equal(
+      session.entry_session_ref.domain_snapshot_ref,
+      'domain-snapshot:rca/product-entry-session/session-a',
+    );
+    assert.equal(session.delivery_locator_refs.deliverable_id, 'deck-a');
+    assert.equal(
+      session.currentness_refs.latest_stage_execution_plan_ref,
+      continued.continuation_snapshot.latest_stage_execution_plan_ref,
+    );
+    assert.equal(session.operator_navigation_refs.generated_session_surface_ref, 'opl_generated:product_session');
+    assert.equal(session.authority_refs.review_state_ref, 'domain-handler:getReviewState');
+    assert.equal(session.authority_boundary.refs_only, true);
+    assert.equal(session.authority_boundary.rca_owns_generic_session_shell, false);
+    assert.equal(session.authority_boundary.rca_owns_generic_workbench, false);
   });
 });
 

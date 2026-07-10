@@ -99,7 +99,7 @@ function ownerEvidenceLaneIndexFor(moduleItems) {
 const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
     module_id: 'product_entry_continuity_refs_adapter',
-    surface_ref: '/session_continuity',
+    surface_ref: 'domain-handler:getProductEntrySession',
     status: 'opl_generated_workbench_session_surface_consumed',
     classification: 'refs_only_adapter',
     opl_generic_primitive: 'workbench_shell',
@@ -112,7 +112,6 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     codePaths: [
       'packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session.ts',
-      'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts',
       'packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts',
       'packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts',
     ],
@@ -123,7 +122,7 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     ],
     activeCallerStatus: 'opl_generated_session_shell_domain_refs',
     migrationAction: 'Use OPL/App generic session shell, resume token, operator navigation and workbench state as the default shell; RCA returns entry-session domain snapshot refs only.',
-    retentionReason: 'RCA retains entry_session_id to deliverable/topic/run locators and domain-specific continuation snapshot refs.',
+    retentionReason: 'RCA retains entry-session, deliverable/topic/run locator, currentness and domain authority refs.',
     cannotAbsorbReason: 'OPL can own session shell UX but cannot own RCA deliverable truth, review/export gate or visual session authority.',
     tombstone_required: false,
   },
@@ -388,7 +387,8 @@ const FUNCTIONAL_MODULE_MIGRATION_CLASSES = Object.freeze({
 const FUNCTIONAL_MODULE_CURRENT_SURFACE_REFS = Object.freeze({
   product_entry_continuity_refs_adapter: [
     'product_session',
-    '/session_continuity',
+    'domain-handler:getProductEntrySession',
+    'projection:rca_product_entry_session_domain_snapshot_refs',
   ],
   generic_cli_mcp_wrappers: [
     'cli',

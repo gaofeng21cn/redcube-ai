@@ -41,7 +41,6 @@ export function assertManifestActionAndStageControlPlane({
     manifest.family_action_catalog.actions.map((action) => action.action_id),
     [
       'get_product_status',
-      'get_product_start',
       'get_product_preflight',
       'invoke_product_entry',
       'get_product_entry_session',

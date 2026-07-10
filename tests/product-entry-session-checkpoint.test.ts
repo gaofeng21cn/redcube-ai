@@ -25,30 +25,6 @@ const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
 ]);
 
-const PROVIDER_LEDGER_DELTA = {
-  domain_alias: 'provider_ledger_closeout_binding_delta',
-  delta_kind: 'provider_ledger_closeout_binding',
-  required_output_kind: 'provider_attempt_ledger_binding',
-  owner: 'one-person-lab',
-  next_required_owner_action: 'resolve_provider_attempt_ledger',
-};
-
-const OPERATOR_TYPED_BLOCKER_DELTA = {
-  domain_alias: 'operator_typed_blocker_delta',
-  delta_kind: 'operator_typed_blocker',
-  required_output_kind: 'typed_blocker_resolution',
-  owner: 'redcube_ai',
-  next_required_owner_action: 'consume_route_closeout_before_new_plan',
-};
-
-const VISUAL_DELIVERABLE_DELTA = {
-  domain_alias: 'visual_deliverable_delta',
-  delta_kind: 'visual_deliverable_delta',
-  required_output_kind: 'visual_deliverable_delta',
-  owner: 'redcube_ai',
-  next_required_owner_action: 'pick_up_artifacts',
-};
-
 function readSessionUpdatedAt(first) {
   const updatedAt = Date.parse(readJson(first.entry_session.session_file).updated_at);
   assert.equal(Number.isFinite(updatedAt), true);
@@ -94,6 +70,39 @@ function startProductEntry({
       stop_after_stage: 'storyline',
     },
   });
+}
+
+function assertRefsOnlySession(session, entrySessionId) {
+  assert.equal(session.ok, true);
+  assert.equal(session.surface_kind, 'product_entry_session');
+  assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
+  assert.equal(session.entry_session_ref.entry_session_id, entrySessionId);
+  assert.equal(
+    session.entry_session_ref.domain_snapshot_ref,
+    `domain-snapshot:rca/product-entry-session/${entrySessionId}`,
+  );
+  assert.equal(session.operator_navigation_refs.generated_session_surface_ref, 'opl_generated:product_session');
+  assert.equal(session.authority_boundary.refs_only, true);
+  assert.equal(session.authority_boundary.rca_owns_generic_session_shell, false);
+  assert.equal(session.authority_boundary.rca_owns_generic_workbench, false);
+  for (const genericField of [
+    'entry_session',
+    'delivery_identity',
+    'continuation_snapshot',
+    'session_continuity',
+    'progress_projection',
+    'artifact_inventory',
+    'workspace_receipt_inventory_projection',
+    'native_proof_artifact_inventory',
+    'ppt_deck_visual_route_session',
+    'runtime_loop_closure',
+    'review_state',
+    'publication_projection',
+    'opl_family_lifecycle_adapter',
+    'family_orchestration',
+  ]) {
+    assert.equal(genericField in session, false, genericField);
+  }
 }
 
 function buildProviderCurrentnessRun({
@@ -152,15 +161,6 @@ function buildProviderCurrentnessRun({
       progress_delta_classification: 'deliverable_progress',
     },
   };
-}
-
-function assertNextForcedDelta(value, expected) {
-  assert.equal(value.surface_kind, 'next_forced_delta');
-  assert.equal(value.domain_alias, expected.domain_alias);
-  assert.equal(value.delta_kind, expected.delta_kind);
-  assert.equal(value.required_output_kind, expected.required_output_kind);
-  assert.equal(value.owner, expected.owner);
-  assert.equal(value.next_required_owner_action, expected.next_required_owner_action);
 }
 
 async function withMockCodexRuntimeState(testFn) {
@@ -226,19 +226,16 @@ test('getProductEntrySession projects the OPL stage execution plan checkpoint wi
       entry_session_id: 'session-stale-checkpoint',
     });
 
+    assertRefsOnlySession(session, 'session-stale-checkpoint');
     assert.equal(
-      session.continuation_snapshot.latest_stage_execution_plan_ref,
-      continued.continuation_snapshot.latest_stage_execution_plan_ref,
-    );
-    assert.equal(
-      session.session_continuity.restore_point.latest_stage_execution_plan_ref,
+      session.currentness_refs.latest_stage_execution_plan_ref,
       continued.continuation_snapshot.latest_stage_execution_plan_ref,
     );
     assert.equal(
       readJson(sessionFile).latest_stage_execution_plan_ref,
       continued.continuation_snapshot.latest_stage_execution_plan_ref,
     );
-    assert.equal(session.runtime_loop_closure.resume_point.checkpoint_locator_field, 'continuation_snapshot.latest_stage_execution_plan_ref');
+    assert.equal(session.currentness_refs.latest_visual_run_ref, null);
   });
 });
 
@@ -324,34 +321,17 @@ test('getProductEntrySession resolves latest deliverable attempt first and block
       entry_session_id: 'session-closeout-first',
     });
 
-    assert.equal(session.continuation_snapshot.latest_run_id, runId);
-    assert.equal(session.continuation_snapshot.latest_stage_execution_plan_ref, null);
-    assert.equal(session.continuation_snapshot.closeout_first_blocker.surface_kind, 'typed_blocker');
-    assert.equal(session.continuation_snapshot.closeout_first_blocker.blocker_kind, 'route_closeout_unconsumed');
-    assert.equal(session.continuation_snapshot.closeout_first_blocker.blocker_ref, `rca-typed-blocker:route-closeout-unconsumed:${closeoutRef}`);
-    assert.deepEqual(session.progress_projection.deliverable_progress_delta, {
-      count: 0,
-      refs: [],
-      domain_alias: 'visual_deliverable_delta',
-    });
-    assert.deepEqual(session.progress_projection.platform_repair_delta, {
-      count: 1,
-      refs: ['route_closeout_unconsumed'],
-      domain_alias: 'platform_interface_repair_delta',
-    });
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, OPERATOR_TYPED_BLOCKER_DELTA);
-    assert.equal(session.progress_projection.progress_delta_classification, 'platform_repair');
-    assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, OPERATOR_TYPED_BLOCKER_DELTA);
-    assert.equal(
-      session.runtime_loop_closure.control_policy.recommended_action,
-      'consume_route_closeout_before_new_plan',
-    );
-    assert.deepEqual(session.runtime_loop_closure.stall_lineage.repeat_budget, {
-      max_repeats: 2,
-      remaining_repeats: 0,
-      budget_exhausted: true,
-    });
+    const typedBlockerRef = `rca-typed-blocker:route-closeout-unconsumed:${closeoutRef}`;
+    assertRefsOnlySession(session, 'session-closeout-first');
+    assert.equal(session.currentness_refs.latest_visual_run_ref, `route-run:${runId}`);
+    assert.equal(session.currentness_refs.latest_stage_execution_plan_ref, null);
+    assert.equal(session.currentness_refs.latest_surface_kind, 'typed_blocker');
+    assert.equal(session.currentness_refs.typed_blocker_ref, typedBlockerRef);
+    assert.deepEqual(session.currentness_refs.next_forced_delta_refs, [
+      typedBlockerRef,
+      closeoutRef,
+      `route-run:${runId}`,
+    ]);
 
     const blockedContinuation = await invokeSessionProductEntry({
       workspaceRoot,
@@ -431,35 +411,21 @@ test('getProductEntrySession fails closed when a newer route run lacks OPL provi
       entry_session_id: 'session-provider-currentness',
     });
 
-    assert.equal(session.continuation_snapshot.latest_run_id, runId);
-    assert.equal(session.continuation_snapshot.latest_surface_kind, 'typed_blocker');
-    assert.equal(session.continuation_snapshot.runtime_projection.surface_kind, 'cross_provider_attempt_currentness_projection');
+    const typedBlockerRef = `rca-typed-blocker:missing-provider-attempt-ledger:route-run:${runId}`;
+    assertRefsOnlySession(session, 'session-provider-currentness');
+    assert.equal(session.currentness_refs.latest_visual_run_ref, `route-run:${runId}`);
+    assert.equal(session.currentness_refs.latest_surface_kind, 'typed_blocker');
+    assert.equal(session.currentness_refs.provider_attempt_ref, null);
+    assert.equal(session.currentness_refs.provider_attempt_ledger_ref, null);
+    assert.equal(session.currentness_refs.typed_blocker_ref, typedBlockerRef);
     assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
-      'blocked_missing_provider_attempt_ledger',
+      session.currentness_refs.next_forced_delta_refs.includes(
+        'product-entry-session:session-provider-currentness',
+      ),
+      true,
     );
-    assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.local_session_ref,
-      'product-entry-session:session-provider-currentness',
-    );
-    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ref, null);
-    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ledger_ref, null);
-    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, false);
-    assert.equal(session.continuation_snapshot.closeout_first_blocker.surface_kind, 'typed_blocker');
-    assert.equal(
-      session.continuation_snapshot.closeout_first_blocker.blocker_kind,
-      'missing_provider_attempt_ledger',
-    );
-    assert.equal(
-      session.continuation_snapshot.closeout_first_blocker.blocker_ref,
-      `rca-typed-blocker:missing-provider-attempt-ledger:route-run:${runId}`,
-    );
-    assert.equal(session.progress_projection.summary.content_status, 'blocked_missing_provider_attempt_ledger');
-    assert.equal(session.progress_projection.typed_blocker.blocker_kind, 'missing_provider_attempt_ledger');
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, PROVIDER_LEDGER_DELTA);
-    assert.equal(session.runtime_loop_closure.control_policy.approval_required, true);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, PROVIDER_LEDGER_DELTA);
-    assert.equal(session.runtime_loop_closure.control_policy.recommended_action, 'resolve_provider_attempt_ledger');
+    assert.equal(session.currentness_refs.next_forced_delta_refs.includes(`route-run:${runId}`), true);
+    assert.equal(session.currentness_refs.next_forced_delta_refs.includes(typedBlockerRef), true);
   });
 });
 
@@ -511,19 +477,20 @@ test('getProductEntrySession fails closed when provider attempt binding is parti
         entry_session_id: currentnessCase.entrySessionId,
       });
 
-      assert.equal(session.continuation_snapshot.latest_run_id, currentnessCase.runId);
-      assert.equal(session.continuation_snapshot.latest_surface_kind, 'typed_blocker');
-      assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, false);
+      const typedBlockerRef = `rca-typed-blocker:missing-provider-attempt-ledger:route-run:${currentnessCase.runId}`;
+      const acceptedProviderAttemptRef = currentnessCase.providerAttemptRef?.startsWith('product-entry-session:')
+        ? null
+        : currentnessCase.providerAttemptRef ?? null;
+      assertRefsOnlySession(session, currentnessCase.entrySessionId);
+      assert.equal(session.currentness_refs.latest_visual_run_ref, `route-run:${currentnessCase.runId}`);
+      assert.equal(session.currentness_refs.latest_surface_kind, 'typed_blocker');
+      assert.equal(session.currentness_refs.provider_attempt_ref, acceptedProviderAttemptRef);
       assert.equal(
-        session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
-        'blocked_missing_provider_attempt_ledger',
+        session.currentness_refs.provider_attempt_ledger_ref,
+        currentnessCase.providerAttemptLedgerRef ?? null,
       );
-      assert.equal(
-        session.continuation_snapshot.closeout_first_blocker.blocker_kind,
-        'missing_provider_attempt_ledger',
-      );
-      assertNextForcedDelta(session.progress_projection.next_forced_delta, PROVIDER_LEDGER_DELTA);
-      assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, PROVIDER_LEDGER_DELTA);
+      assert.equal(session.currentness_refs.typed_blocker_ref, typedBlockerRef);
+      assert.equal(session.currentness_refs.next_forced_delta_refs.includes(typedBlockerRef), true);
     });
   }
 });
@@ -555,31 +522,13 @@ test('getProductEntrySession records provider attempt ledger refs when a newer r
       entry_session_id: 'session-provider-currentness-ready',
     });
 
-    assert.equal(session.continuation_snapshot.latest_run_id, runId);
-    assert.equal(session.continuation_snapshot.latest_surface_kind, 'route_run');
-    assert.equal(session.continuation_snapshot.closeout_first_blocker, null);
-    assert.equal(session.continuation_snapshot.runtime_projection.surface_kind, 'cross_provider_attempt_currentness_projection');
-    assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.currentness_status,
-      'current_with_provider_attempt_ledger',
-    );
-    assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.local_session_ref,
-      'product-entry-session:session-provider-currentness-ready',
-    );
-    assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ref,
-      providerAttemptRef,
-    );
-    assert.equal(
-      session.continuation_snapshot.runtime_projection.provider_currentness.provider_attempt_ledger_ref,
-      providerAttemptLedgerRef,
-    );
-    assert.equal(session.continuation_snapshot.runtime_projection.provider_currentness.can_claim_current, true);
-    assertNextForcedDelta(session.progress_projection.next_forced_delta, VISUAL_DELIVERABLE_DELTA);
-    assert.equal(session.progress_projection.summary.content_status, 'completed');
-    assert.equal(session.runtime_loop_closure.control_policy.approval_required, false);
-    assertNextForcedDelta(session.runtime_loop_closure.next_forced_delta, VISUAL_DELIVERABLE_DELTA);
+    assertRefsOnlySession(session, 'session-provider-currentness-ready');
+    assert.equal(session.currentness_refs.latest_visual_run_ref, `route-run:${runId}`);
+    assert.equal(session.currentness_refs.latest_surface_kind, 'route_run');
+    assert.equal(session.currentness_refs.typed_blocker_ref, null);
+    assert.equal(session.currentness_refs.provider_attempt_ref, providerAttemptRef);
+    assert.equal(session.currentness_refs.provider_attempt_ledger_ref, providerAttemptLedgerRef);
+    assert.deepEqual(session.currentness_refs.next_forced_delta_refs, [`artifact:${runId}`]);
   });
 });
 
@@ -629,15 +578,13 @@ test('getProductEntrySession preserves a newer route-run checkpoint over stale l
       entry_session_id: 'session-route-checkpoint',
     });
 
+    assertRefsOnlySession(session, 'session-route-checkpoint');
     assert.equal(
-      session.continuation_snapshot.latest_run_id,
-      routeRun.continuation_snapshot.latest_run_id,
+      session.currentness_refs.latest_visual_run_ref,
+      `route-run:${routeRun.continuation_snapshot.latest_run_id}`,
     );
-    assert.equal('latest_stage_execution_plan_ref' in session.continuation_snapshot, true);
-    assert.equal(
-      session.session_continuity.restore_point.latest_handle,
-      routeRun.continuation_snapshot.latest_run_id,
-    );
+    assert.equal(session.currentness_refs.latest_stage_execution_plan_ref, null);
+    assert.equal(session.currentness_refs.latest_surface_kind, 'route_run');
     assert.equal(readJson(sessionFile).latest_surface_kind, 'route_run');
   });
 });

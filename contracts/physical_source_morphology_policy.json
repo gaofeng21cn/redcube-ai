@@ -238,7 +238,6 @@
       "source_refs": [
         "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
         "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
         "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
       ],
@@ -876,17 +875,72 @@
         ],
         "missing_source_allowed": true
       },
-      {
-        "construct_id": "repo_local_executor_attempt_blocker_envelope",
+    {
+      "construct_id": "repo_local_executor_attempt_blocker_envelope",
         "source_ref": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-executor-attempt-diagnostic.ts",
         "forbidden_tokens": [
           "redcube_native_ppt_codex_invocation_blocker",
           "typed_blocker: {",
           "prompt_telemetry: {",
           "surface_kind: 'opl_executor_attempt_diagnostic'"
-        ],
-        "missing_source_allowed": false
-      }
+      ],
+      "missing_source_allowed": false
+    },
+    {
+      "construct_id": "repo_local_product_entry_session_shell_assembly",
+      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
+      "forbidden_tokens": [
+        "buildProductEntryContinuationSnapshot",
+        "buildSessionContinuationFamilyOrchestration",
+        "buildWorkspaceReceiptInventoryProjection",
+        "getReviewState",
+        "getPublicationProjection",
+        "buildSessionContinuitySurface",
+        "buildProgressProjectionSurface",
+        "buildArtifactInventorySurface",
+        "buildRuntimeLoopClosureSurface",
+        "buildOplFamilyLifecycleAdapterSurface"
+      ],
+      "missing_source_allowed": false
+    },
+    {
+      "construct_id": "repo_local_product_entry_session_surface_assembly",
+      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
+      "forbidden_tokens": [
+        "entry_session:",
+        "delivery_identity:",
+        "continuation_snapshot:",
+        "session_continuity:",
+        "progress_projection:",
+        "artifact_inventory:",
+        "workspace_receipt_inventory_projection:",
+        "native_proof_artifact_inventory:",
+        "ppt_deck_visual_route_session:",
+        "runtime_loop_closure:",
+        "review_state:",
+        "publication_projection:",
+        "opl_family_lifecycle_adapter:",
+        "family_orchestration:"
+      ],
+      "missing_source_allowed": false
+    },
+    {
+      "construct_id": "retired_get_product_start_wrapper",
+      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-start.ts",
+      "forbidden_tokens": [
+        "getProductStart"
+      ],
+      "missing_source_allowed": true
+    },
+    {
+      "construct_id": "retired_get_product_start_export",
+      "source_ref": "packages/redcube-domain-entry/src/index.ts",
+      "forbidden_tokens": [
+        "getProductStart",
+        "get-product-start.js"
+      ],
+      "missing_source_allowed": false
+    }
     ],
     "authority_boundary": {
       "scan_can_write_visual_truth": false,
@@ -1212,7 +1266,6 @@
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/product-entry-session-refs.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
-          "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
           "packages/redcube-domain-entry/src/actions/product-entry-continuity-surfaces.ts"
         ],
@@ -1521,7 +1574,7 @@
       "legacy_name_policy.current_role_guard_policy",
       "legacy_name_policy.forbidden_payload_role_policy"
     ],
-    "checked_source_ref_count": 59,
+    "checked_source_ref_count": 58,
     "checked_machine_boundary_ref_count": 3,
     "checked_source_refs": [
       "agent/",
@@ -1545,7 +1598,6 @@
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
-      "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-artifacts.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-session-parts/session-surfaces.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",
       "packages/redcube-domain-entry/src/actions/get-product-status.ts",

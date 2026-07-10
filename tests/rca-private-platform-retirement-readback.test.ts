@@ -34,6 +34,10 @@ function assertSourceGuardSummary(payload, scope) {
   assert.deepEqual(payload.guard_summary.active_source_scan.forbidden_construct_ids, [
     'repo_local_product_entry_companion_assembly',
     'repo_local_executor_attempt_blocker_envelope',
+    'repo_local_product_entry_session_shell_assembly',
+    'repo_local_product_entry_session_surface_assembly',
+    'retired_get_product_start_wrapper',
+    'retired_get_product_start_export',
   ]);
   assert.equal(payload.guard_summary.active_source_scan.violation_count, 0);
   assert.deepEqual(payload.guard_summary.active_source_scan.violations, []);

@@ -14,7 +14,6 @@ import {
   DOMAIN_HANDLER_DISPATCH_COMMAND,
   DOMAIN_HANDLER_EXPORT_COMMAND,
   PRODUCT_SESSION_COMMAND,
-  PRODUCT_START_COMMAND,
   PRODUCT_STATUS_COMMAND,
 } from './get-product-entry-manifest-parts/policy.js';
 import {
@@ -27,7 +26,6 @@ type JsonMap = Record<string, any>;
 const SERVICE_SAFE_DOMAIN_ENTRY_COMMAND = 'redcube service-safe domain entry';
 const RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS = new Set([
   'get_product_status',
-  'get_product_start',
   'get_product_preflight',
   'get_product_entry_session',
   'get_product_entry_manifest',
@@ -63,10 +61,6 @@ const MCP_TOOLS = [
 
 const PROJECTION_METADATA: Record<string, JsonMap> = {
   get_product_status: {
-    cli: null,
-    mcp: null,
-  },
-  get_product_start: {
     cli: null,
     mcp: null,
   },
@@ -271,21 +265,6 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
         cli: null,
         mcp: null,
         skill: null,
-        product_entry: null,
-      },
-    }),
-    action({
-      actionId: 'get_product_start',
-      title: 'Read RedCube product start surface',
-      summary: '读取 OPL generated product-entry start shell 所需的 RCA refs；RCA repo-local public caller 只保留 direct invoke target。',
-      effect: 'read_only',
-      command: PRODUCT_START_COMMAND,
-      surfaceKind: 'product_entry_start',
-      inputSchemaRef: 'schema:redcube.product_start.request.v1',
-      outputSchemaRef: 'schema:redcube.product_start.response.v1',
-      supportedSurfaces: {
-        cli: null,
-        mcp: null,
         product_entry: null,
       },
     }),
