@@ -207,14 +207,14 @@ test('current runtime program keeps one active baton and machine-readable histor
   assert.equal(currentProgram.current_state.active_mainline.unique, true);
 
   assert.equal(activeBaton.id, ACTIVE_BATON_ID);
-  assert.equal(activeBaton.status, 'closeout_completed');
+  assert.equal(activeBaton.status, 'generic_session_sources_retired_domain_snapshot_projection_verified');
   assert.equal(activeBaton.review_status, 'verified');
   assert.equal(activeBaton.artifacts.session_continuity_provenance_contract, ACTIVE_BATON_CONTRACT);
   assert.equal(existsSync(path.resolve(ACTIVE_BATON_CONTRACT)), true);
 
   const activeContract = readJson(ACTIVE_BATON_CONTRACT);
   assert.equal(activeContract.product_entry_session_continuity_id, ACTIVE_BATON_ID);
-  assert.equal(activeContract.status, 'closeout_completed');
+  assert.equal(activeContract.status, 'generic_session_source_retired_domain_snapshot_projection_current');
   assert.equal(activeContract.callable_surface.action_ref, 'get_product_entry_session');
   assert.equal(activeContract.callable_surface.api_surface, 'getProductEntrySession');
 
@@ -225,10 +225,7 @@ test('current runtime program keeps one active baton and machine-readable histor
   assert.equal(retiredManagedContract.retained_human_doc, RETIRED_MANAGED_BATON_HUMAN_DOC);
   assert.equal(retiredManagedContract.callable_surface_retained, false);
   assert.equal(retiredManagedContract.compatibility_alias_allowed, false);
-  assert.deepEqual(activeContract.legacy_tombstone_refs, [
-    RETIRED_MANAGED_BATON_CONTRACT,
-    RETIRED_MANAGED_BATON_HUMAN_DOC,
-  ]);
+  assert.equal(activeContract.legacy_tombstone_refs, undefined);
 
   for (const historicalContract of HISTORICAL_CONTRACTS) {
     const milestone = currentProgram.current_state.foundation_milestones[historicalContract.milestone];

@@ -53,7 +53,9 @@ test('current role guard replaces retired legacy surface id pointer allowances',
   assert.equal(audit.retired_no_resurrection_guards, undefined);
   assert.equal(audit.physical_deletion_guard.retired_legacy_surface_ids, undefined);
   assert.equal(audit.physical_deletion_guard.closed_retirement_count, 8);
-  assert.equal(audit.closed_retirement_summary.current_role_guard.compatibility_alias_allowed, false);
+  assert.equal(audit.physical_deletion_guard.current_role_guard.compatibility_alias_allowed, false);
+  assert.equal(audit.closed_retirement_summary, undefined);
+  assert.equal(audit.owner_evidence_lane_index, undefined);
 
   const forbiddenKeys = new Set([
     'retired_legacy_surface_ids',

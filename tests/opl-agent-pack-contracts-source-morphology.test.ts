@@ -188,22 +188,7 @@ test('RCA physical source morphology policy classifies active source tails witho
   assertAllBooleans(gate.false_ready_guard, false, 'default_caller_tail_thinning_gate.false_ready_guard');
   assertAllBooleans(gate.current_role_guard, false, 'default_caller_tail_thinning_gate.current_role_guard');
 
-  const readbackGuard = gate.retirement_readback_cleanup_guard;
-  assert.equal(readbackGuard.guard_id, 'rca.source_morphology.retirement_readback_cleanup_guard.v1');
-  assert.equal(readbackGuard.state, 'readback_guard_available_physical_delete_not_authorized');
-  assert.deepEqual(readbackGuard.json_transport_guard.command_refs, [
-    'npm run private-platform:readback',
-    'npm run test:private-platform:strict',
-  ]);
-  assert.equal(readbackGuard.claims.claims_retirement_cleanup_complete, false);
-  assert.equal(readbackGuard.claims.claims_physical_delete_authorized, false);
-  assert.equal(readbackGuard.claims.claims_visual_ready, false);
-  assert.equal(readbackGuard.claims.claims_production_ready, false);
-  assert.equal(readbackGuard.authority_boundary.guard_can_identify_cleanup_candidates, true);
-  assert.equal(readbackGuard.authority_boundary.guard_can_route_owner_delta, true);
-  assert.equal(readbackGuard.authority_boundary.guard_can_authorize_physical_delete, false);
-  assert.equal(readbackGuard.authority_boundary.guard_can_sign_owner_receipt, false);
-  assert.equal(readbackGuard.authority_boundary.guard_can_create_typed_blocker, false);
+  assert.equal(gate.retirement_readback_cleanup_guard, undefined);
 
   const readback = policy.default_caller_tail_readback;
   assert.equal(readback.readback_id, 'rca.source_morphology.default_caller_tail_readback.v1');
@@ -216,10 +201,11 @@ test('RCA physical source morphology policy classifies active source tails witho
   assert.deepEqual(readback.compact_retirement_summary.cleanup_candidate_surface_ids, []);
   assert.equal(readback.compact_retirement_summary.can_apply_cleanup, false);
   assert.equal(readback.compact_retirement_summary.owner_delta_required, false);
-  assert.equal(readback.compact_retirement_summary.owner_delta_work_order_pack.authority_boundary.work_order_can_sign_owner_receipt, false);
-  assert.deepEqual(
-    readback.retained_default_caller_boundary_gate,
-    readback.compact_retirement_summary.retained_default_caller_boundary_gate,
+  assert.equal(readback.compact_retirement_summary.owner_delta_work_order_pack, undefined);
+  assert.equal(readback.compact_retirement_summary.retained_default_caller_boundary_gate, undefined);
+  assert.equal(
+    readback.retained_default_caller_boundary_gate.gate_id,
+    'rca.source_morphology.retained_default_caller_boundary_gate.v1',
   );
   assertAllBooleans(readback.false_ready_guard, false, 'default_caller_tail_readback.false_ready_guard');
   assert.deepEqual(
@@ -233,8 +219,8 @@ test('RCA physical source morphology policy classifies active source tails witho
   for (const entry of [...readback.current_non_tail_surfaces, ...readback.retained_current_refs_only_boundaries]) {
     assert.equal(entry.classification, byId[entry.surface_id].classification, entry.surface_id);
     assert.deepEqual(entry.source_refs, byId[entry.surface_id].source_refs, entry.surface_id);
-    assertAllBooleans(entry.current_role_guard, false, `${entry.surface_id}.current_role_guard`);
-    assertAllBooleans(entry.readback_claims, false, `${entry.surface_id}.readback_claims`);
+    assert.equal(entry.current_role_guard, undefined, `${entry.surface_id}.current_role_guard`);
+    assert.equal(entry.readback_claims, undefined, `${entry.surface_id}.readback_claims`);
   }
 });
 

@@ -434,21 +434,24 @@ function collectSummaryFailures({
   );
 
   const deletionGuard = audit.physical_deletion_guard || {};
-  if (deletionGuard.physical_delete_authorization_ref !== null) {
+  if (deletionGuard.surface_kind !== 'rca_private_platform_retirement_guard'
+    || deletionGuard.state !== 'no_cleanup_candidates_current_roles_guarded') {
     failures.push({
-      check_id: 'physical_delete_authorization_ref',
-      value: deletionGuard.physical_delete_authorization_ref,
+      check_id: 'private_platform_retirement_guard',
+      state: deletionGuard.state,
+      surface_kind: deletionGuard.surface_kind,
     });
   }
-  if ((deletionGuard.physical_delete_authorization_refs || []).length !== 0) {
-    failures.push({
-      check_id: 'physical_delete_authorization_refs',
-      value: deletionGuard.physical_delete_authorization_refs,
-    });
+  for (const [key, expected] of Object.entries({
+    cleanup_candidate_count: 0,
+    physical_delete_authorized: false,
+    default_caller_cutover_claim_authorized: false,
+  })) {
+    if (deletionGuard[key] !== expected) {
+      failures.push({ check_id: 'private_platform_retirement_guard', key, value: deletionGuard[key] });
+    }
   }
-  const roleGuard = audit.closed_retirement_summary?.current_role_guard
-    || deletionGuard.current_role_guard
-    || {};
+  const roleGuard = deletionGuard.current_role_guard || {};
   collectFalseValueFailures(
     roleGuard.forbidden_owner_flags,
     'current_role_guard_forbidden_owner_flag',
@@ -477,19 +480,6 @@ function collectSummaryFailures({
     'default_caller_tail_current_role_guard',
     failures,
   );
-  collectFalseValueFailures(
-    tailGate.retirement_readback_cleanup_guard?.claims,
-    'retirement_readback_false_claim_guard',
-    failures,
-  );
-  for (const [key, value] of Object.entries(
-    tailGate.retirement_readback_cleanup_guard?.authority_boundary || {},
-  )) {
-    if (key.startsWith('guard_can_identify') || key.startsWith('guard_can_route')) continue;
-    if (value !== false) {
-      failures.push({ check_id: 'retirement_readback_authority_boundary', key, value });
-    }
-  }
 
   const tailReadback = physicalPolicy.default_caller_tail_readback || {};
   collectFalseValueFailures(

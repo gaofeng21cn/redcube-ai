@@ -3,7 +3,7 @@
 import {
   FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS,
   FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
-  RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS,
+  FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
   RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS,
   buildBridgeExitGate,
   buildFunctionalModulePhysicalDeletionGuard,
@@ -77,27 +77,6 @@ const RCA_FUNCTIONAL_STRUCTURE_COMPLETED_GAPS = Object.freeze([
   'workspace_source_lifecycle_receipt_shell',
   'legacy_physical_cleanup',
 ]);
-
-function ownerEvidenceLaneIndexFor(moduleItems) {
-  const pendingDeleteItems = moduleItems.filter(
-    (entry) => entry.module_id !== 'product_entry_continuity_refs_adapter',
-  );
-  return {
-    'all-retained-private-platform-residue': {
-      source_ref: 'contracts/functional_privatization_audit.json#/physical_deletion_guard',
-      builder_ref:
-        'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
-    },
-    ...Object.fromEntries(pendingDeleteItems.map((entry) => [
-      entry.module_id.replaceAll('_', '-'),
-      {
-        source_ref: `contracts/functional_privatization_audit.json#/modules/${moduleItems.indexOf(entry)}/physical_deletion_guard`,
-        builder_ref:
-          `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${entry.module_id.replaceAll('_', '-')}`,
-      },
-    ])),
-  };
-}
 
 const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
   {
@@ -572,30 +551,17 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       ],
     },
     physical_deletion_guard: {
+      surface_kind: 'rca_private_platform_retirement_guard',
+      state: 'no_cleanup_candidates_current_roles_guarded',
       current_safe_tombstone_candidate_count: 0,
       closed_retirement_count: CLOSED_DEFAULT_RETIREMENT_COUNT,
       closed_default_caller_retirement_count: CLOSED_DEFAULT_CALLER_RETIREMENT_COUNT,
-      surface_id_policy: 'current_role_guard_with_count_only_closed_retirement_summary',
-      deletion_status: 'closed_retirements_counted_current_roles_guarded',
+      cleanup_candidate_count: 0,
+      physical_delete_authorized: false,
+      default_caller_cutover_claim_authorized: false,
       current_role_guard: { ...CURRENT_ROLE_GUARD },
-      remaining_deletion_scope: 'Only visual authority functions, refs-only projections, and declared visual pack inputs remain in RCA package surfaces.',
-      required_before_remaining_physical_delete: [],
-      physical_delete_authorization_ref: null,
-      physical_delete_authorization_refs: [],
-      keep_as_authority_adapter_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.map((entry) =>
-        `rca-keep-authority-adapter:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}`),
-      typed_blocker_refs: RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS
-        .filter((entry) => entry.module_id !== 'product_entry_continuity_refs_adapter')
-        .map((entry) =>
-        `rca-typed-blocker:private-platform-retirement:${entry.module_id.replaceAll('_', '-')}:physical-delete-requires-explicit-owner-receipt`),
-      memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-      memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
-      owner_evidence_lane_ref:
-        'contracts/functional_privatization_audit.json#/owner_evidence_lane_index/all-retained-private-platform-residue',
-      owner_evidence_lane_builder_ref:
-        'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:all-retained-private-platform-residue',
+      no_resurrection_readback_ref: 'scripts/check-private-platform-retirement.ts',
     },
-    owner_evidence_lane_index: ownerEvidenceLaneIndexFor(RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS),
     fresh_large_private_surface_scan: RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN,
     bridge_exit_gate: buildPrivateGenericResidueBridgeExitGate(
       RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS.filter(
@@ -648,6 +614,7 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
           : undefined,
         forbidden_generic_owner_flags_ref: FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF,
         physical_deletion_guard: buildFunctionalModulePhysicalDeletionGuard(entry),
+        retirement_guard_ref: FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
         rca_retains: entry.rcaRetains || [],
         repo_local_handler_target_only: entry.module_id === 'generic_cli_mcp_wrappers' ? true : undefined,
         generated_surface_metadata_owner: entry.module_id === 'generic_cli_mcp_wrappers' ? 'one-person-lab' : undefined,
@@ -684,14 +651,6 @@ export function buildPrivatizedFunctionalModuleAuditProjection({
       'owner_receipt',
       'native_helper_implementation',
     ],
-    closed_retirement_summary: {
-      surface_kind: 'rca_closed_retirement_count_summary',
-      closed_retirement_count: CLOSED_DEFAULT_RETIREMENT_COUNT,
-      closed_default_caller_retirement_count: CLOSED_DEFAULT_CALLER_RETIREMENT_COUNT,
-      current_role_guard: { ...CURRENT_ROLE_GUARD },
-      compatibility_alias_allowed: false,
-      active_default_caller_alias_allowed: false,
-    },
     must_not_retire: [
       'visual_stage_descriptor',
       'visual_review_export_gate',

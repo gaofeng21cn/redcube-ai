@@ -875,34 +875,34 @@
         ],
         "missing_source_allowed": true
       },
-    {
-      "construct_id": "repo_local_executor_attempt_blocker_envelope",
+      {
+        "construct_id": "repo_local_executor_attempt_blocker_envelope",
         "source_ref": "packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-executor-attempt-diagnostic.ts",
         "forbidden_tokens": [
           "redcube_native_ppt_codex_invocation_blocker",
           "typed_blocker: {",
           "prompt_telemetry: {",
           "surface_kind: 'opl_executor_attempt_diagnostic'"
-      ],
-      "missing_source_allowed": false
-    },
-    {
-      "construct_id": "retired_get_product_start_wrapper",
-      "source_ref": "packages/redcube-domain-entry/src/actions/get-product-start.ts",
-      "forbidden_tokens": [
-        "getProductStart"
-      ],
-      "missing_source_allowed": true
-    },
-    {
-      "construct_id": "retired_get_product_start_export",
-      "source_ref": "packages/redcube-domain-entry/src/index.ts",
-      "forbidden_tokens": [
-        "getProductStart",
-        "get-product-start.js"
-      ],
-      "missing_source_allowed": false
-    }
+        ],
+        "missing_source_allowed": false
+      },
+      {
+        "construct_id": "retired_get_product_start_wrapper",
+        "source_ref": "packages/redcube-domain-entry/src/actions/get-product-start.ts",
+        "forbidden_tokens": [
+          "getProductStart"
+        ],
+        "missing_source_allowed": true
+      },
+      {
+        "construct_id": "retired_get_product_start_export",
+        "source_ref": "packages/redcube-domain-entry/src/index.ts",
+        "forbidden_tokens": [
+          "getProductStart",
+          "get-product-start.js"
+        ],
+        "missing_source_allowed": false
+      }
     ],
     "typescript_ast_owner_boundary": {
       "policy_id": "rca.source_morphology.product_session_owner_ast_boundary.v1",
@@ -1059,86 +1059,6 @@
         "scan_can_claim_domain_ready": false,
         "scan_can_claim_production_ready": false
       }
-    },
-    "retirement_readback_cleanup_guard": {
-      "guard_id": "rca.source_morphology.retirement_readback_cleanup_guard.v1",
-      "state": "readback_guard_available_physical_delete_not_authorized",
-      "readback_surface_ref": "contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate",
-      "json_transport_guard": {
-        "guard_id": "rca.source_morphology.retirement_readback_json_transport_guard.v1",
-        "state": "complete_parseable_json_required",
-        "command_refs": [
-          "npm run private-platform:readback",
-          "npm run test:private-platform:strict"
-        ],
-        "required_properties": [
-          "stdout_must_flush_before_exit",
-          "direct_readback_json_must_parse",
-          "strict_gate_payload_must_equal_direct_readback_payload",
-          "large_readback_over_64kb_must_not_truncate"
-        ],
-        "false_ready_guard": {
-          "parseable_json_can_claim_physical_delete_authorized": false,
-          "parseable_json_can_claim_default_caller_cutover_complete": false,
-          "parseable_json_can_claim_visual_ready": false,
-          "parseable_json_can_claim_domain_ready": false,
-          "parseable_json_can_claim_production_ready": false
-        }
-      },
-      "allowed_readback_outputs": [
-        "active_surface_classification",
-        "current_non_tail_surface",
-        "missing_evidence_worklist",
-        "owner_delta_route",
-        "retained_current_refs_only_boundary",
-        "typed_blocker_ref_shape",
-        "current_role_guard"
-      ],
-      "forbidden_readback_outputs": [
-        "physical_delete_operation",
-        "owner_receipt_signature",
-        "typed_blocker_instance_creation",
-        "visual_ready_or_exportable_claim",
-        "production_ready_claim",
-        "app_or_default_caller_cutover_claim"
-      ],
-      "required_before_cleanup_apply": [
-        "opl_generated_default_caller_parity",
-        "no_active_repo_local_default_caller",
-        "rca_owner_receipt_or_typed_blocker_roundtrip",
-        "no_forbidden_write_proof",
-        "current_role_guard_no_alias_proof",
-        "compressed_history_index_pointer",
-        "owner_receipt://redcube_ai/physical_delete_or_tombstone_authorization"
-      ],
-      "false_ready_claim_guard_keys": [
-        "retirement_readback_cleanup_complete",
-        "retirement_readback_guard_satisfied",
-        "cleanup_readback_physical_delete_authorized",
-        "claims_cleanup_readback_authorizes_delete",
-        "claims_retirement_cleanup_applied"
-      ],
-      "claims": {
-        "claims_retirement_cleanup_complete": false,
-        "claims_physical_delete_authorized": false,
-        "claims_owner_receipt_signed": false,
-        "claims_typed_blocker_created": false,
-        "claims_visual_ready": false,
-        "claims_exportable": false,
-        "claims_handoffable": false,
-        "claims_domain_ready": false,
-        "claims_production_ready": false
-      },
-      "authority_boundary": {
-        "guard_can_identify_cleanup_candidates": true,
-        "guard_can_route_owner_delta": true,
-        "guard_can_authorize_physical_delete": false,
-        "guard_can_sign_owner_receipt": false,
-        "guard_can_create_typed_blocker": false,
-        "guard_can_claim_default_caller_cutover": false,
-        "guard_can_claim_app_or_live_readiness": false,
-        "guard_can_claim_visual_or_export_readiness": false
-      }
     }
   },
   "default_caller_tail_readback": {
@@ -1162,33 +1082,6 @@
       "owner_delta_required": false,
       "next_owner": null,
       "required_delta": null,
-      "owner_delta_work_order_pack": {
-        "surface_kind": "rca_default_caller_tail_owner_delta_work_order_pack",
-        "pack_id": "rca.source_morphology.default_caller_tail.owner_delta_work_order_pack.v1",
-        "state": "tail_worklist_empty_no_owner_delta_required",
-        "target_domain_id": "redcube-ai",
-        "source_summary_ref": "contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/compact_retirement_summary",
-        "tail_surface_count": 0,
-        "cleanup_candidate_count": 0,
-        "owner_delta_route_count": 0,
-        "missing_evidence_ids": [],
-        "owner_delta_routes": [],
-        "authority_boundary": {
-          "work_order_can_write_visual_truth": false,
-          "work_order_can_write_artifact_blob": false,
-          "work_order_can_write_memory_body": false,
-          "work_order_can_issue_review_or_export_verdict": false,
-          "work_order_can_sign_owner_receipt": false,
-          "work_order_can_create_typed_blocker_instance": false,
-          "work_order_can_authorize_physical_delete": false,
-          "work_order_can_claim_default_caller_cutover": false,
-          "work_order_can_claim_visual_ready": false,
-          "work_order_can_claim_exportable": false,
-          "work_order_can_claim_handoffable": false,
-          "work_order_can_claim_domain_ready": false,
-          "work_order_can_claim_production_ready": false
-        }
-      },
       "current_non_tail_surface_ids": [
         "product_entry_continuity_refs_adapter",
         "domain_action_adapter_guarded_actions",
@@ -1201,54 +1094,6 @@
         "operator_evidence_stability_projection",
         "executor_runtime_route_run_records"
       ],
-      "retained_default_caller_boundary_gate": {
-        "gate_id": "rca.source_morphology.retained_default_caller_boundary_gate.v1",
-        "state": "retained_boundaries_require_generated_default_caller_parity_before_delete_or_further_thin",
-        "applies_to_surface_ids": [
-          "product_entry_continuity_refs_adapter",
-          "domain_action_adapter_guarded_actions",
-          "product_entry_manifest_projection",
-          "deliverable_route_attempt_shell",
-          "repo_shell_verification_wrappers",
-          "runtime_watch_projection",
-          "operator_evidence_stability_projection",
-          "executor_runtime_route_run_records"
-        ],
-        "required_before_delete_or_further_thin": [
-          "opl_generated_default_caller_parity",
-          "no_active_repo_local_default_caller",
-          "rca_owner_receipt_or_typed_blocker_roundtrip",
-          "no_forbidden_write_proof",
-          "retired_alias_no_resurrection_proof",
-          "tombstone_or_provenance_pointer"
-        ],
-        "allowed_terminal_decisions": [
-          "retain_as_domain_handler_target_or_refs_only_boundary",
-          "delete_after_explicit_owner_receipt",
-          "tombstone_after_domain_typed_blocker_or_owner_decision"
-        ],
-        "forbidden_terminal_decisions": [
-          "delete_from_empty_tail_worklist",
-          "delete_from_cleanup_candidate_count_zero",
-          "retain_as_generic_session_or_workbench_owner",
-          "claim_default_caller_cutover_without_external_parity"
-        ],
-        "authority_boundary": {
-          "gate_can_write_visual_truth": false,
-          "gate_can_write_artifact_blob": false,
-          "gate_can_write_memory_body": false,
-          "gate_can_issue_review_or_export_verdict": false,
-          "gate_can_sign_owner_receipt": false,
-          "gate_can_create_typed_blocker_instance": false,
-          "gate_can_authorize_physical_delete": false,
-          "gate_can_claim_default_caller_cutover": false,
-          "gate_can_claim_visual_ready": false,
-          "gate_can_claim_exportable": false,
-          "gate_can_claim_handoffable": false,
-          "gate_can_claim_domain_ready": false,
-          "gate_can_claim_production_ready": false
-        }
-      },
       "can_apply_cleanup": false,
       "can_authorize_physical_delete": false,
       "can_claim_default_caller_cutover_complete": false,
@@ -1261,10 +1106,7 @@
       "compact_retirement_summary",
       "current_non_tail_surface",
       "missing_evidence_worklist",
-      "owner_delta_route",
-      "owner_delta_work_order_pack",
       "retained_current_refs_only_boundary",
-      "typed_blocker_ref_shape",
       "current_role_guard"
     ],
     "tail_classifications": [],
@@ -1279,27 +1121,7 @@
           "packages/redcube-domain-entry/src/actions/invoke-opl-hosted-product-entry.ts",
           "packages/redcube-domain-entry/src/actions/product-entry-domain-snapshot-refs.ts",
           "packages/redcube-domain-entry/src/types-parts/product-entry.ts"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "domain_action_adapter_guarded_actions",
@@ -1309,27 +1131,7 @@
           "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
           "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts",
           "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "product_entry_manifest_projection",
@@ -1338,27 +1140,7 @@
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "deliverable_route_attempt_shell",
@@ -1367,27 +1149,7 @@
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/run-deliverable-route.ts",
           "packages/redcube-domain-entry/src/actions/run-deliverable-route-parts/"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "repo_shell_verification_wrappers",
@@ -1404,27 +1166,7 @@
           "tools/image-ppt-proof/run.sh",
           "tools/native-ppt-proof/install-deps.sh",
           "tools/native-ppt-proof/run.sh"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       }
     ],
     "retained_current_refs_only_boundaries": [
@@ -1434,27 +1176,7 @@
         "current_rca_role": "run_review_existing_run_locator_refs_only_projection_not_supervisor",
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "operator_evidence_stability_projection",
@@ -1464,27 +1186,7 @@
           "packages/redcube-domain-entry/src/actions/get-product-status.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
           "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       },
       {
         "surface_id": "executor_runtime_route_run_records",
@@ -1493,27 +1195,7 @@
         "source_refs": [
           "packages/redcube-runtime-protocol/src/executor-runtime.ts",
           "packages/redcube-runtime/src/route-execution-refs.ts"
-        ],
-        "current_role_guard": {
-          "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch": false,
-          "domain_action_adapter_can_become_generic_dispatch_owner": false,
-          "domain_action_adapter_can_become_generated_wrapper_owner": false,
-          "product_session_can_become_generic_session_shell_owner": false,
-          "operator_projection_can_become_generic_workbench_owner": false,
-          "route_run_records_can_become_attempt_ledger_owner": false,
-          "shell_wrappers_can_become_runtime_owner": false,
-          "compatibility_alias_or_facade_allowed": false
-        },
-        "readback_claims": {
-          "can_claim_cleanup_complete": false,
-          "can_claim_physical_delete_authorized": false,
-          "can_claim_default_caller_cutover_complete": false,
-          "can_claim_visual_ready": false,
-          "can_claim_exportable": false,
-          "can_claim_handoffable": false,
-          "can_claim_domain_ready": false,
-          "can_claim_production_ready": false
-        }
+        ]
       }
     ],
     "retained_default_caller_boundary_gate": {

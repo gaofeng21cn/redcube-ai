@@ -92,8 +92,11 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.equal(surface.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
     assert.equal(surface.physical_deletion_guard.closed_retirement_count, 8);
     assert.equal(surface.physical_deletion_guard.closed_default_caller_retirement_count, 5);
-    assert.equal(surface.physical_deletion_guard.surface_id_policy, 'current_role_guard_with_count_only_closed_retirement_summary');
-    assert.equal(surface.physical_deletion_guard.deletion_status, 'closed_retirements_counted_current_roles_guarded');
+    assert.equal(surface.physical_deletion_guard.surface_kind, 'rca_private_platform_retirement_guard');
+    assert.equal(surface.physical_deletion_guard.state, 'no_cleanup_candidates_current_roles_guarded');
+    assert.equal(surface.physical_deletion_guard.cleanup_candidate_count, 0);
+    assert.equal(surface.physical_deletion_guard.physical_delete_authorized, false);
+    assert.equal(surface.physical_deletion_guard.default_caller_cutover_claim_authorized, false);
     assert.equal(surface.physical_deletion_guard.current_role_guard.forbidden_owner_flags.rca_owns_generic_runner, false);
     assert.equal(surface.fresh_large_private_surface_scan.surface_kind, 'rca_large_private_platform_surface_scan');
     assert.equal(surface.fresh_large_private_surface_scan.current_clean_truth.no_obvious_safe_large_generic_control_plane_split_found, true);
@@ -119,8 +122,8 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
     assert.deepEqual(surface.modules.map((entry) => entry.module_id), expectedModules);
     assert.equal(surface.retire_tombstone_candidates, undefined);
     assert.equal(surface.retired_no_resurrection_guards, undefined);
-    assert.equal(surface.closed_retirement_summary.closed_retirement_count, 8);
-    assert.equal(surface.closed_retirement_summary.current_role_guard.compatibility_alias_allowed, false);
+    assert.equal(surface.closed_retirement_summary, undefined);
+    assert.equal(surface.owner_evidence_lane_index, undefined);
     assert.equal(surface.authority_boundary.opl_can_index_audit_projection, true);
     assert.equal(surface.authority_boundary.opl_can_write_rca_visual_truth, false);
     assert.equal(surface.authority_boundary.opl_can_claim_production_soak_complete, false);
@@ -160,37 +163,25 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
       assert.equal(typeof entry.rca_projection_mode, 'string', entry.module_id);
       assert.ok(Array.isArray(entry.rca_exports_only) && entry.rca_exports_only.length > 0, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.equal(
+        entry.retirement_guard_ref,
+        'contracts/functional_privatization_audit.json#/physical_deletion_guard',
+        entry.module_id,
+      );
+      assert.equal(entry.physical_deletion_guard.owner_evidence_lane_ref, undefined, entry.module_id);
+      assert.equal(entry.physical_deletion_guard.typed_blocker_ref, undefined, entry.module_id);
       if (entry.module_id === 'visual_pack_compiler_handoff') {
         assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
-        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-          'domain_package_replaced_by_new_rca_pack_contract',
-        ], entry.module_id);
       } else if (entry.module_id === 'visual_authority_functions') {
         assert.equal(entry.opl_owned_generic_primitive_consumer, false, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, false, entry.module_id);
-        assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-          'visual_domain_authority_moved_by_explicit_product_decision',
-        ], entry.module_id);
       } else {
         assert.equal(entry.opl_owned_generic_primitive_consumer, true, entry.module_id);
         assert.equal(entry.opl_absorb_candidate, true, entry.module_id);
         if (entry.module_id === 'product_entry_continuity_refs_adapter') {
           assert.match(entry.physical_deletion_guard.reason, /generic session sources are retired/i);
-          assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-            'replacement_rca_domain_snapshot_refs_handler',
-          ]);
           assert.equal(entry.physical_deletion_guard.generic_session_source_retirement, 'completed');
-        } else {
-          assert.match(
-            entry.physical_deletion_guard.reason,
-            /retained RCA domain authority or refs-only projection/,
-            entry.module_id,
-          );
-          assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-            'domain_authority_refs_preserved',
-            'no_regression_proof_recorded',
-          ], entry.module_id);
         }
       }
       assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);

@@ -64,17 +64,21 @@ test('RCA functional audit keeps generic runtime ownership retired without copyi
   );
   assert.deepEqual(audit.functional_structure_gap_closure.remaining_functional_structure_gap_ids, []);
   assert.equal(audit.physical_deletion_guard.current_safe_tombstone_candidate_count, 0);
-  assert.equal(audit.physical_deletion_guard.physical_delete_authorization_ref, null);
-  assert.deepEqual(audit.physical_deletion_guard.physical_delete_authorization_refs, []);
+  assert.equal(audit.physical_deletion_guard.surface_kind, 'rca_private_platform_retirement_guard');
+  assert.equal(audit.physical_deletion_guard.state, 'no_cleanup_candidates_current_roles_guarded');
+  assert.equal(audit.physical_deletion_guard.cleanup_candidate_count, 0);
+  assert.equal(audit.physical_deletion_guard.physical_delete_authorized, false);
+  assert.equal(audit.physical_deletion_guard.default_caller_cutover_claim_authorized, false);
   assert.equal(audit.physical_deletion_guard.closed_retirement_count, 8);
   assert.equal(audit.physical_deletion_guard.closed_default_caller_retirement_count, 5);
-  assert.equal(audit.closed_retirement_summary.current_role_guard.compatibility_alias_allowed, false);
+  assert.equal(audit.closed_retirement_summary, undefined);
+  assert.equal(audit.owner_evidence_lane_index, undefined);
   assert.equal(audit.retire_tombstone_candidates, undefined);
   assert.equal(audit.retired_no_resurrection_guards, undefined);
   assertAllFalse(audit.forbidden_generic_owner_flags, 'forbidden_generic_owner_flags');
   assertAllFalse(
-    audit.closed_retirement_summary.current_role_guard.forbidden_owner_flags,
-    'closed_retirement_summary.current_role_guard',
+    audit.physical_deletion_guard.current_role_guard.forbidden_owner_flags,
+    'physical_deletion_guard.current_role_guard',
   );
 
   assert.deepEqual(Object.keys(modules).sort(), [
@@ -103,12 +107,16 @@ test('RCA functional audit keeps generic runtime ownership retired without copyi
     assert.equal(entry.forbidden_generic_owner_flags, undefined, moduleId);
     assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, moduleId);
     assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, moduleId);
+    assert.equal(
+      entry.retirement_guard_ref,
+      'contracts/functional_privatization_audit.json#/physical_deletion_guard',
+      moduleId,
+    );
+    assert.equal(entry.physical_deletion_guard.owner_evidence_lane_ref, undefined, moduleId);
+    assert.equal(entry.physical_deletion_guard.typed_blocker_ref, undefined, moduleId);
     assert.equal(entry.declares_production_soak_complete, false, moduleId);
 
     if (moduleId === 'visual_pack_compiler_handoff') {
-      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-        'domain_package_replaced_by_new_rca_pack_contract',
-      ]);
       continue;
     }
     if (moduleId === 'visual_authority_functions') {
@@ -124,33 +132,9 @@ test('RCA functional audit keeps generic runtime ownership retired without copyi
     }
     if (moduleId === 'product_entry_continuity_refs_adapter') {
       assert.match(entry.physical_deletion_guard.reason, /generic session sources are retired/i);
-      assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-        'replacement_rca_domain_snapshot_refs_handler',
-      ]);
       assert.equal(entry.physical_deletion_guard.generic_session_source_retirement, 'completed');
-      assert.equal(audit.owner_evidence_lane_index['product-entry-continuity-refs-adapter'], undefined);
       continue;
     }
-
-    const segment = moduleId.replaceAll('_', '-');
-    assert.deepEqual(entry.physical_deletion_guard.required_before_delete, [
-      'domain_authority_refs_preserved',
-      'no_regression_proof_recorded',
-    ], moduleId);
-    assert.equal(
-      entry.physical_deletion_guard.keep_as_authority_adapter_ref,
-      `rca-keep-authority-adapter:private-platform-retirement:${segment}`,
-      moduleId,
-    );
-    assert.equal(
-      entry.physical_deletion_guard.typed_blocker_ref,
-      `rca-typed-blocker:private-platform-retirement:${segment}:physical-delete-requires-explicit-owner-receipt`,
-      moduleId,
-    );
-    assert.deepEqual(audit.owner_evidence_lane_index?.[segment], {
-      source_ref: `contracts/functional_privatization_audit.json#/modules/${audit.modules.indexOf(entry)}/physical_deletion_guard`,
-      builder_ref: entry.physical_deletion_guard.owner_evidence_lane_builder_ref,
-    }, moduleId);
   }
 
   assert.equal(

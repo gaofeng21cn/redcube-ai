@@ -18,6 +18,8 @@ export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS = Object.freeze({
 
 export const FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF =
   'contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags';
+export const FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF =
+  'contracts/functional_privatization_audit.json#/physical_deletion_guard';
 
 export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
   product_entry_continuity_refs_adapter: {
@@ -132,14 +134,6 @@ const RCA_BRIDGE_EXIT_AUTHORITY_ALLOWLIST = Object.freeze([
   'safe_action_refs',
 ]);
 
-export const RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS = Object.freeze([
-  'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted',
-  'rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-rejected',
-  'rca-lifecycle-receipt:cleanup:production-evidence-tail-ppt-image-first-cleanup',
-  'rca-lifecycle-receipt:restore:production-evidence-tail-ppt-image-first-restore',
-  'rca-lifecycle-receipt:retention:production-evidence-tail-ppt-image-first-retention',
-]);
-
 const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
   product_entry_continuity_refs_adapter: {
     bridge_role: 'retained_domain_snapshot_refs_boundary_after_generic_session_retirement',
@@ -240,59 +234,6 @@ function physicalDeleteBlockerRef(moduleId) {
   return `rca-typed-blocker:private-platform-retirement:${privatePlatformOwnerEvidenceSegment(moduleId)}:physical-delete-requires-explicit-owner-receipt`;
 }
 
-function ownerEvidenceLaneRef(moduleId) {
-  return `contracts/functional_privatization_audit.json#/owner_evidence_lane_index/${privatePlatformOwnerEvidenceSegment(moduleId)}`;
-}
-
-function ownerEvidenceLaneBuilderRef(moduleId) {
-  return `packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts#buildPrivatePlatformRetirementOwnerEvidenceLane:${privatePlatformOwnerEvidenceSegment(moduleId)}`;
-}
-
-function buildPrivatePlatformRetirementOwnerEvidenceLane(target = null) {
-  const moduleItems = Array.isArray(target) ? target : null;
-  const moduleId = moduleItems ? 'all-retained-private-platform-residue' : target?.module_id;
-  const moduleIds = moduleItems ? moduleItems.map((entry) => entry.module_id) : [moduleId];
-  const keepRefs = moduleIds.map((id) => keepAsAuthorityAdapterRef(id));
-  const blockerRefs = moduleIds.map((id) => physicalDeleteBlockerRef(id));
-
-  return {
-    surface_kind: 'rca_private_platform_retirement_owner_evidence_lane',
-    lane_id: `rca.private_platform_retirement.${privatePlatformOwnerEvidenceSegment(moduleId)}.owner_evidence.v1`,
-    owner: 'redcube_ai',
-    consumer: 'opl',
-    state: 'active_contract',
-    evidence_scope: 'owner_native_refs_only_no_physical_delete_authorization',
-    decision: moduleItems
-      ? 'retained_private_platform_residue_classified_by_owner_refs'
-      : 'keep_as_authority_adapter_or_blocked_pending_explicit_owner_delete_receipt',
-    physical_delete_authorization_ref: null,
-    physical_delete_authorization_refs: [],
-    keep_as_authority_adapter_ref: moduleItems ? null : keepRefs[0],
-    keep_as_authority_adapter_refs: keepRefs,
-    typed_blocker_ref: moduleItems ? null : blockerRefs[0],
-    typed_blocker_refs: blockerRefs,
-    memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-    memory_artifact_lifecycle_receipt_refs: [...RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS],
-    source_contract_refs: {
-      functional_privatization_audit_ref: 'contracts/functional_privatization_audit.json#/',
-      live_stage_run_progress_ref: 'contracts/live_stage_run_progress_evidence.json',
-      workspace_receipt_scaleout_ref: 'contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json',
-    },
-    authority_boundary: {
-      owner_can_authorize_physical_delete: true,
-      physical_delete_authorized_now: false,
-      opl_projection_can_authorize_physical_delete: false,
-      open_count_zero_can_authorize_physical_delete: false,
-      opl_can_store_refs: true,
-      opl_can_write_visual_truth: false,
-      opl_can_write_artifact_body: false,
-      opl_can_write_memory_body: false,
-      opl_can_issue_rca_owner_receipt: false,
-      opl_can_create_rca_typed_blocker: false,
-    },
-  };
-}
-
 export function buildBridgeExitGate(entry, replacementGuard = {}) {
   const profile = MODULE_BRIDGE_EXIT_PROFILES[entry.module_id] || {};
   const replacementSurface = replacementGuard.opl_replacement_surface || entry.opl_generic_primitive || 'domain_authority_function';
@@ -366,10 +307,8 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
       physical_delete_authorization_ref: null,
       keep_as_authority_adapter_ref: keepAsAuthorityAdapterRef(entry.module_id),
       typed_blocker_ref: physicalDeleteBlockerRef(entry.module_id),
-      memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-      owner_evidence_lane_ref: ownerEvidenceLaneRef(entry.module_id),
-      owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef(entry.module_id),
     } : {}),
+    retirement_guard_ref: FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
   };
 }
 
@@ -389,12 +328,6 @@ export function buildFunctionalModulePhysicalDeletionGuard(entry) {
       'domain_authority_refs_preserved',
       'no_regression_proof_recorded',
     ],
-    physical_delete_authorization_ref: null,
-    keep_as_authority_adapter_ref: keepAsAuthorityAdapterRef(entry.module_id),
-    typed_blocker_ref: physicalDeleteBlockerRef(entry.module_id),
-    memory_artifact_lifecycle_receipt_ref: 'contracts/live_stage_run_progress_evidence.json#/refs/memory_lifecycle_refs',
-    owner_evidence_lane_ref: ownerEvidenceLaneRef(entry.module_id),
-    owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef(entry.module_id),
   };
 }
 
@@ -442,8 +375,7 @@ export function buildPrivateGenericResidueBridgeExitGate(moduleItems) {
       'real_memory_lifecycle_receipt_instances',
       'cross_family_repeated_no_regression_evidence',
     ],
-    owner_evidence_lane_ref: ownerEvidenceLaneRef('all-retained-private-platform-residue'),
-    owner_evidence_lane_builder_ref: ownerEvidenceLaneBuilderRef('all-retained-private-platform-residue'),
+    retirement_guard_ref: FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
   };
 }
 
@@ -482,6 +414,7 @@ export function buildVisualPackCompilerHandoffAuditModule() {
       reason: 'Declarative pack input is a required RCA domain package surface, not a generic runtime shell.',
       required_before_delete: ['domain_package_replaced_by_new_rca_pack_contract'],
     },
+    retirement_guard_ref: FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
     bridge_exit_gate: buildBridgeExitGate({
       module_id: 'visual_pack_compiler_handoff',
       opl_generic_primitive: 'visual_pack_compiler_handoff',
@@ -553,6 +486,7 @@ export function buildVisualAuthorityFunctionsAuditModule() {
       reason: 'Minimal authority functions are the allowed RCA retention surface.',
       required_before_delete: ['visual_domain_authority_moved_by_explicit_product_decision'],
     },
+    retirement_guard_ref: FUNCTIONAL_MODULE_RETIREMENT_GUARD_REF,
     bridge_exit_gate: buildBridgeExitGate({
       module_id: 'visual_authority_functions',
       opl_generic_primitive: 'minimal_authority_functions',

@@ -65,8 +65,8 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
       'mapped_surfaces.opl_generic_primitive_consumption.status': 'functional_consumer_follow_through_landed',
       'mapped_surfaces.opl_stability_read_model_consumption.status': 'refs_only_consumer_projection_landed',
       'mapped_surfaces.privatized_functional_module_audit.ref': '/privatized_functional_module_audit',
-      'mapped_surfaces.privatized_functional_module_audit.closed_retirement_summary.closed_retirement_count': 8,
-      'mapped_surfaces.privatized_functional_module_audit.closed_retirement_summary.closed_default_caller_retirement_count': 5,
+      'mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.closed_retirement_count': 8,
+      'mapped_surfaces.privatized_functional_module_audit.physical_deletion_guard.closed_default_caller_retirement_count': 5,
       'mapped_surfaces.privatized_functional_module_audit.replacement_expectation_mode': 'opl_replacement_expectation_or_refs_only_projection',
       'mapped_surfaces.privatized_functional_module_audit.functional_structure_gap_closure.status': 'functional_structure_gaps_closed_evidence_gates_open',
       'mapped_surfaces.privatized_functional_module_audit.functional_structure_gap_closure.functional_structure_gap_count': 0,
@@ -126,6 +126,11 @@ test('domain-handler export and dispatch preserve RCA authority while allowing g
     for (const entry of Object.values(modulesById)) {
       assert.equal(entry.opl_replacement_expectation.rca_owns_replacement_runtime, false, entry.module_id);
       assert.equal(entry.physical_deletion_guard.safe_to_delete_now, false, entry.module_id);
+      assert.equal(
+        entry.retirement_guard_ref,
+        'contracts/functional_privatization_audit.json#/physical_deletion_guard',
+        entry.module_id,
+      );
       assert.equal(entry.forbidden_generic_owner_flags, undefined, entry.module_id);
       assert.equal(entry.forbidden_generic_owner_flags_ref, FUNCTIONAL_MODULE_FORBIDDEN_OWNER_FLAGS_REF, entry.module_id);
     }
