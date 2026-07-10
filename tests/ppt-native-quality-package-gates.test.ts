@@ -2,14 +2,340 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { evaluateNativePptBenchmark } from '../tools/native-ppt-proof/evaluate-quality.ts';
 
+const PARITY_CONTRACT_PATH = 'contracts/runtime-program/ppt-master-parity-benchmark.json';
+const PARITY_EVALUATOR_PATH = 'tools/native-ppt-proof/ppt-master-parity.ts';
+
 function readJson(file) {
   return JSON.parse(readFileSync(path.resolve(file), 'utf-8'));
 }
+
+test('ppt-master parity contract pins the upstream and fail-closed blind benchmark boundary', () => {
+  assert.equal(existsSync(PARITY_CONTRACT_PATH), true, 'parity contract must exist');
+  const contract = readJson(PARITY_CONTRACT_PATH);
+
+  assert.equal(contract.external_source.repository, 'https://github.com/hugohe3/ppt-master.git');
+  assert.equal(contract.external_source.commit, 'b0beba5b659c664bdbf0c07227fbdee313698dd7');
+  assert.deepEqual(contract.benchmark_protocol.same_source_lock.required_fields, [
+    'material_bundle_ref',
+    'material_bundle_sha256',
+    'page_count',
+    'audience',
+    'brand_constraints',
+    'edit_requirements',
+  ]);
+  assert.deepEqual(contract.review_protocol.dimensions, [
+    'professionality',
+    'aesthetics',
+    'stability',
+    'editability',
+  ]);
+  assert.equal(contract.acceptance.noninferiority_margin_percentage_points, 5);
+  assert.equal(contract.acceptance.noninferiority_method, 'paired_mean_difference_conservative_student_t_lower_bound');
+  assert.equal(contract.acceptance.confidence_multiplier, 2.776);
+  assert.equal(contract.acceptance.critical_defect_rate_policy, 'candidate_lte_reference');
+  assert.equal(contract.acceptance.candidate_edit_requirements_policy, 'all_passed');
+  assert.deepEqual(contract.benchmark_protocol.reviewer_visible_output_fields, [
+    'slot_id',
+    'artifact_ref',
+    'pptx_sha256',
+    'render_manifest_ref',
+    'package_readback_ref',
+  ]);
+  assert.deepEqual(contract.evidence_boundary.allowed_outcomes, [
+    'pass_candidate',
+    'route_back_candidate',
+    'blocked',
+  ]);
+  assert.equal(contract.evidence_boundary.insufficient_evidence_outcome, 'blocked');
+  assert.equal(contract.authority.can_sign_owner_receipt, false);
+  assert.equal(contract.authority.owner_receipt_signer, 'RedCube AI');
+});
+
+function parityContract() {
+  return readJson(PARITY_CONTRACT_PATH);
+}
+
+function anonymousPairManifest() {
+  return {
+    schema_version: 1,
+    pair_manifest_kind: 'rca_ppt_same_source_anonymous_pair',
+    pair_id: 'blind-pair-001',
+    source_lock: {
+      material_bundle_ref: 'source:benchmark:capital-brief',
+      material_bundle_sha256: '1'.repeat(64),
+      page_count: 6,
+      audience: 'investment committee',
+      brand_constraints: ['16:9', 'neutral institutional palette', 'English'],
+      edit_requirements: [
+        { task_id: 'edit-data', requirement: 'change the Q4 value and refresh the chart' },
+        { task_id: 'edit-text', requirement: 'replace the executive takeaway' },
+        { task_id: 'edit-color', requirement: 'change the accent color' },
+        { task_id: 'edit-node', requirement: 'move one relationship node' },
+        { task_id: 'edit-notes', requirement: 'update speaker notes' },
+      ],
+    },
+    anonymous_outputs: [
+      {
+        slot_id: 'output_alpha',
+        artifact_ref: 'artifact:blind-output-alpha',
+        pptx_sha256: 'a'.repeat(64),
+        render_manifest_ref: 'artifact:blind-render-alpha',
+        package_readback_ref: 'artifact:blind-package-alpha',
+      },
+      {
+        slot_id: 'output_beta',
+        artifact_ref: 'artifact:blind-output-beta',
+        pptx_sha256: 'b'.repeat(64),
+        render_manifest_ref: 'artifact:blind-render-beta',
+        package_readback_ref: 'artifact:blind-package-beta',
+      },
+    ],
+  };
+}
+
+async function parityEvaluator() {
+  assert.equal(existsSync(PARITY_EVALUATOR_PATH), true, 'parity evaluator must exist');
+  return import(path.resolve(PARITY_EVALUATOR_PATH));
+}
+
+test('blind parity review packet carries the shared lock without provider identity', async () => {
+  const { buildBlindParityReviewPacket } = await parityEvaluator();
+  const contract = parityContract();
+  const packet = buildBlindParityReviewPacket({
+    contract,
+    pairManifest: anonymousPairManifest(),
+  });
+
+  assert.equal(packet.pair_id, 'blind-pair-001');
+  assert.deepEqual(packet.source_lock, anonymousPairManifest().source_lock);
+  assert.deepEqual(packet.anonymous_outputs.map((output) => output.slot_id), [
+    'output_alpha',
+    'output_beta',
+  ]);
+  assert.match(packet.review_packet_sha256, /^[a-f0-9]{64}$/);
+  assert.equal('identity_binding' in packet, false);
+  const serialized = JSON.stringify(packet).toLowerCase();
+  for (const token of contract.benchmark_protocol.forbidden_reviewer_identity_tokens) {
+    assert.equal(serialized.includes(token), false, token);
+  }
+});
+
+function parityIdentityBinding(packet, reviews, hashBlindParityReviewSet) {
+  return {
+    pair_id: packet.pair_id,
+    review_packet_sha256: packet.review_packet_sha256,
+    sealed_binding_ref: 'binding:blind-pair-001',
+    revealed_after_scoring: true,
+    review_set_sha256: hashBlindParityReviewSet(reviews),
+    candidate_slot_id: 'output_alpha',
+    reference_slot_id: 'output_beta',
+  };
+}
+
+function blindReviews(packet, count, {
+  candidateScore = 82,
+  referenceScore = 84,
+  candidateCriticalReviewers = [],
+  referenceCriticalReviewers = [],
+} = {}) {
+  const dimensions = parityContract().review_protocol.dimensions;
+  return Array.from({ length: count }, (_, index) => {
+    const reviewerId = `reviewer-${index + 1}`;
+    const alphaScore = Array.isArray(candidateScore) ? candidateScore[index] : candidateScore;
+    const betaScore = Array.isArray(referenceScore) ? referenceScore[index] : referenceScore;
+    return {
+      review_id: `blind-review-${index + 1}`,
+      reviewer_id: reviewerId,
+      review_packet_sha256: packet.review_packet_sha256,
+      attestations: {
+        independent: true,
+        provider_identity_unseen: true,
+      },
+      scores: {
+        output_alpha: Object.fromEntries(dimensions.map((dimension) => [dimension, alphaScore])),
+        output_beta: Object.fromEntries(dimensions.map((dimension) => [dimension, betaScore])),
+      },
+      critical_defects: {
+        output_alpha: candidateCriticalReviewers.includes(index) ? [`critical-alpha-${index + 1}`] : [],
+        output_beta: referenceCriticalReviewers.includes(index) ? [`critical-beta-${index + 1}`] : [],
+      },
+    };
+  });
+}
+
+function editResults(status = 'passed') {
+  return anonymousPairManifest().source_lock.edit_requirements.map((requirement, index) => ({
+    slot_id: 'output_alpha',
+    task_id: requirement.task_id,
+    status,
+    edited_artifact_sha256: String(index + 2).repeat(64).slice(0, 64),
+  }));
+}
+
+test('blind parity evaluation blocks insufficient independent scoring without issuing a receipt', async () => {
+  const {
+    buildBlindParityReviewPacket,
+    evaluateBlindPptParity,
+    hashBlindParityReviewSet,
+  } = await parityEvaluator();
+  assert.equal(typeof evaluateBlindPptParity, 'function');
+  assert.equal(typeof hashBlindParityReviewSet, 'function');
+  const contract = parityContract();
+  const pairManifest = anonymousPairManifest();
+  const packet = buildBlindParityReviewPacket({ contract, pairManifest });
+  const reviews = blindReviews(packet, 2);
+  const verdict = evaluateBlindPptParity({
+    contract,
+    pairManifest,
+    identityBinding: parityIdentityBinding(packet, reviews, hashBlindParityReviewSet),
+    reviews,
+    editTaskResults: editResults(),
+  });
+
+  assert.equal(verdict.status, 'blocked');
+  assert.equal(verdict.evidence_state, 'pending_independent_scoring');
+  assert.equal(verdict.blockers.some((item) => item.code === 'insufficient_independent_reviewers'), true);
+  assert.equal(verdict.authority.owner_verdict_claimed, false);
+  assert.equal(verdict.authority.can_sign_owner_receipt, false);
+  assert.equal(verdict.authority.owner_receipt_ref, null);
+  assert.equal('owner_receipt' in verdict, false);
+});
+
+async function evaluateParity({ reviews, edits = editResults() }) {
+  const {
+    buildBlindParityReviewPacket,
+    evaluateBlindPptParity,
+    hashBlindParityReviewSet,
+  } = await parityEvaluator();
+  const contract = parityContract();
+  const pairManifest = anonymousPairManifest();
+  const packet = buildBlindParityReviewPacket({ contract, pairManifest });
+  const reviewSet = reviews(packet);
+  return evaluateBlindPptParity({
+    contract,
+    pairManifest,
+    identityBinding: parityIdentityBinding(packet, reviewSet, hashBlindParityReviewSet),
+    reviews: reviewSet,
+    editTaskResults: edits,
+  });
+}
+
+test('paired four-dimension lower bounds can produce a non-authoritative pass candidate', async () => {
+  const verdict = await evaluateParity({
+    reviews: (packet) => blindReviews(packet, 5, {
+      candidateScore: [83, 81, 82, 84, 80],
+      referenceScore: [84, 84, 84, 84, 84],
+    }),
+  });
+
+  assert.equal(verdict.status, 'pass_candidate');
+  assert.equal(verdict.evidence_state, 'complete_candidate_evidence');
+  assert.deepEqual(Object.keys(verdict.dimension_results), parityContract().review_protocol.dimensions);
+  for (const result of Object.values(verdict.dimension_results)) {
+    assert.equal(result.sample_count, 5);
+    assert.equal(result.mean_difference_percentage_points, -2);
+    assert.ok(result.lower_confidence_bound_percentage_points > -5);
+    assert.equal(result.status, 'passed');
+  }
+  assert.deepEqual(verdict.critical_defect_rates, { candidate: 0, reference: 0, status: 'passed' });
+  assert.equal(verdict.edit_requirements.status, 'passed');
+  assert.equal(verdict.authority.can_sign_owner_receipt, false);
+  assert.equal(verdict.authority.owner_receipt_ref, null);
+});
+
+test('a dimension below the five-point noninferiority lower bound routes back', async () => {
+  const verdict = await evaluateParity({
+    reviews: (packet) => blindReviews(packet, 5, {
+      candidateScore: [80, 78, 79, 77, 76],
+      referenceScore: [84, 84, 84, 84, 84],
+    }),
+  });
+
+  assert.equal(verdict.status, 'route_back_candidate');
+  assert.equal(Object.values(verdict.dimension_results).every((result) => result.status === 'failed'), true);
+  assert.equal(verdict.failures.some((item) => item.code === 'noninferiority_lower_bound_not_met'), true);
+});
+
+test('candidate critical defect rate above reference routes back', async () => {
+  const verdict = await evaluateParity({
+    reviews: (packet) => blindReviews(packet, 5, {
+      candidateCriticalReviewers: [0],
+    }),
+  });
+
+  assert.equal(verdict.status, 'route_back_candidate');
+  assert.deepEqual(verdict.critical_defect_rates, { candidate: 0.2, reference: 0, status: 'failed' });
+  assert.equal(verdict.failures.some((item) => item.code === 'candidate_critical_defect_rate_exceeds_reference'), true);
+});
+
+test('explicit candidate edit task failure routes back', async () => {
+  const edits = editResults();
+  edits[2].status = 'failed';
+  const verdict = await evaluateParity({
+    reviews: (packet) => blindReviews(packet, 5),
+    edits,
+  });
+
+  assert.equal(verdict.status, 'route_back_candidate');
+  assert.equal(verdict.edit_requirements.status, 'failed');
+  assert.deepEqual(verdict.edit_requirements.failed_task_ids, ['edit-color']);
+  assert.equal(verdict.failures.some((item) => item.code === 'candidate_edit_requirement_failed'), true);
+});
+
+test('missing candidate edit evidence blocks instead of becoming a parity verdict', async () => {
+  const verdict = await evaluateParity({
+    reviews: (packet) => blindReviews(packet, 5),
+    edits: editResults().slice(0, -1),
+  });
+
+  assert.equal(verdict.status, 'blocked');
+  assert.equal(verdict.evidence_state, 'pending_edit_task_evidence');
+  assert.equal(verdict.blockers.some((item) => item.code === 'missing_edit_task_evidence'), true);
+  assert.equal(verdict.authority.owner_receipt_ref, null);
+});
+
+test('provider identity in reviewer-visible output metadata is rejected', async () => {
+  const { buildBlindParityReviewPacket } = await parityEvaluator();
+  const pairManifest = anonymousPairManifest();
+  pairManifest.anonymous_outputs[0].provider_identity = 'anonymous-vendor';
+
+  assert.throws(
+    () => buildBlindParityReviewPacket({ contract: parityContract(), pairManifest }),
+    /reviewer-visible output field provider_identity is not allowed/,
+  );
+});
+
+test('private provider mapping must bind the exact completed blind review set', async () => {
+  const {
+    buildBlindParityReviewPacket,
+    evaluateBlindPptParity,
+    hashBlindParityReviewSet,
+  } = await parityEvaluator();
+  const contract = parityContract();
+  const pairManifest = anonymousPairManifest();
+  const packet = buildBlindParityReviewPacket({ contract, pairManifest });
+  const reviews = blindReviews(packet, 5);
+  const identityBinding = parityIdentityBinding(packet, reviews, hashBlindParityReviewSet);
+  reviews[0].scores.output_alpha.professionality = 100;
+
+  const verdict = evaluateBlindPptParity({
+    contract,
+    pairManifest,
+    identityBinding,
+    reviews,
+    editTaskResults: editResults(),
+  });
+
+  assert.equal(verdict.status, 'blocked');
+  assert.equal(verdict.evidence_state, 'pending_private_identity_binding');
+  assert.equal(verdict.blockers.some((item) => item.code === 'review_set_binding_mismatch'), true);
+  assert.equal(verdict.authority.owner_receipt_ref, null);
+});
 
 function canonicalBenchmark() {
   const fixture = readJson('tests/fixtures/ppt-native-visual-benchmark/benchmark.json');

@@ -1,0 +1,116 @@
+{
+  "schema_version": 1,
+  "contract_id": "rca_ppt_master_same_source_blind_parity_benchmark_v1",
+  "state": "non_live_harness_landed_live_evidence_pending",
+  "owner": "RedCube AI",
+  "purpose": "Define a fail-closed same-source blind A/B evidence package for non-inferiority review without importing the upstream runtime or granting receipt authority to the harness.",
+  "machine_boundary": "This contract and its evaluator can emit evidence candidates only. They do not run either provider, conduct live review, or sign a visual-ready or parity owner receipt.",
+  "external_source": {
+    "repository": "https://github.com/hugohe3/ppt-master.git",
+    "commit": "b0beba5b659c664bdbf0c07227fbdee313698dd7",
+    "role": "read_only_pattern_and_reference_output_source",
+    "runtime_owned_by_rca": false
+  },
+  "learning_landing": [
+    {
+      "pattern": "same_source_blind_comparison",
+      "classification": "adopt",
+      "local_owner_surface": "tools/native-ppt-proof/ppt-master-parity.ts",
+      "acceptance_evidence": "anonymous review packet and independent paired scores"
+    },
+    {
+      "pattern": "visual_noninferiority_with_editability_and_stability",
+      "classification": "adapt",
+      "local_owner_surface": "contracts/runtime-program/ppt-master-parity-benchmark.json",
+      "acceptance_evidence": "paired lower bound, defect rate, and edit task evidence"
+    },
+    {
+      "pattern": "ppt_master_runtime_or_provider_protocol",
+      "classification": "reject",
+      "local_owner_surface": null,
+      "reason": "RCA keeps its existing Stage, professional Skill, native helper, and review authority boundaries."
+    }
+  ],
+  "benchmark_protocol": {
+    "pair_manifest_kind": "rca_ppt_same_source_anonymous_pair",
+    "same_source_lock": {
+      "required_fields": [
+        "material_bundle_ref",
+        "material_bundle_sha256",
+        "page_count",
+        "audience",
+        "brand_constraints",
+        "edit_requirements"
+      ],
+      "applies_identically_to_both_outputs": true,
+      "minimum_edit_requirement_count": 1
+    },
+    "anonymous_output_count": 2,
+    "reviewer_visible_output_fields": [
+      "slot_id",
+      "artifact_ref",
+      "pptx_sha256",
+      "render_manifest_ref",
+      "package_readback_ref"
+    ],
+    "reviewer_visible_provider_identity": false,
+    "identity_binding_surface": "post_review_private_binding",
+    "review_set_binding": {
+      "algorithm": "sha256",
+      "canonicalization": "recursive_object_key_sort_and_reviewer_id_review_id_sort",
+      "required_in_private_binding": true
+    },
+    "forbidden_reviewer_identity_tokens": [
+      "rca",
+      "redcube",
+      "ppt-master",
+      "ppt_master",
+      "hugohe3"
+    ]
+  },
+  "review_protocol": {
+    "dimensions": [
+      "professionality",
+      "aesthetics",
+      "stability",
+      "editability"
+    ],
+    "score_scale": {
+      "minimum": 0,
+      "maximum": 100
+    },
+    "critical_defects_required": true,
+    "minimum_independent_reviewers": 5,
+    "minimum_paired_scores_per_dimension": 5,
+    "reviewer_attestations": [
+      "independent",
+      "provider_identity_unseen"
+    ]
+  },
+  "acceptance": {
+    "noninferiority_method": "paired_mean_difference_conservative_student_t_lower_bound",
+    "confidence_multiplier": 2.776,
+    "confidence_multiplier_basis": "two_sided_95_percent_student_t_critical_value_df_4_applied_conservatively_for_all_n_gte_5",
+    "noninferiority_margin_percentage_points": 5,
+    "dimension_policy": "all_dimensions_pass",
+    "critical_defect_rate_policy": "candidate_lte_reference",
+    "candidate_edit_requirements_policy": "all_passed"
+  },
+  "evidence_boundary": {
+    "allowed_outcomes": [
+      "pass_candidate",
+      "route_back_candidate",
+      "blocked"
+    ],
+    "insufficient_evidence_outcome": "blocked",
+    "blocked_evidence_state": "pending_independent_scoring_or_complete_edit_evidence",
+    "parity_owner_receipt_emitted": false
+  },
+  "authority": {
+    "owner": "RedCube AI",
+    "owner_receipt_signer": "RedCube AI",
+    "can_sign_owner_receipt": false,
+    "candidate_only": true,
+    "receipt_requires_fresh_owner_review": true
+  }
+}
