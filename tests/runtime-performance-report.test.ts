@@ -109,6 +109,32 @@ test('buildPerformanceReport aggregates route telemetry, child calls, review sco
   assert.equal(report.review_history.blocked_checks.block_content_fit_ok, 1);
 });
 
+test('buildPerformanceReport includes matching artifacts under hidden paths', () => {
+  const workspaceRoot = mkdtempWorkspace();
+  const deliverableDir = path.join(workspaceRoot, 'topics', 'topic-a', 'deliverables', 'deck-a');
+
+  writeJson(path.join(workspaceRoot, 'runtime', 'runs', '.archive', '.run.json'), {
+    route: 'hidden_route',
+    topic_id: 'topic-a',
+    deliverable_id: 'deck-a',
+    status: 'completed',
+  });
+  writeJson(path.join(deliverableDir, 'artifacts', 'render_batches', '.archive', '.batch.json'), {
+    cache_status: 'hidden',
+  });
+  writeJson(path.join(deliverableDir, 'reports', 'screenshots', '.capture', 'capture-manifest.json'), {
+    capture_mode: 'hidden',
+    slide_count: 1,
+  });
+
+  const report = buildPerformanceReport({ workspaceRoot, topicId: 'topic-a', deliverableId: 'deck-a' });
+
+  assert.equal(report.totals.route_run_count, 1);
+  assert.equal(report.routes.hidden_route.status_counts.completed, 1);
+  assert.equal(report.render_batches.count, 1);
+  assert.equal(report.capture_manifests.count, 1);
+});
+
 test('performance report is exposed through domain entry and CLI surfaces', async () => {
   const workspaceRoot = mkdtempWorkspace();
   writeJson(path.join(workspaceRoot, 'runtime', 'runs', 'run-1.json'), {

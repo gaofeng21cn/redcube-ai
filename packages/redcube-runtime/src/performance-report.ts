@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { existsSync, globSync, readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 
 import { resolveWorkspaceContract } from '@redcube/runtime-protocol';
 
@@ -49,8 +49,13 @@ function readJsonFile(file: string): JsonRecord | null {
   }
 }
 
-function globFiles(root: string, pattern: string): string[] {
-  return globSync(pattern, { cwd: root }).map((file) => path.join(root, file)).sort();
+function listFiles(root: string, predicate: (file: string) => boolean): string[] {
+  if (!existsSync(root)) return [];
+  return readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.join(entry.parentPath, entry.name))
+    .filter(predicate)
+    .sort();
 }
 
 function childCallsFromTelemetry(telemetry: JsonRecord): JsonRecord[] {
@@ -274,7 +279,7 @@ export function buildPerformanceReport({
     },
   };
 
-  for (const file of globFiles(path.join(workspace.runtimeDir, 'runs'), '**/*.json')) {
+  for (const file of listFiles(path.join(workspace.runtimeDir, 'runs'), (entry) => entry.endsWith('.json'))) {
     const run = readJsonFile(file);
     if (run && runMatchesFilters(run, topicFilter, deliverableFilter)) {
       addRun(report, run);
@@ -282,10 +287,10 @@ export function buildPerformanceReport({
   }
 
   for (const deliverableRoot of deliverableRoots(workspace.workspaceRoot, topicFilter, deliverableFilter)) {
-    for (const file of globFiles(path.join(deliverableRoot, 'artifacts', 'render_batches'), '**/*.json')) {
+    for (const file of listFiles(path.join(deliverableRoot, 'artifacts', 'render_batches'), (entry) => entry.endsWith('.json'))) {
       addRenderBatch(report, file);
     }
-    for (const file of globFiles(path.join(deliverableRoot, 'reports', 'screenshots'), '**/capture-manifest.json')) {
+    for (const file of listFiles(path.join(deliverableRoot, 'reports', 'screenshots'), (entry) => path.basename(entry) === 'capture-manifest.json')) {
       addCaptureManifest(report, file);
     }
     addReviewHistory(report, path.join(deliverableRoot, 'reports', 'review-history.jsonl'));
