@@ -11,7 +11,7 @@
     "@redcube/overlay-core": "0.1.0",
     "@redcube/runtime": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
-    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#d7f0593d943c0c0a85235e6964e66d2b50a098a8"
+    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#e1e734031ab3ea45596c6ce131f611f296ca9746"
   },
   "license": "Apache-2.0"
 }
