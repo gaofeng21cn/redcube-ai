@@ -212,7 +212,7 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
   });
 });
 
-test('ppt claim spine lock remains canonical across story stages and reaches visual direction', async () => {
+test('ppt claim spine lock remains canonical across story stages and reaches visual direction', { concurrency: false }, async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-lock-'));
     const runRoute = (deliverableId, route) => runDeliverableRoute({
@@ -309,6 +309,25 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
       );
     }
 
+    const tamperedBlueprint = structuredClone(blueprint);
+    const tamperedVisual = structuredClone(visual);
+    tamperedBlueprint.slide_blueprint.claim_spine_lock[0].claim_text = '同步篡改后的下游判断';
+    tamperedVisual.visual_direction.claim_spine_lock[0].claim_text = '同步篡改后的下游判断';
+    writeFileSync(blueprintFile, `${JSON.stringify(tamperedBlueprint, null, 2)}\n`);
+    writeFileSync(visualFile, `${JSON.stringify(tamperedVisual, null, 2)}\n`);
+    for (const route of ['author_image_pages', 'author_pptx_native']) {
+      assert.throws(
+        () => stageParts.ensurePrerequisites({
+          workspaceRoot,
+          topicId: 'topic-claim-lock',
+          deliverableId: 'deck-claim-lock',
+          route,
+          mode: 'draft_new',
+        }),
+        /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+      );
+    }
+
     await createDeliverable({
       workspaceRoot,
       overlay: 'ppt_deck',
@@ -337,7 +356,7 @@ test('ppt claim spine lock remains canonical across story stages and reaches vis
   });
 });
 
-test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings', async () => {
+test('ppt claim spine lock rejects duplicate, oversized, and reversed mappings', { concurrency: false }, async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-spine-invalid-'));
     const variants = [

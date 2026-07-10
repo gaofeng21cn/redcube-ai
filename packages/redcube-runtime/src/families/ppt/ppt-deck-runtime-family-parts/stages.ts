@@ -169,6 +169,8 @@ export function createPptDeckStageParts(deps) {
     if (deps.STAGE_REQUIREMENTS?.[route]
       && !['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction'].includes(route)) {
       assertClaimSpineArtifactContinuity(
+        readStageArtifact(contract, deliverablePaths, 'storyline'),
+        readStageArtifact(contract, deliverablePaths, 'detailed_outline'),
         readStageArtifact(contract, deliverablePaths, 'slide_blueprint'),
         readStageArtifact(contract, deliverablePaths, 'visual_direction'),
       );

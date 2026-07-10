@@ -131,9 +131,29 @@ export function createPptDeckAuthoringNormalizers(deps) {
     }
   }
 
-  function assertClaimSpineArtifactContinuity(blueprintArtifact, visualArtifact) {
-    const blueprintLock = normalizeClaimSpineLock(
+  function assertClaimSpineArtifactContinuity(
+    storylineArtifact,
+    outlineArtifact,
+    blueprintArtifact,
+    visualArtifact,
+  ) {
+    const storylineLock = normalizeClaimSpineLock(
+      storylineArtifact?.storyline?.claim_spine_lock,
+      'storyline.claim_spine_lock',
+    );
+    const outlineLock = preserveClaimSpineLock(
+      outlineArtifact?.detailed_outline?.claim_spine_lock,
+      storylineLock,
+      'detailed_outline.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(
+      outlineLock,
+      outlineArtifact?.detailed_outline?.slides,
+      'detailed_outline.claim_spine_lock',
+    );
+    const blueprintLock = preserveClaimSpineLock(
       blueprintArtifact?.slide_blueprint?.claim_spine_lock,
+      storylineLock,
       'slide_blueprint.claim_spine_lock',
     );
     assertClaimSpineSlideMapping(
@@ -143,10 +163,10 @@ export function createPptDeckAuthoringNormalizers(deps) {
     );
     preserveClaimSpineLock(
       visualArtifact?.visual_direction?.claim_spine_lock,
-      blueprintLock,
+      storylineLock,
       'visual_direction.claim_spine_lock',
     );
-    return blueprintLock;
+    return storylineLock;
   }
 
   function normalizeOutlineSlide(slide, index, defaultPublicSources) {

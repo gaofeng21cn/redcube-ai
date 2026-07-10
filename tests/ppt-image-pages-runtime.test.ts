@@ -130,6 +130,22 @@ function seedWorkspace() {
       forbidden_drift: ['Do not replace the claim with route metadata'],
     },
   ];
+  writeStageArtifact(paths, contract, 'storyline', {
+    route: 'storyline',
+    storyline: {
+      claim_spine_lock: claimSpineLock,
+    },
+  });
+  writeStageArtifact(paths, contract, 'detailed_outline', {
+    route: 'detailed_outline',
+    detailed_outline: {
+      claim_spine_lock: claimSpineLock,
+      slides: [
+        { slide_id: 'S01' },
+        { slide_id: 'S02' },
+      ],
+    },
+  });
   writeStageArtifact(paths, contract, 'slide_blueprint', {
     route: 'slide_blueprint',
     slide_blueprint: {
