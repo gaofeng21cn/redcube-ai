@@ -64,7 +64,7 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
       route: 'render_html',
     });
     assert.equal(renderResult.ok, true, 'render_html');
-    const renderArtifactFile = path.join(workspaceRoot, 'topics/topic-a/deliverables/note-a/artifacts/render_bundle.json');
+    const renderArtifactFile = renderResult.artifactFile;
     const renderArtifact = readJson(renderArtifactFile);
     renderArtifact.html_bundle.slides[0].content = renderArtifact.html_bundle.slides[0].content
       .replaceAll('data-qa-block=', 'data-broken-qa-block=')
@@ -92,7 +92,7 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
     assert.equal(result.run.status, 'quality_blocked');
     assert.equal(result.run.error_kind, 'quality_blocked');
     assert.equal(result.run.error.failure_kind, 'quality_blocked');
-    const qualityGate = readJson(path.join(workspaceRoot, 'topics/topic-a/deliverables/note-a/artifacts/quality_gate.json'));
+    const qualityGate = readJson(result.artifactFile);
     assert.equal(qualityGate.status, 'block');
     assert.equal(qualityGate.preflight_gate.status, 'block');
     assert.equal(qualityGate.preflight_gate.ai_review_skipped, true);
@@ -138,7 +138,7 @@ test('ppt screenshot_review fails fast on deterministic HTML preflight before AI
       route: 'render_html',
     });
     assert.equal(renderResult.ok, true, 'render_html');
-    const renderArtifactFile = path.join(workspaceRoot, 'topics/topic-a/deliverables/deck-a/artifacts/render_bundle.json');
+    const renderArtifactFile = renderResult.artifactFile;
     const renderArtifact = readJson(renderArtifactFile);
     renderArtifact.html_bundle.slides[0].content = renderArtifact.html_bundle.slides[0].content
       .replaceAll('data-qa-block=', 'data-broken-qa-block=')
@@ -166,7 +166,7 @@ test('ppt screenshot_review fails fast on deterministic HTML preflight before AI
     });
 
     assert.equal(result.ok, false);
-    const qualityGate = readJson(path.join(workspaceRoot, 'topics/topic-a/deliverables/deck-a/artifacts/quality_gate.json'));
+    const qualityGate = readJson(result.artifactFile);
     assert.equal(qualityGate.status, 'block');
     assert.equal(qualityGate.preflight_gate.status, 'block');
     assert.equal(qualityGate.preflight_gate.ai_review_skipped, true);

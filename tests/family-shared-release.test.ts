@@ -7,6 +7,7 @@ import path from 'node:path';
 
 import { assertCurrentRepoSharedPinAlignment } from '../scripts/run-test-group-lib.ts';
 import { buildVerifyLanePlan } from '../scripts/test-registry.ts';
+import { REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH } from './helpers/opl-agent-pack-contracts.ts';
 
 test('root and domain manifests plus lock stay aligned with the current OPL family shared release contract', () => {
   const inspection = assertCurrentRepoSharedPinAlignment({
@@ -54,7 +55,7 @@ test('stale exact lock receipt remains nonblocking when manifests follow latest-
   const staleCommit = 'a'.repeat(40);
 
   try {
-    const contractPath = path.join(ownerRepoRoot, 'contracts/family-release/shared-owner-release.json');
+    const contractPath = path.join(ownerRepoRoot, REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH);
     mkdirSync(path.dirname(contractPath), { recursive: true });
     writeFileSync(contractPath, JSON.stringify({
       contract_kind: 'family_shared_owner_release.v2',
