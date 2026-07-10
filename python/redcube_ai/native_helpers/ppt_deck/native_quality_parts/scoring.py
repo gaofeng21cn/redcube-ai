@@ -59,8 +59,8 @@ def quality_checks(context: dict) -> dict:
             MIN_NATIVE_DENSITY <= context['occupied_ratio'] <= MAX_NATIVE_DENSITY
             and context['card_blank_ratio'] <= MAX_TABLE_CELL_BLANK_RATIO
         ),
-        'visual_structure_present': context['structural_visual_count'] >= 1,
-        'non_text_visual_specific_ok': context['structural_visual_count'] >= 1,
+        'visual_structure_present': context['semantic_visual_evidence_count'] >= 1,
+        'non_text_visual_specific_ok': context['semantic_visual_evidence_count'] >= 1,
         'mechanical_card_template_absent': not context['mechanical_card_template_detected'],
         'panel_text_safe_area_ok': len(context['panel_safe_area_failures']) == 0,
         'text_card_internal_padding_ok': len(context['card_padding_failures']) == 0,

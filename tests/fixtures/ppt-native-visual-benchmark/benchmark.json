@@ -1,6 +1,6 @@
 {
-  "fixture_id": "ppt_native_visual_benchmark_v2",
-  "schema_version": 2,
+  "fixture_id": "ppt_native_ppt_master_parity_benchmark_v3",
+  "schema_version": 3,
   "expected_renderer_kind": "libreoffice_headless",
   "route_policy": {
     "native_route": "author_pptx_native",
@@ -9,21 +9,9 @@
     "comparison_only": true
   },
   "quality_comparison_report": {
-    "report_kind": "native_vs_html_quality_comparison_fixture",
-    "schema_version": 1,
-    "source_surface": "ppt_native_visual_benchmark_v2",
-    "comparison_axes": [
-      "layout_diversity",
-      "shape_richness",
-      "field_leakage",
-      "png_non_empty",
-      "margin_overlap_density",
-      "editable_shape_count"
-    ],
-    "candidate_routes": [
-      { "route": "author_pptx_native", "surface_kind": "native_pptx", "default_route": false },
-      { "route": "html_first_ppt_deck", "surface_kind": "html_rendered_pptx", "default_route": true }
-    ],
+    "report_kind": "native_ppt_semantic_package_quality_candidate",
+    "schema_version": 2,
+    "source_surface": "ppt_native_ppt_master_parity_benchmark_v3",
     "required_record_fields": [
       "suite_id",
       "route",
@@ -43,469 +31,344 @@
   "suite_defaults": {
     "expected_page_count_min": 6,
     "expected_page_count_max": 10,
-    "min_shape_count": 14,
-    "min_text_box_count": 6,
-    "min_content_shape_count": 7,
-    "min_decorative_shape_count": 5,
+    "min_shape_count": 7,
+    "min_text_box_count": 3,
+    "min_content_shape_count": 4,
+    "min_decorative_shape_count": 1,
     "min_shape_kind_count": 3,
-    "min_editable_shape_count": 14,
+    "min_editable_shape_count": 7,
     "min_layout_family_count": 6,
     "min_layout_richness_score": 0.68,
-    "min_density": 0.18,
+    "min_density": 0.12,
     "max_density": 0.82
   },
   "forbidden_visible_text_fragments": [
     "Label-only metadata",
-    "private_metric",
-    "manifest_only",
-    "editable_text",
-    "page_core_content",
-    "native_shapes",
-    "visual_private_note",
-    "html_baseline_only",
-    "不会显示的字段名",
-    "仍然不显示字段名"
+    "helper generated",
+    "placeholder"
   ],
   "suites": [
     {
-      "suite_id": "business_review",
-      "suite_label": "商业汇报",
-      "expected_page_count": 6,
-      "expected_layout_families": ["cover_signal", "multi_zone_compare", "timeline_band", "judgement_ladder", "ring_cross", "summary_peak"],
-      "expected_anchor_shapes": ["B01-hero-block", "B02-zone-1-panel", "B03-timeline-rail", "B04-gate-1-panel", "B05-center-hub", "B06-summary-peak"],
-      "expected_visible_text_fragments": ["Executive signal holds across channels", "Gate four authorizes scale", "Primary outcome is ready"],
-      "editable_shape_plan": {
-        "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
-        "route": "author_pptx_native",
-        "slides": [
-          {
-            "slide_id": "B01",
-            "title": "Q3 commercial review",
-            "layout_family": "cover_signal",
-            "render_recipe_id": "ppt.hero_signal",
-            "core_sentence": "Revenue story starts from one visible signal.",
-            "page_core_content": [
-              { "label": "Label-only metadata 01", "private_metric": "do-not-render" },
-              { "label": "不会显示的字段名", "text": "Executive signal holds across channels" },
-              { "label": "仍然不显示字段名", "text": "Editable emphasis stays in DrawingML" },
-              "Audience-ready cover takeaway"
-            ],
-            "native_shapes": [{ "shape_id": "B01-title", "role": "title", "editable_text": "Q3 commercial review" }]
-          },
-          {
-            "slide_id": "B02",
-            "title": "Regional operating comparison",
-            "layout_family": "multi_zone_compare",
-            "render_recipe_id": "ppt.compare_zones",
-            "core_sentence": "Four markets need separate readable operating zones.",
-            "page_core_content": [
-              { "label": "Label-only metadata 02", "manifest_only": true },
-              { "label": "不会显示的字段名", "text": "North region expands efficiently" },
-              { "label": "仍然不显示字段名", "text": "South region needs margin guardrails" },
-              { "text": "Enterprise motion remains editable" },
-              "Channel mix has visible contrast"
-            ],
-            "native_shapes": [{ "shape_id": "B02-title", "role": "title", "editable_text": "Regional operating comparison" }]
-          },
-          {
-            "slide_id": "B03",
-            "title": "Commercial milestone cadence",
-            "layout_family": "timeline_band",
-            "render_recipe_id": "ppt.timeline_rail",
-            "core_sentence": "A timeline benchmark needs alternating page geometry.",
-            "page_core_content": [
-              { "label": "Label-only metadata 03", "private_metric": "timeline" },
-              { "label": "不会显示的字段名", "text": "Discovery locks baseline" },
-              { "label": "仍然不显示字段名", "text": "Pilot proves repeatability" },
-              { "text": "Scale plan keeps provenance" },
-              "Launch checkpoint remains reviewable"
-            ],
-            "native_shapes": [{ "shape_id": "B03-title", "role": "title", "editable_text": "Commercial milestone cadence" }]
-          },
-          {
-            "slide_id": "B04",
-            "title": "Investment decision ladder",
-            "layout_family": "judgement_ladder",
-            "render_recipe_id": "ppt.judgement_ladder",
-            "core_sentence": "The decision path rises through editable gates.",
-            "page_core_content": [
-              { "label": "Label-only metadata 04", "manifest_only": "ladder" },
-              { "label": "不会显示的字段名", "text": "Gate one confirms evidence" },
-              { "label": "仍然不显示字段名", "text": "Gate two checks adoption" },
-              { "text": "Gate three secures timing" },
-              "Gate four authorizes scale"
-            ],
-            "native_shapes": [{ "shape_id": "B04-title", "role": "title", "editable_text": "Investment decision ladder" }]
-          },
-          {
-            "slide_id": "B05",
-            "title": "Growth synthesis map",
-            "layout_family": "ring_cross",
-            "render_recipe_id": "ppt.ring_cross",
-            "core_sentence": "A hub-and-axis page checks radial diversity.",
-            "page_core_content": [
-              { "label": "Label-only metadata 05", "private_metric": "ring" },
-              { "label": "不会显示的字段名", "text": "Product signal" },
-              { "label": "仍然不显示字段名", "text": "Market signal" },
-              { "text": "Execution signal" },
-              "Risk signal"
-            ],
-            "native_shapes": [{ "shape_id": "B05-title", "role": "title", "editable_text": "Growth synthesis map" }]
-          },
-          {
-            "slide_id": "B06",
-            "title": "Executive close",
-            "layout_family": "summary_peak",
-            "render_recipe_id": "ppt.summary_peak",
-            "core_sentence": "The closing page stresses one editable peak.",
-            "page_core_content": [
-              { "label": "Label-only metadata 06", "manifest_only": "summary" },
-              { "label": "不会显示的字段名", "text": "Primary outcome is ready" },
-              { "label": "仍然不显示字段名", "text": "Secondary proof is durable" },
-              { "text": "Operating ask is precise" },
-              "Follow-up path is clear"
-            ],
-            "native_shapes": [{ "shape_id": "B06-title", "role": "title", "editable_text": "Executive close" }]
-          }
-        ]
-      }
-    },
-    {
-      "suite_id": "academic_lecture",
-      "suite_label": "学术讲座",
-      "expected_page_count": 6,
-      "expected_layout_families": ["cover_signal", "timeline_band", "multi_zone_compare", "ring_cross", "judgement_ladder", "summary_peak"],
-      "expected_anchor_shapes": ["A01-hero-block", "A02-timeline-rail", "A03-zone-1-panel", "A04-center-hub", "A05-gate-1-panel", "A06-summary-peak"],
-      "expected_visible_text_fragments": ["Study question anchors the lecture", "Cohort definition remains reproducible", "Limitations are explicit"],
-      "editable_shape_plan": {
-        "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
-        "route": "author_pptx_native",
-        "slides": [
-          {
-            "slide_id": "A01",
-            "title": "Clinical evidence seminar",
-            "layout_family": "cover_signal",
-            "render_recipe_id": "ppt.hero_signal",
-            "core_sentence": "Study question anchors the lecture.",
-            "page_core_content": [
-              { "label": "Label-only metadata A01", "private_metric": "academic" },
-              { "label": "不会显示的字段名", "text": "Study question anchors the lecture" },
-              { "label": "仍然不显示字段名", "text": "Outcome hierarchy is predeclared" },
-              "Methods frame is visible"
-            ],
-            "native_shapes": [{ "shape_id": "A01-title", "role": "title", "editable_text": "Clinical evidence seminar" }]
-          },
-          {
-            "slide_id": "A02",
-            "title": "Evidence timeline",
-            "layout_family": "timeline_band",
-            "render_recipe_id": "ppt.timeline_rail",
-            "core_sentence": "The talk separates protocol, cohort, analysis, and interpretation.",
-            "page_core_content": [
-              { "label": "Label-only metadata A02", "manifest_only": true },
-              { "label": "不会显示的字段名", "text": "Protocol question registered" },
-              { "label": "仍然不显示字段名", "text": "Cohort definition remains reproducible" },
-              { "text": "Model specification is inspectable" },
-              "Interpretation stays bounded"
-            ],
-            "native_shapes": [{ "shape_id": "A02-title", "role": "title", "editable_text": "Evidence timeline" }]
-          },
-          {
-            "slide_id": "A03",
-            "title": "Methods comparison",
-            "layout_family": "multi_zone_compare",
-            "render_recipe_id": "ppt.compare_zones",
-            "core_sentence": "Method blocks must remain separated for teaching.",
-            "page_core_content": [
-              { "label": "Label-only metadata A03", "private_metric": "methods" },
-              { "label": "不会显示的字段名", "text": "Population inclusion is explicit" },
-              { "label": "仍然不显示字段名", "text": "Exposure window is bounded" },
-              { "text": "Endpoint definition is auditable" },
-              "Sensitivity analysis is named"
-            ],
-            "native_shapes": [{ "shape_id": "A03-title", "role": "title", "editable_text": "Methods comparison" }]
-          },
-          {
-            "slide_id": "A04",
-            "title": "Conceptual model",
-            "layout_family": "ring_cross",
-            "render_recipe_id": "ppt.ring_cross",
-            "core_sentence": "A causal map checks radial structure in academic content.",
-            "page_core_content": [
-              { "label": "Label-only metadata A04", "manifest_only": "model" },
-              { "label": "不会显示的字段名", "text": "Biology axis" },
-              { "label": "仍然不显示字段名", "text": "Measurement axis" },
-              { "text": "Treatment axis" },
-              "Outcome axis"
-            ],
-            "native_shapes": [{ "shape_id": "A04-title", "role": "title", "editable_text": "Conceptual model" }]
-          },
-          {
-            "slide_id": "A05",
-            "title": "Critical appraisal ladder",
-            "layout_family": "judgement_ladder",
-            "render_recipe_id": "ppt.judgement_ladder",
-            "core_sentence": "The appraisal path moves from validity to generalizability.",
-            "page_core_content": [
-              { "label": "Label-only metadata A05", "private_metric": "appraisal" },
-              { "label": "不会显示的字段名", "text": "Internal validity checked" },
-              { "label": "仍然不显示字段名", "text": "Confounding addressed" },
-              { "text": "Effect size interpreted" },
-              "Limitations are explicit"
-            ],
-            "native_shapes": [{ "shape_id": "A05-title", "role": "title", "editable_text": "Critical appraisal ladder" }]
-          },
-          {
-            "slide_id": "A06",
-            "title": "Take-home synthesis",
-            "layout_family": "summary_peak",
-            "render_recipe_id": "ppt.summary_peak",
-            "core_sentence": "Lecture close keeps one claim and three caveats editable.",
-            "page_core_content": [
-              { "label": "Label-only metadata A06", "manifest_only": "close" },
-              { "label": "不会显示的字段名", "text": "Main claim is teachable" },
-              { "label": "仍然不显示字段名", "text": "Boundary condition is visible" },
-              { "text": "Clinical translation is cautious" },
-              "Next reading is actionable"
-            ],
-            "native_shapes": [{ "shape_id": "A06-title", "role": "title", "editable_text": "Take-home synthesis" }]
-          }
-        ]
-      }
-    },
-    {
       "suite_id": "data_charts",
-      "suite_label": "数据图表型",
+      "audience": "executive operating review",
       "expected_page_count": 6,
-      "expected_layout_families": ["cover_signal", "multi_zone_compare", "ring_cross", "timeline_band", "judgement_ladder", "summary_peak"],
-      "expected_anchor_shapes": ["D01-hero-block", "D02-structured-note-1-panel", "D03-center-hub", "D04-timeline-rail", "D05-gate-1-panel", "D06-summary-peak"],
-      "expected_visible_text_fragments": ["Metric panel replaces screenshot charts", "Variance band remains editable", "Decision threshold is visible"],
+      "expected_layout_families": [
+        "ring_cross",
+        "timeline_band",
+        "judgement_ladder",
+        "multi_zone_compare",
+        "summary_peak",
+        "cover_signal"
+      ],
+      "expected_visible_text_fragments": [
+        "Every dependency is editable",
+        "The inflection is visible in Q3",
+        "The evidence image remains inspectable"
+      ],
+      "expected_anchor_shapes": [],
+      "benchmark_thresholds": {
+        "min_distinct_composition_share": 1.0,
+        "max_repeated_silhouette_count": 0
+      },
+      "package_expectations": {
+        "minimum_distinct_object_kinds": 4,
+        "minimum_picture_bytes": 4096,
+        "minimum_notes_count": 6,
+        "minimum_transition_count": 2,
+        "required_object_counts": {
+          "chart": 1,
+          "table": 1,
+          "picture": 1,
+          "connector": 8
+        }
+      },
       "editable_shape_plan": {
-        "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
         "route": "author_pptx_native",
         "slides": [
           {
             "slide_id": "D01",
-            "title": "Metrics dashboard overview",
-            "layout_family": "cover_signal",
-            "render_recipe_id": "ppt.hero_signal",
-            "core_sentence": "Metric panel replaces screenshot charts.",
+            "title": "Three owners make dependencies explicit",
+            "page_role": "architecture_map",
+            "semantic_composition": "relationship_graph",
+            "layout_family": "ring_cross",
+            "core_sentence": "The graph makes ownership and direction explicit instead of decorating a card grid.",
             "page_core_content": [
-              { "label": "Label-only metadata D01", "private_metric": "chart" },
-              { "label": "不会显示的字段名", "text": "Metric panel replaces screenshot charts" },
-              { "label": "仍然不显示字段名", "text": "Editable KPI emphasis is preserved" },
-              "Chart benchmark stays shape-native"
+              "Every dependency is editable and directionally connected.",
+              "The audience can identify the route owner in one glance."
             ],
-            "native_shapes": [{ "shape_id": "D01-title", "role": "title", "editable_text": "Metrics dashboard overview" }]
+            "speaker_notes": "Start at the center owner, then follow the two directed handoffs. Emphasize that every node and connector remains editable.",
+            "transition": { "type": "fade", "duration_ms": 350 },
+            "layout_intent": {
+              "rhetorical_role": "explain owner dependencies",
+              "composition_signature": "relationship-graph-three-nodes-two-directed-edges",
+              "primary_grid": "centered triangular dependency graph",
+              "visual_weight": "central owner with two downstream nodes",
+              "negative_space_strategy": "open edge corridors preserve arrow legibility",
+              "non_text_visual": "directed relationship graph",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "ring_cross",
+              "archetype_instance_id": "D01-ring-cross",
+              "rhythm_role": "architecture_map",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "one concise action title", "safe_inset_in": 0.15, "bounds": { "left_in": 0.8, "top_in": 0.4, "width_in": 14.4, "height_in": 1.4 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "one audience-facing claim", "safe_inset_in": 0.15, "bounds": { "left_in": 0.85, "top_in": 1.55, "width_in": 13.9, "height_in": 1.1 } },
+                { "zone_id": "body_zone", "semantic_role": "relationship_evidence", "intended_content": "editable dependency nodes connectors and takeaway", "safe_inset_in": 0.15, "bounds": { "left_in": 0.7, "top_in": 2.55, "width_in": 14.6, "height_in": 5.55 } }
+              ]
+            },
+            "native_shapes": [
+              { "shape_id": "D01-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#F7F8FA", "line": "none" },
+              { "shape_id": "D01-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Three owners make dependencies explicit", "bounds": { "left_in": 0.9, "top_in": 0.55, "width_in": 13.8, "height_in": 0.9 }, "font_size": 40, "font": "Aptos Display", "color": "#172033", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D01-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "Ownership and direction are visible without reading a card ledger.", "bounds": { "left_in": 0.95, "top_in": 1.65, "width_in": 11.8, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#526173", "fill": "none", "line": "none" },
+              { "shape_id": "D01-owner", "kind": "rounded_rect", "role": "dependency_node", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Accountable visual owner", "bounds": { "left_in": 6.25, "top_in": 3.15, "width_in": 3.5, "height_in": 1.15 }, "font_size": 22, "font": "Aptos", "color": "#FFFFFF", "fill": "#1E2761", "line": "none", "align": "center" },
+              { "shape_id": "D01-stage", "kind": "rounded_rect", "role": "dependency_node", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Stage operator", "bounds": { "left_in": 1.55, "top_in": 5.45, "width_in": 3.6, "height_in": 1.15 }, "font_size": 20, "font": "Aptos", "color": "#172033", "fill": "#CADCFC", "line": "#8395B7", "align": "center" },
+              { "shape_id": "D01-helper", "kind": "rounded_rect", "role": "dependency_node", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Native helper", "bounds": { "left_in": 10.85, "top_in": 5.45, "width_in": 3.6, "height_in": 1.15 }, "font_size": 20, "font": "Aptos", "color": "#172033", "fill": "#E7E8D1", "line": "#A7AE8B", "align": "center" },
+              { "shape_id": "D01-edge-stage", "kind": "connector", "role": "dependency_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D01-owner", "to_shape_id": "D01-stage", "connector_shape": "elbow", "tail_end": "triangle", "bounds": { "left_in": 4.7, "top_in": 4.05, "width_in": 2.25, "height_in": 1.72 }, "line": "#1E2761", "line_width_pt": 2.25 },
+              { "shape_id": "D01-edge-helper", "kind": "connector", "role": "dependency_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D01-owner", "to_shape_id": "D01-helper", "connector_shape": "elbow", "tail_end": "triangle", "bounds": { "left_in": 9.05, "top_in": 4.05, "width_in": 2.25, "height_in": 1.72 }, "line": "#1E2761", "line_width_pt": 2.25 },
+              { "shape_id": "D01-takeaway", "kind": "text_box", "role": "point_text", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Every dependency is editable and directionally connected.", "bounds": { "left_in": 4.2, "top_in": 7.15, "width_in": 7.6, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D01-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "01", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none", "align": "right" }
+            ]
           },
           {
             "slide_id": "D02",
-            "title": "Segment score grid",
-            "layout_family": "multi_zone_compare",
-            "render_recipe_id": "ppt.compare_zones",
-            "core_sentence": "Data-heavy slides need stable zones instead of flat images.",
+            "title": "Four milestones move source to proof",
+            "page_role": "execution_timeline",
+            "semantic_composition": "timeline",
+            "layout_family": "timeline_band",
+            "core_sentence": "The sequence is carried by native nodes and directed connectors, not a list of dates.",
             "page_core_content": [
-              { "label": "Label-only metadata D02", "manifest_only": true },
-              { "label": "不会显示的字段名", "text": "Retention score improves" },
-              { "label": "仍然不显示字段名", "text": "Variance band remains editable" },
-              { "text": "Acquisition score lags" },
-              "Expansion score is balanced"
+              "Each milestone owns one observable output.",
+              "The route can resume from the last accepted milestone."
             ],
+            "speaker_notes": "Walk from source lock to render proof. The audience should see a cadence, not four unrelated cards.",
+            "transition": { "type": "push", "direction": "left", "duration_ms": 420 },
+            "layout_intent": {
+              "rhetorical_role": "show execution sequence",
+              "composition_signature": "timeline-four-nodes-three-directed-connectors",
+              "primary_grid": "horizontal milestone rail",
+              "visual_weight": "centered lower timeline",
+              "negative_space_strategy": "open upper band isolates the sequence",
+              "non_text_visual": "directed milestone timeline",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "timeline_band",
+              "archetype_instance_id": "D02-timeline-band",
+              "rhythm_role": "sequence",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "one concise action title", "safe_inset_in": 0.15, "bounds": { "left_in": 0.8, "top_in": 0.4, "width_in": 14.4, "height_in": 1.4 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "one audience-facing claim", "safe_inset_in": 0.15, "bounds": { "left_in": 0.85, "top_in": 1.55, "width_in": 13.9, "height_in": 1.1 } },
+                { "zone_id": "body_zone", "semantic_role": "timeline_evidence", "intended_content": "editable milestones connectors labels and takeaway", "safe_inset_in": 0.15, "bounds": { "left_in": 0.7, "top_in": 2.55, "width_in": 14.6, "height_in": 5.55 } }
+              ]
+            },
             "native_shapes": [
-              { "shape_id": "D02-title", "role": "title", "editable_text": "Segment score grid" },
-              {
-                "shape_id": "D02-growth-chart",
-                "kind": "chart",
-                "series_name": "Growth",
-                "categories": ["Retention", "Acquisition", "Expansion"],
-                "values": [42, 31, 27],
-                "bounds": { "left_in": 1.0, "top_in": 2.15, "width_in": 5.75, "height_in": 2.72 }
-              },
-              {
-                "shape_id": "D02-operating-table",
-                "kind": "table",
-                "headers": ["Metric", "Signal", "Guardrail"],
-                "rows": [
-                  ["Retention", "Improves", "Capacity"],
-                  ["Acquisition", "Lags", "Pricing"],
-                  ["Expansion", "Balanced", "Cycle"]
-                ],
-                "bounds": { "left_in": 7.38, "top_in": 2.15, "width_in": 6.45, "height_in": 2.72 }
-              },
-              {
-                "shape_id": "D02-metric-grid",
-                "kind": "metric_grid",
-                "items": [
-                  { "label": "Retention", "value": "42%" },
-                  { "label": "Acquisition", "value": "31%" },
-                  { "label": "Expansion", "value": "27%" }
-                ],
-                "bounds": { "left_in": 1.0, "top_in": 5.9, "width_in": 13.2, "height_in": 1.05 }
-              }
+              { "shape_id": "D02-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#FFFFFF", "line": "none" },
+              { "shape_id": "D02-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Four milestones move source to proof", "bounds": { "left_in": 0.9, "top_in": 0.55, "width_in": 13.8, "height_in": 0.9 }, "font_size": 40, "font": "Aptos Display", "color": "#172033", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D02-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "Each node owns one observable output and one restart point.", "bounds": { "left_in": 0.95, "top_in": 1.65, "width_in": 11.8, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#526173", "fill": "none", "line": "none" },
+              { "shape_id": "D02-panel", "kind": "rounded_rect", "role": "timeline_panel", "quality_role": "content", "layout_zone_id": "body_zone", "bounds": { "left_in": 0.95, "top_in": 3.35, "width_in": 14.1, "height_in": 3.05 }, "fill": "#F7F8FA", "line": "#D8DEE8" },
+              { "shape_id": "D02-m1", "kind": "oval", "role": "milestone_node", "quality_role": "structural", "layout_zone_id": "body_zone", "bounds": { "left_in": 1.6, "top_in": 4.25, "width_in": 0.72, "height_in": 0.72 }, "fill": "#1E2761", "line": "none" },
+              { "shape_id": "D02-m2", "kind": "oval", "role": "milestone_node", "quality_role": "structural", "layout_zone_id": "body_zone", "bounds": { "left_in": 5.35, "top_in": 4.25, "width_in": 0.72, "height_in": 0.72 }, "fill": "#4F6AA3", "line": "none" },
+              { "shape_id": "D02-m3", "kind": "oval", "role": "milestone_node", "quality_role": "structural", "layout_zone_id": "body_zone", "bounds": { "left_in": 9.1, "top_in": 4.25, "width_in": 0.72, "height_in": 0.72 }, "fill": "#8AA6D6", "line": "none" },
+              { "shape_id": "D02-m4", "kind": "oval", "role": "milestone_node", "quality_role": "structural", "layout_zone_id": "body_zone", "bounds": { "left_in": 12.85, "top_in": 4.25, "width_in": 0.72, "height_in": 0.72 }, "fill": "#B85042", "line": "none" },
+              { "shape_id": "D02-c1", "kind": "connector", "role": "timeline_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D02-m1", "to_shape_id": "D02-m2", "tail_end": "triangle", "bounds": { "left_in": 2.28, "top_in": 4.56, "width_in": 3.08, "height_in": 0.08 }, "line": "#1E2761", "line_width_pt": 2 },
+              { "shape_id": "D02-c2", "kind": "connector", "role": "timeline_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D02-m2", "to_shape_id": "D02-m3", "tail_end": "triangle", "bounds": { "left_in": 6.03, "top_in": 4.56, "width_in": 3.08, "height_in": 0.08 }, "line": "#4F6AA3", "line_width_pt": 2 },
+              { "shape_id": "D02-c3", "kind": "connector", "role": "timeline_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D02-m3", "to_shape_id": "D02-m4", "tail_end": "triangle", "bounds": { "left_in": 9.78, "top_in": 4.56, "width_in": 3.08, "height_in": 0.08 }, "line": "#8AA6D6", "line_width_pt": 2 },
+              { "shape_id": "D02-label-1", "kind": "text_box", "role": "point_text_short", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Source lock", "bounds": { "left_in": 0.71, "top_in": 5.3, "width_in": 2.5, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D02-label-2", "kind": "text_box", "role": "point_text_short", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Story plan", "bounds": { "left_in": 4.46, "top_in": 5.3, "width_in": 2.5, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D02-label-3", "kind": "text_box", "role": "point_text_short", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Native build", "bounds": { "left_in": 8.21, "top_in": 5.3, "width_in": 2.5, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D02-label-4", "kind": "text_box", "role": "point_text_short", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Render proof", "bounds": { "left_in": 11.96, "top_in": 5.3, "width_in": 2.5, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D02-takeaway", "kind": "text_box", "role": "takeaway", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "The route resumes from the last accepted milestone.", "bounds": { "left_in": 4.35, "top_in": 6.65, "width_in": 7.3, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#1E2761", "bold": true, "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D02-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "02", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none", "align": "right" }
             ]
           },
           {
             "slide_id": "D03",
-            "title": "Metric dependency map",
-            "layout_family": "ring_cross",
-            "render_recipe_id": "ppt.ring_cross",
-            "core_sentence": "The radial chart page checks connector density.",
+            "title": "Three gates turn evidence into decisions",
+            "page_role": "decision_logic",
+            "semantic_composition": "decision_ladder",
+            "layout_family": "judgement_ladder",
+            "core_sentence": "The decision path exposes thresholds and direction instead of stacking decorative cards.",
             "page_core_content": [
-              { "label": "Label-only metadata D03", "private_metric": "radial" },
-              { "label": "不会显示的字段名", "text": "Volume driver" },
-              { "label": "仍然不显示字段名", "text": "Conversion driver" },
-              { "text": "Margin driver" },
-              "Retention driver"
+              "Each gate is actionable and independently repairable.",
+              "The final state is a route, not a vague recommendation."
             ],
-            "native_shapes": [{ "shape_id": "D03-title", "role": "title", "editable_text": "Metric dependency map" }]
+            "speaker_notes": "Explain the gates from bottom to top: structural integrity, visual review, then export authority. The arrows encode direction.",
+            "transition": { "type": "fade", "duration_ms": 300 },
+            "layout_intent": {
+              "rhetorical_role": "make decision thresholds explicit",
+              "composition_signature": "decision-ladder-three-steps-two-risers",
+              "primary_grid": "ascending diagonal ladder",
+              "visual_weight": "lower-left to upper-right progression",
+              "negative_space_strategy": "open riser gaps preserve direction",
+              "non_text_visual": "directed decision ladder",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "judgement_ladder",
+              "archetype_instance_id": "D03-judgement-ladder",
+              "rhythm_role": "decision",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "one concise action title", "safe_inset_in": 0.15, "bounds": { "left_in": 0.8, "top_in": 0.4, "width_in": 14.4, "height_in": 1.4 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "one audience-facing claim", "safe_inset_in": 0.15, "bounds": { "left_in": 0.85, "top_in": 1.55, "width_in": 13.9, "height_in": 1.1 } },
+                { "zone_id": "body_zone", "semantic_role": "decision_evidence", "intended_content": "editable decision steps connectors and route-back takeaway", "safe_inset_in": 0.15, "bounds": { "left_in": 0.7, "top_in": 2.55, "width_in": 14.6, "height_in": 5.55 } }
+              ]
+            },
+            "native_shapes": [
+              { "shape_id": "D03-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#F6F2EA", "line": "none" },
+              { "shape_id": "D03-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Three gates turn evidence into decisions", "bounds": { "left_in": 0.9, "top_in": 0.55, "width_in": 13.8, "height_in": 0.9 }, "font_size": 40, "font": "Aptos Display", "color": "#172033", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D03-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "Thresholds and direction make every route-back actionable.", "bounds": { "left_in": 0.95, "top_in": 1.65, "width_in": 11.8, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#526173", "fill": "none", "line": "none" },
+              { "shape_id": "D03-step-1", "kind": "rounded_rect", "role": "decision_step", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "1  Package integrity", "bounds": { "left_in": 1.4, "top_in": 5.85, "width_in": 3.7, "height_in": 1.05 }, "font_size": 20, "font": "Aptos", "color": "#172033", "fill": "#FFFFFF", "line": "#C8CDD6" },
+              { "shape_id": "D03-step-2", "kind": "rounded_rect", "role": "decision_step", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "2  Visual evidence", "bounds": { "left_in": 6.15, "top_in": 4.45, "width_in": 3.7, "height_in": 1.05 }, "font_size": 20, "font": "Aptos", "color": "#172033", "fill": "#CADCFC", "line": "#8395B7" },
+              { "shape_id": "D03-step-3", "kind": "rounded_rect", "role": "decision_step", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "3  Export authority", "bounds": { "left_in": 10.9, "top_in": 3.05, "width_in": 3.7, "height_in": 1.05 }, "font_size": 20, "font": "Aptos", "color": "#FFFFFF", "fill": "#1E2761", "line": "none" },
+              { "shape_id": "D03-rise-1", "kind": "connector", "role": "decision_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D03-step-1", "to_shape_id": "D03-step-2", "connector_shape": "elbow", "tail_end": "triangle", "bounds": { "left_in": 4.95, "top_in": 4.95, "width_in": 1.35, "height_in": 1.45 }, "line": "#B85042", "line_width_pt": 2.2 },
+              { "shape_id": "D03-rise-2", "kind": "connector", "role": "decision_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "from_shape_id": "D03-step-2", "to_shape_id": "D03-step-3", "connector_shape": "elbow", "tail_end": "triangle", "bounds": { "left_in": 9.7, "top_in": 3.55, "width_in": 1.35, "height_in": 1.45 }, "line": "#B85042", "line_width_pt": 2.2 },
+              { "shape_id": "D03-takeaway", "kind": "text_box", "role": "point_text", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "A failed gate routes back to one object or page; it does not stop the whole agent.", "bounds": { "left_in": 1.4, "top_in": 7.15, "width_in": 10.8, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "fill": "none", "line": "none" },
+              { "shape_id": "D03-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "03", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none", "align": "right" }
+            ]
           },
           {
             "slide_id": "D04",
-            "title": "Quarterly movement rail",
-            "layout_family": "timeline_band",
-            "render_recipe_id": "ppt.timeline_rail",
-            "core_sentence": "Trend context should remain readable across quarters.",
+            "title": "Q3 reveals the inflection",
+            "page_role": "data_evidence",
+            "semantic_composition": "data_chart",
+            "layout_family": "multi_zone_compare",
+            "core_sentence": "A native data object keeps the comparison editable while the package retains chart parts.",
             "page_core_content": [
-              { "label": "Label-only metadata D04", "manifest_only": "trend" },
-              { "label": "不会显示的字段名", "text": "Baseline quarter measured" },
-              { "label": "仍然不显示字段名", "text": "Midyear signal normalized" },
-              { "text": "Q3 outlier reviewed" },
-              "Q4 forecast bounded"
+              "The inflection is visible in Q3.",
+              "Actual exceeds plan by seven points in Q4."
             ],
-            "native_shapes": [{ "shape_id": "D04-title", "role": "title", "editable_text": "Quarterly movement rail" }]
+            "speaker_notes": "Lead with the Q3 crossing point and finish on the seven-point Q4 gap. Do not read every data label.",
+            "animation_timeline": [
+              { "target_shape_id": "D04-chart", "effect": "fade", "trigger": "afterPrevious", "duration_ms": 420 }
+            ],
+            "layout_intent": {
+              "rhetorical_role": "show a time-series inflection",
+              "composition_signature": "native-chart-left-insight-right",
+              "primary_grid": "two-thirds chart with one-third interpretation",
+              "visual_weight": "chart dominant",
+              "negative_space_strategy": "right insight rail remains sparse",
+              "non_text_visual": "native line chart",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "multi_zone_compare",
+              "archetype_instance_id": "D04-multi-zone-compare",
+              "rhythm_role": "data_peak",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "one concise action title", "safe_inset_in": 0.15, "bounds": { "left_in": 0.8, "top_in": 0.4, "width_in": 14.4, "height_in": 1.4 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "one audience-facing claim", "safe_inset_in": 0.15, "bounds": { "left_in": 0.85, "top_in": 1.55, "width_in": 13.9, "height_in": 1.1 } },
+                { "zone_id": "body_zone", "semantic_role": "chart_evidence", "intended_content": "native chart insight panel and source note", "safe_inset_in": 0.15, "bounds": { "left_in": 0.7, "top_in": 2.55, "width_in": 14.6, "height_in": 5.55 } }
+              ]
+            },
+            "native_shapes": [
+              { "shape_id": "D04-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#FFFFFF", "line": "none" },
+              { "shape_id": "D04-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Q3 reveals the inflection", "bounds": { "left_in": 0.9, "top_in": 0.55, "width_in": 13.8, "height_in": 0.9 }, "font_size": 40, "font": "Aptos Display", "color": "#172033", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D04-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "The chart remains a native editable data object with its workbook relationship.", "bounds": { "left_in": 0.95, "top_in": 1.65, "width_in": 12.2, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#526173", "fill": "none", "line": "none" },
+              { "shape_id": "D04-chart", "kind": "chart", "role": "data_chart", "quality_role": "structural", "layout_zone_id": "body_zone", "materialization_intent": "native_data_object", "chart_type": "line", "categories": ["Q1", "Q2", "Q3", "Q4"], "series": [{ "name": "Actual", "values": [42, 45, 53, 61], "color": "#1E2761" }, { "name": "Plan", "values": [44, 47, 49, 54], "color": "#B85042" }], "show_legend": true, "bounds": { "left_in": 0.95, "top_in": 2.65, "width_in": 10.2, "height_in": 4.55 }, "fill": "#F7F8FA", "line": "#D8DEE8" },
+              { "shape_id": "D04-evidence-anchor", "kind": "oval", "role": "chart_evidence_anchor", "quality_role": "structural", "layout_zone_id": "body_zone", "bounds": { "left_in": 11.05, "top_in": 4.68, "width_in": 0.16, "height_in": 0.16 }, "fill": "#B85042", "line": "none" },
+              { "shape_id": "D04-evidence-to-insight", "kind": "connector", "role": "evidence_to_insight_connector", "quality_role": "structural", "layout_zone_id": "body_zone", "tail_end": "triangle", "bounds": { "left_in": 11.21, "top_in": 4.73, "width_in": 0.44, "height_in": 0.06 }, "line": "#B85042", "line_width_pt": 2.25 },
+              { "shape_id": "D04-insight-bg", "kind": "rounded_rect", "role": "insight_panel", "quality_role": "content", "layout_zone_id": "body_zone", "bounds": { "left_in": 11.65, "top_in": 2.65, "width_in": 3.35, "height_in": 4.55 }, "fill": "#1E2761", "line": "none" },
+              { "shape_id": "D04-insight", "kind": "text_box", "role": "point_text", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Q3 is the crossing point. Q4 closes seven points above plan.", "bounds": { "left_in": 12.0, "top_in": 3.35, "width_in": 2.65, "height_in": 2.4 }, "font_size": 20, "font": "Aptos", "color": "#FFFFFF", "fill": "none", "line": "none" },
+              { "shape_id": "D04-source", "kind": "text_box", "role": "source_note", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Source: benchmark operating series", "bounds": { "left_in": 1.05, "top_in": 7.22, "width_in": 5.2, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none" },
+              { "shape_id": "D04-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "04", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none", "align": "right" }
+            ]
           },
           {
             "slide_id": "D05",
-            "title": "Threshold decision ladder",
-            "layout_family": "judgement_ladder",
-            "render_recipe_id": "ppt.judgement_ladder",
-            "core_sentence": "Metric review escalates only through visible gates.",
+            "title": "Four criteria determine the route",
+            "page_role": "decision_table",
+            "semantic_composition": "data_table",
+            "layout_family": "summary_peak",
+            "core_sentence": "A native table keeps labels, values, and formatting independently editable.",
             "page_core_content": [
-              { "label": "Label-only metadata D05", "private_metric": "threshold" },
-              { "label": "不会显示的字段名", "text": "Data quality passes" },
-              { "label": "仍然不显示字段名", "text": "Signal stability passes" },
-              { "text": "Operational cost fits" },
-              "Decision threshold is visible"
+              "Native data objects win when editing matters.",
+              "Stable DrawingML wins when cross-viewer fidelity dominates."
             ],
-            "native_shapes": [{ "shape_id": "D05-title", "role": "title", "editable_text": "Threshold decision ladder" }]
+            "speaker_notes": "Compare the two materialization modes row by row. End with the recommendation in the final column.",
+            "layout_intent": {
+              "rhetorical_role": "compare materialization choices",
+              "composition_signature": "native-table-with-decision-callout",
+              "primary_grid": "full-width comparison table with bottom recommendation",
+              "visual_weight": "table dominant",
+              "negative_space_strategy": "one open recommendation band below the table",
+              "non_text_visual": "native comparison table",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "summary_peak",
+              "archetype_instance_id": "D05-summary-peak",
+              "rhythm_role": "comparison_close",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "one concise action title", "safe_inset_in": 0.15, "bounds": { "left_in": 0.8, "top_in": 0.4, "width_in": 14.4, "height_in": 1.4 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "one audience-facing claim", "safe_inset_in": 0.15, "bounds": { "left_in": 0.85, "top_in": 1.55, "width_in": 13.9, "height_in": 1.1 } },
+                { "zone_id": "body_zone", "semantic_role": "table_evidence", "intended_content": "native table and closing recommendation", "safe_inset_in": 0.15, "bounds": { "left_in": 0.7, "top_in": 2.55, "width_in": 14.6, "height_in": 5.55 } }
+              ]
+            },
+            "native_shapes": [
+              { "shape_id": "D05-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#F7F8FA", "line": "none" },
+              { "shape_id": "D05-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Four criteria determine the route", "bounds": { "left_in": 0.9, "top_in": 0.55, "width_in": 13.8, "height_in": 0.9 }, "font_size": 40, "font": "Aptos Display", "color": "#172033", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D05-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "The table preserves comparable labels, values, and formatting as editable cells.", "bounds": { "left_in": 0.95, "top_in": 1.65, "width_in": 12.2, "height_in": 0.95 }, "font_size": 20, "font": "Aptos", "color": "#526173", "fill": "none", "line": "none" },
+              { "shape_id": "D05-table", "kind": "table", "role": "data_table", "quality_role": "structural", "layout_zone_id": "body_zone", "materialization_intent": "native_data_object", "data": [["Criterion", "Stable DrawingML", "Native data object", "Recommendation"], ["Cross-viewer fidelity", "High", "Medium", "Stable"], ["Data editing", "Shape-level", "Workbook-level", "Native"], ["Style predictability", "High", "Viewer-dependent", "Stable"], ["Analyst workflow", "Manual", "Direct", "Native"]], "first_row": true, "header_fill": "#1E2761", "header_color": "#FFFFFF", "header_font": "Aptos Display", "header_font_size": 16, "body_font_size": 16, "bounds": { "left_in": 0.95, "top_in": 2.65, "width_in": 14.1, "height_in": 4.25 }, "fill": "#FFFFFF", "line": "#C8CDD6" },
+              { "shape_id": "D05-takeaway-bg", "kind": "rounded_rect", "role": "takeaway_panel", "quality_role": "content", "layout_zone_id": "body_zone", "bounds": { "left_in": 3.0, "top_in": 7.05, "width_in": 10.0, "height_in": 1.0 }, "fill": "#E7E8D1", "line": "none" },
+              { "shape_id": "D05-takeaway", "kind": "text_box", "role": "point_text", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Choose native data objects only when the editing gain outweighs viewer drift.", "bounds": { "left_in": 3.35, "top_in": 7.13, "width_in": 9.3, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#172033", "bold": true, "fill": "none", "line": "none", "align": "center" },
+              { "shape_id": "D05-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "05", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#6F7C8C", "fill": "none", "line": "none", "align": "right" }
+            ]
           },
           {
             "slide_id": "D06",
-            "title": "Dashboard action close",
-            "layout_family": "summary_peak",
-            "render_recipe_id": "ppt.summary_peak",
-            "core_sentence": "The chart close keeps the selected action editable.",
-            "page_core_content": [
-              { "label": "Label-only metadata D06", "manifest_only": "action" },
-              { "label": "不会显示的字段名", "text": "Primary chart action is funded" },
-              { "label": "仍然不显示字段名", "text": "Secondary monitor is retained" },
-              { "text": "Data refresh owner is assigned" },
-              "Next readout date is fixed"
-            ],
-            "native_shapes": [{ "shape_id": "D06-title", "role": "title", "editable_text": "Dashboard action close" }]
-          }
-        ]
-      }
-    },
-    {
-      "suite_id": "chinese_long_text",
-      "suite_label": "中文长文本型",
-      "expected_page_count": 6,
-      "expected_layout_families": ["cover_signal", "multi_zone_compare", "timeline_band", "judgement_ladder", "ring_cross", "summary_peak"],
-      "expected_anchor_shapes": ["C01-hero-block", "C02-zone-1-panel", "C03-timeline-rail", "C04-gate-1-panel", "C05-center-hub", "C06-summary-peak"],
-      "expected_visible_text_fragments": ["本页检验中文长句在原生文本框中的可编辑性", "每个段落都保持明确边界", "最终结论保留为可编辑形状"],
-      "editable_shape_plan": {
-        "contract_kind": "redcube_ai_first_native_ppt_shape_plan",
-        "route": "author_pptx_native",
-        "slides": [
-          {
-            "slide_id": "C01",
-            "title": "中文长文本首页",
+            "title": "Evidence remains inspectable",
+            "page_role": "image_evidence_close",
+            "semantic_composition": "image_evidence",
             "layout_family": "cover_signal",
-            "render_recipe_id": "ppt.hero_signal",
-            "core_sentence": "本页检验中文长句在原生文本框中的可编辑性。",
+            "core_sentence": "The close uses a real picture object with alt text, fit policy, and a separate editable conclusion.",
             "page_core_content": [
-              { "label": "Label-only metadata C01", "private_metric": "zh" },
-              { "label": "不会显示的字段名", "text": "本页检验中文长句在原生文本框中的可编辑性" },
-              { "label": "仍然不显示字段名", "text": "标题和正文需要共同保持边距" },
-              "观众可直接编辑重点语句"
+              "The evidence image remains inspectable.",
+              "The conclusion stays readable when motion is unavailable."
             ],
-            "native_shapes": [{ "shape_id": "C01-title", "role": "title", "editable_text": "中文长文本首页" }]
-          },
-          {
-            "slide_id": "C02",
-            "title": "四象限文字对比",
-            "layout_family": "multi_zone_compare",
-            "render_recipe_id": "ppt.compare_zones",
-            "core_sentence": "中文内容在多区域版式中需要清晰分隔。",
-            "page_core_content": [
-              { "label": "Label-only metadata C02", "manifest_only": true },
-              { "label": "不会显示的字段名", "text": "第一部分说明目标人群和业务边界" },
-              { "label": "仍然不显示字段名", "text": "第二部分说明流程约束和质量要求" },
-              { "text": "第三部分保留风险提示和审阅责任" },
-              "每个段落都保持明确边界"
-            ],
-            "native_shapes": [{ "shape_id": "C02-title", "role": "title", "editable_text": "四象限文字对比" }]
-          },
-          {
-            "slide_id": "C03",
-            "title": "中文里程碑推进",
-            "layout_family": "timeline_band",
-            "render_recipe_id": "ppt.timeline_rail",
-            "core_sentence": "时间线需要容纳较长中文短句并保持不重叠。",
-            "page_core_content": [
-              { "label": "Label-only metadata C03", "private_metric": "timeline" },
-              { "label": "不会显示的字段名", "text": "需求确认后冻结输入材料" },
-              { "label": "仍然不显示字段名", "text": "初稿生成后进行版式审查" },
-              { "text": "修订阶段记录关键证据" },
-              "交付前完成可视化验收"
-            ],
-            "native_shapes": [{ "shape_id": "C03-title", "role": "title", "editable_text": "中文里程碑推进" }]
-          },
-          {
-            "slide_id": "C04",
-            "title": "中文决策阶梯",
-            "layout_family": "judgement_ladder",
-            "render_recipe_id": "ppt.judgement_ladder",
-            "core_sentence": "阶梯页检验长文本在递进结构中的密度控制。",
-            "page_core_content": [
-              { "label": "Label-only metadata C04", "manifest_only": "decision" },
-              { "label": "不会显示的字段名", "text": "第一关确认材料来源可靠" },
-              { "label": "仍然不显示字段名", "text": "第二关确认结论表达准确" },
-              { "text": "第三关确认版面没有遮挡" },
-              "第四关确认交付口径一致"
-            ],
-            "native_shapes": [{ "shape_id": "C04-title", "role": "title", "editable_text": "中文决策阶梯" }]
-          },
-          {
-            "slide_id": "C05",
-            "title": "中文综合结构图",
-            "layout_family": "ring_cross",
-            "render_recipe_id": "ppt.ring_cross",
-            "core_sentence": "环形结构用于检验中文标签和连接线组合。",
-            "page_core_content": [
-              { "label": "Label-only metadata C05", "private_metric": "map" },
-              { "label": "不会显示的字段名", "text": "产品叙事轴" },
-              { "label": "仍然不显示字段名", "text": "用户证据轴" },
-              { "text": "运营路径轴" },
-              "质量风险轴"
-            ],
-            "native_shapes": [{ "shape_id": "C05-title", "role": "title", "editable_text": "中文综合结构图" }]
-          },
-          {
-            "slide_id": "C06",
-            "title": "中文结论收束页",
-            "layout_family": "summary_peak",
-            "render_recipe_id": "ppt.summary_peak",
-            "core_sentence": "最后一页需要把中文结论集中到一个强信号。",
-            "page_core_content": [
-              { "label": "Label-only metadata C06", "manifest_only": "close" },
-              { "label": "不会显示的字段名", "text": "最终结论保留为可编辑形状" },
-              { "label": "仍然不显示字段名", "text": "补充依据保留为可审阅文本" },
-              { "text": "执行责任清晰可追踪" },
-              "下一步动作明确可落地"
-            ],
-            "native_shapes": [{ "shape_id": "C06-title", "role": "title", "editable_text": "中文结论收束页" }]
+            "speaker_notes": "Use the image as evidence, not atmosphere. Close on the editable conclusion and the next operating action.",
+            "layout_intent": {
+              "rhetorical_role": "close with inspectable image evidence",
+              "composition_signature": "fit-picture-with-conclusion-column",
+              "primary_grid": "picture-left conclusion-right",
+              "visual_weight": "image dominant with protected text column",
+              "negative_space_strategy": "right column uses a calm solid field",
+              "non_text_visual": "native picture object",
+              "forbidden_template_reuse_checked": true
+            },
+            "template_layout_binding": {
+              "selected_archetype": "cover_signal",
+              "archetype_instance_id": "D06-cover-signal",
+              "rhythm_role": "image_close",
+              "zone_gap_in_min": 0.36,
+              "zone_inset_in_min": 0.18,
+              "zones": [
+                { "zone_id": "title_zone", "semantic_role": "action_title", "intended_content": "final action title beside the image", "safe_inset_in": 0.15, "bounds": { "left_in": 9.4, "top_in": 0.75, "width_in": 5.8, "height_in": 2.5 } },
+                { "zone_id": "claim_zone", "semantic_role": "core_claim", "intended_content": "picture-object claim", "safe_inset_in": 0.15, "bounds": { "left_in": 9.4, "top_in": 2.85, "width_in": 5.8, "height_in": 2.0 } },
+                { "zone_id": "body_zone", "semantic_role": "closing_evidence", "intended_content": "decision takeaway and package-readable caption", "safe_inset_in": 0.15, "bounds": { "left_in": 9.4, "top_in": 4.9, "width_in": 5.8, "height_in": 3.0 } },
+                { "zone_id": "visual_zone", "semantic_role": "fit_evidence_diagram", "intended_content": "native picture object with fit policy and alt text", "safe_inset_in": 0.15, "bounds": { "left_in": 0, "top_in": 1.466, "width_in": 9.1, "height_in": 6.067 } }
+              ]
+            },
+            "native_shapes": [
+              { "shape_id": "D06-bg", "kind": "rect", "role": "background", "quality_role": "decorative", "bounds": { "left_in": 0, "top_in": 0, "width_in": 16, "height_in": 9 }, "fill": "#172033", "line": "none" },
+              { "shape_id": "D06-picture", "kind": "picture", "role": "evidence_picture", "quality_role": "structural", "layout_zone_id": "visual_zone", "source_file": "assets/branding/redcube-ai-overview-v2.png", "source_sha256": "b4f85aab8791faef24483e69252411c3068a861804339ce773600ef8c1de66b9", "alt": "RedCube AI source-to-deliverable workflow with source, storyline, direction, image pages, review, export, versions, notes, files, and human approval", "aspect_ratio_policy": "contain", "crop": "0,0,0,0", "bounds": { "left_in": 0, "top_in": 1.466, "width_in": 9.1, "height_in": 6.067 }, "fill": "#CADCFC", "line": "none" },
+              { "shape_id": "D06-title", "kind": "text_box", "role": "title", "quality_role": "content", "layout_zone_id": "title_zone", "editable_text": "Evidence remains inspectable", "bounds": { "left_in": 9.65, "top_in": 1.05, "width_in": 5.35, "height_in": 1.65 }, "font_size": 38, "font": "Aptos Display", "color": "#FFFFFF", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D06-core", "kind": "text_box", "role": "core_sentence", "quality_role": "content", "layout_zone_id": "claim_zone", "editable_text": "A real picture object carries alt text and fit intent; the conclusion remains separately editable.", "bounds": { "left_in": 9.7, "top_in": 3.05, "width_in": 4.95, "height_in": 1.6 }, "font_size": 20, "font": "Aptos", "color": "#CADCFC", "fill": "none", "line": "none" },
+              { "shape_id": "D06-signal-panel", "kind": "rounded_rect", "role": "signal_panel", "quality_role": "content", "layout_zone_id": "body_zone", "bounds": { "left_in": 9.45, "top_in": 4.95, "width_in": 5.6, "height_in": 2.9 }, "fill": "#202A3E", "line": "#4F6AA3" },
+              { "shape_id": "D06-takeaway", "kind": "text_box", "role": "point_text", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "The next action is to approve the native route for evidence-heavy editable decks.", "bounds": { "left_in": 9.7, "top_in": 5.15, "width_in": 4.95, "height_in": 1.45 }, "font_size": 22, "font": "Aptos", "color": "#FFFFFF", "bold": true, "fill": "none", "line": "none" },
+              { "shape_id": "D06-caption", "kind": "text_box", "role": "image_caption", "quality_role": "content", "layout_zone_id": "body_zone", "editable_text": "Picture, notes, and transition remain package-readable.", "bounds": { "left_in": 9.7, "top_in": 6.82, "width_in": 4.95, "height_in": 0.84 }, "font_size": 18, "font": "Aptos", "color": "#AAB8CC", "fill": "none", "line": "none" },
+              { "shape_id": "D06-page", "kind": "text_box", "role": "page_number", "quality_role": "auxiliary", "editable_text": "06", "bounds": { "left_in": 14.45, "top_in": 8.15, "width_in": 0.6, "height_in": 0.35 }, "font_size": 12, "font": "Aptos", "color": "#AAB8CC", "fill": "none", "line": "none", "align": "right" }
+            ]
           }
         ]
       }

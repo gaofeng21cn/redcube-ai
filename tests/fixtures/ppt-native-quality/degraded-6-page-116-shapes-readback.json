@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "evidence_source": "pptx_package_readback",
+  "pptx_file": "historical/native-ppt-proof-6-page-116-shapes.pptx",
+  "pptx_sha256": "3fc99804ca3b4dc8c5d16c768f35a354c4179a50cf98f28d7022d3fe710764b4",
+  "slide_count": 6,
+  "object_type_counts": {
+    "rect": 36,
+    "text_box": 80
+  },
+  "notes_slide_count": 0,
+  "transition_count": 0,
+  "animation_count": 0,
+  "part_counts": {
+    "chart": 0,
+    "media": 0,
+    "notes": 0
+  },
+  "slides": [
+    { "slide_index": 1, "slide_part": "ppt/slides/slide1.xml", "object_counts": { "rect": 6, "text_box": 14 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 },
+    { "slide_index": 2, "slide_part": "ppt/slides/slide2.xml", "object_counts": { "rect": 6, "text_box": 14 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 },
+    { "slide_index": 3, "slide_part": "ppt/slides/slide3.xml", "object_counts": { "rect": 6, "text_box": 13 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 },
+    { "slide_index": 4, "slide_part": "ppt/slides/slide4.xml", "object_counts": { "rect": 6, "text_box": 13 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 },
+    { "slide_index": 5, "slide_part": "ppt/slides/slide5.xml", "object_counts": { "rect": 6, "text_box": 13 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 },
+    { "slide_index": 6, "slide_part": "ppt/slides/slide6.xml", "object_counts": { "rect": 6, "text_box": 13 }, "object_names": [], "objects": [], "speaker_notes": "", "notes_part": "", "transition": {}, "animation_count": 0 }
+  ]
+}

@@ -6,6 +6,23 @@ cd "$repo_root"
 
 export PATH="$HOME/.local/bin:$PATH"
 
+proof_cache_root="${CODEX_HOME:-$HOME/.codex}/projects/redcube-ai/runtime-state/native-ppt-proof-cache"
+proof_tmp_root="/tmp/rca-native-ppt-proof"
+mkdir -p \
+  "$proof_tmp_root" \
+  "$proof_cache_root/pycache" \
+  "$proof_cache_root/pytest-cache" \
+  "$proof_cache_root/uv-cache" \
+  "$proof_cache_root/uv-project-venv" \
+  "$proof_cache_root/pip-cache"
+export TMPDIR="$proof_tmp_root/"
+export PYTHONDONTWRITEBYTECODE=1
+export PYTHONPYCACHEPREFIX="$proof_cache_root/pycache"
+export PYTEST_ADDOPTS="${PYTEST_ADDOPTS:+$PYTEST_ADDOPTS }-p no:cacheprovider -o cache_dir=$proof_cache_root/pytest-cache"
+export UV_CACHE_DIR="$proof_cache_root/uv-cache"
+export UV_PROJECT_ENVIRONMENT="$proof_cache_root/uv-project-venv"
+export PIP_CACHE_DIR="$proof_cache_root/pip-cache"
+
 output_root="${REDCUBE_NATIVE_PPT_PROOF_OUTPUT_DIR:-artifacts/native-ppt-proof}"
 skip_system_deps="${REDCUBE_NATIVE_PPT_PROOF_SKIP_SYSTEM_DEPS:-0}"
 proof_python=""
@@ -84,6 +101,8 @@ doctor_report="$output_root/doctor.json"
 manifest_report="$output_root/product-manifest.json"
 status_report="$output_root/product-status.json"
 helper_report="$output_root/native-helper-output.json"
+package_readback_report="$output_root/native-package-readback.json"
+quality_verdict_report="$output_root/native-quality-verdict.json"
 summary_report="$output_root/proof-summary.json"
 artifact_index_report="$output_root/artifact-index.json"
 native_dir="$output_root/native-helper"
@@ -139,7 +158,26 @@ PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
     --engine-contract "$repo_root/contracts/runtime-program/ppt-native-python-engine-contract.json" \
     > "$helper_report"
 
-"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$summary_report" <<'PY'
+PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
+  "$proof_python" -m redcube_ai.native_helpers.ppt_deck.native_package \
+    "$native_dir/benchmark-author.pptx" \
+    --pretty \
+    > "$package_readback_report"
+
+if ! node --experimental-strip-types tools/native-ppt-proof/evaluate-quality.ts \
+  --fixture "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
+  --suite-id "$suite_id" \
+  --package-readback "$package_readback_report" \
+  --shape-manifest "$native_dir/benchmark-shape-manifest.json" \
+  --output "$quality_verdict_report" \
+  >/dev/null
+then
+  quality_gate_failed=1
+else
+  quality_gate_failed=0
+fi
+
+"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$package_readback_report" "$quality_verdict_report" "$summary_report" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -148,7 +186,9 @@ doctor = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 manifest = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
 status = json.loads(Path(sys.argv[3]).read_text(encoding="utf-8"))
 helper = json.loads(Path(sys.argv[4]).read_text(encoding="utf-8"))
-summary_file = Path(sys.argv[5])
+package_readback = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8"))
+quality_verdict = json.loads(Path(sys.argv[6]).read_text(encoding="utf-8"))
+summary_file = Path(sys.argv[7])
 
 proof_lane = (
     manifest.get("deliverable_facade", {})
@@ -186,6 +226,8 @@ if render_proof.get("synthetic_preview") is not False:
     failures.append("native helper produced synthetic preview")
 if int(render_proof.get("slide_count") or 0) != 6:
     failures.append("native helper fixture should render six slides")
+if quality_verdict.get("status") != "pass_candidate":
+    failures.append("native PPT package quality verdict requires route-back")
 for file in [
     helper.get("pptx_file"),
     helper.get("pdf_file"),
@@ -216,13 +258,42 @@ summary = {
         "shape_manifest_file": helper.get("shape_manifest_file"),
         "preview_screenshots": render_proof.get("preview_screenshots", []),
     },
+    "native_package_readback": {
+        "status": "completed",
+        "pptx_sha256": package_readback.get("pptx_sha256"),
+        "slide_count": package_readback.get("slide_count"),
+        "object_type_counts": package_readback.get("object_type_counts", {}),
+        "notes_slide_count": package_readback.get("notes_slide_count"),
+        "transition_count": package_readback.get("transition_count"),
+        "animation_count": package_readback.get("animation_count"),
+        "part_counts": package_readback.get("part_counts", {}),
+    },
+    "native_quality_verdict": {
+        "status": quality_verdict.get("status"),
+        "verdict_kind": quality_verdict.get("verdict_kind"),
+        "failed_gate_ids": [
+            gate.get("gate_id")
+            for gate in quality_verdict.get("gates", [])
+            if gate.get("status") == "failed"
+        ],
+        "owner_verdict_claimed": quality_verdict.get("authority", {}).get("owner_verdict_claimed"),
+    },
 }
 summary_file.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 print(json.dumps(summary, ensure_ascii=False, indent=2))
-if failures:
-    raise SystemExit(1)
 PY
 
 "$proof_python" tools/native-ppt-proof/build-artifact-index.py \
   --output-dir "$output_root" \
   --index-file "$artifact_index_report"
+
+"$proof_python" - "$summary_report" "$quality_gate_failed" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+summary = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+quality_gate_failed = int(sys.argv[2])
+if summary.get("status") != "passed" or quality_gate_failed:
+    raise SystemExit(1)
+PY

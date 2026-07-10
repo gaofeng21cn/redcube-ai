@@ -24,6 +24,11 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /tools\/native-ppt-proof\/install-deps\.sh/);
   assert.match(runner, /renderer_auto_install=1/);
   assert.match(runner, /\$HOME\/\.local\/bin:\$PATH/);
+  assert.match(runner, /proof_tmp_root="\/tmp\/rca-native-ppt-proof"/);
+  assert.match(runner, /PYTHONDONTWRITEBYTECODE=1/);
+  assert.match(runner, /PYTHONPYCACHEPREFIX="\$proof_cache_root\/pycache"/);
+  assert.match(runner, /cache_dir=\$proof_cache_root\/pytest-cache/);
+  assert.match(runner, /UV_PROJECT_ENVIRONMENT="\$proof_cache_root\/uv-project-venv"/);
   assert.match(runner, /REDCUBE_NATIVE_PPT_RENDERER_AUTO_INSTALL="\$renderer_auto_install"/);
   assert.match(workflow, /tools\/native-ppt-proof\/run\.sh --output-dir artifacts\/native-ppt-proof/);
   assert.match(installScript, /brew install --cask libreoffice/);
@@ -33,6 +38,11 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /redcube_ai\.native_helpers\.doctor/);
   assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native/);
   assert.match(runner, /native-helper-output\.json/);
+  assert.match(runner, /native-package-readback\.json/);
+  assert.match(runner, /native-quality-verdict\.json/);
+  assert.match(runner, /redcube_ai\.native_helpers\.ppt_deck\.native_package/);
+  assert.doesNotMatch(runner, /tools\/native-ppt-proof\/read-package\.py/);
+  assert.match(runner, /tools\/native-ppt-proof\/evaluate-quality\.ts/);
   assert.match(runner, /proof-summary\.json/);
   assert.match(runner, /artifact-index\.json/);
   assert.match(runner, /build-artifact-index\.py/);

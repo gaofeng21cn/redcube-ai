@@ -18,6 +18,16 @@ test('native PPTX officecli materializer accepts complete AI spatial plans', () 
   assert.equal(result.pptx_slides.length, slides.length);
   assert.deepEqual(result.pptx_geometry.overflows, []);
   assert.equal(result.officecli_gate.materializer, 'officecli_pptx_materializer');
+  const timeline = result.slides.find((slide) => slide.slide_id === 'S02');
+  const timelineConnectors = timeline.native_shapes.filter((shape) => shape.role === 'timeline_connector');
+  assert.equal(timeline.metrics.semantic_visual_evidence.some((item) => item.family === 'timeline'), true);
+  assert.equal(timelineConnectors.length, 3);
+  assert.equal(timelineConnectors.every((shape) => (
+    shape.kind === 'connector'
+    && shape.from_shape_id
+    && shape.to_shape_id
+    && [shape.head_end, shape.tail_end].some((value) => value && value !== 'none')
+  )), true);
   assert.equal(
     result.slides.every((slide) => (
       slide.layout_writer === 'officecli_pptx_materializer'

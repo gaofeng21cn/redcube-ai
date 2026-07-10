@@ -81,9 +81,11 @@ test('native PPTX preflight rejects narrow route labels that force awkward short
       kind: 'connector',
       role: 'route_flow_connector',
       quality_role: 'structural',
+      from_shape_id: 'S01-input-panel',
+      to_shape_id: 'S01-gate-panel',
+      tail_end: 'triangle',
       bounds: { left_in: 4.15, top_in: 3.08 + index * 0.24, width_in: 4.75, height_in: 0.04 },
       line: { color: '#2563EB', width_pt: 2, end_arrow: true },
-      tailEnd: 'triangle',
       fill: 'none',
     })),
     {
