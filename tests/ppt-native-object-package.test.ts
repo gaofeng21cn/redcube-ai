@@ -95,7 +95,11 @@ print(json.dumps({
 
 test('real build_deck preserves native table metrics and body font size in the manifest', () => {
   const slide = createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', slotCount: 2 });
-  slide.native_shapes = slide.native_shapes.filter((item) => item.shape_id !== 'S01-slot-1-panel');
+  slide.native_shapes = slide.native_shapes.filter((item) => (
+    item.shape_id !== 'S01-slot-1-panel'
+    && item.from_shape_id !== 'S01-slot-1-panel'
+    && item.to_shape_id !== 'S01-slot-1-panel'
+  ));
   slide.native_shapes.push(shape('S01-table-proof', 'table', bounds(1.15, 3.2, 6.15, 2.68), {
     role: 'compare_panel',
     quality_role: 'content',

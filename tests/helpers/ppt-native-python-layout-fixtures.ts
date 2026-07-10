@@ -257,6 +257,10 @@ function decorative(slideId, suffix, kind, role, bounds, extra = {}) {
   return slideShape(slideId, suffix, kind, role, bounds, { quality_role: 'decorative', ...extra });
 }
 
+function structural(slideId, suffix, kind, role, bounds, extra = {}) {
+  return slideShape(slideId, suffix, kind, role, bounds, { quality_role: 'structural', ...extra });
+}
+
 function slotGeometry(slotCount, index) {
   const gap = slotCount === 2 ? 0.72 : 0.48;
   const width = slotCount === 2 ? 6.15 : slotCount === 3 ? 3.95 : 2.9;
@@ -324,30 +328,84 @@ function layoutVisualIntent(layoutFamily) {
 
 const STRUCTURAL_VISUAL_SPECS = {
   cover_signal: [
-    ['ai-signal-hub', 'oval', 'signal_hub', inBox(14.26, 2.7, 0.72, 0.72), { fill: '#B94624', line: 'none' }],
-    ['ai-signal-connector', 'line', 'signal_connector', inBox(14.6, 3.44, 0.06, 2.05), { line: '#B94624' }],
+    ['ai-signal-hub', 'oval', 'signal_hub', inBox(14.26, 2.78, 0.72, 0.72), { fill: '#B94624', line: 'none' }],
   ],
-  timeline_band: [
-    ['ai-timeline-rail', 'line', 'timeline_rail', inBox(1.1, 2.98, 13.3, 0.06), { line: '#B94624' }],
-  ],
-  judgement_ladder: [
-    ['ai-gate-ladder-spine', 'line', 'gate_ladder_spine', inBox(7.58, 2.7, 0.08, 4.92), { line: '#B94624' }],
-  ],
+  timeline_band: [],
+  judgement_ladder: [],
   ring_cross: [
     ['ai-center-hub', 'oval', 'center_hub', inBox(7.28, 4.1, 1.0, 1.0), { fill: '#B94624', line: 'none' }],
-    ['ai-axis-cross-horizontal', 'line', 'axis_connector', inBox(7.31, 4.58, 0.32, 0.05), { line: '#B94624' }],
   ],
   summary_peak: [
-    ['ai-takeaway-band', 'rect', 'takeaway_band', inBox(0.92, 4.52, 13.6, 0.18), { fill: '#B94624', line: 'none' }],
+    ['ai-takeaway-band', 'rect', 'takeaway_band', inBox(0.92, 4.52, 13.6, 0.18), {
+      fill: '#B94624',
+      line: 'none',
+      layout_zone_id: 'decision_zone',
+    }],
   ],
-  multi_zone_compare: [
-    ['ai-bridge-rail', 'line', 'bridge_connector_rail', inBox(1.1, 6.18, 13.15, 0.06), { line: '#B94624' }],
-  ],
+  multi_zone_compare: [],
 };
 
 function structuralShapes(layoutFamily, slideId) {
   return (STRUCTURAL_VISUAL_SPECS[layoutFamily] || STRUCTURAL_VISUAL_SPECS.multi_zone_compare)
-    .map(([suffix, kind, role, bounds, extra]) => decorative(slideId, suffix, kind, role, bounds, extra));
+    .map(([suffix, kind, role, bounds, extra]) => structural(slideId, suffix, kind, role, bounds, extra));
+}
+
+function connectedPanelShapes(layoutFamily, slideId, slotCount) {
+  const connectorRole = {
+    cover_signal: 'signal_connector',
+    multi_zone_compare: 'comparison_connector',
+    timeline_band: 'timeline_connector',
+    judgement_ladder: 'gate_connector',
+    ring_cross: 'axis_connector',
+  }[layoutFamily];
+  if (!connectorRole) return [];
+
+  if (layoutFamily === 'cover_signal' || layoutFamily === 'ring_cross') {
+    const hubShapeId = `${slideId}-${layoutFamily === 'cover_signal' ? 'ai-signal-hub' : 'ai-center-hub'}`;
+    const railTop = layoutFamily === 'cover_signal' ? 2.92 : 6.02;
+    return Array.from({ length: slotCount }, (_, index) => {
+      const panel = slotGeometry(slotCount, index);
+      return structural(
+        slideId,
+        `${connectorRole}-${index + 1}`,
+        'connector',
+        connectorRole,
+        inBox(panel.left_in + (panel.width_in / 2), railTop + (index * 0.04), 0.2, 0.04),
+        {
+          line: '#B94624',
+          tail_end: 'triangle',
+          from_shape_id: hubShapeId,
+          to_shape_id: `${slideId}-slot-${index + 1}-panel`,
+        },
+      );
+    });
+  }
+
+  return Array.from({ length: Math.max(0, slotCount - 1) }, (_, index) => {
+    const left = slotGeometry(slotCount, index);
+    const right = slotGeometry(slotCount, index + 1);
+    const connectorTop = layoutFamily === 'multi_zone_compare'
+      ? left.top_in + left.height_in - 0.24
+      : left.top_in + (left.height_in / 2) - 0.03;
+    return structural(
+      slideId,
+      `${connectorRole}-${index + 1}`,
+      'connector',
+      connectorRole,
+      inBox(
+        left.left_in + left.width_in,
+        connectorTop,
+        Math.max(0.06, right.left_in - left.left_in - left.width_in),
+        0.06,
+      ),
+      {
+        line: '#B94624',
+        tail_end: 'triangle',
+        from_shape_id: `${slideId}-slot-${index + 1}-panel`,
+        to_shape_id: `${slideId}-slot-${index + 2}-panel`,
+      },
+    );
+  });
 }
 
 function layoutIntentForSlide({ slideId, layoutFamily, slotCount, shapes }) {
@@ -460,6 +518,9 @@ export function createAiSlide({
     });
     shapes.push(panelMutator ? panelMutator(basePanel, index) : basePanel);
   }
+  if (includeStructuralVisual) {
+    shapes.push(...connectedPanelShapes(layoutFamily, slideId, desiredSlots));
+  }
   for (let index = 0; index < desiredSlots; index += 1) {
     const base = slotGeometry(desiredSlots, index);
     const pointNumber = index + 1;
@@ -555,33 +616,16 @@ export function materializerPayload(slides, route = 'author_pptx_native') {
   };
 }
 
-function enrichFixtureSuitePayload(suite) {
-  return materializerPayload(suite.editable_shape_plan.slides.map((slide) => createAiSlide({
-    slideId: slide.slide_id,
-    title: slide.title,
-    layoutFamily: slide.layout_family,
-    core: slide.core_sentence,
-    points: slide.page_core_content,
-    slotCount: requestedSlotCount(slide),
-  })), suite.editable_shape_plan.route);
-}
-
-let benchmarkFixtureMaterializations = null;
-
-export function materializedBenchmarkFixture() {
-  if (benchmarkFixtureMaterializations) {
-    return benchmarkFixtureMaterializations;
-  }
-  const fixture = readJson(path.resolve('tests/fixtures/ppt-native-visual-benchmark/benchmark.json'));
-  const suites = fixture.suites.map((suite) => ({
-    suite,
-    result: runNativeMaterializer(
-      enrichFixtureSuitePayload(suite),
-      `redcube-native-visual-benchmark-${suite.suite_id}-`,
-    ),
-  }));
-  benchmarkFixtureMaterializations = { fixture, suites };
-  return benchmarkFixtureMaterializations;
+export function benchmarkSuitePayload(suite) {
+  const slides = JSON.parse(JSON.stringify(suite.editable_shape_plan.slides));
+  const base = materializerPayload(slides, suite.editable_shape_plan.route);
+  return {
+    editable_shape_plan: {
+      ...base.editable_shape_plan,
+      ...suite.editable_shape_plan,
+      slides,
+    },
+  };
 }
 
 function repeatedCompositionSignatures(slides) {

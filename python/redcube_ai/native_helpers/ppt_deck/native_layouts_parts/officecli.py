@@ -244,6 +244,13 @@ def native_shape_manifest_record(shape_spec: dict) -> dict:
         'materialization_intent': safe_text(shape_spec.get('materialization_intent'), 'native_data_object' if kind in {'chart', 'table', 'metric_grid'} else 'native_object'),
         'officecli_materialized': True,
     }
+    if kind == 'connector':
+        record.update({
+            'from_shape_id': safe_text(shape_spec.get('from_shape_id') or shape_spec.get('from')),
+            'to_shape_id': safe_text(shape_spec.get('to_shape_id') or shape_spec.get('to')),
+            'head_end': ai_shape_line_end(shape_spec, end='head'),
+            'tail_end': ai_shape_line_end(shape_spec, end='tail'),
+        })
     if kind == 'chart':
         record.update({
             'categories': safe_list(shape_spec.get('categories')),

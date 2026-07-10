@@ -3,6 +3,7 @@
   "output_root": "/tmp/redcube/native-ppt-proof",
   "status": "passed",
   "missing_required_artifacts": [],
+  "failed_required_checks": [],
   "retention_contract": {
     "required_artifact_ids": [
       "doctor_json",
@@ -10,6 +11,8 @@
       "product_status_json",
       "native_helper_input_json",
       "native_helper_output_json",
+      "native_package_readback_json",
+      "native_quality_verdict_json",
       "proof_summary_json",
       "editable_pptx",
       "rendered_pdf",
@@ -22,9 +25,15 @@
       "preview_png_06"
     ],
     "preview_png_count": 6,
+    "preview_png_unique_count": 6,
+    "summary_preview_png_count": 6,
+    "preview_summary_bound": true,
     "doctor_status": "ok",
     "proof_summary_status": "passed",
-    "renderer_pipeline": "libreoffice_headless_pdf_png_v1"
+    "renderer_pipeline": "libreoffice_headless_pdf_png_v1",
+    "native_helper_page_count": 6,
+    "native_package_slide_count": 6,
+    "native_quality_verdict_status": "pass_candidate"
   },
   "artifacts": [
     {
@@ -78,6 +87,26 @@
       "sha256": "aeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeaeae"
     },
     {
+      "artifact_id": "native_package_readback_json",
+      "relative_path": "native-package-readback.json",
+      "media_type": "application/json",
+      "category": "native_quality",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0"
+    },
+    {
+      "artifact_id": "native_quality_verdict_json",
+      "relative_path": "native-quality-verdict.json",
+      "media_type": "application/json",
+      "category": "native_quality",
+      "required": true,
+      "exists": true,
+      "bytes": 100,
+      "sha256": "b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1"
+    },
+    {
       "artifact_id": "proof_summary_json",
       "relative_path": "proof-summary.json",
       "media_type": "application/json",
@@ -94,6 +123,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     },
@@ -104,6 +134,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
     },
@@ -114,6 +145,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
     },
@@ -124,6 +156,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
     },
@@ -134,6 +167,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2f2"
     },
@@ -144,6 +178,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3f3"
     },
@@ -154,6 +189,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4f4"
     },
@@ -164,6 +200,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5f5"
     },
@@ -174,6 +211,7 @@
       "category": "native_render",
       "required": true,
       "exists": true,
+      "source_ref_present": true,
       "bytes": 100,
       "sha256": "f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6f6"
     }

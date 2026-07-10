@@ -162,8 +162,13 @@ def slot_fill_audit(native_shapes: list[dict], primary_points: int) -> dict:
     panel_count = len(shapes_with_role(native_shapes, panel_role))
     text_role = roles[1] if len(roles) > 1 else ''
     if text_role:
+        text_roles = {text_role}
+        if variant == 'timeline_band':
+            text_roles.add('point_text_short')
         text_count = len([
-            shape for shape in shapes_with_role(native_shapes, text_role)
+            shape for shape in native_shapes
+            if shape.get('quality_role') == 'content'
+            and safe_text(shape.get('role')) in text_roles
             if safe_text(shape.get('text'))
         ])
     elif panel_role == 'content_panel':

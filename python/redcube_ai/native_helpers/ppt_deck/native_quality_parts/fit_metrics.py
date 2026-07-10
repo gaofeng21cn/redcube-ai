@@ -31,6 +31,7 @@ from redcube_ai.native_helpers.ppt_deck.native_quality_parts.visual_validation i
     composition_signature,
     generic_overlap_excluded,
     mechanical_card_panel_count,
+    semantic_visual_evidence,
     structural_text_collision_failures,
     structural_visual_shapes,
     title_underline_failures,
@@ -70,7 +71,23 @@ def native_quality_context(native_shapes: list, primary_points: int) -> dict:
     embedded = embedded_visual_metrics(native_shapes)
     structural_shapes = structural_visual_shapes(native_shapes)
     structural_visual_count = len(structural_shapes)
+    semantic_evidence = semantic_visual_evidence(native_shapes)
     audience_slot_count = len(content_slot_shapes(native_shapes))
+    slot_audit = slot_fill_audit(native_shapes, primary_points)
+    if slot_audit['layout_variant'] == 'unknown' and semantic_evidence:
+        expected_slots = max(1, min(primary_points, MAX_NATIVE_PRIMARY_POINTS))
+        filled_slots = min(audience_slot_count, expected_slots)
+        slot_audit = {
+            'layout_variant': semantic_evidence[0]['family'] if len(semantic_evidence) == 1 else 'semantic_composite',
+            'expected_slot_count': expected_slots,
+            'filled_slot_count': filled_slots,
+            'slot_fill_ok': filled_slots == expected_slots,
+            'slot_fill_failures': [] if filled_slots == expected_slots else [{
+                'reason': 'semantic_content_slot_count_mismatch',
+                'expected': expected_slots,
+                'actual': audience_slot_count,
+            }],
+        }
     card_panel_count = mechanical_card_panel_count(native_shapes)
 
     context = {
@@ -95,19 +112,21 @@ def native_quality_context(native_shapes: list, primary_points: int) -> dict:
         'panel_safe_area_failures': panel_text_safe_area_failures(native_shapes),
         'card_padding_failures': text_card_internal_padding_failures(native_shapes),
         'label_wrap_failures': short_label_wrap_failures(native_shapes),
-        'slot_audit': slot_fill_audit(native_shapes, primary_points),
+        'slot_audit': slot_audit,
         'label_failures': audience_label_readability_failures(content_shapes),
         'content_depth': content_depth_audit(content_shapes),
         'grid_audit': grid_balance_audit(native_shapes),
         'underline_failures': title_underline_failures(native_shapes),
         'structural_shapes': structural_shapes,
         'structural_visual_count': structural_visual_count,
+        'semantic_visual_evidence': semantic_evidence,
+        'semantic_visual_evidence_count': len(semantic_evidence),
         'card_panel_count': card_panel_count,
         'audience_slot_count': audience_slot_count,
         'mechanical_card_template_detected': (
             card_panel_count >= 2
             and audience_slot_count >= 2
-            and structural_visual_count < 1
+            and len(semantic_evidence) < 1
         ),
         'composition_signature': composition_signature(native_shapes),
         'coordinate_determinism_hash': coordinate_determinism_hash(native_shapes),
@@ -122,6 +141,7 @@ def native_quality_context(native_shapes: list, primary_points: int) -> dict:
         context['shape_kinds'],
         context['shape_roles'],
         decorative_shapes,
+        len(semantic_evidence),
     )
     context['table_failures'] = table_legibility_failures(context['table_metrics'])
     return context
@@ -277,12 +297,14 @@ def layout_richness_score(
     shape_kinds: set[str],
     shape_roles: set[str],
     decorative_shapes: list[dict],
+    semantic_visual_evidence_count: int = 0,
 ) -> float:
     return round(clamp(
         (min(len(native_shapes), 20) / 20.0 * 0.34)
         + (min(len(shape_kinds), 4) / 4.0 * 0.22)
         + (min(len(shape_roles), 10) / 10.0 * 0.22)
-        + (min(len(decorative_shapes), 7) / 7.0 * 0.22),
+        + (min(len(decorative_shapes), 7) / 7.0 * 0.22)
+        + (min(semantic_visual_evidence_count, 1) * 0.14),
         0.0,
         1.0,
     ), 4)

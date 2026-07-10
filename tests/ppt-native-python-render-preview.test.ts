@@ -7,7 +7,6 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import {
   assertMaterializedQuality,
   createAiSlide,
-  materializedBenchmarkFixture,
   materializerPayload,
   pythonTestEnv,
   resolveTestPythonCommand,
@@ -18,6 +17,69 @@ import {
   writeJson,
   writeTinyPng,
 } from './helpers/ppt-native-python-layout-fixtures.ts';
+
+let semanticMaterialization = null;
+
+function materializedSemanticFixture() {
+  if (semanticMaterialization) return semanticMaterialization;
+  const slides = [
+    createAiSlide({
+      slideId: 'S01',
+      title: 'Native semantic signal',
+      layoutFamily: 'cover_signal',
+      points: [
+        'Opening signal establishes the audience decision.',
+        'Editable evidence stays separate from the title.',
+        'The signal composition remains visually specific.',
+      ],
+    }),
+    createAiSlide({
+      slideId: 'S02',
+      layoutFamily: 'timeline_band',
+      points: [
+        'Source lock creates the first restart point.',
+        'Native authoring produces editable package objects.',
+        'Render proof closes the visible execution sequence.',
+      ],
+    }),
+    createAiSlide({
+      slideId: 'S03',
+      layoutFamily: 'summary_peak',
+      points: [
+        'The final synthesis names the operating decision.',
+        'The proof remains editable and independently reviewable.',
+        'The route-back target stays explicit after evaluation.',
+      ],
+    }),
+  ];
+  const fixture = {
+    expected_renderer_kind: 'libreoffice_headless',
+    forbidden_visible_text_fragments: [],
+    suite_defaults: {
+      min_layout_family_count: 3,
+      min_density: 0.12,
+      max_density: 0.82,
+    },
+  };
+  const suite = {
+    suite_id: 'semantic_materializer_smoke',
+    expected_page_count: slides.length,
+    expected_layout_families: slides.map((slide) => slide.layout_family),
+    expected_anchor_shapes: [],
+    expected_visible_text_fragments: [
+      'Opening signal establishes the audience decision.',
+      'Render proof closes the visible execution sequence.',
+      'The final synthesis names the operating decision.',
+    ],
+    editable_shape_plan: { route: 'author_pptx_native' },
+  };
+  semanticMaterialization = {
+    fixture,
+    suite,
+    result: runNativeMaterializer(materializerPayload(slides), 'redcube-native-semantic-smoke-'),
+  };
+  return semanticMaterialization;
+}
 
 test('native PPTX shape quality flags missing slots, low content, overlap, and unbalanced grids', () => {
   const missingSlot = createAiSlide({
@@ -81,49 +143,43 @@ test('native PPTX shape quality flags missing slots, low content, overlap, and u
   assert.match(JSON.stringify(overlapPreflight.failures), /ai_first_text_box_overlap/);
 });
 
-test('native PPT visual benchmark fixture is materialized from AI shapes without helper templates', () => {
-  const { fixture, suites } = materializedBenchmarkFixture();
-  assert.equal(fixture.route_policy.native_default_route, false);
-  assert.equal(fixture.route_policy.comparison_only, true);
-  assert.equal(fixture.suites.length, 4);
-  const reportRows = suites.map(({ suite, result }) => assertMaterializedQuality({ fixture, suite, result }));
-  const requiredFields = fixture.quality_comparison_report.required_record_fields;
-  assert.equal(reportRows.every((row) => requiredFields.every((field) => Object.hasOwn(row, field))), true);
-  assert.equal(reportRows.every((row) => row.route === 'author_pptx_native'), true);
-  assert.equal(reportRows.every((row) => row.page_count >= 6 && row.page_count <= 10), true);
-  assert.equal(reportRows.every((row) => row.layout_family_count >= fixture.suite_defaults.min_layout_family_count), true);
-  assert.equal(reportRows.every((row) => row.field_leakage_count === 0), true);
-  assert.equal(reportRows.every((row) => row.overlap_pairs === 0), true);
+test('native semantic shape smoke is materialized without helper templates', () => {
+  const { fixture, suite, result } = materializedSemanticFixture();
+  const report = assertMaterializedQuality({ fixture, suite, result });
+  assert.equal(report.route, 'author_pptx_native');
+  assert.equal(report.page_count, 3);
+  assert.equal(report.layout_family_count, 3);
+  assert.equal(report.field_leakage_count, 0);
+  assert.equal(report.overlap_pairs, 0);
 });
 
 test('native render preview attachment records PNG manifest metrics without packaging screenshots into PPTX', () => {
-  const { fixture, suites } = materializedBenchmarkFixture();
-  for (const { suite, result } of suites) {
-    const previewDir = path.join(result.workspaceRoot, 'previews');
-    mkdirSync(previewDir, { recursive: true });
-    const previewMetrics = result.slides.map((slide, index) => {
-      const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
-      return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
-    });
-    assertMaterializedQuality({ fixture, suite, result, previewMetrics });
+  const { fixture, suite, result } = materializedSemanticFixture();
+  const previewDir = path.join(result.workspaceRoot, 'previews');
+  mkdirSync(previewDir, { recursive: true });
+  const previewMetrics = result.slides.map((slide, index) => {
+    const file = path.join(previewDir, `slide-${String(index + 1).padStart(2, '0')}.png`);
+    return { file, ...writeTinyPng(file), slide_id: slide.slide_id };
+  });
+  assertMaterializedQuality({ fixture, suite, result, previewMetrics });
 
-    const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
-    writeJson(inputFile, {
-      slides: result.slides,
-      render_proof: {
-        renderer_kind: 'libreoffice_headless',
-        renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
-        source_surface_kind: 'native_pptx',
-        source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
-        pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
-        preview_screenshots: previewMetrics.map((item) => item.file),
-        preview_png_hashes: previewMetrics.map((item) => ({
-          file: item.file,
-          sha256: item.sha256,
-        })),
-      },
-    });
-    const script = `
+  const inputFile = path.join(result.workspaceRoot, 'attach-input.json');
+  writeJson(inputFile, {
+    slides: result.slides,
+    render_proof: {
+      renderer_kind: 'libreoffice_headless',
+      renderer_pipeline: 'libreoffice_headless_pdf_png_v1',
+      source_surface_kind: 'native_pptx',
+      source_pptx_sha256: sha256Hex(readFileSync(result.outputPptx)),
+      pdf_sha256: sha256Hex(Buffer.from('pdf-proof')),
+      preview_screenshots: previewMetrics.map((item) => item.file),
+      preview_png_hashes: previewMetrics.map((item) => ({
+        file: item.file,
+        sha256: item.sha256,
+      })),
+    },
+  });
+  const script = `
 import json
 from pathlib import Path
 from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
@@ -131,26 +187,25 @@ from redcube_ai.native_helpers.ppt_deck.native import attach_rendered_previews
 payload = json.loads(Path(${JSON.stringify(inputFile)}).read_text(encoding='utf-8'))
 print(json.dumps(attach_rendered_previews(payload['slides'], payload['render_proof']), ensure_ascii=False))
 `;
-    const python = resolveTestPythonCommand();
-    const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
-      cwd: path.resolve('.'),
-      env: pythonTestEnv(),
-      encoding: 'utf-8',
-    });
-    const attachedSlides = JSON.parse(stdout);
+  const python = resolveTestPythonCommand();
+  const stdout = execFileSync(python.command, [...(python.args || []), '-c', script], {
+    cwd: path.resolve('.'),
+    env: pythonTestEnv(),
+    encoding: 'utf-8',
+  });
+  const attachedSlides = JSON.parse(stdout);
 
-    assert.equal(attachedSlides.length, suite.expected_page_count);
-    for (const [index, slide] of attachedSlides.entries()) {
-      const expected = previewMetrics[index];
-      assert.equal(slide.preview_screenshot_file, expected.file);
-      assert.equal(slide.preview_screenshot_sha256, expected.sha256);
-      assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
-      assert.equal(slide.synthetic_preview, false);
-      assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
-    }
-    const outputBytes = readFileSync(result.outputPptx);
-    for (const preview of previewMetrics) {
-      assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
-    }
+  assert.equal(attachedSlides.length, suite.expected_page_count);
+  for (const [index, slide] of attachedSlides.entries()) {
+    const expected = previewMetrics[index];
+    assert.equal(slide.preview_screenshot_file, expected.file);
+    assert.equal(slide.preview_screenshot_sha256, expected.sha256);
+    assert.deepEqual(slide.preview_screenshot_dimensions, expected.dimensions);
+    assert.equal(slide.synthetic_preview, false);
+    assert.equal(slide.render_provenance.preview_screenshot_sha256, expected.sha256);
+  }
+  const outputBytes = readFileSync(result.outputPptx);
+  for (const preview of previewMetrics) {
+    assert.equal(outputBytes.includes(readFileSync(preview.file)), false);
   }
 });

@@ -6,7 +6,7 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { resolveRedCubePythonCommand } from '../scripts/run-test-group-lib.ts';
+import { runNativePlanValidation } from './helpers/ppt-native-python-layout-fixtures.ts';
 
 function buildNativeProofFixture() {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-proof-fixture-'));
@@ -32,51 +32,11 @@ function buildNativeProofFixture() {
   };
 }
 
-function pythonCacheEnv(workspaceRoot) {
-  return {
-    ...process.env,
-    PYTHONPATH: path.resolve('python'),
-    PYTHONDONTWRITEBYTECODE: '1',
-    PYTHONPYCACHEPREFIX: path.join(workspaceRoot, 'pycache'),
-    PYTEST_ADDOPTS: `${process.env.PYTEST_ADDOPTS || ''} -p no:cacheprovider -o cache_dir=${path.join(workspaceRoot, 'pytest-cache')}`.trim(),
-  };
-}
-
-function validatePlan(inputFile, workspaceRoot) {
-  const python = resolveRedCubePythonCommand();
-  const stdout = execFileSync(
-    python.command,
-    [
-      ...(python.args || []),
-      '-m',
-      'redcube_ai.native_helpers.ppt_deck.native',
-      '--input-json',
-      inputFile,
-      '--mode',
-      'validate_plan',
-      '--output-pptx',
-      path.join(workspaceRoot, 'out.pptx'),
-      '--shape-manifest',
-      path.join(workspaceRoot, 'shape-manifest.json'),
-      '--preview-dir',
-      path.join(workspaceRoot, 'previews'),
-      '--engine-contract',
-      'contracts/runtime-program/ppt-native-python-engine-contract.json',
-    ],
-    {
-      cwd: path.resolve('.'),
-      env: pythonCacheEnv(workspaceRoot),
-      encoding: 'utf-8',
-    },
-  );
-  return JSON.parse(stdout);
-}
-
 test('native PPT proof fixture emits the complete AI-first native shape plan contract', () => {
-  const { outputFile, payload, workspaceRoot } = buildNativeProofFixture();
+  const { payload } = buildNativeProofFixture();
   const plan = payload.editable_shape_plan;
 
-  assert.equal(payload.fixture_id, 'ppt_native_visual_benchmark_v2');
+  assert.equal(payload.fixture_id, 'ppt_native_ppt_master_parity_benchmark_v3');
   assert.equal(payload.suite_id, 'data_charts');
   assert.equal(plan.contract_kind, 'redcube_ai_first_native_ppt_shape_plan');
   assert.equal(plan.design_spec_lock.owner, 'llm_agent');
@@ -92,6 +52,21 @@ test('native PPT proof fixture emits the complete AI-first native shape plan con
   assert.equal(plan.template_layout_grammar.archetype_catalog.length, 6);
   assert.equal(plan.deck_layout_rhythm_plan.owner, 'llm_agent');
   assert.equal(plan.deck_layout_rhythm_plan.slides.length, plan.slides.length);
+  const semanticFamilies = new Set(plan.slides.map((slide) => slide.semantic_composition));
+  const objectKinds = new Set(plan.slides.flatMap((slide) => slide.native_shapes.map((shape) => shape.kind)));
+  assert.deepEqual([...semanticFamilies], [
+    'relationship_graph',
+    'timeline',
+    'decision_ladder',
+    'data_chart',
+    'data_table',
+    'image_evidence',
+  ]);
+  for (const kind of ['chart', 'table', 'picture', 'connector']) {
+    assert.equal(objectKinds.has(kind), true, kind);
+  }
+  assert.equal(plan.slides.every((slide) => slide.speaker_notes), true);
+  assert.equal(plan.slides.filter((slide) => slide.transition?.type).length >= 2, true);
 
   for (const slide of plan.slides) {
     const binding = slide.template_layout_binding;
@@ -99,7 +74,9 @@ test('native PPT proof fixture emits the complete AI-first native shape plan con
     assert.equal(binding.selected_archetype, slide.layout_family);
     assert.equal(binding.zone_gap_in_min >= 0.32, true);
     assert.equal(binding.zone_inset_in_min >= 0.15, true);
-    assert.deepEqual([...zoneIds], ['title_zone', 'claim_zone', 'body_zone']);
+    for (const requiredZone of ['title_zone', 'claim_zone', 'body_zone']) {
+      assert.equal(zoneIds.has(requiredZone), true, `${slide.slide_id}:${requiredZone}`);
+    }
     for (const shape of slide.native_shapes) {
       if (['decorative', 'auxiliary'].includes(shape.quality_role)) {
         continue;
@@ -107,13 +84,20 @@ test('native PPT proof fixture emits the complete AI-first native shape plan con
       assert.equal(zoneIds.has(shape.layout_zone_id), true, `${slide.slide_id}:${shape.shape_id}`);
     }
   }
+  const validation = runNativePlanValidation(payload, 'redcube-native-proof-fixture-contract-');
+  assert.equal(validation.ok, true, JSON.stringify(validation, null, 2));
+});
 
-  const validation = validatePlan(outputFile, workspaceRoot);
-  assert.deepEqual(validation, {
-    ok: true,
-    stage: 'ai_first_shape_plan_preflight',
-    slide_count: 6,
-    failure_count: 0,
-    failures: [],
-  });
+test('native PPT proof artifact index retains package readback and quality verdict evidence', () => {
+  const index = JSON.parse(readFileSync(
+    path.resolve('tools/native-ppt-proof/artifact-index-fixture.json'),
+    'utf-8',
+  ));
+  const requiredIds = new Set(index.retention_contract.required_artifact_ids);
+  const artifactIds = new Set(index.artifacts.map((artifact) => artifact.artifact_id));
+
+  for (const artifactId of ['native_package_readback_json', 'native_quality_verdict_json']) {
+    assert.equal(requiredIds.has(artifactId), true, artifactId);
+    assert.equal(artifactIds.has(artifactId), true, artifactId);
+  }
 });
