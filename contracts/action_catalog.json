@@ -144,7 +144,25 @@
         "openai": null,
         "ai_sdk": null
       },
-      "authority_boundary": {}
+      "authority_boundary": {},
+      "stage_route": {
+        "entry_stage_ref": "source_intake",
+        "required_stage_refs": [
+          "source_intake",
+          "communication_strategy",
+          "visual_direction",
+          "artifact_creation",
+          "review_and_revision"
+        ],
+        "optional_stage_refs": [
+          "package_and_handoff"
+        ],
+        "terminal_stage_refs": [
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      }
     },
     {
       "action_id": "get_product_entry_session",
@@ -325,6 +343,20 @@
         "temporal_stage_run_consumption_policy_ref": "/temporal_stage_run_consumption_policy",
         "allowed_temporal_stage_run_writes": [],
         "rca_writes_opl_stage_attempts": false
+      },
+      "stage_route": {
+        "entry_stage_ref": "review_and_revision",
+        "required_stage_refs": [
+          "review_and_revision"
+        ],
+        "optional_stage_refs": [
+          "package_and_handoff"
+        ],
+        "terminal_stage_refs": [
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
       }
     },
     {
@@ -369,7 +401,20 @@
         "openai": null,
         "ai_sdk": null
       },
-      "authority_boundary": {}
+      "authority_boundary": {},
+      "stage_route": {
+        "entry_stage_ref": "artifact_creation",
+        "required_stage_refs": [
+          "artifact_creation",
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      }
     },
     {
       "action_id": "run_native_ppt_proof",
@@ -413,7 +458,20 @@
         "openai": null,
         "ai_sdk": null
       },
-      "authority_boundary": {}
+      "authority_boundary": {},
+      "stage_route": {
+        "entry_stage_ref": "artifact_creation",
+        "required_stage_refs": [
+          "artifact_creation",
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      }
     },
     {
       "action_id": "invoke_domain_entry",
@@ -455,7 +513,25 @@
         "openai": null,
         "ai_sdk": null
       },
-      "authority_boundary": {}
+      "authority_boundary": {},
+      "stage_route": {
+        "entry_stage_ref": "source_intake",
+        "required_stage_refs": [
+          "source_intake",
+          "communication_strategy",
+          "visual_direction",
+          "artifact_creation",
+          "review_and_revision"
+        ],
+        "optional_stage_refs": [
+          "package_and_handoff"
+        ],
+        "terminal_stage_refs": [
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      }
     }
   ],
   "notes": [

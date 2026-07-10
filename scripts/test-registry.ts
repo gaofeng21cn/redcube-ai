@@ -23,6 +23,7 @@ export type VerifyLanePlan = Readonly<{
 const PRIMARY_TEST_FILES = Object.freeze({
   meta: Object.freeze([
     'tests/ai-first-authoring-boundary.test.ts',
+    'tests/action-stage-route-parity.test.ts',
     'tests/ci-workflow.test.ts',
     'tests/candidate-racing.test.ts',
     'tests/codex-plugin.test.ts',
@@ -140,6 +141,7 @@ const PRIMARY_TEST_FILES = Object.freeze({
     'tests/product-entry-native-ppt-live-proof.test.ts',
     'tests/product-entry-native-ppt-proof-lane.test.ts',
     'tests/product-entry-route-integration.test.ts',
+    'tests/product-entry-stage-order.test.ts',
     'tests/product-entry-runtime-manager-registration.test.ts',
     'tests/product-entry-session-checkpoint.test.ts',
     'tests/product-entry.test.ts',

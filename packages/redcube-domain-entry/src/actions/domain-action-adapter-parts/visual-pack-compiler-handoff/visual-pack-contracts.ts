@@ -342,6 +342,7 @@ export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([
   'agent/stages/artifact_creation.md',
   'agent/stages/review_and_revision.md',
   'agent/stages/package_and_handoff.md',
+  'agent/stages/manifest.json',
   'agent/skills/visual_deliverable_authoring.md',
   'agent/skills/native_helper_policy.md',
   'agent/skills/visual_memory_policy.md',

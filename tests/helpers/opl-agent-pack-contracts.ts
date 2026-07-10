@@ -35,6 +35,7 @@ export const requiredDomainPackPaths = [
   'agent/stages/artifact_creation.md',
   'agent/stages/review_and_revision.md',
   'agent/stages/package_and_handoff.md',
+  'agent/stages/manifest.json',
   'agent/skills/visual_deliverable_authoring.md',
   'agent/skills/native_helper_policy.md',
   'agent/skills/visual_memory_policy.md',
@@ -222,7 +223,7 @@ export function buildCanonicalPack() {
       source_refs: {
         canonical_semantic_pack: 'agent/',
         action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
-        stage_control_plane: 'packages/redcube-domain-entry/src/actions/family-stage-control-plane.ts::buildRedCubeFamilyStageControlPlane',
+        stage_control_plane: 'agent/stages/manifest.json',
         memory_descriptor: 'packages/redcube-domain-entry/src/actions/domain-authority-refs.ts::buildFamilyDomainMemoryDescriptor',
         functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
       },

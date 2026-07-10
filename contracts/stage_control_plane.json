@@ -53,6 +53,11 @@
       "role": "declarative_visual_pack_root"
     },
     {
+      "ref_kind": "repo_path",
+      "ref": "agent/stages/manifest.json",
+      "role": "declarative_stage_manifest"
+    },
+    {
       "ref_kind": "contract",
       "ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
       "role": "artifact_authority_contract"
@@ -66,7 +71,7 @@
   "freshness": {
     "status": "current",
     "checked_at": "manifest_build",
-    "source_ref_count": 3,
+    "source_ref_count": 4,
     "stale_refs": [],
     "missing_refs": []
   },
@@ -192,15 +197,17 @@
     {
       "stage_id": "source_intake",
       "title": "Source intake",
-      "goal": "Freeze source truth, audience, constraints, and missing-material risk before visual planning.",
+      "goal": "Freeze source truth, source readiness, research refs, constraints, and missing-material risk before communication planning.",
       "domain_stage_refs": [
         "source_readiness",
-        "research",
-        "storyline"
+        "research"
       ],
       "action_refs": [
         "get_product_status",
-        "get_product_entry_manifest"
+        "get_product_preflight",
+        "get_product_entry_manifest",
+        "invoke_product_entry",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -214,7 +221,10 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "get_product_status",
-        "get_product_entry_manifest"
+        "get_product_preflight",
+        "get_product_entry_manifest",
+        "invoke_product_entry",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -261,11 +271,6 @@
         {
           "ref_kind": "stage_strategy_ref",
           "ref": "research",
-          "role": "domain_stage_strategy_ref"
-        },
-        {
-          "ref_kind": "stage_strategy_ref",
-          "ref": "storyline",
           "role": "domain_stage_strategy_ref"
         }
       ],
@@ -541,7 +546,11 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/source_intake/handoff",
+        "next_stage_refs": [
+          "communication_strategy"
+        ]
       },
       "prompt_ref": "agent/prompts/source_intake.md",
       "stage_ref": "agent/stages/source_intake.md",
@@ -623,7 +632,23 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [
+        "communication_strategy"
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [
+          "communication_strategy"
+        ],
+        "provides": [
+          "source_truth_frozen"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Freeze source truth and resolve source-readiness or research gaps before communication planning."
     },
     {
       "stage_id": "communication_strategy",
@@ -638,7 +663,8 @@
       ],
       "action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -654,7 +680,8 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -991,7 +1018,11 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/communication_strategy/handoff",
+        "next_stage_refs": [
+          "visual_direction"
+        ]
       },
       "prompt_ref": "agent/prompts/communication_strategy.md",
       "stage_ref": "agent/stages/communication_strategy.md",
@@ -1073,7 +1104,23 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [
+        "visual_direction"
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [
+          "visual_direction"
+        ],
+        "provides": [
+          "communication_strategy_accepted"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Turn frozen source truth into the communication sequence and page-level information plan."
     },
     {
       "stage_id": "visual_direction",
@@ -1084,7 +1131,8 @@
       ],
       "action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md"
@@ -1101,7 +1149,8 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -1418,7 +1467,11 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/visual_direction/handoff",
+        "next_stage_refs": [
+          "artifact_creation"
+        ]
       },
       "prompt_ref": "agent/prompts/visual_direction.md",
       "stage_ref": "agent/stages/visual_direction.md",
@@ -1500,7 +1553,23 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [
+        "artifact_creation"
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [
+          "artifact_creation"
+        ],
+        "provides": [
+          "visual_direction_accepted"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Choose visual language, rhythm, layout density, and feasibility before artifact creation."
     },
     {
       "stage_id": "artifact_creation",
@@ -1514,7 +1583,8 @@
       "action_refs": [
         "invoke_product_entry",
         "run_image_ppt_proof",
-        "run_native_ppt_proof"
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md",
@@ -1534,7 +1604,8 @@
       "allowed_action_refs": [
         "invoke_product_entry",
         "run_image_ppt_proof",
-        "run_native_ppt_proof"
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -1866,7 +1937,11 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/artifact_creation/handoff",
+        "next_stage_refs": [
+          "review_and_revision"
+        ]
       },
       "prompt_ref": "agent/prompts/artifact_creation.md",
       "stage_ref": "agent/stages/artifact_creation.md",
@@ -1948,7 +2023,23 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [
+        "review_and_revision"
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [
+          "review_and_revision"
+        ],
+        "provides": [
+          "artifact_candidate_rendered"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Create the deliverable through one explicit RCA authoring route while preserving source truth."
     },
     {
       "stage_id": "review_and_revision",
@@ -1963,7 +2054,11 @@
       ],
       "action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "dispatch_domain_handler",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/visual_deliverable_authoring.md",
@@ -1982,7 +2077,11 @@
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
         "invoke_product_entry",
-        "get_product_entry_session"
+        "get_product_entry_session",
+        "dispatch_domain_handler",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -2324,7 +2423,11 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/review_and_revision/handoff",
+        "next_stage_refs": [
+          "package_and_handoff"
+        ]
       },
       "prompt_ref": "agent/prompts/review_and_revision.md",
       "stage_ref": "agent/stages/review_and_revision.md",
@@ -2406,7 +2509,23 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [
+        "package_and_handoff"
+      ],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [
+          "package_and_handoff"
+        ],
+        "provides": [
+          "visual_review_gate_receipt_recorded"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Review rendered evidence, identify repair targets, and record the visual review gate result."
     },
     {
       "stage_id": "package_and_handoff",
@@ -2419,9 +2538,14 @@
         "export_poster"
       ],
       "action_refs": [
+        "invoke_product_entry",
         "get_product_entry_session",
         "get_product_entry_manifest",
-        "export_domain_handler"
+        "export_domain_handler",
+        "dispatch_domain_handler",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "skill_refs": [
         "agent/skills/native_helper_policy.md",
@@ -2437,9 +2561,14 @@
       "owner": "redcube_ai",
       "stage_pack_conformance_version": "standard-stage-pack.v2",
       "allowed_action_refs": [
+        "invoke_product_entry",
         "get_product_entry_session",
         "get_product_entry_manifest",
-        "export_domain_handler"
+        "export_domain_handler",
+        "dispatch_domain_handler",
+        "run_image_ppt_proof",
+        "run_native_ppt_proof",
+        "invoke_domain_entry"
       ],
       "prompt_refs": [
         {
@@ -2776,7 +2905,9 @@
             "opl_can_escalate_without_domain_or_human_gate_ref": false,
             "opl_can_claim_deliverable_progress_from_platform_repair": false
           }
-        }
+        },
+        "handoff_ref": "/family_stage_control_plane/stages/package_and_handoff/handoff",
+        "next_stage_refs": []
       },
       "prompt_ref": "agent/prompts/package_and_handoff.md",
       "stage_ref": "agent/stages/package_and_handoff.md",
@@ -2858,7 +2989,19 @@
           "tool_catalog_can_override_stage_goal": false,
           "tool_catalog_can_authorize_forbidden_write": false
         }
-      }
+      },
+      "next_stage_refs": [],
+      "handoff": {
+        "next_owner": "redcube_ai",
+        "next_stage_refs": [],
+        "provides": [
+          "export_handoff_receipt_recorded"
+        ],
+        "resume_surface_ref": "domain-handler:invokeProductEntry",
+        "owner_receipt_ref": "/domain_owner_receipt_contract",
+        "handler_target_ref": "domain-handler:invokeProductEntry"
+      },
+      "summary": "Export accepted files and bind package, resume, artifact, and owner handoff refs."
     }
   ],
   "notes": [

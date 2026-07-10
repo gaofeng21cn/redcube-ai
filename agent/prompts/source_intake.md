@@ -2,17 +2,17 @@
 
 Stage id: `source_intake`
 Owner: RedCube AI
-Purpose: freeze source truth, audience constraints, source gaps, and allowed evidence before communication planning.
+Purpose: freeze source truth, source readiness, research refs, source gaps, and allowed evidence before communication planning.
 
 Canonical policy:
-- Read all supplied source material before producing source readiness or storyline inputs.
+- Read all supplied source material before producing source readiness or research refs.
 - Treat `source_materials_full_text`, source package refs, and explicit user constraints as the only source-truth basis.
-- Return source truth refs, evidence gaps, and typed blockers when source material is insufficient.
+- Return source truth refs, research refs, evidence gaps, and typed blockers when source material is insufficient.
+- Leave storyline, outline, page-role, and communication-sequence judgment to `communication_strategy`.
 - Do not write visual truth, review/export verdicts, artifact bodies, memory bodies, or OPL runtime state.
 
 Detailed prompt locators:
-- `ppt_deck`: `prompts/ppt_deck/storyline.md`
-- `xiaohongshu`: `prompts/xiaohongshu/research.md`, `prompts/xiaohongshu/storyline.md`
+- `xiaohongshu`: `prompts/xiaohongshu/research.md`
 
 Authority boundary:
 - AI-first source readiness judgment belongs to RCA stage artifacts.

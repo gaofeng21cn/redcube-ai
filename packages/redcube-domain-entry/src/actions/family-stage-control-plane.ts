@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { readFileSync } from 'node:fs';
+
 import {
   RCA_STAGE_OUTPUT_CANONICAL_ROLES,
   RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS,
@@ -8,78 +10,15 @@ import {
   RCA_DOMAIN_TOOL_AFFORDANCE_REF,
 } from './domain-action-adapter-parts/visual-pack-compiler-handoff/visual-pack-contracts.js';
 
-const STAGES = [
-  {
-    stage_id: 'source_intake',
-    title: 'Source intake',
-    goal: 'Freeze source truth, audience, constraints, and missing-material risk before visual planning.',
-    domain_stage_refs: ['source_readiness', 'research', 'storyline'],
-    action_refs: ['get_product_status', 'get_product_entry_manifest'],
-    skill_refs: ['agent/skills/visual_deliverable_authoring.md'],
-    quality_gate_refs: ['agent/quality_gates/source_and_truth.md'],
-    professional_skill_refs: [],
-  },
-  {
-    stage_id: 'communication_strategy',
-    title: 'Communication strategy',
-    goal: 'Shape storyline, outline, audience fit, information density, and key takeaways.',
-    domain_stage_refs: ['storyline', 'detailed_outline', 'slide_blueprint', 'single_note_plan', 'poster_blueprint'],
-    action_refs: ['invoke_product_entry', 'get_product_entry_session'],
-    skill_refs: ['agent/skills/visual_deliverable_authoring.md'],
-    quality_gate_refs: ['agent/quality_gates/communication_and_direction.md'],
-    professional_skill_refs: ['agent/professional_skills/rca-ppt-story-architect/SKILL.md'],
-  },
-  {
-    stage_id: 'visual_direction',
-    title: 'Visual direction',
-    goal: 'Define layout density, image strategy, visual language, and feasibility before artifact creation.',
-    domain_stage_refs: ['visual_direction'],
-    action_refs: ['invoke_product_entry', 'get_product_entry_session'],
-    skill_refs: ['agent/skills/visual_deliverable_authoring.md'],
-    quality_gate_refs: ['agent/quality_gates/visual_pack_discipline.md'],
-    professional_skill_refs: [
-      'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
-      'agent/professional_skills/rca-template-profiler/SKILL.md',
-    ],
-  },
-  {
-    stage_id: 'artifact_creation',
-    title: 'Artifact creation',
-    goal: 'Create the visual deliverable through the selected RCA route while preserving source truth.',
-    domain_stage_refs: ['author_image_pages', 'render_html', 'author_pptx_native'],
-    action_refs: ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof'],
-    skill_refs: ['agent/skills/visual_deliverable_authoring.md', 'agent/skills/native_helper_policy.md'],
-    quality_gate_refs: ['agent/quality_gates/artifact_authority.md'],
-    professional_skill_refs: [
-      'agent/professional_skills/rca-ppt-page-author/SKILL.md',
-      'agent/professional_skills/rca-native-ppt-designer/SKILL.md',
-      'agent/professional_skills/rca-template-profiler/SKILL.md',
-    ],
-  },
-  {
-    stage_id: 'review_and_revision',
-    title: 'Review and revision',
-    goal: 'Run visual, screenshot, source-fidelity, and repair gates before export.',
-    domain_stage_refs: ['visual_director_review', 'screenshot_review', 'repair_image_pages', 'fix_html', 'repair_pptx_native'],
-    action_refs: ['invoke_product_entry', 'get_product_entry_session'],
-    skill_refs: ['agent/skills/visual_deliverable_authoring.md', 'agent/skills/visual_memory_policy.md'],
-    quality_gate_refs: ['agent/quality_gates/review_export_memory.md'],
-    professional_skill_refs: [
-      'agent/professional_skills/rca-ppt-reviewer/SKILL.md',
-      'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
-    ],
-  },
-  {
-    stage_id: 'package_and_handoff',
-    title: 'Package and handoff',
-    goal: 'Export final files, preview metadata, resume handles, and operator handoff refs.',
-    domain_stage_refs: ['export_pptx', 'publish_copy', 'export_bundle', 'export_poster'],
-    action_refs: ['get_product_entry_session', 'get_product_entry_manifest', 'export_domain_handler'],
-    skill_refs: ['agent/skills/native_helper_policy.md', 'agent/skills/visual_memory_policy.md'],
-    quality_gate_refs: ['agent/quality_gates/package_distribution.md'],
-    professional_skill_refs: ['agent/professional_skills/rca-ppt-reviewer/SKILL.md'],
-  },
-];
+const STAGE_MANIFEST_REF = 'agent/stages/manifest.json';
+const STAGE_MANIFEST = JSON.parse(readFileSync(new URL(`../../../../${STAGE_MANIFEST_REF}`, import.meta.url), 'utf8'));
+const STAGES = STAGE_MANIFEST.stages.map((stage) => ({
+  ...stage,
+  action_refs: stage.allowed_action_refs,
+  skill_refs: stage.skill_refs,
+  quality_gate_refs: stage.quality_gate_refs,
+  professional_skill_refs: stage.professional_skill_refs,
+}));
 
 function buildFreshness(sourceRefs) {
   return {
@@ -117,6 +56,15 @@ function stageRef(stage, actionIds) {
       policy: 'execution_and_review_attempts_must_be_separable_for_quality_progression',
       same_attempt_self_review_can_close_quality_gate: false,
     },
+    next_stage_refs: [...stage.next_stage_refs],
+    handoff: {
+      ...stage.handoff,
+      next_owner: 'redcube_ai',
+      next_stage_refs: [...stage.next_stage_refs],
+      resume_surface_ref: 'domain-handler:invokeProductEntry',
+      owner_receipt_ref: '/domain_owner_receipt_contract',
+      handler_target_ref: 'domain-handler:invokeProductEntry',
+    },
     handoff_policy: {
       policy: 'receipt_typed_blocker_human_gate_or_route_back_ref_required',
       refs_only: true,
@@ -125,6 +73,8 @@ function stageRef(stage, actionIds) {
       tool_affordance_boundary_ref: `/family_stage_control_plane/stages/${stage.stage_id}/tool_affordance_boundary`,
       candidate_pool_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/candidate_pool_policy`,
       handoff_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/handoff_policy`,
+      handoff_ref: `/family_stage_control_plane/stages/${stage.stage_id}/handoff`,
+      next_stage_refs: [...stage.next_stage_refs],
       independent_gate_policy_ref: `/family_stage_control_plane/stages/${stage.stage_id}/independent_gate_policy`,
       runtime_event_refs: [],
     },
@@ -147,6 +97,7 @@ export function buildRedCubeFamilyStageControlPlane({ familyActionCatalog = null
   const actionIds = new Set((familyActionCatalog?.actions ?? []).map((action) => action.action_id));
   const sourceRefs = [
     { ref_kind: 'repo_path', ref: 'agent/', role: 'declarative_visual_pack_root' },
+    { ref_kind: 'repo_path', ref: STAGE_MANIFEST_REF, role: 'declarative_stage_manifest' },
     { ref_kind: 'contract', ref: 'contracts/artifact_locator_contract.json#/primary_artifact_truth', role: 'artifact_authority_contract' },
     { ref_kind: 'json_pointer', ref: '/family_action_catalog', role: 'domain_handler_target_refs' },
   ];

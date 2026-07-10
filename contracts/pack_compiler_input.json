@@ -24,6 +24,7 @@
     "agent/stages/artifact_creation.md",
     "agent/stages/review_and_revision.md",
     "agent/stages/package_and_handoff.md",
+    "agent/stages/manifest.json",
     "agent/skills/visual_deliverable_authoring.md",
     "agent/skills/native_helper_policy.md",
     "agent/skills/visual_memory_policy.md",
@@ -60,10 +61,10 @@
   "source_refs": {
     "domain_descriptor": "contracts/domain_descriptor.json",
     "action_target_refs": "contracts/action_catalog.json",
-    "stage_refs": "contracts/stage_control_plane.json",
+    "stage_refs": "agent/stages/manifest.json",
     "artifact_locator": "contracts/artifact_locator_contract.json",
     "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json",
-    "stage_graph_source_ref": "contracts/stage_control_plane.json",
+    "stage_graph_source_ref": "agent/stages/manifest.json",
     "quality_gate_source_ref": "agent/quality_gates/visual_pack_discipline.md",
     "executor_policy_source_ref": "contracts/stage_control_plane.json#/stages/*/selected_executor",
     "owner_receipt_schema_source_ref": "contracts/owner_receipt_contract.json",
@@ -75,7 +76,6 @@
     "visual_transition_adapter_profile_source_ref": "contracts/visual_transition_adapter_profile.json"
   },
   "authority_boundary": {
-    "opl_can_compile_generated_surfaces_from_refs": true,
     "opl_can_write_domain_truth": false,
     "opl_can_write_memory_body": false,
     "opl_can_authorize_quality_or_export": false,
@@ -290,7 +290,7 @@
   "standard_stage_pack_conformance": {
     "version": "standard-stage-pack.v2",
     "required": true,
-    "enforcement_ref": "contracts/stage_control_plane.json#stage_pack_conformance_version"
+    "enforcement_ref": "agent/stages/manifest.json"
   },
   "standard_agent_pack_abi": {
     "surface_kind": "opl_standard_agent_pack_abi",

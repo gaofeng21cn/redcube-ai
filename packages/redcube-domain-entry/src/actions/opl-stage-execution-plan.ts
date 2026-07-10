@@ -11,8 +11,8 @@ function safeArray(value) {
   return Array.isArray(value) ? value : [];
 }
 
-function stageSequenceFromContract(contract) {
-  return safeArray(contract?.stage_sequence?.stages)
+function normalizeStageSequence(stages, sequenceKind) {
+  return safeArray(stages)
     .map((stage, index) => ({
       stage_id: safeText(stage?.stage_id),
       title: safeText(stage?.title || stage?.label || stage?.stage_id),
@@ -21,9 +21,17 @@ function stageSequenceFromContract(contract) {
       requires_stages: safeArray(stage?.requires_stages).map((dependency) => safeText(dependency)).filter(Boolean),
       route_handler_ref: `redcube.route_handler:${safeText(stage?.stage_id)}`,
       stage_attempt_ref: `opl.stage_attempt:${safeText(stage?.stage_id)}`,
+      sequence_kind: sequenceKind,
       sequence_index: index,
     }))
     .filter((stage) => stage.stage_id);
+}
+
+function stageSequencesFromContract(contract) {
+  return {
+    primaryStages: normalizeStageSequence(contract?.stage_sequence?.stages, 'primary'),
+    alternateStages: normalizeStageSequence(contract?.stage_sequence?.alternate_stages, 'alternate'),
+  };
 }
 
 function stagePlanRef({ overlay, topicId, deliverableId, stopAfterStage }) {
@@ -36,12 +44,100 @@ function stagePlanRef({ overlay, topicId, deliverableId, stopAfterStage }) {
   ].join(':');
 }
 
-function plannedStagesForStop({ stages, stopAfterStage }) {
-  const stopStage = safeText(stopAfterStage);
-  if (!stopStage) return stages;
-  const stopIndex = stages.findIndex((stage) => stage.stage_id === stopStage);
-  if (stopIndex < 0) return stages;
-  return stages.slice(0, stopIndex + 1);
+function dependencyPlan(stages, targetStageId) {
+  const stagesById = new Map(stages.map((stage) => [stage.stage_id, stage]));
+  const visiting = new Set();
+  const included = new Set();
+  const planned = [];
+
+  function visit(stageId) {
+    if (included.has(stageId)) return;
+    if (visiting.has(stageId)) throw new Error(`Hydrated overlay stage_sequence contains a dependency cycle at ${stageId}`);
+    const stage = stagesById.get(stageId);
+    if (!stage) throw new Error(`Hydrated overlay stage_sequence is missing dependency stage ${stageId}`);
+    visiting.add(stageId);
+    stage.requires_stages.forEach(visit);
+    visiting.delete(stageId);
+    included.add(stageId);
+    planned.push(stage);
+  }
+
+  visit(targetStageId);
+  return planned;
+}
+
+function planStageSequence({ primaryStages, alternateStages, route, stopAfterStage }) {
+  const requestedRoute = safeText(route);
+  const requestedStop = safeText(stopAfterStage);
+  const allStages = [...primaryStages, ...alternateStages];
+  const stagesById = new Map(allStages.map((stage) => [stage.stage_id, stage]));
+  const routeStage = requestedRoute ? stagesById.get(requestedRoute) : null;
+  const stopStage = requestedStop ? stagesById.get(requestedStop) : null;
+
+  if (requestedRoute && !routeStage) throw new Error(`Unknown delivery_request.route: ${requestedRoute}`);
+  if (requestedStop && !stopStage) throw new Error(`Unknown delivery_request.stop_after_stage: ${requestedStop}`);
+
+  if (routeStage && stopStage) {
+    if (routeStage.sequence_kind === 'primary' && stopStage.sequence_kind === 'primary') {
+      if (stopStage.sequence_index < routeStage.sequence_index) {
+        throw new Error(`delivery_request.stop_after_stage=${requestedStop} precedes delivery_request.route=${requestedRoute}`);
+      }
+      return {
+        plannedStages: primaryStages.slice(0, stopStage.sequence_index + 1),
+        effectiveStopAfterStage: requestedStop,
+        routeStrategy: 'primary_route_prefix',
+        dependencyRecoveryApplied: false,
+      };
+    }
+
+    const stopPlan = dependencyPlan(allStages, requestedStop);
+    if (stopPlan.some((stage) => stage.stage_id === requestedRoute)) {
+      return {
+        plannedStages: stopPlan,
+        effectiveStopAfterStage: requestedStop,
+        routeStrategy: 'explicit_route_dependency_recovery',
+        dependencyRecoveryApplied: true,
+      };
+    }
+    const routePlan = dependencyPlan(allStages, requestedRoute);
+    if (routePlan.some((stage) => stage.stage_id === requestedStop)) {
+      throw new Error(`delivery_request.stop_after_stage=${requestedStop} precedes delivery_request.route=${requestedRoute}`);
+    }
+    throw new Error(
+      `delivery_request.route=${requestedRoute} and delivery_request.stop_after_stage=${requestedStop} do not share an ordered stage path`,
+    );
+  }
+
+  if (routeStage) {
+    const alternateRoute = routeStage.sequence_kind === 'alternate';
+    return {
+      plannedStages: alternateRoute
+        ? dependencyPlan(allStages, requestedRoute)
+        : primaryStages.slice(0, routeStage.sequence_index + 1),
+      effectiveStopAfterStage: requestedRoute,
+      routeStrategy: alternateRoute ? 'alternate_route_dependency_recovery' : 'primary_route_prefix',
+      dependencyRecoveryApplied: alternateRoute,
+    };
+  }
+
+  if (stopStage) {
+    const alternateStop = stopStage.sequence_kind === 'alternate';
+    return {
+      plannedStages: alternateStop
+        ? dependencyPlan(allStages, requestedStop)
+        : primaryStages.slice(0, stopStage.sequence_index + 1),
+      effectiveStopAfterStage: requestedStop,
+      routeStrategy: alternateStop ? 'alternate_stop_dependency_recovery' : 'primary_stop_prefix',
+      dependencyRecoveryApplied: alternateStop,
+    };
+  }
+
+  return {
+    plannedStages: primaryStages,
+    effectiveStopAfterStage: '',
+    routeStrategy: 'primary_sequence',
+    dependencyRecoveryApplied: false,
+  };
 }
 
 export async function buildOplStageExecutionPlan({
@@ -64,15 +160,20 @@ export async function buildOplStageExecutionPlan({
   });
   const contract = deliverableRecord.hydrated_contract || {};
   const contractOverlay = safeText(contract.overlay || deliverableRecord.summary?.overlay, overlay);
-  const stages = stageSequenceFromContract(contract);
-  const plannedStages = plannedStagesForStop({ stages, stopAfterStage });
+  const { primaryStages, alternateStages } = stageSequencesFromContract(contract);
+  const {
+    plannedStages,
+    effectiveStopAfterStage,
+    routeStrategy,
+    dependencyRecoveryApplied,
+  } = planStageSequence({ primaryStages, alternateStages, route, stopAfterStage });
   const planRef = stagePlanRef({
     overlay: contractOverlay,
     topicId,
     deliverableId,
-    stopAfterStage,
+    stopAfterStage: effectiveStopAfterStage,
   });
-  const approvalRequired = Boolean(safeText(stopAfterStage));
+  const approvalRequired = Boolean(effectiveStopAfterStage);
 
   return {
     ok: true,
@@ -102,8 +203,12 @@ export async function buildOplStageExecutionPlan({
       rca_role: 'visual_domain_authority_functions_and_route_handler_refs',
     },
     control_policy: {
-      mode: safeText(stopAfterStage) ? 'stop_after_stage' : 'auto_to_terminal',
-      requested_stop_after_stage: safeText(stopAfterStage) || null,
+      mode: effectiveStopAfterStage ? 'stop_after_stage' : 'auto_to_terminal',
+      requested_route: safeText(route) || null,
+      explicit_stop_after_stage: safeText(stopAfterStage) || null,
+      requested_stop_after_stage: effectiveStopAfterStage || null,
+      route_strategy: routeStrategy,
+      dependency_recovery_applied: dependencyRecoveryApplied,
       approval_required: approvalRequired,
       gate_status: approvalRequired ? 'requested' : 'approved',
       stop_policy: 'opl_provider_runs_until_explicit_stop_after_stage_or_rca_review_gate',
@@ -115,6 +220,7 @@ export async function buildOplStageExecutionPlan({
       stage_id: stage.stage_id,
       stage_kind: stage.stage_kind,
       title: stage.title,
+      sequence_kind: stage.sequence_kind,
       route_handler_ref: stage.route_handler_ref,
       provider_attempt_ref: `${planRef}:${stage.stage_id}`,
       depends_on: stage.requires_stages,
@@ -127,7 +233,8 @@ export async function buildOplStageExecutionPlan({
         artifact_authority_owner: RCA_DOMAIN_OWNER,
       },
     })),
-    full_stage_sequence_refs: stages.map((stage) => stage.stage_id),
+    full_stage_sequence_refs: primaryStages.map((stage) => stage.stage_id),
+    alternate_stage_refs: alternateStages.map((stage) => stage.stage_id),
     authority_refs: {
       domain_handler_ref: '/product_entry_shell/domain_handler',
       domain_action_adapter_ref: '/product_entry_shell/domain_handler',

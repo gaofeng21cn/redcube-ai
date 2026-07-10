@@ -31,6 +31,52 @@ const RETIRED_REPO_LOCAL_WRAPPER_ACTION_IDS = new Set([
   'get_product_entry_manifest',
 ]);
 
+const MAINLINE_TO_REVIEW_STAGE_REFS = [
+  'source_intake',
+  'communication_strategy',
+  'visual_direction',
+  'artifact_creation',
+  'review_and_revision',
+];
+
+const ACTION_STAGE_ROUTES: Record<string, JsonMap> = Object.freeze({
+  invoke_product_entry: {
+    entry_stage_ref: 'source_intake',
+    required_stage_refs: MAINLINE_TO_REVIEW_STAGE_REFS,
+    optional_stage_refs: ['package_and_handoff'],
+    terminal_stage_refs: ['review_and_revision', 'package_and_handoff'],
+    route_policy: 'ordered_stage_attempts_no_skip',
+  },
+  dispatch_domain_handler: {
+    entry_stage_ref: 'review_and_revision',
+    required_stage_refs: ['review_and_revision'],
+    optional_stage_refs: ['package_and_handoff'],
+    terminal_stage_refs: ['review_and_revision', 'package_and_handoff'],
+    route_policy: 'ordered_stage_attempts_no_skip',
+  },
+  run_image_ppt_proof: {
+    entry_stage_ref: 'artifact_creation',
+    required_stage_refs: ['artifact_creation', 'review_and_revision', 'package_and_handoff'],
+    optional_stage_refs: [],
+    terminal_stage_refs: ['package_and_handoff'],
+    route_policy: 'ordered_stage_attempts_no_skip',
+  },
+  run_native_ppt_proof: {
+    entry_stage_ref: 'artifact_creation',
+    required_stage_refs: ['artifact_creation', 'review_and_revision', 'package_and_handoff'],
+    optional_stage_refs: [],
+    terminal_stage_refs: ['package_and_handoff'],
+    route_policy: 'ordered_stage_attempts_no_skip',
+  },
+  invoke_domain_entry: {
+    entry_stage_ref: 'source_intake',
+    required_stage_refs: MAINLINE_TO_REVIEW_STAGE_REFS,
+    optional_stage_refs: ['package_and_handoff'],
+    terminal_stage_refs: ['review_and_revision', 'package_and_handoff'],
+    route_policy: 'ordered_stage_attempts_no_skip',
+  },
+});
+
 const MCP_TOOLS = [
   {
     name: 'redcube_workspace',
@@ -203,6 +249,22 @@ function attachSourceOfWork(catalog: JsonMap | null): JsonMap | null {
   };
 }
 
+function attachActionStageRoutes(catalog: JsonMap | null): JsonMap | null {
+  if (!catalog) return catalog;
+  return {
+    ...catalog,
+    actions: (catalog.actions ?? []).map((entry: JsonMap) => {
+      if (entry.effect === 'read_only') return entry;
+      const route = ACTION_STAGE_ROUTES[entry.action_id];
+      if (!route) throw new Error(`Missing required RCA action stage route: ${entry.action_id}`);
+      return {
+        ...entry,
+        stage_route: JSON.parse(JSON.stringify(route)),
+      };
+    }),
+  };
+}
+
 function sourceOfWork(actionId: string): JsonMap {
   return {
     source_catalog: 'family_action_catalog',
@@ -214,7 +276,7 @@ function sourceOfWork(actionId: string): JsonMap {
   };
 }
 
-const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
+const ACTION_CATALOG = attachSourceOfWork(attachActionStageRoutes(normalizeFamilyActionCatalog({
   surface_kind: 'family_action_catalog',
   version: 'family-action-catalog.v1',
   catalog_id: 'redcube_product_entry_action_catalog',
@@ -451,7 +513,7 @@ const ACTION_CATALOG = attachSourceOfWork(normalizeFamilyActionCatalog({
     'RCA owns action semantics and domain handlers; OPL owns generated CLI/MCP/Skill/product/status/workbench descriptors derived from this catalog.',
     'Repo-local redcube CLI/MCP remain domain handler targets and direct diagnostic entries, not unified metadata owners.',
   ],
-}));
+})));
 
 if (!ACTION_CATALOG) {
   throw new Error('Failed to build RedCube family action catalog');
