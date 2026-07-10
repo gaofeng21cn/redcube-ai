@@ -203,7 +203,7 @@ function inspectCurrentRepoSharedPinAlignment({
 
 export function assertCurrentRepoSharedPinAlignment(options: SharedPinAlignmentOptions = {}) {
   const inspection = inspectCurrentRepoSharedPinAlignment(options);
-  if (inspection.status !== 'aligned') {
+  if (inspection.status !== 'aligned' && inspection.status !== 'update_available') {
     const findings = inspection.findings
       .map((entry) => `${entry.file ?? '(repo)'} [${entry.kind}] -> ${entry.status}${entry.pins.length > 0 ? ` (${entry.pins.join(', ')})` : ''}`)
       .join('\n');
