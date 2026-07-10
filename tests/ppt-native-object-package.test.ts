@@ -4,8 +4,11 @@ import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
 import { buildNativeShapePlanOutputContract } from '../packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/native-ppt-shape-plan-contract.ts';
 import {
+  createAiSlide,
+  materializerPayload,
   pythonTestEnv,
   resolveTestPythonCommand,
+  runNativeMaterializer,
 } from './helpers/ppt-native-python-layout-fixtures.ts';
 import {
   bounds,
@@ -48,6 +51,27 @@ print(json.dumps({
     encoding: 'utf-8',
   });
   assert.deepEqual(JSON.parse(stdout), { picture: true, image: true });
+});
+
+test('real build_deck preserves native table metrics and body font size in the manifest', () => {
+  const slide = createAiSlide({ slideId: 'S01', layoutFamily: 'multi_zone_compare', slotCount: 2 });
+  slide.native_shapes = slide.native_shapes.filter((item) => item.shape_id !== 'S01-slot-1-panel');
+  slide.native_shapes.push(shape('S01-table-proof', 'table', bounds(1.15, 3.2, 6.15, 2.68), {
+    role: 'compare_panel',
+    quality_role: 'content',
+    layout_zone_id: 'matrix_zone',
+    materialization_intent: 'native_data_object',
+    data: [['Metric', 'Value'], ['Quality', 'Pass']],
+    body_font_size: 16,
+    metrics: { max_cell_blank_ratio: 0.12 },
+  }));
+
+  const result = runNativeMaterializer(materializerPayload([slide]), 'redcube-native-object-build-deck-');
+  const table = result.slides[0].native_shapes.find((item) => item.shape_id === 'S01-table-proof');
+  assert.equal(table.body_font_size, 16);
+  assert.equal(table.metrics.min_font_pt, 16);
+  assert.equal(table.metrics.max_cell_blank_ratio, 0.12);
+  assert.deepEqual(table.data, [['Metric', 'Value'], ['Quality', 'Pass']]);
 });
 
 test('native PPT materializer writes distinct editable objects and motion parts', () => {
