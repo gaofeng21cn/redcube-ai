@@ -4,6 +4,8 @@ Owner: `redcube_ai`
 State: `skill_local_resource`
 Boundary: refs-only professional method resource. This file is not visual truth, an artifact body, an owner receipt, a quality verdict, an export verdict, or runtime state.
 
+Registry refs: `ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, `#/professional_style_registry`; provenance audit: `ppt-master-learning-landing.json`.
+
 ## Template
 
 ```text
@@ -16,6 +18,12 @@ review_check:
   verdict:
   weak_pages:
   blocked_pages:
+
+semantic_composition_review:
+  communication_mode_fit:
+  visualization_pattern_id:
+  required_observable_semantics:
+  observable_semantics_verdict:
 
 repair_target_row:
   slide_id:

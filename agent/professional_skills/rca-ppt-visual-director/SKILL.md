@@ -66,6 +66,11 @@ Operate as the visual direction specialist between blueprint approval and page a
 - Image-first density ceiling is stricter than editable PPTX: keep on-image text to a small number of short labels, and move explanation to speaker notes or the next page.
 - Contact sheets are a visual rhythm gate. The reviewer should be able to spot story order, repeated layouts, and overloaded pages from the sheet before opening individual slides.
 
+## Design Registry Consumption
+
+- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Preserve the blueprint mode, independently lock a local style profile or explicit custom behavior, and bind every semantic composition row to a pattern id plus selection rationale.
+- Scan the full local visualization registry before selecting. When nothing fits, author a bespoke composition and record the no-match rationale; `contracts/runtime-program/ppt-master-learning-landing.json` is provenance only, never a template or visual authority.
+
 ## Minimal Template Resource
 
 - `spec_lock`: deck thesis, palette, typography scale, grid, motif, title safe zone, density ceiling, route policy, proof-object families, and forbidden regressions.

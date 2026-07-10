@@ -511,9 +511,103 @@
       }
     ]
   },
+  "communication_mode_registry": {
+    "selection_owner": "rca-ppt-story-architect",
+    "selection_field": "slide_blueprint.communication_mode_id",
+    "mode_behavior_field": "slide_blueprint.communication_mode_behavior",
+    "mode_and_style_locked_independently": true,
+    "user_supplied_outline_overrides_mode_reordering": true,
+    "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/communication_modes",
+    "modes": [
+      {
+        "mode_id": "decision_pyramid",
+        "use_when": "the audience must decide from a recommendation and its mutually exclusive support",
+        "argument_sequence": ["recommendation", "supporting_arguments", "evidence", "decision"],
+        "title_voice": "conclusion_first_action_titles",
+        "notes_register": "concise_executive_reasoning",
+        "forbidden": ["topic_only_titles", "uncompared_numbers", "recommendation_after_appendix"]
+      },
+      {
+        "mode_id": "narrative_arc",
+        "use_when": "the conclusion earns force through situation, tension, proof, and resolution",
+        "argument_sequence": ["situation", "tension", "turning_evidence", "resolution"],
+        "title_voice": "progressive_claim_titles",
+        "notes_register": "spoken_story_with_explicit_turns",
+        "forbidden": ["spoiling_every_turn_on_cover", "chronology_without_tension", "unsupported_emotional_claim"]
+      },
+      {
+        "mode_id": "instructional_sequence",
+        "use_when": "the audience must build understanding or capability step by step",
+        "argument_sequence": ["learning_goal", "concept_decomposition", "worked_proof", "application"],
+        "title_voice": "learning_progress_titles",
+        "notes_register": "clear_explanatory_scaffolding",
+        "forbidden": ["undefined_terms", "steps_without_dependency", "assessment_before_explanation"]
+      },
+      {
+        "mode_id": "visual_showcase",
+        "use_when": "presence, demonstration, or a small number of memorable proof objects leads",
+        "argument_sequence": ["hook", "hero_proof", "contrast_or_reveal", "call_to_action"],
+        "title_voice": "short_high_contrast_claims",
+        "notes_register": "presenter_led_minimal_on_slide_copy",
+        "forbidden": ["dense_exposition", "equal_weight_card_wall", "imagery_without_claim"]
+      },
+      {
+        "mode_id": "neutral_briefing",
+        "use_when": "the audience needs complete, scannable information without a forced thesis",
+        "argument_sequence": ["scope", "organized_topics", "status_or_reference", "next_actions"],
+        "title_voice": "precise_topic_or_status_titles",
+        "notes_register": "neutral_complete_reference",
+        "forbidden": ["manufactured_drama", "hidden_status", "recommendation_presented_as_fact"]
+      }
+    ],
+    "custom_escape": {
+      "mode_id": "custom",
+      "use_only_when_no_single_preset_has_a_dominant_spine": true,
+      "mode_behavior_required": true,
+      "behavior_must_name": ["act_or_posture_sequence", "title_voice", "page_rhythm", "notes_register"],
+      "bare_custom_token_allowed": false
+    }
+  },
+  "visualization_pattern_registry": {
+    "selection_owner": "rca-ppt-visual-director",
+    "selection_field": "slide_blueprint.slides[].visualization_pattern_id",
+    "selection_rationale_field": "slide_blueprint.slides[].visualization_selection_rationale",
+    "full_registry_scan_required": true,
+    "no_match_policy": "author_bespoke_composition_and_record_selection_rationale",
+    "copy_upstream_svg_body_allowed": false,
+    "source_coverage_ref": "contracts/runtime-program/ppt-master-learning-landing.json#/source_catalog_coverage/visualizations",
+    "patterns": [
+      {"pattern_id":"quantitative_trend","content_shape":"values over ordered time","use_when":"direction, cumulative volume, or multi-series movement is the message","skip_when":"time order is absent or category ranking is primary","accepted_object_families":["chart","path","text_box"],"required_observable_semantics":["ordered_axis","series_encoding","source_note"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"category_comparison","content_shape":"named categories with comparable values","use_when":"rank, magnitude, or side-by-side differences matter","skip_when":"composition or continuous time is the message","accepted_object_families":["chart","table"],"required_observable_semantics":["shared_scale","category_labels","value_encoding"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"part_to_whole","content_shape":"parts of one whole or nested composition","use_when":"share, allocation, or hierarchy composition matters","skip_when":"parts do not share a valid denominator","accepted_object_families":["chart","shape","text_box"],"required_observable_semantics":["whole_definition","part_encoding","total_consistency"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"distribution_relationship","content_shape":"observations, ranges, correlation, or outliers","use_when":"spread, cluster, association, or distribution shape matters","skip_when":"only aggregate category values are available","accepted_object_families":["chart","path"],"required_observable_semantics":["quantitative_axes","observation_encoding","outlier_or_range_legibility"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"target_progress","content_shape":"actual, target, completion, or capability scores","use_when":"goal attainment or multi-axis capability is the message","skip_when":"there is no declared baseline or comparable scale","accepted_object_families":["chart","metric_grid"],"required_observable_semantics":["baseline_or_target","actual_value","unit_or_scale"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"variance_bridge","content_shape":"additive and subtractive contributors between two totals","use_when":"the audience must explain how a start becomes an end","skip_when":"contributors do not form a running total","accepted_object_families":["chart","shape","connector"],"required_observable_semantics":["start_total","signed_steps","end_total"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"magnitude_flow","content_shape":"flow with splits, merges, or volume loss","use_when":"magnitude through a system or conversion stages is material","skip_when":"steps have no quantity or branching semantics","accepted_object_families":["chart","path","connector"],"required_observable_semantics":["source_nodes","directed_flow","magnitude_encoding"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"sequential_process","content_shape":"ordered steps, phases, or pipeline outputs","use_when":"sequence and handoff logic matter more than time scale","skip_when":"the relation is cyclical or durations need an axis","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["ordered_steps","directional_edges","stage_outputs"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"time_schedule","content_shape":"milestones, durations, or roadmap states","use_when":"time position, duration, or delivery order is the message","skip_when":"steps are timeless or cyclical","accepted_object_families":["shape","connector","table"],"required_observable_semantics":["time_axis","event_or_duration_binding","status_legibility"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"cycle_feedback","content_shape":"closed-loop stages or compounding feedback","use_when":"the final stage returns to or strengthens the first","skip_when":"the process is one-way","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["closed_loop","ordered_stages","feedback_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"hierarchy_architecture","content_shape":"layers, containment, maturity, or reporting hierarchy","use_when":"levels and parent-child structure are the message","skip_when":"items are peers without containment or rank","accepted_object_families":["shape","group","connector"],"required_observable_semantics":["level_encoding","parent_child_relation","layer_labels"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]},
+      {"pattern_id":"hub_network","content_shape":"one core with outward capabilities or inward forces","use_when":"core-periphery relation and edge direction matter","skip_when":"a strict hierarchy or sequence is required","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["core_node","spokes_or_forces","edge_direction"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"matrix_quadrant","content_shape":"two axes, grid cells, or named quadrants","use_when":"position, priority, intensity, or cross-classification matters","skip_when":"there is only one comparison dimension","accepted_object_families":["chart","table","shape"],"required_observable_semantics":["axis_or_row_column_grammar","cell_or_point_binding","quadrant_meaning"],"owner_skills":["rca-ppt-visual-director","rca-native-ppt-designer"]},
+      {"pattern_id":"comparison_decision","content_shape":"options, pros and cons, tiers, or decision gates","use_when":"the audience must compare alternatives and land a choice","skip_when":"items are unrelated facts without decision criteria","accepted_object_families":["table","shape","connector"],"required_observable_semantics":["options","criteria_or_tradeoffs","decision_signal"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"tabular_evidence","content_shape":"rectangular facts, metrics, statements, or schedules","use_when":"precise row-column lookup is more honest than a chart","skip_when":"the message is a visible quantitative shape","accepted_object_families":["table","text_box"],"required_observable_semantics":["headers","cell_alignment","units_and_sources"],"owner_skills":["rca-template-profiler","rca-native-ppt-designer"]},
+      {"pattern_id":"portfolio_density","content_shape":"many weighted topics, modules, or nested areas","use_when":"coverage and relative emphasis matter more than sequence","skip_when":"each item needs a detailed sentence or exact position","accepted_object_families":["chart","shape","group"],"required_observable_semantics":["item_set","weight_or_group_encoding","label_legibility"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"root_cause","content_shape":"effect with grouped causal branches","use_when":"the audience must diagnose causes rather than follow a process","skip_when":"causal evidence is unavailable or the relation is merely sequential","accepted_object_families":["shape","connector","path"],"required_observable_semantics":["effect","cause_groups","causal_edges"],"owner_skills":["rca-ppt-story-architect","rca-ppt-visual-director"]},
+      {"pattern_id":"dependency_system_map","content_shape":"systems, components, routes, or actors connected by typed relationships","use_when":"the promise depends on topology, dependency, or information flow","skip_when":"items are merely grouped or sequential without meaningful edges","accepted_object_families":["shape","connector","group"],"required_observable_semantics":["typed_nodes","meaningful_edges","direction_or_dependency_legend"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"set_overlap","content_shape":"two or three sets whose overlap is the message","use_when":"shared membership or intersection carries the claim","skip_when":"sets do not overlap or need quantitative area accuracy","accepted_object_families":["shape","path","text_box"],"required_observable_semantics":["named_sets","visible_intersection","intersection_meaning"],"owner_skills":["rca-ppt-visual-director","rca-ppt-reviewer"]},
+      {"pattern_id":"list_showcase","content_shape":"parallel items, agenda, roster, principles, or hero evidence","use_when":"the message is scannable parallel coverage or one dominant proof object","skip_when":"sequence, hierarchy, or comparison must be encoded","accepted_object_families":["shape","picture","text_box","group"],"required_observable_semantics":["item_or_hero_identity","intentional_emphasis","reading_order"],"owner_skills":["rca-ppt-visual-director","rca-template-profiler"]}
+    ]
+  },
   "professional_style_registry": {
     "active_profile_id": "rca_executive_proof_board",
     "selection_field": "editable_shape_plan.design_spec_lock.professional_design_brief.design_register",
+    "custom_escape": {
+      "profile_id": "custom",
+      "style_behavior_field": "editable_shape_plan.design_spec_lock.professional_design_brief.custom_style_behavior",
+      "style_behavior_required": true,
+      "bare_custom_token_allowed": false
+    },
     "profiles": [
       {
         "profile_id": "rca_executive_proof_board",
@@ -583,6 +677,38 @@
           "empty matrix cells",
           "unexplained stage labels"
         ]
+      },
+      {
+        "profile_id": "rca_swiss_system_brief",
+        "use_when": "consulting, architecture, or type-led system explanation",
+        "palette": {"canvas":"#FAFAF8","ink":"#151515","muted":"#626262","accent":"#D62F2F","panel":"#EDEDEA"},
+        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "strict grid, sharp rules, large whitespace, asymmetric proof anchors",
+        "forbidden_patterns": ["soft floating card wall", "ornamental gradients", "uncontrolled alignment"]
+      },
+      {
+        "profile_id": "rca_data_editorial_report",
+        "use_when": "market review, finance, research, or data-led long-form analysis",
+        "palette": {"canvas":"#FCFBF7","ink":"#202124","muted":"#70757A","accent":"#006B5B","panel":"#E8EEE9"},
+        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "editorial columns, source lines, annotated charts, strong typographic hierarchy",
+        "forbidden_patterns": ["dashboard chrome everywhere", "source-free charts", "equal emphasis on every number"]
+      },
+      {
+        "profile_id": "rca_technical_blueprint",
+        "use_when": "engineering, architecture, or annotated technical walkthrough",
+        "palette": {"canvas":"#10202B","ink":"#F4F7F8","muted":"#A8BBC5","accent":"#46C2B3","panel":"#173441"},
+        "typography": {"title_family":"Noto Sans CJK SC","body_family":"Noto Sans Mono CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "schematic line work, explicit nodes, measured annotations, restrained depth",
+        "forbidden_patterns": ["glow as structure", "unlabeled edges", "decorative pseudo-code"]
+      },
+      {
+        "profile_id": "rca_photo_editorial_story",
+        "use_when": "architecture, culture, product, or brand story led by inspectable imagery",
+        "palette": {"canvas":"#F5F3EF","ink":"#161616","muted":"#66615A","accent":"#B43C32","panel":"#E7E1D8"},
+        "typography": {"title_family":"Noto Serif CJK SC","body_family":"Noto Sans CJK SC","title_weight":700,"body_weight":400},
+        "layout_motif": "large inspectable image fields, editorial captions, quiet text blocks, deliberate crop rhythm",
+        "forbidden_patterns": ["dark blurred stock image", "text covering the subject", "thumbnail mosaic without hierarchy"]
       }
     ]
   },
@@ -595,7 +721,9 @@
     "template_layout_binding_required": true,
     "layout_zone_id_required_for_visible_non_auxiliary_shapes": true,
     "selected_archetype_must_be_from_catalog": true,
-    "style_profile_must_be_from_registry": true
+    "style_profile_must_be_from_registry": true,
+    "communication_mode_must_be_from_registry_or_custom_escape": true,
+    "visualization_pattern_must_be_from_registry_or_bespoke_no_match": true
   },
   "quality_claim_boundary": {
     "contract_presence_claims_design_assets_available": true,

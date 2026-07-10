@@ -78,6 +78,11 @@ Operate as the RCA visual review specialist. Judge rendered pages and screenshot
 - Review the story arc as pixels: the deck should show why the proposal is necessary, why it is feasible, and how it lands. A visually polished product tour can still be a story failure.
 - Screenshot/contact-sheet evidence is required before export/handoff; a PPTX assembled from unreviewed images remains draft-only.
 
+## Design Registry Consumption
+
+- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry`, `#/visualization_pattern_registry`, and `#/professional_style_registry`. Review mode fit, selected pattern id, and every required observable semantic against current pixels and package readback.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Missing visual/readback evidence blocks the verdict; catalog coverage never authorizes `visual_ready` or an owner receipt.
+
 ## Minimal Template Resource
 
 - `visual_qa`: inspect pixels, contact sheet rhythm, source fidelity, title hierarchy, text fit, collisions, crop, leaks, and export evidence before returning a verdict ref.

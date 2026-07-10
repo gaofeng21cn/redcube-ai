@@ -70,6 +70,11 @@ Operate as the native editable PPTX design specialist. The AI-authored `editable
 - Native follow-up should target the pages that need editability, links, charts, or live text most. Do not make the whole deck native unless the user or route contract requires it.
 - Public GitHub/source links are native-friendly candidates: keep them as editable text or hyperlink shapes when native PPTX is selected, not baked into a low-resolution image.
 
+## Design Registry Consumption
+
+- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/professional_style_registry`, and `#/connector_semantics`. Preserve each selected `visualization_pattern_id`, declare its observable semantics, and choose the supported typed materialization mode explicitly.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance. Fail closed when typed objects cannot express the selected semantics; never substitute an unknown kind with a generic rectangle or copy an upstream SVG body.
+
 ## Minimal Template Resource
 
 - `spec_lock`: `design_spec_lock_id`, design thesis, palette, typography, grid, motif, rhythm, route constraints, QA gates, and forbidden native shortcuts.

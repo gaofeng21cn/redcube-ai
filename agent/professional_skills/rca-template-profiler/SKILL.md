@@ -79,6 +79,11 @@ Keep this as a separate professional skill. Do not merge it into `rca-ppt-visual
 - Profile the failure modes too: text density, repeated product cards, stale route words, and places where links/source badges crowd the layout.
 - For image-first reuse, capture the prompt-facing style boundary: what the image model should imitate, what visible text budget it must obey, and which old artifacts are forbidden.
 
+## Design Registry Consumption
+
+- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/visualization_pattern_registry`, `#/layout_archetype_taxonomy`, and `#/professional_style_registry`. Emit pattern compatibility, semantic zones, and capacity for the selected local pattern id.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only to trace external coverage. Block or route back when real placeholders, masters, layouts, or inherited objects cannot carry the selected pattern semantics.
+
 ## Minimal Template Resource
 
 - `style_boundary`: separate reusable layout intelligence from decorative skin; RCA keeps route policy, source truth, visual judgment, and review/export authority.

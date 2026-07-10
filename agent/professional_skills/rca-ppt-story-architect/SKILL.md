@@ -63,6 +63,11 @@ Operate as the PPT narrative specialist inside the RCA stage chain. Keep the sta
 - A "clear logic but weak effect" review usually means the spine is under-motivated or over-named. Repair by moving the audience problem and proof threshold earlier, not by adding more product labels.
 - If a live talk or user review says a middle chapter causes a break, treat that as a story-architecture defect. Merge, demote, or split the chapter before sending the deck to visual direction.
 
+## Design Registry Consumption
+
+- Read `contracts/runtime-program/ppt-native-ai-first-design-pack.json#/communication_mode_registry` and `#/visualization_pattern_registry` before finalizing the slide blueprint. Emit `communication_mode_id` (or a fully stated custom behavior), plus a `visualization_pattern_id` and selection rationale for every proof-bearing slide.
+- Use `contracts/runtime-program/ppt-master-learning-landing.json` only as provenance and coverage. If no registry pattern honestly fits, keep the proof intent and record a bespoke-composition rationale; never name an upstream template as local authority.
+
 ## Minimal Template Resource
 
 - `serial_pipeline`: `source_lock -> claim_spine -> detailed_outline -> slide_blueprint -> visual_direction_ready`. Each step names the accepted input ref, output ref, next gate, and repair owner before the next step starts.

@@ -115,3 +115,153 @@ test('native PPT proof lane records the Python engine contract as the single own
     'contracts/runtime-program/ppt-native-python-engine-contract.json',
   );
 });
+
+test('native PPT professional registries land ppt-master learning without importing its runtime or assets', () => {
+  const designPack = readJson(
+    path.resolve('contracts/runtime-program/ppt-native-ai-first-design-pack.json'),
+  );
+  const landing = readJson(
+    path.resolve('contracts/runtime-program/ppt-master-learning-landing.json'),
+  );
+
+  assert.equal(
+    landing.external_source.commit,
+    'b0beba5b659c664bdbf0c07227fbdee313698dd7',
+  );
+  assert.equal(landing.external_source.role, 'pattern_source_only');
+  assert.equal(landing.audit_status, 'non_live_functional_landing_complete');
+  assert.equal(landing.claims_live_evidence_complete, false);
+  assert.equal(landing.claims_visual_ready, false);
+  assert.equal(landing.claims_owner_receipt, false);
+  assert.deepEqual(landing.prohibited_imports, [
+    'runtime',
+    'claude_specific_protocol',
+    'template_assets',
+    'icon_corpus',
+    'svg_template_bodies',
+  ]);
+
+  const modes = designPack.communication_mode_registry.modes;
+  assert.deepEqual(modes.map((entry: any) => entry.mode_id), [
+    'decision_pyramid',
+    'narrative_arc',
+    'instructional_sequence',
+    'visual_showcase',
+    'neutral_briefing',
+  ]);
+  for (const mode of modes) {
+    assert.equal(typeof mode.use_when, 'string');
+    assert.ok(mode.argument_sequence.length >= 3);
+    assert.ok(mode.title_voice.length > 0);
+    assert.ok(mode.notes_register.length > 0);
+    assert.ok(mode.forbidden.length > 0);
+  }
+  assert.equal(designPack.communication_mode_registry.custom_escape.mode_id, 'custom');
+  assert.equal(
+    designPack.communication_mode_registry.custom_escape.mode_behavior_required,
+    true,
+  );
+  assert.equal(
+    designPack.communication_mode_registry.mode_and_style_locked_independently,
+    true,
+  );
+
+  const patterns = designPack.visualization_pattern_registry.patterns;
+  assert.ok(patterns.length >= 18);
+  assert.equal(new Set(patterns.map((entry: any) => entry.pattern_id)).size, patterns.length);
+  for (const pattern of patterns) {
+    assert.equal(typeof pattern.content_shape, 'string');
+    assert.equal(typeof pattern.use_when, 'string');
+    assert.equal(typeof pattern.skip_when, 'string');
+    assert.ok(pattern.accepted_object_families.length > 0);
+    assert.ok(pattern.required_observable_semantics.length > 0);
+    assert.ok(pattern.owner_skills.length > 0);
+  }
+  assert.equal(
+    designPack.visualization_pattern_registry.no_match_policy,
+    'author_bespoke_composition_and_record_selection_rationale',
+  );
+  assert.equal(
+    designPack.visualization_pattern_registry.copy_upstream_svg_body_allowed,
+    false,
+  );
+  assert.ok(designPack.professional_style_registry.profiles.length >= 7);
+
+  const modeCoverage = landing.source_catalog_coverage.communication_modes;
+  assert.deepEqual(modeCoverage.entries.map((entry: any) => entry.source_id), [
+    'pyramid',
+    'narrative',
+    'instructional',
+    'showcase',
+    'briefing',
+  ]);
+  assert.equal(modeCoverage.custom_escape.source_id, 'custom');
+
+  const styleCoverage = landing.source_catalog_coverage.visual_styles.entries;
+  assert.equal(styleCoverage.length, 18);
+  assert.equal(new Set(styleCoverage.map((entry: any) => entry.source_id)).size, 18);
+
+  const visualizationCoverage = landing.source_catalog_coverage.visualizations.entries;
+  assert.equal(visualizationCoverage.length, 76);
+  assert.equal(
+    new Set(visualizationCoverage.map((entry: any) => entry.source_id)).size,
+    76,
+  );
+  const localModeIds = new Set(modes.map((entry: any) => entry.mode_id));
+  const localStyleIds = new Set(
+    designPack.professional_style_registry.profiles.map((entry: any) => entry.profile_id),
+  );
+  localStyleIds.add(designPack.professional_style_registry.custom_escape.profile_id);
+  const localPatternIds = new Set(patterns.map((entry: any) => entry.pattern_id));
+  for (const entry of modeCoverage.entries) {
+    assert.equal(entry.classification, 'adapt');
+    assert.ok(localModeIds.has(entry.local_target_id));
+    assert.equal(typeof entry.owner_skill, 'string');
+    assert.equal(typeof entry.consumer_field, 'string');
+  }
+  for (const entry of styleCoverage) {
+    assert.equal(entry.classification, 'adapt');
+    assert.ok(localStyleIds.has(entry.local_target_id));
+    assert.equal(typeof entry.owner_skill, 'string');
+    assert.equal(typeof entry.consumer_field, 'string');
+  }
+  for (const entry of visualizationCoverage) {
+    assert.equal(entry.classification, 'adapt');
+    assert.ok(localPatternIds.has(entry.local_target_id));
+    assert.equal(typeof entry.owner_skill, 'string');
+    assert.equal(typeof entry.consumer_field, 'string');
+  }
+
+  const candidates = landing.learning_candidates;
+  assert.deepEqual(
+    [...new Set(candidates.map((entry: any) => entry.classification))].sort(),
+    ['adapt', 'adopt', 'reject', 'watch_only'],
+  );
+  for (const candidate of candidates) {
+    assert.ok(candidate.source_ref.length > 0);
+    assert.ok(candidate.local_owner_surface.length > 0);
+    assert.ok(candidate.consumer_fields.length > 0);
+    assert.ok(candidate.acceptance_evidence.length > 0);
+    assert.ok(candidate.authority_boundary.length > 0);
+    assert.ok(candidate.stop_condition.length > 0);
+  }
+
+  const skillBindings = landing.skill_consumption_bindings;
+  assert.deepEqual(skillBindings.map((entry: any) => entry.skill_id).sort(), [
+    'rca-native-ppt-designer',
+    'rca-ppt-reviewer',
+    'rca-ppt-story-architect',
+    'rca-ppt-visual-director',
+    'rca-template-profiler',
+  ]);
+  for (const binding of skillBindings) {
+    assert.equal(
+      binding.design_pack_ref,
+      'contracts/runtime-program/ppt-native-ai-first-design-pack.json',
+    );
+    assert.match(binding.resource_pack_ref, /^skill_resource:/);
+    assert.ok(binding.consumes.length > 0);
+    assert.ok(binding.emits.length > 0);
+    assert.ok(binding.stop_condition.length > 0);
+  }
+});
