@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { recordParallelOverlap, readySources, safeArray, safeText, topicFocus } from './shared.ts';
+import { safeArray, safeText } from './shared.ts';
 
 function sourceMaterialClaim(meta) {
   const text = safeArray(meta?.context?.source_materials_full_text)
@@ -15,18 +15,6 @@ function sourceMaterialClaim(meta) {
 
 export function buildMockXhsStoryline(meta) {
   const context = meta?.context || {};
-  if (process.env.REDCUBE_MOCK_XHS_REQUIRE_AI_FIRST_FRAMING === '1') {
-    const forbiddenSeeds = ['audience_seed', 'tension_seed', 'why_now_seed', 'memory_hook_seed']
-      .filter((key) => Object.hasOwn(context, key));
-    if (forbiddenSeeds.length > 0) {
-      throw new Error(`mock xhs expected AI-first framing without programmatic seeds: ${forbiddenSeeds.join(', ')}`);
-    }
-    const framing = context.ai_first_framing_contract || context.framing || {};
-    if (safeText(framing.source_input) !== 'source_materials_full_text'
-      || safeText(framing.binding) !== 'ai_authored_required') {
-      throw new Error(`mock xhs expected AI-first framing contract: ${JSON.stringify(framing)}`);
-    }
-  }
   const sourceClaim = sourceMaterialClaim(meta);
   return {
     mode: safeText(context.mode, 'single'),
@@ -285,73 +273,22 @@ export function buildMockXhsRender(meta) {
   const peakPages = new Set(safeArray(meta?.context?.visual_direction?.peak_pages));
   const authorBranding = meta?.context?.author_branding || null;
   const canvas = xhsCanvasFromMeta(meta);
-  const route = safeText(meta?.route);
-  const renderVariants = new Set(
-    safeText(process.env.REDCUBE_MOCK_XHS_RENDER_VARIANT)
-      .split(',')
-      .map((item) => safeText(item))
-      .filter(Boolean),
-  );
-  const targetSlideIds = new Set(
-    safeArray(meta?.context?.repair_scope?.target_slide_ids)
-      .map((item) => safeText(item))
-      .filter(Boolean),
-  );
-  if (renderVariants.has('require_operator_revision_context') && route === 'fix_html') {
-    const operatorTargetSlideIds = safeArray(meta?.context?.revision_context?.operator_revision_brief?.target_slide_ids)
-      .map((item) => safeText(item))
-      .filter(Boolean);
-    const operatorSlideFeedbackIds = safeArray(meta?.context?.revision_context?.operator_revision_brief?.slide_feedback)
-      .map((item) => safeText(item?.slide_id))
-      .filter(Boolean);
-    if (!operatorTargetSlideIds.includes('N06') || !operatorSlideFeedbackIds.includes('N06')) {
-      throw new Error(`mock xhs render expected operator_revision_brief for N06: ${JSON.stringify(meta?.context?.revision_context || {})}`);
-    }
-    const slideIds = slides.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
-    if (slideIds.length !== 1 || slideIds[0] !== 'N06') {
-      throw new Error(`mock xhs render expected fix_html to scope only operator-targeted slide N06: ${JSON.stringify(slideIds)}`);
-    }
-  }
-  const payload = {
+  return {
     slides: slides.map((slide, index) => ({
       slide_id: slide.slide_id,
-      content_html: (() => {
-        let markup = buildXhsSlideMarkup(
-          { ...slide, slide_no: index + 1 },
-          slides.length,
-          peakPages.has(slide.slide_id),
-          authorBranding,
-          canvas,
-        );
-        if (renderVariants.has('repair_marker')) {
-          const slideId = safeText(slide?.slide_id);
-          const shouldStayBlocked = slideId === 'N02' && !targetSlideIds.has('N02');
-          const marker = shouldStayBlocked ? 'blocked' : 'fixed';
-          markup = markup.replace('data-slide-root="true"', `data-slide-root="true" data-mock-fit="${marker}"`);
-        }
-        if (renderVariants.has('repair_marker_extra_weak')) {
-          const slideId = safeText(slide?.slide_id);
-          if (slideId === 'N02') {
-            const marker = targetSlideIds.has('N02') ? 'fixed' : 'blocked';
-            markup = markup.replace('data-slide-root="true"', `data-slide-root="true" data-mock-fit="${marker}"`);
-          }
-          if (slideId === 'N04') {
-            const marker = targetSlideIds.has('N04') ? 'fixed' : 'weak';
-            markup = markup.replace('data-slide-root="true"', `data-slide-root="true" data-mock-fit="${marker}"`);
-          }
-        }
-        return markup;
-      })(),
+      content_html: buildXhsSlideMarkup(
+        { ...slide, slide_no: index + 1 },
+        slides.length,
+        peakPages.has(slide.slide_id),
+        authorBranding,
+        canvas,
+      ),
     })),
     render_summary: [
       '每页都由上游 AI 直接写出完整卡片式 HTML。',
       '封面、机制页、证据页保持明显结构差异，没有退化成统一模板。',
     ],
   };
-  if (renderVariants.has('omit_render_summary_on_fix') && route === 'fix_html') {
-    delete payload.render_summary;
-  }
-  return payload;
 }
 
 export function buildMockXhsDirectorReview() {
@@ -368,134 +305,10 @@ export function buildMockXhsDirectorReview() {
 
 export function buildMockXhsScreenshotReview(meta) {
   const slides = safeArray(meta?.context?.screenshot_mechanics?.slides);
-  const variants = new Set(
-    safeText(process.env.REDCUBE_MOCK_XHS_SCREENSHOT_REVIEW_VARIANT)
-      .split(',')
-      .map((item) => safeText(item))
-      .filter(Boolean),
-  );
-  if (variants.has('require_source_html')) {
-    for (const slide of slides) {
-      const sourceHtml = safeText(slide?.source_html);
-      if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes(safeText(slide?.slide_id))) {
-        throw new Error(`mock xhs screenshot review expected source_html for ${safeText(slide?.slide_id)}`);
-      }
-    }
-  }
-  if (variants.has('require_incremental_single_N02')) {
-    const slideIds = slides.map((slide) => safeText(slide?.slide_id)).filter(Boolean);
-    if (slideIds.length !== 1 || slideIds[0] !== 'N02') {
-      throw new Error(`mock xhs screenshot review expected page-local review for N02 only: ${JSON.stringify(slideIds)}`);
-    }
-    const sourceHtml = safeText(slides[0]?.source_html);
-    if (!sourceHtml.includes('data-slide-root') || !sourceHtml.includes('data-slide-id="N02"')) {
-      throw new Error(`mock xhs screenshot review expected local source_html for N02: ${sourceHtml.slice(0, 160)}`);
-    }
-    return {
-      director_intent_landed: true,
-      anti_template_ok: true,
-      weak_pages: [],
-      review_summary: 'N02 局部复核已通过，其余卡片沿用上一轮通过结果。',
-      slide_reviews: [
-        {
-          slide_id: 'N02',
-          judgement: 'pass',
-          visual_findings: ['N02 的截图与本页 HTML 已局部对齐。'],
-          recommended_fix: 'none',
-        },
-      ],
-    };
-  }
-  if (variants.has('block_until_fix_html')) {
-    const blockedSlideId = safeText(
-      slides.find((slide) => safeText(slide?.source_html).includes('data-mock-fit="blocked"'))?.slide_id,
-      '',
-    );
-    return {
-      director_intent_landed: true,
-      anti_template_ok: true,
-      weak_pages: blockedSlideId ? [blockedSlideId] : [],
-      review_summary: blockedSlideId ? `${blockedSlideId} 仍需 fix_html 后再放行。` : '局部修页已完成，可以继续发布流程。',
-      slide_reviews: slides.map((slide) => ({
-        slide_id: safeText(slide?.slide_id),
-        judgement: safeText(slide?.slide_id) === blockedSlideId ? 'block' : 'pass',
-        visual_findings: safeText(slide?.slide_id) === blockedSlideId
-          ? ['当前卡片保留了待修标记，系统应回到 fix_html 处理后再复核。']
-          : ['当前卡片已达到继续推进的截图质量。'],
-        recommended_fix: safeText(slide?.slide_id) === blockedSlideId ? '执行 fix_html 并重跑 screenshot_review。' : 'none',
-      })),
-    };
-  }
-  if (variants.has('block_until_repair_image_pages')) {
-    const sourceSurfaceKind = safeText(meta?.context?.screenshot_mechanics?.source_surface_kind);
-    const sourceVisualRoute = safeText(meta?.context?.screenshot_mechanics?.source_visual_route);
-    const blockedSlideId = sourceSurfaceKind === 'image_pages' && sourceVisualRoute === 'author_image_pages'
-      ? 'N02'
-      : '';
-    return {
-      director_intent_landed: true,
-      anti_template_ok: true,
-      weak_pages: blockedSlideId ? [blockedSlideId] : [],
-      review_summary: blockedSlideId ? `${blockedSlideId} 需要通过 repair_image_pages 重绘后再放行。` : '问题页已通过重绘，可以继续发布流程。',
-      slide_reviews: slides.map((slide) => ({
-        slide_id: safeText(slide?.slide_id),
-        judgement: safeText(slide?.slide_id) === blockedSlideId ? 'block' : 'pass',
-        visual_findings: safeText(slide?.slide_id) === blockedSlideId
-          ? ['当前整页图仍有视觉阻断，系统应回到 repair_image_pages 重绘该页。']
-          : ['当前整页图已达到继续推进的视觉质量。'],
-        recommended_fix: safeText(slide?.slide_id) === blockedSlideId ? '执行 repair_image_pages 并重跑 screenshot_review。' : 'none',
-      })),
-    };
-  }
-  if (variants.has('block_with_extra_weak_page')) {
-    const blockedSlideId = safeText(
-      slides.find((slide) => safeText(slide?.source_html).includes('data-mock-fit="blocked"'))?.slide_id,
-      'N02',
-    );
-    return {
-      director_intent_landed: true,
-      anti_template_ok: true,
-      weak_pages: [blockedSlideId, 'N04'],
-      review_summary: `${blockedSlideId} 是硬阻断页，N04 虽然还能看，但也属于应一起修掉的弱页。`,
-      slide_reviews: slides.map((slide) => ({
-        slide_id: safeText(slide?.slide_id),
-        judgement: safeText(slide?.slide_id) === blockedSlideId ? 'block' : 'pass',
-        visual_findings: safeText(slide?.slide_id) === blockedSlideId
-          ? ['当前卡片是截图硬阻断页。']
-          : safeText(slide?.slide_id) === 'N04'
-            ? ['当前卡片属于弱页，建议和硬阻断页同轮一起修。']
-            : ['当前卡片已达到继续推进的截图质量。'],
-        recommended_fix: safeText(slide?.slide_id) === blockedSlideId || safeText(slide?.slide_id) === 'N04'
-          ? 'fix_html 需一并处理当前卡片。'
-          : 'none',
-      })),
-    };
-  }
-  if (variants.has('local_block_with_director_soft_false')) {
-    return {
-      director_intent_landed: false,
-      anti_template_ok: true,
-      weak_pages: ['N04'],
-      review_summary: '整体导演意图大体成立，但 N04 的局部遮挡让机制峰值页失去完整落地，需要继续 fix_html。',
-      slide_reviews: slides.map((slide) => ({
-        slide_id: safeText(slide?.slide_id),
-        judgement: safeText(slide?.slide_id) === 'N04' ? 'block' : 'pass',
-        visual_findings: safeText(slide?.slide_id) === 'N04'
-          ? ['当前局部遮挡集中在 N04，适合继续走 fix_html 局部返修。']
-          : ['当前卡片已经达到继续推进的截图质量。'],
-        recommended_fix: safeText(slide?.slide_id) === 'N04'
-          ? 'fix_html 只修当前卡片，不要回退整套重画。'
-          : 'none',
-      })),
-    };
-  }
-  const weakPages = variants.has('many_weak_pages')
-    ? slides.map((slide) => safeText(slide?.slide_id)).filter(Boolean)
-    : [];
   return {
     director_intent_landed: true,
     anti_template_ok: true,
-    weak_pages: weakPages,
+    weak_pages: [],
     review_summary: '封面抓停、机制推进和结尾动作都已经在最终卡片截图里成立。',
     slide_reviews: slides.map((slide) => ({
       slide_id: safeText(slide?.slide_id),

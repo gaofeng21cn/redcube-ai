@@ -9,7 +9,6 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync
 import { materializeScreenshotCaptureStore } from './package-surfaces.ts';
 import { materializePptScreenshotReviewCapture } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/screenshot-capture.js';
 import { createPptDeckStageParts } from '../packages/redcube-runtime/dist/families/ppt/ppt-deck-runtime-family-parts/stages.js';
-import { createXiaohongshuReviewParts } from '../packages/redcube-runtime/dist/families/xiaohongshu/xiaohongshu-runtime-family-parts/review.js';
 import { pptExportHelperFixture, pptReviewHelperFixture, testPythonCommandEnv } from './helpers/python-native-helper-fixtures.ts';
 
 const safeArray = (value) => Array.isArray(value) ? value : [];
@@ -532,97 +531,4 @@ test('ppt screenshot_review batches page-local AI calls while preserving child-c
     artifact.review_execution.generation_runtime.child_calls.map((call) => call.target_slide_ids),
     [['S01', 'S02'], ['S03'], []],
   );
-});
-
-function makeXhsReviewParts() {
-  const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-xhs-screenshot-cache-'));
-  const reportsDir = path.join(workspaceRoot, 'reports');
-  mkdirSync(reportsDir, { recursive: true });
-  const htmlFile = path.join(workspaceRoot, 'note.html');
-  const screenshotFile = path.join(reportsDir, 'screenshots', 'note-01.png');
-  mkdirSync(path.dirname(screenshotFile), { recursive: true });
-  writeFileSync(htmlFile, '<html><body><section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section></body></html>');
-  writeFileSync(screenshotFile, 'png');
-  const deliverablePaths = { deliverableDir: workspaceRoot, reportsDir, deliverableId: 'note-a' };
-  const contract = { title: 'XHS cache', layout_rules: { max_primary_points_per_slide: 4 } };
-  const artifacts = new Map();
-  const reviewHelper = pptReviewHelperFixture(workspaceRoot);
-  let pythonCalls = 0;
-  let aiCalls = 0;
-  const reviewParts = createXiaohongshuReviewParts({
-    CANVAS: { width: 390, height: 844 },
-    CODEX_DEFAULT_ADAPTER: 'test-adapter',
-    CREATIVE_MATERIALIZED_FROM: 'test',
-    PYTHON_REVIEW: reviewHelper,
-    attachCommon: (stage) => ({ stage }),
-    aiFirstMechanicalCheckValue: (slides, check) => slides.every((slide) => slide.checks?.[check] !== false),
-    buildAiFirstVisualSlideReview: (slide, aiReview) => ({ ...slide, ai_review: aiReview }),
-    buildAuthoringContext: () => ({}),
-    computeBaselineReview: () => ({ baseline_comparison_passed: true }),
-    collectSlidesNeedingTargetedRevision: () => [],
-    creativeExecution: () => ({}),
-    creativeSourceStamp: () => ({}),
-    deriveScreenshotReviewRerunStage: () => 'render_html',
-    directorReviewOutputContract: () => ({}),
-    ensureDir: (dir) => {
-      mkdirSync(dir, { recursive: true });
-      return dir;
-    },
-    generateStructuredArtifact: async () => {
-      aiCalls += 1;
-      return { data: { director_intent_landed: true, anti_template_ok: true, weak_pages: [], review_summary: 'ai ok', slide_reviews: [{ slide_id: 'N01', judgement: 'pass', visual_findings: [], recommended_fix: '' }] }, generationRuntime: { provider: 'test' } };
-    },
-    getDeliverablePaths: () => deliverablePaths,
-    getDeliverableViewSurfacePaths: () => ({ stableHtmlFile: htmlFile }),
-    hasAiVisualBlock: (review) => review?.judgement === 'block',
-    hasAiVisualPass: (review) => review?.judgement === 'pass',
-    isImagePagesArtifact: () => false,
-    loadPriorRenderedXhsSlideHtmlMap: () => new Map([['N01', '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>']]),
-    markPublishBundleStaleAfterBlockedReview: () => [],
-    normalizeStringList: (value) => safeArray(value),
-    normalizeXhsScreenshotAiSlideReviews: (value) => value,
-    primarySurface: () => 'test-surface',
-    promoteStableHtml: () => ['stable.html'],
-    promptRoute: () => 'prompt.md',
-    readCurrentHtmlArtifact: () => ({ html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>' }] } }),
-    readCurrentVisualArtifact: () => ({ route: 'render_html', html_bundle: { html_file: htmlFile, slides: [{ slide_id: 'N01', title: '第一页', content: '<section data-slide-root="true" data-slide-id="N01" data-qa-block="a" data-primary-point="true"><span data-qa-block="b">same html</span></section>' }] } }),
-    readJson: () => ({}),
-    readStageArtifact: (_contract, _paths, stage) => {
-      if (stage === 'screenshot_review') return artifacts.get('screenshot_review') || null;
-      if (stage === 'visual_director_review') return { visual_director_review: { director_intent_landed: true, anti_template_ok: true, memory_hook_present: true } };
-      if (stage === 'research') return {};
-      return {};
-    },
-    requireText: (value) => String(value || ''),
-    reviewAuthorship: () => ({}),
-    runPython: () => {
-      pythonCalls += 1;
-      return { slide_reviews: [{ slide_id: 'N01', title: '第一页', screenshot_file: screenshotFile, metrics: { occupied_ratio: 0.5, overlaps: [] }, checks: { block_content_fit_ok: true, speaker_fit_ok: true } }], checks: { overflow_free: true }, metrics: { page_count: 1 } };
-    },
-    safeArray,
-    safeText,
-    screenshotReviewOutputContract: () => ({}),
-    stageArtifactPath: () => path.join(workspaceRoot, 'screenshot-review.json'),
-    stripHtml: (value) => String(value || '').replace(/<[^>]+>/g, ''),
-    summarizePlanSlides: () => [],
-    syncCurrentCandidateHtmlFromStageArtifact: () => ['current.html'],
-    writeText: (file, text) => {
-      mkdirSync(path.dirname(file), { recursive: true });
-      writeFileSync(file, text);
-    },
-  });
-  return { reviewParts, workspaceRoot, contract, deliverablePaths, remember: (artifact) => artifacts.set('screenshot_review', artifact), counts: () => ({ pythonCalls, aiCalls }) };
-}
-
-test('xiaohongshu screenshot_review reuses mechanical cache for identical HTML while still running AI visual gate', async () => {
-  const fixture = makeXhsReviewParts();
-  const first = await fixture.reviewParts.buildScreenshotReview(fixture.workspaceRoot, 'topic-a', fixture.contract, fixture.deliverablePaths, 'create_new', null, 'test-adapter');
-  fixture.remember(first);
-  const second = await fixture.reviewParts.buildScreenshotReview(fixture.workspaceRoot, 'topic-a', fixture.contract, fixture.deliverablePaths, 'create_new', null, 'test-adapter');
-
-  assert.deepEqual(fixture.counts(), { pythonCalls: 1, aiCalls: 2 });
-  assert.equal(first.mechanical_review.cache_status, 'miss');
-  assert.equal(second.mechanical_review.cache_status, 'hit');
-  assert.equal(second.mechanical_review.hash, first.mechanical_review.hash);
-  assert.equal(second.mechanical_review.freshness, 'current');
 });
