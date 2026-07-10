@@ -25,10 +25,12 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     opl_replacement_surface: 'opl_app_session_shell_and_workbench',
     rca_projection_mode: 'entry_session_domain_snapshot_refs_only',
     rca_exports_only: [
-      'entry_session_id',
-      'topic_deliverable_run_locator_refs',
-      'latest_visual_run_ref',
-      'domain_snapshot_ref',
+      'entry_session_ref',
+      'delivery_locator_refs',
+      'currentness_refs',
+      'authority_refs',
+      'operator_navigation_refs',
+      'authority_boundary',
     ],
     default_caller_contract: {
       surface_kind: 'generated_session_shell_boundary',
@@ -38,13 +40,11 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
       generated_session_command: 'opl_generated:product_session',
       generated_session_command_template: 'opl_generated:product_session --entry-session-id <entry-session-id>',
       rca_role: 'entry_session_domain_snapshot_refs_only_adapter',
-      default_caller_status: 'opl_generated_session_shell_domain_refs',
+      default_caller_status: 'generic_session_sources_retired_opl_generated_surface_required',
       rca_owns_generic_session_shell: false,
-      physical_delete_authorized_now: false,
-      physical_delete_requires_owner_receipt_ref:
-        'rca-typed-blocker:private-platform-retirement:product-entry-continuity-refs-adapter:physical-delete-requires-explicit-owner-receipt',
-      no_forbidden_write_ref:
-        'no-forbidden-write:rca/default-caller-deletion/product_entry_continuity_refs_adapter/refs-only-boundary',
+      generic_session_source_retirement: 'completed',
+      required_absent_source_refs_policy:
+        'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy/typescript_ast_owner_boundary/required_absent_source_refs',
     },
   },
   workspace_source_intake: {
@@ -142,11 +142,12 @@ export const RCA_PRIVATE_PLATFORM_MEMORY_ARTIFACT_LIFECYCLE_RECEIPT_REFS = Objec
 
 const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
   product_entry_continuity_refs_adapter: {
-    bridge_role: 'entry_session_snapshot_refs_only_delete_tail',
+    bridge_role: 'retained_domain_snapshot_refs_boundary_after_generic_session_retirement',
     replacement_owner: 'opl',
     exit_gate_ref: '/opl_generated_interface_consumption',
     retained_authority: ['entry_session_domain_refs', 'deliverable_locator_refs', 'latest_visual_run_ref'],
     after_exit_rca_surface: 'domain_session_snapshot_refs_only',
+    generic_source_retirement_complete: true,
   },
   workspace_source_intake: {
     bridge_role: 'source_readiness_refs_only_delete_tail',
@@ -297,35 +298,56 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
   const replacementSurface = replacementGuard.opl_replacement_surface || entry.opl_generic_primitive || 'domain_authority_function';
   const isAuthorityFunction = entry.module_id === 'visual_authority_functions';
   const isDeclarativePack = entry.module_id === 'visual_pack_compiler_handoff';
-  const emitsDefaultCallerDeletionEvidence = !isAuthorityFunction && !isDeclarativePack;
+  const genericSourceRetirementComplete = profile.generic_source_retirement_complete === true;
+  const emitsDefaultCallerDeletionEvidence = !isAuthorityFunction
+    && !isDeclarativePack
+    && !genericSourceRetirementComplete;
   return {
     gate_id: `${entry.module_id}_bridge_exit_gate`,
     bridge_role: profile.bridge_role || 'refs_only_adapter_until_opl_replacement_live',
-    bridge_owner: isAuthorityFunction || isDeclarativePack ? 'redcube_ai' : 'redcube_ai_refs_only_adapter_tail',
+    bridge_owner: isAuthorityFunction || isDeclarativePack || genericSourceRetirementComplete
+      ? 'redcube_ai'
+      : 'redcube_ai_refs_only_adapter_tail',
     replacement_owner: profile.replacement_owner || 'opl',
     replacement_surface: replacementSurface,
     exit_gate_ref: profile.exit_gate_ref || replacementGuard.expectation_ref || '/opl_generic_primitive_consumption',
-    current_status: isAuthorityFunction
-      ? 'retained_domain_authority'
-      : (isDeclarativePack ? 'declarative_pack_landed' : 'source_shape_landed_delete_tail_evidence_gate_open'),
-    required_before_retire: isAuthorityFunction || isDeclarativePack
+    current_status: genericSourceRetirementComplete
+      ? 'generic_session_sources_physically_retired_domain_refs_boundary_retained'
+      : (isAuthorityFunction
+          ? 'retained_domain_authority'
+          : (isDeclarativePack ? 'declarative_pack_landed' : 'source_shape_landed_delete_tail_evidence_gate_open')),
+    required_before_retire: isAuthorityFunction || isDeclarativePack || genericSourceRetirementComplete
       ? []
       : [...RCA_BRIDGE_EXIT_REQUIRED_GATES],
     retained_rca_authority: profile.retained_authority || entry.rcaRetains || [],
     after_exit_rca_surface: profile.after_exit_rca_surface || 'refs_only_domain_authority_adapter',
-    tail_class: isAuthorityFunction || isDeclarativePack
-      ? 'retained_domain_surface'
-      : 'repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target',
+    tail_class: genericSourceRetirementComplete
+      ? 'retained_domain_refs_boundary'
+      : (isAuthorityFunction || isDeclarativePack
+          ? 'retained_domain_surface'
+          : 'repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target'),
     declares_source_shape_landed: true,
     declares_functional_structure_gap: false,
     can_delete_without_no_active_caller_proof: false,
-    declares_replacement_complete: false,
+    declares_replacement_complete: genericSourceRetirementComplete,
     rca_can_own_replacement_runtime: false,
     opl_can_write_visual_truth: false,
     opl_can_store_artifact_blob: false,
     opl_can_write_memory_body: false,
     opl_can_authorize_review_export_verdict: false,
     opl_can_issue_owner_receipt: false,
+    ...(genericSourceRetirementComplete ? {
+      default_caller_deletion_evidence_scope:
+        'generic_session_sources_retired_domain_snapshot_refs_handler_retained',
+      generic_session_source_retirement: 'completed',
+      keep_as_authority_adapter_ref: keepAsAuthorityAdapterRef(entry.module_id),
+      no_forbidden_write_refs: [
+        `no-forbidden-write:rca/default-caller-deletion/${entry.module_id}/refs-only-boundary`,
+      ],
+      no_forbidden_write_evidence_refs: [
+        `no-forbidden-write:rca/default-caller-deletion/${entry.module_id}/refs-only-boundary`,
+      ],
+    } : {}),
     ...(emitsDefaultCallerDeletionEvidence ? {
       default_caller_deletion_evidence_scope:
         'domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization',
@@ -352,6 +374,14 @@ export function buildBridgeExitGate(entry, replacementGuard = {}) {
 }
 
 export function buildFunctionalModulePhysicalDeletionGuard(entry) {
+  if (entry.module_id === 'product_entry_continuity_refs_adapter') {
+    return {
+      safe_to_delete_now: false,
+      reason: 'The generic session sources are retired; the remaining RCA domain snapshot refs handler is current domain behavior.',
+      required_before_delete: ['replacement_rca_domain_snapshot_refs_handler'],
+      generic_session_source_retirement: 'completed',
+    };
+  }
   return {
     safe_to_delete_now: false,
     reason: `${entry.module_id} is a retained RCA domain authority or refs-only projection; physical deletion would remove current domain behavior.`,

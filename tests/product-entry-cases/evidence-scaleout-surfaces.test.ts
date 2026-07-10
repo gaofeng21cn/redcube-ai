@@ -4,7 +4,6 @@ import {
   assert,
   dispatchDomainActionAdapter,
   exportDomainActionAdapter,
-  getProductEntrySession,
   getProductEntryManifest,
   invokeProductEntry,
   prepareProductEntryWorkspace,
@@ -242,7 +241,7 @@ test('workspace receipt inventory aggregates refs across two workspaces without 
   });
 });
 
-test('product-entry session reads explicit workspace receipt scaleout roots without becoming the generic session owner', SERIAL_ENV_TEST, async () => {
+test('product-entry manifest reads explicit workspace receipt scaleout roots', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const firstWorkspaceRoot = await prepareProductEntryWorkspace();
     const secondWorkspaceRoot = await prepareProductEntryWorkspace();
@@ -267,13 +266,12 @@ test('product-entry session reads explicit workspace receipt scaleout roots with
       [secondWorkspaceRoot, 'session-scaleout-workspace-b-repeat'],
     ]);
 
-    const session = await getProductEntrySession({
-      entry_session_id: 'session-scaleout-entry',
+    const manifest = await getProductEntryManifest({
+      workspace_root: firstWorkspaceRoot,
       workspace_receipt_scaleout_roots: [secondWorkspaceRoot],
     });
-    assertPathValues(session, {
-      surface_kind: 'product_entry_session',
-      'entry_session.entry_session_id': 'session-scaleout-entry',
+    assertPathValues(manifest, {
+      surface_kind: 'product_entry_manifest',
       'workspace_receipt_inventory_projection.scaleout_projection.observed_workspace_count': 2,
       'workspace_receipt_inventory_projection.scaleout_projection.receipt_kind_coverage_ready': true,
       'workspace_receipt_inventory_projection.scaleout_projection.workspace_receipt_scaleout_claimed': false,

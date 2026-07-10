@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { invokeProductEntry } from './invoke-product-entry.js';
-import { getProductEntrySession } from './get-product-entry-session.js';
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
-import { readJson, requireField, safeText } from './action-utils.js';
+import { requireField, safeText } from './action-utils.js';
+import { readJson } from './json-file.js';
 
 const NATIVE_PPT_ROUTES = ['author_pptx_native', 'repair_pptx_native'];
 
@@ -31,7 +31,7 @@ function constraintsFromRequest(request) {
   return Object.keys(constraints).length > 0 ? constraints : undefined;
 }
 
-function nativeArtifactRefs(routeResult, sessionSurface) {
+function nativeArtifactRefs(routeResult) {
   const artifactRefs = [];
   const artifactFile = safeText(routeResult?.artifactFile);
   if (artifactFile) {
@@ -72,17 +72,6 @@ function nativeArtifactRefs(routeResult, sessionSurface) {
         source: 'native_render_proof',
       });
     }
-  }
-
-  const sessionRefs = Array.isArray(sessionSurface?.artifact_inventory?.artifact_refs)
-    ? sessionSurface.artifact_inventory.artifact_refs
-    : [];
-  for (const path of sessionRefs.map((entry) => safeText(entry)).filter(Boolean)) {
-    artifactRefs.push({
-      artifact_kind: 'session_artifact',
-      path,
-      source: 'product_entry_session',
-    });
   }
 
   const seen = new Set();
@@ -135,8 +124,7 @@ export async function runNativePptProductEntryProof(request) {
   });
   const routeResult = productEntry?.domain_entry_surface?.result_surface || {};
 
-  const sessionSurface = await getProductEntrySession({ entry_session_id: entrySessionId });
-  const artifactRefs = nativeArtifactRefs(routeResult, sessionSurface);
+  const artifactRefs = nativeArtifactRefs(routeResult);
 
   return {
     ok: routeResult.ok === true,
@@ -149,13 +137,12 @@ export async function runNativePptProductEntryProof(request) {
     blocked_reason: routeResult.ok === true ? null : safeText(routeResult?.error?.message || routeResult?.run?.error?.message, 'native_ppt_route_failed'),
     product_entry_surface: productEntry,
     route_result: routeResult,
-    entry_session: sessionSurface?.entry_session || null,
+    entry_session: productEntry?.entry_session || null,
     artifact_inventory: {
       surface_kind: 'native_ppt_proof_artifact_inventory',
       entry_session_id: entrySessionId,
       route,
       artifact_refs: artifactRefs,
-      session_artifact_inventory: sessionSurface?.artifact_inventory || null,
       summary: {
         artifact_ref_count: artifactRefs.length,
         has_pptx: artifactRefs.some((entry) => entry.artifact_kind === 'pptx'),

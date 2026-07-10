@@ -20,7 +20,6 @@ import {
   createDeliverable,
   executeSourceAugmentation,
   getProductPreflight,
-  getProductStart,
   intakeSource,
   invokeOplHostedProductEntry,
   invokeProductEntry,
@@ -28,6 +27,9 @@ import {
   researchSource,
   writeSourceAugmentationResult,
 } from '@redcube/domain-entry';
+import {
+  buildGeneratedProductEntrySessionSurface,
+} from 'opl-framework-shared/product-entry-companions';
 import {
   buildOplRouteAttemptIndexForTest,
   runDeliverableRoute,
@@ -154,6 +156,52 @@ async function prepareProductEntryWorkspace() {
   return workspaceRoot;
 }
 
+function buildOplGeneratedProductSessionForTest({
+  entrySessionId,
+  handoffRefs,
+  entryMode = 'direct',
+}): ReturnType<typeof buildGeneratedProductEntrySessionSurface> {
+  const currentness = handoffRefs.currentness_refs || {};
+  const crossProviderAttemptIndex = currentness.cross_provider_attempt_index || null;
+  return buildGeneratedProductEntrySessionSurface({
+    domain_id: 'rca',
+    domain_owner: 'redcube_ai',
+    runtime_owner: 'configured_family_runtime_provider',
+    entry_session_id: entrySessionId,
+    session_file: `/opl-owned/product-sessions/${entrySessionId}.json`,
+    delivery_identity: handoffRefs.delivery_locator_refs,
+    continuation_snapshot: {
+      domain_snapshot_ref: handoffRefs.domain_snapshot_ref,
+      latest_surface_kind: currentness.latest_surface_kind || null,
+      latest_stage_execution_plan_ref: currentness.latest_stage_execution_plan_ref || null,
+      latest_run_id: currentness.latest_visual_run_ref || null,
+      provider_attempt_ref: currentness.provider_attempt_ref || null,
+      provider_attempt_ledger_ref: currentness.provider_attempt_ledger_ref || null,
+      cross_provider_attempt_index: crossProviderAttemptIndex,
+      typed_blocker_ref: currentness.typed_blocker_ref || null,
+      next_forced_delta_refs: currentness.next_forced_delta_refs || [],
+    },
+    family_orchestration: {
+      action_graph_ref: 'opl-generated:family-orchestration/rca',
+    },
+    review_projection: {
+      review_state_ref: 'domain-handler:getReviewState',
+    },
+    publication_projection: {
+      publication_projection_ref: 'domain-handler:getPublicationProjection',
+    },
+    artifact_locator_contract: {
+      contract_ref: 'contracts/artifact_locator_contract.json',
+    },
+    artifact_refs: (handoffRefs.artifact_authority_refs || []).map((ref) => ({ ref })),
+    direct_product_entry_command: 'redcube product invoke',
+    opl_hosted_handoff_ref: 'opl_framework:hosted_product_entry',
+    source: 'product_entry',
+    entry_mode: entryMode,
+    domain_projection: handoffRefs,
+  });
+}
+
 function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.action_graph_ref.ref_kind, 'json_pointer');
   assert.equal(surface.family_orchestration.action_graph_ref.ref, '/family_orchestration/action_graph');
@@ -177,53 +225,8 @@ function assertFamilyOrchestrationCompanion(surface, { sessionLocatorField }) {
   assert.equal(surface.family_orchestration.resume_contract.session_locator_field, sessionLocatorField);
   assert.equal(
     surface.family_orchestration.resume_contract.checkpoint_locator_field,
-    'continuation_snapshot.latest_stage_execution_plan_ref',
+    'entry_session_contract.opl_generated_session_surface.domain_projection.domain_snapshot_ref',
   );
-}
-
-function assertRuntimeLoopClosureShape(surface, { source, entryMode, runtimeOwner = 'configured_family_runtime_provider' }) {
-  assert.equal(surface.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-  assert.equal(surface.runtime_loop_closure.loop_owner.runtime_owner, runtimeOwner);
-  assert.equal(surface.runtime_loop_closure.loop_owner.domain_owner, 'redcube_ai');
-  assert.equal(surface.runtime_loop_closure.loop_owner.product_entry_owner, 'redcube_ai');
-  assert.equal(surface.runtime_loop_closure.resume_point.entry_session_id, surface.entry_session?.entry_session_id ?? null);
-  assert.equal(
-    surface.runtime_loop_closure.resume_point.latest_handle,
-    surface.summary?.target_handle ?? surface.summary?.latest_handle ?? null,
-  );
-  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_kind, 'session_continuity');
-  assert.equal(surface.runtime_loop_closure.continuity_cursor.surface_ref, '/session_continuity');
-  assert.equal(
-    surface.runtime_loop_closure.continuity_cursor.entry_session_id,
-    surface.entry_session?.entry_session_id ?? null,
-  );
-  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_kind, 'progress_projection');
-  assert.equal(surface.runtime_loop_closure.progress_cursor.surface_ref, '/progress_projection');
-  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_kind, 'artifact_inventory');
-  assert.equal(surface.runtime_loop_closure.artifact_pickup.surface_ref, '/artifact_inventory');
-  assert.equal(surface.runtime_loop_closure.control_policy.approval_gate_id, 'redcube_operator_review_gate');
-  assert.equal(surface.runtime_loop_closure.control_policy.default_run_mode, 'auto_to_terminal');
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.stop_policy,
-    'stop_only_on_explicit_stop_after_stage_or_runtime_review_gate',
-  );
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.gate_status,
-    surface.runtime_loop_closure.control_policy.approval_required ? 'requested' : 'approved',
-  );
-  assert.equal(
-    surface.runtime_loop_closure.control_policy.interrupt_policy,
-    surface.runtime_loop_closure.control_policy.approval_required
-      ? 'human_gate_required_before_continuation'
-      : 'continue_autonomously_until_runtime_gate',
-  );
-  assert.equal(surface.runtime_loop_closure.control_policy.continue_action.surface_kind, 'product_entry_session');
-  assert.equal(surface.runtime_loop_closure.source_linkage.current_source, source);
-  assert.equal(surface.runtime_loop_closure.source_linkage.entry_mode, entryMode);
-  assert.equal(surface.runtime_loop_closure.source_linkage.direct_surface_kind, 'product_entry');
-  assert.equal(surface.runtime_loop_closure.source_linkage.opl_hosted_surface_kind, 'opl_hosted_product_entry');
-  assert.equal(surface.runtime_loop_closure.source_linkage.session_surface_kind, 'product_entry_session');
-  assert.equal(surface.runtime_loop_closure.source_linkage.downstream_entry_surface_kind, 'domain_entry');
 }
 
 function buildAugmentationResultPayload(overrides = {}) {
@@ -270,10 +273,10 @@ export {
   assert,
   assertFamilyOrchestrationCompanion,
   assertReceiptOnlyHostedAttemptProjection,
-  assertRuntimeLoopClosureShape,
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
   buildHostedAttemptBridgeFixture,
+  buildOplGeneratedProductSessionForTest,
   buildOplRouteAttemptIndexForTest,
   chmodSync,
   completeSourceReadiness,
@@ -288,7 +291,6 @@ export {
   getProductEntrySessionSurface as getProductEntrySession,
   getProductStatus,
   getProductPreflight,
-  getProductStart,
   getDomainActionAdapterGuardedActionMetadata,
   importDomainEntrySharedModule,
   intakeSource,

@@ -1,8 +1,8 @@
 {
   "product_entry_id": "redcube_product_entry",
-  "date_anchor": "2026-04-12",
-  "status": "closeout_completed",
-  "goal": "Land a repo-verified RedCube direct product-entry service surface without changing the visual-domain boundary.",
+  "date_anchor": "2026-07-10",
+  "status": "domain_entry_with_opl_session_handoff_refs_current",
+  "goal": "Expose the RCA domain entry while OPL owns product-session persistence, currentness, and continuation.",
   "callable_surface": {
     "action_ref": "invoke_product_entry",
     "api_surface": "invokeProductEntry",
@@ -14,6 +14,7 @@
       "workspace_locator.workspace_root",
       "entry_session_contract.entry_session_id"
     ],
+    "continuation_surface_field": "entry_session_contract.opl_generated_session_surface",
     "delivery_identity_fields": [
       "delivery_request.deliverable_family",
       "delivery_request.topic_id",
@@ -28,52 +29,48 @@
       "run_opl_stage_execution_plan",
       "run_deliverable_route"
     ],
-    "optional_delivery_fields": [
-      "delivery_request.route",
-      "delivery_request.adapter",
-      "delivery_request.user_intent",
-      "delivery_request.stop_after_stage",
-      "delivery_request.lifecycle_policy",
-      "delivery_request.mode",
-      "delivery_request.baseline_deliverable_id"
-    ],
     "default_task_intent": "run_opl_stage_execution_plan",
     "default_runtime_owner": "configured_family_runtime_provider",
     "default_executor_owner": "configured_by_opl_runtime_provider",
     "default_return_surface_kind": "opl_stage_execution_plan",
-    "hosted_runtime_owner_when_opl_hosted": "configured_family_runtime_provider",
     "shared_domain_entry_contract": "contracts/runtime-program/service-safe-domain-entry-adapter.json"
   },
   "behavior_contract": {
     "create_or_continue_same_deliverable": true,
-    "session_continuity_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "continuation_identity_owner": "one-person-lab",
+    "repo_local_session_store_allowed": false,
+    "workspace_run_scan_for_session_currentness_allowed": false,
     "fail_closed_on": [
       "missing_workspace_root",
       "missing_entry_session_id",
-      "missing_delivery_identity_without_session_binding",
+      "missing_delivery_identity_without_opl_generated_session_surface",
+      "delivery_identity_mismatch_with_opl_generated_session_surface",
+      "provider_currentness_mismatch_with_opl_generated_session_surface",
+      "delivery_identity_mismatch_with_rca_deliverable_record",
       "missing_profile_or_title_or_goal_when_deliverable_creation_is_required",
       "unsupported_task_intent",
       "unsupported_target_domain"
     ]
   },
-    "response_contract": {
-        "surface_kind": "product_entry",
-        "must_include": [
-            "product_entry_contract_id",
-            "entry_session",
-            "domain_entry_surface",
-            "continuation_snapshot",
-            "session_continuity",
-            "progress_projection",
-            "artifact_inventory",
-            "review_state",
-            "publication_projection"
-        ],
-        "durable_handles": [
-            "program_id",
-      "topic_id",
-      "deliverable_id",
-      "run_id"
+  "response_contract": {
+    "surface_kind": "product_entry",
+    "must_include": [
+      "product_entry_contract_id",
+      "domain_entry_surface",
+      "session_handoff_refs",
+      "review_state",
+      "publication_projection",
+      "authority_boundary",
+      "summary"
+    ],
+    "must_not_include": [
+      "entry_session",
+      "continuation_snapshot",
+      "session_continuity",
+      "progress_projection",
+      "artifact_inventory",
+      "runtime_loop_closure",
+      "family_orchestration"
     ]
   }
 }

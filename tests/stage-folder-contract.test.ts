@@ -146,6 +146,49 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
   });
 });
 
+test('RCA stage folder keeps long OPL attempt ref normalization stable across write and read', () => {
+  withTempOplState(() => {
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-long-attempt-'));
+    const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+    const attemptId = `${'a'.repeat(95)}/suffix`;
+    const expectedAttemptId = `${'a'.repeat(95)}-`;
+    const input = {
+      deliverablePaths: paths,
+      programId: paths.programId,
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      routeStageId: 'storyline',
+      canonicalStageId: 'source_intake',
+      stageOrder: 1,
+      attemptId,
+      outputName: 'storyline.json',
+      requiredOutputs: ['storyline.json'],
+      ownerReceiptRefs: ['rca-owner-receipt:visual-stage:deck-a'],
+    };
+    const outputFile = stageFolderOutputPath(input);
+    writeJson(outputFile, { route: 'storyline', status: 'completed' });
+    const written = writeStageFolderArtifact({
+      ...input,
+      artifactFile: outputFile,
+    });
+
+    const loaded = readStageFolderArtifact({
+      deliverablePaths: paths,
+      canonicalStageId: 'source_intake',
+      routeStageId: 'storyline',
+    });
+
+    assert.equal(path.basename(written.attempt_dir), expectedAttemptId);
+    assert.equal(written.output_file, outputFile);
+    assert.equal(written.manifest.attempt_id, expectedAttemptId);
+    assert.equal(readFileSync(written.latest_pointer, 'utf-8').trim(), expectedAttemptId);
+    assert.equal(existsSync(path.join(path.dirname(written.attempt_dir), 'a'.repeat(95))), false);
+    assert.equal(loaded?.status, 'success');
+    assert.equal(loaded?.attempt_id, expectedAttemptId);
+    assert.equal(loaded?.artifact.route, 'storyline');
+  });
+});
+
 test('RCA stage folder success closeout fails closed without explicit owner receipt refs', () => {
   withTempOplState((stateRoot) => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-missing-owner-ref-'));

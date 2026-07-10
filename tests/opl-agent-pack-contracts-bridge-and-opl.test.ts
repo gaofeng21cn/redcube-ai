@@ -73,8 +73,19 @@ test('RCA bridge residue exposes exit gates without claiming generic ownership',
       assert.equal(entry.bridge_exit_gate.rca_can_own_replacement_runtime, false, entry.module_id);
       assert.equal(entry.bridge_exit_gate.opl_can_write_visual_truth, false, entry.module_id);
       assert.equal(entry.bridge_exit_gate.opl_can_store_artifact_blob, false, entry.module_id);
-      assert.equal(entry.bridge_exit_gate.declares_replacement_complete, false, entry.module_id);
-      if (!['visual_pack_compiler_handoff', 'visual_authority_functions'].includes(entry.module_id)) {
+      assert.equal(
+        entry.bridge_exit_gate.declares_replacement_complete,
+        entry.module_id === 'product_entry_continuity_refs_adapter',
+        entry.module_id,
+      );
+      if (entry.module_id === 'product_entry_continuity_refs_adapter') {
+        assert.deepEqual(entry.bridge_exit_gate.required_before_retire, []);
+        assert.equal(entry.bridge_exit_gate.generic_session_source_retirement, 'completed');
+        assert.equal(
+          entry.bridge_exit_gate.keep_as_authority_adapter_ref,
+          'rca-keep-authority-adapter:private-platform-retirement:product-entry-continuity-refs-adapter',
+        );
+      } else if (!['visual_pack_compiler_handoff', 'visual_authority_functions'].includes(entry.module_id)) {
         assert.deepEqual(entry.bridge_exit_gate.required_before_retire, [
           'domain_authority_refs_preserved',
           'no_regression_proof_recorded',
@@ -105,6 +116,8 @@ test('OPL generated interfaces are ready from RCA root contracts when OPL checko
   assert.equal(bundle.source_kind, 'standard_agent_repo_contracts');
   assert.equal(bundle.status, 'ready');
   assert.equal(bundle.owner, 'one-person-lab');
+  assert.equal(bundle.agent_id, 'rca');
+  assert.equal(bundle.target_domain_id, 'redcube_ai');
   assert.equal(bundle.domain_repo_can_own_generated_surface, false);
   assert.deepEqual(bundle.blocker_reasons, []);
   assert.equal(bundle.cli.status, 'ready');

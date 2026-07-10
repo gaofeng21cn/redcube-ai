@@ -20,8 +20,8 @@ import {
 import { createNativePptShapePlanNormalizeParts } from './native-ppt-shape-plan-normalize.js';
 import { createNativePptRepairEvidenceParts } from './native-ppt-repair-evidence.js';
 import {
-  createNativePptCodexInvocationBlockerParts,
-} from './native-ppt-codex-invocation-blocker.js';
+  createNativePptExecutorAttemptDiagnosticParts,
+} from './native-ppt-executor-attempt-diagnostic.js';
 import {
   AI_FIRST_EDITING_CONTRACT,
   OFFICECLI_MATERIALIZER_POLICY,
@@ -103,8 +103,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
   } = createNativePptShapePlanNormalizeParts({ safeArray, safeText });
   const {
     isCodexInvocationFailure,
-    writeCodexInvocationBlocker,
-  } = createNativePptCodexInvocationBlockerParts({
+    writeExecutorAttemptDiagnostic,
+  } = createNativePptExecutorAttemptDiagnosticParts({
     PROMPT_PACK,
     safeArray,
     safeText,
@@ -296,7 +296,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
     safeText,
     structuralFeedbackFromPlanError,
     summarizeNativeSlides,
-    writeCodexInvocationBlocker,
+    writeExecutorAttemptDiagnostic,
     writeJson,
   });
 
@@ -350,7 +350,7 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       adapter,
       validationInputFile: paths.planValidationFile,
       editableShapePlanFile: paths.editableShapePlanFile,
-      codexInvocationBlockerFile: paths.codexInvocationBlockerFile,
+      executorAttemptDiagnosticFile: paths.executorAttemptDiagnosticFile,
     });
     const {
       editableShapePlan,

@@ -441,8 +441,15 @@ function writeStageFolderDescriptors({ paths, locator, canonicalStageId, stageOr
 
 export function writeStageFolderArtifact(input) {
   const canonicalStageId = safeText(input.canonicalStageId, canonicalStageForRoute(input.routeStageId));
-  const attemptId = safeSegmentFromText(input.attemptId, 'attempt');
   const stageOrder = input.stageOrder ?? stageOrderForCanonicalStage(canonicalStageId);
+  const paths = buildStageFolderAttemptPaths({
+    ...input,
+    deliverablePaths: input.deliverablePaths,
+    canonicalStageId,
+    stageOrder,
+    attemptId: input.attemptId,
+  });
+  const attemptId = path.basename(paths.attempt_dir);
   const status = closeoutStatus(input);
   const ownerReceiptRefs = ownerReceiptRefsFor(input);
   const typedBlockerRefs = typedBlockerRefsFor(input);
@@ -453,13 +460,9 @@ export function writeStageFolderArtifact(input) {
     canonicalStageId,
     attemptId,
   });
-  const paths = stageFolderAttemptPaths({
-    ...input,
-    deliverablePaths: input.deliverablePaths,
-    canonicalStageId,
-    stageOrder,
-    attemptId,
-  });
+  for (const dir of [paths.inputs_dir, paths.outputs_dir, paths.evidence_dir, paths.receipts_dir]) {
+    ensureDir(dir);
+  }
   const locator = stageArtifactLocator(input);
   const descriptors = writeStageFolderDescriptors({
     paths,

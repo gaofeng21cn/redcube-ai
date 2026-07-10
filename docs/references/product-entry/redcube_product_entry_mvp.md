@@ -43,9 +43,9 @@ Machine boundary: 人读 product-entry support。机器真相继续归 `contract
 ## 最小行为
 
 1. 接收 `workspace_locator.workspace_root` 与 `entry_session_contract.entry_session_id`
-2. 允许 direct entry 创建或继续同一 deliverable
+2. direct entry 可创建 deliverable；继续同一 deliverable 时必须由 OPL generated product-entry session surface 重新提供 identity 与 currentness refs
 3. deliverable 缺失时，要求显式提供 `profile_id / title / goal`
-4. 成功后返回 `product_entry` surface，而不是直接暴露 repo-local runtime 细节
+4. 成功后返回 `product_entry` 与 `session_handoff_refs`，不写 RCA-local session store
 5. 内部继续下沉到 `invokeDomainEntry`
 
 ## 明确不做

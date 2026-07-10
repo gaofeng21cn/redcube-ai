@@ -4,9 +4,9 @@ import {
   PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER,
   SERIAL_ENV_TEST,
   assert,
+  buildOplGeneratedProductSessionForTest,
   getProductEntryManifest,
   getProductEntrySession,
-  getProductStart,
   getProductStatus,
   importDomainEntrySharedModule,
   invokeProductEntry,
@@ -42,11 +42,11 @@ test('default product-entry path returns an OPL stage execution plan without req
     const status = await getProductStatus({ workspace_root: workspaceRoot });
     assertPathValues(status, {
       'runtime.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      surface_kind: 'opl_generated_product_entry_domain_surface',
+      generated_interface_owner: 'one-person-lab',
+      'authority_boundary.generated_surface_only': true,
     });
-
-    const start = await getProductStart({ workspace_root: workspaceRoot });
-    assert.equal(start.runtime_loop_closure.loop_owner.runtime_owner, RUNTIME_OWNER);
+    assert.equal(status.runtime_loop_closure, undefined);
 
     const invoked = await invokeProductEntry({
       workspace_locator: { workspace_root: workspaceRoot },
@@ -63,9 +63,10 @@ test('default product-entry path returns an OPL stage execution plan without req
       },
     });
     assertPathValues(invoked, {
-      'entry_session.runtime_owner': RUNTIME_OWNER,
-      'session_continuity.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+      'session_handoff_refs.entry_session_id': 'session-codex-default',
+      'session_handoff_refs.delivery_locator_refs.deliverable_id': 'deck-codex-default',
+      'authority_boundary.generic_session_runtime_owner': 'one-person-lab',
+      'authority_boundary.rca_owns_generic_session_runtime': false,
       'domain_entry_surface.runtime_session_contract.runtime_owner': RUNTIME_OWNER,
       'domain_entry_surface.runtime_session_contract.adapter_surface': 'opl_codex_executor',
       'domain_entry_surface.result_surface.surface_kind': 'opl_stage_execution_plan',
@@ -74,31 +75,42 @@ test('default product-entry path returns an OPL stage execution plan without req
       'domain_entry_surface.result_surface.adapter_boundary.executor_selection_owner': 'one-person-lab',
     });
 
-    const session = await getProductEntrySession({ entry_session_id: 'session-codex-default' });
-    assertPathValues(session, {
-      'entry_session.runtime_owner': RUNTIME_OWNER,
-      'session_continuity.runtime_owner': RUNTIME_OWNER,
-      'runtime_loop_closure.loop_owner.runtime_owner': RUNTIME_OWNER,
+    const handoff = invoked.session_handoff_refs;
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-codex-default',
+      opl_generated_session_surface: buildOplGeneratedProductSessionForTest({
+        entrySessionId: 'session-codex-default',
+        handoffRefs: handoff,
+      }),
     });
+    assertPathValues(session, {
+      projection_kind: 'rca_product_entry_session_domain_snapshot_refs',
+      'entry_session_ref.runtime_owner': RUNTIME_OWNER,
+      'entry_session_ref.entry_session_id': 'session-codex-default',
+      'operator_navigation_refs.generated_session_surface_ref': 'opl_generated:product_session',
+      'authority_boundary.refs_only': true,
+      'authority_boundary.rca_owns_generic_session_shell': false,
+    });
+    assert.equal(session.session_continuity, undefined);
+    assert.equal(session.runtime_loop_closure, undefined);
+    assert.equal(session.artifact_inventory, undefined);
   });
 });
 
-test('product status exposes overlay stage sequence for ppt_deck callers', async () => {
+test('product status keeps overlay stage sequences behind the generated manifest and domain ref', async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const status = await getProductStatus({ workspace_locator: { workspace_root: workspaceRoot } });
 
     assertPathValues(status, {
-      'overlay_stage_sequences.ppt_deck.protected_stage_sequence': list('storyline detailed_outline slide_blueprint visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages export_pptx'),
-      'overlay_stage_sequences.ppt_deck.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.ppt_deck.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
-      'ppt_deck_visual_route_truth.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.ppt_deck.route_gate_policy': 'fail_closed_against_overlay_stage_sequence',
-      'overlay_stage_sequences.xiaohongshu.protected_stage_sequence': list('research storyline single_note_plan visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages publish_copy export_bundle'),
-      'overlay_stage_sequences.xiaohongshu.default_visual_route': 'author_image_pages',
-      'overlay_stage_sequences.xiaohongshu.default_visual_policy': 'image_first',
-      'overlay_stage_sequences.xiaohongshu.route_selection_policy.style_reference_dir_input': 'delivery_request.style_reference_dir',
+      'domain_projection.overlay_stage_sequences_ref': '/deliverable_facade/family_route_policy',
+      'domain_projection.ppt_deck_visual_route_truth_ref': '/ppt_deck_visual_route_truth',
+      'product_entry_manifest.deliverable_facade.family_route_policy.ppt_deck.protected_stage_sequence': list('storyline detailed_outline slide_blueprint visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages export_pptx'),
+      'product_entry_manifest.deliverable_facade.family_route_policy.ppt_deck.default_visual_route': 'author_image_pages',
+      'product_entry_manifest.deliverable_facade.family_route_policy.xiaohongshu.protected_stage_sequence': list('research storyline single_note_plan visual_direction author_image_pages visual_director_review screenshot_review repair_image_pages publish_copy export_bundle'),
     });
+    assert.equal(status.overlay_stage_sequences, undefined);
+    assert.equal(status.ppt_deck_visual_route_truth, undefined);
   });
 });
 
@@ -122,28 +134,6 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
       }),
       /delivery_request\.stop_after_stage=native_pptx is not allowed by the hydrated overlay stage_sequence/,
     );
-  });
-});
-
-test('getProductStart exposes the same direct-entry start companion as the manifest', SERIAL_ENV_TEST, async () => {
-  await withMockCodexRuntimeState(async () => {
-    const workspaceRoot = await prepareProductEntryWorkspace();
-    const start = await getProductStart({ workspace_root: workspaceRoot });
-
-    assertPathValues(start, {
-      ok: true,
-      surface_kind: 'product_entry_start',
-      recommended_mode_id: 'start_direct_session',
-      'modes.0.mode_id': 'start_direct_session',
-      'modes.1.mode_id': 'opl_hosted_handoff',
-      'modes.2.mode_id': 'resume_session',
-      'runtime_loop_closure.surface_kind': 'runtime_loop_closure',
-      'runtime_loop_closure.source_linkage.current_source': 'start',
-      'runtime_loop_closure.source_linkage.entry_mode': 'start_projection',
-      'resume_surface.surface_kind': 'product_entry_session',
-      human_gate_ids: ['redcube_operator_review_gate'],
-    });
-    assert.match(start.modes[0].command, /redcube product invoke/);
   });
 });
 

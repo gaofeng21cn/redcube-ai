@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { existsSync } from 'node:fs';
 
 import {
@@ -7,11 +6,7 @@ import {
 } from 'opl-framework-shared/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
-import { buildRuntimeLoopClosureManifestSurface } from './product-entry-continuity-surfaces.js';
-import { productEntrySessionDir } from './product-entry-session-refs.js';
 import { requireField } from './action-utils.js';
-
-const DEFAULT_RUNTIME_OWNER = 'codex_cli';
 
 type ProductPreflightRequest = Record<string, any>;
 
@@ -25,9 +20,7 @@ function normalizeWorkspaceRoot(request: ProductPreflightRequest): string {
 export async function getProductPreflight(request: ProductPreflightRequest) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
   const doctor = await doctorWorkspace({ workspaceRoot });
-  const runtimeStateRoot = path.dirname(productEntrySessionDir());
   const workspaceRootExists = existsSync(doctor.workspaceRoot);
-  const runtimeStateRootReady = existsSync(runtimeStateRoot);
   const checkCommand = `redcube workspace doctor --workspace-root ${doctor.workspaceRoot}`;
   const startCommand = `redcube product invoke --workspace-root ${doctor.workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`;
   const checks = [
@@ -49,16 +42,6 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       summary: doctor.workspaceFileExists
         ? 'workspace contract 已就位。'
         : 'workspace contract 仍缺失；请先 bootstrap workspace canonical surfaces。',
-      command: checkCommand,
-    }),
-    buildProgramCheck({
-      check_id: 'runtime_state_root_ready',
-      title: 'Runtime State Root Ready',
-      status: runtimeStateRootReady ? 'pass' : 'fail',
-      blocking: true,
-      summary: runtimeStateRootReady
-        ? 'runtime state root 已就位。'
-        : 'runtime state root 尚未就位。',
       command: checkCommand,
     }),
     buildProgramCheck({
@@ -87,11 +70,6 @@ export async function getProductPreflight(request: ProductPreflightRequest) {
       workspace_surface_kind: 'redcube_workspace',
       workspace_root: doctor.workspaceRoot,
     },
-    runtime_loop_closure: buildRuntimeLoopClosureManifestSurface({
-      runtimeOwner: DEFAULT_RUNTIME_OWNER,
-      source: 'preflight',
-      entryMode: 'preflight_projection',
-    }),
     ...productEntryPreflight,
   };
 }

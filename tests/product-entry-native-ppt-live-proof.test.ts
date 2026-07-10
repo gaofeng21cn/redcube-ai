@@ -3,12 +3,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
-import { existsSync, mkdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, statSync } from 'node:fs';
 
 import {
   getProductEntrySession,
   invokeProductEntry,
 } from './product-domain-action-test-api.ts';
+import { buildOplGeneratedProductSessionForTest } from './product-domain-action-case-shared.ts';
+import { buildOplRouteAttemptIndexForTest } from './helpers/route-attempt-test-api.ts';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
 import { mkUserScopedTestWorkspace } from './helpers/test-workspace.ts';
 import {
@@ -48,14 +50,7 @@ function resolveManagedPythonCommand() {
 
 async function withLiveNativePptProductEntryRuntime(testFn) {
   const upstream = await startMockCodexCli();
-  const runtimeStateRoot = path.join(
-    resolveCodexHome(),
-    'projects',
-    'redcube-ai',
-    'runtime-state',
-    'native-ppt-live-product-proof',
-  );
-  mkdirSync(runtimeStateRoot, { recursive: true });
+  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-ppt-live-runtime-'));
   const restoreEnv = withEnv({
     REDCUBE_CODEX_COMMAND: upstream.command,
     REDCUBE_PYTHON_COMMAND: resolveManagedPythonCommand(),
@@ -66,6 +61,7 @@ async function withLiveNativePptProductEntryRuntime(testFn) {
   } finally {
     restoreEnv();
     await upstream.close();
+    rmSync(runtimeStateRoot, { recursive: true, force: true });
   }
 }
 
@@ -76,8 +72,6 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
     },
     entry_session_contract: {
       entry_session_id: entrySessionId,
-      provider_attempt_ref: `opl-provider-attempt:${entrySessionId}:${route}`,
-      provider_attempt_ledger_ref: `attempt-ledger:opl/redcube_ai/native-ppt-live-proof:${entrySessionId}`,
     },
     task_intent: 'run_deliverable_route',
     delivery_request: {
@@ -90,6 +84,12 @@ async function invokeRoute({ workspaceRoot, entrySessionId, route, stopAfterStag
       route,
       stop_after_stage: stopAfterStage,
       user_intent: userIntent,
+      cross_provider_attempt_index: buildOplRouteAttemptIndexForTest({
+        route,
+        runId: `${entrySessionId}/${route}`,
+        topicId: TOPIC_ID,
+        deliverableId: DELIVERABLE_ID,
+      }),
     },
   });
 }
@@ -148,8 +148,9 @@ test('live product-entry native PPT proof reaches review and export gates with r
     });
     assert.equal(planned.ok, true);
     assert.equal(routeSurface(planned).summary.executed_route, 'visual_direction');
-    assert.equal(planned.entry_session.created_deliverable, true);
-    assert.equal(existsSync(planned.entry_session.session_file), true);
+    assert.equal(planned.summary.created_deliverable, true);
+    assert.equal(planned.session_handoff_refs.entry_session_id, entrySessionId);
+    assert.equal(existsSync(path.join(runtimeStateRoot, 'product-entry-sessions')), false);
 
     const authored = await invokeRoute({
       workspaceRoot,
@@ -217,20 +218,27 @@ test('live product-entry native PPT proof reaches review and export gates with r
     assert.equal(existsSync(exportArtifact.export_bundle.pptx_file), true);
     assert.equal(existsSync(exportArtifact.export_bundle.pdf_file), true);
 
+    const handoff = exported.session_handoff_refs;
     const session = await getProductEntrySession({
       entrySessionId,
+      oplGeneratedSessionSurface: buildOplGeneratedProductSessionForTest({
+        entrySessionId,
+        handoffRefs: handoff,
+      }),
     });
     assert.equal(session.ok, true);
     assert.equal(session.surface_kind, 'product_entry_session');
-    assert.equal(session.entry_session.entry_session_id, entrySessionId);
-    assert.equal(session.entry_session.session_file.startsWith(runtimeStateRoot), true);
-    assert.equal(session.delivery_identity.deliverable_id, DELIVERABLE_ID);
+    assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
+    assert.equal(session.entry_session_ref.entry_session_id, entrySessionId);
+    assert.equal(
+      session.entry_session_ref.generated_session_surface_kind,
+      'opl_generated_product_entry_session_surface',
+    );
+    assert.equal(session.entry_session_ref.domain_snapshot_ref, handoff.domain_snapshot_ref);
+    assert.equal(session.delivery_locator_refs.deliverable_id, DELIVERABLE_ID);
     assert.equal(session.summary.deliverable_id, DELIVERABLE_ID);
-    assert.equal(session.session_continuity.restore_point.latest_handle, session.continuation_snapshot.latest_run_id);
-    assert.equal(session.native_proof_artifact_inventory.surface_kind, 'native_ppt_proof_artifact_inventory');
-    assert.equal(session.native_proof_artifact_inventory.summary.has_pptx, true);
-    assert.equal(session.native_proof_artifact_inventory.summary.has_pdf, true);
-    assert.equal(session.native_proof_artifact_inventory.summary.has_shape_manifest, true);
-    assert.equal(session.summary.native_proof_artifact_ref_count > 0, true);
+    assert.equal(session.currentness_refs.latest_visual_run_ref, session.summary.latest_visual_run_ref);
+    assert.equal(session.authority_boundary.refs_only, true);
+    assert.equal(session.authority_boundary.rca_owns_generic_session_shell, false);
   });
 });

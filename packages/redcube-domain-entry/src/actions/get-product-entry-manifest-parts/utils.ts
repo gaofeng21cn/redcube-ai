@@ -1,9 +1,9 @@
 import { fileURLToPath } from 'node:url';
 
 import {
-  readJson,
   requireField,
 } from '../action-utils.js';
+import { readJson } from '../json-file.js';
 export { safeText } from '../action-utils.js';
 
 type SourcePartRef = {

@@ -29,12 +29,16 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
     const status = await getProductStatus({
       workspace_root: workspaceRoot,
     });
-    assert.equal(status.ok, true);
-    assert.equal(status.surface_kind, 'product_status');
-    assertNoActiveBridgeContractWording(status.entry_status_surface);
-    assertNoActiveBridgeContractWording(status.status_surface);
+    assert.equal(status.ok, undefined);
+    assert.equal(status.surface_kind, 'opl_generated_product_entry_domain_surface');
+    assert.equal(status.generated_surface_kind, 'product_entry_surface');
+    assert.equal(status.generated_interface_owner, 'one-person-lab');
+    assert.equal(status.generated_for_domain_id, 'redcube_ai');
+    assert.equal(status.domain_owner, 'redcube_ai');
+    assertNoActiveBridgeContractWording(status.product_entry_surface);
+    assertNoActiveBridgeContractWording(status.entry_surfaces.status);
     assert.match(
-      status.entry_status_surface.summary,
+      status.product_entry_surface.summary,
       /OPL generated product-entry overview\/status shell/,
     );
     assertNoActiveBridgeContractWording(manifest.entry_status_surface);
@@ -42,24 +46,24 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
     assert.equal(status.product_entry_overview.surface_kind, 'product_entry_overview');
     assert.equal(status.product_entry_overview.progress_surface.surface_kind, 'product_entry_session');
     assert.equal(status.product_entry_start.surface_kind, 'product_entry_start');
-    assert.equal(status.product_entry_start.recommended_mode_id, 'start_direct_session');
+    assert.equal(status.product_entry_start.recommended_mode_id, 'direct');
     assert.deepEqual(
       status.product_entry_start.modes.map((mode) => mode.mode_id),
-      ['start_direct_session', 'opl_hosted_handoff', 'resume_session'],
+      ['direct', 'opl_hosted', 'session'],
     );
     assert.deepEqual(status.product_entry_start, manifest.product_entry_start);
-    assert.deepEqual(status.native_ppt_operator_ux, manifest.native_ppt_operator_ux);
-    assert.deepEqual(
-      status.workspace_receipt_inventory_projection,
-      manifest.workspace_receipt_inventory_projection,
+    assert.equal(status.native_ppt_operator_ux, undefined);
+    assert.equal(status.workspace_receipt_inventory_projection, undefined);
+    assert.equal(status.operator_evidence_readiness_projection, undefined);
+    assert.equal(status.runtime_loop_closure, undefined);
+    assert.equal(status.domain_projection.native_ppt_helper_descriptor_ref, '/native_ppt_operator_ux');
+    assert.equal(
+      status.domain_projection.workspace_receipt_inventory_ref,
+      '/workspace_receipt_inventory_projection',
     );
-    assert.deepEqual(
-      status.operator_evidence_readiness_projection,
-      manifest.operator_evidence_readiness_projection,
-    );
-    assert.equal(status.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(status.runtime_loop_closure.source_linkage.current_source, 'product_entry_overview');
-    assert.equal(status.runtime_loop_closure.source_linkage.entry_mode, 'product_entry_overview_projection');
+    assert.equal(status.authority_boundary.generated_surface_only, true);
+    assert.equal(status.authority_boundary.can_write_domain_truth, false);
+    assert.equal(status.authority_boundary.can_create_typed_blocker, false);
     assert.equal(
       status.product_entry_overview.resume_surface.command,
       'opl_generated:product_session --entry-session-id <entry-session-id>',
@@ -76,8 +80,8 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
     );
     assert.deepEqual(status.product_entry_preflight, manifest.product_entry_preflight);
-    assert.match(status.product_entry_quickstart.summary, /direct product-entry domain handler target/);
-    assert.match(status.product_entry_quickstart.steps[1].summary, /OPL generated session shell consumes RCA entry-session refs/);
+    assert.match(status.product_entry_quickstart.summary, /generated entry/);
+    assert.match(status.product_entry_quickstart.steps[1].summary, /generated session and progress projection/);
     assert.equal(status.product_entry_quickstart.recommended_step_id, 'continue_current_loop');
     assert.equal(status.product_entry_quickstart.steps[1].step_id, 'inspect_current_progress');
     assert.equal(status.product_entry_quickstart.steps[1].surface_kind, 'product_entry_session');
@@ -99,9 +103,7 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
     assert.equal(preflight.target_domain_id, 'redcube_ai');
     assert.equal(preflight.workspace_locator.workspace_root, workspaceRoot);
     assert.equal(preflight.ready_to_try_now, true);
-    assert.equal(preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
-    assert.equal(preflight.runtime_loop_closure.source_linkage.entry_mode, 'preflight_projection');
+    assert.equal(preflight.runtime_loop_closure, undefined);
     assert.equal(
       preflight.recommended_check_command,
       `redcube workspace doctor --workspace-root ${workspaceRoot}`,
@@ -111,8 +113,7 @@ test('product status, preflight, and CLI manifest stay aligned with the product-
       `redcube product invoke --workspace-root ${workspaceRoot} --entry-session-id <entry-session-id> --overlay <overlay-id> --topic-id <topic-id> --deliverable-id <deliverable-id>`,
     );
     assert.deepEqual(preflight.blocking_check_ids, []);
-    assert.equal(manifest.product_entry_preflight.runtime_loop_closure.surface_kind, 'runtime_loop_closure');
-    assert.equal(manifest.product_entry_preflight.runtime_loop_closure.source_linkage.current_source, 'preflight');
+    assert.equal(manifest.product_entry_preflight.runtime_loop_closure, undefined);
 
     try {
       execFileSync(

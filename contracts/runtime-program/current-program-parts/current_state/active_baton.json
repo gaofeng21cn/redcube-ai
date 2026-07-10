@@ -1,10 +1,10 @@
 {
   "id": "product_entry_session_continuity",
-  "status": "closeout_completed",
+  "status": "generic_session_sources_retired_domain_snapshot_projection_verified",
   "review_status": "verified",
-  "program_mode": "repo_verified_product_entry_service_surface",
+  "program_mode": "opl_owned_product_session_rca_domain_snapshot_refs",
   "scope": {
-    "hardening_axis": "product_entry_service_surface_and_opl_hosted_handoff",
+    "hardening_axis": "opl_generated_session_surface_and_rca_domain_snapshot_refs_boundary",
     "implementation_in_scope": true,
     "runtime_substrate_owner": "configured_family_runtime_provider",
     "default_runtime_owner": "configured_family_runtime_provider",
@@ -39,12 +39,12 @@
       "privatized_functional_module_audit"
     ],
     "required_identity_fields": [
-      "program_id",
-      "topic_id",
-      "deliverable_id",
-      "run_id"
+      "entry_session_id",
+      "domain_snapshot_ref",
+      "delivery_locator_refs",
+      "currentness_refs"
     ],
-    "required_session_continuity_root": "$CODEX_HOME/projects/redcube-ai/runtime-state/product-entry-sessions/",
+    "required_session_envelope_owner": "one-person-lab",
     "excluded_scope": [
       "managed web runtime control plane",
       "controller expansion",
@@ -57,15 +57,15 @@
       "routes": [
         "product_status",
         "product_invoke",
-        "session_continuation",
+        "session_domain_snapshot_projection",
         "opl_hosted_stage_runtime"
       ],
       "shared_truth_surfaces": [
         "domain_entry_surface",
-        "session_continuity",
-        "progress_projection",
-        "artifact_inventory",
-        "runtime_loop_closure",
+        "session_handoff_refs",
+        "stage_folder_locator_refs",
+        "artifact_authority_refs",
+        "authority_boundary",
         "review_state",
         "publication_projection"
       ],
@@ -102,14 +102,14 @@
       "repo_local_stage_runner_role": "tombstone_or_historical_regression_only"
     },
     "opl_family_lifecycle_adapter": {
-      "status": "repo_tracked_projection_contract",
+      "status": "repo_tracked_refs_only_projection_contract",
       "adapter_id": "rca.opl.family.lifecycle.adapter.v1",
       "source_surfaces": [
-        "session-continuity run envelopes",
-        "product-entry sessions",
+        "OPL generated product-entry session surface refs",
+        "RCA product-entry domain snapshot refs",
         "review/publication projections",
-        "artifact inventory",
-        "runtime loop closure"
+        "artifact authority refs",
+        "OPL provider attempt currentness refs"
       ],
       "exposes": [
         "family persistence",
@@ -120,6 +120,9 @@
       "sqlite_status": "deferred_for_rca_opl_state_index_kernel_sidecar",
       "domain_truth_owner": "redcube_ai",
       "opl_role": "projection_consumer_only",
+      "rca_owns_generic_lifecycle_adapter": false,
+      "rca_owns_generic_session_shell": false,
+      "rca_owns_runtime_loop": false,
       "state_index_kernel_adoption_ref": "contracts/stage_artifact_kernel_adoption.json#/opl_state_index_kernel_adoption",
       "state_index_kernel_adoption": {
         "owner": "one-person-lab",

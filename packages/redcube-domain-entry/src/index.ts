@@ -22,7 +22,6 @@ export { invokeProductEntry } from './actions/invoke-product-entry.js';
 export { invokeOplHostedProductEntry } from './actions/invoke-opl-hosted-product-entry.js';
 export { getProductEntrySession } from './actions/get-product-entry-session.js';
 export { getProductEntryManifest } from './actions/get-product-entry-manifest.js';
-export { getProductStart } from './actions/get-product-start.js';
 export { getProductPreflight } from './actions/get-product-preflight.js';
 export { getProductStatus } from './actions/get-product-status.js';
 export { runNativePptProductEntryProof } from './actions/native-ppt-product-entry-proof.js';

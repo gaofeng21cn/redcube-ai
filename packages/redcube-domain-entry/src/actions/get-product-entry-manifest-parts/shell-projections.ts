@@ -13,9 +13,6 @@ import {
 } from 'opl-framework-shared/automation-companions';
 
 import {
-  buildOplRuntimeManagerRegistration,
-} from '../product-entry-continuity-surfaces.js';
-import {
   buildFamilySchedulerReplacementProjection,
   buildOplGenericPrimitiveConsumptionProjection,
   buildOplStabilityReadModelConsumptionProjection,
@@ -88,8 +85,8 @@ export function buildProductEntryManifestShellProjections({
     },
     workspace_binding: {
       workspace_root: workspaceRoot,
-      runtime_state_root: runtime.runtime_state_root,
-      session_continuity_root: runtime.session_continuity_root,
+      product_session_surface_ref: runtime.product_session_surface_ref,
+      stage_folder_locator_contract_ref: runtime.stage_folder_locator_contract_ref,
     },
     domain_projection: {
       opl_provider_runtime_contract_ref: oplProviderRuntimeContract.shared_contract_ref,
@@ -116,7 +113,7 @@ export function buildProductEntryManifestShellProjections({
     task_kind: 'visual_deliverable_loop',
     task_id: 'redcube_opl_stage_execution_plan_loop',
     status: 'resumable',
-    summary: 'Continue the same RedCube deliverable loop via entry_session_id and persisted continuation snapshot.',
+    summary: 'Continue the same RedCube deliverable loop through the OPL generated product-entry session surface and RCA domain refs.',
     progress_surface: {
       surface_kind: 'product_entry_session',
       summary: 'Inspect current same-session progress for the active deliverable loop.',
@@ -146,34 +143,46 @@ export function buildProductEntryManifestShellProjections({
     executor_owner: oplProviderRuntimeContract.executor_owner,
     session_locator_field: familyOrchestration.resume_contract.session_locator_field,
     session_surface_ref: {
-      ref_kind: 'json_pointer',
-      ref: '/entry_session',
-      label: 'entry session surface',
+      ref_kind: 'opl_generated_surface',
+      ref: runtime.product_session_surface_ref,
+      label: 'OPL generated product session',
     },
     progress_surface_ref: {
-      ref_kind: 'json_pointer',
-      ref: '/progress_projection',
-      label: 'progress projection surface',
+      ref_kind: 'opl_generated_surface',
+      ref: `${runtime.product_session_surface_ref}#/progress_projection`,
+      label: 'OPL generated progress projection',
     },
     artifact_surface_ref: {
       ref_kind: 'json_pointer',
-      ref: '/artifact_inventory',
-      label: 'artifact inventory surface',
+      ref: '/artifact_locator_contract',
+      label: 'RCA artifact authority locator refs',
     },
     restore_point_surface_ref: {
-      ref_kind: 'json_pointer',
-      ref: '/session_continuity/restore_point',
-      label: 'restore point surface',
+      ref_kind: 'opl_generated_surface',
+      ref: `${runtime.product_session_surface_ref}#/currentness_refs`,
+      label: 'OPL generated currentness refs',
     },
     recommended_resume_command: productEntrySessionCommand,
     recommended_progress_command: productEntrySessionCommand,
     recommended_artifact_command: productEntrySessionCommand,
   };
-  const oplRuntimeManagerRegistration = buildOplRuntimeManagerRegistration({
-    runtimeContinuityEnvelope,
-    productEntrySessionCommand,
-    domainAuthorityRefs,
-  });
+  const oplRuntimeManagerRegistration = {
+    surface_kind: 'opl_generated_runtime_registration_ref',
+    owner: 'one-person-lab',
+    domain_id: 'rca',
+    registration_ref: 'opl_generated:domain_runtime_registration/rca',
+    product_session_ref: runtime.product_session_surface_ref,
+    domain_handler_ref: 'domain-handler:invokeProductEntry',
+    artifact_locator_contract_ref: '/artifact_locator_contract',
+    owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+    review_state_ref: '/review_state',
+    publication_projection_ref: '/publication_projection',
+    authority_boundary: {
+      rca_owns_runtime_registration: false,
+      rca_owns_session_persistence: false,
+      rca_returns_domain_refs_only: true,
+    },
+  };
   const automation = buildAutomationCatalog({
     summary: 'RedCube automation companions expose continuation board tracking with operator review-gated continuation truth.',
     automations: [

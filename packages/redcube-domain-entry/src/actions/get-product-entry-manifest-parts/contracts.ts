@@ -12,7 +12,7 @@ const overlayRegistry = getDefaultOverlayRegistry();
 
 type RuntimeContractInput = {
   runtime_owner?: unknown;
-  session_continuity_root?: unknown;
+  product_session_surface_ref?: unknown;
 };
 
 type ManifestOverlayVisualPolicy = Record<string, unknown> & {
@@ -96,7 +96,7 @@ export function buildRouteEquivalenceContract({
       entry_surface_kind: 'domain_entry',
       entry_adapter: 'RedCubeDomainEntry',
       runtime_owner: runtime.runtime_owner,
-      session_continuity_root: runtime.session_continuity_root,
+      product_session_surface_ref: runtime.product_session_surface_ref,
       executor_owner: 'configured_by_opl_runtime_provider',
     },
     guardrails: [

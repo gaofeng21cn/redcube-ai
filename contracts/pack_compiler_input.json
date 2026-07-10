@@ -3,6 +3,7 @@
   "schema_version": 2,
   "lifecycle_state": "refs_only_anchor_after_private_pack_compiler_input_retirement",
   "domain_id": "redcube_ai",
+  "canonical_agent_id": "rca",
   "domain_pack_owner": "redcube_ai",
   "pack_compiler_owner": "one-person-lab",
   "projection_mode": "repo_source_refs_only",
@@ -67,9 +68,11 @@
     "executor_policy_source_ref": "contracts/stage_control_plane.json#/stages/*/selected_executor",
     "owner_receipt_schema_source_ref": "contracts/owner_receipt_contract.json",
     "authority_functions_source_ref": "runtime/authority_functions/README.md",
+    "agent_lab_cost_profile_source_ref": "contracts/agent_lab_cost_profile.json",
     "functional_privatization_audit_source_ref": "contracts/functional_privatization_audit.json",
     "generated_surface_handoff_source_ref": "contracts/generated_surface_handoff.json",
-    "capability_map_source_ref": "contracts/capability_map.json"
+    "capability_map_source_ref": "contracts/capability_map.json",
+    "visual_transition_adapter_profile_source_ref": "contracts/visual_transition_adapter_profile.json"
   },
   "authority_boundary": {
     "opl_can_compile_generated_surfaces_from_refs": true,
@@ -105,6 +108,8 @@
     "receipt_schema",
     "authority_function_manifest",
     "oracle_fixtures",
+    "visual_transition_adapter_profile",
+    "agent_lab_cost_profile",
     "tool_affordance_catalog",
     "cognitive_kernel_adoption_contract",
     "golden_path_profile"

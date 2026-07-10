@@ -2,14 +2,11 @@
 import {
   SERIAL_ENV_TEST,
   assert,
-  assertFamilyOrchestrationCompanion,
-  assertRuntimeLoopClosureShape,
-  existsSync,
+  buildOplGeneratedProductSessionForTest,
   getProductEntrySession,
   importDomainEntrySharedModule,
   invokeOplHostedProductEntry,
   invokeProductEntry,
-  readJson,
   test,
   withMockCodexRuntimeState,
   prepareProductEntryWorkspace,
@@ -37,28 +34,31 @@ function assertProductEntryProjection(surface, {
   surfaceKind = 'product_entry',
   entrySessionId,
   deliverableId,
-  source,
-  entryMode = 'redcube_product_entry',
 }) {
   assert.equal(surface.ok, true);
   assert.equal(surface.surface_kind, surfaceKind);
-  assert.equal(surface.entry_session.entry_session_id, entrySessionId);
-  assert.equal(surface.delivery_identity.deliverable_id, deliverableId);
+  assert.equal(surface.session_handoff_refs.entry_session_id, entrySessionId);
+  assert.equal(surface.session_handoff_refs.delivery_locator_refs.deliverable_id, deliverableId);
+  assert.equal(
+    surface.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
+    surface.summary.target_handle,
+  );
   assert.equal(surface.summary.latest_handle, surface.summary.target_handle);
-  assert.equal(surface.continuation_snapshot.latest_stage_execution_plan_ref, surface.summary.target_handle);
-  assert.equal(surface.session_continuity.entry_session_id, entrySessionId);
-  assert.equal(surface.session_continuity.restore_point.latest_handle, surface.summary.target_handle);
-  assert.equal(surface.progress_projection.projection.projection_kind, 'opl_stage_execution_plan_projection');
-  assert.equal(surface.artifact_inventory.summary.latest_handle, surface.summary.target_handle);
   assert.equal(surface.review_state.surface_kind, 'review_state');
   assert.equal(surface.publication_projection.surface_kind, 'publication_projection');
-  assert.equal(surface.opl_family_lifecycle_adapter.discovery.adoption_state, 'hydrated_session_projection');
-  assert.equal(surface.opl_family_lifecycle_adapter.authority_boundary.owns_domain_truth, false);
-  assert.equal(surface.opl_family_lifecycle_adapter.authority_boundary.owns_publication_projection, false);
-  assertRuntimeLoopClosureShape(surface, { source, entryMode });
-  assertFamilyOrchestrationCompanion(surface, {
-    sessionLocatorField: 'entry_session.entry_session_id',
-  });
+  assert.equal(surface.authority_boundary.generic_session_runtime_owner, 'one-person-lab');
+  assert.equal(surface.authority_boundary.rca_owns_generic_session_runtime, false);
+  for (const retiredField of [
+    'entry_session',
+    'continuation_snapshot',
+    'session_continuity',
+    'progress_projection',
+    'artifact_inventory',
+    'runtime_loop_closure',
+    'family_orchestration',
+  ]) {
+    assert.equal(retiredField in surface, false, retiredField);
+  }
 }
 
 test('invokeProductEntry converts review-first deck intent into a stop-after-outline lifecycle gate', SERIAL_ENV_TEST, async () => {
@@ -81,7 +81,7 @@ test('invokeProductEntry converts review-first deck intent into a stop-after-out
     assert.equal(response.domain_entry_surface.result_surface.control_policy.mode, 'stop_after_stage');
     assert.equal(response.domain_entry_surface.result_surface.control_policy.requested_stop_after_stage, 'detailed_outline');
     assert.equal(response.domain_entry_surface.result_surface.execution_model.repo_local_stage_runner_active_caller, false);
-    assert.equal(response.summary.approval_required, true);
+    assert.equal(response.session_handoff_refs.entry_session_id, 'session-review-first');
   });
 });
 
@@ -107,7 +107,7 @@ test('invokeProductEntry treats route as a StageRun stop target unless route han
   });
 });
 
-test('invokeProductEntry creates a deliverable, delegates to the service-safe domain entry, and persists session continuity', SERIAL_ENV_TEST, async () => {
+test('invokeProductEntry creates a deliverable and returns OPL-owned session handoff refs', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const response = await invokeProductEntry(productEntryRequest(
@@ -130,16 +130,7 @@ test('invokeProductEntry creates a deliverable, delegates to the service-safe do
     assertProductEntryProjection(response, {
       entrySessionId: 'session-a',
       deliverableId: 'deck-a',
-      source: 'direct',
     });
-
-    assert.equal(existsSync(response.entry_session.session_file), true);
-    const storedSession = readJson(response.entry_session.session_file);
-    assert.equal(storedSession.entry_session_id, 'session-a');
-    assert.equal(storedSession.deliverable_family, 'ppt_deck');
-    assert.equal(storedSession.topic_id, 'topic-a');
-    assert.equal(storedSession.deliverable_id, 'deck-a');
-    assert.equal(storedSession.latest_stage_execution_plan_ref, response.summary.target_handle);
   });
 });
 
@@ -163,7 +154,7 @@ test('invokeProductEntry rejects retired deliverable task intent without compati
   });
 });
 
-test('invokeProductEntry can continue the same deliverable from the persisted entry session without respecifying delivery identity', SERIAL_ENV_TEST, async () => {
+test('invokeProductEntry continues only from the OPL generated session surface', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
@@ -179,39 +170,60 @@ test('invokeProductEntry can continue the same deliverable from the persisted en
       }),
     ));
 
-    const continued = await invokeProductEntry(productEntryRequest(
-      workspaceRoot,
-      'session-a',
-      {
+    const firstGeneratedSession = buildOplGeneratedProductSessionForTest({
+      entrySessionId: 'session-a',
+      handoffRefs: first.session_handoff_refs,
+    });
+    const continued = await invokeProductEntry({
+      workspace_locator: { workspace_root: workspaceRoot },
+      entry_session_contract: {
+        entry_session_id: 'session-a',
+        opl_generated_session_surface: firstGeneratedSession,
+      },
+      delivery_request: {
         user_intent: '继续推进到最终 PPT',
         stop_after_stage: 'visual_direction',
       },
-    ));
+    });
 
     assertProductEntryProjection(continued, {
       entrySessionId: 'session-a',
       deliverableId: 'deck-a',
-      source: 'direct',
     });
-    assert.equal(continued.entry_session.resumed_from_session, true);
+    assert.equal(
+      continued.session_handoff_refs.previous_domain_snapshot_ref,
+      first.session_handoff_refs.domain_snapshot_ref,
+    );
     assert.notEqual(
-      continued.continuation_snapshot.latest_stage_execution_plan_ref,
-      first.continuation_snapshot.latest_stage_execution_plan_ref,
+      continued.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
+      first.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
     );
 
-    const session = await getProductEntrySession({ entry_session_id: 'session-a' });
-    assertProductEntryProjection(session, {
-      surfaceKind: 'product_entry_session',
-      entrySessionId: 'session-a',
-      deliverableId: 'deck-a',
-      source: 'session',
+    const session = await getProductEntrySession({
+      entry_session_id: 'session-a',
+      opl_generated_session_surface: buildOplGeneratedProductSessionForTest({
+        entrySessionId: 'session-a',
+        handoffRefs: continued.session_handoff_refs,
+      }),
     });
-    assert.equal(session.ppt_deck_visual_route_session.default_visual_route, 'author_image_pages');
-    assert.equal(session.opl_family_lifecycle_adapter.owner_route_discovery.candidate_routes[0].route_id, 'product_entry_session');
-    assert.equal(session.opl_family_lifecycle_adapter.persistence.sqlite.status, 'not_domain_owned_generic_persistence');
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_exports_only.includes('domain_snapshot_ref'), true);
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_owns_generic_session_shell, false);
-    assert.equal(session.session_continuity.generated_session_shell_boundary.rca_owns_generic_workbench, false);
+    assert.equal(session.ok, true);
+    assert.equal(session.surface_kind, 'product_entry_session');
+    assert.equal(session.projection_kind, 'rca_product_entry_session_domain_snapshot_refs');
+    assert.equal(session.entry_session_ref.entry_session_id, 'session-a');
+    assert.equal(
+      session.entry_session_ref.domain_snapshot_ref,
+      continued.session_handoff_refs.domain_snapshot_ref,
+    );
+    assert.equal(session.delivery_locator_refs.deliverable_id, 'deck-a');
+    assert.equal(
+      session.currentness_refs.latest_stage_execution_plan_ref,
+      continued.session_handoff_refs.currentness_refs.latest_stage_execution_plan_ref,
+    );
+    assert.equal(session.operator_navigation_refs.generated_session_surface_ref, 'opl_generated:product_session');
+    assert.equal(session.authority_refs.review_state_ref, 'domain-handler:getReviewState');
+    assert.equal(session.authority_boundary.refs_only, true);
+    assert.equal(session.authority_boundary.rca_owns_generic_session_shell, false);
+    assert.equal(session.authority_boundary.rca_owns_generic_workbench, false);
   });
 });
 
@@ -248,21 +260,12 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
     assert.equal(response.return_surface_contract.actual_surface_kind, 'product_entry');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_mode, 'opl_hosted');
     assert.equal(response.product_entry_surface.domain_entry_surface.entry_contract_id, 'redcube_service_safe_domain_entry');
-    assert.equal(response.opl_family_lifecycle_adapter.owner_route_discovery.current_source, 'opl_hosted');
     assertProductEntryProjection(response.product_entry_surface, {
       entrySessionId: 'session-oplHosted',
       deliverableId: 'deck-fed',
-      source: 'opl_hosted',
-      entryMode: 'opl_hosted',
     });
-    assertRuntimeLoopClosureShape(response, {
-      source: 'opl_hosted',
-      entryMode: 'opl_hosted',
-      runtimeOwner: 'configured_family_runtime_provider',
-    });
-    assertFamilyOrchestrationCompanion(response, {
-      sessionLocatorField: 'entry_session.entry_session_id',
-    });
+    assert.deepEqual(response.session_handoff_refs, response.product_entry_surface.session_handoff_refs);
+    assert.equal(response.authority_boundary.rca_owns_generic_session_runtime, false);
   });
 });
 
@@ -272,49 +275,5 @@ test('domain-entry shared family orchestration surface exposes the product-entry
   assert.equal(
     typeof familyOrchestration.buildFamilyProductEntryPresetOrchestration,
     'function',
-  );
-});
-
-test('session continuation family orchestration companion uses the shared continuation refs', async () => {
-  const companionModule = await import('../../packages/redcube-domain-entry/dist/actions/family-orchestration-companion.js');
-  const buildSessionContinuationFamilyOrchestration = companionModule.buildSessionContinuationFamilyOrchestration;
-  assert.equal(typeof buildSessionContinuationFamilyOrchestration, 'function');
-
-  const requested = buildSessionContinuationFamilyOrchestration({
-    continuationSnapshot: {
-      runtime_progress_projection: {
-        needs_user_decision: true,
-      },
-    },
-  });
-  assert.equal(requested.human_gates[0].status, 'requested');
-  assert.deepEqual(requested.human_gates[0].review_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/review_state',
-    label: 'current review state surface',
-  });
-  assert.deepEqual(requested.event_envelope_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/stage_execution_plan/stage_attempts',
-    label: 'OPL stage execution plan companion',
-  });
-  assert.deepEqual(requested.checkpoint_lineage_surface, {
-    ref_kind: 'json_pointer',
-    ref: '/continuation_snapshot/latest_stage_execution_plan_ref',
-    label: 'latest OPL stage execution plan locator',
-  });
-
-  const approved = buildSessionContinuationFamilyOrchestration({
-    continuationSnapshot: {
-      runtime_progress_projection: {
-        needs_user_decision: false,
-      },
-    },
-    sessionLocatorField: 'entry_session_contract.entry_session_id',
-  });
-  assert.equal(approved.human_gates[0].status, 'approved');
-  assert.equal(
-    approved.resume_contract.session_locator_field,
-    'entry_session_contract.entry_session_id',
   );
 });
