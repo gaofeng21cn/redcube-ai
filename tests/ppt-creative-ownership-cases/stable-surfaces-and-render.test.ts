@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 
 test('ppt screenshot review capture remains the export source boundary', () => {
   const screenshotReview = readFileSync(
-    'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/stage-screenshot-review.ts',
+    'packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/stages.ts',
     'utf-8',
   );
   const exportSource = readFileSync(
