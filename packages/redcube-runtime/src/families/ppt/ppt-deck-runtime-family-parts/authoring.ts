@@ -172,7 +172,22 @@ export function createPptDeckAuthoringParts(deps) {
     };
   }
 
-  async function generateBlueprintDraft(contract, outlineArtifact, adapter) {
+  function canonicalClaimSpineForOutline(storylineArtifact, outlineArtifact) {
+    const claimSpineLock = preserveClaimSpineLock(
+      outlineArtifact?.detailed_outline?.claim_spine_lock,
+      storylineArtifact?.storyline?.claim_spine_lock,
+      'detailed_outline.claim_spine_lock',
+    );
+    assertClaimSpineSlideMapping(
+      claimSpineLock,
+      outlineArtifact?.detailed_outline?.slides,
+      'detailed_outline.claim_spine_lock',
+    );
+    return claimSpineLock;
+  }
+
+  async function generateBlueprintDraft(contract, storylineArtifact, outlineArtifact, adapter) {
+    const canonicalClaimSpineLock = canonicalClaimSpineForOutline(storylineArtifact, outlineArtifact);
     const { data, generationRuntime } = await generateStructuredArtifact({
       adapter,
       family: 'ppt_deck',
@@ -183,7 +198,7 @@ export function createPptDeckAuthoringParts(deps) {
         manuscript_evidence_table: safeArray(outlineArtifact?.detailed_outline?.manuscript_evidence_table),
         outline: {
           chapter_structure: safeArray(outlineArtifact?.detailed_outline?.chapter_structure),
-          claim_spine_lock: safeArray(outlineArtifact?.detailed_outline?.claim_spine_lock),
+          claim_spine_lock: canonicalClaimSpineLock,
           slides: summarizeOutlineSlides(outlineArtifact),
         },
       },
@@ -192,7 +207,7 @@ export function createPptDeckAuthoringParts(deps) {
     const authoredBlueprint = normalizeBlueprintDraft(data, contract);
     const claimSpineLock = preserveClaimSpineLock(
       data?.claim_spine_lock,
-      outlineArtifact?.detailed_outline?.claim_spine_lock,
+      canonicalClaimSpineLock,
       'slide_blueprint.claim_spine_lock',
     );
     assertClaimSpineSlideMapping(claimSpineLock, authoredBlueprint.slides, 'slide_blueprint.claim_spine_lock');
@@ -205,9 +220,19 @@ export function createPptDeckAuthoringParts(deps) {
     };
   }
 
-  async function generateVisualDirectionDraft(contract, blueprintArtifact, mode, baselineDeliverableId, adapter) {
-    const claimSpineLock = normalizeClaimSpineLock(
+  async function generateVisualDirectionDraft(
+    contract,
+    storylineArtifact,
+    outlineArtifact,
+    blueprintArtifact,
+    mode,
+    baselineDeliverableId,
+    adapter,
+  ) {
+    const canonicalClaimSpineLock = canonicalClaimSpineForOutline(storylineArtifact, outlineArtifact);
+    const claimSpineLock = preserveClaimSpineLock(
       blueprintArtifact?.slide_blueprint?.claim_spine_lock,
+      canonicalClaimSpineLock,
       'slide_blueprint.claim_spine_lock',
     );
     assertClaimSpineSlideMapping(

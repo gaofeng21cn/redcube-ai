@@ -85,8 +85,14 @@ async function buildDetailedOutlineRoutePayload({ contract, deliverablePaths, ad
 }
 
 async function buildSlideBlueprintRoutePayload({ contract, deliverablePaths, adapter }) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
   const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
-  const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(contract, outlineArtifact, adapter);
+  const { authoredBlueprint, generationRuntime } = await generateBlueprintDraft(
+    contract,
+    storylineArtifact,
+    outlineArtifact,
+    adapter,
+  );
   return buildPptSlideBlueprintArtifact({
     contract,
     attachCommon,
@@ -106,9 +112,13 @@ async function buildVisualDirectionRoutePayload({
   baselineDeliverableId,
   adapter,
 }) {
+  const storylineArtifact = readStageArtifact(contract, deliverablePaths, 'storyline');
+  const outlineArtifact = readStageArtifact(contract, deliverablePaths, 'detailed_outline');
   const blueprintArtifact = readStageArtifact(contract, deliverablePaths, 'slide_blueprint');
   const { authoredVisualDirection, generationRuntime } = await generateVisualDirectionDraft(
     contract,
+    storylineArtifact,
+    outlineArtifact,
     blueprintArtifact,
     mode,
     baselineDeliverableId,
