@@ -19,7 +19,6 @@ Machine boundary: 人读历史 activation brief。当前机器真相继续归 co
 | source readiness / augmentation 支撑 | `docs/source/README.md`, `docs/source/source_augmentation_executor_contract.md` |
 | canonical source truth | workspace canonical artifacts, runtime-family contracts/source/tests, generated reports, owner receipts |
 | 当前状态与 owner boundary | `docs/status.md`, `docs/architecture.md`, `docs/invariants.md`, `docs/decisions.md` |
-| 历史 machine provenance | `contracts/runtime-program/phase-2-source-intake-activation-package-freeze.json` |
 
 ## Historical Fact
 

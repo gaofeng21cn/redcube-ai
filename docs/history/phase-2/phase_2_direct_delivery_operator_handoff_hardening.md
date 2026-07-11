@@ -31,7 +31,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | operator handoff / delivery support | `docs/delivery/`, runtime-program contracts, workspace artifacts |
 | review/publication projection | `getReviewState`, `getPublicationProjection`, runtime-family source/tests |
 | RCA completion and evidence tail | `docs/active/rca-ideal-state-gap-plan.md`, production acceptance contracts |
-| historical machine provenance | `contracts/runtime-program/phase-2-direct-delivery-operator-handoff-hardening.json` |
 
 ## No-Resurrection Rule
 

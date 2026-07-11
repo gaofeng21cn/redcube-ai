@@ -144,34 +144,10 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
   ]) {
     assert.equal(map.skill_local_resource_pack[key], true, `resource_pack.${key}`);
   }
+  assert.deepEqual(map.skill_local_resource_pack.required_sections, ['## Template', '## Example', '## Checklist']);
+  const professionalCapabilities = map.capabilities.filter((entry) => entry.surface_role === 'professional_skill');
   assert.deepEqual(
-    map.skill_local_resource_pack.capability_resource_refs.map((entry) => entry.capability_id),
-    expectedCapabilityIds,
-  );
-  for (const resourceEntry of map.skill_local_resource_pack.capability_resource_refs) {
-    const expectedResourceRef = expectedResourceRefs[resourceEntry.capability_id];
-    assert.equal(resourceEntry.skill_ref, `agent/professional_skills/${resourceEntry.capability_id}/SKILL.md`);
-    assert.deepEqual(resourceEntry.resource_refs, [expectedResourceRef]);
-    assert.deepEqual(resourceEntry.required_sections, ['## Template', '## Example', '## Checklist']);
-    assert.equal(fs.existsSync(path.join(repoRoot, resourceEntry.skill_ref)), true, resourceEntry.skill_ref);
-    assert.equal(fs.existsSync(path.join(repoRoot, expectedResourceRef)), true, expectedResourceRef);
-  }
-  const professionalCapabilityIndex = map.professional_capabilities;
-  assert.equal(Array.isArray(professionalCapabilityIndex), false);
-  assert.equal(professionalCapabilityIndex.summary_kind, 'professional_skill_resolver_ref_index');
-  assert.equal(
-    professionalCapabilityIndex.source_of_truth_ref,
-    'contracts/capability_map.json#/capabilities?surface_role=professional_skill',
-  );
-  assert.equal(professionalCapabilityIndex.entries_are_refs_only, true);
-  assert.deepEqual(professionalCapabilityIndex.capability_ids, expectedCapabilityIds);
-  for (const capabilityId of expectedCapabilityIds) {
-    assert.equal(professionalCapabilityIndex[capabilityId], undefined, `${capabilityId}.summary_body`);
-  }
-  assert.deepEqual(
-    map.capabilities
-      .filter((entry) => entry.surface_role === 'professional_skill')
-      .map((entry) => entry.capability_id),
+    professionalCapabilities.map((entry) => entry.capability_id),
     expectedCapabilityIds,
   );
   assert.deepEqual(Object.keys(map.feedback_token_index), expectedTokens);
@@ -205,15 +181,15 @@ function assertPptCapabilityMapShape(map, handoff, adoption) {
     assert.equal(resolverCapability.physical_source_ref.ref, expectedSkillRef, capabilityId);
     assert.equal(fs.existsSync(path.join(repoRoot, expectedSkillRef)), true, expectedSkillRef);
     assert.equal(
-      resolverCapability.runtime_projection_refs.some((entry) => entry.ref === 'contracts/capability_map.json#/professional_capabilities'),
+      resolverCapability.runtime_projection_refs.some((entry) => entry.ref === 'contracts/capability_map.json#/feedback_token_index'),
       true,
       capabilityId,
     );
     assert.equal(resolverCapability.owner_closeout_boundary_ref, 'contracts/capability_map.json#/ppt_visual_failure_token_contract/owner_closeout_boundary');
     assert.equal(resolverCapability.canonical_paths.includes(expectedSkillRef), true, capabilityId);
     assert.equal(resolverCapability.canonical_paths.includes(expectedResourceRef), true, capabilityId);
-    assert.equal(resolverCapability.target_repo_file_hints.includes(expectedResourceRef), true, capabilityId);
     assert.deepEqual(resolverCapability.resource_refs, [expectedResourceRef]);
+    assert.equal(fs.existsSync(path.join(repoRoot, expectedResourceRef)), true, expectedResourceRef);
     assert.equal(resolverCapability.resource_pack_boundary_ref, 'contracts/capability_map.json#/skill_local_resource_pack');
     assert.equal(resolverCapability.verification_refs.includes('contracts/capability_map.json#/skill_local_resource_pack'), true);
     assert.equal(resolverCapability.verification_refs.includes('contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture'), true);

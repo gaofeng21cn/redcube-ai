@@ -9,7 +9,7 @@ Machine boundary: 人读历史 continuation board。当前机器真相继续归 
 
 ## 历史 SSOT
 
-本文只保留 2026-04-11 左右的 Phase 2 continuation board 读者上下文。机器化历史快照在 `contracts/runtime-program/phase-2-family-parity-autopilot-continuation-board.json`；当前完成口径、功能/结构差距、证据缺口和下一轮 owner-delta baton 回到 `docs/active/rca-ideal-state-gap-plan.md`、核心五件套、runtime-program contracts、source/tests、owner receipts 和 typed blockers。
+本文只保留 2026-04-11 左右的 Phase 2 continuation board 读者上下文。当前完成口径、功能/结构差距、证据缺口和下一轮 owner-delta baton 回到 `docs/active/rca-ideal-state-gap-plan.md`、核心五件套、runtime-program contracts、source/tests、owner receipts 和 typed blockers。
 
 这个历史 board 当时服务的 stable family 是：
 

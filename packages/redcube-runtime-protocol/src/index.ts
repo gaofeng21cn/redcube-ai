@@ -34,8 +34,10 @@ export {
 } from './source-readiness-summary.js';
 export {
   validateSourceAugmentationRequestContract,
+} from './source-augmentation-request-validator.js';
+export {
   validateSourceAugmentationResultContract,
-} from './source-augmentation-contract.js';
+} from './source-augmentation-result-validator.js';
 export {
   REDCUBE_PYTHON_COMMAND_ENV,
   resolveRedCubePythonCommand,

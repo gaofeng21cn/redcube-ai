@@ -44,14 +44,11 @@ function runBuildToLog(logFile: string): void {
   }
 }
 
-async function runPrivatePlatformReadback({ scope, output }: PrivatePlatformReadbackStep): Promise<void> {
-  const logFile = scope === 'default-caller-tail'
-    ? '/tmp/redcube-ai-default-caller-tail-readback-build.log'
-    : '/tmp/redcube-ai-private-platform-readback-build.log';
-  runBuildToLog(logFile);
+async function runPrivatePlatformReadback({ output }: PrivatePlatformReadbackStep): Promise<void> {
+  runBuildToLog('/tmp/redcube-ai-private-platform-readback-build.log');
 
   const { buildPrivatePlatformSourceGuardReadback } = await import('./check-private-platform-retirement.ts');
-  const payload = `${JSON.stringify(buildPrivatePlatformSourceGuardReadback(scope), null, 2)}\n`;
+  const payload = `${JSON.stringify(buildPrivatePlatformSourceGuardReadback(), null, 2)}\n`;
   if (output === 'stdout') {
     process.stdout.write(payload);
     return;
@@ -97,7 +94,7 @@ async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Prom
   }
   if (step.kind === 'private-platform-readback') {
     if (forwardedArgs.length > 0) {
-      throw new Error(`${step.scope} readback does not accept forwarded node test arguments`);
+      throw new Error('private-platform readback does not accept forwarded node test arguments');
     }
     await runPrivatePlatformReadback(step);
     return;

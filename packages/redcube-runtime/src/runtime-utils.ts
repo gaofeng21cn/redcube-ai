@@ -1,4 +1,5 @@
-import { mkdirSync, readFileSync } from 'node:fs';
+import path from 'node:path';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 export type JsonRecord = Record<string, unknown>;
 
@@ -14,4 +15,9 @@ export function ensureDir(dir: string): string {
 
 export function readJson<T = JsonRecord>(file: string): T {
   return JSON.parse(readFileSync(file, 'utf-8')) as T;
+}
+
+export function writeJson(file: string, value: unknown): void {
+  ensureDir(path.dirname(file));
+  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }

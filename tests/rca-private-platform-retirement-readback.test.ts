@@ -12,10 +12,9 @@ import {
   buildPrivatePlatformSourceGuardReadback,
 } from '../scripts/check-private-platform-retirement.ts';
 
-function assertSourceGuardSummary(payload, scope) {
+function assertSourceGuardSummary(payload) {
   assert.equal(payload.surface_kind, 'rca_private_platform_source_guard_summary');
   assert.equal(payload.schema_version, 2);
-  assert.equal(payload.scope, scope);
   assert.equal(payload.state, 'passed_repo_source_guard_only');
   assert.deepEqual(payload.failed_checks, []);
   assert.equal(payload.guard_summary.functional_structure_gap_count, 0);
@@ -260,40 +259,36 @@ test('RCA product-session AST guard accepts canonical OPL session fields in runt
   assert.deepEqual(violations, []);
 });
 
-for (const scope of ['private-platform', 'default-caller-tail']) {
-  test(`RCA ${scope} readback is a compact source guard summary`, () => {
-    const payload = buildPrivatePlatformSourceGuardReadback(scope);
+test('RCA no-resurrection readback is a compact source guard summary', () => {
+  const payload = buildPrivatePlatformSourceGuardReadback();
 
-    assertSourceGuardSummary(payload, scope);
-    assert.equal(
-      payload.source_refs.active_source_scan_policy,
-      'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
-    );
-    assert.equal(
-      payload.source_refs.behavioral_source_scan_policy,
-      'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy',
-    );
-  });
+  assertSourceGuardSummary(payload);
+  assert.equal(
+    payload.source_refs.active_source_scan_policy,
+    'contracts/physical_source_morphology_policy.json#/default_caller_tail_thinning_gate/active_source_resurrection_scan_policy',
+  );
+  assert.equal(
+    payload.source_refs.behavioral_source_scan_policy,
+    'contracts/physical_source_morphology_policy.json#/behavioral_source_scan_policy',
+  );
+});
 
-  test(`RCA ${scope} script emits compact parseable JSON`, () => {
-    const result = spawnSync(
-      process.execPath,
-      [
-        '--experimental-strip-types',
-        'scripts/check-private-platform-retirement.ts',
-        '--format',
-        'json',
-        '--scope',
-        scope,
-      ],
-      {
-        cwd: process.cwd(),
-        encoding: 'utf8',
-      },
-    );
+test('RCA no-resurrection script emits compact parseable JSON', () => {
+  const result = spawnSync(
+    process.execPath,
+    [
+      '--experimental-strip-types',
+      'scripts/check-private-platform-retirement.ts',
+      '--format',
+      'json',
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: 'utf8',
+    },
+  );
 
-    assert.equal(result.status, 0, result.stderr || result.stdout);
-    assert.ok(result.stdout.length < 20000);
-    assertSourceGuardSummary(JSON.parse(result.stdout), scope);
-  });
-}
+  assert.equal(result.status, 0, result.stderr || result.stdout);
+  assert.ok(result.stdout.length < 20000);
+  assertSourceGuardSummary(JSON.parse(result.stdout));
+});

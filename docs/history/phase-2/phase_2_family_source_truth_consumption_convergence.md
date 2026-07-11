@@ -30,7 +30,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | source readiness / consumption support | `docs/source/README.md`, source contracts, runtime-family source/tests |
 | review/export and delivery owner boundary | `docs/delivery/`, RCA review/export gates, artifact locator contracts |
 | current RCA completion and gaps | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-family-source-truth-consumption-convergence.json` |
 
 ## No-Resurrection Rule
 

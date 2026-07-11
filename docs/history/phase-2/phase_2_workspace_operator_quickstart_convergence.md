@@ -36,7 +36,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | human quickstart | `docs/product/human_quickstart.md` |
 | workspace/source bootstrap | source contracts, source/runtime-family source/tests, workspace artifacts |
 | runtime and operator projection | `docs/runtime/`, runtimeWatch contracts/source/tests |
-| historical machine provenance | `contracts/runtime-program/phase-2-workspace-operator-quickstart-convergence.json` |
 
 ## No-Resurrection Rule
 

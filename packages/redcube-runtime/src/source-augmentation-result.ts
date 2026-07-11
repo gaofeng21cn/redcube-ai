@@ -1,4 +1,4 @@
-import { existsSync, writeFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -6,7 +6,7 @@ import {
   validateSourceAugmentationRequestContract,
   validateSourceAugmentationResultContract,
 } from '@redcube/runtime-protocol';
-import { ensureDir, readJson, safeText } from './runtime-utils.js';
+import { readJson, safeText, writeJson } from './runtime-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -17,11 +17,6 @@ interface SourceArtifactPaths {
 
 function asRecord(value: unknown): JsonRecord {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as JsonRecord : {};
-}
-
-function writeJson(file: string, value: unknown): void {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }
 
 function safeArray(value: unknown): unknown[] {

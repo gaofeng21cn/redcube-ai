@@ -2,7 +2,7 @@ import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
-import { runtimeStateDisplayGlob, runtimeStateDisplayPath } from './runtime-state.js';
+import { runtimeStateDisplayPath } from './runtime-state.js';
 
 const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
@@ -213,7 +213,7 @@ export const P19_TEAM_GATE_CONTRACT = Object.freeze({
       lifecycle_focus: ['regression', 'audit', 'reports'],
       write_scopes: [
         'tests/review-platform.test.ts',
-        runtimeStateDisplayGlob('reports', 'redcube-runtime-program', '**'),
+        runtimeStateDisplayPath('reports', 'redcube-runtime-program', '**'),
       ],
       verification_commands: [
         'node --test tests/review-platform.test.ts',

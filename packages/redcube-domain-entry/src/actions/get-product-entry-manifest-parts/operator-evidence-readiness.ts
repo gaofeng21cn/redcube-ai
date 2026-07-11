@@ -20,8 +20,8 @@ import {
   RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
   buildOperatorEvidenceTailWorkorderItemRef,
 } from './operator-evidence-refs/evidence-constants.js';
-import { buildRcaGoalWorkflowAgentLabSuite } from './goal-workflow-agent-lab-suite.js';
-import { buildRcaPptThreeRouteAgentLabSuite } from './ppt-three-route-agent-lab-suite.js';
+import goalWorkflowAgentLabSuiteContract from '../../../../../contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json' with { type: 'json' };
+import pptThreeRouteAgentLabSuiteContract from '../../../../../contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json' with { type: 'json' };
 
 export function buildOperatorEvidenceReadinessProjection({
   familyStageControlPlane,
@@ -54,8 +54,8 @@ export function buildOperatorEvidenceReadinessProjection({
   const rcaEfficiencyHandoffProjection = buildRcaEfficiencyHandoffProjection({
     productionEvidenceScaleoutRefs,
   });
-  const goalWorkflowAgentLabSuite = buildRcaGoalWorkflowAgentLabSuite();
-  const pptThreeRouteAgentLabSuite = buildRcaPptThreeRouteAgentLabSuite();
+  const goalWorkflowAgentLabSuite = structuredClone(goalWorkflowAgentLabSuiteContract);
+  const pptThreeRouteAgentLabSuite = structuredClone(pptThreeRouteAgentLabSuiteContract);
   const completedFunctionalStructureGapIds = [
     'opl_generated_surface_production_consumption',
     'repo_local_wrapper_active_caller_migration',

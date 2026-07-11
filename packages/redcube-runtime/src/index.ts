@@ -177,9 +177,6 @@ export {
   buildPerformanceReport,
 } from './performance-report.js';
 export {
-  resolveSourceAugmentationAdapter,
-} from './source-augmentation-executor.js';
-export {
   executeSourceAugmentation,
 } from './source-augmentation-execution.js';
 export {
@@ -195,13 +192,6 @@ export {
 export {
   researchSource,
 } from './source-research.js';
-export {
-  resolveCodexHome,
-  resolveRuntimeStatePath,
-  resolveRuntimeStateRoot,
-  runtimeStateDisplayGlob,
-  runtimeStateDisplayPath,
-} from './runtime-state.js';
 
 export type {
   RuntimeCompleteRunRequest,

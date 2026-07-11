@@ -74,108 +74,10 @@
     "does_not_authorize_owner_receipt": true,
     "does_not_authorize_quality_or_export_verdict": true,
     "does_not_write_runtime_state": true,
-    "capability_resource_refs": [
-      {
-        "capability_id": "rca-ppt-story-architect",
-        "skill_ref": "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-ppt-visual-director",
-        "skill_ref": "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-ppt-page-author",
-        "skill_ref": "agent/professional_skills/rca-ppt-page-author/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-ppt-reviewer",
-        "skill_ref": "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-visual-memory-curator",
-        "skill_ref": "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-native-ppt-designer",
-        "skill_ref": "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-native-ppt-designer/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      },
-      {
-        "capability_id": "rca-template-profiler",
-        "skill_ref": "agent/professional_skills/rca-template-profiler/SKILL.md",
-        "resource_refs": [
-          "agent/professional_skills/rca-template-profiler/resources/minimal-resource-pack.md"
-        ],
-        "required_sections": [
-          "## Template",
-          "## Example",
-          "## Checklist"
-        ]
-      }
-    ]
-  },
-  "professional_capabilities": {
-    "summary_kind": "professional_skill_resolver_ref_index",
-    "source_of_truth_ref": "contracts/capability_map.json#/capabilities?surface_role=professional_skill",
-    "resolver_policy_ref": "contracts/capability_map.json#/resolver_policy",
-    "resource_pack_ref": "contracts/capability_map.json#/skill_local_resource_pack",
-    "entries_are_refs_only": true,
-    "entry_body_policy": "Full professional skill resolver bodies live under capabilities; this index only carries the canonical professional capability id list and resolver refs needed by AgentLab/OMA routing.",
-    "capability_ids": [
-      "rca-ppt-story-architect",
-      "rca-ppt-visual-director",
-      "rca-ppt-page-author",
-      "rca-ppt-reviewer",
-      "rca-visual-memory-curator",
-      "rca-native-ppt-designer",
-      "rca-template-profiler"
+    "required_sections": [
+      "## Template",
+      "## Example",
+      "## Checklist"
     ]
   },
   "feedback_token_index": {
@@ -566,7 +468,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -587,33 +489,7 @@
         "story_spec_lock",
         "claim_spine_lock"
       ],
-      "failure_tokens": [
-        "storyline",
-        "outline",
-        "claim_spine",
-        "narrative_sequence",
-        "detailed_outline",
-        "slide_blueprint",
-        "page_role",
-        "evidence_placement",
-        "rca-ppt-story-architect",
-        "serial_pipeline",
-        "progressive_disclosure",
-        "story_spec_lock",
-        "claim_spine_lock"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
-        "agent/prompts/communication_strategy.md",
-        "prompts/ppt_deck/storyline.md",
-        "prompts/ppt_deck/detailed_outline.md",
-        "prompts/ppt_deck/slide_blueprint.md",
-        "contracts/stage_control_plane.json",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
         "agent/prompts/communication_strategy.md",
         "prompts/ppt_deck/storyline.md",
@@ -707,7 +583,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -733,37 +609,7 @@
         "semantic_composition"
       ],
       "template_profiler_relationship": "Consumes template_profile and placeholder_capacity from rca-template-profiler; does not own reference deck profiling or placeholder measurement.",
-      "failure_tokens": [
-        "visual_direction",
-        "style",
-        "visual_density",
-        "layout_quality",
-        "visual_language",
-        "layout_rhythm",
-        "density_controls",
-        "peak_pages",
-        "layout_variety",
-        "template_profile_consumption",
-        "rca-ppt-visual-director",
-        "ppt_visual_density",
-        "spec_lock",
-        "progressive_disclosure",
-        "style_boundary",
-        "visual_qa",
-        "semantic_composition"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
-        "agent/prompts/visual_direction.md",
-        "prompts/ppt_deck/visual_direction.md",
-        "agent/quality_gates/visual_pack_discipline.md",
-        "agent/quality_gates/communication_and_direction.md",
-        "contracts/stage_control_plane.json",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-ppt-visual-director/SKILL.md",
         "agent/prompts/visual_direction.md",
         "prompts/ppt_deck/visual_direction.md",
@@ -867,7 +713,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -889,34 +735,7 @@
         "progressive_disclosure",
         "editable_pptx_grammar"
       ],
-      "failure_tokens": [
-        "page_authoring",
-        "layout_quality",
-        "visual_density",
-        "page_level_authoring",
-        "route_specific_page_payload",
-        "structural_visual",
-        "text_fit",
-        "blocked_slide_repair",
-        "visible_text_safety",
-        "rca-ppt-page-author",
-        "ppt_visual_density",
-        "serial_pipeline",
-        "progressive_disclosure",
-        "editable_pptx_grammar"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-ppt-page-author/SKILL.md",
-        "agent/prompts/artifact_creation.md",
-        "prompts/ppt_deck/author_image_pages.md",
-        "prompts/ppt_deck/repair_image_pages.md",
-        "agent/skills/visual_deliverable_authoring.md",
-        "contracts/stage_control_plane.json",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-ppt-page-author/SKILL.md",
         "agent/prompts/artifact_creation.md",
         "prompts/ppt_deck/author_image_pages.md",
@@ -1014,7 +833,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -1039,38 +858,7 @@
         "presentation_semantics",
         "blind_comparison_review"
       ],
-      "failure_tokens": [
-        "visual_review",
-        "ppt_review",
-        "layout_quality",
-        "visual_density",
-        "rendered_page_review",
-        "screenshot_review",
-        "source_fidelity",
-        "repair_target_selection",
-        "weak_page_detection",
-        "review_export_gate_evidence",
-        "rca-ppt-reviewer",
-        "ppt_visual_density",
-        "visual_qa",
-        "semantic_composition",
-        "native_object_semantics",
-        "presentation_semantics",
-        "blind_comparison_review"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
-        "agent/prompts/review_and_revision.md",
-        "prompts/ppt_deck/director_review.md",
-        "prompts/ppt_deck/screenshot_review.md",
-        "agent/quality_gates/screenshot_review.md",
-        "agent/quality_gates/review_export_memory.md",
-        "contracts/stage_control_plane.json",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-ppt-reviewer/SKILL.md",
         "agent/prompts/review_and_revision.md",
         "prompts/ppt_deck/director_review.md",
@@ -1169,7 +957,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -1188,31 +976,7 @@
         "locator_projection_refs",
         "rca-visual-memory-curator"
       ],
-      "failure_tokens": [
-        "visual_memory",
-        "memory_writeback",
-        "review_export_memory",
-        "visual_pattern_memory",
-        "visual_memory_writeback_proposal",
-        "accept_reject_review",
-        "accepted_memory_receipt",
-        "rejected_memory_receipt",
-        "consumed_memory_refs",
-        "locator_projection_refs",
-        "rca-visual-memory-curator"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
-        "docs/policies/visual_pattern_memory_policy.md",
-        "agent/skills/visual_memory_policy.md",
-        "agent/quality_gates/review_export_memory.md",
-        "agent/knowledge/review_export_memory.md",
-        "contracts/memory_descriptor.json",
-        "contracts/capability_map.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-visual-memory-curator/SKILL.md",
         "docs/policies/visual_pattern_memory_policy.md",
         "agent/skills/visual_memory_policy.md",
@@ -1304,7 +1068,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -1327,33 +1091,7 @@
         "presentation_semantics"
       ],
       "template_profiler_relationship": "Consumes template_profile and placeholder_capacity when binding editable_shape_plan to native zones; does not own route-agnostic template profiling.",
-      "failure_tokens": [
-        "native_pptx_editability",
-        "editable_shape_plan",
-        "native_pptx_design_spec_lock",
-        "template_layout_grammar",
-        "shape_coordinates",
-        "office_editability",
-        "native_repair_targets",
-        "rca-native-ppt-designer",
-        "spec_lock",
-        "editable_pptx_grammar",
-        "semantic_composition",
-        "template_package_intake",
-        "native_object_semantics",
-        "presentation_semantics"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
-        "prompts/ppt_deck/author_pptx_native.md",
-        "prompts/ppt_deck/repair_pptx_native.md",
-        "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
-        "contracts/runtime-program/ppt-native-pptx-quality-nonregression.json",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-native-ppt-designer/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-native-ppt-designer/SKILL.md",
         "prompts/ppt_deck/author_pptx_native.md",
         "prompts/ppt_deck/repair_pptx_native.md",
@@ -1447,7 +1185,7 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/capability_map.json#/professional_capabilities",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
           "role": "rca_feedback_target_mapping"
         }
       ],
@@ -1467,29 +1205,7 @@
       ],
       "consolidation_decision": "retained_as_pre_route_template_profile_owner",
       "no_merge_rationale_ref": "contracts/capability_map.json#/professional_skill_consolidation",
-      "failure_tokens": [
-        "template_profile",
-        "placeholder_capacity",
-        "reference_deck_analysis",
-        "semantic_layout_inventory",
-        "layout_grammar",
-        "title_safe_zone",
-        "rca-template-profiler",
-        "style_boundary",
-        "editable_pptx_grammar",
-        "template_package_intake"
-      ],
       "canonical_paths": [
-        "agent/professional_skills/rca-template-profiler/SKILL.md",
-        "agent/prompts/visual_direction.md",
-        "prompts/ppt_deck/visual_direction.md",
-        "prompts/ppt_deck/author_pptx_native.md",
-        "docs/references/native-ppt-open-source-design-discipline.md",
-        "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
-        "agent/professional_skills/rca-template-profiler/resources/minimal-resource-pack.md"
-      ],
-      "target_repo_file_hints": [
         "agent/professional_skills/rca-template-profiler/SKILL.md",
         "agent/prompts/visual_direction.md",
         "prompts/ppt_deck/visual_direction.md",
@@ -1595,16 +1311,7 @@
         "visual_stage_prompt",
         "ppt_stage"
       ],
-      "failure_tokens": [
-        "stage_prompt",
-        "visual_stage_prompt",
-        "ppt_stage"
-      ],
       "canonical_paths": [
-        "agent/prompts/",
-        "contracts/stage_control_plane.json"
-      ],
-      "target_repo_file_hints": [
         "agent/prompts/",
         "contracts/stage_control_plane.json"
       ],
@@ -1684,18 +1391,7 @@
         "render",
         "export"
       ],
-      "failure_tokens": [
-        "tool_connector",
-        "native_helper",
-        "officecli",
-        "render",
-        "export"
-      ],
       "canonical_paths": [
-        "agent/tools/domain_affordances.md",
-        "contracts/action_catalog.json"
-      ],
-      "target_repo_file_hints": [
         "agent/tools/domain_affordances.md",
         "contracts/action_catalog.json"
       ],
@@ -1773,16 +1469,7 @@
         "visual_truth",
         "review_export_memory"
       ],
-      "failure_tokens": [
-        "knowledge_pack",
-        "visual_truth",
-        "review_export_memory"
-      ],
       "canonical_paths": [
-        "agent/knowledge/",
-        "contracts/domain_descriptor.json"
-      ],
-      "target_repo_file_hints": [
         "agent/knowledge/",
         "contracts/domain_descriptor.json"
       ],
@@ -1860,16 +1547,7 @@
         "screenshot_review",
         "review_export_memory"
       ],
-      "failure_tokens": [
-        "quality_gate",
-        "screenshot_review",
-        "review_export_memory"
-      ],
       "canonical_paths": [
-        "agent/quality_gates/",
-        "contracts/artifact_locator_contract.json"
-      ],
-      "target_repo_file_hints": [
         "agent/quality_gates/",
         "contracts/artifact_locator_contract.json"
       ],
@@ -1948,17 +1626,7 @@
         "ppt_three_route",
         "visual_density"
       ],
-      "failure_tokens": [
-        "agent_lab",
-        "eval_suite",
-        "ppt_three_route",
-        "visual_density"
-      ],
       "canonical_paths": [
-        "contracts/agent_lab_handoff.json",
-        "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
-      ],
-      "target_repo_file_hints": [
         "contracts/agent_lab_handoff.json",
         "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json"
       ],

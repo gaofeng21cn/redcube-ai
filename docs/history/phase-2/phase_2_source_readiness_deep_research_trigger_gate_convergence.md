@@ -32,7 +32,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | Source Readiness / augmentation | `docs/source/`, source contracts, source/runtime-family source/tests |
 | human quickstart readout | `docs/product/human_quickstart.md` |
 | RCA completion and open gaps | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-source-readiness-deep-research-trigger-gate-convergence.json` |
 
 ## No-Resurrection Rule
 

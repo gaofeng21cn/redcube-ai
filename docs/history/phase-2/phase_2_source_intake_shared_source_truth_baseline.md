@@ -36,7 +36,6 @@ Machine boundary: 人读历史 baseline brief。当前机器真相继续归 cont
 | source readiness / augmentation support | `docs/source/README.md`, `docs/source/source_augmentation_executor_contract.md` |
 | current RCA completion and gaps | `docs/active/rca-ideal-state-gap-plan.md` |
 | current state / architecture / invariants | `docs/status.md`, `docs/architecture.md`, `docs/invariants.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-source-intake-shared-source-truth-baseline.json` |
 
 ## Historical Content Compression
 

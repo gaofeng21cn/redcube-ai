@@ -34,7 +34,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | delivery lifecycle support | `docs/delivery/`, route contracts, runtime-family source/tests |
 | review/export authority | RCA review/export gates, artifact locator contracts, owner receipts |
 | RCA completion and open gaps | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-direct-delivery-lifecycle-stage-convergence.json` |
 
 ## No-Resurrection Rule
 

@@ -35,7 +35,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | family parity and route governance | runtime-program contracts, runtime-family source/tests, RCA route/review/export surfaces |
 | runtime owner boundary | `docs/runtime/`, `docs/architecture.md`, OPL/Temporal owner docs |
 | RCA completion and evidence tail | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-family-parity-governance-surface-convergence.json` |
 
 ## No-Resurrection Rule
 

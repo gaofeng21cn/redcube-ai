@@ -3,20 +3,6 @@
     "status": "closeout_completed",
     "commit": "96dc6c1"
   },
-  "phase_2_source_intake_shared_source_truth_baseline": {
-    "status": "closeout_completed",
-    "commit": "a4424d2"
-  },
-  "phase_2_family_source_truth_consumption_convergence": {
-    "status": "closeout_completed",
-    "commit": "e894641"
-  },
-  "phase_2_runtime_watch_locator_integrity_hardening": {
-    "status": "closeout_completed"
-  },
-  "phase_2_family_parity_governance_surface_convergence": {
-    "status": "closeout_completed"
-  },
   "upstream_hermes_agent_activation_package": {
     "status": "closeout_completed",
     "contract": "contracts/runtime-program/upstream-hermes-agent-activation-package.json",

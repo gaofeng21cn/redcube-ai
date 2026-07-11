@@ -29,7 +29,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | runtimeWatch / locator support | `docs/runtime/`, runtime-program contracts, CLI/MCP behavior, source/tests |
 | operator quickstart | `docs/product/human_quickstart.md` |
 | RCA completion and open gaps | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-runtime-watch-locator-integrity-hardening.json` |
 
 ## No-Resurrection Rule
 

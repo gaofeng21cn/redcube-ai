@@ -4,7 +4,7 @@ Owner: `RedCube AI`
 Purpose: `ideal_state_gap_plan`
 State: `active_plan`
 Machine boundary: 本文是人读 gap / completion plan。机器真相继续归 `contracts/`、源码、CLI/MCP 行为、product-entry manifest、runtime workspace、artifact locator、receipt、review/export gate 与真实交付物证据。
-Last reviewed: `2026-07-10`
+Last reviewed: `2026-07-11`
 
 Dated native proof、workspace path、attempt id、screenshot path、no-regression ref 流水和 proof 命令摘要不再追加到本文；这些过程证据进入 `docs/history/process/` 或 runtime/evidence ledger。本文只保留 current readout、open gates、owner delta 和完成顺序。
 
@@ -12,7 +12,7 @@ Dated native proof、workspace path、attempt id、screenshot path、no-regressi
 
 RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [RedCube AI 理想目标态](../references/rca-visual-deliverable-agent-ideal-state.md)；项目当前角色、架构、硬约束和决策读核心五件套；过程性 dated follow-through、closeout tranche、proof 命令流水、run/probe id 和旧路线读 `docs/history/**`、runtime evidence 或提交历史。
 
-2026-07-10 结构收薄目标：本轮按 [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md) 一次性关闭 stdlib walker、default registry、validator utility、退役 `getRun` / Hermes public surface、单消费者 Parts factory、overlay value/type/validator 重复和 private-platform retirement guard 密度八项候选。该 reference 只定义本轮设计、lane 写集和验收；本文继续是唯一 active completion plan，最终状态必须逐项折回本文、核心 docs、contracts、source 和 tests。
+2026-07-11 过度设计审计以 17 项为当前 completion scope；2026-07-10 的 stdlib walker、default registry、validator utility、退役 `getRun` / Hermes public surface、单消费者 Parts factory、overlay value/type/validator 重复和 private-platform retirement guard 八项只作为历史结构子集读取，不能替代本轮逐项验收、main 吸收、worktree 清理或远端读回。历史语境见 [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md)；本文继续是唯一 active completion plan，最终状态必须逐项折回本文、核心 docs、contracts、source 和 tests。
 
 2026-06-30 SSOT refresh：本文的默认 active gap 只维护功能面落地、结构收薄、source hygiene、generated/default caller thinning、repo-local adapter retirement、compatibility-free retirement 和 legacy naming guard。真实 Temporal controlled visual-stage long-soak、production-like repeated no-regression、visual ready、exportable、handoffable、human approval、App/operator sustained consumption 和 production-ready 不再混入功能/结构 gap。RCA 当前仍需关注的缺口是 generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene；这些只在 OPL default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance 成立后关闭。
 
@@ -45,7 +45,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 | 审计项 | 状态 | 完成度 | Fresh / machine evidence | 缺口与 owner 路径 |
 | --- | --- | ---: | --- | --- |
-| 八项 overdesign thinning | `done` | 100% | [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md#2026-07-10-完成度审计)、machine completion audit、repo verification | 无结构缺口；只保留 live/authority 边界。 |
+| 2026-07-10 八项 overdesign thinning 子集 | `historical` | 不作为当前完成度 | [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md#2026-07-10-历史完成度记录) | 不能替代 2026-07-11 17 项审计的逐项验收、main 吸收与远端读回。 |
 | Professional Learning Landing | `done` | 100% | `ppt-master-learning-landing.json`、design registry、professional skill/resource bindings、engine contract tests | 不包含 upstream runtime、asset/SVG body 或 authority。 |
 | Native object fidelity | `done` | 100% | object package 48/48、chart/picture/group/connector package readback、unknown-kind fail-fast | 无已知非 Live 缺口。 |
 | Editability round trip | `done` | 100% | 独立 editability regression 1/1；chart/text/fill/position/notes edit -> save -> OOXML readback -> LibreOffice render | 缺 renderer 时继续 `missing_renderer_dependency` fail closed。 |
@@ -60,7 +60,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 机器可读对应面是 `contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json`。任何 blocked 项都不得从本文的结构完成度推导为 ready、current、accepted 或 production complete。
 
-2026-07-09 retained helper / thin adapter cleanup gate fresh readback 继续落在上述边界内：`private-platform:readback` 与 `default-caller-tail:readback` 都只证明 source guard clean，未产生 physical delete authorization、default-caller cutover authority、owner receipt 或 typed blocker instance roundtrip。因此当前执行动作是保留为 refs-only / authority adapter 并记录 no-safe-delete blocker，不删除源码、不新增 alias / facade。
+2026-07-09 retained helper / thin adapter cleanup gate fresh readback 继续落在上述边界内：`private-platform:readback` 只证明 source guard clean，未产生 physical delete authorization、default-caller cutover authority、owner receipt 或 typed blocker instance roundtrip。因此当前执行动作是保留为 refs-only / authority adapter 并记录 no-safe-delete blocker，不删除源码、不新增 alias / facade。
 
 本文执行原则是功能/结构优先：generated/default caller cutover、repo-local session / domain_action_adapter / runtimeWatch / operator projection / neutral route-run adapter thinning、compatibility-free retirement、naming / legacy string hygiene、Stage Artifact / review-repair / artifact locator functional boundary 和 no-resurrection guard 不等待真实 Temporal long-soak 或 production-like repeated no-regression。Visual ready、exportable、handoffable、human approval、production visual-stage long-soak、real visual memory lifecycle receipt、App/operator sustained consumption 和 production-ready claim 只在对应声明前回 owner evidence surface；conformance、mock provider route chain、refs-only production acceptance、single dated sample proof 或 provider completion 不能替代。
 
@@ -101,7 +101,7 @@ Direct route 与 OPL-hosted route 都必须进入同一套 RCA-owned service-saf
 | --- | --- | --- |
 | Standard OPL Agent structure | done, standard OPL roots after cutover | `agent/`、标准 OPL `contracts/stage_control_plane.json` / `contracts/action_catalog.json`、refs-only `contracts/pack_compiler_input.json`、`contracts/runtime-program/current-program.index.json`；OPL generic stage runtime / pack compiler / Foundry series profile 不再由 RCA root contracts 维护 |
 | Visual memory curator professional skill | done structurally | `agent/professional_skills/rca-visual-memory-curator/SKILL.md`、`contracts/capability_map.json` 和核心 docs 已把 visual memory proposal / accept-reject review / writeback lifecycle 收为 refs-only professional method layer；RCA 继续持有 memory body、accept/reject judgment、owner receipt 和 typed blocker，OPL 只 transport/project locator、proposal、receipt 和 coverage refs。本项不声明 real memory lifecycle receipt scaleout、visual ready、exportable、handoffable、domain ready 或 production ready。 |
-| Capability map professional resolver index | done structurally | `contracts/capability_map.json#/professional_capabilities` 已收薄为 canonical capability id list + source refs；7 个 professional skill 的完整 resolver body 单源维护在 `contracts/capability_map.json#/capabilities?surface_role=professional_skill`。`tests/rca-ppt-three-route-agent-lab-suite.test.ts` 继续验证 skill/resource refs、feedback token index、dry-run token cases 与 AgentLab handoff refs-only 边界，`contracts/agent_lab_handoff.json#/dry_run_token_mapping_check` 不再复制 dry-run tokens / flags。本项不声明 visual ready、exportable、handoffable、domain ready 或 production ready。 |
+| Capability map professional resolver | done structurally | `contracts/capability_map.json#/capabilities?surface_role=professional_skill` 是 7 个 professional skill body、skill/resource refs 与 authority boundary 的唯一 canonical 声明；`feedback_token_index` 只提供反向 routing，`skill_local_resource_pack` 只提供共享 resource 要求。重复 id/resource/token/path projection 已删除。`tests/rca-ppt-three-route-agent-lab-suite.test.ts` 继续验证 canonical skill/resource refs、feedback token index、dry-run token cases 与 AgentLab handoff refs-only 边界，`contracts/agent_lab_handoff.json#/dry_run_token_mapping_check` 不复制 dry-run tokens / flags。本项不声明 visual ready、exportable、handoffable、domain ready 或 production ready。 |
 | Generic private runtime cleanup | done | `docs/status.md`、`docs/decisions.md`、`contracts/functional_privatization_audit.json`、`contracts/physical_source_morphology_policy.json` |
 | RCA retained authority surfaces | done | `authority_surface_id` contracts、production acceptance surface、product-entry manifest |
 | Direct / hosted boundary | done structurally | product-entry manifest、标准 OPL `family_action_catalog`、RCA `domain-handler export|dispatch` target、OPL-generated `domain_action_adapter` descriptor refs、stage control projection；repo-local Foundry generic CLI spine 已退役 |

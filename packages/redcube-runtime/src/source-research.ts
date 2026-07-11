@@ -1,5 +1,4 @@
-import { existsSync, writeFileSync } from 'node:fs';
-import path from 'node:path';
+import { existsSync } from 'node:fs';
 
 import {
   getSourceArtifactPaths,
@@ -16,7 +15,7 @@ import {
   writeSourceAugmentationResult,
 } from './source-augmentation-result.js';
 import { executeSourceAugmentation } from './source-augmentation-execution.js';
-import { ensureDir, readJson, safeText } from './runtime-utils.js';
+import { readJson, safeText, writeJson } from './runtime-utils.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -61,11 +60,6 @@ function safeStringArray(value: unknown): string[] {
 
 function mergeArtifactFiles(...groups: Array<JsonRecord | null | undefined>): JsonRecord {
   return Object.assign({}, ...groups.map((group) => asRecord(group?.artifactFiles)));
-}
-
-function writeJson(file: string, value: unknown): void {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
 }
 
 function planningReadyFromExecution(execution: JsonRecord): boolean {

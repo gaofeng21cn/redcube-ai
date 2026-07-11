@@ -33,7 +33,6 @@ export {
   P19_TEAM_GATE_CONTRACT,
   planCandidateRace,
   resolveExecutorAdapter,
-  resolveSourceAugmentationAdapter,
   runCandidateRaceRoute,
   selectCandidateRaceWinner,
 } from '@redcube/runtime';

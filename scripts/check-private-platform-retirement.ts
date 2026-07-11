@@ -651,7 +651,7 @@ function collectSummaryFailures({
   return failures;
 }
 
-export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platform') {
+export function buildPrivatePlatformSourceGuardReadback() {
   const audit = readJson('contracts/functional_privatization_audit.json');
   const physicalPolicy = buildPhysicalSourceMorphologyPolicy();
   const activeSourceScan = buildActiveSourceScanSummary(physicalPolicy);
@@ -671,7 +671,6 @@ export function buildPrivatePlatformSourceGuardReadback(scope = 'private-platfor
     surface_kind: 'rca_private_platform_source_guard_summary',
     schema_version: 2,
     target_domain_id: 'redcube-ai',
-    scope,
     state: failures.length === 0 ? 'passed_repo_source_guard_only' : 'failed',
     failed_checks: failures,
     source_refs: {
@@ -735,28 +734,23 @@ function parseArgs(argv) {
     allowPositionals: false,
     options: {
       format: { type: 'string', default: 'text' },
-      scope: { type: 'string', default: 'private-platform' },
     },
   });
   const format = parsed.values.format;
   if (!['json', 'text'].includes(format)) {
     throw new Error('--format must be json or text');
   }
-  const scope = parsed.values.scope;
-  if (!['private-platform', 'default-caller-tail'].includes(scope)) {
-    throw new Error('--scope must be private-platform or default-caller-tail');
-  }
-  return { format, scope };
+  return { format };
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
   try {
     const args = parseArgs(process.argv.slice(2));
-    const payload = buildPrivatePlatformSourceGuardReadback(args.scope);
+    const payload = buildPrivatePlatformSourceGuardReadback();
     if (args.format === 'json') {
       process.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
     } else {
-      process.stdout.write(`${payload.surface_kind}:${payload.scope}: ${payload.state} (${payload.failed_checks.length} failed checks)\n`);
+      process.stdout.write(`${payload.surface_kind}: ${payload.state} (${payload.failed_checks.length} failed checks)\n`);
     }
     process.exitCode = payload.state === 'passed_repo_source_guard_only' ? 0 : 1;
   } catch (error) {

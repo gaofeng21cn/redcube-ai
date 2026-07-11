@@ -1,9 +1,5 @@
 // @ts-nocheck
-import path from 'node:path';
-import {
-  existsSync,
-  writeFileSync,
-} from 'node:fs';
+import { existsSync } from 'node:fs';
 
 import {
   getSourceArtifactPaths,
@@ -14,12 +10,7 @@ import {
   getRequestedSourceAugmentationAdapterId,
   resolveSourceAugmentationAdapter,
 } from './source-augmentation-executor.js';
-import { ensureDir, readJson, safeText } from './runtime-utils.js';
-
-function writeJson(file, value) {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
+import { readJson, safeText, writeJson } from './runtime-utils.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

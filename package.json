@@ -20,8 +20,6 @@
     "test:full:with-historical": "node --experimental-strip-types scripts/verify-lane.ts full:with-historical",
     "private-platform:readback": "node --experimental-strip-types scripts/verify-lane.ts private-platform:readback",
     "test:private-platform:strict": "node --experimental-strip-types scripts/verify-lane.ts private-platform:strict",
-    "default-caller-tail:readback": "node --experimental-strip-types scripts/verify-lane.ts default-caller-tail:readback",
-    "test:default-caller-tail:strict": "node --experimental-strip-types scripts/verify-lane.ts default-caller-tail:strict",
     "repo:hygiene": "scripts/repo-hygiene.sh",
     "repo:hygiene:fix": "scripts/repo-hygiene.sh --fix",
     "contracts:current-program:write": "node --experimental-strip-types scripts/sync-current-program-leaf-index.ts --write",

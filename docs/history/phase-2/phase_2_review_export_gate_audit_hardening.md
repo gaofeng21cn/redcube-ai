@@ -32,7 +32,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | source readiness gate | `docs/source/`, source contracts, workspace canonical artifacts |
 | delivery and route support | `docs/delivery/`, runtime-program contracts |
 | current RCA completion and gaps | `docs/active/rca-ideal-state-gap-plan.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-review-export-gate-audit-hardening.json` |
 
 ## No-Resurrection Rule
 

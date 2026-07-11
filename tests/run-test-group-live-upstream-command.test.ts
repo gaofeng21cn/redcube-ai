@@ -301,7 +301,9 @@ test('run-test-group usage and verify lane registry include the family verificat
   assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.match(verifyLaneScript, /buildVerifyLanePlan/);
   assert.equal(listVerifyLanes().includes('family'), true);
-  assert.equal(listVerifyLanes().includes('default-caller-tail:strict'), true);
+  assert.equal(listVerifyLanes().includes('private-platform:strict'), true);
+  assert.equal(listVerifyLanes().includes('default-caller-tail:strict'), false);
+  assert.throws(() => buildVerifyLanePlan('default-caller-tail:strict'), /Unknown lane/);
   assert.deepEqual(
     buildVerifyLanePlan('family').steps,
     [

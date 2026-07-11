@@ -30,7 +30,6 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 | delivery / publication support | `docs/delivery/README.md`, delivery support docs, route contracts |
 | current RCA completion and gaps | `docs/active/rca-ideal-state-gap-plan.md` |
 | current state and architecture | `docs/status.md`, `docs/architecture.md` |
-| historical machine provenance | `contracts/runtime-program/phase-2-publication-projection-delivery-contract-convergence.json` |
 
 ## No-Resurrection Rule
 

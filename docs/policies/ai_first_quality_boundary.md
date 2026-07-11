@@ -40,7 +40,6 @@ Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、
 
 涉及创作、视觉审阅、截图复核、质量 promotion 或 publication projection 的改动，至少检查相关 guard：
 
-- `tests/ai-first-authoring-boundary.test.ts`
 - `tests/screenshot-review-ai-first.test.ts`
 - `tests/ppt-creative-ownership.test.ts`
 - `tests/xiaohongshu-creative-ownership.test.ts`

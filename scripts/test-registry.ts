@@ -11,7 +11,7 @@ export type VerifyStep = Readonly<
   | { kind: 'build' }
   | { kind: 'typecheck' }
   | { kind: 'test-group'; group: string }
-  | { kind: 'private-platform-readback'; scope: 'private-platform' | 'default-caller-tail'; output: string }
+  | { kind: 'private-platform-readback'; output: string }
   | { kind: 'line-budget'; strict: boolean }
   | { kind: 'structure'; strict: boolean }
 >;
@@ -22,7 +22,6 @@ export type VerifyLanePlan = Readonly<{
 
 const PRIMARY_TEST_FILES = Object.freeze({
   meta: Object.freeze([
-    'tests/ai-first-authoring-boundary.test.ts',
     'tests/ci-workflow.test.ts',
     'tests/candidate-racing.test.ts',
     'tests/codex-plugin.test.ts',
@@ -181,7 +180,6 @@ const SMOKE_FILES = Object.freeze([
 ]) satisfies readonly TestFile[];
 
 const FAST_FILES = Object.freeze([
-  'tests/ai-first-authoring-boundary.test.ts',
   'tests/typescript-baseline.test.ts',
   'tests/typescript-closeout-audit.test.ts',
   'tests/runtime-protocol-workspace.test.ts',
@@ -344,8 +342,6 @@ export function buildTestGroups(): TestGroups {
 const VERIFY_LANE_ALIASES: Readonly<Record<string, string>> = Object.freeze({
   'private-platform': 'private-platform:strict',
   'private-platform-strict': 'private-platform:strict',
-  'default-caller-tail': 'default-caller-tail:strict',
-  'default-caller-tail-strict': 'default-caller-tail:strict',
   'integration-remaining': 'integration:remaining',
   'full-remaining': 'full:remaining',
   'full-with-historical': 'full:with-historical',
@@ -357,8 +353,6 @@ const SPECIAL_VERIFY_LANES = Object.freeze([
   'line-budget-strict',
   'private-platform:readback',
   'private-platform:strict',
-  'default-caller-tail:readback',
-  'default-caller-tail:strict',
   'structure',
   'structure-strict',
 ]);
@@ -399,10 +393,8 @@ export function buildVerifyLanePlan(lane: string = 'smoke'): VerifyLanePlan {
     ],
     'line-budget': [{ kind: 'line-budget', strict: false }],
     'line-budget-strict': [{ kind: 'line-budget', strict: true }],
-    'private-platform:readback': [{ kind: 'private-platform-readback', scope: 'private-platform', output: 'stdout' }],
-    'private-platform:strict': [{ kind: 'private-platform-readback', scope: 'private-platform', output: '/tmp/redcube-ai-private-platform-retirement.json' }],
-    'default-caller-tail:readback': [{ kind: 'private-platform-readback', scope: 'default-caller-tail', output: 'stdout' }],
-    'default-caller-tail:strict': [{ kind: 'private-platform-readback', scope: 'default-caller-tail', output: '/tmp/redcube-ai-default-caller-tail-readback.json' }],
+    'private-platform:readback': [{ kind: 'private-platform-readback', output: 'stdout' }],
+    'private-platform:strict': [{ kind: 'private-platform-readback', output: '/tmp/redcube-ai-private-platform-retirement.json' }],
     structure: [{ kind: 'structure', strict: false }],
     'structure-strict': [{ kind: 'structure', strict: true }],
   };

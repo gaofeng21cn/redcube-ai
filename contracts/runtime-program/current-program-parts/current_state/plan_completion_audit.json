@@ -201,7 +201,6 @@
         "test:historical",
         "current-program-check",
         "private-platform-readback",
-        "default-caller-tail-readback",
         "fallow-production",
         "no-resurrection-scan",
         "remote-443-readback"
@@ -216,8 +215,6 @@
         "current_program_source_index": "35 refs in sync",
         "private_platform_readback": "passed_repo_source_guard_only",
         "private_platform_strict": "pass",
-        "default_caller_tail_readback": "passed_repo_source_guard_only",
-        "default_caller_tail_strict": "pass",
         "line_budget_strict": "pass",
         "fallow_production": "30 entry points, 0 issues",
         "git_diff_check": "pass",

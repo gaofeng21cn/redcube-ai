@@ -5,7 +5,7 @@ Purpose: `historical_phase_2_provenance_index`
 State: `history`
 Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/runtime-program/current-program.index.json`、`contracts/runtime-program/current-program-parts/**`、source、CLI/MCP/API behavior、workspace/runtime artifacts、owner receipts、核心五件套和当前 owner docs。
 
-生命周期说明：本目录只保留已吸收的 Phase 2 tranche、continuation board、proof lane、manual-test brief 与 closeout provenance。它由旧 `docs/program/phase-2/` 迁入 history；多个 runtime-program contracts 继续通过 `human_doc:program_phase_2_*` 语义 ID 指向这些 brief 的读者上下文。
+生命周期说明：本目录只保留已吸收的 Phase 2 tranche、continuation board、proof lane、manual-test brief 与 closeout provenance。它由旧 `docs/program/phase-2/` 迁入 history；精确旧合同内容由 Git history 追溯，不再保留重复的 runtime-program JSON bundle。
 
 本目录不表示 Phase 2 仍是新的公开产品方向，也不重新打开 gateway-first、harness-first、Hermes-first、OPL-first runtime、managed web runtime、controller expansion、academic poster 或 new family 主线。当前公开身份、runtime topology、delivery/source truth、review/export authority、native helper boundary 与验证口径以核心五件套、`docs/runtime/`、`docs/delivery/`、`docs/source/`、`docs/policies/` 和 runtime-program contracts 为准。
 
@@ -27,7 +27,7 @@ Machine boundary: 人读历史索引。当前机器真相继续归 `contracts/ru
 | Route proof / manual QA / optional PPT routes | `phase_2_ppt_native_authoring_proof_lane.md`、`ppt_mainline_quality_closeout.md`、`stable_deliverable_manual_test_brief.md` | 只保留 native editable PPTX selectable-route proof、HTML lane quality closeout 和 stable deliverable manual-test provenance。当前 `ppt_deck` 默认路线由 image-first production route contracts 持有；HTML/native 都是显式可选路线。Native PPTX 只在用户显式要求可编辑 / DrawingML 时启用，且不绕过 source truth、review、runtimeWatch、export gate 或 production evidence tail。 |
 | Architecture / package / layer boundary | `phase_2_architecture_boundary_governance.md` | 只保留 package/layer/test gate hardening 的 historical provenance。当前 owner map、source-purity tail、line-budget / Sentrux 读法、repo hygiene、package dependency boundary 和 test registration truth 读核心五件套、active gap plan、`docs/docs_portfolio_consolidation.md`、`contracts/physical_source_morphology_policy.json`、repo-native scripts 和 live source/tests。 |
 
-逐 brief 的 contract-linked 读者上下文继续保留在对应子文件中；本索引不再维护逐文件 closeout 表、测试命令清单、operator flow、proof runner handbook、next-tranche pointer、absorption gate 或 backlog schema。需要追溯精确 tranche 顺序、contract id、历史命令或文件级 evidence 时读对应 brief、runtime-program contract 或 git history；需要当前执行入口时回到 active gap plan、owner docs、contracts/source/tests 和 live workspace evidence。
+逐 brief 的读者上下文继续保留在对应子文件中；本索引不再维护逐文件 closeout 表、测试命令清单、operator flow、proof runner handbook、next-tranche pointer、absorption gate 或 backlog schema。需要追溯精确 tranche 顺序、旧 contract id、历史命令或文件级 evidence 时读对应 brief 或 Git history；需要当前执行入口时回到 active gap plan、owner docs、contracts/source/tests 和 live workspace evidence。
 
 ## Handling Rules
 
