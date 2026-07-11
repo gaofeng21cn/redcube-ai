@@ -136,7 +136,7 @@
           "expected_status": "passed",
           "observed_status": "passed",
           "source_refs": [
-            "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
+            "contracts/production_acceptance/rca-production-acceptance.json#/temporal_autonomy_readiness",
             "opl_generated:product_session#/runtime_loop_closure"
           ]
         },
@@ -146,7 +146,7 @@
           "expected_status": "passed",
           "observed_status": "passed",
           "source_refs": [
-            "redcube domain-handler export#/mapped_surfaces/production_evidence_tail_workorder",
+            "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder",
             "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers"
           ]
         }
@@ -218,9 +218,9 @@
           "metric-ref:rca/goal-workflow/no-codex-app-monitor"
         ],
         "evidence_refs": [
-          "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder",
-          "redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite"
+          "contracts/production_acceptance/rca-production-acceptance.json#/temporal_autonomy_readiness",
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder",
+          "contracts/agent_lab_handoff.json#/external_suite_seeds/goal_workflow"
         ],
         "review_refs": [
           "agent/quality_gates/review_export_memory.md",
@@ -295,10 +295,8 @@
     "forbidden_authority_flags_all_false"
   ],
   "target_runtime_consumption_refs": [
-    "opl_generated:product_entry_manifest#/goal_workflow_agent_lab_suite",
-    "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/goal_workflow_agent_lab_suite",
-    "redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite",
-    "redcube domain-handler export#/source_manifest_refs/goal_workflow_agent_lab_suite_ref"
+    "contracts/agent_lab_handoff.json#/external_suite_seeds/goal_workflow",
+    "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json"
   ],
   "target_verification_refs": [
     "target-verification:redcube-ai/goal-workflow-product-entry",

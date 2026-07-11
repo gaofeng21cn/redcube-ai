@@ -1,17 +1,65 @@
 import {
   assert,
   exportDomainHandler,
+  fileURLToPath,
   getProductEntryManifest,
+  path,
   prepareProductEntryWorkspace,
+  readJson,
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
 import { existsSync } from 'node:fs';
 
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+
 async function readManifest() {
   return getProductEntryManifest({
     workspace_root: await prepareProductEntryWorkspace(),
   });
+}
+
+function resolveProductEntryLocator(manifest, locator) {
+  const prefix = 'opl_generated:product_entry_manifest#';
+  assert.equal(locator.startsWith(prefix), true, locator);
+  return locator
+    .slice(prefix.length)
+    .split('/')
+    .filter(Boolean)
+    .reduce((value, segment) => value?.[segment.replaceAll('~1', '/').replaceAll('~0', '~')], manifest);
+}
+
+function resolvePointer(value, pointer) {
+  return pointer
+    .split('/')
+    .filter(Boolean)
+    .reduce((current, segment) => current?.[segment.replaceAll('~1', '/').replaceAll('~0', '~')], value);
+}
+
+function resolveCurrentOwnerLocator(manifest, locator) {
+  const productEntryPrefix = 'opl_generated:product_entry_manifest#';
+  if (locator.startsWith(productEntryPrefix)) {
+    return resolvePointer(manifest, locator.slice(productEntryPrefix.length));
+  }
+  const [relativePath, pointer = ''] = locator.split('#', 2);
+  assert.equal(relativePath.startsWith('contracts/'), true, locator);
+  return resolvePointer(readJson(path.join(repoRoot, relativePath)), pointer);
+}
+
+function collectCurrentOwnerLocators(value, locators = []) {
+  if (typeof value === 'string') {
+    if (value.startsWith('opl_generated:product_entry_manifest#')
+      || (value.startsWith('contracts/') && !/[ <>]/.test(value))) {
+      locators.push(value);
+    }
+    return locators;
+  }
+  if (Array.isArray(value)) {
+    value.forEach((entry) => collectCurrentOwnerLocators(entry, locators));
+  } else if (value && typeof value === 'object') {
+    Object.values(value).forEach((entry) => collectCurrentOwnerLocators(entry, locators));
+  }
+  return locators;
 }
 
 test('product-entry is a thin domain-authority refs adapter', async () => {
@@ -128,6 +176,31 @@ test('domain-handler export is an exact refs-only authority target without gener
       assert.equal(Object.hasOwn(exportSurface, retiredSurface), false, retiredSurface);
     }
     assert.equal(exportSurface.authority_boundary.projection_can_claim_domain_ready, false);
+    const manifest = await readManifest();
+    for (const [name, locator] of Object.entries(exportSurface.domain_authority_refs)) {
+      assert.notEqual(resolveProductEntryLocator(manifest, locator), undefined, `${name}: ${locator}`);
+    }
     assert.ok(JSON.stringify(exportSurface).length < 20_000);
+  });
+});
+
+test('active acceptance contracts resolve current RCA and generated authority locators', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const manifest = await readManifest();
+    const readContract = (relativePath) => readJson(path.join(repoRoot, relativePath));
+    const contracts = [
+      'contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json',
+      'contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json',
+      'contracts/production_acceptance/rca-efficiency-handoff-projection.json',
+      'contracts/production_acceptance/rca-production-acceptance.json',
+      'contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json',
+    ].map(readContract);
+    const locators = contracts.flatMap((contract) => collectCurrentOwnerLocators(contract));
+
+    assert.equal(locators.length > 200, true);
+    for (const locator of locators) {
+      assert.notEqual(resolveCurrentOwnerLocator(manifest, locator), undefined, locator);
+    }
+    assert.equal(locators.some((locator) => locator.startsWith('redcube domain-handler export#/')), false);
   });
 });

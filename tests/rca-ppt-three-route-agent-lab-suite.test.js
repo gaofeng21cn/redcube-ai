@@ -366,10 +366,10 @@ function assertPptThreeRouteSuiteShape(suite) {
     'mock_visual_quality_claims_absent',
   ], 'native_pptx_real_route_probe.required_report_observations');
   assertIncludesAll(suite.target_runtime_consumption_refs, [
-    'opl_generated:product_entry_manifest#/ppt_three_route_agent_lab_suite',
-    'redcube domain-handler export#/mapped_surfaces/ppt_three_route_agent_lab_suite',
-    'redcube domain-handler export#/source_manifest_refs/ppt_three_route_agent_lab_suite_ref',
+    'contracts/agent_lab_handoff.json#/external_suite_seeds/ppt_three_route_native_terminal_refs',
+    'contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json',
   ], 'target_runtime_consumption_refs');
+  assert.equal(suite.target_runtime_consumption_refs.some((ref) => ref.startsWith('redcube domain-handler export#/')), false);
   assertIncludesAll(suite.target_verification_refs, [
     'target-verification:redcube-ai/product-manifest-read',
     'target-verification:redcube-ai/domain-handler-export-read',

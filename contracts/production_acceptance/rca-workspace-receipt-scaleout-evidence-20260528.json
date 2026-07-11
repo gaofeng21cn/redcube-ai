@@ -12,7 +12,7 @@
     "local_export_path": "/Users/gaofeng/.codex/projects/redcube-ai/runtime-state/evidence-scaleout/20260528-rca-workspace-receipt-scaleout-refresh/scaleout-export.json",
     "sha256": "c8b88f9cb5f3b09176b6b2eb6ce26db57e85ca4ac0cbc098ec2927a9ee38a583",
     "source_provenance_ref": "git-history:rca-workspace-receipt-scaleout-evidence-20260528",
-    "source_surface_ref": "redcube domain-handler export#/mapped_surfaces/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
+    "source_surface_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
     "runtime_state_root_ref": "user-runtime-state:redcube-ai/runtime-state",
     "run_root_ref": "user-runtime-state:redcube-ai/evidence-scaleout/20260528-rca-workspace-receipt-scaleout-refresh"
   },

@@ -34,6 +34,8 @@ OPL 是 stage-led family runtime、generated/default caller、projection、opera
 
 `contracts/action_catalog.json` 是 action 的唯一正文，`agent/stages/manifest.json` 是 RCA stage graph 的唯一 repo source；OPL standard compiler 从该 manifest 生成 `opl-generated:family_stage_control_plane`。RCA product-entry manifest、domain-handler export 与 stage plan 只返回 source/projection refs，不复制 route、professional-skill、runtime 或 workorder body；OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这些精确路径。
 
+RCA Agent Lab suite、efficiency handoff 与 production acceptance workorder 的 machine owner 是 repo-tracked acceptance contract，并通过 `contracts/agent_lab_handoff.json` 或精确 contract JSON Pointer交给 OPL Foundry 消费；它们不投影回 `domain-handler export`。只有 product-entry manifest 实际持有的领域 authority 使用 `opl_generated:product_entry_manifest#/...`，其中 handler export 的嵌套 authority 必须显式落到 `#/domain_authority_refs/...` 并可对真实 manifest 解引用。
+
 ### RCA authority kernel 保留 visual judgment 和 artifact authority
 
 RCA 保留 source readiness、communication / visual direction、route truth、layout/review/export verdict、artifact mutation/export authority、visual memory accept/reject、owner receipt、typed blocker、route-back、human gate 和 native helper implementation。

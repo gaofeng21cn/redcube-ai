@@ -105,7 +105,7 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
 
     assert.equal(
       domain_action_adapter.domain_authority_refs.external_work_order_owner_closeout_ref,
-      '/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
+      'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
     );
     assert.equal(domain_action_adapter.authority_boundary.opl_can_write_visual_truth, false);
     assert.equal(domain_action_adapter.authority_boundary.opl_can_authorize_review_or_export, false);

@@ -21,7 +21,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   assert.deepEqual(scaleout.selected_artifact_producing_visual_route, {
     deliverable_family: 'ppt_deck',
     route_id: 'ppt_deck.image_first.artifact_producing.v1',
-    route_ref: 'opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth',
+    route_ref: 'contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json#/route_family_summary',
     route_kind: 'image_first_ppt_artifact_route',
     stage_sequence_refs: [
       'author_image_pages',
@@ -99,7 +99,7 @@ test('RCA production acceptance records visual evidence scaleout refs without mo
   ]);
   assert.equal(
     scaleout.owner_payload_item_summary.accepted_payload_paths_ref,
-    'opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths',
+    'contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/accepted_payload_paths',
   );
   assert.deepEqual(
     scaleout.owner_payload_item_summary.work_items.map((item) => item.item_id),

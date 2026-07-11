@@ -35,21 +35,22 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         'packages/redcube-domain-entry/src/actions/domain-handler.ts',
     },
     domain_authority_refs: {
-      visual_transition_spec_ref: '/visual_transition_spec',
+      visual_transition_spec_ref:
+        'opl_generated:product_entry_manifest#/visual_transition_spec',
       visual_transition_adapter_profile_registry_ref:
-        '/visual_transition_adapter_profile_registry',
+        'opl_generated:product_entry_manifest#/visual_transition_adapter_profile_registry',
       domain_memory_descriptor_locator_ref:
-        '/domain_authority_refs/domain_memory_descriptor_locator',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/domain_memory_descriptor_locator',
       controlled_visual_stage_attempt_ref:
-        '/domain_authority_refs/controlled_visual_stage_attempt',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/controlled_visual_stage_attempt',
       controlled_memory_apply_proof_ref:
-        '/domain_authority_refs/controlled_memory_apply_proof',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/controlled_memory_apply_proof',
       controlled_soak_no_regression_attempt_ref:
-        '/domain_authority_refs/controlled_soak_no_regression_attempt',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/controlled_soak_no_regression_attempt',
       external_work_order_owner_closeout_ref:
-        '/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
       lifecycle_guarded_apply_proof_ref:
-        '/domain_authority_refs/lifecycle_guarded_apply_proof',
+        'opl_generated:product_entry_manifest#/domain_authority_refs/lifecycle_guarded_apply_proof',
     },
     ...selectManifestRefs(manifest),
     authority_boundary: {

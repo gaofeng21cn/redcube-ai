@@ -49,14 +49,17 @@ function assertEfficiencySuiteShape(suite) {
 
   assert.equal(suite.target_agent_owner_surface_refs.owner, 'redcube_ai');
   assert.equal(suite.target_agent_owner_surface_refs.refs_only, true);
-  assert.equal(suite.target_agent_owner_surface_refs.owner_route_ref, 'opl_generated:product_entry_manifest#/owner_route');
+  assert.equal(
+    suite.target_agent_owner_surface_refs.owner_route_ref,
+    'contracts/agent_lab_handoff.json#/external_suite_seeds/goal_workflow/tasks/0/owner_route',
+  );
   assert.equal(
     suite.target_agent_owner_surface_refs.owner_receipt_contract_ref,
-    'opl_generated:product_entry_manifest#/domain_owner_receipt_contract',
+    'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract',
   );
   assert.equal(
     suite.target_agent_owner_surface_refs.external_work_order_owner_closeout_ref,
-    'opl_generated:product_entry_manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout',
+    'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
   );
   assert.equal(
     suite.target_agent_owner_surface_refs.external_work_order_owner_closeout_action,
@@ -70,21 +73,18 @@ function assertEfficiencySuiteShape(suite) {
   assertRefArray(suite.target_agent_owner_surface_refs.regression_suite_refs, 'regression_suite_refs');
   assertRefArray(suite.target_runtime_consumption_refs, 'target_runtime_consumption_refs');
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection'),
+    suite.target_runtime_consumption_refs.includes(
+      'contracts/production_acceptance/rca-efficiency-handoff-projection.json#/agent_lab_suite_input',
+    ),
     true,
   );
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection'),
+    suite.target_runtime_consumption_refs.includes(
+      'opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout',
+    ),
     true,
   );
-  assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube domain-handler export#/mapped_surfaces/external_work_order_owner_closeout'),
-    true,
-  );
-  assert.equal(
-    suite.target_runtime_consumption_refs.includes('redcube domain-handler export#/source_manifest_refs/external_work_order_owner_closeout_ref'),
-    true,
-  );
+  assert.equal(suite.target_runtime_consumption_refs.some((ref) => ref.startsWith('redcube domain-handler export#/')), false);
 
   assertRefArray(suite.efficiency_signal_refs.duration_refs, 'duration_refs');
   assertRefArray(suite.efficiency_signal_refs.cost_refs, 'cost_refs');

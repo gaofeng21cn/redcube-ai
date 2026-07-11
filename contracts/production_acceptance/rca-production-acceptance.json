@@ -95,7 +95,7 @@
     "selected_artifact_producing_visual_route": {
       "deliverable_family": "ppt_deck",
       "route_id": "ppt_deck.image_first.artifact_producing.v1",
-      "route_ref": "opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth",
+      "route_ref": "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json#/route_family_summary",
       "route_kind": "image_first_ppt_artifact_route",
       "stage_sequence_refs": [
         "author_image_pages",
@@ -139,10 +139,10 @@
       "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
       "contracts/owner_receipt_contract.json#/receipt_cases/0",
       "contracts/artifact_locator_contract.json",
-      "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
-      "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
-      "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
-      "opl_generated:product_entry_manifest#/no_regression_owner_receipt_opl_consumption_proof",
+      "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
+      "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
+      "opl_generated:product_entry_manifest#/domain_authority_refs/controlled_memory_apply_proof",
+      "opl_generated:product_entry_manifest#/domain_authority_refs/no_regression_owner_receipt_opl_consumption_proof",
       "workspace-runtime-ref:review-export:transition-run",
       "workspace-runtime-ref:review-export:production-evidence-tail-ppt-image-first",
       "rca-memory-receipt:visual-pattern:production-evidence-tail-ppt-image-first-accepted",
@@ -227,13 +227,13 @@
         "owner_chain_ref",
         "typed_blocker_ref"
       ],
-      "accepted_payload_paths_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/accepted_payload_paths",
+      "accepted_payload_paths_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/accepted_payload_paths",
       "work_items": [
         {
           "item_id": "owner_chain_apply",
           "sequence": 1,
           "remaining_gap_id": "owner_chain_apply_to_real_opl_attempt",
-          "workorder_item_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/0",
+          "workorder_item_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder/work_items/0",
           "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
           "current_payload_template": {
             "domain_owner_receipt_refs": [],
@@ -254,7 +254,7 @@
               "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
               "contracts/owner_receipt_contract.json#/receipt_cases/0",
               "contracts/artifact_locator_contract.json",
-              "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection"
+              "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs"
             ]
           },
           "typed_blocker_path_payload": {
@@ -278,7 +278,7 @@
           "item_id": "memory_lifecycle_receipt_scaleout",
           "sequence": 2,
           "remaining_gap_id": "real_memory_lifecycle_receipt_instances",
-          "workorder_item_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/1",
+          "workorder_item_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder/work_items/1",
           "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
           "current_payload_template": {
             "domain_owner_receipt_refs": [],
@@ -318,7 +318,7 @@
           "item_id": "temporal_controlled_visual_stage_long_soak",
           "sequence": 3,
           "remaining_gap_id": "opl_hosted_controlled_visual_stage_long_soak",
-          "workorder_item_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/2",
+          "workorder_item_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder/work_items/2",
           "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
           "current_payload_template": {
             "domain_owner_receipt_refs": [],
@@ -354,7 +354,7 @@
           "export_readiness_claimed": false,
           "production_soak_complete_claimed": false,
           "required_input_refs": [
-            "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory"
+            "contracts/production_acceptance/rca-production-acceptance.json#/controlled_visual_soak"
           ],
           "expected_output_refs": [
             "rca-long-soak:visual-stage:<soak-id>",
@@ -362,7 +362,7 @@
           ],
           "temporal_readiness_refs": {
             "long_soak_evidence_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
-            "long_soak_evidence_inventory_ref": "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory",
+            "long_soak_evidence_inventory_ref": "contracts/production_acceptance/rca-production-acceptance.json#/controlled_visual_soak",
             "long_soak_evidence_ref_count": 0,
             "latest_long_soak_evidence_ref": null,
             "latest_long_soak_runtime_locator_ref": null,
@@ -374,7 +374,7 @@
           "item_id": "cross_family_repeated_no_regression",
           "sequence": 4,
           "remaining_gap_id": "cross_family_repeated_no_regression_evidence",
-          "workorder_item_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder/work_items/3",
+          "workorder_item_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder/work_items/3",
           "payload_kind": "domain_owner_receipt_or_typed_blocker_refs",
           "current_payload_template": {
             "domain_owner_receipt_refs": [],
@@ -396,7 +396,7 @@
               "rca-no-regression:visual-stage:2026-05-31-opl-family-native-repair-to-export-repeat"
             ],
             "owner_chain_refs": [
-              "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection"
+              "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs"
             ]
           },
           "typed_blocker_path_payload": {
@@ -428,7 +428,7 @@
     },
     "workspace_receipt_scaleout_refs": {
       "status": "scaleout_ref_model_landed_more_workspaces_pending",
-      "workspace_receipt_inventory_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+      "workspace_receipt_inventory_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
       "workspace_receipt_proof_action": "emit_workspace_receipt_proof",
       "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
       "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
@@ -460,8 +460,8 @@
     },
     "visual_memory_body_reuse_refs": {
       "status": "body_external_reuse_ref_landed",
-      "memory_locator_ref": "opl_generated:product_entry_manifest#/domain_memory_descriptor_locator/memory_locator",
-      "controlled_apply_proof_ref": "opl_generated:product_entry_manifest#/controlled_memory_apply_proof",
+      "memory_locator_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/domain_memory_descriptor_locator/memory_locator",
+      "controlled_apply_proof_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/controlled_memory_apply_proof",
       "consumed_memory_ref": "rca-memory:visual-pattern:<memory-id>",
       "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
       "memory_body_projected_to_opl": false,
@@ -471,7 +471,7 @@
     "repeated_no_regression_evidence_refs": {
       "status": "repeated_refs_available_not_production_soak",
       "generator_action": "emit_no_regression_evidence",
-      "proof_contract_ref": "opl_generated:product_entry_manifest#/no_regression_owner_receipt_opl_consumption_proof",
+      "proof_contract_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/no_regression_owner_receipt_opl_consumption_proof",
       "evidence_refs": [
         "rca-no-regression:visual-stage:transition-hosted-no-regression",
         "rca-no-regression:visual-stage:workspace-receipt-scaleout-no-regression",
@@ -581,10 +581,10 @@
     "evidence_model": "refs_only_no_visual_truth_artifact_blob_memory_body_or_review_verdict_body",
     "evidence_receipt_fixture_ref": "contracts/production_acceptance/rca-evidence-receipt-fixture.json",
     "source_projection_refs": {
-      "operator_evidence_readiness_projection_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
-      "production_evidence_scaleout_refs_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
-      "workspace_receipt_inventory_projection_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
-      "domain_action_adapter_export_ref": "opl_generated:product_entry_manifest#/product_entry_shell/domain_handler"
+      "operator_evidence_readiness_projection_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff",
+      "production_evidence_scaleout_refs_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
+      "workspace_receipt_inventory_projection_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
+      "domain_action_adapter_export_ref": "contracts/action_catalog.json#/actions/6"
     },
     "body_free_owner_receipt_ref": {
       "expected_receipt_slot": "artifact_producing_owner_receipt",
@@ -598,7 +598,7 @@
     },
     "body_free_workspace_receipt_ref": {
       "expected_receipt_slot": "workspace_receipt",
-      "workspace_receipt_inventory_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+      "workspace_receipt_inventory_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
       "workspace_receipt_proof_action": "emit_workspace_receipt_proof",
       "workspace_receipt_proof_ref_model": "rca-workspace-receipt-proof:visual-stage:<proof-id>",
       "runtime_locator_ref_model": "workspace-runtime-ref:receipt-proof:<proof-id>",
@@ -607,7 +607,7 @@
     },
     "body_free_visual_memory_reuse_ref": {
       "expected_receipt_slot": "visual_memory_reuse_ref",
-      "memory_locator_ref": "opl_generated:product_entry_manifest#/domain_memory_descriptor_locator/memory_locator",
+      "memory_locator_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/domain_memory_descriptor_locator/memory_locator",
       "consumed_memory_ref": "rca-memory:visual-pattern:<memory-id>",
       "memory_content_body_ref": "rca-memory-content-ref:visual-pattern:<memory-id>",
       "memory_body_projected_to_opl": false,
@@ -635,11 +635,11 @@
       "repeated_no_regression_claimed_as_soak": false
     },
     "monitor_freshness_backfill_refs": {
-      "monitor_surface_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+      "monitor_surface_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
       "freshness_ref_group": "workspace_receipt_inventory_and_no_regression_refs",
-      "observed_workspace_count_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection/scaleout_projection/observed_workspace_count",
-      "observed_receipt_count_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection/scaleout_projection/observed_receipt_count",
-      "no_regression_evidence_refs_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/repeated_no_regression_evidence_refs/evidence_refs",
+      "observed_workspace_count_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json#/scaleout_projection/observed_workspace_count",
+      "observed_receipt_count_ref": "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json#/scaleout_projection/observed_receipt_count",
+      "no_regression_evidence_refs_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/repeated_no_regression_evidence_refs/evidence_refs",
       "monitor_freshness_payload_body_required": false,
       "production_soak_claimed": false
     },
@@ -653,7 +653,7 @@
       "blocker_owner": "redcube_ai",
       "payload_body_included": false,
       "blocks_stage_expected_receipt_or_monitor_refs": false,
-      "production_tail_workorder_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_tail_workorder"
+      "production_tail_workorder_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_tail_workorder"
     },
     "stage_expected_receipt_payload_summary": {
       "surface_kind": "rca_stage_expected_receipt_payload_summary",
@@ -676,7 +676,7 @@
         "runtime_event_ref",
         "typed_blocker_ref"
       ],
-      "accepted_payload_paths_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/owner_payload_workorder/accepted_payload_paths",
+      "accepted_payload_paths_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/accepted_payload_paths",
       "stage_count": 6,
       "stage_ids": [
         "source_intake",
@@ -700,7 +700,7 @@
         ]
       },
       "success_ref_models": {
-        "monitor_freshness_ref_model": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>",
+        "monitor_freshness_ref_model": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/monitor_freshness_backfill_refs",
         "runtime_event_ref_model": "family_stage_control_plane.stages[*].stage_contract.runtime_event_refs",
         "source_runtime_event_ref": "opl-generated:family_stage_control_plane#/stages/<stage-index>/stage_contract/runtime_event_refs"
       },
@@ -997,18 +997,15 @@
     "work_order_ref": "oma_developer_patch_work_order_5a1b68cacbd4",
     "owner": "redcube_ai",
     "consumer": "opl_agent_lab",
-    "projection_ref": "opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection",
-    "domain_action_adapter_projection_ref": "redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection",
+    "projection_ref": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
+    "owner_closeout_projection_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout",
     "contract_ref": "contracts/production_acceptance/rca-efficiency-handoff-projection.json",
-    "external_work_order_owner_closeout_ref": "opl_generated:product_entry_manifest#/domain_owner_receipt_contract/external_work_order_owner_closeout",
+    "external_work_order_owner_closeout_ref": "opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout",
     "external_work_order_owner_closeout_action": "emit_external_work_order_owner_closeout",
     "runtime_consumption_refs": [
-      "opl_generated:product_entry_manifest#/rca_efficiency_handoff_projection",
-      "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/rca_efficiency_handoff_projection",
-      "redcube domain-handler export#/mapped_surfaces/rca_efficiency_handoff_projection",
-      "redcube domain-handler export#/source_manifest_refs/rca_efficiency_handoff_projection_ref",
-      "redcube domain-handler export#/mapped_surfaces/external_work_order_owner_closeout",
-      "redcube domain-handler export#/source_manifest_refs/external_work_order_owner_closeout_ref"
+      "contracts/production_acceptance/rca-efficiency-handoff-projection.json#/agent_lab_suite_input",
+      "contracts/production_acceptance/rca-efficiency-handoff-projection.json#/efficiency_signal_refs",
+      "opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract/external_work_order_owner_closeout"
     ],
     "quality_floor_refs": [
       "workspace-runtime-ref:review-export:<run-id>",
@@ -1086,7 +1083,7 @@
   },
   "temporal_autonomy_readiness": {
     "surface_kind": "temporal_autonomy_readiness",
-    "readiness_ref": "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
+    "readiness_ref": "contracts/production_acceptance/rca-production-acceptance.json#/temporal_autonomy_readiness",
     "status": "standard_default_opl_temporal_hosted_autonomy_enabled_evidence_pending",
     "provider_owner": "one-person-lab",
     "provider_kind_required_for_production": "temporal",
@@ -1155,11 +1152,11 @@
     "payload_body_allowed": false,
     "evidence_after_contract_required": true,
     "source_projection_refs": {
-      "operator_evidence_readiness_projection_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection",
-      "production_evidence_scaleout_refs_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs",
-      "opl_expected_receipt_monitor_freshness_handoff_ref": "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff",
-      "temporal_autonomy_readiness_ref": "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
-      "workspace_receipt_inventory_projection_ref": "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection",
+      "operator_evidence_readiness_projection_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff",
+      "production_evidence_scaleout_refs_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs",
+      "opl_expected_receipt_monitor_freshness_handoff_ref": "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff",
+      "temporal_autonomy_readiness_ref": "contracts/production_acceptance/rca-production-acceptance.json#/temporal_autonomy_readiness",
+      "workspace_receipt_inventory_projection_ref": "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs",
       "remaining_evidence_gate_blockers_contract_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers"
     },
     "work_items": [
@@ -1170,10 +1167,10 @@
         "status": "pending_real_opl_attempt_receipt_or_typed_blocker",
         "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
         "required_input_refs": [
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/owner_chain_refs",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/domain_owner_receipt_refs",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff/body_free_owner_receipt_ref",
-          "opl_generated:product_entry_manifest#/domain_owner_receipt_contract"
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/owner_chain_refs",
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/domain_owner_receipt_refs",
+          "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/body_free_owner_receipt_ref",
+          "opl_generated:product_entry_manifest#/domain_authority_refs/domain_owner_receipt_contract"
         ],
         "expected_output_refs": [
           "workspace-runtime-ref:stage-attempt:<run-id>",
@@ -1199,10 +1196,10 @@
         "status": "pending_runtime_receipt_instances",
         "typed_blocker_ref": "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
         "required_input_refs": [
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/visual_memory_body_reuse_refs",
-          "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection/actual_workspace_receipt_refs",
-          "opl_generated:product_entry_manifest#/controlled_memory_apply_proof/runtime_receipt_instances",
-          "opl_generated:product_entry_manifest#/lifecycle_guarded_apply_proof"
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/visual_memory_body_reuse_refs",
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/workspace_receipt_scaleout_refs/actual_workspace_receipt_refs",
+          "opl_generated:product_entry_manifest#/domain_authority_refs/controlled_memory_apply_proof/runtime_receipt_instances",
+          "opl_generated:product_entry_manifest#/domain_authority_refs/lifecycle_guarded_apply_proof"
         ],
         "expected_output_refs": [
           "rca-memory-receipt:visual-pattern:<accepted-receipt-id>",
@@ -1230,11 +1227,11 @@
         "status": "pending_production_soak",
         "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
         "required_input_refs": [
-          "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
-          "opl_generated:product_entry_manifest#/controlled_soak_no_regression_attempt",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff/monitor_freshness_backfill_refs",
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/review_export_verdict_refs",
-          "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory"
+          "contracts/production_acceptance/rca-production-acceptance.json#/temporal_autonomy_readiness",
+          "opl_generated:product_entry_manifest#/domain_authority_refs/controlled_soak_no_regression_attempt",
+          "contracts/production_acceptance/rca-production-acceptance.json#/opl_expected_receipt_monitor_freshness_handoff/monitor_freshness_backfill_refs",
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/review_export_verdict_refs",
+          "contracts/production_acceptance/rca-production-acceptance.json#/controlled_visual_soak"
         ],
         "expected_output_refs": [
           "rca-long-soak:visual-stage:<soak-id>",
@@ -1257,7 +1254,7 @@
         "production_soak_complete_claimed": false,
         "temporal_readiness_refs": {
           "long_soak_evidence_action": "emit_temporal_controlled_visual_stage_long_soak_evidence",
-          "long_soak_evidence_inventory_ref": "opl_generated:product_entry_manifest#/temporal_controlled_visual_stage_long_soak_evidence_inventory",
+          "long_soak_evidence_inventory_ref": "contracts/production_acceptance/rca-production-acceptance.json#/controlled_visual_soak",
           "long_soak_evidence_ref_count": 0,
           "latest_long_soak_evidence_ref": null,
           "latest_long_soak_runtime_locator_ref": null,
@@ -1280,9 +1277,9 @@
         "status": "pending_repeated_runtime_evidence",
         "typed_blocker_ref": "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending",
         "required_input_refs": [
-          "opl_generated:product_entry_manifest#/operator_evidence_readiness_projection/production_evidence_scaleout_refs/repeated_no_regression_evidence_refs",
-          "opl_generated:product_entry_manifest#/no_regression_owner_receipt_opl_consumption_proof",
-          "opl_generated:product_entry_manifest#/workspace_receipt_inventory_projection/scaleout_projection"
+          "contracts/production_acceptance/rca-production-acceptance.json#/production_evidence_scaleout_refs/repeated_no_regression_evidence_refs",
+          "opl_generated:product_entry_manifest#/domain_authority_refs/no_regression_owner_receipt_opl_consumption_proof",
+          "contracts/production_acceptance/rca-workspace-receipt-scaleout-evidence-20260528.json#/scaleout_projection"
         ],
         "expected_output_refs": [
           "rca-no-regression:visual-stage:ppt_deck:<run-id>",

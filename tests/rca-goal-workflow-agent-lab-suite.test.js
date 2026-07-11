@@ -104,21 +104,18 @@ function assertGoalWorkflowSuiteShape(suite) {
   assert.equal(suite.not_authorized_claims.includes('visual_ready'), true);
   assert.equal(suite.not_authorized_claims.includes('production_soak_complete'), true);
   assert.equal(
-    suite.target_runtime_consumption_refs.includes('opl_generated:product_entry_manifest#/goal_workflow_agent_lab_suite'),
-    true,
-  );
-  assert.equal(
     suite.target_runtime_consumption_refs.includes(
-      'redcube domain-handler export#/mapped_surfaces/goal_workflow_agent_lab_suite',
+      'contracts/agent_lab_handoff.json#/external_suite_seeds/goal_workflow',
     ),
     true,
   );
   assert.equal(
     suite.target_runtime_consumption_refs.includes(
-      'redcube domain-handler export#/source_manifest_refs/goal_workflow_agent_lab_suite_ref',
+      'contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json',
     ),
     true,
   );
+  assert.equal(suite.target_runtime_consumption_refs.some((ref) => ref.startsWith('redcube domain-handler export#/')), false);
   assert.equal(suite.no_forbidden_write_refs.length > 0, true);
   assert.equal(suite.quality_floor_refs.includes('quality-floor:rca/goal-workflow/visual-authority-boundary'), true);
   assertRefsOnlyAuthorityBoundary(suite.authority_boundary, 'suite.authority_boundary');
