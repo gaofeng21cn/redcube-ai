@@ -1,6 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { existsSync, globSync, readFileSync } from 'node:fs';
 
 import {
   auditDeliverableRequest,
@@ -60,19 +60,7 @@ function collectJsonSurfacePaths(rootDir) {
     return [];
   }
 
-  const entries = [];
-  for (const entry of readdirSync(rootDir)) {
-    const absolutePath = path.join(rootDir, entry);
-    const stats = statSync(absolutePath);
-    if (stats.isDirectory()) {
-      entries.push(...collectJsonSurfacePaths(absolutePath));
-      continue;
-    }
-    if (stats.isFile() && absolutePath.endsWith('.json')) {
-      entries.push(absolutePath);
-    }
-  }
-  return entries;
+  return globSync('**/*.json', { cwd: rootDir }).map((file) => path.join(rootDir, file));
 }
 
 function loadHydratedContract({ workspaceRoot, topicId, deliverableId }) {

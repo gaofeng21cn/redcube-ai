@@ -53,8 +53,8 @@ export function buildRcaEfficiencyHandoffProjection({
         'agent/quality_gates/artifact_authority.md',
       ],
       regression_suite_refs: [
-        'tests/rca-efficiency-handoff-projection.test.ts',
-        'tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+        'tests/rca-efficiency-handoff-projection.test.js',
+        'tests/product-entry-cases/evidence-scaleout-surfaces.test.js',
       ],
       owner: 'redcube_ai',
       refs_only: true,

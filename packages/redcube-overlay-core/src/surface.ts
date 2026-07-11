@@ -61,10 +61,6 @@ export function listSurfaceArtifactPaths(specs: SurfaceArtifactSpec[]) {
   return specs.map((spec) => spec.relativePath);
 }
 
-export function createSurfaceValidators(specs: Record<string, SurfaceValidator>): Record<string, SurfaceValidator> {
-  return { ...specs };
-}
-
 function valueAtPath(content: SurfaceContract, path: string): unknown {
   return path.split('.').reduce((current: unknown, key) => (
     current && typeof current === 'object' ? (current as SurfaceContract)[key] : undefined

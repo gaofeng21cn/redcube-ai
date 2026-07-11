@@ -450,8 +450,8 @@ const RCA_FRESH_LARGE_PRIVATE_SURFACE_SCAN = Object.freeze({
     'scripts/verify.sh structure-strict',
   ],
   scan_command_refs: [
-    'node --experimental-strip-types scripts/line-budget.ts --list',
-    'node --experimental-strip-types scripts/line-budget.ts --strict',
+    'node scripts/line-budget.ts --list',
+    'node scripts/line-budget.ts --strict',
   ],
   current_clean_truth: {
     no_tracked_code_file_exceeds_1500_lines: true,

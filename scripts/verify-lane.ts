@@ -85,7 +85,6 @@ async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Prom
   }
   if (step.kind === 'test-group') {
     run(process.execPath, [
-      '--experimental-strip-types',
       'scripts/run-test-group.ts',
       step.group,
       ...forwardedArgs,
@@ -112,7 +111,7 @@ async function runStep(step: VerifyStep, forwardedArgs: readonly string[]): Prom
 }
 
 function printUsage(): void {
-  process.stderr.write(`Usage: node --experimental-strip-types scripts/verify-lane.ts <${listVerifyLanes().join('|')}> [node --test args]\n`);
+  process.stderr.write(`Usage: node scripts/verify-lane.ts <${listVerifyLanes().join('|')}> [node --test args]\n`);
 }
 
 const [rawLane = 'smoke', ...rawArgs] = process.argv.slice(2);

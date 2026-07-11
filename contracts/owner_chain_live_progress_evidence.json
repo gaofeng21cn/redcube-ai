@@ -18,7 +18,7 @@
   },
   "live_visual_owner_chain_canary": {
     "canary_kind": "mock_safe_artifact_producing_visual_owner_chain",
-    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.ts#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
+    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.js#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
     "deliverable_family": "ppt_deck",
     "visual_route": "author_image_pages",
     "route_chain": [
@@ -55,7 +55,7 @@
   },
   "rca_owned_owner_action_canary": {
     "canary_kind": "refs_only_owner_action_runtime_canary",
-    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.ts#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
+    "source_test_ref": "tests/rca-owner-chain-live-progress-evidence.test.js#RCA mock-safe visual owner-chain canary reaches review/export refs and owner-action refs",
     "guarded_action": "emit_workspace_receipt_proof",
     "observed_return_shapes": [
       "workspace_receipt_proof",

@@ -9,7 +9,6 @@ export const CODEX_RUNTIME_SURFACE = 'codex_cli_runtime';
 
 const CODEX_DEPLOYMENT_HOST = 'codex_local_operator_host';
 const CODEX_DEPLOYMENT_STATUS = 'active_primary';
-const CODEX_FREEZE_ORIGIN = 'P19.A';
 
 export type CodexExecutionModel = ReturnType<typeof buildCodexExecutionModel>;
 
@@ -47,7 +46,6 @@ export function buildCodexExecutionModel({ adapter = CODEX_DEFAULT_ADAPTER } = {
     requested_adapter: requestedAdapter,
     default_model_selection: CODEX_DEFAULT_MODEL_SELECTION,
     default_reasoning_effort: CODEX_DEFAULT_REASONING_SELECTION,
-    freeze_origin_milestone: CODEX_FREEZE_ORIGIN,
     executor_adapter_owner_boundary: buildExecutorAdapterOwnerBoundary(),
   } as const;
 }

@@ -61,9 +61,9 @@ HTML route quality surface 的最小验证：
 
 ```bash
 npm run --silent build
-node --experimental-strip-types tests/ppt-html-route-quality-nonregression.test.ts
-node --experimental-strip-types tests/render-html-guardrails.test.ts
-node --experimental-strip-types tests/ppt-creative-ownership-cases/targeted-rerender-operator-context.test.ts
+node tests/ppt-html-route-quality-nonregression.test.js
+node tests/render-html-guardrails.test.js
+node tests/ppt-creative-ownership-cases/targeted-rerender-operator-context.test.js
 ```
 
 这些验证只证明 HTML route policy、runtime refs 和 targeted repair non-regression。最终 visual ready/exportable/handoffable 仍回到 RCA-owned review/export gates。

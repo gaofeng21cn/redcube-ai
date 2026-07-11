@@ -44,11 +44,6 @@ type BuildNodeTestArgsOptions = Readonly<{
   forwardedArgs?: readonly string[];
   serialized?: boolean;
 }>;
-type ParseRunTestGroupArgsResult = Readonly<{
-  groupName?: string;
-  forwardedArgs: string[];
-  requestedFiles: string[];
-}>;
 
 const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
   '@redcube/runtime',
@@ -223,80 +218,13 @@ export function buildNodeTestArgs({
   forwardedArgs = [],
   serialized = false,
 }: BuildNodeTestArgsOptions = {}): string[] {
-  const args = ['--experimental-strip-types', '--test'];
+  const args = ['--test'];
   if (serialized) {
     // Browser / screenshot / local-exec heavy files can still oversubscribe the host;
     // keep only that explicit subset at file-level concurrency 1.
     args.push('--test-concurrency=1');
   }
   return [...args, ...forwardedArgs];
-}
-
-function parseRequestedFileList(value: unknown): string[] {
-  return String(value || '')
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter(Boolean);
-}
-
-export function parseRunTestGroupArgs(argv: readonly string[] = []): ParseRunTestGroupArgsResult {
-  const [groupName, ...args] = argv;
-  const forwardedArgs: string[] = [];
-  const requestedFiles: string[] = [];
-
-  for (let index = 0; index < args.length; index += 1) {
-    const arg = args[index];
-    if (arg === '--files') {
-      const value = args[index + 1];
-      if (!value || String(value).startsWith('--')) {
-        throw new Error('--files 需要一个逗号分隔的测试文件列表');
-      }
-      requestedFiles.push(...parseRequestedFileList(value));
-      index += 1;
-      continue;
-    }
-    if (String(arg).startsWith('--files=')) {
-      requestedFiles.push(...parseRequestedFileList(String(arg).slice('--files='.length)));
-      continue;
-    }
-    forwardedArgs.push(arg);
-  }
-
-  return {
-    groupName,
-    forwardedArgs,
-    requestedFiles,
-  };
-}
-
-function normalizeRequestedTestFiles(files: readonly string[] = []): string[] {
-  const normalized = files.map((file) => String(file).trim().replaceAll(path.sep, '/').replace(/^\.\//, ''));
-  const invalid = normalized.filter((file) => !/^tests\/[^/]+\.test\.(?:js|ts)$/.test(file));
-  if (invalid.length > 0) {
-    throw new Error(`--files 只接受根级测试文件: ${invalid.join(', ')}`);
-  }
-  return [...new Set(normalized)];
-}
-
-export function selectGroupFiles({
-  groupName = '(unknown)',
-  groupFiles = [],
-  requestedFiles = [],
-}: {
-  groupName?: string;
-  groupFiles?: readonly string[];
-  requestedFiles?: readonly string[];
-} = {}): string[] {
-  if (requestedFiles.length === 0) {
-    return [...groupFiles];
-  }
-
-  const normalized = normalizeRequestedTestFiles(requestedFiles);
-  const missing = normalized.filter((file) => !groupFiles.includes(file));
-  if (missing.length > 0) {
-    throw new Error(`${groupName} 分组不包含请求的测试文件: ${missing.join(', ')}`);
-  }
-  return groupFiles.filter((file) => normalized.includes(file));
 }
 
 export function discoverRootTestFiles({

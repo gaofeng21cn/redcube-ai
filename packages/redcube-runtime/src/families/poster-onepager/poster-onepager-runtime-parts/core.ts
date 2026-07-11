@@ -1,6 +1,5 @@
 // @ts-nocheck
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import {
   buildSourceTruthConsumptionSummary,
@@ -40,8 +39,7 @@ import {
  * @typedef {import('../types.js').PosterRuntimeRouteResult} PosterRuntimeRouteResult
  */
 
-export function createPosterOnepagerRuntimeCore() {
-  const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+  const MODULE_DIR = import.meta.dirname;
   const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
   const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
   const CANVAS = Object.freeze({ ratio: '4:5', width: 1080, height: 1350 });
@@ -561,7 +559,7 @@ export function createPosterOnepagerRuntimeCore() {
     writeText,
   });
 
-  return {
+  export {
     CODEX_DEFAULT_ADAPTER,
     ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE,
     buildDirectorReview,
@@ -576,4 +574,3 @@ export function createPosterOnepagerRuntimeCore() {
     safeArray,
     sourceLabels,
   };
-}

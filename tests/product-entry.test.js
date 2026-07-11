@@ -1,0 +1,12 @@
+await import('./product-entry-cases/manifest-and-start-surfaces.test.js');
+await import('./product-entry-cases/manifest-status-preflight-surfaces.test.js');
+await import('./product-entry-cases/evidence-scaleout-surfaces.test.js');
+await import('./product-entry-cases/domain-memory-ref-adapter.test.js');
+await import('./product-entry-cases/manifest-memory-and-attempt-surfaces.test.js');
+await import('./product-entry-cases/domain-authority-refs-retirement-proof.test.js');
+await import('./product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js');
+await import('./product-entry-cases/opl-ledger-artifact-registration.test.js');
+await import('./product-entry-cases/runtime-default-product-entry.test.js');
+await import('./product-entry-cases/domain_action_adapter-receipt-and-workspace-proof.test.js');
+await import('./product-entry-cases/substrate-adapter-export.test.js');
+await import('./product-entry-cases/temporal-autonomy-readiness.test.js');

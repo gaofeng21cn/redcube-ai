@@ -13,7 +13,6 @@ export { createOverlayRegistry } from './registry.js';
 export {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
-  createSurfaceValidators,
   listSurfaceArtifactPaths,
   validateBaselinePolicySurface,
   validateDeliveryContractSurface,

@@ -1,13 +1,12 @@
 // @ts-nocheck
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { existsSync, readFileSync } from 'node:fs';
 
 import { resolveWorkspaceXiaohongshuAuthorProfile } from '@redcube/redcube-config/xiaohongshu-author-profile';
 
 import { safeArray, safeText } from './shared.js';
 
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MODULE_DIR = import.meta.dirname;
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
 const DEFAULT_PROMPT_PACK = {
   research: 'prompts/xiaohongshu/research.md',

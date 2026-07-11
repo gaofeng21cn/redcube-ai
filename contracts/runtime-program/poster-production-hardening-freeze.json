@@ -49,12 +49,8 @@
     ]
   },
   "current_slice": {
-    "required_paths": [
-      "prompts/paper_poster/paper_asset_library.md",
-      "prompts/paper_poster/poster_storyboard.md",
-      "prompts/paper_poster/layout_plan.md",
-      "prompts/paper_poster/render_bundle.md"
-    ],
+    "retired_source_provenance": "git_history_before_academic_poster_family_admission",
+    "tracked_prompt_paths_retired": true,
     "required_content_tokens": [
       "figures",
       "tables",

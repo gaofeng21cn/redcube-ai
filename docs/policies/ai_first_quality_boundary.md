@@ -40,10 +40,10 @@ Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、
 
 涉及创作、视觉审阅、截图复核、质量 promotion 或 publication projection 的改动，至少检查相关 guard：
 
-- `tests/screenshot-review-ai-first.test.ts`
-- `tests/ppt-creative-ownership.test.ts`
-- `tests/xiaohongshu-creative-ownership.test.ts`
-- `tests/poster-creative-ownership.test.ts`
-- `tests/review-platform.test.ts`
+- `tests/screenshot-review-ai-first.test.js`
+- `tests/ppt-creative-ownership.test.js`
+- `tests/xiaohongshu-creative-ownership.test.js`
+- `tests/poster-creative-ownership.test.js`
+- `tests/review-platform.test.js`
 - `scripts/verify.sh meta`
 - `npm run test:fast`

@@ -1,7 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 
 import type {
   RedcubeIdentityConfig,
@@ -18,7 +17,7 @@ type RuntimeState = {
 };
 
 const RUNTIME_KEYS: RuntimeKey[] = ['rootDir', 'workspaceRoot', 'promptsDir'];
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MODULE_DIR = import.meta.dirname;
 const DEFAULT_REPO_ROOT = path.resolve(MODULE_DIR, '../../../');
 
 export function isRedcubeInternalJsonObject(value: unknown): value is RedcubeInternalJsonObject {

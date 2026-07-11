@@ -14,6 +14,9 @@ import {
   stageFolderArtifactPath,
   stageOrderForCanonicalStage,
 } from '@redcube/runtime-protocol';
+import { readJson, writeJson } from '../../../runtime-utils.js';
+
+export { readJson, writeJson };
 
 export const MIN_REVIEW_QA_BLOCKS = 2;
 export const MIN_REVIEW_PRIMARY_POINTS = 1;
@@ -554,18 +557,9 @@ export function markPublishBundleStaleAfterBlockedReview(contract, deliverablePa
   return [publishPaths.publishManifestFile, publishPaths.publishReadmeFile];
 }
 
-export function writeJson(file, value) {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
-
 export function writeText(file, value) {
   ensureDir(path.dirname(file));
   writeFileSync(file, value, 'utf-8');
-}
-
-export function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 export function stageArtifactPath(contract, deliverablePaths, stageId) {

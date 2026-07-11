@@ -14,6 +14,10 @@ import {
 import { compactStringArray, safeText } from './shared.js';
 
 const PROFESSIONAL_SPECIALIST_SKILL_FILES = Object.freeze({
+  xhs_content_strategist: {
+    title: 'Xiaohongshu Content Strategist',
+    path: 'agent/professional_skills/rca-xhs-content-strategist/SKILL.md',
+  },
   story_architect: {
     title: 'Story Architect',
     path: 'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
@@ -45,6 +49,8 @@ const PROFESSIONAL_SPECIALIST_SKILL_FILES = Object.freeze({
 });
 
 const PROFESSIONAL_SPECIALIST_SKILLS_BY_ROUTE = Object.freeze({
+  'xiaohongshu:storyline': ['xhs_content_strategist'],
+  'xiaohongshu:single_note_plan': ['xhs_content_strategist'],
   'ppt_deck:storyline': ['story_architect'],
   'ppt_deck:detailed_outline': ['story_architect'],
   'ppt_deck:slide_blueprint': ['story_architect'],

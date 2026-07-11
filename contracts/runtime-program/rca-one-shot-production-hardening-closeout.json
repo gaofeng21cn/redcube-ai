@@ -101,10 +101,10 @@
       "evidence_refs": [
         "contracts/functional_privatization_audit.json",
         "contracts/physical_source_morphology_policy.json",
-        "contracts/runtime-program/current-program.json#/current_state/active_baton/scope/privatized_functional_module_audit",
-        "contracts/runtime-program/current-program.json#/product_release_metadata/functional_privatization_audit",
-        "tests/rca-retired-surface-guard.test.ts",
-        "tests/opl-agent-pack-contracts.test.ts"
+        "contracts/runtime-program/current-program-parts/current_state/privatized_functional_module_audit.json",
+        "contracts/runtime-program/current-program-parts/product_release_metadata.json#/privatized_functional_module_audit",
+        "tests/rca-functional-audit-retirement.test.js",
+        "tests/opl-agent-pack-contracts-source-morphology.test.js"
       ],
       "landed_truth": [
         "active reader-facing classifications are domain_handler_target, refs_only_adapter, minimal_authority_function, native_helper_implementation and provenance",
@@ -117,12 +117,12 @@
       "status": "implemented_in_closeout_lane",
       "evidence_refs": [
         "contracts/runtime-program/rca-one-shot-production-hardening-closeout.json",
-        "contracts/runtime-program/current-program.json#/current_state/active_baton/closeout",
+        "contracts/runtime-program/current-program-parts/current_state/active_baton.json#/closeout",
         "human_doc:rca_current_status",
         "human_doc:rca_ideal_state_gap_plan",
         "human_doc:rca_architecture",
         "human_doc:rca_invariants",
-        "tests/rca-one-shot-closeout.test.ts"
+        "tests/rca-one-shot-closeout.test.js"
       ],
       "landed_truth": [
         "planned/done/deferred/skipped/verification/commit-push state is machine-readable",
@@ -139,7 +139,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/0",
       "reason": "Temporal controlled visual-stage long soak still lacks live provider restart, re-query, retry and dead-letter evidence",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts"
+        "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js"
       ],
       "must_not_claim": [
         "production_visual_stage_long_soak_complete",
@@ -155,7 +155,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/1",
       "reason": "RCA exposes locator and receipt ref models, but more real visual memory accepted/rejected lifecycle receipt instances are still pending",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+        "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
       ],
       "must_not_claim": [
         "memory_lifecycle_scaleout_complete",
@@ -169,7 +169,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/2",
       "reason": "Repeated no-regression refs exist for ppt_deck and xiaohongshu, but cross-family production cadence evidence is not complete",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/rca-production-acceptance.test.ts"
+        "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/rca-production-acceptance.test.js"
       ],
       "must_not_claim": [
         "cross_family_repeated_no_regression_complete",
@@ -182,7 +182,7 @@
       "backlog_ref": "human_doc:rca_ideal_state_gap_plan#current_cleanliness_tail",
       "reason": "Some historical managed/runtime/session semantic ids remain as provenance or tombstone-compatible contract ids and require compatibility-free migration before deletion",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-retired-surface-guard.test.ts tests/runtime-program-provenance.test.ts"
+        "command:npm run --silent build && node --test tests/rca-functional-audit-retirement.test.js tests/runtime-program-provenance.test.js"
       ]
     }
   ],
@@ -211,7 +211,7 @@
           "git diff --check",
           "git diff --cached --check",
           "npm run contracts:current-program:check",
-          "npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/manifest-and-start-surfaces.test.ts"
+          "npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/manifest-and-start-surfaces.test.js"
         ],
         "reported_result": "pass"
       },
@@ -219,8 +219,8 @@
         "reported_commands": [
           "git diff --check",
           "npm run --silent build",
-          "node --experimental-strip-types scripts/run-test-group.ts meta --files tests/runtime-config.test.ts",
-          "node --experimental-strip-types scripts/run-test-group.ts integration --files tests/rca-executor-backend-contract.test.ts"
+          "node scripts/run-test-group.ts meta tests/runtime-config.test.js",
+          "node scripts/run-test-group.ts integration tests/rca-executor-backend-contract.test.ts"
         ],
         "reported_result": "pass"
       },
@@ -229,7 +229,7 @@
           "git diff --check",
           "npm run --silent contracts:current-program:check",
           "npm run --silent line-budget",
-          "npm run --silent build && node --test tests/rca-retired-surface-guard.test.ts tests/opl-agent-pack-contracts.test.ts tests/opl-family-contract-adoption.test.ts tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-session-checkpoint.test.ts"
+          "npm run --silent build && node --test tests/rca-functional-audit-retirement.test.js tests/opl-agent-pack-contracts-source-morphology.test.js tests/opl-family-contract-adoption.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-session-checkpoint.test.js"
         ],
         "reported_result": "pass"
       },
@@ -237,8 +237,8 @@
         "required_fresh_commands_before_absorb": [
           "git diff --check",
           "npm run contracts:current-program:check",
-          "npm run --silent build && node --experimental-strip-types --test tests/rca-one-shot-closeout.test.ts tests/rca-production-acceptance.test.ts tests/runtime-config.test.ts tests/opl-agent-pack-contracts.test.ts",
-          "npm run test:meta"
+          "npm run --silent build && node --test tests/rca-one-shot-closeout.test.js tests/rca-production-acceptance.test.js tests/runtime-config.test.js tests/opl-agent-pack-contracts-canonical.test.js",
+          "scripts/verify.sh meta"
         ],
         "fresh_verification_result": "pass_before_lane_commit",
         "fresh_verification_observed": {
@@ -252,7 +252,7 @@
     "final_main_verification_required": [
       "scripts/verify.sh",
       "npm run test:fast",
-      "npm run test:meta",
+      "scripts/verify.sh meta",
       "git diff --check",
       "git worktree list",
       "git status --short --branch"

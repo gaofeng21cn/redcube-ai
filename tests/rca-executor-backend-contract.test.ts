@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import {
   buildCodexExecutorDescriptor,
   resolveExecutorAdapter,
-} from './package-surfaces.ts';
+} from './package-surfaces.js';
 
 function readJson(file: string): Record<string, any> {
   return JSON.parse(readFileSync(file, 'utf-8')) as Record<string, any>;

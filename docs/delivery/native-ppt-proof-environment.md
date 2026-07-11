@@ -161,7 +161,7 @@ For a full product-entry smoke instead of the fixture runner, use:
 
 ```bash
 REDCUBE_TEST_PYTHON=/path/to/playwright-enabled/python \
-  node --experimental-strip-types --test tests/product-entry-native-ppt-live-proof.test.ts
+  node --test tests/product-entry-native-ppt-live-proof.test.js
 ```
 
 Build and run the Docker proof image:

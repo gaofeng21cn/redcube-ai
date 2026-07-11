@@ -216,6 +216,11 @@ export function buildAuthoringContext({ workspaceRoot, contract, research = null
 export function storylineOutputContract() {
   return {
     mode: 'single | series',
+    mode_decision: {
+      result: 'single | series',
+      rationale: ['<source volume judgement>', '<topic span judgement>', '<reader task complexity judgement>'],
+      thematic_units: ['<source-grounded thematic unit>'],
+    },
     audience_judgement: '<string>',
     tension: '<string>',
     why_now: '<string>',
@@ -224,11 +229,43 @@ export function storylineOutputContract() {
     narrative_progression: ['<string>', '<string>', '<string>', '<string>'],
     journey: ['<string>', '<string>', '<string>'],
     resolution: '<string>',
+    series_architecture: {
+      status: 'required | not_applicable',
+      series_thesis: '<string>',
+      recommended_note_range: '<string>',
+      chapters: [{
+        chapter_id: '<string>',
+        chapter_role: '<string>',
+        reader_question: '<string>',
+        topic_units: ['<string>'],
+        transition: '<string>',
+      }],
+      note_briefs: [{
+        note_id: '<string>',
+        chapter_id: '<string>',
+        working_title: '<string>',
+        reader_question: '<string>',
+        content_scope: '<string>',
+        evidence_anchors: ['<string>'],
+        estimated_pages: '<string, maximum 18>',
+        transition: '<string>',
+        no_repeat_scope: ['<string>'],
+      }],
+      publication_arc: ['<string>'],
+    },
   };
 }
 
 export function singleNotePlanOutputContract() {
   return {
+    series_context: {
+      mode: 'single | series',
+      note_id: '<series note id or single>',
+      series_role: '<current note responsibility>',
+      previous_note: '<previous bridge or none>',
+      next_note: '<next bridge or none>',
+      no_repeat_scope: ['<string or none>'],
+    },
     title_options: ['<string>', '<string>', '<string>'],
     slides: [
       {

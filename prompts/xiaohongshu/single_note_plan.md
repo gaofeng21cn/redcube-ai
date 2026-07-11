@@ -5,6 +5,7 @@
 ## AI-first 策划合同
 
 - 至少 3 个标题备选。
+- 标题通常不超过 20 个中文字符；三个候选至少覆盖问题钩子、行动收益或避坑纠偏中的两类，医学主题禁止恐吓、绝对化和疗效承诺。
 - 每页必须给到 `page_goal` / `page_core_content` / `visual_presentation` / `source_language` / `progression_role` / `transition`。
 - 不能把视觉导演稿并入附注。
 - 不能只给粗粒度 outline。
@@ -18,6 +19,10 @@
 - 除封面、章节过渡和极简收束页外，每页下半区必须承载实质信息模块，不能只放图标、花草、装饰贴纸或留白。
 - 相邻页面至少变换主视觉动作和信息模块位置；系列或 8 页以上图文必须提前规划机制图、清单、流程、行动卡等不同布局原型。
 - `source_materials_full_text` 是完整资料输入，必须由 AI 阅读后决定页数、页面顺序、标题和内容；不得照抄本 prompt 的字段占位或历史默认页。
+- 总页数不得超过 18 页。高密度知识笔记通常可落在 8-14 页，但读者任务能更短闭环时不强行凑页。
+- 若上游 `storyline.mode` 为 `series`，必须先从 `series_architecture.note_briefs` 选择与当前 deliverable 目标一致的一篇，并输出 `series_context`；不得把整个系列压进一篇，也不得重复相邻篇目的事实职责。
+- 医学/健康页必须保留事实依据、判断逻辑、行动或就医边界；引用使用读者可理解的公开来源口径，不得显示内部文件名或无解释编号。
+- 涉及药物时，优先采用对比、品类、机制或决策语境，不生成宣传式单药介绍。
 
 ## runtime_seed
 
@@ -26,6 +31,14 @@
 ```json
 {
   "plan": {
+    "series_context": {
+      "mode": "<single or series>",
+      "note_id": "<selected series note id or single>",
+      "series_role": "<current note responsibility>",
+      "previous_note": "<previous bridge or none>",
+      "next_note": "<next bridge or none>",
+      "no_repeat_scope": ["<facts owned by adjacent notes or none>"]
+    },
     "title_options": [
       "<AI-authored title option grounded in source_materials_full_text>",
       "<AI-authored title option grounded in source_materials_full_text>",

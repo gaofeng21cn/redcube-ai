@@ -1,5 +1,5 @@
 import { materializeScreenshotCaptureStore } from '@redcube/runtime-protocol';
-import { safeText } from './core-helpers.js';
+import { pptSafeText as safeText } from './core-helpers.js';
 
 type JsonRecord = Record<string, any>;
 

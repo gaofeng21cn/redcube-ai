@@ -7,11 +7,6 @@ export type {
   CliDomainActions,
   CliHelpSurface,
   CliOptions,
-  CliPrivateProfileBootstrapRequest,
-  CliPrivateProfileBundleRequest,
-  CliPrivateProfileModule,
-  CliPrivateProfileRequest,
-  CliPrivateProfileResult,
   CliRunResult,
   CliRunSurface,
 } from './types.js';

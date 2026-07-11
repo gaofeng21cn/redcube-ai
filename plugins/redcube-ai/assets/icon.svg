@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="RedCube AI plugin icon">
-  <rect width="512" height="512" rx="112" fill="#C65D2E"/>
-  <path d="M256 120L378 190V322L256 392L134 322V190Z" fill="#FFFFFF"/>
-  <path d="M256 120V256M134 190L256 256L378 190M256 256V392" fill="none" stroke="#C65D2E" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M182 332L256 374L330 332" fill="none" stroke="#FFB18A" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>

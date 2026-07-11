@@ -120,7 +120,7 @@
     "verification_refs": [
       "contracts/capability_map.json#/feedback_token_index",
       "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary"
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary"
     ]
   },
   "patch_surface_hints": {
@@ -278,7 +278,7 @@
       "contracts/capability_map.json#/ppt_visual_failure_token_contract",
       "contracts/capability_map.json#/feedback_token_index",
       "contracts/agent_lab_handoff.json#/change_ref_mappings/source_of_truth_ref",
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary"
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary"
     ],
     "forbidden_surfaces": [
       "visual_truth_artifacts",
@@ -380,7 +380,7 @@
       "can_write_export_or_quality_verdict": false
     },
     "verification_refs": [
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
     ]
   }
 }

@@ -126,7 +126,7 @@
         "rca-owner-receipt:review-export:<family>:export_pptx:<deliverable-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-owner-chain-live-progress-evidence.test.ts tests/stage-run-kernel-profile.test.ts"
+        "command:npm run --silent build && node --test tests/rca-owner-chain-live-progress-evidence.test.js tests/stage-run-kernel-profile.test.js"
       ],
       "owner_followthrough_ref": "rca-operator-ready:export-handoff:deck-owner-chain-human-ready-20260614",
       "closed_typed_blocker_ref": "rca-typed-blocker:review-export:human-ready-export-handoff-pending",
@@ -156,7 +156,7 @@
         "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/temporal-autonomy-readiness.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+        "command:npm run --silent build && node --test tests/product-entry-cases/temporal-autonomy-readiness.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
       ],
       "ready_claim_allowed": false
     },
@@ -193,7 +193,7 @@
         "rca-lifecycle-receipt:retention:<receipt-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+        "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
       ],
       "ready_claim_allowed": false
     },
@@ -231,14 +231,14 @@
         "workspace-runtime-ref:no-regression:<run-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/evidence-scaleout-surfaces.test.ts"
+        "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
       ],
       "ready_claim_allowed": false
     }
   ],
   "next_verification_command_refs": [
-    "command:npm run --silent build && node --experimental-strip-types --test tests/rca-owner-chain-live-progress-evidence.test.ts tests/stage-run-kernel-profile.test.ts",
-    "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts"
+    "command:npm run --silent build && node --test tests/rca-owner-chain-live-progress-evidence.test.js tests/stage-run-kernel-profile.test.js",
+    "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js"
   ],
   "owner_chain_completion_audit": {
     "audit_id": "rca.live_stage_run_owner_chain_completion_audit.v1",

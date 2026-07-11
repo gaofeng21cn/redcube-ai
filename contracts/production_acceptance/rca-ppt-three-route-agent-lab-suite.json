@@ -159,12 +159,12 @@
         ],
         "file_refs": [
           "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js",
           "contracts/runtime-program/ppt-image-first-production-route.json",
           "contracts/runtime-program/ppt-image-first-quality-nonregression.json"
         ],
         "test_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "typed_blocker_refs": [
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
@@ -238,7 +238,7 @@
           "opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth"
         ],
         "regression_suite_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "no_forbidden_write_proof_refs": [
           "no-forbidden-write:rca/ppt-three-route/agent-lab-suite-refs-only"
@@ -397,12 +397,12 @@
         ],
         "file_refs": [
           "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js",
           "contracts/runtime-program/ppt-html-route-quality-nonregression.json",
           "contracts/runtime-program/ppt-html-route-quality-nonregression.json"
         ],
         "test_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "typed_blocker_refs": [
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
@@ -476,7 +476,7 @@
           "opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth"
         ],
         "regression_suite_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "no_forbidden_write_proof_refs": [
           "no-forbidden-write:rca/ppt-three-route/agent-lab-suite-refs-only"
@@ -635,12 +635,12 @@
         ],
         "file_refs": [
           "contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js",
           "contracts/runtime-program/ppt-native-pptx-quality-nonregression.json",
           "contracts/runtime-program/ppt-native-pptx-quality-nonregression.json"
         ],
         "test_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "typed_blocker_refs": [
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
@@ -714,7 +714,7 @@
           "opl_generated:product_entry_manifest#/ppt_deck_visual_route_truth"
         ],
         "regression_suite_refs": [
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js"
         ],
         "no_forbidden_write_proof_refs": [
           "no-forbidden-write:rca/ppt-three-route/agent-lab-suite-refs-only"

@@ -647,7 +647,8 @@
         "agent/quality_gates/communication_and_direction.md"
       ],
       "professional_skill_refs": [
-        "agent/professional_skills/rca-ppt-story-architect/SKILL.md"
+        "agent/professional_skills/rca-ppt-story-architect/SKILL.md",
+        "agent/professional_skills/rca-xhs-content-strategist/SKILL.md"
       ],
       "stage_kind": "domain_specific",
       "owner": "redcube_ai",

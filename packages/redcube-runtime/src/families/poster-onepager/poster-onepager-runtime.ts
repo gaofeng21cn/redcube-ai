@@ -1,58 +1,4 @@
-import { createPosterOnepagerRuntimeCore } from './poster-onepager-runtime-parts/core.js';
-import type {
-  PosterRuntimeContract,
-  PosterRuntimeRoute,
-  PosterRuntimeRouteResult,
-  PosterRuntimeRunRequest,
-  PosterRuntimeStageContract,
-} from './types.js';
-
-type PosterRuntimeCore = {
-  CODEX_DEFAULT_ADAPTER: string;
-  ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE: Record<string, string | undefined>;
-  buildDirectorReview: (contract: PosterRuntimeContract, deliverablePaths: unknown, adapter?: string) => Promise<unknown>;
-  buildExportBundle: (contract: PosterRuntimeContract, deliverablePaths: unknown, adapter?: string) => unknown;
-  buildPosterBlueprintArtifact: (contract: PosterRuntimeContract, deliverablePaths: unknown, adapter?: string) => Promise<unknown>;
-  buildPosterVisualDirectionArtifact: (
-    contract: PosterRuntimeContract,
-    deliverablePaths: unknown,
-    mode: string,
-    baselineDeliverableId: string,
-    adapter?: string,
-  ) => Promise<unknown>;
-  buildRenderHtmlArtifact: (input: {
-    deliverableId: string;
-    contract: PosterRuntimeContract;
-    deliverablePaths: unknown;
-    adapter?: string;
-  }) => Promise<unknown>;
-  buildScreenshotReview: (
-    workspaceRoot: string,
-    topicId: string,
-    contract: PosterRuntimeContract,
-    deliverablePaths: unknown,
-    mode: string,
-    baselineDeliverableId: string,
-    adapter?: string,
-  ) => Promise<unknown>;
-  buildSourceTruthConsumptionSummary: (
-    sharedSourceTruth: PosterRuntimeContract['shared_source_truth'],
-    options: { consumptionRole: string; defaultSourceLabels: string[] },
-  ) => unknown;
-  buildStoryline: (contract: PosterRuntimeContract, adapter?: string) => Promise<unknown>;
-  ensurePrerequisites: (input: {
-    workspaceRoot: string;
-    topicId: string;
-    deliverableId: string;
-    route: PosterRuntimeRoute;
-    mode: string;
-    baselineDeliverableId: string;
-  }) => { deliverablePaths: unknown };
-  safeArray: <T = unknown>(value: unknown) => T[];
-  sourceLabels: (contract: PosterRuntimeContract) => string[];
-};
-
-const {
+import {
   CODEX_DEFAULT_ADAPTER,
   ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE,
   buildDirectorReview,
@@ -66,7 +12,14 @@ const {
   ensurePrerequisites,
   safeArray,
   sourceLabels,
-} = createPosterOnepagerRuntimeCore() as PosterRuntimeCore;
+} from './poster-onepager-runtime-parts/core.js';
+import type {
+  PosterRuntimeContract,
+  PosterRuntimeRoute,
+  PosterRuntimeRouteResult,
+  PosterRuntimeRunRequest,
+  PosterRuntimeStageContract,
+} from './types.js';
 
 export async function runPosterOnepagerRoute({
   workspaceRoot,
@@ -79,7 +32,8 @@ export async function runPosterOnepagerRoute({
   adapter = CODEX_DEFAULT_ADAPTER,
 }: PosterRuntimeRunRequest): Promise<PosterRuntimeRouteResult> {
   const { deliverablePaths } = ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
-  const stageContract = safeArray<PosterRuntimeStageContract>(contract.stage_sequence?.stages).find((stage) => stage?.stage_id === route) || null;
+  const stages = safeArray(contract.stage_sequence?.stages) as PosterRuntimeStageContract[];
+  const stageContract = stages.find((stage) => stage?.stage_id === route) || null;
   let payload: unknown;
   switch (route) {
     case 'storyline':
@@ -120,7 +74,7 @@ export async function runPosterOnepagerRoute({
     default:
       throw new Error(`Unsupported poster_onepager route: ${route}`);
   }
-  const sourceTruthConsumptionRole = ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE[route] || '';
+  const sourceTruthConsumptionRole = (ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE as Record<string, string>)[route] || '';
   return {
     overlay: contract.overlay,
     route,

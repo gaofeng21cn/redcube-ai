@@ -17,10 +17,10 @@ Machine boundary: 本文是人读 probe provenance。旧 `scripts/run-real-route
 | --- | --- |
 | Retired probe command, mock/live mode, route timeout, output files | provenance only in this document and dated historical evidence |
 | Product-entry route evidence | `redcube product invoke --task-intent run_deliverable_route`, domain-entry source, workspace artifacts, review/export gates |
-| Current route/cache regression coverage | `tests/runtime-deliverable-route-cases/cache-liveness-and-repeat-blocks.test.ts` and focused route/product-entry tests |
+| Current route/cache regression coverage | `tests/runtime-deliverable-route-cases/cache-liveness-and-repeat-blocks.test.js` and focused route/product-entry tests |
 | Image-first route support | `docs/delivery/image-first-ppt-production-route.md`, `contracts/runtime-program/ppt-image-first-production-route.json`, route source/tests |
 | Native PPTX proof environment | `docs/delivery/native-ppt-proof-environment.md`, native helper contracts/source/tests |
-| Three-route AgentLab refs-only boundary | `contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json`, `tests/rca-ppt-three-route-agent-lab-suite.test.ts` |
+| Three-route AgentLab refs-only boundary | `contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json`, `tests/rca-ppt-three-route-agent-lab-suite.test.js` |
 | Production evidence and readiness boundary | `docs/active/rca-ideal-state-gap-plan.md`, `contracts/production_acceptance/rca-production-acceptance.json`, runtime evidence, owner receipts, typed blockers |
 
 ## Historical Read
@@ -46,8 +46,8 @@ For repo-native regression, use current product-entry/route owners:
 
 ```bash
 npm run --silent build
-node --experimental-strip-types --test tests/runtime-deliverable-route-cases/cache-liveness-and-repeat-blocks.test.ts
-node --experimental-strip-types --test tests/rca-ppt-three-route-agent-lab-suite.test.ts
+node --test tests/runtime-deliverable-route-cases/cache-liveness-and-repeat-blocks.test.js
+node --test tests/rca-ppt-three-route-agent-lab-suite.test.js
 ```
 
 These commands are pointers to current machine owners. If they change, update tests/contracts first, then keep this history record as provenance.

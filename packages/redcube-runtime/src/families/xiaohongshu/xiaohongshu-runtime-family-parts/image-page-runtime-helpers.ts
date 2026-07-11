@@ -1,7 +1,6 @@
 // @ts-nocheck
 import path from 'node:path';
 import { createHash } from 'node:crypto';
-import { deflateSync } from 'node:zlib';
 import {
   copyFileSync,
   existsSync,
@@ -10,6 +9,7 @@ import {
   statSync,
 } from 'node:fs';
 import { generateImageViaCodexNativeImagegen } from '../../../executors/codex-caller.js';
+import { solidPngFixture } from '../../../testing/solid-png-fixture.js';
 
 const DEFAULT_IMAGE_MODEL = 'gpt-image-2';
 const DEFAULT_IMAGE_SIZE = '1086x1448';
@@ -35,66 +35,6 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
 
   function sha256(value) {
     return createHash('sha256').update(value).digest('hex');
-  }
-
-  function crc32(buffer) {
-    let crc = 0xffffffff;
-    for (const byte of buffer) {
-      crc ^= byte;
-      for (let bit = 0; bit < 8; bit += 1) {
-        crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
-      }
-    }
-    return (crc ^ 0xffffffff) >>> 0;
-  }
-
-  function pngChunk(type, data) {
-    const typeBuffer = Buffer.from(type, 'ascii');
-    const length = Buffer.alloc(4);
-    length.writeUInt32BE(data.length, 0);
-    const crc = Buffer.alloc(4);
-    crc.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])), 0);
-    return Buffer.concat([length, typeBuffer, data, crc]);
-  }
-
-  function solidPngBuffer(width, height, seed) {
-    const seedHash = createHash('sha256').update(seed).digest();
-    const background = [255, 250, 240];
-    const accent = [seedHash[0], seedHash[1], seedHash[2]].map((value) => 90 + (value % 120));
-    const contentLeft = Math.floor(width * 0.08);
-    const contentRight = Math.floor(width * 0.92);
-    const contentTop = Math.floor(height * 0.08);
-    const contentBottom = Math.floor(height * 0.9);
-    const scanlineLength = 1 + (width * 4);
-    const raw = Buffer.alloc(scanlineLength * height);
-    for (let y = 0; y < height; y += 1) {
-      const rowOffset = y * scanlineLength;
-      raw[rowOffset] = 0;
-      for (let x = 0; x < width; x += 1) {
-        const offset = rowOffset + 1 + (x * 4);
-        const inContent = x >= contentLeft && x <= contentRight && y >= contentTop && y <= contentBottom;
-        const band = inContent && (((x - contentLeft) + Math.floor((y - contentTop) * 0.55)) % 118) < 7;
-        const dot = inContent && (((Math.floor((x - contentLeft) / 42) + Math.floor((y - contentTop) / 58)) % 11) === 0);
-        raw[offset] = band || dot ? accent[0] : background[0];
-        raw[offset + 1] = band || dot ? accent[1] : background[1];
-        raw[offset + 2] = band || dot ? accent[2] : background[2];
-        raw[offset + 3] = 255;
-      }
-    }
-    const ihdr = Buffer.alloc(13);
-    ihdr.writeUInt32BE(width, 0);
-    ihdr.writeUInt32BE(height, 4);
-    ihdr[8] = 8;
-    ihdr[9] = 6;
-    ihdr[10] = 0;
-    ihdr[11] = 0;
-    ihdr[12] = 0;
-    return Buffer.concat([
-      Buffer.from('89504e470d0a1a0a', 'hex'),
-      pngChunk('IHDR', ihdr),
-      pngChunk('IDAT', deflateSync(raw)),
-      pngChunk('IEND', Buffer.alloc(0)),
-    ]);
   }
 
   function pngDimensions(buffer) {
@@ -279,7 +219,7 @@ export function createXiaohongshuImagePageRuntimeHelpers(deps) {
 
   async function callImageGeneration({ config, prompt, toolOptions, route, slideId, imageFile }) {
     if (process.env.REDCUBE_IMAGE_GENERATION_MOCK === '1') {
-      const mockBytes = solidPngBuffer(CANVAS.width, CANVAS.height, `${route}:${slideId}:${prompt}`);
+      const mockBytes = solidPngFixture(CANVAS.width, CANVAS.height, `${route}:${slideId}:${prompt}`);
       return {
         id: `resp_mock_${sha256(`${route}:${slideId}:${prompt}`).slice(0, 16)}`,
         output: [{

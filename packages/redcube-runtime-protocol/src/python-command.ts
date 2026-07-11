@@ -3,7 +3,6 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
 import type {
   ResolvedRedCubePythonCommand,
@@ -15,7 +14,7 @@ export const REDCUBE_PYTHON_COMMAND_ENV = 'REDCUBE_PYTHON_COMMAND';
 const PYTHON_PLAYWRIGHT_PROBE_COMMAND = 'python3';
 const PYTHON_PLAYWRIGHT_PROBE_ARGS = ['-c', 'import sys; import playwright; print(sys.executable)'];
 
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MODULE_DIR = import.meta.dirname;
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../..');
 const PYPROJECT_FILE = path.join(REPO_ROOT, 'pyproject.toml');
 const UV_LOCK_FILE = path.join(REPO_ROOT, 'uv.lock');

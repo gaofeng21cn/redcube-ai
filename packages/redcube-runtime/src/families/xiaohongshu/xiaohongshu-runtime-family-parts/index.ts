@@ -1,6 +1,5 @@
 // @ts-nocheck
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { existsSync } from 'node:fs';
 
 import {
@@ -28,7 +27,7 @@ import { createXiaohongshuRenderParts } from './render.js';
 import { createXiaohongshuReviewParts } from './review.js';
 import { createXiaohongshuDeliveryParts } from './delivery.js';
 
-const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const MODULE_DIR = import.meta.dirname;
 const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../../..');
 const PYTHON_REVIEW = resolvePythonNativeHelper(REPO_ROOT, 'ppt_deck_review');
 const CANVAS = { ratio: '3:4', width: 1086, height: 1448 };

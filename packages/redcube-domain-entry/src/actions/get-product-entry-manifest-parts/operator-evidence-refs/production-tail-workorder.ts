@@ -122,7 +122,7 @@ export function buildProductionEvidenceTailWorkOrder({
           typedBlockerRefs[0],
         ],
         next_verification_command_refs: [
-          'command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+          'command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js',
         ],
         owner_boundary: {
           opl_owner: 'stage_attempt_transport_attempt_refs_and_monitor_freshness_refs',
@@ -154,7 +154,7 @@ export function buildProductionEvidenceTailWorkOrder({
           typedBlockerRefs[1],
         ],
         next_verification_command_refs: [
-          'command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.ts',
+          'command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js',
         ],
         receipt_accounting_refs: {
           observed_receipt_count: workspaceReceiptInventoryProjection?.receipt_counts?.total || 0,
@@ -196,7 +196,7 @@ export function buildProductionEvidenceTailWorkOrder({
           typedBlockerRefs[0],
         ],
         next_verification_command_refs: [
-          'command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/temporal-autonomy-readiness.test.ts tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+          'command:npm run --silent build && node --test tests/product-entry-cases/temporal-autonomy-readiness.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js',
         ],
         temporal_readiness_refs: {
           status: temporalAutonomyReadiness?.status || 'unknown',
@@ -241,7 +241,7 @@ export function buildProductionEvidenceTailWorkOrder({
           typedBlockerRefs[2],
         ],
         next_verification_command_refs: [
-          'command:npm run --silent build && node --experimental-strip-types --test tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+          'command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js',
         ],
         no_regression_ref_accounting: {
           evidence_refs: productionEvidenceScaleoutRefs?.repeated_no_regression_evidence_refs?.evidence_refs || [],

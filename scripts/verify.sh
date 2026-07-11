@@ -7,4 +7,4 @@ fi
 
 lane="${1:-smoke}"
 shift || true
-node --experimental-strip-types scripts/verify-lane.ts "$lane" --verify-wrapper "$@"
+node scripts/verify-lane.ts "$lane" --verify-wrapper "$@"

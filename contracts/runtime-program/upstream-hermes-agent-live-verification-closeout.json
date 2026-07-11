@@ -14,7 +14,7 @@
       "summary": "standard run-test-group live launcher passed /v1/health, /v1/models, /v1/runs, and /v1/runs/{run_id}/events preflight with a terminal run.completed event on the current host",
       "evidence": [
         "npm run test:e2e",
-        "node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'"
+        "node scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'"
       ]
     },
     {
@@ -22,7 +22,7 @@
       "summary": "ppt_deck fresh live e2e passed through screenshot_review, export_pptx, optimize_existing relative review, and shared source-truth proof under upstream Hermes-Agent",
       "evidence": [
         "npm run test:e2e",
-        "tests/ppt-deliverable-e2e.test.ts"
+        "tests/ppt-deliverable-e2e.test.js"
       ]
     },
     {
@@ -30,15 +30,15 @@
       "summary": "xiaohongshu fresh live e2e passed through publish_copy, export_bundle, optimize_existing relative review, and shared source-truth proof under upstream Hermes-Agent",
       "evidence": [
         "npm run test:e2e",
-        "tests/xiaohongshu-deliverable-e2e.test.ts"
+        "tests/xiaohongshu-deliverable-e2e.test.js"
       ]
     },
     {
       "surface": "guarded_poster_onepager.live_integration",
       "summary": "guarded knowledge-poster integration proof passed on the real upstream launcher, including poster_onepager managed execution without drifting direct-delivery truth",
       "evidence": [
-        "node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'",
-        "tests/family-source-truth-consumption.test.ts",
+        "node scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'",
+        "tests/family-source-truth-consumption.test.js",
         "tests/managed-deliverable-execution.test.ts"
       ]
     },
@@ -47,7 +47,7 @@
       "summary": "poster_onepager remained green on the shared runtime route/review/export contract lane while preserving the guarded knowledge-poster boundary",
       "evidence": [
         "npm run test:fast",
-        "tests/runtime-deliverable-route.test.ts"
+        "tests/runtime-deliverable-route.test.js"
       ]
     }
   ],
@@ -61,7 +61,7 @@
     "current_host_python_command": "/opt/homebrew/opt/python@3.14/bin/python3.14",
     "commands": [
       "npm run test:e2e",
-      "node --experimental-strip-types scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'",
+      "node scripts/run-test-group.ts integration --test-name-pattern 'poster_onepager|knowledge-poster'",
       "npm run test:fast"
     ]
   },

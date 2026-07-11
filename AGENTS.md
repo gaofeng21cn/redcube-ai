@@ -94,7 +94,7 @@
 - 项目级 `.runtime-program/` 已退役，不再作为仓库本地控制面。
 - 本地 session、prompt、log、report 与 hook 状态统一迁入用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/`。
 - 任何机器私有 overlay 也只允许放在用户级 runtime-state 根目录下，不进入 repo-tracked 主线。
-- Native PPT 测试使用 `tests/helpers/test-workspace.ts` 创建用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/test-workspaces/` 临时 workspace，以避开 macOS `/private` 授权循环；测试 workspace 必须写入 `.redcube-test-workspace.json` marker，并由 helper 默认清理本进程创建项与过期 marker 目录。需要保留失败现场时显式设置 `REDCUBE_TEST_WORKSPACE_KEEP=1`；不要绕过 helper 直接向该目录长期写入。
+- Native PPT 测试使用 `tests/helpers/test-workspace.js` 创建用户级 `$CODEX_HOME/projects/redcube-ai/runtime-state/test-workspaces/` 临时 workspace，以避开 macOS `/private` 授权循环；测试 workspace 必须写入 `.redcube-test-workspace.json` marker，并由 helper 默认清理本进程创建项与过期 marker 目录。需要保留失败现场时显式设置 `REDCUBE_TEST_WORKSPACE_KEEP=1`；不要绕过 helper 直接向该目录长期写入。
 
 <!-- OPL_FLOW_MANAGED_START -->
 OPL Flow managed surface: repo_agent_instructions

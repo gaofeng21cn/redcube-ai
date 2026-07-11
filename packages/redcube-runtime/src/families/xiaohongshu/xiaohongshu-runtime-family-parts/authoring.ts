@@ -37,6 +37,63 @@ export function createXiaohongshuAuthoringParts(deps) {
     visualDirectionOutputContract,
   } = deps;
 
+  function normalizeStorylineStrategy(data, fallbackMode) {
+    const requestedMode = safeText(data?.mode_decision?.result, data?.mode);
+    const mode = ['single', 'series'].includes(requestedMode) ? requestedMode : fallbackMode;
+    const modeDecision = {
+      result: mode,
+      rationale: normalizeStringList(data?.mode_decision?.rationale, 'storyline.mode_decision.rationale', { min: 3, max: 5 }),
+      thematic_units: normalizeStringList(data?.mode_decision?.thematic_units, 'storyline.mode_decision.thematic_units', { min: 1, max: 12 }),
+    };
+    if (mode !== 'series') {
+      return {
+        mode,
+        modeDecision,
+        seriesArchitecture: {
+          status: 'not_applicable',
+          series_thesis: requireText(data?.series_architecture?.series_thesis, 'storyline.series_architecture.series_thesis'),
+          recommended_note_range: '1',
+          chapters: [],
+          note_briefs: [],
+          publication_arc: [],
+        },
+      };
+    }
+
+    const chapters = requireObjectArray(data?.series_architecture?.chapters, 'storyline.series_architecture.chapters', { min: 2 })
+      .map((chapter, index) => ({
+        chapter_id: requireText(chapter?.chapter_id, `storyline.series_architecture.chapters[${index}].chapter_id`),
+        chapter_role: requireText(chapter?.chapter_role, `storyline.series_architecture.chapters[${index}].chapter_role`),
+        reader_question: requireText(chapter?.reader_question, `storyline.series_architecture.chapters[${index}].reader_question`),
+        topic_units: normalizeStringList(chapter?.topic_units, `storyline.series_architecture.chapters[${index}].topic_units`, { min: 1, max: 8 }),
+        transition: requireText(chapter?.transition, `storyline.series_architecture.chapters[${index}].transition`),
+      }));
+    const noteBriefs = requireObjectArray(data?.series_architecture?.note_briefs, 'storyline.series_architecture.note_briefs', { min: 2 })
+      .map((brief, index) => ({
+        note_id: requireText(brief?.note_id, `storyline.series_architecture.note_briefs[${index}].note_id`),
+        chapter_id: requireText(brief?.chapter_id, `storyline.series_architecture.note_briefs[${index}].chapter_id`),
+        working_title: requireText(brief?.working_title, `storyline.series_architecture.note_briefs[${index}].working_title`),
+        reader_question: requireText(brief?.reader_question, `storyline.series_architecture.note_briefs[${index}].reader_question`),
+        content_scope: requireText(brief?.content_scope, `storyline.series_architecture.note_briefs[${index}].content_scope`),
+        evidence_anchors: normalizeStringList(brief?.evidence_anchors, `storyline.series_architecture.note_briefs[${index}].evidence_anchors`, { min: 1, max: 8 }),
+        estimated_pages: requireText(brief?.estimated_pages, `storyline.series_architecture.note_briefs[${index}].estimated_pages`),
+        transition: requireText(brief?.transition, `storyline.series_architecture.note_briefs[${index}].transition`),
+        no_repeat_scope: normalizeStringList(brief?.no_repeat_scope, `storyline.series_architecture.note_briefs[${index}].no_repeat_scope`, { min: 1, max: 8 }),
+      }));
+    return {
+      mode,
+      modeDecision,
+      seriesArchitecture: {
+        status: 'required',
+        series_thesis: requireText(data?.series_architecture?.series_thesis, 'storyline.series_architecture.series_thesis'),
+        recommended_note_range: requireText(data?.series_architecture?.recommended_note_range, 'storyline.series_architecture.recommended_note_range'),
+        chapters,
+        note_briefs: noteBriefs,
+        publication_arc: normalizeStringList(data?.series_architecture?.publication_arc, 'storyline.series_architecture.publication_arc', { min: 2, max: 12 }),
+      },
+    };
+  }
+
   function buildResearch(contract, adapter = CODEX_DEFAULT_ADAPTER) {
     const references = sourceTruth(contract)
       ? sourceLabels(contract)
@@ -97,9 +154,11 @@ export function createXiaohongshuAuthoringParts(deps) {
       },
       outputContract: storylineOutputContract(),
     });
+    const strategy = normalizeStorylineStrategy(data, safeText(researchArtifact?.research?.mode, 'single'));
     return {
       authoredStoryline: {
-        mode: requireText(data?.mode, 'storyline.mode'),
+        mode: strategy.mode,
+        mode_decision: strategy.modeDecision,
         audience_judgement: requireText(data?.audience_judgement, 'storyline.audience_judgement'),
         tension: requireText(data?.tension, 'storyline.tension'),
         why_now: requireText(data?.why_now, 'storyline.why_now'),
@@ -108,6 +167,7 @@ export function createXiaohongshuAuthoringParts(deps) {
         narrative_progression: normalizeStringList(data?.narrative_progression, 'storyline.narrative_progression', { min: 3, max: 6 }),
         journey: normalizeStringList(data?.journey, 'storyline.journey', { min: 3, max: 5 }),
         resolution: requireText(data?.resolution, 'storyline.resolution'),
+        series_architecture: strategy.seriesArchitecture,
       },
       generationRuntime,
     };
@@ -126,6 +186,7 @@ export function createXiaohongshuAuthoringParts(deps) {
       creative_execution: creativeExecution('storyline', generationRuntime, adapter),
       storyline: {
         mode: safeText(authoredStoryline.mode, research?.research?.mode || 'single'),
+        mode_decision: authoredStoryline.mode_decision,
         audience_judgement: safeText(authoredStoryline.audience_judgement),
         tension: safeText(authoredStoryline.tension),
         why_now: safeText(authoredStoryline.why_now),
@@ -134,7 +195,8 @@ export function createXiaohongshuAuthoringParts(deps) {
         narrative_progression: safeArray(authoredStoryline.narrative_progression),
         journey: safeArray(authoredStoryline.journey),
         resolution: safeText(authoredStoryline.resolution),
-        series_needed: (research?.research?.mode || 'single') === 'series',
+        series_needed: authoredStoryline.mode === 'series',
+        series_architecture: authoredStoryline.series_architecture,
         source_truth_material_ids: safeArray(research?.research?.source_truth_material_ids),
         source_truth_confidence: safeText(research?.research?.confidence),
         creative_sources: {
@@ -266,6 +328,14 @@ export function createXiaohongshuAuthoringParts(deps) {
       .map((slide, index) => normalizePlanSlide(slide, index, sources, generationRuntime, adapter));
     return {
       authoredPlan: {
+        series_context: {
+          mode: safeText(data?.series_context?.mode, storylineArtifact?.storyline?.mode || 'single'),
+          note_id: requireText(data?.series_context?.note_id, 'single_note_plan.series_context.note_id'),
+          series_role: requireText(data?.series_context?.series_role, 'single_note_plan.series_context.series_role'),
+          previous_note: requireText(data?.series_context?.previous_note, 'single_note_plan.series_context.previous_note'),
+          next_note: requireText(data?.series_context?.next_note, 'single_note_plan.series_context.next_note'),
+          no_repeat_scope: normalizeStringList(data?.series_context?.no_repeat_scope, 'single_note_plan.series_context.no_repeat_scope', { min: 1, max: 8 }),
+        },
         title_options: titleOptions,
         slides,
       },
@@ -287,7 +357,8 @@ export function createXiaohongshuAuthoringParts(deps) {
       ...attachCommon('single_note_plan', contract, generationRuntime, adapter),
       creative_execution: creativeExecution('single_note_plan', generationRuntime, adapter),
       single_note_plan: {
-        mode: isSeries(contract) ? 'series' : 'single',
+        mode: safeText(storyline?.storyline?.mode, isSeries(contract) ? 'series' : 'single'),
+        series_context: authoredPlan.series_context,
         title_options: authoredPlan.title_options,
         planning_doc_markdown: ['# 01_单篇策划', '', `- 目标：${contract.goal}`, `- 封面钩子：${authoredPlan.title_options[0] || contract.title}`].join('\n'),
         slides: authoredPlan.slides,

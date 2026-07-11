@@ -1,7 +1,6 @@
 import {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
-  createSurfaceValidators,
   listSurfaceArtifactPaths,
   type SurfaceContract,
   validateBaselinePolicySurface,
@@ -29,7 +28,7 @@ export function listPosterSurfaceArtifactPaths(): PosterSurfaceArtifactPath[] {
   return listSurfaceArtifactPaths(SURFACE_ARTIFACTS) as PosterSurfaceArtifactPath[];
 }
 
-const SURFACE_VALIDATORS = createSurfaceValidators({
+const SURFACE_VALIDATORS = {
   'contracts/stage-sequence.json': (content: SurfaceContract) => Array.isArray(content?.stages)
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'poster_blueprint')
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'visual_director_review'),
@@ -97,7 +96,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
       'visual_director_review',
       'export_bundle',
     ]),
-});
+};
 
 export function validatePosterSurfaceArtifact(
   relativePath: PosterSurfaceArtifactPath,

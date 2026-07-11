@@ -9,7 +9,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 
-import { mkUserScopedTestWorkspace } from '../../tests/helpers/test-workspace.ts';
+import { mkUserScopedTestWorkspace } from '../../tests/helpers/test-workspace.js';
 
 const repoRoot = process.cwd();
 const pythonCommand = process.env.REDCUBE_NATIVE_PPT_PROOF_PYTHON

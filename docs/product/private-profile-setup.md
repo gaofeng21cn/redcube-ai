@@ -90,50 +90,22 @@ Machine boundary: 人读本地配置指南。机器真相继续归 ignored local
 
 这个目录已经在 `.gitignore` 中整体忽略，只保留说明文件和占位文件，因此适合放本机专属配置。
 
-## 从旧工作目录迁移
+## 迁移与备份
 
-如果你已经有一套外部 prompts，可执行：
-
-```bash
-node apps/redcube-cli/dist/cli.js profile \
-  --action bootstrap \
-  --source-dir "/absolute/path/to/your-private-prompts/system/自动小红书"
-```
-
-这会把当前可识别的私有层迁移到 `~/.config/redcube/`。如果你更希望当前项目独立持有作者档案，也可以把迁移结果复制到 `<workspace>/.redcube/`。
-
-## 导出私有层备份
+私有 profile 就是普通目录，不再使用 RCA 专有 bundle 协议。迁移旧 prompts 时直接复制到用户级或 workspace 级配置目录：
 
 ```bash
-node apps/redcube-cli/dist/cli.js profile \
-  --action export \
-  --bundle "~/Downloads/redcube-private-profile.tgz"
+mkdir -p ~/.config/redcube/prompts/aligned
+cp -R "/absolute/path/to/your-private-prompts/system/自动小红书" \
+  ~/.config/redcube/prompts/aligned/
 ```
 
-适合：
-
-- 跨机器迁移
-- 做离线备份
-- 在新电脑上快速恢复
-
-## 在另一台机器安装
+跨机器备份使用平台自带的 `tar`：
 
 ```bash
-node apps/redcube-cli/dist/cli.js profile \
-  --action install \
-  --bundle "~/Downloads/redcube-private-profile.tgz"
+tar -czf ~/Downloads/redcube-private-profile.tgz -C ~/.config redcube
+mkdir -p ~/.config
+tar -xzf ~/Downloads/redcube-private-profile.tgz -C ~/.config
 ```
 
-如果目标位置已有旧内容，可加：
-
-```bash
---force
-```
-
-## 推荐的跨机流程
-
-1. 在旧机器上执行 `profile export`
-2. 在新机器克隆公开仓库并 `npm install`
-3. 在新机器执行 `profile install`
-4. 检查 `~/.config/redcube/runtime.json` 中的工作区路径是否需要按新机器调整
-5. 启动 CLI 或 MCP 验证 prompts 与 identity 是否已生效
+恢复后检查 `runtime.json` 中的绝对路径是否需要按新机器调整，再通过 `redcube profile --action list` 读取当前 profile catalog。覆盖现有目录前自行保留备份；RCA 不再包装复制、覆盖和归档语义。

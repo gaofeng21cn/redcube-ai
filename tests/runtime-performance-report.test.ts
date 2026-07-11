@@ -4,8 +4,8 @@ import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, writeFileSync } from 'node:fs';
 
-import { buildPerformanceReport as buildDomainEntryPerformanceReport } from './product-domain-action-test-api.ts';
-import { buildPerformanceReport } from './package-surfaces.ts';
+import { buildPerformanceReport as buildDomainEntryPerformanceReport } from './product-domain-action-test-api.js';
+import { buildPerformanceReport } from './package-surfaces.js';
 import { executeCli } from '../apps/redcube-cli/dist/index.js';
 
 function writeJson(file: string, value: unknown): void {

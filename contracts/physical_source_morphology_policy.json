@@ -643,7 +643,6 @@
     {
       "surface_id": "visual_authority_functions",
       "source_refs": [
-        "packages/redcube-runtime/src/creative-ownership.ts",
         "packages/redcube-runtime/src/deliverable-routes.ts",
         "packages/redcube-runtime/src/executors/index.ts",
         "packages/redcube-runtime/src/source-intake.ts",
@@ -1033,7 +1032,7 @@
         "python"
       ],
       "helper_ref": "scripts/check-private-platform-retirement.ts#ACTIVE_PRIVATE_PLATFORM_RESURRECTION_CLAIM_PATTERNS",
-      "test_ref": "tests/rca-legacy-name-allowance.test.ts#RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection",
+      "test_ref": "tests/rca-legacy-name-allowance.test.js#RCA source-morphology tail thinning gate prevents runtimeWatch and domain_action_adapter resurrection",
       "forbidden_true_claim_keys": [
         "runtimeWatch_can_return_to_domain_action_adapter_default_dispatch",
         "domain_action_adapter_can_become_generic_dispatch_owner",
@@ -1268,7 +1267,7 @@
       "legacy_name_policy.current_role_guard_policy",
       "legacy_name_policy.forbidden_payload_role_policy"
     ],
-    "checked_source_ref_count": 58,
+    "checked_source_ref_count": 57,
     "checked_machine_boundary_ref_count": 3,
     "checked_source_refs": [
       "agent/",
@@ -1307,7 +1306,6 @@
       "packages/redcube-runtime-protocol/src/executor-runtime.ts",
       "packages/redcube-runtime-protocol/src/runs.ts",
       "packages/redcube-runtime-protocol/src/workspace.ts",
-      "packages/redcube-runtime/src/creative-ownership.ts",
       "packages/redcube-runtime/src/default-registries.ts",
       "packages/redcube-runtime/src/deliverable-routes.ts",
       "packages/redcube-runtime/src/executors/index.ts",

@@ -292,7 +292,7 @@
       "export_behavior": "export_pptx copies the editable native source PPTX when the latest reviewed visual artifact is native PPTX and records operator-facing proof summary, source/final hashes, renderer provenance, shape manifest, repair log, and PNG proof refs"
     },
     "production_hardening": {
-      "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.ts",
+      "live_product_entry_proof": "tests/product-entry-native-ppt-live-proof.test.js",
       "live_product_entry_proof_scope": "product_entry_route_review_export_and_true_render_proof",
       "mock_codex_test_double_policy": {
         "allowed": true,

@@ -26,7 +26,6 @@ import { buildCommandHelp, buildHelp } from './help.js';
 import { buildCliJsonSummary } from './json-summary.js';
 import { parseArgs, resolveWorkspaceRoot } from './options.js';
 import { printJson } from './output.js';
-import { loadPrivateProfileModule } from './private-profile.js';
 import type { CliDependenciesMap, JsonMap } from './types.js';
 
 const DEFAULT_DOMAIN_ACTIONS = {
@@ -207,7 +206,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
   const options = parseArgs(rest);
   const domainEntry = getCliDomainActions(deps.domainActions || {});
   const cwd = deps.cwd || process.cwd;
-  const loadPrivateProfile = deps.loadPrivateProfileModule || loadPrivateProfileModule;
 
   if (!command || command === 'help' || command === '--help') {
     return buildHelp(domainEntry);
@@ -482,34 +480,7 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
       return domainEntry.getOverlayCatalog();
     }
 
-    if (options.action === 'bootstrap') {
-      const { bootstrapPrivateProfile } = await loadPrivateProfile();
-      return bootstrapPrivateProfile({
-        sourceSystemDir: options.sourceDir || '',
-        configHome: options.configHome || '',
-        force: options.force === true,
-      });
-    }
-
-    if (options.action === 'export') {
-      const { exportPrivateProfile } = await loadPrivateProfile();
-      return exportPrivateProfile({
-        configHome: options.configHome || '',
-        bundleFile: options.bundle || '',
-        force: options.force === true,
-      });
-    }
-
-    if (options.action === 'install') {
-      const { installPrivateProfile } = await loadPrivateProfile();
-      return installPrivateProfile({
-        configHome: options.configHome || '',
-        bundleFile: options.bundle || '',
-        force: options.force === true,
-      });
-    }
-
-    throw new Error('profile 命令需要 --action <list|bootstrap|export|install>');
+    throw new Error('profile 命令仅支持 --action list；私有配置迁移与备份使用标准文件操作');
   }
 
   throw new Error(`未知命令: ${command}`);

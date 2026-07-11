@@ -11,7 +11,7 @@
   "connection_proof": {
     "required_runtime_owner": "upstream_hermes_agent",
     "adapter_surface": "@redcube/runtime-protocol Hermes-Agent API client and loop bridge",
-    "probe_script": "node --experimental-strip-types --test tests/runtime-topology-regression.test.ts tests/python-native-helper-catalog.test.ts",
+    "probe_script": "node --test tests/runtime-topology-regression.test.js tests/python-native-helper-catalog.test.js",
     "upstream_launch_command_env": "REDCUBE_HERMES_GATEWAY_COMMAND",
     "python_command_env": "REDCUBE_PYTHON_COMMAND",
     "python_command_probe": "python3 -c \"import sys; import playwright; print(sys.executable)\"",
@@ -32,8 +32,8 @@
       "python3 -c \"import sys; import playwright; print(sys.executable)\"",
       "curl http://127.0.0.1:8642/v1/health",
       "curl http://127.0.0.1:8642/v1/models",
-      "node --experimental-strip-types --test tests/runtime-topology-regression.test.ts",
-      "node --experimental-strip-types --test tests/python-native-helper-catalog.test.ts"
+      "node --test tests/runtime-topology-regression.test.js",
+      "node --test tests/python-native-helper-catalog.test.js"
     ]
   },
   "cutover_scope": {
@@ -74,9 +74,9 @@
     "managed web runtime completion claim"
   ],
   "required_verification": [
-    "node --experimental-strip-types --test tests/runtime-topology-regression.test.ts",
-    "node --experimental-strip-types --test tests/python-native-helper-catalog.test.ts",
-    "node --experimental-strip-types --test tests/upstream-hermes-agent-activation-package.test.ts tests/runtime-deliverable-route.test.ts tests/managed-deliverable-execution.test.ts tests/service-safe-domain-entry.test.ts",
+    "node --test tests/runtime-topology-regression.test.js",
+    "node --test tests/python-native-helper-catalog.test.js",
+    "node --test tests/upstream-hermes-agent-activation-package.test.ts tests/runtime-deliverable-route.test.js tests/managed-deliverable-execution.test.ts tests/service-safe-domain-entry.test.js",
     "npm run test:fast",
     "npm run typecheck"
   ],

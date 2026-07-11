@@ -5,8 +5,7 @@
   "type": "module",
   "types": "./dist/index.d.ts",
   "dependencies": {
-    "@redcube/domain-entry": "0.1.0",
-    "@redcube/redcube-config": "0.1.0"
+    "@redcube/domain-entry": "0.1.0"
   },
   "bin": {
     "redcube": "dist/cli.js"

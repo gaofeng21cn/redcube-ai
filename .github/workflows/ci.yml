@@ -56,13 +56,13 @@ jobs:
         run: npm run typecheck
 
       - name: Run fast tests
-        run: node --experimental-strip-types scripts/run-test-group.ts fast
+        run: node scripts/run-test-group.ts fast
 
       - name: Run family tests
-        run: node --experimental-strip-types scripts/run-test-group.ts family
+        run: node scripts/run-test-group.ts family
 
       - name: Run remaining meta tests
-        run: node --experimental-strip-types scripts/run-test-group.ts meta:ci
+        run: node scripts/run-test-group.ts meta:ci
 
   native-ppt-proof:
     if: >-

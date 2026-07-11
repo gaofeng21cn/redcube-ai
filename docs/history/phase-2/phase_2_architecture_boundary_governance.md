@@ -51,7 +51,7 @@ Machine boundary: 人读历史 tranche brief。当前机器真相继续归 contr
 - 新增 package/layer boundary meta gate：扫描 `apps/*/src` 与 `packages/*/src` 的 `@redcube/*` imports，检查依赖声明和 layer allow matrix。
 - 补齐 `@redcube/runtime` 对 `@redcube/overlay-core` 与 `@redcube/overlay-registry` 的显式依赖声明。
 - 新增 nested-test registration gate：扫描 `tests/**/*.test.ts`，要求嵌套 case 可从根级测试显式 import 到达。
-- 补挂已存在但未执行的 `tests/cli-v2-smoke-cases/cli-summary-output.test.ts`。
+- 补挂已存在但未执行的 `tests/cli-v2-smoke-cases/cli-summary-output.test.js`。
 - 抽出 Codex runtime topology authority：`runtime-protocol` 持有默认 topology builder，`overlay-core` 不再依赖旧 runtime substrate package，退役 runtime package 只作为历史迁移背景保留。
 - 收口 pack provenance 命名：`ppt`、`xiaohongshu`、`poster_onepager` pack type 层只表达 prompt-pack seed / runtime artifact provenance，不再编码 executor owner 字符串；`pack-first-completion` 增加 pack 源码扫描 gate。
 

@@ -1,7 +1,6 @@
 import {
   buildSurfaceArtifactSpecs,
   buildSurfaceBundle,
-  createSurfaceValidators,
   listSurfaceArtifactPaths,
   type SurfaceContract,
   validateBaselinePolicySurface,
@@ -31,7 +30,7 @@ export function listXiaohongshuSurfaceArtifactPaths(): XiaohongshuSurfaceArtifac
   return listSurfaceArtifactPaths(SURFACE_ARTIFACTS) as XiaohongshuSurfaceArtifactPath[];
 }
 
-const SURFACE_VALIDATORS = createSurfaceValidators({
+const SURFACE_VALIDATORS = {
   'contracts/stage-sequence.json': (content: SurfaceContract) =>
     Array.isArray(content?.stages)
     && content.stages.some((stage: SurfaceContract) => stage?.stage_id === 'single_note_plan')
@@ -94,7 +93,7 @@ const SURFACE_VALIDATORS = createSurfaceValidators({
       'visual_director_review',
       'series_publish_cadence',
     ]),
-});
+};
 
 export function validateXiaohongshuSurfaceArtifact(
   relativePath: XiaohongshuSurfaceArtifactPath,

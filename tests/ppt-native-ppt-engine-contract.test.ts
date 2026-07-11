@@ -5,8 +5,8 @@ import path from 'node:path';
 import {
   nativeEngineContract,
   readJson,
-} from './helpers/ppt-native-ppt-runtime-fixtures.ts';
-import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
+} from './helpers/ppt-native-ppt-runtime-fixtures.js';
+import { readCurrentProgramContract } from './helpers/current-program-contract.js';
 
 test('native PPT proof lane records the Python engine contract as the single ownership source', () => {
   const engineContract = nativeEngineContract();

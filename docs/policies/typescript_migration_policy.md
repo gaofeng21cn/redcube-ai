@@ -11,16 +11,16 @@ Machine boundary: 人读实现语言 policy。机器真相继续归 source、pac
 
 - 新代码默认使用 TypeScript
 - 新增实现默认走 TypeScript；Office/PPT/document native helper 默认走 repo-owned Python helper
-- Agent-facing prompt、skill descriptor 与安装器输出必须把 `TypeScript + Python` 写成默认实现面，并明确 repo-tracked JavaScript 已退役
+- Agent-facing prompt、skill descriptor 与安装器输出必须把 `TypeScript + Python` 写成默认产品实现面，并明确 `apps/`、`packages/` 下的 repo-tracked JavaScript 已退役
 - 不做一次性全仓重写
-- 旧 JS 迁移窗口已关闭；仓内已跟踪 JavaScript 维持零文件预算
+- 旧产品 JS 迁移窗口已关闭；`apps/`、`packages/` 下已跟踪 JavaScript 维持零文件预算
 - 不允许把迁移做成“后缀变了，但导出 surface 仍然是 `any`”
 
 ## JS 例外登记 / JS Exception Registration
 
-- Repo-tracked JavaScript residue is retired and must remain at zero files.
-- New `.js`, `.mjs`, or `.cjs` files under product, test, script, or proof-helper surfaces make the TypeScript closeout audit fail closed.
-- `contracts/runtime-program/js-residue-line-lock.json` locks product-source JS at zero files and zero lines.
+- Repo-tracked product JavaScript under `apps/` and `packages/` is retired and must remain at zero files.
+- New `.js`, `.mjs`, or `.cjs` files under `apps/` or `packages/` make the TypeScript closeout audit fail closed.
+- Tests may use native Node.js `.js` syntax; TypeScript test files remain first-class only where type-level contracts or typed fixtures require them. The test registry owns that mixed JS/TS partition.
 - Any new implementation must land in TypeScript, or in Python-owned native helper surfaces when the work is Office/PPT/document automation.
 
 ## 编译与模块策略

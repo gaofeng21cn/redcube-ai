@@ -7,19 +7,18 @@ import {
   stageFolderArtifactPath,
   stageOrderForCanonicalStage,
 } from '@redcube/runtime-protocol';
+import { readJson, writeJson } from '../../../runtime-utils.js';
 
-export function safeText(value, fallback = '') {
+function safeText(value, fallback = '') {
   const text = String(value ?? '').replace(/\uFFFD+/g, '').trim();
   return text || fallback;
 }
 
+export { safeText as pptSafeText };
+
 function ensureDir(dir) {
   mkdirSync(dir, { recursive: true });
   return dir;
-}
-
-function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 export function createPptDeckCoreHelpers({
@@ -113,11 +112,6 @@ export function createPptDeckCoreHelpers({
       .replaceAll('__REDCUBE_RENDER_STRATEGY__', escapeHtml(renderStrategy.replaceAll('_', '-')))
       .replaceAll('__REDCUBE_RENDER_PLAN__', escapeHtml(JSON.stringify(renderPlan)))
       .replaceAll('__PPT_DECK_SLIDES_DATA__', slidesLiteral);
-  }
-
-  function writeJson(file, data) {
-    ensureDir(path.dirname(file));
-    writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
   }
 
   function writeText(file, content) {

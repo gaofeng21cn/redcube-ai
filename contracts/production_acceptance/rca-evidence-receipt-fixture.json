@@ -324,7 +324,7 @@
       "source_contract": "rca.temporal_controlled_visual_stage_long_soak.v1",
       "next_required_owner_action": "run_temporal_controlled_visual_stage_long_soak_or_emit_rca_refs_only_evidence",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
+        "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js",
         "command:npm run test:fast"
       ]
     }
@@ -369,7 +369,7 @@
         "typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
         "typed_blocker_kind": "controlled_visual_soak_runtime_evidence_pending",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
+          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js",
           "command:npm run test:fast"
         ]
       },
@@ -378,7 +378,7 @@
         "typed_blocker_ref": "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending",
         "typed_blocker_kind": "real_memory_lifecycle_receipt_instances_pending",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
+          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js",
           "command:npm run test:fast"
         ]
       },
@@ -387,7 +387,7 @@
         "typed_blocker_ref": "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending",
         "typed_blocker_kind": "cross_family_repeated_no_regression_evidence_pending",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --experimental-strip-types --test tests/rca-production-acceptance.test.ts",
+          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js",
           "command:npm run test:fast"
         ]
       }

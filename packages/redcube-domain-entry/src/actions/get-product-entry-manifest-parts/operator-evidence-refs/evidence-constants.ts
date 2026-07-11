@@ -74,8 +74,8 @@ export const RCA_EFFICIENCY_PATCH_TRACEABILITY_MATRIX = Object.freeze([
     proposed_change_ref: 'target_agent_regression_suite_ref:target_agent/owner-boundary',
     target_surface: 'target_agent_regression_suite_ref',
     target_repo_refs: [
-      'tests/rca-efficiency-handoff-projection.test.ts',
-      'tests/product-entry-cases/evidence-scaleout-surfaces.test.ts',
+      'tests/rca-efficiency-handoff-projection.test.js',
+      'tests/product-entry-cases/evidence-scaleout-surfaces.test.js',
     ],
     verifies_ref: 'target-verification:redcube-ai/targeted-efficiency-tests',
     refs_only: true,

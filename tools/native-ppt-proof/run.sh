@@ -139,7 +139,7 @@ fs.writeFileSync(manifestReport, `${JSON.stringify(manifest, null, 2)}\n`);
 fs.writeFileSync(statusReport, `${JSON.stringify(status, null, 2)}\n`);
 NODE
 
-node --experimental-strip-types tools/native-ppt-proof/build-fixture-input.ts \
+node tools/native-ppt-proof/build-fixture-input.ts \
   "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
   "$fixture_input" \
   "$suite_id"
@@ -162,7 +162,7 @@ PYTHONPATH="$repo_root/python${PYTHONPATH:+:$PYTHONPATH}" \
     --pretty \
     > "$package_readback_report"
 
-if ! node --experimental-strip-types tools/native-ppt-proof/evaluate-quality.ts \
+if ! node tools/native-ppt-proof/evaluate-quality.ts \
   --fixture "$repo_root/tests/fixtures/ppt-native-visual-benchmark/benchmark.json" \
   --suite-id "$suite_id" \
   --package-readback "$package_readback_report" \

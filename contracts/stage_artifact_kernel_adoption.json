@@ -11,7 +11,7 @@
   "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
   "conformance_validator": {
     "surface_kind": "rca_stage_artifact_kernel_adoption_conformance_validator",
-    "validator_ref": "tests/opl-family-contract-adoption.test.ts",
+    "validator_ref": "tests/opl-family-contract-adoption.test.js",
     "test_name": "RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint",
     "validates": [
       "root_contract_discoverability",

@@ -2,8 +2,6 @@
 import path from 'node:path';
 import {
   existsSync,
-  readFileSync,
-  writeFileSync,
 } from 'node:fs';
 
 import {
@@ -12,16 +10,13 @@ import {
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
 import { ensureWorkspaceXiaohongshuAuthorTemplate } from '@redcube/redcube-config/xiaohongshu-author-profile';
-import { ensureDir, safeText } from '../runtime-utils.js';
+import { ensureDir, readJson, safeText, writeJson } from '../runtime-utils.js';
 
-export function writeJson(file, value) {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
+export { writeJson };
 
 export function readJsonIfExists(file) {
   if (!existsSync(file)) return null;
-  return JSON.parse(readFileSync(file, 'utf-8'));
+  return readJson(file);
 }
 
 function buildTopicRecord(topicId, title) {

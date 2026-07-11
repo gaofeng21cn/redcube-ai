@@ -135,7 +135,7 @@ export const RCA_PACKAGE_DISTRIBUTION_GATE = Object.freeze({
   external_runtime_authority_allowed: false,
 });
 
-export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
+const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'prompt_refs',
   'skill_refs',
   'tool_refs',
@@ -148,7 +148,7 @@ export const RCA_COGNITIVE_STAGE_PACK_REQUIRED_SECTIONS = Object.freeze([
   'handoff_policy',
 ]);
 
-export const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
+const RCA_DOMAIN_TOOL_AFFORDANCE_REF = Object.freeze({
   ref: 'agent/tools/domain_affordances.md',
   ref_kind: 'repo_path',
   role: 'domain_tool_affordance_catalog',
@@ -345,6 +345,7 @@ export const RCA_REQUIRED_DOMAIN_PACK_PATHS = Object.freeze([
   'agent/skills/visual_deliverable_authoring.md',
   'agent/skills/native_helper_policy.md',
   'agent/skills/visual_memory_policy.md',
+  'agent/professional_skills/rca-xhs-content-strategist/SKILL.md',
   'agent/professional_skills/rca-ppt-story-architect/SKILL.md',
   'agent/professional_skills/rca-ppt-visual-director/SKILL.md',
   'agent/professional_skills/rca-ppt-page-author/SKILL.md',

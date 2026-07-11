@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { safeText } from './ppt-deck-runtime-family-parts/core-helpers.js';
+import { pptSafeText as safeText } from './ppt-deck-runtime-family-parts/core-helpers.js';
 
 function safeArray(value) {
   return Array.isArray(value) ? value : [];

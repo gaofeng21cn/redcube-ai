@@ -12,7 +12,7 @@ Machine boundary: `agent/` 持有 stage semantics、prompt policy refs、stage s
 ## Stage Prompt / Skill / Tool 分工
 
 - `agent/prompts/*.md` 是 stage operating surface：它说明每个 stage 应该做什么、读取哪些 source / prior stage refs、返回哪些 receipts / refs / typed blockers / repair targets。Stage prompt 不沉淀跨 stage 的专业方法，也不物化文件。
-- Professional specialist skill 是 repo-local reusable professional method：story architecture、visual direction、page authoring、review、visual memory curation、native PPT design、template profiling 等方法可以被多个 stage 调用。它不创建新外部 repo、新外部产品或第二套 public skill。
+- Professional specialist skill 是 repo-local reusable professional method：PPT story architecture、Xiaohongshu content/series strategy、visual direction、page authoring、review、visual memory curation、native PPT design、template profiling 等方法可以被多个 stage 调用。它不创建新外部 repo、新外部产品或第二套 public skill。
 - Tool/helper 是 materialization / validation / export surface：Codex-native imagegen、screenshot/render、Office / PPT helper、manifest / locator / export helper 只负责生成、渲染、校验、导出和返回 evidence refs。工具不是 skill，也不授权 visual truth、review/export verdict 或 owner receipt。
 - `agent/skills/*.md` 是旧 stage skill policy refs：它们只约束 stage 如何使用 authoring、native helper 和 visual memory policy；它们不是 standalone Codex professional skills。`agent/skills/visual_memory_policy.md` 只声明 stage behavior policy，visual memory proposal / accept-reject review / writeback lifecycle 的专业方法入口是 `agent/professional_skills/rca-visual-memory-curator/SKILL.md`。
 

@@ -9,6 +9,9 @@ import {
   stageFolderArtifactPath,
   stageOrderForCanonicalStage,
 } from '@redcube/runtime-protocol';
+import { readJson, writeJson } from '../../../runtime-utils.js';
+
+export { readJson, writeJson };
 
 export function safeText(value, fallback = '') {
   const text = String(value || '').trim();
@@ -64,18 +67,9 @@ export function promoteStableView(paths, htmlFile, slidesFile) {
   return refs;
 }
 
-export function writeJson(file, value) {
-  ensureDir(path.dirname(file));
-  writeFileSync(file, JSON.stringify(value, null, 2), 'utf-8');
-}
-
 export function writeText(file, value) {
   ensureDir(path.dirname(file));
   writeFileSync(file, value, 'utf-8');
-}
-
-export function readJson(file) {
-  return JSON.parse(readFileSync(file, 'utf-8'));
 }
 
 export function stageArtifactPath(contract, deliverablePaths, stageId) {

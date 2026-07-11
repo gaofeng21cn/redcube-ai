@@ -9,10 +9,6 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./private-profile": {
-      "types": "./dist/private-profile.d.ts",
-      "default": "./dist/private-profile.js"
-    },
     "./xiaohongshu-author-profile": {
       "types": "./dist/xiaohongshu-author-profile.d.ts",
       "default": "./dist/xiaohongshu-author-profile.js"

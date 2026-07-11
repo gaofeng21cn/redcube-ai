@@ -300,7 +300,7 @@
     "production_hardening": {
       "live_product_entry_proof": {
         "status": "landed",
-        "test": "tests/product-entry-native-ppt-live-proof.test.ts",
+        "test": "tests/product-entry-native-ppt-live-proof.test.js",
         "route_chain": [
           "source_readiness",
           "create_deliverable",

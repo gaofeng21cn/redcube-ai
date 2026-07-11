@@ -23,17 +23,6 @@ export {
   selectCandidateRaceWinner,
 } from './candidate-racing.js';
 export {
-  P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
-  P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
-  P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
-  P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
-  P19_RESEARCH_OWNERSHIP_CONTRACT,
-  P19_REVIEW_OVERLAY_CONTRACT,
-  P19_TEAM_GATE_CONTRACT,
-  P19_UNIFIED_LIFECYCLE_CONTRACT,
-  buildCreativeOwnershipResidueAudit,
-} from './creative-ownership.js';
-export {
   getDefaultOverlayCatalog,
   getDefaultOverlayRegistry,
   listDefaultRuntimeFamilyModules,
@@ -195,15 +184,6 @@ export {
 
 export type {
   RuntimeCompleteRunRequest,
-  RuntimeCreativeOwnershipAudit,
-  RuntimeCreativeOwnershipCloseoutAudit,
-  RuntimeCreativeOwnershipExecutionContract,
-  RuntimeCreativeOwnershipForbiddenBoundaries,
-  RuntimeCreativeOwnershipLifecycleContract,
-  RuntimeCreativeOwnershipProgramCloseout,
-  RuntimeCreativeOwnershipProgramStatus,
-  RuntimeCreativeOwnershipResearchOwnershipContract,
-  RuntimeCreativeOwnershipReviewOverlayContract,
   RuntimeEventRecord,
   RuntimeFailRunRequest,
   RuntimeRunRecord,

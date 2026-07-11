@@ -54,24 +54,6 @@ export interface RedcubeRuntimeConfig {
   configDirs: RedcubeRuntimeConfigDirs;
 }
 
-export interface RedcubePrivateProfileOptions {
-  configHome?: string;
-  env?: Record<string, string | undefined>;
-  homeDir?: string;
-  force?: boolean;
-  sourceSystemDir?: string;
-  bundleFile?: string;
-}
-
-export interface RedcubePrivateProfileResult {
-  ok: true;
-  configHome: string;
-  promptsDir?: string;
-  sourceSystemDir?: string;
-  profiles?: string[];
-  bundleFile?: string;
-}
-
 export interface RedcubeWorkspaceAuthorTemplateRequest {
   workspaceRoot: string;
 }

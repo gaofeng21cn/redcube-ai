@@ -50,7 +50,7 @@
       "publish_copy",
       "export_bundle"
     ],
-    "proof_test_ref": "tests/rca-goal-workflow-agent-lab-suite.test.ts#artifact-producing-xiaohongshu-export-bundle",
+    "proof_test_ref": "tests/rca-goal-workflow-agent-lab-suite.test.js#artifact-producing-xiaohongshu-export-bundle",
     "expected_files": [
       "artifacts/image_pages/author_image_pages/N01.png",
       "publish/screenshots/N01.png",
@@ -64,7 +64,7 @@
       "executor_task_surface": "codex_native_imagegen_skill",
       "explicit_provider_token_required": false,
       "provider_token_source": "codex_executor_native_tool",
-      "proof_test_ref": "tests/codex-executor-adapter.test.ts#generateImageViaCodexNativeImagegen",
+      "proof_test_ref": "tests/codex-executor-adapter.test.js#generateImageViaCodexNativeImagegen",
       "live_sample_requirement": "run Codex executor imagegen probe when visual quality, not CI plumbing, must be proven"
     },
     "proves_artifact_export_chain": true,
@@ -181,7 +181,7 @@
         ],
         "file_refs": [
           "contracts/production_acceptance/rca-goal-workflow-agent-lab-suite.json",
-          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+          "tests/rca-goal-workflow-agent-lab-suite.test.js"
         ],
         "subagent_refs": [
           "subagent-ref:codex/rca-goal-workflow-executor"
@@ -190,7 +190,7 @@
           "worktree-ref:codex/rca-goal-workflow-suite"
         ],
         "test_refs": [
-          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+          "tests/rca-goal-workflow-agent-lab-suite.test.js"
         ],
         "web_source_refs": [],
         "typed_blocker_refs": [
@@ -263,7 +263,7 @@
           "quality-scorecard:rca/goal-workflow/minimal-autonomous-visual-delivery"
         ],
         "regression_suite_refs": [
-          "tests/rca-goal-workflow-agent-lab-suite.test.ts"
+          "tests/rca-goal-workflow-agent-lab-suite.test.js"
         ],
         "no_forbidden_write_proof_refs": [
           "no-forbidden-write:rca/goal-workflow/agent-lab-suite-refs-only"

@@ -33,8 +33,8 @@ Machine boundary: 人读历史 brief。当前机器真相继续归 contracts、s
 ```bash
 hermes gateway run -q
 REDCUBE_HERMES_GATEWAY_COMMAND='<known-good upstream gateway launch command>' scripts/verify.sh integration
-node --experimental-strip-types --test tests/runtime-topology-regression.test.ts
-node --experimental-strip-types --test tests/python-native-helper-catalog.test.ts
+node --test tests/runtime-topology-regression.test.js
+node --test tests/python-native-helper-catalog.test.js
 ```
 
 这些命令是 2026-04-12 proof provenance，不是当前默认验证入口。若后续需要重新证明 Hermes-Agent backend、executor adapter 或 Python helper path，必须从当前 contracts/source/tests 和 fresh environment truth 重建验证。

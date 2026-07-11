@@ -34,17 +34,12 @@ import {
   buildOplRouteAttemptIndexForTest,
   runDeliverableRoute,
 } from './helpers/route-attempt-test-api.ts';
-import { completeSourceReadiness } from './helpers/complete-source-readiness.ts';
-import {
-  assertReceiptOnlyHostedAttemptProjection as assertReceiptOnlyHostedAttemptProjectionImpl,
-  buildHostedAttemptBridgeFixture as buildHostedAttemptBridgeFixtureImpl,
-  reconcileHostedAttemptReceipt as reconcileHostedAttemptReceiptImpl,
-} from './helpers/hosted-attempt-reconciliation.ts';
+import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import {
   startMockCodexCli,
   withEnv,
-} from './helpers/mock-codex-cli.ts';
-import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.ts';
+} from './helpers/mock-codex-cli.js';
+import { assertWorkspaceGitBoundary } from './helpers/workspace-git-boundary.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
@@ -53,7 +48,7 @@ function readJson(file) {
 const MOCK_REDCUBE_PYTHON_COMMAND = JSON.stringify([
   process.execPath,
   '--experimental-strip-types',
-  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.ts', import.meta.url)),
+  fileURLToPath(new URL('./helpers/mock-redcube-python-with-playwright.js', import.meta.url)),
 ]);
 const DOMAIN_ENTRY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-domain-entry/package.json', import.meta.url),
@@ -99,18 +94,6 @@ async function getDomainActionAdapterGuardedActionMetadata() {
     forbiddenWrites: module.listDomainActionAdapterForbiddenWrites(),
     blockedActions: module.listDomainActionAdapterBlockedActions(),
   };
-}
-
-async function buildHostedAttemptBridgeFixture(request) {
-  return buildHostedAttemptBridgeFixtureImpl(request);
-}
-
-async function reconcileHostedAttemptReceipt(request) {
-  return reconcileHostedAttemptReceiptImpl(request);
-}
-
-async function assertReceiptOnlyHostedAttemptProjection(projection) {
-  return assertReceiptOnlyHostedAttemptProjectionImpl(projection);
 }
 
 async function withMockCodexRuntimeState(testFn) {
@@ -272,10 +255,8 @@ export {
   SERIAL_ENV_TEST,
   assert,
   assertFamilyOrchestrationCompanion,
-  assertReceiptOnlyHostedAttemptProjection,
   assertWorkspaceGitBoundary,
   buildAugmentationResultPayload,
-  buildHostedAttemptBridgeFixture,
   buildOplGeneratedProductSessionForTest,
   buildOplRouteAttemptIndexForTest,
   chmodSync,
@@ -304,7 +285,6 @@ export {
   prepareSourceAugmentationResult,
   readFileSync,
   readJson,
-  reconcileHostedAttemptReceipt,
   researchSource,
   runDeliverableRoute,
   test,

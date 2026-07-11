@@ -3,7 +3,6 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
-import { fileURLToPath } from 'node:url';
 
 import {
   assertCurrentRepoSharedPinAlignment,
@@ -12,8 +11,6 @@ import {
   assertWorkspacePackageResolution,
   buildNodeTestArgs,
   discoverRootTestFiles,
-  parseRunTestGroupArgs,
-  selectGroupFiles,
   resolveRedCubePythonCommand,
 } from './run-test-group-lib.ts';
 import {
@@ -28,7 +25,7 @@ import {
   readCodexCliContract,
 } from '@redcube/runtime';
 
-const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
@@ -142,26 +139,15 @@ function assertPartition() {
 function printUsage() {
   const groupNames = Object.keys(GROUPS).join('|');
   process.stdout.write([
-    `用法: node --experimental-strip-types scripts/run-test-group.ts <${groupNames}> [--files tests/a.test.ts,tests/b.test.ts] [node --test 参数]`,
-    '示例: node --experimental-strip-types scripts/run-test-group.ts smoke --test-reporter=dot',
-    '示例: node --experimental-strip-types scripts/run-test-group.ts full --test-reporter=dot',
-    '示例: node --experimental-strip-types scripts/run-test-group.ts full:with-historical --test-reporter=dot',
-    '示例: node --experimental-strip-types scripts/run-test-group.ts full:remaining --test-reporter=dot',
-    '示例: node --experimental-strip-types scripts/run-test-group.ts integration:remaining --test-reporter=dot',
-    '示例: node --experimental-strip-types scripts/run-test-group.ts integration --files tests/source-intake.test.ts --test-reporter=dot',
+    `用法: node scripts/run-test-group.ts <${groupNames}> [tests/example.test.js] [node --test 参数]`,
+    '示例: node scripts/run-test-group.ts smoke --test-reporter=dot',
+    '示例: node scripts/run-test-group.ts integration tests/source-intake.test.js --test-reporter=dot',
   ].join('\n'));
 }
 
-let parsedArgs;
-try {
-  parsedArgs = parseRunTestGroupArgs(process.argv.slice(2));
-} catch (error) {
-  process.stderr.write(`${error.message}\n`);
-  printUsage();
-  process.exit(1);
-}
-
-const { groupName, forwardedArgs, requestedFiles } = parsedArgs;
+const [groupName, ...rawArgs] = process.argv.slice(2);
+const requestedFiles = rawArgs.filter((arg) => /^tests\/[^/]+\.test\.(?:js|ts)$/.test(arg));
+const forwardedArgs = rawArgs.filter((arg) => !requestedFiles.includes(arg));
 
 if (!groupName || !Object.hasOwn(GROUPS, groupName)) {
   printUsage();
@@ -173,11 +159,11 @@ for (const [name, files] of Object.entries(GROUPS)) {
 }
 assertPartition();
 
-const selectedFiles = selectGroupFiles({
-  groupName,
-  groupFiles: GROUPS[groupName],
-  requestedFiles,
-});
+const missingRequestedFiles = requestedFiles.filter((file) => !GROUPS[groupName].includes(file));
+if (missingRequestedFiles.length > 0) {
+  throw new Error(`${groupName} 分组不包含请求的测试文件: ${missingRequestedFiles.join(', ')}`);
+}
+const selectedFiles = requestedFiles.length > 0 ? requestedFiles : GROUPS[groupName];
 await prepareSerializedVerification(groupName);
 const executionPlan = partitionTestFilesForExecution({
   groupName,
@@ -207,28 +193,6 @@ function runNodeTestBatch({ label, files, serialized }) {
   return result.status ?? 1;
 }
 
-function runSerializedNodeTestFiles({ label, files }) {
-  if (files.length === 0) {
-    return 0;
-  }
-
-  process.stdout.write(
-    `[run-test-group] ${groupName} ${label}: ${files.length} files (one process per file)\n`,
-  );
-
-  for (const file of files) {
-    const status = runNodeTestBatch({
-      label: `${label}: ${file}`,
-      files: [file],
-      serialized: true,
-    });
-    if (status !== 0) {
-      return status;
-    }
-  }
-  return 0;
-}
-
 const parallelStatus = runNodeTestBatch({
   label: 'parallel batch',
   files: executionPlan.parallel_files,
@@ -238,8 +202,9 @@ if (parallelStatus !== 0) {
   process.exit(parallelStatus);
 }
 
-const serializedStatus = runSerializedNodeTestFiles({
+const serializedStatus = runNodeTestBatch({
   label: 'serialized route-heavy batch',
   files: executionPlan.serialized_files,
+  serialized: true,
 });
 process.exit(serializedStatus);

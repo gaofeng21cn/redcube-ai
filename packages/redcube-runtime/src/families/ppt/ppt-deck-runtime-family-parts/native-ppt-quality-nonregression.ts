@@ -1,4 +1,4 @@
-import { safeText } from './core-helpers.js';
+import { pptSafeText as safeText } from './core-helpers.js';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';

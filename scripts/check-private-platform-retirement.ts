@@ -44,13 +44,13 @@ const TEXT_EXTENSIONS = new Set([
 ]);
 const RETIRED_SURFACE_GUARD_EXEMPT_FILES = new Set([
   'scripts/check-private-platform-retirement.ts',
-  'tests/helpers/rca-retired-surface-guard.ts',
-  'tests/rca-retired-surface-active-guard.test.ts',
-  'tests/rca-opl-generic-primitive-consumption.test.ts',
-  'tests/rca-functional-audit-retirement.test.ts',
-  'tests/rca-legacy-name-allowance.test.ts',
-  'tests/rca-retired-payload-pointer-guard.test.ts',
-  'tests/python-native-helper-catalog.test.ts',
+  'tests/helpers/rca-retired-surface-guard.js',
+  'tests/rca-retired-surface-active-guard.test.js',
+  'tests/rca-opl-generic-primitive-consumption.test.js',
+  'tests/rca-functional-audit-retirement.test.js',
+  'tests/rca-legacy-name-allowance.test.js',
+  'tests/rca-retired-payload-pointer-guard.test.js',
+  'tests/python-native-helper-catalog.test.js',
 ]);
 
 function readJson(relativePath) {

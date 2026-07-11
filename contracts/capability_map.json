@@ -13,11 +13,12 @@
     "contracts/stage_control_plane.json#/professional_skill_refs",
     "contracts/standard-agent-principles-adoption.json#/module_organization/professional_skill_surfaces",
     "agent/professional_skills/*/SKILL.md",
+    "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
     "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-    "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+    "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
     "contracts/capability_map.json#/dry_run_token_mapping_check",
     "contracts/agent_lab_handoff.json#/dry_run_token_mapping_check",
-    "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+    "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
     "agent/professional_skills/*/resources/minimal-resource-pack.md",
     "docs/policies/visual_pattern_memory_policy.md",
     "agent/skills/visual_memory_policy.md",
@@ -59,7 +60,7 @@
     "old_entry_policy": "No tombstone is needed because rca-template-profiler remains active. If retired later, keep only a thin redirect to the surviving owner and preserve this rationale."
   },
   "skill_local_resource_pack": {
-    "pack_kind": "rca_ppt_professional_skill_local_resource_pack",
+    "pack_kind": "rca_professional_skill_local_resource_pack",
     "pack_root_ref": "agent/professional_skills/",
     "refs_only": true,
     "resource_roles": [
@@ -81,6 +82,24 @@
     ]
   },
   "feedback_token_index": {
+    "xhs_content_strategy": {
+      "canonical_capability_ids": [
+        "rca-xhs-content-strategist"
+      ],
+      "owner_stage_refs": [
+        "communication_strategy"
+      ],
+      "default_patch_surface_hint": "Patch single/series mode judgment, audience framing, medical content discipline, or the single-note handoff before visual direction."
+    },
+    "xhs_series_architecture": {
+      "canonical_capability_ids": [
+        "rca-xhs-content-strategist"
+      ],
+      "owner_stage_refs": [
+        "communication_strategy"
+      ],
+      "default_patch_surface_hint": "Patch chapter roles, non-overlapping note briefs, evidence anchors, page estimates, transitions, or publication arc before planning individual notes."
+    },
     "storyline": {
       "canonical_capability_ids": [
         "rca-ppt-story-architect"
@@ -451,6 +470,107 @@
       }
     },
     {
+      "capability_id": "rca-xhs-content-strategist",
+      "surface_role": "professional_skill",
+      "capability_kind": "professional_skill",
+      "canonical_owner": "redcube_ai",
+      "physical_source_ref": {
+        "ref_kind": "repo_path",
+        "ref": "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
+        "role": "repo_local_professional_skill_source"
+      },
+      "runtime_projection_refs": [
+        {
+          "ref_kind": "repo_path",
+          "ref": "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
+          "role": "codex_skill_guidance_source"
+        },
+        {
+          "ref_kind": "contract_ref",
+          "ref": "contracts/capability_map.json#/feedback_token_index",
+          "role": "rca_feedback_target_mapping"
+        }
+      ],
+      "sync_policy": "repo_local_default",
+      "externalization_reason": "Xiaohongshu content and series strategy is an AI-first RCA professional method; runtime code may inject, validate, and persist it but cannot author the strategy.",
+      "improvement_tokens": [
+        "xhs_content_strategy",
+        "xhs_series_architecture",
+        "single_series_mode",
+        "note_responsibility",
+        "medical_content_framing",
+        "cross_note_continuity"
+      ],
+      "canonical_paths": [
+        "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
+        "agent/professional_skills/rca-xhs-content-strategist/resources/minimal-resource-pack.md",
+        "agent/prompts/communication_strategy.md",
+        "prompts/xiaohongshu/storyline.md",
+        "prompts/xiaohongshu/series_plan.md",
+        "prompts/xiaohongshu/single_note_plan.md",
+        "contracts/stage_control_plane.json"
+      ],
+      "authority_boundary": {
+        "refs_only": true,
+        "can_write_domain_truth": false,
+        "can_write_memory_body": false,
+        "can_mutate_artifact_body": false,
+        "can_sign_owner_receipt": false,
+        "can_create_typed_blocker": false,
+        "can_authorize_quality_or_export": false,
+        "can_claim_domain_ready": false,
+        "can_claim_production_ready": false,
+        "can_write_visual_truth_artifact": false,
+        "can_write_export_or_quality_verdict": false,
+        "rca_owner_receipt_or_typed_blocker_required": true
+      },
+      "stage_refs": [
+        "communication_strategy"
+      ],
+      "verification_refs": [
+        "contracts/capability_map.json#/capabilities/rca-xhs-content-strategist",
+        "contracts/capability_map.json#/feedback_token_index/xhs_content_strategy",
+        "contracts/capability_map.json#/feedback_token_index/xhs_series_architecture",
+        "contracts/capability_map.json#/skill_local_resource_pack",
+        "tests/codex-executor-adapter.test.js#buildGenerationInput includes the Xiaohongshu content strategist for story planning routes",
+        "tests/xiaohongshu-creative-ownership.test.js#xiaohongshu series storyline materializes an actionable series architecture"
+      ],
+      "forbidden_surfaces": [
+        "visual_truth_artifacts",
+        "artifact_blobs",
+        "owner_receipts",
+        "export_verdicts",
+        "quality_verdicts",
+        "runtime_data",
+        "generated_opl_surfaces_as_visual_authority"
+      ],
+      "resource_refs": [
+        "agent/professional_skills/rca-xhs-content-strategist/resources/minimal-resource-pack.md"
+      ],
+      "resource_pack_boundary_ref": "contracts/capability_map.json#/skill_local_resource_pack",
+      "exposure_layer": "repo_internal_professional_skill",
+      "codex_default_exposure": false,
+      "allowed_exposure_scopes": [
+        "domain_runtime_stage"
+      ],
+      "codex_visibility_policy": "not_registered_as_global_codex_skill",
+      "exposure_owner": "redcube_ai",
+      "canonical_target_paths": [
+        "agent/professional_skills/rca-xhs-content-strategist/SKILL.md"
+      ],
+      "owner_closeout_boundary": {
+        "owner": "redcube_ai",
+        "required_return_shapes": [
+          "owner_receipt_ref",
+          "typed_blocker_ref",
+          "human_gate_ref",
+          "route_back_ref"
+        ],
+        "can_write_owner_receipt_body": false,
+        "can_create_typed_blocker": false
+      }
+    },
+    {
       "capability_id": "rca-ppt-story-architect",
       "surface_role": "professional_skill",
       "capability_kind": "professional_skill",
@@ -497,7 +617,7 @@
         "prompts/ppt_deck/slide_blueprint.md",
         "contracts/stage_control_plane.json",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -522,11 +642,11 @@
         "contracts/capability_map.json#/feedback_token_index/storyline",
         "contracts/capability_map.json#/feedback_token_index/outline",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/serial_pipeline",
         "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -617,7 +737,7 @@
         "agent/quality_gates/communication_and_direction.md",
         "contracts/stage_control_plane.json",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -649,14 +769,14 @@
         "contracts/capability_map.json#/feedback_token_index/layout_quality",
         "contracts/capability_map.json#/feedback_token_index/ppt_review",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
         "contracts/capability_map.json#/feedback_token_index/spec_lock",
         "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
         "contracts/capability_map.json#/feedback_token_index/style_boundary",
         "contracts/capability_map.json#/feedback_token_index/visual_qa",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -743,7 +863,7 @@
         "agent/skills/visual_deliverable_authoring.md",
         "contracts/stage_control_plane.json",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -770,13 +890,13 @@
         "contracts/capability_map.json#/feedback_token_index/visual_density",
         "contracts/capability_map.json#/feedback_token_index/layout_quality",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
         "contracts/capability_map.json#/feedback_token_index/serial_pipeline",
         "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
         "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -867,7 +987,7 @@
         "agent/quality_gates/review_export_memory.md",
         "contracts/stage_control_plane.json",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -896,11 +1016,11 @@
         "contracts/capability_map.json#/feedback_token_index/layout_quality",
         "contracts/capability_map.json#/feedback_token_index/ppt_review",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
         "contracts/capability_map.json#/feedback_token_index/visual_qa",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -984,7 +1104,7 @@
         "agent/knowledge/review_export_memory.md",
         "contracts/memory_descriptor.json",
         "contracts/capability_map.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-visual-memory-curator/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -1011,7 +1131,7 @@
         "contracts/capability_map.json#/feedback_token_index/memory_writeback",
         "contracts/capability_map.json#/feedback_token_index/review_export_memory",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -1098,7 +1218,7 @@
         "contracts/runtime-program/ppt-native-ai-first-design-pack.json",
         "contracts/runtime-program/ppt-native-pptx-quality-nonregression.json",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-native-ppt-designer/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -1124,11 +1244,11 @@
         "contracts/capability_map.json#/feedback_token_index/template_profile",
         "contracts/capability_map.json#/feedback_token_index/placeholder_capacity",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/spec_lock",
         "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -1212,7 +1332,7 @@
         "prompts/ppt_deck/author_pptx_native.md",
         "docs/references/native-ppt-open-source-design-discipline.md",
         "contracts/agent_lab_handoff.json",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-template-profiler/resources/minimal-resource-pack.md"
       ],
       "authority_boundary": {
@@ -1239,11 +1359,11 @@
         "contracts/capability_map.json#/feedback_token_index/template_profile",
         "contracts/capability_map.json#/feedback_token_index/placeholder_capacity",
         "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
         "contracts/capability_map.json#/feedback_token_index/style_boundary",
         "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar",
         "contracts/capability_map.json#/dry_run_token_mapping_check",
-        "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+        "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
         "contracts/capability_map.json#/skill_local_resource_pack"
       ],
       "forbidden_surfaces": [
@@ -1768,10 +1888,10 @@
       "contracts/capability_map.json#/feedback_token_index",
       "contracts/agent_lab_handoff.json#/change_ref_mappings/source_of_truth_ref",
       "contracts/agent_lab_handoff.json#/visual_feedback_failure_fixture",
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT capability map routes AgentLab visual feedback fixture to professional skills and owner closeout boundary",
       "contracts/capability_map.json#/dry_run_token_mapping_check",
       "contracts/agent_lab_handoff.json#/dry_run_token_mapping_check",
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts",
       "contracts/capability_map.json#/feedback_token_index/visual_memory",
       "contracts/capability_map.json#/feedback_token_index/memory_writeback",
       "contracts/capability_map.json#/feedback_token_index/review_export_memory"
@@ -1870,7 +1990,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/ppt_visual_density",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1891,7 +2011,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/native_pptx_editability",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1910,7 +2030,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/serial_pipeline",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1929,7 +2049,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/spec_lock",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1950,7 +2070,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/progressive_disclosure",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1969,7 +2089,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/style_boundary",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -1988,7 +2108,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/visual_qa",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       },
       {
@@ -2009,7 +2129,7 @@
         ],
         "verification_refs": [
           "contracts/capability_map.json#/feedback_token_index/editable_pptx_grammar",
-          "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+          "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
         ]
       }
     ],
@@ -2021,7 +2141,7 @@
       "forbidden_authority_flags_all_false"
     ],
     "verification_refs": [
-      "tests/rca-ppt-three-route-agent-lab-suite.test.ts#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
+      "tests/rca-ppt-three-route-agent-lab-suite.test.js#RCA PPT dry-run feedback tokens resolve to professional skills without live artifacts"
     ]
   }
 }

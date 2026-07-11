@@ -16,29 +16,6 @@ export interface CliHelpSurface extends Record<string, unknown> {
   commandGroups: Record<string, string[]>;
 }
 
-export interface CliPrivateProfileRequest {
-  configHome: string;
-  force: boolean;
-}
-
-export interface CliPrivateProfileBootstrapRequest extends CliPrivateProfileRequest {
-  sourceSystemDir: string;
-}
-
-export interface CliPrivateProfileBundleRequest extends CliPrivateProfileRequest {
-  bundleFile: string;
-}
-
-export interface CliPrivateProfileResult extends Record<string, unknown> {
-  ok?: boolean;
-}
-
-export interface CliPrivateProfileModule {
-  bootstrapPrivateProfile(request: CliPrivateProfileBootstrapRequest): CliPrivateProfileResult;
-  exportPrivateProfile(request: CliPrivateProfileBundleRequest): CliPrivateProfileResult;
-  installPrivateProfile(request: CliPrivateProfileBundleRequest): CliPrivateProfileResult;
-}
-
 export interface CliDomainActions {
   doctorWorkspace(request: { workspaceRoot: string }): Promise<JsonSurface>;
   listTopics(request: { workspaceRoot: string }): Promise<JsonSurface>;
@@ -61,7 +38,6 @@ export interface CliDomainActions {
 
 export interface CliDependencies {
   domainActions?: Partial<CliDomainActions>;
-  loadPrivateProfileModule?: () => Promise<CliPrivateProfileModule>;
   cwd?: () => string;
   printJson?: (data: CliRunSurface) => void;
 }
