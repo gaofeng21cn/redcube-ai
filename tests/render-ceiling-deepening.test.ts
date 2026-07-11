@@ -17,15 +17,14 @@ function readImplementation(file) {
 test('ppt family runtime uses upstream structured generation directly and no longer imports pack builders', () => {
   const runtime = read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime.ts');
   const runtimeCore = readImplementation('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/core.ts');
-  const executionAdapters = read('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/execution-adapters.ts');
 
   assert.equal(runtime.includes('function buildOutlineSlides('), false);
   assert.equal(runtime.includes('function buildSlideBlueprint('), false);
   assert.equal(runtime.includes('function buildVisualDirection('), false);
   assert.equal(runtime.includes('@redcube/pack-ppt'), false);
   assert.equal(runtime.includes('../../redcube-runtime/src'), false);
-  assert.equal(runtimeCore.includes("from './execution-adapters.js'"), true);
-  assert.equal(executionAdapters.includes('generateStructuredArtifactViaCodexCli'), true);
+  assert.equal(existsSync(path.resolve('packages/redcube-runtime/src/families/ppt/ppt-deck-runtime-family-parts/execution-adapters.ts')), false);
+  assert.equal(runtimeCore.includes('generateStructuredArtifactViaCodexCli'), true);
   assert.equal(runtime.includes('function buildRenderArtifact('), false);
 });
 
