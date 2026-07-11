@@ -220,6 +220,40 @@
       },
       "verification": "clean conversion main and the OPL Framework hosting candidate report the same Sentrux debt counts; the cycles come from unchanged overlay type-import edges",
       "rule": "The refreshed baseline is a debt ratchet after the JS conversion, not evidence that the recorded structural debt disappeared."
+    },
+    "ponytail_ultra_22_item_closeout": {
+      "status": "partial_replacements_fail_closed",
+      "implementation_percent": 55,
+      "completion_basis": {
+        "items_implemented_or_already_absorbed": 12,
+        "items_total": 22,
+        "items_replacement_or_owner_gated": 10,
+        "rule": "Approval authorizes the recommendation, but does not satisfy its explicit replacement API, behavior parity, or active write-set ownership precondition."
+      },
+      "items": [
+        {"id":1,"surface":"ppt_canonical_prompt_orphans","status":"done","commit":"5f8ec75c"},
+        {"id":2,"surface":"source_string_only_cli_ppt_publish_tests","status":"done","commit":"5f8ec75c"},
+        {"id":3,"surface":"historical_runtime_contract_snapshots","status":"done","commit":"5f8ec75c"},
+        {"id":4,"surface":"unused_opl_agent_pack_contract_mirror","status":"done","commit":"5f8ec75c"},
+        {"id":5,"surface":"native_proof_artifact_index_fixture","status":"done","commit":"5f8ec75c"},
+        {"id":6,"surface":"unconsumed_reference_samples","status":"done","commit":"5f8ec75c"},
+        {"id":7,"surface":"thin_reexport_and_json_fs_facades","status":"already_absorbed_on_base","evidence":"fresh source scan found no remaining one-line production re-export facade in the audited shape"},
+        {"id":8,"surface":"current_program_duplicate_leaf_bodies","status":"done","commit":"9349df1a","evidence":"six product/active duplicate leaves now reference canonical current_state leaves"},
+        {"id":9,"surface":"foundry_agent_series_policy_body","status":"already_absorbed_on_base","evidence":"contract is a thin domain delta plus OPL canonical refs"},
+        {"id":10,"surface":"cognitive_tool_affordance_body_copy","status":"already_absorbed_on_base","evidence":"pack compiler input keeps required-field schema instead of the cognitive policy body"},
+        {"id":11,"surface":"redcube_config_workspace_package","status":"done","commit":"9349df1a","evidence":"single workspace identity file plus explicit environment overrides"},
+        {"id":12,"surface":"domain_action_adapter_public_wrapper","status":"blocked_active_owner_overlap","owner":"rca structural successor lanes","required_output":"owner lane absorption followed by caller migration to domain-handler and removal of the public adapter export"},
+        {"id":13,"surface":"proof_runner_indexer_bootstrap_shells","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"callable proof-lane, artifact-index and bootstrap API with RCA proof schema parity"},
+        {"id":14,"surface":"dated_workspace_receipt_materializer","status":"done","commit":"9349df1a","evidence":"immutable snapshot retained with Git provenance; replay script removed"},
+        {"id":15,"surface":"python_helper_execution_envelope","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"public domain Python helper envelope preserving locked uv, Playwright and typed blocker behavior"},
+        {"id":16,"surface":"generic_boundary_static_projection_builders","status":"blocked_active_owner_overlap","owner":"rca structural closeout and successor lanes","required_output":"absorb or reject the existing exact-path owner write sets before replay"},
+        {"id":17,"surface":"private_codex_executor","status":"blocked_missing_callable_replacement","owner":"one-person-lab/OPL","required_output":"callable executor adapter with session, timeout, telemetry and owner-receipt parity"},
+        {"id":18,"surface":"handwritten_cli_dispatch","status":"blocked_missing_callable_replacement","owner":"one-person-lab/OPL","required_output":"generated executable CLI dispatch, not descriptor-only generated interface metadata"},
+        {"id":19,"surface":"repo_local_run_event_lifecycle","status":"blocked_behavior_parity","owner":"one-person-lab/OPL plus redcube_ai","required_output":"direct RCA route callers migrated to the OPL attempt lifecycle with recovery and receipt parity"},
+        {"id":20,"surface":"repo_local_stage_folder_writer","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"public Stage Folder writer API with role, current-pointer, orphan-output and receipt parity"},
+        {"id":21,"surface":"repo_local_source_intake_materialization","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"material-ref intake API preserving RCA source-readiness and visual verdict authority"},
+        {"id":22,"surface":"native_ppt_ooxml_reader","status":"blocked_schema_parity","owner":"OfficeCLI plus redcube_ai","required_output":"structured OfficeCLI readback mapped to the existing package-review schema with package, template, notes, transition, animation and relationship parity"}
+      ]
     }
   },
   "evidence_refs": {
