@@ -11,9 +11,6 @@
       "path": "./packages/redcube-governance"
     },
     {
-      "path": "./packages/redcube-config"
-    },
-    {
       "path": "./packages/redcube-runtime"
     },
     {

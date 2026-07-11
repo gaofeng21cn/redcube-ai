@@ -98,15 +98,21 @@ const CURRENT_PROGRAM_CANONICAL_PROJECTION_POINTERS = Object.freeze([
   '/current_state/opl_stability_read_model_consumption',
   '/current_state/privatized_functional_module_audit',
   '/current_state/visual_pack_compiler_handoff',
-  '/current_state/active_baton/scope/opl_generic_primitive_consumption',
-  '/current_state/active_baton/scope/opl_stability_read_model_consumption',
   '/current_state/active_baton/scope/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
-  '/current_state/active_baton/scope/privatized_functional_module_audit',
-  '/current_state/active_baton/scope/visual_pack_compiler_handoff',
-  '/product_release_metadata/opl_generic_primitive_consumption',
-  '/product_release_metadata/opl_stability_read_model_consumption',
-  '/product_release_metadata/privatized_functional_module_audit',
-  '/product_release_metadata/visual_pack_compiler_handoff',
+]);
+
+const CURRENT_PROGRAM_LEAF_REF_POINTERS = Object.freeze([
+  ...[
+    'opl_generic_primitive_consumption',
+    'opl_stability_read_model_consumption',
+    'privatized_functional_module_audit',
+    'visual_pack_compiler_handoff',
+    'stage_artifact_kernel_adoption',
+    'temporal_stage_run_consumption_policy',
+  ].flatMap((surfaceId) => [
+    `/current_state/active_baton/scope/${surfaceId}`,
+    `/product_release_metadata/${surfaceId}`,
+  ]),
 ]);
 
 test('current runtime program is backed by source parts and one source index locator', () => {
@@ -180,6 +186,18 @@ test('current runtime program is backed by source parts and one source index loc
       pointer,
     );
     assert.equal(JSON.stringify(projection).length < 1600, true, pointer);
+  }
+
+  for (const pointer of CURRENT_PROGRAM_LEAF_REF_POINTERS) {
+    const projection = valueAtJsonPointer(currentProgram, pointer);
+    assert.equal(projection.surface_kind, 'rca_current_program_leaf_ref', pointer);
+    assert.equal(projection.projection_mode, 'canonical_current_state_ref_only_no_body_copy', pointer);
+    assert.equal(projection.body_copy_in_current_program, false, pointer);
+    assert.equal(
+      projection.duplicate_entity_policy,
+      'reference_current_state_leaf_instead_of_repeating_machine_body',
+      pointer,
+    );
   }
 
   const functionalAuditProjection = currentProgram.product_release_metadata.functional_privatization_audit;

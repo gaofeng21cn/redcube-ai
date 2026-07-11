@@ -16,17 +16,15 @@ const LAYER_BY_PACKAGE = new Map([
   ['@redcube/runtime', 'runtime'],
   ['@redcube/overlay-core', 'overlay'],
   ['@redcube/runtime-protocol', 'protocol'],
-  ['@redcube/redcube-config', 'config'],
   ['@redcube/governance', 'governance'],
 ]);
 
 const ALLOWED_DEPENDENCY_LAYERS = new Map([
-  ['app', new Set(['domain-entry', 'config'])],
+  ['app', new Set(['domain-entry'])],
   ['domain-entry', new Set(['overlay', 'runtime', 'protocol'])],
-  ['runtime', new Set(['config', 'governance', 'overlay', 'protocol', 'substrate'])],
+  ['runtime', new Set(['governance', 'overlay', 'protocol', 'substrate'])],
   ['overlay', new Set(['overlay', 'protocol'])],
   ['protocol', new Set(['protocol'])],
-  ['config', new Set(['config', 'protocol'])],
   ['governance', new Set(['overlay', 'protocol'])],
   ['substrate', new Set(['protocol'])],
 ]);

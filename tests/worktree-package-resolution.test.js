@@ -40,10 +40,6 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
     repoRoot,
     checks: [
       {
-        specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
-        resolve_from: 'packages/redcube-runtime/package.json',
-      },
-      {
         specifier: 'opl-framework/product-entry-companions',
         resolve_from: 'packages/redcube-domain-entry/package.json',
       },
@@ -63,10 +59,6 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
     () => assertRequiredRuntimeSharedResolution({
       repoRoot,
       checks: [
-        {
-          specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
-          resolve_from: 'packages/redcube-runtime/package.json',
-        },
         {
           specifier: 'opl-framework/product-entry-program-companions',
           resolve_from: 'packages/redcube-domain-entry/package.json',

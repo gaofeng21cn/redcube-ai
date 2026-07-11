@@ -54,8 +54,8 @@ test('RCA workspace receipt scaleout evidence snapshot records 6-workspace refs 
   assert.equal(snapshot.source_runtime_export_provenance.local_export_path.startsWith('/'), true);
   assert.equal(snapshot.source_runtime_export_provenance.sha256.length, 64);
   assertRefString(
-    snapshot.source_runtime_export_provenance.source_command_ref,
-    'source_runtime_export_provenance.source_command_ref',
+    snapshot.source_runtime_export_provenance.source_provenance_ref,
+    'source_runtime_export_provenance.source_provenance_ref',
   );
   assertRefString(
     snapshot.source_runtime_export_provenance.source_surface_ref,

@@ -98,7 +98,6 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/rca-retired-payload-pointer-guard.test.js', lane: 'meta' },
   { file: 'tests/rca-retired-surface-active-guard.test.js', lane: 'meta' },
   { file: 'tests/render-ceiling-deepening.test.js', lane: 'meta' },
-  { file: 'tests/runtime-config.test.js', lane: 'meta' },
   { file: 'tests/runtime-protocol-workspace.test.js', lane: 'meta', smoke: true, fast: true },
   { file: 'tests/run-test-group-live-upstream-command.test.js', lane: 'meta' },
   { file: 'tests/source-augmentation-contract.test.js', lane: 'meta' },

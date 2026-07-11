@@ -2,7 +2,7 @@
 import path from 'node:path';
 import { existsSync, readFileSync } from 'node:fs';
 
-import { resolveWorkspaceXiaohongshuAuthorProfile } from '@redcube/redcube-config/xiaohongshu-author-profile';
+import { resolveWorkspaceXiaohongshuAuthorProfile } from '../../../xiaohongshu-author-profile.js';
 
 import { safeArray, safeText } from './shared.js';
 
@@ -201,6 +201,5 @@ export function resolveAuthorBranding(workspaceRoot, contract) {
     taskTitle: contract?.title,
     projectTitle: contract?.goal,
     promptFile: 'xiaohongshu',
-    configCwd: REPO_ROOT,
   });
 }

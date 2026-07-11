@@ -61,46 +61,6 @@ test('P22.A: Codex executor substrate is internal to runtime, not a standalone R
   assert.match(runtimeSource, /OPL_CODEX_EXECUTOR_SURFACE = 'opl_codex_executor'/);
 });
 
-test('P23.A: current utility package exposes TypeScript service entrypoints without legacy utility packages', () => {
-  assert.equal(existsSync(path.resolve('packages/redcube-tools')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-llm')), false);
-  assert.equal(existsSync(path.resolve('packages/redcube-overlay-paper-poster')), false);
-
-  const packages = [
-    {
-      directory: 'packages/redcube-config',
-      expectedTypesEntry: './dist/index.d.ts',
-      publicEntrypoints: [
-        'src/index.ts',
-        'src/xiaohongshu-author-profile.ts',
-      ],
-    },
-  ];
-  const rootTsconfig = JSON.parse(readFileSync(path.resolve('tsconfig.json'), 'utf-8'));
-
-  for (const pkgSpec of packages) {
-    const pkg = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'package.json'), 'utf-8'));
-    const packageTsconfig = JSON.parse(readFileSync(path.resolve(pkgSpec.directory, 'tsconfig.json'), 'utf-8'));
-    assert.equal(pkg.types, pkgSpec.expectedTypesEntry, pkgSpec.directory);
-    assert.equal(packageTsconfig.extends, '../../tsconfig.package-build.json', pkgSpec.directory);
-    assert.equal(
-      rootTsconfig.references.some((entrypoint) => entrypoint.path === `./${pkgSpec.directory}`),
-      true,
-      pkgSpec.directory,
-    );
-
-    for (const entrypoint of pkgSpec.publicEntrypoints) {
-      assert.equal(existsSync(path.resolve(pkgSpec.directory, entrypoint)), true, entrypoint);
-    }
-  }
-
-  const redcubeConfigPkg = JSON.parse(readFileSync(path.resolve('packages/redcube-config/package.json'), 'utf-8'));
-  assert.equal(redcubeConfigPkg.exports['.'].default, './dist/index.js');
-  assert.equal(redcubeConfigPkg.exports['.'].types, './dist/index.d.ts');
-  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].default, './dist/xiaohongshu-author-profile.js');
-  assert.equal(redcubeConfigPkg.exports['./xiaohongshu-author-profile'].types, './dist/xiaohongshu-author-profile.d.ts');
-});
-
 const TESTS_DIR = 'tests';
 const TRANSIENT_TEST_FIXTURE_DIRS = new Set([
   '__closeout-audit-nested-ts-case__',

@@ -29,7 +29,7 @@ git status --short --ignored
 - 只有新的主分支历史
 - 没有旧 remote
 - 工作树干净
-- `.env`、`.cursor/`、`config/local/` 之类本地文件保持忽略状态
+- `.env`、`.cursor/` 之类本地文件保持忽略状态
 
 ## 使用 GitHub CLI 创建仓库并推送
 
@@ -82,7 +82,6 @@ export REDCUBE_WORKSPACE_ROOT="/absolute/path/to/workspace"
 
 - `~/.config/redcube/`
 - `<workspace>/.redcube/`
-- `config/local/` 下的本机私有覆盖文件
 
 ### 3. 提交前先检查差异
 

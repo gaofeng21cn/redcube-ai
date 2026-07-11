@@ -30,22 +30,6 @@
   },
   "compiled_dist_runtime_exports": [
     {
-      "directory": "packages/redcube-config",
-      "package_name": "@redcube/redcube-config",
-      "exports": [
-        {
-          "subpath": ".",
-          "condition": "default",
-          "target": "./dist/index.js"
-        },
-        {
-          "subpath": "./xiaohongshu-author-profile",
-          "condition": "default",
-          "target": "./dist/xiaohongshu-author-profile.js"
-        }
-      ]
-    },
-    {
       "directory": "packages/redcube-domain-entry",
       "package_name": "@redcube/domain-entry",
       "exports": [

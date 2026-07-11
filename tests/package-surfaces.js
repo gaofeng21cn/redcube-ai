@@ -42,9 +42,6 @@ export {
   validateSourceAugmentationResultContract,
 } from '@redcube/runtime-protocol';
 export {
-  loadRuntimeConfig,
-} from '@redcube/redcube-config';
-export {
   buildCodexExecutorDescriptor,
   RUN_LOCATOR_ENVELOPE_BOUNDARY,
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,

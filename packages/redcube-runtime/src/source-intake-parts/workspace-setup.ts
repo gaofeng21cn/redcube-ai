@@ -9,7 +9,7 @@ import {
   getSourceArtifactPaths,
   resolveWorkspaceContract,
 } from '@redcube/runtime-protocol';
-import { ensureWorkspaceXiaohongshuAuthorTemplate } from '@redcube/redcube-config/xiaohongshu-author-profile';
+import { ensureWorkspaceXiaohongshuAuthorTemplate } from '../xiaohongshu-author-profile.js';
 import { ensureDir, readJson, safeText, writeJson } from '../runtime-utils.js';
 
 export { writeJson };

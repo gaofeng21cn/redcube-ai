@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "5929d455020aa85c2e0b514b0f33da0b4b20b81d8a1c109de10bd199cde9a1dd",
+  "source_digest": "820d1c0f7f8ead2ad4f013fda02cebe9bd9772c6f37305b3eaaf818a027bf6cc",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -99,8 +99,8 @@
       "json_pointer": "/product_release_metadata",
       "ref": "contracts/runtime-program/current-program-parts/product_release_metadata.json",
       "role": "current_program_leaf_source",
-      "line_count": 375,
-      "sha256": "20b6fd75ad0f7790ddfdd30d4dac2cbb20a70fbf4e4359eacdeec67660b26454"
+      "line_count": 248,
+      "sha256": "389de51470da54c68409bf402932be33bb91894590f867cad0234c1f91cfc9a2"
     },
     {
       "json_pointer": "/longrun_goal",
@@ -134,8 +134,8 @@
       "json_pointer": "/current_state/active_baton",
       "ref": "contracts/runtime-program/current-program-parts/current_state/active_baton.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 744,
-      "sha256": "b225221bee82b0cb92a3ad7acfe0cad0e9def85d65b314247fc0875294f61915"
+      "line_count": 617,
+      "sha256": "b8ca47a380a52224fec44cf75b5833f24798ea135d77391207ad4f66202d628f"
     },
     {
       "json_pointer": "/current_state/active_mainline",

@@ -31,10 +31,6 @@ const WORKSPACE_PACKAGE_SPECIFIERS = Object.freeze([
 ]);
 const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
   {
-    specifier: '@redcube/redcube-config/xiaohongshu-author-profile',
-    resolve_from: 'packages/redcube-runtime/package.json',
-  },
-  {
     specifier: 'opl-framework/product-entry-companions',
     resolve_from: 'packages/redcube-domain-entry/package.json',
   },

@@ -103,7 +103,6 @@ const PACKAGE_SURFACES = Object.freeze([
       'tsconfig.json',
     ],
     dependencies: {
-      '@redcube/redcube-config': '0.1.0',
       '@redcube/runtime-protocol': '0.1.0',
       '@redcube/governance': '0.1.0',
       '@redcube/overlay-core': '0.1.0',
