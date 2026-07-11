@@ -106,6 +106,50 @@ test('invokeProductEntry treats route as a StageRun stop target unless route han
   });
 });
 
+test('invokeProductEntry fails closed when stop_after_stage precedes route on the declared path', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+    await assert.rejects(
+      () => invokeProductEntry(productEntryRequest(
+        workspaceRoot,
+        'session-reversed-route-stop',
+        deckDeliveryRequest({
+          deliverable_id: 'deck-reversed-route-stop',
+          title: 'Reversed route stop',
+          goal: '验证 route 和 stop 的顺序门',
+          route: 'visual_direction',
+          stop_after_stage: 'storyline',
+        }),
+      )),
+      /stop_after_stage=storyline precedes route=visual_direction on the declared ordered path/,
+    );
+  });
+});
+
+test('invokeProductEntry accepts an alternate route and later stop on one declared path', SERIAL_ENV_TEST, async () => {
+  await withMockCodexRuntimeState(async () => {
+    const workspaceRoot = await prepareProductEntryWorkspace();
+    const response = await invokeProductEntry(productEntryRequest(
+      workspaceRoot,
+      'session-alternate-route-stop',
+      deckDeliveryRequest({
+        deliverable_id: 'deck-alternate-route-stop',
+        title: 'Alternate route stop',
+        goal: '验证 alternate route 和 stop 共用有序路径',
+        route: 'render_html',
+        stop_after_stage: 'screenshot_review',
+      }),
+    ));
+
+    assert.equal(response.ok, true);
+    assert.equal(response.domain_entry_surface.result_surface.delivery_identity.route, 'render_html');
+    assert.equal(
+      response.domain_entry_surface.result_surface.control_policy.requested_stop_after_stage,
+      'screenshot_review',
+    );
+  });
+});
+
 test('invokeProductEntry creates a deliverable and returns OPL-owned session handoff refs', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();

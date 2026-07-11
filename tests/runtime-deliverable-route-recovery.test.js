@@ -51,6 +51,28 @@ function readStageArtifact(workspaceRoot, topicId, deliverableId, routeStageId) 
   return loaded.artifact;
 }
 
+function declaredDependencyClosure(contract, route) {
+  const stages = [
+    ...(contract.stage_sequence?.stages || []),
+    ...(contract.stage_sequence?.alternate_stages || []),
+  ];
+  const stagesById = new Map(stages.map((stage) => [stage.stage_id, stage]));
+  const dependencies = new Set();
+  const pending = [route];
+  while (pending.length > 0) {
+    const stage = stagesById.get(pending.pop());
+    for (const dependency of [
+      ...(stage?.requires_stages || []),
+      ...(stage?.requires_review_from_any || []),
+    ]) {
+      if (dependencies.has(dependency)) continue;
+      dependencies.add(dependency);
+      pending.push(dependency);
+    }
+  }
+  return dependencies;
+}
+
 async function runPptRoute({ workspaceRoot, topicId = 'topic-a', deliverableId = 'deck-a', route, ...options }) {
   return runDeliverableRoute({
     workspaceRoot,
@@ -200,6 +222,14 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
       assert.deepEqual(
         result.dependency_route_runs.map((entry) => entry.route),
         ['visual_director_review', 'screenshot_review'],
+      );
+      const deliverablePaths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
+      const deliverable = readJson(deliverablePaths.deliverableFile);
+      const contract = readJson(path.join(deliverablePaths.deliverableDir, deliverable.hydrated_contract_ref));
+      const declaredDependencies = declaredDependencyClosure(contract, 'fix_html');
+      assert.equal(
+        result.dependency_route_runs.every((entry) => declaredDependencies.has(entry.route)),
+        true,
       );
       assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
       const fixArtifact = readJson(routeArtifactFile(result));

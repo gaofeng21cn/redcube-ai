@@ -140,32 +140,58 @@ function recoverableDependencyRoutes(request: RunDeliverableRouteRequest, result
   const route = request.route;
   const overlay = safeText(request.overlay);
   const message = routeResultErrorMessage(result);
+  let candidates: string[] = [];
   if (overlay === 'ppt_deck' && VISUAL_AUTHOR_ALTERNATE_ROUTES.has(route) && /requires completed stage artifacts:/i.test(message)) {
     const requestedMissing = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
       .filter((stageId) => new RegExp(`\\b${stageId}\\b`).test(message));
     if (requestedMissing.length > 0) {
-      return ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
+      candidates = ['storyline', 'detailed_outline', 'slide_blueprint', 'visual_direction']
         .filter((stageId) => !readStageArtifactForRequest(request, stageId));
     }
   }
   if (route === 'fix_html' && /requires screenshot_review based on the current HTML/i.test(message)) {
-    return ['visual_director_review', 'screenshot_review'];
+    candidates = ['visual_director_review', 'screenshot_review'];
   }
   if (route === 'fix_html' && /requires completed stage artifacts: .*screenshot_review/i.test(message)) {
-    return readStageArtifactForRequest(request, 'visual_director_review')
+    candidates = readStageArtifactForRequest(request, 'visual_director_review')
       ? ['screenshot_review']
       : [];
   }
   if (route === 'screenshot_review' && /requires visual_director_review to be rerun after the latest visual changes/i.test(message)) {
-    return ['visual_director_review'];
+    candidates = ['visual_director_review'];
   }
   if (route === 'export_pptx' && /requires screenshot_review to be rerun after the latest visual changes/i.test(message)) {
-    return ['visual_director_review', 'screenshot_review'];
+    candidates = ['visual_director_review', 'screenshot_review'];
   }
   if (route === 'repair_pptx_native' && /requires screenshot_review based on the current native PPTX/i.test(message)) {
-    return ['visual_director_review', 'screenshot_review'];
+    candidates = ['visual_director_review', 'screenshot_review'];
   }
-  return [];
+  if (candidates.length === 0) return [];
+
+  const contract = readHydratedContractForRequest(request);
+  const stageEntries = stageDefinitions(contract, true)
+    .map((stage): [string, unknown] => [safeText((stage as { stage_id?: unknown })?.stage_id), stage])
+    .filter(([stageId]) => Boolean(stageId));
+  const stagesById = new Map<string, unknown>(stageEntries);
+  const declaredDependencies = new Set<string>();
+  const pending = [route];
+  while (pending.length > 0) {
+    const current = pending.pop()!;
+    const stage = stagesById.get(current) as {
+      requires_stages?: unknown[];
+      requires_review_from_any?: unknown[];
+    } | undefined;
+    const dependencies = [
+      ...(Array.isArray(stage?.requires_stages) ? stage.requires_stages : []),
+      ...(Array.isArray(stage?.requires_review_from_any) ? stage.requires_review_from_any : []),
+    ].map((dependency) => safeText(dependency)).filter(Boolean);
+    for (const dependency of dependencies) {
+      if (declaredDependencies.has(dependency)) continue;
+      declaredDependencies.add(dependency);
+      pending.push(dependency);
+    }
+  }
+  return candidates.filter((candidate) => declaredDependencies.has(candidate));
 }
 
 function nextContinuationStageId({

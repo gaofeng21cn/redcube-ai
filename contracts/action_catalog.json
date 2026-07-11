@@ -125,6 +125,22 @@
       "human_gate_ids": [
         "redcube_operator_review_gate"
       ],
+      "stage_route": {
+        "entry_stage_ref": "source_intake",
+        "required_stage_refs": [
+          "source_intake",
+          "communication_strategy",
+          "visual_direction",
+          "artifact_creation",
+          "review_and_revision",
+          "package_and_handoff"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      },
       "supported_surfaces": {
         "cli": {
           "surface_kind": "product_entry"
@@ -290,6 +306,17 @@
       "output_schema_ref": "schema:redcube.domain_handler.dispatch.response.v1",
       "workspace_locator_fields": [],
       "human_gate_ids": [],
+      "stage_route": {
+        "entry_stage_ref": "package_and_handoff",
+        "required_stage_refs": [
+          "package_and_handoff"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "package_and_handoff"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      },
       "supported_surfaces": {
         "cli": {
           "surface_kind": "product_domain_handler_dispatch"
@@ -353,6 +380,17 @@
         "deliverable_id"
       ],
       "human_gate_ids": [],
+      "stage_route": {
+        "entry_stage_ref": "artifact_creation",
+        "required_stage_refs": [
+          "artifact_creation"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "artifact_creation"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      },
       "supported_surfaces": {
         "cli": {
           "surface_kind": "image_ppt_product_entry_proof"
@@ -397,6 +435,17 @@
         "deliverable_id"
       ],
       "human_gate_ids": [],
+      "stage_route": {
+        "entry_stage_ref": "artifact_creation",
+        "required_stage_refs": [
+          "artifact_creation"
+        ],
+        "optional_stage_refs": [],
+        "terminal_stage_refs": [
+          "artifact_creation"
+        ],
+        "route_policy": "ordered_stage_attempts_no_skip"
+      },
       "supported_surfaces": {
         "cli": {
           "surface_kind": "native_ppt_product_entry_proof"
@@ -440,22 +489,32 @@
         "task_intent"
       ],
       "human_gate_ids": [],
+      "stage_route_exempt": "domain_handler_target_only",
       "supported_surfaces": {
         "cli": null,
         "mcp": {
           "command": "redcube service-safe domain entry",
           "tool_name": "redcube_product_entry",
-          "action_key": "invoke_domain_entry"
+          "action_key": "invoke_domain_entry",
+          "surface_kind": "domain_handler_target_descriptor",
+          "descriptor_only": true,
+          "public_runtime": false
         },
         "skill": null,
         "product_entry": {
-          "surface_kind": "domain_entry",
-          "action_key": "invoke_domain_entry"
+          "surface_kind": "domain_handler_target_metadata",
+          "action_key": "invoke_domain_entry",
+          "descriptor_only": true,
+          "public_runtime": false
         },
         "openai": null,
         "ai_sdk": null
       },
-      "authority_boundary": {}
+      "authority_boundary": {
+        "target_role": "internal_domain_handler_target_only",
+        "descriptor_only": true,
+        "public_runtime": false
+      }
     }
   ],
   "notes": [

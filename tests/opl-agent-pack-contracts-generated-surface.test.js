@@ -44,6 +44,30 @@ test('RCA generated surface handoff is OPL-owned and root pack input is refs-onl
   assert.equal(bundle.status, 'ready');
   assert.equal(bundle.bundle.agent_id, 'rca');
   assert.equal(bundle.bundle.target_domain_id, 'redcube_ai');
+  assert.deepEqual(
+    bundle.bundle.action_stage_routes.map((route) => route.action_id),
+    ['invoke_product_entry', 'dispatch_domain_handler', 'run_image_ppt_proof', 'run_native_ppt_proof'],
+  );
+  assert.deepEqual(
+    bundle.bundle.action_stage_routes.find((route) => route.action_id === 'invoke_product_entry').required_stage_refs,
+    ['source_intake', 'communication_strategy', 'visual_direction', 'artifact_creation', 'review_and_revision', 'package_and_handoff'],
+  );
+  const internalTargetDescriptors = Object.fromEntries(
+    ['cli', 'mcp', 'skill', 'product_entry', 'openai_tool', 'ai_sdk'].map((surface) => [
+      surface,
+      bundle.bundle[surface].descriptors.filter(
+        (descriptor) => descriptor.source_of_work?.source_action_id === 'invoke_domain_entry',
+      ),
+    ]),
+  );
+  assert.deepEqual(internalTargetDescriptors.cli, []);
+  assert.deepEqual(internalTargetDescriptors.skill, []);
+  assert.deepEqual(internalTargetDescriptors.openai_tool, []);
+  assert.deepEqual(internalTargetDescriptors.ai_sdk, []);
+  assert.equal(internalTargetDescriptors.mcp.length, 1);
+  assert.equal(internalTargetDescriptors.mcp[0].descriptor_only, true);
+  assert.equal(internalTargetDescriptors.mcp[0].public_runtime, false);
+  assert.equal(internalTargetDescriptors.product_entry.length, 1);
 
   assert.equal(actionTargets.surface_kind, 'family_action_catalog');
   assert.equal(actionTargets.version, 'family-action-catalog.v1');

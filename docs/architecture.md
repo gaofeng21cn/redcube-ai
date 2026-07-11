@@ -174,7 +174,7 @@ RCA 的长线实现语言目标是 `TypeScript + Python`：
 
 - contract: `contracts/runtime-program/service-safe-domain-entry-adapter.json`
 - callable surface: `@redcube/domain-entry` `invokeDomainEntry`
-- OPL generated MCP descriptor: `invoke_domain_entry`
+- OPL generated MCP descriptor: `invoke_domain_entry`（仅 descriptor-only、non-public internal handler target；不属于 public runtime 或 stage action）
 
 这就是当前 mainline 明确冻结的 service-safe domain entry surface。
 

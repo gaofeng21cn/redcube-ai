@@ -108,6 +108,10 @@ Route-local repeated block 进入 OPL stall lineage；连续无 deliverable delt
 
 RCA 当前 6 个 top-level stage 已接近“一个 stage 一个主要开放判断”：`source_intake` 冻结 source truth 与缺口，`communication_strategy` 决定叙事 / 大纲 / 页面角色，`visual_direction` 决定视觉语言 / 节奏 / 密度，`artifact_creation` 在已选 route 内生成候选 artifact，`review_and_revision` 判断渲染结果并给出 repair target，`package_and_handoff` 只在 review gate 后导出、打包和交接。
 
+六阶段顺序只由 `agent/stages/manifest.json` 持有；action catalog 只声明 action 经过这条顺序中的哪一段，OPL control plane 与 generated interfaces 均从两份 canonical input 编译并做双向 parity。`invoke_product_entry` 保留完整六阶段 ordered route；proof 与 domain mutation action 只声明实际执行的 stage；read-only action 不声明 route。`invoke_domain_entry` 仅作为 descriptor-only、non-public 的 internal domain-handler target 存在，不进入任何 stage allow-list，也不以 exemption 绕过 public product-entry route。
+
+Product entry 同时收到 `route` 与 `stop_after_stage` 时，两者必须位于同一 hydrated ordered path，且 stop 不得早于 route。Alternate route 的自动恢复只允许消费该 alternate 在 hydrated contract 中声明的直接或传递依赖；未声明依赖不能由错误文本触发隐式补跑。
+
 OMA、OBF 或其他 family agent 暴露的 stage 粒度问题不能反向驱动 RCA 把主链拆碎。RCA 的 `artifact_creation` 与 `review_and_revision` 内部确实存在 image-first、HTML、native PPTX 等 route 差异，但这些差异应留在 route-local detailed prompt locator、repo-local professional specialist skill、quality gate 和 typed repair target 内处理；只有出现新的 RCA-owned durable owner boundary，且需要同步修改 `agent/stages/manifest.json`、stage/prompt refs 和 generated projection contract tests 时，才评估 top-level stage 拆分。
 
 ### SQLite 只作为未来 OPL-owned sidecar index 选项

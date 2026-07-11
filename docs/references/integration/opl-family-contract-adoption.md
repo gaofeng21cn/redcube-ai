@@ -51,8 +51,8 @@ manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integrati
 
 当前映射覆盖 `ppt_deck`、`xiaohongshu` 与 `poster_onepager`：
 
-- `source_intake`：PPT 的 `storyline`、小红书的 `research`、poster 的 `storyline`
-- `communication_strategy`：PPT 的 `detailed_outline` / `slide_blueprint`、小红书的 `storyline` / `single_note_plan`、poster 的 `poster_blueprint`
+- `source_intake`：各 family 的 source readiness、source truth freeze 与 evidence-gap refs；不生成或接受 storyline
+- `communication_strategy`：PPT 的 `storyline` / `detailed_outline` / `slide_blueprint`、小红书的 `storyline` / `single_note_plan`、poster 的 `storyline` / `poster_blueprint`
 - `visual_direction`：各 family 的 `visual_direction`
 - `artifact_creation`：PPT 的 `author_image_pages` / explicit HTML / explicit native PPT authoring，小红书的 `author_image_pages` / explicit HTML，poster 的 `render_html`
 - `review_and_revision`：visual director review、screenshot review 与对应 repair/fix route

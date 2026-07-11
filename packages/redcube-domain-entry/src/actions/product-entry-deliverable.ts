@@ -79,18 +79,61 @@ function rehydrateDeliverableContractWithConstraints({
   return buildGovernanceSurfaceContract(hydratedContract);
 }
 
-function stageIdsFromDeliverableRecord(deliverableRecord) {
+function stageSequenceFromDeliverableRecord(deliverableRecord) {
   const stageSequence = deliverableRecord?.hydrated_contract?.stage_sequence
     || deliverableRecord?.governance_surface?.stage_sequence
     || {};
-  return [
-    ...(Array.isArray(stageSequence.stages) ? stageSequence.stages : []),
-    ...(Array.isArray(stageSequence.alternate_stages) ? stageSequence.alternate_stages : []),
-  ].map((stage) => safeText(stage?.stage_id)).filter(Boolean);
+  return {
+    stages: Array.isArray(stageSequence.stages) ? stageSequence.stages : [],
+    alternateStages: Array.isArray(stageSequence.alternate_stages) ? stageSequence.alternate_stages : [],
+  };
+}
+
+function orderedPathForRequestedStages(deliverableRecord, route, stopAfterStage) {
+  const { stages, alternateStages } = stageSequenceFromDeliverableRecord(deliverableRecord);
+  const mainStageIds = stages.map((stage) => safeText(stage?.stage_id)).filter(Boolean);
+  const mainStageIdSet = new Set(mainStageIds);
+  const alternatesById = new Map(alternateStages
+    .map((stage) => [safeText(stage?.stage_id), stage])
+    .filter(([stageId]) => stageId));
+
+  function mainAnchor(stageId) {
+    let current = stageId;
+    const visited = new Set();
+    while (!mainStageIdSet.has(current)) {
+      if (visited.has(current)) return '';
+      visited.add(current);
+      const alternate = alternatesById.get(current);
+      current = safeText(alternate?.replaces_stage);
+      if (!current) return '';
+    }
+    return current;
+  }
+
+  const requestedAlternates = [route, stopAfterStage]
+    .map((stageId) => alternatesById.get(stageId))
+    .filter(Boolean);
+  const requestedLaneIds = new Set(requestedAlternates
+    .map((stage) => safeText(stage?.lane_id))
+    .filter(Boolean));
+  if (requestedLaneIds.size > 1) return null;
+
+  const replacements = new Map();
+  for (const alternate of requestedAlternates) {
+    const stageId = safeText(alternate?.stage_id);
+    const anchor = mainAnchor(stageId);
+    if (!anchor || (replacements.has(anchor) && replacements.get(anchor) !== stageId)) return null;
+    replacements.set(anchor, stageId);
+  }
+  const orderedPath = mainStageIds.map((stageId) => replacements.get(stageId) || stageId);
+  return orderedPath.includes(route) && orderedPath.includes(stopAfterStage) ? orderedPath : null;
 }
 
 function assertRequestedStagesAllowed(deliverableRecord, delivery) {
-  const allowedStages = stageIdsFromDeliverableRecord(deliverableRecord);
+  const { stages, alternateStages } = stageSequenceFromDeliverableRecord(deliverableRecord);
+  const allowedStages = [...stages, ...alternateStages]
+    .map((stage) => safeText(stage?.stage_id))
+    .filter(Boolean);
   if (allowedStages.length === 0) return;
   for (const [fieldName, requestedStage] of [
     ['delivery_request.route', delivery.route],
@@ -101,6 +144,23 @@ function assertRequestedStagesAllowed(deliverableRecord, delivery) {
         `${fieldName}=${requestedStage} is not allowed by the hydrated overlay stage_sequence; allowed stages: ${allowedStages.join(', ')}`,
       );
     }
+  }
+  if (!delivery.route || !delivery.stopAfterStage) return;
+
+  const orderedPath = orderedPathForRequestedStages(
+    deliverableRecord,
+    delivery.route,
+    delivery.stopAfterStage,
+  );
+  if (!orderedPath) {
+    throw new Error(
+      `delivery_request.route=${delivery.route} and stop_after_stage=${delivery.stopAfterStage} are not on the same declared ordered path`,
+    );
+  }
+  if (orderedPath.indexOf(delivery.stopAfterStage) < orderedPath.indexOf(delivery.route)) {
+    throw new Error(
+      `delivery_request.stop_after_stage=${delivery.stopAfterStage} precedes route=${delivery.route} on the declared ordered path`,
+    );
   }
 }
 
