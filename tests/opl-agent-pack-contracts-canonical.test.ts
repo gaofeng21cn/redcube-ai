@@ -1,6 +1,8 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import path from 'node:path';
+import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-agent-principles.js';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.ts';
 
@@ -61,4 +63,11 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(packRefs.projection_mode, 'repo_source_refs_only');
   assert.equal(packRefs.required_domain_pack_paths.every((entry) => entry.startsWith('agent/')), true);
   assert.equal(packRefs.minimal_authority_surface_ids.includes('owner_receipt_signer'), true);
+});
+
+test('RCA standard-agent principles resolve current OPL stage references', () => {
+  const checks = buildStandardAgentPrincipleAdoptionChecks(path.resolve());
+
+  assert.equal(checks.status, 'passed');
+  assert.deepEqual(checks.blockers, []);
 });
