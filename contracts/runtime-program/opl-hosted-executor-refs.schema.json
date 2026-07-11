@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://redcube.local/contracts/runtime-program/opl-hosted-executor-refs.schema.json",
+  "title": "RedCube OPL Hosted Executor References",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "surface_kind",
+    "owner_boundary",
+    "refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "surface_kind": {
+      "const": "opl_hosted_executor_refs"
+    },
+    "owner_boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "executor_adapter_owner",
+        "rca_owns_generic_executor_adapter",
+        "rca_executes_hosted_adapter"
+      ],
+      "properties": {
+        "executor_adapter_owner": {
+          "const": "one-person-lab"
+        },
+        "rca_owns_generic_executor_adapter": {
+          "const": false
+        },
+        "rca_executes_hosted_adapter": {
+          "const": false
+        }
+      }
+    },
+    "refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "opl_executor_adapter_receipt_ref",
+        "opl_hosted_executor_requirement_ref"
+      ],
+      "properties": {
+        "opl_executor_adapter_receipt_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "opl_hosted_executor_requirement_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

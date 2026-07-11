@@ -153,9 +153,6 @@ export function createPptDeckRenderBatchCacheParts(deps) {
 
   async function executeRenderBatchStagesDurably({
     adapter,
-    executionShape = null,
-    hermesProfile = null,
-    executorRouting = null,
     deliverablePaths,
     route,
     stages,
@@ -190,9 +187,6 @@ export function createPptDeckRenderBatchCacheParts(deps) {
           localFileInspection: stageInput.localFileInspection,
           timeoutMs: stageInput.timeoutMs,
           cwd: stageInput.cwd || deliverablePaths.deliverableDir,
-          executionShape,
-          hermesProfile,
-          executorRouting,
         });
         const persisted = writeRenderBatchCache({
           deliverablePaths,
@@ -275,9 +269,6 @@ export function createPptDeckRenderBatchCacheParts(deps) {
         localFileInspection: stageInput.localFileInspection,
         timeoutMs: stageInput.timeoutMs,
         cwd: stageInput.cwd || deliverablePaths.deliverableDir,
-        executionShape,
-        hermesProfile,
-        executorRouting,
       });
       generatedBatchCount += 1;
       const persisted = writeRenderBatchCache({

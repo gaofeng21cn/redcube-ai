@@ -15,10 +15,7 @@ import {
 } from '@redcube/runtime-protocol';
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
-  buildHermesAgentLoopExecutionModel,
-  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
 import { compareFailuresAndDensity, summarizeRelativeQuality } from '../../../relative-quality.js';
 import { getReviewState, isBaselineApprovedState } from '@redcube/governance';
@@ -62,7 +59,6 @@ const ROUTE_TO_SOURCE_TRUTH_CONSUMPTION_ROLE = Object.freeze({
 });
 
 const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 const CREATIVE_MATERIALIZED_FROM = 'codex_cli_json_output';
 
 function uniqueStrings(value) {
@@ -106,34 +102,36 @@ function routeCloseoutRefs({ route, deliverableId, payload }) {
 }
 
 function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-  return adapter === HERMES_AGENT_ADAPTER
-    ? HERMES_AGENT_LOOP_EXECUTION_MODEL
-    : CODEX_EXECUTION_MODEL;
+  requireCodexAdapter(adapter);
+  return CODEX_EXECUTION_MODEL;
+}
+
+function requireCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+  const requested = shared.safeText(adapter, CODEX_DEFAULT_ADAPTER);
+  if (requested !== CODEX_DEFAULT_ADAPTER) {
+    throw new Error(`Unsupported executor adapter: ${requested}`);
+  }
 }
 
 function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   if (shared.safeText(generationRuntime?.creative_owner)) {
     return shared.safeText(generationRuntime.creative_owner);
   }
-  return adapter === HERMES_AGENT_ADAPTER ? HERMES_AGENT_ADAPTER : 'codex_cli';
+  return CODEX_DEFAULT_ADAPTER;
 }
 
 function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
   if (shared.safeText(generationRuntime?.primary_surface)) {
     return shared.safeText(generationRuntime.primary_surface);
   }
-  return adapter === HERMES_AGENT_ADAPTER
-    ? 'hermes_agent_loop'
-    : 'codex_cli_runtime';
+  return 'codex_cli_runtime';
 }
 
 async function generateStructuredArtifact({
   adapter = CODEX_DEFAULT_ADAPTER,
   ...input
 }) {
-  if (adapter === HERMES_AGENT_ADAPTER) {
-    return failRetiredHermesAgentAdapter();
-  }
+  requireCodexAdapter(adapter);
   return generateStructuredArtifactViaCodexCli(input);
 }
 
@@ -141,9 +139,7 @@ async function generateStructuredArtifactBatch({
   adapter = CODEX_DEFAULT_ADAPTER,
   ...input
 }) {
-  if (adapter === HERMES_AGENT_ADAPTER) {
-    return failRetiredHermesAgentAdapter();
-  }
+  requireCodexAdapter(adapter);
   return generateStructuredArtifactBatchViaCodexCli(input);
 }
 

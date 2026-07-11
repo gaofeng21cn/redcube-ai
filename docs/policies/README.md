@@ -26,8 +26,8 @@ Machine boundary: 人读 policy 索引。机器真相继续归 contracts、schem
 
 当前统一口径：
 
-- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_agent` proof lane 共同成立
-- 默认 concrete executor 仍是本地 `Codex CLI`；external `Hermes-Agent` 只作为显式 hosted/proof backend 或 OPL adapter/proof lane 出现，不改写默认公开 capability contract；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance
+- `Agent-first` 由 RCA 仓内默认 `Codex` concrete executor 与 OPL hosted executor handoff 共同成立
+- RCA 只物化本地 `Codex CLI`；其他 executor 由 OPL 选择和托管，RCA 只保留 opaque receipt / requirement refs；历史 `repo-local managed runtime pilot` 只保留为迁移 provenance
 - 共享宏观生命周期是：
   - `Source Readiness`
   - `Story Architecture`

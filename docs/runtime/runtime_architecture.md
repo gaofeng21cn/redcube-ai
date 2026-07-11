@@ -49,7 +49,7 @@ User / Agent
 
 当前默认 concrete stage executor 是 `Codex CLI host-agent runtime`，对应 runtime-program surface 里的 `codex_cli`。任务启动后默认由 OPL/Temporal 承担持久在线调度、唤醒、retry/dead-letter、resume 和 attempt 投影；`Codex CLI` 是 stage 内的第一公民执行单元，不是 RCA 自带 daemon / scheduler / attempt loop。
 
-`hermes_agent` 只表示显式 hosted/proof backend、可选 executor adapter 或历史 proof lane。它不能作为默认 runtime owner、OPL provider、production online substrate 或 legacy fallback 读取，也不能把旧 Hermes 优先 board 重新提升为当前公开主线。
+RCA runtime-local 只物化 `Codex CLI`。其他 executor 的选择、执行与 receipt body 归 OPL hosted surface；RCA 只消费 opaque receipt / requirement refs。旧 external executor key 仅按 history/provenance、stable legacy machine contract 或 no-resurrection guard 读取。
 `claude_code` 等未来 executor 也按 OPL generic Agent Executor Adapter / receipt 边界显式接入；RCA 只消费 receipt/projection refs，不实现 generic executor owner，也不承诺非默认 executor 的视觉质量、工具语义或 resume 行为与 `Codex CLI` 等价。2026-05-12 当前状态是 adapter/receipt/fail-closed 边界已落地，剩余验收是 provider-hosted controlled visual stage soak、真实 receipt instance、workspace/runtime memory writeback 和 no-forbidden-write proof。
 
 OPL provider-backed 路径的 production online runtime 必需 substrate 是 Temporal。RCA 侧只暴露 `domain-handler export|dispatch` refs-only target 和 service-safe domain entry；OPL-generated `domain_action_adapter` wrapper 只是框架侧 descriptor / dispatch shell。provider 负责在线唤醒、signal/query、retry/dead-letter 与 attempt 投影，不写 RedCube visual truth、review verdict、publication projection truth、canonical artifacts 或 export authority。

@@ -55,7 +55,6 @@ export interface CliDomainActions {
   getDeliverable(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<JsonSurface>;
   getPublicationProjection(request: { workspaceRoot: string; topicId: string }): Promise<JsonSurface>;
   getReviewState(request: { workspaceRoot: string; topicId: string; deliverableId: string }): Promise<JsonSurface>;
-  getRun(request: { workspaceRoot: string; runId: string }): Promise<JsonSurface>;
   auditDeliverable(request: JsonSurface): Promise<JsonSurface>;
   applyReviewMutation(request: JsonSurface): Promise<JsonSurface>;
 }

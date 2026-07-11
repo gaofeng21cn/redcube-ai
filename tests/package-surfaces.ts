@@ -26,14 +26,12 @@ export {
   applyReviewMutation,
   buildCreativeOwnershipResidueAudit,
   buildPerformanceReport,
-  loadExecutorRoutingConfig,
   P19_CREATIVE_OWNERSHIP_EXECUTION_CONTRACT,
   P19_CREATIVE_OWNERSHIP_FORBIDDEN_BOUNDARIES,
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_CREATIVE_OWNERSHIP_PROGRAM_CLOSEOUT,
   P19_TEAM_GATE_CONTRACT,
   planCandidateRace,
-  resolveExecutorRouting,
   resolveExecutorAdapter,
   resolveSourceAugmentationAdapter,
   runCandidateRaceRoute,
@@ -60,11 +58,7 @@ export {
 } from '@redcube/redcube-config/private-profile';
 export {
   buildCodexExecutorDescriptor,
-  buildExecutorBackendContract,
-  buildHermesAgentLoopExecutorDescriptor,
-  failRetiredHermesAgentAdapter,
   RUN_LOCATOR_ENVELOPE_BOUNDARY,
-  normalizeExecutorBackend,
   WORKSPACE_LOCATOR_ENVELOPE_BOUNDARY,
 } from '@redcube/runtime-protocol';
 export { runDeliverableRoute } from './helpers/route-attempt-test-api.ts';

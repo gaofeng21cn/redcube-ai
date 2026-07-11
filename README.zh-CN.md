@@ -115,7 +115,7 @@ Machine boundary: 人读公开入口。机器真相继续归 contracts、schemas
 
 - `OPL` 可以把 RedCube 作为外部领域智能体托管；这条 hosted path 是内部集成面，不是 RedCube 的对外第一身份。
 - 任务启动后，OPL/Temporal 可以负责持久在线调度、唤醒、retry/dead-letter 与 resume；RCA 不内置 daemon、scheduler 或 attempt loop。
-- `Codex CLI` 是当前第一公民 executor；Hermes-Agent、Claude Code 等其他 executor 是显式 opt-in adapter，必须产出可审计回执。
+- RCA 仓内 runtime 只物化 `Codex CLI` executor。其他 executor 由 OPL 选择和托管，RCA 只消费 hosted-executor receipt / requirement 的 opaque refs。
 - RedCube 保留视觉交付权威：视觉领域真相、review/export gates、标准产物、文件交接和 owner receipts。
 - 完整入口 taxonomy、service-safe domain entry、generated-wrapper 边界、合同 refs、canary evidence 和 no-readiness 规则由 [文档索引](./docs/README.md)、[当前状态](./docs/status.md)、[架构](./docs/architecture.md)、[硬约束](./docs/invariants.md)、[关键决策](./docs/decisions.md) 和 [合同说明](./contracts/README.md) 维护。
 

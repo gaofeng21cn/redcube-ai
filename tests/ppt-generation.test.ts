@@ -214,7 +214,7 @@ test('ppt authoring treats numbered source slide plans as suggestions, not appro
 
 test('ppt core authoring stages carry Codex generation evidence and keep operator meta instructions out of audience-facing content', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-generation-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-generation-'));
 
     await createDeliverable({
       workspaceRoot,
@@ -304,7 +304,7 @@ test('ppt core authoring stages carry Codex generation evidence and keep operato
 
 test('ppt authoring context keeps lecture_peer audience and public source labels aligned to source truth', async () => {
   await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-hermes-audience-'));
+    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-audience-'));
     const sourceFile = path.join(workspaceRoot, 'med-auto-science.md');
     writeFileSync(sourceFile, [
       '# 项目概览',

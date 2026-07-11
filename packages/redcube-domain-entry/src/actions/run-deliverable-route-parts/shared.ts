@@ -17,34 +17,6 @@ export type DependencyRouteRun = {
   status: string | null;
 };
 
-export type FixHtmlEscalationAttempt = {
-  attempt_index: number;
-  route: 'fix_html';
-  executor_backend: 'codex_cli' | 'hermes_agent';
-  execution_shape: 'structured_call' | 'agent_loop';
-  adapter: string;
-  ok: boolean;
-  run_id: string | null;
-  status: string | null;
-  executed_route: string | null;
-  review_requires_fix_html: boolean;
-  dependency_route_runs: DependencyRouteRun[];
-  continuation_route_runs: DependencyRouteRun[];
-};
-
-export type FixHtmlExecutionProof = {
-  proof_kind: 'fix_html_agentic_escalation';
-  policy: 'structured_call_then_single_agent_loop_escalation';
-  escalation_status:
-    | 'not_required'
-    | 'escalated'
-    | 'escalated_still_requires_fix_html'
-    | 'escalation_unavailable'
-    | 'already_agent_loop';
-  stop_after_stage: string;
-  attempts: FixHtmlEscalationAttempt[];
-};
-
 export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summary' | 'surface_kind'> & {
   surface_kind: 'route_run' | 'typed_blocker';
   return_shape?: 'typed_blocker';
@@ -52,7 +24,6 @@ export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summar
   artifact?: unknown;
   dependency_route_runs?: DependencyRouteRun[];
   continuation_route_runs?: DependencyRouteRun[];
-  execution_proof?: FixHtmlExecutionProof;
   summary: RouteRunResponse['summary'] & {
     cache_status: string;
     requested_route: string;
@@ -61,13 +32,10 @@ export type RouteRunDomainEntryResponse = Omit<RouteRunResponse, 'run' | 'summar
     continued_route_sequence: string[];
     stop_after_stage: string | null;
     recovery_terminal_reason: string | null;
-    fix_html_escalation_status: FixHtmlExecutionProof['escalation_status'] | null;
   };
 };
 
 export const CODEX_STRUCTURED_ADAPTER = 'codex_cli';
-export const HERMES_AGENT_LOOP_ADAPTER = 'hermes_agent';
-
 export function readJsonRecord(file: string): JsonObject {
   return JSON.parse(readFileSync(file, 'utf-8')) as JsonObject;
 }

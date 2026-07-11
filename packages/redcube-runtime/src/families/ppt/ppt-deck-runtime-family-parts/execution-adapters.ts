@@ -5,78 +5,45 @@ import {
 } from '../../../executors/codex-caller.js';
 import {
   CODEX_DEFAULT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_AGENT_ADAPTER,
   buildCodexExecutionModel,
-  buildHermesExecutionModel,
-  buildHermesAgentLoopExecutionModel,
-  failRetiredHermesAgentAdapter,
 } from '@redcube/runtime-protocol';
-import { createStructuredArtifactExecutor } from './executor-routing.js';
 
 export function createPptDeckExecutionAdapterParts({ safeText }) {
   const CODEX_EXECUTION_MODEL = Object.freeze(buildCodexExecutionModel());
-  const HERMES_AGENT_EXECUTION_MODEL = Object.freeze(buildHermesExecutionModel());
-  const HERMES_AGENT_LOOP_EXECUTION_MODEL = Object.freeze(buildHermesAgentLoopExecutionModel());
 
-  function isHermesAgentAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    const requested = safeText(adapter);
-    return requested === HERMES_AGENT_EXECUTOR_BACKEND;
+  function requireCodexAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
+    const requested = safeText(adapter, CODEX_DEFAULT_ADAPTER);
+    if (requested !== CODEX_DEFAULT_ADAPTER) {
+      throw new Error(`Unsupported executor adapter: ${requested}`);
+    }
   }
 
   function executionModelForAdapter(adapter = CODEX_DEFAULT_ADAPTER) {
-    if (adapter === HERMES_AGENT_ADAPTER) return HERMES_AGENT_LOOP_EXECUTION_MODEL;
-    if (isHermesAgentAdapter(adapter)) return HERMES_AGENT_EXECUTION_MODEL;
+    requireCodexAdapter(adapter);
     return CODEX_EXECUTION_MODEL;
   }
 
-  function creativeOwner(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (isHermesAgentAdapter(adapter)) {
-      if (safeText(generationRuntime?.creative_owner)) {
-        return safeText(generationRuntime.creative_owner);
-      }
-      if (safeText(generationRuntime?.owner)) {
-        return safeText(generationRuntime.owner);
-      }
-      return HERMES_AGENT_EXECUTOR_BACKEND;
-    }
-    if (adapter === HERMES_AGENT_ADAPTER) {
-      if (safeText(generationRuntime?.creative_owner)) {
-        return safeText(generationRuntime.creative_owner);
-      }
-      if (safeText(generationRuntime?.owner)) {
-        return safeText(generationRuntime.owner);
-      }
-      return HERMES_AGENT_ADAPTER;
-    }
-    return 'codex_cli';
+  function creativeOwner(generationRuntime = null) {
+    return safeText(generationRuntime?.creative_owner)
+      || safeText(generationRuntime?.owner)
+      || CODEX_DEFAULT_ADAPTER;
   }
 
-  function primarySurface(generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
-    if (safeText(generationRuntime?.primary_surface)) {
-      return safeText(generationRuntime.primary_surface);
-    }
-    if (safeText(generationRuntime?.adapter_surface)) {
-      return safeText(generationRuntime.adapter_surface);
-    }
-    if (isHermesAgentAdapter(adapter)) {
-      return 'hermes_agent_api_server';
-    }
-    return adapter === HERMES_AGENT_ADAPTER
-      ? 'hermes_agent_loop'
-      : 'codex_cli_runtime';
+  function primarySurface(generationRuntime = null) {
+    return safeText(generationRuntime?.primary_surface)
+      || safeText(generationRuntime?.adapter_surface)
+      || 'codex_cli_runtime';
   }
 
   function runtimeCreativeSource(
     protectedSurface,
     artifactSource,
     generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
   ) {
     return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
-      stage_owner: primarySurface(generationRuntime, adapter),
+      owner: creativeOwner(generationRuntime),
+      primary_surface: primarySurface(generationRuntime),
+      stage_owner: primarySurface(generationRuntime),
       ownership_model: 'director_first',
       authored_surface: protectedSurface,
       materialized_from: artifactSource,
@@ -89,10 +56,9 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     authoredSurface,
     materializedFrom = 'prompt_pack_seed',
     generationRuntime = null,
-    adapter = CODEX_DEFAULT_ADAPTER,
   }) {
     return {
-      ...runtimeCreativeSource(authoredSurface, materializedFrom, generationRuntime, adapter),
+      ...runtimeCreativeSource(authoredSurface, materializedFrom, generationRuntime),
       route,
       lifecycle_stage: lifecycleStage,
       authored_surface: authoredSurface,
@@ -100,10 +66,10 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     };
   }
 
-  function creativeExecution(routeOrLifecycleStage, generationRuntime = null, adapter = CODEX_DEFAULT_ADAPTER) {
+  function creativeExecution(routeOrLifecycleStage, generationRuntime = null) {
     return {
-      owner: creativeOwner(generationRuntime, adapter),
-      primary_surface: primarySurface(generationRuntime, adapter),
+      owner: creativeOwner(generationRuntime),
+      primary_surface: primarySurface(generationRuntime),
       lifecycle_stage: routeOrLifecycleStage,
       ownership_model: 'director_first',
       ...(generationRuntime
@@ -114,42 +80,30 @@ export function createPptDeckExecutionAdapterParts({ safeText }) {
     };
   }
 
-  const generateStructuredArtifact = createStructuredArtifactExecutor({
-    CODEX_DEFAULT_ADAPTER,
-    HERMES_AGENT_EXECUTOR_BACKEND,
-    HERMES_AGENT_ADAPTER,
-    failRetiredHermesAgentAdapter,
-    generateStructuredArtifactViaCodexCli,
-    isHermesAgentAdapter,
-    safeText,
-  });
+  async function generateStructuredArtifact({
+    adapter = CODEX_DEFAULT_ADAPTER,
+    ...input
+  }) {
+    requireCodexAdapter(adapter);
+    return generateStructuredArtifactViaCodexCli(input);
+  }
 
   async function generateStructuredArtifactBatch({
     adapter = CODEX_DEFAULT_ADAPTER,
     stages = [],
-    executionShape = null,
-    hermesProfile = null,
-    executorRouting = null,
     ...input
   }) {
-    if (isHermesAgentAdapter(adapter)) {
-      return failRetiredHermesAgentAdapter({
-        surface: executionShape === 'structured_call' ? 'hermes_agent_api_server' : 'hermes_agent_loop',
-      });
-    }
+    requireCodexAdapter(adapter);
     return generateStructuredArtifactBatchViaCodexCli({ stages, ...input });
   }
 
   return {
     CODEX_DEFAULT_ADAPTER,
-    HERMES_AGENT_EXECUTOR_BACKEND,
-    HERMES_AGENT_ADAPTER,
     creativeExecution,
     creativeSourceStamp,
     executionModelForAdapter,
     generateStructuredArtifact,
     generateStructuredArtifactBatch,
-    isHermesAgentAdapter,
     primarySurface,
     runtimeCreativeSource,
   };

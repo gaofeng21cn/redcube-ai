@@ -25,9 +25,6 @@ export interface RuntimeRunRecord {
   executor?: Record<string, unknown>;
 }
 
-type RuntimeExecutorBackend = 'codex_cli' | 'hermes_agent';
-type RuntimeExecutionShape = 'structured_call' | 'agent_loop';
-
 export interface RuntimeCreativeOwnershipLifecycleFamilyMapping {
   source_readiness: string[];
   story_architecture: string[];
@@ -296,10 +293,6 @@ export interface RuntimeRunRouteRequest {
   route: string;
   runId?: string | null;
   adapter?: string;
-  executorBackend?: 'codex_cli' | 'hermes_agent';
-  executor_backend?: 'codex_cli' | 'hermes_agent';
-  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
-  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   mode?: string;
   baselineDeliverableId?: string;

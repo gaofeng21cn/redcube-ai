@@ -20,12 +20,9 @@ import { assertPathValues, list } from './surface-fixture-assertions.ts';
 const RUNTIME_OWNER = 'configured_family_runtime_provider';
 const EXECUTOR_OWNER = 'configured_by_opl_runtime_provider';
 
-test('default product-entry path returns an OPL stage execution plan without requiring Hermes API server', SERIAL_ENV_TEST, async () => {
+test('default product-entry path returns an OPL stage execution plan with Codex as the RCA-local executor', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-
-    assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_API_BASE_URL), false);
-    assert.equal(Boolean(process.env.REDCUBE_HERMES_AGENT_LOOP_BRIDGE_COMMAND), false);
 
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
     assertPathValues(manifest, {
@@ -57,7 +54,7 @@ test('default product-entry path returns an OPL stage execution plan without req
         deliverable_id: 'deck-codex-default',
         profile_id: 'lecture_student',
         title: 'OPL default product entry proof',
-        goal: '验证未配置 Hermes 时默认 product-entry 生成 OPL stage execution plan',
+        goal: '验证默认 product-entry 生成 OPL stage execution plan',
         user_intent: '先给我主线故事',
         stop_after_stage: 'storyline',
       },

@@ -20,9 +20,9 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 - RCA runtime-family shell 只负责 visual-deliverable stage pack、artifact refs、review/export gate 与 owner receipt
 - 通用 stage attempt、queue、wakeup、retry/dead-letter、operator projection 与 App/workbench shell 归 OPL Framework 或产品壳
 - 正式主线优先复用宿主 Agent runtime，不在 RCA 内重建 generic runtime platform
-- 显式 proof lane 可以使用 `hermes_agent`，但它不是默认 runtime owner
+- hosted executor lane 由 OPL 选择和运行，RCA 只消费 opaque refs
 - 默认 concrete executor 是本地 `Codex CLI host-agent runtime`
-- `Hermes-Agent` 只作为显式 hosted/proof backend、非默认 executor adapter 或技术参考层保留
+- 外部 executor 只在 OPL hosted refs、技术参考或 history/provenance 中保留
 - `Codex` 本地 operator host 是当前 deployment host / development shell
 - 历史 `repo-local managed runtime pilot` 只作为迁移 provenance，不是兼容桥、当前 owner 或可继续扩展的 active path
 - 未来人用 workbench / product shell 应读取 projection 和 receipt refs；它不持有 visual truth、review/export verdict 或 artifact rewrite authority
@@ -30,7 +30,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 
 补充执行原则：
 
-- `Agent-first` 由默认 `Codex` concrete executor 与显式 `hermes_agent` proof lane 共同成立
+- `Agent-first` 由 RCA 仓内默认 `Codex` concrete executor 与 OPL hosted executor handoff 共同成立
 - 在当前 Codex-native 语境里，`Codex` 继续承担本地 operator / development host 与默认 concrete executor，而不是 generic managed-runtime owner
 - code 必须退回 contract、governance、audit、artifact persistence、review/export gate 与 render boundary
 

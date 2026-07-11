@@ -16,7 +16,7 @@
       "default_backend": "codex_cli",
       "render_html_execution_shape": "structured_call",
       "fix_html_default_execution_shape": "structured_call",
-      "hermes_agent_allowed_only_when_explicit_or_fix_escalation_policy_requires": true,
+      "rca_owned_non_codex_executor_branch_absent": true,
       "silent_executor_fallback_allowed": false
     }
   },

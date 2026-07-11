@@ -118,7 +118,7 @@ You can start with prompts like:
 
 - OPL can host RedCube as an external domain agent, but that hosted path is an internal integration surface, not RedCube's first public identity.
 - After task start, OPL/Temporal may own persistent scheduling, wakeup, retry/dead-letter handling, and resume. RCA does not embed a daemon, scheduler, or attempt loop.
-- `Codex CLI` is the current first-class executor; Hermes-Agent, Claude Code, and similar executors are explicit opt-in adapters with auditable receipts.
+- RCA's repo-local runtime materializes only the `Codex CLI` executor. Other executors are selected and hosted by OPL; RCA consumes only opaque hosted-executor receipt and requirement refs.
 - RedCube keeps the visual-deliverable authority: visual-domain truth, review/export gates, canonical artifacts, artifact handoff, and owner receipts.
 - The full entry taxonomy, service-safe domain entry, generated-wrapper boundary, contract refs, canary evidence, and no-readiness rules are maintained in the [Docs Guide](./docs/README.md), [Status](./docs/status.md), [Architecture](./docs/architecture.md), [Invariants](./docs/invariants.md), [Decisions](./docs/decisions.md), and [Contracts Overview](./contracts/README.md).
 

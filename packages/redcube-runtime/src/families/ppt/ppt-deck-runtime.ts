@@ -135,9 +135,6 @@ async function buildRenderRoutePayload({
   deliverablePaths,
   route,
   adapter,
-  executionShape,
-  hermesProfile,
-  executorRouting,
 }) {
   return buildRenderHtmlArtifact({
     workspaceRoot,
@@ -146,9 +143,6 @@ async function buildRenderRoutePayload({
     deliverablePaths,
     ...(route ? { route } : {}),
     adapter,
-    executionShape,
-    hermesProfile,
-    executorRouting,
   });
 }
 
@@ -226,9 +220,6 @@ export async function runPptDeckRoute({
   baselineDeliverableId = '',
   adapter = CODEX_DEFAULT_ADAPTER,
   executor = null,
-  executionShape = executor?.execution_shape,
-  hermesProfile = executor?.hermes_profile || null,
-  executorRouting = executor?.executor_routing || null,
 }) {
   ensurePrerequisites({ workspaceRoot, topicId, deliverableId, route, mode, baselineDeliverableId });
   const deliverablePaths = getDeliverablePaths(workspaceRoot, topicId, deliverableId);
@@ -245,9 +236,6 @@ export async function runPptDeckRoute({
     mode,
     baselineDeliverableId,
     adapter,
-    executionShape,
-    hermesProfile,
-    executorRouting,
     deliverablePaths,
   });
   payload = attachRouteReviewReset(payload, route);

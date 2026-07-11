@@ -10,7 +10,6 @@ import {
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
-  getRun as getDomainEntryRun,
   invokeDomainEntry,
   invokeProductEntry,
   buildPerformanceReport,
@@ -39,7 +38,6 @@ const DEFAULT_DOMAIN_ACTIONS = {
   getOverlayCatalog,
   getPublicationProjection,
   getReviewState,
-  getRun: getDomainEntryRun,
   exportDomainHandler: async (request: Record<string, unknown>) => {
     const domainEntry = await import('@redcube/domain-entry');
     return (domainEntry as Record<string, any>).exportDomainHandler(request);
@@ -465,17 +463,6 @@ export async function executeCli(argv: string[], deps: CliDependenciesMap = {}):
     }
 
     throw new Error('review 命令仅支持 get|projection|mutate；runtimeWatch default wrapper 由 OPL status/workbench/read-model caller 持有');
-  }
-
-  if (command === 'runs') {
-    if (subcommand !== 'get') {
-      throw new Error('runs 命令仅支持 get');
-    }
-
-    return domainEntry.getRun({
-      workspaceRoot: resolveWorkspaceRoot(options, cwd),
-      runId: options.runId || '',
-    });
   }
 
   if (command === 'report') {

@@ -339,7 +339,7 @@ test('native PPT fast runtime tests use the mock Python helper instead of launch
   assert.equal(GROUPS.integration.includes('tests/ppt-native-python-layouts.test.ts'), true);
   for (const file of [
     'tests/ppt-native-ppt-runtime.test.ts',
-    'tests/ppt-hermes-generation.test.ts',
+    'tests/ppt-generation.test.ts',
     'tests/runtime-deliverable-route-recovery.test.ts',
     'tests/runtime-deliverable-route-cases/shared.ts',
   ]) {

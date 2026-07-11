@@ -202,8 +202,6 @@ test('runDeliverableRoute auto-recovers fresh review dependencies before ppt fix
         result.dependency_route_runs.map((entry) => entry.route),
         ['visual_director_review', 'screenshot_review'],
       );
-      assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
-      assert.equal(result.execution_proof?.escalation_status, 'escalation_unavailable');
       assert.deepEqual(result.artifact?.render_execution?.freshly_rendered_slide_ids, ['S02']);
       const fixArtifact = readJson(routeArtifactFile(result));
       assert.deepEqual(fixArtifact.render_execution?.freshly_rendered_slide_ids, ['S02']);
@@ -556,13 +554,13 @@ test('runDeliverableRoute reports repeated ppt screenshot blocks after image rep
   });
 });
 
-test('runDeliverableRoute fails closed when repeated ppt fix_html review blocks cannot escalate to retired Hermes loop', async () => {
+test('runDeliverableRoute keeps repeated ppt fix_html review blocked without a second executor pass', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-route-escalation-'));
     await createPptDeliverable({
       workspaceRoot,
       title: 'Route escalation proof',
-      brief: '验证 fix_html 复审仍阻断且 Hermes loop 已退役时保持 fail-closed。',
+      brief: '验证 fix_html 复审仍阻断时保持单次 executor pass。',
       keywords: ['ppt', 'fix_html', 'agent_loop'],
       profileId: 'lecture_peer',
       goal: '验证 route escalation',
@@ -585,21 +583,10 @@ test('runDeliverableRoute fails closed when repeated ppt fix_html review blocks 
       assert.equal(result.summary.requested_route, 'fix_html');
       assert.equal(result.summary.executed_route, 'screenshot_review');
       assert.equal(result.summary.stop_after_stage, 'screenshot_review');
-      assert.equal(result.execution_proof?.proof_kind, 'fix_html_agentic_escalation');
-      assert.equal(result.execution_proof?.escalation_status, 'escalation_unavailable');
-      assert.deepEqual(
-        result.execution_proof?.attempts.map((attempt) => [attempt.executor_backend, attempt.execution_shape]),
-        [
-          ['codex_cli', 'structured_call'],
-        ],
-      );
-      assert.deepEqual(
-        result.execution_proof?.attempts.map((attempt) => attempt.review_requires_fix_html),
-        [true],
-      );
+      assert.equal('execution_proof' in result, false);
 
       const reviewArtifact = readStageArtifact(workspaceRoot, 'topic-a', 'deck-a', 'screenshot_review');
-      assert.equal(reviewArtifact.execution_proof.escalation_status, 'escalation_unavailable');
+      assert.equal('execution_proof' in reviewArtifact, false);
     });
   });
 });

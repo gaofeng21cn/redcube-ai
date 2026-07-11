@@ -54,36 +54,16 @@ export {
   buildCodexRuntimeTopology,
 } from './runtime-topology.js';
 export {
-  HERMES_AGENT_ADAPTER_DELETION_GATE,
-  HERMES_AGENT_ADAPTER_DELETION_GATE_OWNER,
-  HERMES_AGENT_BACKEND_LIFECYCLE,
-  AGENT_LOOP_EXECUTION_SHAPE,
   CODEX_DEFAULT_ADAPTER,
   CODEX_DEFAULT_MODEL_SELECTION,
   CODEX_DEFAULT_REASONING_SELECTION,
-  CODEX_EXECUTOR_BACKEND,
   CODEX_RUNTIME_SURFACE,
-  HERMES_AGENT_ADAPTER,
-  HERMES_AGENT_EXECUTOR_BACKEND,
-  HERMES_AGENT_LOOP_RUNTIME_SURFACE,
-  HERMES_RUNTIME_SURFACE,
-  STRUCTURED_CALL_EXECUTION_SHAPE,
   buildCodexExecutorDescriptor,
   buildCodexExecutionModel,
-  buildExecutorBackendContract,
-  buildHermesAgentLoopExecutorDescriptor,
-  buildHermesAgentLoopExecutionModel,
-  buildHermesExecutorDescriptor,
-  buildHermesExecutionModel,
-  buildHermesRuntimeTopology,
-  failRetiredHermesAgentAdapter,
-  hermesAgentAdapterRetirementBoundary,
-  normalizeExecutorBackend,
 } from './executor-runtime.js';
 
 export type {
   CodexExecutionModel,
-  HermesAgentLoopExecutionModel,
 } from './executor-runtime.js';
 export type {
   BuildSourceTruthConsumptionSummaryOptions,

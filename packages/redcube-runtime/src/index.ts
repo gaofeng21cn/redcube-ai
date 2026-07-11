@@ -174,22 +174,6 @@ export {
   resolveExecutorAdapter,
 } from './executors/index.js';
 export {
-  loadExecutorRoutingConfig,
-  resolveExecutorRouting,
-} from './executor-routing.js';
-export type {
-  RedcubeExecutionShape,
-  RedcubeExecutorBackend,
-  RedcubeExecutorResolutionSource,
-  RedcubeExecutorRoutingConfig,
-  RedcubeExecutorRoutingConfigResult,
-  RedcubeExecutorRoutingResolution,
-  RedcubeExecutorRoutingResolutionRequest,
-  RedcubeExecutorSelection,
-  RedcubeStructuredCallRoutePolicy,
-  RedcubeStructuredCallRoutingConfig,
-} from './executor-routing.js';
-export {
   buildPerformanceReport,
 } from './performance-report.js';
 export {

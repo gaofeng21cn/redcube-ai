@@ -34,7 +34,7 @@ Machine boundary: 人读质量边界 policy。机器真相继续归 contracts、
 - 程序化 helper 只能生成 evidence、metrics、artifact refs、layout facts、rerun hints 或 mutation envelope。
 - 不得新增 hidden templates、hardcoded prose、heuristic-only visual verdict、scorecard-only ready verdict 或程序化正文/HTML/视觉创作 fallback。
 - 修复 visual quality bug 时，应把问题收回到 AI review / authoring loop，再加固 renderer、QC 或 gate；不得只改某个样例 artifact。
-- OPL 托管路径、Runtime Manager、Hermes proof lane 或 native helper 只改变运行/投影/执行位置，不改变 RedCube 的 visual-domain judgment owner。
+- OPL 托管路径、hosted executor refs 或 native helper 只改变运行/投影/执行位置，不改变 RedCube 的 visual-domain judgment owner。
 
 ## Verification
 

@@ -1,6 +1,5 @@
 import type {
   CodexExecutionModel,
-  HermesAgentLoopExecutionModel,
 } from '@redcube/runtime-protocol';
 
 export type XhsRunMode = 'single' | 'series';
@@ -383,7 +382,7 @@ interface XhsRenderArtifactDependencies {
   path: XhsPathModuleLike;
 }
 
-export type XhsRuntimeExecutionModel = CodexExecutionModel | HermesAgentLoopExecutionModel;
+export type XhsRuntimeExecutionModel = CodexExecutionModel;
 
 export type XhsRuntimeRoute =
   | 'research'

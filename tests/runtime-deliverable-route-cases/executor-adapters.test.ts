@@ -11,16 +11,13 @@ import {
   writeFileSync,
   createDeliverable,
   getDeliverable,
-  getRun,
   runtimeWatch,
   runDeliverableRoute,
   startMockCodexCli,
   withEnv,
   completeSourceReadiness,
   MODULE_DIR,
-  MOCK_HERMES_AGENT_LOOP_BRIDGE_COMMAND,
   withMockCodexRuntime,
-  withMockHermesAgentLoop,
 } from './shared.ts';
 
 test('runDeliverableRoute uses Codex-backed executor by default', async () => {
@@ -119,33 +116,5 @@ test('runDeliverableRoute executes other declared stages through Codex-backed ex
     assert.equal(artifact.stage_contract.stage_id, 'detailed_outline');
     assert.equal(artifact.contract.profile_id, 'lecture_peer');
     assert.equal(artifact.execution_model.mainline_adapter, 'codex_cli');
-  });
-});
-
-test('runDeliverableRoute fails closed for explicit retired hermes_agent adapter without changing the default executor', async () => {
-  await withMockCodexRuntime(async () => {
-    const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-runtime-hermes-retired-'));
-
-    await createDeliverable({
-      workspaceRoot,
-      overlay: 'ppt_deck',
-      profileId: 'lecture_student',
-      topicId: 'topic-a',
-      deliverableId: 'deck-a',
-      title: 'Hermes-Agent retired route',
-      goal: '验证 RedCube 显式 Hermes-Agent adapter 退役后 fail closed',
-    });
-
-    await assert.rejects(
-      () => runDeliverableRoute({
-        workspaceRoot,
-        overlay: 'ppt_deck',
-        topicId: 'topic-a',
-        deliverableId: 'deck-a',
-        route: 'storyline',
-        adapter: 'hermes_agent',
-      }),
-      /RCA-owned Hermes-Agent adapter has been retired/,
-    );
   });
 });

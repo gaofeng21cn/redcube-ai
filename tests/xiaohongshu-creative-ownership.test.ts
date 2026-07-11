@@ -25,7 +25,7 @@ const XHS_ROUTES_THROUGH_PUBLISH_COPY = [...XHS_ROUTES_THROUGH_SCREENSHOT_REVIEW
 
 const preparedWorkspaceCache = new Map();
 let sharedMockCodexRuntime = null;
-let restoreMockHermesEnv = null;
+let restoreMockCodexEnv = null;
 
 function withOptionalEnv(env = {}) {
   if (Object.keys(env).length === 0) {
@@ -39,7 +39,7 @@ async function ensureMockCodexRuntime() {
     return;
   }
   sharedMockCodexRuntime = await startMockCodexCli();
-  restoreMockHermesEnv = withEnv({
+  restoreMockCodexEnv = withEnv({
     REDCUBE_CODEX_COMMAND: sharedMockCodexRuntime.command,
   });
 }
@@ -118,9 +118,9 @@ async function withMockCodexRuntime(testFn) {
 }
 
 test.after(async () => {
-  if (restoreMockHermesEnv) {
-    restoreMockHermesEnv();
-    restoreMockHermesEnv = null;
+  if (restoreMockCodexEnv) {
+    restoreMockCodexEnv();
+    restoreMockCodexEnv = null;
   }
   if (sharedMockCodexRuntime) {
     await sharedMockCodexRuntime.close();

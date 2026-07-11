@@ -126,27 +126,10 @@ export interface PublicationProjectionResponse extends SurfaceBase<'publication_
   };
 }
 
-export interface RunRecordResponse extends SurfaceBase<'run_record'> {
-  run: Record<string, unknown>;
-  run_telemetry: RunTelemetrySummary;
-  error_taxonomy: ErrorTaxonomySummary;
-  rerun_analytics: RerunAnalyticsSummary;
-  cost_summary: CostSummary;
-  quality_drift_summary: QualityDriftSummary;
-  approval_throughput_summary: ApprovalThroughputSummary;
-  metric_extensions: MetricExtensionSummary[];
-  summary: {
-    run_id: string;
-    status: string;
-    current_stage: string | null;
-  };
-}
-
 export interface RouteRunResponse extends SurfaceBase<'route_run'> {
   run: Record<string, unknown>;
   events: unknown[];
   artifactFile?: string;
-  execution_proof?: Record<string, unknown>;
   error?: unknown;
   error_kind: string | null;
   governance_surface: GovernanceSurfaceContract;
@@ -160,10 +143,6 @@ export interface RouteRunResponse extends SurfaceBase<'route_run'> {
 export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayRequest {
   route: string;
   adapter?: string;
-  executorBackend?: 'codex_cli' | 'hermes_agent';
-  executor_backend?: 'codex_cli' | 'hermes_agent';
-  oplDefaultExecutorBackend?: 'codex_cli' | 'hermes_agent';
-  opl_default_executor_backend?: 'codex_cli' | 'hermes_agent';
   userIntent?: string;
   stopAfterStage?: string;
   crossProviderAttemptIndex?: Record<string, unknown>;
