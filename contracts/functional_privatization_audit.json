@@ -1112,6 +1112,8 @@
         "retirement_guard_ref": "contracts/functional_privatization_audit.json#/physical_deletion_guard"
       },
       "current_surface_refs": [
+        "product_status",
+        "status_read_model",
         "domain_evidence_refs",
         "typed_blocker_refs",
         "receipt_refs",
