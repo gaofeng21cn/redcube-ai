@@ -30,7 +30,9 @@ const repoRoot = path.resolve(scriptDir, '..');
 process.chdir(repoRoot);
 
 function assertManagedFrameworkLink() {
-  const result = spawnSync(process.env.OPL_BIN || 'opl', [
+  const managedOplBin = path.join(repoRoot, 'node_modules', 'opl-framework', 'bin', 'opl');
+  const oplBin = process.env.OPL_BIN || managedOplBin;
+  const result = spawnSync(oplBin, [
     'connect',
     'agent-packages',
     'link-framework',

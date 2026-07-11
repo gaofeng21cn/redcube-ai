@@ -4,6 +4,7 @@ import path from 'node:path';
 
 import {
   listWorkspacePackageDirs,
+  readRepoFile,
   readRepoJson,
 } from './shared.js';
 

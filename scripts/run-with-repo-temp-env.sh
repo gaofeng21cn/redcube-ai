@@ -7,9 +7,10 @@ if [ "$#" -eq 0 ]; then
 fi
 
 repo_root="$(cd "$(dirname "$0")/.." && pwd -P)"
+opl_bin="${OPL_BIN:-${repo_root}/node_modules/opl-framework/bin/opl}"
 framework_link_check_status=0
 framework_link_check_output="$(
-  "${OPL_BIN:-opl}" connect agent-packages link-framework \
+  "${opl_bin}" connect agent-packages link-framework \
     --agent-root "${repo_root}" \
     --check \
     --json 2>&1

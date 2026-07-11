@@ -94,10 +94,16 @@ test('repo command wrapper runs only after the OPL-managed framework link check 
   }
 });
 
-test('OPL-managed framework link resolves canonical imports without a local Temporal install', async () => {
+test('OPL-managed framework link resolves canonical imports without an RCA Temporal lock', async () => {
   const frameworkLink = path.join(repoRoot, 'node_modules', 'opl-framework');
   assert.equal(fs.lstatSync(frameworkLink).isSymbolicLink(), true);
-  assert.equal(fs.existsSync(path.join(repoRoot, 'node_modules', '@temporalio')), false);
+  const lockPackages = JSON.parse(
+    fs.readFileSync(path.join(repoRoot, 'package-lock.json'), 'utf8'),
+  ).packages ?? {};
+  assert.equal(
+    Object.keys(lockPackages).some((entry) => entry.startsWith('node_modules/@temporalio/')),
+    false,
+  );
 
   const { STANDARD_AGENT_PACK_ABI } = await import('opl-framework/standard-agent-pack-abi');
   assert.equal(STANDARD_AGENT_PACK_ABI.owner, 'one-person-lab');

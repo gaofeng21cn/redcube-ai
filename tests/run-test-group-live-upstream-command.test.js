@@ -68,6 +68,7 @@ test('run-test-group routes Python cache outside the checkout', () => {
   const pyproject = readFileSync('pyproject.toml', 'utf-8');
 
   assert.match(runner, /connect[\s\S]*agent-packages[\s\S]*link-framework/);
+  assert.match(runner, /node_modules[\s\S]*opl-framework[\s\S]*bin[\s\S]*opl/);
   assert.match(runner, /OPL-managed framework link check failed before test execution/);
   assert.match(runner, /OPL_REPO_TEMP_ROOT/);
   assert.match(runner, /redcube-repo-temp-/);
@@ -96,7 +97,7 @@ test('verification scripts expose repo temp hygiene entrypoints', () => {
   assert.match(verifyScript, /scripts\/verify-lane\.ts "\$lane" --verify-wrapper "\$@"/);
   assert.match(
     readFileSync('scripts/run-with-repo-temp-env.sh', 'utf-8'),
-    /connect agent-packages link-framework[\s\S]*--check/,
+    /node_modules\/opl-framework\/bin\/opl[\s\S]*connect agent-packages link-framework[\s\S]*--check/,
   );
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh', \['--fix'\]\)/);
   assert.match(verifyLaneScript, /run\('scripts\/repo-hygiene\.sh'\)/);
