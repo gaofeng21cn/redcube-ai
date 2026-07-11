@@ -9,8 +9,7 @@
   "source_of_truth_refs": [
     "user_request:2026-07-07:rca-visual-memory-curator-professional-skill",
     "user_request:2026-07-03:agent-lab-ppt-professional-skill-capability-map",
-    "contracts/stage_control_plane.json#/stage_ids",
-    "contracts/stage_control_plane.json#/professional_skill_refs",
+    "agent/stages/manifest.json#/stages/*/stage_id",
     "contracts/standard-agent-principles-adoption.json#/module_organization/professional_skill_surfaces",
     "agent/professional_skills/*/SKILL.md",
     "agent/professional_skills/rca-xhs-content-strategist/SKILL.md",
@@ -508,7 +507,7 @@
         "prompts/xiaohongshu/storyline.md",
         "prompts/xiaohongshu/series_plan.md",
         "prompts/xiaohongshu/single_note_plan.md",
-        "contracts/stage_control_plane.json"
+        "agent/stages/manifest.json"
       ],
       "authority_boundary": {
         "refs_only": true,
@@ -615,7 +614,7 @@
         "prompts/ppt_deck/storyline.md",
         "prompts/ppt_deck/detailed_outline.md",
         "prompts/ppt_deck/slide_blueprint.md",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
         "contracts/agent_lab_handoff.json",
         "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-story-architect/resources/minimal-resource-pack.md"
@@ -735,7 +734,7 @@
         "prompts/ppt_deck/visual_direction.md",
         "agent/quality_gates/visual_pack_discipline.md",
         "agent/quality_gates/communication_and_direction.md",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
         "contracts/agent_lab_handoff.json",
         "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-visual-director/resources/minimal-resource-pack.md"
@@ -861,7 +860,7 @@
         "prompts/ppt_deck/author_image_pages.md",
         "prompts/ppt_deck/repair_image_pages.md",
         "agent/skills/visual_deliverable_authoring.md",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
         "contracts/agent_lab_handoff.json",
         "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-page-author/resources/minimal-resource-pack.md"
@@ -985,7 +984,7 @@
         "prompts/ppt_deck/screenshot_review.md",
         "agent/quality_gates/screenshot_review.md",
         "agent/quality_gates/review_export_memory.md",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
         "contracts/agent_lab_handoff.json",
         "tests/rca-ppt-three-route-agent-lab-suite.test.js",
         "agent/professional_skills/rca-ppt-reviewer/resources/minimal-resource-pack.md"
@@ -1420,8 +1419,8 @@
         },
         {
           "ref_kind": "contract_ref",
-          "ref": "contracts/stage_control_plane.json",
-          "role": "stage_control_plane"
+          "ref": "agent/stages/manifest.json",
+          "role": "declarative_stage_manifest"
         }
       ],
       "sync_policy": "repo_local_default",
@@ -1433,7 +1432,7 @@
       ],
       "canonical_paths": [
         "agent/prompts/",
-        "contracts/stage_control_plane.json"
+        "agent/stages/manifest.json"
       ],
       "authority_boundary": {
         "can_write_domain_truth": false,

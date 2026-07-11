@@ -8,7 +8,7 @@
   "machine_boundary": "This contract is advisory/current adoption metadata. Domain truth, artifact bodies, quality verdicts, owner receipts, typed blockers, human gates, and export authority remain domain-owned; OPL owns transport, attempts, refs, receipts projection, and generated/hosted surfaces only.",
   "framework_contract_ref": "one-person-lab/contracts/opl-framework/cognitive-computation-kernel.json",
   "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
-  "stage_control_plane_ref": "contracts/stage_control_plane.json",
+  "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
   "golden_path_profile_ref": "contracts/golden_path_profile.json",
   "domain_affordance_catalog_ref": "agent/tools/domain_affordances.md",
   "stage_pack_required_sections": [

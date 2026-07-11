@@ -1,8 +1,14 @@
-import { assert, currentProgram, stageArtifactKernelAdoption, stageControlPlane, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH, STAGE_CONTROL_PLANE_PATH, test } from './shared.js';
+import {
+  assert,
+  currentProgram,
+  GENERATED_STAGE_CONTROL_PLANE_REF,
+  stageArtifactKernelAdoption,
+  STAGE_ARTIFACT_KERNEL_ADOPTION_PATH,
+  test,
+} from './shared.js';
 
 test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint', () => {
   const adoption = stageArtifactKernelAdoption();
-  const plane = stageControlPlane();
   const current = currentProgram();
 
   assert.equal(adoption.surface_kind, 'opl_stage_artifact_kernel_adoption');
@@ -11,7 +17,7 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.domain_id, 'redcube_ai');
   assert.equal(adoption.package_id, 'redcube-ai');
   assert.equal(adoption.conformance_entrypoint, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH);
-  assert.equal(adoption.stage_control_plane_ref, STAGE_CONTROL_PLANE_PATH);
+  assert.equal(adoption.stage_control_plane_ref, GENERATED_STAGE_CONTROL_PLANE_REF);
   assert.equal(adoption.artifact_locator_contract_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
   assert.equal(adoption.owner_receipt_contract_ref, 'contracts/owner_receipt_contract.json');
   assert.equal(adoption.conformance_validator.surface_kind, 'rca_stage_artifact_kernel_adoption_conformance_validator');
@@ -132,7 +138,7 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
     sqlite_can_store_review_export_judgment: false,
   });
   assert.equal(adoption.stage_artifact_runtime_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
-  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.stage_artifact_runtime.contract_ref);
+  assert.equal(adoption.stage_artifact_runtime_contract_id, adoption.stage_artifact_runtime_ref);
   assert.deepEqual(adoption.authority_boundary, {
     opl_can_index_refs: true,
     opl_can_rebuild_projection: true,

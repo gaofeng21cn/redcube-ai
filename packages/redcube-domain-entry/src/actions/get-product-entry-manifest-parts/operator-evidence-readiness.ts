@@ -24,7 +24,7 @@ import goalWorkflowAgentLabSuiteContract from '../../../../../contracts/producti
 import pptThreeRouteAgentLabSuiteContract from '../../../../../contracts/production_acceptance/rca-ppt-three-route-agent-lab-suite.json' with { type: 'json' };
 
 export function buildOperatorEvidenceReadinessProjection({
-  familyStageControlPlane,
+  declarativeStageManifest,
   oplGenericPrimitiveConsumption,
   oplGeneratedInterfaceConsumption,
   oplStabilityReadModelConsumption,
@@ -40,7 +40,7 @@ export function buildOperatorEvidenceReadinessProjection({
     workspaceReceiptInventoryProjection,
   });
   const oplExpectedReceiptMonitorFreshnessHandoff = buildOplExpectedReceiptMonitorFreshnessHandoff({
-    familyStageControlPlane,
+    declarativeStageManifest,
     productionEvidenceScaleoutRefs,
     workspaceReceiptInventoryProjection,
   });

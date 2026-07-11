@@ -8,7 +8,7 @@ export function buildReturnedManifestProjection({
   domainMemoryDescriptor,
   entryStatusSurface,
   familySchedulerReplacement,
-  familyStageControlPlane,
+  declarativeStageManifest,
   manifest,
   nativePptOperatorUx,
   oplProviderRuntimeContract,
@@ -38,7 +38,7 @@ export function buildReturnedManifestProjection({
   temporalStageRunConsumptionPolicy,
 }) {
   const operatorEvidenceReadinessProjection = buildOperatorEvidenceReadinessProjection({
-    familyStageControlPlane,
+    declarativeStageManifest,
     oplGenericPrimitiveConsumption,
     oplGeneratedInterfaceConsumption,
     oplStabilityReadModelConsumption,

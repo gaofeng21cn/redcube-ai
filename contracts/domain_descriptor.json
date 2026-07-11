@@ -25,7 +25,7 @@
   "standard_contract_refs": {
     "domain_manifest_registration": "contracts/opl_domain_manifest_registration.json",
     "action_target_refs": "contracts/action_catalog.json",
-    "stage_refs": "contracts/stage_control_plane.json",
+    "stage_refs": "agent/stages/manifest.json",
     "pack_refs": "contracts/pack_compiler_input.json",
     "agent_lab_handoff": "contracts/agent_lab_handoff.json",
     "agent_lab_cost_profile": "contracts/agent_lab_cost_profile.json",

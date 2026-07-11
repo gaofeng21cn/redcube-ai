@@ -18,9 +18,9 @@ import {
   FAMILY_ACTION_CATALOG_CONTRACT_REF,
 } from './family-action-catalog.js';
 import {
-  buildRedCubeFamilyStageControlPlane,
-  FAMILY_STAGE_CONTROL_PLANE_CONTRACT_REF,
-} from './family-stage-control-plane.js';
+  buildRedCubeDeclarativeStageManifest,
+  DECLARATIVE_STAGE_MANIFEST_REF,
+} from './declarative-stage-manifest.js';
 import {
   buildFamilyDomainMemoryDescriptor,
   buildRuntimeResidueRetirementAudit,
@@ -78,11 +78,7 @@ const FAMILY_ACTION_CATALOG_REF = {
   ref: FAMILY_ACTION_CATALOG_CONTRACT_REF,
   label: 'RedCube canonical action catalog',
 };
-const FAMILY_STAGE_CONTROL_PLANE_REF = {
-  ref_kind: 'repo_path',
-  ref: FAMILY_STAGE_CONTROL_PLANE_CONTRACT_REF,
-  label: 'RedCube canonical stage control plane',
-};
+const GENERATED_FAMILY_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
 
 export async function getProductEntryManifest(request) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
@@ -173,7 +169,7 @@ export async function getProductEntryManifest(request) {
   };
   const sourceProvenance = buildSourceProvenanceSection();
   const actionMetadata = buildRedCubeActionMetadata();
-  const familyStageControlPlane = buildRedCubeFamilyStageControlPlane();
+  const declarativeStageManifest = buildRedCubeDeclarativeStageManifest();
   const {
     automation,
     entryStatusSurface,
@@ -294,14 +290,15 @@ export async function getProductEntryManifest(request) {
     }),
   }),
     family_action_catalog_ref: FAMILY_ACTION_CATALOG_REF,
-    family_stage_control_plane_ref: FAMILY_STAGE_CONTROL_PLANE_REF,
+    declarative_stage_manifest_ref: DECLARATIVE_STAGE_MANIFEST_REF,
+    family_stage_control_plane_ref: GENERATED_FAMILY_STAGE_CONTROL_PLANE_REF,
   };
   return buildReturnedManifestProjection({
     actionMetadata,
     domainMemoryDescriptor,
     entryStatusSurface,
     familySchedulerReplacement,
-    familyStageControlPlane,
+    declarativeStageManifest,
     manifest,
     nativePptOperatorUx,
     oplProviderRuntimeContract,

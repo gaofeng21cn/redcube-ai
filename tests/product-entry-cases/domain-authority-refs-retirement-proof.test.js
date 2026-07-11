@@ -6,6 +6,7 @@ import {
   test,
   withMockCodexRuntimeState,
 } from '../product-domain-action-case-shared.ts';
+import { existsSync } from 'node:fs';
 
 test('product-entry manifest retires the private standard skeleton body and keeps explicit authority refs', async () => {
   await withMockCodexRuntimeState(async () => {
@@ -111,5 +112,18 @@ test('product-entry manifest projects the domain-owned visual transition adapter
     ]) {
       assert.equal(registry.authority_boundary[field], false, field);
     }
+  });
+});
+
+test('product-entry consumes the declarative stage manifest and never a tracked stage plane', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const manifest = await getProductEntryManifest({
+      workspace_root: await prepareProductEntryWorkspace(),
+    });
+
+    assert.equal(existsSync('contracts/stage_control_plane.json'), false);
+    assert.equal(manifest.declarative_stage_manifest_ref, 'agent/stages/manifest.json');
+    assert.equal(manifest.family_stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+    assert.equal(Object.hasOwn(manifest, 'family_stage_control_plane'), false);
   });
 });

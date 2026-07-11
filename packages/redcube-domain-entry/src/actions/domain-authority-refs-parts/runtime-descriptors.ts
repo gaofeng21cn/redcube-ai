@@ -126,7 +126,7 @@ export function buildArtifactLocatorContract({ workspaceRoot, productSessionSurf
 export function buildControlledVisualStageAttemptFixture() {
   const sharedRefs = {
     descriptor_refs: [
-      'contracts/stage_control_plane.json#/stages',
+      'opl-generated:family_stage_control_plane#/stages',
       '/artifact_locator_contract',
       '/domain_memory_descriptor_locator',
       '/domain_memory_descriptor',

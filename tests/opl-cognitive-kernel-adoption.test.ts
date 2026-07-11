@@ -118,43 +118,29 @@ test('RCA visual pack compiler handoff exposes cognitive-kernel refs-only inputs
   ]);
 });
 
-test('RCA stage control plane declares tool boundaries and independent gates', () => {
-  const plane = readJson('contracts/stage_control_plane.json');
+test('RCA declarative manifest binds stage refs while OPL owns generated cognitive policy', () => {
+  const manifest = readJson('agent/stages/manifest.json');
+  const pack = readJson('contracts/pack_compiler_input.json');
   const adoption = readJson('contracts/cognitive_kernel_adoption.json');
   const adoptionBoundary = adoption.tool_affordance_boundary;
 
-  assert.equal(plane.cognitive_kernel_adoption_ref, 'contracts/cognitive_kernel_adoption.json');
-  assert.equal(plane.golden_path_profile_ref, 'contracts/golden_path_profile.json');
-  assert.deepEqual(plane.stage_pack_required_sections, requiredStagePackSections);
+  assert.equal(manifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
+  assert.equal(manifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
+  assert.equal(pack.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
+  assert.equal(
+    pack.source_refs.executor_policy_source_ref,
+    'opl-generated:family_stage_control_plane#/stages/*/selected_executor',
+  );
+  assert.deepEqual(pack.stage_pack_required_sections, requiredStagePackSections);
 
-  for (const [index, stage] of plane.stages.entries()) {
-    assert.equal(stage.tool_refs[0].ref, 'agent/tools/domain_affordances.md');
-    assert.equal(stage.tool_refs[0].catalog_role, 'available_affordance_catalog_not_workflow_script');
-
-    assert.equal(
-      stage.stage_contract.tool_affordance_boundary_ref,
-      `contracts/stage_control_plane.json#/stages/${index}/tool_affordance_boundary`,
-    );
+  for (const stage of manifest.stages) {
+    assert.equal(stage.policy_ref, `agent/stages/${stage.stage_id}.md`);
+    assert.equal(stage.prompt_ref, `agent/prompts/${stage.stage_id}.md`);
+    assert.equal(stage.quality_gate_refs.length > 0, true);
+    assert.equal(stage.knowledge_refs.length > 0, true);
     assert.equal(refs(adoptionBoundary.capability_refs).has('source_context_and_visual_brief_reading'), true);
     assert.equal(adoptionBoundary.executor_autonomy.executor_can_choose_tools, true);
     assert.equal(adoptionBoundary.executor_autonomy.tool_catalog_can_define_cognitive_strategy, false);
     assert.equal(adoptionBoundary.executor_autonomy.tool_catalog_can_authorize_forbidden_write, false);
-
-    assert.equal(
-      stage.stage_contract.candidate_pool_policy_ref,
-      `contracts/stage_control_plane.json#/stages/${index}/candidate_pool_policy`,
-    );
-    assert.ok(stage.strategy_refs.length > 0);
-    assert.equal(
-      stage.stage_contract.handoff_policy_ref,
-      `contracts/stage_control_plane.json#/stages/${index}/handoff_policy`,
-    );
-
-    const declaredGateRefs = new Set(stage.evaluation.map((entry: any) => entry.ref));
-    assert.equal(declaredGateRefs.size > 0, true);
-    assert.equal(
-      stage.stage_contract.independent_gate_policy_ref,
-      `contracts/stage_control_plane.json#/stages/${index}/independent_gate_policy`,
-    );
   }
 });

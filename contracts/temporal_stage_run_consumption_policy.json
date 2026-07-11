@@ -112,7 +112,7 @@
   },
   "source_refs": {
     "temporal_autonomy_readiness_ref": "opl_generated:product_entry_manifest#/temporal_autonomy_readiness",
-    "family_stage_control_plane_ref": "contracts/stage_control_plane.json",
+    "family_stage_control_plane_ref": "opl-generated:family_stage_control_plane",
     "domain_owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
     "latest_temporal_long_soak_probe_closeout_ref": "contracts/production_acceptance/rca-temporal-long-soak-probe-20260710.json",
     "owner_chain_live_progress_evidence_ref": "contracts/owner_chain_live_progress_evidence.json",

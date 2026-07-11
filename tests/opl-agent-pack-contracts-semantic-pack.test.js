@@ -11,14 +11,13 @@ import {
 
 test('RCA canonical semantic pack remains concrete while root stage/pack contracts are refs-only', () => {
   const packRefs = readJson('contracts/pack_compiler_input.json');
-  const stageRefs = readJson('contracts/stage_control_plane.json');
+  const stageManifest = readJson('agent/stages/manifest.json');
 
   assert.equal(packRefs.canonical_semantic_pack_root, 'agent/');
   assert.equal(packRefs.canonical_semantic_pack_role, 'repo_source_declarative_visual_pack');
   assert.equal(packRefs.projection_mode, 'repo_source_refs_only');
-  assert.equal(stageRefs.surface_kind, 'family_stage_control_plane');
-  assert.equal(stageRefs.version, 'family-stage-control-plane.v1');
-  assert.equal(stageRefs.stage_descriptor_body_copied, false);
+  assert.equal(stageManifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
+  assert.equal(stageManifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
 
   for (const relativePath of packRefs.required_domain_pack_paths) {
     assert.equal(relativePath.startsWith('agent/'), true, relativePath);
@@ -29,7 +28,7 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
     assert.equal(/\b(?:TODO|TBD)\b/i.test(content), false, relativePath);
   }
 
-  assert.deepEqual(stageRefs.stage_ids, [
+  assert.deepEqual(stageManifest.stages.map((stage) => stage.stage_id), [
     'source_intake',
     'communication_strategy',
     'visual_direction',
@@ -38,7 +37,7 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
     'package_and_handoff',
   ]);
 
-  for (const stageId of stageRefs.stage_ids) {
+  for (const stageId of stageManifest.stages.map((stage) => stage.stage_id)) {
     assertCleanAgentRepoPathRef(
       { ref_kind: 'repo_path', ref: `agent/prompts/${stageId}.md` },
       'agent/prompts/',
@@ -51,7 +50,7 @@ test('RCA canonical semantic pack remains concrete while root stage/pack contrac
     );
   }
 
-  assert.equal(stageRefs.authority_boundary.opl_can_generate_stage_control_from_refs, true);
-  assert.equal(stageRefs.authority_boundary.opl_can_write_visual_truth, false);
-  assert.equal(stageRefs.authority_boundary.provider_completion_is_visual_ready, false);
+  assert.equal(stageManifest.authority_boundary.opl_can_write_domain_truth, false);
+  assert.equal(stageManifest.authority_boundary.provider_completion_is_domain_completion, false);
+  assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
 });

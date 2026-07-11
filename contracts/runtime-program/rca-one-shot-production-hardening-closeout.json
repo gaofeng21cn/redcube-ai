@@ -83,7 +83,7 @@
       "status": "superseded_by_opl_executor_owner_cutover",
       "evidence_refs": [
         "contracts/pack_compiler_input.json#/source_refs/executor_policy_source_ref",
-        "contracts/stage_control_plane.json#/stages/*/selected_executor",
+        "opl-generated:family_stage_control_plane#/stages/*/selected_executor",
         "packages/redcube-domain-entry/src/actions/opl-stage-execution-plan.ts",
         "packages/redcube-runtime/src/executors/index.ts",
         "tests/rca-executor-backend-contract.test.ts"

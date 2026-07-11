@@ -223,7 +223,7 @@ export function buildOwnerPayloadItemSummaries({
 }
 
 export function buildStageExpectedReceiptPayloadSummary({
-  familyStageControlPlane,
+  declarativeStageManifest,
   productionEvidenceScaleoutRefs,
   workspaceReceiptInventoryProjection,
 }) {
@@ -235,7 +235,7 @@ export function buildStageExpectedReceiptPayloadSummary({
   ];
   const typedBlockerRefs = productionEvidenceScaleoutRefs.typed_blocker_refs || [];
   const stageRuntimeEventRefs = new Map(
-    (Array.isArray(familyStageControlPlane?.stages) ? familyStageControlPlane.stages : [])
+    (Array.isArray(declarativeStageManifest?.stages) ? declarativeStageManifest.stages : [])
       .map((stage) => [
         stage.stage_id,
         uniqueRefs(stage.stage_contract?.runtime_event_refs || stage.runtime_event_refs || []),
@@ -269,7 +269,7 @@ export function buildStageExpectedReceiptPayloadSummary({
     success_ref_models: {
       monitor_freshness_ref_model: '/workspace_receipt_inventory_projection/stage_monitor_freshness/<stage-id>',
       runtime_event_ref_model: 'opl_generated_stage_control_descriptor.stages[*].stage_contract.runtime_event_refs',
-      source_runtime_event_ref: 'contracts/stage_control_plane.json#/stages/<stage-index>/stage_contract/runtime_event_refs',
+      source_runtime_event_ref: 'opl-generated:family_stage_control_plane#/stages/<stage-index>/stage_contract/runtime_event_refs',
     },
     stages: stageIds.map((stageId, index) => ({
       stage_id: stageId,
