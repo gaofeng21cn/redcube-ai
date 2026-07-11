@@ -651,7 +651,8 @@ function buildFailedRouteResponse({
     error: failedRun.error,
   };
 
-  const includeFailedArtifact = failure.failure_kind === 'repeated_block_without_input_change';
+  const includeFailedArtifact = qualityBlocked
+    || failure.failure_kind === 'repeated_block_without_input_change';
   return {
     ok: false,
     run: failedRun,

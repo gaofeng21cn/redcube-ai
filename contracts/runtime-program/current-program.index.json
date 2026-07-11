@@ -79,7 +79,7 @@
     }
   ],
   "generated_array_fields": [],
-  "source_digest": "f67b5fc2ba23de3e9bf249e037edba4483068e7d0f8acf2f78710bc22e0f9c53",
+  "source_digest": "ae2d900a7f816d58f3f8f945a0b830980377a505812f0dccbee2670feecfe80b",
   "source_part_refs": [
     {
       "json_pointer": "/program_id",
@@ -239,8 +239,8 @@
       "json_pointer": "/current_state/plan_completion_audit",
       "ref": "contracts/runtime-program/current-program-parts/current_state/plan_completion_audit.json",
       "role": "active_current_truth_leaf_source",
-      "line_count": 717,
-      "sha256": "15353f6614adf1f8b3ee1abc73c97f721754f1f95957079288bb8d865f446e39"
+      "line_count": 744,
+      "sha256": "05b7170276bb1015c58428d92725a100db37c603e105d1d5bfefc9edb2f447b4"
     },
     {
       "json_pointer": "/current_state/privatized_functional_module_audit",

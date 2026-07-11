@@ -388,7 +388,7 @@
     {
       "surface_id": "domain_action_adapter_guarded_actions",
       "source_refs": [
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+        "packages/redcube-domain-entry/src/actions/domain-handler.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
       ],
@@ -1124,7 +1124,7 @@
         "classification": "domain_handler_target",
         "current_rca_role": "guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner",
         "source_refs": [
-          "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+          "packages/redcube-domain-entry/src/actions/domain-handler.ts",
           "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",
           "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
         ]
@@ -1281,7 +1281,7 @@
       "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts",
       "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts",
       "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/physical-source-morphology-policy.ts#buildPhysicalSourceMorphologyPolicy",
-      "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+      "packages/redcube-domain-entry/src/actions/domain-handler.ts",
       "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
       "packages/redcube-domain-entry/src/actions/get-product-entry-session.ts",

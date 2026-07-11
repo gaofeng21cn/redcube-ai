@@ -25,10 +25,6 @@ export { getProductPreflight } from './actions/get-product-preflight.js';
 export { getProductStatus } from './actions/get-product-status.js';
 export { runNativePptProductEntryProof } from './actions/native-ppt-product-entry-proof.js';
 export {
-  dispatchDomainActionAdapter,
-  exportDomainActionAdapter,
-} from './actions/domain-action-adapter.js';
-export {
   dispatchDomainHandler,
   exportDomainHandler,
 } from './actions/domain-handler.js';

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
-  exportDomainActionAdapter,
+  exportDomainHandler,
   prepareProductEntryWorkspace,
   runDeliverableRoute,
   SERIAL_ENV_TEST,

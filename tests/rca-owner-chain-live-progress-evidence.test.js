@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
-  dispatchDomainActionAdapter,
+  dispatchDomainHandler,
   runDeliverableRoute,
   SERIAL_ENV_TEST,
   withMockCodexRuntime,
@@ -460,7 +460,7 @@ test('RCA mock-safe visual owner-chain canary reaches review/export refs and own
 
     await withMockCodexRuntimeState(async () => {
       const workspaceRoot = mkUserScopedTestWorkspace('redcube-owner-action-canary-');
-      const proof = await dispatchDomainActionAdapter({
+      const proof = await dispatchDomainHandler({
         task: {
           action: 'emit_workspace_receipt_proof',
           workspace_root: workspaceRoot,
@@ -486,7 +486,7 @@ test('RCA mock-safe visual owner-chain canary reaches review/export refs and own
       assert.equal(fs.existsSync(proof.result_surface.runtime_files.domain_owner_receipt_file), true);
       assert.equal(fs.existsSync(proof.result_surface.runtime_files.no_regression_evidence_file), true);
 
-      const blocker = await dispatchDomainActionAdapter({
+      const blocker = await dispatchDomainHandler({
         task: {
           action: 'emit_workspace_receipt_proof',
           workspace_root: workspaceRoot,

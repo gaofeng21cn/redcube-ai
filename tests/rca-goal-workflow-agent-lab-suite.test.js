@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 import {
   createDeliverable,
-  exportDomainActionAdapter,
+  exportDomainHandler,
   invokeOplHostedProductEntry,
   prepareProductEntryWorkspace,
   runDeliverableRoute,

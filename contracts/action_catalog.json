@@ -261,7 +261,7 @@
         "provider_role": "stage_attempt_queue_wakeup_transport",
         "generated_surface_owner": "one-person-lab",
         "rca_role": "domain_handler_target_or_refs_only_adapter",
-        "internal_implementation_ref": "exportDomainActionAdapter",
+        "internal_implementation_ref": "exportDomainHandler",
         "write_policy": "read_projection_only",
         "temporal_stage_run_consumption_policy_ref": "/temporal_stage_run_consumption_policy",
         "domain_repo_can_own_temporal_runtime": false,

@@ -3,8 +3,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import test from 'node:test';
 
 import {
-  dispatchDomainActionAdapter,
-  exportDomainActionAdapter,
+  dispatchDomainHandler,
+  exportDomainHandler,
   getProductEntryManifest,
   getDomainActionAdapterGuardedActionMetadata,
   prepareProductEntryWorkspace,
@@ -58,7 +58,7 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    const domain_action_adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
+    const domain_action_adapter = await exportDomainHandler({ workspace_root: workspaceRoot });
     const metadata = await getDomainActionAdapterGuardedActionMetadata();
 
     assert.equal(
@@ -115,7 +115,7 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
 test('RCA owner closeout returns refs-only no-regression evidence for absorbed external work orders', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
-    const result = await dispatchDomainActionAdapter({
+    const result = await dispatchDomainHandler({
       task: validCloseoutTask(workspaceRoot),
     });
 
@@ -172,7 +172,7 @@ test('RCA owner closeout returns typed blockers for insufficient or forbidden ex
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
 
-    const missing = await dispatchDomainActionAdapter({
+    const missing = await dispatchDomainHandler({
       task: {
         action: 'emit_external_work_order_owner_closeout',
         workspace_root: workspaceRoot,
@@ -197,7 +197,7 @@ test('RCA owner closeout returns typed blockers for insufficient or forbidden ex
       false,
     );
 
-    const forbidden = await dispatchDomainActionAdapter({
+    const forbidden = await dispatchDomainHandler({
       task: validCloseoutTask(workspaceRoot, {
         work_order_id: 'forbidden-body-work-order',
         visual_truth_body: { slides: [] },

@@ -1,13 +1,8 @@
 // @ts-nocheck
 
 export {
-  buildRcaMinimalAuthoritySurfaceContracts,
-  buildRcaMinimalAuthoritySurfaceTaxonomy,
-} from './visual-pack-compiler-handoff/authority-surfaces.js';
-export {
   RCA_COGNITIVE_KERNEL_ADOPTION,
   RCA_GOLDEN_PATH_PROFILE,
-  OPL_GENERATED_SURFACE_EXIT_GATE,
 } from './visual-pack-compiler-handoff/visual-pack-contracts.js';
 
 import {

@@ -374,6 +374,8 @@ test('run-test-group resolves an explicit Python command for screenshot review a
 
   const managed = resolveRedCubePythonCommand({
     env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
+    fileExists: () => true,
+    pythonProbeImpl: () => ({ status: 0 }),
   });
   assert.equal(managed.command, '/usr/bin/true');
   assert.equal(managed.source, 'managed_python_runtime');
@@ -382,6 +384,8 @@ test('run-test-group resolves an explicit Python command for screenshot review a
 test('run-test-group consumes an OPL-managed Python runtime without installing a domain-local environment', () => {
   const resolved = resolveRedCubePythonCommand({
     env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
+    fileExists: () => true,
+    pythonProbeImpl: () => ({ status: 0 }),
   });
   assert.equal(resolved.command, '/usr/bin/true');
   assert.equal(resolved.source, 'managed_python_runtime');
@@ -397,6 +401,8 @@ test('OPL-managed Python helper invocations preserve helper environment and doma
   };
   const result = runRedCubePythonHelper(helper, ['--input-json', '/tmp/input.json'], {
     env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
+    fileExists: () => true,
+    pythonProbeImpl: () => ({ status: 0 }),
     spawnSyncImpl(command, args, options) {
       if (command === '/usr/bin/true' && args[0] === '-m') {
         assert.match(options.env.PLAYWRIGHT_BROWSERS_PATH, /opl\/domain-helper\/playwright-browsers$/);
@@ -415,6 +421,8 @@ test('run-test-group fails fast when no Python with playwright can be resolved',
   assert.throws(
     () => resolveRedCubePythonCommand({
       env: { PATH: '', OPL_MANAGED_PYTHON: '/missing/opl-python' },
+      fileExists: (file) => file !== '/missing/opl-python',
+      pythonProbeImpl: () => ({ status: 1 }),
     }),
     /OPL-managed Python runtime/i,
   );

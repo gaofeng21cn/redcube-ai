@@ -251,7 +251,11 @@ export function writeStageFolderArtifact(input): any {
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
   fs.writeFileSync(paths.manifest_file, `${JSON.stringify(domainManifest, null, 2)}\n`, 'utf8');
-  const descriptorRefs = [path.join(paths.root, 'deliverable.json'), path.join(paths.stage_dir, 'stage.json')];
+  const descriptorRefs = [
+    path.join(paths.root, 'deliverable.json'),
+    path.join(paths.stage_dir, 'stage.json'),
+    paths.attempt_file,
+  ];
   return {
     ...paths,
     output_file: path.join(paths.outputs_dir, output),
@@ -270,12 +274,17 @@ export function readStageFolderArtifact(input): any {
   if (!stage?.latest_attempt_id) return null;
   const requestedRoute = safeText(input.routeStageId || input.route_stage_id);
   const selectedAttempt = requestedRoute
-    ? [...stage.attempts].reverse().find((attempt) => {
+    ? stage.attempts.filter((attempt) => {
         const candidate = stageArtifactAttemptPaths({ ...base, stage_id: stageId, stage_order: stage.stage_order, attempt_id: attempt.attempt_id });
         const sidecar = path.join(candidate.receipts_dir, 'rca-stage-output-interface.json');
         return (fs.existsSync(sidecar) && safeText(readJson(sidecar).route_stage_id) === requestedRoute)
           || attempt.present_outputs?.includes(`${requestedRoute}.json`);
-      })
+      }).sort((left, right) => {
+        const mtime = (attempt) => {
+          try { return fs.statSync(attempt.attempt_dir).mtimeMs; } catch { return 0; }
+        };
+        return mtime(left) - mtime(right) || left.attempt_id.localeCompare(right.attempt_id);
+      }).at(-1)
     : stage.attempts.find((attempt) => attempt.attempt_id === stage.latest_attempt_id);
   if (!selectedAttempt) return null;
   const attemptLocator = { ...base, stage_id: stageId, stage_order: stage.stage_order, attempt_id: selectedAttempt.attempt_id };

@@ -3,13 +3,30 @@ import assert from 'node:assert/strict';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { getDeliverablePaths } from '@redcube/runtime-protocol';
 
 import { createDeliverable, runDeliverableRoute } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 import { startMockCodexCli, withEnv } from './mock-codex-cli.js';
+import { refreshStageFolderRouteArtifact } from '../packages/redcube-runtime/dist/deliverable-route-local.js';
 
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
+}
+
+function commitInvalidRenderAttempt({ workspaceRoot, overlay, topicId, deliverableId, artifact }) {
+  const artifactFile = path.join(workspaceRoot, `${deliverableId}-invalid-render.json`);
+  writeFileSync(artifactFile, JSON.stringify(artifact, null, 2), 'utf-8');
+  refreshStageFolderRouteArtifact({
+    deliverablePaths: getDeliverablePaths(workspaceRoot, topicId, deliverableId),
+    overlay,
+    topicId,
+    deliverableId,
+    route: 'render_html',
+    attemptId: 'preflight-invalid-render',
+    artifactFile,
+    artifact,
+  });
 }
 
 async function withMockCodexRuntime(testFn) {
@@ -68,7 +85,13 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
     renderArtifact.html_bundle.slides[0].content = renderArtifact.html_bundle.slides[0].content
       .replaceAll('data-qa-block=', 'data-broken-qa-block=')
       .replaceAll('data-primary-point=', 'data-broken-primary-point=');
-    writeFileSync(renderArtifactFile, JSON.stringify(renderArtifact, null, 2), 'utf-8');
+    commitInvalidRenderAttempt({
+      workspaceRoot,
+      overlay: 'xiaohongshu',
+      topicId: 'topic-a',
+      deliverableId: 'note-a',
+      artifact: renderArtifact,
+    });
 
     const directorResult = await runDeliverableRoute({
       workspaceRoot,
@@ -86,7 +109,6 @@ test('xiaohongshu screenshot_review fails fast on deterministic HTML preflight b
       deliverableId: 'note-a',
       route: 'screenshot_review',
     });
-
     assert.equal(result.ok, false);
     assert.equal(result.run.status, 'quality_blocked');
     assert.equal(result.run.error_kind, 'quality_blocked');
@@ -145,7 +167,13 @@ test('ppt screenshot_review fails fast on deterministic HTML preflight before AI
       .replaceAll('data-title=', 'data-broken-title=')
       .replaceAll('data-layout-family=', 'data-broken-layout-family=')
       .replaceAll('data-speaker-seconds=', 'data-broken-speaker-seconds=');
-    writeFileSync(renderArtifactFile, JSON.stringify(renderArtifact, null, 2), 'utf-8');
+    commitInvalidRenderAttempt({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      topicId: 'topic-a',
+      deliverableId: 'deck-a',
+      artifact: renderArtifact,
+    });
 
     const directorResult = await runDeliverableRoute({
       workspaceRoot,
@@ -163,7 +191,6 @@ test('ppt screenshot_review fails fast on deterministic HTML preflight before AI
       deliverableId: 'deck-a',
       route: 'screenshot_review',
     });
-
     assert.equal(result.ok, false);
     const qualityGate = readJson(result.artifactFile);
     assert.equal(qualityGate.status, 'block');

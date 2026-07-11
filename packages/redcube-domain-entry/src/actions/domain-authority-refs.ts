@@ -1,8 +1,6 @@
 // @ts-nocheck
 import {
   buildControlledMemoryApplyProof,
-  buildRuntimeResidueRetirementAudit,
-  buildVisualPatternMemoryWritebackProjection,
 } from './domain-authority-refs-parts/memory-apply-proof.js';
 import {
   buildDomainOwnerReceiptContract,
@@ -23,8 +21,6 @@ import {
 } from './domain-authority-refs-parts/runtime-descriptors.js';
 
 export {
-  buildRuntimeResidueRetirementAudit,
-  buildVisualPatternMemoryWritebackProjection,
   buildFamilyDomainMemoryDescriptor,
 };
 

@@ -304,7 +304,6 @@ test('route-run handoff preserves real Stage Folder and artifact authority refs'
       '/attempt.json',
       '/manifest.json',
       '/current.json',
-      '/latest.json',
       '/latest',
     ]) {
       assert.equal(

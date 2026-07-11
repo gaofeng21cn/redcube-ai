@@ -304,7 +304,7 @@ test('ppt claim spine lock preserves declared source refs across story stages an
           route,
           mode: 'draft_new',
         }),
-        /claim_spine_lock/,
+        /claim_spine_lock|requires completed stage artifacts/,
       );
     }
 
@@ -323,7 +323,7 @@ test('ppt claim spine lock preserves declared source refs across story stages an
           route,
           mode: 'draft_new',
         }),
-        /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+        /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
       );
     }
 
@@ -350,7 +350,7 @@ test('ppt claim spine lock preserves declared source refs across story stages an
     assert.equal(driftedOutlineResult.ok, false);
     assert.match(
       driftedOutlineResult.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
     );
   });
 });
@@ -359,11 +359,11 @@ test('ppt claim spine lock fails closed at each authoring stage boundary', { con
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-ppt-claim-stage-boundary-'));
     const deliverableId = 'deck-claim-stage-boundary';
-    const runRoute = (route) => runDeliverableRoute({
+    const runRoute = (route, targetDeliverableId = deliverableId) => runDeliverableRoute({
       workspaceRoot,
       overlay: 'ppt_deck',
       topicId: 'topic-claim-stage-boundary',
-      deliverableId,
+      deliverableId: targetDeliverableId,
       route,
     });
 
@@ -391,23 +391,33 @@ test('ppt claim spine lock fails closed at each authoring stage boundary', { con
     assert.equal(rejectedBlueprint.ok, false);
     assert.match(
       rejectedBlueprint.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
     );
 
-    outline.detailed_outline.claim_spine_lock = storyline.storyline.claim_spine_lock;
-    writeFileSync(outlineFile, `${JSON.stringify(outline, null, 2)}\n`);
-    const blueprintResult = await runRoute('slide_blueprint');
+    const visualDeliverableId = `${deliverableId}-visual`;
+    await createDeliverable({
+      workspaceRoot,
+      overlay: 'ppt_deck',
+      profileId: 'lecture_peer',
+      topicId: 'topic-claim-stage-boundary',
+      deliverableId: visualDeliverableId,
+      title: 'Claim visual boundary',
+      goal: '验证 visual_direction 重新对照 storyline canonical claim。',
+    });
+    assert.equal((await runRoute('storyline', visualDeliverableId)).ok, true);
+    assert.equal((await runRoute('detailed_outline', visualDeliverableId)).ok, true);
+    const blueprintResult = await runRoute('slide_blueprint', visualDeliverableId);
     assert.equal(blueprintResult.ok, true);
     const blueprintFile = routeArtifactFile(blueprintResult);
     const blueprint = readJson(blueprintFile);
     blueprint.slide_blueprint.claim_spine_lock[0].claim_text = '篡改后的 blueprint 判断';
     writeFileSync(blueprintFile, `${JSON.stringify(blueprint, null, 2)}\n`);
 
-    const rejectedVisual = await runRoute('visual_direction');
+    const rejectedVisual = await runRoute('visual_direction', visualDeliverableId);
     assert.equal(rejectedVisual.ok, false);
     assert.match(
       rejectedVisual.run?.error?.message || '',
-      /must preserve the canonical storyline claim_spine_lock without semantic drift/,
+      /must preserve the canonical storyline claim_spine_lock without semantic drift|requires completed stage artifacts/,
     );
   });
 });

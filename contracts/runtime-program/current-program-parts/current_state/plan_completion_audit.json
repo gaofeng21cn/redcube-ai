@@ -222,13 +222,13 @@
       "rule": "The refreshed baseline is a debt ratchet after the JS conversion, not evidence that the recorded structural debt disappeared."
     },
     "ponytail_ultra_22_item_closeout": {
-      "status": "partial_replacements_fail_closed",
-      "implementation_percent": 55,
+      "status": "completed",
+      "implementation_percent": 100,
       "completion_basis": {
-        "items_implemented_or_already_absorbed": 12,
+        "items_implemented_or_already_absorbed": 22,
         "items_total": 22,
-        "items_replacement_or_owner_gated": 10,
-        "rule": "Approval authorizes the recommendation, but does not satisfy its explicit replacement API, behavior parity, or active write-set ownership precondition."
+        "items_replacement_or_owner_gated": 0,
+        "rule": "Generic substrate moved to OPL before RCA callers were thinned; RCA retains only domain authority, native helper bodies, and thin adapters."
       },
       "items": [
         {"id":1,"surface":"ppt_canonical_prompt_orphans","status":"done","commit":"5f8ec75c"},
@@ -242,29 +242,41 @@
         {"id":9,"surface":"foundry_agent_series_policy_body","status":"already_absorbed_on_base","evidence":"contract is a thin domain delta plus OPL canonical refs"},
         {"id":10,"surface":"cognitive_tool_affordance_body_copy","status":"already_absorbed_on_base","evidence":"pack compiler input keeps required-field schema instead of the cognitive policy body"},
         {"id":11,"surface":"redcube_config_workspace_package","status":"done","commit":"9349df1a","evidence":"single workspace identity file plus explicit environment overrides"},
-        {"id":12,"surface":"domain_action_adapter_public_wrapper","status":"blocked_active_owner_overlap","owner":"rca structural successor lanes","required_output":"owner lane absorption followed by caller migration to domain-handler and removal of the public adapter export"},
-        {"id":13,"surface":"proof_runner_indexer_bootstrap_shells","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"callable proof-lane, artifact-index and bootstrap API with RCA proof schema parity"},
+        {"id":12,"surface":"domain_action_adapter_public_wrapper","status":"done","evidence":"public adapter facade and root exports removed; callers use domain-handler directly"},
+        {"id":13,"surface":"proof_runner_indexer_bootstrap_shells","status":"done","opl_commits":["86aab8153","bbf64086f"],"rca_commit":"ee320cf5","evidence":"proof runners consume the OPL helper resolver and shared TypeScript directory proof index"},
         {"id":14,"surface":"dated_workspace_receipt_materializer","status":"done","commit":"9349df1a","evidence":"immutable snapshot retained with Git provenance; replay script removed"},
-        {"id":15,"surface":"python_helper_execution_envelope","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"public domain Python helper envelope preserving locked uv, Playwright and typed blocker behavior"},
-        {"id":16,"surface":"generic_boundary_static_projection_builders","status":"blocked_active_owner_overlap","owner":"rca structural closeout and successor lanes","required_output":"absorb or reject the existing exact-path owner write sets before replay"},
-        {"id":17,"surface":"private_codex_executor","status":"blocked_missing_callable_replacement","owner":"one-person-lab/OPL","required_output":"callable executor adapter with session, timeout, telemetry and owner-receipt parity"},
-        {"id":18,"surface":"handwritten_cli_dispatch","status":"blocked_missing_callable_replacement","owner":"one-person-lab/OPL","required_output":"generated executable CLI dispatch, not descriptor-only generated interface metadata"},
-        {"id":19,"surface":"repo_local_run_event_lifecycle","status":"blocked_behavior_parity","owner":"one-person-lab/OPL plus redcube_ai","required_output":"direct RCA route callers migrated to the OPL attempt lifecycle with recovery and receipt parity"},
-        {"id":20,"surface":"repo_local_stage_folder_writer","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"public Stage Folder writer API with role, current-pointer, orphan-output and receipt parity"},
-        {"id":21,"surface":"repo_local_source_intake_materialization","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"material-ref intake API preserving RCA source-readiness and visual verdict authority"},
-        {"id":22,"surface":"native_ppt_ooxml_reader","status":"blocked_schema_parity","owner":"OfficeCLI plus redcube_ai","required_output":"structured OfficeCLI readback mapped to the existing package-review schema with package, template, notes, transition, animation and relationship parity"}
+        {"id":15,"surface":"python_helper_execution_envelope","status":"done","opl_commit":"86aab8153","rca_commit":"98d331fc","evidence":"RCA resolves and invokes Python through the OPL domain-helper runtime"},
+        {"id":16,"surface":"generic_boundary_static_projection_builders","status":"done","commits":["3e1b890e","15d01708"],"evidence":"latest main retired generic product shell builders and thinned domain-handler refs"},
+        {"id":17,"surface":"private_codex_executor","status":"done","opl_commits":["4644e3a36","f4d9c1ff4"],"rca_commit":"98d331fc","evidence":"process transport, timeout and event parsing are OPL-owned; RCA keeps visual prompt/result projection"},
+        {"id":18,"surface":"handwritten_cli_dispatch","status":"done","opl_commit":"069154ba4","rca_commit":"ee320cf5","evidence":"CLI action bindings execute through OPL dispatchDomainAction"},
+        {"id":19,"surface":"repo_local_run_event_lifecycle","status":"done","opl_commit":"069154ba4","rca_commit":"98d331fc","evidence":"run records, events and executor dispatch use OPL domain-task-runtime"},
+        {"id":20,"surface":"repo_local_stage_folder_writer","status":"done","opl_commit":"66c977f1c","rca_commit":"98d331fc","evidence":"Stage Artifact persistence, index, open, commit and status are OPL-owned; RCA retains role and owner-receipt sidecars"},
+        {"id":21,"surface":"repo_local_source_intake_materialization","status":"done","opl_commit":"fd450a119","rca_commit":"98d331fc","evidence":"source materialization and fingerprinting use OPL domain-source-runtime; RCA retains source-readiness verdicts"},
+        {"id":22,"surface":"native_ppt_ooxml_reader","status":"done","rca_commit":"ee320cf5","evidence":"OfficeCLI structured get/query/save powers schema v2 package, object, template, notes, transition, animation and picture-payload readback; internal part paths are intentionally absent and ambiguous chart categories remain raw with an explicit delimiter_ambiguous marker"}
       ],
       "verification": {
-        "typecheck": "pass",
-        "smoke": "56 pass, 0 fail",
-        "fast": "212 parallel plus 26 serialized pass, 0 fail",
-        "full": "572 parallel plus 102 serialized pass, 0 fail",
-        "historical": "5 pass, 0 fail",
-        "private_platform_strict": "pass",
-        "structure_strict": "quality 4075 to 4081, cycles 3 to 3, god files 2 to 2",
-        "fallow_production": "22 entry points, 0 issues",
-        "current_program_source_index": "35 refs in sync",
-        "git_diff_check": "pass"
+        "status": "fresh_closeout_passed",
+        "date_anchor": "2026-07-11",
+        "opl_framework_commit": "c7e94f5f7",
+        "typecheck": "passed",
+        "full": {
+          "parallel": "546/546",
+          "serialized_route_heavy": "102/102"
+        },
+        "historical": "5/5",
+        "private_platform_strict": "passed",
+        "structure_strict": {
+          "status": "passed_no_degradation",
+          "cycles": "3_to_3",
+          "god_files": "2_to_1"
+        },
+        "fallow_production": {
+          "version": "3.3.0",
+          "entry_points": 24,
+          "issues": 0
+        },
+        "legacy_active_residue": 0,
+        "git_diff_check": "passed"
       }
     }
   },

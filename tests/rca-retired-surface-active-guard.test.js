@@ -28,5 +28,5 @@ test('RCA-local run lookup stays absent from domain entry and CLI public surface
   const help = await buildHelp(getCliDomainActions());
   assert.equal(Object.hasOwn(help.commandGroups, 'runs'), false);
   assert.equal(Object.hasOwn(help.usage, 'runsGet'), false);
-  await assert.rejects(() => executeCli(['runs', 'get']), /未知命令: runs/);
+  await assert.rejects(() => executeCli(['runs', 'get']), /Unsupported domain action: runs get\./);
 });

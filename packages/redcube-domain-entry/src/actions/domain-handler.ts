@@ -1,11 +1,18 @@
 // @ts-nocheck
-import {
-  dispatchDomainActionAdapter,
-  exportDomainActionAdapter,
-} from './domain-action-adapter.js';
+import { getProductEntryManifest } from './get-product-entry-manifest.js';
+import { dispatchDomainActionAdapter } from './domain-action-adapter-parts/dispatch-orchestration.js';
+import { buildDomainActionAdapterProjection } from './domain-action-adapter-parts/domain_action_adapter-export-projection.js';
+import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
 
 export async function exportDomainHandler(request) {
-  const projection = await exportDomainActionAdapter(request);
+  const workspaceRoot = normalizeWorkspaceRoot(request);
+  const manifest = await getProductEntryManifest({
+    workspace_root: workspaceRoot,
+    ...(Array.isArray(request?.workspace_receipt_scaleout_roots)
+      ? { workspace_receipt_scaleout_roots: request.workspace_receipt_scaleout_roots }
+      : {}),
+  });
+  const projection = buildDomainActionAdapterProjection({ workspaceRoot, manifest });
   return {
     ...projection,
     surface_kind: 'product_domain_handler_export',

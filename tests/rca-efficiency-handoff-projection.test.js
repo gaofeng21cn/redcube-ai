@@ -5,7 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import {
-  exportDomainActionAdapter,
+  exportDomainHandler,
   prepareProductEntryWorkspace,
   SERIAL_ENV_TEST,
   withMockCodexRuntimeState,

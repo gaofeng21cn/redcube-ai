@@ -3,8 +3,8 @@ import { runFamilyTransition } from 'opl-framework/family-transition-runner';
 import {
   SERIAL_ENV_TEST,
   assert,
-  dispatchDomainActionAdapter,
-  exportDomainActionAdapter,
+  dispatchDomainHandler,
+  exportDomainHandler,
   getProductEntryManifest,
   prepareProductEntryWorkspace,
   test,
@@ -15,7 +15,7 @@ test('OPL transition runner and RCA domain adapter exchange refs without sharing
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();
     const manifest = await getProductEntryManifest({ workspace_root: workspaceRoot });
-    const adapter = await exportDomainActionAdapter({ workspace_root: workspaceRoot });
+    const adapter = await exportDomainHandler({ workspace_root: workspaceRoot });
     const transition = manifest.visual_transition_spec.transition_table.find(
       (entry) => entry.transition_id === 'review_ready_to_package',
     );
@@ -73,7 +73,7 @@ test('OPL transition runner and RCA domain adapter exchange refs without sharing
     assert.equal(result.projection.domain_ready_claimed, false);
     assert.equal(result.projection.production_ready_claimed, false);
 
-    const domainReceipt = await dispatchDomainActionAdapter({
+    const domainReceipt = await dispatchDomainHandler({
       task: {
         action: 'emit_domain_owner_receipt',
         workspace_root: workspaceRoot,
@@ -92,7 +92,7 @@ test('OPL transition runner and RCA domain adapter exchange refs without sharing
       'rca-owner-receipt:visual-stage:transition-hosted-domain-receipt',
     );
 
-    const blockedReceipt = await dispatchDomainActionAdapter({
+    const blockedReceipt = await dispatchDomainHandler({
       task: {
         action: 'emit_domain_owner_receipt',
         workspace_root: workspaceRoot,
@@ -103,7 +103,7 @@ test('OPL transition runner and RCA domain adapter exchange refs without sharing
     assert.equal(blockedReceipt.result_surface.return_shape, 'typed_blocker');
     assert.equal(blockedReceipt.result_surface.owner, 'redcube_ai');
 
-    const noRegression = await dispatchDomainActionAdapter({
+    const noRegression = await dispatchDomainHandler({
       task: {
         action: 'emit_no_regression_evidence',
         workspace_root: workspaceRoot,

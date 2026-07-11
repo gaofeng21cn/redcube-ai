@@ -122,7 +122,7 @@ test('CLI help common tasks stay deduplicated and CLI actions stay aligned with 
 test('CLI managed command is retired from public operator surface', async () => {
   await assert.rejects(
     () => executeCli(['managed', 'supervise', '--workspace-root', '/tmp/ws', '--managed-run-id', 'managed-a']),
-    /未知命令: managed/,
+    /Unsupported domain action: managed supervise\./,
   );
 });
 
@@ -215,7 +215,7 @@ test('brand-new workspace quickstart converges doctor -> source research -> crea
       const failure = JSON.parse(error.stdout);
       assert.equal(failure.ok, false);
       assert.equal(failure.error_kind, 'cli_usage_error');
-      assert.match(failure.error, /runtimeWatch default wrapper 由 OPL status\/workbench\/read-model caller 持有/);
+      assert.match(failure.error, /Unsupported domain action: review watch\./);
     }
 
     assert.equal(review.source_readiness_summary?.planning_ready, true);

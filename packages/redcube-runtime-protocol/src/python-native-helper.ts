@@ -94,6 +94,8 @@ export function runRedCubePythonHelper(
   const spawnSyncImpl = options.spawnSyncImpl || spawnSync;
   const pythonCommand = resolveRedCubePythonCommand({
     env: options.env,
+    fileExists: options.fileExists,
+    pythonProbeImpl: options.pythonProbeImpl,
   });
   const result = spawnSyncImpl(pythonCommand.command, [...(pythonCommand.args || []), ...invocation.argv, ...args], {
     encoding: 'utf-8',

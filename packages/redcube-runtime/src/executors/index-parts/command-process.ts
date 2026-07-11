@@ -72,6 +72,7 @@ export async function runCodexPrompt({
       model: contract.model || undefined,
       reasoningEffort: contract.reasoning_effort || undefined,
       outputLastMessagePath: lastMessageFile,
+      promptViaStdin: true,
     }),
   ];
   const result = typeof spawnSyncImpl === 'function'
@@ -87,6 +88,7 @@ export async function runCodexPrompt({
         binaryPath: contract.command[0],
         cwd: path.resolve(cwd),
         timeoutMs,
+        stdin: prompt,
       });
   if (result.error) throw result.error;
   const parsed = parseCodexExecOutput(result.stdout || '');

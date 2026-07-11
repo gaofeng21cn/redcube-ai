@@ -547,7 +547,8 @@ test('runDeliverableRoute reports repeated ppt screenshot blocks after image rep
         result.continuation_route_runs.map((entry) => entry.route),
         ['screenshot_review', 'repair_image_pages', 'visual_director_review', 'screenshot_review'],
       );
-      assert.equal(result.artifact, null);
+      assert.equal(result.artifact?.status, 'block');
+      assert.equal(result.artifact?.route, 'screenshot_review');
       assert.match(result.run.error.message, /Route screenshot_review blocked/);
     });
   });

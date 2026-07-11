@@ -2,6 +2,12 @@ import type { spawnSync } from 'node:child_process';
 
 export interface ResolveRedCubePythonCommandOptions {
   env?: Record<string, string | undefined>;
+  fileExists?: (file: string) => boolean;
+  pythonProbeImpl?: (
+    command: string,
+    modules: string[],
+    env: Record<string, string | undefined>,
+  ) => { status: number | null };
 }
 
 export interface ResolvedRedCubePythonCommand {
@@ -39,6 +45,7 @@ export interface RunRedCubePythonHelperOptions {
   env?: Record<string, string | undefined>;
   spawnSyncImpl?: typeof spawnSync;
   fileExists?: (file: string) => boolean;
+  pythonProbeImpl?: ResolveRedCubePythonCommandOptions['pythonProbeImpl'];
   maxBuffer?: number;
   missingMessagePrefix?: string;
   failureMessagePrefix?: string;

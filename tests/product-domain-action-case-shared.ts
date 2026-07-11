@@ -81,14 +81,9 @@ async function getProductStatus(request) {
   return module.getProductStatus(request);
 }
 
-async function exportDomainActionAdapter(request) {
-  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
-  return module.exportDomainActionAdapter(request);
-}
-
-async function dispatchDomainActionAdapter(request) {
-  const module = await import('../packages/redcube-domain-entry/dist/actions/domain-action-adapter.js');
-  return module.dispatchDomainActionAdapter(request);
+async function dispatchDomainHandler(request) {
+  const module = await import('../packages/redcube-domain-entry/dist/index.js');
+  return module.dispatchDomainHandler(request);
 }
 
 async function getDomainActionAdapterGuardedActionMetadata() {
@@ -268,9 +263,8 @@ export {
   completeSourceReadiness,
   createDeliverable,
   execFileSync,
-  exportDomainActionAdapter,
   exportDomainHandler,
-  dispatchDomainActionAdapter,
+  dispatchDomainHandler,
   executeSourceAugmentation,
   existsSync,
   fileURLToPath,

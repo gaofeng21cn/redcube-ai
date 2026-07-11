@@ -541,7 +541,7 @@
       "audit_readout": "project_opl_memory_transport_retain_visual_memory_authority",
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/memory-apply-proof.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts#applyVisualMemoryWriteback",
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/domain-memory-descriptors.ts"
       ],
       "activeCallers": [
@@ -663,7 +663,7 @@
       "audit_readout": "project_opl_artifact_lifecycle_retain_rca_export_authority",
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts#/artifact_locator_refs",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts#applyVisualWorkspaceLifecycle",
         "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
       "activeCallers": [
@@ -1664,7 +1664,7 @@
       },
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-pack-compiler-handoff.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts",
+        "packages/redcube-domain-entry/src/actions/domain-handler.ts",
         "packages/redcube-runtime/src",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts",
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/functional-closure.ts"

@@ -9,13 +9,20 @@ export const REDCUBE_PYTHON_COMMAND_ENV = 'REDCUBE_PYTHON_COMMAND';
 
 export function resolveRedCubePythonCommand({
   env = process.env,
+  fileExists,
+  pythonProbeImpl,
 }: ResolveRedCubePythonCommandOptions = {}): ResolvedRedCubePythonCommand {
   const resolved = resolveDomainPythonCommand({
     command_env: REDCUBE_PYTHON_COMMAND_ENV,
-    env,
+    env: {
+      ...env,
+      [REDCUBE_PYTHON_COMMAND_ENV]: env[REDCUBE_PYTHON_COMMAND_ENV],
+    },
     managed_python_path: env.OPL_MANAGED_PYTHON,
     required_modules: ['playwright'],
     cache_root: env.REDCUBE_RUNTIME_STATE_ROOT,
+    file_exists: fileExists,
+    probe_python: pythonProbeImpl,
   });
   return {
     command: resolved.command,

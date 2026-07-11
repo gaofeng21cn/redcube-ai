@@ -13,32 +13,6 @@ export function buildControlledMemoryApplyProofRef() {
   };
 }
 
-export function buildRuntimeResidueRetirementAudit({ runtime } = {}) {
-  return {
-    surface_kind: 'runtime_residue_retirement_audit',
-    audit_id: 'rca.runtime_residue_retirement.active_path.v1',
-    status: 'active_path_retired',
-    default_runtime_owner: runtime?.runtime_owner || 'configured_family_runtime_provider',
-    retired_default_surfaces: [
-      'hermes_first_default_runtime',
-      'retired_gateway_protocol_boundary_public_entry',
-      'repo_local_manager_default',
-    ],
-    allowed_remaining_roles: [
-      'explicit_proof_backend',
-      'provenance',
-      'history',
-    ],
-    active_path_policy: {
-      hermes_agent_default_runtime: false,
-      retired_gateway_protocol_boundary_public_entry: false,
-      repo_local_manager_default: false,
-      opl_hosted_provider_path_allowed: true,
-      explicit_proof_backend_allowed: true,
-    },
-  };
-}
-
 export function buildControlledMemoryApplyProof() {
   return {
     surface_kind: 'controlled_visual_stage_domain_memory_apply_proof',
@@ -117,25 +91,5 @@ export function buildControlledMemoryApplyProof() {
       repo_tracks_review_export_verdict: false,
       repo_tracks_artifact_blobs: false,
     },
-  };
-}
-
-export function buildVisualPatternMemoryWritebackProjection({ domainAuthorityRefs }) {
-  const locator = domainAuthorityRefs.domain_memory_descriptor_locator;
-  const attempt = domainAuthorityRefs.controlled_visual_stage_attempt;
-  return {
-    surface_kind: 'visual_pattern_memory_writeback_projection',
-    status: locator.status,
-    proof_contract_state: attempt.proof_contract_state,
-    runtime_writeback_state: attempt.runtime_writeback_state,
-    apply_proof_ref: '/controlled_memory_apply_proof',
-    proposal_generator: locator.writeback_proposal_generator,
-    accept_reject_command: locator.accept_reject_command,
-    operator_receipt_projection: locator.operator_receipt_projection,
-    writeback_receipt_locator: locator.writeback_receipt_locator,
-    repo_tracks_memory_entries: false,
-    repo_tracks_receipt_instances: false,
-    repo_tracks_visual_or_export_artifacts: false,
-    opl_role: 'operator_receipt_projection_consumer_only',
   };
 }

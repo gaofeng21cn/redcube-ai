@@ -44,9 +44,9 @@ export function assertEvery(items, predicate, message) {
   assert.equal(items.every(predicate), true, message);
 }
 
-export async function emitWorkspaceReceiptProofs(dispatchDomainActionAdapter, entries) {
+export async function emitWorkspaceReceiptProofs(dispatchDomainHandler, entries) {
   for (const [workspaceRoot, proofId] of entries) {
-    await dispatchDomainActionAdapter({
+    await dispatchDomainHandler({
       task: {
         action: 'emit_workspace_receipt_proof',
         workspace_root: workspaceRoot,
