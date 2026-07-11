@@ -98,7 +98,10 @@ export function runRedCubePythonHelper(
   });
   const result = spawnSyncImpl(pythonCommand.command, [...(pythonCommand.args || []), ...invocation.argv, ...args], {
     encoding: 'utf-8',
-    env: invocation.env,
+    env: {
+      ...invocation.env,
+      ...pythonCommand.runtimeEnv,
+    },
     maxBuffer: options.maxBuffer || 16 * 1024 * 1024,
   });
   if (result.status !== 0) {

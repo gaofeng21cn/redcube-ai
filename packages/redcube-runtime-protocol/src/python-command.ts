@@ -237,6 +237,14 @@ function managedPythonReady(paths: ManagedPythonPaths, spawnSyncImpl: SpawnSyncI
   return versionProbe.ok && isStablePythonVersion(versionProbe);
 }
 
+function managedPythonRuntimeEnv(paths: ManagedPythonPaths): EnvMap {
+  return {
+    PLAYWRIGHT_BROWSERS_PATH: paths.playwrightBrowsersDir,
+    PYTHONDONTWRITEBYTECODE: '1',
+    PYTHONPYCACHEPREFIX: paths.pycacheDir,
+  };
+}
+
 function managedPythonEnv(env: EnvMap, paths: ManagedPythonPaths): EnvMap {
   return {
     ...process.env,
@@ -244,9 +252,7 @@ function managedPythonEnv(env: EnvMap, paths: ManagedPythonPaths): EnvMap {
     UV_PROJECT_ENVIRONMENT: paths.venvDir,
     UV_CACHE_DIR: paths.cacheDir,
     UV_PYTHON_DOWNLOADS: 'never',
-    PLAYWRIGHT_BROWSERS_PATH: paths.playwrightBrowsersDir,
-    PYTHONDONTWRITEBYTECODE: '1',
-    PYTHONPYCACHEPREFIX: paths.pycacheDir,
+    ...managedPythonRuntimeEnv(paths),
   };
 }
 
@@ -289,6 +295,7 @@ function ensureManagedPythonCommand(env: EnvMap, spawnSyncImpl: SpawnSyncImpl): 
     return {
       command: paths.pythonCommand,
       source: 'managed_python_runtime',
+      runtimeEnv: managedPythonRuntimeEnv(paths),
     };
   }
 
@@ -329,6 +336,7 @@ function ensureManagedPythonCommand(env: EnvMap, spawnSyncImpl: SpawnSyncImpl): 
   return {
     command: paths.pythonCommand,
     source: 'managed_python_runtime',
+    runtimeEnv: managedPythonRuntimeEnv(paths),
   };
 }
 

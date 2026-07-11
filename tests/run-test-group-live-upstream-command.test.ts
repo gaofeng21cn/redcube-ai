@@ -1,10 +1,12 @@
 // @ts-nocheck
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import os from 'node:os';
 import path from 'node:path';
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { readCurrentProgramContract } from './helpers/current-program-contract.ts';
+import { runRedCubePythonHelper } from '../packages/redcube-runtime-protocol/dist/python-native-helper.js';
 
 import {
   buildNodeTestArgs,
@@ -583,9 +585,76 @@ test('run-test-group bootstraps a lock-synced managed Python runtime when host p
 
   assert.equal(resolved.command, managedPython);
   assert.equal(resolved.source, 'managed_python_runtime');
+  assert.deepEqual(resolved.runtimeEnv, {
+    PLAYWRIGHT_BROWSERS_PATH: path.join(managedRoot, 'playwright-browsers'),
+    PYTHONDONTWRITEBYTECODE: '1',
+    PYTHONPYCACHEPREFIX: path.join(managedRoot, 'pycache'),
+  });
   const marker = JSON.parse(readFileSync(path.join(managedRoot, 'installation.json'), 'utf-8'));
   assert.match(marker.dependency_signature, /^[a-f0-9]{64}$/);
   assert.equal('requirements_signature' in marker, false);
+});
+
+test('managed Python helper invocations preserve the private Playwright browser path', () => {
+  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-helper-'));
+  const managedRoot = path.join(runtimeStateRoot, 'python', 'stable-playwright');
+  const managedPython = path.join(managedRoot, 'venv', 'bin', 'python');
+  const dependencySignature = createHash('sha256')
+    .update('pyproject.toml')
+    .update('\0')
+    .update(readFileSync('pyproject.toml'))
+    .update('uv.lock')
+    .update('\0')
+    .update(readFileSync('uv.lock'))
+    .digest('hex');
+  mkdirSync(path.dirname(managedPython), { recursive: true });
+  writeFileSync(managedPython, '#!/usr/bin/env python3\n', 'utf-8');
+  writeFileSync(path.join(managedRoot, 'installation.json'), JSON.stringify({ dependency_signature: dependencySignature }), 'utf-8');
+
+  const helper = {
+    helperId: 'ppt_deck_review',
+    packageModule: 'redcube_ai.native_helpers.ppt_deck.review',
+    pythonRoot: path.resolve('python'),
+    catalogFile: 'contracts/runtime-program/python-native-helper-catalog.json',
+  };
+  const result = runRedCubePythonHelper(helper, ['--input-json', '/tmp/input.json'], {
+    env: { REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot },
+    spawnSyncImpl(command, args, options) {
+      if (command === 'python3') {
+        return { status: 0, stdout: '/opt/homebrew/bin/python3.14\n', stderr: '' };
+      }
+      if (command === '/opt/homebrew/bin/python3.14') {
+        return {
+          status: 0,
+          stdout: JSON.stringify({ executable: '/opt/homebrew/bin/python3.14', version: '3.14.3', major: 3, minor: 14 }),
+          stderr: '',
+        };
+      }
+      if (command === managedPython && args[0] === '-c') {
+        const script = String(args[1] || '');
+        if (script.includes('import sys; import playwright; print(sys.executable)')) {
+          return { status: 0, stdout: `${managedPython}\n`, stderr: '' };
+        }
+        if (script.includes('sys.version_info')) {
+          return {
+            status: 0,
+            stdout: JSON.stringify({ executable: managedPython, version: '3.12.13', major: 3, minor: 12 }),
+            stderr: '',
+          };
+        }
+      }
+      if (command === managedPython && args[0] === '-m') {
+        assert.equal(options.env.PLAYWRIGHT_BROWSERS_PATH, path.join(managedRoot, 'playwright-browsers'));
+        assert.equal(options.env.PYTHONPYCACHEPREFIX, path.join(managedRoot, 'pycache'));
+        assert.equal(options.env.PYTHONDONTWRITEBYTECODE, '1');
+        assert.equal(options.env.PYTHONPATH.startsWith(path.resolve('python')), true);
+        return { status: 0, stdout: JSON.stringify({ status: 'ok' }), stderr: '' };
+      }
+      throw new Error(`unexpected spawnSync call: ${command} ${args.join(' ')}`);
+    },
+  });
+
+  assert.deepEqual(result.payload, { status: 'ok' });
 });
 
 test('run-test-group fails fast when no Python with playwright can be resolved', () => {

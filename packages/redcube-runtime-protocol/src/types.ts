@@ -9,6 +9,7 @@ export interface ResolvedRedCubePythonCommand {
   command: string;
   args?: string[];
   source: 'env' | 'python3_with_playwright' | 'managed_python_runtime';
+  runtimeEnv?: Record<string, string | undefined>;
 }
 
 export interface RedCubePythonNativeHelper {
