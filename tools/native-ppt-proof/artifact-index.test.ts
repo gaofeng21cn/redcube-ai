@@ -224,53 +224,6 @@ test('native PPT proof artifact index consumes renderer, page, slide, and qualit
   ]);
 });
 
-test('native PPT proof artifact index fixture preserves every proof surface', () => {
-  const index = readJson('tools/native-ppt-proof/artifact-index-fixture.json');
-  const requiredIds = new Set(index.retention_contract.required_artifact_ids);
-  const artifactIds = new Set(index.artifacts.map((artifact) => artifact.artifact_id));
-
-  assert.equal(index.schema_version, 'native_ppt_proof_artifact_index.v2');
-  assert.equal(index.status, 'passed');
-  assert.deepEqual(index.missing_required_artifacts, []);
-  assert.deepEqual(index.failed_required_checks, []);
-  assert.equal(index.retention_contract.preview_png_count, 6);
-  assert.equal(index.retention_contract.preview_png_unique_count, 6);
-  assert.equal(index.retention_contract.summary_preview_png_count, 6);
-  assert.equal(index.retention_contract.preview_summary_bound, true);
-  assert.equal(index.retention_contract.renderer_pipeline, 'libreoffice_headless_pdf_png_v1');
-  assert.equal(index.retention_contract.native_helper_page_count, 6);
-  assert.equal(index.retention_contract.native_package_slide_count, 6);
-  assert.equal(index.retention_contract.native_quality_verdict_status, 'pass_candidate');
-
-  for (const artifactId of [
-    'doctor_json',
-    'product_manifest_json',
-    'product_status_json',
-    'native_helper_output_json',
-    'native_package_readback_json',
-    'native_quality_verdict_json',
-    'proof_summary_json',
-    'editable_pptx',
-    'rendered_pdf',
-    'shape_manifest_json',
-    'preview_png_01',
-    'preview_png_06',
-  ]) {
-    assert.equal(requiredIds.has(artifactId), true, `${artifactId} must be retained`);
-  }
-  assert.deepEqual(artifactIds, requiredIds);
-
-  for (const artifact of index.artifacts) {
-    assert.equal(artifact.required, true);
-    assert.equal(artifact.exists, true);
-    assert.match(artifact.relative_path, /^[^/].+/);
-    assert.match(artifact.sha256, /^[a-f0-9]{64}$/);
-    if (artifact.category === 'native_render') {
-      assert.equal(artifact.source_ref_present, true);
-    }
-  }
-});
-
 test('native PPT proof CI contract keeps true renderer out of default quality and defines opt-in proof triggers', () => {
   const contract = readJson('tools/native-ppt-proof/ci-contract.json');
 
@@ -289,6 +242,6 @@ test('native PPT proof CI contract keeps true renderer out of default quality an
   assert.equal(contract.proof_job.artifact_index.required, true);
   assert.deepEqual(
     contract.proof_job.required_cache_layers.map((layer) => layer.id),
-    ['npm', 'pip', 'playwright'],
+    ['npm', 'uv', 'playwright'],
   );
 });

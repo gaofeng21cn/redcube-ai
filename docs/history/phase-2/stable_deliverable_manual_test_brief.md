@@ -19,7 +19,7 @@ Machine boundary: 人读历史 manual-test brief。当前机器真相继续归 c
 | 当前默认入口与运行链路 | `docs/status.md`, `docs/architecture.md`, `contracts/runtime-program/current-program.index.json`, `contracts/runtime-program/current-program-parts/**` |
 | 当前 delivery / route / proof 支撑 | `docs/delivery/README.md`, `docs/delivery/image-first-ppt-production-route.md`, route contracts, runtime-family source/tests |
 | 当前 production evidence tail | `contracts/production_acceptance/rca-production-acceptance.json`, runtime evidence, owner receipts, typed blockers |
-| 历史 machine provenance | `contracts/runtime-program/stable-deliverable-manual-test-driven-hardening.json`, `contracts/runtime-program/stable-deliverable-hardening-backlog.json` |
+| 历史 machine provenance | 已退役的 dated snapshot 由 Git 历史保留；当前机器面不再加载这两份历史合同。 |
 
 ## Historical Fact
 

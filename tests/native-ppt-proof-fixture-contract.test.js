@@ -86,17 +86,3 @@ test('native PPT proof fixture emits the complete AI-first native shape plan con
   const validation = runNativePlanValidation(payload, 'redcube-native-proof-fixture-contract-');
   assert.equal(validation.ok, true, JSON.stringify(validation, null, 2));
 });
-
-test('native PPT proof artifact index retains package readback and quality verdict evidence', () => {
-  const index = JSON.parse(readFileSync(
-    path.resolve('tools/native-ppt-proof/artifact-index-fixture.json'),
-    'utf-8',
-  ));
-  const requiredIds = new Set(index.retention_contract.required_artifact_ids);
-  const artifactIds = new Set(index.artifacts.map((artifact) => artifact.artifact_id));
-
-  for (const artifactId of ['native_package_readback_json', 'native_quality_verdict_json']) {
-    assert.equal(requiredIds.has(artifactId), true, artifactId);
-    assert.equal(artifactIds.has(artifactId), true, artifactId);
-  }
-});

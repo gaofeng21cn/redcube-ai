@@ -31,7 +31,6 @@ const RUNTIME_PYTHON_CALLER_FILES = [
 const TEST_PYTHON_PROOF_CALLER_FILES = [
   'tests/block-content-fit-review-cases/shared.js',
   'tests/block-content-fit-review-surface-children.test.js',
-  'tests/ppt-creative-ownership-cases/foundation-and-routes.test.js',
 ];
 
 function readJson(file) {

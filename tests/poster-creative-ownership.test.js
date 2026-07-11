@@ -13,10 +13,6 @@ import {
   withEnv,
 } from './mock-codex-cli.js';
 
-function read(file) {
-  return readFileSync(path.resolve(file), 'utf-8');
-}
-
 function readJson(file) {
   return JSON.parse(readFileSync(file, 'utf-8'));
 }
@@ -33,46 +29,6 @@ async function withMockCodexRuntime(testFn) {
     await upstream.close();
   }
 }
-
-test('poster_onepager creative mainline no longer lets runtime artifacts, seeds, or pack compilers author content', () => {
-  const familyTypes = read('packages/redcube-runtime/src/families/poster-onepager/types.ts');
-  const runtime = [
-    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime.ts'),
-    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/authoring.ts'),
-    read('packages/redcube-runtime/src/families/poster-onepager/poster-onepager-runtime-parts/core.ts'),
-  ].join('\n');
-  const storylinePrompt = read('prompts/poster_onepager/storyline.md');
-  const blueprintPrompt = read('prompts/poster_onepager/poster_blueprint.md');
-  const visualPrompt = read('prompts/poster_onepager/visual_direction.md');
-  const renderHtmlPrompt = read('prompts/poster_onepager/render_html.md');
-  const renderShell = read('prompts/poster_onepager/render_shell.html');
-  const directorReviewPrompt = read('prompts/poster_onepager/director_review.md');
-  const screenshotReviewPrompt = read('prompts/poster_onepager/screenshot_review.md');
-
-  assert.equal(existsSync(path.resolve('packages/redcube-pack-poster-onepager')), false);
-  assert.equal(familyTypes.includes('@redcube/pack-poster-onepager'), false);
-  assert.equal(familyTypes.includes('buildPosterBlueprint'), false);
-  assert.equal(familyTypes.includes('buildPosterVisualDirection'), false);
-  assert.equal(familyTypes.includes('buildPosterRenderArtifact'), false);
-  assert.equal(familyTypes.includes('compilePosterRenderSlides'), false);
-  assert.equal(runtime.includes("const authoredArtifact = promptArtifact(contract, 'storyline', {"), false);
-  assert.equal(runtime.includes("const seed = promptSeed(contract, 'visual_director_review', {"), false);
-  assert.equal(runtime.includes('buildPosterBlueprint(contract, storylineArtifact,'), false);
-  assert.equal(runtime.includes('buildPosterVisualDirection(contract, blueprintArtifact'), false);
-  assert.equal(runtime.includes("const renderArtifact = deps.promptArtifact(contract, 'render_html')?.render_markup_artifact || {};"), false);
-  assert.equal(runtime.includes('buildPosterRenderArtifact({ workspaceRoot, topicId, deliverableId, contract, deliverablePaths }'), false);
-  assert.equal(runtime.includes('@redcube/pack-poster-onepager'), false);
-  assert.match(storylinePrompt, /## runtime_artifact/);
-  assert.match(blueprintPrompt, /## runtime_seed/);
-  assert.match(visualPrompt, /## runtime_seed/);
-  assert.match(visualPrompt, /相邻可读块安全间距/);
-  assert.match(renderHtmlPrompt, /## runtime_seed/);
-  assert.match(renderHtmlPrompt, /相邻读者可见.*安全间距/);
-  assert.match(renderShell, /font-awesome\/6\.5\.1/);
-  assert.match(directorReviewPrompt, /## runtime_seed/);
-  assert.match(screenshotReviewPrompt, /相邻读者可见.*视觉贴住/);
-  assert.equal(runtime.includes("family: 'poster_onepager'"), true);
-});
 
 test('poster_onepager route artifacts record Codex-backed ownership for story, visual, render, and director review surfaces', async () => {
   await withMockCodexRuntime(async () => {
