@@ -253,7 +253,19 @@
         {"id":20,"surface":"repo_local_stage_folder_writer","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"public Stage Folder writer API with role, current-pointer, orphan-output and receipt parity"},
         {"id":21,"surface":"repo_local_source_intake_materialization","status":"blocked_missing_public_platform_api","owner":"one-person-lab/OPL","required_output":"material-ref intake API preserving RCA source-readiness and visual verdict authority"},
         {"id":22,"surface":"native_ppt_ooxml_reader","status":"blocked_schema_parity","owner":"OfficeCLI plus redcube_ai","required_output":"structured OfficeCLI readback mapped to the existing package-review schema with package, template, notes, transition, animation and relationship parity"}
-      ]
+      ],
+      "verification": {
+        "typecheck": "pass",
+        "smoke": "56 pass, 0 fail",
+        "fast": "212 parallel plus 26 serialized pass, 0 fail",
+        "full": "572 parallel plus 102 serialized pass, 0 fail",
+        "historical": "5 pass, 0 fail",
+        "private_platform_strict": "pass",
+        "structure_strict": "quality 4075 to 4081, cycles 3 to 3, god files 2 to 2",
+        "fallow_production": "22 entry points, 0 issues",
+        "current_program_source_index": "35 refs in sync",
+        "git_diff_check": "pass"
+      }
     }
   },
   "evidence_refs": {
