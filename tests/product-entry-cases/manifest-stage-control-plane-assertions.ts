@@ -7,11 +7,8 @@ const ACTION_CATALOG_REF = {
   ref: 'contracts/action_catalog.json',
   label: 'RedCube canonical action catalog',
 };
-const STAGE_CONTROL_PLANE_REF = {
-  ref_kind: 'repo_path',
-  ref: 'contracts/stage_control_plane.json',
-  label: 'RedCube canonical stage control plane',
-};
+const DECLARATIVE_STAGE_MANIFEST_REF = 'agent/stages/manifest.json';
+const GENERATED_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
 
 function readContract(relativePath) {
   return JSON.parse(readFileSync(new URL(`../../${relativePath}`, import.meta.url), 'utf8'));
@@ -22,22 +19,19 @@ export function assertManifestActionAndStageControlPlane({
   domain_action_adapterGuardedActionMetadata,
 }) {
   const actionCatalog = readContract(ACTION_CATALOG_REF.ref);
-  const stageControlPlane = readContract(STAGE_CONTROL_PLANE_REF.ref);
+  const stageManifest = readContract(DECLARATIVE_STAGE_MANIFEST_REF);
 
   assert.deepEqual(manifest.family_action_catalog_ref, ACTION_CATALOG_REF);
-  assert.deepEqual(manifest.family_stage_control_plane_ref, STAGE_CONTROL_PLANE_REF);
+  assert.equal(manifest.declarative_stage_manifest_ref, DECLARATIVE_STAGE_MANIFEST_REF);
+  assert.equal(manifest.family_stage_control_plane_ref, GENERATED_STAGE_CONTROL_PLANE_REF);
   assert.equal(Object.hasOwn(manifest, 'family_action_catalog'), false);
   assert.equal(Object.hasOwn(manifest, 'family_action_catalog_parity'), false);
   assert.equal(Object.hasOwn(manifest, 'family_stage_control_plane'), false);
 
   assert.equal(actionCatalog.surface_kind, 'family_action_catalog');
   assert.equal(actionCatalog.version, 'family-action-catalog.v1');
-  assert.equal(stageControlPlane.surface_kind, 'family_stage_control_plane');
-  assert.equal(stageControlPlane.version, 'family-stage-control-plane.v1');
-  assert.equal(
-    stageControlPlane.source_refs.some((sourceRef) => sourceRef.ref === ACTION_CATALOG_REF.ref),
-    true,
-  );
+  assert.equal(stageManifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
+  assert.equal(stageManifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
 
   const catalogActionIds = new Set(actionCatalog.actions.map((action) => action.action_id));
   const domainHandlerDispatchAction = actionCatalog.actions.find(
@@ -52,32 +46,16 @@ export function assertManifestActionAndStageControlPlane({
     domain_action_adapterGuardedActionMetadata.forbiddenWrites,
   );
 
-  assert.deepEqual(stageControlPlane.stages.map((stage) => stage.stage_id), stageControlPlane.stage_ids);
-  for (const [index, stage] of stageControlPlane.stages.entries()) {
-    assert.deepEqual(stage.allowed_action_refs, stage.action_refs);
-    assert.equal(stage.action_refs.every((actionRef) => catalogActionIds.has(actionRef)), true);
-    assert.equal(stage.missing_action_refs.length, 0);
-    assert.equal(stage.authority_boundary.opl_can_write_visual_truth, false);
-    assert.equal(stage.authority_boundary.provider_completion_is_visual_ready, false);
-    assert.equal(stage.authority_boundary.provider_completion_is_domain_ready, false);
-    for (const field of [
-      'tool_affordance_boundary',
-      'candidate_pool_policy',
-      'handoff_policy',
-      'independent_gate_policy',
-    ]) {
-      assert.equal(
-        stage.stage_contract[`${field}_ref`],
-        `${STAGE_CONTROL_PLANE_REF.ref}#/stages/${index}/${field}`,
-      );
-    }
+  for (const stage of stageManifest.stages) {
+    assert.equal(stage.allowed_action_refs.every((actionRef) => catalogActionIds.has(actionRef)), true);
+    assert.deepEqual(stage.next_stage_refs, stage.handoff.next_stage_refs);
   }
 
-  const artifactStage = stageControlPlane.stages.find((stage) => stage.stage_id === 'artifact_creation');
+  const artifactStage = stageManifest.stages.find((stage) => stage.stage_id === 'artifact_creation');
   assert.deepEqual(artifactStage.domain_stage_refs, ['author_image_pages', 'render_html', 'author_pptx_native']);
-  assert.deepEqual(artifactStage.action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
-  const reviewStage = stageControlPlane.stages.find((stage) => stage.stage_id === 'review_and_revision');
-  assert.equal(reviewStage.authority_boundary.redcube_ai_owns_review_export_verdict, true);
-  const handoffStage = stageControlPlane.stages.find((stage) => stage.stage_id === 'package_and_handoff');
+  assert.deepEqual(artifactStage.allowed_action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
+  const reviewStage = stageManifest.stages.find((stage) => stage.stage_id === 'review_and_revision');
+  assert.equal(reviewStage.trust_lane, 'ai_decision');
+  const handoffStage = stageManifest.stages.find((stage) => stage.stage_id === 'package_and_handoff');
   assert.deepEqual(handoffStage.domain_stage_refs, ['export_pptx', 'publish_copy', 'export_bundle', 'export_poster']);
 }

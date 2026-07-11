@@ -66,7 +66,7 @@
     "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json",
     "stage_graph_source_ref": "agent/stages/manifest.json",
     "quality_gate_source_ref": "agent/quality_gates/visual_pack_discipline.md",
-    "executor_policy_source_ref": "contracts/stage_control_plane.json#/stages/*/selected_executor",
+    "executor_policy_source_ref": "opl-generated:family_stage_control_plane#/stages/*/selected_executor",
     "owner_receipt_schema_source_ref": "contracts/owner_receipt_contract.json",
     "authority_functions_source_ref": "runtime/authority_functions/README.md",
     "agent_lab_cost_profile_source_ref": "contracts/agent_lab_cost_profile.json",
@@ -126,7 +126,7 @@
     "owner": "redcube_ai",
     "consumer": "opl_pack_compiler",
     "contract_ref": "contracts/opl-framework/cognitive-computation-kernel.json",
-    "stage_control_plane_ref": "contracts/stage_control_plane.json",
+    "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
     "cognitive_kernel_adoption_ref": "contracts/cognitive_kernel_adoption.json",
     "golden_path_profile_ref": "contracts/golden_path_profile.json",
     "domain_affordance_catalog_ref": {

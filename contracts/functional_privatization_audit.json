@@ -2284,7 +2284,7 @@
     "consumed_from_refs": [
       "/domain_descriptor",
       "contracts/action_catalog.json",
-      "contracts/stage_control_plane.json",
+      "opl-generated:family_stage_control_plane",
       "/visual_pack_compiler_handoff/generated_surface_handoff",
       "/privatized_functional_module_audit"
     ],

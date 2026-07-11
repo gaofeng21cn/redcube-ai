@@ -4,7 +4,6 @@ import assert from 'node:assert/strict';
 
 import {
   buildRedCubeActionMetadata,
-  buildRedCubeFamilyStageControlPlaneContract,
   invokeProductEntry,
 } from '@redcube/domain-entry';
 import {
@@ -41,45 +40,22 @@ function stageIds(response) {
 test('canonical stage source generates one storyline owner and explicit top-level handoffs', () => {
   const manifest = readJson('agent/stages/manifest.json');
   const familyActionCatalog = buildRedCubeActionMetadata().family_action_catalog;
-  const generated = buildRedCubeFamilyStageControlPlaneContract({ familyActionCatalog });
-  const tracked = readJson('contracts/stage_control_plane.json');
-
-  assert.deepEqual(
-    manifest.stages.map((stage) => stage.stage_id),
-    generated.stage_ids,
-  );
-  assert.equal(
-    tracked.source_refs.some((sourceRef) => sourceRef.ref === 'agent/stages/manifest.json'),
-    true,
-  );
-  for (const source of generated.stages) {
-    const projected = tracked.stages.find((stage) => stage.stage_id === source.stage_id);
-    const declared = manifest.stages.find((stage) => stage.stage_id === source.stage_id);
-    assert.deepEqual(declared.next_stage_refs, declared.handoff.next_stage_refs, source.stage_id);
-    for (const field of ['summary', 'goal', 'domain_stage_refs', 'strategy_refs', 'next_stage_refs', 'handoff']) {
-      assert.deepEqual(projected[field], source[field], `${source.stage_id}.${field}`);
-    }
-    assert.deepEqual(
-      projected.stage_contract.next_stage_refs,
-      source.stage_contract.next_stage_refs,
-      `${source.stage_id}.stage_contract.next_stage_refs`,
-    );
-    assert.equal(
-      projected.stage_contract.handoff_ref,
-      source.stage_contract.handoff_ref,
-      `${source.stage_id}.stage_contract.handoff_ref`,
-    );
+  for (const declared of manifest.stages) {
+    assert.deepEqual(declared.next_stage_refs, declared.handoff.next_stage_refs, declared.stage_id);
+    assert.equal(declared.allowed_action_refs.every((actionId) => (
+      familyActionCatalog.actions.some((action) => action.action_id === actionId)
+    )), true, declared.stage_id);
   }
-  assert.deepEqual(generated.stages.find((stage) => stage.stage_id === 'source_intake').domain_stage_refs, [
+  assert.deepEqual(manifest.stages.find((stage) => stage.stage_id === 'source_intake').domain_stage_refs, [
     'source_readiness',
     'research',
   ]);
   assert.deepEqual(
-    generated.stages.filter((stage) => stage.domain_stage_refs.includes('storyline')).map((stage) => stage.stage_id),
+    manifest.stages.filter((stage) => stage.domain_stage_refs.includes('storyline')).map((stage) => stage.stage_id),
     ['communication_strategy'],
   );
-  generated.stages.forEach((stage, index) => {
-    const expected = generated.stages[index + 1] ? [generated.stages[index + 1].stage_id] : [];
+  manifest.stages.forEach((stage, index) => {
+    const expected = manifest.stages[index + 1] ? [manifest.stages[index + 1].stage_id] : [];
     assert.deepEqual(stage.next_stage_refs, expected, stage.stage_id);
     assert.deepEqual(stage.handoff.next_stage_refs, expected, stage.stage_id);
   });

@@ -33,7 +33,6 @@ function canReach(manifest, from, to, allowedStageIds) {
 test('mutating RCA actions declare ordered routes with exact manifest coverage', () => {
   const manifest = readJson('agent/stages/manifest.json');
   const trackedCatalog = readJson('contracts/action_catalog.json');
-  const trackedStageControlPlane = readJson('contracts/stage_control_plane.json');
   const sourceCatalog = buildRedCubeActionMetadata().family_action_catalog;
 
   assert.deepEqual(
@@ -50,12 +49,6 @@ test('mutating RCA actions declare ordered routes with exact manifest coverage',
       stage_route_exempt,
     })),
   );
-  for (const stage of manifest.stages) {
-    const trackedStage = trackedStageControlPlane.stages.find((entry) => entry.stage_id === stage.stage_id);
-    assert.deepEqual(trackedStage.action_refs, stage.allowed_action_refs, `${stage.stage_id}.action_refs`);
-    assert.deepEqual(trackedStage.allowed_action_refs, stage.allowed_action_refs, `${stage.stage_id}.allowed_action_refs`);
-  }
-
   for (const action of sourceCatalog.actions) {
     if (action.stage_route_exempt === 'domain_handler_target_only') {
       assert.equal('stage_route' in action, false, action.action_id);

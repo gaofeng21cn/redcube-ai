@@ -10,7 +10,6 @@ import {
   buildPrivatizedFunctionalModuleAuditProjection,
   buildPhysicalSourceMorphologyPolicy,
   buildRedCubeActionMetadata,
-  buildRedCubeFamilyStageControlPlaneContract,
   buildRedCubeDomainAuthorityRefs,
   buildVisualPackCompilerHandoffProjection,
 } from '../../packages/redcube-domain-entry/dist/index.js';
@@ -148,9 +147,7 @@ export function assertCleanAgentRepoPathRef(refEntry, expectedPrefix, label) {
 
 export function buildCanonicalPack() {
   const actionCatalog = buildRedCubeActionMetadata().family_action_catalog;
-  const stageControlPlane = buildRedCubeFamilyStageControlPlaneContract({
-    familyActionCatalog: actionCatalog,
-  });
+  const declarativeStageManifest = readJson('agent/stages/manifest.json');
   const authorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot: '<workspace_root>',
     runtime: {
@@ -173,7 +170,8 @@ export function buildCanonicalPack() {
       generated_surface_owner: 'one-person-lab',
       domain_repo_can_own_generated_surface: false,
     },
-    stageControlPlane,
+    declarativeStageManifest,
+    generatedStageControlPlaneRef: 'opl-generated:family_stage_control_plane',
     memoryDescriptor: {
       ...buildFamilyDomainMemoryDescriptor({
         domainMemoryDescriptorLocator: authorityRefs.domain_memory_descriptor_locator,
@@ -223,7 +221,8 @@ export function buildCanonicalPack() {
       source_refs: {
         canonical_semantic_pack: 'agent/',
         action_catalog: 'packages/redcube-domain-entry/src/actions/family-action-catalog.ts::buildRedCubeActionMetadata',
-        stage_control_plane: 'agent/stages/manifest.json',
+        declarative_stage_manifest: 'agent/stages/manifest.json',
+        generated_stage_control_plane: 'opl-generated:family_stage_control_plane',
         memory_descriptor: 'packages/redcube-domain-entry/src/actions/domain-authority-refs.ts::buildFamilyDomainMemoryDescriptor',
         functional_audit: 'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts::buildPrivatizedFunctionalModuleAuditProjection',
       },

@@ -18,7 +18,7 @@
       "fix_html_default_execution_shape": "structured_call",
       "rca_local_executor_routing_allowed": false,
       "fix_html_second_executor_pass_allowed": false,
-      "opl_executor_policy_ref": "contracts/stage_control_plane.json#/stages/*/selected_executor",
+      "opl_executor_policy_ref": "opl-generated:family_stage_control_plane#/stages/*/selected_executor",
       "silent_executor_fallback_allowed": false
     }
   },

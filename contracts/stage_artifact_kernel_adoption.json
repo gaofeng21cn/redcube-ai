@@ -6,7 +6,7 @@
   "package_id": "redcube-ai",
   "conformance_entrypoint": "contracts/stage_artifact_kernel_adoption.json",
   "kernel_contract_ref": "contracts/opl-framework/stage-artifact-runtime-contract.json",
-  "stage_control_plane_ref": "contracts/stage_control_plane.json",
+  "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
   "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
   "conformance_validator": {
@@ -244,7 +244,7 @@
   },
   "domain_pack_binding": {
     "accepted_source_refs": [
-      "contracts/stage_control_plane.json",
+      "opl-generated:family_stage_control_plane",
       "contracts/foundry_agent_series.json",
       "docs/decisions.md#decision-rca-route-handler-writes-opl-stage-folder-contract"
     ],
