@@ -84,8 +84,6 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
 
   function runPython(helper: RedCubePythonNativeHelper, args: string[]): JsonRecord {
     return runRedCubePythonHelper(helper, args, {
-      fileExists,
-      missingMessagePrefix: 'Missing ppt_deck python helper',
       failureMessagePrefix: 'ppt_deck python helper failed',
     });
   }
@@ -640,7 +638,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
     const previewMetrics = cachedPreview?.metrics || exportPreviewMetricsFromPayload({ exportPayload, renderArtifact, reviewArtifact });
     const conversionCommand = cachedPreview
       ? []
-      : [...python.argv, '--screenshots-dir', screenshotsDir, '--output-pptx', pptxFile, '--output-pdf', pdfFile];
+      : python.argv;
     const finalDelivery = syncWorkspaceFinalDelivery({
       workspaceRoot,
       contract,
@@ -737,6 +735,7 @@ export function createPptDeckExportStageParts(deps: PptDeckExportStageDeps) {
           helper_id: python.helper_id,
           package_module: python.package_module,
           command: conversionCommand,
+          request_args: cachedPreview ? [] : python.request_args,
         },
       },
       artifact_refs: artifactRefs,

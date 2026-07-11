@@ -1,12 +1,11 @@
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
-import { resolveRedCubePythonCommand } from './python-command.js';
-import { readJson, safeText } from './protocol-utils.js';
+import { safeText } from './protocol-utils.js';
 
 import type {
-  RedCubePythonHelperInvocation,
   RedCubePythonHelperReference,
   RedCubePythonHelperRunResult,
   RedCubePythonNativeHelper,
@@ -14,74 +13,46 @@ import type {
   RunRedCubePythonHelperOptions,
 } from './types.js';
 
-export function buildPythonHelperEnv(
-  pythonRoot: string,
-  env: Record<string, string | undefined> = process.env,
-): Record<string, string | undefined> {
-  const currentPath = safeText(env.PYTHONPATH);
-  return {
-    ...env,
-    PYTHONPATH: currentPath ? `${pythonRoot}${path.delimiter}${currentPath}` : pythonRoot,
-  };
-}
+const DEFAULT_CATALOG = 'contracts/runtime-program/python-native-helper-catalog.json';
 
 export function resolvePythonNativeHelper(
   repoRoot: string,
   helperId: string,
   options: ResolveRedCubePythonNativeHelperOptions = {},
 ): RedCubePythonNativeHelper {
-  const catalogFile = path.join(repoRoot, options.catalogFile || 'contracts/runtime-program/python-native-helper-catalog.json');
-  const catalog = readJson(catalogFile) as {
-    package?: { source_root?: string };
-    helpers?: Array<{
-      helper_id?: string;
-      package_module?: string;
-    }>;
-  };
-  const helper = (Array.isArray(catalog.helpers) ? catalog.helpers : [])
-    .find((item) => item?.helper_id === helperId);
-  if (!helper?.package_module) {
-    throw new Error(`Missing Python helper catalog package_module: ${helperId}`);
+  const catalogFile = path.resolve(repoRoot, options.catalogFile || DEFAULT_CATALOG);
+  if (!(options.fileExists || existsSync)(catalogFile)) {
+    throw new Error(`Missing Python helper catalog: ${catalogFile}`);
   }
-  return Object.freeze({
-    helperId,
-    packageModule: helper.package_module,
-    pythonRoot: path.resolve(repoRoot, catalog.package?.source_root || 'python'),
-    catalogFile,
-  });
-}
-
-export function resolvePythonHelperInvocation(
-  helper: RedCubePythonNativeHelper,
-  options: RunRedCubePythonHelperOptions = {},
-): RedCubePythonHelperInvocation {
-  const fileExists = options.fileExists || existsSync;
-  const env = options.env || process.env;
-  if (!helper || typeof helper !== 'object' || !helper.packageModule) {
-    throw new Error('Python helper must be resolved from the native helper catalog before invocation');
+  if (!safeText(helperId)) {
+    throw new Error('Python helper id is required');
   }
-  const pythonRoot = safeText(helper.pythonRoot);
-  if (!pythonRoot || !fileExists(pythonRoot)) {
-    throw new Error(`Missing RedCube Python package root for helper ${helper.helperId || helper.packageModule}: ${pythonRoot}`);
-  }
-  return {
-    helperId: helper.helperId || helper.packageModule,
-    packageModule: helper.packageModule,
-    argv: ['-m', helper.packageModule],
-    env: buildPythonHelperEnv(pythonRoot, env),
-    label: helper.packageModule,
-  };
+  return Object.freeze({ helperId, catalogFile });
 }
 
 export function pythonHelperReference(
   helper: RedCubePythonNativeHelper,
 ): RedCubePythonHelperReference {
-  if (!helper || typeof helper !== 'object' || !helper.packageModule) {
-    throw new Error('Python helper reference must come from the native helper catalog');
+  if (!helper || typeof helper !== 'object' || !safeText(helper.helperId) || !safeText(helper.catalogFile)) {
+    throw new Error('Python helper reference must identify an RCA catalog declaration');
   }
   return {
-    helper_id: helper.helperId || helper.packageModule,
-    package_module: helper.packageModule,
+    helper_id: helper.helperId,
+    catalog_ref: helper.catalogFile,
+  };
+}
+
+function resolveOplCommand(options: RunRedCubePythonHelperOptions) {
+  const env = options.env || process.env;
+  return safeText(options.oplBin || env.OPL_BIN || env.OPL_COMMAND || 'opl');
+}
+
+function oplExecutionEnv(options: RunRedCubePythonHelperOptions) {
+  const env = options.env || process.env;
+  if (env.OPL_DOMAIN_PYTHON_COMMAND || !env.REDCUBE_PYTHON_COMMAND) return env;
+  return {
+    ...env,
+    OPL_DOMAIN_PYTHON_COMMAND: env.REDCUBE_PYTHON_COMMAND,
   };
 }
 
@@ -90,30 +61,62 @@ export function runRedCubePythonHelper(
   args: string[],
   options: RunRedCubePythonHelperOptions = {},
 ): RedCubePythonHelperRunResult {
-  const invocation = resolvePythonHelperInvocation(helper, options);
-  const spawnSyncImpl = options.spawnSyncImpl || spawnSync;
-  const pythonCommand = resolveRedCubePythonCommand({
-    env: options.env,
-    fileExists: options.fileExists,
-    pythonProbeImpl: options.pythonProbeImpl,
-  });
-  const result = spawnSyncImpl(pythonCommand.command, [...(pythonCommand.args || []), ...invocation.argv, ...args], {
-    encoding: 'utf-8',
-    env: {
-      ...invocation.env,
-      ...pythonCommand.runtimeEnv,
-    },
-    maxBuffer: options.maxBuffer || 16 * 1024 * 1024,
-  });
-  if (result.status !== 0) {
-    const message = String(result.stderr || result.stdout || `${options.failureMessagePrefix || 'python helper failed'}: ${invocation.label}`).trim();
-    throw new Error(message);
+  const reference = pythonHelperReference(helper);
+  if (!Array.isArray(args) || args.some((arg) => typeof arg !== 'string')) {
+    throw new Error('Python helper args must be a string array');
   }
-  return {
-    command: pythonCommand.command,
-    helper_id: invocation.helperId,
-    package_module: invocation.packageModule,
-    argv: invocation.argv,
-    payload: JSON.parse(String(result.stdout || '{}')),
-  };
+
+  const requestDir = mkdtempSync(path.join(options.tempRoot || os.tmpdir(), 'redcube-opl-native-helper-'));
+  const requestFile = path.join(requestDir, 'request.json');
+  writeFileSync(requestFile, `${JSON.stringify({ args, timeout_seconds: options.timeoutSeconds || 300 })}\n`, 'utf8');
+
+  const command = resolveOplCommand(options);
+  const executionArgv = [
+    'pack', 'native-helper', 'run',
+    '--catalog', reference.catalog_ref,
+    '--helper', reference.helper_id,
+    '--request', requestFile,
+    '--json',
+  ];
+  const spawnSyncImpl = options.spawnSyncImpl || spawnSync;
+  try {
+    const result = spawnSyncImpl(command, executionArgv, {
+      cwd: options.cwd || path.dirname(reference.catalog_ref),
+      encoding: 'utf-8',
+      env: oplExecutionEnv(options),
+      maxBuffer: options.maxBuffer || 16 * 1024 * 1024,
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      const message = String(result.stderr || result.stdout || `${options.failureMessagePrefix || 'OPL native helper failed'}: ${reference.helper_id}`).trim();
+      throw new Error(message);
+    }
+    const envelope = JSON.parse(String(result.stdout || '{}')) as {
+      pack_native_helper_execution_receipt?: {
+        helper_id?: string;
+        package_module?: string;
+        payload?: unknown;
+      };
+    };
+    const receipt = envelope.pack_native_helper_execution_receipt;
+    if (!receipt || receipt.helper_id !== reference.helper_id || !safeText(receipt.package_module)) {
+      throw new Error(`Invalid OPL native helper execution receipt: ${reference.helper_id}`);
+    }
+    return {
+      command,
+      helper_id: receipt.helper_id,
+      package_module: receipt.package_module as string,
+      argv: [
+        'pack', 'native-helper', 'run',
+        '--catalog', reference.catalog_ref,
+        '--helper', reference.helper_id,
+        '--request', '<ephemeral-request>',
+        '--json',
+      ],
+      request_args: [...args],
+      payload: receipt.payload,
+    };
+  } finally {
+    rmSync(requestDir, { recursive: true, force: true });
+  }
 }

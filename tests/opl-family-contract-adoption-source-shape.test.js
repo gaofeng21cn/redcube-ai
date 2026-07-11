@@ -58,7 +58,10 @@ test('RCA source-shape tail modules are refs-only or native-helper tails, not br
   assert.equal(byId.workspace_source_intake.status, 'source_readiness_refs_adapter_landed');
   assert.equal(byId.memory_writeback_receipt_transport.status, 'memory_receipt_refs_adapter_landed');
   assert.equal(byId.review_repair_transport.status, 'review_repair_refs_adapter_landed');
-  assert.equal(byId.native_helper_envelope.status, 'native_helper_implementation_opl_envelope_tail');
+  assert.equal(byId.native_helper_envelope.status, 'native_helper_implementation_via_opl_envelope');
+  assert.equal(byId.native_helper_envelope.oplAbsorbCandidate, false);
+  assert.equal(byId.native_helper_envelope.bridge_exit_gate.current_status, 'closed_opl_envelope_is_default_caller');
+  assert.equal(byId.native_helper_envelope.bridge_exit_gate.declares_replacement_complete, true);
   assert.equal(byId.operator_projection_shell.status, 'domain_authority_refs_adapter_landed');
   assert.equal(byId.operator_projection_shell.codePaths.some((ref) => ref.includes('get-product-entry-manifest-parts/')), false);
   assert.equal(byId.codex_executor_adapter.status, 'route_executor_policy_refs_adapter_landed');

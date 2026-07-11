@@ -19,35 +19,27 @@ export interface ResolvedRedCubePythonCommand {
 
 export interface RedCubePythonNativeHelper {
   helperId: string;
-  packageModule: string;
-  pythonRoot: string;
   catalogFile: string;
 }
 
 export interface ResolveRedCubePythonNativeHelperOptions {
   catalogFile?: string;
-}
-
-export interface RedCubePythonHelperInvocation {
-  helperId: string;
-  packageModule: string;
-  argv: string[];
-  env: Record<string, string | undefined>;
-  label: string;
+  fileExists?: (file: string) => boolean;
 }
 
 export interface RedCubePythonHelperReference {
   helper_id: string;
-  package_module: string;
+  catalog_ref: string;
 }
 
 export interface RunRedCubePythonHelperOptions {
   env?: Record<string, string | undefined>;
   spawnSyncImpl?: typeof spawnSync;
-  fileExists?: (file: string) => boolean;
-  pythonProbeImpl?: ResolveRedCubePythonCommandOptions['pythonProbeImpl'];
+  oplBin?: string;
+  cwd?: string;
+  tempRoot?: string;
+  timeoutSeconds?: number;
   maxBuffer?: number;
-  missingMessagePrefix?: string;
   failureMessagePrefix?: string;
 }
 
@@ -56,6 +48,7 @@ export interface RedCubePythonHelperRunResult {
   helper_id: string;
   package_module: string;
   argv: string[];
+  request_args: string[];
   payload: unknown;
 }
 

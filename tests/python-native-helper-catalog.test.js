@@ -155,7 +155,7 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
   assert.equal(catalog.language, 'python');
   assert.equal(
     catalog.typescript_boundary,
-    'TypeScript owns product entry, CLI/MCP, domain-entry protocol contracts, runtime-family route orchestration, and review/export gate wiring.',
+    'RCA TypeScript owns product entry, domain-entry protocol contracts, runtime-family visual route orchestration, review/export gate wiring, and the thin OPL invocation client; OPL owns catalog resolution, Python environment selection, process lifecycle, timeout, and JSON execution receipt envelope.',
   );
   assert.doesNotMatch(catalog.typescript_boundary, /\bgateway contracts\b/);
   assert.deepEqual(catalog.package, {
@@ -176,9 +176,27 @@ test('Python native helper catalog records the repo-owned helper boundary', () =
     },
   });
   assert.equal(existsSync(path.resolve(catalog.package.pyproject)), true);
+  assert.deepEqual(catalog.framework_execution_envelope, {
+    owner: 'opl',
+    surface: 'opl pack native-helper run',
+    command_shape: 'opl pack native-helper run --catalog <catalog.json> --helper <helper_id> --request <request.json> --json',
+    receipt_surface_kind: 'opl_pack_native_helper_execution_receipt',
+    rca_role: 'catalog_declaration_helper_implementation_and_receipt_consumer',
+    rca_owns_catalog_resolution: false,
+    rca_owns_python_environment_selection: false,
+    rca_owns_helper_process_lifecycle: false,
+    rca_owns_json_execution_envelope: false,
+    opl_owns_visual_truth: false,
+    opl_owns_review_export_verdict: false,
+    opl_owns_artifact_authority: false,
+  });
   assert.deepEqual(catalog.invocation_policy, {
-    preferred_internal_invocation: 'package_module',
-    preferred_argv_shape: ['python', '-m', '<package_module>'],
+    preferred_internal_invocation: 'opl_pack_native_helper_envelope',
+    preferred_argv_shape: [
+      'opl', 'pack', 'native-helper', 'run', '--catalog', '<catalog.json>', '--helper', '<helper_id>',
+      '--request', '<request.json>', '--json',
+    ],
+    domain_implementation_shape: 'python_package_module',
     legacy_wrapper_scripts_allowed: false,
     legacy_wrapper_scripts_are_preferred: false,
   });
@@ -439,7 +457,8 @@ test('Python helper catalog has retired compatibility wrapper scripts', () => {
   assert.equal(Object.hasOwn(runtimeExecutorProof, 'native_writer'), false);
 });
 
-test('Runtime Python helper callers prefer package module invocation over wrapper script paths', () => {
+test('Runtime Python helper callers delegate catalog resolution and process lifecycle to OPL', () => {
+  const transportSource = readImplementation('packages/redcube-runtime-protocol/src/python-native-helper.ts');
   const combinedSource = RUNTIME_PYTHON_CALLER_FILES
     .map((file) => readImplementation(file))
     .join('\n');
@@ -449,7 +468,11 @@ test('Runtime Python helper callers prefer package module invocation over wrappe
     /const\s+PYTHON_[A-Z_]+\s*=\s*path\.join\([^;]+redcube-runtime\/scripts\/ppt_deck_[a-z_]+\.py/s,
   );
   assert.doesNotMatch(combinedSource, /DEFAULT_BRIDGE_SCRIPT/);
-  assert.match(combinedSource, /'-m',\s*helper\.packageModule/);
+  assert.doesNotMatch(transportSource, /resolveRedCubePythonCommand/);
+  assert.doesNotMatch(transportSource, /PYTHONPATH/);
+  assert.doesNotMatch(transportSource, /'-m',\s*helper\.packageModule/);
+  assert.match(transportSource, /'pack', 'native-helper', 'run'/);
+  assert.match(transportSource, /pack_native_helper_execution_receipt/);
   assert.match(combinedSource, /runRedCubePythonHelper/);
   assert.match(combinedSource, /python-native-helper-catalog\.json/);
 

@@ -26,8 +26,6 @@ export function createPptDeckScreenshotReviewMechanicsParts(deps) {
 
   function runPython(helper, args) {
     return runRedCubePythonHelper(helper, args, {
-      fileExists: mainExistsSync || existsSync,
-      missingMessagePrefix: 'Missing ppt_deck python helper',
       failureMessagePrefix: 'ppt_deck python helper failed',
     });
   }

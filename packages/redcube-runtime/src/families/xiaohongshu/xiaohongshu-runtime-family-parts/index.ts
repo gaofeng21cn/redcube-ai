@@ -286,8 +286,6 @@ function syncCurrentCandidateHtmlFromStageArtifact(contract, deliverablePaths) {
 
 function runPython(helper, args) {
   return runRedCubePythonHelper(helper, args, {
-    fileExists: existsSync,
-    missingMessagePrefix: 'Missing python helper',
     failureMessagePrefix: 'python helper failed',
   }).payload;
 }

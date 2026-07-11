@@ -749,7 +749,8 @@ export function createPptDeckStageParts(deps) {
           ? {
               helper_id: python.helper_id,
               package_module: python.package_module,
-              command: [...python.argv, ...args],
+              command: python.argv,
+              request_args: python.request_args,
             }
           : null,
         checks: summarizeMechanicalChecksFromSlides(mechanicalSlideReviews),

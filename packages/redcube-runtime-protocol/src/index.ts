@@ -43,9 +43,7 @@ export {
   resolveRedCubePythonCommand,
 } from './python-command.js';
 export {
-  buildPythonHelperEnv,
   pythonHelperReference,
-  resolvePythonHelperInvocation,
   resolvePythonNativeHelper,
   runRedCubePythonHelper,
 } from './python-native-helper.js';
@@ -80,7 +78,6 @@ export type {
   RuntimeErrorKind,
   ResolvedRedCubePythonCommand,
   ResolveRedCubePythonCommandOptions,
-  RedCubePythonHelperInvocation,
   RedCubePythonHelperReference,
   RedCubePythonHelperRunResult,
   RedCubePythonNativeHelper,

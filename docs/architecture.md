@@ -196,11 +196,14 @@ OPL generated MCP product-entry descriptor 只承载 RCA `family_action_catalog`
 
 ## Python Native Helper Surface
 
-当前 repo-owned Python helper surface 是 package-module-only：
+当前 Python helper 边界是 `RCA 声明与实现 + OPL 执行 envelope`：
 
 - catalog: `contracts/runtime-program/python-native-helper-catalog.json`
-- invocation: `python -m redcube_ai.<helper_module>`
+- framework invocation: `opl pack native-helper run --catalog <catalog.json> --helper <helper_id> --request <request.json> --json`
+- domain implementation: `python -m redcube_ai.<helper_module>`，只由 OPL 根据 catalog 解析和启动
 - proof lane: `contracts/runtime-program/ppt-native-authoring-proof-lane.json`
+
+RCA runtime-family 只提交 `catalog_ref`、`helper_id` 与领域参数，并消费 `opl_pack_native_helper_execution_receipt`。Python 环境选择、`PYTHONPATH`、module spawn、timeout、stdout JSON 校验与通用 execution receipt 均归 OPL；RCA 继续持有 helper body、PPT/image/export mutation、视觉 review/export gate、artifact authority 与 route-specific proof。
 
 退役的 thin wrapper 包括 `packages/redcube-runtime/scripts/ppt_deck_review.py`、`packages/redcube-runtime/scripts/ppt_deck_export.py`、`packages/redcube-runtime/scripts/ppt_deck_native.py` 与 `python/redcube_ai/hermes/agent_loop_bridge.py`。这些路径不得作为 active caller、contract anchor 或 compatibility layer 恢复；no-active-caller proof 与 retired-surface guard 由 native helper catalog tests 和 retired surface guard 维护。
 

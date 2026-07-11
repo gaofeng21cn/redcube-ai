@@ -21,14 +21,37 @@
     }
   },
   "scope": "Repo-tracked Python helper catalog for native PPT/Office/document automation surfaces.",
-  "typescript_boundary": "TypeScript owns product entry, CLI/MCP, domain-entry protocol contracts, runtime-family route orchestration, and review/export gate wiring.",
+  "typescript_boundary": "RCA TypeScript owns product entry, domain-entry protocol contracts, runtime-family visual route orchestration, review/export gate wiring, and the thin OPL invocation client; OPL owns catalog resolution, Python environment selection, process lifecycle, timeout, and JSON execution receipt envelope.",
+  "framework_execution_envelope": {
+    "owner": "opl",
+    "surface": "opl pack native-helper run",
+    "command_shape": "opl pack native-helper run --catalog <catalog.json> --helper <helper_id> --request <request.json> --json",
+    "receipt_surface_kind": "opl_pack_native_helper_execution_receipt",
+    "rca_role": "catalog_declaration_helper_implementation_and_receipt_consumer",
+    "rca_owns_catalog_resolution": false,
+    "rca_owns_python_environment_selection": false,
+    "rca_owns_helper_process_lifecycle": false,
+    "rca_owns_json_execution_envelope": false,
+    "opl_owns_visual_truth": false,
+    "opl_owns_review_export_verdict": false,
+    "opl_owns_artifact_authority": false
+  },
   "invocation_policy": {
-    "preferred_internal_invocation": "package_module",
+    "preferred_internal_invocation": "opl_pack_native_helper_envelope",
     "preferred_argv_shape": [
-      "python",
-      "-m",
-      "<package_module>"
+      "opl",
+      "pack",
+      "native-helper",
+      "run",
+      "--catalog",
+      "<catalog.json>",
+      "--helper",
+      "<helper_id>",
+      "--request",
+      "<request.json>",
+      "--json"
     ],
+    "domain_implementation_shape": "python_package_module",
     "legacy_wrapper_scripts_allowed": false,
     "legacy_wrapper_scripts_are_preferred": false
   },

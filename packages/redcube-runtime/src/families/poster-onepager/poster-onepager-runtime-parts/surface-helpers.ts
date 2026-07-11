@@ -105,8 +105,6 @@ export function normalizeInlineText(value, maxLength = 220) {
 
 export function runPython(helper, args) {
   return runRedCubePythonHelper(helper, args, {
-    fileExists: existsSync,
-    missingMessagePrefix: 'Missing python helper',
     failureMessagePrefix: 'python helper failed',
   }).payload;
 }

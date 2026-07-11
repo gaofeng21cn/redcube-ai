@@ -900,20 +900,21 @@
     {
       "module_id": "native_helper_envelope",
       "surface_ref": "/native_ppt_operator_ux",
-      "status": "native_helper_implementation_opl_envelope_tail",
+      "status": "native_helper_implementation_via_opl_envelope",
       "classification": "native_helper_implementation",
       "opl_generic_primitive": "native_helper_generic_envelope",
-      "oplAbsorbCandidate": true,
+      "oplAbsorbCandidate": false,
       "rcaRetains": [
         "python_native_helper_implementation",
         "ppt_image_export_mutation_logic",
         "helper_specific_proof"
       ],
       "rca_scope": "python_native_helper_implementation",
-      "audit_readout": "retain_rca_implementation_project_opl_envelope",
+      "audit_readout": "opl_envelope_default_caller_rca_implementation_retained",
       "codePaths": [
         "contracts/runtime-program/python-native-helper-catalog.json",
         "python/redcube_ai",
+        "packages/redcube-runtime-protocol/src/python-native-helper.ts",
         "packages/redcube-domain-entry/src/actions/native-ppt-product-entry-proof.ts"
       ],
       "activeCallers": [
@@ -922,8 +923,8 @@
         "repair_pptx_native route",
         "python native helper catalog tests"
       ],
-      "activeCallerStatus": "active_rca_native_implementation_package_module_only",
-      "migrationAction": "Keep helper registration, environment/provisioning metadata, execution receipt and operator-safe launch envelope in OPL; RCA owns the native helper implementation and route-specific proof refs.",
+      "activeCallerStatus": "active_rca_native_implementation_called_through_opl_envelope",
+      "migrationAction": "OPL now owns helper catalog resolution, environment/provisioning selection, process lifecycle, timeout and JSON execution receipt; RCA owns catalog declarations, native helper implementation, visual route integration and proof refs.",
       "retentionReason": "RCA owns PPT/image/export helper implementation and route-specific mutation/review integration.",
       "cannotAbsorbReason": "OPL can standardize execution envelope but cannot own domain helper logic that mutates RCA visual artifacts.",
       "tombstone_required": false,
@@ -931,7 +932,7 @@
       "active_reader_facing_classification": "native_helper_implementation",
       "opl_owned_generic_primitive_consumer": true,
       "rca_owned_visual_domain_authority": true,
-      "opl_absorb_candidate": true,
+      "opl_absorb_candidate": false,
       "opl_replacement_expectation": {
         "owner": "opl",
         "expectation_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
@@ -942,12 +943,12 @@
       },
       "bridge_exit_gate": {
         "gate_id": "native_helper_envelope_bridge_exit_gate",
-        "bridge_role": "native_helper_implementation_opl_envelope_tail",
-        "bridge_owner": "redcube_ai_refs_only_adapter_tail",
+        "bridge_role": "thin_opl_native_helper_receipt_client",
+        "bridge_owner": "redcube_ai_domain_invocation_client",
         "replacement_owner": "opl",
         "replacement_surface": "opl_native_helper_execution_envelope",
         "exit_gate_ref": "/opl_generic_primitive_consumption/consumed_projection_surfaces/native_helper_generic_envelope",
-        "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
+        "current_status": "closed_opl_envelope_is_default_caller",
         "required_before_retire": [
           "domain_authority_refs_preserved",
           "no_regression_proof_recorded",
@@ -958,18 +959,18 @@
           "helper_proof_refs"
         ],
         "after_exit_rca_surface": "native_helper_package_module_implementation",
-        "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
+        "tail_class": "domain_native_implementation_and_thin_opl_receipt_client",
         "declares_source_shape_landed": true,
         "declares_functional_structure_gap": false,
         "can_delete_without_no_active_caller_proof": false,
-        "declares_replacement_complete": false,
+        "declares_replacement_complete": true,
         "rca_can_own_replacement_runtime": false,
         "opl_can_write_visual_truth": false,
         "opl_can_store_artifact_blob": false,
         "opl_can_write_memory_body": false,
         "opl_can_authorize_review_export_verdict": false,
         "opl_can_issue_owner_receipt": false,
-        "default_caller_deletion_evidence_scope": "domain_owned_typed_blocker_and_no_forbidden_write_refs_only_no_physical_delete_authorization",
+        "default_caller_deletion_evidence_scope": "opl_native_helper_execution_receipt_and_rca_no_direct_python_transport_source_guard",
         "typed_blocker_refs": [
           "rca-typed-blocker:private-platform-retirement:native-helper-envelope:physical-delete-requires-explicit-owner-receipt",
           "typed-blocker:rca/default-caller-deletion/native_helper_envelope/physical-delete-requires-explicit-owner-receipt"

@@ -392,28 +392,41 @@ test('run-test-group consumes an OPL-managed Python runtime without installing a
   assert.equal(resolved.runtimeEnv.PYTHONDONTWRITEBYTECODE, '1');
 });
 
-test('OPL-managed Python helper invocations preserve helper environment and domain payload', () => {
+test('RCA native helper invocation delegates catalog resolution and process lifecycle to OPL', () => {
   const helper = {
     helperId: 'ppt_deck_review',
-    packageModule: 'redcube_ai.native_helpers.ppt_deck.review',
-    pythonRoot: path.resolve('python'),
     catalogFile: 'contracts/runtime-program/python-native-helper-catalog.json',
   };
   const result = runRedCubePythonHelper(helper, ['--input-json', '/tmp/input.json'], {
-    env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
-    fileExists: () => true,
-    pythonProbeImpl: () => ({ status: 0 }),
+    oplBin: '/opt/opl/bin/opl',
+    env: { REDCUBE_PYTHON_COMMAND: '["node","mock-helper.js"]', PATH: '' },
     spawnSyncImpl(command, args, options) {
-      if (command === '/usr/bin/true' && args[0] === '-m') {
-        assert.match(options.env.PLAYWRIGHT_BROWSERS_PATH, /opl\/domain-helper\/playwright-browsers$/);
-        assert.equal(options.env.PYTHONDONTWRITEBYTECODE, '1');
-        assert.equal(options.env.PYTHONPATH.startsWith(path.resolve('python')), true);
-        return { status: 0, stdout: JSON.stringify({ status: 'ok' }), stderr: '' };
-      }
-      throw new Error(`unexpected spawnSync call: ${command} ${args.join(' ')}`);
+      assert.equal(command, '/opt/opl/bin/opl');
+      assert.deepEqual(args.slice(0, 3), ['pack', 'native-helper', 'run']);
+      assert.equal(args[args.indexOf('--catalog') + 1], helper.catalogFile);
+      assert.equal(args[args.indexOf('--helper') + 1], helper.helperId);
+      assert.equal(args.at(-1), '--json');
+      const request = JSON.parse(readFileSync(args[args.indexOf('--request') + 1], 'utf8'));
+      assert.deepEqual(request.args, ['--input-json', '/tmp/input.json']);
+      assert.equal(request.timeout_seconds, 300);
+      assert.equal(Object.hasOwn(options.env, 'PYTHONPATH'), false);
+      assert.equal(options.env.OPL_DOMAIN_PYTHON_COMMAND, '["node","mock-helper.js"]');
+      return {
+        status: 0,
+        stdout: JSON.stringify({
+          pack_native_helper_execution_receipt: {
+            helper_id: helper.helperId,
+            package_module: 'redcube_ai.native_helpers.ppt_deck.review',
+            payload: { status: 'ok' },
+          },
+        }),
+        stderr: '',
+      };
     },
   });
 
+  assert.equal(result.command, '/opt/opl/bin/opl');
+  assert.equal(result.package_module, 'redcube_ai.native_helpers.ppt_deck.review');
   assert.deepEqual(result.payload, { status: 'ok' });
 });
 

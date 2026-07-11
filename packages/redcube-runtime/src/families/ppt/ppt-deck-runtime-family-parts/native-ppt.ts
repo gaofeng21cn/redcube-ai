@@ -130,8 +130,6 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
 
   function runPython(helper: RedCubePythonNativeHelper, args: string[]): JsonRecord {
     return runRedCubePythonHelper(helper, args, {
-      fileExists: existsSync,
-      missingMessagePrefix: 'Missing ppt_deck python helper',
       failureMessagePrefix: 'ppt_deck python helper failed',
     });
   }
@@ -147,8 +145,6 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
       '--repair-log', path.join(path.dirname(inputFile), 'validate-plan-repair-log.json'),
       '--engine-contract', NATIVE_PPT_ENGINE_CONTRACT,
     ], {
-      fileExists: existsSync,
-      missingMessagePrefix: 'Missing ppt_deck python helper',
       failureMessagePrefix: 'ppt_deck python helper failed',
     });
   }
@@ -501,7 +497,8 @@ export function createPptDeckNativePptStageParts(deps: NativePptDeps) {
           ? {
               helper_id: python.helper_id,
               package_module: python.package_module,
-              command: [...python.argv, '--input-json', paths.inputFile],
+              command: python.argv,
+              request_args: python.request_args,
             }
           : null,
         creative_sources: {
