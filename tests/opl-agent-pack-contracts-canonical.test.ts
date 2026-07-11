@@ -19,6 +19,12 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(foundryProfile.domain_specific_profile.stage_pack_role, 'declarative_visual_pack');
   assert.equal(foundryProfile.standard_public_projection_policy.standard_public_foundry_surface, 'opl_generated_hosted_series');
   assert.equal(foundryProfile.rca_authority_boundary.opl_can_write_visual_truth, false);
+  assert.equal(foundryProfile.stage_manifest_ref, 'agent/stages/manifest.json');
+  assert.equal(foundryProfile.stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+  assert.equal(foundryProfile.required_identity_fields.includes('stage_manifest_ref'), true);
+  assert.equal(foundryProfile.shared_release_pin_strategy.owner_managed_latest_stable_channel_required, true);
+  assert.equal(foundryProfile.shared_release_pin_strategy.lockfile_resolved_commit_receipt_required, true);
+  assert.equal(foundryProfile.shared_release_pin_strategy.consumer_exact_commit_equality_gate, false);
 
   assert.equal(domainDescriptor.foundry_agent_profile_ref, 'contracts/foundry_agent_series.json');
   assert.equal(domainDescriptor.generic_surface_owner, 'one-person-lab');

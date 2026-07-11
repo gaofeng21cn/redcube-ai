@@ -46,7 +46,7 @@
   "refs": {
     "domain_descriptor": "contracts/domain_descriptor.json",
     "declarative_visual_pack_root": "agent/",
-    "stage_refs": "contracts/stage_control_plane.json",
+    "stage_refs": "agent/stages/manifest.json",
     "pack_refs": "contracts/pack_compiler_input.json",
     "action_target_refs": "contracts/action_catalog.json",
     "visual_authority_kernel": "contracts/foundry-agent-os-domain-kernel-manifest.json"
@@ -348,6 +348,9 @@
     "owner_release_contract_ref": "contracts/family-release/shared-owner-release.json",
     "owner_commit_pin_required": true,
     "domain_dependency_pin_required": true,
+    "owner_managed_latest_stable_channel_required": true,
+    "lockfile_resolved_commit_receipt_required": true,
+    "consumer_exact_commit_equality_gate": false,
     "supported_pin_sources": [
       "pyproject.toml",
       "uv.lock",
@@ -371,7 +374,8 @@
     "product_layer",
     "domain_label",
     "authority_owner",
-    "stage_control_plane_ref"
+    "stage_control_plane_ref",
+    "stage_manifest_ref"
   ],
   "required_stage_packets": [
     "stage_completion_policy",
@@ -413,5 +417,6 @@
   "domain_label": "RedCube AI",
   "foundry_agent_id": "redcube-ai",
   "authority_owner": "redcube_ai",
-  "stage_control_plane_ref": "contracts/stage_control_plane.json"
+  "stage_manifest_ref": "agent/stages/manifest.json",
+  "stage_control_plane_ref": "opl-generated:family_stage_control_plane"
 }
