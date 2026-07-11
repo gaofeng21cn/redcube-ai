@@ -72,43 +72,26 @@ function countLines(content) {
 }
 
 function listSourceFiles(directory, extension) {
-  const sourceDir = path.resolve(directory, 'src');
+  const root = path.resolve(directory);
+  const sourceDir = path.join(root, 'src');
   if (!existsSync(sourceDir)) return [];
 
-  const files = [];
-  function visit(currentDirectory) {
-    for (const entry of readdirSync(currentDirectory, { withFileTypes: true })) {
-      const fullPath = path.join(currentDirectory, entry.name);
-      if (entry.isDirectory()) {
-        visit(fullPath);
-      } else if (entry.isFile() && entry.name.endsWith(extension)) {
-        files.push(path.relative(path.resolve(directory), fullPath).split(path.sep).join('/'));
-      }
-    }
-  }
-
-  visit(sourceDir);
-  return files.sort();
+  return readdirSync(sourceDir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith(extension))
+    .map((entry) => path.relative(root, path.join(entry.parentPath, entry.name)).split(path.sep).join('/'))
+    .sort();
 }
 
 function listFilesUnder(directory, predicate) {
   const root = path.resolve(directory);
   if (!existsSync(root)) return [];
 
-  const files = [];
-  function visit(currentDirectory) {
-    for (const entry of readdirSync(currentDirectory, { withFileTypes: true })) {
-      const fullPath = path.join(currentDirectory, entry.name);
-      if (entry.isDirectory()) {
-        visit(fullPath);
-      } else if (entry.isFile() && predicate(fullPath)) {
-        files.push(path.relative(path.resolve(), fullPath).split(path.sep).join('/'));
-      }
-    }
-  }
-
-  visit(root);
-  return files.sort();
+  return readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.join(entry.parentPath, entry.name))
+    .filter(predicate)
+    .map((file) => path.relative(path.resolve(), file).split(path.sep).join('/'))
+    .sort();
 }
 
 function readRegisteredRootTestFiles() {

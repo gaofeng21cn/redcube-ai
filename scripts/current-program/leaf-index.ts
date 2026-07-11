@@ -128,12 +128,9 @@ function leafRole(pointer: string): string {
 
 export function listJsonFiles(root: string): string[] {
   if (!fs.existsSync(path.resolve(root))) return [];
-  return fs.readdirSync(path.resolve(root), { withFileTypes: true }).flatMap((entry) => {
-    const absolute = path.resolve(root, entry.name);
-    const relative = path.relative(process.cwd(), absolute).split(path.sep).join('/');
-    if (entry.isDirectory()) return listJsonFiles(relative);
-    return entry.isFile() && entry.name.endsWith('.json') ? [relative] : [];
-  });
+  return fs.readdirSync(path.resolve(root), { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.relative(process.cwd(), path.join(entry.parentPath, entry.name)).split(path.sep).join('/'));
 }
 
 export function childSegmentMap(sourcePartRefs: Array<{ json_pointer: string }>): Map<string, Set<string>> {

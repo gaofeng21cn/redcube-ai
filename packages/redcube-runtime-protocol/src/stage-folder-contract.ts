@@ -137,19 +137,16 @@ function fileHashRecord(rootDir, file, role) {
   };
 }
 
-function listRelativeFilesRecursive(dir, prefix = '') {
+function listRelativeFiles(dir) {
   if (!existsSync(dir)) return [];
-  const targetDir = path.join(dir, prefix);
-  return readdirSync(targetDir, { withFileTypes: true }).flatMap((entry) => {
-    const relativePath = path.join(prefix, entry.name);
-    if (entry.isDirectory()) return listRelativeFilesRecursive(dir, relativePath);
-    if (!entry.isFile()) return [];
-    return [relativePath.split(path.sep).join('/')];
-  }).sort();
+  return readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile())
+    .map((entry) => path.relative(dir, path.join(entry.parentPath, entry.name)).split(path.sep).join('/'))
+    .sort();
 }
 
 function hashFiles(dir, role) {
-  return listRelativeFilesRecursive(dir).map((relativePath) => {
+  return listRelativeFiles(dir).map((relativePath) => {
     const file = path.join(dir, relativePath);
     const content = readFileSync(file);
     return {
@@ -569,7 +566,7 @@ export function writeStageFolderArtifact(input) {
     output_file: outputFile,
     required_outputs: requiredOutputs,
     required_output_roles: effectiveRequiredOutputRoles,
-    present_outputs: listRelativeFilesRecursive(paths.outputs_dir),
+    present_outputs: listRelativeFiles(paths.outputs_dir),
     present_output_roles: outputRoleRefs.map((entry) => entry.role),
     output_refs: outputRoleRefs,
     stage_output_role_interface: {

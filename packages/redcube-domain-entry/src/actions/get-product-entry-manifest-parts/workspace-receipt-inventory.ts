@@ -31,19 +31,10 @@ function listJsonFiles(root) {
   if (!existsSync(root)) {
     return [];
   }
-  const result = [];
-  const visit = (dir) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const file = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        visit(file);
-      } else if (entry.isFile() && entry.name.endsWith('.json')) {
-        result.push(file);
-      }
-    }
-  };
-  visit(root);
-  return result.sort();
+  return readdirSync(root, { recursive: true, withFileTypes: true })
+    .filter((entry) => entry.isFile() && entry.name.endsWith('.json'))
+    .map((entry) => path.join(entry.parentPath, entry.name))
+    .sort();
 }
 
 function findForbiddenPayloadFields(value, found = new Set()) {
