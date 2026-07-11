@@ -287,42 +287,6 @@ test('artifact-producing xiaohongshu goal workflow reaches export bundle without
   });
 });
 
-test('manifest and domain-handler export expose the RCA /goal workflow AgentLab suite', SERIAL_ENV_TEST, async () => {
-  await withMockCodexRuntimeState(async () => {
-    const workspaceRoot = await prepareProductEntryWorkspace();
-    const manifestModule = await import('../packages/redcube-domain-entry/dist/index.js');
-    const manifest = await manifestModule.getProductEntryManifest({
-      workspace_root: workspaceRoot,
-    });
-    const projection = await exportDomainActionAdapter({
-      workspace_root: workspaceRoot,
-    });
-
-    assertGoalWorkflowSuiteShape(manifest.goal_workflow_agent_lab_suite);
-    assert.deepEqual(
-      manifest.operator_evidence_readiness_projection.goal_workflow_agent_lab_suite,
-      manifest.goal_workflow_agent_lab_suite,
-    );
-    assertGoalWorkflowSuiteShape(projection.mapped_surfaces.goal_workflow_agent_lab_suite);
-    assert.equal(
-      projection.source_manifest_refs.goal_workflow_agent_lab_suite_ref,
-      '/goal_workflow_agent_lab_suite',
-    );
-    assert.equal(
-      manifest.owner_route.projection_refs.some((entry) => entry.ref === '/goal_workflow_agent_lab_suite'),
-      true,
-    );
-    assert.equal(
-      manifest.domain_owner_receipt_contract.goal_workflow_agent_lab_suite_owner_projection.refs_only,
-      true,
-    );
-    assert.equal(
-      manifest.domain_owner_receipt_contract.goal_workflow_agent_lab_suite_owner_projection.authorizes_quality_or_export,
-      false,
-    );
-  });
-});
-
 test('OPL-hosted /goal workflow starts one-shot RCA product entry without stop-after-stage monitoring', SERIAL_ENV_TEST, async () => {
   await withMockCodexRuntimeState(async () => {
     const workspaceRoot = await prepareProductEntryWorkspace();

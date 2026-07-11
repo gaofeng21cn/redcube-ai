@@ -7,7 +7,7 @@ Machine boundary: This file declares available domain tool affordances for RCA s
 
 ## Boundary
 
-RCA stage attempts may use tools to read source context, inspect visual workspaces, render or screenshot artifacts, and produce refs-only evidence. Tool use stays inside the permission, credential, write-scope, side-effect, and forbidden-authority boundaries declared by `contracts/pack_compiler_input.json`, `contracts/stage_control_plane.json`, and `contracts/cognitive_kernel_adoption.json`.
+RCA stage attempts may use tools to read source context, inspect visual workspaces, render or screenshot artifacts, and produce refs-only evidence. Tool use stays inside the permission, credential, write-scope, side-effect, and forbidden-authority boundaries declared by `contracts/pack_compiler_input.json`, `agent/stages/manifest.json`, the `opl-generated:family_stage_control_plane` projection, and `contracts/cognitive_kernel_adoption.json`.
 
 Tool affordances are advisory capabilities, not workflow control. They may expose ways to inspect, render, compare, and repair, but they do not prescribe executor order, choose the visual route, score candidates, or replace AI-first communication / visual direction judgment.
 

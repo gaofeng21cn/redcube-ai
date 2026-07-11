@@ -196,11 +196,11 @@ export async function emitTemporalControlledVisualStageLongSoakEvidence(task) {
     source_manifest_refs: {
       temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
       controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
-      production_evidence_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
-      production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
-      opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
+      domain_evidence_refs_ref: '/domain_evidence_refs',
+      typed_blocker_refs_ref: '/typed_blocker_refs',
+      receipt_refs_ref: '/receipt_refs',
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
-      review_export_verdict_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs/review_export_verdict_refs',
+      artifact_locator_refs_ref: '/artifact_locator_refs',
       forbidden_write_audit_ref: '/controlled_memory_apply_proof/forbidden_write_audit',
     },
     coverage: {
@@ -352,9 +352,10 @@ export async function emitExternalWorkOrderOwnerCloseout(task) {
     source_manifest_refs: {
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
       external_work_order_owner_closeout_contract_ref: '/domain_owner_receipt_contract/external_work_order_owner_closeout',
-      rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
-      operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
-      domain_handler_ref: '/product_entry_shell/domain_handler',
+      domain_evidence_refs_ref: '/domain_evidence_refs',
+      typed_blocker_refs_ref: '/typed_blocker_refs',
+      receipt_refs_ref: '/receipt_refs',
+      artifact_locator_refs_ref: '/artifact_locator_refs',
       no_regression_owner_receipt_opl_consumption_proof_ref: '/no_regression_owner_receipt_opl_consumption_proof',
     },
     coverage: {

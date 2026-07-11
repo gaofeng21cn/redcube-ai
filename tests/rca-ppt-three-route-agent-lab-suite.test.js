@@ -680,31 +680,3 @@ test('OPL AgentLab runner consumes the RCA PPT three-route suite with refs-only 
     assert.equal(suiteResult.authority_boundary.can_write_owner_receipt, false);
   }
 });
-
-test('manifest and domain-handler export expose the RCA PPT three-route AgentLab suite', SERIAL_ENV_TEST, async () => {
-  await withMockCodexRuntimeState(async () => {
-    const workspaceRoot = await prepareProductEntryWorkspace();
-    const manifestModule = await import('../packages/redcube-domain-entry/dist/index.js');
-    const manifest = await manifestModule.getProductEntryManifest({
-      workspace_root: workspaceRoot,
-    });
-    const projection = await exportDomainActionAdapter({
-      workspace_root: workspaceRoot,
-    });
-
-    assertPptThreeRouteSuiteShape(manifest.ppt_three_route_agent_lab_suite);
-    assert.deepEqual(
-      manifest.operator_evidence_readiness_projection.ppt_three_route_agent_lab_suite,
-      manifest.ppt_three_route_agent_lab_suite,
-    );
-    assertPptThreeRouteSuiteShape(projection.mapped_surfaces.ppt_three_route_agent_lab_suite);
-    assert.equal(
-      projection.source_manifest_refs.ppt_three_route_agent_lab_suite_ref,
-      '/ppt_three_route_agent_lab_suite',
-    );
-    assert.equal(
-      manifest.owner_route.projection_refs.some((entry) => entry.ref === '/ppt_three_route_agent_lab_suite'),
-      true,
-    );
-  });
-});

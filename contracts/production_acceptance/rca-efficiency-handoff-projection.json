@@ -32,7 +32,7 @@
     ],
     "regression_suite_refs": [
       "tests/rca-efficiency-handoff-projection.test.js",
-      "tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+      "tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
     ],
     "owner": "redcube_ai",
     "refs_only": true
@@ -199,7 +199,7 @@
       "target_surface": "target_agent_regression_suite_ref",
       "target_repo_refs": [
         "tests/rca-efficiency-handoff-projection.test.js",
-        "tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+        "tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "verifies_ref": "target-verification:redcube-ai/targeted-efficiency-tests",
       "refs_only": true,

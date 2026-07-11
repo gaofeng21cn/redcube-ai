@@ -76,7 +76,7 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
           '/opl_stability_read_model_consumption',
           '/opl_generated_interface_consumption',
           '/visual_pack_compiler_handoff',
-          '/operator_evidence_readiness_projection',
+          '/domain_evidence_refs',
         '/opl_substrate_adapter_export',
       ],
       allowed_remaining_module_classes: [
@@ -254,7 +254,12 @@ test('RCA privatized functional module audit is machine readable for OPL with ge
   );
   assert.equal(byId.artifact_export_lifecycle.rca_scope, 'visual_artifact_export_authority_and_locator_refs');
   assert.equal(byId.review_repair_transport.rca_scope, 'visual_review_export_verdict_and_repair_decision');
-  assert.equal(byId.operator_projection_shell.activeCallerStatus, 'opl_app_workbench_shell_domain_evidence_refs');
+  assert.equal(byId.operator_projection_shell.activeCallerStatus, 'thin_domain_authority_refs_adapter_active');
+  assert.deepEqual(byId.operator_projection_shell.codePaths, [
+    'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+    'packages/redcube-domain-entry/src/actions/get-product-status.ts',
+  ]);
   assert.equal(byId.generic_cli_mcp_wrappers.rca_scope, 'domain_handler_status_action_metadata_projection');
   assert.equal(byId.generic_cli_mcp_wrappers.activeCallerStatus, 'opl_generated_wrappers_domain_handler_targets');
   assert.equal(byId.generic_cli_mcp_wrappers.migration_class, 'domain_handler_target');

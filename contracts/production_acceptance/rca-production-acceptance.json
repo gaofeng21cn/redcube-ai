@@ -1106,7 +1106,7 @@
       "cross_family_no_regression"
     ],
     "remaining_typed_blocker_ref": "rca-typed-blocker:controlled-soak:temporal-long-soak-pending",
-    "focused_test_ref": "tests/product-entry-cases/temporal-autonomy-readiness.test.js"
+    "focused_test_ref": "tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
   },
   "remaining_evidence_gate_blockers": {
     "status": "domain_owned_typed_blockers_reported",
@@ -1119,7 +1119,7 @@
         "typed_blocker_kind": "controlled_visual_soak_runtime_evidence_pending",
         "reason": "OPL hosted visual-stage long soak has not produced live provider restart, re-query, retry, dead-letter, owner receipt, or no-regression evidence.",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ]
       },
       {
@@ -1128,7 +1128,7 @@
         "typed_blocker_kind": "real_memory_lifecycle_receipt_instances_pending",
         "reason": "RCA exposes locator, workspace receipt inventory, and memory/lifecycle ref models, but this repo does not track live receipt instance bodies or claim scaleout receipt instances are complete.",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ]
       },
       {
@@ -1137,7 +1137,7 @@
         "typed_blocker_kind": "cross_family_repeated_no_regression_evidence_pending",
         "reason": "RCA exposes repeated no-regression refs for ppt_deck and xiaohongshu, but those refs are not production soak completion evidence across repeated family runs.",
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ]
       }
     ]
@@ -1182,7 +1182,7 @@
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
         ],
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ],
         "success_claims_allowed": false,
         "payload_body_allowed": false,
@@ -1213,7 +1213,7 @@
           "rca-typed-blocker:memory-lifecycle:real-receipt-instances-pending"
         ],
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ],
         "success_claims_allowed": false,
         "payload_body_allowed": false,
@@ -1246,7 +1246,7 @@
           "rca-typed-blocker:controlled-soak:temporal-long-soak-pending"
         ],
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/product-entry-cases/temporal-autonomy-readiness.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ],
         "success_claims_allowed": false,
         "payload_body_allowed": false,
@@ -1291,7 +1291,7 @@
           "rca-typed-blocker:no-regression:cross-family-production-scaleout-pending"
         ],
         "next_verification_command_refs": [
-          "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+          "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ],
         "success_claims_allowed": false,
         "payload_body_allowed": false,

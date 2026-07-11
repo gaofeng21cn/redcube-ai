@@ -1,329 +1,98 @@
-// @ts-nocheck
+import { buildRedCubeSharedHandoff } from './domain-entry-contract.js';
+import { FAMILY_ACTION_CATALOG_CONTRACT_REF } from './family-action-catalog.js';
+import { DECLARATIVE_STAGE_MANIFEST_REF } from './declarative-stage-manifest.js';
+import { buildRedCubeDomainAuthorityRefs } from './domain-authority-refs.js';
+import { normalizeWorkspaceRoot } from './domain-action-adapter-parts/task-utils.js';
 
-import {
-  buildFamilyProductEntryManifest,
-  buildGeneratedProductEntryManifestCompanions,
-  collectFamilyHumanGateIds,
-} from 'opl-framework/product-entry-companions';
+const GENERATED_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
 
-import {
-  buildRedCubeDomainEntryContract,
-  buildRedCubeSharedHandoff,
-  buildRedCubeUserInteractionContract,
-} from './domain-entry-contract.js';
-import { buildFamilyOrchestrationCompanion } from './family-orchestration-companion.js';
-import { getProductPreflight } from './get-product-preflight.js';
-import {
-  buildRedCubeActionMetadata,
-  FAMILY_ACTION_CATALOG_CONTRACT_REF,
-} from './family-action-catalog.js';
-import {
-  buildRedCubeDeclarativeStageManifest,
-  DECLARATIVE_STAGE_MANIFEST_REF,
-} from './declarative-stage-manifest.js';
-import {
-  buildFamilyDomainMemoryDescriptor,
-  buildRuntimeResidueRetirementAudit,
-  buildRedCubeDomainAuthorityRefs,
-  buildVisualPatternMemoryWritebackProjection,
-} from './domain-authority-refs.js';
-import {
-  OPL_GENERATED_INTERFACE_CONSUMPTION,
-} from './guarded-domain-actions.js';
-import {
-  listDomainActionAdapterForbiddenWrites,
-  listDomainActionAdapterGuardedActionIds,
-} from './domain-action-adapter-parts/guarded-action-catalog.js';
-import {
-  buildRouteEquivalenceContract,
-  buildDeliverableFacadeContract,
-} from './get-product-entry-manifest-parts/contracts.js';
-import { buildManifestExtraPayload } from './get-product-entry-manifest-parts/extra-payload.js';
-import {
-  buildFormalEntryPolicy,
-  buildManifestNotes,
-  buildProductEntryStatusSection,
-  buildSourceProvenanceSection,
-  projectProductEntryPreflight,
-} from './get-product-entry-manifest-parts/manifest-sections.js';
-import { buildReturnedManifestProjection } from './get-product-entry-manifest-parts/manifest-return.js';
-import { buildNativePptOperatorUx } from './get-product-entry-manifest-parts/native-ppt-operator-ux.js';
-import { buildOplLedgerArtifactRegistrationContract } from './get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
-import {
-  DEFAULT_RUNTIME_OWNER,
-  OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-  SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
-  PRODUCT_ENTRY_CONTRACT_REF,
-  PRODUCT_STATUS_COMMAND,
-  PRODUCT_INVOKE_COMMAND,
-  PRODUCT_MANIFEST_COMMAND,
-  PRODUCT_SESSION_COMMAND,
-  PRODUCT_START_COMMAND,
-  SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
-} from './get-product-entry-manifest-parts/policy.js';
-import { buildProductEntryManifestShellProjections } from './get-product-entry-manifest-parts/shell-projections.js';
-import {
-  buildActionMetadataProjection,
-  normalizeWorkspaceRoot,
-  readCurrentProgramContract,
-  safeText,
-} from './get-product-entry-manifest-parts/utils.js';
-import { buildWorkspaceReceiptInventoryProjection } from './get-product-entry-manifest-parts/workspace-receipt-inventory.js';
-import { buildTemporalLongSoakEvidenceInventory } from './get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.js';
-import { buildVisualTransitionEvaluatorProjection } from './domain-action-adapter-parts/visual-transition-evaluator.js';
-import { buildRedCubeProductEntryDescriptor } from './get-product-entry-manifest-parts/entry-descriptor.js';
+function buildDomainEvidenceRefs() {
+  return {
+    live_stage_run_progress_evidence_ref:
+      'contracts/live_stage_run_progress_evidence.json',
+    production_acceptance_ref:
+      'contracts/production_acceptance/rca-production-acceptance.json',
+    no_regression_evidence_ref:
+      'contracts/live_stage_run_progress_evidence.json#/no_regression_refs',
+  };
+}
 
-const FAMILY_ACTION_CATALOG_REF = {
-  ref_kind: 'repo_path',
-  ref: FAMILY_ACTION_CATALOG_CONTRACT_REF,
-  label: 'RedCube canonical action catalog',
-};
-const GENERATED_FAMILY_STAGE_CONTROL_PLANE_REF = 'opl-generated:family_stage_control_plane';
+function buildTypedBlockerRefs() {
+  return {
+    typed_blocker_refs_ref:
+      'contracts/live_stage_run_progress_evidence.json#/typed_blocker_refs',
+    human_gate_refs_ref:
+      'contracts/live_stage_run_progress_evidence.json#/human_gate_refs',
+  };
+}
 
-export async function getProductEntryManifest(request) {
+export async function getProductEntryManifest(request: Record<string, unknown> = {}) {
   const workspaceRoot = normalizeWorkspaceRoot(request);
-  const productEntrySessionCommand = `${PRODUCT_SESSION_COMMAND} --entry-session-id <entry-session-id>`;
-  const productEntryPreflight = await getProductPreflight({ workspace_root: workspaceRoot });
-  const currentProgram = readCurrentProgramContract();
-  const currentState = currentProgram.current_state || {};
-  const activeMainline = currentState.active_mainline || {};
-  const activeBaton = currentState.active_baton || {};
-  const deliverableFacade = buildDeliverableFacadeContract();
-  const nativePptOperatorUx = buildNativePptOperatorUx({
-    workspaceRoot,
-    productEntryPreflight,
-    pptPolicy: deliverableFacade.family_route_policy.ppt_deck,
-  });
-  const pptRoutePolicy = deliverableFacade.family_route_policy.ppt_deck || {};
-  const pptRouteSelection = nativePptOperatorUx.route_selection || {};
-  const domainEntryContract = buildRedCubeDomainEntryContract({
-    productManifestCommand: PRODUCT_MANIFEST_COMMAND,
-    productStatusCommand: PRODUCT_STATUS_COMMAND,
-    productStartCommand: PRODUCT_START_COMMAND,
-    productInvokeCommand: PRODUCT_INVOKE_COMMAND,
-    productSessionCommand: PRODUCT_SESSION_COMMAND,
-    serviceSafeDomainEntryContractRef: SERVICE_SAFE_DOMAIN_ENTRY_CONTRACT_REF,
-    productEntryContractRef: PRODUCT_ENTRY_CONTRACT_REF,
-    oplHostedProductEntryContractRef: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-    sessionContinuityProvenanceContractRef: SESSION_CONTINUITY_PROVENANCE_CONTRACT_REF,
-  });
-  const userInteractionContract = buildRedCubeUserInteractionContract({
-    productStatusCommand: PRODUCT_STATUS_COMMAND,
-    productManifestCommand: PRODUCT_MANIFEST_COMMAND,
-    oplHostedProductEntryContractRef: OPL_HOSTED_PRODUCT_ENTRY_CONTRACT_REF,
-  });
-  const familyOrchestration = buildFamilyOrchestrationCompanion({
-    sessionLocatorField: 'entry_session_contract.entry_session_id',
-    gateStatus: 'requested',
-    reviewSurfaceRef: {
-      ref_kind: 'json_pointer',
-      ref: '/operator_loop_actions/continue_session',
-      label: 'continue session surface',
-    },
-  });
-  const humanGateIds = collectFamilyHumanGateIds(familyOrchestration);
-  const productEntryDescriptor = buildRedCubeProductEntryDescriptor({
-    humanGateIds,
-    nativePptOperatorUx,
-    productEntrySessionCommand,
-  });
-  const {
-    product_entry_overview: productEntryOverview,
-    product_entry_quickstart: productEntryQuickstart,
-    product_entry_readiness: productEntryReadiness,
-    product_entry_start: productEntryStart,
-  } = buildGeneratedProductEntryManifestCompanions({
-    entry_descriptor: productEntryDescriptor,
-    family_orchestration: familyOrchestration,
-  });
   const runtime = {
-    runtime_owner: DEFAULT_RUNTIME_OWNER,
-    product_session_surface_ref: 'opl_generated:product_session',
+    runtime_owner: 'one-person-lab',
+    product_session_surface_ref: 'opl-generated:product_session',
     stage_folder_locator_contract_ref: 'contracts/artifact_locator_contract.json',
   };
   const domainAuthorityRefs = buildRedCubeDomainAuthorityRefs({
     workspaceRoot,
     runtime,
   });
-  const visualTransitionEvaluator = buildVisualTransitionEvaluatorProjection({
-    visualTransitionSpec: domainAuthorityRefs.visual_transition_spec,
-  });
-  const domainMemoryDescriptor = buildFamilyDomainMemoryDescriptor({ domainMemoryDescriptorLocator: domainAuthorityRefs.domain_memory_descriptor_locator });
-  const visualPatternMemoryWriteback = buildVisualPatternMemoryWritebackProjection({ domainAuthorityRefs });
-  const workspaceReceiptInventoryProjection = buildWorkspaceReceiptInventoryProjection({
-    workspaceRoot,
-    workspaceReceiptScaleoutRoots: request?.workspace_receipt_scaleout_roots,
-  });
-  const temporalLongSoakEvidenceInventory = buildTemporalLongSoakEvidenceInventory({ workspaceRoot });
-  const oplLedgerArtifactRegistration = buildOplLedgerArtifactRegistrationContract();
-  const runtimeResidueRetirement = buildRuntimeResidueRetirementAudit({ runtime });
-  const routeEquivalence = buildRouteEquivalenceContract({
-    runtime,
-    productEntrySessionCommand,
-  });
-  const oplFamilyLifecycleAdapter = {
-    surface_kind: 'opl_generated_product_session_ref',
-    owner: 'one-person-lab',
-    ref: runtime.product_session_surface_ref,
-    rca_role: 'domain_result_and_currentness_refs_provider',
-  };
-  const sourceProvenance = buildSourceProvenanceSection();
-  const actionMetadata = buildRedCubeActionMetadata();
-  const declarativeStageManifest = buildRedCubeDeclarativeStageManifest();
-  const {
-    automation,
-    entryStatusSurface,
-    familySchedulerReplacement,
-    lifecycleLedger,
-    oplGenericPrimitiveConsumption,
-    oplProviderRuntimeContract,
-    oplStabilityReadModelConsumption,
-    oplSubstrateAdapterExport,
-    operatorLoopActions,
-    operatorLoopSurface,
-    ownerRoute,
-    persistencePolicy,
-    privatizedFunctionalModuleAudit,
-    productEntryShell,
-    runtimeInventory,
-    skillCatalog,
-    taskLifecycle,
-    temporalAutonomyReadiness,
-    temporalStageRunConsumptionPolicy,
-    visualPackCompilerHandoff,
-  } = buildProductEntryManifestShellProjections({
-    actionMetadata,
-    familyOrchestration,
-    humanGateIds,
-    nativePptOperatorUx,
-    productEntryPreflight,
-    productEntrySessionCommand,
-    domainActionAdapterForbiddenWrites: listDomainActionAdapterForbiddenWrites(),
-    domainActionAdapterGuardedActionIds: listDomainActionAdapterGuardedActionIds(),
-    pptRoutePolicy,
-    pptRouteSelection,
-    runtime,
-    domainAuthorityRefs,
-    familyActionCatalogRef: FAMILY_ACTION_CATALOG_REF,
-    workspaceRoot,
-  });
 
-  const manifest = {
-    ...buildFamilyProductEntryManifest({
-    manifest_kind: 'redcube_product_entry_manifest',
+  return {
+    ok: true,
+    surface_kind: 'product_entry_manifest',
+    manifest_kind: 'rca_domain_authority_refs_projection',
+    manifest_version: 'rca-domain-authority-refs.v1',
+    agent_id: 'rca',
     target_domain_id: 'redcube_ai',
-    formal_entry: buildFormalEntryPolicy(),
+    formal_entry: {
+      default: 'CLI',
+      supported_protocols: ['MCP'],
+      internal_surface: 'controller',
+    },
     workspace_locator: {
       workspace_surface_kind: 'redcube_workspace',
       workspace_root: workspaceRoot,
     },
-    recommended_shell: 'direct',
-    recommended_command: PRODUCT_INVOKE_COMMAND,
-    product_entry_surface: entryStatusSurface,
-    operator_loop_surface: operatorLoopSurface,
-    operator_loop_actions: operatorLoopActions,
-    repo_mainline: {
-      program_id: safeText(activeMainline.id, 'redcube-runtime-program'),
-      phase_id: safeText(currentState.phase_id, 'unknown_phase'),
-      phase_label: safeText(currentState.phase_label, 'unknown phase'),
-      active_baton_provenance_id: safeText(activeBaton.id, 'unknown_baton'),
-      active_baton_role: 'session_continuity_provenance',
-      active_baton_status: safeText(activeBaton.status, 'unknown'),
-    },
-    product_entry_status: buildProductEntryStatusSection(),
     runtime,
-    opl_provider_runtime_contract: oplProviderRuntimeContract,
-    runtime_inventory: runtimeInventory,
-    task_lifecycle: taskLifecycle,
-    persistence_policy: persistencePolicy,
-    lifecycle_ledger: lifecycleLedger,
-    owner_route: ownerRoute,
-    artifact_locator_contract: domainAuthorityRefs.artifact_locator_contract,
-    domain_memory_descriptor_locator: domainAuthorityRefs.domain_memory_descriptor_locator,
-    visual_pattern_memory_writeback: visualPatternMemoryWriteback,
-    domain_action_adapter_receipt_refs: domainAuthorityRefs.domain_action_adapter_receipt_refs,
-    controlled_visual_stage_attempt: domainAuthorityRefs.controlled_visual_stage_attempt,
-    controlled_memory_apply_proof: domainAuthorityRefs.controlled_memory_apply_proof,
-    workspace_receipt_inventory_projection: workspaceReceiptInventoryProjection,
-    opl_ledger_artifact_registration: oplLedgerArtifactRegistration,
-    temporal_controlled_visual_stage_long_soak_evidence_inventory: temporalLongSoakEvidenceInventory,
-    temporal_autonomy_readiness: temporalAutonomyReadiness,
-    temporal_stage_run_consumption_policy: temporalStageRunConsumptionPolicy,
-    controlled_soak_no_regression_attempt: domainAuthorityRefs.controlled_soak_no_regression_attempt,
-    domain_owner_receipt_contract: domainAuthorityRefs.domain_owner_receipt_contract,
-    no_regression_owner_receipt_opl_consumption_proof: domainAuthorityRefs.no_regression_owner_receipt_opl_consumption_proof,
-    lifecycle_guarded_apply_proof: domainAuthorityRefs.lifecycle_guarded_apply_proof,
-    visual_transition_spec: domainAuthorityRefs.visual_transition_spec,
-    visual_transition_adapter_profile_registry: domainAuthorityRefs.visual_transition_adapter_profile_registry,
-    visual_transition_evaluator: visualTransitionEvaluator,
-    family_scheduler_replacement: familySchedulerReplacement,
-    opl_generic_primitive_consumption: oplGenericPrimitiveConsumption,
-    opl_stability_read_model_consumption: oplStabilityReadModelConsumption,
-    visual_pack_compiler_handoff: visualPackCompilerHandoff,
-    opl_generated_interface_consumption: OPL_GENERATED_INTERFACE_CONSUMPTION,
-    privatized_functional_module_audit: privatizedFunctionalModuleAudit,
-    opl_substrate_adapter_export: oplSubstrateAdapterExport,
-    runtime_residue_retirement: runtimeResidueRetirement,
-    action_metadata: buildActionMetadataProjection(actionMetadata),
-    skill_catalog: skillCatalog,
-    automation,
-    product_entry_shell: productEntryShell,
+    product_entry_shell: {},
     shared_handoff: buildRedCubeSharedHandoff(),
-    product_entry_start: productEntryStart,
-    product_entry_overview: productEntryOverview,
-    product_entry_preflight: projectProductEntryPreflight(productEntryPreflight),
-    native_ppt_operator_ux: nativePptOperatorUx,
-    opl_family_lifecycle_adapter: oplFamilyLifecycleAdapter,
-    product_entry_readiness: productEntryReadiness,
-    product_entry_quickstart: productEntryQuickstart,
-    family_orchestration: familyOrchestration,
-    notes: buildManifestNotes(),
-    domain_entry_contract: domainEntryContract,
-    user_interaction_contract: userInteractionContract,
-    extra_payload: buildManifestExtraPayload({
-      routeEquivalence,
-      deliverableFacade,
-      productEntryDescriptor,
-      nativePptOperatorUx,
-      productEntrySessionCommand,
-      sourceProvenance,
-    }),
-  }),
-    family_action_catalog_ref: FAMILY_ACTION_CATALOG_REF,
+    family_action_catalog_ref: {
+      ref_kind: 'repo_path',
+      ref: FAMILY_ACTION_CATALOG_CONTRACT_REF,
+      label: 'RedCube canonical action catalog',
+    },
     declarative_stage_manifest_ref: DECLARATIVE_STAGE_MANIFEST_REF,
-    family_stage_control_plane_ref: GENERATED_FAMILY_STAGE_CONTROL_PLANE_REF,
+    family_stage_control_plane_ref: GENERATED_STAGE_CONTROL_PLANE_REF,
+    domain_evidence_refs: buildDomainEvidenceRefs(),
+    typed_blocker_refs: buildTypedBlockerRefs(),
+    receipt_refs: {
+      owner_receipt_contract_ref: '/domain_owner_receipt_contract',
+      domain_action_receipt_refs_ref: '/domain_action_adapter_receipt_refs',
+      no_regression_receipt_ref: '/no_regression_owner_receipt_opl_consumption_proof',
+    },
+    artifact_locator_refs: {
+      artifact_locator_contract_ref: '/artifact_locator_contract',
+      stage_folder_locator_contract_ref: 'contracts/artifact_locator_contract.json',
+    },
+    domain_authority_refs: domainAuthorityRefs,
+    authority_boundary: {
+      projection_scope:
+        'domain_evidence_typed_blocker_receipt_and_artifact_locator_refs_only',
+      generic_product_shell_owner: 'one-person-lab',
+      generic_workbench_owner: 'one-person-lab',
+      generic_session_owner: 'one-person-lab',
+      agent_lab_owner: 'one-person-lab',
+      production_workorder_owner: 'one-person-lab',
+      rca_owns_visual_truth: true,
+      rca_owns_review_export_verdict: true,
+      rca_owns_owner_receipt: true,
+      opl_can_write_visual_truth: false,
+      opl_can_authorize_review_or_export: false,
+      opl_can_create_owner_receipt: false,
+      opl_can_create_typed_blocker: false,
+      projection_can_claim_domain_ready: false,
+      projection_can_claim_production_ready: false,
+    },
   };
-  return buildReturnedManifestProjection({
-    actionMetadata,
-    domainMemoryDescriptor,
-    entryStatusSurface,
-    familySchedulerReplacement,
-    declarativeStageManifest,
-    manifest,
-    nativePptOperatorUx,
-    oplProviderRuntimeContract,
-    oplGenericPrimitiveConsumption,
-    oplStabilityReadModelConsumption,
-    visualPackCompilerHandoff,
-    privatizedFunctionalModuleAudit,
-    oplSubstrateAdapterExport,
-    oplFamilyLifecycleAdapter,
-    operatorLoopActions,
-    runtimeInventory,
-    productEntryShell,
-    pptRoutePolicy,
-    taskLifecycle,
-    persistencePolicy,
-    lifecycleLedger,
-    ownerRoute,
-    runtimeResidueRetirement,
-    domainAuthorityRefs,
-    visualTransitionEvaluator,
-    visualPatternMemoryWriteback,
-    workspaceReceiptInventoryProjection,
-    oplLedgerArtifactRegistration,
-    temporalLongSoakEvidenceInventory,
-    temporalAutonomyReadiness,
-    temporalStageRunConsumptionPolicy,
-  });
 }

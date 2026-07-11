@@ -139,7 +139,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/0",
       "reason": "Temporal controlled visual-stage long soak still lacks live provider restart, re-query, retry and dead-letter evidence",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js"
+        "command:npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "must_not_claim": [
         "production_visual_stage_long_soak_complete",
@@ -155,7 +155,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/1",
       "reason": "RCA exposes locator and receipt ref models, but more real visual memory accepted/rejected lifecycle receipt instances are still pending",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "must_not_claim": [
         "memory_lifecycle_scaleout_complete",
@@ -169,7 +169,7 @@
       "backlog_ref": "contracts/production_acceptance/rca-production-acceptance.json#/remaining_evidence_gate_blockers/2",
       "reason": "Repeated no-regression refs exist for ppt_deck and xiaohongshu, but cross-family production cadence evidence is not complete",
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/rca-production-acceptance.test.js"
+        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/rca-production-acceptance.test.js"
       ],
       "must_not_claim": [
         "cross_family_repeated_no_regression_complete",
@@ -211,7 +211,7 @@
           "git diff --check",
           "git diff --cached --check",
           "npm run contracts:current-program:check",
-          "npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/manifest-and-start-surfaces.test.js"
+          "npm run --silent build && node --test tests/rca-production-acceptance.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
         ],
         "reported_result": "pass"
       },
@@ -229,7 +229,7 @@
           "git diff --check",
           "npm run --silent contracts:current-program:check",
           "npm run --silent line-budget",
-          "npm run --silent build && node --test tests/rca-functional-audit-retirement.test.js tests/opl-agent-pack-contracts-source-morphology.test.js tests/opl-family-contract-adoption.test.js tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-session-checkpoint.test.js"
+          "npm run --silent build && node --test tests/rca-functional-audit-retirement.test.js tests/opl-agent-pack-contracts-source-morphology.test.js tests/opl-family-contract-adoption.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-session-checkpoint.test.js"
         ],
         "reported_result": "pass"
       },

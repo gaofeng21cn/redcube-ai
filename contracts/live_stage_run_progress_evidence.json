@@ -156,7 +156,7 @@
         "workspace-runtime-ref:temporal-controlled-visual-stage-long-soak:<soak-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/temporal-autonomy-readiness.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "ready_claim_allowed": false
     },
@@ -193,7 +193,7 @@
         "rca-lifecycle-receipt:retention:<receipt-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/runtime-and-domain_action_adapter-surfaces.test.js tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "ready_claim_allowed": false
     },
@@ -231,7 +231,7 @@
         "workspace-runtime-ref:no-regression:<run-id>"
       ],
       "next_verification_command_refs": [
-        "command:npm run --silent build && node --test tests/product-entry-cases/evidence-scaleout-surfaces.test.js"
+        "command:npm run --silent build && node --test tests/product-entry-cases/domain-authority-refs-retirement-proof.test.js"
       ],
       "ready_claim_allowed": false
     }

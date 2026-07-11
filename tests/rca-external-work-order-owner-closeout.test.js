@@ -86,15 +86,16 @@ test('RCA manifest and domain_action_adapter expose external work-order owner cl
       domainHandlerAction.authority_boundary.allowed_actions.includes('emit_external_work_order_owner_closeout'),
       true,
     );
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.action, 'emit_external_work_order_owner_closeout');
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.owner, 'redcube_ai');
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.refs_only, true);
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.allowed_return_shapes.includes('no_regression_evidence'), true);
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.allowed_return_shapes.includes('typed_blocker'), true);
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.authority_boundary.opl_can_write_rca_visual_truth, false);
-    assert.equal(manifest.domain_owner_receipt_contract.external_work_order_owner_closeout.authority_boundary.opl_can_authorize_quality_or_export, false);
+    const ownerReceiptContract = manifest.domain_authority_refs.domain_owner_receipt_contract;
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.action, 'emit_external_work_order_owner_closeout');
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.owner, 'redcube_ai');
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.refs_only, true);
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.allowed_return_shapes.includes('no_regression_evidence'), true);
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.allowed_return_shapes.includes('typed_blocker'), true);
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.authority_boundary.opl_can_write_rca_visual_truth, false);
+    assert.equal(ownerReceiptContract.external_work_order_owner_closeout.authority_boundary.opl_can_authorize_quality_or_export, false);
     assert.equal(
-      manifest.no_regression_owner_receipt_opl_consumption_proof.guarded_actions.some(
+      manifest.domain_authority_refs.no_regression_owner_receipt_opl_consumption_proof.guarded_actions.some(
         (entry) => entry.action === 'emit_external_work_order_owner_closeout'
           && entry.expected_return_shapes.includes('no_regression_evidence')
           && entry.expected_return_shapes.includes('typed_blocker'),

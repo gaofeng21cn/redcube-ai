@@ -32,7 +32,7 @@ OPL 是 stage-led family runtime、generated/default caller、projection、opera
 
 ### Action 与 stage 合同只保留一份正文
 
-`contracts/action_catalog.json` 是 action 的唯一正文，`contracts/stage_control_plane.json` 是 RCA direct product-entry / Codex executor 所需 visual route、professional-skill 和 stage contract 的唯一正文。`agent/stages/manifest.json` 仅是 OPL standard compiler 的薄 declarative carrier：它只列出六个 stage、已有 repo refs、action refs、next-stage refs 与 authority boundary，并从 compiler 固定路径生成 OPL interface；它不得复制 route / professional-skill body、成为 parity mirror 或替代 stage control plane。RCA product-entry manifest、domain-handler export、stage plan 及其测试只消费各自 canonical ref；OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这些精确路径。
+`contracts/action_catalog.json` 是 action 的唯一正文，`agent/stages/manifest.json` 是 RCA stage graph 的唯一 repo source；OPL standard compiler 从该 manifest 生成 `opl-generated:family_stage_control_plane`。RCA product-entry manifest、domain-handler export 与 stage plan 只返回 source/projection refs，不复制 route、professional-skill、runtime 或 workorder body；OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这些精确路径。
 
 ### RCA authority kernel 保留 visual judgment 和 artifact authority
 
@@ -106,7 +106,7 @@ Route-local repeated block 进入 OPL stall lineage；连续无 deliverable delt
 
 RCA 当前 6 个 top-level stage 已接近“一个 stage 一个主要开放判断”：`source_intake` 冻结 source truth 与缺口，`communication_strategy` 决定叙事 / 大纲 / 页面角色，`visual_direction` 决定视觉语言 / 节奏 / 密度，`artifact_creation` 在已选 route 内生成候选 artifact，`review_and_revision` 判断渲染结果并给出 repair target，`package_and_handoff` 只在 review gate 后导出、打包和交接。
 
-OMA、OBF 或其他 family agent 暴露的 stage 粒度问题不能反向驱动 RCA 把主链拆碎。RCA 的 `artifact_creation` 与 `review_and_revision` 内部确实存在 image-first、HTML、native PPTX 等 route 差异，但这些差异应留在 route-local detailed prompt locator、repo-local professional specialist skill、quality gate 和 typed repair target 内处理；只有出现新的 RCA-owned durable owner boundary，且需要同步修改 `contracts/stage_control_plane.json`、`agent/stages/*`、prompt refs 和 contract tests 时，才评估 top-level stage 拆分。
+OMA、OBF 或其他 family agent 暴露的 stage 粒度问题不能反向驱动 RCA 把主链拆碎。RCA 的 `artifact_creation` 与 `review_and_revision` 内部确实存在 image-first、HTML、native PPTX 等 route 差异，但这些差异应留在 route-local detailed prompt locator、repo-local professional specialist skill、quality gate 和 typed repair target 内处理；只有出现新的 RCA-owned durable owner boundary，且需要同步修改 `agent/stages/manifest.json`、stage/prompt refs 和 generated projection contract tests 时，才评估 top-level stage 拆分。
 
 ### SQLite 只作为未来 OPL-owned sidecar index 选项
 

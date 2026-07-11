@@ -80,10 +80,15 @@ export const RCA_FUNCTIONAL_MODULE_REPLACEMENT_GUARDS = Object.freeze({
     rca_exports_only: ['helper_catalog_refs', 'package_module_refs', 'helper_proof_refs'],
   },
   operator_projection_shell: {
-    expectation_ref: '/operator_evidence_readiness_projection',
+    expectation_ref: '/domain_evidence_refs',
     opl_replacement_surface: 'opl_app_operator_workbench_shell',
-    rca_projection_mode: 'operator_evidence_readiness_refs_only',
-    rca_exports_only: ['evidence_gap_refs', 'typed_blocker_refs', 'safe_repair_hint_refs'],
+    rca_projection_mode: 'domain_authority_refs_only',
+    rca_exports_only: [
+      'domain_evidence_refs',
+      'typed_blocker_refs',
+      'receipt_locator_refs',
+      'artifact_locator_refs',
+    ],
   },
   generic_cli_mcp_wrappers: {
     expectation_ref: 'contracts/action_catalog.json',
@@ -179,11 +184,16 @@ const MODULE_BRIDGE_EXIT_PROFILES = Object.freeze({
     after_exit_rca_surface: 'native_helper_package_module_implementation',
   },
   operator_projection_shell: {
-    bridge_role: 'operator_evidence_refs_only_delete_tail',
+    bridge_role: 'thin_domain_authority_refs_adapter',
     replacement_owner: 'opl',
-    exit_gate_ref: '/operator_evidence_readiness_projection',
-    retained_authority: ['evidence_gap_refs', 'typed_blocker_refs', 'safe_repair_hint_refs'],
-    after_exit_rca_surface: 'operator_evidence_refs_only',
+    exit_gate_ref: '/domain_evidence_refs',
+    retained_authority: [
+      'domain_evidence_refs',
+      'typed_blocker_refs',
+      'receipt_locator_refs',
+      'artifact_locator_refs',
+    ],
+    after_exit_rca_surface: 'domain_authority_refs_only',
   },
   generic_cli_mcp_wrappers: {
     bridge_role: 'domain_handler_target_only_delete_tail',

@@ -399,8 +399,8 @@ export function buildOplSubstrateAdapterExportProjection() {
         refs: [
           '/artifact_locator_contract',
           '/domain_action_adapter_receipt_refs',
-          '/workspace_receipt_inventory_projection',
-          '/operator_evidence_readiness_projection',
+          '/receipt_refs',
+          '/artifact_locator_refs',
         ],
       },
       {
@@ -417,8 +417,8 @@ export function buildOplSubstrateAdapterExportProjection() {
     lifecycle_projection_refs: [
       '/task_lifecycle',
       '/runtime_inventory',
-      '/runtime_loop_closure',
-      '/operator_evidence_readiness_projection',
+      '/domain_evidence_refs',
+      '/typed_blocker_refs',
     ],
     authority_boundary: {
       rca_owns_visual_truth: true,
@@ -462,8 +462,10 @@ export function buildOplSubstrateAdapterExportProjection() {
       artifact_locator_contract_ref: '/artifact_locator_contract',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
-      workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
-      operator_evidence_readiness_projection_ref: '/operator_evidence_readiness_projection',
+      domain_evidence_refs_ref: '/domain_evidence_refs',
+      typed_blocker_refs_ref: '/typed_blocker_refs',
+      receipt_refs_ref: '/receipt_refs',
+      artifact_locator_refs_ref: '/artifact_locator_refs',
     },
   };
 }

@@ -67,7 +67,7 @@
       "/opl_stability_read_model_consumption",
       "/opl_generated_interface_consumption",
       "/visual_pack_compiler_handoff",
-      "/operator_evidence_readiness_projection",
+      "/domain_evidence_refs",
       "/opl_substrate_adapter_export"
     ],
     "allowed_remaining_module_classes": [
@@ -542,13 +542,11 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/memory-apply-proof.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_memory_writeback",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/workspace-receipt-inventory.ts",
         "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/domain-memory-descriptors.ts"
       ],
       "activeCallers": [
         "apply_visual_memory_writeback domain handler action",
-        "workspace receipt inventory",
-        "operator evidence readiness projection"
+        "domain authority refs projection"
       ],
       "activeCallerStatus": "active_refs_only_transport",
       "migrationAction": "Keep body-free memory transport, freshness grouping and receipt inventory shell in OPL; RCA returns memory decision and receipt refs only.",
@@ -666,8 +664,6 @@
       "codePaths": [
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/artifact_locator",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#apply_visual_workspace_lifecycle",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/opl-ledger-artifact-registration.ts",
         "packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts"
       ],
       "activeCallers": [
@@ -918,7 +914,6 @@
       "rca_scope": "python_native_helper_implementation",
       "audit_readout": "retain_rca_implementation_project_opl_envelope",
       "codePaths": [
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/native-ppt-operator-ux.ts",
         "contracts/runtime-program/python-native-helper-catalog.json",
         "python/redcube_ai",
         "packages/redcube-domain-entry/src/actions/native-ppt-product-entry-proof.ts"
@@ -1029,44 +1024,31 @@
     },
     {
       "module_id": "operator_projection_shell",
-      "surface_ref": "/operator_evidence_readiness_projection",
-      "status": "operator_evidence_refs_projection_landed",
+      "surface_ref": "/domain_evidence_refs",
+      "status": "domain_authority_refs_adapter_landed",
       "classification": "refs_only_adapter",
       "opl_generic_primitive": "workbench_shell",
       "oplAbsorbCandidate": true,
       "rcaRetains": [
-        "operator_evidence_refs",
-        "domain_gap_semantics",
-        "safe_repair_hints"
+        "domain_evidence_refs",
+        "typed_blocker_refs",
+        "receipt_locator_refs",
+        "artifact_locator_refs"
       ],
-      "rca_scope": "rca_operator_projection_refs_only",
-      "audit_readout": "project_opl_app_shell_retain_domain_gap_projection",
+      "rca_scope": "rca_domain_authority_refs_only",
+      "audit_readout": "thin_domain_authority_adapter_no_generic_shell_builders",
       "codePaths": [
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection",
-        "packages/redcube-domain-entry/src/actions/get-product-status.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/contracts.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/extra-payload.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-sections.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-payload-summaries.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-readiness.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/efficiency-handoff.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/evidence-constants.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/production-scaleout.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/production-tail-workorder.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/utils.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts"
+        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
+        "packages/redcube-domain-entry/src/actions/get-product-status.ts"
       ],
       "activeCallers": [
-        "OPL generated product status/workbench consumes RCA operator evidence refs",
-        "product-entry manifest domain projection refs",
-        "domain-handler export refs-only projection",
-        "operator evidence readiness tests"
+        "OPL generated product status and workbench consume RCA domain authority refs",
+        "domain-handler export consumes domain authority refs"
       ],
-      "activeCallerStatus": "opl_app_workbench_shell_domain_evidence_refs",
-      "migrationAction": "Keep generic dashboard/workbench layout, attention queue, repair command projection and drilldown shell in OPL App; RCA returns domain evidence refs, blocker meaning and safe repair hints only.",
-      "retentionReason": "RCA provides domain evidence refs, blocker meaning and safe repair hints for visual deliverable readiness.",
+      "activeCallerStatus": "thin_domain_authority_refs_adapter_active",
+      "migrationAction": "OPL owns the product, status, workbench, Agent Lab, monitor, ledger and workorder shells; RCA returns only domain evidence, typed blocker, receipt and artifact locator refs.",
+      "retentionReason": "RCA owns the meaning and authority of its visual evidence, typed blockers, owner receipts and artifact locators.",
       "cannotAbsorbReason": "OPL App may render projections but cannot turn them into RCA visual ready/exportable claims.",
       "tombstone_required": false,
       "migration_class": "refs_only_adapter",
@@ -1076,7 +1058,7 @@
       "opl_absorb_candidate": true,
       "opl_replacement_expectation": {
         "owner": "opl",
-        "expectation_ref": "/operator_evidence_readiness_projection",
+        "expectation_ref": "/domain_evidence_refs",
         "replacement_surface": "opl_app_operator_workbench_shell",
         "expected_mode": "refs_only_adapter_to_opl_surface",
         "rca_consumes_as": "consumer_projection_only",
@@ -1084,11 +1066,11 @@
       },
       "bridge_exit_gate": {
         "gate_id": "operator_projection_shell_bridge_exit_gate",
-        "bridge_role": "operator_evidence_refs_only_delete_tail",
+        "bridge_role": "thin_domain_authority_refs_adapter",
         "bridge_owner": "redcube_ai_refs_only_adapter_tail",
         "replacement_owner": "opl",
         "replacement_surface": "opl_app_operator_workbench_shell",
-        "exit_gate_ref": "/operator_evidence_readiness_projection",
+        "exit_gate_ref": "/domain_evidence_refs",
         "current_status": "source_shape_landed_delete_tail_evidence_gate_open",
         "required_before_retire": [
           "domain_authority_refs_preserved",
@@ -1096,11 +1078,12 @@
           "explicit_owner_receipt_authorizes_physical_delete"
         ],
         "retained_rca_authority": [
-          "evidence_gap_refs",
+          "domain_evidence_refs",
           "typed_blocker_refs",
-          "safe_repair_hint_refs"
+          "receipt_locator_refs",
+          "artifact_locator_refs"
         ],
-        "after_exit_rca_surface": "operator_evidence_refs_only",
+        "after_exit_rca_surface": "domain_authority_refs_only",
         "tail_class": "repo_local_wrapper_delete_tail_refs_only_or_domain_handler_target",
         "declares_source_shape_landed": true,
         "declares_functional_structure_gap": false,
@@ -1131,17 +1114,17 @@
         "retirement_guard_ref": "contracts/functional_privatization_audit.json#/physical_deletion_guard"
       },
       "current_surface_refs": [
-        "product_status",
-        "status_read_model",
-        "workbench",
-        "workbench_drilldown",
-        "operator_evidence_readiness_projection"
-      ],
-      "rca_projection_mode": "operator_evidence_readiness_refs_only",
-      "rca_exports_only": [
-        "evidence_gap_refs",
+        "domain_evidence_refs",
         "typed_blocker_refs",
-        "safe_repair_hint_refs"
+        "receipt_refs",
+        "artifact_locator_refs"
+      ],
+      "rca_projection_mode": "domain_authority_refs_only",
+      "rca_exports_only": [
+        "domain_evidence_refs",
+        "typed_blocker_refs",
+        "receipt_locator_refs",
+        "artifact_locator_refs"
       ],
       "forbidden_generic_owner_flags_ref": "contracts/functional_privatization_audit.json#/forbidden_generic_owner_flags",
       "physical_deletion_guard": {
@@ -1154,9 +1137,10 @@
       },
       "retirement_guard_ref": "contracts/functional_privatization_audit.json#/physical_deletion_guard",
       "rca_retains": [
-        "operator_evidence_refs",
-        "domain_gap_semantics",
-        "safe_repair_hints"
+        "domain_evidence_refs",
+        "typed_blocker_refs",
+        "receipt_locator_refs",
+        "artifact_locator_refs"
       ],
       "retire_tombstone": false,
       "writes_visual_truth": false,
@@ -1189,11 +1173,7 @@
         "apps/redcube-cli/src/cli.ts",
         "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
         "packages/redcube-domain-entry/src/actions/family-action-catalog.ts",
-        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/entry-descriptor.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/policy.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/shell-catalog.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/shell-projections.ts"
+        "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts"
       ],
       "activeCallers": [
         "OPL generated CLI/MCP wrapper domain handler targets",
@@ -1471,14 +1451,11 @@
         "packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts#/opl_stability_read_model_consumption",
         "packages/redcube-domain-entry/src/actions/get-product-status.ts",
         "packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/runtime_framework",
-        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/runtime-descriptors.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/operator-evidence-refs/receipt-monitor-handoff.ts",
-        "packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/temporal-long-soak-evidence-inventory.ts"
+        "packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/runtime-descriptors.ts"
       ],
       "activeCallers": [
         "product status refs",
-        "domain-handler runtime framework refs",
-        "operator evidence readiness projection"
+        "domain-handler runtime framework refs"
       ],
       "activeCallerStatus": "active_refs_only_consumer_projection",
       "migrationAction": "Keep observability exporter, SLO, control-loop summary, usage and resource-pressure aggregation in OPL.",

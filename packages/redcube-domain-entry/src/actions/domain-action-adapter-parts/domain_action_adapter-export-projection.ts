@@ -18,7 +18,6 @@ import { buildDomainActionAdapterOwnerBoundary } from './owner-boundary.js';
 import { buildTemporalAutonomyReadinessProjection } from './temporal-autonomy-readiness.js';
 import { buildTemporalStageRunConsumptionPolicy } from './temporal-stage-run-consumption-policy.js';
 import { buildVisualTransitionEvaluatorProjection } from './visual-transition-evaluator.js';
-import { buildOplLedgerArtifactRegistrationContract } from '../get-product-entry-manifest-parts/opl-ledger-artifact-registration.js';
 
 export const DOMAIN_ACTION_ADAPTER_ID = 'redcube_domain_action_adapter_adapter.v1';
 export const DOMAIN_ID = 'redcube_ai';
@@ -98,6 +97,10 @@ function buildRouteStageHandoffBoundary(manifest) {
 }
 
 export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) {
+  manifest = {
+    ...manifest,
+    ...(manifest.domain_authority_refs || {}),
+  };
   const sessionSurface = manifest.product_entry_shell?.session || {};
   const familySchedulerReplacement = manifest.family_scheduler_replacement || buildFamilySchedulerReplacementProjection();
   const oplGenericPrimitiveConsumption = (
@@ -133,24 +136,6 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
   const routeStageHandoffBoundary = (
     manifest.route_stage_handoff_boundary || buildRouteStageHandoffBoundary(manifest)
   );
-  const rcaEfficiencyHandoffProjection = (
-    manifest.rca_efficiency_handoff_projection
-    || manifest.operator_evidence_readiness_projection?.rca_efficiency_handoff_projection
-    || {}
-  );
-  const goalWorkflowAgentLabSuite = (
-    manifest.goal_workflow_agent_lab_suite
-    || manifest.operator_evidence_readiness_projection?.goal_workflow_agent_lab_suite
-    || {}
-  );
-  const pptThreeRouteAgentLabSuite = (
-    manifest.ppt_three_route_agent_lab_suite
-    || manifest.operator_evidence_readiness_projection?.ppt_three_route_agent_lab_suite
-    || {}
-  );
-  const productionEvidenceTailWorkOrder = (
-    manifest.operator_evidence_readiness_projection?.production_evidence_tail_workorder || {}
-  );
   const domainAuthorityRefs = {
     controlled_soak_no_regression_attempt: manifest.controlled_soak_no_regression_attempt,
     domain_owner_receipt_contract: manifest.domain_owner_receipt_contract,
@@ -170,9 +155,6 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
   );
   const temporalStageRunConsumptionPolicy = (
     manifest.temporal_stage_run_consumption_policy || buildTemporalStageRunConsumptionPolicy()
-  );
-  const oplLedgerArtifactRegistration = (
-    manifest.opl_ledger_artifact_registration || buildOplLedgerArtifactRegistrationContract()
   );
   return {
     ok: true,
@@ -298,44 +280,11 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         lifecycle_transport_owner: 'opl',
         rca_retained_authority: ['artifact_authority'],
       },
-      opl_ledger_artifact_registration: {
-        ...oplLedgerArtifactRegistration,
-        ref: '/opl_ledger_artifact_registration',
-        projection_mode: 'refs_only_registration_contract',
-        writable_by_domain_action_adapter: false,
-        ledger_transport_owner: 'one-person-lab/OPL Ledger',
-      },
       receipt_refs: {
         ref: '/domain_action_adapter_receipt_refs',
         owner: DOMAIN_ID,
         writable_by_domain_action_adapter: false,
         forbidden_receipt_fields: manifest.domain_action_adapter_receipt_refs?.forbidden_receipt_fields || [],
-      },
-      workspace_receipt_inventory_projection: {
-        ref: '/workspace_receipt_inventory_projection',
-        owner: DOMAIN_ID,
-        consumer: 'opl_app_operator',
-        status: manifest.workspace_receipt_inventory_projection?.status || 'unknown',
-        projection_id: manifest.workspace_receipt_inventory_projection?.projection_id || 'rca.workspace_receipt_inventory.v1',
-        receipt_root_model: manifest.workspace_receipt_inventory_projection?.receipt_root_model || '<workspace-root>/.redcube/runtime/receipts/',
-        receipt_counts: manifest.workspace_receipt_inventory_projection?.receipt_counts || {},
-        gap_projection: manifest.workspace_receipt_inventory_projection?.gap_projection || {},
-        scaleout_projection: manifest.workspace_receipt_inventory_projection?.scaleout_projection || {},
-        selected_artifact_producing_visual_route: (
-          manifest.workspace_receipt_inventory_projection?.selected_artifact_producing_visual_route || {}
-        ),
-        actual_workspace_receipt_refs: (
-          manifest.workspace_receipt_inventory_projection?.actual_workspace_receipt_refs || {}
-        ),
-        writable_by_domain_action_adapter: false,
-        read_only: true,
-        refs_only: true,
-        implements_opl_artifact_gallery: false,
-        implements_opl_workbench: false,
-        opl_can_write_receipt_instance: false,
-        opl_can_write_visual_truth: false,
-        opl_can_store_artifact_blob: false,
-        opl_can_claim_production_soak_complete: false,
       },
       visual_pattern_memory_writeback: {
         descriptor_ref: '/domain_memory_descriptor_locator',
@@ -460,14 +409,10 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
         opl_consumption_policy: manifest.no_regression_owner_receipt_opl_consumption_proof?.opl_consumption_policy || {},
         writable_by_domain_action_adapter: true,
       },
-      production_evidence_scaleout_refs: manifest.operator_evidence_readiness_projection?.production_evidence_scaleout_refs || {},
-      opl_expected_receipt_monitor_freshness_handoff: (
-        manifest.operator_evidence_readiness_projection?.opl_expected_receipt_monitor_freshness_handoff || {}
-      ),
-      production_evidence_tail_workorder: productionEvidenceTailWorkOrder,
-      rca_efficiency_handoff_projection: rcaEfficiencyHandoffProjection,
-      goal_workflow_agent_lab_suite: goalWorkflowAgentLabSuite,
-      ppt_three_route_agent_lab_suite: pptThreeRouteAgentLabSuite,
+      domain_evidence_refs: manifest.domain_evidence_refs || {},
+      typed_blocker_refs: manifest.typed_blocker_refs || {},
+      receipt_locator_refs: manifest.receipt_refs || {},
+      artifact_locator_refs: manifest.artifact_locator_refs || {},
       lifecycle_guarded_apply: {
         ref: '/lifecycle_guarded_apply_proof',
         owner: DOMAIN_ID,
@@ -510,14 +455,12 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       opl_family_lifecycle_adapter_ref: '/opl_family_lifecycle_adapter',
       family_action_catalog_ref: 'contracts/action_catalog.json',
       artifact_locator_contract_ref: '/artifact_locator_contract',
-      opl_ledger_artifact_registration_ref: '/opl_ledger_artifact_registration',
       domain_memory_descriptor_locator_ref: '/domain_memory_descriptor_locator',
       domain_action_adapter_receipt_refs_ref: '/domain_action_adapter_receipt_refs',
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
       lifecycle_guarded_apply_proof_ref: '/lifecycle_guarded_apply_proof',
       visual_transition_spec_ref: '/visual_transition_spec',
       visual_transition_evaluator_ref: '/visual_transition_evaluator',
-      workspace_receipt_inventory_projection_ref: '/workspace_receipt_inventory_projection',
       controlled_visual_stage_attempt_ref: '/controlled_visual_stage_attempt',
       controlled_memory_apply_proof_ref: '/controlled_memory_apply_proof',
       controlled_soak_no_regression_attempt_ref: '/controlled_soak_no_regression_attempt',
@@ -528,12 +471,10 @@ export function buildDomainActionAdapterProjection({ workspaceRoot, manifest }) 
       family_scheduler_replacement_ref: '/family_scheduler_replacement',
       opl_generic_primitive_consumption_ref: '/opl_generic_primitive_consumption',
       opl_stability_read_model_consumption_ref: '/opl_stability_read_model_consumption',
-      production_evidence_scaleout_refs_ref: '/operator_evidence_readiness_projection/production_evidence_scaleout_refs',
-      opl_expected_receipt_monitor_freshness_handoff_ref: '/operator_evidence_readiness_projection/opl_expected_receipt_monitor_freshness_handoff',
-      production_evidence_tail_workorder_ref: '/operator_evidence_readiness_projection/production_evidence_tail_workorder',
-      rca_efficiency_handoff_projection_ref: '/rca_efficiency_handoff_projection',
-      goal_workflow_agent_lab_suite_ref: '/goal_workflow_agent_lab_suite',
-      ppt_three_route_agent_lab_suite_ref: '/ppt_three_route_agent_lab_suite',
+      domain_evidence_refs_ref: '/domain_evidence_refs',
+      typed_blocker_refs_ref: '/typed_blocker_refs',
+      receipt_locator_refs_ref: '/receipt_refs',
+      artifact_locator_refs_ref: '/artifact_locator_refs',
       temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
       privatized_functional_module_audit_ref: '/privatized_functional_module_audit',
       opl_substrate_adapter_export_ref: '/opl_substrate_adapter_export',
