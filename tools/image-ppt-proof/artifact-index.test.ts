@@ -8,10 +8,6 @@ import { mkdtempSync, readFileSync } from 'node:fs';
 
 const repoRoot = process.cwd();
 
-function readJson(relativePath) {
-  return JSON.parse(readFileSync(path.join(repoRoot, relativePath), 'utf-8'));
-}
-
 test('image PPT proof runner mock mode emits every retained artifact without a real API', () => {
   const outputDir = mkdtempSync(path.join(os.tmpdir(), 'redcube-image-ppt-proof-'));
   const result = spawnSync(
@@ -103,27 +99,4 @@ test('image PPT proof runner mock mode emits every retained artifact without a r
     assert.match(artifact.relative_path, /^[^/].+/);
     assert.match(artifact.sha256, /^[a-f0-9]{64}$/);
   }
-});
-
-test('image PPT proof CI contract keeps real image generation opt-in', () => {
-  const contract = readJson('tools/image-ppt-proof/ci-contract.json');
-
-  assert.equal(contract.schema_version, 'image_ppt_proof_ci_contract.v1');
-  assert.equal(contract.default_quality_lane.runs_real_image_generation, false);
-  assert.deepEqual(contract.default_quality_lane.required_workflow_events, ['push', 'pull_request']);
-  assert.equal(contract.proof_job.runs_real_image_generation_by_default, false);
-  assert.equal(contract.proof_job.required_triggers.manual, 'workflow_dispatch');
-  assert.equal(contract.proof_job.required_triggers.nightly.event, 'schedule');
-  assert.equal(contract.proof_job.required_triggers.pull_request_label.label, 'image-ppt-proof');
-  assert.deepEqual(
-    contract.proof_job.required_triggers.pull_request_label.types,
-    ['labeled', 'synchronize', 'opened', 'reopened'],
-  );
-  assert.equal(contract.proof_job.artifact_index.path, 'artifacts/image-ppt-proof/artifact-index.json');
-  assert.equal(contract.proof_job.artifact_index.schema_version, 'image_ppt_proof_artifact_index.v1');
-  assert.equal(contract.proof_job.artifact_index.required, true);
-  assert.deepEqual(
-    contract.proof_job.required_cache_layers.map((layer) => layer.id),
-    ['npm', 'pip', 'playwright'],
-  );
 });

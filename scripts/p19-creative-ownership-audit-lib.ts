@@ -9,8 +9,8 @@ import {
   P19_CREATIVE_OWNERSHIP_LIFECYCLE_CONTRACT,
   P19_TEAM_GATE_CONTRACT,
   buildCreativeOwnershipResidueAudit,
-  resolveRuntimeStatePath,
 } from '@redcube/runtime';
+import { resolveRuntimeStatePath } from '../packages/redcube-runtime/src/runtime-state.ts';
 
 export const AUDIT_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P19_CREATIVE_OWNERSHIP_AUDIT.json');
 export const STATUS_FILE = resolveRuntimeStatePath('reports', 'redcube-runtime-program', 'P19_CREATIVE_OWNERSHIP_STATUS.json');
