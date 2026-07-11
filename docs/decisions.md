@@ -32,7 +32,7 @@ OPL 是 stage-led family runtime、generated/default caller、projection、opera
 
 ### Action 与 stage 合同只保留一份正文
 
-`contracts/action_catalog.json` 与 `contracts/stage_control_plane.json` 分别是 action 和 stage 的唯一正文。RCA product-entry manifest、domain-handler export、stage plan 及其测试只传递或读取这两个 repo-local contract ref；不得重新内联 catalog / stage body、parity mirror，或使用未绑定的路径。OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这两个精确路径。
+`contracts/action_catalog.json` 是 action 的唯一正文，`contracts/stage_control_plane.json` 是 RCA direct product-entry / Codex executor 所需 visual route、professional-skill 和 stage contract 的唯一正文。`agent/stages/manifest.json` 仅是 OPL standard compiler 的薄 declarative carrier：它只列出六个 stage、已有 repo refs、action refs、next-stage refs 与 authority boundary，并从 compiler 固定路径生成 OPL interface；它不得复制 route / professional-skill body、成为 parity mirror 或替代 stage control plane。RCA product-entry manifest、domain-handler export、stage plan 及其测试只消费各自 canonical ref；OPL 解析器必须在绑定的 RCA repo 内 fail-closed 地加载这些精确路径。
 
 ### RCA authority kernel 保留 visual judgment 和 artifact authority
 

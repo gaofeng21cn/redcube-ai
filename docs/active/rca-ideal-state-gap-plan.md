@@ -14,6 +14,32 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 2026-07-11 过度设计审计以 17 项为当前 completion scope；2026-07-10 的 stdlib walker、default registry、validator utility、退役 `getRun` / Hermes public surface、单消费者 Parts factory、overlay value/type/validator 重复和 private-platform retirement guard 八项只作为历史结构子集读取，不能替代本轮逐项验收、main 吸收、worktree 清理或远端读回。历史语境见 [RCA 过度设计收薄设计](../references/rca-overdesign-thinning-design.md)；本文继续是唯一 active completion plan，最终状态必须逐项折回本文、核心 docs、contracts、source 和 tests。
 
+### 2026-07-11 17 项过度设计收口
+
+下表以可复核 implementation ID 和 absorbed commit 记录本轮范围；截至本地 `main@8572655d6464c015857f158b403dd558f99a5b1f`，`done` 只表示实现已吸收。shared-release lock refresh、完整 mainline 验证、远端 push/443 readback 和本轮 worktree cleanup 仍未关闭，状态以 `plan_completion_audit.json` 为准，不能由这张表推导 visual ready、exportable、handoffable、owner receipt 或 production ready。
+
+| # | Implementation ID | 状态 | 吸收提交 |
+| --- | --- | --- | --- |
+| 1 | `node_recursive_fs_walkers` | `done` | `a6ddb0b8` |
+| 2 | `orphan_state_index_contract_removal` | `done` | `a6ddb0b8` |
+| 3 | `cli_import_meta_main` | `done` | `a6ddb0b8` |
+| 4 | `unreferenced_logo_asset_removal` | `done` | `a6ddb0b8` |
+| 5 | `source_string_only_test_removal` | `done` | `22037a6f` |
+| 6 | `source_augmentation_export_facade_removal` | `done` | `22037a6f` |
+| 7 | `agent_lab_manifest_body_removal` | `done` | `22037a6f` |
+| 8 | `python_dependency_ssot_uv_lock` | `done` | `d5092be5` |
+| 9 | `phase2_current_program_snapshot_retirement` | `done` | `22037a6f` |
+| 10 | `runtime_state_display_alias_removal` | `done` | `22037a6f` |
+| 11 | `runtime_json_write_helper_consolidation` | `done` | `22037a6f` |
+| 12 | `action_catalog_contract_projection` | `done` | `e64e557d` |
+| 13 | `capability_map_projection_deduplication` | `done` | `22037a6f` |
+| 14 | `ppt_execution_adapter_inline` | `done` | `a7d15700` |
+| 15 | `managed_python_runtime_uv_and_browser_env` | `done` | `d5092be5`, `67860e68` |
+| 16 | `private_platform_guard_scope_consolidation` | `done` | `22037a6f` |
+| 17 | `stage_control_plane_contract_projection` | `done` | `e64e557d` |
+
+Closeout 发现 OPL compiler 真实 consumer 还需要标准 declarative manifest carrier，已以 `c2db68e1` 补齐：`agent/stages/manifest.json` 只承载 compiler 所需的六个 stage、repo refs、action refs 和 authority boundary；它不复制 RCA route / professional-skill body。后续 `2850cc10`、`5f5b61bd` 与 `8572655d` 分别收齐 Foundry stage refs、remaining source-behavior 分类和 stage-principle refs；OPL `latest-stable@1bf8af46bca9c09631540e49730890272cb3cebe` 同时接受 OPL-owned deferred state-index sidecar。fresh `opl agents conformance --agent rca=<repo>` 的 structural contract、ordinary-path guard 和 family live probe 均为 `passed`，但这只关闭结构 currentness gate。`contracts/stage_control_plane.json` 继续是 RCA direct product-entry 与 Codex executor 的 canonical visual route surface；shared-release lock refresh、完整 mainline 验证、远端 push/443 readback 和安全 worktree cleanup 仍为本轮 closeout 的待办，不授予 OPL visual truth、review/export 或 owner-receipt authority。
+
 2026-06-30 SSOT refresh：本文的默认 active gap 只维护功能面落地、结构收薄、source hygiene、generated/default caller thinning、repo-local adapter retirement、compatibility-free retirement 和 legacy naming guard。真实 Temporal controlled visual-stage long-soak、production-like repeated no-regression、visual ready、exportable、handoffable、human approval、App/operator sustained consumption 和 production-ready 不再混入功能/结构 gap。RCA 当前仍需关注的缺口是 generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene；这些只在 OPL default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance 成立后关闭。
 
 2026-06-30 functional closure gate：`contracts/physical_source_morphology_policy.json#/default_caller_tail_readback/retained_default_caller_boundary_gate` 已把 default-caller tail readback 的 retained boundaries 显式化。当前 `tail_surface_count=0` 只表示没有可立即执行的 tail cleanup candidate；`product_entry_continuity_refs_adapter`、`domain_action_adapter_guarded_actions`、`product_entry_manifest_projection`、`deliverable_route_attempt_shell`、`repo_shell_verification_wrappers`、`runtime_watch_projection`、`operator_evidence_stability_projection`、`executor_runtime_route_run_records` 仍必须等 OPL generated/default caller parity、no-active repo-local default caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write、retired alias no-resurrection 和 tombstone/provenance pointer 齐备后，才能删除或进一步收薄。该 gate 禁止把 empty tail worklist、`cleanup_candidate_count=0`、source guard clean 或 focused tests 写成 physical delete、default-caller cutover、visual-ready、domain-ready 或 production-ready。
@@ -35,7 +61,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | Real benchmark and proof | tests/fixtures + native proof + RCA authority | `partial` | 真实 6 页 native PPT proof、package/OfficeCLI/LibreOffice true render 与独立 visual review 已有证据；同源双跑五人盲评、跨 viewer fresh human readback 和 parity owner receipt 未完成。 |
 | Progress-first no-regression | product entry / stage loop | `done` | route auto-continuation、targeted repair、typed blocker 与无第二 executor pass 的回归均保留。 |
 | Truth/docs/current-program foldback | contracts / current-program / core docs | `done` | 本文、status/architecture/spec、learning/parity contracts 与 current-program completion audit 已对齐。 |
-| Absorb and cleanup | main session | `done` | 固定 integration target 完成 full 715/715、historical 5/5、smoke 55/55、fast 245/245、family 4/4、typecheck、strict readback、current-program 35 refs、Fallow 0 issues 与 diff-check；main 已 fast-forward、push/remote readback，15 条 exact/patch-equivalent worktree/branch 已清理。dirty retired-surfaces 与 pinned ppt-master proof worktree按 owner gate 保留。 |
+| Absorb and cleanup | main session | `historical` | 2026-07-10 integration target 的 full 715/715、historical 5/5、smoke 55/55、fast 245/245、family 4/4、typecheck、strict readback、current-program 35 refs、Fallow 0 issues 与 diff-check 仅保留为历史证据；不覆盖本轮 17 项的验证、push 或 cleanup。 |
 
 风险档为 `L3/L4`，验证预算为 `full`。TDD 仅用于已确认的对象退化、fixture 丢失和 evaluator 假阳性回归；最终完成证据必须包含真实 PPTX package/readback、render artifact、visual review 和 mainline completion audit。
 

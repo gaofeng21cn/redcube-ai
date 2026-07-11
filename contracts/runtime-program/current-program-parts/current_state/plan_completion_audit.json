@@ -1,11 +1,83 @@
 {
   "surface_kind": "rca_plan_completion_audit",
   "schema_version": 1,
-  "audit_id": "rca_plan_completion_audit_20260710",
-  "date_anchor": "2026-07-10",
-  "status": "non_live_scope_complete_live_evidence_open",
+  "audit_id": "rca_plan_completion_audit_20260711",
+  "date_anchor": "2026-07-11",
+  "status": "overdesign_implementation_absorbed_conformance_passed_release_closeout_in_progress",
   "scope": {
+    "overdesign_audit_20260711": {
+      "status": "implementation_absorbed_conformance_passed_release_closeout_in_progress",
+      "completion_percent": 100,
+      "completion_basis": {
+        "method": "seventeen_absorbed_implementation_items",
+        "items_done": 17,
+        "items_total": 17,
+        "implementation_target_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
+        "rule": "100 percent covers only the 17 requested simplification implementations; shared-release lock refresh, full verification, remote push/readback, and safe cleanup remain explicit closeout gates."
+      },
+      "items": [
+        {"id":"node_recursive_fs_walkers","status":"done","commits":["a6ddb0b8"]},
+        {"id":"orphan_state_index_contract_removal","status":"done","commits":["a6ddb0b8"]},
+        {"id":"cli_import_meta_main","status":"done","commits":["a6ddb0b8"]},
+        {"id":"unreferenced_logo_asset_removal","status":"done","commits":["a6ddb0b8"]},
+        {"id":"source_string_only_test_removal","status":"done","commits":["22037a6f"]},
+        {"id":"source_augmentation_export_facade_removal","status":"done","commits":["22037a6f"]},
+        {"id":"agent_lab_manifest_body_removal","status":"done","commits":["22037a6f"]},
+        {"id":"python_dependency_ssot_uv_lock","status":"done","commits":["d5092be5"]},
+        {"id":"phase2_current_program_snapshot_retirement","status":"done","commits":["22037a6f"]},
+        {"id":"runtime_state_display_alias_removal","status":"done","commits":["22037a6f"]},
+        {"id":"runtime_json_write_helper_consolidation","status":"done","commits":["22037a6f"]},
+        {"id":"action_catalog_contract_projection","status":"done","commits":["e64e557d"]},
+        {"id":"capability_map_projection_deduplication","status":"done","commits":["22037a6f"]},
+        {"id":"ppt_execution_adapter_inline","status":"done","commits":["a7d15700"]},
+        {"id":"managed_python_runtime_uv_and_browser_env","status":"done","commits":["d5092be5","67860e68"]},
+        {"id":"private_platform_guard_scope_consolidation","status":"done","commits":["22037a6f"]},
+        {"id":"stage_control_plane_contract_projection","status":"done","commits":["e64e557d"]}
+      ],
+      "closeout_gates": [
+        {
+          "id": "opl_domain_pack_compiler_real_consumer",
+          "status": "done",
+          "commit": "c2db68e1",
+          "evidence": "buildRepoGeneratedInterfaceBundle returns status=ready for rca"
+        },
+        {
+          "id": "standard_domain_agent_conformance_currentness",
+          "status": "done",
+          "owner": "redcube_ai",
+          "verified_code_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
+          "evidence": "fresh opl agents conformance reports structural_contract_status=passed, ordinary_path_guard_status=passed, and family_live_conformance_probe_status=passed",
+          "required_output": "foundry_agent_series consumes stage_manifest_ref and current shared-release receipts"
+        },
+        {
+          "id": "state_index_conformance_validator_alignment",
+          "status": "done",
+          "owner": "one-person-lab",
+          "owner_latest_stable_commit": "1bf8af46bca9c09631540e49730890272cb3cebe",
+          "owner_main_release_receipt": "9fa8760f6031b7400be68ec6a2bb46820f712ad8",
+          "required_output": "validator accepts the declared OPL-owned deferred sidecar without requiring a retired RCA state-index contract"
+        },
+        {
+          "id": "functional_audit_source_behavior_classification",
+          "status": "done",
+          "owner": "redcube_ai",
+          "verified_code_commit": "5f5b61bd",
+          "required_output": "each remaining generic-behavior source path is deleted or classified by its canonical functional audit entry"
+        },
+        {
+          "id": "foundry_stage_and_principle_ref_currentness",
+          "status": "done",
+          "owner": "redcube_ai",
+          "commits": [
+            "2850cc10",
+            "8572655d"
+          ],
+          "required_output": "standard manifest and generated-plane refs remain current without restoring a second stage-control body"
+        }
+      ]
+    },
     "overdesign_thinning": {
+      "scope_role": "historical_20260710_subset_not_current_completion_scope",
       "status": "done",
       "completion_percent": 100,
       "items": [
@@ -124,7 +196,9 @@
     "opl_canonical_identity_owner_commit": "external_owner_repo:one-person-lab@4f12827a06dc81d42dc859cbddee4c9650f67062",
     "fallow_target_commit": "f07d2e0e",
     "active_plan": "human_doc:rca_ideal_state_gap_plan",
-    "overdesign_closeout": "human_doc:rca_overdesign_thinning_completion_audit"
+    "overdesign_closeout": "human_doc:rca_ideal_state_gap_plan#2026-07-11-17-items",
+    "opl_pack_compiler_consumer_test": "tests/opl-agent-pack-contracts-generated-surface.test.ts",
+    "opl_standard_stage_manifest": "agent/stages/manifest.json"
   },
   "open_typed_blockers": [
     {
@@ -151,6 +225,71 @@
     }
   ],
   "closeout_accounting": {
+    "scope": "overdesign_audit_20260711",
+    "planned": [
+      "seventeen_simplification_implementations",
+      "opl_pack_compiler_real_consumer",
+      "standard_domain_agent_conformance",
+      "shared_release_lock_refresh",
+      "main_verification",
+      "remote_443_readback",
+      "safe_worktree_cleanup"
+    ],
+    "done": [
+      "seventeen_simplification_implementations",
+      "opl_pack_compiler_real_consumer",
+      "standard_domain_agent_conformance",
+      "state_index_conformance_validator_alignment",
+      "functional_audit_source_behavior_classification",
+      "foundry_stage_and_principle_ref_currentness",
+      "main_absorption_to_8572655d"
+    ],
+    "in_progress": [
+      "shared_release_lock_refresh",
+      "main_verification",
+      "remote_443_readback",
+      "safe_worktree_cleanup"
+    ],
+    "deferred": [],
+    "skipped": [],
+    "verification": {
+      "state": "in_progress",
+      "verified_code_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
+      "completed": [
+        "typecheck",
+        "opl-pack-compiler-real-consumer",
+        "opl-standard-domain-agent-conformance",
+        "state-index-conformance-validator-alignment",
+        "functional-audit-source-behavior-classification",
+        "foundry-stage-and-principle-ref-currentness",
+        "focused-owner-receipt-product-entry-tests",
+        "git-diff-check"
+      ],
+      "required_before_final_closeout": [
+        "shared-release-lock-refresh",
+        "scripts-verify",
+        "typecheck",
+        "test-fast",
+        "test-family",
+        "test-full",
+        "test-historical",
+        "private-platform-readback",
+        "uv-lock-check",
+        "git-diff-check",
+        "remote-443-readback",
+        "safe-worktree-cleanup"
+      ]
+    },
+    "commit_push_state": {
+      "implementation_commits": "absorbed_to_local_main_8572655d",
+      "closeout_commit": "current_program_foldback_pending_main_absorption",
+      "shared_release_lock": "pending",
+      "remote_push": "pending",
+      "remote_readback": "pending",
+      "cleanup_safe_worktrees": "pending"
+    }
+  },
+  "historical_closeout_accounting_20260710": {
     "planned": [
       "overdesign_thinning",
       "owner_closure_absorption",

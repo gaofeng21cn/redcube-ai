@@ -5,7 +5,7 @@ Purpose: `current_status_and_gap_readout`
 State: `current_truth`
 Machine boundary: 人读状态面。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-Last reviewed: `2026-07-10`
+Last reviewed: `2026-07-11`
 
 Plugin native profile pointer: `contracts/opl-native-profile.json` 只声明 OPL Flow / OPL Doc 插件同步与 drift 检查所需的 repo-native profile；它不是 visual truth、runtime truth、artifact authority、review/export verdict、owner receipt 或 production-ready 证据。
 
@@ -42,7 +42,7 @@ OPL family `Foundry Agent OS` 目标下，RCA 的 target delta 读 [RCA Foundry 
 
 `Codex CLI` 是 RCA 当前唯一物化的 executor。generic executor selection、hosted adapter、attempt ledger 与 receipt residency 归 OPL owner surface；RCA 只消费 `contracts/stage_control_plane.json#/stages/*/selected_executor` 等 opaque refs，不保留本地 routing config、Hermes adapter/proof、fallback 或第二 executor pass。历史 Hermes contracts/docs 只按 provenance / external reference 读取。
 
-2026-07-10 的八项 overdesign thinning 只作为历史结构子集：stdlib walker、single family registry、protocol validator utility、`getRun` public surface、single-consumer Parts plumbing、overlay value-first、RCA-owned Hermes execution 与 private-platform retirement guard density。2026-07-11 当前审计范围扩大为 17 项，旧的测试计数、main 吸收、远端读回与 cleanup 记录不能替代本轮逐项验收；当前细节以 active plan、源码、contracts 和 fresh mainline evidence 为准。任何结构收薄都不授权 physical delete、default-caller cutover、visual ready、exportable、handoffable、domain ready 或 production ready。
+2026-07-11 的 17 项过度设计收口已按 implementation ID 和 absorbed commit 吸收至本地 `main@8572655d6464c015857f158b403dd558f99a5b1f`；2026-07-10 的八项 thinning 仅是历史结构子集。真实 OPL compiler 已从 `agent/stages/manifest.json` 编译 RCA generated interface 并返回 `ready`，OPL `latest-stable@1bf8af46bca9c09631540e49730890272cb3cebe` 已接受 deferred state-index sidecar，fresh RCA structural conformance 为 `passed`。该 manifest 仍只是 compiler-only 的薄 declarative carrier；`contracts/stage_control_plane.json` 仍是 RCA direct product-entry / Codex executor 的 canonical visual route 与专业语义 surface。shared-release lock refresh、完整 mainline 验证、远端 push/443 readback 与本轮安全 worktree cleanup 仍未完成，且本地 main 尚未据此声明远端同步；最终状态只以 current-program completion audit 和 fresh command evidence 为准。任何结构收薄都不授权 physical delete、default-caller cutover、visual ready、exportable、handoffable、domain ready 或 production ready。
 
 当前 acceptance / readiness 口径是 AI-first / executor-first：OPL 搭建 stage-led runtime、queue、receipt ledger、replay / recovery shell 与 operator projection；Codex/default executor 执行视觉阶段；RCA 持有 visual truth、review/export verdict、artifact authority、visual memory accept/reject 和 owner receipt。合同只固定边界、安全、receipt、replay 和恢复语义，不能把机械 conformance 或 provider completion 升级成视觉判断。
 
