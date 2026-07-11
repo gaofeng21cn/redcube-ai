@@ -67,6 +67,7 @@ test('native PPT Linux proof environment is documented without adding a desktop-
 
 test('native PPT proof V2 contract is ready for opt-in CI triggers and cache policy', () => {
   const contract = readRepoJson('tools/native-ppt-proof/ci-contract.json');
+  const laneContract = readRepoJson('contracts/runtime-program/ppt-native-authoring-proof-lane.json');
   const runner = readRepoFile('tools/native-ppt-proof/run.sh');
   const workflow = readRepoFile('.github/workflows/ci.yml');
 
@@ -87,6 +88,10 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   );
   assert.equal(contract.proof_job.artifact_index.path, 'artifacts/native-ppt-proof/artifact-index.json');
   assert.equal(contract.proof_job.artifact_index.schema_version, 'native_ppt_proof_artifact_index.v2');
+  assert.equal(laneContract.candidate_route_model.default_enabled, false);
+  assert.deepEqual(laneContract.candidate_route_model.runnable_routes, ['author_pptx_native', 'repair_pptx_native']);
+  assert.match(runner, /ppt-native-authoring-proof-lane\.json/);
+  assert.match(runner, /candidate_route_model/);
   assert.match(workflow, /github\.event_name == 'schedule'/);
   assert.match(workflow, /contains\(github\.event\.pull_request\.labels\.\*\.name, 'native-ppt-proof'\)/);
   assert.match(workflow, /native-ppt-proof-uv-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);

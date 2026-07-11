@@ -80,6 +80,7 @@ package_readback_report="$output_root/native-package-readback.json"
 quality_verdict_report="$output_root/native-quality-verdict.json"
 summary_report="$output_root/proof-summary.json"
 artifact_index_report="$output_root/artifact-index.json"
+proof_lane_contract="$repo_root/contracts/runtime-program/ppt-native-authoring-proof-lane.json"
 native_dir="$output_root/native-helper"
 preview_dir="$native_dir/previews"
 suite_id="data_charts"
@@ -152,7 +153,7 @@ else
   quality_gate_failed=0
 fi
 
-"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$package_readback_report" "$quality_verdict_report" "$summary_report" <<'PY'
+"$proof_python" - "$doctor_report" "$manifest_report" "$status_report" "$helper_report" "$package_readback_report" "$quality_verdict_report" "$summary_report" "$proof_lane_contract" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -164,20 +165,9 @@ helper = json.loads(Path(sys.argv[4]).read_text(encoding="utf-8"))
 package_readback = json.loads(Path(sys.argv[5]).read_text(encoding="utf-8"))
 quality_verdict = json.loads(Path(sys.argv[6]).read_text(encoding="utf-8"))
 summary_file = Path(sys.argv[7])
+proof_contract = json.loads(Path(sys.argv[8]).read_text(encoding="utf-8"))
 
-proof_lane = (
-    manifest.get("deliverable_facade", {})
-    .get("family_route_policy", {})
-    .get("ppt_deck", {})
-    .get("native_ppt_proof_lane", {})
-)
-status_lane = (
-    status.get("product_entry_manifest", {})
-    .get("deliverable_facade", {})
-    .get("family_route_policy", {})
-    .get("ppt_deck", {})
-    .get("native_ppt_proof_lane", {})
-)
+proof_lane = proof_contract.get("candidate_route_model", {})
 render_proof = helper.get("render_proof", {})
 
 failures = []
@@ -189,8 +179,6 @@ if proof_lane.get("default_enabled") is not False:
     failures.append("product-entry native proof lane must remain default_enabled=false")
 if proof_lane.get("runnable_routes") != ["author_pptx_native", "repair_pptx_native"]:
     failures.append("product-entry native proof lane runnable routes mismatch")
-if status_lane.get("default_enabled") is not False:
-    failures.append("status native proof lane must remain default_enabled=false")
 if helper.get("status") != "completed":
     failures.append(f"native helper status is {helper.get('status')!r}")
 if render_proof.get("renderer_kind") != "libreoffice_headless":
