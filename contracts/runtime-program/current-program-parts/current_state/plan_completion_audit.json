@@ -3,17 +3,17 @@
   "schema_version": 1,
   "audit_id": "rca_plan_completion_audit_20260711",
   "date_anchor": "2026-07-11",
-  "status": "overdesign_implementation_absorbed_conformance_passed_release_closeout_in_progress",
+  "status": "overdesign_implementation_absorbed_local_release_validation_passed_remote_cleanup_pending",
   "scope": {
     "overdesign_audit_20260711": {
-      "status": "implementation_absorbed_conformance_passed_release_closeout_in_progress",
+      "status": "implementation_absorbed_local_release_validation_passed_remote_cleanup_pending",
       "completion_percent": 100,
       "completion_basis": {
         "method": "seventeen_absorbed_implementation_items",
         "items_done": 17,
         "items_total": 17,
         "implementation_target_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
-        "rule": "100 percent covers only the 17 requested simplification implementations; shared-release lock refresh, full verification, remote push/readback, and safe cleanup remain explicit closeout gates."
+        "rule": "100 percent covers only the 17 requested simplification implementations; the shared-release lock and local validation gates passed at b25e02bfd096b48f6d940b189e0c6a780de60f38, while remote push/readback and safe cleanup remain explicit closeout gates."
       },
       "items": [
         {"id":"node_recursive_fs_walkers","status":"done","commits":["a6ddb0b8"]},
@@ -242,19 +242,19 @@
       "state_index_conformance_validator_alignment",
       "functional_audit_source_behavior_classification",
       "foundry_stage_and_principle_ref_currentness",
-      "main_absorption_to_8572655d"
+      "main_absorption_to_8572655d",
+      "shared_release_lock_refresh",
+      "main_verification"
     ],
     "in_progress": [
-      "shared_release_lock_refresh",
-      "main_verification",
       "remote_443_readback",
       "safe_worktree_cleanup"
     ],
     "deferred": [],
     "skipped": [],
     "verification": {
-      "state": "in_progress",
-      "verified_code_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
+      "state": "local_final_gate_passed_remote_cleanup_pending",
+      "verified_code_commit": "b25e02bfd096b48f6d940b189e0c6a780de60f38",
       "completed": [
         "typecheck",
         "opl-pack-compiler-real-consumer",
@@ -263,7 +263,17 @@
         "functional-audit-source-behavior-classification",
         "foundry-stage-and-principle-ref-currentness",
         "focused-owner-receipt-product-entry-tests",
-        "git-diff-check"
+        "git-diff-check",
+        "shared-release-lock-refresh",
+        "scripts-verify",
+        "test-fast",
+        "test-family",
+        "test-full",
+        "test-historical",
+        "private-platform-readback",
+        "uv-lock-check",
+        "current-program-check",
+        "installed-opl-conformance"
       ],
       "required_before_final_closeout": [
         "shared-release-lock-refresh",
@@ -282,8 +292,8 @@
     },
     "commit_push_state": {
       "implementation_commits": "absorbed_to_local_main_8572655d",
-      "closeout_commit": "current_program_foldback_pending_main_absorption",
-      "shared_release_lock": "pending",
+      "closeout_commit": "local_validation_target_b25e02bfd096b48f6d940b189e0c6a780de60f38",
+      "shared_release_lock": "completed_at_4bc95e00ed29ea36b774451931835f840c2e4904",
       "remote_push": "pending",
       "remote_readback": "pending",
       "cleanup_safe_worktrees": "pending"
