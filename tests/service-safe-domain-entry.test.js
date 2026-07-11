@@ -65,7 +65,7 @@ async function prepareDomainEntryWorkspace() {
 
 test('invokeDomainEntry returns an OPL stage execution plan under the configured provider contract', async () => {
   await withMockCodexRuntime(async () => {
-    const sharedCompanions = await importDomainEntrySharedModule('opl-framework-shared/product-entry-companions');
+    const sharedCompanions = await importDomainEntrySharedModule('opl-framework/product-entry-companions');
     const workspaceRoot = await prepareDomainEntryWorkspace();
 
     const response = await invokeDomainEntry({

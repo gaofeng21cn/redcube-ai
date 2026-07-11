@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { readFileSync } from 'node:fs';
-import { buildStandardAgentSourceBehaviorChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-domain-agent-source-behavior.js';
+import { buildStandardAgentSourceBehaviorChecks } from '../node_modules/opl-framework/dist/modules/foundry-lab/standard-domain-agent-source-behavior.js';
 
 import {
   activeShellScripts,

@@ -1,6 +1,6 @@
 type TestFile = `tests/${string}.test.${'js' | 'ts'}`;
 
-const TEST_LANES = Object.freeze(['meta', 'family', 'integration', 'e2e', 'historical'] as const);
+const TEST_LANES = Object.freeze(['meta', 'integration', 'e2e', 'historical'] as const);
 type TestLane = (typeof TEST_LANES)[number];
 type TestRegistryEntry = Readonly<{
   file: TestFile;
@@ -112,7 +112,6 @@ export const TEST_REGISTRY = Object.freeze([
   { file: 'tests/typescript-service-boundaries.test.js', lane: 'meta' },
   { file: 'tests/worktree-package-resolution.test.js', lane: 'meta', fast: true },
   { file: 'tests/xiaohongshu-overlay.test.js', lane: 'meta' },
-  { file: 'tests/family-shared-release.test.js', lane: 'family' },
   { file: 'tests/block-content-fit-review.test.js', lane: 'integration' },
   { file: 'tests/block-content-fit-review-surface-children.test.js', lane: 'integration' },
   { file: 'tests/cli-v2-smoke.test.js', lane: 'integration' },
@@ -209,12 +208,11 @@ function excludeCoveredTestFiles(
 
 export function buildTestGroups(): TestGroups {
   const meta = primaryLaneFiles('meta');
-  const family = primaryLaneFiles('family');
   const integration = primaryLaneFiles('integration');
   const e2e = primaryLaneFiles('e2e');
   const historical = primaryLaneFiles('historical');
   const fast = taggedFiles('fast');
-  const full = [...meta, ...family, ...integration, ...e2e];
+  const full = [...meta, ...integration, ...e2e];
   const metaCi = excludeCoveredTestFiles(meta, fast);
   const integrationRemaining = excludeCoveredTestFiles(integration, fast);
 
@@ -223,7 +221,6 @@ export function buildTestGroups(): TestGroups {
     fast,
     meta,
     'meta:ci': metaCi,
-    family,
     integration,
     'integration:remaining': integrationRemaining,
     e2e,
@@ -232,7 +229,6 @@ export function buildTestGroups(): TestGroups {
     'full:with-historical': [...full, ...historical],
     'full:remaining': excludeCoveredTestFiles(full, [
       ...fast,
-      ...family,
       ...metaCi,
       ...integrationRemaining,
     ]),
@@ -288,7 +284,6 @@ export function buildVerifyLanePlan(lane: string = 'smoke'): VerifyLanePlan {
     ci: [
       { kind: 'typecheck' },
       { kind: 'test-group', group: 'fast' },
-      { kind: 'test-group', group: 'family' },
       { kind: 'test-group', group: 'meta:ci' },
     ],
     'line-budget': [{ kind: 'line-budget', strict: false }],

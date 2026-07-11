@@ -4,7 +4,7 @@ import {
   buildFamilyProductEntryManifest,
   buildGeneratedProductEntryManifestCompanions,
   collectFamilyHumanGateIds,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import {
   buildRedCubeDomainEntryContract,

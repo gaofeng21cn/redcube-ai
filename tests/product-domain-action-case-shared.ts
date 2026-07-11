@@ -29,7 +29,7 @@ import {
 } from '@redcube/domain-entry';
 import {
   buildGeneratedProductEntrySessionSurface,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 import {
   buildOplRouteAttemptIndexForTest,
   runDeliverableRoute,
@@ -54,8 +54,8 @@ const DOMAIN_ENTRY_PACKAGE_JSON = fileURLToPath(
   new URL('../packages/redcube-domain-entry/package.json', import.meta.url),
 );
 const domainEntryRequire = createRequire(DOMAIN_ENTRY_PACKAGE_JSON);
-const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-companions';
-const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-framework-shared/product-entry-program-companions';
+const PRODUCT_ENTRY_COMPANIONS_SPECIFIER = 'opl-framework/product-entry-companions';
+const PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER = 'opl-framework/product-entry-program-companions';
 
 async function importDomainEntrySharedModule(moduleSpecifier) {
   return import(pathToFileURL(domainEntryRequire.resolve(moduleSpecifier)).href);

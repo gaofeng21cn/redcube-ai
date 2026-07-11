@@ -16,7 +16,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 
 ### 2026-07-11 17 项过度设计收口
 
-下表以可复核 implementation ID 和 absorbed commit 记录本轮范围；`done` 只表示实现已吸收。shared-release lock 已以 `4bc95e00` 锁定到 OPL `latest-stable@1bf8af46bca9c09631540e49730890272cb3cebe`，完整本地验证、远端 443 readback 与本轮两个安全 worktree cleanup 已在 `c4240cfc4e13b613bd0d3a4ae548eb8bc48ce1bf` 关闭；状态以 `plan_completion_audit.json` 和当前 Git ref 为准，不能由这张表推导 visual ready、exportable、handoffable、owner receipt 或 production ready。
+下表以可复核 implementation ID 和 absorbed commit 记录本轮范围；`done` 只表示实现已吸收。状态以 `plan_completion_audit.json` 和当前 Git ref 为准，不能由这张表推导 visual ready、exportable、handoffable、owner receipt 或 production ready。
 
 | # | Implementation ID | 状态 | 吸收提交 |
 | --- | --- | --- | --- |
@@ -38,7 +38,7 @@ RCA 当前唯一 active completion plan 就是本文。North-star 目标态读 [
 | 16 | `private_platform_guard_scope_consolidation` | `done` | `22037a6f` |
 | 17 | `stage_control_plane_contract_projection` | `done` | `e64e557d` |
 
-Closeout 发现 OPL compiler 真实 consumer 还需要标准 declarative manifest carrier，已以 `c2db68e1` 补齐：`agent/stages/manifest.json` 只承载 compiler 所需的六个 stage、repo refs、action refs 和 authority boundary；它不复制 RCA route / professional-skill body。后续 `2850cc10`、`5f5b61bd` 与 `8572655d` 分别收齐 Foundry stage refs、remaining source-behavior 分类和 stage-principle refs；OPL `latest-stable@1bf8af46bca9c09631540e49730890272cb3cebe` 同时接受 OPL-owned deferred state-index sidecar。fresh `opl agents conformance --agent rca=<repo>` 的 structural contract、ordinary-path guard 和 family live probe 均为 `passed`，而 shared-release lock、`scripts/verify.sh`、typecheck、fast/family/full/historical、private-platform readback、uv lock 和 current-program check 也已在本地 target 通过。该 target 已推送并经 SSH 443 读回，本轮 release-lock（exact-merged）与 projection（patch-equivalent）worktree 已删除。`contracts/stage_control_plane.json` 继续是 RCA direct product-entry 与 Codex executor 的 canonical visual route surface；这些结构验证不授予 OPL visual truth、review/export 或 owner-receipt authority。
+Closeout 发现 OPL compiler 真实 consumer 还需要标准 declarative manifest carrier，已以 `c2db68e1` 补齐：`agent/stages/manifest.json` 只承载 compiler 所需的六个 stage、repo refs、action refs 和 authority boundary；它不复制 RCA route / professional-skill body。`contracts/stage_control_plane.json` 继续是 RCA direct product-entry 与 Codex executor 的 canonical visual route surface；这些结构验证不授予 OPL visual truth、review/export 或 owner-receipt authority。
 
 2026-06-30 SSOT refresh：本文的默认 active gap 只维护功能面落地、结构收薄、source hygiene、generated/default caller thinning、repo-local adapter retirement、compatibility-free retirement 和 legacy naming guard。真实 Temporal controlled visual-stage long-soak、production-like repeated no-regression、visual ready、exportable、handoffable、human approval、App/operator sustained consumption 和 production-ready 不再混入功能/结构 gap。RCA 当前仍需关注的缺口是 generated/default caller thinning、repo-local adapter delete after cutover、compatibility-free retirement、naming / legacy string hygiene；这些只在 OPL default caller parity、no-active-caller、RCA owner receipt / typed blocker roundtrip、no-forbidden-write 和 tombstone/provenance 成立后关闭。
 
@@ -79,7 +79,7 @@ Closeout 发现 OPL compiler 真实 consumer 还需要标准 declarative manifes
 | Live same-source parity verdict | `blocked` | 0% | `ppt-master-parity-benchmark.json` 明确 `non_live_harness_landed_live_evidence_pending` | RCA owner 需真实双跑、5 名独立盲评、完整 edit evidence、private binding 和 fresh owner review。 |
 | Native presentation semantics | `done` | 100% | notes、transition、timing、animation target/effect/trigger/duration 均有真实 package materialization 与 OOXML readback | 无已知非 Live 实现缺口。 |
 | Cross-viewer human readback | `blocked` | 0% | LibreOffice true render 已有单套 proof；当前无 fresh PowerPoint/Keynote/Google Slides 对照验收 | 需 PowerPoint、LibreOffice，加 Keynote 或 Google Slides 的 fresh same-source human/cross-viewer evidence。 |
-| OPL canonical agent id consumption | `done` | 100% | OPL owner `main=origin/main@4f12827a`、`latest-stable@ae122533`；generated interface fresh readback 为 `agent_id=rca`、`target_domain_id=redcube_ai` | 身份分工已闭合；RCA 不复制 OPL 生成器。 |
+| OPL canonical agent id consumption | `done` | 100% | generated interface fresh readback 为 `agent_id=rca`、`target_domain_id=redcube_ai` | 身份分工已闭合；RCA 不复制 OPL 生成器。 |
 | Fallow production gate | `done` | 100% | target commit `f07d2e0e`；固定 Fallow 3.3.0、30 entry points、production `--fail-on-issues` 读回 0 issues | 39 个保留项均为逐文件 ABI/analyzer 边界；未使用全局 `publicPackages` 或 `ignoreExportsUsedInFile`。 |
 | OPL Temporal transport / restart probe | `partial` | 67% | `rca-temporal-long-soak-probe-20260710.json` 记录 6/9：Temporal reachable、managed worker ready、真实重启后 history requery 与 domain boundary 均成立 | OPL Runway 仍需同一 fresh proof 中完成 Codex attempt、typed closeout 与 retry/dead-letter 观察。 |
 | Real RCA visual-stage long soak / production authority | `blocked` | 0% | provider transport probe 未产生 RCA visual-stage artifact、review/export acceptance 或 owner receipt | 仍需同一真实 visual-stage run 的 artifact locator、review/export、retry/dead-letter/requery/resume 与 RCA owner receipt 或稳定 typed blocker；不得据 6/9 transport probe 声称 visual/production ready。 |

@@ -13,7 +13,7 @@
         "items_done": 17,
         "items_total": 17,
         "implementation_target_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
-        "rule": "100 percent covers only the 17 requested simplification implementations; shared-release lock, local validation, remote 443 readback, and safe cleanup completed at c4240cfc4e13b613bd0d3a4ae548eb8bc48ce1bf."
+        "rule": "100 percent covers only the 17 requested simplification implementations."
       },
       "items": [
         {"id":"node_recursive_fs_walkers","status":"done","commits":["a6ddb0b8"]},
@@ -47,7 +47,7 @@
           "owner": "redcube_ai",
           "verified_code_commit": "8572655d6464c015857f158b403dd558f99a5b1f",
           "evidence": "fresh opl agents conformance reports structural_contract_status=passed, ordinary_path_guard_status=passed, and family_live_conformance_probe_status=passed",
-          "required_output": "foundry_agent_series consumes stage_manifest_ref and current shared-release receipts"
+          "required_output": "foundry_agent_series consumes stage_manifest_ref and the OPL-managed Framework contract"
         },
         {
           "id": "state_index_conformance_validator_alignment",
@@ -182,6 +182,44 @@
       "issue_count": 0,
       "uses_global_public_packages_suppression": false,
       "uses_ignore_exports_used_in_file_suppression": false
+    },
+    "structural_debt_ratchet": {
+      "status": "current_reviewed_debt",
+      "baseline_source_commit": "1d4310a13a93c849204073e0190497c72c21b2e7",
+      "cycle_count": 3,
+      "god_file_count": 2,
+      "complex_function_count": 148,
+      "cycle_components": [
+        [
+          "packages/redcube-runtime/src/families/poster-onepager/overlay/contracts.ts",
+          "packages/redcube-runtime/src/families/poster-onepager/overlay/types.ts"
+        ],
+        [
+          "packages/redcube-runtime/src/families/ppt/overlay/profiles.ts",
+          "packages/redcube-runtime/src/families/ppt/overlay/types.ts"
+        ],
+        [
+          "packages/redcube-runtime/src/families/xiaohongshu/overlay/contracts.ts",
+          "packages/redcube-runtime/src/families/xiaohongshu/overlay/types.ts"
+        ]
+      ],
+      "god_files": [
+        {
+          "path": "packages/redcube-domain-entry/src/index.ts",
+          "fanout": 32
+        },
+        {
+          "path": "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
+          "fanout": 21
+        }
+      ],
+      "hosting_delta": {
+        "cycle_count": 0,
+        "god_file_count": 0,
+        "complex_function_count": 0
+      },
+      "verification": "clean conversion main and the OPL Framework hosting candidate report the same Sentrux debt counts; the cycles come from unchanged overlay type-import edges",
+      "rule": "The refreshed baseline is a debt ratchet after the JS conversion, not evidence that the recorded structural debt disappeared."
     }
   },
   "evidence_refs": {
@@ -263,10 +301,8 @@
         "foundry-stage-and-principle-ref-currentness",
         "focused-owner-receipt-product-entry-tests",
         "git-diff-check",
-        "shared-release-lock-refresh",
         "scripts-verify",
         "test-fast",
-        "test-family",
         "test-full",
         "test-historical",
         "private-platform-readback",
@@ -275,11 +311,9 @@
         "installed-opl-conformance"
       ],
       "required_before_final_closeout": [
-        "shared-release-lock-refresh",
         "scripts-verify",
         "typecheck",
         "test-fast",
-        "test-family",
         "test-full",
         "test-historical",
         "private-platform-readback",

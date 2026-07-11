@@ -5,7 +5,6 @@ import path from 'node:path';
 import process from 'node:process';
 
 import {
-  assertCurrentRepoSharedPinAlignment,
   assertRootTestPartition,
   assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
@@ -92,7 +91,6 @@ if (hygieneResult.status !== 0) {
 }
 assertWorkspacePackageResolution({ repoRoot });
 assertRequiredRuntimeSharedResolution({ repoRoot });
-assertCurrentRepoSharedPinAlignment({ repoRoot });
 
 assertValidTestRegistry();
 const GROUPS = buildTestGroups();

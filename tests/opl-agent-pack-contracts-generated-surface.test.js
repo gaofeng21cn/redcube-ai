@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 
-import { buildRepoGeneratedInterfaceBundle } from 'opl-framework-shared/domain-pack-compiler';
+import { buildRepoGeneratedInterfaceBundle } from 'opl-framework/domain-pack-compiler';
 
 import {
   assertNoLegacyAuthorityFunctionFields,

@@ -109,7 +109,7 @@ test('root package exposes formal typecheck entrypoint', () => {
   assert.equal(pkg.scripts['test:fast'], 'node scripts/verify-lane.ts fast');
   assert.equal(pkg.scripts['test:ci'], 'node scripts/verify-lane.ts ci');
   assert.equal(pkg.scripts['test:full'], 'node scripts/verify-lane.ts full');
-  assert.equal(pkg.scripts['test:family'], 'node scripts/verify-lane.ts family');
+  assert.equal(pkg.scripts['test:family'], undefined);
   assert.equal(pkg.scripts['test:historical'], 'node scripts/verify-lane.ts historical');
   assert.equal(pkg.scripts['test:full:with-historical'], 'node scripts/verify-lane.ts full:with-historical');
   for (const script of ['test:meta', 'test:integration', 'test:e2e']) {
@@ -132,7 +132,7 @@ test('root package exposes formal typecheck entrypoint', () => {
 });
 
 test('registry and verify dispatcher own non-package test lanes', () => {
-  for (const lane of ['meta', 'family', 'integration', 'e2e', 'historical', 'full:with-historical']) {
+  for (const lane of ['meta', 'integration', 'e2e', 'historical', 'full:with-historical']) {
     assert.equal(listVerifyLanes().includes(lane), true, lane);
     assert.equal(buildVerifyLanePlan(lane).lane, lane, lane);
   }
@@ -334,7 +334,7 @@ test('test runner treats root-level TypeScript tests as first-class lane members
       discoveredFiles: ['tests/alpha.test.js', 'tests/beta.test.ts'],
       partitionFiles: ['tests/alpha.test.js'],
     }),
-    /未被纳入 meta\/family\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
+    /未被纳入 meta\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
   );
 });
 

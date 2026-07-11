@@ -1,4 +1,4 @@
-import { buildExecutorAttemptDiagnostic } from 'opl-framework-shared/runtime-task-companions';
+import { buildExecutorAttemptDiagnostic } from 'opl-framework/runtime-task-companions';
 
 type JsonRecord = Record<string, any>;
 type NativePptRoute = 'author_pptx_native' | 'repair_pptx_native';

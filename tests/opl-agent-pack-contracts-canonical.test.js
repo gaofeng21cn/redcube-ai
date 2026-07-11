@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import path from 'node:path';
-import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-agent-principles.js';
+import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework/dist/modules/foundry-lab/standard-agent-principles.js';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.js';
 
@@ -57,7 +57,6 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
     'required_stage_packets',
     'series_design_profile',
     'shared_progress_projection_fields',
-    'shared_release_pin_strategy',
     'standard_feedback_self_evolution_trigger_policy',
     'standard_public_projection_policy',
     'workspace_topology_profile',

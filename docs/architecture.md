@@ -5,19 +5,16 @@ Purpose: `current_architecture_and_owner_boundary`
 State: `current_truth`
 Machine boundary: 人读架构说明。机器真相继续归 contracts、schema、source、CLI/MCP/API 行为、product-entry manifest、runtime artifacts、owner receipts、artifact locator 与 RCA-owned review/export gates。
 
-对外主语：`RedCube AI` 是独立 visual-deliverable Foundry Agent；公开发布形态是 built on `OPL Framework` 的 `OPL-compatible package`。`gateway / harness` 仅保留为内部架构边界语言。
+对外主语：`RedCube AI` 是由 OPL 安装、注册和运行的 visual-deliverable Foundry Agent，不是独立应用或独立 runtime。RCA 持有视觉领域能力与交付权威；OPL 持有 Framework 安装、Temporal/provider runtime、generated/hosted interfaces 和通用平台能力。
 
 ## 主链路
 
-当前对外主链路以 direct route 为第一主语，OPL 路线保留为 hosted integration surface。OPL 是 stage-led 的完整智能体运行框架，可以托管 RCA，但它不是 RCA 的第一公开身份：
+唯一产品主链路是 `User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain handler -> RedCube visual-domain truth surfaces`。repo-local domain handler 和开发命令只是 OPL 可调用的领域入口，不是第二套安装、runtime 或最终用户入口。RCA manifest / lock 不声明 OPL Framework implementation dependency；OPL module workflow 在 checkout 中托管 `opl-framework` 根包解析，因此 Temporal、E2B、OPL CLI 和通用 Framework 依赖只由 OPL 安装一次。
 
-- direct route：`User -> RedCube Product Entry -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-- OPL-hosted route：`User -> OPL Product Entry -> OPL stage-led family runtime provider -> RedCube service-safe domain entry -> executor adapter -> RedCube visual-domain truth surfaces`
-
-在 OPL stage-led family framework 中，这两条路线都可以被投影为 stage attempt，但 RCA owner 边界不变：OPL 只提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
+RCA owner 边界不变：OPL 提供 stage descriptor discovery、queue/wakeup、handoff、receipt、approval/retry、trace/projection；RedCube 持有视觉 route truth、review/export gate、canonical artifacts 和 visual-domain quality 判断。
 `contracts/foundry_agent_series.json` 现在是 OPL Foundry policy 的 RCA thin consumer，`contracts/domain_descriptor.json` 只保留 domain-specific profile / refs anchor；两者不再复制 OPL Foundry generic `series_design_profile`、workspace topology profile 或 public series spine。RCA 的视觉资料输入、visual stage pack、PPT/PDF/PNG/export bundle 输出和视觉 authority 函数写在 `visual_domain_delta_refs`、`domain_specific_profile`、`agent/`、stage/action refs 与 authority refs 中。OPL generic lifecycle、public series profile、workspace topology、provider runtime 和 App/workbench shell 由 OPL owned/generated/hosted surface 持有；这些 refs 不创建 RCA 私有 lifecycle，也不把 OPL provider completion 升级为 visual ready、exportable、handoffable 或 domain ready。
 
-两条路线在进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
+进入 `invokeDomainEntry` 之后，继续按同一条执行链工作：
 
 `service-safe domain entry -> executor adapter -> concrete executor -> audit / review / publication projection`
 

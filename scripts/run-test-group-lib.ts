@@ -2,10 +2,6 @@ import path from 'node:path';
 import { readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-import {
-  inspectCurrentRepoFamilySharedAlignment,
-} from 'opl-framework-shared/family-shared-release';
-
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
 type Resolver = (specifier: string) => string;
@@ -23,23 +19,6 @@ type RuntimeSharedResolutionOptions = Readonly<{
   checks?: readonly RuntimeSharedResolutionCheck[];
   resolve?: (specifier: string, check: RuntimeSharedResolutionCheck) => string;
 }>;
-type SharedPinAlignmentOptions = Readonly<{
-  repoRoot?: string;
-  consumerRepoId?: string;
-  ownerRepoRoot?: string;
-  ownerRepo?: string;
-}>;
-type SharedPinAlignmentInspection = Readonly<{
-  status: string;
-  owner_commit: string;
-  repo_root: string;
-  findings: readonly Readonly<{
-    file?: string;
-    kind: string;
-    status: string;
-    pins: readonly string[];
-  }>[];
-}>;
 type BuildNodeTestArgsOptions = Readonly<{
   forwardedArgs?: readonly string[];
   serialized?: boolean;
@@ -56,15 +35,11 @@ const REQUIRED_RUNTIME_SHARED_RESOLUTION_CHECKS = Object.freeze([
     resolve_from: 'packages/redcube-runtime/package.json',
   },
   {
-    specifier: 'opl-framework-shared/product-entry-companions',
+    specifier: 'opl-framework/product-entry-companions',
     resolve_from: 'packages/redcube-domain-entry/package.json',
   },
   {
-    specifier: 'opl-framework-shared/product-entry-program-companions',
-    resolve_from: 'packages/redcube-domain-entry/package.json',
-  },
-  {
-    specifier: 'opl-framework-shared/family-shared-release',
+    specifier: 'opl-framework/product-entry-program-companions',
     resolve_from: 'packages/redcube-domain-entry/package.json',
   },
 ]);
@@ -182,38 +157,6 @@ export function assertRequiredRuntimeSharedResolution(options: RuntimeSharedReso
   return inspection;
 }
 
-function inspectCurrentRepoSharedPinAlignment({
-  repoRoot,
-  consumerRepoId = 'redcube',
-  ownerRepoRoot,
-  ownerRepo = 'one-person-lab',
-}: SharedPinAlignmentOptions = {}): SharedPinAlignmentInspection {
-  return inspectCurrentRepoFamilySharedAlignment({
-    repoRoot,
-    consumerRepoId,
-    ownerRepoRoot,
-    ownerRepo,
-  }) as SharedPinAlignmentInspection;
-}
-
-export function assertCurrentRepoSharedPinAlignment(options: SharedPinAlignmentOptions = {}) {
-  const inspection = inspectCurrentRepoSharedPinAlignment(options);
-  if (inspection.status !== 'aligned' && inspection.status !== 'update_available') {
-    const findings = inspection.findings
-      .map((entry) => `${entry.file ?? '(repo)'} [${entry.kind}] -> ${entry.status}${entry.pins.length > 0 ? ` (${entry.pins.join(', ')})` : ''}`)
-      .join('\n');
-    throw new Error(
-      [
-        'current checkout is not aligned with the OPL family shared release pin contract',
-        `expected owner commit: ${inspection.owner_commit}`,
-        `repo root: ${inspection.repo_root}`,
-        findings,
-      ].join('\n'),
-    );
-  }
-  return inspection;
-}
-
 export function buildNodeTestArgs({
   forwardedArgs = [],
   serialized = false,
@@ -244,7 +187,7 @@ export function discoverRootTestFiles({
 export function assertRootTestPartition({
   discoveredFiles = [],
   partitionFiles = [],
-  partitionName = 'meta/family/integration/e2e/historical',
+  partitionName = 'meta/integration/e2e/historical',
 }: {
   discoveredFiles?: readonly string[];
   partitionFiles?: readonly string[];

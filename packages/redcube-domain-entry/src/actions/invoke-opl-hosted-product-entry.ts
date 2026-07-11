@@ -2,7 +2,7 @@
 import {
   buildReturnSurfaceContract,
   buildRuntimeSessionContract,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import { invokeProductEntry } from './invoke-product-entry.js';
 import { requireField } from './action-utils.js';

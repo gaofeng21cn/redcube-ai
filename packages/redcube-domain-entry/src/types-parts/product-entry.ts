@@ -1,14 +1,14 @@
 import type {
   FamilySharedHandoffSurface,
   UserInteractionContractSurface,
-} from 'opl-framework-shared/family-entry-contracts';
+} from 'opl-framework/family-entry-contracts';
 import type {
   FamilyProductEntrySurfaces,
   FamilyOrchestrationCompanion as SharedFamilyOrchestrationCompanion,
   FamilyOrchestrationGatePreview as SharedFamilyOrchestrationGatePreview,
   FamilyOrchestrationReferenceRef as SharedFamilyOrchestrationReferenceRef,
   ProductEntryResumeContract as SharedProductEntryResumeContract,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import type {
   DomainEntryContractSurface,

@@ -7,6 +7,9 @@
     "tools/native-ppt-proof/evaluate-quality.ts",
     "tools/native-ppt-proof/ppt-master-parity.ts"
   ],
+  "ignoreDependencies": [
+    "opl-framework"
+  ],
   "ignoreExports": [
     {
       "file": "packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-orchestration.ts",

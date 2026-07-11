@@ -1,6 +1,6 @@
 import type { GovernanceSurfaceContract } from '@redcube/overlay-core';
 import type { WorkspaceContract } from '@redcube/runtime-protocol';
-import type { FamilyDomainEntryContractSurface } from 'opl-framework-shared/family-entry-contracts';
+import type { FamilyDomainEntryContractSurface } from 'opl-framework/family-entry-contracts';
 
 
 export interface WorkspaceRootRequest {

@@ -11,8 +11,7 @@
     "@redcube/redcube-config": "0.1.0",
     "@redcube/runtime-protocol": "0.1.0",
     "@redcube/governance": "0.1.0",
-    "@redcube/overlay-core": "0.1.0",
-    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#latest-stable"
+    "@redcube/overlay-core": "0.1.0"
   },
   "license": "Apache-2.0"
 }

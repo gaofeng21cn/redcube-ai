@@ -5,7 +5,7 @@ import {
   buildFamilyUserInteractionContract,
   buildSharedHandoff,
   buildSharedHandoffReturnSurface,
-} from 'opl-framework-shared/family-entry-contracts';
+} from 'opl-framework/family-entry-contracts';
 
 const REDCUBE_DOMAIN_ENTRY_ADAPTER = 'RedCubeDomainEntry';
 const PRODUCT_ENTRY_KIND = 'redcube_product_entry';
