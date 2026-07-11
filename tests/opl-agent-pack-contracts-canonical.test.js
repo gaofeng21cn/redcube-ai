@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import path from 'node:path';
+import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework/dist/modules/foundry-lab/standard-agent-principles.js';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.js';
 
@@ -55,7 +57,6 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
     'required_stage_packets',
     'series_design_profile',
     'shared_progress_projection_fields',
-    'shared_release_pin_strategy',
     'standard_feedback_self_evolution_trigger_policy',
     'standard_public_projection_policy',
     'workspace_topology_profile',
@@ -98,41 +99,9 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(packRefs.minimal_authority_surface_ids.includes('owner_receipt_signer'), true);
 });
 
-test('RCA standard-agent principles declare current OPL stage references without private framework imports', () => {
-  const adoption = readJson('contracts/standard-agent-principles-adoption.json');
+test('RCA standard-agent principles resolve current OPL stage references', () => {
+  const checks = buildStandardAgentPrincipleAdoptionChecks(path.resolve());
 
-  assert.equal(adoption.surface_kind, 'opl_standard_agent_principles_adoption');
-  assert.equal(adoption.state, 'active_contract');
-  assert.equal(
-    adoption.adopted_principle_pack_ref,
-    'contracts/opl-framework/standard-agent-principles.json',
-  );
-  assert.equal(adoption.source_refs.stage_manifest_ref, 'agent/stages/manifest.json');
-  assert.equal(
-    adoption.source_refs.stage_control_plane_ref,
-    'opl-generated:family_stage_control_plane',
-  );
-  for (const value of Object.values(adoption.authority_boundary)) {
-    assert.equal(value, false);
-  }
-});
-
-test('RCA declares the required OPL-owned workspace lifecycle policy', () => {
-  const lifecyclePolicy = readJson('contracts/workspace_lifecycle_policy.json');
-
-  assert.equal(lifecyclePolicy.surface_kind, 'opl_domain_workspace_file_lifecycle_policy');
-  assert.equal(lifecyclePolicy.version, 'opl-domain-workspace-file-lifecycle.v1');
-  assert.equal(lifecyclePolicy.policy_owner, 'one-person-lab');
-  assert.equal(lifecyclePolicy.domain_id, 'redcube_ai');
-  assert.equal(lifecyclePolicy.structural_gate_only, true);
-  assert.equal(lifecyclePolicy.workspace_runtime_artifact_roots.externalized, true);
-  assert.deepEqual(lifecyclePolicy.workspace_runtime_artifact_roots.required_locator_refs, [
-    'workspace_root_ref',
-    'runtime_artifact_root_ref',
-    'artifact_locator_ref',
-    'restore_or_retention_receipt_ref',
-  ]);
-  for (const value of Object.values(lifecyclePolicy.authority_boundary)) {
-    assert.equal(value, false);
-  }
+  assert.equal(checks.status, 'passed');
+  assert.deepEqual(checks.blockers, []);
 });

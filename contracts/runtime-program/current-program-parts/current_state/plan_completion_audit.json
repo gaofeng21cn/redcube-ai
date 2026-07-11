@@ -182,6 +182,44 @@
       "issue_count": 0,
       "uses_global_public_packages_suppression": false,
       "uses_ignore_exports_used_in_file_suppression": false
+    },
+    "structural_debt_ratchet": {
+      "status": "current_reviewed_debt",
+      "baseline_source_commit": "1d4310a13a93c849204073e0190497c72c21b2e7",
+      "cycle_count": 3,
+      "god_file_count": 2,
+      "complex_function_count": 148,
+      "cycle_components": [
+        [
+          "packages/redcube-runtime/src/families/poster-onepager/overlay/contracts.ts",
+          "packages/redcube-runtime/src/families/poster-onepager/overlay/types.ts"
+        ],
+        [
+          "packages/redcube-runtime/src/families/ppt/overlay/profiles.ts",
+          "packages/redcube-runtime/src/families/ppt/overlay/types.ts"
+        ],
+        [
+          "packages/redcube-runtime/src/families/xiaohongshu/overlay/contracts.ts",
+          "packages/redcube-runtime/src/families/xiaohongshu/overlay/types.ts"
+        ]
+      ],
+      "god_files": [
+        {
+          "path": "packages/redcube-domain-entry/src/index.ts",
+          "fanout": 32
+        },
+        {
+          "path": "packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts",
+          "fanout": 21
+        }
+      ],
+      "hosting_delta": {
+        "cycle_count": 0,
+        "god_file_count": 0,
+        "complex_function_count": 0
+      },
+      "verification": "clean conversion main and the OPL Framework hosting candidate report the same Sentrux debt counts; the cycles come from unchanged overlay type-import edges",
+      "rule": "The refreshed baseline is a debt ratchet after the JS conversion, not evidence that the recorded structural debt disappeared."
     }
   },
   "evidence_refs": {

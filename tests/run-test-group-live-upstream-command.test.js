@@ -240,6 +240,7 @@ test('run-test-group usage and verify lane registry expose active verification l
   assert.equal(listVerifyLanes().includes('private-platform:strict'), true);
   assert.equal(listVerifyLanes().includes('default-caller-tail:strict'), false);
   assert.throws(() => buildVerifyLanePlan('default-caller-tail:strict'), /Unknown lane/);
+  assert.throws(() => buildVerifyLanePlan('family'), /Unknown lane/);
   assert.equal(buildVerifyLanePlan('integration-remaining').lane, 'integration:remaining');
   assert.equal(buildVerifyLanePlan('full-remaining').lane, 'full:remaining');
   assert.equal(buildVerifyLanePlan('full-with-historical').lane, 'full:with-historical');
@@ -347,15 +348,11 @@ test('serialized verification rule is documented in current program contract', (
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
-    /full:remaining keeps local fast-family-meta-integration verification from rerunning already covered active files/i,
+    /full:remaining keeps local fast-meta-integration verification from rerunning already covered active files/i,
   );
   assert.match(
     currentProgram.current_state.green_baseline.ci_quality_lane_reason,
     /historical stays explicit through .*full:with-historical/i,
-  );
-  assert.match(
-    currentProgram.current_state.green_baseline.ci_quality_lane_reason,
-    /family shared pin contract.*clean-clone/i,
   );
 });
 

@@ -73,9 +73,7 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
         },
       ],
       resolve(specifier) {
-        if (
-          specifier === 'opl-framework/product-entry-program-companions'
-        ) {
+        if (specifier === 'opl-framework/product-entry-program-companions') {
           const error = new Error('Cannot find module');
           error.code = 'ERR_MODULE_NOT_FOUND';
           throw error;

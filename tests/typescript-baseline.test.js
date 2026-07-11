@@ -335,7 +335,7 @@ test('test runner treats root-level TypeScript tests as first-class lane members
       discoveredFiles: ['tests/alpha.test.js', 'tests/beta.test.ts'],
       partitionFiles: ['tests/alpha.test.js'],
     }),
-    /未被纳入 meta\/family\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
+    /未被纳入 meta\/integration\/e2e\/historical 的测试文件: tests\/beta\.test\.ts/,
   );
 });
 

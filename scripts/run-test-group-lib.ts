@@ -2,7 +2,6 @@ import path from 'node:path';
 import { readdirSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-
 export { resolveRedCubePythonCommand } from '@redcube/runtime-protocol';
 
 type Resolver = (specifier: string) => string;
@@ -188,7 +187,7 @@ export function discoverRootTestFiles({
 export function assertRootTestPartition({
   discoveredFiles = [],
   partitionFiles = [],
-  partitionName = 'meta/family/integration/e2e/historical',
+  partitionName = 'meta/integration/e2e/historical',
 }: {
   discoveredFiles?: readonly string[];
   partitionFiles?: readonly string[];
