@@ -135,7 +135,12 @@ export function assertManifestActionAndStageControlPlane({
   }
   const artifactStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'artifact_creation');
   assert.deepEqual(artifactStage.domain_stage_refs, ['author_image_pages', 'render_html', 'author_pptx_native']);
-  assert.deepEqual(artifactStage.action_refs, ['invoke_product_entry', 'run_image_ppt_proof', 'run_native_ppt_proof']);
+  assert.deepEqual(artifactStage.action_refs, [
+    'invoke_product_entry',
+    'run_image_ppt_proof',
+    'run_native_ppt_proof',
+    'invoke_domain_entry',
+  ]);
   const reviewStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'review_and_revision');
   assert.equal(reviewStage.authority_boundary.redcube_ai_owns_review_export_verdict, true);
   const handoffStage = manifest.family_stage_control_plane.stages.find((stage) => stage.stage_id === 'package_and_handoff');
