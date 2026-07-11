@@ -274,7 +274,7 @@ test('intakeSource keeps operator files out of audience-facing fact library whil
   assert.equal(pack.fact_library.topic_summary.includes('domain-agent'), true);
   assert.equal(pack.fact_library.topic_summary.includes('封面必须署名'), false);
   assert.equal(
-    pack.fact_library.reference_source_list.some((item) => item.includes('content-01-med-autoscience.md')),
+    pack.fact_library.reference_source_list.some((item) => item.includes('med-autoscience.md')),
     true,
   );
   assert.equal(
@@ -282,7 +282,7 @@ test('intakeSource keeps operator files out of audience-facing fact library whil
     true,
   );
   assert.equal(
-    pack.fact_library.reference_source_list.some((item) => item.includes('operator-01-speaker-rules.md')),
+    pack.fact_library.reference_source_list.some((item) => item.includes('speaker-rules.md')),
     false,
   );
   assert.equal(
@@ -364,9 +364,8 @@ test('intakeSource cleans markdown wrapper noise out of audience-facing fact lib
   assert.equal(pack.fact_library.topic_summary.includes('source extraction'), true);
   assert.equal(pack.fact_library.topic_summary.includes('fact library'), true);
   assert.equal(pack.fact_library.topic_summary.includes('domain-agent'), true);
-  assert.deepEqual(pack.fact_library.reference_source_list, [
-    'inputs/raw_materials/source-intake/content-01-opl-readme.md',
-  ]);
+  assert.equal(pack.fact_library.reference_source_list.length, 1);
+  assert.equal(pack.fact_library.reference_source_list[0].endsWith('-opl-readme.md'), true);
   assert.equal(
     pack.fact_library.key_fact_groups.some((item) => item.label.includes('fact library') && item.source_id === 'SRC-FILE-1'),
     true,

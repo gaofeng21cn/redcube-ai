@@ -1,9 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
-import os from 'node:os';
 import path from 'node:path';
-import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { readCurrentProgramContract } from './helpers/current-program-contract.js';
 import { runRedCubePythonHelper } from '../packages/redcube-runtime-protocol/dist/python-native-helper.js';
 
@@ -358,183 +356,39 @@ test('serialized verification rule is documented in current program contract', (
 });
 
 test('run-test-group resolves an explicit Python command for screenshot review and export surfaces', () => {
-  assert.deepEqual(
-    resolveRedCubePythonCommand({
-      env: {
-        REDCUBE_PYTHON_COMMAND: '/opt/custom/python-with-playwright',
-      },
-      spawnSyncImpl() {
-        throw new Error('should not probe when REDCUBE_PYTHON_COMMAND is explicit');
-      },
-    }),
-    {
-      command: '/opt/custom/python-with-playwright',
-      source: 'env',
-    },
-  );
+  const direct = resolveRedCubePythonCommand({
+    env: { REDCUBE_PYTHON_COMMAND: '/opt/custom/python-with-playwright' },
+  });
+  assert.equal(direct.command, '/opt/custom/python-with-playwright');
+  assert.equal(direct.source, 'env');
+  assert.equal(direct.runtimeEnv.PYTHONDONTWRITEBYTECODE, '1');
 
-  assert.deepEqual(
-    resolveRedCubePythonCommand({
+  const arrayCarrier = resolveRedCubePythonCommand({
       env: {
         REDCUBE_PYTHON_COMMAND: '["node","--experimental-strip-types","/tmp/mock-redcube-python.ts"]',
       },
-      spawnSyncImpl() {
-        throw new Error('should not probe when REDCUBE_PYTHON_COMMAND is explicit');
-      },
-    }),
-    {
-      command: 'node',
-      args: ['--experimental-strip-types', '/tmp/mock-redcube-python.ts'],
-      source: 'env',
-    },
-  );
+    });
+  assert.equal(arrayCarrier.command, 'node');
+  assert.deepEqual(arrayCarrier.args, ['--experimental-strip-types', '/tmp/mock-redcube-python.ts']);
+  assert.equal(arrayCarrier.source, 'env');
 
-  assert.deepEqual(
-    resolveRedCubePythonCommand({
-      env: {},
-      spawnSyncImpl(command, args) {
-        if (command === 'python3') {
-          assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
-          return { status: 0, stdout: '/opt/homebrew/bin/python3.12\n', stderr: '' };
-        }
-        assert.equal(command, '/opt/homebrew/bin/python3.12');
-        assert.equal(args[0], '-c');
-        assert.equal(String(args[1]).includes('sys.version_info'), true);
-        return {
-          status: 0,
-          stdout: JSON.stringify({
-            executable: '/opt/homebrew/bin/python3.12',
-            version: '3.12.13',
-            major: 3,
-            minor: 12,
-          }),
-          stderr: '',
-        };
-      },
-    }),
-    {
-      command: '/opt/homebrew/bin/python3.12',
-      source: 'python3_with_playwright',
-    },
-  );
+  const managed = resolveRedCubePythonCommand({
+    env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
+  });
+  assert.equal(managed.command, '/usr/bin/true');
+  assert.equal(managed.source, 'managed_python_runtime');
 });
 
-test('run-test-group bootstraps a lock-synced managed Python runtime when host python resolves to unstable 3.14', () => {
-  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-python-'));
-  const managedPython = path.join(runtimeStateRoot, 'python', 'stable-playwright', 'venv', 'bin', 'python');
-  const managedRoot = path.join(runtimeStateRoot, 'python', 'stable-playwright');
-
+test('run-test-group consumes an OPL-managed Python runtime without installing a domain-local environment', () => {
   const resolved = resolveRedCubePythonCommand({
-    env: {
-      REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot,
-    },
-    spawnSyncImpl(command, args, options) {
-      if (command === 'python3') {
-        assert.deepEqual(args, ['-c', 'import sys; import playwright; print(sys.executable)']);
-        return { status: 0, stdout: '/opt/homebrew/bin/python3.14\n', stderr: '' };
-      }
-      if (command === '/opt/homebrew/bin/python3.14') {
-        assert.equal(args[0], '-c');
-        assert.equal(String(args[1]).includes('sys.version_info'), true);
-        return {
-          status: 0,
-          stdout: JSON.stringify({
-            executable: '/opt/homebrew/bin/python3.14',
-            version: '3.14.3',
-            major: 3,
-            minor: 14,
-          }),
-          stderr: '',
-        };
-      }
-      if (command === 'python3.12') {
-        assert.equal(args[0], '-c');
-        return {
-          status: 0,
-          stdout: JSON.stringify({
-            executable: '/Users/test/python3.12',
-            version: '3.12.13',
-            major: 3,
-            minor: 12,
-          }),
-          stderr: '',
-        };
-      }
-      if (command === 'uv') {
-        assert.deepEqual(args, [
-          'sync',
-          '--locked',
-          '--no-dev',
-          '--extra',
-          'native',
-          '--no-install-project',
-          '--python',
-          '/Users/test/python3.12',
-        ]);
-        assert.equal(options.cwd, path.resolve(''));
-        assert.equal(options.env.UV_PROJECT_ENVIRONMENT, path.join(managedRoot, 'venv'));
-        assert.equal(options.env.UV_CACHE_DIR, path.join(managedRoot, 'uv-cache'));
-        assert.equal(options.env.PLAYWRIGHT_BROWSERS_PATH, path.join(managedRoot, 'playwright-browsers'));
-        assert.equal(options.env.UV_PYTHON_DOWNLOADS, 'never');
-        mkdirSync(path.dirname(managedPython), { recursive: true });
-        writeFileSync(managedPython, '#!/usr/bin/env python3\n', 'utf-8');
-        return { status: 0, stdout: '', stderr: '' };
-      }
-      if (command === managedPython && args[0] === '-m' && args[1] === 'playwright') {
-        assert.equal(options.cwd, path.resolve(''));
-        assert.equal(options.env.UV_PROJECT_ENVIRONMENT, path.join(managedRoot, 'venv'));
-        return { status: 0, stdout: '', stderr: '' };
-      }
-      if (command === managedPython && args[0] === '-c') {
-        const script = String(args[1] || '');
-        if (script.includes('import sys; import playwright; print(sys.executable)')) {
-          return { status: 0, stdout: `${managedPython}\n`, stderr: '' };
-        }
-        if (script.includes('sys.version_info')) {
-          return {
-            status: 0,
-            stdout: JSON.stringify({
-              executable: managedPython,
-              version: '3.12.13',
-              major: 3,
-              minor: 12,
-            }),
-            stderr: '',
-          };
-        }
-      }
-      throw new Error(`unexpected spawnSync call: ${command} ${args.join(' ')}`);
-    },
+    env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
   });
-
-  assert.equal(resolved.command, managedPython);
+  assert.equal(resolved.command, '/usr/bin/true');
   assert.equal(resolved.source, 'managed_python_runtime');
-  assert.deepEqual(resolved.runtimeEnv, {
-    PLAYWRIGHT_BROWSERS_PATH: path.join(managedRoot, 'playwright-browsers'),
-    PYTHONDONTWRITEBYTECODE: '1',
-    PYTHONPYCACHEPREFIX: path.join(managedRoot, 'pycache'),
-  });
-  const marker = JSON.parse(readFileSync(path.join(managedRoot, 'installation.json'), 'utf-8'));
-  assert.match(marker.dependency_signature, /^[a-f0-9]{64}$/);
-  assert.equal('requirements_signature' in marker, false);
+  assert.equal(resolved.runtimeEnv.PYTHONDONTWRITEBYTECODE, '1');
 });
 
-test('managed Python helper invocations preserve the private Playwright browser path', () => {
-  const runtimeStateRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-managed-helper-'));
-  const managedRoot = path.join(runtimeStateRoot, 'python', 'stable-playwright');
-  const managedPython = path.join(managedRoot, 'venv', 'bin', 'python');
-  const dependencySignature = createHash('sha256')
-    .update('pyproject.toml')
-    .update('\0')
-    .update(readFileSync('pyproject.toml'))
-    .update('uv.lock')
-    .update('\0')
-    .update(readFileSync('uv.lock'))
-    .digest('hex');
-  mkdirSync(path.dirname(managedPython), { recursive: true });
-  writeFileSync(managedPython, '#!/usr/bin/env python3\n', 'utf-8');
-  writeFileSync(path.join(managedRoot, 'installation.json'), JSON.stringify({ dependency_signature: dependencySignature }), 'utf-8');
-
+test('OPL-managed Python helper invocations preserve helper environment and domain payload', () => {
   const helper = {
     helperId: 'ppt_deck_review',
     packageModule: 'redcube_ai.native_helpers.ppt_deck.review',
@@ -542,34 +396,10 @@ test('managed Python helper invocations preserve the private Playwright browser 
     catalogFile: 'contracts/runtime-program/python-native-helper-catalog.json',
   };
   const result = runRedCubePythonHelper(helper, ['--input-json', '/tmp/input.json'], {
-    env: { REDCUBE_RUNTIME_STATE_ROOT: runtimeStateRoot },
+    env: { OPL_MANAGED_PYTHON: '/usr/bin/true', PATH: '' },
     spawnSyncImpl(command, args, options) {
-      if (command === 'python3') {
-        return { status: 0, stdout: '/opt/homebrew/bin/python3.14\n', stderr: '' };
-      }
-      if (command === '/opt/homebrew/bin/python3.14') {
-        return {
-          status: 0,
-          stdout: JSON.stringify({ executable: '/opt/homebrew/bin/python3.14', version: '3.14.3', major: 3, minor: 14 }),
-          stderr: '',
-        };
-      }
-      if (command === managedPython && args[0] === '-c') {
-        const script = String(args[1] || '');
-        if (script.includes('import sys; import playwright; print(sys.executable)')) {
-          return { status: 0, stdout: `${managedPython}\n`, stderr: '' };
-        }
-        if (script.includes('sys.version_info')) {
-          return {
-            status: 0,
-            stdout: JSON.stringify({ executable: managedPython, version: '3.12.13', major: 3, minor: 12 }),
-            stderr: '',
-          };
-        }
-      }
-      if (command === managedPython && args[0] === '-m') {
-        assert.equal(options.env.PLAYWRIGHT_BROWSERS_PATH, path.join(managedRoot, 'playwright-browsers'));
-        assert.equal(options.env.PYTHONPYCACHEPREFIX, path.join(managedRoot, 'pycache'));
+      if (command === '/usr/bin/true' && args[0] === '-m') {
+        assert.match(options.env.PLAYWRIGHT_BROWSERS_PATH, /opl\/domain-helper\/playwright-browsers$/);
         assert.equal(options.env.PYTHONDONTWRITEBYTECODE, '1');
         assert.equal(options.env.PYTHONPATH.startsWith(path.resolve('python')), true);
         return { status: 0, stdout: JSON.stringify({ status: 'ok' }), stderr: '' };
@@ -584,16 +414,9 @@ test('managed Python helper invocations preserve the private Playwright browser 
 test('run-test-group fails fast when no Python with playwright can be resolved', () => {
   assert.throws(
     () => resolveRedCubePythonCommand({
-      env: {},
-      spawnSyncImpl() {
-        return {
-          status: 1,
-          stdout: '',
-          stderr: 'ModuleNotFoundError: No module named playwright',
-        };
-      },
+      env: { PATH: '', OPL_MANAGED_PYTHON: '/missing/opl-python' },
     }),
-    /REDCUBE_PYTHON_COMMAND|playwright/i,
+    /OPL-managed Python runtime/i,
   );
 });
 

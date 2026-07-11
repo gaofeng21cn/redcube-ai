@@ -35,7 +35,8 @@ async function main(argv = process.argv) {
     throw new Error('--output-last-message 不能为空');
   }
 
-  const prompt = await readStdin();
+  const stdin = await readStdin();
+  const prompt = stdin.trim() ? stdin : String(argv.at(-1) || '');
   const output = buildMockCodexLastMessage(prompt);
   mkdirSync(path.dirname(lastMessageFile), { recursive: true });
   writeFileSync(lastMessageFile, output, 'utf-8');

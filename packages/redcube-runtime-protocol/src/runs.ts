@@ -1,19 +1,15 @@
-import type {
-  CreateRunRecordInput,
-  RerunLinkage,
-  RunRecord,
-  RunTelemetryEnvelope,
-} from './types.js';
+import { createDomainRunRecord } from 'opl-framework/domain-task-runtime';
+
+import type { CreateRunRecordInput, RunRecord } from './types.js';
 
 export const RUN_LOCATOR_ENVELOPE_BOUNDARY = Object.freeze({
   surface_kind: 'run_locator_envelope_boundary',
   boundary_contract_id: 'rca.run_locator_envelope_refs_only.v1',
-  owner: 'redcube_ai',
-  consumer: 'opl',
-  role: 'run_locator_envelope_refs_only_adapter',
+  owner: 'one-person-lab',
+  consumer: 'redcube_ai',
+  role: 'domain_route_projection_adapter',
   classification: 'refs_only_read_model',
   refs_only: true,
-  active_caller_status: 'domain_handler_and_opl_stage_runtime_run_locator_refs',
   owns_generic_runner: false,
   owns_generic_attempt_ledger: false,
   owns_generic_scheduler: false,
@@ -36,89 +32,70 @@ export const RUN_LOCATOR_ENVELOPE_BOUNDARY = Object.freeze({
   ],
 });
 
-function requireIdentity(name: string, value: unknown): string {
-  const text = String(value || '').trim();
-  if (!text) {
-    throw new Error(`${name} 不能为空`);
-  }
-  return text;
-}
-
-function toNullableString(value: unknown): string | null {
-  const text = String(value || '').trim();
-  return text || null;
-}
-
-function toNonNegativeInteger(value: unknown): number {
-  const numeric = Number.parseInt(String(value ?? 0), 10);
-  return Number.isFinite(numeric) && numeric >= 0 ? numeric : 0;
-}
-
-function createRunTelemetryEnvelope({
-  run_id,
-  route,
-  scope,
-  target,
-  overlay,
-}: Pick<RunTelemetryEnvelope, 'run_id' | 'route' | 'scope' | 'target' | 'overlay'>): RunTelemetryEnvelope {
-  return {
-    run_id,
-    route,
-    scope,
-    target,
-    overlay,
-    executor_kind: null,
-    execution_surface: null,
-    status: 'running',
-    started_at: null,
-    finished_at: null,
-    latency_ms: null,
-    prompt_tokens: null,
-    completion_tokens: null,
-    estimated_cost: null,
-  };
-}
-
-function createRerunLinkage(input: CreateRunRecordInput = {}): RerunLinkage {
-  return {
-    rerun_count: toNonNegativeInteger(input.rerunCount),
-    previous_run_id: toNullableString(input.previousRunId),
-    source_stage: toNullableString(input.sourceStage),
-    blocking_review: toNullableString(input.blockingReview),
-    baseline_deliverable_id: toNullableString(input.baselineDeliverableId),
-  };
+function text(value: unknown): string | null {
+  const normalized = String(value ?? '').trim();
+  return normalized || null;
 }
 
 export function createRunRecord(input: CreateRunRecordInput = {}): RunRecord {
-  const run_id = requireIdentity('runId', input.runId);
-  const route = requireIdentity('route', input.route);
-  const scope = requireIdentity('scope', input.scope);
-  const target = requireIdentity('target', input.target);
-  const overlay = requireIdentity('overlay', input.overlay);
-
+  const runId = text(input.runId);
+  const route = text(input.route);
+  const scope = text(input.scope);
+  const target = text(input.target);
+  const overlay = text(input.overlay);
+  if (!runId || !route || !scope || !target || !overlay) {
+    throw new Error('runId, route, scope, target, overlay 不能为空');
+  }
+  const canonical = createDomainRunRecord({
+    domain_id: 'redcube_ai',
+    program_id: route,
+    topic_id: text(input.topicId) ?? target,
+    deliverable_id: text(input.deliverableId) ?? target,
+    run_id: runId,
+  }, {
+    status: 'running',
+    attempt: Number.parseInt(String(input.rerunCount ?? 0), 10) || 0,
+    parent_run_id: text(input.previousRunId),
+    metadata: { route, scope, target, overlay },
+  });
   return {
-    run_id,
+    run_id: canonical.run_id,
     route,
     scope,
     target,
     overlay,
-    topic_id: toNullableString(input.topicId),
-    deliverable_id: toNullableString(input.deliverableId),
+    topic_id: text(input.topicId),
+    deliverable_id: text(input.deliverableId),
     status: 'running',
     started_at: null,
     finished_at: null,
     current_stage: null,
     stage_results: [],
     artifact_refs: [],
-    telemetry: createRunTelemetryEnvelope({
-      run_id,
+    telemetry: {
+      run_id: canonical.run_id,
       route,
       scope,
       target,
       overlay,
-    }),
+      executor_kind: null,
+      execution_surface: null,
+      status: 'running',
+      started_at: null,
+      finished_at: null,
+      latency_ms: null,
+      prompt_tokens: null,
+      completion_tokens: null,
+      estimated_cost: null,
+    },
     error_kind: null,
-    rerun_linkage: createRerunLinkage(input),
+    rerun_linkage: {
+      rerun_count: canonical.attempt,
+      previous_run_id: canonical.parent_run_id,
+      source_stage: text(input.sourceStage),
+      blocking_review: text(input.blockingReview),
+      baseline_deliverable_id: text(input.baselineDeliverableId),
+    },
     error: null,
   };
 }

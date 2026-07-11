@@ -2,7 +2,6 @@ import type { spawnSync } from 'node:child_process';
 
 export interface ResolveRedCubePythonCommandOptions {
   env?: Record<string, string | undefined>;
-  spawnSyncImpl?: typeof spawnSync;
 }
 
 export interface ResolvedRedCubePythonCommand {

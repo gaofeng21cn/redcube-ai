@@ -148,7 +148,7 @@ test('readCodexCliContract falls back to local Codex defaults', () => {
   }
 });
 
-test('readCodexCliContract prefers the OPL-managed canonical Codex shim when present', () => {
+test('readCodexCliContract leaves Codex binary resolution to OPL', () => {
   const homeRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-codex-canonical-home-'));
   const canonicalBin = path.join(homeRoot, 'bin', 'codex-canonical');
   mkdirSync(path.dirname(canonicalBin), { recursive: true });
@@ -156,7 +156,7 @@ test('readCodexCliContract prefers the OPL-managed canonical Codex shim when pre
 
   try {
     const contract = readCodexCliContract({ HOME: homeRoot });
-    assert.deepEqual(contract.command, [canonicalBin]);
+    assert.deepEqual(contract.command, ['codex']);
   } finally {
     rmSync(homeRoot, { recursive: true, force: true });
   }
@@ -725,13 +725,12 @@ test('generateImageViaCodexNativeImagegen rejects PNGs created without native im
   rmSync(workspaceRoot, { recursive: true, force: true });
 });
 
-test('runtime Codex executor keeps async codex exec attached while preserving timeout cleanup', () => {
+test('runtime Codex executor delegates process lifecycle and timeout cleanup to OPL', () => {
   const source = readFileSync(
     new URL('../packages/redcube-runtime/src/executors/index-parts/command-process.ts', import.meta.url),
     'utf-8',
   );
 
-  assert.match(source, /detached:\s*process\.platform\s*!==\s*'win32'/);
-  assert.match(source, /process\.kill\(-pid,\s*'SIGKILL'\)/);
-  assert.match(source, /child\.kill\('SIGKILL'\)/);
+  assert.match(source, /runCodexCommandStreaming/);
+  assert.doesNotMatch(source, /process\.kill|child\.kill|detached:/);
 });

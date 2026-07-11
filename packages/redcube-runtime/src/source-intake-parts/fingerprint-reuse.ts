@@ -1,11 +1,11 @@
 // @ts-nocheck
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
+import { fingerprintDomainSource } from 'opl-framework/domain-source-runtime';
 
 import { safeText } from '../runtime-utils.js';
 
 export function sha256Text(value) {
-  return createHash('sha256').update(String(value || ''), 'utf-8').digest('hex');
+  return fingerprintDomainSource(String(value || ''));
 }
 
 export function normalizeKeywords(input) {
@@ -49,7 +49,7 @@ function sourceContentHashInput(source) {
 
 export function enrichSourceFingerprint(source) {
   const content = sourceContentHashInput(source);
-  const contentHash = createHash('sha256').update(content).digest('hex');
+  const contentHash = fingerprintDomainSource(content);
   return {
     ...source,
     content_hash: contentHash,

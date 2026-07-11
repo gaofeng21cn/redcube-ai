@@ -125,13 +125,13 @@ test('RCA stage folder artifact write creates manifest, receipt, current pointer
     assert.equal(manifest.authority_boundary.opl_can_issue_owner_receipt, false);
     const currentPointer = readJson(written.current_file);
     assert.equal(currentPointer.authority_boundary.owner, 'one-person-lab');
-    assert.equal(currentPointer.authority_boundary.domain_authority_owner, 'redcube_ai');
+    assert.equal(currentPointer.authority_boundary.source_of_truth, 'physical_stage_folder_contract');
     assert.equal(
-      currentPointer.authority_boundary.stage_folder_current_pointer_role,
-      'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
+      currentPointer.authority_boundary.current_pointer_role,
+      'artifact_attempt_pointer_not_stage_run_current_pointer',
     );
-    assert.equal(currentPointer.authority_boundary.can_write_opl_stage_run_current_pointer, false);
-    assert.equal(currentPointer.authority_boundary.can_write_opl_stage_run_terminal_state, false);
+    assert.equal(currentPointer.authority_boundary.can_write_stage_current_pointer, false);
+    assert.equal(currentPointer.authority_boundary.can_write_stage_run_terminal_state, false);
     assert.equal(currentPointer.authority_boundary.can_publish_current_owner_delta, false);
 
     const loaded = readStageFolderArtifact({
@@ -150,7 +150,6 @@ test('RCA stage folder keeps long OPL attempt ref normalization stable across wr
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-stage-folder-long-attempt-'));
     const paths = getDeliverablePaths(workspaceRoot, 'topic-a', 'deck-a');
     const attemptId = `${'a'.repeat(95)}/suffix`;
-    const expectedAttemptId = `${'a'.repeat(95)}-`;
     const input = {
       deliverablePaths: paths,
       programId: paths.programId,
@@ -177,7 +176,8 @@ test('RCA stage folder keeps long OPL attempt ref normalization stable across wr
       routeStageId: 'storyline',
     });
 
-    assert.equal(path.basename(written.attempt_dir), expectedAttemptId);
+    const expectedAttemptId = path.basename(written.attempt_dir);
+    assert.match(expectedAttemptId, /^attempt-[a-f0-9]{24}$/);
     assert.equal(written.output_file, outputFile);
     assert.equal(written.manifest.attempt_id, expectedAttemptId);
     assert.equal(readFileSync(written.latest_pointer, 'utf-8').trim(), expectedAttemptId);
@@ -526,7 +526,7 @@ test('RCA route stage folder helper supplies deterministic owner receipt refs', 
       'rca-owner-receipt:visual-stage:ppt_deck:export_pptx:deck-a',
     ]);
     assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'current.json')), true);
-    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), true);
+    assert.equal(existsSync(path.join(stateRoot, 'runtime-state', 'domains', 'redcube_ai', 'deliverables', paths.programId, 'topic-a', 'deck-a', 'latest.json')), false);
     assert.equal(existsSync(pointers.latest_pointer), true);
     assert.equal(existsSync(pointers.stage_current_file), true);
   });

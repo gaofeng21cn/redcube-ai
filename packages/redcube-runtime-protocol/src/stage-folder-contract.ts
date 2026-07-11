@@ -1,34 +1,23 @@
 // @ts-nocheck
-import path from 'node:path';
+import fs from 'node:fs';
+import crypto from 'node:crypto';
 import os from 'node:os';
-import { createHash } from 'node:crypto';
+import path from 'node:path';
 import {
-  existsSync,
-  readFileSync,
-  readdirSync,
-  renameSync,
-  statSync,
-  writeFileSync,
-} from 'node:fs';
-import { ensureDir, readJson, safeText } from './protocol-utils.js';
+  commitStageArtifactAttemptRuntime,
+  openStageArtifactAttemptRuntime,
+  stageArtifactAttemptPaths,
+  statusStageArtifactRuntime,
+  writeDomainArtifact,
+} from 'opl-framework/domain-artifact-runtime';
 
-function safeArray(value) {
-  return Array.isArray(value) ? value : [];
-}
+import { readJson, safeText } from './protocol-utils.js';
 
-function uniqueStrings(value) {
-  return [...new Set(safeArray(value).map((entry) => safeText(entry)).filter(Boolean))];
-}
+const unique = (value) => [...new Set((Array.isArray(value) ? value : []).map((item) => safeText(item)).filter(Boolean))];
 
 export const RCA_STAGE_OUTPUT_CANONICAL_ROLES = Object.freeze([
-  'source_truth_pack',
-  'material_inventory',
-  'strategy_brief',
-  'visual_direction',
-  'render_manifest',
-  'review_verdict',
-  'export_bundle',
-  'handoff_manifest',
+  'source_truth_pack', 'material_inventory', 'strategy_brief', 'visual_direction',
+  'render_manifest', 'review_verdict', 'export_bundle', 'handoff_manifest',
 ]);
 
 export const RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS = Object.freeze({
@@ -40,203 +29,12 @@ export const RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS = Object.freeze({
   package_and_handoff: ['export_bundle', 'handoff_manifest'],
 });
 
-function canonicalRole(value) {
-  const text = safeText(value);
-  return RCA_STAGE_OUTPUT_CANONICAL_ROLES.includes(text) ? text : '';
-}
-
-function inferStageOutputRoles(input = {}) {
-  const route = safeText(input.routeStageId || input.route_stage_id || input.canonicalStageId || input.canonical_stage_id);
-  const explicit = uniqueStrings([
-    input.outputRole || input.output_role,
-    ...safeArray(input.outputRoles || input.output_roles),
-  ]).map((role) => canonicalRole(role)).filter(Boolean);
-  if (explicit.length > 0) return explicit;
-  if (['source_readiness'].includes(route)) return ['source_truth_pack'];
-  if (['research'].includes(route)) return ['material_inventory'];
-  if (['storyline', 'detailed_outline', 'single_note_plan', 'communication_strategy'].includes(route)) {
-    return ['strategy_brief'];
-  }
-  if (['slide_blueprint', 'poster_blueprint', 'visual_direction'].includes(route)) return ['visual_direction'];
-  if ([
-    'render_html',
-    'fix_html',
-    'author_image_pages',
-    'repair_image_pages',
-    'author_pptx_native',
-    'repair_pptx_native',
-  ].includes(route)) return ['render_manifest'];
-  if (['visual_director_review', 'screenshot_review'].includes(route)) return ['review_verdict'];
-  if (['publish_copy', 'export_bundle'].includes(route)) return ['export_bundle', 'handoff_manifest'];
-  if (['export_pptx'].includes(route)) return ['export_bundle', 'handoff_manifest'];
-  return [];
-}
-
-function requiredOutputNames(input, outputName, outputRoles) {
-  const requested = uniqueStrings(input.requiredOutputs);
-  const roleSet = new Set(outputRoles);
-  const names = requested.filter((entry) => !roleSet.has(entry));
-  return names.length > 0 ? names : [outputName];
-}
-
-function normalizeHelperOutputRefs(input, attemptDir) {
-  return safeArray(input.helperOutputRefs || input.helper_output_refs).map((entry) => {
-    const record = entry && typeof entry === 'object' && !Array.isArray(entry) ? entry : {};
-    const file = safeText(record.file || record.path || record.ref);
-    const role = safeText(record.role);
-    return {
-      role,
-      ref: file,
-      output_ref: file && path.isAbsolute(file)
-        ? path.relative(attemptDir, file).split(path.sep).join('/')
-        : file,
-      sha256: safeText(record.sha256),
-      bytes: Number.isFinite(Number(record.bytes)) ? Number(record.bytes) : null,
-      evidence_ref: safeText(record.evidence_ref || record.evidenceRef) || null,
-      review_receipt_ref: safeText(record.review_receipt_ref || record.reviewReceiptRef) || null,
-      review_receipt_refs: uniqueStrings(record.review_receipt_refs || record.reviewReceiptRefs),
-    };
-  }).filter((entry) => entry.role && entry.ref);
-}
-
-function safeSegment(value, fallback) {
-  const text = safeText(value, fallback);
-  if (!text || text.includes('/') || text.includes('\\') || text.includes('..')) {
-    throw new Error(`Invalid stage folder segment: ${fallback}`);
-  }
-  return text;
-}
-
-function safeSegmentFromText(value, fallback) {
-  const text = safeText(value, fallback);
-  if (!text) return safeSegment(fallback, fallback);
-  const normalized = text.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
-  const compact = normalized || createHash('sha256').update(text).digest('hex').slice(0, 16);
-  return safeSegment(compact.slice(0, 96), fallback);
-}
-
-function writeTextAtomic(file, payload) {
-  ensureDir(path.dirname(file));
-  const tmp = `${file}.${process.pid}.${Date.now()}.tmp`;
-  writeFileSync(tmp, payload, 'utf-8');
-  renameSync(tmp, file);
-}
-
-function writeJson(file, payload) {
-  writeTextAtomic(file, `${JSON.stringify(payload, null, 2)}\n`);
-}
-
-function fileHashRecord(rootDir, file, role) {
-  if (!existsSync(file)) return null;
-  const content = readFileSync(file);
-  return {
-    path: path.relative(rootDir, file).split(path.sep).join('/'),
-    role,
-    sha256: createHash('sha256').update(content).digest('hex'),
-    bytes: content.byteLength,
-  };
-}
-
-function listRelativeFiles(dir) {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir, { recursive: true, withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => path.relative(dir, path.join(entry.parentPath, entry.name)).split(path.sep).join('/'))
-    .sort();
-}
-
-function hashFiles(dir, role) {
-  return listRelativeFiles(dir).map((relativePath) => {
-    const file = path.join(dir, relativePath);
-    const content = readFileSync(file);
-    return {
-      path: relativePath,
-      role,
-      sha256: createHash('sha256').update(content).digest('hex'),
-      bytes: content.byteLength,
-    };
-  });
-}
-
-function fileMtimeMs(file) {
-  if (!file || !existsSync(file)) return 0;
-  try {
-    return Number(statSync(file).mtimeMs || 0);
-  } catch {
-    return 0;
-  }
-}
-
-function listFiles(dir) {
-  if (!existsSync(dir)) return [];
-  return readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isFile())
-    .map((entry) => entry.name)
-    .sort();
-}
-
-function resolveOplStateRoot(input = {}) {
-  const explicit = safeText(input.oplStateDir || input.opl_state_dir || process.env.OPL_STATE_DIR);
-  if (explicit) return path.resolve(explicit);
-  const homeDir = safeText(process.env.HOME, os.homedir());
-  return path.join(homeDir, 'Library', 'Application Support', 'OPL', 'state');
-}
-
-function inferLocatorFromDeliverablePaths(deliverablePaths = {}) {
-  const programId = safeText(deliverablePaths.programId || deliverablePaths.program_id);
-  const explicitTopicId = safeText(deliverablePaths.topicId || deliverablePaths.topic_id);
-  const deliverableDir = safeText(deliverablePaths.deliverableDir);
-  const deliverableId = safeText(deliverablePaths.deliverableId);
-  if (!deliverableDir) {
-    return {
-      programId,
-      topicId: explicitTopicId,
-      deliverableId,
-    };
-  }
-  const parts = path.resolve(deliverableDir).split(path.sep);
-  const deliverablesIndex = parts.lastIndexOf('deliverables');
-  const topicId = explicitTopicId || (deliverablesIndex > 0 ? parts[deliverablesIndex - 1] : '');
-  return {
-    programId,
-    topicId,
-    deliverableId: deliverableId || safeText(parts[deliverablesIndex + 1]),
-  };
-}
-
-function stageArtifactLocator(input = {}) {
-  const inferred = inferLocatorFromDeliverablePaths(input.deliverablePaths);
-  const topicId = safeText(input.topicId || input.topic_id, inferred.topicId);
-  return {
-    domainId: safeText(input.domainId || input.domain_id, 'redcube_ai'),
-    programId: safeText(input.programId || input.program_id, inferred.programId || topicId),
-    topicId,
-    deliverableId: safeText(input.deliverableId || input.deliverable_id, inferred.deliverableId),
-  };
-}
-
-function stageFolderName(canonicalStageId, stageOrder) {
-  const stageId = safeSegment(canonicalStageId, 'stage');
-  return Number.isInteger(stageOrder) && stageOrder > 0
-    ? `${String(stageOrder).padStart(2, '0')}-${stageId}`
-    : stageId;
-}
-
-function resolveStageDir(stageRoot, canonicalStageId) {
-  const direct = path.join(stageRoot, safeSegment(canonicalStageId, 'stage'));
-  if (existsSync(direct)) return direct;
-  if (!existsSync(stageRoot)) return direct;
-  const match = readdirSync(stageRoot, { withFileTypes: true })
-    .find((entry) => entry.isDirectory() && entry.name.replace(/^\d+-/, '') === canonicalStageId);
-  return match ? path.join(stageRoot, match.name) : direct;
-}
-
-const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
+const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = Object.freeze({
   owner: 'one-person-lab',
   substrate_owner: 'one-person-lab',
   domain_authority_owner: 'redcube_ai',
-  opl_role: 'stage_folder_contract_owner_and_locator_index_provider',
-  rca_role: 'domain_artifact_authority_receipt_refs_only',
+  opl_role: 'stage_artifact_runtime_owner',
+  rca_role: 'visual_stage_role_and_owner_receipt_adapter',
   stage_folder_current_pointer_role: 'artifact_attempt_pointer_not_opl_stage_run_current_pointer',
   stage_folder_terminal_status_role: 'domain_owner_closeout_receipt_projection_not_opl_stage_run_terminal_state',
   stage_transition_authority_required_for_opl_stage_run_current: true,
@@ -246,511 +44,260 @@ const RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY = {
   opl_can_issue_owner_receipt: false,
   opl_can_write_visual_truth: false,
   opl_can_write_review_export_verdict: false,
-  opl_can_write_domain_artifact_body: false,
   rca_owns_artifact_authority: true,
   rca_owns_stage_folder_substrate: false,
-  rca_owns_generic_stage_run_current_pointer: false,
-};
+});
 
 export function canonicalStageForRoute(stageId) {
   const route = safeText(stageId);
   if (['source_readiness', 'research', 'storyline'].includes(route)) return 'source_intake';
   if (['detailed_outline', 'single_note_plan', 'communication_strategy'].includes(route)) return 'communication_strategy';
   if (['slide_blueprint', 'poster_blueprint', 'visual_direction'].includes(route)) return 'visual_direction';
-  if ([
-    'render_html',
-    'fix_html',
-    'author_image_pages',
-    'repair_image_pages',
-    'author_pptx_native',
-    'repair_pptx_native',
-  ].includes(route)) return 'artifact_creation';
+  if (['render_html', 'fix_html', 'author_image_pages', 'repair_image_pages', 'author_pptx_native', 'repair_pptx_native'].includes(route)) return 'artifact_creation';
   if (['visual_director_review', 'screenshot_review'].includes(route)) return 'review_and_revision';
   if (['publish_copy', 'export_bundle', 'export_pptx'].includes(route)) return 'package_and_handoff';
   return route || 'domain_specific';
 }
 
 export function stageOrderForCanonicalStage(stageId) {
+  return { source_intake: 1, communication_strategy: 2, visual_direction: 3, artifact_creation: 4, review_and_revision: 5, package_and_handoff: 6 }[stageId] ?? 99;
+}
+
+function stateDir(input) {
+  const explicit = safeText(input.oplStateDir || input.opl_state_dir || process.env.OPL_STATE_DIR);
+  return explicit ? path.resolve(explicit) : path.join(os.homedir(), 'Library', 'Application Support', 'OPL', 'state');
+}
+
+function inferredIds(input) {
+  const deliverablePaths = input.deliverablePaths || {};
+  const deliverableDir = safeText(deliverablePaths.deliverableDir);
+  const parts = deliverableDir ? path.resolve(deliverableDir).split(path.sep) : [];
+  const index = parts.lastIndexOf('deliverables');
+  const topic = safeText(input.topicId || input.topic_id || deliverablePaths.topicId || deliverablePaths.topic_id || (index > 0 ? parts[index - 1] : ''));
   return {
-    source_intake: 1,
-    communication_strategy: 2,
-    visual_direction: 3,
-    artifact_creation: 4,
-    review_and_revision: 5,
-    package_and_handoff: 6,
-  }[stageId] ?? 99;
-}
-
-function stageFolderRoot(input = {}) {
-  const locator = stageArtifactLocator(input);
-  return path.join(
-    resolveOplStateRoot(input),
-    'runtime-state',
-    'domains',
-    safeSegment(locator.domainId, 'domain'),
-    'deliverables',
-    safeSegment(locator.programId, 'program'),
-    safeSegment(locator.topicId, 'topic'),
-    safeSegment(locator.deliverableId, 'deliverable'),
-  );
-}
-
-function buildStageFolderAttemptPaths(input, { createDirs = false } = {}) {
-  const canonicalStageId = safeSegment(input.canonicalStageId, 'stage');
-  const attemptId = safeSegmentFromText(input.attemptId, 'attempt');
-  const root = stageFolderRoot(input);
-  const stage_dir = path.join(root, 'stages', stageFolderName(canonicalStageId, input.stageOrder));
-  const attempt_dir = path.join(stage_dir, 'attempts', attemptId);
-  const paths = {
-    root,
-    current_file: path.join(root, 'current.json'),
-    latest_file: path.join(root, 'latest.json'),
-    stage_dir,
-    latest_pointer: path.join(stage_dir, 'latest'),
-    stage_current_file: path.join(stage_dir, 'current.json'),
-    attempt_dir,
-    attempt_file: path.join(attempt_dir, 'attempt.json'),
-    manifest_file: path.join(attempt_dir, 'manifest.json'),
-    inputs_dir: path.join(attempt_dir, 'inputs'),
-    outputs_dir: path.join(attempt_dir, 'outputs'),
-    evidence_dir: path.join(attempt_dir, 'evidence'),
-    receipts_dir: path.join(attempt_dir, 'receipts'),
+    program: safeText(input.programId || input.program_id || deliverablePaths.programId || deliverablePaths.program_id || topic),
+    topic,
+    deliverable: safeText(input.deliverableId || input.deliverable_id || deliverablePaths.deliverableId || (index >= 0 ? parts[index + 1] : '')),
   };
-  if (createDirs) {
-    for (const dir of [paths.inputs_dir, paths.outputs_dir, paths.evidence_dir, paths.receipts_dir]) {
-      ensureDir(dir);
-    }
-  }
-  return paths;
+}
+
+function locator(input, withAttempt = true) {
+  const ids = inferredIds(input);
+  const stageId = safeText(input.canonicalStageId || input.canonical_stage_id, canonicalStageForRoute(input.routeStageId || input.route_stage_id));
+  const base = {
+    state_dir: stateDir(input),
+    domain_id: safeText(input.domainId || input.domain_id, 'redcube_ai'),
+    program_id: ids.program,
+    topic_id: ids.topic,
+    deliverable_id: ids.deliverable,
+  };
+  return withAttempt ? {
+    ...base,
+    stage_id: stageId,
+    stage_order: input.stageOrder ?? input.stage_order ?? stageOrderForCanonicalStage(stageId),
+    attempt_id: normalizedAttemptId(input.attemptId || input.attempt_id),
+  } : base;
+}
+
+function normalizedAttemptId(value) {
+  const raw = safeText(value, 'attempt');
+  const normalized = raw.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
+  if (normalized && normalized.length <= 80) return normalized;
+  return `attempt-${crypto.createHash('sha256').update(raw).digest('hex').slice(0, 24)}`;
+}
+
+function outputName(input) {
+  return safeText(input.outputName || input.output_name)
+    || path.basename(safeText(input.artifactFile || input.artifact_file))
+    || `${safeText(input.routeStageId || input.route_stage_id || input.canonicalStageId, 'stage')}.json`;
+}
+
+function roles(input) {
+  const explicit = unique([input.outputRole || input.output_role, ...(input.outputRoles || input.output_roles || [])])
+    .filter((role) => RCA_STAGE_OUTPUT_CANONICAL_ROLES.includes(role));
+  if (explicit.length) return explicit;
+  const route = safeText(input.routeStageId || input.route_stage_id);
+  const canonical = canonicalStageForRoute(route);
+  return RCA_STAGE_OUTPUT_STAGE_EXPECTATIONS[canonical] || [];
+}
+
+function helperOutputRefs(input, attemptDir) {
+  return (input.helperOutputRefs || input.helper_output_refs || []).map((entry) => {
+    const file = safeText(entry.file || entry.output_file);
+    if (!file || !fs.existsSync(file)) return { ...entry };
+    const body = fs.readFileSync(file);
+    return {
+      ...entry,
+      output_ref: path.relative(attemptDir, file),
+      sha256: crypto.createHash('sha256').update(body).digest('hex'),
+      bytes: body.length,
+    };
+  });
+}
+
+function publicPaths(input) {
+  const paths = stageArtifactAttemptPaths(locator(input));
+  return {
+    root: paths.deliverable_root,
+    current_file: paths.current_file,
+    latest_file: paths.current_file,
+    stage_dir: paths.stage_dir,
+    latest_pointer: paths.latest_pointer,
+    stage_current_file: paths.current_file,
+    attempt_dir: paths.attempt_dir,
+    attempt_file: paths.attempt_file,
+    manifest_file: paths.manifest_file,
+    inputs_dir: paths.inputs_dir,
+    outputs_dir: paths.outputs_dir,
+    evidence_dir: paths.evidence_dir,
+    receipts_dir: paths.receipts_dir,
+  };
 }
 
 export function stageFolderAttemptPaths(input) {
-  return buildStageFolderAttemptPaths(input, { createDirs: true });
+  openStageArtifactAttemptRuntime(locator(input));
+  return publicPaths(input);
 }
 
 export function stageFolderOutputPath(input) {
-  const canonicalStageId = safeText(input.canonicalStageId, canonicalStageForRoute(input.routeStageId));
-  const paths = buildStageFolderAttemptPaths({
-    ...input,
-    canonicalStageId,
-    stageOrder: input.stageOrder ?? stageOrderForCanonicalStage(canonicalStageId),
-    attemptId: input.attemptId,
-  });
-  return path.join(paths.outputs_dir, outputNameForStage(input));
-}
-
-function outputNameForStage(input) {
-  return safeText(input.outputName || input.output_name)
-    || path.basename(safeText(input.artifactFile || input.artifact_file))
-    || `${safeText(input.routeStageId || input.route_stage_id || input.canonicalStageId || input.canonical_stage_id, 'stage')}.json`;
+  return path.join(publicPaths(input).outputs_dir, outputName(input));
 }
 
 export function stageFolderArtifactPath(input) {
-  const canonicalStageId = safeText(input.canonicalStageId, canonicalStageForRoute(input.routeStageId));
-  const loaded = readStageFolderArtifact({
-    ...input,
-    canonicalStageId,
-  });
-  if (loaded?.status && ['success', 'blocked'].includes(loaded.status) && loaded.output_file) {
-    return loaded.output_file;
+  return readStageFolderArtifact(input)?.output_file
+    || path.join(publicPaths(input).stage_dir, 'missing-current-output', outputName(input));
+}
+
+export function writeStageFolderArtifact(input): any {
+  const attemptLocator = locator(input);
+  const paths = publicPaths(input);
+  const output = outputName(input);
+  const ownerReceiptRefs = unique(input.ownerReceiptRefs || input.owner_receipt_refs);
+  const typedBlockerRefs = unique(input.typedBlockerRefs || input.typed_blocker_refs);
+  const terminalStatus = safeText(input.status) === 'blocked' || typedBlockerRefs.length ? 'blocked' : 'success';
+  if (terminalStatus === 'success' && ownerReceiptRefs.length === 0) throw new Error('RCA Stage Folder success closeout requires explicit ownerReceiptRefs');
+  if (terminalStatus === 'blocked' && typedBlockerRefs.length === 0) throw new Error('RCA Stage Folder blocked closeout requires explicit typedBlockerRefs');
+
+  if (fs.existsSync(input.artifactFile)) {
+    writeDomainArtifact({ ...attemptLocator, role: 'output', relative_path: output, body: fs.readFileSync(input.artifactFile) });
   }
-  const root = stageFolderRoot(input);
-  return path.join(
-    root,
-    'stages',
-    stageFolderName(canonicalStageId, input.stageOrder ?? stageOrderForCanonicalStage(canonicalStageId)),
-    'missing-current-output',
-    outputNameForStage(input),
-  );
-}
-
-function ownerReceiptRefsFor(input) {
-  return uniqueStrings(input.ownerReceiptRefs || input.owner_receipt_refs);
-}
-
-function typedBlockerRefsFor(input) {
-  return uniqueStrings(input.typedBlockerRefs || input.typed_blocker_refs);
-}
-
-function closeoutStatus(input) {
-  const explicit = safeText(input.status);
-  if (explicit === 'blocked' || explicit === 'success' || explicit === 'in_progress') return explicit;
-  if (uniqueStrings(input.typedBlockerRefs || input.typed_blocker_refs).length > 0) return 'blocked';
-  if (uniqueStrings(input.ownerReceiptRefs || input.owner_receipt_refs).length > 0) return 'success';
-  return 'success';
-}
-
-function refsFromWritten(paths) {
-  return [
-    paths.deliverable_file,
-    paths.stage_file,
-    paths.attempt_file,
-    paths.manifest_file,
-    paths.receipt_file,
-    paths.blocker_evidence_file,
-    paths.current_file,
-    paths.latest_file,
-    paths.latest_pointer,
-    paths.stage_current_file,
-    paths.output_file,
-  ].filter(Boolean);
-}
-
-function assertExplicitTerminalCloseoutRefs({ status, ownerReceiptRefs, typedBlockerRefs, canonicalStageId, attemptId }) {
-  if (status === 'success' && ownerReceiptRefs.length === 0) {
-    throw new Error(
-      `RCA Stage Folder success closeout requires explicit ownerReceiptRefs for ${canonicalStageId}/${attemptId}`,
-    );
-  }
-  if (status === 'blocked' && typedBlockerRefs.length === 0) {
-    throw new Error(
-      `RCA Stage Folder blocked closeout requires explicit typedBlockerRefs for ${canonicalStageId}/${attemptId}`,
-    );
-  }
-}
-
-function writeStageFolderDescriptors({ paths, locator, canonicalStageId, stageOrder }) {
-  const deliverableFile = path.join(paths.root, 'deliverable.json');
-  const stageFile = path.join(paths.stage_dir, 'stage.json');
-  if (!existsSync(deliverableFile)) {
-    writeJson(deliverableFile, {
-      surface_kind: 'opl_stage_artifact_deliverable',
-      domain_id: locator.domainId,
-      program_id: locator.programId,
-      topic_id: locator.topicId,
-      deliverable_id: locator.deliverableId,
-      authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-    });
-  }
-  if (!existsSync(stageFile)) {
-    writeJson(stageFile, {
-      surface_kind: 'opl_stage_artifact_stage',
-      stage_id: canonicalStageId,
-      stage_order: stageOrder,
-      authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-    });
-  }
-  return {
-    deliverable_file: deliverableFile,
-    stage_file: stageFile,
+  const outputRoles = roles(input);
+  const interfacePayload = {
+    surface_kind: 'rca_stage_output_role_interface',
+    version: 'rca-stage-output-role-interface.v1',
+    route_stage_id: safeText(input.routeStageId || input.route_stage_id),
+    required_roles: unique(input.requiredOutputRoles || input.required_output_roles).length
+      ? unique(input.requiredOutputRoles || input.required_output_roles)
+      : outputRoles,
+    present_roles: outputRoles,
+    output_roles: outputRoles.map((role) => ({ role, output_ref: `outputs/${output}` })),
+    helper_output_refs: helperOutputRefs(input, paths.attempt_dir),
+    artifact_refs: unique(input.artifactRefs),
+    review_export_refs: unique(input.reviewExportRefs),
+    authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
-}
-
-export function writeStageFolderArtifact(input) {
-  const canonicalStageId = safeText(input.canonicalStageId, canonicalStageForRoute(input.routeStageId));
-  const stageOrder = input.stageOrder ?? stageOrderForCanonicalStage(canonicalStageId);
-  const paths = buildStageFolderAttemptPaths({
-    ...input,
-    deliverablePaths: input.deliverablePaths,
-    canonicalStageId,
-    stageOrder,
-    attemptId: input.attemptId,
-  });
-  const attemptId = path.basename(paths.attempt_dir);
-  const status = closeoutStatus(input);
-  const ownerReceiptRefs = ownerReceiptRefsFor(input);
-  const typedBlockerRefs = typedBlockerRefsFor(input);
-  assertExplicitTerminalCloseoutRefs({
-    status,
-    ownerReceiptRefs,
-    typedBlockerRefs,
-    canonicalStageId,
-    attemptId,
-  });
-  for (const dir of [paths.inputs_dir, paths.outputs_dir, paths.evidence_dir, paths.receipts_dir]) {
-    ensureDir(dir);
+  writeDomainArtifact({ ...attemptLocator, role: 'receipt', relative_path: 'rca-stage-output-interface.json', body: `${JSON.stringify(interfacePayload, null, 2)}\n` });
+  if (ownerReceiptRefs.length) {
+    writeDomainArtifact({ ...attemptLocator, role: 'receipt', relative_path: 'domain-owner-receipt.json', body: `${JSON.stringify({ surface_kind: 'domain_owner_receipt_ref', owner: 'redcube_ai', receipt_refs: ownerReceiptRefs }, null, 2)}\n` });
   }
-  const locator = stageArtifactLocator(input);
-  const descriptors = writeStageFolderDescriptors({
-    paths,
-    locator,
-    canonicalStageId,
-    stageOrder,
-  });
-  const outputName = outputNameForStage(input);
-  const outputFile = path.join(paths.outputs_dir, outputName);
-  if (existsSync(input.artifactFile) && path.resolve(input.artifactFile) !== path.resolve(outputFile)) {
-    writeFileSync(outputFile, readFileSync(input.artifactFile));
+  if (typedBlockerRefs.length) {
+    writeDomainArtifact({ ...attemptLocator, role: 'evidence', relative_path: 'typed-blocker-ref.json', body: `${JSON.stringify({ surface_kind: 'domain_typed_blocker_ref', typed_blocker_refs: typedBlockerRefs, blocking_reasons: unique(input.blockingReasons || input.blocking_reasons) }, null, 2)}\n` });
   }
-  const outputRoles = inferStageOutputRoles(input);
-  const requiredOutputRoles = uniqueStrings(input.requiredOutputRoles || input.required_output_roles)
-    .map((role) => canonicalRole(role)).filter(Boolean);
-  const effectiveRequiredOutputRoles = requiredOutputRoles.length > 0 ? requiredOutputRoles : outputRoles;
-  const requiredOutputs = requiredOutputNames(input, outputName, outputRoles);
-  const outputRef = path.relative(paths.attempt_dir, outputFile);
-  const outputHash = fileHashRecord(paths.outputs_dir, outputFile, 'output');
-  const outputHashes = outputHash ? [outputHash] : [];
-  const receiptRef = ownerReceiptRefs.length > 0 ? 'receipts/domain-owner-receipt.json' : null;
-  const blockerRef = typedBlockerRefs.length > 0 ? 'evidence/typed-blocker-ref.json' : null;
-  const outputRoleRefs = outputRoles.map((role) => ({
+  const committed = commitStageArtifactAttemptRuntime({
+    ...attemptLocator,
+    terminal_status: terminalStatus,
+    required_outputs: [output],
+    owner_receipt_refs: ownerReceiptRefs,
+    typed_blocker_refs: typedBlockerRefs,
+  });
+  const outputHash = committed.manifest.output_hashes.find((entry) => entry.path === output) || null;
+  const stageReceipts = [
+    ...ownerReceiptRefs.map((receiptRef) => ({ receipt_kind: 'domain_owner_receipt', receipt_ref: receiptRef, receipt_file: 'receipts/domain-owner-receipt.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
+    ...typedBlockerRefs.map((typedBlockerRef) => ({ receipt_kind: 'domain_typed_blocker', typed_blocker_ref: typedBlockerRef, evidence_file: 'evidence/typed-blocker-ref.json', output_roles: outputRoles, route_stage_id: interfacePayload.route_stage_id, owner: 'redcube_ai' })),
+  ];
+  const outputRefs = outputRoles.map((role) => ({
     role,
-    output_ref: outputRef,
-    output_file: outputFile,
+    output_ref: `outputs/${output}`,
+    output_file: path.join(paths.outputs_dir, output),
     manifest_ref: 'manifest.json',
-    receipt_ref: receiptRef,
-    typed_blocker_ref: blockerRef,
+    receipt_ref: ownerReceiptRefs.length ? 'receipts/domain-owner-receipt.json' : null,
+    typed_blocker_ref: typedBlockerRefs.length ? 'evidence/typed-blocker-ref.json' : null,
     sha256: outputHash?.sha256 || null,
     bytes: outputHash?.bytes || null,
   }));
-  const helperOutputRefs = normalizeHelperOutputRefs(input, paths.attempt_dir);
-  const stageReceipts = [
-    ...ownerReceiptRefs.map((receiptRefValue) => ({
-      receipt_kind: 'domain_owner_receipt',
-      receipt_ref: receiptRefValue,
-      receipt_file: receiptRef,
-      output_roles: outputRoles,
-      route_stage_id: safeText(input.routeStageId),
-      owner: 'redcube_ai',
-    })),
-    ...typedBlockerRefs.map((blockerRefValue) => ({
-      receipt_kind: 'domain_typed_blocker',
-      typed_blocker_ref: blockerRefValue,
-      evidence_file: blockerRef,
-      output_roles: outputRoles,
-      route_stage_id: safeText(input.routeStageId),
-      owner: 'redcube_ai',
-    })),
-  ];
-  writeJson(paths.attempt_file, {
-    surface_kind: 'opl_stage_artifact_attempt',
-    attempt_id: attemptId,
-    route_stage_id: safeText(input.routeStageId),
-    canonical_stage_id: canonicalStageId,
-    stage_id: canonicalStageId,
-    domain_id: locator.domainId,
-    program_id: locator.programId,
-    topic_id: locator.topicId,
-    deliverable_id: locator.deliverableId,
-    authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-  });
-  if (ownerReceiptRefs.length > 0) {
-    writeJson(path.join(paths.receipts_dir, 'domain-owner-receipt.json'), {
-      surface_kind: 'domain_owner_receipt_ref',
-      owner: 'redcube_ai',
-      stage_id: canonicalStageId,
-      route_stage_id: safeText(input.routeStageId),
-      attempt_id: attemptId,
-      receipt_refs: ownerReceiptRefs,
-      output_hashes: outputHashes,
-      authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-    });
-  }
-  if (typedBlockerRefs.length > 0) {
-    writeJson(path.join(paths.evidence_dir, 'typed-blocker-ref.json'), {
-      surface_kind: 'domain_typed_blocker_ref',
-      owner: 'redcube_ai',
-      stage_id: canonicalStageId,
-      route_stage_id: safeText(input.routeStageId),
-      attempt_id: attemptId,
-      typed_blocker_refs: typedBlockerRefs,
-      blocking_reasons: uniqueStrings(input.blockingReasons || input.blocking_reasons),
-      authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-    });
-  }
-  const manifest = {
-    surface_kind: 'opl_stage_artifact_manifest',
-    version: 'stage-artifact-runtime.v1',
-    manifest_version: 'stage-artifact-manifest.v1',
-    domain_id: locator.domainId,
-    program_id: locator.programId,
-    topic_id: locator.topicId,
-    deliverable_id: locator.deliverableId,
-    route_stage_id: safeText(input.routeStageId),
-    canonical_stage_id: canonicalStageId,
-    stage_id: canonicalStageId,
-    stage_order: stageOrder,
-    attempt_id: attemptId,
-    status,
-    terminal_status: status === 'in_progress' ? null : status,
-    artifact_file: input.artifactFile,
-    output_file: outputFile,
-    required_outputs: requiredOutputs,
-    required_output_roles: effectiveRequiredOutputRoles,
-    present_outputs: listRelativeFiles(paths.outputs_dir),
-    present_output_roles: outputRoleRefs.map((entry) => entry.role),
-    output_refs: outputRoleRefs,
+  const domainManifest = {
+    ...committed.manifest,
+    domain_id: attemptLocator.domain_id,
+    program_id: attemptLocator.program_id,
+    topic_id: attemptLocator.topic_id,
+    deliverable_id: attemptLocator.deliverable_id,
+    status: terminalStatus,
+    route_stage_id: interfacePayload.route_stage_id,
+    output_file: path.join(paths.outputs_dir, output),
+    required_output_roles: interfacePayload.required_roles,
+    present_output_roles: outputRoles,
+    output_refs: outputRefs,
     stage_output_role_interface: {
-      surface_kind: 'rca_stage_output_role_interface',
-      version: 'rca-stage-output-role-interface.v1',
+      ...interfacePayload,
       canonical_roles: RCA_STAGE_OUTPUT_CANONICAL_ROLES,
-      required_roles: effectiveRequiredOutputRoles,
-      present_roles: outputRoleRefs.map((entry) => entry.role),
       file_name_is_interface: false,
       role_manifest_receipt_is_interface: true,
-      output_roles: outputRoleRefs,
+      output_roles: outputRefs,
     },
-    helper_output_refs: helperOutputRefs,
-    output_hashes: outputHashes,
-    evidence_hashes: hashFiles(paths.evidence_dir, 'evidence'),
-    receipt_hashes: hashFiles(paths.receipts_dir, 'receipt'),
-    owner_receipt_refs: ownerReceiptRefs,
-    typed_blocker_refs: typedBlockerRefs,
-    decision_receipt_refs: [],
+    helper_output_refs: interfacePayload.helper_output_refs,
     stage_receipts: stageReceipts,
-    review_export_refs: uniqueStrings(input.reviewExportRefs),
-    artifact_refs: uniqueStrings(input.artifactRefs ?? []),
+    artifact_refs: interfacePayload.artifact_refs,
+    review_export_refs: interfacePayload.review_export_refs,
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
-  writeJson(paths.manifest_file, manifest);
-  const pointer = {
-    surface_kind: 'rca_stage_folder_current_pointer',
-    current_stage: {
-      stage_id: canonicalStageId,
-      route_stage_id: safeText(input.routeStageId),
-      attempt_id: attemptId,
-      manifest_file: paths.manifest_file,
-      output_file: outputFile,
-      status,
-    },
-    authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-  };
-  if (status === 'success' || status === 'blocked') {
-    writeTextAtomic(paths.latest_pointer, `${attemptId}\n`);
-    writeJson(paths.current_file, pointer);
-    writeJson(paths.latest_file, pointer);
-    writeJson(paths.stage_current_file, pointer);
-  }
-  const receiptFile = path.join(paths.receipts_dir, 'domain-owner-receipt.json');
-  const blockerEvidenceFile = path.join(paths.evidence_dir, 'typed-blocker-ref.json');
-  const writtenRefs = refsFromWritten({
-    ...paths,
-    ...descriptors,
-    output_file: outputFile,
-    receipt_file: existsSync(receiptFile) ? receiptFile : null,
-    blocker_evidence_file: existsSync(blockerEvidenceFile) ? blockerEvidenceFile : null,
-  });
+  fs.writeFileSync(paths.manifest_file, `${JSON.stringify(domainManifest, null, 2)}\n`, 'utf8');
+  const descriptorRefs = [path.join(paths.root, 'deliverable.json'), path.join(paths.stage_dir, 'stage.json')];
   return {
     ...paths,
-    output_file: outputFile,
-    manifest,
-    receipt_file: receiptFile,
-    blocker_evidence_file: blockerEvidenceFile,
-    artifact_refs: writtenRefs,
+    output_file: path.join(paths.outputs_dir, output),
+    manifest: domainManifest,
+    receipt_file: path.join(paths.receipts_dir, 'domain-owner-receipt.json'),
+    blocker_evidence_file: path.join(paths.evidence_dir, 'typed-blocker-ref.json'),
+    artifact_refs: [...descriptorRefs, paths.manifest_file, paths.current_file, paths.latest_pointer, path.join(paths.outputs_dir, output)],
   };
 }
 
-export function readStageFolderArtifact(input) {
-  const canonicalStageId = safeText(input.canonicalStageId, canonicalStageForRoute(input.routeStageId));
-  const stageDir = resolveStageDir(path.join(stageFolderRoot(input), 'stages'), canonicalStageId);
-  const latestPointer = path.join(stageDir, 'latest');
-  const expectedRouteStageId = safeText(input.routeStageId || input.route_stage_id);
-  const expectedOutputName = expectedRouteStageId ? `${expectedRouteStageId}.json` : '';
-  const candidates = listAttemptDirs(stageDir);
-  if (existsSync(latestPointer)) {
-    const latestAttemptId = safeText(readFileSync(latestPointer, 'utf-8'));
-    const latestAttemptDir = path.join(stageDir, 'attempts', latestAttemptId);
-    if (existsSync(latestAttemptDir) && !candidates.includes(latestAttemptDir)) {
-      candidates.push(latestAttemptDir);
-    }
-  }
-  if (candidates.length === 0) return null;
-  const inspected = candidates.map((attemptDir) => inspectStageFolderAttempt({
-    attemptDir,
-    expectedStageId: canonicalStageId,
-  }));
-  const routeMatched = expectedRouteStageId
-    ? inspected.filter((attempt) => (
-        attempt.route_stage_id === expectedRouteStageId
-        || !attempt.route_stage_id
-        || attempt.output_names?.includes(expectedOutputName)
-      ))
-    : inspected;
-  if (expectedRouteStageId && routeMatched.length === 0) {
-    return null;
-  }
-  const ranked = [...routeMatched]
-    .sort((left, right) => (
-      Number(left.attempt_sort_key || 0) - Number(right.attempt_sort_key || 0)
-      || String(left.attempt_id || '').localeCompare(String(right.attempt_id || ''))
-    ));
-  const selected = ranked.at(-1);
-  if (!selected) return null;
-  if (
-    expectedOutputName
-    && selected.route_stage_id !== expectedRouteStageId
-    && selected.output_names?.includes(expectedOutputName)
-  ) {
-    const outputFile = path.join(selected.outputs_dir, expectedOutputName);
-    return {
-      ...selected,
-      artifact: ['success', 'blocked'].includes(selected.status) && existsSync(outputFile) ? readJson(outputFile) : null,
-      output_file: outputFile,
-    };
-  }
-  return selected;
-}
-
-function listAttemptDirs(stageDir) {
-  const attemptsDir = path.join(stageDir, 'attempts');
-  if (!existsSync(attemptsDir)) return [];
-  return readdirSync(attemptsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => path.join(attemptsDir, entry.name))
-    .sort((left, right) => left.localeCompare(right));
-}
-
-function inspectStageFolderAttempt({ attemptDir, expectedStageId }) {
-  const manifestFile = path.join(attemptDir, 'manifest.json');
-  const outputsDir = path.join(attemptDir, 'outputs');
-  const outputNames = listFiles(outputsDir);
-  if (!existsSync(manifestFile)) {
-    const outputFiles = outputNames.map((name) => path.join(outputsDir, name));
-    return {
-      status: 'orphan',
-      artifact: null,
-      manifest: null,
-      manifest_file: manifestFile,
-      output_file: '',
-      output_names: outputNames,
-      outputs_dir: outputsDir,
-      missing_outputs: [],
-      orphan_outputs: outputNames,
-      route_stage_id: '',
-      attempt_id: path.basename(attemptDir),
-      attempt_sort_key: Math.max(fileMtimeMs(attemptDir), ...outputFiles.map((file) => fileMtimeMs(file))),
-      authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
-    };
-  }
-  const manifest = readJson(manifestFile);
-  const requiredOutputs = uniqueStrings(manifest.required_outputs);
-  const missingOutputs = requiredOutputs.filter((name) => !existsSync(path.join(outputsDir, name)));
-  const ownerReceiptRefs = uniqueStrings(manifest.owner_receipt_refs);
-  const typedBlockerRefs = uniqueStrings(manifest.typed_blocker_refs);
-  const receiptFiles = listFiles(path.join(attemptDir, 'receipts'));
-  const evidenceFiles = listFiles(path.join(attemptDir, 'evidence'));
-  const manifestStageId = safeText(manifest.stage_id || manifest.canonical_stage_id);
-  const manifestAttemptId = safeText(manifest.attempt_id);
-  const manifestValid = manifestStageId === expectedStageId && manifestAttemptId === path.basename(attemptDir);
-  const status = !manifestValid
-    ? (outputNames.length > 0 ? 'orphan' : 'broken')
-    : missingOutputs.length > 0 && typedBlockerRefs.length === 0
-      ? 'broken'
-      : ownerReceiptRefs.length > 0 && receiptFiles.length > 0 && missingOutputs.length === 0
-        ? 'success'
-        : typedBlockerRefs.length > 0 && evidenceFiles.length > 0
-          ? 'blocked'
-          : 'in_progress';
-  const outputFile = safeText(manifest.output_file) || (requiredOutputs[0] ? path.join(outputsDir, requiredOutputs[0]) : '');
-  const receiptFilesAbs = receiptFiles.map((name) => path.join(attemptDir, 'receipts', name));
-  const evidenceFilesAbs = evidenceFiles.map((name) => path.join(attemptDir, 'evidence', name));
+export function readStageFolderArtifact(input): any {
+  const base = locator(input, false);
+  const stageId = canonicalStageForRoute(input.canonicalStageId || input.routeStageId || input.route_stage_id);
+  const status = statusStageArtifactRuntime(base);
+  const stage = status.stages.find((item) => item.stage_id === stageId);
+  if (!stage?.latest_attempt_id) return null;
+  const requestedRoute = safeText(input.routeStageId || input.route_stage_id);
+  const selectedAttempt = requestedRoute
+    ? [...stage.attempts].reverse().find((attempt) => {
+        const candidate = stageArtifactAttemptPaths({ ...base, stage_id: stageId, stage_order: stage.stage_order, attempt_id: attempt.attempt_id });
+        const sidecar = path.join(candidate.receipts_dir, 'rca-stage-output-interface.json');
+        return (fs.existsSync(sidecar) && safeText(readJson(sidecar).route_stage_id) === requestedRoute)
+          || attempt.present_outputs?.includes(`${requestedRoute}.json`);
+      })
+    : stage.attempts.find((attempt) => attempt.attempt_id === stage.latest_attempt_id);
+  if (!selectedAttempt) return null;
+  const attemptLocator = { ...base, stage_id: stageId, stage_order: stage.stage_order, attempt_id: selectedAttempt.attempt_id };
+  const paths = stageArtifactAttemptPaths(attemptLocator);
+  const persistedManifest = fs.existsSync(paths.manifest_file) ? readJson(paths.manifest_file) : {};
+  const output = requestedRoute ? `${requestedRoute}.json` : selectedAttempt.required_outputs[0];
+  const selectedOutput = fs.existsSync(path.join(paths.outputs_dir, output)) ? output : selectedAttempt.required_outputs[0];
+  const outputFile = selectedOutput ? path.join(paths.outputs_dir, selectedOutput) : '';
+  const interfaceFile = path.join(paths.receipts_dir, 'rca-stage-output-interface.json');
+  const domainInterface = fs.existsSync(interfaceFile) ? readJson(interfaceFile) : {};
   return {
-    status,
-    artifact: ['success', 'blocked'].includes(status) && outputFile && existsSync(outputFile) ? readJson(outputFile) : null,
-    manifest,
-    manifest_file: manifestFile,
+    status: selectedAttempt.status,
+    artifact: ['success', 'blocked'].includes(selectedAttempt.status) && outputFile && fs.existsSync(outputFile) ? readJson(outputFile) : null,
+    manifest: { ...persistedManifest, ...domainInterface, output_file: outputFile },
+    manifest_file: paths.manifest_file,
     output_file: outputFile,
-    output_names: outputNames,
-    outputs_dir: outputsDir,
-    missing_outputs: missingOutputs,
-    orphan_outputs: status === 'orphan' ? outputNames : [],
-    route_stage_id: safeText(manifest.route_stage_id),
-    attempt_id: path.basename(attemptDir),
-    attempt_sort_key: Math.max(
-      fileMtimeMs(manifestFile),
-      fileMtimeMs(outputFile),
-      ...receiptFilesAbs.map((file) => fileMtimeMs(file)),
-      ...evidenceFilesAbs.map((file) => fileMtimeMs(file)),
-    ),
+    output_names: selectedAttempt.required_outputs,
+    outputs_dir: paths.outputs_dir,
+    missing_outputs: selectedAttempt.missing_outputs,
+    orphan_outputs: selectedAttempt.orphan_outputs,
+    route_stage_id: safeText(domainInterface.route_stage_id),
+    attempt_id: selectedAttempt.attempt_id,
     authority_boundary: RCA_STAGE_FOLDER_AUTHORITY_BOUNDARY,
   };
 }

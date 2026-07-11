@@ -2,10 +2,10 @@
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
-  cpSync,
   existsSync,
   readFileSync,
 } from 'node:fs';
+import { materializeDomainSources } from 'opl-framework/domain-source-runtime';
 
 import { enrichSourceFingerprint, sourceReuseKey } from './fingerprint-reuse.js';
 import { safeText } from '../runtime-utils.js';
@@ -44,12 +44,13 @@ function copySourceIntoTopic(sourceFile, topicPaths, index, sourceLabel = 'sourc
     };
   }
 
-  const fileName = `${sourceLabel}-${String(index + 1).padStart(2, '0')}-${path.basename(absolute)}`;
-  const target = path.join(sourceIntakeMaterialInboxDir(topicPaths), fileName);
-  cpSync(absolute, target);
+  const materialized = materializeDomainSources({
+    material_root: sourceIntakeMaterialInboxDir(topicPaths),
+    sources: [{ kind: 'file', source_path: absolute, role: sourceLabel }],
+  }).entries[0];
   return {
-    absolute_path: target,
-    relative_path: path.relative(topicPaths.topicDir, target),
+    absolute_path: materialized.path,
+    relative_path: path.relative(topicPaths.topicDir, materialized.path),
   };
 }
 
