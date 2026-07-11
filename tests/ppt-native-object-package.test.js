@@ -725,9 +725,10 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   assert.equal(titleObject.bullet_count, 1);
   const byName = Object.fromEntries(result.package_readback.slides[0].objects.map((item) => [item.name, item]));
   assert.equal(byName['S01-chart'].series_count, 1);
-  assert.equal(byName['S01-chart'].category_count, 2);
+  assert.equal(byName['S01-chart'].category_count, 0);
   assert.equal(byName['S01-chart'].chart_type, 'column');
-  assert.deepEqual(byName['S01-chart'].categories, ['North, East', 'South']);
+  assert.equal(byName['S01-chart'].categories_raw, 'North, East,South');
+  assert.equal(byName['S01-chart'].categories_readback, 'delimiter_ambiguous');
   assert.deepEqual(byName['S01-chart'].series, [{ name: 'Actual', values: [3, 8] }]);
   assert.equal(byName['S01-table'].row_count, 3);
   assert.equal(byName['S01-table'].column_count, 2);
@@ -768,11 +769,9 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   relocateRelationshipBackedParts(result.outputPptx);
   assert.equal(validatePptx(result.outputPptx).success, true);
   const relocated = runPackageReadback(result.outputPptx);
-  assert.equal(relocated.schema_version, 1);
-  assert.equal(relocated.evidence_source, 'pptx_package_readback');
+  assert.equal(relocated.schema_version, 2);
+  assert.equal(relocated.evidence_source, 'officecli_structured_readback');
   assert.match(relocated.pptx_sha256, /^[a-f0-9]{64}$/);
-  assert.equal(relocated.slides[0].slide_part, 'ppt/scenes/semantic-slide.xml');
-  assert.equal(relocated.slides[0].notes_part, 'ppt/speakerNotes/semantic-notes.xml');
   assert.equal(relocated.notes_slide_count, 1);
   assert.equal(relocated.transition_count, 1);
   assert.equal(relocated.animation_count, 1);
@@ -783,10 +782,8 @@ test('native PPT materializer writes distinct editable objects and semantic pack
   assert.equal(relocated.slides[0].notes_relationship_resolved, true);
   assert.match(relocated.slides[0].notes_content_type, /presentationml\.notesSlide/);
   const relocatedByName = Object.fromEntries(relocated.slides[0].objects.map((item) => [item.name, item]));
-  assert.equal(relocatedByName['S01-chart'].relationship_target, 'ppt/dataObjects/semantic-chart.xml');
   assert.match(relocatedByName['S01-chart'].content_type, /drawingml\.chart/);
   assert.equal(relocatedByName['S01-chart'].series_count, 1);
-  assert.equal(relocatedByName['S01-picture'].relationship_target.startsWith('ppt/assets/'), true);
   assert.match(relocatedByName['S01-picture'].content_type, /^image\//);
   assert.equal(relocatedByName['S01-connector'].from_shape_name, 'S01-diamond');
   assert.equal(relocatedByName['S01-connector'].to_shape_name, 'S01-path');

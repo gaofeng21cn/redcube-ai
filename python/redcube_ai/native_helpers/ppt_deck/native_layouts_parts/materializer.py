@@ -637,18 +637,16 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
         )
     if actual_kind == 'chart':
         if (
-            not safe_text(materialized.get('relationship_type')).endswith('/chart')
-            or not materialized.get('relationship_resolved')
+            not materialized.get('relationship_resolved')
             or 'drawingml.chart' not in safe_text(materialized.get('content_type'))
         ):
-            raise RuntimeError(f'native PPT chart package relationship/content type missing: {shape_id}')
+            raise RuntimeError(f'native PPT chart structured readback/content type missing: {shape_id}')
     if actual_kind == 'picture':
         if (
-            not safe_text(materialized.get('relationship_type')).endswith('/image')
-            or not materialized.get('relationship_resolved')
+            not materialized.get('relationship_resolved')
             or not safe_text(materialized.get('content_type')).startswith('image/')
         ):
-            raise RuntimeError(f'native PPT picture package relationship/content type missing: {shape_id}')
+            raise RuntimeError(f'native PPT picture structured readback/content type missing: {shape_id}')
     if actual_kind == 'chart':
         expected_chart_type = safe_text(native_shape.get('chart_type') or native_shape.get('chartType'))
         if not expected_chart_type:
@@ -660,11 +658,15 @@ def _assert_package_object_evidence(native_shape: dict, materialized: dict) -> N
                 f'expected {expected_chart_type!r}, got {actual_chart_type!r}'
             )
         expected_categories = [str(value) for value in safe_list(native_shape.get('categories'))]
-        actual_categories = [str(value) for value in safe_list(materialized.get('categories'))]
-        if actual_categories != expected_categories:
+        actual_categories_raw = (
+            safe_text(materialized.get('categories_raw'))
+            if 'categories_raw' in materialized
+            else ','.join(str(value) for value in safe_list(materialized.get('categories')))
+        )
+        if actual_categories_raw != ','.join(expected_categories):
             raise RuntimeError(
                 f'native PPT chart categories mismatch for {shape_id}: '
-                f'expected {expected_categories!r}, got {actual_categories!r}'
+                f'expected {expected_categories!r}, got {actual_categories_raw!r}'
             )
         expected_series = [
             {

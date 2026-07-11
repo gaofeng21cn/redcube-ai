@@ -41,30 +41,6 @@ to force the Python interpreter used by the proof runner.
 USAGE
 }
 
-python_is_usable() {
-  [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import sys; print(sys.executable)' >/dev/null 2>&1
-}
-
-resolve_proof_python() {
-  for candidate in \
-    "${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-}" \
-    "${REDCUBE_TEST_PYTHON:-}" \
-    "${REDCUBE_PYTHON_COMMAND:-}" \
-    "$(command -v python3 2>/dev/null || true)" \
-    "$HOME/.codex/projects/redcube-ai/runtime-state/python/stable-playwright/venv/bin/python" \
-    "/opt/homebrew/bin/python3" \
-    "/usr/bin/python3"
-  do
-    if python_is_usable "$candidate"; then
-      printf '%s\n' "$candidate"
-      return 0
-    fi
-  done
-  echo "No usable Python interpreter found for native PPT proof runner." >&2
-  echo "Set REDCUBE_NATIVE_PPT_PROOF_PYTHON or run tools/native-ppt-proof/install-deps.sh in a Python-ready environment." >&2
-  return 127
-}
-
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --output-dir)
@@ -91,7 +67,8 @@ while [ "$#" -gt 0 ]; do
   esac
 done
 
-proof_python="$(resolve_proof_python)"
+export REDCUBE_NATIVE_PPT_PROOF_PYTHON="${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-${REDCUBE_TEST_PYTHON:-${REDCUBE_PYTHON_COMMAND:-}}}"
+proof_python="$(REDCUBE_PYTHON_COMMAND="$REDCUBE_NATIVE_PPT_PROOF_PYTHON" node --experimental-strip-types tools/resolve-proof-python.ts --command-env REDCUBE_PYTHON_COMMAND)"
 output_root="$("$proof_python" -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$output_root")"
 workspace_root="$output_root/workspace"
 fixture_input="$output_root/native-helper-input.json"
@@ -281,7 +258,7 @@ summary_file.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encod
 print(json.dumps(summary, ensure_ascii=False, indent=2))
 PY
 
-"$proof_python" tools/native-ppt-proof/build-artifact-index.py \
+node --experimental-strip-types tools/proof-artifact-index.ts --profile native-ppt \
   --output-dir "$output_root" \
   --index-file "$artifact_index_report"
 

@@ -44,11 +44,8 @@ test('native PPT Linux proof environment is documented without adding a desktop-
   assert.match(runner, /tools\/native-ppt-proof\/evaluate-quality\.ts/);
   assert.match(runner, /proof-summary\.json/);
   assert.match(runner, /artifact-index\.json/);
-  assert.match(runner, /build-artifact-index\.py/);
-  assert.match(
-    runner,
-    /"\$\(command -v python3 2>\/dev\/null \|\| true\)"[\s\S]*"\$HOME\/\.codex\/projects\/redcube-ai\/runtime-state\/python\/stable-playwright\/venv\/bin\/python"[\s\S]*"\/usr\/bin\/python3"/,
-  );
+  assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);
+  assert.match(runner, /tools\/resolve-proof-python\.ts/);
   assert.match(runner, /suite_id"\)\s*==\s*"data_charts"|suite_id/);
   assert.match(runner, /synthetic_preview/);
   assert.match(dockerfile, /FROM ghcr\.io\/astral-sh\/uv:0\.9\.5 AS uv/);
@@ -95,7 +92,7 @@ test('native PPT proof V2 contract is ready for opt-in CI triggers and cache pol
   assert.match(workflow, /native-ppt-proof-uv-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(workflow, /native-ppt-proof-playwright-\$\{\{ runner\.os \}\}-\$\{\{ hashFiles\('uv\.lock'\) \}\}/);
   assert.match(runner, /artifact-index\.json/);
-  assert.match(runner, /build-artifact-index\.py/);
+  assert.match(runner, /proof-artifact-index\.ts --profile native-ppt/);
   assert.doesNotMatch(
     workflow,
     /quality:\n[\s\S]*?tools\/native-ppt-proof\/run\.sh[\s\S]*?Run family tests/,

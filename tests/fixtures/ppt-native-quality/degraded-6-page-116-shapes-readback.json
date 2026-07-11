@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "evidence_source": "pptx_package_readback",
+  "evidence_source": "officecli_structured_readback",
   "pptx_file": "historical/native-ppt-proof-6-page-116-shapes.pptx",
   "pptx_sha256": "3fc99804ca3b4dc8c5d16c768f35a354c4179a50cf98f28d7022d3fe710764b4",
   "slide_count": 6,

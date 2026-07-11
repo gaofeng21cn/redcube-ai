@@ -450,7 +450,7 @@ function buildNativePayload(args) {
   };
   const packageReadback = {
     schema_version: 1,
-    evidence_source: 'pptx_package_readback',
+    evidence_source: 'officecli_structured_readback',
     pptx_file: outputPptx,
     pptx_sha256: renderProof.source_pptx_sha256,
     slide_count: slides.length,

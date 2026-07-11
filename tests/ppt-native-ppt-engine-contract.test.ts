@@ -72,8 +72,8 @@ test('native PPT proof lane records the Python engine contract as the single own
   );
   assert.equal(engineContract.engine_capabilities.authoring_ir, 'redcube_svg_ir');
   assert.equal(engineContract.engine_capabilities.pptx_writer, 'officecli_pptx_materializer');
-  assert.equal(engineContract.native_object_model.package_readback_schema_version, 1);
-  assert.equal(engineContract.native_object_model.package_readback_evidence_source, 'pptx_package_readback');
+  assert.equal(engineContract.native_object_model.package_readback_schema_version, 2);
+  assert.equal(engineContract.native_object_model.package_readback_evidence_source, 'officecli_structured_readback');
   assert.equal(engineContract.native_object_model.pptx_sha256_required, true);
   assert.deepEqual(engineContract.presentation_semantics.package_readback_count_fields, [
     'notes_slide_count',

@@ -26,31 +26,6 @@ usage() {
     'Live mode delegates raster generation to the Codex executor native imagegen skill; RCA does not read provider Base URL or API tokens.'
 }
 
-python_is_usable() {
-  [ -n "$1" ] && [ -x "$1" ] && "$1" -c 'import sys; print(sys.executable)' >/dev/null 2>&1
-}
-
-resolve_proof_python() {
-  for candidate in \
-    "${REDCUBE_IMAGE_PPT_PROOF_PYTHON:-}" \
-    "${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-}" \
-    "${REDCUBE_TEST_PYTHON:-}" \
-    "${REDCUBE_PYTHON_COMMAND:-}" \
-    "$HOME/.codex/projects/redcube-ai/runtime-state/python/stable-playwright/venv/bin/python" \
-    "/opt/homebrew/bin/python3" \
-    "/usr/bin/python3" \
-    "$(command -v python3 2>/dev/null || true)"
-  do
-    if python_is_usable "$candidate"; then
-      printf '%s\n' "$candidate"
-      return 0
-    fi
-  done
-  echo "No usable Python interpreter found for image PPT proof runner." >&2
-  echo "Set REDCUBE_IMAGE_PPT_PROOF_PYTHON or REDCUBE_TEST_PYTHON." >&2
-  return 127
-}
-
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --output-dir)
@@ -106,7 +81,8 @@ if [ "$image_generation_mode" != "mock" ] && [ "$image_generation_mode" != "live
   exit 2
 fi
 
-proof_python="$(resolve_proof_python)"
+export REDCUBE_IMAGE_PPT_PROOF_PYTHON="${REDCUBE_IMAGE_PPT_PROOF_PYTHON:-${REDCUBE_NATIVE_PPT_PROOF_PYTHON:-${REDCUBE_TEST_PYTHON:-${REDCUBE_PYTHON_COMMAND:-}}}}"
+proof_python="$(REDCUBE_PYTHON_COMMAND="$REDCUBE_IMAGE_PPT_PROOF_PYTHON" node --experimental-strip-types tools/resolve-proof-python.ts --command-env REDCUBE_PYTHON_COMMAND)"
 output_root="$("$proof_python" -c 'import pathlib,sys; print(pathlib.Path(sys.argv[1]).resolve())' "$output_root")"
 workspace_root="$output_root/workspace"
 image_dir="$output_root/images"
@@ -131,6 +107,6 @@ fi
   --fixture "$fixture_file" \
   ${style_reference_dir:+--style-reference-dir "$style_reference_dir"}
 
-"$proof_python" tools/image-ppt-proof/build-artifact-index.py \
+node --experimental-strip-types tools/proof-artifact-index.ts --profile image-ppt \
   --output-dir "$output_root" \
   --index-file "$artifact_index"

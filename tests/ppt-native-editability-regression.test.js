@@ -83,7 +83,8 @@ test('native PPT edit task survives package readback and true rerender', () => {
   const edited = proof.package_readback;
   const byName = Object.fromEntries(edited.slides[0].objects.map((item) => [item.name, item]));
   assert.notEqual(edited.pptx_sha256, baseline.pptx_sha256);
-  assert.deepEqual(byName['S01-chart'].categories, ['North', 'South', 'West']);
+  assert.equal(byName['S01-chart'].categories_raw, 'North,South,West');
+  assert.equal(byName['S01-chart'].categories_readback, 'delimiter_ambiguous');
   assert.deepEqual(byName['S01-chart'].series, [{ name: 'Reforecast', values: [5, 9, 12] }]);
   assert.equal(byName['S01-title'].text, 'Updated operating result');
   assert.equal(byName['S01-node-a'].fill, '#0F766E');

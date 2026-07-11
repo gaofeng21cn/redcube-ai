@@ -5,6 +5,7 @@ import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import {
   mkdirSync,
+  existsSync,
   readFileSync,
   writeFileSync,
 } from 'node:fs';
@@ -12,11 +13,6 @@ import {
 import { mkUserScopedTestWorkspace } from '../../tests/helpers/test-workspace.js';
 
 const repoRoot = process.cwd();
-const pythonCommand = process.env.REDCUBE_NATIVE_PPT_PROOF_PYTHON
-  || process.env.REDCUBE_TEST_PYTHON
-  || process.env.REDCUBE_PYTHON_COMMAND
-  || 'python3';
-
 function readJson(relativePath) {
   return JSON.parse(readFileSync(path.join(repoRoot, relativePath), 'utf-8'));
 }
@@ -100,9 +96,12 @@ function createProofOutput({
     run() {
       const indexFile = path.join(outputDir, 'artifact-index.json');
       const result = spawnSync(
-        pythonCommand,
+        process.execPath,
         [
-          'tools/native-ppt-proof/build-artifact-index.py',
+          '--experimental-strip-types',
+          'tools/proof-artifact-index.ts',
+          '--profile',
+          'native-ppt',
           '--output-dir',
           outputDir,
           '--index-file',
@@ -110,6 +109,9 @@ function createProofOutput({
         ],
         { cwd: repoRoot, encoding: 'utf-8' },
       );
+      assert.equal(result.error, undefined, result.error?.message);
+      assert.equal(result.signal, null, result.stderr || result.stdout);
+      assert.equal(existsSync(indexFile), true, result.stderr || result.stdout);
       return {
         result,
         index: JSON.parse(readFileSync(indexFile, 'utf-8')),

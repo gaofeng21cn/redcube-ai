@@ -37,7 +37,7 @@
   },
   "native_object_model": {
     "unknown_kind_policy": "fail_fast",
-    "manifest_kind_source": "materialized_pptx_package_readback",
+    "manifest_kind_source": "materialized_officecli_structured_readback",
     "stable_drawingml_intent": "grouped_editable_drawingml_children",
     "native_data_object_intent": [
       "chart",
@@ -45,10 +45,10 @@
     ],
     "path_geometry": "drawingml_custom_geometry",
     "package_readback_required": true,
-    "package_readback_schema_version": 1,
-    "package_readback_evidence_source": "pptx_package_readback",
+    "package_readback_schema_version": 2,
+    "package_readback_evidence_source": "officecli_structured_readback",
     "pptx_sha256_required": true,
-    "relationship_type_counts_required": true
+    "structured_object_counts_required": true
   },
   "template_intake": {
     "supported_modes": [

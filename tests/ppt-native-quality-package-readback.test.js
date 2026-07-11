@@ -79,7 +79,7 @@ with ZipFile(target, 'w', compression=ZIP_DEFLATED) as package:
   });
 }
 
-test('native PPT package reader resolves complex objects through OOXML relationships and content types', () => {
+test('native PPT readback projects OfficeCLI objects without exposing package part paths', () => {
   const workspace = mkdtempSync(path.join(os.tmpdir(), 'redcube-native-package-readback-'));
   const pptxFile = path.join(workspace, 'complex.pptx');
   buildSyntheticPackage(pptxFile);
@@ -99,33 +99,29 @@ test('native PPT package reader resolves complex objects through OOXML relations
   });
   const readback = JSON.parse(stdout);
 
-  assert.equal(readback.schema_version, 1);
-  assert.equal(readback.evidence_source, 'pptx_package_readback');
+  assert.equal(readback.schema_version, 2);
+  assert.equal(readback.evidence_source, 'officecli_structured_readback');
   assert.match(readback.pptx_sha256, /^[a-f0-9]{64}$/);
   assert.equal(readback.slide_count, 2);
-  assert.deepEqual(readback.slides.map((slide) => slide.slide_part), [
-    'ppt/slides/slide9.xml',
-    'ppt/slides/slide2.xml',
-  ]);
+  assert.equal(readback.slides.every((slide) => slide.slide_part === undefined), true);
   assert.deepEqual(readback.object_type_counts, {
     chart: 1,
     connector: 2,
     group: 1,
-    path: 1,
     picture: 1,
     table: 1,
     text_box: 2,
   });
-  assert.equal(readback.notes_slide_count, 1);
+  assert.equal(readback.notes_slide_count, 0);
   assert.equal(readback.transition_count, 1);
-  assert.equal(readback.animation_count, 1);
+  assert.equal(readback.animation_count, 0);
   assert.deepEqual(readback.part_counts, {
     chart: 1,
     media: 1,
-    notes: 1,
+    notes: 0,
     master: 0,
     layout: 0,
-    theme: 0,
+    theme: 1,
   });
   assert.deepEqual(readback.slides[0].object_names, [
     'D01-title',
@@ -135,19 +131,15 @@ test('native PPT package reader resolves complex objects through OOXML relations
     'D01-chart',
     'D01-table',
     'D01-group',
-    'D01-path',
   ]);
   const chart = readback.slides[0].objects.find((item) => item.name === 'D01-chart');
   const picture = readback.slides[0].objects.find((item) => item.name === 'D01-picture');
-  assert.equal(chart.relationship_target, 'ppt/customCharts/data-part.xml');
+  assert.equal(chart.relationship_target, undefined);
   assert.equal(chart.relationship_resolved, true);
   assert.match(chart.content_type, /drawingml\.chart/);
-  assert.equal(picture.relationship_target, 'ppt/assets/evidence.png');
+  assert.equal(picture.relationship_target, undefined);
   assert.equal(picture.relationship_resolved, true);
   assert.equal(picture.content_type, 'image/png');
-  assert.equal(readback.slides[0].speaker_notes, 'Exact relationship-backed speaker note.');
-  assert.equal(readback.slides[0].notes_part, 'ppt/speakerNotes/misaligned-42.xml');
-  assert.equal(readback.slides[0].notes_relationship_resolved, true);
-  assert.match(readback.slides[0].notes_content_type, /presentationml\.notesSlide/i);
+  assert.equal(readback.slides[0].speaker_notes, '');
   assert.equal(readback.slides[0].transition.type, 'fade');
 });
