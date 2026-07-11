@@ -6,7 +6,7 @@
   "package_id": "redcube-ai",
   "conformance_entrypoint": "contracts/stage_artifact_kernel_adoption.json",
   "kernel_contract_ref": "contracts/opl-framework/stage-artifact-runtime-contract.json",
-  "stage_control_plane_ref": "contracts/stage_control_plane.json",
+  "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
   "artifact_locator_contract_ref": "contracts/artifact_locator_contract.json#/primary_artifact_truth",
   "owner_receipt_contract_ref": "contracts/owner_receipt_contract.json",
   "conformance_validator": {
@@ -232,11 +232,6 @@
       "opl_owns_state_index_kernel": true,
       "opl_can_store_refs_hashes_provenance": true,
       "opl_can_rebuild_sidecar_index": true,
-      "rca_owns_file_authority": true,
-      "rca_owns_artifact_index_truth": true,
-      "rca_owns_visual_truth": true,
-      "rca_owns_review_export_verdict": true,
-      "rca_owns_artifact_authority": true,
       "sqlite_can_be_truth_source": false,
       "sqlite_can_store_visual_artifact_body": false,
       "sqlite_can_store_review_export_judgment": false
@@ -244,7 +239,7 @@
   },
   "domain_pack_binding": {
     "accepted_source_refs": [
-      "contracts/stage_control_plane.json",
+      "opl-generated:family_stage_control_plane",
       "contracts/foundry_agent_series.json",
       "docs/decisions.md#decision-rca-route-handler-writes-opl-stage-folder-contract"
     ],

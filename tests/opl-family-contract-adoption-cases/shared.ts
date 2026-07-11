@@ -12,7 +12,7 @@ import { readCurrentProgramContract } from '../helpers/current-program-contract.
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(__dirname, '../..');
 export const CONTRACT_PATH = 'contracts/runtime-program/opl-family-contract-adoption.json';
-export const STAGE_CONTROL_PLANE_PATH = 'contracts/stage_control_plane.json';
+export const DECLARATIVE_STAGE_MANIFEST_PATH = 'agent/stages/manifest.json';
 export const STAGE_ARTIFACT_KERNEL_ADOPTION_PATH = 'contracts/stage_artifact_kernel_adoption.json';
 export const DOMAIN_DESCRIPTOR_PATH = 'contracts/domain_descriptor.json';
 export const USER_STAGE_LOG_REQUIRED_FIELDS = [
@@ -61,8 +61,8 @@ export function currentProgram() {
   return readCurrentProgramContract();
 }
 
-export function stageControlPlane() {
-  return JSON.parse(read(STAGE_CONTROL_PLANE_PATH));
+export function declarativeStageManifest() {
+  return JSON.parse(read(DECLARATIVE_STAGE_MANIFEST_PATH));
 }
 
 export function stageArtifactKernelAdoption() {

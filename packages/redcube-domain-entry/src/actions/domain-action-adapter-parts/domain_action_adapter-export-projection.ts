@@ -39,7 +39,8 @@ function buildRouteStageHandoffBoundary(manifest) {
     queue_attempt_owner: 'one-person-lab',
     opl_hydrates_route_refs_to_queue_and_stage_attempts: true,
     rca_owns_inter_route_scheduler: false,
-    stage_graph_ref: 'contracts/stage_control_plane.json',
+    declarative_stage_manifest_ref: 'agent/stages/manifest.json',
+    stage_graph_ref: 'opl-generated:family_stage_control_plane',
     route_stage_projection_ref: '/stage_control_projection/route_stage_projection',
     visual_transition_spec_ref: '/visual_transition_spec',
     visual_stage_descriptor_scope: (

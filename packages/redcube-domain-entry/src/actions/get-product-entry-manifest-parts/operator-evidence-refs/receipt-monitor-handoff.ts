@@ -30,11 +30,11 @@ type WorkspaceReceiptInventoryProjection = RefGroup & {
 };
 
 export function buildOplExpectedReceiptMonitorFreshnessHandoff({
-  familyStageControlPlane,
+  declarativeStageManifest,
   productionEvidenceScaleoutRefs,
   workspaceReceiptInventoryProjection,
 }: {
-  familyStageControlPlane: RefGroup;
+  declarativeStageManifest: RefGroup;
   productionEvidenceScaleoutRefs: ProductionEvidenceScaleoutRefs;
   workspaceReceiptInventoryProjection: WorkspaceReceiptInventoryProjection;
 }) {
@@ -113,7 +113,7 @@ export function buildOplExpectedReceiptMonitorFreshnessHandoff({
       production_tail_workorder_ref: RCA_PRODUCTION_EVIDENCE_TAIL_WORKORDER_REF,
     },
     stage_expected_receipt_payload_summary: buildStageExpectedReceiptPayloadSummary({
-      familyStageControlPlane,
+      declarativeStageManifest,
       productionEvidenceScaleoutRefs,
       workspaceReceiptInventoryProjection,
     }),

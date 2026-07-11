@@ -132,7 +132,7 @@ export async function buildOplStageExecutionPlan({
       domain_handler_ref: '/product_entry_shell/domain_handler',
       domain_action_adapter_ref: '/product_entry_shell/domain_handler',
       family_action_catalog_ref: 'contracts/action_catalog.json',
-      family_stage_control_plane_ref: 'contracts/stage_control_plane.json',
+      family_stage_control_plane_ref: 'opl-generated:family_stage_control_plane',
       domain_memory_descriptor_ref: '/domain_memory_descriptor',
       visual_transition_spec_ref: '/visual_transition_spec',
       artifact_locator_contract_ref: '/artifact_locator_contract',

@@ -54,7 +54,8 @@
       "domain_source_refs": [
         "contracts/domain_descriptor.json",
         "contracts/pack_compiler_input.json",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
+        "opl-generated:family_stage_control_plane",
         "contracts/action_catalog.json",
         "contracts/artifact_locator_contract.json",
         "contracts/memory_descriptor.json"

@@ -72,7 +72,7 @@ export function buildTemporalStageRunConsumptionPolicy() {
     },
     source_refs: {
       temporal_autonomy_readiness_ref: '/temporal_autonomy_readiness',
-      family_stage_control_plane_ref: 'contracts/stage_control_plane.json',
+      family_stage_control_plane_ref: 'opl-generated:family_stage_control_plane',
       domain_owner_receipt_contract_ref: '/domain_owner_receipt_contract',
       domain_action_adapter_ref: '/mapped_surfaces/temporal_stage_run_consumption_policy',
     },

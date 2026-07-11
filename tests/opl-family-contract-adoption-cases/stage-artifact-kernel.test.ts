@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { assert, currentProgram, stageArtifactKernelAdoption, stageControlPlane, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH, STAGE_CONTROL_PLANE_PATH, test } from './shared.ts';
+import { assert, currentProgram, declarativeStageManifest, stageArtifactKernelAdoption, DECLARATIVE_STAGE_MANIFEST_PATH, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH, test } from './shared.ts';
 
 test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint', () => {
   const adoption = stageArtifactKernelAdoption();
-  const plane = stageControlPlane();
+  const manifest = declarativeStageManifest();
   const current = currentProgram();
 
   assert.equal(adoption.surface_kind, 'opl_stage_artifact_kernel_adoption');
@@ -12,7 +12,10 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
   assert.equal(adoption.domain_id, 'redcube_ai');
   assert.equal(adoption.package_id, 'redcube-ai');
   assert.equal(adoption.conformance_entrypoint, STAGE_ARTIFACT_KERNEL_ADOPTION_PATH);
-  assert.equal(adoption.stage_control_plane_ref, STAGE_CONTROL_PLANE_PATH);
+  assert.equal(adoption.stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+  assert.equal(manifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
+  assert.equal(DECLARATIVE_STAGE_MANIFEST_PATH, 'agent/stages/manifest.json');
+  assert.equal(fs.existsSync('contracts/state_index_kernel_adoption.json'), false);
   assert.equal(adoption.artifact_locator_contract_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
   assert.equal(adoption.owner_receipt_contract_ref, 'contracts/owner_receipt_contract.json');
   assert.equal(adoption.conformance_validator.surface_kind, 'rca_stage_artifact_kernel_adoption_conformance_validator');
@@ -123,17 +126,12 @@ test('RCA exposes a root Stage Artifact Kernel adoption conformance entrypoint',
     opl_owns_state_index_kernel: true,
     opl_can_store_refs_hashes_provenance: true,
     opl_can_rebuild_sidecar_index: true,
-    rca_owns_file_authority: true,
-    rca_owns_artifact_index_truth: true,
-    rca_owns_visual_truth: true,
-    rca_owns_review_export_verdict: true,
-    rca_owns_artifact_authority: true,
     sqlite_can_be_truth_source: false,
     sqlite_can_store_visual_artifact_body: false,
     sqlite_can_store_review_export_judgment: false,
   });
   assert.equal(adoption.stage_artifact_runtime_ref, 'contracts/artifact_locator_contract.json#/primary_artifact_truth');
-  assert.equal(adoption.stage_artifact_runtime_contract_id, plane.stage_artifact_runtime.contract_ref);
+  assert.equal(adoption.stage_artifact_runtime_contract_id, adoption.artifact_locator_contract_ref);
   assert.deepEqual(adoption.authority_boundary, {
     opl_can_index_refs: true,
     opl_can_rebuild_projection: true,

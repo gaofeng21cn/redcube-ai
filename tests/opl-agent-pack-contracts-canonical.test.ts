@@ -1,5 +1,6 @@
 // @ts-nocheck
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import test from 'node:test';
 import path from 'node:path';
 import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-agent-principles.js';
@@ -10,7 +11,7 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   const foundryProfile = readJson('contracts/foundry_agent_series.json');
   const domainDescriptor = readJson('contracts/domain_descriptor.json');
   const actionTargets = readJson('contracts/action_catalog.json');
-  const stageRefs = readJson('contracts/stage_control_plane.json');
+  const stageManifest = readJson('agent/stages/manifest.json');
   const packRefs = readJson('contracts/pack_compiler_input.json');
 
   assert.equal(foundryProfile.surface_kind, 'opl_foundry_agent_series_contract');
@@ -44,12 +45,12 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   );
   assert.equal(packRefs.minimal_authority_surface_ids.includes('review_export_verdict'), true);
 
-  assert.equal(stageRefs.surface_kind, 'family_stage_control_plane');
-  assert.equal(stageRefs.version, 'family-stage-control-plane.v1');
-  assert.equal(stageRefs.authority_boundary.opl_role, 'projection_consumer_only');
-  assert.equal(stageRefs.generated_stage_control_owner, 'one-person-lab');
-  assert.equal(stageRefs.stage_descriptor_body_copied, false);
-  assert.deepEqual(stageRefs.stage_ids, [
+  assert.equal(stageManifest.surface_kind, 'opl_standard_agent_declarative_stage_manifest');
+  assert.equal(stageManifest.version, 'opl-standard-agent-declarative-stage-manifest.v1');
+  assert.equal(stageManifest.authority_boundary.opl_role, 'projection_consumer_only');
+  assert.equal(stageManifest.authority_boundary.opl_can_write_domain_truth, false);
+  assert.equal(stageManifest.authority_boundary.provider_completion_is_domain_completion, false);
+  assert.deepEqual(stageManifest.stages.map((stage) => stage.stage_id), [
     'source_intake',
     'communication_strategy',
     'visual_direction',
@@ -61,8 +62,14 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(packRefs.surface_kind, 'opl_domain_pack_compiler_input');
   assert.equal(packRefs.pack_compiler_owner, 'one-person-lab');
   assert.equal(packRefs.projection_mode, 'repo_source_refs_only');
+  assert.equal(packRefs.source_refs.stage_graph_source_ref, 'agent/stages/manifest.json');
+  assert.equal(
+    packRefs.source_refs.executor_policy_source_ref,
+    'opl-generated:family_stage_control_plane#/stages/*/selected_executor',
+  );
   assert.equal(packRefs.required_domain_pack_paths.every((entry) => entry.startsWith('agent/')), true);
   assert.equal(packRefs.minimal_authority_surface_ids.includes('owner_receipt_signer'), true);
+  assert.equal(existsSync('contracts/stage_control_plane.json'), false);
 });
 
 test('RCA standard-agent principles resolve current OPL stage references', () => {
