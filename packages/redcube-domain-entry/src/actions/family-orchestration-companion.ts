@@ -1,7 +1,7 @@
 // @ts-nocheck
 import {
   buildFamilyProductEntryPresetOrchestration,
-} from 'opl-framework-shared/family-orchestration';
+} from 'opl-framework/family-orchestration';
 
 import type { FamilyOrchestrationCompanion } from '../types.js';
 import { safeText } from './action-utils.js';

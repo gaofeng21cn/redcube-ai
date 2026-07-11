@@ -269,7 +269,7 @@ test('invokeOplHostedProductEntry validates the OPL envelope and converges onto 
 });
 
 test('domain-entry shared family orchestration surface exposes the product-entry preset builder', async () => {
-  const familyOrchestration = await importDomainEntrySharedModule('opl-framework-shared/family-orchestration');
+  const familyOrchestration = await importDomainEntrySharedModule('opl-framework/family-orchestration');
 
   assert.equal(
     typeof familyOrchestration.buildFamilyProductEntryPresetOrchestration,

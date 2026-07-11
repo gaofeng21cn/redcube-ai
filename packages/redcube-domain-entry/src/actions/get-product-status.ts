@@ -1,6 +1,6 @@
 import {
   buildGeneratedProductEntryDomainSurface,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import { getProductEntryManifest } from './get-product-entry-manifest.js';
 

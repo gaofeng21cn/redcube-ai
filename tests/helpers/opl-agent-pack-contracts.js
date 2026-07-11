@@ -13,11 +13,6 @@ import {
   buildRedCubeDomainAuthorityRefs,
   buildVisualPackCompilerHandoffProjection,
 } from '../../packages/redcube-domain-entry/dist/index.js';
-import {
-  SHARED_OWNER_RELEASE_CONTRACT_PATH,
-} from 'opl-framework-shared/family-shared-release';
-export const REPO_LOCAL_SHARED_OWNER_RELEASE_CONTRACT_PATH = SHARED_OWNER_RELEASE_CONTRACT_PATH;
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const repoRoot = path.resolve(__dirname, '..', '..');
 

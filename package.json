@@ -14,7 +14,6 @@
     "test:smoke": "node scripts/verify-lane.ts smoke",
     "test:fast": "node scripts/verify-lane.ts fast",
     "test:ci": "node scripts/verify-lane.ts ci",
-    "test:family": "node scripts/verify-lane.ts family",
     "test:historical": "node scripts/verify-lane.ts historical",
     "test:full": "node scripts/verify-lane.ts full",
     "test:full:with-historical": "node scripts/verify-lane.ts full:with-historical",
@@ -34,8 +33,7 @@
   "dependencies": {
     "@redcube/domain-entry": "0.1.0",
     "@redcube/runtime": "0.1.0",
-    "@redcube/runtime-protocol": "0.1.0",
-    "opl-framework-shared": "git+https://github.com/gaofeng21cn/one-person-lab.git#latest-stable"
+    "@redcube/runtime-protocol": "0.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.7.0",

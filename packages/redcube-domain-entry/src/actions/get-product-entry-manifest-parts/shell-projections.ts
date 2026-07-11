@@ -1,16 +1,16 @@
 // @ts-nocheck
 import {
   buildManagedRuntimeContract as buildOplProviderRuntimeContract,
-} from 'opl-framework-shared/managed-runtime-contract';
+} from 'opl-framework/managed-runtime-contract';
 import {
   buildCheckpointSummary,
   buildRuntimeInventory,
   buildTaskLifecycle,
-} from 'opl-framework-shared/runtime-task-companions';
+} from 'opl-framework/runtime-task-companions';
 import {
   buildAutomationCatalog,
   buildAutomationDescriptor,
-} from 'opl-framework-shared/automation-companions';
+} from 'opl-framework/automation-companions';
 
 import {
   buildFamilySchedulerReplacementProjection,

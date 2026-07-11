@@ -1,4 +1,4 @@
-import { runFamilyTransition } from 'opl-framework-shared/family-transition-runner';
+import { runFamilyTransition } from 'opl-framework/family-transition-runner';
 
 import {
   SERIAL_ENV_TEST,

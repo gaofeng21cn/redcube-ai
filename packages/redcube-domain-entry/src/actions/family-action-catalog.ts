@@ -3,7 +3,7 @@ import {
   buildFamilyActionCatalogParity,
   normalizeFamilyActionCatalog,
   projectFamilyAction,
-} from 'opl-framework-shared/family-action-catalog';
+} from 'opl-framework/family-action-catalog';
 
 import { readJson } from './json-file.js';
 

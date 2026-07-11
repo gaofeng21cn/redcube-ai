@@ -136,17 +136,12 @@ test('invokeProductEntry rejects route and stop_after_stage outside hydrated sta
   });
 });
 
-test('product preflight consumes OPL shared builders from latest-stable with an exact lock receipt', async () => {
+test('product preflight consumes the OPL-managed Framework without a local implementation lock', async () => {
   const domainEntryPackage = readJson(DOMAIN_ENTRY_PACKAGE_JSON);
-  assert.equal(
-    domainEntryPackage.dependencies['opl-framework-shared'],
-    'git+https://github.com/gaofeng21cn/one-person-lab.git#latest-stable',
-  );
+  assert.equal(domainEntryPackage.dependencies['opl-framework'], undefined);
   const packageLock = readJson(new URL('../../package-lock.json', import.meta.url));
-  assert.match(
-    packageLock.packages['node_modules/opl-framework-shared'].resolved,
-    /#[0-9a-f]{40}$/,
-  );
+  assert.equal(packageLock.packages['node_modules/opl-framework'], undefined);
+  assert.equal(packageLock.packages['node_modules/@temporalio/activity'], undefined);
   const companions = await importDomainEntrySharedModule(PRODUCT_ENTRY_PROGRAM_COMPANIONS_SPECIFIER);
   assert.equal(typeof companions.buildProductEntryPreflight, 'function');
   assert.equal(typeof companions.buildProgramCheck, 'function');

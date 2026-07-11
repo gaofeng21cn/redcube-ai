@@ -1,12 +1,12 @@
 // @ts-nocheck
 import {
   buildSkillCatalog,
-} from 'opl-framework-shared/skill-catalog';
+} from 'opl-framework/skill-catalog';
 import {
   buildOperatorLoopActionCatalog,
   buildProductEntryShellCatalog,
   buildProductEntryShellLinkedSurface,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import {
   DOMAIN_HANDLER_DISPATCH_COMMAND,

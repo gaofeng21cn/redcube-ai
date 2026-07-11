@@ -85,11 +85,11 @@ export function createIsolatedCliInstall() {
     copyPackageIntoInstall(path.resolve(source), target);
   }
 
-  const oplFrameworkSharedDist = domainEntryResolve.resolve('opl-framework-shared/family-orchestration');
+  const oplFrameworkSharedDist = domainEntryResolve.resolve('opl-framework/family-orchestration');
   const oplFrameworkSharedPackageRoot = path.resolve(path.dirname(oplFrameworkSharedDist), '..');
   copyPackageIntoInstall(
     oplFrameworkSharedPackageRoot,
-    path.join(domainEntryPackagePath, 'node_modules', 'opl-framework-shared'),
+    path.join(domainEntryPackagePath, 'node_modules', 'opl-framework'),
   );
 
   return {

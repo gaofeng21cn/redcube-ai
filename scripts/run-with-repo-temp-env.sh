@@ -6,6 +6,19 @@ if [ "$#" -eq 0 ]; then
   exit 2
 fi
 
+repo_root="$(cd "$(dirname "$0")/.." && pwd -P)"
+framework_link_check_status=0
+framework_link_check_output="$(
+  "${OPL_BIN:-opl}" connect agent-packages link-framework \
+    --agent-root "${repo_root}" \
+    --check \
+    --json 2>&1
+)" || framework_link_check_status=$?
+if [ "${framework_link_check_status}" -ne 0 ]; then
+  printf '%s\n' "${framework_link_check_output}" >&2
+  exit "${framework_link_check_status}"
+fi
+
 cleanup_temp_root=0
 if [ -n "${OPL_REPO_TEMP_ROOT:-}" ]; then
   repo_temp_root="${OPL_REPO_TEMP_ROOT}"

@@ -1,7 +1,5 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import path from 'node:path';
-import { buildStandardAgentPrincipleAdoptionChecks } from '../node_modules/opl-framework-shared/dist/modules/foundry-lab/standard-agent-principles.js';
 
 import { readJson } from './helpers/opl-agent-pack-contracts.js';
 
@@ -100,9 +98,21 @@ test('RCA root contracts expose OPL-owned standard surfaces with RCA refs-only p
   assert.equal(packRefs.minimal_authority_surface_ids.includes('owner_receipt_signer'), true);
 });
 
-test('RCA standard-agent principles resolve current OPL stage references', () => {
-  const checks = buildStandardAgentPrincipleAdoptionChecks(path.resolve());
+test('RCA standard-agent principles declare current OPL stage references without private framework imports', () => {
+  const adoption = readJson('contracts/standard-agent-principles-adoption.json');
 
-  assert.equal(checks.status, 'passed');
-  assert.deepEqual(checks.blockers, []);
+  assert.equal(adoption.surface_kind, 'opl_standard_agent_principles_adoption');
+  assert.equal(adoption.state, 'active_contract');
+  assert.equal(
+    adoption.adopted_principle_pack_ref,
+    'contracts/opl-framework/standard-agent-principles.json',
+  );
+  assert.equal(adoption.source_refs.stage_manifest_ref, 'agent/stages/manifest.json');
+  assert.equal(
+    adoption.source_refs.stage_control_plane_ref,
+    'opl-generated:family_stage_control_plane',
+  );
+  for (const value of Object.values(adoption.authority_boundary)) {
+    assert.equal(value, false);
+  }
 });

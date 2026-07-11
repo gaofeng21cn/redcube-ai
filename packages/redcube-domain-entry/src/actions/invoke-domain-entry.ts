@@ -2,7 +2,7 @@
 import {
   buildReturnSurfaceContract,
   buildRuntimeSessionContract,
-} from 'opl-framework-shared/product-entry-companions';
+} from 'opl-framework/product-entry-companions';
 
 import { runDeliverableRoute } from './run-deliverable-route.js';
 import { buildOplStageExecutionPlan } from './opl-stage-execution-plan.js';

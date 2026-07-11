@@ -44,11 +44,7 @@ test('inspectRequiredRuntimeSharedResolution accepts required runtime/shared spe
         resolve_from: 'packages/redcube-runtime/package.json',
       },
       {
-        specifier: 'opl-framework-shared/product-entry-companions',
-        resolve_from: 'packages/redcube-domain-entry/package.json',
-      },
-      {
-        specifier: 'opl-framework-shared/family-shared-release',
+        specifier: 'opl-framework/product-entry-companions',
         resolve_from: 'packages/redcube-domain-entry/package.json',
       },
     ],
@@ -72,18 +68,13 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
           resolve_from: 'packages/redcube-runtime/package.json',
         },
         {
-          specifier: 'opl-framework-shared/product-entry-program-companions',
-          resolve_from: 'packages/redcube-domain-entry/package.json',
-        },
-        {
-          specifier: 'opl-framework-shared/family-shared-release',
+          specifier: 'opl-framework/product-entry-program-companions',
           resolve_from: 'packages/redcube-domain-entry/package.json',
         },
       ],
       resolve(specifier) {
         if (
-          specifier === 'opl-framework-shared/product-entry-program-companions'
-          || specifier === 'opl-framework-shared/family-shared-release'
+          specifier === 'opl-framework/product-entry-program-companions'
         ) {
           const error = new Error('Cannot find module');
           error.code = 'ERR_MODULE_NOT_FOUND';
@@ -92,6 +83,6 @@ test('inspectRequiredRuntimeSharedResolution fails closed when required runtime/
         return path.join(repoRoot, 'node_modules', specifier, 'index.js');
       },
     }),
-    /opl-framework-shared\/family-shared-release/,
+    /opl-framework\/product-entry-program-companions/,
   );
 });

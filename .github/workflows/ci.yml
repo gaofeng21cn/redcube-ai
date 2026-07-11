@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Checkout OPL shared owner contract
+      - name: Checkout OPL Framework
         run: |
           git clone --depth=1 --filter=blob:none https://github.com/gaofeng21cn/one-person-lab.git ../one-person-lab
 
@@ -30,6 +30,12 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
+
+      - name: Build OPL Framework
+        run: |
+          npm ci --prefix ../one-person-lab --ignore-scripts
+          npm run --prefix ../one-person-lab build
+          echo "OPL_BIN=$GITHUB_WORKSPACE/../one-person-lab/bin/opl" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -52,14 +58,15 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Link OPL Framework
+        run: |
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
+
       - name: Run build and typecheck
         run: npm run typecheck
 
       - name: Run fast tests
         run: node scripts/run-test-group.ts fast
-
-      - name: Run family tests
-        run: node scripts/run-test-group.ts family
 
       - name: Run remaining meta tests
         run: node scripts/run-test-group.ts meta:ci
@@ -83,6 +90,13 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
+
+      - name: Checkout and build OPL Framework
+        run: |
+          git clone --depth=1 --filter=blob:none https://github.com/gaofeng21cn/one-person-lab.git ../one-person-lab
+          npm ci --prefix ../one-person-lab --ignore-scripts
+          npm run --prefix ../one-person-lab build
+          echo "OPL_BIN=$GITHUB_WORKSPACE/../one-person-lab/bin/opl" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -117,6 +131,10 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - name: Link OPL Framework
+        run: |
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
+
       - name: Run native PPT true proof
         run: tools/native-ppt-proof/run.sh --output-dir artifacts/native-ppt-proof
 
@@ -148,6 +166,13 @@ jobs:
           node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: 'package-lock.json'
+
+      - name: Checkout and build OPL Framework
+        run: |
+          git clone --depth=1 --filter=blob:none https://github.com/gaofeng21cn/one-person-lab.git ../one-person-lab
+          npm ci --prefix ../one-person-lab --ignore-scripts
+          npm run --prefix ../one-person-lab build
+          echo "OPL_BIN=$GITHUB_WORKSPACE/../one-person-lab/bin/opl" >> "$GITHUB_ENV"
 
       - name: Setup Python
         uses: actions/setup-python@v6
@@ -181,6 +206,10 @@ jobs:
 
       - name: Install Node dependencies
         run: npm ci
+
+      - name: Link OPL Framework
+        run: |
+          "$OPL_BIN" connect agent-packages link-framework --agent-root "$GITHUB_WORKSPACE" --json
 
       - name: Run image PPT proof
         run: tools/image-ppt-proof/run.sh --output-dir artifacts/image-ppt-proof --mock-image-generation

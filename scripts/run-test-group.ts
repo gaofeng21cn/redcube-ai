@@ -5,7 +5,6 @@ import path from 'node:path';
 import process from 'node:process';
 
 import {
-  assertCurrentRepoSharedPinAlignment,
   assertRootTestPartition,
   assertRequiredRuntimeSharedResolution,
   assertWorkspacePackageResolution,
@@ -29,6 +28,32 @@ const scriptDir = import.meta.dirname;
 const repoRoot = path.resolve(scriptDir, '..');
 
 process.chdir(repoRoot);
+
+function assertManagedFrameworkLink() {
+  const result = spawnSync(process.env.OPL_BIN || 'opl', [
+    'connect',
+    'agent-packages',
+    'link-framework',
+    '--agent-root',
+    repoRoot,
+    '--check',
+    '--json',
+  ], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
+  if (result.error) {
+    throw result.error;
+  }
+  if ((result.status ?? 1) !== 0) {
+    process.stderr.write(result.stdout || '');
+    process.stderr.write(result.stderr || '');
+    throw new Error('OPL-managed framework link check failed before test execution.');
+  }
+}
+
+assertManagedFrameworkLink();
+
 function pathIsInsideRepo(value) {
   if (!value) {
     return false;
@@ -92,7 +117,6 @@ if (hygieneResult.status !== 0) {
 }
 assertWorkspacePackageResolution({ repoRoot });
 assertRequiredRuntimeSharedResolution({ repoRoot });
-assertCurrentRepoSharedPinAlignment({ repoRoot });
 
 assertValidTestRegistry();
 const GROUPS = buildTestGroups();

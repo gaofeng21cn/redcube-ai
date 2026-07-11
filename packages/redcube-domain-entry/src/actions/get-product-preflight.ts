@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs';
 import {
   buildProductEntryPreflight,
   buildProgramCheck,
-} from 'opl-framework-shared/product-entry-program-companions';
+} from 'opl-framework/product-entry-program-companions';
 
 import { doctorWorkspace } from './doctor-workspace.js';
 import { requireField } from './action-utils.js';

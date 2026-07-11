@@ -3,37 +3,10 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 
 import {
-  listRepoFiles,
   listWorkspacePackageDirs,
   readRepoFile,
   readRepoJson,
 } from './shared.js';
-
-test('repo-local family pin wrapper is the only allowed direct upstream family helper entrypoint', () => {
-  const allowedFiles = new Set([
-    'scripts/run-test-group-lib.ts',
-    'tests/helpers/opl-agent-pack-contracts.js',
-  ]);
-  const disallowedDirectImports = [];
-  const upstreamFamilyHelperImportPattern = /\bfrom\s+['"]opl-framework-shared\/family-shared-release['"]|\bimport\s*\(\s*['"]opl-framework-shared\/family-shared-release['"]\s*\)/;
-  const sharedOwnerContractPathPattern = /['"]contracts\/family-release\/shared-owner-release\.json['"]/;
-
-  for (const file of [...listRepoFiles('scripts'), ...listRepoFiles('tests')]) {
-    if (!/\.(?:ts|js|mjs|cjs)$/.test(file) || allowedFiles.has(file)) {
-      continue;
-    }
-
-    const text = readRepoFile(file);
-    if (
-      upstreamFamilyHelperImportPattern.test(text)
-      || sharedOwnerContractPathPattern.test(text)
-    ) {
-      disallowedDirectImports.push(file);
-    }
-  }
-
-  assert.deepEqual(disallowedDirectImports, []);
-});
 
 test('package-lock tracks every declared workspace package', () => {
   const lockfile = readRepoJson('package-lock.json');
@@ -48,4 +21,13 @@ test('package-lock tracks every declared workspace package', () => {
     );
     assert.equal(lockPackages[relativeDir].name, manifest.name);
   }
+});
+
+test('CI constructs and links the OPL Framework before running consumers', () => {
+  const workflow = readRepoFile('.github/workflows/ci.yml');
+
+  assert.match(workflow, /npm ci --prefix \..\/one-person-lab --ignore-scripts/);
+  assert.match(workflow, /npm run --prefix \..\/one-person-lab build/);
+  assert.match(workflow, /connect agent-packages link-framework --agent-root "\$GITHUB_WORKSPACE" --json/);
+  assert.doesNotMatch(workflow, /scripts\/run-test-group\.ts family/);
 });
