@@ -22,7 +22,6 @@ const SHARED_GOVERNANCE_SURFACES = [
   'deliverable run',
   'review watch',
   'auditDeliverable',
-  'runtimeWatch',
   'getReviewState',
   'getPublicationProjection',
 ];
@@ -132,19 +131,12 @@ test('stable families expose one explicit governance_surface contract on create 
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      run: {
-        run_id: 'run-deck-a-001',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-a',
-        overlay: 'ppt_deck',
-        current_stage: 'screenshot_review',
-        status: 'completed',
-      },
     });
 
     assert.deepEqual(review.governance_surface.shared_governance_surfaces, SHARED_GOVERNANCE_SURFACES);
     assert.deepEqual(audit.governance_surface, review.governance_surface);
-    assert.deepEqual(watch.governance_surface, review.governance_surface);
+    assert.equal(watch.visual_review_semantics.review_status, review.state.current_status);
+    assert.equal(Object.hasOwn(watch, 'governance_surface'), false);
     assert.deepEqual(
       projection.publication.deliverables['deck-a'].governance_surface,
       review.governance_surface,
@@ -154,7 +146,7 @@ test('stable families expose one explicit governance_surface contract on create 
   });
 });
 
-test('canonical publication projection, audit, and watch rebuild governance summaries after stored drift is detected', async () => {
+test('canonical publication projection and audit rebuild governance while runtimeWatch only exposes artifact refs', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-governance-parity-'));
     await buildReviewReadyWorkspace({
@@ -199,20 +191,12 @@ test('canonical publication projection, audit, and watch rebuild governance summ
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'poster-a',
-      run: {
-        run_id: 'run-poster-a-001',
-        topic_id: 'topic-a',
-        deliverable_id: 'poster-a',
-        overlay: 'poster_onepager',
-        current_stage: 'export_bundle',
-        status: 'completed',
-      },
     });
     assert.equal(rebuilt.publication.deliverables['poster-a'].operator_handoff?.gate_status, 'ready');
     assert.equal(audit.operator_handoff?.gate_status, 'ready');
-    assert.equal(watch.operator_handoff?.gate_status, 'ready');
+    assert.equal(watch.artifact_locator_refs.canonical_export_artifact_ref, rebuilt.publication.deliverables['poster-a'].canonical_export_artifact);
     assert.equal(rebuilt.publication.deliverables['poster-a'].lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
     assert.equal(audit.lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
-    assert.equal(watch.lifecycle_stage_summary?.stage_model, 'direct_delivery_human_workline');
+    assert.equal(Object.hasOwn(watch, 'lifecycle_stage_summary'), false);
   });
 });

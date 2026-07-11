@@ -50,7 +50,6 @@ export const SHARED_GOVERNANCE_SURFACES = [
   'deliverable run',
   'review watch',
   'auditDeliverable',
-  'runtimeWatch',
   'getReviewState',
   'getPublicationProjection',
 ] as const;
@@ -100,7 +99,7 @@ export function buildSharedSourceTruthContract({
     authoritative_artifacts: ['source_index', 'extracted_materials', 'source_audit', 'source_brief', 'source_readiness_pack'],
     readiness_target: 'planning_ready',
     pass_condition: 'source_audit.status=pass && source_readiness_pack.readiness.planning_ready=true',
-    route_gate_rule: 'authoritative_fail_closed_in_audit_and_runtime_watch',
+    route_gate_rule: 'authoritative_fail_closed_in_audit_and_review_state',
     hydration_model: {
       hydrated_contract_surface: 'contracts/hydrated-deliverable.json',
       runtime_injection_surface: 'shared_source_truth',
@@ -213,7 +212,7 @@ export function buildGovernanceSurfaceContract(contract: JsonObject = {}): Gover
     schema_version: 1,
     shared_governance_surfaces: [...SHARED_GOVERNANCE_SURFACES],
     required_summaries: [...REQUIRED_GOVERNANCE_SUMMARIES],
-    authoritative_audit_surfaces: ['auditDeliverable', 'runtimeWatch'],
+    authoritative_audit_surfaces: ['auditDeliverable'],
     authoritative_review_surfaces: ['getReviewState', 'getPublicationProjection'],
     family_boundary: buildGovernanceFamilyBoundary(contract),
     formal_entry: {
@@ -239,7 +238,6 @@ export function validateGovernanceSurfaceContract(content: JsonObject): boolean 
     && SHARED_GOVERNANCE_SURFACES.every((surface) => surfaces.includes(surface))
     && REQUIRED_GOVERNANCE_SUMMARIES.every((summary) => requiredSummaries.includes(summary))
     && stringArray(content.authoritative_audit_surfaces).includes('auditDeliverable')
-    && stringArray(content.authoritative_audit_surfaces).includes('runtimeWatch')
     && stringArray(content.authoritative_review_surfaces).includes('getReviewState')
     && stringArray(content.authoritative_review_surfaces).includes('getPublicationProjection')
     && typeof familyBoundary.family_kind === 'string'

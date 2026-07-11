@@ -160,6 +160,29 @@ test('RCA canonical functional audit leaves no OPL source-behavior residue', () 
   assert.equal(checks.active_private_generic_residue_count, 0);
 });
 
+test('RCA functional audit records runtimeWatch generic shell retirement', () => {
+  const audit = readJson('contracts/functional_privatization_audit.json');
+  const thinning = audit.runtime_watch_thinning;
+
+  assert.equal(thinning.status, 'generic_runtime_status_shell_retired');
+  assert.equal(thinning.surface_kind, 'rca_visual_review_refs_projection');
+  assert.equal(thinning.generic_runtime_status_owner, 'one-person-lab');
+  assert.equal(thinning.accepts_generic_run_input, false);
+  assert.equal(thinning.compatibility_facade_allowed, false);
+  assert.equal(thinning.fallback_allowed, false);
+  assert.deepEqual(thinning.allowed_outputs, [
+    'delivery_locator_refs',
+    'visual_review_semantics',
+    'review_state_refs',
+    'artifact_locator_refs',
+    'typed_blocker_refs',
+    'owner_evidence_refs',
+  ]);
+  for (const field of ['status', 'current_stage', 'resumable', 'run_telemetry', 'lifecycle_stage_summary']) {
+    assert.equal(thinning.retired_generic_outputs.includes(field), true, field);
+  }
+});
+
 test('RCA physical morphology policy keeps active source tails classified and source refs resolvable', () => {
   const policy = readJson('contracts/physical_source_morphology_policy.json');
   const surfaces = byId(policy.active_surface_classifications, 'surface_id');

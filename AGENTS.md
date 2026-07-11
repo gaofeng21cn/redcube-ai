@@ -17,7 +17,7 @@
 - `gateway / harness` 只作为仓内边界层、执行层或历史语境保留；对外第一身份是 RedCube AI visual-deliverable domain agent。
 - 若文档提到 `Hermes-Agent`，只能指上游外部 runtime 项目 / 服务；仓内自写的 runtime package、pilot、shim 或 scaffold，不得写成“已接入 Hermes-Agent”。
 - 当前 formal-entry matrix 固定为：默认正式入口 `CLI`、支持协议层 `MCP`、内部控制面 `controller`。
-- 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id`、`run_id`，以及 `auditDeliverable`、`runtimeWatch`、`getReviewState`、`getPublicationProjection` 收口。
+- 关键 durable surface 继续围绕 `program_id`、`topic_id`、`deliverable_id` 与 OPL-owned `run_id` refs 收口；`auditDeliverable`、`getReviewState`、`getPublicationProjection` 持有 RCA review/projection truth，`runtimeWatch` 只返回 visual review/artifact/blocker/owner evidence refs。
 
 ## 开发原则
 

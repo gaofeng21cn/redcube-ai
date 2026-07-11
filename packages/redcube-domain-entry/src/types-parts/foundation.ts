@@ -149,89 +149,6 @@ export interface RunDeliverableRouteRequest extends DeliverableRequest, OverlayR
   cross_provider_attempt_index?: Record<string, unknown>;
 }
 
-// Telemetry summaries
-type PosterMetricId =
-  | 'far_view_readability'
-  | 'scan_path_clarity'
-  | 'figure_claim_alignment'
-  | 'density_balance'
-  | 'citation_visibility'
-  | 'venue_metadata_complete'
-  | 'print_export_safe';
-
-interface MetricExtensionMetricSummary {
-  metric_id: PosterMetricId | string;
-  value: number | string | boolean | null;
-  status: 'not_evaluated' | 'captured';
-}
-
-interface MetricExtensionSummary {
-  extension_id: string;
-  overlay_scope: string[];
-  profile_scope: string[];
-  status: 'declared' | 'inactive';
-  metrics: MetricExtensionMetricSummary[];
-}
-
-interface RunTelemetrySummary {
-  run_id: string | null;
-  route: string | null;
-  overlay: string | null;
-  scope: string | null;
-  target: string | null;
-  executor_kind: string | null;
-  execution_surface: string | null;
-  status: string | null;
-  started_at: string | null;
-  finished_at: string | null;
-  latency_ms: number | null;
-  prompt_tokens: number | null;
-  completion_tokens: number | null;
-  estimated_cost: number | null;
-}
-
-interface ErrorTaxonomySummary {
-  error_kind: string | null;
-  error_message: string | null;
-  current_stage: string | null;
-  failed: boolean;
-}
-
-interface RerunAnalyticsSummary {
-  rerun_count: number;
-  previous_run_id: string | null;
-  source_stage: string | null;
-  blocking_review: string | null;
-  baseline_deliverable_id: string | null;
-}
-
-interface CostSummary {
-  executor_identity: string | null;
-  executor_kind: string | null;
-  latency_ms: number | null;
-  prompt_tokens: number | null;
-  completion_tokens: number | null;
-  estimated_cost: number | null;
-}
-
-interface QualityDriftSummary {
-  relative_quality_verdict: string | null;
-  degradation_count: number;
-  improvement_count: number;
-  acceptable_change_count: number;
-  baseline_promotion_state: string | null;
-  promoted_reference_id: string | null;
-}
-
-interface ApprovalThroughputSummary {
-  publish_state: string | null;
-  pending_review_count: number;
-  approval_pending: boolean;
-  published: boolean;
-  blocked: boolean;
-}
-
-
 // Runtime projection surfaces
 export interface RuntimeProgressProjection {
   current_stage: string | null;
@@ -340,33 +257,6 @@ export interface ReviewStateResponse extends SurfaceBase<'review_state'> {
   operator_handoff: Record<string, unknown> | null;
   lifecycle_stage_summary: Record<string, unknown> | null;
   governance_surface: GovernanceSurfaceContract;
-}
-
-interface RuntimeWatchResponse extends SurfaceBase<'runtime_watch'> {
-  owner_boundary: Record<string, unknown>;
-  run_id: string;
-  current_stage: string | null;
-  status: string;
-  pending_reviews: string[];
-  review_state: Record<string, unknown>;
-  quality_summary: Record<string, unknown>;
-  publication_projection: Record<string, unknown> | null;
-  source_readiness_summary: Record<string, unknown> | null;
-  gate_summary: Record<string, unknown> | null;
-  operator_handoff: Record<string, unknown> | null;
-  lifecycle_stage_summary: Record<string, unknown> | null;
-  governance_surface: GovernanceSurfaceContract;
-  resumable: boolean;
-  profile_id: string | null;
-  delivery_contract: Record<string, unknown> | null;
-  required_export_bundle: Record<string, unknown> | null;
-  run_telemetry: RunTelemetrySummary;
-  error_taxonomy: ErrorTaxonomySummary;
-  rerun_analytics: RerunAnalyticsSummary;
-  cost_summary: CostSummary;
-  quality_drift_summary: QualityDriftSummary;
-  approval_throughput_summary: ApprovalThroughputSummary;
-  metric_extensions: MetricExtensionSummary[];
 }
 
 interface ReviewMutationRequest extends DeliverableRequest {

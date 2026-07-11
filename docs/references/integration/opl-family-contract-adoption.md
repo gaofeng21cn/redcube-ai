@@ -11,7 +11,7 @@ Machine boundary: 人读 OPL family contract support。机器真相继续归 run
 
 ## Runtime Attempt Projection
 
-RCA 通过 product-entry session、direct `runtimeWatch`、artifact inventory、runtime health、`domain-handler export|dispatch` 与 `temporal_autonomy_readiness` 映射 `opl_family_runtime_attempt_contract.v1`。这些 surface 向 `OPL` 投影 stage descriptor、attempt locator、retry/backoff refs、workspace boundary、failure reason、reconciliation status、last observed projection 和 owner receipt / typed blocker refs。
+RCA 通过 product-entry session、route response 的 OPL attempt refs、artifact inventory、`domain-handler export|dispatch` 与 `temporal_autonomy_readiness` 映射 `opl_family_runtime_attempt_contract.v1`；通用 attempt/status 由 OPL Console / Runway / Ledger 读取。`runtimeWatch` 不参与 generic runtime contract，只投影 visual review/artifact/blocker/owner evidence refs。
 
 OPL hosted integration 可以托管、排队、唤醒、retry/dead-letter、重新查询并投影 provider-backed attempt；它不能把 provider completion 写成 visual ready、exportable、handoffable 或 production visual-stage long soak complete。RCA 继续持有 visual route truth、review/export verdict、canonical artifacts、publication projection truth、visual memory body 和 owner receipt authority。
 
@@ -31,7 +31,7 @@ RCA 的质量门是 visual-deliverable-specific：内容适配、视觉审阅、
 
 ## Incident Projection
 
-RCA 通过 `runtimeWatch`、OPL stage-plan / route-run report、review/export gate audit 和 operator handoff 映射 `opl_family_incident_learning_loop.v1`。真实 incident 必须回流成 guard、test、contract、runbook、taxonomy update 或 operator projection；domain-specific failure 必须有 RCA-owned closure ref。
+RCA 通过 OPL stage-plan / route-run report、review/export gate audit、visual blocker refs 和 operator handoff 映射 `opl_family_incident_learning_loop.v1`。`runtimeWatch` 只提供其中的 visual blocker/owner evidence refs，不聚合通用 error/rerun telemetry。真实 incident 必须回流成 guard、test、contract、runbook、taxonomy update 或 operator projection；domain-specific failure 必须有 RCA-owned closure ref。
 
 ## Product Operator Projection
 
@@ -41,7 +41,7 @@ RCA 通过 product entry、product session、OPL-hosted integration、artifact i
 
 `opl_family_lifecycle_adapter` 当前是 refs-only lifecycle adoption projection，不是 RCA-owned generic lifecycle adapter。它把 OPL stage-plan / route-run refs、product-entry sessions、artifact inventory、review state、publication projection 与 runtime loop closure 映射给 OPL family persistence / lifecycle / owner-route discovery；RCA 不因此拥有 generic runner、attempt ledger、queue、workbench、session shell 或 lifecycle runtime。
 
-manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。`runtimeWatch` 继续是 direct review/progress read model，`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；OPL 的 runtime 查询目标是 status/workbench runtime read-model，而不是 RCA repo-local default wrapper。
+manifest 暴露 `discoverable_manifest_projection`，用于 OPL hosted integration 发现 RCA 可采纳的 surface；direct product entry、OPL-hosted product entry 和 product-entry session 响应暴露 `hydrated_session_projection`，用于同一 `entry_session_id` 下恢复、索引和采纳当前 deliverable loop。`runtimeWatch` 只保留 visual review/artifact/blocker/owner evidence refs projection，`runtime_watch` 已从 generated `domain_action_adapter` dispatch 退役；OPL 的 runtime 查询目标是 Console / Runway / Ledger status/workbench read model，而不是 RCA repo-local default wrapper。
 
 该 surface 继续遵守 RCA 当前持久化策略：canonical truth 仍是文件 authority 与可重建 artifact/session index，SQLite 只作为 OPL State Index Kernel / refs-only sidecar index 保持 `deferred_for_rca_opl_state_index_kernel_sidecar`，只在实测 file-count 增长、跨 deliverable 查询压力或 retention ledger 成本达到阈值后重新评估；它不存 PNG/PPTX/PDF body，也不持有 visual truth、canonical artifact truth 或 review/export verdict。
 

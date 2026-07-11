@@ -292,66 +292,26 @@ test('reviewRenderOutput maps checks and profile contracts to rerun targets', as
   }
 });
 
-test('runtimeWatch reports pending state and rejects retired run lookup locator', async () => {
-  const pending = await runtimeWatch({
-    run: {
-      run_id: 'run-1',
-      current_stage: 'render_review',
-      status: 'blocked',
-      pending_reviews: ['render_review'],
-      resumable: true,
+test('runtimeWatch rejects generic run inputs and routes status ownership to OPL', async () => {
+  await assert.rejects(
+    () => runtimeWatch({ run: { run_id: 'run-1', status: 'blocked', resumable: true } }),
+    (error) => {
+      assert.match(error.message, /only projects visual review refs/);
+      assert.equal(error.surface_kind, 'typed_blocker');
+      assert.equal(error.blocker_kind, 'generic_runtime_watch_input_moved_to_opl');
+      assert.deepEqual(error.typed_blocker.required_refs, [
+        'opl_stage_attempt_ref',
+        'provider_attempt_ref',
+        'provider_attempt_ledger_ref',
+      ]);
+      assert.equal(error.typed_blocker.owner_boundary.rca_owns_generic_runtime_record_store, false);
+      assert.equal(error.typed_blocker.next_required_owner_action, 'read_generic_runtime_status_from_opl_console_runway_or_ledger');
+      return true;
     },
-  });
-  assert.equal(pending.ok, true);
-  assert.equal(pending.surface_kind, 'runtime_watch');
-  assert.equal(pending.run_id, 'run-1');
-  assert.equal(pending.current_stage, 'render_review');
-  assert.equal(pending.status, 'review_pending');
-  assert.deepEqual(pending.pending_reviews, ['render_review']);
-  assert.equal(pending.owner_boundary.classification, 'retained_current_refs_only_boundary');
-  assert.equal(pending.owner_boundary.refs_only, true);
-  assert.equal(pending.owner_boundary.generic_supervisor_owner, 'opl');
-  assert.equal(pending.owner_boundary.owns_generic_supervisor, false);
-  assert.equal(pending.owner_boundary.declares_production_soak_complete, false);
-  assert.deepEqual(pending.owner_boundary.exports_only, [
-    'run_status_refs',
-    'artifact_locator_refs',
-    'review_state_refs',
-    'typed_blocker_refs',
-    'operator_evidence_refs',
-    'telemetry_summary_refs',
-  ]);
-
-  await withMockCodexRuntime(async () => {
-    const root = workspace('redcube-runtime-watch-locator-');
-    await completeTopicSource(root, { title: '正式答辩 deck source', brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。', keywords: ['答辩', '结果', '问题'] });
-    await createDeck(root, { profileId: 'defense_deck', title: '正式答辩 deck', goal: '用于正式答辩并覆盖潜在质询' });
-    const runResult = await runDeliverableRoute({
-      workspaceRoot: root,
-      overlay: 'ppt_deck',
-      topicId: TOPIC_ID,
-      deliverableId: DECK_ID,
-      route: 'storyline',
-    });
-    await assert.rejects(
-      () => runtimeWatch({ workspaceRoot: root, topicId: TOPIC_ID, deliverableId: DECK_ID, runId: runResult.run.run_id }),
-      (error) => {
-        assert.match(error.message, /runtimeWatch no longer reads RCA-local route-run records/);
-        assert.equal(error.surface_kind, 'typed_blocker');
-        assert.equal(error.blocker_kind, 'rca_local_route_run_lookup_retired');
-        assert.deepEqual(error.typed_blocker.required_refs, [
-          'opl_stage_attempt_ref',
-          'provider_attempt_ref',
-          'provider_attempt_ledger_ref',
-        ]);
-        assert.equal(error.typed_blocker.owner_boundary.rca_owns_generic_runtime_record_store, false);
-        return true;
-      },
-    );
-  });
+  );
 });
 
-test('runtimeWatch keeps deliverable-level review watch available without run locator', async () => {
+test('runtimeWatch returns only visual review, artifact, blocker, and owner evidence refs', async () => {
   await withMockCodexRuntime(async () => {
     const root = workspace('redcube-runtime-watch-deliverable-only-');
     await createDeck(root, { title: '肠癌 AI 讲课 deck', goal: '给学生讲清肠癌 AI 的问题、方法与边界' });
@@ -372,110 +332,48 @@ test('runtimeWatch keeps deliverable-level review watch available without run lo
     assert.equal(blocked.state.current_status, 'blocked_for_revision');
     const watch = await runtimeWatch({ workspaceRoot: root, topicId: TOPIC_ID, deliverableId: DECK_ID });
     assert.equal(watch.ok, true);
-    assert.equal(watch.status, 'review_pending');
-    assert.equal(watch.review_state.current_status, 'blocked_for_revision');
-    assert.equal(watch.review_state.rerun_from_stage, 'render_html');
+    assert.equal(watch.surface_kind, 'rca_visual_review_refs_projection');
+    assert.equal(watch.visual_review_semantics.review_status, 'blocked_for_revision');
+    assert.equal(watch.visual_review_semantics.rerun_from_visual_stage, 'render_html');
+    assert.deepEqual(watch.visual_review_semantics.pending_visual_reviews, ['visual_peak_missing']);
+    assert.match(watch.review_state_refs.canonical_review_state_ref, /review-state\.json$/);
+    assert.match(watch.review_state_refs.publication_projection_ref, /publication-state\.json$/);
+    assert.deepEqual(watch.typed_blocker_refs.visual_review_blocker_refs, [
+      `${watch.review_state_refs.canonical_review_state_ref}#/pending_reviews`,
+      `${watch.review_state_refs.canonical_review_state_ref}#/blocking_reasons`,
+    ]);
+    assert.deepEqual(
+      watch.typed_blocker_refs.visual_review_blocker_refs,
+      watch.owner_evidence_refs.visual_review_blocker_refs,
+    );
+    assert.equal(watch.owner_boundary.classification, 'retained_current_refs_only_boundary');
+    assert.deepEqual(watch.owner_boundary.exports_only, [
+      'delivery_locator_refs',
+      'artifact_locator_refs',
+      'review_state_refs',
+      'typed_blocker_refs',
+      'owner_evidence_refs',
+      'visual_review_semantics',
+    ]);
+    for (const genericField of [
+      'run_id',
+      'current_stage',
+      'status',
+      'resumable',
+      'run_telemetry',
+      'error_taxonomy',
+      'rerun_analytics',
+      'cost_summary',
+      'approval_throughput_summary',
+      'publication_projection',
+      'gate_summary',
+      'operator_handoff',
+      'lifecycle_stage_summary',
+      'governance_surface',
+    ]) {
+      assert.equal(Object.hasOwn(watch, genericField), false, genericField);
+    }
   });
-});
-
-test('runtimeWatch rejects preloaded runs when locator identity is unsafe', async () => {
-  const topicRoot = workspace('redcube-runtime-watch-locator-mismatch-');
-  await completeTopicSource(topicRoot, { title: 'topic a source', brief: 'topic a', keywords: ['topic-a'] });
-  await completeSourceReadiness({ workspaceRoot: topicRoot, topicId: 'topic-b', title: 'topic b source', brief: 'topic b', keywords: ['topic-b'] });
-  for (const topicId of [TOPIC_ID, 'topic-b']) {
-    await createDeck(topicRoot, { topicId, profileId: 'defense_deck', title: `deck ${topicId}`, goal: `goal ${topicId}` });
-  }
-  await assert.rejects(
-    () => runtimeWatch({
-      workspaceRoot: topicRoot,
-      topicId: 'topic-b',
-      deliverableId: DECK_ID,
-      run: { run_id: 'run-topic-a-001', topic_id: TOPIC_ID, deliverable_id: DECK_ID, current_stage: 'storyline', status: 'completed' },
-    }),
-    /runtimeWatch topicId 与 run\.topic_id 不一致/,
-  );
-
-  const deliverableRoot = workspace('redcube-review-loop-preloaded-mismatch-');
-  await createDeck(deliverableRoot, { profileId: 'defense_deck', deliverableId: DECK_ID, title: 'deck a', goal: 'goal a' });
-  await createDeck(deliverableRoot, { profileId: 'defense_deck', deliverableId: 'deck-b', title: 'deck b', goal: 'goal b' });
-  await assert.rejects(
-    () => runtimeWatch({
-      workspaceRoot: deliverableRoot,
-      topicId: TOPIC_ID,
-      deliverableId: 'deck-b',
-      run: { run_id: 'run-1', topic_id: TOPIC_ID, deliverable_id: DECK_ID, current_stage: 'export_pptx', status: 'blocked', pending_reviews: ['backup_qa_ready'], resumable: true },
-    }),
-    /runtimeWatch deliverableId 与 run\.deliverable_id 不一致/,
-  );
-  await assert.rejects(
-    () => runtimeWatch({
-      workspaceRoot: deliverableRoot,
-      topicId: TOPIC_ID,
-      deliverableId: DECK_ID,
-      run: { run_id: 'run-1', current_stage: 'export_pptx', status: 'blocked', pending_reviews: ['backup_qa_ready'], resumable: true },
-    }),
-    /runtimeWatch run\.topic_id 与 run\.deliverable_id 不能为空/,
-  );
-});
-
-test('runtimeWatch exposes hydrated contract, source readiness, publication, and poster metric projections', async () => {
-  const exportRoot = workspace('redcube-review-loop-export-contract-');
-  await completeTopicSource(exportRoot, { title: '正式答辩 deck source', brief: '答辩 deck 需要清晰展示问题、方法、结果与答辩防守要点。', keywords: ['答辩', '结果', '问题'] });
-  await createDeck(exportRoot, { profileId: 'defense_deck', title: '正式答辩 deck', goal: '用于正式答辩并覆盖潜在质询' });
-  const exportWatch = await runtimeWatch({
-    workspaceRoot: exportRoot,
-    topicId: TOPIC_ID,
-    deliverableId: DECK_ID,
-    run: { run_id: 'run-1', topic_id: TOPIC_ID, deliverable_id: DECK_ID, current_stage: 'export_pptx', status: 'blocked', pending_reviews: ['backup_qa_ready'], resumable: true },
-  });
-  assertPptRunWatchIdentity(exportWatch);
-  assert.equal(exportWatch.source_readiness_summary?.status, 'pass');
-  assert.equal(exportWatch.source_readiness_summary?.canonical_source?.kind, 'shared_source_truth.source_readiness_gate');
-  assert.equal(exportWatch.gate_summary?.source_readiness_status, 'pass');
-  assert.equal(exportWatch.gate_summary?.source_planning_ready, true);
-  assert.equal(exportWatch.gate_summary?.approval_status, 'not_required');
-
-  await withMockCodexRuntime(async () => {
-    const noteRoot = workspace('redcube-review-loop-publication-');
-    await createXhs(noteRoot);
-    await runRoutes({ workspaceRoot: noteRoot, overlay: 'xiaohongshu', deliverableId: NOTE_ID, routes: XHS_FULL_ROUTES });
-    const publication = await runtimeWatch({
-      workspaceRoot: noteRoot,
-      topicId: TOPIC_ID,
-      deliverableId: NOTE_ID,
-      run: { run_id: 'run-1', topic_id: TOPIC_ID, deliverable_id: NOTE_ID, current_stage: 'publish_copy', status: 'completed', pending_reviews: [], resumable: false },
-    });
-    assert.equal(publication.surface_kind, 'runtime_watch');
-    assert.equal(publication.review_state.publish_state.current, 'approval_pending');
-    assert.equal(publication.publication_projection.current, 'approval_pending');
-    assert.equal(publication.quality_summary?.relative_quality_verdict, null);
-    assert.equal(publication.quality_summary?.baseline_promotion_state, null);
-    assert.equal(publication.approval_throughput_summary.publish_state, 'approval_pending');
-    assert.equal(publication.approval_throughput_summary.pending_review_count, 0);
-  });
-
-  const posterRoot = workspace('redcube-review-loop-poster-');
-  await createDeliverable({
-    workspaceRoot: posterRoot,
-    overlay: 'poster_onepager',
-    profileId: 'knowledge_poster',
-    topicId: TOPIC_ID,
-    deliverableId: 'poster-a',
-    title: '甲状腺门诊知识海报',
-    goal: '为门诊患者生成单页知识海报',
-  });
-  const poster = await runtimeWatch({
-    workspaceRoot: posterRoot,
-    topicId: TOPIC_ID,
-    deliverableId: 'poster-a',
-    run: { run_id: 'run-poster-1', topic_id: TOPIC_ID, deliverable_id: 'poster-a', current_stage: 'visual_direction', status: 'running', pending_reviews: [], resumable: true },
-  });
-  assert.equal(Array.isArray(poster.metric_extensions), true);
-  assert.equal(poster.metric_extensions.length, 1);
-  assert.equal(poster.metric_extensions[0].extension_id, 'poster_specific_metrics');
-  assert.equal(poster.metric_extensions[0].metrics.some((item) => item.metric_id === 'far_view_readability'), true);
-  assert.equal(poster.metric_extensions[0].metrics.some((item) => item.metric_id === 'print_export_safe'), true);
-  assert.equal(poster.metric_extensions[0].metrics.every((item) => item.status === 'not_evaluated'), true);
 });
 
 test('@redcube/domain-entry manifest declares runtime dependency for review loop actions', () => {

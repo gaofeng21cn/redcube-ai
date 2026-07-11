@@ -10,7 +10,6 @@ import {
   getPublicationProjection,
   getReviewState,
   intakeSource,
-  runtimeWatch,
 } from './product-domain-action-test-api.js';
 import { completeSourceReadiness } from './helpers/complete-source-readiness.js';
 
@@ -54,7 +53,7 @@ test('auditDeliverable blocks when source_audit passes but planning_ready is sti
   assert.equal(report.gate_summary?.source_next_required_surface, 'source_research');
 });
 
-test('planning_ready gate converges across audit/watch/review/projection after source research finishes', async () => {
+test('planning_ready gate converges across audit/review/projection after source research finishes', async () => {
   const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-source-gate-ready-'));
 
   const research = await completeSourceReadiness({
@@ -92,20 +91,6 @@ test('planning_ready gate converges across audit/watch/review/projection after s
     workspaceRoot,
     topicId: 'topic-a',
   });
-  const watch = await runtimeWatch({
-    workspaceRoot,
-    topicId: 'topic-a',
-    deliverableId: 'note-a',
-    run: {
-      run_id: 'run-note-a-001',
-      topic_id: 'topic-a',
-      deliverable_id: 'note-a',
-      overlay: 'xiaohongshu',
-      current_stage: 'source_readiness',
-      status: 'completed',
-    },
-  });
-
   assert.equal(audit.status, 'pass');
   assert.equal(audit.source_readiness_summary?.planning_ready, true);
   assert.equal(audit.gate_summary?.source_planning_ready, true);
@@ -113,6 +98,4 @@ test('planning_ready gate converges across audit/watch/review/projection after s
   assert.equal(review.gate_summary?.source_planning_ready, true);
   assert.equal(projection.publication.deliverables['note-a'].source_readiness_summary.planning_ready, true);
   assert.equal(projection.publication.deliverables['note-a'].gate_summary.source_planning_ready, true);
-  assert.equal(watch.source_readiness_summary?.planning_ready, true);
-  assert.equal(watch.gate_summary?.source_planning_ready, true);
 });

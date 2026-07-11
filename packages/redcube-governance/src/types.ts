@@ -79,25 +79,15 @@ export interface ReviewMutationResponse {
   publication_state_file: string | null;
 }
 
-export interface RuntimeWatchResponse {
+export interface VisualReviewRefProjectionResponse {
   ok: boolean;
-  surface_kind: 'runtime_watch';
-  run_id: string;
-  current_stage: string | null;
-  status: string;
-  pending_reviews: string[];
-  review_state: Record<string, unknown> | null;
-  quality_summary: Record<string, unknown>;
-  publication_projection: Record<string, unknown> | null;
-  source_readiness_summary: Record<string, unknown> | null;
-  gate_summary: Record<string, unknown> | null;
-  operator_handoff: Record<string, unknown> | null;
-  lifecycle_stage_summary: Record<string, unknown> | null;
-  governance_surface: GovernanceSurfaceContract;
-  resumable: boolean;
-  profile_id: string | null;
-  delivery_contract: Record<string, unknown> | null;
-  required_export_bundle: Record<string, unknown> | null;
+  surface_kind: 'rca_visual_review_refs_projection';
+  delivery_locator_refs: Record<string, unknown>;
+  visual_review_semantics: Record<string, unknown>;
+  review_state_refs: Record<string, unknown>;
+  artifact_locator_refs: Record<string, unknown>;
+  typed_blocker_refs: Record<string, unknown>;
+  owner_evidence_refs: Record<string, unknown>;
 }
 
 interface MetricExtensionRegistration {

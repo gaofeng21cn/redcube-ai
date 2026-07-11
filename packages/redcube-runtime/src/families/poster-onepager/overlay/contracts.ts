@@ -37,7 +37,7 @@ export const POSTER_DELIVERY_CONTRACT = Object.freeze({
   operator_handoff: {
     owner_surface: 'required_export_artifact.delivery_state',
     handoff_ready_state: 'output_ready',
-    gate_surfaces: ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection'],
+    gate_surfaces: ['auditDeliverable', 'getReviewState', 'getPublicationProjection'],
     reopen_mutation_surface: 'request_changes',
     closeout_mutation_surface: 'promote_baseline',
   },

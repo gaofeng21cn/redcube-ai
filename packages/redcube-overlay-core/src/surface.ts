@@ -139,7 +139,7 @@ export function validateDeliveryContractSurface(
     && content?.operator_handoff?.handoff_ready_state === 'output_ready'
     && Array.isArray(content?.operator_handoff?.gate_surfaces)
     && content.operator_handoff.gate_surfaces.includes('auditDeliverable')
-    && content.operator_handoff.gate_surfaces.includes('runtimeWatch')
+    && content.operator_handoff.gate_surfaces.includes('getReviewState')
     && content.operator_handoff.reopen_mutation_surface === 'request_changes'
     && content.operator_handoff.closeout_mutation_surface === 'promote_baseline';
 }
@@ -171,7 +171,7 @@ export function validateHydratedDeliverableSurface(
 ): boolean {
   return (!overlay || content?.overlay === overlay)
     && content?.source_truth_contract?.authoritative_surface === 'shared_source_truth'
-    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_runtime_watch'
+    && content?.source_truth_contract?.route_gate_rule === 'authoritative_fail_closed_in_audit_and_review_state'
     && content?.delivery_contract?.required_export_route === requiredExportRoute;
 }
 

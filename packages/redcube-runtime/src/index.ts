@@ -4,13 +4,13 @@ export {
   buildBaselineAuditSummary,
   buildGateSummary,
   buildSourceReadinessReport,
+  buildVisualReviewRefProjection,
   getPublicationProjection,
   getReviewState,
   isBaselineApprovedState,
   persistReviewStatePatch,
   rebuildTopicPublicationProjection,
   reviewRenderedDeliverable,
-  watchRuntimeReviewLoop,
 } from '@redcube/governance';
 export {
   buildRelativeQualityRubric,

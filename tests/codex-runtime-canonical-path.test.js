@@ -111,7 +111,6 @@ test('ppt_deck canonical mainline closes through Codex CLI runtime without drift
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      run: lastResult.run,
     });
 
     assert.equal(lastResult.run.current_stage, 'export_pptx');
@@ -120,12 +119,11 @@ test('ppt_deck canonical mainline closes through Codex CLI runtime without drift
     assert.deepEqual(audit.review_state, review.state);
     assert.deepEqual(withoutUpdatedAt(audit.publication_projection), withoutUpdatedAt(projection.publication));
     assert.equal(audit.governance_surface.runtime_topology.runtime_substrate_surface, 'codex_cli_runtime');
-    assert.equal(watch.run_id, lastResult.run.run_id);
-    assert.equal(watch.governance_surface.runtime_topology.runtime_substrate_owner, 'Codex CLI');
-    assert.equal(watch.review_state.current_status, review.state.current_status);
-    assert.equal(
-      watch.publication_projection.deliverables['deck-a'].current,
-      projection.publication.deliverables['deck-a'].current,
-    );
+    assert.equal(watch.surface_kind, 'rca_visual_review_refs_projection');
+    assert.equal(watch.visual_review_semantics.review_status, review.state.current_status);
+    assert.equal(watch.review_state_refs.canonical_review_state_ref, review.state_file);
+    assert.equal(watch.review_state_refs.publication_projection_ref, projection.projection_file);
+    assert.equal(Object.hasOwn(watch, 'run_id'), false);
+    assert.equal(Object.hasOwn(watch, 'governance_surface'), false);
   });
 });

@@ -168,9 +168,10 @@ test('platform review state tracks pending revisions and rerun loop for ppt_deck
     assert.deepEqual(blocked.state.pending_reviews, ['visual_peak_missing']);
 
     const watchBlocked = await runtimeWatch({ workspaceRoot, topicId: TOPIC_ID, deliverableId: 'deck-candidate' });
-    assert.equal(watchBlocked.status, 'review_pending');
-    assert.equal(watchBlocked.review_state.current_status, 'blocked_for_revision');
-    assert.equal(watchBlocked.review_state.rerun_from_stage, 'author_image_pages');
+    assert.equal(watchBlocked.surface_kind, 'rca_visual_review_refs_projection');
+    assert.equal(watchBlocked.visual_review_semantics.review_status, 'blocked_for_revision');
+    assert.equal(watchBlocked.visual_review_semantics.rerun_from_visual_stage, 'author_image_pages');
+    assert.deepEqual(watchBlocked.visual_review_semantics.pending_visual_reviews, ['visual_peak_missing']);
 
     const authorImagePages = await runDeliverableRoute({
       workspaceRoot,

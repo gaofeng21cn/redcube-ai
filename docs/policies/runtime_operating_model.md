@@ -52,7 +52,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 
 当前 canonical durable surfaces 固定为：
 
-- audit / watch：`auditDeliverable`、`runtimeWatch`
+- audit / visual refs：`auditDeliverable` 持有 audit gate；`runtimeWatch` 只投影 visual review/artifact/blocker/owner evidence refs
 - review / projection：`getReviewState`、`getPublicationProjection`
 - canonical artifacts：
   - `topics/<topic>/canonical/source-audit.json`
@@ -62,7 +62,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 
 当前 behavior convergence 继续要求：
 
-- `auditDeliverable` 与 `runtimeWatch` 在同一 deliverable/topic 边界上，不得脱离 canonical `review_state`、topic 级 `publication_projection` 与 hydrated `delivery_contract`
+- `auditDeliverable`、`getReviewState` 与 `getPublicationProjection` 在同一 deliverable/topic 边界上持有 gate/read truth；`runtimeWatch` 只能引用这些 canonical refs，不得复制 governance/publication/runtime body
 - `getReviewState` / `getPublicationProjection` 是权威表面；audit / watch 只能围绕它们收口，不能另写一套平行语义
 
 后续即使接入 upper-layer product shell、OPL App workbench 或托管展示面，也只能迁移宿主展示、projection 消费和 operator action transport，不能迁移 RCA execution handle、visual truth、review/export verdict 或 artifact authority。
@@ -123,7 +123,7 @@ Machine boundary: 人读运行模型 policy。机器真相继续归 contracts、
 | --- | --- |
 | Source readiness | `CLI` / `MCP` / product-entry 只暴露 source intake、readiness、augmentation、research trigger 和 fail-closed source gate；source truth 与 augmentation truth 归 source owner docs、contracts、canonical artifacts 和 tests。 |
 | Visual route lifecycle | `ppt_deck` 与 `xiaohongshu` 默认 image-first；`poster_onepager` 是 guarded knowledge poster；HTML 和 native editable PPTX 是显式可选路线。 |
-| Review / watch / projection | `auditDeliverable`、`runtimeWatch`、`getReviewState` 和 `getPublicationProjection` 围绕同一 `workspace/topic/deliverable/run` 与 hydrated delivery contract 收口，不能生成平行 review truth。 |
+| Review / visual refs / projection | `auditDeliverable`、`getReviewState` 和 `getPublicationProjection` 围绕同一 `workspace/topic/deliverable` 与 hydrated delivery contract 收口；`runtimeWatch` 只返回 visual refs 与必要视觉审阅语义，不能生成平行 review truth 或 generic runtime status。 |
 | Product/runtime handoff | direct product entry、service-safe domain entry、OPL stage-plan refs 和 Codex-default concrete executor 构成当前 repo-verified baseline；OPL/Temporal 持有通用 runtime 与 attempt ledger，RCA 持有 visual-domain authority。 |
 | Delivery / publication | `publication-state.json`、delivery contract、review state、operator handoff 和 lifecycle stage summary 只做 handoff / projection / gate 解释；RCA review/export verdict 和 artifact authority 仍由 owner receipt、typed blocker 和 workspace artifacts 证明。 |
 | Evidence tail | 真实 long-soak、production-like repeated route no-regression、memory/lifecycle receipt scaleout 和 generated/default caller thinning 继续由 active gap plan 与 production acceptance contracts 管理。 |

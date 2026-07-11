@@ -70,7 +70,7 @@ Typed native object fidelity、edit/save/package readback、true render 与 blin
 
 RCA domain handler guarded actions、forbidden writes、manifest generated descriptor refs、family action catalog、CLI help 和 MCP product-entry routes 从 RCA-owned canonical action/status metadata 派生。OPL 侧 generated descriptor id 可以继续是 `domain_action_adapter`；RCA repo-local active/default command 是 `domain-handler export|dispatch`。
 
-Product-entry manifest、session snapshot、runtimeWatch、operator evidence/stability projection 和 substrate adapter export 都只能是 refs-only projection / service-safe domain adapter / direct review read model。它们不能恢复为 RCA-owned generic product/session/workbench/domain_action_adapter wrapper owner，也不能写 visual truth、artifact body、memory body、review/export verdict 或 production-ready claim。
+Product-entry manifest、session snapshot、runtimeWatch、operator evidence/stability projection 和 substrate adapter export 都只能是 refs-only projection / service-safe domain adapter。`runtimeWatch` 特别限定为 visual review/artifact/blocker/owner evidence refs projection，不接受 generic run input，不展开 status/attempt/telemetry/lifecycle/resumable body；这些通用面由 OPL Console / Runway / Ledger 持有。上述 projection 不能恢复为 RCA-owned generic product/session/workbench/domain_action_adapter wrapper owner，也不能写 visual truth、artifact body、memory body、review/export verdict 或 production-ready claim。
 
 ### Private surface retirement 直接删除或 tombstone，不保留兼容面
 

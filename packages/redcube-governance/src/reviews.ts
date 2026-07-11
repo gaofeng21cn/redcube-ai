@@ -243,55 +243,69 @@ export function reviewRenderedDeliverable(request) {
   };
 }
 
-export function watchRuntimeReviewLoop(request) {
-  const run = request?.run || {};
-  const pendingReviews = Array.isArray(run?.pending_reviews)
-    ? run.pending_reviews.map((item) => String(item).trim()).filter(Boolean)
-    : [];
+export function buildVisualReviewRefProjection(request) {
+  if (!request?.workspaceRoot || !request?.topicId || !request?.deliverableId) {
+    throw new Error('visual review refs projection requires workspaceRoot, topicId, and deliverableId');
+  }
   const contract = loadHydratedContract(request);
   const reviewResponse = loadPlatformReviewState(request);
   const reviewState = reviewResponse?.state || null;
-  const governanceSurface = reviewResponse?.governance_surface || (contract ? buildGovernanceSurface(contract) : null);
-  const sourceReadinessSummary = reviewResponse?.source_readiness_summary || loadSourceReadinessSummary(request);
-  const publicationProjection = request?.workspaceRoot && request?.topicId
-    ? loadPublicationProjection({ workspaceRoot: request.workspaceRoot, topicId: request.topicId }).publication
-    : null;
+  const publicationResponse = loadPublicationProjection({
+    workspaceRoot: request.workspaceRoot,
+    topicId: request.topicId,
+  });
+  const publicationProjection = publicationResponse.publication;
   const publicationProjectionEntry = publicationProjection?.deliverables?.[request?.deliverableId] || null;
-  const operatorHandoff = reviewResponse?.operator_handoff || publicationProjectionEntry?.operator_handoff || null;
-  const lifecycleStageSummary = reviewResponse?.lifecycle_stage_summary || publicationProjectionEntry?.lifecycle_stage_summary || null;
   const relativeQuality = reviewState?.baseline?.relative_quality || null;
+  const pendingVisualReviews = Array.isArray(reviewState?.pending_reviews)
+    ? reviewState.pending_reviews.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  const blockingReasons = Array.isArray(reviewState?.blocking_reasons)
+    ? reviewState.blocking_reasons.map((item) => String(item).trim()).filter(Boolean)
+    : [];
+  const visualReviewBlockerRefs = [
+    ...(pendingVisualReviews.length > 0 ? [`${reviewResponse.state_file}#/pending_reviews`] : []),
+    ...(blockingReasons.length > 0 ? [`${reviewResponse.state_file}#/blocking_reasons`] : []),
+  ];
 
   return {
     ok: true,
-    surface_kind: 'runtime_watch',
-    run_id: String(run?.run_id || '').trim(),
-    current_stage: String(run?.current_stage || '').trim() || null,
-    status: reviewState?.pending_reviews?.length > 0 ? 'review_pending' : (pendingReviews.length > 0 ? 'review_pending' : String(run?.status || reviewState?.current_status || 'idle')),
-    pending_reviews: reviewState?.pending_reviews || pendingReviews,
-    review_state: reviewState,
-    quality_summary: {
+    surface_kind: 'rca_visual_review_refs_projection',
+    delivery_locator_refs: {
+      topic_id: request.topicId,
+      deliverable_id: request.deliverableId,
+      profile_id: String(contract?.profile_id || '').trim() || null,
+    },
+    visual_review_semantics: {
+      review_status: String(reviewState?.current_status || '').trim() || null,
+      pending_visual_reviews: pendingVisualReviews,
+      blocking_reasons: blockingReasons,
+      rerun_from_visual_stage: String(reviewState?.rerun_from_stage || '').trim() || null,
+      ready_for_export: Boolean(reviewState?.ready_for_export),
       relative_quality_verdict: relativeQuality?.verdict || null,
       degradations: Array.isArray(relativeQuality?.degradations) ? relativeQuality.degradations : [],
       improvements: Array.isArray(relativeQuality?.improvements) ? relativeQuality.improvements : [],
       acceptable_changes: Array.isArray(relativeQuality?.acceptable_changes) ? relativeQuality.acceptable_changes : [],
-      baseline_promotion_state: reviewState?.baseline?.promotion_state || null,
-      promoted_reference_id: reviewState?.baseline?.promoted_reference_id || null,
     },
-    publication_projection: publicationProjection,
-    source_readiness_summary: sourceReadinessSummary,
-    gate_summary: reviewResponse?.gate_summary || publicationProjectionEntry?.gate_summary || buildGateSummary({
-      sourceReadinessSummary,
-      reviewState,
-      contract,
-      publicationProjectionEntry,
-      operatorHandoff,
-    }),
-    operator_handoff: operatorHandoff,
-    lifecycle_stage_summary: lifecycleStageSummary,
-    governance_surface: governanceSurface,
-    resumable: Boolean(run?.resumable),
-    profile_id: String(contract?.profile_id || '').trim() || null,
-    delivery_contract: contract?.delivery_contract || null,
-    required_export_bundle: contract?.export_bundle || null,
+    review_state_refs: {
+      review_state_action_ref: 'domain-handler:getReviewState',
+      canonical_review_state_ref: reviewResponse.state_file,
+      review_history_ref: reviewResponse.history_file,
+      publication_projection_action_ref: 'domain-handler:getPublicationProjection',
+      publication_projection_ref: publicationResponse.projection_file,
+    },
+    artifact_locator_refs: {
+      artifact_locator_contract_ref: 'contracts/artifact_locator_contract.json',
+      canonical_export_artifact_ref: publicationProjectionEntry?.canonical_export_artifact || null,
+    },
+    typed_blocker_refs: {
+      visual_review_blocker_refs: visualReviewBlockerRefs,
+    },
+    owner_evidence_refs: {
+      review_state_ref: reviewResponse.state_file,
+      publication_projection_ref: publicationResponse.projection_file,
+      visual_review_blocker_refs: visualReviewBlockerRefs,
+      canonical_export_artifact_ref: publicationProjectionEntry?.canonical_export_artifact || null,
+    },
   };
 }

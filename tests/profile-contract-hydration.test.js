@@ -167,7 +167,7 @@ test('hydrateDeliverableContract resolves ppt lecture_student contract as machin
   assert.equal(contract.delivery_contract.operator_handoff.handoff_ready_state, 'output_ready');
   assert.deepEqual(
     contract.delivery_contract.operator_handoff.gate_surfaces,
-    ['auditDeliverable', 'runtimeWatch', 'getReviewState', 'getPublicationProjection'],
+    ['auditDeliverable', 'getReviewState', 'getPublicationProjection'],
   );
   assert.equal(contract.delivery_contract.operator_handoff.reopen_mutation_surface, 'request_changes');
   assert.equal(contract.delivery_contract.operator_handoff.closeout_mutation_surface, 'promote_baseline');

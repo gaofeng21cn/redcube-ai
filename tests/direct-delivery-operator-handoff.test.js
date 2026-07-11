@@ -22,7 +22,7 @@ async function runRoutes(workspaceRoot, overlay, topicId, deliverableId, routes)
   }
 }
 
-test('direct-delivery families expose one aligned operator_handoff summary across audit/watch/review/projection surfaces', async () => {
+test('direct-delivery families keep operator handoff on audit/review/projection while runtimeWatch stays refs-only', async () => {
   await withMockCodexRuntime(async () => {
     const workspaceRoot = mkdtempSync(path.join(os.tmpdir(), 'redcube-direct-handoff-'));
     await completeSourceReadiness({
@@ -59,23 +59,16 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'deck-a',
-      run: {
-        run_id: 'run-deck-a-001',
-        topic_id: 'topic-a',
-        deliverable_id: 'deck-a',
-        overlay: 'ppt_deck',
-        current_stage: 'export_pptx',
-        status: 'completed',
-      },
     });
 
     const projectionEntry = projection.publication.deliverables['deck-a'];
     assert.deepEqual(review.operator_handoff, projectionEntry.operator_handoff);
     assert.deepEqual(audit.operator_handoff, projectionEntry.operator_handoff);
-    assert.deepEqual(watch.operator_handoff, projectionEntry.operator_handoff);
     assert.deepEqual(review.lifecycle_stage_summary, projectionEntry.lifecycle_stage_summary);
     assert.deepEqual(audit.lifecycle_stage_summary, projectionEntry.lifecycle_stage_summary);
-    assert.deepEqual(watch.lifecycle_stage_summary, projectionEntry.lifecycle_stage_summary);
+    assert.equal(watch.artifact_locator_refs.canonical_export_artifact_ref, projectionEntry.canonical_export_artifact);
+    assert.equal(Object.hasOwn(watch, 'operator_handoff'), false);
+    assert.equal(Object.hasOwn(watch, 'lifecycle_stage_summary'), false);
     assert.equal(review.operator_handoff.handoff_kind, 'direct_delivery_operator');
     assert.equal(review.operator_handoff.gate_status, 'ready');
     assert.equal(review.operator_handoff.delivery_state_owner, 'required_export_artifact.delivery_state');
@@ -93,7 +86,6 @@ test('direct-delivery families expose one aligned operator_handoff summary acros
     assert.equal(review.lifecycle_stage_summary.route_to_human_stage.detailed_outline, 'plan');
     assert.equal(review.lifecycle_stage_summary.route_to_human_stage.export_pptx, 'delivery');
     assert.equal(audit.gate_summary.operator_handoff_status, 'ready');
-    assert.equal(watch.gate_summary.operator_handoff_status, 'ready');
     assert.equal(audit.gate_summary.delivery_state_owner, 'required_export_artifact.delivery_state');
   });
 });
@@ -173,14 +165,6 @@ test('human-publication family keeps explicit publish gate and does not expose d
       workspaceRoot,
       topicId: 'topic-a',
       deliverableId: 'note-a',
-      run: {
-        run_id: 'run-note-a-001',
-        topic_id: 'topic-a',
-        deliverable_id: 'note-a',
-        overlay: 'xiaohongshu',
-        current_stage: 'export_bundle',
-        status: 'completed',
-      },
     });
 
     assert.equal(review.operator_handoff ?? null, null);
@@ -189,8 +173,8 @@ test('human-publication family keeps explicit publish gate and does not expose d
     assert.equal(projection.publication.deliverables['note-a'].lifecycle_stage_summary ?? null, null);
     assert.equal(audit.operator_handoff ?? null, null);
     assert.equal(audit.lifecycle_stage_summary ?? null, null);
-    assert.equal(watch.operator_handoff ?? null, null);
-    assert.equal(watch.lifecycle_stage_summary ?? null, null);
+    assert.equal(Object.hasOwn(watch, 'operator_handoff'), false);
+    assert.equal(Object.hasOwn(watch, 'lifecycle_stage_summary'), false);
     assert.equal(projection.publication.deliverables['note-a'].current, 'approval_pending');
   });
 });

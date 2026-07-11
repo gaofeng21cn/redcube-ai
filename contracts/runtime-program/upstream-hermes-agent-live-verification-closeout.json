@@ -53,7 +53,7 @@
   ],
   "boundary_assertions": [
     "upstream Hermes-Agent live run surface was verified in this closeout, while current OPL-hosted route is mediated by OPL hosted integration",
-    "RedCube continues to own auditDeliverable, runtimeWatch, getReviewState, and getPublicationProjection truth",
+    "RedCube continues to own auditDeliverable, getReviewState, and getPublicationProjection truth; runtimeWatch only projects visual review and evidence refs",
     "guarded poster_onepager remains limited to the knowledge-poster boundary and does not activate academic poster semantics"
   ],
   "verification": {

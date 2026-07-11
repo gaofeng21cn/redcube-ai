@@ -21,7 +21,7 @@ const EXPECTED_SURFACES = [
   ['redcube_domain_entry_package_protocol_boundary', 'package_protocol_boundary', 'package_protocol_boundary_for_domain_action_protocol_not_public_framework_identity'],
   ['product_entry_continuity_refs_adapter', 'refs_only_read_model', 'entry_session_domain_snapshot_refs_only_adapter_consuming_opl_generated_session_shell'],
   ['workspace_run_envelope_helpers', 'refs_only_read_model', 'workspace_and_run_locator_envelope_refs_only_adapter_not_attempt_ledger'],
-  ['runtime_watch_projection', 'retained_current_refs_only_boundary', 'run_review_existing_run_locator_refs_only_projection_not_supervisor'],
+  ['runtime_watch_projection', 'retained_current_refs_only_boundary', 'visual_review_artifact_blocker_owner_evidence_refs_projection_not_runtime_status'],
   ['domain_action_adapter_guarded_actions', 'domain_handler_target', 'guarded_domain_action_target_and_refs_only_domain_action_adapter_adapter_not_domain_action_adapter_owner'],
   ['operator_evidence_stability_projection', 'retained_current_refs_only_boundary', 'domain_evidence_typed_blocker_receipt_and_artifact_locator_refs_only'],
   ['product_entry_manifest_projection', 'refs_only_read_model', 'thin_domain_authority_refs_adapter_not_generated_wrapper_owner'],
@@ -166,6 +166,14 @@ test('RCA physical source morphology policy classifies active source tails witho
   ]);
   assert.deepEqual(byId.runtime_watch_projection.machine_boundary_refs, [
     'packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts#RUNTIME_WATCH_BOUNDARY',
+  ]);
+  assert.deepEqual(byId.runtime_watch_projection.allowed_outputs, [
+    'delivery_locator_refs',
+    'artifact_locator_refs',
+    'review_state_refs',
+    'typed_blocker_refs',
+    'owner_evidence_refs',
+    'visual_review_semantics',
   ]);
 
   const gate = policy.default_caller_tail_thinning_gate;

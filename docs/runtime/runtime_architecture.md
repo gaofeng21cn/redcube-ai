@@ -72,7 +72,7 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 | `program_id` | active mainline pointer、program truth 与 absorbed provenance routing |
 | `topic_id` | topic 聚合根，承载 source audit 与 publication projection |
 | `deliverable_id` | topic 内交付物身份，承载 delivery contract、review state 与 export readiness |
-| `run_id` | 单次 route execution 句柄，承载 telemetry、OPL attempt / provider ledger refs、runtime watch locator 与 refs-only event projection；RCA 不再写 repo-local event log |
+| `run_id` | OPL stage attempt / provider ledger 持有的单次 execution 句柄；RCA route response 只回传对应 refs，不再由 `runtimeWatch` 聚合或保存 status / telemetry / lifecycle |
 
 当前 canonical callable surfaces 固定为：
 
@@ -82,13 +82,13 @@ RCA 长线实现语言面保持 `TypeScript + Python`：
 | `invokeOplHostedProductEntry` | OPL-hosted integration，仍回到同一 downstream RedCube entry |
 | `invokeDomainEntry` / `invoke_domain_entry` | service-safe domain entry |
 | `auditDeliverable` | gate judgement，并回指 canonical review state、publication projection 与 hydrated delivery contract |
-| `runtimeWatch` | run / progress / escalation read model，必须和 review/publication projection 对齐 |
+| `runtimeWatch` | visual review / artifact / blocker / owner evidence refs projection；不返回通用 run status、attempt、telemetry、lifecycle 或 resumable shell |
 | `getReviewState` | review truth read surface |
 | `getPublicationProjection` | publication / handoff projection read surface |
 
 ## Watch / Projection
 
-`runtimeWatch` 是读模型和治理投影，不是第二套 runtime truth。它必须围绕同一组 `workspaceRoot`、`topic_id`、`deliverable_id`、`run_id` 与 artifact refs 读取状态，并与 `getReviewState`、`getPublicationProjection`、`auditDeliverable` 对齐。
+`runtimeWatch` 只围绕 `workspaceRoot`、`topic_id`、`deliverable_id` 投影 RCA-owned visual review 摘要及 canonical review/artifact/blocker/owner evidence refs。它不再接收 `run` / `runId`，也不展开 `status`、`current_stage`、`resumable`、telemetry、cost、publication、gate、operator handoff、lifecycle 或 governance body。通用状态、attempt 和生命周期由 OPL generated Console / Runway / Ledger 读取；权威 review/export gate 继续由 `auditDeliverable`、`getReviewState` 与 `getPublicationProjection` 持有。
 
 OPL 侧通过 generated `domain_action_adapter` descriptor 进入 RCA `domain-handler export|dispatch` target。机器 action set 由 action catalog、product-entry manifest、domain handler source 和 contracts 持有；本文不保存逐 action 清单。
 
@@ -96,7 +96,7 @@ OPL 侧通过 generated `domain_action_adapter` descriptor 进入 RCA `domain-ha
 | --- | --- |
 | `domain-handler export` | 只暴露 action-handler、domain-authority、domain-evidence、typed-blocker、receipt 与 artifact-locator refs；不生成通用 runtime、session/workbench、operator、stability 或 readiness projection。 |
 | `domain-handler dispatch` | 只接受 RCA-owned guarded actions，并只返回 receipt、typed blocker、no-regression、memory/lifecycle 或 workspace evidence refs。 |
-| `runtimeWatch` | direct review/progress read model；`runtime_watch` 不再是 generated `domain_action_adapter` default dispatch action。 |
+| `runtimeWatch` | visual review/artifact/blocker/owner evidence refs projection；generic runtime input fail-closed 到 OPL Console / Runway / Ledger，且 `runtime_watch` 不再是 generated `domain_action_adapter` default dispatch action。 |
 | retired managed / continuation actions | 只作为 tombstone、negative guard 或 history/provenance 读取；generic supervision / continuation 归 OPL runner/session shell。 |
 
 DomainActionAdapter 不写 visual truth、canonical artifacts、memory body、review verdict 或 publication gate。任何生成、修复、审阅、导出或 memory accept/reject 都必须回到 RCA-owned route、authority function、review/export gate、owner receipt 或 typed blocker。OPL hosted integration 和 Temporal provider 只能调度、唤醒、投影并保存 locator/projection/receipt refs；真实 OPL Temporal controlled visual-stage long soak 仍是 pending runtime proof。

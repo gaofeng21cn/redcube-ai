@@ -79,6 +79,52 @@
       "provenance"
     ]
   },
+  "runtime_watch_thinning": {
+    "status": "generic_runtime_status_shell_retired",
+    "source_ref": "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts",
+    "governance_projection_ref": "packages/redcube-governance/src/reviews.ts#buildVisualReviewRefProjection",
+    "surface_kind": "rca_visual_review_refs_projection",
+    "allowed_outputs": [
+      "delivery_locator_refs",
+      "visual_review_semantics",
+      "review_state_refs",
+      "artifact_locator_refs",
+      "typed_blocker_refs",
+      "owner_evidence_refs"
+    ],
+    "retired_generic_outputs": [
+      "run_id",
+      "current_stage",
+      "status",
+      "resumable",
+      "run_telemetry",
+      "error_taxonomy",
+      "rerun_analytics",
+      "cost_summary",
+      "approval_throughput_summary",
+      "publication_projection",
+      "gate_summary",
+      "operator_handoff",
+      "lifecycle_stage_summary",
+      "governance_surface"
+    ],
+    "generic_runtime_status_owner": "one-person-lab",
+    "generic_runtime_consumers": [
+      "opl_generated_console",
+      "opl_runway",
+      "opl_ledger"
+    ],
+    "rca_retained_authority": [
+      "visual_review_semantics",
+      "visual_review_export_verdict",
+      "visual_artifact_authority",
+      "visual_typed_blocker",
+      "owner_evidence_refs"
+    ],
+    "accepts_generic_run_input": false,
+    "compatibility_facade_allowed": false,
+    "fallback_allowed": false
+  },
   "physical_deletion_guard": {
     "surface_kind": "rca_private_platform_retirement_guard",
     "state": "no_cleanup_candidates_current_roles_guarded",

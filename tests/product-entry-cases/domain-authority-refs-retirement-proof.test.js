@@ -3,6 +3,7 @@ import {
   exportDomainHandler,
   fileURLToPath,
   getProductEntryManifest,
+  getProductStatus,
   path,
   prepareProductEntryWorkspace,
   readJson,
@@ -115,6 +116,38 @@ test('product-entry returns only domain evidence, blocker, receipt, and artifact
     assert.equal(manifest.authority_boundary.opl_can_create_owner_receipt, false);
     assert.equal(manifest.authority_boundary.opl_can_create_typed_blocker, false);
     assert.equal(manifest.authority_boundary.projection_can_claim_domain_ready, false);
+  });
+});
+
+test('product status remains a refs-only domain projection without runtime telemetry or lifecycle body', async () => {
+  await withMockCodexRuntimeState(async () => {
+    const status = await getProductStatus({
+      workspace_root: await prepareProductEntryWorkspace(),
+    });
+
+    assert.deepEqual(Object.keys(status).sort(), [
+      'artifact_locator_refs',
+      'authority_boundary',
+      'consumer',
+      'domain_evidence_refs',
+      'ok',
+      'owner',
+      'receipt_refs',
+      'surface_kind',
+      'target_domain_id',
+      'typed_blocker_refs',
+    ]);
+    for (const genericField of [
+      'status',
+      'current_stage',
+      'resumable',
+      'telemetry',
+      'cost_summary',
+      'lifecycle_stage_summary',
+      'governance_surface',
+    ]) {
+      assert.equal(Object.hasOwn(status, genericField), false, genericField);
+    }
   });
 });
 

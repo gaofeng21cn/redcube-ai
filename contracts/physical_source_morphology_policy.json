@@ -346,12 +346,14 @@
         "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts"
       ],
       "classification": "retained_current_refs_only_boundary",
-      "current_rca_role": "run_review_existing_run_locator_refs_only_projection_not_supervisor",
+      "current_rca_role": "visual_review_artifact_blocker_owner_evidence_refs_projection_not_runtime_status",
       "allowed_outputs": [
-        "run_status_refs",
+        "delivery_locator_refs",
         "artifact_locator_refs",
         "review_state_refs",
-        "typed_blocker"
+        "typed_blocker_refs",
+        "owner_evidence_refs",
+        "visual_review_semantics"
       ],
       "legacy_name_allowance": {
         "legacy_terms": [
@@ -361,7 +363,7 @@
           "retained_current_refs_only_boundary",
           "negative_test_guard"
         ],
-        "rationale": "runtimeWatch is a direct review/progress refs read model and remains retired from domain_action_adapter default dispatch.",
+        "rationale": "runtimeWatch is a visual review refs projection; generic run status, attempts, telemetry, lifecycle, resumability, and supervision belong to OPL generated surfaces.",
         "compatibility_alias_allowed": false,
         "callable_alias_allowed": false,
         "public_identity_allowed": false,
@@ -1168,7 +1170,7 @@
       {
         "surface_id": "runtime_watch_projection",
         "classification": "retained_current_refs_only_boundary",
-        "current_rca_role": "run_review_existing_run_locator_refs_only_projection_not_supervisor",
+        "current_rca_role": "visual_review_artifact_blocker_owner_evidence_refs_projection_not_runtime_status",
         "source_refs": [
           "packages/redcube-domain-entry/src/actions/run-review-ref-projection.ts"
         ]

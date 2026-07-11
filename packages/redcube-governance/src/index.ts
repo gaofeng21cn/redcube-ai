@@ -1,8 +1,8 @@
 export {
   auditDeliverableRequest,
   buildBaselineAuditSummary,
+  buildVisualReviewRefProjection,
   reviewRenderedDeliverable,
-  watchRuntimeReviewLoop,
 } from './reviews.js';
 export {
   applyReviewMutation,
@@ -30,5 +30,5 @@ export type {
   ReviewMutationResponse,
   ReviewStateResponse,
   ReviewSurfaceResult,
-  RuntimeWatchResponse,
+  VisualReviewRefProjectionResponse,
 } from './types.js';
