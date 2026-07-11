@@ -194,6 +194,9 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/owner-boundary.ts',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/review_projection',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/visual-transition-evaluator.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/opl-generic-boundaries.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts',
+      'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts',
     ],
     activeCallers: ['visual director review', 'screenshot review', 'repair_image_pages', 'domain-handler review projection refs'],
     activeCallerStatus: 'active_domain_review_gate',
@@ -238,6 +241,10 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
       'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/manifest-return.ts#/operator_evidence_readiness_projection',
       'packages/redcube-domain-entry/src/actions/get-product-status.ts',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter.ts#/mapped_surfaces/operator_evidence_readiness_projection',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/contracts.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/goal-workflow-agent-lab-suite.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/ppt-three-route-agent-lab-suite.ts',
     ],
     activeCallers: [
       'OPL generated product status/workbench consumes RCA operator evidence refs',
@@ -268,8 +275,9 @@ const RCA_PRIVATIZED_FUNCTIONAL_MODULE_AUDIT_ITEMS = Object.freeze([
     codePaths: [
       'apps/redcube-cli/src/cli.ts',
       'packages/redcube-domain-entry/src/actions/family-action-catalog.ts',
-      'packages/redcube-domain-entry/src/actions/family-action-catalog.ts',
       'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/guarded-action-catalog.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts',
     ],
     activeCallers: [
       'OPL generated CLI/MCP wrapper domain handler targets',

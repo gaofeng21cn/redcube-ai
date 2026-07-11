@@ -21,7 +21,8 @@
     "opl_projection_ref": "agent/principles/opl-standard-agent-principles.md",
     "domain_specialization_ref": "agent/principles/domain-specialization.md",
     "domain_specific_principles_ref": "agent/principles/redcube-ai-principles.md",
-    "stage_control_plane_ref": "contracts/stage_control_plane.json",
+    "stage_manifest_ref": "agent/stages/manifest.json",
+    "stage_control_plane_ref": "opl-generated:family_stage_control_plane",
     "capability_map_ref": "contracts/capability_map.json",
     "pack_compiler_input_ref": "contracts/pack_compiler_input.json",
     "action_catalog_ref": "contracts/action_catalog.json",
@@ -31,7 +32,7 @@
   "domain_mapping": {
     "domain_intake": {
       "principle_id": "domain_intake_mapping",
-      "domain_stage_ref": "contracts/stage_control_plane.json#/stages/0",
+      "domain_stage_ref": "agent/stages/manifest.json#/stages/0",
       "stage_id": "source_intake",
       "prompt_ref": "agent/prompts/source_intake.md",
       "is_standalone_skill": false,
@@ -53,7 +54,7 @@
       "domain_source_refs": [
         "contracts/domain_descriptor.json",
         "contracts/pack_compiler_input.json",
-        "contracts/stage_control_plane.json",
+        "agent/stages/manifest.json",
         "contracts/action_catalog.json",
         "contracts/artifact_locator_contract.json",
         "contracts/memory_descriptor.json"

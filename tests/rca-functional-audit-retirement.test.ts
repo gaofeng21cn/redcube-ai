@@ -2,7 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 
 import {
   activeShellScripts,
@@ -26,6 +26,11 @@ function assertAllFalse(record, label) {
 
 function byId(entries, key = 'module_id') {
   return Object.fromEntries(entries.map((entry) => [entry[key], entry]));
+}
+
+function sourcePathCoversFile(sourcePath, filePath) {
+  const normalized = String(sourcePath).split('#')[0].replace(/\/+$/, '');
+  return filePath === normalized || filePath.startsWith(`${normalized}/`);
 }
 
 function assertSourceRefsResolve(entry, label) {
@@ -271,4 +276,71 @@ test('RCA owns declarative visual transition and Agent Lab cost profiles', () =>
   } = costProfile.authority_boundary;
   assert.equal(costRefsOnly, true);
   assertAllFalse(costForbiddenAuthority, 'agent_lab_cost_profile.authority_boundary');
+});
+
+test('RCA standard-agent contracts bind the declarative manifest and OPL state-index sidecar', () => {
+  const foundryAgentSeries = readJson('contracts/foundry_agent_series.json');
+  const principles = readJson('contracts/standard-agent-principles-adoption.json');
+  const stateIndexAdoptionPath = 'contracts/state_index_kernel_adoption.json';
+
+  assert.equal(foundryAgentSeries.stage_manifest_ref, 'agent/stages/manifest.json');
+  assert.equal(foundryAgentSeries.stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+  assert.equal(foundryAgentSeries.shared_release_pin_strategy.owner_managed_latest_stable_channel_required, true);
+  assert.equal(foundryAgentSeries.shared_release_pin_strategy.lockfile_resolved_commit_receipt_required, true);
+  assert.equal(foundryAgentSeries.shared_release_pin_strategy.consumer_exact_commit_equality_gate, false);
+  assert.equal(foundryAgentSeries.required_identity_fields.includes('stage_manifest_ref'), true);
+
+  assert.equal(principles.source_refs.stage_manifest_ref, 'agent/stages/manifest.json');
+  assert.equal(principles.source_refs.stage_control_plane_ref, 'opl-generated:family_stage_control_plane');
+  assert.equal(principles.domain_mapping.domain_intake.domain_stage_ref, 'agent/stages/manifest.json#/stages/0');
+
+  assert.equal(existsSync(stateIndexAdoptionPath), true);
+  const stateIndexAdoption = readJson(stateIndexAdoptionPath);
+  assert.equal(stateIndexAdoption.surface_kind, 'opl_state_index_kernel_adoption');
+  assert.equal(stateIndexAdoption.sqlite_role, 'rebuildable_refs_only_sidecar_index');
+  assert.equal(stateIndexAdoption.authority_boundary.sqlite_sidecar_source_of_truth, false);
+  assert.equal(stateIndexAdoption.authority_boundary.domain_repo_can_own_generic_sqlite_persistence_engine, false);
+});
+
+test('RCA source-behavior audit covers only precise refs-only and authority paths', () => {
+  const audit = readJson('contracts/functional_privatization_audit.json');
+  const modules = byId(audit.modules);
+  const expectedCoverage = {
+    generic_cli_mcp_wrappers: [
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/dispatch-receipt-actions.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/domain_action_adapter-export-projection.ts',
+    ],
+    operator_projection_shell: [
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/contracts.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/goal-workflow-agent-lab-suite.ts',
+      'packages/redcube-domain-entry/src/actions/get-product-entry-manifest-parts/ppt-three-route-agent-lab-suite.ts',
+    ],
+    review_repair_transport: [
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/opl-generic-boundaries.ts',
+      'packages/redcube-domain-entry/src/actions/domain-action-adapter-parts/privatized-functional-module-audit.ts',
+      'packages/redcube-domain-entry/src/actions/guarded-domain-actions.ts',
+    ],
+    visual_authority_functions: [
+      'packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/functional-closure.ts',
+      'packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/runtime-descriptors.ts',
+      'packages/redcube-domain-entry/src/actions/domain-authority-refs-parts/domain-memory-descriptors.ts',
+      'packages/redcube-domain-entry/src/actions/product-entry-deliverable.ts',
+      'packages/redcube-domain-entry/src/actions/native-ppt-product-entry-proof.ts',
+    ],
+  };
+
+  for (const [moduleId, sourcePaths] of Object.entries(expectedCoverage)) {
+    const codePaths = modules[moduleId].codePaths ?? [];
+    for (const sourcePath of sourcePaths) {
+      assert.equal(
+        codePaths.some((candidate) => sourcePathCoversFile(candidate, sourcePath)),
+        true,
+        `${moduleId} must cover ${sourcePath}`,
+      );
+    }
+  }
+
+  const allCodePaths = Object.values(modules).flatMap((entry) => entry.codePaths ?? []);
+  assert.equal(allCodePaths.includes('packages/redcube-domain-entry/src/actions/'), false);
 });
